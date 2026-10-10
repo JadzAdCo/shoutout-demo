@@ -203,7 +203,7 @@
         <div class="ad-mgmt-info">
           <h4>${esc(c.title || "Untitled ad")}</h4>
           <p class="small">${esc(c.body || "")}</p>
-          <p class="small"><strong>Status:</strong> ${esc(c.status)} · <strong>Payment:</strong> ${esc(c.paymentStatus || "unpaid")} (${esc(c.paymentMode || "—")}) · ${esc(money(c.priceCents))}${c.invoiceNumber ? ` · <a href="./ad-invoice.html?v=${esc(root.FLOQRNav?.appVersion || "")}&n=${encodeURIComponent(c.invoiceNumber)}" target="_blank" rel="noopener">${esc(c.invoiceNumber)}</a>` : ""}</p>
+          <p class="small"><strong>Status:</strong> ${esc(c.status)} · <strong>Payment:</strong> ${esc(c.paymentStatus || "unpaid")} (${esc(c.paymentMode || "—")}) · ${esc(money(c.priceCents))}${c.invoiceNumber ? ` · <a href="./ad-invoice.html?n=${encodeURIComponent(c.invoiceNumber)}" target="_blank" rel="noopener">${esc(c.invoiceNumber)}</a>` : ""}</p>
           <p class="small"><strong>Posted by:</strong> ${esc(c.posterLabel || c.advertiser || "—")} (${esc(c.posterType || "—")}) · <strong>Source:</strong> ${esc(c.source || "portal")}${c.intakeChannel ? ` via ${esc(c.intakeChannel)}` : ""}</p>
           <p class="small"><strong>Placement:</strong> ${esc(c.placementType || "inline")} · ${esc(c.runDays || "—")} days · ${esc(formatWhen(c.startsAtMs || c.proposedStartsAtMs))} → ${esc(formatWhen(c.endsAtMs || c.proposedEndsAtMs))}</p>
           <p class="small"><strong>Audience:</strong> ${esc(demographicsText(c))}</p>

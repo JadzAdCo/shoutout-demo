@@ -34,7 +34,7 @@ Until DNS/hosting flip, patrons keep using GitHub Pages; account-level prefs in 
 1. **Do not** invent a second production brand origin. New links, emails, Store listings, and privacy copy use `https://www.floqr.com` (or relative paths resolved via canonical config).
 2. **Do not** hardcode `jadzadco.github.io/shoutout-demo` in new features. Prefer `FLOQRNav` / a single `FLOQR_CANONICAL_ORIGIN` (or equivalent) with staging override for Pages.
 3. **Display / Xibo URLs** stay `display.html?location=` / `display2.html?location=` with **no** `?v=` — only the **host** changes at cutover (`https://www.floqr.com/display.html?location=…`).
-4. Interactive pages may keep `?v=` cache-bust via `FLOQRNav.appVersion` on the new host.
+4. Page links never carry `?v=` (owner decision Oct 10 2026) — on Pages or on the new host. Only asset tags (`<script src>` / `<link href>`) are cache-busted, by the bump script. Old `?v=` URLs keep working (ignored).
 5. Privacy / CCPA / Consent Mode work must assume final policy URL: `https://www.floqr.com/privacy.html` (path may adjust; **host must be floqr.com**).
 6. Preview-email / diagnostics defaults that still point at github.io are **staging**; at cutover they must switch to `www.floqr.com`.
 7. Hybrid native: deep links and universal links target `www.floqr.com`, not Pages.

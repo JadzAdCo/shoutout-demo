@@ -82,7 +82,7 @@
       return {
         answer: "I can help with that from Settings > AI Notification Preferences. I will only use public, shared, or permissioned venue/event data.",
         results: [],
-        actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications&v=29.09.8"}]
+        actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications"}]
       };
     }
     if (/background|template|studio|floral|tattoo|design/.test(lower) && window.FLOQRStudio) {
@@ -109,9 +109,9 @@
   }
 
   function suggestedAction(item) {
-    if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}&v=29.09.8`};
-    if (item.type === "event") return {label:`View ${item.title}`, href:`./?v=29.09.8`};
-    if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./?v=29.09.8"};
+    if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}`};
+    if (item.type === "event") return {label:`View ${item.title}`, href:`./`};
+    if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./"};
     return null;
   }
 

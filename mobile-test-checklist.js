@@ -3,12 +3,6 @@
   "use strict";
 
   const BASE = "https://jadzadco.github.io/shoutout-demo";
-  const V_PORTAL = "29.09.19";
-  const V_ADMIN = "29.09.18";
-  const V_COMMERCE = "29.09.14";
-  const V_MINGL = "29.09.17";
-  const V_GIST = "29.09.14";
-  const V_SEED = "29.09.14";
   const CASAMARA = "casamara-rooftop-washington-dc";
 
   const TESTS = [
@@ -16,55 +10,55 @@
       id: "dc-casamara",
       title: "DC venues / Casamara",
       detail: "Open Casamara Club Admin. Spot-check events + Advertising tab loads. (Optional: another DC venue if you have time.)",
-      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}`
+      href: `${BASE}/admin.html?location=${CASAMARA}`
     },
     {
       id: "adv-media-upload",
       title: "Advertising — device media upload",
       detail: "Advertising panel → template input: upload a local photo/video from the phone (not only a URL). Confirm preview sticks.",
-      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
+      href: `${BASE}/admin.html?location=${CASAMARA}#panelMarketingAdPerformance`
     },
     {
       id: "adv-stripe-10",
       title: "Advertising — $10 Buy → Stripe",
       detail: "Same Advertising panel. Tap Buy SMS or WhatsApp $10 service/bundle and confirm Stripe Checkout opens.",
-      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
+      href: `${BASE}/admin.html?location=${CASAMARA}#panelMarketingAdPerformance`
     },
     {
       id: "portal-tabs-wrap",
       title: "Profile tabs wrap on mobile",
       detail: "My Profile and Settings — tabs/labels stay readable and wrap (no clipped text) on iPhone Safari.",
-      href: `${BASE}/patron-portal.html?v=${V_PORTAL}`
+      href: `${BASE}/patron-portal.html`
     },
     {
       id: "mingl-accept",
       title: "Mingl Accept",
       detail: "Search → Mingl → Requests. Accept a pending Friend/Mingl request (e.g. Anne). No permission-denied; chat can open.",
-      href: `${BASE}/index.html?v=${V_MINGL}&start=search`
+      href: `${BASE}/index.html?start=search`
     },
     {
       id: "mingl-gist-ads",
       title: "Mingl Gist + spot ads",
       detail: "Open Mingl Gist; confirm stories load. Also check Mingl/search for splash or in-grid spot ads.",
-      href: `${BASE}/mingl-gist.html?v=${V_GIST}&from=mingl`
+      href: `${BASE}/mingl-gist.html?from=mingl`
     },
     {
       id: "bartr-cobra",
       title: "BartR — Cobra arts products",
       detail: "Search “art” or browse; open Cobra Callisto Arts; confirm catalog items; optional checkout smoke.",
-      href: `${BASE}/commerce.html?v=${V_COMMERCE}`
+      href: `${BASE}/commerce.html`
     },
     {
       id: "floqr-branding",
       title: "FloqR branding note",
       detail: "On the pages you opened, branding should read FloqR / FLOQR (not Flocker). Mark Fail only if you still see Flocker.",
-      href: `${BASE}/index.html?v=${V_MINGL}&start=search`
+      href: `${BASE}/index.html?start=search`
     },
     {
       id: "seed-optional",
       title: "Seed page (if catalog/ads empty)",
       detail: "Optional. Master Admin: run spot-ad pool + Lucy/Cobra BartR seed, then retest ads/BartR.",
-      href: `${BASE}/seed-v29-09-14.html?v=${V_SEED}`
+      href: `${BASE}/seed-v29-09-14.html`
     }
   ];
 

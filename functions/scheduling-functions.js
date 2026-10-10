@@ -874,7 +874,7 @@ async function respondAsAssignee(shiftId, decision, authContext, source = "calla
     title: managerNote.title,
     body: managerNote.body,
     type: nextStatus === "confirmed" ? "scheduleShiftConfirmed" : "scheduleShiftDeclined",
-    link: `./admin.html?location=${encodeURIComponent(text(shift.ownerId, 160))}&tab=scheduling&shift=${encodeURIComponent(shiftId)}&v=s3.0.1`,
+    link: `./admin.html?location=${encodeURIComponent(text(shift.ownerId, 160))}&tab=scheduling&shift=${encodeURIComponent(shiftId)}`,
     shiftId,
     ownerKey: shift.ownerKey
   });

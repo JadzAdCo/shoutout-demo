@@ -433,7 +433,6 @@
     if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
-    url.searchParams.set("v", CURRENT_VERSION);
     url.searchParams.set("from", "master");
     return `./admin.html?${url.searchParams.toString()}`;
   }

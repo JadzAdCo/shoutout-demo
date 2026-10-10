@@ -127,7 +127,7 @@ test("every feature link surface goes through linkState", () => {
   assert.match(portal, /data-panel="portalMinglFriends" data-floqr-feature-link="mingl"/);
   assert.match(portal, /data-floqr-feature-link="mingl" href="\.\/mingl-chat\.html/);
   assert.match(portal, /data-floqr-feature-link="bartr" href="\.\/commerce\.html/);
-  assert.match(portal, /floqr-feature-services\.js\?v=s3\.1\.30/);
+  assert.match(portal, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
   assert.match(read("patron-portal-app.js"), /fs\.applyFeatureLinks\(/);
 
   const floqai = read("intent-search.js");
@@ -157,8 +157,8 @@ test("Features & Services table: plain-language headers, Revision N, link inside
 test("reason is asked after Save in the shared prompt — no standing input, no window.prompt", () => {
   const html = read("master-admin.html");
   assert.doesNotMatch(html, /id="featureServicesReason"|id="featurePromotionReason"/);
-  assert.match(html, /floqr-reason-prompt\.js\?v=s3\.1\.30/);
-  assert.match(html, /floqr-reason-prompt\.css\?v=s3\.1\.30/);
+  assert.match(html, /floqr-reason-prompt\.js\?v=s3\.\d+\.\d+/);
+  assert.match(html, /floqr-reason-prompt\.css\?v=s3\.\d+\.\d+/);
   const app = read("master-feature-services.js");
   assert.match(app, /FLOQRReasonPrompt/);
   assert.doesNotMatch(app, /(root|window)\.prompt\(|[^.\w]prompt\(/);

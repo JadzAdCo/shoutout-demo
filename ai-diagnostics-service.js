@@ -981,7 +981,7 @@
         {label:"supRstar preview no auto popup", file:"suprstar-preview.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message))"]},
         {label:"Portal iframe embed=1", file:"patron-portal-app.js", includes:["embed: \"1\"", "from: \"portal\""]},
         {label:"Satellite session rule", file:".cursor/rules/satellite-session-auth.mdc", includes:["FLOQRSessionShell", "embed=1"]},
-        {label:"Venue Links use current package", file:"floqr-nav.js", includes:["adminPortalUrl", "currentVersion", "Never copy the page's ?v="]},
+        {label:"Venue Links are version-free", file:"floqr-nav.js", includes:["adminPortalUrl", "currentVersion", "Page links never carry ?v="]},
         {label:"Venue Links not hardcoded 29.09", file:"entity-management.js", includes:["adminPortalUrl"], notIncludes:["v=29.09.95"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.3\""]}
       ]
@@ -1483,7 +1483,7 @@
       area:"Master Admin / Search",
       feature:"Features & Services (IsFeatureEnabled / IsTestFeature), beta testers, audit trail; in-app ad shows …loading your search for 5 seconds",
       changed:"Search shows only the ShoutOut button by default. Master Admin → Features & Services turns each feature Live or Test with a reason, invites beta testers, records test → live promotions and shows a hash-chained audit trail. Test pages (BartR, RydR, Pickup, supRstar, Mingl chat/Gist) are blocked for regular patrons. The in-app ad no longer shows a countdown or Skip; it shows …loading your search for 5 seconds.",
-      howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.108 → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Admin, open Features & Services, unlock SOS2FA, see all six features and the Beta-labelled test tiles on Search. Invite a test patron; as that patron open the Inbox → Review beta invite → Accept → Search shows the Beta tiles. Toggle a feature Live with a reason and confirm the audit row, then Verify integrity. Tap Mingl to see the ad: …loading your search, no Skip, continues after 5 seconds.",
+      howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/ → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Admin, open Features & Services, unlock SOS2FA, see all six features and the Beta-labelled test tiles on Search. Invite a test patron; as that patron open the Inbox → Review beta invite → Accept → Search shows the Beta tiles. Toggle a feature Live with a reason and confirm the audit row, then Verify integrity. Tap Mingl to see the ad: …loading your search, no Skip, continues after 5 seconds.",
       expected:"Patrons see only live features; beta testers and admins see test features marked Beta; every change is in the audit trail with who, when, reason and before/after; integrity check reports OK. Ad shows the loading message for 5 seconds with no Skip."
     },
     {
@@ -1491,7 +1491,7 @@
       area:"Sign-in / Welcome",
       feature:"WhatsApp OTP (Worldwide), SMS OTP (US Only), privacy links at the bottom",
       changed:"Welcome adds Continue with WhatsApp OTP (Worldwide). SMS OTP is US (+1) only. The OTP divider is gone. Privacy Policy · Do Not Sell or Share moved below all sign-in buttons in white. The Welcome ? explains what an OTP is and how it works.",
-      howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.107. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp number, tap Send WhatsApp code, then enter the 6-digit code from WhatsApp. Master Admin → Twilio → WhatsApp Logs and Compliance Logs show the send, delivery status and verify rows. Switch language and repeat.",
+      howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp number, tap Send WhatsApp code, then enter the 6-digit code from WhatsApp. Master Admin → Twilio → WhatsApp Logs and Compliance Logs show the send, delivery status and verify rows. Switch language and repeat.",
       expected:"Code arrives on WhatsApp and signs you in, or a clear reason is shown if WhatsApp could not deliver. SMS country code shows United States (+1) only. Privacy links are white at the bottom. Text is translated."
     },
     {
@@ -1499,7 +1499,7 @@
       area:"Search / FloqAi",
       feature:"Nearest-first search (GPS, then IP), near me, Google venue coordinates",
       changed:"Listings now show the closest events and clubs first, then by name. FLOQR uses phone/browser GPS when allowed, otherwise an IP city estimate. Near me works in all languages. Venues get Google coordinates automatically. Search for heading and venue tiles removed; FloqAi mark animates with a borderless dialog.",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.106 and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your city> first (GPS). Deny location in a private window → status says (IP estimate). Search Clubs in Monaco → only Monaco venues, closest to you first then by name. Tap ? beside Location-aware search. Switch language and repeat.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your city> first (GPS). Deny location in a private window → status says (IP estimate). Search Clubs in Monaco → only Monaco venues, closest to you first then by name. Tap ? beside Location-aware search. Switch language and repeat.",
       expected:"No Search for heading or venue tiles. Nearest-first order with GPS or IP source shown. Explicit city filters results. Help and status text translated."
     },
     {
@@ -1507,7 +1507,7 @@
       area:"Search / FloqAi",
       feature:"FloqAi venue search on Search for, Welcome help, no signed-in interstitial",
       changed:"Welcome now has a ? help with the landing description. Signed-in patrons go straight to Search for. FloqAi sits above a search box on Search for and understands Events, Clubs, Beach Clubs, Lounges and Lounge-Clubs plus genre and city (e.g. Hip Hop Clubs in DC, EDM Events in New York).",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.105. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also search for dialogs. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also search for dialogs. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
       expected:"Help popout opens beside Welcome. No interstitial. Clubs / Events / Beach Clubs listings open with genre and city filters applied. Dialog text is translated."
     },
     {
@@ -1515,7 +1515,7 @@
       area:"My Privacy / compliance",
       feature:"Privacy Policy, Do Not Sell / GPC, server export and delete",
       changed:"Added privacy.html (www.floqr.com canonical). My Privacy has Do Not Sell or Share, GPC auto-apply, Download My Data via exportPatronData, and Request Data Delete via requestPatronDelete. Targeted ads skip profile tags when DNS/GPC/sharing is off. privacyConsents is owner-create only.",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html?v=s3.0.103 (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?v=s3.0.103&tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server export with bundles); FloqAi “do not sell”. Optional GPC browser. Ads: DNS on → house/all still rotate, targeted tags stop. Delete only on disposable test account (type DELETE). Full steps: .cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc Manual test process.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server export with bundles); FloqAi “do not sell”. Optional GPC browser. Ads: DNS on → house/all still rotate, targeted tags stop. Delete only on disposable test account (type DELETE). Full steps: .cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc Manual test process.",
       expected:"Policy loads. DNS persists. Export JSON includes profile bundles. Targeted tag scoring stops while house ads can still show. Delete requires typing DELETE and anonymizes the account."
     },
     {
@@ -1531,7 +1531,7 @@
       area:"Display / soccer jerseys",
       feature:"Cameroon jersey test at Heist, Zebbies Garden, and LIMA Twist",
       changed:"soccerJersey is Cameroon-only (soccerJerseyTeamIds) at heist-washington-dc, zebbies-garden-washington-dc, and lima-twist-washington-dc. Composer/URL preview still paints without Display Security.",
-      howToTest:"Open index.html?v=s3.0.12&location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
+      howToTest:"Open index.html?location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
       expected:"Each of the three venues shows only the Cameroon kit. CSS NYX and 99. No other country/club in the picker."
     },
     {
@@ -1539,7 +1539,7 @@
       area:"Display / soccer jerseys",
       feature:"Cameroon country baked in PNG; CSS name/number; Heist test only",
       changed:"CAMEROON is printed on soccer-cameroon-back-with-country.png (collar arch, upright caps). NYX and 99 are CSS only. Heist DC soccer picker is Cameroon-only. URL preview (template/main/preview=1) paints without Display Security.",
-      howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?v=s3.0.10&location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
+      howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
       expected:"Baked CAMEROON on the green kit. CSS NYX and 99 upright, not italic. No other country/club in the Heist picker. Composer preview is not a black Display Security screen."
     },
     {
@@ -1547,7 +1547,7 @@
       area:"Display / soccer jerseys",
       feature:"Photo kits on one silhouette, solid black LED backdrop",
       changed:"Proposed Tanzania (blue/yellow), Ethiopia (green/white collar), Zambia (copper), Ivory Coast (IVORY COAST), and South Africa (SOUTH AFRICA) replaced the live named PNGs. All 23 photo kits use #000 behind the shirt. CSS hanger stays off photo backs.",
-      howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xibo URLs stay display.html?location= only.",
+      howToTest:"Open soccer-jersey-preview.html then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xibo URLs stay display.html?location= only.",
       expected:"Tanzania is royal blue not CSS green. jerseyCssBack=1 cannot resurrect the hanger when a named PNG exists. Backdrop is black. Name/number do not cover the country wordmark."
     },
     {
@@ -1555,7 +1555,7 @@
       area:"Master Admin / Twilio",
       feature:"twilio_sendgridMailLogs records every system-generated email",
       changed:"Master Admin → Twilio → twilio_sendgridMailLogs lists SendGrid system mail with status, headers, body, TLS 1.3, and delivery events (moved from Diagnostics → Mail Logging).",
-      howToTest:"Hard-refresh master-admin.html?v=s3.0.78#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row: headers, body, and TLS 1.3 are visible.",
+      howToTest:"Hard-refresh master-admin.html#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row: headers, body, and TLS 1.3 are visible.",
       expected:"A row exists for bans.don@gmail.com, kind preview-links, send ok, TLS min TLSv1.3. Subject is FLOQR s3.0.7 — mobile preview links, not FLOQR vs3.0.7."
     },
     {
@@ -1563,7 +1563,7 @@
       area:"Search / phones",
       feature:"Profile menu stays in the dropdown; help ? sits beside its label",
       changed:"Status-card links no longer leak under the avatar over Clubs. Help ? is glued to the heading, not parked on the far right. French Search chrome includes Back to welcome, Boîtes de nuit, Clubs de plage, Salons.",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile links stay inside the card. Confirm ? on Mingl / Language Settings sits immediately beside the title.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile links stay inside the card. Confirm ? on Mingl / Language Settings sits immediately beside the title.",
       expected:"No English My Profile stack over Clubs. ? is next to the label. Back to welcome is ← Retour à l'accueil. Beach Clubs is Clubs de plage."
     },
     {
@@ -1571,15 +1571,15 @@
       area:"Master Admin / Venue Links",
       feature:"Venue Admin Portal URLs always use the current package",
       changed:"Venue Links generate admin.html URLs from FLOQRNav.appVersion at search time. They do not copy the Master Admin page ?v= and do not keep a hardcoded 29.09.N. Display URLs stay location-only.",
-      howToTest:"Open master-admin.html?v=29.09.22#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.",
-      expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&v=s3.0.3&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
+      howToTest:"Open master-admin.html#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.",
+      expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
     },
     {
       id:"s3-0-3-all-satellites-session-shell",
       area:"Satellite / iframe pages",
       feature:"Every satellite inherits FLOQR login; no auto Google popup",
       changed:"role-request, BartR, guest list, Mingl, RydR, services, promoter admin, payment-return, and supRstar all load floqr-session-shell.js. Payment return and private preview no longer call signInWithPopup on signed-out. Embedded panels use popupBlocked and Open My Profile.",
-      howToTest:"Sign in on patron-portal.html?v=s3.0.3 as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from Search while still signed in. Confirm each restores the session and does not force a Google popup.",
+      howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from Search while still signed in. Confirm each restores the session and does not force a Google popup.",
       expected:"Signed-in parent/session is reused. No Google-only gate. Iframe Work Calendar still has tick / Approve selected."
     },
     {
@@ -1587,7 +1587,7 @@
       area:"Work Calendar / satellite pages",
       feature:"Iframe and deep-linked pages inherit FLOQR login",
       changed:"Work Calendar iframe loads staff-worksheet with embed=1 and floqr-session-shell.js. When My Profile is signed in, the child restores that session and hides Google. Embedded panels do not use signInWithPopup.",
-      howToTest:"Sign in on patron-portal.html?v=s3.0.2 as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — same session, tick / Approve selected.",
+      howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — same session, tick / Approve selected.",
       expected:"No Google-only card while parent is signed in. Status may briefly say Restoring your FLOQR session… then assignments appear."
     },
     {
@@ -1595,7 +1595,7 @@
       area:"Inbox / Work Calendar / Club Admin Notifications",
       feature:"Shift confirm is tick + Approve selected; System Message templates",
       changed:"Inbox schedule links open Work Calendar (not the DJ scheduling portal). Opening the link does not confirm. Worker ticks shifts or Select all, then Approve selected. Only the assignee can confirm. Inbox CTA is Review & confirm shift, not Open Related ShoutOut. Club Admin Notifications has a Message templates tab for these System Messages.",
-      howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?v=s3.0.1&tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, checkboxes, Select all, and Approve selected. Do not expect the shift to flip to confirmed until Approve selected. As temp_clubadmin_1@floqr-demo.com open admin.html?location=temp-democlub-1&v=s3.0.1&tab=notifications&notify=templates and edit a template.",
+      howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, checkboxes, Select all, and Approve selected. Do not expect the shift to flip to confirmed until Approve selected. As temp_clubadmin_1@floqr-demo.com open admin.html?location=temp-democlub-1&tab=notifications&notify=templates and edit a template.",
       expected:"No Google-only scheduling.html DJ form. No Open Related ShoutOut on a schedule System Message. Pending stays pending until Approve selected. Message templates save to clubNotificationSettings.messageTemplates."
     },
     {
@@ -1603,7 +1603,7 @@
       area:"Club Admin / Scheduling",
       feature:"Save schedule card closes editor, success popout, no duplicate chips",
       changed:"Editing a confirmed chip to draft updates that same card. Save is locked against double-click, closes the assign window, shows Schedule card successfully saved, then refreshes the week grid after the popout closes.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.116&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the editor closes, the success popout appears, and after it closes there is one draft chip — not two.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the editor closes, the success popout appears, and after it closes there is one draft chip — not two.",
       expected:"One chip. Assign modal gone. Popout text is Schedule card successfully saved. Second Save click while saving does nothing."
     },
     {
@@ -1611,7 +1611,7 @@
       area:"Club Admin / Staff Calendar / Club websites",
       feature:"Scheduler help, Work Sheet calendar, website ingest API",
       changed:"User Guide lives in the ? beside Scheduler (heading renamed from Week schedule). Elected staff open Staff Calendar → Work Sheet for a read-only published grid. Clubs generate a one-time ingest secret for JSON, RSS, and iframe on their official site (published shifts only).",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.115&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/iframe. As an elected temp staff account, open patron-portal.html → Staff Calendar → Work Sheet.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/iframe. As an elected temp staff account, open patron-portal.html → Staff Calendar → Work Sheet.",
       expected:"No standalone User Guide card. Scheduler ? sits beside the heading. Website ingest reveals the secret once. Work Sheet shows colleagues’ published chips, highlights you, hides drafts. iframe/JSON omit email/phone/drafts."
     },
     {
@@ -1619,7 +1619,7 @@
       area:"Club Admin / Scheduling / FloqAi",
       feature:"Multi-delete shifts + User Guide create/publish",
       changed:"Select shifts on the week grid (day header + Drafts/Pending/Confirmed filter, mix chips across days) then Delete selected. User Guide card under Scheduling. FloqAi ? catalog User Guide plus create a schedule / publish schedule / delete Wednesday drafts.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.114 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Guide. FloqAi: type create a schedule and publish schedule.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Guide. FloqAi: type create a schedule and publish schedule.",
       expected:"Mixed selection deletes in one confirm. User Guide lists create/publish and multi-delete steps. FloqAi returns those step cards with Scheduling User Guide links."
     },
     {
@@ -1627,7 +1627,7 @@
       area:"Club Admin / Scheduling",
       feature:"Pending until worker confirms; delete pending and confirmed",
       changed:"Published shifts are pending until the worker confirms via Inbox / Email / SMS / WhatsApp (confirm link in the message). Require-approval checkboxes removed because every published shift needs worker confirmation. Club Admin can delete pending and confirmed shifts.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.113 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the chip: Delete shift is visible. Sign in as that worker on scheduling.html?shift=… and Confirm. Chip becomes confirmed. Delete still works.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the chip: Delete shift is visible. Sign in as that worker on scheduling.html?shift=… and Confirm. Chip becomes confirmed. Delete still works.",
       expected:"No Require approval checkbox. New published shifts pending. Worker confirm → confirmed. Delete visible for pending and confirmed."
     },
     {
@@ -1635,7 +1635,7 @@
       area:"Club Admin / QA staff / VIP ShoutOut",
       feature:"Twilio Account SID health, unique diverse waitresses, DonPapi LED wall carried by busboys",
       changed:"Test alerts map Twilio 20003 to Account SID (AC…) instructions and report SID prefix without leaking secrets. Waitress 1 remains Priya Shah; waitress 2 is Imani Cole; waitress 3 is Sofia Alvarez. Waiters cycle Luis, Malik, and Andre; featured busboys Andre/Jamal. VIP gallery shows busboys holding the handheld DonPapi LED wall in the air.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.112 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid username only). Open Employee/Workers and club-profile.html?location=temp-democlub-1,2,3 and confirm Priya / Imani / Sofia are different faces. Gallery first shots are busboys holding the LED wall.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid username only). Open Employee/Workers and club-profile.html?location=temp-democlub-1,2,3 and confirm Priya / Imani / Sofia are different faces. Gallery first shots are busboys holding the LED wall.",
       expected:"Clear Twilio SID guidance. Unique waitress photos per club 1–3. VIP ShoutOut photos show the sign held overhead in front of patrons."
     },
     {
@@ -1643,7 +1643,7 @@
       area:"Club Admin / Notifications",
       feature:"Compact SMS/WhatsApp pills, Firebase subscription color, test alert",
       changed:"Notifications channel tiles are compact. SMS and WhatsApp labels are short. Green = Firebase subscribed (1); red/flashing = not subscribed (0). Payment, prepaid vs monthly/yearly, credits remaining, and Subscribe live in each channel ?. Test alerts explain missing phone, paused channels, or Twilio delivery errors.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.111 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays red until paid; ? offers Subscribe $10. Send test alert with +12027330274 saved — expect a dry-run or delivered count, not a silent 0.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays red until paid; ? offers Subscribe $10. Send test alert with +12027330274 saved — expect a dry-run or delivered count, not a silent 0.",
       expected:"SMS green and no second Stripe checkout. WhatsApp red until paid. Test alert names the skip/error instead of 'sent to 0 channel(s)' when nothing can send."
     },
     {
@@ -1651,7 +1651,7 @@
       area:"QA / Club Public Profile",
       feature:"Temp QA clubs use photoreal photos and full shared datapoints",
       changed:"temp-democlub-1..10 (Aurelia–Northstar) now share PNG logos/venue/gallery plus DJ/staff/bottle/promoter/admin portraits. Club records fill the Club Public Profile datapoints (identity, address, socials, hours grid + Labor Day exception, featured people, media). Service-member users get public photo + gallery slots.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1&v=29.09.108 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. Scheduling grid shows worker avatars. Sign in as temp_dj_1 / temp_bottle_1 → patron-portal public preview photos.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. Scheduling grid shows worker avatars. Sign in as temp_dj_1 / temp_bottle_1 → patron-portal public preview photos.",
       expected:"Photos are photoreal PNGs (not SVG placeholders). Club Admin 1 lands on Aurelia. Shared datapoints appear on the public profile and in Firestore clubLocations."
     },
     {
@@ -1659,7 +1659,7 @@
       area:"Search",
       feature:"Ask FloqR plain-language intent Search",
       changed:"Alternate Search (?start=intent) shows Patron Status card + FloqR logo + wish box. Routes meet/social → Mingl, ride/taxi → RydR, trade/shop → BartR, shout/display → ShoutOut.",
-      howToTest:"Open ?v=29.09.9&start=intent. Confirm help text and type 'I want to meet someone' → Mingl result; 'book a ride' → RydR. From classic Search, Ask FloqR tile opens intent page.",
+      howToTest:"Open ?start=intent. Confirm help text and type 'I want to meet someone' → Mingl result; 'book a ride' → RydR. From classic Search, Ask FloqR tile opens intent page.",
       expected:"Intent matches open the right product. Classic category Search remains available."
     },
     {
@@ -1667,7 +1667,7 @@
       area:"RydR",
       feature:"RydR landing with approved mark + Robotaxi path",
       changed:"RydR product landing uses approved merge mark (#4 car/text + #7 black/yellow road). Robotaxi links to Pickup simulation; Ultra Luxury is preview-queued.",
-      howToTest:"Open rydr.html?v=29.09.9&from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
+      howToTest:"Open rydr.html?from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
       expected:"RydR page loads with mark; Robotaxi opens Pickup sim; no payment/dispatch claims beyond simulation banner on Pickup."
     },
     {
@@ -1675,7 +1675,7 @@
       area:"BartR",
       feature:"Trade by BartR Search tile + transparent overlay mark",
       changed:"Search tile label is Trade by BartR (same size as Mingl/ShoutOut). Commerce hero uses transparent BartR overlay mark with large wordmark.",
-      howToTest:"Open ?v=29.09.9&start=search → Trade by BartR tile. Open commerce.html and confirm BartR mark (no navy plate behind wordmark).",
+      howToTest:"Open ?start=search → Trade by BartR tile. Open commerce.html and confirm BartR mark (no navy plate behind wordmark).",
       expected:"Tile reads Trade by BartR and aligns with siblings. Hero shows pink/lime graphics + BartR text."
     },
     {
@@ -1683,7 +1683,7 @@
       area:"BartR",
       feature:"Shared BartR frontend + US seller backend + FloqR MoR",
       changed:"BartR is the shared ecommerce frontend (barter + swag). Search shows a larger BartR icon tile. Vendors manage products/store/refund policy under My Profile → BartR Store (US only). Shoppers browse shuffled listings on commerce.html. FloqR collects payment; vendor ships.",
-      howToTest:"Open ?v=29.09.8&start=search, tap BartR. Sign in, confirm marketplace grid (not a single-seller storefront titled with your name). In Patron Portal set Country=United States, enable BartR seller store, save, open BartR Store tab, publish a product, return to BartR and find it. See STANDARD-AFTER-DEPLOYMENT.md §A–C.",
+      howToTest:"Open ?start=search, tap BartR. Sign in, confirm marketplace grid (not a single-seller storefront titled with your name). In Patron Portal set Country=United States, enable BartR seller store, save, open BartR Store tab, publish a product, return to BartR and find it. See STANDARD-AFTER-DEPLOYMENT.md §A–C.",
       expected:"Search BartR tile is larger and uses the icon. Back from BartR with from=search returns to Search. Seller tools are in portal, not on the shared frontend. Non-US country cannot enable seller store."
     },
     {
@@ -5930,7 +5930,6 @@
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", targetId);
     url.searchParams.set("profileImportDraft", draftId);
-    url.searchParams.set("v", "29.07-crawler-profile-import");
     return url.href;
   }
 
@@ -6500,17 +6499,17 @@
 2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
 3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,
       links: [
-        ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
-        ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
-        ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
-        ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
-        ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
-        ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications&notify=templates`],
-        ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
-        ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
-        ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
-        ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
-        ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+        ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1`],
+        ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&tab=notifications`],
+        ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&tab=scheduling`],
+        ["Patron Service Members tab", `${base}/patron-portal.html?tab=service-members`],
+        ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?tab=work-calendar`],
+        ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&tab=notifications&notify=templates`],
+        ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html`],
+        ["Work Sheet staff calendar", `${base}/staff-worksheet.html?location=temp-democlub-1`],
+        ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html`],
+        ["Master Admin diagnostics", `${base}/master-admin.html`],
+        ["Search / FloqAi", `${base}/?start=intent`],
         ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1`]
       ]
     };

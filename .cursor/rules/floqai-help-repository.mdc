@@ -24,5 +24,5 @@ Checklist (tick mentally before commit):
 - [ ] New/changed `?` verbiage mirrored in `floqai-help-repository.js`
 - [ ] New feature covered in `PRODUCT_INTENTS` / `HELP_INTENTS` with alternate phrasings
 - [ ] `searchPhrases` cover natural patron wording
-- [ ] Links point at real FLOQR routes with `v=` / `from=floqai` when applicable
+- [ ] Links point at real FLOQR routes with `from=floqai` when applicable — never `v=` (page links never carry a version)
 - [ ] Category / Search entry updated if the feature is public

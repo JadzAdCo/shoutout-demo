@@ -110,7 +110,7 @@ test("IP provider can be disabled", async () => {
 
 test("index loads floqr-geo-search before ai-location-service and patron-app", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  assert.match(html, /floqr-geo-search\.js\?v=s3\.0\.106/);
+  assert.match(html, /floqr-geo-search\.js\?v=s3\.\d+\.\d+/);
   assert.ok(html.indexOf("floqr-geo-search.js") < html.indexOf("ai-location-service.js"));
   assert.ok(html.indexOf("floqr-geo-search.js") < html.indexOf("patron-app.js"));
   assert.match(html, /data-floqr-help-id="help-location-search"/);

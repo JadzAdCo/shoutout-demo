@@ -203,7 +203,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "suprstrBtnCard", "intentSearchBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
-  assert.match(html, /floqr-feature-services\.js\?v=s3\.1\.30/);
+  assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
   const app = read("patron-app.js");
   assert.match(app, /FLOQRFeatureServices\?\.applySearchUi/);
   assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("floqAi"\)/, "start=intent must not bypass the floqAi gate");
@@ -221,7 +221,7 @@ test("test-feature satellite pages are guarded", () => {
   Object.entries(pages).forEach(([file, key]) => {
     const html = read(file);
     assert.match(html, new RegExp(`<body[^>]*data-floqr-feature="${key}"`), file);
-    assert.match(html, /floqr-feature-services\.js\?v=s3\.1\.30/, file);
+    assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/, file);
     assert.doesNotMatch(html, /data-floqr-feature-signed-out="allow"/, `${file} must send signed-out visitors to sign-in`);
   });
   assert.match(guard, /if \(!root\.FLOQRSessionShell\?\.redirectToLogin\?\.\(\)\) showDenied\(doc\)/);
@@ -251,8 +251,8 @@ test("signed-out visitors on a forwarded page go to the general sign-in, then ba
   const next = new URL(replaced[0], "https://example.test/shoutout-demo/commerce.html");
   assert.equal(next.pathname, "/shoutout-demo/");
   assert.equal(next.searchParams.get("profileRequired"), "sign-in");
-  assert.equal(next.searchParams.get("v"), "s3.0.110");
-  assert.equal(next.searchParams.get("returnTo"), "commerce.html?v=s3.0.1&club=abc#store");
+  assert.equal(next.searchParams.get("v"), null, "page links never carry a version");
+  assert.equal(next.searchParams.get("returnTo"), "commerce.html?club=abc#store");
 
   const embedded = loadShell("https://example.test/staff-worksheet.html?embed=1");
   assert.equal(embedded.shell.redirectToLogin(), false, "iframes never navigate to sign-in");
@@ -295,7 +295,7 @@ test("Master Admin Features & Services tab is SOS2FA gated", () => {
   const html = read("master-admin.html");
   assert.match(html, /data-panel="featuresServices"/);
   assert.match(html, /<section id="featuresServices"/);
-  assert.match(html, /master-feature-services\.js\?v=s3\.1\.30/);
+  assert.match(html, /master-feature-services\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /id="betaInviteFeatures"/);
   const app = read("master-feature-services.js");
   assert.match(app, /httpsCallable\("setBetaTesterFeatures"\)|call\("setBetaTesterFeatures"/);

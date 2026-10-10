@@ -91,7 +91,7 @@ All Master callables: `assertSos2faSession` (scope `entityManagement`), reason �
 
 1. Advertiser texts / WhatsApps a flyer (JPG/PNG/GIF/WebP) or video ≤ 30 s (or `AD`) to the FLOQR number. Twilio → `adIntakeWebhook` (dedicated number) or `messagingInboundWebhook` (shared number hook). Twilio signature validated; STOP/START/HELP honored (`adIntakeOptOuts`); daily cap per phone (`maxIntakePerPhonePerDay`); `intakeEnabled` kill switch.
 2. Media downloaded from Twilio only, inspected, stored at `adIntake/{id}/creative.*`. `adIntakeSubmissions/{sha256(token)}` (phone hashed + masked; token never stored).
-3. Reply (via `sendTwilioMessagesApi` — compliance rows) with `ad-submit.html?v=&t=<token>` (72 h).
+3. Reply (via `sendTwilioMessagesApi` — compliance rows) with `ad-submit.html?t=<token>` (72 h).
 4. `ad-submit.html` (public, `data-floqr-public`): title, copy, link, placement, payment mode (`payg` | `subscription`; invoice refused), run days, start date, **demographics** (age, gender, cities, countries, interests, music), contact → `startAdIntakeCheckout` → Stripe → `confirmAdIntakePayment` → campaign `pending_approval` (`posterType: thirdParty`, `source: intake`) + invoice link `ad-invoice.html?t=`.
 5. Master Admin edits demographics in the queue before approve.
 

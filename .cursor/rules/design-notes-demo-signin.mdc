@@ -36,7 +36,7 @@ Why: demo accounts `temp_<role>_<1-10>@floqr-demo.com` sign in only by Email OTP
 - Generate → `FLOQRReasonPrompt.ask` (`reason-prompt-on-save.mdc`, min 8, no standing input) → `issueDemoSignInCode` with the Entity Management `sos2faSessionId`. Result card: large code, countdown, Copy code / Copy email, incognito steps. SOS2FA errors lock + re-show the gate.
 - **Recent codes issued**: `featureServiceAuditLogs where eventType == "demo.signin_code_issued"` (Master Admin read), newest 10 — who / when / target / reason, never a code.
 - CSS in its own file `master-demo-employees.css` (not `admin.css`). Shared-file edits are applied by `scripts/apply-s3-1-31-demo-employees-tab.js` (anchored, idempotent).
-- `demo-signin.html` (first s3.1.31 cut, a standalone satellite) is now a redirect to `master-admin.html?v=s3.1.31#demoEmployees`; `demo-signin.js` was removed.
+- `demo-signin.html` (first s3.1.31 cut, a standalone satellite) is now a redirect to `master-admin.html#demoEmployees` (no `v` since s3.1.37); `demo-signin.js` was removed.
 - FloqAi help `help-master-demo-signin` (masterAdmin) links to the tab; phrases include "demo employee code", "temp code", "demo sign in", "sign in as demo".
 
 ## Removal (when SendGrid is paid and demo email OTP is delivered again)

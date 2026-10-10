@@ -146,7 +146,7 @@ function loadShell({lang} = {}) {
 
 const signedOutAuth = {currentUser: null, authStateReady: () => Promise.resolve(), onAuthStateChanged() {}};
 
-test("embedded signed-out hint is a plain status line with a current-package My Profile link", async () => {
+test("embedded signed-out hint is a plain status line with a version-free My Profile link", async () => {
   const {shell, els} = loadShell();
   await shell.bind({auth: signedOutAuth, chrome: "#chrome", statusEl: "#status"}).ready;
   const hint = els["#chrome"].children[0];
@@ -155,8 +155,8 @@ test("embedded signed-out hint is a plain status line with a current-package My 
   assert.equal(hint.dataset.keepVisible, "true");
   const link = hint.children[0];
   assert.equal(link.textContent, "Open My Profile & Settings");
-  assert.match(link.href, new RegExp(`[?&]v=${pkgVersion.replace(/\./g, "\\.")}(&|$)`));
-  assert.doesNotMatch(link.href, /s3\.0\.3|s3\.1\.26/);
+  assert.match(link.href, /patron-portal\.html\?from=session-shell$/);
+  assert.doesNotMatch(link.href, /[?&]v=/);
   assert.match(els["#status"].textContent, /restoring that session here/);
 });
 

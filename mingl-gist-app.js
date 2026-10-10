@@ -4,7 +4,6 @@
 
   const STORY_MS = 5000;
   const AD_EVERY = 4;
-  const APP_V = "29.09.14";
 
   if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
@@ -318,7 +317,7 @@
       const showCta = story.type === "ad" && story.ctaHref && story.ctaHref !== "#";
       cta.classList.toggle("hidden", !showCta && story.type !== "ad");
       cta.textContent = story.ctaLabel || "Learn more";
-      cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?v=${APP_V}&start=mingl`;
+      cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?start=mingl`;
       if (!showCta && story.type === "ad") cta.classList.remove("hidden");
       cta.onclick = story.type === "ad" && story.campaignId
         ? () => { window.FLOQRAdTracking?.click?.(story, "mingl-gist"); }

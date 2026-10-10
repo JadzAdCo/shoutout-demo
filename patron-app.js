@@ -610,6 +610,7 @@
       const basePath = window.location.pathname.slice(0, window.location.pathname.lastIndexOf("/") + 1);
       if (!target.pathname.startsWith(basePath)) return "";
       if (/(?:^|\/)display\.html$/i.test(target.pathname)) return "";
+      target.searchParams.delete("v");
       return target.toString();
     } catch (e) { return ""; }
   }
@@ -2179,8 +2180,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=29.09.8",
-      minglLink:"./mingl-chat.html?v=29.09.33",
+      link:"./patron-portal.html?tab=inbox",
+      minglLink:"./mingl-chat.html",
       read:false,
       createdAt:now
     };
@@ -2222,7 +2223,7 @@
   }
 
   function portalChatUrl(roomId = "") {
-    const params = new URLSearchParams({ v: "29.09.8", from: "mingl" });
+    const params = new URLSearchParams({ from: "mingl" });
     if (roomId) params.set("room", roomId);
     return `./mingl-chat.html?${params.toString()}`;
   }
@@ -3340,7 +3341,7 @@
       const countryLabel = Place?.country?.(l.country) || l.country;
       const genreLine = (Place?.genres?.(l.genres) || l.genres || []).join(" • ");
       const badges = (l.activityDates || []).slice(0, 4).map((x) => Place?.offering?.(x) || x);
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.8">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });
@@ -3784,7 +3785,7 @@
 
   function goToBartrFromConfirmation() {
     clearConfirmationTimers();
-    window.location.href = "./commerce.html?v=29.09.33&from=search";
+    window.location.href = "./commerce.html?from=search";
   }
 
   function editSubmittedShoutout() {
@@ -4506,7 +4507,7 @@
       }
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.09.8`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, ownerUid:currentUser.uid, actorUid:currentUser.uid, actorEmail:safeUser(), clientIp:payload.clientIp || "", ipSource:payload.ipSource || "", createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try {
         const stamped = await firebase.app().functions("us-central1").httpsCallable("stampShoutoutActorContext")({shoutoutId: shoutoutRef.id});
@@ -4962,7 +4963,6 @@
   }
   window.openGuestListForLocation = function(locationId){
     const url = new URL("./guest-list.html", location.href);
-    url.searchParams.set("v", window.FLOQRNav?.appVersion || "29.09.8");
     url.searchParams.set("location", locationId || selectedLocationId());
     const promoter = new URL(location.href).searchParams.get("promoter");
     if (promoter) url.searchParams.set("promoter", promoter);
@@ -5060,9 +5060,9 @@
 function qs(n){return new URL(location.href).searchParams.get(n)||"";}
 function currentLoc(){return window.selectedLocationId||window.locationId?.()||qs("location")||qs("club")||"zebbies-garden-washington-dc";}
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
-window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v", window.FLOQRNav?.appVersion || "29.09.8");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
+window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=29.09.8`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

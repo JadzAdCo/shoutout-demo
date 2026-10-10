@@ -175,7 +175,7 @@ test("Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help 
     assert.match(section, new RegExp(`id="${id}"`), id);
   }
   assert.doesNotMatch(section, /id="demoReason"|placeholder="Why/, "reason is asked after Generate, never a standing input");
-  assert.match(html, /href="\.\/master-demo-employees\.css\?v=s3\.1\.31"/);
+  assert.match(html, /href="\.\/master-demo-employees\.css\?v=s3\.\d+\.\d+"/);
   const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "floqai-help-repository.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
     .map(file => html.indexOf(`src="./${file}?v=`));
   order.forEach((at, i) => assert.ok(at > 0 && (i === 0 || at > order[i - 1]), `script order ${i}`));
@@ -232,7 +232,7 @@ test("Demo Svc / Emp Mgmt tab label exists in all 11 chrome packs", () => {
 
 test("old demo-signin.html redirects to the Master Admin tab", () => {
   const html = read("demo-signin.html");
-  assert.match(html, /location\.replace\("\.\/master-admin\.html\?v=s\d+\.\d+\.\d+#demoEmployees"\)/);
+  assert.match(html, /location\.replace\("\.\/master-admin\.html#demoEmployees"\)/);
   assert.match(html, /<body data-floqr-public>/);
   assert.ok(!fs.existsSync(path.join(root, "demo-signin.js")));
 });

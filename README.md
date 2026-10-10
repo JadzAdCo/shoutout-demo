@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.36 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.37 (stable)
+
+- s3.1.37: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, FloqAi, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.
 
 - s3.1.36: FloqAi links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.
 

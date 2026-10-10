@@ -88,12 +88,12 @@ test("main message typing preserves spaces instead of live-fitting on every keys
   assert.match(html, /patron-app\.js\?v=s3\.\d+\.\d+/);
 });
 
-test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29.09 or page ?v=", () => {
+test("venue admin portal URLs come from FLOQRNav and carry no version (page links never carry ?v=)", () => {
   const vm = require("node:vm");
   const navSource = readReleaseFile("floqr-nav.js");
   assert.match(navSource, /const APP_V = "s3\.\d+\.\d+"/);
   assert.match(navSource, /adminPortalUrl/);
-  assert.match(navSource, /Never copy the page's \?v=/);
+  assert.match(navSource, /Page links never carry \?v=/);
 
   const entity = readReleaseFile("entity-management.js");
   assert.match(entity, /adminPortalUrl/);
@@ -120,8 +120,7 @@ test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29
   const href = sandbox.FLOQRNav.adminPortalUrl("zebbies-garden-washington-dc");
   assert.match(href, /admin\.html/);
   assert.match(href, /location=zebbies-garden-washington-dc/);
-  assert.match(href, /v=s3\.\d+\.\d+/);
-  assert.doesNotMatch(href, /v=29\.09\.22/);
+  assert.doesNotMatch(href, /[?&]v=/);
   assert.match(href, /from=master/);
 });
 

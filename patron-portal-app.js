@@ -67,7 +67,6 @@
     next.searchParams.set("shift", shift);
     if (owner) next.searchParams.set("owner", owner);
     next.searchParams.set("from", "schedule-notify");
-    if (window.FLOQRNav?.appVersion) next.searchParams.set("v", window.FLOQRNav.appVersion);
     return `${next.pathname}${next.search}`;
   }
 
@@ -82,7 +81,6 @@
         if (params.get("shift")) next.set("shift", params.get("shift"));
         if (params.get("owner")) next.set("owner", params.get("owner"));
         next.set("from", "schedule-notify");
-        next.set("v", "s3.0.1");
         return `./patron-portal.html?${next.toString()}`;
       }
     );
@@ -424,7 +422,7 @@
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
       if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({v:"29.09.8", from:"portal"});
+        const params = new URLSearchParams({from:"portal"});
         const room = new URL(window.location.href).searchParams.get("room");
         if (room) params.set("room", room);
         window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
@@ -486,7 +484,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
+  async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?start=search"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -951,8 +949,7 @@
     try {
       sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
     } catch (_e) {}
-    const v = window.FLOQRNav?.appVersion;
-    const params = new URLSearchParams({ ...(v ? { v } : {}), start: "shoutout", from: "portal-reuse" });
+    const params = new URLSearchParams({ start: "shoutout", from: "portal-reuse" });
     if (draft.locationId) params.set("location", draft.locationId);
     if (draft.template) params.set("template", draft.template);
     window.location.href = `./?${params.toString()}`;
@@ -2422,7 +2419,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(rewriteScheduleNotifyBody(x.body))}${x.link ? `<p><a href="${esc(isScheduleInboxMessage(x) ? scheduleConfirmHref(x) : x.link)}" class="buttonlike">${esc(inboxLinkLabel(x))}</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&from=portal`)}">Open Mingl Chat</a></p>` : ""}
         ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
       </div>
     </div>`;
@@ -2585,7 +2582,7 @@
         recipientUid:requestOtherUid(connection, user),
         createdByUid:user.uid,
         connectionId,
-        link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&v=29.09.8&from=portal`,
+        link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&from=portal`,
         read:false,
         createdAt:fieldValue()
       });
@@ -3401,7 +3398,6 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    if (window.FLOQRNav?.appVersion) url.searchParams.set("v", window.FLOQRNav.appVersion);
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -4159,7 +4155,6 @@
       else showShoutoutPane("shoutoutPendingPane");
     }
     const frameQuery = new URLSearchParams({
-      ...(window.FLOQRNav?.appVersion ? { v: window.FLOQRNav.appVersion } : {}),
       embed: "1",
       from: "portal"
     });
@@ -4214,7 +4209,7 @@
     fillProfileForm(profile, user);
     renderStaffConsentManager();
     try {
-      const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || "./privacy.html?v=s3.0.103";
+      const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.() || "./privacy.html";
       const dnsHref = `${policyHref}#do-not-sell`;
       if (byId("privacyPolicyLink")) byId("privacyPolicyLink").href = policyHref;
       if (byId("privacyDoNotSellLink")) byId("privacyDoNotSellLink").href = dnsHref;

@@ -101,14 +101,14 @@ Region detection: profile `country` / `uiLanguage` + IP country **only as hint**
 
 ## Manual test process (demo / Pages)
 
-Use package cache-bust `?v=s3.0.103` (or current package that includes privacy). Hard-refresh so scripts load.
+Page links carry no version (s3.1.37); asset tags are cache-busted by the bump script. Hard-refresh so scripts load.
 
 ### 1. Privacy Policy
-- Open: `https://jadzadco.github.io/shoutout-demo/privacy.html?v=s3.0.103`
+- Open: `https://jadzadco.github.io/shoutout-demo/privacy.html`
 - Expect: Do Not Sell section (`#do-not-sell`), processors list, production host wording `https://www.floqr.com`.
 
 ### 2. My Privacy (main path)
-1. Sign in → `https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=s3.0.103&tab=privacy`
+1. Sign in → `https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=privacy`
 2. Confirm **Privacy Policy** and **Do Not Sell or Share** links open the policy page.
 3. Toggle **Do Not Sell or Share (CCPA / CPRA)** → **Save Privacy Preferences** → refresh → checkbox still on; report row shows Yes.
 4. **Download My Data JSON** → file includes server export shape (`exportedAt`, `uid`, `profile`, `bundles`), not a local-only profile dump. If callable is down, JSON may note local-fallback — that is a deploy gap, not a pass.

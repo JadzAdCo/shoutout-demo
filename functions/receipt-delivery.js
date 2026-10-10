@@ -239,7 +239,7 @@ async function deliverFinalPaidShoutoutReceipt({
 } = {}) {
   const ownerUid = text(order.ownerUid, 160);
   const ownerEmail = text(order.customerEmail || order.ownerEmail, 200);
-  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}&v=s3.0.62`;
+  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}`;
   const inboxId = await writeFloqrInboxReceipt({
     recipientUid: ownerUid,
     recipientEmail: ownerEmail,

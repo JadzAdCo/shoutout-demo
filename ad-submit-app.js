@@ -99,8 +99,7 @@
   }
 
   function invoiceHref() {
-    const v = window.FLOQRNav?.appVersion || "";
-    return `./ad-invoice.html?v=${encodeURIComponent(v)}&t=${encodeURIComponent(token)}`;
+    return `./ad-invoice.html?t=${encodeURIComponent(token)}`;
   }
 
   function showDone(message, withInvoice) {

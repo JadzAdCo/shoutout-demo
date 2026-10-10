@@ -79,7 +79,7 @@ Two derived `0|1` fields on `featureServices/{featureKey}`:
 
 A forwarded / bookmarked URL opened while signed out must land on the **general** FLOQR sign-in (Search Welcome card: Google, Microsoft, Facebook, Email, SMS, WhatsApp) — never a Google-only card.
 
-- URL contract: `./?v=<APP_V>&profileRequired=sign-in&returnTo=<file?query#hash>` — same shape as `profile-access-guard.js` (hubs). `patron-app.js` `safeReturnTo` validates it (same-origin relative file only) and returns there after sign-in; Welcome status shows `app.signInToContinue`.
+- URL contract: `./?profileRequired=sign-in&returnTo=<file?query#hash>` (no `v` since s3.1.37; `v` is stripped from `returnTo`) — same shape as `profile-access-guard.js` (hubs). `patron-app.js` `safeReturnTo` validates it (same-origin relative file only) and returns there after sign-in; Welcome status shows `app.signInToContinue`.
 - `floqr-session-shell.js`: `loginHref()`, `redirectToLogin()`, and `requireSignIn()` which **auto-runs on every page that loads the shell** (even pages that never call `bind`). It never calls `initializeApp` — it polls ≤ 4 s for an existing Firebase app (many page apps call `initializeApp` unguarded), then waits ≤ 15 s for the persisted user.
 - `bind()` no longer shows a Google button on standalone signed-out pages; it redirects instead.
 - **Never redirect:** iframes / `embed=1` / `from=portal` (they keep the “open My Profile” link), and public pages: `index`, `display`, `display2`, `display-error`, `privacy`, `translation-policy`, `auth-debug`, or any page with `<body data-floqr-public>`.

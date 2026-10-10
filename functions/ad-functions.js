@@ -33,7 +33,6 @@ const RETURN_ORIGINS = [DEFAULT_ORIGIN, "https://jadzadco.github.io/shoutout-dem
 const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(v => v.trim().toLowerCase()).filter(Boolean);
-const APP_V = "s3.1.0";
 const DEFAULT_SETTINGS = Object.freeze({
   splashEnabled: 1,
   splashSeconds: 5,
@@ -449,7 +448,7 @@ async function fulfillAdOrder(orderId, order = {}, session = {}) {
     title: "Paid ad awaiting approval",
     body: `${result.campaign.posterLabel || "An advertiser"} paid for “${result.campaign.title || "an ad"}”. Review it in Master Admin → Ad Management.`,
     campaignId,
-    link: `./master-admin.html?v=${APP_V}#adApprovalQueue`
+    link: `./master-admin.html#adApprovalQueue`
   });
   await writeAdAudit({eventType: "ad.paid", actorUid: text(order.ownerUid, 128), campaignId, detail: {orderId, invoiceNumber}});
   return {campaignId, alreadyFulfilled: false};
@@ -584,7 +583,7 @@ exports.createAdCampaign = onCall({region: "us-central1", secrets: [STRIPE_SECRE
       title: "Invoiced ad awaiting approval",
       body: `${poster.label} submitted “${value.title}” on invoice terms.`,
       campaignId: ref.id,
-      link: `./master-admin.html?v=${APP_V}#adApprovalQueue`
+      link: `./master-admin.html#adApprovalQueue`
     });
     return {campaignId: ref.id, status, invoiceNumber};
   }
@@ -595,8 +594,8 @@ exports.createAdCampaign = onCall({region: "us-central1", secrets: [STRIPE_SECRE
     ownerUid: auth.uid,
     ownerEmail: ctx.email,
     customerEmail: ctx.email,
-    successUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
-    cancelUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&cancelled=1&kind=ad`,
+    successUrl: `${base}payment-return.html?order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
+    cancelUrl: `${base}payment-return.html?order={ORDER_ID}&cancelled=1&kind=ad`,
     source: "ad-portal"
   });
   return {campaignId: ref.id, status, ...checkout};
@@ -621,8 +620,8 @@ async function startCheckoutForExisting(campaignId, campaign, auth, base) {
     ownerUid: auth.uid,
     ownerEmail: emailOf(auth),
     customerEmail: emailOf(auth),
-    successUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
-    cancelUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&cancelled=1&kind=ad`,
+    successUrl: `${base}payment-return.html?order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
+    cancelUrl: `${base}payment-return.html?order={ORDER_ID}&cancelled=1&kind=ad`,
     source: "ad-portal"
   });
 }
@@ -845,7 +844,7 @@ exports.approveAdCampaign = onCall({region: "us-central1", timeoutSeconds: 30, m
       title: "Your ad is approved",
       body: `“${campaign.title}” runs ${new Date(flight.startsAtMs).toISOString().slice(0, 10)} to ${new Date(endsAtMs).toISOString().slice(0, 10)}.`,
       campaignId: id,
-      link: `./patron-portal.html?v=${APP_V}&tab=ad-campaigns`,
+      link: `./patron-portal.html?tab=ad-campaigns`,
       read: false,
       createdAt: FieldValue.serverTimestamp()
     }).catch(() => {});
@@ -895,7 +894,7 @@ exports.rejectAdCampaign = onCall({region: "us-central1", secrets: [STRIPE_SECRE
       title: "Your ad was not approved",
       body: `“${campaign.title}”: ${reason}${patch.paymentStatus === "refunded" ? " Your payment is being refunded." : ""}`,
       campaignId: id,
-      link: `./patron-portal.html?v=${APP_V}&tab=ad-campaigns`,
+      link: `./patron-portal.html?tab=ad-campaigns`,
       read: false,
       createdAt: FieldValue.serverTimestamp()
     }).catch(() => {});
@@ -1254,7 +1253,7 @@ async function handleAdIntakeMessage(req, form, {functionName = "messagingInboun
     expiresAtMs: nowMs + core.INTAKE_TTL_MS,
     createdAt: FieldValue.serverTimestamp()
   });
-  const link = `${publicOrigin()}/ad-submit.html?v=${APP_V}&t=${encodeURIComponent(token)}`;
+  const link = `${publicOrigin()}/ad-submit.html?t=${encodeURIComponent(token)}`;
   await sendIntakeReply({creds, channel, to: from, from: replyFrom, body: `FLOQR: Got your ${media.kind === "video" ? "video" : "flyer"}. Pick who should see it and pay here (link works for 72 hours): ${link} Reply STOP to opt out.`});
   return true;
 }
@@ -1366,8 +1365,8 @@ exports.startAdIntakeCheckout = onCall({region: "us-central1", secrets: [STRIPE_
     campaignId: campaignRef.id,
     campaign: {title: value.title, placementType: value.placementType, runDays, paymentMode: value.paymentMode, amountCents},
     customerEmail: contactEmail,
-    successUrl: `${base}ad-submit.html?v=${APP_V}&t=${t}&paid=1&session_id={CHECKOUT_SESSION_ID}`,
-    cancelUrl: `${base}ad-submit.html?v=${APP_V}&t=${t}&cancelled=1`,
+    successUrl: `${base}ad-submit.html?t=${t}&paid=1&session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: `${base}ad-submit.html?t=${t}&cancelled=1`,
     source: "ad-intake"
   });
   await ref.set({orderId: checkout.orderId}, {merge: true});
@@ -1456,7 +1455,7 @@ exports.onAdInvoiceCreated = onDocumentCreated({
   const inv = snap.data() || {};
   const delivery = {};
   const lines = core.buildInvoiceLines(inv);
-  const link = inv.intakeTokenHash ? "" : `${publicOrigin()}/ad-invoice.html?v=${APP_V}&invoice=${encodeURIComponent(inv.invoiceNumber)}`;
+  const link = inv.intakeTokenHash ? "" : `${publicOrigin()}/ad-invoice.html?invoice=${encodeURIComponent(inv.invoiceNumber)}`;
   if (inv.deliverPhone && inv.deliverChannel) {
     const privSnap = await db.collection("adCampaignPrivate").doc(inv.campaignId).get();
     const replyFrom = text(privSnap.data()?.replyFrom, 60);

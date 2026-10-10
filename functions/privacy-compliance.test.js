@@ -41,7 +41,7 @@ test("FLOQRCanonical prefers www.floqr.com production origin", () => {
   assert.equal(sandbox.FLOQRCanonical.PRODUCTION_ORIGIN, "https://www.floqr.com");
   assert.equal(sandbox.FLOQRCanonical.privacyPolicyCanonicalUrl(), "https://www.floqr.com/privacy.html");
   assert.equal(sandbox.FLOQRCanonical.doNotSellCanonicalUrl(), "https://www.floqr.com/privacy.html#do-not-sell");
-  assert.match(sandbox.FLOQRCanonical.privacyPolicyUrl("s3.0.103"), /privacy\.html\?v=s3\.0\.103/);
+  assert.equal(sandbox.FLOQRCanonical.privacyPolicyUrl("s3.0.103"), "./privacy.html", "page links never carry ?v=");
 });
 
 test("FLOQRPrivacyPrefs blocks personalized ads for DNS / GPC / sharing false", () => {
@@ -145,7 +145,7 @@ test("privacy DSAR module exports callables and portal wires them", () => {
   assert.match(portal, /doNotSellOrShare/);
   assert.match(portal, /applyGpcOnLoad/);
   assert.match(html, /id="privacyDoNotSell"/);
-  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.0\.103/);
+  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /privacy\.html/);
   assert.match(rules, /s3\.0\.103-privacy-consents-owner/);
   assert.match(rules, /resource\.data\.uid == request\.auth\.uid/);

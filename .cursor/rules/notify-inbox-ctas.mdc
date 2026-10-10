@@ -33,4 +33,4 @@ Schedule System Message wording lives under **Notifications → Message template
 1. Pick a **hub** landing URL (portal/admin tab), not a Google-gated satellite.
 2. Set Inbox `type` and a type-aware button label.
 3. Seed the same copy in Club Admin message templates + `floqai-help-repository.js`.
-4. Cache-bust the landing page `?v=` (never on Xibo Display URLs).
+4. Never put `?v=` on the landing link (page links never carry a version — owner decision Oct 10 2026). Asset tags on the landing page are re-stamped by the bump script.

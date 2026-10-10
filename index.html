@@ -5,9 +5,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>
-  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.37"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=s3.1.37"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=s3.1.37"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
 </head>
 <body>
@@ -165,7 +165,7 @@
           </div>
         </div>
         <p id="authStatus" class="status"></p>
-        <p class="login-legal"><a href="./privacy.html?v=s3.0.107" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.107#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
+        <p class="login-legal"><a href="./privacy.html" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
       </div>
     </div>
   </section>
@@ -292,14 +292,14 @@
     <div class="category-grid compact-category-grid">
       <div class="category-or" data-i18n="cat.or">Or</div>
       <button id="shoutoutBtnCard" class="shoutout-icon-card" type="button" data-feature-key="shoutOut">
-        <img src="./shoutout-logo.png?v=29.09.33" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden')}"/>
+        <img src="./shoutout-logo.png?v=s3.1.37" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=s3.1.37'}else{this.classList.add('hidden')}"/>
         <span class="shoutout-icon-title" data-i18n="cat.shoutout">Throw a ShoutOut</span>
       </button>
       <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
-      <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?v=s3.0.108&from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
-      <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?v=s3.0.108&from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
-      <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?v=s3.0.108&from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
-      <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./floqai.html?v=s3.1.36&from=search" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
+      <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
+      <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
+      <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./floqai.html?from=search" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
     </div>
   </section>
 
@@ -317,23 +317,23 @@
           <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
           <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>, <em>make me a superstar</em>, User Guide phrases like <em>create a schedule</em> / <em>publish schedule</em>, or <em>website ingest</em> / <em>staff calendar</em>.</p>
           <div class="floqai-help-links" data-floqai-search-catalog="1">
-            <a href="./suprstr-search.html?v=29.09.66&from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.">Make me a supRstar / superstar</a>
-            <a href="./role-request.html?v=29.09.48&from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
-            <a href="./role-request.html?v=29.09.48&from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
-            <a href="./role-request.html?v=29.09.48&from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
-            <a href="./role-profiles.html?v=29.09.48&from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profiles overview</a>
-            <a href="./patron-portal.html?v=s3.1.36&from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &amp; Settings</a>
-            <a href="./role-request.html?v=29.09.48&from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access.">Onboarding (role / service access)</a>
-            <a href="./onboard-dc-venues.html?v=29.09.48&from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push crawled club profiles into Firestore.">Venue onboarding (Master Admin)</a>
+            <a href="./suprstr-search.html?from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.">Make me a supRstar / superstar</a>
+            <a href="./role-request.html?from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
+            <a href="./role-request.html?from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
+            <a href="./role-request.html?from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
+            <a href="./role-profiles.html?from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profiles overview</a>
+            <a href="./patron-portal.html?from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &amp; Settings</a>
+            <a href="./role-request.html?from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access.">Onboarding (role / service access)</a>
+            <a href="./onboard-dc-venues.html?from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push crawled club profiles into Firestore.">Venue onboarding (Master Admin)</a>
           </div>
           <p class="eyebrow floqai-catalog-heading">User Guide</p>
           <div class="floqai-help-links" data-floqai-search-catalog="1">
-            <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? beside Scheduler: add drafts on the week grid, Publish schedule, workers confirm pending until confirmed.">Create and publish a staff schedule</a>
-            <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts, filter Drafts and tap Wednesday’s header, tap a Thursday confirmed chip, then Delete selected.">Delete multiple shifts</a>
-            <a href="./staff-worksheet.html?v=s3.0.1&from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected" data-blurb="Elected staff: review pending assignments (tick / Select all / Approve selected) plus a people × days grid of published colleague shifts.">Work Sheet - Weekly Staff Calendar</a>
-            <a href="./patron-portal.html?v=s3.1.36&from=floqai&tab=work-calendar" data-search="confirm shift|approve selected|select all shifts|pending assignment|review and confirm shift" data-blurb="Inbox confirmation links open Work Calendar. Tick shifts or Select all, then Approve selected. The link itself does not confirm.">Confirm assigned shifts</a>
-            <a href="./admin.html?v=s3.1.36&from=floqai&tab=notifications&notify=templates" data-search="message template|system message|schedule invite|open related shoutout|edit system message" data-blurb="Club Admin Notifications → Message templates: edit System Messages for shift invite, update, confirmed, and declined. Not ShoutOuts.">Schedule message templates</a>
-            <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a secret, then pull published shifts onto the official club website with JSON, RSS, or iframe. Drafts never appear.">Club website ingest (API / RSS / iframe)</a>
+            <a href="./admin.html?from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? beside Scheduler: add drafts on the week grid, Publish schedule, workers confirm pending until confirmed.">Create and publish a staff schedule</a>
+            <a href="./admin.html?from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts, filter Drafts and tap Wednesday’s header, tap a Thursday confirmed chip, then Delete selected.">Delete multiple shifts</a>
+            <a href="./staff-worksheet.html?from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected" data-blurb="Elected staff: review pending assignments (tick / Select all / Approve selected) plus a people × days grid of published colleague shifts.">Work Sheet - Weekly Staff Calendar</a>
+            <a href="./patron-portal.html?from=floqai&tab=work-calendar" data-search="confirm shift|approve selected|select all shifts|pending assignment|review and confirm shift" data-blurb="Inbox confirmation links open Work Calendar. Tick shifts or Select all, then Approve selected. The link itself does not confirm.">Confirm assigned shifts</a>
+            <a href="./admin.html?from=floqai&tab=notifications&notify=templates" data-search="message template|system message|schedule invite|open related shoutout|edit system message" data-blurb="Club Admin Notifications → Message templates: edit System Messages for shift invite, update, confirmed, and declined. Not ShoutOuts.">Schedule message templates</a>
+            <a href="./admin.html?from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a secret, then pull published shifts onto the official club website with JSON, RSS, or iframe. Drafts never appear.">Club website ingest (API / RSS / iframe)</a>
           </div>
         </div>
 
@@ -355,7 +355,7 @@
         <button id="backToCategoriesFromShoutoutLandingBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./shoutout-logo.png?v=29.09.33" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
+          <img src="./shoutout-logo.png?v=s3.1.37" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=s3.1.37'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
         <h1 data-i18n="page.shoutoutLanding.title">Throw a ShoutOut</h1>
@@ -386,7 +386,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
             <span data-i18n="page.minglLanding.searchPeople">Search for People</span>
           </button>
-          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.33&from=mingl">
+          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?from=mingl">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>
             <span data-i18n="page.minglLanding.gist">Mingl Gist</span>
           </a>
@@ -780,57 +780,57 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.0.67"></script>
-<script src="./floqr-people-directory.js?v=s3.1.26"></script>
-<script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.36"></script>
-<script src="./floqr-i18n.js?v=s3.1.36"></script>
-<script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.1.36"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.26"></script>
-<script src="./floqr-venue-query.js?v=s3.0.106"></script>
-<script src="./intent-search.js?v=s3.1.36"></script>
-<script src="./floqai-search.js?v=s3.0.86"></script>
-<script src="./global-profile-status.js?v=s3.1.30"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.26"></script>
-<script src="./shared-data.js?v=s3.1.26"></script>
-<script src="./national-teams-data.js?v=s3.0.20"></script>
-<script src="./jersey-catalog.js?v=s3.0.62"></script>
-<script src="./feature-gates.js?v=s3.1.26"></script>
-<script src="./floqr-feature-services.js?v=s3.1.30"></script>
-<script src="./url-media-field.js?v=29.09.52"></script>
-<script src="./ai-service.js?v=29.09.33"></script>
-<script src="./ai-index-service.js?v=s3.1.26"></script>
-<script src="./ai-search-service.js?v=29.09.33"></script>
-<script src="./floqr-geo-search.js?v=s3.0.106"></script>
-<script src="./ai-location-service.js?v=s3.0.106"></script>
-<script src="./ai-notification-service.js?v=29.09.33"></script>
-<script src="./ai-template-studio.js?v=29.09.33"></script>
-<script src="./floqr-action-feedback.js?v=29.09.33"></script>
-<script src="./ai-grammar-service.js?v=29.09.33"></script>
-<script src="./help-attach.js?v=s3.1.36"></script>
-<script src="./helper-popouts.js?v=s3.1.36"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.1.4"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
-<script src="./floqr-consent-mode.js?v=s3.0.103"></script>
-<script src="./floqr-canonical.js?v=s3.0.103"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
-<script src="./ad-campaigns.js?v=s3.1.4"></script>
-<script src="./floqr-ad-tracking.js?v=s3.1.0"></script>
-<script src="./floqr-identity.js?v=29.09.33"></script>
-<script src="./floqr-blocks.js?v=s3.1.26"></script>
-<script src="./floqr-logger.js?v=29.09.33"></script>
-<script src="./floqr-client-ip.js?v=s3.0.69"></script>
-<script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./welcome-button-gradient.js?v=s3.1.2"></script>
-<script src="./floqr-name-shoutout.js?v=s3.1.26"></script>
-<script src="./floqr-board-frame.js?v=s3.1.26"></script>
-<script src="./floqr-template-preview.js?v=s3.1.26"></script>
-<script src="./floqr-template-tags.js?v=s3.1.26"></script>
-<script src="./floqr-access-notice.js?v=s3.1.26"></script>
-<script src="./patron-app.js?v=s3.1.31"></script>
-<script src="./ai-assistant-ui.js?v=29.09.33"></script>
-<script src="./ai-media-service.js?v=29.09.33"></script>
-<script src="./notification-center.js?v=29.09.33"></script>
+<script src="./firebase-config.js?v=s3.1.37"></script>
+<script src="./floqr-people-directory.js?v=s3.1.37"></script>
+<script src="./floqr-app-check.js?v=s3.1.37"></script>
+<script src="./floqr-nav.js?v=s3.1.37"></script>
+<script src="./floqr-i18n.js?v=s3.1.37"></script>
+<script src="./floqr-place-i18n.js?v=s3.1.37"></script>
+<script src="./floqai-help-repository.js?v=s3.1.37"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.37"></script>
+<script src="./floqr-venue-query.js?v=s3.1.37"></script>
+<script src="./intent-search.js?v=s3.1.37"></script>
+<script src="./floqai-search.js?v=s3.1.37"></script>
+<script src="./global-profile-status.js?v=s3.1.37"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.37"></script>
+<script src="./shared-data.js?v=s3.1.37"></script>
+<script src="./national-teams-data.js?v=s3.1.37"></script>
+<script src="./jersey-catalog.js?v=s3.1.37"></script>
+<script src="./feature-gates.js?v=s3.1.37"></script>
+<script src="./floqr-feature-services.js?v=s3.1.37"></script>
+<script src="./url-media-field.js?v=s3.1.37"></script>
+<script src="./ai-service.js?v=s3.1.37"></script>
+<script src="./ai-index-service.js?v=s3.1.37"></script>
+<script src="./ai-search-service.js?v=s3.1.37"></script>
+<script src="./floqr-geo-search.js?v=s3.1.37"></script>
+<script src="./ai-location-service.js?v=s3.1.37"></script>
+<script src="./ai-notification-service.js?v=s3.1.37"></script>
+<script src="./ai-template-studio.js?v=s3.1.37"></script>
+<script src="./floqr-action-feedback.js?v=s3.1.37"></script>
+<script src="./ai-grammar-service.js?v=s3.1.37"></script>
+<script src="./help-attach.js?v=s3.1.37"></script>
+<script src="./helper-popouts.js?v=s3.1.37"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.37"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.1.37"></script>
+<script src="./floqr-consent-mode.js?v=s3.1.37"></script>
+<script src="./floqr-canonical.js?v=s3.1.37"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.37"></script>
+<script src="./ad-campaigns.js?v=s3.1.37"></script>
+<script src="./floqr-ad-tracking.js?v=s3.1.37"></script>
+<script src="./floqr-identity.js?v=s3.1.37"></script>
+<script src="./floqr-blocks.js?v=s3.1.37"></script>
+<script src="./floqr-logger.js?v=s3.1.37"></script>
+<script src="./floqr-client-ip.js?v=s3.1.37"></script>
+<script src="./payment-service.js?v=s3.1.37"></script>
+<script src="./welcome-button-gradient.js?v=s3.1.37"></script>
+<script src="./floqr-name-shoutout.js?v=s3.1.37"></script>
+<script src="./floqr-board-frame.js?v=s3.1.37"></script>
+<script src="./floqr-template-preview.js?v=s3.1.37"></script>
+<script src="./floqr-template-tags.js?v=s3.1.37"></script>
+<script src="./floqr-access-notice.js?v=s3.1.37"></script>
+<script src="./patron-app.js?v=s3.1.37"></script>
+<script src="./ai-assistant-ui.js?v=s3.1.37"></script>
+<script src="./ai-media-service.js?v=s3.1.37"></script>
+<script src="./notification-center.js?v=s3.1.37"></script>
 </body>
 </html>

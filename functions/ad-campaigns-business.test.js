@@ -37,8 +37,8 @@ test("patron portal and Club Admin mount the shared server-backed ad composer", 
   assert.match(html, /id="editAccountType"/);
   assert.match(html, /id="portalAdCampaignsTab"/);
   assert.match(html, /id="adComposerHost"/);
-  assert.match(html, /floqr-ad-composer\.js\?v=s3\.1\.0/);
-  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.1\.0/);
+  assert.match(html, /floqr-ad-composer\.js\?v=s3\.\d+\.\d+/);
+  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /id="privacyDoNotSell"/);
   assert.match(app, /IsBusinessAccount/);
   assert.match(app, /FLOQRPatronAdCampaigns/);
@@ -49,7 +49,7 @@ test("patron portal and Club Admin mount the shared server-backed ad composer", 
   assert.match(composer, /getAdPostingIdentities/);
   assert.doesNotMatch(composer, /collection\("spotAdCampaigns"\)\.(add|doc)/);
   assert.match(adminHtml, /id="spotAdComposerHost"/);
-  assert.match(adminHtml, /floqr-ad-composer\.js\?v=s3\.1\.0/);
+  assert.match(adminHtml, /floqr-ad-composer\.js\?v=s3\.\d+\.\d+/);
   assert.match(adminAds, /mountClubPosters/);
   assert.doesNotMatch(adminAds, /status:\s*"active"/);
 });
@@ -65,8 +65,8 @@ test("master admin Ad Management tab group wires queue, live, stats, intake and 
     assert.match(html, new RegExp(`<section id="${id}"`));
     assert.match(html, new RegExp(`data-panel="${id}"`));
   });
-  assert.match(html, /master-ad-management\.js\?v=s3\.1\.0/);
-  assert.match(html, /ad-campaigns\.js\?v=s3\.1\.0/);
+  assert.match(html, /master-ad-management\.js\?v=s3\.\d+\.\d+/);
+  assert.match(html, /ad-campaigns\.js\?v=s3\.\d+\.\d+/);
   ["approveAdCampaign", "rejectAdCampaign", "setAdCampaignState", "resetAdStats", "purgeAdIntake", "setAdSettings", "setAdInvoiceAccount", "markAdInvoicePaid", "updateAdCampaign"].forEach(name => {
     assert.match(mgmt, new RegExp(`"${name}"`));
   });
@@ -176,7 +176,7 @@ test("search splash rotates a real campaign again and records measured impressio
   assert.match(app, /pickCampaign\(/);
   assert.match(app, /FLOQRAdTracking/);
   assert.match(html, /id="adCreative"/);
-  assert.match(html, /floqr-ad-tracking\.js\?v=s3\.1\.0/);
+  assert.match(html, /floqr-ad-tracking\.js\?v=s3\.\d+\.\d+/);
   assert.match(tracking, /recordAdEvent/);
 });
 

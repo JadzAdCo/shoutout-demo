@@ -12,12 +12,15 @@
 
   function returnPath() {
     const file = window.location.pathname.split("/").pop() || "index.html";
-    return `${file}${window.location.search}${window.location.hash}`;
+    const query = new URLSearchParams(window.location.search);
+    query.delete("v");
+    const search = query.toString();
+    return `${file}${search ? `?${search}` : ""}${window.location.hash}`;
   }
 
   function redirect(reason) {
     if (/\/(?:index\.html)?$/i.test(window.location.pathname)) return;
-    const query = new URLSearchParams({v:"29.04", profileRequired:reason, returnTo:returnPath()});
+    const query = new URLSearchParams({profileRequired:reason, returnTo:returnPath()});
     window.location.replace(`./?${query.toString()}`);
   }
 

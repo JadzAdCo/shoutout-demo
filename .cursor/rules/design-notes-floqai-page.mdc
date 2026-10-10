@@ -17,10 +17,12 @@ Owner (Oct 7 2026): clicking FloqAi on the profile card went to a FloqAi search 
 
 | Entry | Target |
 |---|---|
-| Profile card FloqAi (`global-profile-status.js` → `FLOQRNav.intentSearchHome()`) | `./floqai.html?v=APP_V` |
-| Search tile `#intentSearchBtnCard` | `./floqai.html?v=…&from=search` |
+| Profile card FloqAi (`global-profile-status.js` → `FLOQRNav.intentSearchHome()`) | `./floqai.html` |
+| Search tile `#intentSearchBtnCard` | `./floqai.html?from=search` |
 | Feature catalog route (`floqr-feature-services.js` + `functions/feature-services-core.js`, parity test) | `./floqai.html` |
-| Old `./?start=intent|ask|wish[&q=]` (`FLOQRNav.applyStartPage`) | `location.replace(./floqai.html?v=…[&q=])` |
+| Old `./?start=intent|ask|wish[&q=]` (`FLOQRNav.applyStartPage`) | `location.replace(./floqai.html[?q=])` |
+
+No `v` on any of these since s3.1.37 (page links never carry a version — `floqr-versioning.mdc`).
 | `floqai-search.html` | redirect to `floqai.html` (keeps `q`) |
 
 The index `#intentSearchPage` section stays (template-mode FloqAi on the composer still uses `floqai-search.js`); the `continueToMainCategories` fallback stays as a safety net (test asserts it).
