@@ -35,10 +35,10 @@ $functions = @(
   # commerce paths into fulfillAdOrder / deliverFinalPaidShoutoutReceipt (receipt-delivery link)
   "confirmFloqrCheckoutSession", "stripeFloqrWebhook", "sendTestPaidShoutoutReceipt",
   # feature-services beta invite link
-  "createBetaInvite",
-  # demo-seed manifest admin link
-  "seedTempDemoPack"
+  "createBetaInvite"
 )
+# functions/demo-seed-functions.js (seedTempDemoPack manifest link) also changed, but index.js does not export it on main,
+# so there is nothing deployed to update.
 $deferred = "emailFloqrPreviewLinks", "emailV290914TestLinks", "emailFloqrThreeDayTestPlan", "emailMobileTestChecklist"
 if ($functions | Where-Object { $_ -in $deferred }) { throw "Deferred open-relay mailer in the deploy list" }
 $only = ($functions | ForEach-Object { "functions:$_" }) -join ","
