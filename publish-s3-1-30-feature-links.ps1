@@ -1,13 +1,16 @@
 [CmdletBinding()] param(
   [Parameter(Mandatory = $true)][string]$Commit,
   [string[]]$Bases = @("2991c23", "6216d9a", "2f81de0", "85eab7e"),
+  [string[]]$Only = @(),
+  [string]$Message = "feat: s3.1.30 feature link datapoints + reason prompt on save (Features & Services)",
+  [string]$Stage = "",
   [switch]$AllowDrift
 )
 $ErrorActionPreference = "Stop"
 $env:GIT_PAGER = "cat"
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
-$stage = Join-Path $root ".publish-s3-1-30-feature-links"
+$stage = if ($Stage) { $Stage } else { Join-Path $root ".publish-s3-1-30-feature-links" }
 $git = "C:\Program Files\Git\cmd\git.exe"
 # functions/package.json differs on main: patched in place below, never overwritten.
 $files = @(
@@ -52,6 +55,13 @@ $files = @(
   "suprstar-preview.html",
   "suprstr-search.html"
 )
+$Only = @($Only | ForEach-Object { $_ -split "," } | Where-Object { $_ })
+$Bases = @($Bases | ForEach-Object { $_ -split "," } | Where-Object { $_ })
+if ($Only.Count) {
+  $unknown = @($Only | Where-Object { $files -notcontains $_ })
+  if ($unknown.Count) { throw "Not part of s3.1.30: $($unknown -join ', ')" }
+  $files = $Only
+}
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 & $git clone --depth 1 -b main "https://github.com/JadzAdCo/shoutout-demo.git" $stage
 if ($LASTEXITCODE -ne 0) { throw "Clone failed" }
@@ -125,7 +135,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "feat: s3.1.30 feature link datapoints + reason prompt on save (Features & Services)"
+    & $git commit -m $Message
     if ($LASTEXITCODE -ne 0) { throw "Commit failed" }
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) {
