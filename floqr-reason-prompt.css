@@ -1,0 +1,28 @@
+/* FLOQR reason prompt — desktop/tablet modal, phone bottom sheet. Design notes: .cursor/rules/reason-prompt-on-save.mdc */
+.floqr-reason-overlay{position:fixed;inset:0;z-index:13000;display:grid;place-items:center;padding:18px;background:rgba(4,8,20,.72)}
+.floqr-reason-sheet{box-sizing:border-box;width:min(520px,100%);max-height:calc(100dvh - 36px);overflow:auto;display:grid;gap:10px;padding:20px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:#101937;color:#fff;box-shadow:0 18px 60px rgba(0,0,0,.5);text-align:start}
+.floqr-reason-grip{display:none}
+.floqr-reason-title{margin:0;font-size:18px;line-height:1.3;text-transform:none;letter-spacing:normal}
+.floqr-reason-summary{padding:10px 12px;border:1px solid rgba(223,255,90,.35);border-radius:12px;background:rgba(223,255,90,.08)}
+.floqr-reason-summary[hidden]{display:none}
+.floqr-reason-summary-label{display:block;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#dfff5a}
+.floqr-reason-summary-text{margin:4px 0 0;font-weight:700;overflow-wrap:anywhere}
+.floqr-reason-label{font-weight:800}
+.floqr-reason-help{margin:-4px 0 0;font-size:13px;line-height:1.45;color:rgba(255,255,255,.78)}
+.floqr-reason-input{box-sizing:border-box;width:100%;min-height:88px;resize:vertical;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.28);color:inherit;font:inherit;font-size:16px;line-height:1.4}
+.floqr-reason-input:focus{outline:2px solid #26d8ff;outline-offset:1px}
+.floqr-reason-counter{margin:0;font-size:12px;font-weight:700;color:#ffb08a}
+.floqr-reason-counter.is-ok{color:#9dffb0}
+.floqr-reason-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+.floqr-reason-actions button{min-height:44px;min-width:96px}
+.floqr-reason-save[disabled]{opacity:.5;cursor:not-allowed}
+@media (max-width:600px){
+  .floqr-reason-overlay{place-items:end stretch;padding:0}
+  .floqr-reason-sheet{width:100%;max-height:calc(100dvh - var(--floqr-reason-kb,0px) - 24px);margin-bottom:var(--floqr-reason-kb,0px);padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));border-radius:20px 20px 0 0;border-bottom:0}
+  .floqr-reason-grip{display:block;justify-self:center;width:44px;height:5px;border-radius:999px;background:rgba(255,255,255,.3)}
+  .floqr-reason-actions{display:grid;grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:no-preference){
+  .floqr-reason-sheet{animation:floqrReasonIn .16s ease-out}
+  @keyframes floqrReasonIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+}

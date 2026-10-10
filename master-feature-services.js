@@ -8,6 +8,7 @@
   const AUDIT_LIMIT = 50;
   const USER_SCAN_LIMIT = 500;
   const RESULT_LIMIT = 20;
+  const REASON_MIN = 8;
 
   let bound = false;
   let seededOnce = false;
@@ -77,9 +78,12 @@
     return snap.size;
   }
 
+  const FIELD_LABEL = {IsFeatureEnabled: "Enable Feature", IsTestFeature: "Enable Beta Feature"};
+
   function flagToggle(key, field, value) {
     const checked = value === 1 ? " checked" : "";
-    return `<label class="toggle-inline"><input type="checkbox" data-feature-key="${esc(key)}" data-feature-field="${field}"${checked}/> <span>${value === 1 ? "1" : "0"}</span></label>`;
+    const label = `${featureLabel(key)}: ${FIELD_LABEL[field]}`;
+    return `<label class="toggle-inline feature-flag-toggle"><input type="checkbox" data-feature-key="${esc(key)}" data-feature-field="${field}" aria-label="${esc(label)}"${checked}/> <span>${value === 1 ? "1" : "0"}</span></label>`;
   }
 
   const STATE_TEXT = {
@@ -87,6 +91,18 @@
     test: "Testing — granted beta testers see it on Search; Master Admins use the link here",
     live: "Live — every patron sees it on Search"
   };
+
+  function revisionText(row) {
+    return `<span class="feature-revision" title="Number of saved changes to this feature">Revision ${esc(row.revision)}</span>`;
+  }
+
+  function featureCell(base, row) {
+    const state = stateOf(row);
+    const link = state === "off"
+      ? `<small class="feature-open-note">Off — set Enable Feature to 1 to open it.</small>`
+      : `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
+    return `<strong>${esc(base.label)}</strong><small class="feature-state">${esc(STATE_TEXT[state])}</small>${link}`;
+  }
 
   function stateOf(row) {
     return root.FLOQRFeatureServices?.stateOf?.(row) || "off";
@@ -106,19 +122,14 @@
     tbody.innerHTML = catalog().map(base => {
       const row = features[base.key] || base;
       const last = row.revision
-        ? `r${esc(row.revision)} · ${esc(row.updatedByEmail || "system")} · ${esc(formatWhen(row.updatedAtMs))}<br/><small>${esc(row.lastChangeReason || "")}</small>`
-        : "<small>Packaged default (not saved yet)</small>";
-      const state = stateOf(row);
-      const link = state === "off"
-        ? "<small>Off — set IsFeatureEnabled to 1 to open it.</small>"
-        : `<a href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
+        ? `<div>${revisionText(row)} · ${esc(row.updatedByEmail || "system")} · ${esc(formatWhen(row.updatedAtMs))}<small class="feature-reason">${esc(row.lastChangeReason || "")}</small></div>`
+        : "<div><small>Packaged default (not saved yet)</small></div>";
       return `<tr>
-        <td><strong>${esc(base.label)}</strong><br/><small>${esc(STATE_TEXT[state])}</small></td>
-        <td style="text-align:center">${flagToggle(base.key, "IsFeatureEnabled", row.IsFeatureEnabled)}</td>
-        <td style="text-align:center">${flagToggle(base.key, "IsTestFeature", row.IsTestFeature)}</td>
-        <td>${link}</td>
-        <td>${last}</td>
-        <td><button type="button" data-feature-save="${esc(base.key)}">Save</button></td>
+        <td data-label="Feature" class="feature-name-cell">${featureCell(base, row)}</td>
+        <td data-label="Enable Feature" class="feature-flag-cell">${flagToggle(base.key, "IsFeatureEnabled", row.IsFeatureEnabled)}</td>
+        <td data-label="Enable Beta Feature" class="feature-flag-cell">${flagToggle(base.key, "IsTestFeature", row.IsTestFeature)}</td>
+        <td data-label="Last change" class="feature-last-cell">${last}</td>
+        <td class="feature-save-cell"><button type="button" data-feature-save="${esc(base.key)}">Save</button></td>
       </tr>`;
     }).join("");
     renderInviteFeatures();
@@ -143,20 +154,42 @@
     return [...document.querySelectorAll(selector)].filter(input => input.checked).map(input => input.dataset.featureKey);
   }
 
+  /** Reason for the audit trail, asked after Save. Design notes: .cursor/rules/reason-prompt-on-save.mdc */
+  async function askReason(summary, statusId) {
+    const promptApi = root.FLOQRReasonPrompt;
+    if (!promptApi?.ask) {
+      setStatus(statusId, "The reason window did not load. Reload the page and try again.");
+      return null;
+    }
+    const reason = await promptApi.ask({summary, minLength: REASON_MIN});
+    if (!reason) setStatus(statusId, "Cancelled — nothing was saved.");
+    return reason;
+  }
+
+  function flagChangeSummary(key, payload) {
+    const row = features[key] || {};
+    const changes = Object.keys(FIELD_LABEL)
+      .filter(field => Object.prototype.hasOwnProperty.call(payload, field) && Number(row[field]) !== payload[field])
+      .map(field => `${FIELD_LABEL[field]} ${Number(row[field]) === 1 ? 1 : 0} → ${payload[field]}`);
+    return `${featureLabel(key)}: ${changes.join(", ") || "no change"}`;
+  }
+
   async function saveFeature(key) {
-    const reason = String(byId("featureServicesReason")?.value || "").trim();
-    if (reason.length < 8) {
-      setStatus("featureServicesStatus", "Enter a reason of at least 8 characters before saving. It is saved in the audit trail.");
-      byId("featureServicesReason")?.focus();
+    const inputs = document.querySelectorAll(`#featureServicesRows input[data-feature-key="${CSS.escape(key)}"]`);
+    const payload = {featureKey: key};
+    inputs.forEach(input => { payload[input.dataset.featureField] = input.checked ? 1 : 0; });
+    const row = features[key] || {};
+    if (Object.keys(FIELD_LABEL).every(field => Number(row[field]) === payload[field])) {
+      setStatus("featureServicesStatus", `Nothing changed for ${featureLabel(key)} — tick or untick a switch first.`);
       return;
     }
-    const inputs = document.querySelectorAll(`#featureServicesRows input[data-feature-key="${CSS.escape(key)}"]`);
-    const payload = {featureKey: key, reason};
-    inputs.forEach(input => { payload[input.dataset.featureField] = input.checked ? 1 : 0; });
-    setStatus("featureServicesStatus", `Saving ${key}…`);
+    const reason = await askReason(flagChangeSummary(key, payload), "featureServicesStatus");
+    if (!reason) return;
+    payload.reason = reason;
+    setStatus("featureServicesStatus", `Saving ${featureLabel(key)}…`);
     try {
       const result = await call("setFeatureServiceFlags", payload);
-      setStatus("featureServicesStatus", `Saved ${key}: ${result.eventType || "updated"} (audit ${String(result.eventId || "").slice(0, 8)}).`);
+      setStatus("featureServicesStatus", `Saved ${featureLabel(key)}: ${result.eventType || "updated"} (audit ${String(result.eventId || "").slice(0, 8)}).`);
       await refreshFeatures();
       await loadAudit();
     } catch (error) {
@@ -171,10 +204,16 @@
     }
     try {
       const count = await loadFeatures();
-      if (count < catalog().length && !seededOnce) {
+      const drifted = Object.values(features).some(row => row.persisted && row.linkFieldsDrifted);
+      if ((count < catalog().length || drifted) && !seededOnce) {
         seededOnce = true;
-        const seeded = await call("seedFeatureServices");
-        if (seeded.created?.length) await loadFeatures();
+        try {
+          const seeded = await call("seedFeatureServices");
+          if (seeded.created?.length || seeded.backfilled?.length) await loadFeatures();
+        } catch (error) {
+          console.warn("Features & Services seed/backfill failed", errorText(error));
+          if (count < catalog().length) throw error;
+        }
       }
       renderFeatures();
       setStatus("featureServicesStatus", "");
@@ -275,17 +314,13 @@
     }
   }
 
-  function askReason(prompt) {
-    const value = String(root.prompt(prompt) || "").trim();
-    if (value.length < 8) {
-      setStatus("betaInviteStatus", "A reason of at least 8 characters is required.");
-      return "";
-    }
-    return value;
+  function testerLabel(uid) {
+    const button = document.querySelector(`#betaTesterList [data-beta-revoke="${CSS.escape(uid)}"]`);
+    return button?.closest(".queue-item")?.querySelector("strong")?.textContent || "this beta tester";
   }
 
   async function revokeTester(uid) {
-    const reason = askReason("Reason for revoking this beta tester (saved in the audit trail):");
+    const reason = await askReason(`Revoke beta access for ${testerLabel(uid)}`, "betaInviteStatus");
     if (!reason) return;
     try {
       await call("revokeBetaTester", {targetUid: uid, reason});
@@ -303,7 +338,7 @@
       setStatus("betaInviteStatus", "A beta tester needs at least one feature. To remove all access, use Revoke.");
       return;
     }
-    const reason = askReason(`Reason for giving this tester ${featureKeys.map(featureLabel).join(", ")} (saved in the audit trail):`);
+    const reason = await askReason(`${testerLabel(uid)}: beta features → ${featureKeys.map(featureLabel).join(", ")}`, "betaInviteStatus");
     if (!reason) return;
     try {
       await call("setBetaTesterFeatures", {targetUid: uid, featureKeys, reason});
@@ -327,12 +362,10 @@
   }
 
   async function recordPromotion() {
-    const reason = String(byId("featurePromotionReason")?.value || "").trim();
-    if (reason.length < 8) {
-      setStatus("featurePromotionStatus", "Enter a promotion reason of at least 8 characters.");
-      return;
-    }
     const testKeys = Object.values(features).filter(row => stateOf(row) === "test").map(row => row.key);
+    const scope = testKeys.length ? testKeys.map(featureLabel).join(", ") : "no feature currently in testing";
+    const reason = await askReason(`Promote test code to live (${scope})`, "featurePromotionStatus");
+    if (!reason) return;
     setStatus("featurePromotionStatus", "Recording promotion…");
     try {
       const result = await call("logFeatureCodePromotion", {reason, featureKeys: testKeys});
@@ -448,5 +481,5 @@
     loadAll();
   }
 
-  root.FLOQRMasterFeatureServices = {mount, refreshFeatures, loadAudit, auditRowHtml};
+  root.FLOQRMasterFeatureServices = {mount, refreshFeatures, loadAudit, auditRowHtml, featureCell, flagChangeSummary};
 })(window);

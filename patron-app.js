@@ -1251,6 +1251,7 @@
       ]);
       window.FLOQRFeatureGates?.applyPatronGateUi?.(currentUser, cachedUserProfile);
       window.FLOQRFeatureServices?.applySearchUi?.();
+      window.FLOQRFeatureServices?.applyFeatureLinks?.(document);
     } catch (e) {
       console.warn("Search feature visibility failed", e?.message || e);
     }
@@ -4689,12 +4690,27 @@
         const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(1000).get();
         totalMessages += noteSnap.size;
         noteSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
+    if (!chats.dataset.floqrFeatureLink) {
+      chats.dataset.floqrFeatureLink = "mingl";
+      chats.classList.add("hidden");
+      chats.hidden = true;
+    }
       } catch(e) {}
 
       try {
+    applyMenuFeatureLinks(user);
         const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(1000).get();
         totalChats = chatSnap.size;
         chatSnap.forEach(d => {
+  function applyMenuFeatureLinks(user) {
+    const fs = window.FLOQRFeatureServices;
+    const host = byId("userDropdown");
+    if (!fs?.ensureLoaded || !host || !user) return;
+    fs.ensureLoaded({db, user, profile: cachedUserProfile})
+      .then(() => fs.applyFeatureLinks(host))
+      .catch(error => console.warn("Profile menu feature links", error?.message || error));
+  }
+
           const unread = d.data().unreadCounts && d.data().unreadCounts[uid] ? Number(d.data().unreadCounts[uid]) : 0;
           unreadChats += unread;
         });
@@ -4738,6 +4754,7 @@
       }
       if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
       await afterLogin();
+        applyMenuFeatureLinks(currentUser);
     });
     bindCategoryFloqAi();
     window.addEventListener("floqr:location-updated", () => {
@@ -4965,7 +4982,7 @@
       <a class="profile-menu-link" data-patron-menu="portal" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html"}">${esc(t("portal.title", "My Profile and Settings"))}</a>
       <div class="profile-menu-line" data-patron-menu="level">${esc(t("profile.menu.memberLevel", "Member Type: Patron", { level: "Patron" }))}</div>
       <a class="profile-menu-link" data-patron-menu="messages" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox"}">${esc(t("nav.inbox", "FloqR Inbox"))} (${esc(c.um)}/${esc(c.tm)})</a>
-      <a class="profile-menu-link" data-patron-menu="chats" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal"}">${esc(t("nav.mingl", "Mingl"))} (${esc(c.uc)}/${esc(c.tc)})</a>`;
+      <a class="profile-menu-link hidden" hidden aria-hidden="true" data-patron-menu="chats" data-floqr-feature-link="mingl" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal"}">${esc(t("nav.mingl", "Mingl"))} (${esc(c.uc)}/${esc(c.tc)})</a>`;
     while (block.firstChild) {
       if (signOut) host.insertBefore(block.firstChild, signOut);
       else host.appendChild(block.firstChild);
@@ -4998,6 +5015,12 @@
         clearInterval(waitAuth);
         firebase.auth().onAuthStateChanged(user => {
           if(user) setTimeout(() => enhanceMenu(user), 350);
+    const fs = window.FLOQRFeatureServices;
+    if (fs?.ensureLoaded) {
+      fs.ensureLoaded({db: firebase.firestore(), user})
+        .then(() => fs.applyFeatureLinks(host))
+        .catch(error => console.warn("Profile menu feature links", error?.message || error));
+    }
         });
       }
     }catch(e){}

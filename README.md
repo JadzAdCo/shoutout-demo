@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.29 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.30 (stable)
+
+- s3.1.30: Features & Services links. Every place that links to Mingl, BartR, RydR, supRstar or FloqAi (Search tiles, the profile menu, My Profile tabs and links, FloqAi results) now follows the same Features & Services switches, and test features carry a Beta pill. Each feature stores two read-only datapoints, `enableFeatureLink` and `enableBetaFeatureLink`, kept in step with the switches by the server. Master Admin → Features & Services reads "Enable Feature" / "Enable Beta Feature" and "Revision N", the open link sits under the feature name, and the reason for a change is asked in a short prompt after Save (a bottom sheet on phones) instead of a box that was always on screen.
 
 - s3.1.29: Master Admin layout. Features & Services → Feature & beta activity reads as a proper table on PC and as label / value cards on tablet and phone (long emails, IPs and hashes are shortened with the full value on hover; before / after changes open on demand). Tables inside Master Admin report boxes no longer squeeze columns to one letter per line. The stray ? beside the Network Intelligence Center title is gone; its help now sits on the All Locations card and explains what the network numbers mean and how to open one venue. Help popouts inside big headings use normal readable text.
 

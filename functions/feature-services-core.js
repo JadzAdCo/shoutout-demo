@@ -48,15 +48,38 @@ function catalogEntry(key) {
   return FEATURE_CATALOG.find(row => row.key === key) || null;
 }
 
+/** Derived link datapoints — written only by the server, in the same write as the flags they come from. */
+function featureLinkFields(feature) {
+  const enabled = flag(feature?.IsFeatureEnabled);
+  return {
+    enableFeatureLink: enabled,
+    enableBetaFeatureLink: enabled === 1 && flag(feature?.IsTestFeature) === 1 ? 1 : 0
+  };
+}
+
+/** True when a stored doc is missing the derived link fields or they disagree with its flags. */
+function linkFieldsDrifted(raw) {
+  if (!raw || typeof raw !== "object") return false;
+  const want = featureLinkFields(raw);
+  return !Object.prototype.hasOwnProperty.call(raw, "enableFeatureLink")
+    || !Object.prototype.hasOwnProperty.call(raw, "enableBetaFeatureLink")
+    || flag(raw.enableFeatureLink) !== want.enableFeatureLink
+    || flag(raw.enableBetaFeatureLink) !== want.enableBetaFeatureLink;
+}
+
 function normalizeFeature(key, raw = null) {
   const base = catalogEntry(key);
   if (!base) return null;
   const data = raw && typeof raw === "object" ? raw : {};
   const has = field => Object.prototype.hasOwnProperty.call(data, field);
+  const flags = {
+    IsFeatureEnabled: has("IsFeatureEnabled") ? flag(data.IsFeatureEnabled) : base.IsFeatureEnabled,
+    IsTestFeature: has("IsTestFeature") ? flag(data.IsTestFeature) : base.IsTestFeature
+  };
   return {
     ...base,
-    IsFeatureEnabled: has("IsFeatureEnabled") ? flag(data.IsFeatureEnabled) : base.IsFeatureEnabled,
-    IsTestFeature: has("IsTestFeature") ? flag(data.IsTestFeature) : base.IsTestFeature,
+    ...flags,
+    ...featureLinkFields(flags),
     revision: Number.isFinite(Number(data.revision)) ? Number(data.revision) : 0,
     persisted: !!raw
   };
@@ -259,6 +282,8 @@ module.exports = {
   CONTROL_SETS,
   flag,
   catalogEntry,
+  featureLinkFields,
+  linkFieldsDrifted,
   normalizeFeature,
   BETA_ELIGIBLE_KEYS,
   featureState,

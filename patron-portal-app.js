@@ -386,6 +386,19 @@
     }
   }
 
+  /** Mingl / BartR tabs and links follow Features & Services (FLOQRFeatureServices.linkState). */
+  async function applyPortalFeatureLinks(user) {
+    const fs = window.FLOQRFeatureServices;
+    if (!fs?.ensureLoaded) return;
+    try {
+      await fs.ensureLoaded({db, user, profile: currentProfile});
+    } catch (error) {
+      console.warn("Portal feature links", error?.message || error);
+    }
+    fs.applyFeatureLinks(byId("portalPanel") || document);
+    if (!document.querySelector(".admin-panel-section.active")) showPortalPanel("portalOverview", "portalOverview");
+  }
+
   function showShoutoutPane(paneId) {
     const target = String(paneId || "shoutoutPendingPane");
     ["shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutArchivePane", "shoutoutTemplatesPane"].forEach(id => {
@@ -4584,6 +4597,7 @@
       setText("portalStatus", "");
       handleMemberConnectReturn();
       loadPortal(user);
+      applyPortalFeatureLinks(user);
     });
   });
 })();

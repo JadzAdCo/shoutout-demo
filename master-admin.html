@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=s3.1.24"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.29"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.30"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.30"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
@@ -1183,24 +1184,19 @@
           <h2
             data-floqr-help-id="help-features-services"
             data-floqr-help-title="Features & Services"
-            data-floqr-help-search="features and services|feature flags|enable feature|disable feature|test feature|beta tester|beta testers|IsFeatureEnabled|IsTestFeature|promote test to live"
-            data-floqr-help-body="Each feature has two switches. IsFeatureEnabled = 0 turns the feature off for everyone, including beta testers and the Open link on this page. With IsFeatureEnabled = 1 and IsTestFeature = 0, every patron sees the Search link button. With IsFeatureEnabled = 1 and IsTestFeature = 1, the feature is in testing: only beta testers you granted that feature see it on Search, marked Beta, and Master Admins open it from the Open link on this page instead of Search. Master Admins cannot be beta testers. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
+            data-floqr-help-search="features and services|feature flags|enable feature|enable beta feature|disable feature|test feature|beta tester|beta testers|IsFeatureEnabled|IsTestFeature|feature links|revision|promote test to live"
+            data-floqr-help-body="Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link under the feature name in this table. Each feature has two switches. Enable Feature (IsFeatureEnabled) = 0 turns the feature off for everyone, including beta testers, Master Admins, and every menu link. With Enable Feature = 1 and Enable Beta Feature (IsTestFeature) = 0, every patron sees its Search tile and menu links. With both = 1, the feature is in testing: only beta testers you granted that feature see its links, marked Beta; Master Admins see it in their profile menu marked Beta and open it from this table instead of Search. Master Admins cannot be beta testers. When you press Save, FLOQR asks for a reason of at least 8 characters; it needs an SOS2FA unlock and is written to the tamper-evident audit trail below. Revision counts the saved changes to a feature. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
           >Features & Services</h2>
-          <p class="sub small">Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link in this table.</p>
           <p id="featureServicesStatus" class="status" aria-live="polite"></p>
-          <label>Reason for change (required, 8+ characters)
-            <input id="featureServicesReason" type="text" maxlength="500" placeholder="e.g. Beta round 2 for Mingl at Club Echo" autocomplete="off"/>
-          </label>
-          <div class="report-block" style="overflow:auto;margin-top:12px">
-            <table class="admin-table" style="width:100%;border-collapse:collapse">
+          <div class="report-block feature-flags-wrap">
+            <table class="admin-table feature-flags-table">
               <thead>
                 <tr>
-                  <th scope="col" style="text-align:left">Feature</th>
-                  <th scope="col">Enabled<br/><small>IsFeatureEnabled</small></th>
-                  <th scope="col">Test<br/><small>IsTestFeature</small></th>
-                  <th scope="col" style="text-align:left">Master Admin link</th>
-                  <th scope="col" style="text-align:left">Last change</th>
-                  <th scope="col"></th>
+                  <th scope="col">Feature</th>
+                  <th scope="col" title="IsFeatureEnabled — 1 shows the feature's links; 0 turns it off for everyone">Enable Feature</th>
+                  <th scope="col" title="IsTestFeature — 1 limits the feature to granted beta testers (Beta pill); only applies when Enable Feature is 1">Enable Beta Feature</th>
+                  <th scope="col">Last change</th>
+                  <th scope="col"><span class="visually-hidden">Save</span></th>
                 </tr>
               </thead>
               <tbody id="featureServicesRows"></tbody>
@@ -1237,9 +1233,6 @@
           <p class="eyebrow">Test → live</p>
           <h2>Promote test code to live</h2>
           <p class="sub small">Records who promoted what and why, then opens the GitHub workflow that merges the <code>test</code> branch into <code>main</code> after tests pass. Turn the feature Live above once the promotion is published.</p>
-          <label>Promotion reason (required, 8+ characters)
-            <input id="featurePromotionReason" type="text" maxlength="500" placeholder="e.g. Mingl beta signed off by QA" autocomplete="off"/>
-          </label>
           <div class="queue-actions" style="margin-top:12px">
             <button type="button" class="primary" id="featurePromotionBtn">Record promotion &amp; open workflow</button>
           </div>
@@ -1699,11 +1692,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.1.24"></script>
+<script src="./floqr-i18n.js?v=s3.1.30"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.1.0"></script>
-<script src="./global-profile-status.js?v=s3.0.5"></script>
+<script src="./global-profile-status.js?v=s3.1.30"></script>
 <script src="./floqr-temp-qa-showcase.js?v=s3.1.24"></script>
 <script src="./shared-data.js?v=s3.1.26"></script>
 <script src="./feature-gates.js?v=s3.1.26"></script>
@@ -1715,7 +1708,7 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.1.29"></script>
+<script src="./floqai-help-repository.js?v=s3.1.30"></script>
 <script src="./floqr-i18n-help.js?v=s3.1.24"></script>
 <script src="./help-attach.js?v=s3.1.29"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
@@ -1731,8 +1724,9 @@
 <script src="./master-admin-app.js?v=s3.1.27"></script>
 <script src="./master-ad-management.js?v=s3.1.0"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
-<script src="./floqr-feature-services.js?v=s3.1.26"></script>
-<script src="./master-feature-services.js?v=s3.1.29"></script>
+<script src="./floqr-feature-services.js?v=s3.1.30"></script>
+<script src="./floqr-reason-prompt.js?v=s3.1.30"></script>
+<script src="./master-feature-services.js?v=s3.1.30"></script>
 <script src="./floqr-data-classification.js?v=s3.1.24"></script>
 <script src="./master-data-classification.js?v=s3.1.24"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.98"></script>

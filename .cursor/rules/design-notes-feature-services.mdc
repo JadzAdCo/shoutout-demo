@@ -52,6 +52,29 @@ Enforcement points:
 2. **Satellite pages** — `<body data-floqr-feature="key">` + `floqr-feature-services.js`: hides body until checked. **Signed out → `FLOQRSessionShell.redirectToLogin()`** (general sign-in, see below); `data-floqr-feature-signed-out="allow"` was removed everywhere in s3.0.110. Signed in but denied → “This feature isn't available on your account yet.” + Back to Search, and `logFeatureAccessAttempt` records it. 8 s timeout = deny. Guarded: `commerce.html` (bartr), `pickup.html` + `rydr.html` (rydr), `suprstr-search.html` + `suprstar-preview.html` (supRstar), `mingl-chat.html` + `mingl-gist.html` (mingl).
 3. **Server** — `assertFeatureAccess(auth, key)` in `createFloqrCheckoutSession` (`CHECKOUT_FEATURE_KEYS`) and `requestTeslaRobotaxiPickup`; denial detail carries `state` + `surface: "server"`. Client guards are UX; the server check is the control.
 
+## Feature link datapoints (s3.1.30)
+
+Two derived `0|1` fields on `featureServices/{featureKey}`:
+
+| Field | Value |
+|---|---|
+| `enableFeatureLink` | `IsFeatureEnabled` |
+| `enableBetaFeatureLink` | `IsFeatureEnabled == 1 && IsTestFeature == 1 ? 1 : 0` |
+
+- Written **only by the server**, in the same transaction as the flags: `setFeatureServiceFlags` (`after = {...flags, ...featureLinkFields(flags), revision+1}`; audit before/after carry both), `seedFeatureServices` (new docs). Never independently editable (rules keep `featureServices` Functions-write-only). Helpers: `featureLinkFields` / `linkFieldsDrifted` in `functions/feature-services-core.js`; client mirror `deriveLinkFields`.
+- **Backfill:** `seedFeatureServices` also merges the two fields into existing docs that miss or disagree (`linkFieldsBackfilledAtMs`, flags + revision untouched) and writes **one** chained event per call (`feature.seeded` with `detail.linksBackfilled`, or `feature.links_backfilled`). Master Admin F&S tab calls seed automatically when any row is drifted (SOS2FA unlock required). Until then the client derives the fields from the flags.
+- **One client API:** `FLOQRFeatureServices.linkState(key, {surface}) → {show, beta, state, …}`. `show = enableFeatureLink == 1 && access`, where access = `searchVisible` for `surface: "search"` (Master Admins excluded from test tiles) and `canAccess` everywhere else. `beta = show && enableBetaFeatureLink == 1` → append `.feature-beta-pill` (`cat.betaPill`).
+- **Master Admin profile menu shows test features with a Beta pill** (canAccess), even though Search hides them — by design (s3.1.30).
+- Surfaces (all through `linkState` / `applyFeatureLinks` with `data-floqr-feature-link="key"`, hidden via `FLOQRTabGates.apply` / `hidden`, never one-off CSS): Search tiles (`applySearchUi`), profile avatar menu (`global-profile-status.js` on satellites; `patron-app.js` `#userDropdown` on Search: Mingl Chat), My Profile tabs/links (`patron-portal.html` BartR Store tab + Manage Mingl Friends tab with `data-floqr-feature-panel`, Mingl Chat / Open BartR links), FloqAi product cards (`intent-search.js` `featureKey` + `featureLinkShown`). ShoutOut is always live. Server `assertFeatureAccess` unchanged.
+- Master Admin detection on the client also reads token claims (`masterAdmin` / `superAdmin`) so claim-only admins get the Beta menu entries.
+
+## F&S table + reason prompt (s3.1.30)
+
+- Headers: **Enable Feature** (`title` = IsFeatureEnabled) and **Enable Beta Feature** (`title` = IsTestFeature); 0/1 stays under each checkbox. Revision shows **Revision N** (`title` "Number of saved changes to this feature").
+- The Master Admin Open link lives in the Feature cell under the name + state; off rows say "Off — set Enable Feature to 1 to open it." Table on PC, label/value cards ≤900px, single column ≤480px (`admin.css` `.feature-flags-*`).
+- No standing reason input. Reason is asked after Save by `FLOQRReasonPrompt` (modal / phone bottom sheet, min 8) for row Save, tester Save feature access, Revoke, and Record promotion. Contract: `reason-prompt-on-save.mdc`.
+- Intro paragraph moved into the F&S heading `?` (`help-features-services`, masterAdmin).
+
 ## Sign-in redirect on every page (s3.0.110)
 
 A forwarded / bookmarked URL opened while signed out must land on the **general** FLOQR sign-in (Search Welcome card: Google, Microsoft, Facebook, Email, SMS, WhatsApp) — never a Google-only card.
