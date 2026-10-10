@@ -19,7 +19,7 @@ Why: SOS2FA codes travel only by SendGrid email and Twilio SMS. Both accounts we
 
 ## Related break-glass: demo sign-in code (s3.1.31)
 
-With an unlocked SOS2FA session (recovery code works), a Master Admin can mint a one-time Email OTP for a `@floqr-demo.com` demo account on `demo-signin.html` (`issueDemoSignInCode`). Contract, audit and removal: `design-notes-demo-signin.mdc`. Remove it together with the recovery code.
+With an unlocked SOS2FA session (recovery code works), a Master Admin can mint a one-time Email OTP for a `@floqr-demo.com` demo account in Master Admin → Entity Management → Demo Svc / Emp Mgmt (`#demoEmployees`, `issueDemoSignInCode`). Contract, audit and removal: `design-notes-demo-signin.mdc`. Remove it together with the recovery code.
 
 ## Removal (when SendGrid / Twilio are paid)
 

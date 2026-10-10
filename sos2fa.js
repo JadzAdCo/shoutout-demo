@@ -17,6 +17,7 @@
     "clubOnboarding",
     "templateManagement",
     "recommendationModeration",
+    "demoEmployees",
     "featuresServices",
     "dataClassification",
     "adApprovalQueue",

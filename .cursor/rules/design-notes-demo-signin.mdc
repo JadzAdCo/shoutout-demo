@@ -1,5 +1,5 @@
 ---
-description: Demo sign-in code (s3.1.31) — Master Admin + SOS2FA issue a one-time email OTP for floqr-demo.com accounts while SendGrid is unpaid; Welcome card "I already have a code"; audit, expiry, removal
+description: Demo sign-in code (s3.1.31) — Master Admin → Entity Management → Demo Svc / Emp Mgmt + SOS2FA issue a one-time email OTP for floqr-demo.com accounts while SendGrid is unpaid; Welcome card "I already have a code"; audit, expiry, removal
 alwaysApply: false
 ---
 # Demo sign-in code (break-glass, s3.1.31)
@@ -28,12 +28,19 @@ Why: demo accounts `temp_<role>_<1-10>@floqr-demo.com` sign in only by Email OTP
 - Email panel: **I already have a code** (`#emailOtpHaveCodeBtn`, `app.emailHaveCode*` chrome keys in all 11 packs) → no callable, just focuses the code box.
 - `verifyEmailOtp` on the client always derives `challengeId = sha256(email)` with `crypto.subtle` (same id the server uses), so a code works without pressing Send. Send failures for `@floqr-demo.com` append the "enter the code you were given" hint.
 
-## Master Admin UI
+## Master Admin UI — Entity Management → **Demo Svc / Emp Mgmt** (owner placement, s3.1.31)
 
-`demo-signin.html` + `demo-signin.js` (satellite: `FLOQRSessionShell`, `FLOQRSOS2FA.mount` incl. recovery code, Master Admin check from claims). Role picker (waitress, waiter, busboy, bottle, bartender, dj, promoter, clubadmin — from `floqr-temp-qa-showcase.js` `PEOPLE`) × 1–10, or a typed demo email. Reason: `FLOQRReasonPrompt.ask` after Generate (`reason-prompt-on-save.mdc`; no standing reason input — the page needs `floqr-reason-prompt.js/.css` from s3.1.30 on main). Result: big code, countdown, Copy code / Copy email, incognito steps. Not linked from `master-admin.html` (other work owned that file); URL: `/demo-signin.html`. FloqAi help `help-master-demo-signin` (masterAdmin).
+- Subtab `data-panel="demoEmployees"` in the Entity Management group, chrome key `master.demoEmployees` (11 packs). Deep link `master-admin.html#demoEmployees`.
+- Gated by the **existing** Entity Management SOS2FA: `demoEmployees` is in `sos2fa.js` `ENTITY_MGMT_PANELS` and `master-admin-app.js` `ENTITY_MGMT_PANEL_IDS`, so the section is wrapped (`.entity-mgmt-content` hidden) and the Privilege Admin Access gate card (Request SOS2FA Code + recovery code) is prepended while locked. `master-demo-employees.js` (`FLOQRMasterDemoEmployees.mount`, called from `activatePanel`) loads nothing until `isUnlocked("entityManagement")`; it reloads on `floqr:sos2fa-unlocked`.
+- Roster = packaged demo employees (8 roles × 10 demo clubs from `floqr-temp-qa-showcase.js` `personRecord` / `CLUBS`), merged with Firestore `users` docs whose email is in `[temp_, temp\`)` and matches the demo pattern (Master Admin may read `users` under the s3.1.26 rules; no extra callable). Shows name, email, role (`approvedRoles` or packaged role), club (`affiliatedClubName` or demo club brand), "no profile yet". Search box filters name/email/role/club; select list mirrors the filter; each row has **Generate code**. "Not in the list?" = role × demo club picker.
+- Generate → `FLOQRReasonPrompt.ask` (`reason-prompt-on-save.mdc`, min 8, no standing input) → `issueDemoSignInCode` with the Entity Management `sos2faSessionId`. Result card: large code, countdown, Copy code / Copy email, incognito steps. SOS2FA errors lock + re-show the gate.
+- **Recent codes issued**: `featureServiceAuditLogs where eventType == "demo.signin_code_issued"` (Master Admin read), newest 10 — who / when / target / reason, never a code.
+- CSS in its own file `master-demo-employees.css` (not `admin.css`). Shared-file edits are applied by `scripts/apply-s3-1-31-demo-employees-tab.js` (anchored, idempotent).
+- `demo-signin.html` (first s3.1.31 cut, a standalone satellite) is now a redirect to `master-admin.html?v=s3.1.31#demoEmployees`; `demo-signin.js` was removed.
+- FloqAi help `help-master-demo-signin` (masterAdmin) links to the tab; phrases include "demo employee code", "temp code", "demo sign in", "sign in as demo".
 
 ## Removal (when SendGrid is paid and demo email OTP is delivered again)
 
 1. Delete `exports.issueDemoSignInCode` (+ `demoSigninAuditRecord`, `appendDemoSigninChainedAudit`, `writeDemoSigninDenial`), then `firebase functions:delete issueDemoSignInCode --region us-central1 --project shoutoutdemo-5b402`.
 2. Keep `demo-signin-core.js` `emailOtpChallengeId` / `emailOtpChallengeRecord` (requestEmailOtp uses them); drop the `adminIssuedChallengeActive` guard and redeploy `requestEmailOtp`.
-3. Remove `demo-signin.html` / `demo-signin.js`, the FloqAi entry (+ rebuild `floqai-content-classes.json`, redeploy `getFloqAiAccess`), and `functions/demo-signin.test.js` from the test list. The Welcome-card "I already have a code" button may stay (harmless; it only verifies).
+3. Remove the `demoEmployees` subtab/section (+ both panel lists, `activatePanel` hook, `master.demoEmployees` keys, `master-demo-employees.js/.css`), the `demo-signin.html` redirect, the FloqAi entry (+ rebuild `floqai-content-classes.json`, redeploy `getFloqAiAccess`), and `functions/demo-signin.test.js` from the test list. The Welcome-card "I already have a code" button may stay (harmless; it only verifies).
