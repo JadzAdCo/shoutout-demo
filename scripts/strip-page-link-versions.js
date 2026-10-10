@@ -90,10 +90,12 @@ function stripQueryV(src) {
 }
 
 const COND = String.raw`\((?:[^()\n]|\([^()\n]*\))*\)`;
-const SET_V = String.raw`\w+\.searchParams\.set\(\s*["']v["']\s*,[^;\n]*\);`;
+const SET_V = String.raw`\w+(?:\.searchParams)?\.set\(\s*["']v["']\s*,[^;\n]*\);`;
+const NAV_V_TRY = String.raw`^[ \t]*(?:\/\/[^\n]*\r?\n[ \t]*)?try \{\s*const (\w+) = window\.FLOQRNav\?\.appVersion;\s*if \(\1\) \w+(?:\.searchParams)?\.set\(\s*["']v["']\s*,\s*\1\s*\);\s*\} catch \(_\) \{\}[ \t]*\r?\n`;
 
 function stripSearchParamsV(src) {
   return src
+    .replace(new RegExp(NAV_V_TRY, "gm"), "")
     .replace(new RegExp(String.raw`if \(!(\w+)\.searchParams\.get\(["']v["']\)[^)\n]*\) \1\.searchParams\.set\(\s*["']v["']\s*,[^;\n]*\);`, "g"), '$1.searchParams.delete("v");')
     .replace(new RegExp(String.raw`^[ \t]*(?:if\s*${COND}\s*)?${SET_V}[ \t]*\r?\n`, "gm"), "")
     .replace(new RegExp(String.raw`(?:if\s*${COND}\s*)?${SET_V}`, "g"), "");

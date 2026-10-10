@@ -95,7 +95,7 @@ try {
   if ($testExit -ne 0) { throw "npm test failed on staged main tree (see .publish-s3-1-37-npm.txt)" }
 } finally { Pop-Location; $ErrorActionPreference = "Stop" }
 
-if ($DryRun) { Write-Host "Dry run OK — nothing pushed. Stage: $stage"; return }
+if ($DryRun) { Write-Host "Dry run OK - nothing pushed. Stage: $stage"; return }
 
 Push-Location $stage
 try {
