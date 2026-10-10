@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.32 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.33 (stable)
+
+- s3.1.33: Security patch. SMS and WhatsApp logs (Twilio SMS / WhatsApp / feature / compliance logs, club message deliveries and inbound replies, Twilio debugger events) never store the club daily code, sign-in codes, passcodes or recovery codes; they are masked before the row is written. Stored Twilio request paths no longer show the full Account SID.
 
 - s3.1.32: In-app links (Venue Links, FloqAi, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.
 

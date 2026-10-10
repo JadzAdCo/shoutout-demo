@@ -18,7 +18,7 @@ const {
   FLOQR_PROFIT_CENTS,
   TWILIO_BUDGET_CENTS
 } = require("./messaging-credits");
-const {sendTwilioMessagesApi} = require("./twilio-log");
+const {sendTwilioMessagesApi, redactSecrets} = require("./twilio-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -134,7 +134,7 @@ async function sendTwilioMessage({
       clubLocationId: text(clubLocationId, 160),
       channel: useWhatsApp ? "whatsapp" : "sms",
       to: destination || text(to, 40),
-      body: text(body, 1600),
+      body: text(redactSecrets(body), 1600),
       purpose: text(purpose, 80),
       shoutoutId: text(shoutoutId || campaignId, 120),
       status: text(result.status, 40),

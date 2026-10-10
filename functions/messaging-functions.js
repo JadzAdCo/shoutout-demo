@@ -24,7 +24,7 @@ const {
   explainTwilioDeliveryError
 } = require("./messaging-core");
 const {sendSystemMail} = require("./mail-log");
-const {sendTwilioMessagesApi, writeTwilioLog} = require("./twilio-log");
+const {sendTwilioMessagesApi, writeTwilioLog, redactSecrets} = require("./twilio-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -157,7 +157,7 @@ async function logDelivery(entry = {}) {
       clubLocationId: text(entry.clubLocationId, 160),
       channel: text(entry.channel, 40),
       to: text(entry.to, 40),
-      body: text(entry.body, 1600),
+      body: text(redactSecrets(entry.body), 1600),
       status: text(entry.status, 40) || "unknown",
       dryRun: entry.dryRun === true,
       provider: text(entry.provider, 40) || "twilio",
@@ -750,9 +750,9 @@ exports.messagingInboundWebhook = onRequest({
 
   await db.collection("clubMessageInbound").add({
     from,
-    body: text(body, 1600),
+    body: text(redactSecrets(body), 1600),
     action: parsed.action || "",
-    code: text(parsed.code, 20),
+    codeProvided: !!parsed.code,
     provider: "twilio",
     messageSid: text(form.MessageSid || form.SmsSid, 80),
     createdAt: admin.firestore.FieldValue.serverTimestamp()
