@@ -8,6 +8,7 @@
 const https = require("https");
 const crypto = require("crypto");
 const admin = require("firebase-admin");
+const {redactSecrets, plainPreview} = require("./secret-redaction");
 
 const SENDGRID_HOST = "api.sendgrid.com";
 const MAIL_SEND_PATH = "/v3/mail/send";
@@ -35,12 +36,6 @@ function emailsOf(to) {
     if (row && typeof row === "object") return text(row.email || row.to, 200).toLowerCase();
     return text(row, 200).toLowerCase();
   }).filter((v) => v.includes("@")))];
-}
-
-function redactSecrets(value) {
-  return String(value == null ? "" : value)
-    .replace(/\b\d{6}\b/g, "••••••")
-    .replace(/Bearer\s+\S+/gi, "Bearer [redacted]");
 }
 
 function clip(value, max) {
@@ -178,7 +173,8 @@ function mergeDeliveryStatus(current, incoming) {
 
 /**
  * Send a system email via SendGrid over TLS 1.3 and persist a Mail Logging row.
- * OTP / SOS2FA bodies are stored redacted.
+ * Codes are masked in every stored subject/body. With redactBody (OTP / SOS2FA) the body
+ * is not stored at all: only bodyTemplateId + a masked bodyPreview.
  */
 async function sendSystemMail({
   apiKey,
@@ -195,14 +191,16 @@ async function sendSystemMail({
   packageVersion = "",
   extra = {},
   redactBody = false,
+  templateId = "",
   attachments = []
 } = {}) {
   const mailLogId = newMailLogId();
   const recipients = emailsOf(to);
   const fromEmail = text(from, 200).toLowerCase();
   const now = Date.now();
-  const storeText = redactBody ? redactSecrets(textBody) : String(textBody || "");
-  const storeHtml = redactBody ? redactSecrets(htmlBody) : String(htmlBody || "");
+  const storeText = redactBody ? "" : redactSecrets(textBody);
+  const storeHtml = redactBody ? "" : redactSecrets(htmlBody);
+  const bodyPreview = redactBody ? plainPreview(textBody || htmlBody) : "";
   const attachmentNames = (attachments || []).map((row) => text(row.filename || row.name, 120)).filter(Boolean);
 
   const baseLog = {
@@ -212,10 +210,13 @@ async function sendSystemMail({
     to: recipients,
     toLower: recipients[0] || "",
     from: fromEmail,
-    subject: text(subject, 300),
+    subject: text(redactSecrets(subject), 300),
     textBody: clip(storeText, TEXT_MAX),
     htmlBody: clip(storeHtml, HTML_MAX),
     bodyRedacted: !!redactBody,
+    bodyStored: !redactBody,
+    bodyTemplateId: text(templateId || kind, 80),
+    bodyPreview,
     attachmentNames,
     packageVersion: text(packageVersion, 40),
     status: "sending",

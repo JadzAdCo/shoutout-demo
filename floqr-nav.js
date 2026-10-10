@@ -5,7 +5,7 @@
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
      Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
-  const APP_V = "s3.1.26";
+  const APP_V = "s3.1.32";
 
   function navT(key, fallback) {
     try {
@@ -23,9 +23,10 @@
     catch (e) { return ""; }
   }
 
-  function buildUrl(path, params = {}) {
+  function buildUrl(path, params = {}, drop = []) {
     try {
       const next = new URL(path, global.location.href);
+      drop.forEach(key => next.searchParams.delete(key));
       Object.entries(params).forEach(([key, value]) => {
         if (value != null && value !== "") next.searchParams.set(key, String(value));
       });
@@ -84,7 +85,7 @@
       if (isDisplayFile(href)) {
         const params = { ...extra };
         delete params.v;
-        return buildUrl(href, params);
+        return buildUrl(href, params, ["v", "screen", "screenFormatId"]);
       }
       return buildUrl(href, { v: APP_V, ...extra });
     },

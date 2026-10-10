@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.30 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.32 (stable)
+
+- s3.1.32: In-app links (Venue Links, FloqAi, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.
 
 - s3.1.30: Features & Services links. Every place that links to Mingl, BartR, RydR, supRstar or FloqAi (Search tiles, the profile menu, My Profile tabs and links, FloqAi results) now follows the same Features & Services switches, and test features carry a Beta pill. Each feature stores two read-only datapoints, `enableFeatureLink` and `enableBetaFeatureLink`, kept in step with the switches by the server. Master Admin → Features & Services reads "Enable Feature" / "Enable Beta Feature" and "Revision N", the open link sits under the feature name, and the reason for a change is asked in a short prompt after Save (a bottom sheet on phones) instead of a box that was always on screen.
 
