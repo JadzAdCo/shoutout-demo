@@ -1,0 +1,39 @@
+---
+description: Demo sign-in code (s3.1.31) — Master Admin + SOS2FA issue a one-time email OTP for floqr-demo.com accounts while SendGrid is unpaid; Welcome card "I already have a code"; audit, expiry, removal
+alwaysApply: false
+---
+# Demo sign-in code (break-glass, s3.1.31)
+
+Resume: `@demo-signin$`.
+
+Why: demo accounts `temp_<role>_<1-10>@floqr-demo.com` sign in only by Email OTP (`requestEmailOtp` → SendGrid, codes redirected to `bans.don@gmail.com`). SendGrid/Twilio were unpaid (Oct 2026), so nobody could sign in as a demo account to test. Email OTP itself was **not** weakened; a Master Admin can mint the same one-time code in-app.
+
+## Scope
+
+- **Demo emails only** — `isFloqrDemoEmail` (`/^temp_[a-z0-9]+_\d+@floqr-demo\.com$/`). Anything else → `invalid-argument` + unchained `demo.signin_code_denied` (target masked).
+- Caller: Master Admin by server trust only (`assertSos2faSession` → `assertSuperAdmin` → `admin-trust.js` `isServerAdminAuth`: claim or verified listed email; never `users` fields) **and** a live `sos2faSessions` doc for that uid (SOS2FA code or recovery code). Reason ≥ 8 chars.
+
+## Server — `issueDemoSignInCode({email, reason, sos2faSessionId})` (us-central1, `functions/ai-discovery-functions.js`)
+
+- Pure helpers in `functions/demo-signin-core.js`, shared with `requestEmailOtp` so both write the **same** `emailOtpChallenges/{sha256(email)}` record via `emailOtpChallengeRecord`: `email, codeHash (HMAC-SHA256 EMAIL_OTP_PEPPER of "email:CODE"), attempts:0, used:false, requestedAt, expiresAt` + audit-only extras `source:"demo-signin-code", issuedByUid, issuedAtMs, expiresAtMs`. Same 8-char `A-Z2-9` code (`createOtpCode`).
+- Expiry **10 min** (`DEMO_SIGNIN_TTL_MS`; normal email OTP stays 6 min). Re-issue throttle 10 s per account. A new code replaces the old one.
+- `verifyEmailOtp` is **unchanged**: 5 attempts, lock, attempt counter commits before the throw (s3.1.26 `otp-attempts.js`), one use, creates the Auth user if the demo account was never seeded.
+- Challenge write + chained audit `demo.signin_code_issued` (target `demoAccount` / email, reason, SOS2FA session hash, `after: {expiresAtMs, accountExists}`) run in **one transaction** on the Features & Services chain (`featureServiceAuditLogs` + head, `feature-services-core` `buildAuditRecord` / `chainHash`, `source: "issueDemoSignInCode"`). Verify integrity on Features & Services covers it.
+- `systemMailLogs` row (`kind: email-otp`, `purpose: demo-signin-code`, `status: issued-in-app`, no recipient, no body) so Mail Logging shows the issue next to normal OTP sends.
+- The plain code is returned **once** in the callable response; never stored or logged (test counts every use of `code` in the callable).
+- `requestEmailOtp` refuses (`failed-precondition`) while an admin-issued code is live for that email, so a Send on the Welcome card cannot void it (`adminIssuedChallengeActive`).
+
+## Sign-in side (Welcome card, `index.html` + `patron-app.js`)
+
+- Email panel: **I already have a code** (`#emailOtpHaveCodeBtn`, `app.emailHaveCode*` chrome keys in all 11 packs) → no callable, just focuses the code box.
+- `verifyEmailOtp` on the client always derives `challengeId = sha256(email)` with `crypto.subtle` (same id the server uses), so a code works without pressing Send. Send failures for `@floqr-demo.com` append the "enter the code you were given" hint.
+
+## Master Admin UI
+
+`demo-signin.html` + `demo-signin.js` (satellite: `FLOQRSessionShell`, `FLOQRSOS2FA.mount` incl. recovery code, Master Admin check from claims). Role picker (waitress, waiter, busboy, bottle, bartender, dj, promoter, clubadmin — from `floqr-temp-qa-showcase.js` `PEOPLE`) × 1–10, or a typed demo email. Reason: `FLOQRReasonPrompt.ask` after Generate (`reason-prompt-on-save.mdc`; no standing reason input — the page needs `floqr-reason-prompt.js/.css` from s3.1.30 on main). Result: big code, countdown, Copy code / Copy email, incognito steps. Not linked from `master-admin.html` (other work owned that file); URL: `/demo-signin.html`. FloqAi help `help-master-demo-signin` (masterAdmin).
+
+## Removal (when SendGrid is paid and demo email OTP is delivered again)
+
+1. Delete `exports.issueDemoSignInCode` (+ `demoSigninAuditRecord`, `appendDemoSigninChainedAudit`, `writeDemoSigninDenial`), then `firebase functions:delete issueDemoSignInCode --region us-central1 --project shoutoutdemo-5b402`.
+2. Keep `demo-signin-core.js` `emailOtpChallengeId` / `emailOtpChallengeRecord` (requestEmailOtp uses them); drop the `adminIssuedChallengeActive` guard and redeploy `requestEmailOtp`.
+3. Remove `demo-signin.html` / `demo-signin.js`, the FloqAi entry (+ rebuild `floqai-content-classes.json`, redeploy `getFloqAiAccess`), and `functions/demo-signin.test.js` from the test list. The Welcome-card "I already have a code" button may stay (harmless; it only verifies).

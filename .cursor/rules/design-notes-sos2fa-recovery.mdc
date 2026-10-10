@@ -17,6 +17,10 @@ Why: SOS2FA codes travel only by SendGrid email and Twilio SMS. Both accounts we
 - UI: `master-admin.html` SOS2FA gate `<details class="sos2fa-recovery">` → `sos2fa.js` `verifyRecoveryCode`.
 - s3.1.28 (Oct 9 2026 owner decision): the normal Request SOS2FA Code / Verify path is open to **any Master Admin** (claim or verified listed email), not only the Super Admin. The recovery box follows the server and is shown only when `canUseRecoveryCode` (listed email + `emailVerified`) — claim holders with an unverified email (e.g. don.b, Microsoft) use the emailed code instead.
 
+## Related break-glass: demo sign-in code (s3.1.31)
+
+With an unlocked SOS2FA session (recovery code works), a Master Admin can mint a one-time Email OTP for a `@floqr-demo.com` demo account on `demo-signin.html` (`issueDemoSignInCode`). Contract, audit and removal: `design-notes-demo-signin.mdc`. Remove it together with the recovery code.
+
 ## Removal (when SendGrid / Twilio are paid)
 
 Delete the callable + export + UI + helpers, then `firebase functions:delete verifySos2faRecoveryCode` and `firebase functions:secrets:destroy SOS2FA_RECOVERY_CODE`. Long-term replacement: TOTP authenticator (`sos2faTotp/{uid}` rule is reserved, not built).

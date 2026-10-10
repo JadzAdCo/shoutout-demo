@@ -29,6 +29,8 @@ const {
   brokenDemoEmailMessage,
   demoEmailOtpDelivery
 } = require("./floqr-demo-accounts");
+const demoSignin = require("./demo-signin-core");
+const featureAudit = require("./feature-services-core");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -1376,18 +1378,22 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
   if (looksLikeBrokenDemoEmail(email)) {
     throw new HttpsError("invalid-argument", brokenDemoEmailMessage(email));
   }
-  const challengeId = crypto.createHash("sha256").update(email).digest("hex");
+  const challengeId = demoSignin.emailOtpChallengeId(email);
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
   const previous = await ref.get();
   const previousData = previous.exists ? previous.data() || {} : {};
+  if (demoSignin.adminIssuedChallengeActive(previousData)) {
+    throw new HttpsError("failed-precondition", "A Master Admin sign-in code is active for this demo account. Press \"I already have a code\" and enter it.");
+  }
   const lastRequestedMs = previousData.requestedAt?.toMillis?.() || 0;
   if (Date.now() - lastRequestedMs < 60000) throw new HttpsError("resource-exhausted", "Wait one minute before requesting another code.");
   const code = createOtpCode();
-  await ref.set({
-    email, codeHash:otpHash(email, code), attempts:0, used:false,
+  await ref.set(demoSignin.emailOtpChallengeRecord({
+    email,
+    codeHash:otpHash(email, code),
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
-  });
+    expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + demoSignin.EMAIL_OTP_TTL_MS)
+  }));
   const delivery = await sendEmailOtp(email, code);
   return {
     challengeId,
@@ -1442,6 +1448,102 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
   }
   if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified:true});
   return {customToken:await admin.auth().createCustomToken(user.uid, {emailOtp:true}), expiresInSeconds:300};
+});
+
+/* Demo sign-in code: Master Admin + SOS2FA issue a one-time email OTP for a floqr-demo.com account
+   without SendGrid. Design notes: .cursor/rules/design-notes-demo-signin.mdc */
+function demoSigninAuditRecord(request, fields) {
+  const headers = request.rawRequest?.headers || {};
+  return {
+    ...featureAudit.buildAuditRecord({
+      ip:String(headers["x-forwarded-for"] || "").split(",")[0].trim() || String(request.rawRequest?.ip || ""),
+      userAgent:String(headers["user-agent"] || ""),
+      actor:{uid:request.auth?.uid || "", email:request.auth?.token?.email || "", role:fields.role || "masterAdmin"},
+      ...fields
+    }),
+    source:"issueDemoSignInCode"
+  };
+}
+
+function appendDemoSigninChainedAudit(tx, headRef, headSnap, record) {
+  const ref = db.collection(featureAudit.COLLECTIONS.audit).doc();
+  const head = headSnap.exists ? headSnap.data() || {} : {};
+  const body = {...record, eventId:ref.id, seq:Number(head.seq || 0) + 1, prevHash:head.hash || featureAudit.GENESIS_HASH};
+  const hash = featureAudit.chainHash(body.prevHash, body);
+  tx.set(ref, {...body, hash, chained:true, createdAt:admin.firestore.FieldValue.serverTimestamp()});
+  tx.set(headRef, {hash, seq:body.seq, eventId:ref.id, updatedAtMs:record.createdAtMs});
+}
+
+/** Denials stay outside the chain (no head-doc contention from abusive traffic). */
+async function writeDemoSigninDenial(request, fields) {
+  try {
+    const ref = db.collection(featureAudit.COLLECTIONS.audit).doc();
+    const record = demoSigninAuditRecord(request, {eventType:"demo.signin_code_denied", outcome:"denied", ...fields});
+    await ref.set({...record, eventId:ref.id, chained:false, createdAt:admin.firestore.FieldValue.serverTimestamp()});
+  } catch (error) {
+    console.error("demo sign-in denial audit failed", error.message);
+  }
+}
+
+exports.issueDemoSignInCode = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER], timeoutSeconds:30, memory:"256MiB"}, async request => {
+  let session;
+  try {
+    session = await assertSos2faSession(request);
+  } catch (error) {
+    await writeDemoSigninDenial(request, {role:request.auth ? "unverified" : "anonymous", detail:{message:String(error.message || "").slice(0, 200)}});
+    throw error;
+  }
+  const input = demoSignin.validateDemoSigninRequest(request.data || {});
+  if (!input.ok) {
+    if (input.code === "demo-only") {
+      await writeDemoSigninDenial(request, {
+        target:{type:"email", id:featureAudit.maskEmail(input.email)},
+        reason:input.reason,
+        sessionId:session.sessionId,
+        detail:{message:"Not a FLOQR demo account."}
+      });
+    }
+    throw new HttpsError("invalid-argument", input.message);
+  }
+  const {email, reason} = input;
+  const nowMs = Date.now();
+  const expiresAtMs = nowMs + demoSignin.DEMO_SIGNIN_TTL_MS;
+  const code = createOtpCode();
+  const codeHash = otpHash(email, code);
+  let accountExists = false;
+  try { await admin.auth().getUserByEmail(email); accountExists = true; }
+  catch (error) { if (error.code !== "auth/user-not-found") throw error; }
+  const challengeRef = db.collection("emailOtpChallenges").doc(demoSignin.emailOtpChallengeId(email));
+  const headRef = db.collection(featureAudit.COLLECTIONS.auditHead).doc("current");
+  const throttled = await db.runTransaction(async tx => {
+    const [previous, headSnap] = await Promise.all([tx.get(challengeRef), tx.get(headRef)]);
+    const lastRequestedMs = previous.exists ? previous.data()?.requestedAt?.toMillis?.() || 0 : 0;
+    if (Date.now() - lastRequestedMs < demoSignin.DEMO_SIGNIN_REISSUE_MS) return true;
+    tx.set(challengeRef, demoSignin.emailOtpChallengeRecord({
+      email,
+      codeHash,
+      requestedAt:admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt:admin.firestore.Timestamp.fromMillis(expiresAtMs),
+      extra:demoSignin.demoChallengeExtra({actorUid:request.auth.uid, nowMs})
+    }));
+    appendDemoSigninChainedAudit(tx, headRef, headSnap, demoSigninAuditRecord(request, {
+      eventType:"demo.signin_code_issued",
+      target:{type:"demoAccount", id:email},
+      reason,
+      sessionId:session.sessionId,
+      after:{expiresAtMs, accountExists, purpose:demoSignin.DEMO_SIGNIN_PURPOSE},
+      nowMs
+    }));
+    return false;
+  });
+  if (throttled) throw new HttpsError("resource-exhausted", "Wait a few seconds before issuing another code for this account.");
+  const mailLogId = `mail_${nowMs.toString(36)}_${crypto.randomBytes(6).toString("hex")}`;
+  await db.collection("systemMailLogs").doc(mailLogId).set({
+    ...demoSignin.demoSigninMailLogRow({email, actorUid:request.auth.uid, actorEmail:session.email, nowMs, packageVersion:`s${require("./package.json").version}`}),
+    createdAt:admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt:admin.firestore.FieldValue.serverTimestamp()
+  }).catch(error => console.error("demo sign-in mail log failed", error.message));
+  return {email, code, expiresAtMs, expiresInSeconds:Math.round(demoSignin.DEMO_SIGNIN_TTL_MS / 1000), accountExists};
 });
 
 exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {

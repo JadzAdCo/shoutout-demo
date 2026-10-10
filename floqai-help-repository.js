@@ -1129,6 +1129,22 @@
       page: "master-admin.html"
     },
     {
+      id: "help-master-demo-signin",
+      title: "Demo sign-in code",
+      body: "Use this when email codes are not arriving and you need to sign in as a FLOQR demo account (temp_role_number@floqr-demo.com). Unlock SOS2FA, pick the role and number, press Generate and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail. Real patron accounts cannot get a code here.",
+      searchPhrases: [
+        "demo sign-in code", "demo sign in code", "demo signin", "sign in as demo account", "log in as demo account",
+        "temp waitress", "floqr-demo", "demo account login", "test account code", "email code not arriving",
+        "sendgrid not working", "demo account password"
+      ],
+      links: [
+        {label: "Demo sign-in code", href: vUrl("./demo-signin.html", {from: "floqai"}), search: "demo sign-in code"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "demo-signin.html"
+    },
+    {
       id: "help-master-completed-log",
       title: "Completed Log",
       body: "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata: 7 years. Media: deleted 90 days after completion. Default search window: 60 days. Export CSV downloads the current results. FloqR does not forever-archive media for compliance.",
