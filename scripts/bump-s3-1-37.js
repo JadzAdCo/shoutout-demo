@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /* s3.1.36 → s3.1.37 bump. Owner decision Oct 10 2026: page / navigation links never carry ?v=.
  * Every HTML page: strip v= from page links, re-stamp every asset tag ?v= (script / link / image) to NEXT.
+ * Every served script (top level + functions/, not tests): strip v= from page links. admin-scheduling.js (owner: never
+ * edit) and functions/ai-discovery-functions.js (deferred open-relay mailers) are left alone.
  * Usage: node scripts/bump-s3-1-37.js [repoRoot]  (idempotent; runs on main's own copies from the publish script).
  * Library: require(...).transformHtml(src) for staging a clean copy of a file that has someone else's edits. */
 "use strict";
@@ -12,6 +14,7 @@ const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.1.37";
 const NEXT_NUM = NEXT.slice(1);
 const NEW_TESTS = [];
+const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 
 function transformHtml(src) {
@@ -35,6 +38,12 @@ function run(root) {
   });
 
   for (const file of fs.readdirSync(root).filter(name => name.endsWith(".html"))) edit(file, transformHtml);
+
+  const servedJs = [
+    ...fs.readdirSync(root).filter(name => name.endsWith(".js")),
+    ...fs.readdirSync(at("functions")).filter(name => name.endsWith(".js") && !name.endsWith(".test.js")).map(name => `functions/${name}`)
+  ].filter(file => !EXEMPT.includes(file));
+  for (const file of servedJs) edit(file, stripPageLinkVersions);
 
   edit("functions/package.json", src => {
     if (!/"version": "3\.1\.\d+"/.test(src)) throw new Error("package.json version");

@@ -3,6 +3,8 @@
   "use strict";
 
   if (window.FLOQR_PROFILE_GUARD_DISABLED || /(?:^|\/)display\.html$/i.test(window.location.pathname)) return;
+  // Patron portal owns its own sign-in card; do not bounce already-routed patrons to index.
+  const isPatronPortal = /(?:^|\/)patron-portal\.html$/i.test(window.location.pathname);
 
   const blocker = document.createElement("div");
   blocker.id = "floqrProfileAccessBlocker";
@@ -20,7 +22,11 @@
 
   function redirect(reason) {
     if (/\/(?:index\.html)?$/i.test(window.location.pathname)) return;
-    const query = new URLSearchParams({profileRequired:reason, returnTo:returnPath()});
+    if (isPatronPortal && reason === "sign-in") {
+      blocker.remove();
+      return;
+    }
+    const query = new URLSearchParams({profileRequired: reason, returnTo: returnPath()});
     window.location.replace(`./?${query.toString()}`);
   }
 
