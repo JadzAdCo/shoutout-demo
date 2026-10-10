@@ -314,6 +314,8 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     }
     heading = heading || headings[0];
     if (!heading) return null;
+    // Hero h1s never get a `?` (it drifts beside a multi-line title); the caller keeps the text visible.
+    if (heading.tagName === "H1") return null;
     if (heading.querySelector(":scope > details.help-popout, .help-popout, .floqr-help-popout")) {
       return null;
     }

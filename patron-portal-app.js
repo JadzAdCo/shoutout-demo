@@ -67,7 +67,7 @@
     next.searchParams.set("shift", shift);
     if (owner) next.searchParams.set("owner", owner);
     next.searchParams.set("from", "schedule-notify");
-    next.searchParams.set("v", "s3.0.1");
+    if (window.FLOQRNav?.appVersion) next.searchParams.set("v", window.FLOQRNav.appVersion);
     return `${next.pathname}${next.search}`;
   }
 
@@ -951,8 +951,8 @@
     try {
       sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
     } catch (_e) {}
-    const v = window.FLOQRNav?.appVersion || "s3.0.66";
-    const params = new URLSearchParams({ v, start: "shoutout", from: "portal-reuse" });
+    const v = window.FLOQRNav?.appVersion;
+    const params = new URLSearchParams({ ...(v ? { v } : {}), start: "shoutout", from: "portal-reuse" });
     if (draft.locationId) params.set("location", draft.locationId);
     if (draft.template) params.set("template", draft.template);
     window.location.href = `./?${params.toString()}`;
@@ -3401,7 +3401,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "29.09.8");
+    if (window.FLOQRNav?.appVersion) url.searchParams.set("v", window.FLOQRNav.appVersion);
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -4159,7 +4159,7 @@
       else showShoutoutPane("shoutoutPendingPane");
     }
     const frameQuery = new URLSearchParams({
-      v: window.FLOQRNav?.appVersion || "s3.0.5",
+      ...(window.FLOQRNav?.appVersion ? { v: window.FLOQRNav.appVersion } : {}),
       embed: "1",
       from: "portal"
     });

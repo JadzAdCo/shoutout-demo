@@ -3,11 +3,11 @@
   "use strict";
 
   function appV() {
-    return (global.FLOQRNav && global.FLOQRNav.appVersion) || "";
+    return String((global.FLOQRNav && global.FLOQRNav.appVersion) || "").trim();
   }
 
   function vUrl(path, params = {}) {
-    const v = appV();
+    const v = /(?:^|\/)display2?\.html$/i.test(path) ? "" : appV();
     const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
     return qs ? `${path}?${qs}` : path;
   }

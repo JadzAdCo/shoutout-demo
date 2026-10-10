@@ -38,7 +38,7 @@ Effects (guaranteed by the module):
 - Registers copy into `FLOQRHelpRepository` when present
 - Popout body resets heading typography (no inherited uppercase / negative letter-spacing / display font) and the `.card` holding an open popout is raised above the next card (s3.1.29)
 
-Do not put `data-floqr-help-*` on giant hero `h1`s (the `?` drifts beside a multi-line title). Attach to the nearest card heading instead — e.g. Master Admin hero help lives on **All Locations**.
+Do not put `data-floqr-help-*` on giant hero `h1`s (the `?` drifts beside a multi-line title). Attach to the nearest card heading instead — e.g. Master Admin hero help lives on **All Locations**. Since s3.1.36 `attachBesideHeading` (used by `helper-popouts.js`) returns `null` for an h1 target, so a `p.sub.small` under a hero title stays visible text instead of becoming a `?`; auth chrome (`[data-floqr-auth-chrome]`) is never converted.
 
 Declarative alternative:
 

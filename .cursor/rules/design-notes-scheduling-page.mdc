@@ -1,5 +1,5 @@
 ---
-description: Staff Scheduling page (scheduling.html) — who it is for, satellite sign-in, Schedule for owner picker (s3.1.34), Assign to name picker + full localization + version-safe links (s3.1.35)
+description: Staff Scheduling page (scheduling.html) — who it is for, satellite sign-in, Schedule for owner picker (s3.1.34), Assign to name picker + full localization + version-safe links (s3.1.35), no empty v / no hero-h1 session hint (s3.1.36)
 alwaysApply: false
 ---
 
@@ -49,3 +49,7 @@ Every label, placeholder and status on the page is a `sched.*` chrome key (11 pa
 ## Version links (s3.1.35)
 
 The owner saw the old page at `scheduling.html?v=s3.1.26&from=floqai`: Pages served the new file for that URL; the browser showed its cached copy (Pages `max-age=600`) and the link came from a FloqAi tab opened before the s3.1.32 nav fix. Since s3.1.35 `floqai-help-repository.js` / `intent-search.js` read `FLOQRNav.appVersion` at call time with **no** fallback version (no nav → no `v`), pages load `floqr-nav.js` before them, and the bump script re-stamps static hub links. `functions/app-version-sync.test.js` fails on hardcoded `?v=` literals or version fallbacks in link builders, wrong script order, or stale hub links.
+
+s3.1.36: a later screenshot showed `scheduling.html?&from=floqai` (empty `v`) on the s3.1.34 page. No builder in s3.1.34 or later can emit `?&` — all use `URLSearchParams` (worst case `v=&`) — so that address was the s3.1.26 link with `v=s3.1.26` deleted by hand. Hardened anyway: builders trim the version and drop `v` entirely when empty, Display board links never get `v`, the floqai-page fallback never leaves a dangling `?`, and `patron-portal-app.js` / `admin-app.js` / `floqr-session-shell.js` stamp `FLOQRNav.appVersion` instead of old literals. `app-version-sync.test.js` evaluates every FloqAi link (repository + product + help intents) with the package, with `""`/whitespace, and with no nav: always `?v=<package>` first, never `?&`, `v=&`, an empty `v`, or `v` on a board.
+
+Embedded hint (s3.1.36): the shell's signed-out embed hint is a `floqr-session-hint` status line (`data-keep-visible`, `session.*` i18n keys), not `p.sub.small`, so `helper-popouts.js` never turns it into a `?` on the hero h1. `helper-popouts.js` also skips anything inside `[data-floqr-auth-chrome]`, and `FLOQRHelpAttach.attachBesideHeading` refuses an h1 target (the paragraph stays visible) — this also fixed `mingl-gist.html`. Test: `functions/session-hint-hero-help.test.js`.

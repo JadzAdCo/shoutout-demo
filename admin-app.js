@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.99";
+  const CURRENT_VERSION = window.FLOQRNav?.appVersion || "";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -966,7 +966,7 @@
     }
     url.searchParams.set("location", next);
     url.searchParams.delete("club");
-    if (!url.searchParams.get("v")) url.searchParams.set("v", CURRENT_VERSION);
+    if (!url.searchParams.get("v") && CURRENT_VERSION) url.searchParams.set("v", CURRENT_VERSION);
     location.replace(url.toString());
     return true;
   }

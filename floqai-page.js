@@ -4,7 +4,12 @@
   "use strict";
   const byId = id => document.getElementById(id);
   const nav = () => window.FLOQRNav;
-  const href = (path, params) => nav()?.stampCurrentVersion?.(path, params) || `${path}?${new URLSearchParams(params)}`;
+  const href = (path, params) => {
+    const stamped = nav()?.stampCurrentVersion?.(path, params);
+    if (stamped) return stamped;
+    const qs = new URLSearchParams(params).toString();
+    return qs ? `${path}?${qs}` : path;
+  };
   const t = (key, fallback) => {
     const value = window.FLOQRI18n?.t?.(key);
     return value && value !== key ? value : fallback;
