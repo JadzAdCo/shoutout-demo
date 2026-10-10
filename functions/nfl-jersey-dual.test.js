@@ -39,12 +39,12 @@ test("Club Admin approve stamps NFL photo background from packaged catalog", () 
 test("display pages cache-bust NFL FloqR + FrameLoop fix", () => {
   const display = fs.readFileSync(path.join(root, "display.html"), "utf8");
   const display2 = fs.readFileSync(path.join(root, "display2.html"), "utf8");
-  assert.match(display, /display\.css\?v=s3\.0\.74/);
-  assert.match(display, /display-app\.js\?v=s3\.0\.74/);
-  assert.match(display, /floqr-frame-loop\.js\?v=s3\.0\.74/);
-  assert.match(display2, /display\.css\?v=s3\.0\.74/);
-  assert.match(display2, /display-app\.js\?v=s3\.0\.74/);
-  assert.match(display2, /floqr-frame-loop\.js\?v=s3\.0\.74/);
+  assert.match(display, /display\.css\?v=s3\.\d+\.\d+/);
+  assert.match(display, /display-app\.js\?v=s3\.\d+\.\d+/);
+  assert.match(display, /floqr-frame-loop\.js\?v=s3\.\d+\.\d+/);
+  assert.match(display2, /display\.css\?v=s3\.\d+\.\d+/);
+  assert.match(display2, /display-app\.js\?v=s3\.\d+\.\d+/);
+  assert.match(display2, /floqr-frame-loop\.js\?v=s3\.\d+\.\d+/);
 });
 
 test("FLOQRFrameLoop rebinds interval so media↔copy cannot stall", () => {

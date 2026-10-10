@@ -1,21 +1,42 @@
 "use strict";
 
+// Owner decision Oct 10 2026: page / navigation links never carry ?v=. Only asset tags
+// (<script src>, <link href>, images) are cache-busted, and only by the bump script.
+
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const {stripPageLinkVersions} = require("../scripts/strip-page-link-versions.js");
 
-const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, "..", relativePath), "utf8");
+const rootDir = path.resolve(__dirname, "..");
+const read = (relativePath) => fs.readFileSync(path.join(rootDir, relativePath), "utf8");
 const pkgVersion = `s${JSON.parse(read("functions/package.json")).version}`;
+const htmlPages = () => fs.readdirSync(rootDir).filter((name) => name.endsWith(".html"));
 
-function loadNav() {
-  const win = {location: {href: "https://x/admin.html?location=zebbies", pathname: "/admin.html", hash: ""}, URL, URLSearchParams};
+/* Files that may still mint versioned links, and why. Keep this list short. */
+const EXEMPT = new Map([
+  ["admin-scheduling.js", "owner constraint: never edit"],
+  ["functions/ai-discovery-functions.js", "deferred open-relay mailers must not change until the security review"]
+]);
+
+function servedSources() {
+  const pick = (dir, prefix) => fs.readdirSync(dir)
+    .filter((name) => /\.(?:js|html)$/.test(name) && !name.endsWith(".test.js"))
+    .map((name) => `${prefix}${name}`);
+  return [...pick(rootDir, ""), ...pick(path.join(rootDir, "functions"), "functions/")]
+    .filter((file) => !EXEMPT.has(file));
+}
+
+function loadNav(href = "https://x/admin.html?location=zebbies&v=s3.0.1") {
+  const url = new URL(href);
+  const win = {location: {href, pathname: url.pathname, hash: url.hash}, URL, URLSearchParams};
   vm.runInNewContext(read("floqr-nav.js"), {window: win, URL, URLSearchParams});
   return win.FLOQRNav;
 }
 
-test("FLOQRNav.appVersion equals the package version (bump floqr-nav.js with functions/package.json)", () => {
+test("FLOQRNav.appVersion equals the package version (asset cache-bust id)", () => {
   assert.equal(loadNav().appVersion, pkgVersion);
 });
 
@@ -25,54 +46,30 @@ test("README CURRENT PACKAGE matches functions/package.json", () => {
   assert.equal(head[1], pkgVersion);
 });
 
-test("generated links stamp the current package; Display boards stay location-only", () => {
+test("FLOQRNav never puts v= on a link and drops an incoming v from old bookmarks", () => {
   const nav = loadNav();
-  assert.match(nav.adminPortalUrl("zebbies"), new RegExp(`[?&]v=${pkgVersion.replace(/\./g, "\\.")}(&|$)`));
-  assert.match(nav.stampCurrentVersion("./floqai.html"), new RegExp(`v=${pkgVersion.replace(/\./g, "\\.")}`));
+  const hrefs = [
+    nav.adminPortalUrl("zebbies"),
+    nav.adminHome({from: "master"}),
+    nav.portalHome({tab: "inbox"}),
+    nav.searchHome(),
+    nav.masterHome({hash: "networkDashboard"}),
+    nav.suprstrHome(),
+    nav.portalLink("./mingl-chat.html?v=29.09.8", {room: "r1"}),
+    nav.adminLink("./club-profile.html"),
+    nav.masterLink("./suprstr-search.html"),
+    nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"),
+    nav.intentSearchHome(),
+    nav.resolveBack("mingl").href,
+    nav.resolveBack("bartr").href,
+    nav.resolveBack("portal").href
+  ];
+  assert.deepEqual(hrefs.filter((href) => /[?&]v=/.test(href)), []);
+  assert.equal(nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"), "./floqai.html?q=hi");
+  assert.equal(nav.adminPortalUrl("zebbies"), "./admin.html?location=zebbies&from=master");
+  assert.equal(nav.intentSearchHome(), "./floqai.html");
   assert.equal(nav.stableDisplayUrl("zebbies"), "./display.html?location=zebbies");
-  assert.equal(nav.stampCurrentVersion("./display2.html?location=zebbies&v=s3.0.1"), "./display2.html?location=zebbies");
-});
-
-const LINK_BUILDERS = [
-  "floqai-help-repository.js",
-  "intent-search.js",
-  "floqai-page.js",
-  "floqai-access.js",
-  "scheduling-portal.js",
-  "scheduling-owner-picker.js",
-  "scheduling-assignee-picker.js",
-  "floqr-session-shell.js"
-];
-const APP_LINK_STAMPERS = ["patron-portal-app.js", "admin-app.js", "floqr-session-shell.js"];
-const HUB_LINK = /\.\/(?:floqai|scheduling|patron-portal|admin|master-admin)\.html\?(?:[^"'\s#<>]*?(?:&amp;|&))?v=([^"'&\s#<>]+)/g;
-const rootDir = path.resolve(__dirname, "..");
-const htmlPages = () => fs.readdirSync(rootDir).filter((name) => name.endsWith(".html"));
-
-test("link builders never hardcode a package: no ?v=<version> literal and no stale version fallback", () => {
-  const hits = LINK_BUILDERS.flatMap((file) => {
-    const src = read(file);
-    return [
-      ...src.matchAll(/\?v=(?:s\d+\.\d+\.\d+|\d+\.\d+\.\d+)/g),
-      ...src.matchAll(/\|\|\s*["'](?:s\d+\.\d+\.\d+|\d+\.\d+\.\d+)["']/g),
-      ...src.matchAll(/\?v=\$\{APP_V\}/g)
-    ].map((hit) => `${file}: ${hit[0]}`);
-  });
-  assert.deepEqual(hits, []);
-});
-
-test("FloqAi help links stamp FLOQRNav.appVersion, and carry no version at all when nav is missing", () => {
-  const load = (nav) => {
-    const win = {URLSearchParams, console, FLOQRNav: nav};
-    win.window = win;
-    vm.runInNewContext(read("floqai-help-repository.js"), win);
-    const everyone = {IsPatron: 1, IsServiceMember: 1, IsVenueAdmin: 1, IsMasterAdmin: 1};
-    return JSON.stringify(win.FLOQRHelpRepository.toSearchIntents(everyone));
-  };
-  const withNav = load({appVersion: pkgVersion});
-  const versions = [...withNav.matchAll(/[?&]v=([A-Za-z0-9][A-Za-z0-9.]*)/g)].map((hit) => hit[1]);
-  assert.ok(versions.length > 20, `found ${versions.length} stamped links`);
-  assert.deepEqual([...new Set(versions)], [pkgVersion]);
-  assert.doesNotMatch(load(undefined), /[?&]v=[A-Za-z0-9]/);
+  assert.equal(nav.stampCurrentVersion("./display2.html?location=zebbies&v=s3.0.1&screen=led-64x32"), "./display2.html?location=zebbies");
 });
 
 function generatedHrefs(appVersion) {
@@ -86,43 +83,62 @@ function generatedHrefs(appVersion) {
   return [...json.matchAll(/"href":"([^"]*)"/g)].map((hit) => hit[1]).filter((href) => href.startsWith("./"));
 }
 
-const isBoard = (href) => /(?:^|\/)display2?\.html(?:[?#]|$)/i.test(href);
-
-test("FloqAi links always open with ?v=<package> — never ?&, v=& or an empty v; Display boards get no v", () => {
-  const hrefs = generatedHrefs(pkgVersion);
-  assert.ok(hrefs.length > 50, `found ${hrefs.length} links`);
-  const bad = hrefs.filter((href) => {
-    if (/\?&|[?&]v=(?:&|#|$)|\?(?:#|$)/.test(href)) return true;
-    if (isBoard(href)) return /[?&]v=/.test(href);
-    return !new RegExp(`\\?v=${pkgVersion.replace(/\./g, "\\.")}(?:&|#|$)`).test(href);
-  });
-  assert.deepEqual(bad, []);
-  assert.ok(hrefs.includes(`./scheduling.html?v=${pkgVersion}&from=floqai`));
-});
-
-test("an empty FLOQRNav.appVersion never mints ?&from=floqai or v=", () => {
-  for (const version of ["", "   ", undefined]) {
-    const bad = generatedHrefs(version).filter((href) => /\?&|[?&]v=|\?(?:#|$)/.test(href));
+test("FloqAi links carry no version and no dangling ? / ?& whatever FLOQRNav says", () => {
+  for (const version of [pkgVersion, "", undefined]) {
+    const hrefs = generatedHrefs(version);
+    assert.ok(hrefs.length > 50, `found ${hrefs.length} links`);
+    const bad = hrefs.filter((href) => /[?&]v=|\?&|\?(?:#|$)/.test(href));
     assert.deepEqual(bad, [], `appVersion=${JSON.stringify(version)}`);
+    assert.ok(hrefs.includes("./scheduling.html?from=floqai"));
   }
-  assert.ok(generatedHrefs("").includes("./scheduling.html?from=floqai"));
 });
 
-test("app link stampers take v from FLOQRNav, never a hardcoded package", () => {
-  const hits = APP_LINK_STAMPERS.flatMap((file) => {
+test("no served page, script or Functions URL builder mints a versioned page link", () => {
+  const hits = servedSources().filter((file) => {
     const src = read(file);
-    return [
-      ...src.matchAll(/searchParams\.set\(\s*["']v["']\s*,\s*["'][^"']*["']\s*\)/g),
-      ...src.matchAll(/(?:appVersion|get\(["']v["']\))\s*\|\|\s*["'](?:s?\d+\.\d+[^"']*)["']/g),
-      ...src.matchAll(/CURRENT_VERSION\s*=\s*["'][^"']+["']/g)
-    ].map((hit) => `${file}: ${hit[0]}`);
+    return stripPageLinkVersions(src) !== src;
   });
+  assert.deepEqual(hits, []);
+});
+
+test("no code sets a v query parameter on a link (searchParams / URLSearchParams / {v: ...})", () => {
+  const PATTERNS = [
+    /\.set\(\s*["']v["']\s*,/,
+    /URLSearchParams\(\{\s*v\s*[:,}]/,
+    /\{\s*v\s*:\s*(?:APP_V|PACKAGE_VERSION|CURRENT_VERSION|window\.FLOQRNav)/
+  ];
+  const hits = servedSources().flatMap((file) => read(file).split("\n")
+    .map((line, index) => ({line, index}))
+    .filter(({line}) => PATTERNS.some((re) => re.test(line)))
+    .map(({line, index}) => `${file}:${index + 1}: ${line.trim().slice(0, 120)}`));
+  assert.deepEqual(hits, []);
+});
+
+test("Functions notification links are version-free", () => {
+  const core = require("./scheduling-core");
+  const url = core.shiftApproveUrl({id: "s1", ownerKey: "club:c1"}, "https://www.floqr.com");
+  assert.doesNotMatch(url, /[?&]v=/);
+  assert.match(url, /patron-portal\.html\?tab=work-calendar&shift=s1&owner=club%3Ac1&from=schedule-notify$/);
+});
+
+const ASSET_REF = /(?:src|href)\s*=\s*["'](\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?))\?v=([^"'&#\s]*)/gi;
+
+test("every asset tag that cache-busts uses the current package (bump script re-stamps them)", () => {
+  const stale = htmlPages().flatMap((name) => [...read(name).matchAll(ASSET_REF)]
+    .filter((hit) => hit[2] !== pkgVersion)
+    .map((hit) => `${name}: ${hit[1]}?v=${hit[2]}`));
+  assert.deepEqual(stale, []);
+});
+
+test("Display / Xibo pages are never linked with v=", () => {
+  const hits = servedSources().flatMap((file) => [...read(file).matchAll(/display2?\.html\?[^"'`\s<>]*\bv=/g)]
+    .map((hit) => `${file}: ${hit[0]}`));
   assert.deepEqual(hits, []);
 });
 
 test("pages load floqr-nav.js before the FloqAi link builders", () => {
   const bad = htmlPages().flatMap((name) => {
-    const html = fs.readFileSync(path.join(rootDir, name), "utf8");
+    const html = read(name);
     const nav = html.search(/src="\.\/floqr-nav\.js/);
     return ["floqai-help-repository.js", "intent-search.js"]
       .filter((dep) => {
@@ -132,22 +148,4 @@ test("pages load floqr-nav.js before the FloqAi link builders", () => {
       .map((dep) => `${name}: ${dep}`);
   });
   assert.deepEqual(bad, []);
-});
-
-test("static hub links in HTML (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) use the current package", () => {
-  const stale = htmlPages().flatMap((name) =>
-    [...fs.readFileSync(path.join(rootDir, name), "utf8").matchAll(HUB_LINK)]
-      .filter((hit) => hit[1] !== pkgVersion)
-      .map((hit) => `${name}: ${hit[0]}`));
-  assert.deepEqual(stale, []);
-});
-
-test("every page that loads floqr-nav.js cache-busts it with the current package", () => {
-  const root = path.resolve(__dirname, "..");
-  const stale = fs.readdirSync(root)
-    .filter((name) => name.endsWith(".html"))
-    .flatMap((name) => [...fs.readFileSync(path.join(root, name), "utf8").matchAll(/floqr-nav\.js\?v=([^"'&\s]+)/g)]
-      .filter((hit) => hit[1] !== pkgVersion)
-      .map((hit) => `${name} -> ${hit[1]}`));
-  assert.deepEqual(stale, []);
 });

@@ -4,9 +4,6 @@
 (function (global) {
   "use strict";
 
-  function appV() {
-    return String((global.FLOQRNav && global.FLOQRNav.appVersion) || "").trim();
-  }
   const byId = new Map();
   /** Canonical FloqAi help partitions (one audience key each). */
   const HELP_PARTITIONS = {
@@ -30,9 +27,8 @@
     IsMasterAdmin: 0
   };
 
-  function vUrl(path, params = {}) {
-    const v = /(?:^|\/)display2?\.html$/i.test(path) ? "" : appV();
-    const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+  function pageUrl(path, params = {}) {
+    const qs = new URLSearchParams(params).toString();
     return qs ? `${path}?${qs}` : path;
   }
 
@@ -343,7 +339,7 @@
         helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
         links: (entry.links || []).length
           ? entry.links
-          : [{label: localized.title || entry.title, href: vUrl("./floqai.html")}],
+          : [{label: localized.title || entry.title, href: pageUrl("./floqai.html")}],
         searchPhrases,
         patterns: []
       };
@@ -358,8 +354,8 @@
       body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open FloqAi", href: vUrl("./floqai.html")},
-        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open FloqAi", href: pageUrl("./floqai.html")},
+        {label: "Open SupRstR", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "index.html#floqAiHelpPopout"
@@ -369,7 +365,7 @@
       title: "FloqAi",
       body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, supRstar, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
-      links: [{label: "Open FloqAi", href: vUrl("./floqai.html")}],
+      links: [{label: "Open FloqAi", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "floqai.html#floqAiHelpPopout"
@@ -380,7 +376,7 @@
       body: "Search Soccer, Jersey, or a country/club (Tanzania, Chelsea). Each photo kit card is the LED back you will see on ShoutOut — Soccer · Jersey · Country or Club. Sizes 96×48, 64×48, 64×32. Name and 2-character mark overlay the kit; numbers stay center-justified.",
       searchPhrases: ["soccer jersey", "jersey", "tanzania jersey", "football kit", "country jersey", "club jersey", "chelsea jersey"],
       links: [
-        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})}
+        {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})}
       ],
       source: "help-repository-seed"
     },
@@ -394,7 +390,7 @@
         "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
       ],
       links: [
-        {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open supRstar", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron"]
@@ -404,7 +400,7 @@
       title: "Become a Club Admin",
       body: "Request Club Admin access, then get venue approval.",
       searchPhrases: ["become a club admin", "club admin", "be an admin", "I want to be a club admin"],
-      links: [{label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})}],
+      links: [{label: "Request Club Admin access", href: pageUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})}],
       source: "help-repository-seed"
     },
     {
@@ -412,7 +408,7 @@
       title: "Become a DJ",
       body: "Elect DJ as your service role and associate with clubs.",
       searchPhrases: ["become a dj", "dj access", "I want to be a dj", "disc jockey"],
-      links: [{label: "Request DJ access", href: vUrl("./role-request.html", {from: "floqai", type: "dj"})}],
+      links: [{label: "Request DJ access", href: pageUrl("./role-request.html", {from: "floqai", type: "dj"})}],
       source: "help-repository-seed"
     },
     {
@@ -420,7 +416,7 @@
       title: "Become a Promoter",
       body: "Request Promoter access for guest lists and campaigns.",
       searchPhrases: ["become a promoter", "promoter access", "promotion company"],
-      links: [{label: "Request Promoter access", href: vUrl("./role-request.html", {from: "floqai", type: "promoter"})}],
+      links: [{label: "Request Promoter access", href: pageUrl("./role-request.html", {from: "floqai", type: "promoter"})}],
       source: "help-repository-seed"
     },
     {
@@ -428,7 +424,7 @@
       title: "Role profiles overview",
       body: "See how Club Admin, DJ, Promoter, and hospitality roles work.",
       searchPhrases: ["role profiles", "role profiles overview", "how roles work", "service roles"],
-      links: [{label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})}],
+      links: [{label: "Role profiles overview", href: pageUrl("./role-profiles.html", {from: "floqai"})}],
       source: "help-repository-seed"
     },
     {
@@ -442,8 +438,8 @@
         "website ingest", "confirmed only", "public calendar"
       ],
       links: [
-        {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
-        {label: "Club Admin Calendar & Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Draft / Pending / Confirmed / Open cards plus Scheduler drafts"}
+        {label: "Scheduling portal", href: pageUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
+        {label: "Club Admin Calendar & Scheduler", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Draft / Pending / Confirmed / Open cards plus Scheduler drafts"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelScheduling"
@@ -460,7 +456,7 @@
         "in-app notification", "system message", "floqr inbox test"
       ],
       links: [
-        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+        {label: "Club Admin Notifications", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
@@ -471,7 +467,7 @@
       body: "The SMS pill is green when Firebase smsSubscribed is 1 (prepaid $10 pack, 466 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck SMS and Save to pause alerts without losing the paid pack.",
       searchPhrases: ["sms", "sms credits", "sms subscribe", "green sms", "466 credits"],
       links: [
-        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+        {label: "Club Admin Notifications", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
@@ -482,7 +478,7 @@
       body: "The WhatsApp pill is green when Firebase whatsappSubscribed is 1 (prepaid $10 pack, 233 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck WhatsApp and Save to pause alerts without losing the paid pack.",
       searchPhrases: ["whatsapp", "whatsapp credits", "whatsapp subscribe", "red whatsapp", "233 credits"],
       links: [
-        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+        {label: "Club Admin Notifications", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
@@ -497,8 +493,8 @@
         "notification templates", "confirm or decline this shift"
       ],
       links: [
-        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
-        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+        {label: "Message templates", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
+        {label: "Club Admin Notifications", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#notifyTemplatesPane"
@@ -512,8 +508,8 @@
         "flyer ad", "html ad", "sponsored", "post an ad", "advertisement"
       ],
       links: [
-        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
-        {label: "Ad Campaigns", href: vUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
+        {label: "My Profile", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
+        {label: "Ad Campaigns", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalAdCampaigns",
@@ -529,8 +525,8 @@
         "packaged demos", "house ads", "campaign status badge"
       ],
       links: [
-        {label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"},
-        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
+        {label: "Ad approval queue", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"},
+        {label: "Packaged demos", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#adApprovalQueue"
@@ -540,7 +536,7 @@
       title: "Ad approval queue",
       body: "Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the payment reference. Reject asks for a reason the poster will see and can refund a card payment.",
       searchPhrases: ["ad approval", "approve ad", "pending ads", "reject ad", "refund ad", "waive payment", "mark invoice paid", "ad queue"],
-      links: [{label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"}],
+      links: [{label: "Ad approval queue", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"}],
       source: "help-repository-seed",
       page: "master-admin.html#adApprovalQueue"
     },
@@ -549,7 +545,7 @@
       title: "Live and scheduled ads",
       body: "Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log.",
       searchPhrases: ["live ads", "pause ad", "end ad", "resume ad", "edit ad audience", "ad dates", "ad targeting"],
-      links: [{label: "Live & scheduled", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adLiveCampaigns"}],
+      links: [{label: "Live & scheduled", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adLiveCampaigns"}],
       source: "help-repository-seed",
       page: "master-admin.html#adLiveCampaigns"
     },
@@ -558,7 +554,7 @@
       title: "Ad stats",
       body: "Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged.",
       searchPhrases: ["ad stats", "impressions", "clicks", "ctr", "click rate", "clear ad stats", "reset ad stats", "ad measurement"],
-      links: [{label: "Ad stats", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adStatsPanel"}],
+      links: [{label: "Ad stats", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adStatsPanel"}],
       source: "help-repository-seed",
       page: "master-admin.html#adStatsPanel"
     },
@@ -567,7 +563,7 @@
       title: "SMS and WhatsApp ad intake",
       body: "Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here.",
       searchPhrases: ["text an ad", "sms ad", "whatsapp ad", "ad intake", "send flyer", "ad payment link", "delete ad submissions"],
-      links: [{label: "SMS / WhatsApp intake", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adIntakePanel"}],
+      links: [{label: "SMS / WhatsApp intake", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adIntakePanel"}],
       source: "help-repository-seed",
       page: "master-admin.html#adIntakePanel"
     },
@@ -576,7 +572,7 @@
       title: "Ad settings and billing",
       body: "Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad decision.",
       searchPhrases: ["ad settings", "splash ads", "splash seconds", "house ads", "demo ads", "invoice account", "net terms", "ad audit log"],
-      links: [{label: "Settings & billing", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adSettingsPanel"}],
+      links: [{label: "Settings & billing", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adSettingsPanel"}],
       source: "help-repository-seed",
       page: "master-admin.html#adSettingsPanel"
     },
@@ -589,7 +585,7 @@
         "campaign badge", "status live", "shoutout path", "what does preview mean on ad"
       ],
       links: [
-        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
+        {label: "Packaged demos", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#adCampaignManagement"
@@ -605,9 +601,9 @@
         "my shoutout templates", "shoutout receipt", "compressed shoutout"
       ],
       links: [
-        {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})},
-        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
-        {label: "FloqR Inbox", href: vUrl("./patron-portal.html", {from: "floqai", tab: "inbox"})}
+        {label: "My ShoutOuts", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})},
+        {label: "Archive", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
+        {label: "FloqR Inbox", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "inbox"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalShoutouts"
@@ -620,8 +616,8 @@
         "archive shoutout", "archived shoutouts", "compressed shoutout media", "shoutout archive tab"
       ],
       links: [
-        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
-        {label: "Completed ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "completed"})}
+        {label: "Archive", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
+        {label: "Completed ShoutOuts", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "completed"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#shoutoutArchivePane"
@@ -635,8 +631,8 @@
         "schedule notify", "review and confirm shift", "my assigned shifts", "decline shift"
       ],
       links: [
-        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
-        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
+        {label: "Work Calendar", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Message templates", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalWorkCalendar"
@@ -650,8 +646,8 @@
         "split media", "birthday 64x32", "template report"
       ],
       links: [
-        {label: "Club Admin Reports", href: vUrl("./admin.html", {from: "floqai", tab: "reports"})},
-        {label: "Master Admin Template Catalog", href: vUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
+        {label: "Club Admin Reports", href: pageUrl("./admin.html", {from: "floqai", tab: "reports"})},
+        {label: "Master Admin Template Catalog", href: pageUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelReports"
@@ -666,7 +662,7 @@
         "screen datapoint", "led size"
       ],
       links: [
-        {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
+        {label: "Club Public Profile display screens", href: pageUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
         {label: "Display 1 (Xibo)", href: "./display.html"}
       ],
       audiences: ["venueAdmin"],
@@ -687,8 +683,8 @@
         "heist display choice", "heist washington 64x48"
       ],
       links: [
-        {label: "Club Public Profile (display screens)", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
-        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Club Public Profile (display screens)", href: pageUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
+        {label: "Master Admin", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -715,7 +711,7 @@
         "retention", "exposure report", "system access", "security tab", "floqai access",
         "save all classifications", "needs review", "what needs fixing", "delete after", "seed classification"
       ],
-      links: [{label: "Open Data classification", href: `${vUrl("./master-admin.html")}#dataClassification`}],
+      links: [{label: "Open Data classification", href: `${pageUrl("./master-admin.html")}#dataClassification`}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#dataClassification"
@@ -729,8 +725,8 @@
         "bus boys carry", "shoutout led", "checking in", "we're outside"
       ],
       links: [
-        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
-        {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
+        {label: "Club public profile gallery", href: pageUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
+        {label: "Display (VIP LED)", href: pageUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -748,7 +744,7 @@
         "user guide", "create a schedule", "schedule card successfully saved", "save shift"
       ],
       links: [
-        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Club Admin Scheduler", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#schedGridHeading"
@@ -770,8 +766,8 @@
         "make a schedule", "staff schedule steps", "scheduling help", "scheduler"
       ],
       links: [
-        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
-        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Scheduler help", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
+        {label: "Club Admin Scheduling", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#schedGridHeading"
@@ -792,7 +788,7 @@
         "pending until confirmed", "worker confirm shift"
       ],
       links: [
-        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Create and publish (Scheduler)", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#schedGridHeading"
@@ -813,7 +809,7 @@
         "remove several shifts", "multi-delete schedule"
       ],
       links: [
-        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Multi-delete (Scheduler)", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#schedGridHeading"
@@ -828,8 +824,8 @@
         "confirm shift", "approve selected", "my assigned shifts"
       ],
       links: [
-        {label: "Work Calendar tab", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
-        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})}
+        {label: "Work Calendar tab", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Work Sheet", href: pageUrl("./staff-worksheet.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "staff-worksheet.html"
@@ -845,9 +841,9 @@
         "profile template guide", "approve waitress", "pending worker requests"
       ],
       links: [
-        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
-        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
-        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+        {label: "Services & Service Members", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
+        {label: "Club Admin Employee/Workers", href: pageUrl("./admin.html", {from: "floqai", tab: "employees"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalServiceMembers"
@@ -862,7 +858,7 @@
         "json schedule feed", "pull schedule onto website"
       ],
       links: [
-        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+        {label: "Website ingest", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
       ],
       source: "help-repository-seed",
       page: "admin.html#schedWebsiteIngest"
@@ -876,7 +872,7 @@
         "public holiday", "open closed days", "venue calendar"
       ],
       links: [
-        {label: "Club Public Profile", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
+        {label: "Club Public Profile", href: pageUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#clubVenueHoursCard"
@@ -891,7 +887,7 @@
         "club admin imports"
       ],
       links: [
-        {label: "Master Admin AI Crawling", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Master Admin AI Crawling", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html"
@@ -905,7 +901,7 @@
         "promotion groups", "network promoter data"
       ],
       links: [
-        {label: "Master Admin Promoters", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Master Admin Promoters", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#promoterNetwork"
@@ -919,8 +915,8 @@
         "temp-democlub", "not an elected club admin", "zebbies default"
       ],
       links: [
-        {label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
-        {label: "Club Admin portal", href: vUrl("./admin.html", {from: "floqai"})}
+        {label: "Request Club Admin access", href: pageUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
+        {label: "Club Admin portal", href: pageUrl("./admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#adminVenueGate"
@@ -934,8 +930,8 @@
         "entity management unlock", "sos2fa email sms", "notifyEmail", "notifySms"
       ],
       links: [
-        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
+        {label: "General Notifications (My Privacy)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Venue Links", href: pageUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -951,7 +947,7 @@
         "club admin notifications", "whatsapp twilio", "patron user record"
       ],
       links: [
-        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
+        {label: "My Privacy", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -966,8 +962,8 @@
         "personalized ads", "privacy policy", "download my data", "delete my data", "dsar"
       ],
       links: [
-        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+        {label: "My Privacy", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Privacy Policy", href: pageUrl("./privacy.html", {from: "floqai"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -984,8 +980,8 @@
         "whatsapp otp", "whatsapp code", "sms otp", "sms code", "verification code"
       ],
       links: [
-        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
-        {label: "Mingl", href: vUrl("./", {start: "mingl", from: "floqai"})}
+        {label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})},
+        {label: "Mingl", href: pageUrl("./", {start: "mingl", from: "floqai"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -996,7 +992,7 @@
       title: "ShoutOut Recommendations",
       body: "Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages.",
       searchPhrases: ["shoutout recommendations","shoutout ideas","improve my shoutout","use past shoutout","what should i write","help me write a shoutout","recommendation style"],
-      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      links: [{label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#shoutoutRecommendations"
@@ -1006,7 +1002,7 @@
       title: "AI Recommendations",
       body: "Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it.",
       searchPhrases: ["ai recommendations","ai shoutout","ai ideas","write my shoutout with ai","personalized shoutout"],
-      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      links: [{label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#shoutoutRecommendations"
@@ -1016,7 +1012,7 @@
       title: "Trending ShoutOuts",
       body: "Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it.",
       searchPhrases: ["trending shoutouts","popular shoutouts","top shoutouts","approved shoutouts"],
-      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      links: [{label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#shoutoutRecommendations"
@@ -1026,7 +1022,7 @@
       title: "Generic ShoutOuts",
       body: "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own.",
       searchPhrases: ["generic shoutouts","birthday shoutout ideas","celebration shoutout","ready made shoutout"],
-      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      links: [{label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#shoutoutRecommendations"
@@ -1041,8 +1037,8 @@
         "turn off location", "location permission"
       ],
       links: [
-        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
-        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+        {label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})},
+        {label: "Privacy Policy", href: pageUrl("./privacy.html", {from: "floqai"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -1057,8 +1053,8 @@
         "beta invite", "beta invitation", "try new features", "beta label", "why can't i see mingl", "feature not available"
       ],
       links: [
-        {label: "My Profile Inbox", href: vUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})},
-        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}
+        {label: "My Profile Inbox", href: pageUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})},
+        {label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}
       ],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -1074,7 +1070,7 @@
         "promote test to live", "feature audit trail"
       ],
       links: [
-        {label: "Features & Services (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
+        {label: "Features & Services (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1089,8 +1085,8 @@
         "privilege admin access", "sos2fa sms", "entity management 2fa"
       ],
       links: [
-        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"}
+        {label: "General Notifications (My Privacy)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Manage Entities", href: pageUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1105,8 +1101,8 @@
         "master admin status", "master security status", "admin action feedback", "master admin unlock status"
       ],
       links: [
-        {label: "Privilege Admin Access", href: vUrl("./master-admin.html", {from: "floqai"}), search: "privilege admin access"},
-        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Privilege Admin Access", href: pageUrl("./master-admin.html", {from: "floqai"}), search: "privilege admin access"},
+        {label: "Master Admin", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1123,9 +1119,9 @@
         "floqr master admin", "master admin portal"
       ],
       links: [
-        {label: "Network Dashboard", href: vUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"},
-        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}) + "#entityManagement", search: "manage entities"},
-        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubAdminUrls", search: "venue links"}
+        {label: "Network Dashboard", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"},
+        {label: "Manage Entities", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#entityManagement", search: "manage entities"},
+        {label: "Venue Links", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#clubAdminUrls", search: "venue links"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1142,7 +1138,7 @@
         "email code not arriving", "sendgrid not working", "demo account password"
       ],
       links: [
-        {label: "Demo Svc / Emp Mgmt", href: vUrl("./master-admin.html", {from: "floqai"}) + "#demoEmployees", search: "demo employee code"}
+        {label: "Demo Svc / Emp Mgmt", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#demoEmployees", search: "demo employee code"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1157,8 +1153,8 @@
         "audit retention", "soc 2", "iso 27001", "nist", "rebuild compliance", "export csv shoutout"
       ],
       links: [
-        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"},
-        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"}
+        {label: "Completed Log", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"},
+        {label: "Retention", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1173,8 +1169,8 @@
         "anonymize", "completed log retention", "master shoutout retention"
       ],
       links: [
-        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"},
-        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"}
+        {label: "Retention", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"},
+        {label: "Completed Log", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -1189,7 +1185,7 @@
         "public profile media", "8 photos", "profile videos"
       ],
       links: [
-        {label: "Public Media and Data Sharing", href: vUrl("./patron-portal.html", {from: "floqai", tab: "public-profile"}), search: "public media"}
+        {label: "Public Media and Data Sharing", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "public-profile"}), search: "public media"}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalPublicProfile"
@@ -1204,8 +1200,8 @@
         "how language works", "ip language", "country language", "floqr language"
       ],
       links: [
-        {label: "Language Settings (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "language settings", blurb: "Choose FloqR chrome language"},
-        {label: "Translation Overrides (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides", search: "translation overrides", blurb: "Fix German and Arabic UI wording"}
+        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "language settings", blurb: "Choose FloqR chrome language"},
+        {label: "Translation Overrides (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides", search: "translation overrides", blurb: "Fix German and Arabic UI wording"}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalLanguageSettings"
@@ -1215,7 +1211,7 @@
       title: "My Profile & Settings",
       body: "Open My Profile & Settings for roles, seller tools, and account options.",
       searchPhrases: ["my profile", "profile and settings", "settings", "account", "my profile & settings"],
-      links: [{label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})}],
+      links: [{label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})}],
       source: "help-repository-seed"
     },
     {
@@ -1227,21 +1223,21 @@
         "role onboarding", "service member onboarding", "request access", "get started"
       ],
       links: [
-        {label: "Role / service onboarding", href: vUrl("./role-request.html", {from: "floqai"})},
-        {label: "Venue onboarding (Master Admin)", href: vUrl("./onboard-dc-venues.html", {from: "floqai"})}
+        {label: "Role / service onboarding", href: pageUrl("./role-request.html", {from: "floqai"})},
+        {label: "Venue onboarding (Master Admin)", href: pageUrl("./onboard-dc-venues.html", {from: "floqai"})}
       ],
       source: "help-repository-seed"
     },
     {
       id: "help-venue-links",
       title: "Venue Links",
-      body: "Venue Admin Portal URLs are generated when you search — they are not stored with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the latest release. Opening Master Admin with an old ?v= bookmark does not freeze these links. Display board URLs stay location-only with no ?v=.",
+      body: "Venue Admin Portal URLs are generated when you search. Page links never carry a version number, so a saved or shared link always opens the current FLOQR release, and an old bookmark that still has ?v= in it just ignores it. Display board URLs stay location-only.",
       searchPhrases: [
         "venue links", "venue admin portal url", "club admin url", "admin.html version",
         "hardcoded version", "club admin link", "master admin venue links"
       ],
       links: [
-        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Venue Links", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#clubAdminUrls"
@@ -1258,7 +1254,7 @@
       links: [
         {
           label: "Translation Overrides",
-          href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides",
+          href: pageUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides",
           search: "translation overrides|edit translation|german|arabic|native speaker",
           blurb: "Edit German and Arabic UI wording that sounds artificial."
         }
@@ -1275,7 +1271,7 @@
         "preview links email", "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
       ],
       links: [
-        {label: "SendGrid Mail Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilio_sendgridMailLogs"}
+        {label: "SendGrid Mail Logs", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#twilio_sendgridMailLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilio_sendgridMailLogs"
@@ -1289,7 +1285,7 @@
         "marketing sms", "why no sms", "send test debit", "twilio debugger"
       ],
       links: [
-        {label: "SMS Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioSmsLogs"}
+        {label: "SMS Logs", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#twilioSmsLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilioSmsLogs"
@@ -1302,7 +1298,7 @@
         "compliance logs", "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
       ],
       links: [
-        {label: "Compliance Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioComplianceLogs"}
+        {label: "Compliance Logs", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#twilioComplianceLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilioComplianceLogs"
@@ -1316,7 +1312,7 @@
         "marketing sms log", "send test debit", "why no sms"
       ],
       links: [
-        {label: "Club Marketing", href: vUrl("./admin.html", {tab: "marketing", from: "floqai"})}
+        {label: "Club Marketing", href: pageUrl("./admin.html", {tab: "marketing", from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelMessagingLogs"
@@ -1329,7 +1325,7 @@
         "messaging credit", "sms pack", "whatsapp pack", "buy sms bundle", "twilio credits", "466 sms"
       ],
       links: [
-        {label: "Messaging Credit", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMessagingCredit"}
+        {label: "Messaging Credit", href: pageUrl("./admin.html", {from: "floqai"}) + "#panelMessagingCredit"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelMessagingCredit"
@@ -1342,7 +1338,7 @@
         "marketing campaign", "sms blast", "whatsapp campaign", "industry template", "send test marketing"
       ],
       links: [
-        {label: "Marketing Campaigns", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMarketingCampaigns"}
+        {label: "Marketing Campaigns", href: pageUrl("./admin.html", {from: "floqai"}) + "#panelMarketingCampaigns"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelMarketingCampaigns"
@@ -1355,7 +1351,7 @@
         "spot ad", "in-app marketing", "advertisement pool", "mingl ad", "rydr ad", "interstitial"
       ],
       links: [
-        {label: "In-App Marketing", href: vUrl("./admin.html", {from: "floqai"}) + "#panelInAppMarketing"}
+        {label: "In-App Marketing", href: pageUrl("./admin.html", {from: "floqai"}) + "#panelInAppMarketing"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelInAppMarketing"
@@ -1365,7 +1361,7 @@
       title: "Venue onboarding (Master Admin)",
       body: "Master Admin venue onboarding — push crawled club profiles into Firestore.",
       searchPhrases: ["venue onboarding", "onboard clubs", "onboard venues", "dc venues", "link to onboarding venues", "master admin onboarding"],
-      links: [{label: "Venue onboarding", href: vUrl("./onboard-dc-venues.html", {from: "floqai"})}],
+      links: [{label: "Venue onboarding", href: pageUrl("./onboard-dc-venues.html", {from: "floqai"})}],
       source: "help-repository-seed"
     },
     {
@@ -1373,7 +1369,7 @@
       title: "About Mingl search",
       body: "Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.",
       searchPhrases: ["mingl search", "search people", "mingl social playground", "find people"],
-      links: [{label: "Open Mingl", href: vUrl("./", {start: "mingl"})}],
+      links: [{label: "Open Mingl", href: pageUrl("./", {start: "mingl"})}],
       source: "help-repository-seed",
       page: "index.html#mingl"
     },
@@ -1382,7 +1378,7 @@
       title: "Default Template",
       body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
       searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
-      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"
     },
@@ -1391,7 +1387,7 @@
       title: "FloqAi template search",
       body: "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.",
       searchPhrases: ["floqai template", "sports jersey", "nba nfl cars humor"],
-      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"
     },
@@ -1400,7 +1396,7 @@
       title: "Football Intro",
       body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only.",
       searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars template", "team intro", "four player intro"],
-      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1410,7 +1406,7 @@
       title: "Tengo muchos dólares",
       body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault for 5 seconds; then the vault door blows open and $100 bills splash behind your words for 10 seconds. The board closes with the HEIST logo over Washington DC, then loops. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares... I just did a heist!” letter by letter. Plays on 96×48 displays only.",
       searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just did a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
-      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1420,7 +1416,7 @@
       title: "Your club's templates",
       body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",
       searchPhrases: ["club templates", "exclusive templates", "assign template", "remove template", "tengo muchos dolares", "heist templates"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
@@ -1430,7 +1426,7 @@
       title: "Employee / Worker Network",
       body: "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR).",
       searchPhrases: ["employee network", "worker network", "elect patron", "elect role", "give staff a role", "add a waitress", "add staff", "club staff list", "designate csr", "customer service representative"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
@@ -1441,8 +1437,8 @@
       body: "When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, YouTube and similar) without asking you again for each use. They may not publish your phone number or email. You can withdraw at any time in My Profile on the Services & Service Members tab. This stops new marketing; materials already printed or posted do not have to be recalled. Club Admins see each staff member's consent status in Employee / Worker Network and Featured service staff.",
       searchPhrases: ["marketing consent", "staff marketing consent", "use my photos", "club can use my photos", "withdraw marketing consent", "photo consent staff", "instagram consent", "flyer photo consent"],
       links: [
-        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
-        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+        {label: "Services & Service Members", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Club Admin Employee/Workers", href: pageUrl("./admin.html", {from: "floqai", tab: "employees"})}
       ],
       audiences: ["patron", "serviceMember", "venueAdmin"],
       source: "help-repository-seed",
@@ -1453,7 +1449,7 @@
       title: "Featured service staff",
       body: "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes. Before publishing photos, get each person's agreement and tick the photo consent box.",
       searchPhrases: ["featured staff","featured service staff","staff on club page","show staff on club page","staff photo","waiters on club page","bottle service on club page"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
@@ -1463,7 +1459,7 @@
       title: "Club website feed",
       body: "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links.",
       searchPhrases: ["club website feed","website feed","embed on my website","put events on my website","iframe","rss feed","club api","website widget","staff list on website"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
@@ -1473,7 +1469,7 @@
       title: "Template tags",
       body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",
       searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin", "serviceMember"],
       source: "help-repository-seed",
       page: "template-tags.html"
@@ -1483,7 +1479,7 @@
       title: "Staff Scheduling",
       body: "Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each calendar has its own $20/month subscription. Shifts sent to you appear under My assignments, where you confirm or decline them.",
       searchPhrases: ["staff scheduling", "schedule for", "owner id", "whose schedule", "scheduling page", "create shift", "dj schedule", "club schedule", "promoting company schedule", "plan shifts"],
-      links: [{label: "Open Staff Scheduling", href: vUrl("./scheduling.html", {from: "floqai"})}],
+      links: [{label: "Open Staff Scheduling", href: pageUrl("./scheduling.html", {from: "floqai"})}],
       audiences: ["venueAdmin", "serviceMember"],
       source: "help-repository-seed",
       page: "scheduling.html"
@@ -1493,7 +1489,7 @@
       title: "Preview a template",
       body: "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos.",
       searchPhrases: ["preview template", "template preview", "see template", "try template", "what does the template look like"],
-      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1503,7 +1499,7 @@
       title: "Idle board: Use ShoutOut @ venue",
       body: "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away.",
       searchPhrases: ["use shoutout @", "idle board", "default display message", "board stuck on shoutout", "reset display"],
-      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
@@ -1513,7 +1509,7 @@
       title: "About Mingl Requests",
       body: "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.",
       searchPhrases: ["mingl requests", "friend request", "mingl chat"],
-      links: [{label: "Open Mingl", href: vUrl("./", {start: "mingl"})}],
+      links: [{label: "Open Mingl", href: pageUrl("./", {start: "mingl"})}],
       source: "help-repository-seed",
       page: "index.html#mingl"
     }
@@ -1548,6 +1544,6 @@
     canAccessPartition,
     canAccessHelpEntry,
     inferAudiences,
-    vUrl
+    pageUrl
   };
 })(window);

@@ -43,13 +43,9 @@
     return `${canonicalOrigin()}${withSlash}`;
   }
 
-  /** Same-origin relative link for the current demo/staging host. */
-  function localPath(path, version) {
-    const file = String(path || "").replace(/^\.\//, "");
-    const v = version != null && String(version).trim() !== ""
-      ? `?v=${encodeURIComponent(String(version).trim())}`
-      : "";
-    return `./${file}${v}`;
+  /** Same-origin relative link for the current demo/staging host. Page links never carry ?v=. */
+  function localPath(path) {
+    return `./${String(path || "").replace(/^\.\//, "")}`;
   }
 
   global.FLOQRCanonical = {
@@ -59,8 +55,8 @@
     localPath,
     isStagingHost,
     isProductionHost,
-    privacyPolicyUrl(version) {
-      return localPath("privacy.html", version || global.FLOQRNav?.appVersion);
+    privacyPolicyUrl() {
+      return localPath("privacy.html");
     },
     privacyPolicyCanonicalUrl() {
       return absoluteCanonicalPath("/privacy.html");

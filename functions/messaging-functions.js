@@ -340,7 +340,6 @@ function previewUrlForShoutout(shoutout = {}, clubLocationId = "") {
   const url = new URL(`${DEFAULT_ORIGIN.replace(/\/$/, "")}/display.html`);
   if (location) url.searchParams.set("location", location);
   if (ref) url.searchParams.set("ref", ref);
-  url.searchParams.set("v", "29.09.10");
   return url.toString();
 }
 

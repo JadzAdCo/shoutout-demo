@@ -33,11 +33,6 @@
     const ret = safeReturnTo(returnPath());
     if (ret) params.set("returnTo", ret);
     if (reason) params.set("authRequired", reason);
-    // Prefer FLOQRNav version when present; otherwise leave unversioned.
-    try {
-      const v = window.FLOQRNav?.appVersion;
-      if (v) params.set("v", v);
-    } catch (_) {}
     const q = params.toString();
     return `./${q ? `?${q}` : ""}`;
   }

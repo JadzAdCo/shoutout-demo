@@ -2,13 +2,9 @@
 (function (global) {
   "use strict";
 
-  function appV() {
-    return String((global.FLOQRNav && global.FLOQRNav.appVersion) || "").trim();
-  }
 
-  function vUrl(path, params = {}) {
-    const v = /(?:^|\/)display2?\.html$/i.test(path) ? "" : appV();
-    const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+  function pageUrl(path, params = {}) {
+    const qs = new URLSearchParams(params).toString();
     return qs ? `${path}?${qs}` : path;
   }
 
@@ -18,7 +14,7 @@
       kind: "product",
       label: "Advertise on FloqR",
       blurb: "Clubs, promoters, DJs, photographers and businesses post a flyer or a 30-second video; FLOQR approves it after payment.",
-      href: vUrl("./patron-portal.html", {from: "search", tab: "ad-campaigns"}),
+      href: pageUrl("./patron-portal.html", {from: "search", tab: "ad-campaigns"}),
       patterns: [/advertise/, /advertis/, /\bads?\b/, /ad\s*campaign/, /sponsor/, /inline\s*ad/, /mingl\s*gist\s*ad/, /business\s*account/, /post\s*(an?\s*)?ad/, /promote\s*(my\s*)?(event|party|club|night)/, /flyer/, /video\s*ad/, /boost\s*(my\s*)?event/]
     },
     {
@@ -27,7 +23,7 @@
       featureKey: "mingl",
       label: "Mingl",
       blurb: "Meet people, chat, and social discovery.",
-      href: vUrl("./", {start: "mingl"}),
+      href: pageUrl("./", {start: "mingl"}),
       patterns: [/meet/, /mingl/, /date/, /social/, /someone/, /people/, /friend/, /chat/, /connect/, /match/]
     },
     {
@@ -36,7 +32,7 @@
       featureKey: "rydr",
       label: "RydR",
       blurb: "Robotaxi or ultra-luxury ride to the venue.",
-      href: vUrl("./rydr.html", {from: "search"}),
+      href: pageUrl("./rydr.html", {from: "search"}),
       patterns: [/ride/, /rydr/, /taxi/, /uber/, /lyft/, /pickup/, /\bcar\b/, /driver/, /robotaxi/, /chauffeur/, /luxury\s*ride/, /get\s*(me\s*)?(there|home)/]
     },
     {
@@ -45,7 +41,7 @@
       featureKey: "bartr",
       label: "Trade by BartR",
       blurb: "Marketplace — barter and swag.",
-      href: vUrl("./commerce.html", {from: "search"}),
+      href: pageUrl("./commerce.html", {from: "search"}),
       patterns: [/trade/, /bartr/, /buy/, /shop/, /swag/, /marketplace/, /sell/, /merch/, /product/]
     },
     {
@@ -53,7 +49,7 @@
       kind: "product",
       label: "Throw a ShoutOut",
       blurb: "Send a live message to a FloqR display.",
-      href: vUrl("./", {start: "search"}),
+      href: pageUrl("./", {start: "search"}),
       action: "shoutout",
       patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
     },
@@ -62,7 +58,7 @@
       kind: "product",
       label: "Football Intro",
       blurb: "Four-player, 20-second stadium intro ShoutOut on 96×48 boards at Zebbies Garden DC, Heist Washington DC and Aurelia.",
-      href: vUrl("./", {start: "search"}),
+      href: pageUrl("./", {start: "search"}),
       action: "template",
       templateId: "zebbiesFootballTeamIntro",
       searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars", "team intro"],
@@ -73,7 +69,7 @@
       kind: "product",
       label: "Tengo muchos dólares",
       blurb: "Heist Washington DC vault ShoutOut — enter a name or @handle; the board types “Tengo muchos dólares... I just did a heist!” and $100 bills flood the LED.",
-      href: vUrl("./", {start: "search"}),
+      href: pageUrl("./", {start: "search"}),
       action: "template",
       templateId: "heistVaultDollars",
       searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho", "just did a heist", "money rain", "vault night"],
@@ -85,7 +81,7 @@
       featureKey: "supRstar",
       label: "supRstar — go live / be a superstar",
       blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.",
-      href: vUrl("./suprstr-search.html", {from: "floqai"}),
+      href: pageUrl("./suprstr-search.html", {from: "floqai"}),
       patterns: [
         /supr\s*str/, /suprstr/, /supr\s*star/, /suprstar/, /super\s*-?\s*star/, /superstar/,
         /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar|supr\s*str|supr\s*star)/,
@@ -99,7 +95,7 @@
       kind: "product",
       label: "Clubs & venues",
       blurb: "Search events, clubs, beach clubs, lounges, and lounge-clubs — try “Hip Hop Clubs in DC” or “EDM Events in New York”.",
-      href: vUrl("./", {start: "search"}),
+      href: pageUrl("./", {start: "search"}),
       searchPhrases: [
         "hip hop clubs in dc", "edm events in new york", "beach clubs", "beachclub", "beach-club",
         "lounge clubs", "lounge-club", "nightclubs", "night club", "lounges near me", "events tonight",
@@ -125,7 +121,7 @@
         "No account? Text or WhatsApp the flyer or video to the FLOQR advertising number to get a payment link."
       ],
       links: [
-        {label: "Ad Campaigns", href: vUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
+        {label: "Ad Campaigns", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
       ],
       searchPhrases: [
         "post an ad", "post ad", "advertise", "advertise my event", "promote my event", "promote my party",
@@ -147,7 +143,7 @@
         "When approved, tap Go live on your preview page."
       ],
       links: [
-        {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open supRstar", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
@@ -172,10 +168,10 @@
         "Demo: temp_clubadmin_1 maps to temp-democlub-1 (same pattern for 2, 3, …)."
       ],
       links: [
-        {label: "Request Club Admin access", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
-        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})},
-        {label: "Open Club Admin (after approval)", href: vUrl("./admin.html", {from: "floqai"})}
+        {label: "Request Club Admin access", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "Role profiles overview", href: pageUrl("./role-profiles.html", {from: "floqai"})},
+        {label: "Open Club Admin (after approval)", href: pageUrl("./admin.html", {from: "floqai"})}
       ],
       searchPhrases: ["become a club admin", "club admin", "be an admin", "I want to be a club admin"],
       patterns: [
@@ -197,7 +193,7 @@
         "If a test alert says invalid username, set Firebase secret TWILIO_ACCOUNT_SID to the AC… Account SID from Twilio Console."
       ],
       links: [
-        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+        {label: "Club Admin Notifications", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
@@ -225,7 +221,7 @@
         "Save. New Inbox / Email / SMS / WhatsApp notices use this copy. Worker inbox shows Review & confirm shift, not Open Related ShoutOut."
       ],
       links: [
-        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
+        {label: "Message templates", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
       ],
       searchPhrases: [
         "message template", "system message", "schedule invite", "shift confirmation message",
@@ -248,7 +244,7 @@
         "Tap Approve selected or Decline selected."
       ],
       links: [
-        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})}
+        {label: "Work Calendar", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})}
       ],
       searchPhrases: [
         "confirm shift", "approve shift", "select all shifts", "pending assignment",
@@ -270,7 +266,7 @@
         "Table LEDs and portrait walls are separate formats."
       ],
       links: [
-        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})}
+        {label: "Club public profile gallery", href: pageUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
       searchPhrases: [
         "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
@@ -286,8 +282,8 @@
       label: "Role profiles overview",
       blurb: "How Club Admin, DJ, Promoter, hospitality, CSR, and scheduling roles fit together.",
       links: [
-        {label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})},
-        {label: "Request a role", href: vUrl("./role-request.html", {from: "floqai"})}
+        {label: "Role profiles overview", href: pageUrl("./role-profiles.html", {from: "floqai"})},
+        {label: "Request a role", href: pageUrl("./role-request.html", {from: "floqai"})}
       ],
       searchPhrases: ["role profiles", "role profiles overview", "how roles work", "service roles"],
       patterns: [/role\s*profiles?/, /how\s+roles\s+work/, /service\s*roles/]
@@ -304,8 +300,8 @@
         "FLOQR does not pick language from IP address or country."
       ],
       links: [
-        {label: "Language Settings (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "language"})},
-        {label: "Translation Overrides (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
+        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"})},
+        {label: "Translation Overrides (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
       ],
       searchPhrases: [
         "app language", "webapp language", "dutch", "nederlands", "browser language", "first use language",
@@ -331,7 +327,7 @@
         "Patrons see the new wording after they reload. Overrides win over packaged translations."
       ],
       links: [
-        {label: "Translation Overrides", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
+        {label: "Translation Overrides", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
       ],
       searchPhrases: [
         "translation overrides", "edit translation", "fix german translation", "fix arabic translation",
@@ -353,8 +349,8 @@
         "Is* flags live on templates; VenueSupports* live on clubLocations."
       ],
       links: [
-        {label: "Club Admin Reports", href: vUrl("./admin.html", {from: "floqai", tab: "reports"})},
-        {label: "Master Admin Template Catalog", href: vUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
+        {label: "Club Admin Reports", href: pageUrl("./admin.html", {from: "floqai", tab: "reports"})},
+        {label: "Master Admin Template Catalog", href: pageUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
       ],
       searchPhrases: [
         "template catalog", "template types", "which templates", "Is96x48", "display sizes",
@@ -376,7 +372,7 @@
         "Paste display.html?location=<id> (and display2.html for Display 2) into Xibo. Do not add ?screen=."
       ],
       links: [
-        {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})}
+        {label: "Club Public Profile display screens", href: pageUrl("./admin.html", {from: "floqai", tab: "public-profile"})}
       ],
       searchPhrases: [
         "display screens", "64x48", "96x48", "64x32", "xibo url", "led size",
@@ -401,7 +397,7 @@
         "Website ingest: rotate a secret and paste JSON, RSS, or iframe onto the club site."
       ],
       links: [
-        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Club Admin Scheduler", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
@@ -429,7 +425,7 @@
         "Tap Select shifts. Filter Drafts + Wednesday header, then tap a Thursday confirmed chip, then Delete selected."
       ],
       links: [
-        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Scheduler help", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "user guide", "staff scheduling user guide", "create a schedule", "publish schedule",
@@ -452,7 +448,7 @@
         "The worker uses the confirm link. The chip then shows confirmed."
       ],
       links: [
-        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Create and publish (Scheduler)", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
@@ -475,7 +471,7 @@
         "Tap Delete selected and confirm."
       ],
       links: [
-        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Multi-delete (Scheduler)", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
@@ -498,9 +494,9 @@
         "Pick the club if you work at more than one venue. Your row is highlighted. Drafts are not shown."
       ],
       links: [
-        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
-        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
-        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
+        {label: "Work Calendar", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Work Sheet", href: pageUrl("./staff-worksheet.html", {from: "floqai"})},
+        {label: "My Profile", href: pageUrl("./patron-portal.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
@@ -523,7 +519,7 @@
         "The feed ignores any status= query and returns Confirmed only. Optional datasets: schedule, hours, profile, or all."
       ],
       links: [
-        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+        {label: "Website ingest", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
       ],
       searchPhrases: [
         "website ingest", "club website schedule", "rss feed", "iframe schedule",
@@ -540,7 +536,7 @@
       label: "Venue opening hours / public holidays",
       blurb: "Club Public Profile shows a Sun–Sat week grid with the covered dates. Upcoming holidays list open/close hours, especially when they differ from the usual weekday.",
       links: [
-        {label: "Club Public Profile hours", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
+        {label: "Club Public Profile hours", href: pageUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
       ],
       searchPhrases: ["venue hours", "opening hours", "club schedule", "public holiday", "period override"],
       patterns: [/venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /period\s*override/, /open\/closed/]
@@ -551,7 +547,7 @@
       label: "AI crawl venue datapoints",
       blurb: "Discovery crawl parses Club Public Profile fields: contact, socials, genres/DJs/promoters, amenities, dress/age, hoursStructured + timeZone, media, and display formats before approval.",
       links: [
-        {label: "Master Admin Discovery", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Master Admin Discovery", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
@@ -565,8 +561,8 @@
       label: "My Profile & Settings",
       blurb: "Account, identity, seller tools, and links into role / service onboarding.",
       links: [
-        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "Onboarding / role request", href: vUrl("./role-request.html", {from: "floqai"})}
+        {label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "Onboarding / role request", href: pageUrl("./role-request.html", {from: "floqai"})}
       ],
       searchPhrases: ["my profile", "profile and settings", "settings", "account", "my profile & settings"],
       patterns: [/my\s+profile/, /profile\s*(and\s*)?settings/, /\bsettings\b/, /\baccount\b/]
@@ -582,9 +578,9 @@
         "Use Scheduling for notify-and-approve bookings."
       ],
       links: [
-        {label: "Request DJ access", href: vUrl("./role-request.html", {from: "floqai", type: "dj"})},
-        {label: "DJ / Staff Scheduling", href: vUrl("./scheduling.html", {from: "floqai"})},
-        {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Request DJ access", href: pageUrl("./role-request.html", {from: "floqai", type: "dj"})},
+        {label: "DJ / Staff Scheduling", href: pageUrl("./scheduling.html", {from: "floqai"})},
+        {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [
         /\bdj\b/, /disc\s*jockey/, /resident\s*dj/, /want\s+to\s+be\s+(a\s*)?dj/,
@@ -602,10 +598,10 @@
         "After approval, use guest-list and marketing tools."
       ],
       links: [
-        {label: "Request Promoter access", href: vUrl("./role-request.html", {from: "floqai", type: "promoter"})},
-        {label: "Guest list", href: vUrl("./guest-list.html", {from: "floqai"})},
-        {label: "Scheduling for promoting companies", href: vUrl("./scheduling.html", {from: "floqai"})},
-        {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Request Promoter access", href: pageUrl("./role-request.html", {from: "floqai", type: "promoter"})},
+        {label: "Guest list", href: pageUrl("./guest-list.html", {from: "floqai"})},
+        {label: "Scheduling for promoting companies", href: pageUrl("./scheduling.html", {from: "floqai"})},
+        {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [
         /promot(er|ion)/, /street\s*team/, /want\s+to\s+be\s+(a\s*)?promot/,
@@ -623,9 +619,9 @@
         "Club Admin approves — then you can be scheduled / messaged."
       ],
       links: [
-        {label: "Request hospitality access", href: vUrl("./role-request.html", {from: "floqai", type: "hospitality"})},
-        {label: "Request bartender access", href: vUrl("./role-request.html", {from: "floqai", type: "bartender"})},
-        {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Request hospitality access", href: pageUrl("./role-request.html", {from: "floqai", type: "hospitality"})},
+        {label: "Request bartender access", href: pageUrl("./role-request.html", {from: "floqai", type: "bartender"})},
+        {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [
         /hospitality/, /waitress/, /waiter/, /bottle\s*girl/, /bottle\s*service\s*staff/,
@@ -639,8 +635,8 @@
       label: "Join as videographer / media creator",
       blurb: "Camera and media roles associate with clubs the same way other service members do.",
       links: [
-        {label: "Request media creator access", href: vUrl("./role-request.html", {from: "floqai", type: "mediaCreator"})},
-        {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Request media creator access", href: pageUrl("./role-request.html", {from: "floqai", type: "mediaCreator"})},
+        {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [
         /videograph/, /camera\s*operat/, /photographer/, /media\s*creator/, /cinematograph/
@@ -658,9 +654,9 @@
         "Club Admins use Review & elect on the same tab to approve or elect patrons."
       ],
       links: [
-        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
-        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "How roles work", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Services & Service Members", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "How roles work", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [
         /service\s*member/, /work\s*(for|with|at)\s*(a\s*)?(club|venue)/,
@@ -680,7 +676,7 @@
         "Tick Email notifications and/or SMS notifications, then Save Privacy Preferences."
       ],
       links: [
-        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
+        {label: "My Privacy", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
       ],
       searchPhrases: [
         "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
@@ -703,8 +699,8 @@
         "Read the Privacy Policy for processors and rights."
       ],
       links: [
-        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+        {label: "My Privacy", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Privacy Policy", href: pageUrl("./privacy.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "do not sell", "do not share", "ccpa", "cpra", "gpc", "global privacy control",
@@ -721,8 +717,8 @@
       label: "Get on a guest list",
       blurb: "Join a venue guest list from Search or the dedicated guest-list page for that club.",
       links: [
-        {label: "Guest list", href: vUrl("./guest-list.html", {from: "floqai"})},
-        {label: "Find a club first", href: vUrl("./", {start: "search"})}
+        {label: "Guest list", href: pageUrl("./guest-list.html", {from: "floqai"})},
+        {label: "Find a club first", href: pageUrl("./", {start: "search"})}
       ],
       patterns: [/guest\s*list/, /guestlist/, /rsvp/, /get\s*on\s*(the\s*)?list/]
     },
@@ -732,10 +728,10 @@
       label: "Staff Scheduling help",
       blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed on Work Calendar), Select shifts to multi-delete. Edit System Message copy under Notifications → Message templates.",
       links: [
-        {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"})},
-        {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
-        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
-        {label: "Role profiles (who can subscribe)", href: vUrl("./role-profiles.html", {from: "floqai"})}
+        {label: "Scheduling portal", href: pageUrl("./scheduling.html", {from: "floqai"})},
+        {label: "Club Admin Scheduling tab", href: pageUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
+        {label: "Message templates", href: pageUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
+        {label: "Role profiles (who can subscribe)", href: pageUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [/schedul/, /shift/, /staff\s*calendar/, /notify\s*(and\s*)?approve/]
     },
@@ -745,8 +741,8 @@
       label: "How to throw a ShoutOut",
       blurb: "Pick a club, choose a template (free Black & White Classic, or FloqAi for paid themes), pay if needed, and send to the live display.",
       links: [
-        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
-        {label: "Ask FloqAi for templates", href: vUrl("./floqai.html")}
+        {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
+        {label: "Ask FloqAi for templates", href: pageUrl("./floqai.html")}
       ],
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
@@ -756,8 +752,8 @@
       label: "NFL jersey ShoutOut",
       blurb: "Search NFL, 49ers, or ScammerVille. Photo LED backs use the bulky NFL yoke cut with a side helmet — no hanger. Enter patron name (up to 8 characters) and a 2-character mark.",
       links: [
-        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
-        {label: "Jersey preview gallery", href: vUrl("./jersey-preview-all.html", {from: "floqai"})}
+        {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
+        {label: "Jersey preview gallery", href: pageUrl("./jersey-preview-all.html", {from: "floqai"})}
       ],
       patterns: [/nfl\s*jersey/, /49ers/, /49\s*ers/, /scammerville/, /football\s*jersey/, /san\s*francisco\s*49/]
     },
@@ -767,8 +763,8 @@
       label: "Soccer jersey ShoutOut",
       blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
       links: [
-        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
-        {label: "Ask FloqAi for jersey templates", href: vUrl("./floqai.html")}
+        {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
+        {label: "Ask FloqAi for jersey templates", href: pageUrl("./floqai.html")}
       ],
       patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
     },
@@ -778,8 +774,8 @@
       label: "Sell on BartR",
       blurb: "U.S. patrons and service members can manage a seller store from My Profile; shoppers buy on BartR / commerce.",
       links: [
-        {label: "My Profile — seller tools", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "Browse BartR marketplace", href: vUrl("./commerce.html", {from: "floqai"})}
+        {label: "My Profile — seller tools", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "Browse BartR marketplace", href: pageUrl("./commerce.html", {from: "floqai"})}
       ],
       patterns: [/sell\s*(on\s*)?(bartr|marketplace)/, /become\s*(a\s*)?seller/, /list\s*(a\s*)?product/]
     },
@@ -789,8 +785,8 @@
       label: "VIP / bottle / table help",
       blurb: "VIP and bottle flows are venue-scoped. Find the club, then use VIP / guest-list / venue links from the club profile.",
       links: [
-        {label: "Find a club", href: vUrl("./", {start: "search"})},
-        {label: "Guest list", href: vUrl("./guest-list.html", {from: "floqai"})}
+        {label: "Find a club", href: pageUrl("./", {start: "search"})},
+        {label: "Guest list", href: pageUrl("./guest-list.html", {from: "floqai"})}
       ],
       patterns: [/\bvip\b/, /bottle\s*service/, /table\s*service/, /reserve\s*(a\s*)?table/]
     },
@@ -806,10 +802,10 @@
         "Master Admins: use Venue onboarding to push club profiles, events, and media."
       ],
       links: [
-        {label: "Role / service onboarding", href: vUrl("./role-request.html", {from: "floqai"})},
-        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})},
-        {label: "Venue onboarding (Master Admin)", href: vUrl("./onboard-dc-venues.html", {from: "floqai"})}
+        {label: "Role / service onboarding", href: pageUrl("./role-request.html", {from: "floqai"})},
+        {label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "Role profiles overview", href: pageUrl("./role-profiles.html", {from: "floqai"})},
+        {label: "Venue onboarding (Master Admin)", href: pageUrl("./onboard-dc-venues.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "onboarding", "link to onboarding", "onboard", "patron onboarding",
@@ -833,7 +829,7 @@
         "Select a row to view headers, stored content, TLS, and SendGrid delivery events."
       ],
       links: [
-        {label: "Mail Logging", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Mail Logging", href: pageUrl("./master-admin.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "mail logging", "email log", "sendgrid", "system mail", "preview links email",
@@ -850,11 +846,11 @@
       label: "What can FloqAi help with?",
       blurb: "Say what you want in plain words — products (Mingl, RydR, BartR, ShoutOut), goals like “I want to be a Club Admin,” or help-popout phrases like “Onboarding.”",
       links: [
-        {label: "Onboarding", href: vUrl("./role-request.html", {from: "floqai"})},
-        {label: "Request a role / service access", href: vUrl("./role-request.html", {from: "floqai"})},
-        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})},
-        {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})},
-        {label: "Classic Search", href: vUrl("./", {start: "search"})}
+        {label: "Onboarding", href: pageUrl("./role-request.html", {from: "floqai"})},
+        {label: "Request a role / service access", href: pageUrl("./role-request.html", {from: "floqai"})},
+        {label: "My Profile", href: pageUrl("./patron-portal.html", {from: "floqai"})},
+        {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "floqai"})},
+        {label: "Classic Search", href: pageUrl("./", {start: "search"})}
       ],
       searchPhrases: ["ask floqr", "floqai help", "help popout", "what can floqai"],
       patterns: [
@@ -1029,7 +1025,7 @@
       kind: "product",
       label: t("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`),
       blurb: details.length ? details.join(" · ") : String(raw).trim(),
-      href: vUrl("./", {start: "search", q: String(raw).trim()}),
+      href: pageUrl("./", {start: "search", q: String(raw).trim()}),
       patterns: []
     };
   }
@@ -1152,7 +1148,7 @@
       return;
     }
     if (!intents.length) {
-      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="${esc(vUrl("./", {start: "search"}))}">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
+      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${pageUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="${esc(pageUrl("./", {start: "search"}))}">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
       return;
     }
     container.innerHTML = intents.map(intent =>

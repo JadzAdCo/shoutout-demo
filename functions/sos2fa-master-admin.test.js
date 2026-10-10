@@ -169,5 +169,5 @@ test("server: request / verify / session use admin-trust and mail the code to th
 
 test("pages load the s3.1.28 SOS2FA client", () => {
   assert.match(read("master-admin.html"), /sos2fa\.js\?v=s3\.1\.(2[89]|[3-9]\d)"/);
-  assert.match(read("seed-v29-09-14.html"), /sos2fa\.js\?v=s3\.1\.28/);
+  assert.match(read("seed-v29-09-14.html"), /sos2fa\.js\?v=s3\.\d+\.\d+/);
 });

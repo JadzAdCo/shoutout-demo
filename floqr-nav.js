@@ -3,9 +3,8 @@
   "use strict";
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
-     Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
-     Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
-  const APP_V = "s3.1.36";
+     Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
+  const APP_V = "s3.1.37";
 
   function navT(key, fallback) {
     try {
@@ -26,9 +25,9 @@
   function buildUrl(path, params = {}, drop = []) {
     try {
       const next = new URL(path, global.location.href);
-      drop.forEach(key => next.searchParams.delete(key));
+      ["v", ...drop].forEach(key => next.searchParams.delete(key));
       Object.entries(params).forEach(([key, value]) => {
-        if (value != null && value !== "") next.searchParams.set(key, String(value));
+        if (key !== "v" && value != null && value !== "") next.searchParams.set(key, String(value));
       });
       const file = next.pathname.split("/").pop() || path.replace(/^\.\//, "");
       const search = next.searchParams.toString();
@@ -59,10 +58,10 @@
     appVersion: APP_V,
     currentVersion,
     portalHome(extra = {}) {
-      return buildUrl("./patron-portal.html", { v: APP_V, ...extra });
+      return buildUrl("./patron-portal.html", extra);
     },
     searchHome() {
-      return `./?v=${APP_V}&start=search`;
+      return `./?start=search`;
     },
     adminHome(extra = {}) {
       const extraLocation = extra.location;
@@ -70,48 +69,44 @@
         ? String(extraLocation).trim()
         : (qs("location") || qs("club") || "");
       const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");
-      const params = { ...extra, location: locationId, v: APP_V };
+      const params = { ...extra, location: locationId };
       if (from) params.from = from;
       else delete params.from;
       return buildUrl("./admin.html", params);
     },
-    /** Club Admin URL for Venue Links / onboarding — always current package, never page ?v=. */
+    /** Club Admin URL for Venue Links / onboarding. */
     adminPortalUrl(locationId = "", extra = {}) {
       return this.adminHome({ location: locationId, from: "master", ...extra });
     },
-    /** Stamp current package on a relative app URL. Display boards stay location-only. */
+    /** Relative app link with any old ?v= removed. Display boards also drop screen params. */
     stampCurrentVersion(href = "", extra = {}) {
       if (!href) return href;
-      if (isDisplayFile(href)) {
-        const params = { ...extra };
-        delete params.v;
-        return buildUrl(href, params, ["v", "screen", "screenFormatId"]);
-      }
-      return buildUrl(href, { v: APP_V, ...extra });
+      if (isDisplayFile(href)) return buildUrl(href, extra, ["screen", "screenFormatId"]);
+      return buildUrl(href, extra);
     },
     masterHome(extra = {}) {
       const { hash, ...params } = extra || {};
-      const href = buildUrl("./master-admin.html", { v: APP_V, ...params });
+      const href = buildUrl("./master-admin.html", params);
       const panel = String(hash || "").replace(/^#/, "").trim();
       return panel ? `${href}#${panel}` : href;
     },
     suprstrHome(extra = {}) {
-      return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
+      return buildUrl("./suprstr-search.html", { from: "master", ...extra });
     },
     /** Satellite page under My Profile and Settings */
     portalLink(path, extra = {}) {
-      return buildUrl(path, { v: APP_V, from: "portal", ...extra });
+      return buildUrl(path, { from: "portal", ...extra });
     },
     /** Satellite page under Club Admin — always stamp from=admin (+ location). */
     adminLink(path, extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
-      return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
+      return buildUrl(path, { from: "admin", location: locationId, ...extra });
     },
     /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */
     masterLink(path, extra = {}) {
-      return buildUrl(path, { v: APP_V, from: "master", ...extra });
+      return buildUrl(path, { from: "master", ...extra });
     },
-    /** Stable venue board URL — no cache-bust ?v= (for LED devices and external embeds). */
+    /** Stable venue board URL (for LED devices and external embeds). */
     stableDisplayUrl(locationId = "", extra = {}) {
       const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();
       const params = {...extra};
@@ -163,10 +158,10 @@
         return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
       }
       if (from === "mingl") {
-        return { href: `./?v=${APP_V}&start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };
+        return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };
       }
       if (from === "bartr" || from === "commerce") {
-        return { href: `./commerce.html?v=${APP_V}`, label: navT("nav.backToBartr", "← Back to BartR") };
+        return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };
       }
       return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };
     },
@@ -200,13 +195,13 @@
       const start = String(qs("start") || "").toLowerCase();
       if (start === "intent" || start === "ask" || start === "wish") {
         const q = qs("q");
-        global.location.replace(buildUrl("./floqai.html", { v: APP_V, ...(q ? { q } : {}) }));
+        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));
       }
       else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
       else if (start === "mingl") showPage("minglLandingPage");
     },
     intentSearchHome() {
-      return buildUrl("./floqai.html", { v: APP_V });
+      return buildUrl("./floqai.html");
     }
   };
 

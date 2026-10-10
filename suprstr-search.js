@@ -2,7 +2,6 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.68";
   let venueRows = [];
 
   function byId(id) {
@@ -125,7 +124,7 @@
         displayBoard: "secondary"
       });
       const path = res?.data?.previewPath || `./suprstar-preview.html?t=${encodeURIComponent(res?.data?.accessToken || "")}`;
-      const fullUrl = path.includes("?") ? `${path}&v=${APP_V}&from=search` : `${path}?v=${APP_V}&from=search`;
+      const fullUrl = path.includes("?") ? `${path}&from=search` : `${path}?from=search`;
       try { sessionStorage.setItem("floqr_suprstar_token", res?.data?.accessToken || ""); } catch (_) {}
       if (!tabBlocked && previewTab && !previewTab.closed) {
         previewTab.location.href = fullUrl;

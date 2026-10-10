@@ -99,7 +99,7 @@
             recipientEmail: String(change.email || "").toLowerCase(),
             createdByUid: firebase.auth().currentUser?.uid || "",
             clubLocationId: locationId,
-            link: `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
+            link: `./template-tags.html?location=${encodeURIComponent(locationId)}`,
             read: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
@@ -150,7 +150,7 @@
         return;
       }
       const campaignRef = await db.collection("guestListCampaigns").add({...payload, status:"enabled", active:true, approvedByUid:auth.currentUser.uid, approvedAt:firebase.firestore.FieldValue.serverTimestamp(), createdAt:firebase.firestore.FieldValue.serverTimestamp(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestList", sourceCampaignId:campaignRef.id, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.09.10`}});
+      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestList", sourceCampaignId:campaignRef.id, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}`}});
       await campaignRef.set({deliveredCount:result.deliveredCount || 0}, {merge:true});
       await db.collection("clubRoleActivity").doc(id).set({status:"approved", publishedCampaignId:campaignRef.id, reviewedByUid:auth.currentUser.uid, reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     } else {
@@ -161,7 +161,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const tagsLink = byId("clubTemplateTagsLink");
-    if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`;
+    if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}`;
     byId("saveRepPoliciesBtn")?.addEventListener("click", () => savePolicies().catch(error => { byId("repStatus").textContent = error.message; }));
     auth.onAuthStateChanged(user => { if (user) loadRep().catch(error => { byId("repStatus").textContent = error.message; }); });
   });

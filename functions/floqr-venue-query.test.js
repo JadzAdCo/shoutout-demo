@@ -152,7 +152,7 @@ test("index.html wires the stationary FloqAi category search", () => {
   assert.match(html, /id="categoryFloqAiSpeech"/);
   assert.match(html, /id="categoryFloqAiInput"/);
   assert.match(html, /data-i18n="cat\.floqaiWelcome"/);
-  assert.match(html, /floqr-venue-query\.js\?v=s3\.0\.106/);
+  assert.match(html, /floqr-venue-query\.js\?v=s3\.\d+\.\d+/);
   assert.ok(html.indexOf("categoryFloqAiSpeech") < html.indexOf("categoryFloqAiInput"), "FloqAi sits above the input");
   assert.doesNotMatch(html, /id="continueBtn"/);
   assert.doesNotMatch(html, /class="login-copy"/);

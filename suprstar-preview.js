@@ -2,7 +2,6 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.75";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -380,7 +379,7 @@
       try {
         const url = new URL(location.href);
         url.searchParams.set("t", token);
-        if (!url.searchParams.get("v")) url.searchParams.set("v", APP_V);
+        url.searchParams.delete("v");
         history.replaceState(null, "", url.toString());
       } catch (_) {}
       return token;

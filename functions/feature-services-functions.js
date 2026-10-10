@@ -292,7 +292,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
   const inviteId = core.inviteIdFor(token);
   const nowMs = Date.now();
   const expiresAtMs = nowMs + core.INVITE_TTL_MS;
-  const invitePath = `./beta-invite.html?t=${token}&v=${PACKAGE_VERSION}&from=beta-invite`;
+  const invitePath = `./beta-invite.html?t=${token}&from=beta-invite`;
 
   await db.runTransaction(async tx => {
     const head = await tx.get(headRef());

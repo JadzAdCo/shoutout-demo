@@ -23,8 +23,7 @@
     const id = String(locationId || "").trim();
     if (window.FLOQRNav?.adminPortalUrl) return window.FLOQRNav.adminPortalUrl(id);
     if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
-    const v = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
-    return `./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
+    return `./admin.html?location=${encodeURIComponent(id)}&from=master`;
   }
 
   function absoluteUrl(href = "") {
@@ -45,7 +44,7 @@
     const displayUrl = window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
     const display2Url = window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
     const profileUrl = window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
-      || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`;
+      || `./club-profile.html?location=${encodeURIComponent(id)}`;
     return {
       admin: {label: "Open Club Admin", hint: "Club Admin console for this venue (opens as Master Admin).", links: [{name: "Club Admin", url: absoluteUrl(masterAdminUrl(id))}]},
       display1: {label: "Display 1", hint: "Primary LED board. Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 1", url: absoluteUrl(displayUrl)}]},

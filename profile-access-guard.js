@@ -14,7 +14,10 @@
 
   function returnPath() {
     const file = window.location.pathname.split("/").pop() || "index.html";
-    return `${file}${window.location.search}${window.location.hash}`;
+    const query = new URLSearchParams(window.location.search);
+    query.delete("v");
+    const search = query.toString();
+    return `${file}${search ? `?${search}` : ""}${window.location.hash}`;
   }
 
   function redirect(reason) {
@@ -24,10 +27,6 @@
       return;
     }
     const query = new URLSearchParams({profileRequired: reason, returnTo: returnPath()});
-    try {
-      const v = window.FLOQRNav?.appVersion;
-      if (v) query.set("v", v);
-    } catch (_) {}
     window.location.replace(`./?${query.toString()}`);
   }
 

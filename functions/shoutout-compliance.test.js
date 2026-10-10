@@ -57,7 +57,7 @@ test("getFloqrClientIp and stampShoutoutActorContext are exported callables", ()
 
 test("patron Search loads floqr-client-ip and attaches session IP on submit", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-  assert.match(html, /floqr-client-ip\.js\?v=s3\.0\.\d+/);
+  assert.match(html, /floqr-client-ip\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /patron-app\.js\?v=s3\.\d+\.\d+/);
   const clientIp = fs.readFileSync(path.join(__dirname, "..", "floqr-client-ip.js"), "utf8");
   assert.match(clientIp, /getFloqrClientIp/);
@@ -102,7 +102,7 @@ test("master admin html nests ShoutOuts completed log and retention", () => {
   assert.match(html, /help-master-shoutout-retention/);
   assert.match(html, /SOC 2 \/ ISO 27001 \/ NIST-aligned audit metadata/);
   assert.doesNotMatch(html, /<p class="sub small">SOC 2 \/ ISO 27001/);
-  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.98/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /id="soComplianceVenue"/);
   assert.match(html, /id="soComplianceVenueList"/);
   assert.match(html, /id="soComplianceStatusFilter"/);

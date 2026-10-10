@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>FLOQR — Feature tests (v29.09.122)</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.122"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.37"/>
   <style>
     .ft-shell{max-width:720px;margin:0 auto;padding:20px 16px 48px}
     .ft-shell h1{font-size:clamp(28px,7vw,42px);margin:0 0 8px}
@@ -43,11 +43,11 @@
       <li><strong>Notify sink</strong> — If SMS channels enabled, message lands on <strong>+1 202-733-0274</strong> (not a fake demo number). Email subject prefixed <code>[FLOQR demo → temp_…@floqr-demo.com]</code> to <strong>bans.don@gmail.com</strong>.</li>
       <li><strong>Public profile</strong> — Club profile shows Monday–Sunday opening times in Details; Featured events for Hip Hop / Afro House / EDM / Reggaeton·Latin DJs.</li>
     </ol>
-    <a class="ft-link" href="./admin.html?location=temp-democlub-1&v=s3.1.36#panelScheduling">temp_democlub_1 · Scheduling</a>
-    <a class="ft-link" href="./club-profile.html?location=temp-democlub-1&v=29.09.122">temp_democlub_1 · Public profile</a>
-    <a class="ft-link ghost" href="./scheduling.html?v=s3.1.36&from=admin">Scheduling portal</a>
-    <a class="ft-link ghost" href="./master-admin.html?v=s3.1.36">Master Admin · Demo Accounts</a>
-    <a class="ft-link ghost" href="./admin.html?location=shoko-barcelona-spain&v=s3.1.36#panelScheduling">Shôko VCC · Scheduling</a>
+    <a class="ft-link" href="./admin.html?location=temp-democlub-1#panelScheduling">temp_democlub_1 · Scheduling</a>
+    <a class="ft-link" href="./club-profile.html?location=temp-democlub-1">temp_democlub_1 · Public profile</a>
+    <a class="ft-link ghost" href="./scheduling.html?from=admin">Scheduling portal</a>
+    <a class="ft-link ghost" href="./master-admin.html">Master Admin · Demo Accounts</a>
+    <a class="ft-link ghost" href="./admin.html?location=shoko-barcelona-spain#panelScheduling">Shôko VCC · Scheduling</a>
   </article>
 
   <article class="ft-card" id="birthday-layout">
@@ -58,9 +58,9 @@
       <li><strong>64×48</strong> — fullscreen picture ↔ 4-line text rotate loop; photo contain + decorative fill.</li>
       <li><strong>64×32</strong> — same rotate on landscape panel.</li>
     </ol>
-    <a class="ft-link" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-96x48&main=HAPPY%20BIRTHDAY%20ALEX&mediaFit=cover&v=29.09.122">Preview 96×48 split</a>
-    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x48&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain&v=29.09.122">Preview 64×48 rotate</a>
-    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x32&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain&v=29.09.122">Preview 64×32 rotate</a>
+    <a class="ft-link" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-96x48&main=HAPPY%20BIRTHDAY%20ALEX&mediaFit=cover">Preview 96×48 split</a>
+    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x48&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain">Preview 64×48 rotate</a>
+    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x32&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain">Preview 64×32 rotate</a>
     <p class="sub small">Add <code>&amp;media=</code> with a portrait image URL for a real cover/contain check. Local layout mocks: <code>previews/birthday-media-layout-preview.html</code>.</p>
   </article>
 
@@ -72,7 +72,7 @@
       <li>Status should say waiting for board / WebRTC; after connect, full venue seconds run.</li>
       <li>Master Admin / Firestore <code>appLogs</code> category <code>suprstar</code>: look for <code>live_timer_arm_ok</code>, <code>live_heartbeat</code>, <code>live_timer_fire</code>.</li>
     </ol>
-    <a class="ft-link" href="./suprstr-search.html?v=29.09.122&from=test">Open supRstar</a>
+    <a class="ft-link" href="./suprstr-search.html?from=test">Open supRstar</a>
     <a class="ft-link ghost" href="./display2.html?location=shoko-barcelona-spain">Display 2 (stable, no ?v=)</a>
   </article>
 
@@ -84,7 +84,7 @@
       <li>With both ON: wrong IP + correct <code>?k=</code> → board opens; allowlisted IP without <code>k</code> → opens; both wrong → deny.</li>
       <li>Security logs / messages show token last5 got/expect (not full secret).</li>
     </ol>
-    <a class="ft-link" href="./master-admin.html?v=s3.1.36#displaySecurity">Master Admin · Display Security</a>
+    <a class="ft-link" href="./master-admin.html#displaySecurity">Master Admin · Display Security</a>
   </article>
 
   <article class="ft-card" id="floqai">
@@ -95,7 +95,7 @@
       <li><code>sho</code> → ShoutOut + Shows/events</li>
       <li><code>hai</code> / <code>hail</code> → RydR</li>
     </ul>
-    <a class="ft-link" href="./?v=29.09.122&start=intent">Open FloqAi / Intent Search</a>
+    <a class="ft-link" href="./?start=intent">Open FloqAi / Intent Search</a>
   </article>
 
   <article class="ft-card" id="vip-maps">

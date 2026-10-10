@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Ad Campaign Preview v28.99</title>
-  <link rel="stylesheet" href="./styles.css?v=28.98"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.37"/>
   <style>
     body { min-height:100vh; padding:32px; }
     .preview-shell { max-width:1180px; margin:0 auto; }
@@ -17,14 +17,14 @@
 </head>
 <body>
   <main class="preview-shell">
-    <a href="./index.html?v=28.99">&larr; Back to app</a>
+    <a href="./index.html">&larr; Back to app</a>
     <p class="eyebrow">FLOQR Ad Campaign Preview - v28.99</p>
     <h1>Campaigns Pending Approval</h1>
     <p class="sub">These are preview campaign assets and targeting rules. They are not final until Master Admin approves the package.</p>
     <div id="previewGrid" class="preview-grid"></div>
   </main>
 
-  <script src="./ad-campaigns.js?v=29.09.34"></script>
+  <script src="./ad-campaigns.js?v=s3.1.37"></script>
   <script>
     const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
     const campaigns = window.FLOQRAdCampaigns.campaigns().filter(item => ["cuisine-bantu-rowlett", "puff-club", "lima-dc-draft"].includes(item.id));

@@ -123,7 +123,7 @@
       try { storedToken = sessionStorage.getItem("floqr_suprstar_token") || ""; } catch (_) {}
       const requestId = order.payload?.requestId || order.requestId || "";
       const previewToken = storedToken || requestId;
-      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.72` : "";
+      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}` : "";
       const backLink = isPopup
         ? `<p class="sub small">This window will close. Keep your preview tab open for Club Admin approval.</p>`
         : previewUrl
@@ -141,7 +141,7 @@
     }
 
     if (order.orderType === "adCampaign") {
-      const portal = `./patron-portal.html?v=${encodeURIComponent(window.FLOQRNav?.appVersion || "")}&tab=ad-campaigns`;
+      const portal = `./patron-portal.html?tab=ad-campaigns`;
       byId("paymentReturnTitle").textContent = paid ? tr("adreturn.title", "Ad paid") : byId("paymentReturnTitle").textContent;
       if (paid) byId("paymentReturnStatus").textContent = tr("adreturn.status", "FLOQR reviews every ad before it goes live. You will get an Inbox message when it is approved. Your invoice is under My Profile → Ad Campaigns.");
       byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">

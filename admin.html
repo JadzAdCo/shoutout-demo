@@ -5,11 +5,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.26"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.37"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.37"/>
 </head>
 <body>
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=s3.1.36">&larr; Venue Command Center</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&larr; Venue Command Center</a>
 <main id="adminPage" class="app admin-shell">
   <section class="page active">
     <header class="topbar admin-topbar">
@@ -48,7 +48,7 @@
       <p id="adminVenueGateCopy" class="sub small" data-keep-visible="true">This Club Admin account is not affiliated with a venue. Request assignment from Master Admin, or open the club association request form.</p>
       <div class="queue-actions">
         <button id="requestVenueAssignmentBtn" class="primary" type="button">Request assignment from Master Admin</button>
-        <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?v=29.09.99&amp;type=clubAdmin&amp;from=admin">Request club association</a>
+        <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?type=clubAdmin&amp;from=admin">Request club association</a>
       </div>
       <p id="adminVenueGateStatus" class="status"></p>
     </div>
@@ -913,7 +913,7 @@
             <span>SMS template: Guest-list reminder</span>
             <span>Internal message: VIP offer</span>
           </div>
-          <p><a id="adminRoleProfilesLink" href="./role-profiles.html?v=29.09.44&from=admin">Open role/profile landing pages</a></p>
+          <p><a id="adminRoleProfilesLink" href="./role-profiles.html?from=admin">Open role/profile landing pages</a></p>
         </div>
       </section>
       <section id="panelReconciliation" class="admin-panel-section">
@@ -961,53 +961,53 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.0.67"></script>
-<script src="./floqr-people-directory.js?v=s3.1.26"></script>
-<script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.36"></script>
-<script src="./global-profile-status.js?v=s3.1.30"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.26"></script>
-<script src="./shared-data.js?v=s3.1.26"></script>
-<script src="./feature-gates.js?v=s3.1.26"></script>
-<script src="./url-media-field.js?v=29.09.17"></script>
-<script src="./media-source-picker.js?v=29.09.52"></script>
-<script src="./ai-service.js?v=29.09.8"></script>
-<script src="./ai-index-service.js?v=s3.1.26"></script>
-<script src="./ai-template-studio.js?v=29.09.8"></script>
-<script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.1.36"></script>
-<script src="./floqai-help-repository.js?v=s3.1.36"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.26"></script>
-<script src="./help-attach.js?v=s3.1.36"></script>
-<script src="./helper-popouts.js?v=s3.1.36"></script>
-<script src="./floqr-identity.js?v=29.09.98"></script>
-<script src="./floqr-logger.js?v=29.09.8"></script>
-<script src="./payment-service.js?v=29.09.46"></script>
-<script src="./messaging-credits.js?v=29.09.12"></script>
-<script src="./marketing-templates.js?v=29.09.14"></script>
-<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
-<script src="./ad-campaigns.js?v=s3.1.0"></script>
-<script src="./floqr-ad-composer.js?v=s3.1.0"></script>
-<script src="./floqr-tab-gates.js?v=29.09.117"></script>
-<script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./floqr-employee-network.js?v=s3.1.26"></script>
-<script src="./floqr-featured-staff.js?v=s3.1.26"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.1.26"></script>
-<script src="./floqr-access-notice.js?v=s3.1.26"></script>
-<script src="./floqr-board-frame.js?v=s3.1.26"></script>
-<script src="./admin-app.js?v=s3.1.36"></script>
-<script src="./admin-venue-hours.js?v=29.09.103"></script>
-<script src="./floqr-template-tags.js?v=s3.1.26"></script>
-<script src="./admin-rep-extension.js?v=s3.1.26"></script>
-<script src="./admin-notifications.js?v=s3.0.1"></script>
-<script src="./admin-marketing.js?v=s3.0.81"></script>
-<script src="./master-twilio-logging.js?v=s3.0.78"></script>
-<script src="./admin-spot-ads.js?v=s3.1.0"></script>
-<script src="./assignment-card.js?v=s3.1.35"></script>
-<script src="./admin-scheduling.js?v=s3.0.0"></script>
-<script src="./notification-center.js?v=29.09.8"></script>
-<script src="./profile-access-guard.js?v=29.09.8"></script>
+<script src="./firebase-config.js?v=s3.1.37"></script>
+<script src="./floqr-people-directory.js?v=s3.1.37"></script>
+<script src="./floqr-app-check.js?v=s3.1.37"></script>
+<script src="./floqr-nav.js?v=s3.1.37"></script>
+<script src="./global-profile-status.js?v=s3.1.37"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.37"></script>
+<script src="./shared-data.js?v=s3.1.37"></script>
+<script src="./feature-gates.js?v=s3.1.37"></script>
+<script src="./url-media-field.js?v=s3.1.37"></script>
+<script src="./media-source-picker.js?v=s3.1.37"></script>
+<script src="./ai-service.js?v=s3.1.37"></script>
+<script src="./ai-index-service.js?v=s3.1.37"></script>
+<script src="./ai-template-studio.js?v=s3.1.37"></script>
+<script src="./floqr-action-feedback.js?v=s3.1.37"></script>
+<script src="./floqr-i18n.js?v=s3.1.37"></script>
+<script src="./floqai-help-repository.js?v=s3.1.37"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.37"></script>
+<script src="./help-attach.js?v=s3.1.37"></script>
+<script src="./helper-popouts.js?v=s3.1.37"></script>
+<script src="./floqr-identity.js?v=s3.1.37"></script>
+<script src="./floqr-logger.js?v=s3.1.37"></script>
+<script src="./payment-service.js?v=s3.1.37"></script>
+<script src="./messaging-credits.js?v=s3.1.37"></script>
+<script src="./marketing-templates.js?v=s3.1.37"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.37"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.37"></script>
+<script src="./ad-campaigns.js?v=s3.1.37"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.37"></script>
+<script src="./floqr-tab-gates.js?v=s3.1.37"></script>
+<script src="./floqr-venue-calendar.js?v=s3.1.37"></script>
+<script src="./floqr-employee-network.js?v=s3.1.37"></script>
+<script src="./floqr-featured-staff.js?v=s3.1.37"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.37"></script>
+<script src="./floqr-access-notice.js?v=s3.1.37"></script>
+<script src="./floqr-board-frame.js?v=s3.1.37"></script>
+<script src="./admin-app.js?v=s3.1.37"></script>
+<script src="./admin-venue-hours.js?v=s3.1.37"></script>
+<script src="./floqr-template-tags.js?v=s3.1.37"></script>
+<script src="./admin-rep-extension.js?v=s3.1.37"></script>
+<script src="./admin-notifications.js?v=s3.1.37"></script>
+<script src="./admin-marketing.js?v=s3.1.37"></script>
+<script src="./master-twilio-logging.js?v=s3.1.37"></script>
+<script src="./admin-spot-ads.js?v=s3.1.37"></script>
+<script src="./assignment-card.js?v=s3.1.37"></script>
+<script src="./admin-scheduling.js?v=s3.1.37"></script>
+<script src="./notification-center.js?v=s3.1.37"></script>
+<script src="./profile-access-guard.js?v=s3.1.37"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

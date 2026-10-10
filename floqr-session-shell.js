@@ -21,10 +21,6 @@
     return COPY[key];
   }
 
-  function appVersion() {
-    return String(root.FLOQRNav?.appVersion || "").trim();
-  }
-
   function params() {
     try {
       return new URL(location.href).searchParams;
@@ -68,9 +64,7 @@
   }
 
   function portalSignInHref() {
-    const v = appVersion() || params().get("v") || "";
     const next = new URL("./patron-portal.html", location.href);
-    if (v) next.searchParams.set("v", v);
     next.searchParams.set("from", "session-shell");
     return `${next.pathname}${next.search}`;
   }
@@ -85,10 +79,11 @@
   function loginHref() {
     const file = String(location.pathname || "").split("/").pop() || "index.html";
     const q = new URLSearchParams();
-    const v = appVersion() || params().get("v") || "";
-    if (v) q.set("v", v);
+    const back = new URLSearchParams(location.search);
+    back.delete("v");
+    const backSearch = back.toString();
     q.set("profileRequired", "sign-in");
-    q.set("returnTo", `${file}${location.search}${location.hash}`);
+    q.set("returnTo", `${file}${backSearch ? `?${backSearch}` : ""}${location.hash}`);
     return `./?${q.toString()}`;
   }
 

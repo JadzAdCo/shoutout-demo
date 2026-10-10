@@ -8,7 +8,6 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = window.FLOQRNav?.appVersion || "";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -99,9 +98,9 @@
       liveFrame.src = locationId ? stableVenueDisplayUrl() : "about:blank";
     }
     const publicLink = byId("clubPublicProfileLink");
-    if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
+    if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");
-    if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
+    if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?from=admin&location=${encodeURIComponent(locationId)}`;
     const d1 = byId("clubDisplaySecurityDisplay1Link");
     if (d1) d1.href = stableVenueDisplayUrl();
     const d2 = byId("clubDisplaySecurityDisplay2Link");
@@ -190,7 +189,7 @@
   }
 
   function publicProfileUrl() {
-    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
+    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}`, window.location.href).toString();
   }
 
   function staticAddressDefaults(source = loc) {
@@ -966,7 +965,7 @@
     }
     url.searchParams.set("location", next);
     url.searchParams.delete("club");
-    if (!url.searchParams.get("v") && CURRENT_VERSION) url.searchParams.set("v", CURRENT_VERSION);
+    url.searchParams.delete("v");
     location.replace(url.toString());
     return true;
   }
@@ -2408,7 +2407,7 @@
         return;
       }
       const campaignRef = await db.collection("guestListCampaigns").add(payload);
-      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link: window.FLOQRNav?.adminLink("./guest-list.html", { campaign: campaignRef.id }) || `./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&from=admin&v=29.09.44`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
+      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link: window.FLOQRNav?.adminLink("./guest-list.html", { campaign: campaignRef.id }) || `./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&from=admin`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
       await campaignRef.set({publishedAt:firebase.firestore.FieldValue.serverTimestamp(), deliveredCount:result.deliveredCount || 0}, {merge:true});
       setText("adminStatus", `Guest list campaign submitted to ${result.deliveredCount || 0} club follower(s).`);
       await loadGuestListCampaigns();
@@ -2529,7 +2528,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=29.09.8"
+        link:"./patron-portal.html?tab=shoutouts"
       });
     } catch(e) {}
   }

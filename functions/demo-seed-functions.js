@@ -514,7 +514,7 @@ async function runSeed() {
     scheduleLocationId: "temp-democlub-1",
     shiftCount: shifts.length,
     profileUrl: `${ORIGIN}/club-profile.html?location=temp-democlub-1`,
-    adminUrl: `${ORIGIN}/admin.html?location=temp-democlub-1&v=29.09.122`
+    adminUrl: `${ORIGIN}/admin.html?location=temp-democlub-1`
   };
   await db.doc(META_DOC).set({
     ...manifest,
