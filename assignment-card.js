@@ -6,11 +6,17 @@
   "use strict";
 
   const STATUS = {
-    draft: {key: "draft", label: "Draft", icon: "pencil"},
-    pending: {key: "pending", label: "Pending", icon: "clock"},
-    confirmed: {key: "confirmed", label: "Confirmed", icon: "check"},
-    open: {key: "open", label: "Unfilled", icon: "vacancy"}
+    draft: {key: "draft", label: "Draft", icon: "pencil", i18n: "sched.cardDraft"},
+    pending: {key: "pending", label: "Pending", icon: "clock", i18n: "sched.cardPending"},
+    confirmed: {key: "confirmed", label: "Confirmed", icon: "check", i18n: "sched.cardConfirmed"},
+    open: {key: "open", label: "Unfilled", icon: "vacancy", i18n: "sched.cardOpen"}
   };
+
+  function tr(key, fallback) {
+    const i18n = typeof globalThis !== "undefined" ? globalThis.FLOQRI18n : null;
+    const value = i18n?.t?.(key);
+    return value && value !== key ? value : fallback;
+  }
 
   function esc(value) {
     return String(value ?? "")
@@ -55,21 +61,22 @@
   function render(shift = {}, options = {}) {
     const kind = options.kind || "";
     const meta = resolveStatus(shift, kind);
+    const statusLabel = tr(meta.i18n, meta.label);
     const name = meta.key === "open"
-      ? (options.openLabel || "Open shift")
-      : (shift.displayName || shift.assigneeName || "Staff");
+      ? (options.openLabel || tr("sched.cardOpenShift", "Open shift"))
+      : (shift.displayName || shift.assigneeName || tr("sched.cardStaff", "Staff"));
     const selected = options.selected ? " is-selected" : "";
     const interactive = options.interactive !== false;
     const tag = interactive ? "button" : "article";
     const typeAttr = interactive ? ' type="button"' : "";
     const idAttr = shift.id ? ` data-shift-id="${esc(shift.id)}"` : "";
-    return `<${tag}${typeAttr} class="assignment-card is-${meta.key}${selected}" data-status="${esc(meta.key)}"${idAttr} aria-label="${esc(`${name} ${formatTimeRange(shift)} ${meta.label}`)}">
+    return `<${tag}${typeAttr} class="assignment-card is-${meta.key}${selected}" data-status="${esc(meta.key)}"${idAttr} aria-label="${esc(`${name} ${formatTimeRange(shift)} ${statusLabel}`)}">
       <div class="assignment-card-head">
         <span class="assignment-card-icon" aria-hidden="true">${iconSvg(meta.key === "open" ? "vacancy" : meta.icon)}</span>
         <strong class="assignment-card-name">${esc(name)}</strong>
       </div>
       <p class="assignment-card-time">${esc(formatTimeRange(shift))}</p>
-      <p class="assignment-card-status"><span class="assignment-card-status-icon" aria-hidden="true">${iconSvg(meta.icon)}</span><span class="assignment-card-status-label">${esc(meta.label)}</span></p>
+      <p class="assignment-card-status"><span class="assignment-card-status-icon" aria-hidden="true">${iconSvg(meta.icon)}</span><span class="assignment-card-status-label">${esc(statusLabel)}</span></p>
     </${tag}>`;
   }
 

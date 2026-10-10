@@ -2,11 +2,14 @@
 (function (global) {
   "use strict";
 
-  const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.48";
+  function appV() {
+    return (global.FLOQRNav && global.FLOQRNav.appVersion) || "";
+  }
 
   function vUrl(path, params = {}) {
-    const qs = new URLSearchParams({v: APP_V, ...params});
-    return `${path}?${qs.toString()}`;
+    const v = appV();
+    const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+    return qs ? `${path}?${qs}` : path;
   }
 
   const PRODUCT_INTENTS = [
@@ -24,7 +27,7 @@
       featureKey: "mingl",
       label: "Mingl",
       blurb: "Meet people, chat, and social discovery.",
-      href: `./?v=${APP_V}&start=mingl`,
+      href: vUrl("./", {start: "mingl"}),
       patterns: [/meet/, /mingl/, /date/, /social/, /someone/, /people/, /friend/, /chat/, /connect/, /match/]
     },
     {
@@ -50,7 +53,7 @@
       kind: "product",
       label: "Throw a ShoutOut",
       blurb: "Send a live message to a FloqR display.",
-      href: `./?v=${APP_V}&start=search`,
+      href: vUrl("./", {start: "search"}),
       action: "shoutout",
       patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
     },
@@ -59,7 +62,7 @@
       kind: "product",
       label: "Football Intro",
       blurb: "Four-player, 20-second stadium intro ShoutOut on 96×48 boards at Zebbies Garden DC, Heist Washington DC and Aurelia.",
-      href: `./?v=${APP_V}&start=search`,
+      href: vUrl("./", {start: "search"}),
       action: "template",
       templateId: "zebbiesFootballTeamIntro",
       searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars", "team intro"],
@@ -70,7 +73,7 @@
       kind: "product",
       label: "Tengo muchos dólares",
       blurb: "Heist Washington DC vault ShoutOut — enter a name or @handle; the board types “Tengo muchos dólares... I just did a heist!” and $100 bills flood the LED.",
-      href: `./?v=${APP_V}&start=search`,
+      href: vUrl("./", {start: "search"}),
       action: "template",
       templateId: "heistVaultDollars",
       searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho", "just did a heist", "money rain", "vault night"],
@@ -96,7 +99,7 @@
       kind: "product",
       label: "Clubs & venues",
       blurb: "Search events, clubs, beach clubs, lounges, and lounge-clubs — try “Hip Hop Clubs in DC” or “EDM Events in New York”.",
-      href: `./?v=${APP_V}&start=search`,
+      href: vUrl("./", {start: "search"}),
       searchPhrases: [
         "hip hop clubs in dc", "edm events in new york", "beach clubs", "beachclub", "beach-club",
         "lounge clubs", "lounge-club", "nightclubs", "night club", "lounges near me", "events tonight",
@@ -719,7 +722,7 @@
       blurb: "Join a venue guest list from Search or the dedicated guest-list page for that club.",
       links: [
         {label: "Guest list", href: vUrl("./guest-list.html", {from: "floqai"})},
-        {label: "Find a club first", href: `./?v=${APP_V}&start=search`}
+        {label: "Find a club first", href: vUrl("./", {start: "search"})}
       ],
       patterns: [/guest\s*list/, /guestlist/, /rsvp/, /get\s*on\s*(the\s*)?list/]
     },
@@ -742,8 +745,8 @@
       label: "How to throw a ShoutOut",
       blurb: "Pick a club, choose a template (free Black & White Classic, or FloqAi for paid themes), pay if needed, and send to the live display.",
       links: [
-        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
-        {label: "Ask FloqAi for templates", href: `./floqai.html?v=${APP_V}`}
+        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
+        {label: "Ask FloqAi for templates", href: vUrl("./floqai.html")}
       ],
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
@@ -753,7 +756,7 @@
       label: "NFL jersey ShoutOut",
       blurb: "Search NFL, 49ers, or ScammerVille. Photo LED backs use the bulky NFL yoke cut with a side helmet — no hanger. Enter patron name (up to 8 characters) and a 2-character mark.",
       links: [
-        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
+        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
         {label: "Jersey preview gallery", href: vUrl("./jersey-preview-all.html", {from: "floqai"})}
       ],
       patterns: [/nfl\s*jersey/, /49ers/, /49\s*ers/, /scammerville/, /football\s*jersey/, /san\s*francisco\s*49/]
@@ -764,8 +767,8 @@
       label: "Soccer jersey ShoutOut",
       blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
       links: [
-        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
-        {label: "Ask FloqAi for jersey templates", href: `./floqai.html?v=${APP_V}`}
+        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})},
+        {label: "Ask FloqAi for jersey templates", href: vUrl("./floqai.html")}
       ],
       patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
     },
@@ -786,7 +789,7 @@
       label: "VIP / bottle / table help",
       blurb: "VIP and bottle flows are venue-scoped. Find the club, then use VIP / guest-list / venue links from the club profile.",
       links: [
-        {label: "Find a club", href: `./?v=${APP_V}&start=search`},
+        {label: "Find a club", href: vUrl("./", {start: "search"})},
         {label: "Guest list", href: vUrl("./guest-list.html", {from: "floqai"})}
       ],
       patterns: [/\bvip\b/, /bottle\s*service/, /table\s*service/, /reserve\s*(a\s*)?table/]
@@ -851,7 +854,7 @@
         {label: "Request a role / service access", href: vUrl("./role-request.html", {from: "floqai"})},
         {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})},
         {label: "Role profiles", href: vUrl("./role-profiles.html", {from: "floqai"})},
-        {label: "Classic Search", href: `./?v=${APP_V}&start=search`}
+        {label: "Classic Search", href: vUrl("./", {start: "search"})}
       ],
       searchPhrases: ["ask floqr", "floqai help", "help popout", "what can floqai"],
       patterns: [
@@ -1149,7 +1152,7 @@
       return;
     }
     if (!intents.length) {
-      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="./?v=${APP_V}&start=search">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
+      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="${esc(vUrl("./", {start: "search"}))}">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
       return;
     }
     container.innerHTML = intents.map(intent =>
