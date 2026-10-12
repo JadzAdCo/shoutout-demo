@@ -1412,6 +1412,16 @@
       page: "index.html#templates"
     },
     {
+      id: "help-shiloh",
+      title: "Shiloh",
+      body: "$30 Aurelia exclusive. Shiloh the cat sits on the left of the board and your ShoutOut glows in white on the dark side beside her. Emoji are welcome. Type “Shiloh” in Search, write up to three short lines, and add your @handle if you like. Plays on the board sizes Aurelia has.",
+      searchPhrases: ["shiloh", "shiloh cat", "cat shoutout", "cat template", "kitty template", "aurelia cat", "aurelia exclusive"],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
       id: "help-club-template-repository",
       title: "Your club's templates",
       body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",

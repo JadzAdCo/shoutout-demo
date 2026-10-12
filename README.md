@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.37 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.38 (stable)
+
+- s3.1.38: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and FloqAi search ("Shiloh", "cat template") in all 11 languages.
 
 - s3.1.37: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, FloqAi, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.
 

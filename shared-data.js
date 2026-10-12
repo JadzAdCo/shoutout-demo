@@ -1160,6 +1160,28 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:"Zebbies Garden DC, 64×48 only. Loop a picture or a 7-second trimmed video with the shoutout text. The FloqR card shows FROM @handle on both frames.",
     tags:["christine","zebbies","zebbies garden","64x48","video","photo","trimmed video","7 seconds","loop","handle","floqr card"]
   },
+  shiloh: {
+    id:'shiloh',
+    name:'Shiloh',
+    searchAliases:['shiloh','shiloh cat','aurelia cat','cat shoutout'],
+    scope:'Club',
+    venueIds:['temp-democlub-1'],
+    className:'shiloh-cat',
+    category:'Aurelia',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    defaultBackgroundUrl:'./images/aurelia/shiloh-cat-background.jpg',
+    fitTextToColumn:true,
+    priceCents:3000,
+    priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    description:'Aurelia exclusive: Shiloh the cat sits on the left of the board while your ShoutOut glows in white on the dark side beside her. Emoji welcome. Sizes: 96×48, 64×48, 64×32 (the venue shows the sizes its boards support).',
+    tags:["shiloh","cat","kitty","aurelia","pet","cute","club exclusive","photo background","emoji","$30","96x48","64x48","64x32"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {

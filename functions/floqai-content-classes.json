@@ -193,6 +193,9 @@
     "help-service-members": [
       "venueAdmin"
     ],
+    "help-shiloh": [
+      "patron"
+    ],
     "help-shoutout-recommendations": [
       "patron"
     ],
@@ -400,6 +403,9 @@
       "patron"
     ],
     "rydr": [
+      "patron"
+    ],
+    "shiloh": [
       "patron"
     ],
     "shoutout": [
