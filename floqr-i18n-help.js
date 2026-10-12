@@ -208,6 +208,10 @@
         title: "Tengo muchos dólares",
         body: "Эксклюзив Heist Washington DC за $30. Ваше сообщение 5 секунд идёт на фоне хранилища; затем дверь сейфа взрывается, и 10 секунд купюры по $100 разлетаются за вашим текстом. В конце экран показывает логотип HEIST над надписью Washington DC, и всё повторяется. Введите в поиске «Tengo muchos dólares», затем укажите только имя или выберите @ник Instagram / Mingl (до 14 символов). Экран покажет имя и по буквам напечатает «Tengo muchos dólares... I just did a heist!». Только для экранов 96×48."
       },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Эксклюзив Aurelia за $30. Кошка Shiloh сидит в левой части экрана, а ваш ShoutOut светится белым на тёмной стороне рядом с ней. Эмодзи приветствуются. Введите в поиске «Shiloh», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах тех размеров, которые есть в Aurelia."
+      },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
         body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
@@ -455,6 +459,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Exclusief bij Heist Washington DC voor $30. Je bericht speelt 5 seconden voor de kluis; dan vliegt de kluisdeur open en vliegen biljetten van $100 10 seconden lang achter je tekst rond. Daarna toont het scherm het HEIST-logo boven Washington DC en begint alles opnieuw. Typ ‘Tengo muchos dólares’ in Zoeken en vul alleen een naam in of kies een @Instagram- / @Mingl-handle (max. 14). Het scherm toont de naam en typt letter voor letter ‘Tengo muchos dólares... I just did a heist!’. Alleen voor 96×48-schermen."
+      },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Exclusief bij Aurelia voor $30. De kat Shiloh zit links op het scherm en je ShoutOut gloeit wit aan de donkere kant naast haar. Emoji zijn welkom. Typ ‘Shiloh’ in Zoeken, schrijf maximaal drie korte regels en voeg desgewenst je @handle toe. Speelt op de schermformaten die Aurelia heeft."
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
@@ -704,6 +712,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivité Heist Washington DC à 30 $. Votre message s’affiche 5 secondes devant la chambre forte ; puis la porte du coffre explose et des billets de 100 $ jaillissent derrière votre texte pendant 10 secondes. L’écran se termine sur le logo HEIST au-dessus de Washington DC, puis tout recommence. Tapez « Tengo muchos dólares » dans Recherche, puis saisissez seulement un nom ou choisissez un @pseudo Instagram / Mingl (14 max.). L’écran affiche le nom et tape « Tengo muchos dólares... I just did a heist! » lettre par lettre. Uniquement sur les écrans 96×48."
       },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Exclusivité Aurelia à 30 $. Le chat Shiloh est assis à gauche de l’écran et votre ShoutOut brille en blanc sur le côté sombre, juste à côté. Les emoji sont les bienvenus. Tapez « Shiloh » dans Recherche, écrivez jusqu’à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S’affiche sur les tailles d’écran dont dispose Aurelia."
+      },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
         body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
@@ -951,6 +963,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Exklusiv bei Heist Washington DC für 30 $. Deine Nachricht läuft 5 Sekunden vor dem Tresorraum; dann fliegt die Tresortür auf und 100-$-Scheine wirbeln 10 Sekunden lang hinter deinem Text. Zum Schluss zeigt die Anzeige das HEIST-Logo über Washington DC, dann beginnt alles von vorn. Gib „Tengo muchos dólares“ in der Suche ein und trage nur einen Namen ein oder wähle ein @Instagram- / @Mingl-Handle (max. 14). Die Anzeige zeigt den Namen und tippt „Tengo muchos dólares... I just did a heist!“ Buchstabe für Buchstabe. Nur auf 96×48-Displays."
+      },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Exklusiv bei Aurelia für 30 $. Die Katze Shiloh sitzt links auf der Anzeige, und dein ShoutOut leuchtet weiß auf der dunklen Seite neben ihr. Emojis sind willkommen. Gib „Shiloh“ in der Suche ein, schreib bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf den Displaygrößen, die Aurelia hat."
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
@@ -1200,6 +1216,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivo de Heist Washington DC por $30. Tu mensaje aparece 5 segundos frente a la bóveda; luego la puerta de la caja fuerte explota y billetes de $100 saltan detrás de tu texto durante 10 segundos. Al final la pantalla muestra el logo de HEIST sobre Washington DC y todo vuelve a empezar. Escribe «Tengo muchos dólares» en Buscar y pon solo un nombre o elige un @usuario de Instagram / Mingl (máx. 14). La pantalla muestra el nombre y escribe «Tengo muchos dólares... I just did a heist!» letra por letra. Solo en pantallas de 96×48."
       },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Exclusivo de Aurelia por $30. La gata Shiloh aparece a la izquierda de la pantalla y tu ShoutOut brilla en blanco en el lado oscuro, a su lado. Los emojis son bienvenidos. Escribe «Shiloh» en Buscar, escribe hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en los tamaños de pantalla que tiene Aurelia."
+      },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
         body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
@@ -1447,6 +1467,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Esclusiva Heist Washington DC a 30 $. Il tuo messaggio appare per 5 secondi davanti al caveau; poi la porta della cassaforte esplode e banconote da 100 $ volano dietro il tuo testo per 10 secondi. Alla fine lo schermo mostra il logo HEIST sopra Washington DC e tutto ricomincia. Scrivi «Tengo muchos dólares» in Cerca, poi inserisci solo un nome o scegli un @handle Instagram / Mingl (max 14). Lo schermo mostra il nome e scrive «Tengo muchos dólares... I just did a heist!» lettera per lettera. Solo su schermi 96×48."
+      },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Esclusiva Aurelia a 30 $. La gatta Shiloh è seduta a sinistra dello schermo e il tuo ShoutOut brilla in bianco sul lato scuro accanto a lei. Le emoji sono benvenute. Scrivi «Shiloh» in Cerca, scrivi fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sulle dimensioni di schermo che ha Aurelia."
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
@@ -1696,6 +1720,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivo do Heist Washington DC por US$ 30. Sua mensagem aparece por 5 segundos diante da caixa-forte; depois a porta do cofre explode e notas de US$ 100 voam atrás do seu texto por 10 segundos. No final, o painel mostra o logo HEIST sobre Washington DC e tudo recomeça. Digite «Tengo muchos dólares» na Busca e informe só um nome ou escolha um @usuário do Instagram / Mingl (máx. 14). O painel mostra o nome e digita «Tengo muchos dólares... I just did a heist!» letra por letra. Somente em telas 96×48."
       },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Exclusivo do Aurelia por US$ 30. A gata Shiloh fica à esquerda da tela e o seu ShoutOut brilha em branco no lado escuro, ao lado dela. Emojis são bem-vindos. Digite «Shiloh» na Busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Aparece nos tamanhos de tela que o Aurelia tem."
+      },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
         body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
@@ -1943,6 +1971,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Αποκλειστικό του Heist Washington DC με $30. Το μήνυμά σας παίζει για 5 δευτερόλεπτα μπροστά στο θησαυροφυλάκιο· μετά η πόρτα του χρηματοκιβωτίου εκρήγνυται και χαρτονομίσματα των $100 πετούν πίσω από το κείμενό σας για 10 δευτερόλεπτα. Στο τέλος η οθόνη δείχνει το λογότυπο HEIST πάνω από το Washington DC και όλα ξεκινούν ξανά. Πληκτρολογήστε «Tengo muchos dólares» στην Αναζήτηση και βάλτε μόνο ένα όνομα ή διαλέξτε ένα @handle Instagram / Mingl (έως 14). Η οθόνη δείχνει το όνομα και πληκτρολογεί γράμμα-γράμμα «Tengo muchos dólares... I just did a heist!». Μόνο σε οθόνες 96×48."
+      },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Αποκλειστικό του Aurelia στα 30 $. Η γάτα Shiloh κάθεται στα αριστερά της οθόνης και το ShoutOut σας λάμπει λευκό στη σκοτεινή πλευρά δίπλα της. Τα emoji είναι ευπρόσδεκτα. Πληκτρολογήστε «Shiloh» στην Αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει στα μεγέθη οθόνης που έχει το Aurelia."
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
@@ -2192,6 +2224,10 @@
         title: "Tengo muchos dólares",
         body: "Wyłącznie w Heist Washington DC za 30 $. Twoja wiadomość wyświetla się przez 5 sekund przed skarbcem; potem drzwi sejfu wybuchają, a banknoty 100 $ fruwają za Twoim tekstem przez 10 sekund. Na koniec ekran pokazuje logo HEIST nad napisem Washington DC i wszystko zaczyna się od nowa. Wpisz „Tengo muchos dólares” w wyszukiwarce i podaj tylko imię albo wybierz @nick z Instagrama / Mingl (maks. 14). Ekran pokaże imię i litera po literze wypisze „Tengo muchos dólares... I just did a heist!”. Tylko na ekranach 96×48."
       },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "Wyłącznie w Aurelia za 30 $. Kotka Shiloh siedzi po lewej stronie ekranu, a Twój ShoutOut świeci na biało po ciemnej stronie obok niej. Emoji są mile widziane. Wpisz „Shiloh” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach w rozmiarach, które ma Aurelia."
+      },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
         body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
@@ -2439,6 +2475,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "حصري لـ Heist Washington DC مقابل 30 دولارًا. تظهر رسالتك أمام غرفة الخزنة لمدة 5 ثوانٍ؛ ثم ينفجر باب الخزنة وتتطاير أوراق المئة دولار خلف نصك لمدة 10 ثوانٍ. في النهاية تعرض الشاشة شعار HEIST فوق Washington DC ثم يتكرر العرض. اكتب «Tengo muchos dólares» في البحث، ثم أدخل اسمًا فقط أو اختر @معرّف Instagram / Mingl (14 حرفًا كحد أقصى). تعرض الشاشة الاسم ثم تكتب «Tengo muchos dólares... I just did a heist!» حرفًا حرفًا. على شاشات 96×48 فقط."
+      },
+      "help-shiloh": {
+        title: "Shiloh",
+        body: "حصري في Aurelia مقابل 30 $. تجلس القطة Shiloh على يسار الشاشة ويتوهّج ShoutOut الخاص بك باللون الأبيض على الجانب الداكن بجانبها. الرموز التعبيرية مرحّب بها. اكتب «Shiloh» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @اسمك إن أردت. يُعرض على أحجام الشاشات المتوفرة في Aurelia."
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",

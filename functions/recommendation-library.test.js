@@ -34,11 +34,12 @@ test("recommendations fit every supported template's smallest shared ceiling", (
 test("every published template allows patron background changes", () => {
   assert.ok(templates.length >= 30, `expected >= 30 templates, got ${templates.length}`);
   templates.forEach(template => {
-    // Heist club exclusives, Soccer jersey backs, and Christine lock art backgrounds.
+    // Heist club exclusives, Soccer jersey backs, Christine and Shiloh lock art backgrounds.
     if ((template.scope === "Club" && String(template.id || "").startsWith("heist"))
       || template.layout === "soccer-jersey"
       || String(template.id || "").startsWith("soccer")
-      || template.id === "christine") {
+      || template.id === "christine"
+      || template.id === "shiloh") {
       assert.equal(template.backgroundEditable, false, `${template.id} art background must stay locked`);
       assert.equal(template.IsModifiable, 0, `${template.id} must expose IsModifiable=0`);
       return;

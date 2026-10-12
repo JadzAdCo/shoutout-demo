@@ -1921,3 +1921,14 @@ body.suprstr-live-active .heist-brand-slide{
 
 /* s3.1.25 board fit: measurable row run (floqr-board-fit.js). Design notes: .cursor/rules/design-notes-board-fit.mdc */
 .board-fit-run{display:inline-block;white-space:nowrap;flex:0 0 auto;max-width:none}
+
+/* s3.1.38 Shiloh (Aurelia exclusive). Design notes: .cursor/rules/design-notes-template-discovery-idle.mdc */
+.display-canvas.shiloh-cat .display-background{background-position:22% 35%!important;background-size:cover!important}
+.display-canvas.shiloh-cat .display-background:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 40%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.55) 100%);pointer-events:none}
+.display-canvas.shiloh-cat .display-text-overlay{position:absolute;inset:0}
+.display-canvas.shiloh-cat .display-center{position:absolute;left:46%;right:3%;top:8%;bottom:8%;width:auto;max-width:none;height:auto;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;box-sizing:border-box}
+.display-canvas.shiloh-cat #displayMain{flex:0 1 auto;width:100%;margin:0;max-width:none;display:grid;align-content:center;justify-items:center;color:#f8f8f8;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",Inter,"Segoe UI",Arial,sans-serif;font-weight:900;letter-spacing:.01em;text-transform:none;text-shadow:0 0 .14em rgba(255,186,92,.55),0 .05em .12em rgba(0,0,0,.95),0 0 .5em rgba(0,0,0,.8)}
+.display-canvas.shiloh-cat #displaySub{flex:0 0 auto;margin:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ffc56b;font-weight:800;text-shadow:0 .05em .12em #000}
+.display-canvas.shiloh-cat #displaySub:empty{display:none}
+.display-canvas.shiloh-cat[data-screen-format-id="led-64x48"] .display-center{left:50%;right:3%;top:10%;bottom:10%}
+.display-canvas.shiloh-cat[data-screen-format-id="led-64x32"] .display-center{left:47%;right:2.5%;top:6%;bottom:6%}

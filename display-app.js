@@ -450,7 +450,7 @@
     const safeX = window.FLOQRBoardFit?.SAFE_X ?? 0.04;
     const safeY = window.FLOQRBoardFit?.SAFE_Y ?? 0.06;
     const width = Math.floor((host.clientWidth || host.parentElement?.clientWidth || 0) * (1 - 2 * safeX));
-    const height = Math.floor((host.clientHeight || host.parentElement?.clientHeight || 0) * (1 - 2 * safeY));
+    const height = Math.floor((Number(options.boxHeight) || host.clientHeight || host.parentElement?.clientHeight || 0) * (1 - 2 * safeY));
     if (width < 24) return 0;
     const minPx = Math.max(10, Number(options.minPx || 14));
     const lineCount = Math.max(1, lines.length);
@@ -2187,8 +2187,13 @@
       const startVh = usesSplitMedia || isChristine ? mainSize * 0.78 : mainSize;
       byId("displayMain").style.fontSize = `${startVh}vh`;
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
+      // A fixed text column (photo templates) is a stable height budget; a content-sized #displayMain shrinks on every re-run.
+      const columnHeight = () => (t.fitTextToColumn === true && center
+        ? Math.max(0, center.clientHeight - (byId("displaySub").offsetHeight || 0))
+        : 0);
       const runMessageFit = () => fitDisplayMessageLines(byId("displayMain"), {
-        minPx: Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35))
+        minPx: t.fitTextToColumn === true ? 10 : Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35)),
+        boxHeight: columnHeight()
       });
       runMessageFit();
       requestAnimationFrame(() => {

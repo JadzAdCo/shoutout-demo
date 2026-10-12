@@ -76,6 +76,17 @@
       patterns: [/te\w{2,3}\s*muchos?\s*d[oó]l+ar/, /\bte[nd][gd]o\s+muchos?\b/, /muchos?\s*d[oó]l+ares/, /money\s*rain/, /make\s*it\s*rain/, /vault\s*night/]
     },
     {
+      id: "shiloh",
+      kind: "product",
+      label: "Shiloh",
+      blurb: "Aurelia exclusive ShoutOut — Shiloh the cat on the left of the board, your words glowing in white beside her. Emoji welcome.",
+      href: pageUrl("./", {start: "search"}),
+      action: "template",
+      templateId: "shiloh",
+      searchPhrases: ["shiloh", "shiloh cat", "cat shoutout", "cat template", "kitty template", "aurelia cat"],
+      patterns: [/shiloh/, /\bcat\s*(shout|template|background)/, /\bkitty\s*(shout|template)/, /aurelia\s*cat/]
+    },
+    {
       id: "suprstr",
       kind: "product",
       featureKey: "supRstar",
@@ -868,7 +879,7 @@
   const INTENT_AUDIENCES = Object.freeze({
     "venue-search": ["public"],
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
-    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], suprstr: ["patron"], clubs: ["patron"],
+    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], suprstr: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-suprstr": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

@@ -32,7 +32,7 @@ Retired: `v29.09.N`. Treat those strings as historical cache keys only.
 - **Minor (`s3.1.0`)** — new user-visible feature that stays compatible.
 - **Patch (`s3.0.1`)** — fix, copy, help, diagnostics, CSS.
 
-This workspace’s current stable is **s3.1.37**.
+This workspace’s current stable is **s3.1.38**.
 
 ## Checklist
 
