@@ -10,6 +10,15 @@
     catch (error) { return fallback; }
   };
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  // Fails closed: without floqr-safe-render.js no URL, color or gradient from data reaches the board.
+  const safeRender = window.FLOQRSafeRender || {
+    safeUrl: () => "",
+    cssUrl: () => "",
+    safeColor: (value, fallback = "") => fallback,
+    safeGradient: (value, fallback = "") => fallback,
+    styleAttr: declarations => esc(declarations.filter(Boolean).join(";"))
+  };
+  const safeMediaUrl = value => safeRender.safeUrl(value, {allowBlob: true, allowDataImage: true});
 
   function resolveDisplayBoard() {
     const q = String(qs("board", qs("display", "")) || "").toLowerCase();
@@ -891,17 +900,19 @@
 
   function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "", fit = "cover" } = {}) {
     resetBackgroundLayer(bgEl);
-    if (backgroundUrl) {
+    const imageCss = safeRender.cssUrl(backgroundUrl);
+    const gradient = safeRender.safeGradient(backgroundGradient);
+    if (imageCss) {
       const size = fit === "contain" ? "contain" : "cover";
-      bgEl.style.backgroundImage = `url("${String(backgroundUrl).replace(/"/g, "%22")}")`;
+      bgEl.style.backgroundImage = imageCss;
       bgEl.style.backgroundSize = size;
       bgEl.style.backgroundPosition = "center";
       bgEl.style.backgroundRepeat = "no-repeat";
       bgEl.dataset.backgroundFit = size;
       return true;
     }
-    if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) {
-      bgEl.style.background = backgroundGradient;
+    if (gradient) {
+      bgEl.style.background = gradient;
       return true;
     }
     if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) {
@@ -931,13 +942,14 @@
       frameEl.style.backgroundRepeat = "";
       return true;
     }
-    if (!url) {
+    const frameCss = safeRender.cssUrl(url);
+    if (!frameCss) {
       frameEl.className = "display-frame-overlay hidden";
       frameEl.style.backgroundImage = "";
       return false;
     }
     frameEl.className = "display-frame-overlay";
-    frameEl.style.backgroundImage = `url("${url.replace(/"/g, "%22")}")`;
+    frameEl.style.backgroundImage = frameCss;
     frameEl.style.backgroundSize = "100% 100%";
     frameEl.style.backgroundPosition = "center";
     frameEl.style.backgroundRepeat = "no-repeat";
@@ -1039,7 +1051,7 @@
   }
 
   function heistBrandLogoUrl() {
-    return String(loc.logoUrl || loc.clubLogoUrl || loc.brandLogoUrl || HEIST_LOCAL_LOGO || "").trim() || HEIST_LOCAL_LOGO;
+    return safeRender.safeUrl(loc.logoUrl || loc.clubLogoUrl || loc.brandLogoUrl || "") || HEIST_LOCAL_LOGO;
   }
 
   function hideHeistBrandSlide() {
@@ -1570,7 +1582,7 @@
         slot:index + 1,
         name,
         position:String(member.position || "TEAM MEMBER").trim().slice(0, 24) || "TEAM MEMBER",
-        mediaUrl:String(member.mediaUrl || member.enhancedMediaUrl || member.originalMediaUrl || "").trim().slice(0, 1800),
+        mediaUrl:safeMediaUrl(member.mediaUrl || member.enhancedMediaUrl || member.originalMediaUrl || ""),
         aiEnhancementApplied:member.aiEnhancementApplied === true,
         initials:name.split(/\s+/).map(part => part[0] || "").join("").slice(0, 2).toUpperCase() || String(index + 1)
       };
@@ -1649,15 +1661,15 @@
     const skipFinale = window.FLOQRIdentity?.isSmallFootballDisplay?.(formatId) || data.skipFinaleLineup === true || textCaps.skipFinaleLineup === true;
     const portraitMotion = data.aiPortraitMotion === true || members.some(member => member.aiEnhancementApplied);
     const backgroundColor = /^#[0-9a-fA-F]{6}$/.test(String(data.backgroundColor || "")) ? data.backgroundColor : "";
-    const backgroundUrl = String(data.backgroundUrl || "").trim();
-    const stageStyle = [
-      `--football-accent:${theme.accent}`,
-      `--football-field:${theme.field}`,
-      `--football-ink:${theme.ink}`,
-      `--football-frame:${theme.frame}`,
+    const backgroundCss = safeRender.cssUrl(data.backgroundUrl);
+    const stageStyle = safeRender.styleAttr([
+      `--football-accent:${safeRender.safeColor(theme.accent, "#dfff5a")}`,
+      `--football-field:${safeRender.safeColor(theme.field, "#06180f")}`,
+      `--football-ink:${safeRender.safeColor(theme.ink, "#ffffff")}`,
+      `--football-frame:${safeRender.safeColor(theme.frame, "#5c4700")}`,
       backgroundColor ? `background-color:${backgroundColor}` : "",
-      backgroundUrl ? `background-image:url("${backgroundUrl.replace(/"/g, "%22")}");background-size:cover;background-position:center;` : ""
-    ].filter(Boolean).join(";");
+      backgroundCss ? `background-image:${backgroundCss};background-size:cover;background-position:center` : ""
+    ]);
     canvas.classList.add("football-team-intro");
     center.className = "display-center football-team-intro-layout";
     mediaSlot.classList.remove("hidden");
@@ -1863,7 +1875,7 @@
       markDisplayReady();
       return;
     }
-    const mediaUrl = data.mediaUrl || "";
+    const mediaUrl = safeMediaUrl(data.mediaUrl);
     const mediaType = data.mediaType || "";
     const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
     byId("displayMain").style.setProperty("font-size", `${usesSplitMedia ? mainSize * .78 : mainSize}vh`, "important");
@@ -1901,9 +1913,9 @@
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
       const usePhotoBack = !!jerseyBg;
-      canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || data.jerseyPrimary || "#111111");
-      canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
-      canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
+      canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
+      canvas.style.setProperty("--jersey-secondary", safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff"));
+      canvas.style.setProperty("--jersey-accent", safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff"));
       if (usePhotoBack) {
         // Named photo kits (country/club wordmark in PNG): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
@@ -2400,9 +2412,6 @@
       const clubDoc = await db.collection("clubLocations").doc(locationId).get();
       if (clubDoc.exists) loc = mergeLiveVenue(packagedLoc, clubDoc.data() || {});
     } catch (e) {}
-    if (!screenFormatOverride && isUrlPreviewMode()) {
-      screenFormatOverride = boardAssignedFormatId(loc);
-    }
     try {
       document.title = DISPLAY_BOARD === "secondary"
         ? `FLOQR Display 2 · ${loc.locationName || locationId}`
@@ -2412,18 +2421,6 @@
     const accessOk = await enforceDisplayAccess();
     if (!accessOk) return;
 
-    if (isUrlPreviewMode()) {
-      render(buildUrlPreviewPayload());
-      db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
-        if (!doc.exists) return;
-        const data = doc.data() || {};
-        if (isRenderableLiveContent(data)) {
-          if (!data.screenFormatId) data.screenFormatId = boardAssignedFormatId(loc);
-          renderTimedLiveContent(data);
-        }
-      }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
-      return;
-    }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? (doc.data() || {}) : defaultClubDisplayPayload();
       const isIdleDoc = !doc.exists || isIdlePayload(payload) || !isRenderableLiveContent(payload);
@@ -2434,20 +2431,4 @@
       renderTimedLiveContent(payload);
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });
-})();
-
-/* v28.5 media renderer for Xibo HTML */
-(function(){
-function byId(id){return document.getElementById(id);}
-window.jadzRenderDisplayMedia=function(data){
- if(!data||!data.mediaUrl)return;
- let host=byId("mediaHost")||byId("displayMedia")||document.querySelector(".display-media");
- if(!host){host=document.createElement("div");host.id="mediaHost";host.className="display-media";document.body.appendChild(host);}
- host.innerHTML=data.mediaType==="video"?`<video src="${data.mediaUrl}" autoplay muted loop playsinline style="max-width:100%;max-height:80vh;border-radius:18px;"></video>`:`<img src="${data.mediaUrl}" alt="" style="max-width:100%;max-height:80vh;border-radius:18px;">`;
- const video=host.querySelector("video");
- if(video&&data.selectedMediaVersion==="trimmed"){
-  const start=Number(data.trimStart||0),end=Number(data.trimEnd||data.trimmedDuration||7);
-  video.addEventListener("timeupdate",function(){if(video.currentTime<start||video.currentTime>=end){try{video.currentTime=start;}catch(e){} video.play&&video.play().catch(function(){});}});
- }
-};
 })();

@@ -2503,7 +2503,7 @@
             <div class="queue-actions">
               <button class="approve" type="button">Approve & Push Live</button>
               <button class="reject" type="button">Reject</button>
-              <a class="buttonlike" target="_blank" href="${displayUrl(item)}">Preview</a>
+              <a class="buttonlike" target="_blank" rel="noopener" href="${esc(displayUrl(item))}">Preview</a>
             </div>`;
           div.querySelector(".approve").addEventListener("click", () => approve(doc.id, item));
           div.querySelector(".reject").addEventListener("click", () => reject(doc.id));
@@ -2578,6 +2578,18 @@
     return rows.slice(0, caps.lineCount).join("\n");
   }
 
+  // Patron-supplied render fields land on a public board doc: only vetted URLs / colors (rules re-check the URLs).
+  const boardUrl = value => window.FLOQRSafeRender?.safeUrl(value) || "";
+  const boardColor = value => window.FLOQRSafeRender?.safeColor(value, "") || "";
+  function boardTeamMembers(members) {
+    return (Array.isArray(members) ? members.slice(0, 4) : []).map(member => ({
+      ...(member && typeof member === "object" ? member : {}),
+      mediaUrl: boardUrl(member?.mediaUrl),
+      originalMediaUrl: boardUrl(member?.originalMediaUrl),
+      enhancedMediaUrl: boardUrl(member?.enhancedMediaUrl)
+    }));
+  }
+
   async function approve(id, item) {
     const defaultMain = `Use ShoutOut @ ${loc.locationName || locationId}`;
     const textCaps = adminShoutoutTextCaps(item);
@@ -2589,7 +2601,7 @@
       || itemSport === "nfl"
       || String(item.template || "").toLowerCase().startsWith("nfl");
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
-    const resolvedBackgroundUrl = item.backgroundUrl || packaged.defaultBackgroundUrl || "";
+    const resolvedBackgroundUrl = boardUrl(item.backgroundUrl) || boardUrl(packaged.defaultBackgroundUrl);
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
       clubLocationId: locationId,
@@ -2609,9 +2621,9 @@
       nflDualLayout: isNflDual,
       sport: isNflDual ? "nfl" : (item.sport || packaged.sport || ""),
       layout: isNflDual ? "nfl-jersey" : (item.layout || packaged.layout || ""),
-      jerseyPrimary: item.jerseyPrimary || packaged.jerseyPrimary || "",
-      jerseySecondary: item.jerseySecondary || packaged.jerseySecondary || "",
-      jerseyAccent: item.jerseyAccent || packaged.jerseyAccent || packaged.jerseySecondary || "",
+      jerseyPrimary: boardColor(item.jerseyPrimary || packaged.jerseyPrimary),
+      jerseySecondary: boardColor(item.jerseySecondary || packaged.jerseySecondary),
+      jerseyAccent: boardColor(item.jerseyAccent || packaged.jerseyAccent || packaged.jerseySecondary),
       jerseyTeamLabel: item.jerseyTeamLabel || packaged.jerseyTeamLabel || "",
       textLayoutVersion:window.FLOQRTextLayout?.version || "",
       textProfileId:textCaps.profileId || item.textProfileId || "full",
@@ -2622,15 +2634,15 @@
       minimumFontPixels:textCaps.minimumFontPixels || 0,
       mainTextSizePercent:textCaps.mainTextSizePercent || 20.8,
       subTextSizePercent:textCaps.subTextSizePercent || 7.8,
-      mediaUrl: item.mediaUrl || "",
+      mediaUrl: boardUrl(item.mediaUrl),
       mediaType: item.mediaType || "",
       mediaFileName: item.mediaFileName || "",
       mediaStoragePath: item.mediaStoragePath || "",
       originalMediaStoragePath: item.originalMediaStoragePath || "",
       enhancedMediaStoragePath: item.enhancedMediaStoragePath || "",
-      originalMediaUrl: item.originalMediaUploaded === false ? "" : (item.originalMediaUrl || item.mediaUrl || ""),
-      enhancedMediaUrl: item.enhancedMediaUrl || "",
-      trimmedMediaUrl: item.trimmedMediaUrl || "",
+      originalMediaUrl: item.originalMediaUploaded === false ? "" : boardUrl(item.originalMediaUrl || item.mediaUrl),
+      enhancedMediaUrl: boardUrl(item.enhancedMediaUrl),
+      trimmedMediaUrl: boardUrl(item.trimmedMediaUrl),
       selectedMediaVersion: item.selectedMediaVersion || "original",
       aiEnhancementApplied: !!item.aiEnhancementApplied,
       aiEnhancementType: item.aiEnhancementType || "none",
@@ -2647,7 +2659,7 @@
       aiMediaSafetyStatus: item.aiMediaSafetyStatus || "notChecked",
       aiMediaSafetyNotes: item.aiMediaSafetyNotes || "",
       mediaUploadedAt: item.mediaUploadedAt || null,
-      teamMembers: Array.isArray(item.teamMembers) ? item.teamMembers.slice(0, 4) : [],
+      teamMembers: boardTeamMembers(item.teamMembers),
       animationDurationSeconds: item.template === "zebbiesFootballTeamIntro" ? 20 : (item.animationDurationSeconds || null),
       collaborationMode: item.collaborationMode || "",
       stadiumMessage: item.template === "zebbiesFootballTeamIntro" ? String(item.stadiumMessage || "TONIGHT, WE TAKE THE FIELD TOGETHER").slice(0, Number(textCaps.maxStadiumCharacters || 54)) : "",
@@ -2659,8 +2671,8 @@
       lockedBaseTemplateId: item.lockedBaseTemplateId || "",
       backgroundType: item.backgroundType || "",
       backgroundUrl: resolvedBackgroundUrl,
-      backgroundColor: item.backgroundColor || "",
-      backgroundGradient: item.backgroundGradient || "",
+      backgroundColor: boardColor(item.backgroundColor),
+      backgroundGradient: window.FLOQRSafeRender?.safeGradient(item.backgroundGradient) || "",
       backgroundStoragePath: item.backgroundStoragePath || "",
       status: "approved",
       idleCta: false,

@@ -382,7 +382,7 @@
   }
   function footballBackgroundPayload() {
     const backgroundColor = byId("footballBackgroundColor")?.value || "";
-    const backgroundUrl = byId("footballBackgroundUrl")?.value.trim() || "";
+    const backgroundUrl = window.FLOQRSafeRender?.safeUrl(byId("footballBackgroundUrl")?.value) || "";
     return {
       backgroundColor:/^#[0-9a-fA-F]{6}$/.test(backgroundColor) ? backgroundColor : "",
       backgroundUrl
@@ -3434,9 +3434,9 @@
     });
   }
   function jerseyMiniPreview(template) {
-    const bg = String(template.defaultBackgroundUrl || "").trim();
-    if (bg && (template.sport === "soccer" || template.sport === "nfl" || template.layout === "soccer-jersey")) {
-      return `<div class="template-mini-preview jersey-shoutout-preview" style="background-image:url('${esc(bg)}')"><span class="jersey-preview-name">${esc(template.defaultMain || "NYX")}</span><span class="jersey-preview-num">${esc(template.defaultSub || "99")}</span></div>`;
+    const bgCss = window.FLOQRSafeRender?.cssUrl(template.defaultBackgroundUrl) || "";
+    if (bgCss && (template.sport === "soccer" || template.sport === "nfl" || template.layout === "soccer-jersey")) {
+      return `<div class="template-mini-preview jersey-shoutout-preview" style="${esc(`background-image:${bgCss}`)}"><span class="jersey-preview-name">${esc(template.defaultMain || "NYX")}</span><span class="jersey-preview-num">${esc(template.defaultSub || "99")}</span></div>`;
     }
     return `<div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>`;
   }
@@ -4375,7 +4375,7 @@
       const themePayload = footballIntro ? footballThemePayload() : {};
       const backgroundPayload = footballIntro ? footballBackgroundPayload() : {};
       const uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
-      const existingMediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
+      const existingMediaUrl = window.FLOQRSafeRender?.safeUrl(byId("shoutoutMediaUrl")?.value || byId("mediaUrl")?.value) || "";
       const existingMediaType = byId("shoutoutMediaType")?.value.trim() || "";
       const mediaPayload = footballIntro ? {
         mediaUrl:footballTeamMembers[0]?.mediaUrl || "",
