@@ -13,6 +13,8 @@
   const CHANNEL = "identity-card";
   const MAX_GLYPHS = 22;
   const PARTICLES = 12;
+  const MAX_PHASES = 6;
+  const DEFAULT_PHASES = Object.freeze(["brand", "handle"]);
   const CELEBRATION = /^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i;
   const HANDLE_CHOICES = {instagram: "instagram", floqrHandle: "mingl", username: "mingl", mingl: "mingl"};
   const NAME_CHOICES = ["displayName", "manual", "name"];
@@ -112,13 +114,38 @@
     return {kind: "brand", kicker: KICKER_BRAND, value: clean(BRAND)};
   }
 
-  /** Phase list: brand only, or brand then handle. Idle boards never credit a patron. */
+  /**
+   * Template phase list (`identityPhases` on the template config): "brand", "handle", or a fixed line
+   * {kicker, value}. Anything else falls back to the default ["brand", "handle"].
+   */
+  function normalizePhaseSpec(spec) {
+    if (!Array.isArray(spec)) return DEFAULT_PHASES.slice();
+    const out = [];
+    for (const entry of spec.slice(0, MAX_PHASES)) {
+      if (entry === "brand" || entry === "handle") out.push(entry);
+      else if (entry && typeof entry === "object") {
+        const kicker = glyphs(clean(entry.kicker)).slice(0, MAX_GLYPHS).join("");
+        const value = glyphs(clean(entry.value)).slice(0, MAX_GLYPHS).join("");
+        if (value) out.push({kicker, value});
+      }
+    }
+    return out.some(entry => entry !== "handle") ? out : DEFAULT_PHASES.slice();
+  }
+
+  /**
+   * Phases in template order. The handle phase appears only when the patron opted in and the handle resolves;
+   * idle boards never credit a patron. Default template: brand only, or brand then handle.
+   */
   function phases(data = {}, options = {}) {
-    const brand = brandPhase();
-    if (options.idle) return [brand];
-    const handle = resolveHandle(data, options);
-    if (!handle) return [brand];
-    return [brand, {kind: "handle", kicker: KICKER_FROM, value: handle.value, handleKind: handle.kind}];
+    const handle = options.idle ? null : resolveHandle(data, options);
+    const list = [];
+    for (const entry of normalizePhaseSpec(options.identityPhases)) {
+      if (entry === "brand") list.push(brandPhase());
+      else if (entry === "handle") {
+        if (handle) list.push({kind: "handle", kicker: KICKER_FROM, value: handle.value, handleKind: handle.kind});
+      } else list.push({kind: "tagline", kicker: entry.kicker, value: entry.value});
+    }
+    return list.length ? list : [brandPhase()];
   }
 
   function phaseAt(list, elapsedMs, hold = holdMs()) {
@@ -149,7 +176,7 @@
 
   /**
    * Paint the card into `host` and loop it on FLOQRFrameLoop (6s per phase).
-   * options: data, idle, legacySubText, defaultSub, hostClass, shellClass, escape, holdMs.
+   * options: data, idle, identityPhases, legacySubText, defaultSub, hostClass, shellClass, escape, holdMs.
    */
   function mount(host, options = {}) {
     stop();
@@ -174,7 +201,9 @@
     KICKER_FROM,
     CHANNEL,
     MAX_GLYPHS,
+    DEFAULT_PHASES,
     holdMs,
+    normalizePhaseSpec,
     looksPrivate,
     formatValue,
     resolveHandle,

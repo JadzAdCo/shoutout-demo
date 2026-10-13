@@ -1,5 +1,5 @@
 ---
-description: FloqR identity card (s3.1.41) — one behavior on display.html / display2.html for every template that shows the pill: always visible, PRESENTED BY FloqMedia ↔ FROM @handle on FLOQRFrameLoop (6s), opt-in handle only, centralized handle priority, never email/phone.
+description: FloqR identity card (s3.1.41; Heist identityPhases s3.1.42) — one behavior on display.html / display2.html for every template that shows the pill: always visible, PRESENTED BY FloqMedia ↔ FROM @handle on FLOQRFrameLoop (6s), opt-in handle only, centralized handle priority, never email/phone.
 alwaysApply: true
 ---
 
@@ -10,6 +10,23 @@ Resume: `@identity-card$` / `$floqr-card$`.
 ## Owner spec (Oct 13 2026, verbatim)
 
 > "It is supposed to be like a gif... depending on the shoutout, if a display name is included, it plays the FloqMedia side of things before it then displays the '@handle', where '@handle' could be the person's Instagram or Mingl or Entered Name... that is how it is supposed to work!"
+
+Owner follow-up (Oct 13 2026, s3.1.42, verbatim):
+
+> "For Heist, I want to have 'Caught in a HEIST', then 'Presented by FloqMedia', then 'Powered by FloqR Social OS', then '@handle' where applicable."
+
+## Per-template phase list (`identityPhases`, s3.1.42)
+
+Templates may set `identityPhases` (array, ≤ 6 entries) on their config. Entries: `"brand"` (PRESENTED BY FloqMedia), `"handle"` (FROM @handle — dropped unless the handle resolves under the priority below; idle boards always drop it), or a fixed line `{kicker, value}` (cleaned to board capitals, ≤ 22 graphemes each, escaped like everything else). Missing / invalid / handle-only lists fall back to the default `["brand", "handle"]`. Still one `FLOQRFrameLoop.cycle("identity-card")`, 6s per phase — no template timer.
+
+| Template | Phases with handle | Without handle / idle |
+|---|---|---|
+| Default (every template without `identityPhases`) | PRESENTED BY FloqMedia → FROM @handle | PRESENTED BY FloqMedia (steady) |
+| Heist (`heistVaultNight`, `heistPoliceCar`, `heistInterrogation`, `heistVaultDollars`, alias `heistRedLux`) — `window.FLOQR_HEIST_IDENTITY_PHASES` in `shared-data.js` | CAUGHT IN A HEIST → PRESENTED BY FloqMedia → POWERED BY FloqR Social OS → FROM @handle | the first three |
+
+Heist message window: `scheduleHeistMessageThenBrandSlide` stretches the message phase to at least one full card cycle (`phaseCount × 6s`) so every phase plays before the HEIST brand slide (Locked Up / Police Car / Snitch: 20s → 24s with a handle; Tengo muchos dólares: 15s → 18s / 24s). The brand slide itself (club logo, 8s) still fades the whole text overlay, card included — that is the venue's logo slide, not the card. Firestore template docs merge over packaged config, so `identityPhases` stays packaged unless a Master Admin writes one.
+
+Board strings (CAUGHT IN A, PRESENTED BY, POWERED BY, FROM, HEIST, FloqMedia, FloqR Social OS) are brand chrome — not i18n keys, never translated.
 
 ## Behavior (every template with the pill)
 
@@ -42,7 +59,7 @@ Privacy: a value that looks like an email or phone number (≥ 7 digits of phone
 
 ## Decisions
 
-- Heist footer lines ("Caught in a HEIST", "Powered by FloqR Social OS") retired from the card — one behavior everywhere.
+- s3.1.41 retired the Heist footer lines; s3.1.42 brought them back by owner request as Heist `identityPhases` (above), on the shared loop.
 - display2 idle stays the SupRstar idle screen (no card, by design).
 - Full / neon templates keep their plain sub line (no pill added).
 - Board strings PRESENTED BY / FROM / FloqMedia are brand chrome, not localized.
@@ -50,10 +67,10 @@ Privacy: a value that looks like an email or phone number (≥ 7 digits of phone
 
 ## Tests / QA
 
-`functions/identity-card.test.js` (priority, privacy, formatting, phase sequence, escaping, FrameLoop fake timers, CSS min opacity, display-app wiring, composer fields), `display-safe-render.test.js` (FROM @handle escaped on every card template), `commerce-invariants.test.js`. Visual QA harness: `reports/identity-loop-s3-1-41/identity-qa.mjs` (t≈1s / t≈7s stills, 20s opacity sample, 64x32 / 64x48 / 96x48).
+`functions/identity-card.test.js` (priority, privacy, formatting, phase sequence, escaping, FrameLoop fake timers, CSS min opacity, display-app wiring, composer fields), `display-safe-render.test.js` (FROM @handle escaped on every card template), `commerce-invariants.test.js`. Visual QA harness: `reports/identity-loop-s3-1-41/identity-qa.mjs` (t≈1s / t≈7s stills, 20s opacity sample, 64x32 / 64x48 / 96x48). Heist: `reports/identity-loop-heist/heist-qa.mjs` (with / without handle, t≈1/7/13/19s stills, samples through the 24s message window).
 
 ## FIX PROMPT
 
 ```
-FloqR card: always visible. Brand phase PRESENTED BY FloqMedia; opt-in handle adds FROM @handle, 6s each on FLOQRFrameLoop.cycle("identity-card"). One helper FLOQRIdentityCard.resolveHandle (choice none → brand; attribution by attributionChoice; legacy subText only for Heist/split). Never email/phone. No burst keyframes, no per-template setInterval, escape via FLOQRSafeRender. Design notes: design-notes-identity-card.mdc
+FloqR card: always visible. Brand phase PRESENTED BY FloqMedia; opt-in handle adds FROM @handle, 6s each on FLOQRFrameLoop.cycle("identity-card"). Per-template order via identityPhases ("brand" | "handle" | {kicker, value}); Heist = CAUGHT IN A HEIST → FloqMedia → POWERED BY FloqR Social OS → @handle, message window ≥ one card cycle. One helper FLOQRIdentityCard.resolveHandle (choice none → brand; attribution by attributionChoice; legacy subText only for Heist/split). Never email/phone. No burst keyframes, no per-template setInterval, escape via FLOQRSafeRender. Design notes: design-notes-identity-card.mdc
 ```

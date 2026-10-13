@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.41 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.42 (stable)
+
+- s3.1.42: Heist FloqR card. On every Heist ShoutOut the card now plays "Caught in a HEIST", then "Presented by FloqMedia", then "Powered by FloqR Social OS", then "From @handle" when the patron shares a handle - 6 seconds each, then repeats. Without a handle it plays the first three. The card never disappears, and the Heist message stays on screen long enough for every line before the HEIST logo slide. Every other template is unchanged.
 
 - s3.1.41: FloqR card on every board. The "PRESENTED BY FloqMedia" card no longer fades away for most of the cycle - it stays on screen on idle and live boards. When the patron ticks "Include my handle", the card plays like a GIF: PRESENTED BY FloqMedia for 6 seconds, then FROM @handle (Instagram or Mingl handle, or the entered display name) for 6 seconds, and repeats. Without a handle it stays on PRESENTED BY FloqMedia. Email addresses and phone numbers are never shown. Same behavior on Traditional Black and White, Heist, split media / birthday, Christine and every jersey (NFL and soccer).
 

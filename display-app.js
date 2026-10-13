@@ -540,12 +540,12 @@
    * FloqR card on any host (#displaySub on classic / Heist, #displayIdentityRail elsewhere): PRESENTED BY FloqMedia,
    * then FROM @handle when the patron opted in, 6s per phase on FLOQRFrameLoop. Always visible.
    */
-  function mountFloqrCard(host, {data = {}, idle = false, legacySubText = false, defaultSub = "", baseClass = "", hostClass = "", shellClass = ""} = {}) {
+  function mountFloqrCard(host, {data = {}, idle = false, identityPhases = null, legacySubText = false, defaultSub = "", baseClass = "", hostClass = "", shellClass = ""} = {}) {
     if (!host) return null;
     if (baseClass) host.className = baseClass;
     const card = identityCard();
     if (card?.mount) {
-      return card.mount(host, {data, idle, legacySubText, defaultSub, hostClass, shellClass, escape: esc});
+      return card.mount(host, {data, idle, identityPhases, legacySubText, defaultSub, hostClass, shellClass, escape: esc});
     }
     // Without floqr-identity-card.js the card still shows the brand and never a patron value.
     const brand = cleanBoardText(DEFAULT_FLOQR_CARD_BRAND);
@@ -994,7 +994,9 @@
     hideHeistBrandSlide();
     primeHeistBrandSlide();
     replayMoneyRain(template);
-    const messageSeconds = Math.max(5, Number(template.messageDurationSeconds || HEIST_MESSAGE_SECONDS));
+    // The message window always holds one full FloqR card cycle (6s per phase) before the brand slide.
+    const cardSeconds = heistCard.phaseCount * (Number(frameLoop()?.HOLD_MS) || 6000) / 1000;
+    const messageSeconds = Math.max(5, Number(template.messageDurationSeconds || HEIST_MESSAGE_SECONDS), cardSeconds);
     const brandSeconds = Math.max(3, Number(template.brandSlideSeconds || HEIST_BRAND_SLIDE_SECONDS));
     heistPhaseTimer = window.setTimeout(() => {
       showHeistBrandSlide();
@@ -1009,21 +1011,23 @@
   }
 
   // Heist / text-overlay footer: the shared FloqR card. Kept so the brand-slide loop can repaint it.
-  let heistCard = {data: {}, idle: false};
+  let heistCard = {data: {}, idle: false, phaseCount: 0};
   function renderHeistIdentityRail(template = {}, data = heistCard.data, idle = heistCard.idle) {
     stopHeistIdentityCycle();
     const sub = byId("displaySub");
     if (!sub) return;
-    heistCard = {data: data || {}, idle: !!idle};
+    heistCard = {data: data || {}, idle: !!idle, phaseCount: 0};
     sub.classList.remove("text-overlay-identity");
-    mountFloqrCard(sub, {
+    const card = mountFloqrCard(sub, {
       data: heistCard.data,
       idle: heistCard.idle,
+      identityPhases: template.identityPhases || null,
       legacySubText: true,
       defaultSub: template.defaultSub || "",
       hostClass: "classic-bw-identity heist-identity-rail",
       shellClass: "heist-identity-shell"
     });
+    heistCard = {...heistCard, phaseCount: card?.phases?.length || 1};
   }
 
   function urlSearchParams() {
@@ -2020,6 +2024,7 @@
         renderHeistIdentityRail(t, data, isIdleCta);
       } else {
         stopHeistIdentityCycle();
+        heistCard = {data: {}, idle: false, phaseCount: 0};
         byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
         byId("displaySub").removeAttribute("aria-label");
         byId("displaySub").innerHTML = "";

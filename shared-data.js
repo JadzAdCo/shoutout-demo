@@ -1084,6 +1084,14 @@ window.SHOUTOUT_SERVICE_LABELS = {
 window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","scheduled","displayed","archived"];
 
 
+/* FloqR card phases for every Heist template, 6s each (FLOQRIdentityCard). "handle" shows only when the patron opts in. */
+window.FLOQR_HEIST_IDENTITY_PHASES = window.FLOQR_HEIST_IDENTITY_PHASES || Object.freeze([
+  Object.freeze({kicker:'CAUGHT IN A', value:'HEIST'}),
+  'brand',
+  Object.freeze({kicker:'POWERED BY', value:'FloqR Social OS'}),
+  'handle'
+]);
+
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
   blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:16, maxMainCharacters:48, maxSubCharacters:20, identityRail:true, identityAnimation:'identity-loop', identityAnimationSeconds:6, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while the FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle (or their display name). The card never disappears, so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
@@ -1202,6 +1210,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:true,
     identityAnimation:'identity-loop',
     identityAnimationSeconds:6,
+    identityPhases:window.FLOQR_HEIST_IDENTITY_PHASES,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1214,7 +1223,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Jail Bars background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
+    description:'Heist DC exclusive: Jail Bars background with floating transparent framed text (3×14). The FloqR card cycles “Caught in a HEIST”, “Presented by FloqMedia”, “Powered by FloqR Social OS”, then “From @handle” when the patron shares one (6s each), and never disappears. After 20 seconds (24 with a handle) the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","locked up","jail","bars","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistPoliceCar: {
@@ -1235,6 +1244,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:true,
     identityAnimation:'identity-loop',
     identityAnimationSeconds:6,
+    identityPhases:window.FLOQR_HEIST_IDENTITY_PHASES,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1247,7 +1257,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Police Car background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
+    description:'Heist DC exclusive: Police Car background with floating transparent framed text (3×14). The FloqR card cycles “Caught in a HEIST”, “Presented by FloqMedia”, “Powered by FloqR Social OS”, then “From @handle” when the patron shares one (6s each), and never disappears. After 20 seconds (24 with a handle) the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","police car arrest","police","cruiser","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistInterrogation: {
@@ -1268,6 +1278,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:true,
     identityAnimation:'identity-loop',
     identityAnimationSeconds:6,
+    identityPhases:window.FLOQR_HEIST_IDENTITY_PHASES,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1280,7 +1291,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Interrogation background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
+    description:'Heist DC exclusive: Interrogation background with floating transparent framed text (3×14). The FloqR card cycles “Caught in a HEIST”, “Presented by FloqMedia”, “Powered by FloqR Social OS”, then “From @handle” when the patron shares one (6s each), and never disappears. After 20 seconds (24 with a handle) the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","i aint no snitch","interrogation","handcuffs","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistVaultDollars: {
@@ -1308,6 +1319,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:true,
     identityAnimation:'identity-loop',
     identityAnimationSeconds:6,
+    identityPhases:window.FLOQR_HEIST_IDENTITY_PHASES,
     messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1320,7 +1332,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: the patron enters only a name or @handle (max 14). The board shows the name, then types “Tengo muchos dólares... I just did a heist!” one letter at a time over the vault. After 5 seconds the vault door blows open and novelty $100 bills splash behind the text for 10 seconds. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). Then the board shows the HEIST logo over WASHINGTON DC, centered, and the whole sequence loops (the splash replays every loop).',
+    description:'Heist DC exclusive: the patron enters only a name or @handle (max 14). The board shows the name, then types “Tengo muchos dólares... I just did a heist!” one letter at a time over the vault. After 5 seconds the vault door blows open and novelty $100 bills splash behind the text for 10 seconds. The FloqR card cycles “Caught in a HEIST”, “Presented by FloqMedia”, “Powered by FloqR Social OS”, then “From @handle” when the patron shares one (6s each), and never disappears. Then the board shows the HEIST logo over WASHINGTON DC, centered, and the whole sequence loops (the splash replays every loop).',
     tags:["heist","tengo muchos dolares","vault night","vault","heist art","noir","framed overlay","$30","96x48","nightlife","text overlay","club exclusive"]
   },
   /* Legacy alias — redirects old Courthouse / Red Lux links to Vault Night dollars template */
@@ -1348,6 +1360,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:true,
     identityAnimation:'identity-loop',
     identityAnimationSeconds:6,
+    identityPhases:window.FLOQR_HEIST_IDENTITY_PHASES,
     messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,

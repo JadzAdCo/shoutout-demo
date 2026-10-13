@@ -61,6 +61,53 @@ test("phase sequence: no handle → FloqMedia only; handle → FloqMedia then FR
   assert.deepEqual([0, 6000, 12000, 20000].map(ms => card.phaseAt(one, ms, 6000)), [0, 0, 0, 0]);
 });
 
+function sharedTemplates() {
+  const sandbox = {};
+  sandbox.window = sandbox;
+  vm.runInNewContext(read("shared-data.js"), sandbox, {filename: "shared-data.js"});
+  return sandbox.SHOUTOUT_TEMPLATES;
+}
+
+const HEIST_IDS = ["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"];
+const caught = {kind: "tagline", kicker: "CAUGHT IN A", value: "HEIST"};
+const presented = {kind: "brand", kicker: "PRESENTED BY", value: "FLOQMEDIA"};
+const powered = {kind: "tagline", kicker: "POWERED BY", value: "FLOQR SOCIAL OS"};
+
+test("Heist phases: CAUGHT IN A HEIST → PRESENTED BY FloqMedia → POWERED BY FloqR Social OS → FROM @handle", () => {
+  const templates = sharedTemplates();
+  for (const id of HEIST_IDS) {
+    const spec = templates[id].identityPhases;
+    assert.ok(Array.isArray(spec), `${id} declares identityPhases`);
+    const withHandle = card.phases(optedIn("instagram", "nyx.dc"), {identityPhases: spec, legacySubText: true});
+    assert.deepEqual(withHandle, [caught, presented, powered, {kind: "handle", kicker: "FROM", value: "@NYX.DC", handleKind: "instagram"}], id);
+    assert.deepEqual(card.phases({}, {identityPhases: spec, legacySubText: true}), [caught, presented, powered], `${id} without a handle`);
+    assert.deepEqual(card.phases({attributionChoice: "none", subText: "maya"}, {identityPhases: spec, legacySubText: true}), [caught, presented, powered]);
+    assert.deepEqual(card.phases(optedIn("instagram", "nyx"), {identityPhases: spec, idle: true}), [caught, presented, powered], `${id} idle never credits`);
+    assert.deepEqual(card.phases(optedIn("displayName", "maya@example.com"), {identityPhases: spec}), [caught, presented, powered], "never an email");
+  }
+  const four = card.phases(optedIn("instagram", "nyx"), {identityPhases: templates.heistVaultNight.identityPhases});
+  assert.deepEqual([1000, 7000, 13000, 19000, 25000].map(ms => card.phaseAt(four, ms, 6000)), [0, 1, 2, 3, 0]);
+});
+
+test("other templates keep the default card; bad phase specs fall back to it", () => {
+  const templates = sharedTemplates();
+  const heistOnly = Object.keys(templates).filter(id => templates[id].identityPhases);
+  assert.deepEqual(heistOnly.sort(), [...HEIST_IDS].sort(), "only Heist opts in to custom phases today");
+  const handle = {kind: "handle", kicker: "FROM", value: "@NYX", handleKind: "instagram"};
+  assert.deepEqual(card.phases(optedIn("instagram", "nyx"), {identityPhases: templates.blackwhite.identityPhases}), [presented, handle]);
+  for (const bad of [null, "heist", [], ["handle"], [{kicker: "X"}], [42, {}]]) {
+    assert.deepEqual(card.phases(optedIn("instagram", "nyx"), {identityPhases: bad}), [presented, handle], JSON.stringify(bad));
+  }
+  assert.equal(card.normalizePhaseSpec(Array(10).fill("brand")).length, 6, "at most 6 phases");
+});
+
+test("Heist message window holds a full card cycle before the brand slide", () => {
+  const js = read("display-app.js");
+  assert.match(js, /identityPhases: template\.identityPhases \|\| null/);
+  assert.match(js, /const cardSeconds = heistCard\.phaseCount \* /);
+  assert.match(js, /Math\.max\(5, Number\(template\.messageDurationSeconds \|\| HEIST_MESSAGE_SECONDS\), cardSeconds\)/);
+});
+
 test("shell html escapes every patron value", () => {
   const html = card.shellHtml({kind: "handle", kicker: "FROM", value: `<img src=x onerror="alert(1)">'\``}, {shellClass: `x" onclick="y`});
   assert.ok(!/<img/i.test(html));
@@ -135,6 +182,32 @@ test("mount: no handle paints PRESENTED BY FloqMedia once and starts no timer", 
   assert.deepEqual(host.paints, ["brand"]);
   assert.match(host.innerHTML, /<small>PRESENTED BY<\/small><strong>FLOQMEDIA<\/strong>/);
   assert.ok(host.classes.has("uses-brand-fallback"));
+});
+
+test("mount: Heist cycles 4 phases with a handle, 3 without, on one FrameLoop timer", () => {
+  const spec = sharedTemplates().heistVaultNight.identityPhases;
+  const {sandbox, timers, tick} = loadLoop();
+  const host = fakeHost();
+  const mounted = sandbox.FLOQRIdentityCard.mount(host, {data: optedIn("instagram", "nyx"), identityPhases: spec, shellClass: "heist-identity-shell"});
+  assert.equal(mounted.phases.length, 4);
+  assert.equal(timers.length, 1);
+  assert.equal(timers[0].ms, 6000);
+  const seen = [host.innerHTML];
+  for (let i = 0; i < 4; i += 1) { tick(); seen.push(host.innerHTML); }
+  assert.deepEqual(host.paints, ["tagline", "brand", "tagline", "handle", "tagline"]);
+  assert.match(seen[0], /<small>CAUGHT IN A<\/small><strong>HEIST<\/strong>/);
+  assert.match(seen[1], /<small>PRESENTED BY<\/small><strong>FLOQMEDIA<\/strong>/);
+  assert.match(seen[2], /<small>POWERED BY<\/small><strong>FLOQR SOCIAL OS<\/strong>/);
+  assert.match(seen[3], /<small>FROM<\/small><strong>@NYX<\/strong>/);
+  assert.ok(seen.every(html => /heist-identity-shell/.test(html)));
+  assert.ok(!host.classes.has("has-attribution"), "back on CAUGHT IN A HEIST after the handle");
+
+  const {sandbox: s2, timers: t2, tick: tick2} = loadLoop();
+  const bare = fakeHost();
+  assert.equal(s2.FLOQRIdentityCard.mount(bare, {data: {}, identityPhases: spec}).phases.length, 3);
+  for (let i = 0; i < 3; i += 1) tick2();
+  assert.equal(t2.length, 1);
+  assert.deepEqual(bare.paints, ["tagline", "brand", "tagline", "tagline"]);
 });
 
 test("mount: re-mounting replaces the running cycle (one card timer at a time)", () => {
