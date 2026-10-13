@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.40 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.41 (stable)
+
+- s3.1.41: FloqR card on every board. The "PRESENTED BY FloqMedia" card no longer fades away for most of the cycle - it stays on screen on idle and live boards. When the patron ticks "Include my handle", the card plays like a GIF: PRESENTED BY FloqMedia for 6 seconds, then FROM @handle (Instagram or Mingl handle, or the entered display name) for 6 seconds, and repeats. Without a handle it stays on PRESENTED BY FloqMedia. Email addresses and phone numbers are never shown. Same behavior on Traditional Black and White, Heist, split media / birthday, Christine and every jersey (NFL and soccer).
 
 - s3.1.40: Idle board text. "Use ShoutOut @ {club}" now always shows the whole club name on every board size (64×32 used to drop words, e.g. Heist lost "Washington DC"). The words wrap onto as many rows as needed, "@" stays with ShoutOut, and every row uses the same letter size - the largest that fits inside the board's safe margins. Display 2's idle screen (Be a SupRstar @ {club}) also fits on 64×32 boards now. Patron ShoutOuts, their 48-character limit and their sizing are unchanged.
 

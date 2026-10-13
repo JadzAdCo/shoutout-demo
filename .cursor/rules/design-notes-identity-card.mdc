@@ -1,0 +1,59 @@
+---
+description: FloqR identity card (s3.1.41) — one behavior on display.html / display2.html for every template that shows the pill: always visible, PRESENTED BY FloqMedia ↔ FROM @handle on FLOQRFrameLoop (6s), opt-in handle only, centralized handle priority, never email/phone.
+alwaysApply: true
+---
+
+# FloqR identity card (s3.1.41)
+
+Resume: `@identity-card$` / `$floqr-card$`.
+
+## Owner spec (Oct 13 2026, verbatim)
+
+> "It is supposed to be like a gif... depending on the shoutout, if a display name is included, it plays the FloqMedia side of things before it then displays the '@handle', where '@handle' could be the person's Instagram or Mingl or Entered Name... that is how it is supposed to work!"
+
+## Behavior (every template with the pill)
+
+| ShoutOut | Card |
+|---|---|
+| Idle / default CTA | Always visible, steady **PRESENTED BY FloqMedia** (subtle 6s pulse) |
+| Live, no handle (or `attributionChoice: "none"`) | Same steady **PRESENTED BY FloqMedia** — never hidden |
+| Live, handle opted in | GIF-like loop on `FLOQRFrameLoop`, 6s each: **PRESENTED BY FloqMedia** → **FROM @handle** → repeat |
+
+Bug it replaced: `@keyframes classicIdentityShellBurst` (20s burst-away) hid the pill ~67% of the time; classic live ShoutOuts without `data.attribution` hid the card entirely; `startFloqrCardCycle` and the Heist rail ran their own `setInterval`s.
+
+## Handle priority (single helper: `FLOQRIdentityCard.resolveHandle`)
+
+1. `attributionChoice === "none"` → no handle (patron unticked "Include my handle").
+2. `includeAttribution` truthy **or** non-empty `attribution` → `attribution`, formatted by `attributionChoice`:
+   - `instagram` → `@handle`; `floqrHandle` / `username` / `mingl` → `@handle` (Mingl);
+   - `displayName` / `manual` / `name` → entered name as typed (uppercased, sanitized);
+   - missing choice → `@` only when the value starts with `@` or is a single handle token.
+3. Legacy fallback (only Heist / text-overlay and split media pass `legacySubText`): pre-s3.1.41 payloads that carried the handle in `subText`, only when the payload has no `attribution`, no `attributionChoice`, and `includeAttribution` is not truthy; celebration phrases and the template `defaultSub` never count. Jerseys never use `subText` (it is the jersey mark).
+
+Privacy: a value that looks like an email or phone number (≥ 7 digits of phone characters) is dropped → brand only. Capped at 22 graphemes; `FLOQRBoardFit.fitIdentity` shrinks long values instead of clipping. Escaping: `FLOQRSafeRender.escapeHtml` (local fallback escapes `& < > " ' \``). The shell span carries no `data-*` attribute (safe-render allowlist); the phase lives on the host (`data-identity-phase`).
+
+## Modules
+
+- `floqr-identity-card.js` → `window.FLOQRIdentityCard` (UMD, `module.exports` for tests): `resolveHandle`, `phases`, `phaseAt`, `shellHtml`, `mount(host, {data, idle, legacySubText, defaultSub, hostClass, shellClass, escape})`, `stop`. Loaded after `floqr-safe-render.js`, before `display-app.js`, on `display.html` and `display2.html`.
+- `floqr-frame-loop.js` gained named cycles: `cycle(name, {count, holdMs, onAdvance})` / `stopCycle(name)`. The card uses channel `identity-card`. Templates still never start their own interval.
+- `display-app.js` `mountFloqrCard(host, opts)` is the only entry: classic (`#displaySub`, `classic-bw-identity`), Heist / text-overlay (`heist-identity-rail`, `heist-identity-shell`), jersey + NFL dual (`#displayIdentityRail`, `soccer-jersey-rail floqr-card-bottom`), Christine, split media / birthday. Fallback without the module = brand only (never a patron value).
+- `display.css`: `floqrIdentityCardIn` (.5s, min opacity .6) + `floqrIdentityCardPulse` (6s, opacity 1) + one-shot `floqrIdentityParticleBurst`. Per-template pill styles kept. NFL `nflFloqrCardPulse` unchanged. Burst keyframes deleted.
+- Composer (`patron-app.js` `floqrCardAttributionFields`): every template stamps `includeAttribution`, `attribution`, `attributionChoice` (`"none"` when unticked); preview URL carries `attributionChoice`. Checkout + Club Admin approve already copy these fields → no Functions change.
+
+## Decisions
+
+- Heist footer lines ("Caught in a HEIST", "Powered by FloqR Social OS") retired from the card — one behavior everywhere.
+- display2 idle stays the SupRstar idle screen (no card, by design).
+- Full / neon templates keep their plain sub line (no pill added).
+- Board strings PRESENTED BY / FROM / FloqMedia are brand chrome, not localized.
+- Untouched: `classicFitStyle`, idle text fit (s3.1.40), `data-is-96x48` naming, display health diagnostics. Xibo URLs stay `display.html?location=` / `display2.html?location=`.
+
+## Tests / QA
+
+`functions/identity-card.test.js` (priority, privacy, formatting, phase sequence, escaping, FrameLoop fake timers, CSS min opacity, display-app wiring, composer fields), `display-safe-render.test.js` (FROM @handle escaped on every card template), `commerce-invariants.test.js`. Visual QA harness: `reports/identity-loop-s3-1-41/identity-qa.mjs` (t≈1s / t≈7s stills, 20s opacity sample, 64x32 / 64x48 / 96x48).
+
+## FIX PROMPT
+
+```
+FloqR card: always visible. Brand phase PRESENTED BY FloqMedia; opt-in handle adds FROM @handle, 6s each on FLOQRFrameLoop.cycle("identity-card"). One helper FLOQRIdentityCard.resolveHandle (choice none → brand; attribution by attributionChoice; legacy subText only for Heist/split). Never email/phone. No burst keyframes, no per-template setInterval, escape via FLOQRSafeRender. Design notes: design-notes-identity-card.mdc
+```

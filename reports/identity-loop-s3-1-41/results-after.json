@@ -1,0 +1,362 @@
+[
+  {
+    "name": "display-idle-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "files": [
+      "after-display-idle-64x32-t1s.png",
+      "after-display-idle-64x32-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2.1s:brand",
+      "4.1s:brand",
+      "6.1s:brand",
+      "8.1s:brand",
+      "10s:brand",
+      "12.1s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:brand",
+      "20s:brand"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display-idle-64x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "files": [
+      "after-display-idle-64x48-t1s.png",
+      "after-display-idle-64x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2.1s:brand",
+      "4s:brand",
+      "6.1s:brand",
+      "8s:brand",
+      "10s:brand",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:brand",
+      "20.1s:brand"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display-idle-96x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "files": [
+      "after-display-idle-96x48-t1s.png",
+      "after-display-idle-96x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2s:brand",
+      "4s:brand",
+      "6s:brand",
+      "8s:brand",
+      "10s:brand",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:brand",
+      "20.1s:brand"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display-handle-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "files": [
+      "after-display-handle-64x32-t1s.png",
+      "after-display-handle-64x32-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0s:brand",
+      "2s:brand",
+      "4s:brand",
+      "6s:handle",
+      "8s:handle",
+      "10s:handle",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display-handle-64x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "files": [
+      "after-display-handle-64x48-t1s.png",
+      "after-display-handle-64x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0s:brand",
+      "2s:brand",
+      "4s:brand",
+      "6s:handle",
+      "8s:handle",
+      "10s:handle",
+      "12s:brand",
+      "14s:brand",
+      "16.1s:brand",
+      "18.1s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display-handle-96x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "files": [
+      "after-display-handle-96x48-t1s.png",
+      "after-display-handle-96x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2s:brand",
+      "4s:brand",
+      "6s:handle",
+      "8s:handle",
+      "10s:handle",
+      "12.1s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18.2s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-idle-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "files": [
+      "after-display2-idle-64x32-t1s.png",
+      "after-display2-idle-64x32-t7s.png"
+    ],
+    "present": 0,
+    "of": 41,
+    "minOpacity": null,
+    "everHidden": false,
+    "suprstarIdle": true,
+    "phases": [],
+    "sequence": [
+      "0.1s:none",
+      "2.1s:none",
+      "4s:none",
+      "6s:none",
+      "8s:none",
+      "10s:none",
+      "12s:none",
+      "14s:none",
+      "16s:none",
+      "18.1s:none",
+      "20.1s:none"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-idle-64x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "files": [
+      "after-display2-idle-64x48-t1s.png",
+      "after-display2-idle-64x48-t7s.png"
+    ],
+    "present": 0,
+    "of": 41,
+    "minOpacity": null,
+    "everHidden": false,
+    "suprstarIdle": true,
+    "phases": [],
+    "sequence": [
+      "0.1s:none",
+      "2.1s:none",
+      "4.1s:none",
+      "6s:none",
+      "8.1s:none",
+      "10s:none",
+      "12s:none",
+      "14.2s:none",
+      "16s:none",
+      "18.2s:none",
+      "20.1s:none"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-idle-96x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "files": [
+      "after-display2-idle-96x48-t1s.png",
+      "after-display2-idle-96x48-t7s.png"
+    ],
+    "present": 0,
+    "of": 41,
+    "minOpacity": null,
+    "everHidden": false,
+    "suprstarIdle": true,
+    "phases": [],
+    "sequence": [
+      "0s:none",
+      "2s:none",
+      "4s:none",
+      "6s:none",
+      "8.1s:none",
+      "10s:none",
+      "12.1s:none",
+      "14s:none",
+      "16s:none",
+      "18s:none",
+      "20s:none"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-handle-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "files": [
+      "after-display2-handle-64x32-t1s.png",
+      "after-display2-handle-64x32-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2s:brand",
+      "4.1s:brand",
+      "6s:handle",
+      "8.1s:handle",
+      "10s:handle",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-handle-64x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "files": [
+      "after-display2-handle-64x48-t1s.png",
+      "after-display2-handle-64x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0s:brand",
+      "2.1s:brand",
+      "4s:brand",
+      "6s:handle",
+      "8s:handle",
+      "10s:handle",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  },
+  {
+    "name": "display2-handle-96x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "files": [
+      "after-display2-handle-96x48-t1s.png",
+      "after-display2-handle-96x48-t7s.png"
+    ],
+    "present": 41,
+    "of": 41,
+    "minOpacity": 0.6,
+    "everHidden": false,
+    "suprstarIdle": false,
+    "phases": [
+      "PRESENTED BYFLOQMEDIA",
+      "FROM@NYX.DC"
+    ],
+    "sequence": [
+      "0.1s:brand",
+      "2s:brand",
+      "4s:brand",
+      "6s:handle",
+      "8s:handle",
+      "10s:handle",
+      "12s:brand",
+      "14s:brand",
+      "16s:brand",
+      "18s:handle",
+      "20s:handle"
+    ],
+    "errors": []
+  }
+]

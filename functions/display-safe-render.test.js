@@ -183,6 +183,7 @@ function makeDom() {
 function loadDisplay({identity = false} = {}) {
   const dom = makeDom();
   const noop = () => 0;
+  const intervals = [];
   const db = {
     enablePersistence: () => Promise.resolve(),
     collection: () => ({doc: () => ({get: async () => ({exists: false}), onSnapshot: noop}), get: async () => ({forEach() {}})})
@@ -192,17 +193,17 @@ function loadDisplay({identity = false} = {}) {
     location: {origin: "https://example.test", href: "https://example.test/display.html?location=zebbies-garden-washington-dc", pathname: "/display.html", hostname: "example.test"},
     navigator: {userAgent: "test", language: "en"},
     document: dom.document,
-    setTimeout: noop, clearTimeout: noop, setInterval: noop, clearInterval: noop, requestAnimationFrame: noop, cancelAnimationFrame: noop,
+    setTimeout: noop, clearTimeout: noop, setInterval: (fn, ms) => intervals.push({fn, ms}), clearInterval: noop, requestAnimationFrame: noop, cancelAnimationFrame: noop,
     firebaseConfig: {},
     firebase: {initializeApp() {}, firestore: () => db, app: () => ({functions: () => ({httpsCallable: () => async () => ({data: {}})})}), functions: {}}
   };
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  ["floqr-temp-qa-showcase.js", "shared-data.js", "floqr-safe-render.js", "floqr-board-fit.js"].forEach(file => vm.runInContext(read(file), sandbox, {filename: file}));
+  ["floqr-temp-qa-showcase.js", "shared-data.js", "floqr-frame-loop.js", "floqr-safe-render.js", "floqr-board-fit.js", "floqr-identity-card.js"].forEach(file => vm.runInContext(read(file), sandbox, {filename: file}));
   if (identity) vm.runInContext(read("floqr-identity.js"), sandbox, {filename: "floqr-identity.js"});
   vm.runInContext(read("display-app.js"), sandbox, {filename: "display-app.js"});
   assert.equal(typeof sandbox.renderShoutOutDisplay, "function");
-  return {render: payload => sandbox.renderShoutOutDisplay(payload), dom, sandbox};
+  return {render: payload => sandbox.renderShoutOutDisplay(payload), dom, sandbox, intervals};
 }
 
 function assertRenderClean(dom, label) {
@@ -251,6 +252,18 @@ test("split media, text, background layer and jersey colors stay escaped for eve
       const {render, dom} = loadDisplay({identity: true});
       render({status: "preview", screenFormatId: "led-96x48", mainText: payload, subText: payload, ...extra});
       assertRenderClean(dom, `${extra.template} ${JSON.stringify(payload)}`);
+    });
+  });
+});
+
+test("FloqR card FROM @handle phase stays escaped on every card template", () => {
+  PAYLOADS.forEach(payload => {
+    ["blackwhite", "heistVaultNight", "nflEagles", "soccerMorocco", "christine"].forEach(template => {
+      const {render, dom, intervals} = loadDisplay({identity: true});
+      render({status: "preview", screenFormatId: "led-96x48", template, mainText: "HI", subText: "7",
+        attribution: payload, includeAttribution: true, attributionChoice: "displayName"});
+      intervals.filter(timer => timer.ms === 6000).forEach(timer => timer.fn());
+      assertRenderClean(dom, `card ${template} ${JSON.stringify(payload)}`);
     });
   });
 });

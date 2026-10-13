@@ -85,13 +85,13 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
 
 test("Traditional Black and White keeps a global fixed identity rail", () => {
   assert.match(sharedData, /blackwhite:[\s\S]*identityRail:true/);
-  assert.match(sharedData, /identityAnimation:'burst-away'/);
+  assert.match(sharedData, /identityAnimation:'identity-loop'/);
   assert.match(sharedData, /maxSubCharacters:20/);
-  assert.match(displayApp, /classicIdentityPresentation/);
+  assert.match(displayApp, /mountFloqrCard/);
   assert.match(displayApp, /FLOQR ShoutOut/);
   assert.match(displayApp, /classic-bw-identity/);
-  assert.match(displayCss, /classicIdentityShellBurst 20s/);
-  assert.match(displayCss, /classicIdentityParticle 20s/);
+  assert.match(displayCss, /floqrIdentityCardPulse 6s/);
+  assert.match(displayCss, /floqrIdentityParticleBurst 1\.4s/);
   assert.match(indexHtml, /placeholder="Enter ShoutOut Here(?: \(emoji OK\))?"/);
   assert.match(displayApp, /idleTemplate = "blackwhite"/);
   assert.match(displayApp, /defaultClubDisplayPayload/);
@@ -131,17 +131,16 @@ test("Soccer jersey mark accepts any 2 characters", () => {
   assert.match(backend, /Array\.from\(String\(rawShoutout\.subText/);
 });
 
-test("Heist identity rail cycles optional handle then brand lines for 3s each", () => {
+test("Heist identity rail plays the shared FloqR card loop (FloqMedia, then FROM @handle)", () => {
   assert.match(displayApp, /renderHeistIdentityRail/);
-  assert.match(displayApp, /Caught in a HEIST/);
-  assert.match(displayApp, /Powered by FloqR Social OS/);
-  assert.match(displayApp, /kicker: "FROM"/);
+  assert.match(displayApp, /shellClass: "heist-identity-shell"/);
+  assert.doesNotMatch(displayApp, /Caught in a HEIST/);
   assert.match(displayApp, /scheduleHeistMessageThenBrandSlide/);
   assert.match(displayApp, /showHeistBrandSlide/);
   assert.match(displayApp, /HEIST_MESSAGE_SECONDS = 20/);
-  assert.match(displayCss, /heistIdentityShellBurst 3s/);
+  assert.match(displayCss, /\.heist-identity-shell\{\s*animation:floqrIdentityCardIn/);
   assert.match(displayCss, /heist-brand-slide/);
-  assert.match(sharedData, /identityAnimationSeconds:3/);
+  assert.match(sharedData, /identityAnimationSeconds:6/);
   assert.match(sharedData, /messageDurationSeconds:20/);
 });
 
@@ -262,7 +261,7 @@ test("Heist Washington DC defaults Display 1 to the 96x48 board; Display 2 stays
 test("birthday split-media loops on 64x48/64x32 and AssignmentCards spell status", () => {
   assert.match(displayApp, /startFrameLoop/);
   assert.match(fs.readFileSync(path.join(root, "floqr-frame-loop.js"), "utf8"), /HOLD_MS = 6000/);
-  assert.match(displayApp, /kicker: "FLOQR"/);
+  assert.match(displayApp, /baseClass: "display-identity-rail split-media-identity"/);
   assert.match(displayCss, /split-media-loop/);
   assert.match(displayCss, /split-media-phase-media/);
   const adminScheduling = fs.readFileSync(path.join(root, "admin-scheduling.js"), "utf8");

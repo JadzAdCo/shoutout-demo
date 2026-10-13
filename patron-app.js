@@ -157,8 +157,18 @@
     }
     return null;
   }
+  // FloqR card opt-in for every non-jersey template; "none" tells the board not to credit anyone.
+  function floqrCardAttributionFields() {
+    const includeAttribution = !!byId("includeAttribution")?.checked;
+    const attribution = includeAttribution ? currentAttributionValue() : "";
+    return {
+      includeAttribution: includeAttribution && !!attribution,
+      attribution,
+      attributionChoice: includeAttribution && attribution ? (byId("attributionChoice")?.value || "displayName") : "none"
+    };
+  }
   function soccerJerseyPayloadFields() {
-    if (!isSoccerJerseyTemplate()) return {};
+    if (!isSoccerJerseyTemplate()) return floqrCardAttributionFields();
     const nameSource = byId("soccerNameSource")?.value || "displayName";
     const nflDual = isNflDualJerseyTemplate();
     const jerseyPatronName = graphemes(String(soccerNameFromSource() || "").toUpperCase()).slice(0, 8).join("");
@@ -3668,6 +3678,7 @@
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
       if (payload.attribution) url.searchParams.set("attribution", payload.attribution);
       if (payload.includeAttribution) url.searchParams.set("includeAttribution", "1");
+      if (payload.attributionChoice) url.searchParams.set("attributionChoice", payload.attributionChoice);
       if (payload.jerseyPatronName) url.searchParams.set("jerseyPatronName", payload.jerseyPatronName);
       if (payload.nflDualLayout) url.searchParams.set("nflDualLayout", "1");
       if (payload.sport) url.searchParams.set("sport", payload.sport);
