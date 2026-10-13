@@ -113,6 +113,112 @@
     return Math.max(MIN_SCALE, factor);
   }
 
+  /* ---------- Idle CTA ("USE SHOUTOUT @ {club}") — system text, never capped ---------- */
+
+  const IDLE_MAX_ROWS = 5;
+  const IDLE_MAX_GLYPHS = 160;
+  const IDLE_CHAR_EM = 0.52;
+  const IDLE_MEASURE_CANDIDATES = 4;
+  /** Vertical budget per idle row in em: board CSS line-height is .8–.84, so glyphs + shadow need more than the line box. */
+  const IDLE_LINE_EM = 0.95;
+  const IDLE_ENUMERATE_TOKENS = 12;
+  const glyphCount = s => [...String(s)].length;
+
+  /** Words of the idle line with "@" glued to the word before it; clubStart = first token after "@" (or -1). */
+  function idleTokens(text) {
+    const words = String(text || "").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+    const tokens = [];
+    let clubStart = -1;
+    words.forEach(word => {
+      if (word === "@" && tokens.length) {
+        tokens[tokens.length - 1] = `${tokens[tokens.length - 1]} @`;
+        clubStart = tokens.length;
+        return;
+      }
+      tokens.push(word);
+    });
+    return {tokens, clubStart: clubStart > 0 && clubStart < tokens.length ? clubStart : -1};
+  }
+
+  /** Every contiguous split of tokens into ≤ maxRows rows (break indexes = token index that starts a row). */
+  function idleSplits(count, maxRows) {
+    const out = [];
+    const gaps = Math.max(0, count - 1);
+    for (let mask = 0; mask < (1 << gaps); mask += 1) {
+      const breaks = [];
+      for (let i = 0; i < gaps; i += 1) if (mask & (1 << i)) breaks.push(i + 1);
+      if (breaks.length + 1 <= maxRows) out.push(breaks);
+    }
+    return out;
+  }
+
+  function rowsFromBreaks(tokens, breaks) {
+    const rows = [];
+    let start = 0;
+    [...breaks, tokens.length].forEach(end => { rows.push(tokens.slice(start, end).join(" ")); start = end; });
+    return rows;
+  }
+
+  /** Long inputs: min-max greedy packing per row count (optimal longest row, contiguous). */
+  function idleGreedyCandidates(tokens, maxRows) {
+    const out = [];
+    for (let n = 1; n <= Math.min(maxRows, tokens.length); n += 1) {
+      const rows = packWordsWithoutSplitting(tokens, n, 1, glyphCount);
+      if (!out.some(prev => prev.join("\n") === rows.join("\n"))) out.push(rows);
+    }
+    return out;
+  }
+
+  /** Estimated px a row set reaches inside a safe-area box; only used to choose the split. */
+  function estimateIdlePx(rows, boxWidth, boxHeight) {
+    const longest = Math.max(1, ...rows.map(glyphCount));
+    return Math.min(boxWidth / (longest * IDLE_CHAR_EM), boxHeight / (rows.length * IDLE_LINE_EM));
+  }
+
+  /**
+   * Rank idle row splits for a safe-area box: every word kept, "@" stays with SHOUTOUT. Score = estimated uniform px ×
+   * preference (club name starts its own row, club name split over as few rows as possible); ties → most balanced rows.
+   */
+  function rankIdleRows(text, boxWidth = 2, boxHeight = 1, options = {}) {
+    const maxRows = Math.max(1, Number(options.maxRows) || IDLE_MAX_ROWS);
+    const {tokens, clubStart} = idleTokens(text);
+    if (!tokens.length) return [{rows: [""], factor: 1, score: 0, spread: 0}];
+    const W = boxWidth > 0 ? boxWidth : 2;
+    const H = boxHeight > 0 ? boxHeight : 1;
+    const candidates = tokens.length <= IDLE_ENUMERATE_TOKENS
+      ? idleSplits(tokens.length, maxRows).map(breaks => ({breaks, rows: rowsFromBreaks(tokens, breaks)}))
+      : idleGreedyCandidates(tokens, maxRows).map(rows => ({breaks: null, rows}));
+    const ranked = candidates.map(({breaks, rows}) => {
+      let factor = 1;
+      if (breaks && clubStart > 0) {
+        if (!breaks.includes(clubStart)) factor *= 0.93;
+        factor *= Math.pow(0.96, breaks.filter(b => b > clubStart).length);
+      }
+      const lengths = rows.map(glyphCount);
+      return {rows, factor, score: estimateIdlePx(rows, W, H) * factor, spread: Math.max(...lengths) - Math.min(...lengths)};
+    });
+    ranked.sort((a, b) => (Math.abs(b.score - a.score) > 1e-9 ? b.score - a.score : a.spread - b.spread));
+    return ranked.slice(0, Math.max(1, Number(options.limit) || ranked.length));
+  }
+
+  function pickIdleRows(text, boxWidth = 2, boxHeight = 1, options = {}) {
+    return rankIdleRows(text, boxWidth, boxHeight, {...options, limit: 1})[0].rows;
+  }
+
+  /** Largest single px at which every row (widths measured at refPx) and the stacked height fit the safe area. */
+  function uniformFitPx(rowWidthsAtRef, refPx, boxWidth, boxHeight, options = {}) {
+    const lineEm = Number(options.lineHeightEm) || IDLE_LINE_EM;
+    const minPx = Math.max(1, Number(options.minPx) || 8);
+    const availW = boxWidth * (1 - 2 * (options.safeX ?? SAFE_X));
+    const availH = boxHeight * (1 - 2 * (options.safeY ?? SAFE_Y));
+    const widths = (rowWidthsAtRef || []).map(Number).filter(w => w > 0);
+    const widest = widths.length ? Math.max(...widths) : 0;
+    const byWidth = widest > 0 ? (availW * refPx) / widest : Infinity;
+    const byHeight = availH / (Math.max(1, (rowWidthsAtRef || []).length) * lineEm);
+    const px = Math.floor(Math.min(byWidth, byHeight));
+    return Number.isFinite(px) ? Math.max(minPx, px) : minPx;
+  }
+
   /* ---------- DOM fitting (browser only) ---------- */
 
   function measureRun(row) {
@@ -160,9 +266,75 @@
     });
   }
 
+  function setIdleRows(host, rows) {
+    const doc = host.ownerDocument || global.document;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    rows.forEach(text => {
+      const row = doc.createElement("b");
+      const run = doc.createElement("span");
+      run.className = "board-fit-run";
+      run.textContent = text;
+      row.appendChild(run);
+      host.appendChild(row);
+    });
+    host.className = String(host.className || "").replace(/\bclassic-board-lines-\d+\b/g, "").trim() + ` classic-board-lines-${rows.length}`;
+    host.style.setProperty("--board-lines", String(rows.length));
+    host.setAttribute("data-line-count", String(rows.length));
+    host.parentElement?.style?.setProperty("--board-lines", String(rows.length));
+  }
+
+  const IDLE_REF_PX = 100;
+
+  const showIdleRows = (host, rows) => {
+    const current = Array.from(host.children).map(row => row.textContent);
+    if (current.join("\n") !== rows.join("\n")) setIdleRows(host, rows);
+    return Array.from(host.children);
+  };
+  const applyPx = (els, px) => els.forEach(row => row.style.setProperty("font-size", `${px}px`, "important"));
+
+  /** Uniform px for the rows currently in the host, from real run widths at a reference size. */
+  function measuredIdlePx(host, boxW, boxH) {
+    const els = Array.from(host.children);
+    applyPx(els, IDLE_REF_PX);
+    const runs = els.map(measureRun);
+    if (!runs.length || runs.some(run => !run)) return 0;
+    const lineEm = Math.max(IDLE_LINE_EM, ...runs.map(run => run.height / IDLE_REF_PX));
+    return uniformFitPx(runs.map(run => run.width), IDLE_REF_PX, boxW, boxH, {lineHeightEm: lineEm, safeX: 0, safeY: 0});
+  }
+
+  /**
+   * Idle CTA: measure the best-ranked row splits in the real box, keep the one with the largest uniform size, then give
+   * every row that one size. The idle host is inset to the safe area by display.css, so no extra margin is applied here.
+   */
+  function fitIdleHost(host) {
+    const boxW = host.clientWidth;
+    const boxH = host.clientHeight;
+    if (!boxW || !boxH) return 0;
+    const text = host.getAttribute("data-idle-text") || "";
+    let best = null;
+    rankIdleRows(text, boxW, boxH, {limit: IDLE_MEASURE_CANDIDATES}).forEach(candidate => {
+      showIdleRows(host, candidate.rows);
+      const px = measuredIdlePx(host, boxW, boxH);
+      if (px && (!best || px * candidate.factor > best.score)) best = {rows: candidate.rows, px, score: px * candidate.factor};
+    });
+    if (!best) return 0;
+    const els = showIdleRows(host, best.rows);
+    let px = best.px;
+    const cellH = boxH / els.length;
+    const fits = () => els.every(row => {
+      const run = measureRun(row);
+      return run && run.width <= boxW + 0.5 && Math.max(run.height, px * IDLE_LINE_EM) <= cellH + 0.5;
+    });
+    applyPx(els, px);
+    for (let pass = 0; pass < 40 && px > 8 && !fits(); pass += 1) applyPx(els, --px);
+    host.setAttribute("data-idle-fit-px", String(px));
+    return px;
+  }
+
   function fitBoard(scope) {
     if (!scope || !global.getComputedStyle) return;
-    fitRows(Array.from(scope.querySelectorAll(".classic-board-lines > b, .text-overlay-lines > b")));
+    scope.querySelectorAll(".classic-board-lines[data-idle-fit]").forEach(fitIdleHost);
+    fitRows(Array.from(scope.querySelectorAll(".classic-board-lines:not([data-idle-fit]) > b, .text-overlay-lines > b")));
     fitIdentity(scope);
   }
 
@@ -192,6 +364,7 @@
     mergeVenueForDisplay, effectiveBoardSize,
     liveContentDecision, liveExpiryMillis,
     packWordsWithoutSplitting, shrinkFactor,
+    IDLE_MAX_ROWS, IDLE_MAX_GLYPHS, IDLE_LINE_EM, idleTokens, rankIdleRows, pickIdleRows, uniformFitPx, fitIdleHost,
     fitBoard, scheduleFit, rowHtml
   };
   global.FLOQRBoardFit = api;

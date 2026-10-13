@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.39 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.40 (stable)
+
+- s3.1.40: Idle board text. "Use ShoutOut @ {club}" now always shows the whole club name on every board size (64×32 used to drop words, e.g. Heist lost "Washington DC"). The words wrap onto as many rows as needed, "@" stays with ShoutOut, and every row uses the same letter size - the largest that fits inside the board's safe margins. Display 2's idle screen (Be a SupRstar @ {club}) also fits on 64×32 boards now. Patron ShoutOuts, their 48-character limit and their sizing are unchanged.
 
 - s3.1.39: Security fix for the LED boards. A crafted Display preview link (or a ShoutOut with a crafted background / photo link) could slip page code into the board and the Club Admin preview. Boards, template previews, the ShoutOut composer and Club Admin approve now only accept normal web image links (https or FLOQR's own images), plain colors and simple gradients, and escape everything else. Firestore rules refuse unsafe links and colors on ShoutOuts and on the live board record. Nothing changes for patrons or venues using normal ShoutOuts.
 
