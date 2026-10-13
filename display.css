@@ -139,7 +139,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background:linear-gradient(90deg,#050505 0 18%,#ec111a 18% 82%,#050505 82% 100%);
   box-shadow:0 0 0 clamp(2px,.35vw,5px) #ed111a,0 0 clamp(12px,2vw,30px) rgba(245,17,28,.72);
   white-space:nowrap;
-  animation:classicIdentityShellBurst 20s cubic-bezier(.2,.8,.2,1) infinite;
+  animation:floqrIdentityCardIn .5s cubic-bezier(.2,.8,.2,1) both,floqrIdentityCardPulse 6s ease-in-out .5s infinite;
 }
 .classic-identity-shell small{
   flex:0 0 auto;
@@ -178,21 +178,28 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background:#fff;
   box-shadow:0 0 8px #fff;
   opacity:0;
-  animation:classicIdentityParticle 20s ease-out infinite;
+  animation:floqrIdentityParticleBurst 1.4s ease-out 1 both;
 }
 .classic-identity-particles i:nth-child(3n){background:#ef111a;box-shadow:0 0 9px #ef111a}
 .classic-identity-particles i:nth-child(4n){background:#101114;box-shadow:0 0 8px rgba(0,0,0,.7)}
 .classic-identity-particles i:nth-child(1){--dx:-30vw;--dy:-10vh}.classic-identity-particles i:nth-child(2){--dx:-24vw;--dy:9vh}.classic-identity-particles i:nth-child(3){--dx:-18vw;--dy:-17vh}.classic-identity-particles i:nth-child(4){--dx:-10vw;--dy:14vh}.classic-identity-particles i:nth-child(5){--dx:-5vw;--dy:-12vh}.classic-identity-particles i:nth-child(6){--dx:7vw;--dy:16vh}.classic-identity-particles i:nth-child(7){--dx:13vw;--dy:-15vh}.classic-identity-particles i:nth-child(8){--dx:19vw;--dy:11vh}.classic-identity-particles i:nth-child(9){--dx:25vw;--dy:-8vh}.classic-identity-particles i:nth-child(10){--dx:31vw;--dy:7vh}.classic-identity-particles i:nth-child(11){--dx:-15vw;--dy:2vh}.classic-identity-particles i:nth-child(12){--dx:16vw;--dy:-2vh}
-@keyframes classicIdentityShellBurst{
-  0%,24%{opacity:1;transform:scale(1);filter:blur(0)}
-  27%{opacity:1;transform:scale(1.055);filter:brightness(1.35)}
-  33%,100%{opacity:0;transform:scale(1.42);filter:blur(8px)}
+/* FloqR card never fades out: each phase (PRESENTED BY FloqMedia / FROM @handle) pops in, then pulses. Design notes: design-notes-identity-card.mdc */
+@keyframes floqrIdentityCardIn{
+  0%{opacity:.6;transform:scale(.94);filter:brightness(1.4)}
+  60%{opacity:1;transform:scale(1.04);filter:brightness(1.2)}
+  100%{opacity:1;transform:scale(1);filter:brightness(1)}
 }
-@keyframes classicIdentityParticle{
-  0%,25%{opacity:0;transform:translate(0,0) rotate(0deg) scale(.5)}
-  27%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
-  36%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(390deg) scale(.15)}
+@keyframes floqrIdentityCardPulse{
+  0%,100%{opacity:1;transform:scale(1);filter:brightness(1)}
+  45%{opacity:1;transform:scale(1.03);filter:brightness(1.2)}
 }
+@keyframes floqrIdentityParticleBurst{
+  0%{opacity:0;transform:translate(0,0) rotate(0deg) scale(.5)}
+  12%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(390deg) scale(.15)}
+}
+.floqr-identity-card{visibility:visible!important}
+.floqr-identity-card .classic-identity-shell{opacity:1}
 @media(max-width:560px){
   .classic-bw #displaySub.classic-bw-identity{left:13%!important;right:13%!important}
   .classic-identity-shell{gap:6px;padding:2px 10px}
@@ -464,7 +471,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   margin-top:auto;
 }
 .display-canvas.christine-template .classic-identity-shell{
-  animation:classicIdentityShellBurst 20s cubic-bezier(.2,.8,.2,1) infinite!important;
+  animation:floqrIdentityCardIn .5s cubic-bezier(.2,.8,.2,1) both,floqrIdentityCardPulse 6s ease-in-out .5s infinite!important;
 }
 
 /* Text-overlay templates: background layer + transparent framed text */
@@ -631,24 +638,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.classic-bw #displaySub.heist-identity-rail{
   display:grid!important;
 }
-/* Heist footer: each line holds ~2.4s then bursts; JS swaps lines every 3s */
+/* Heist footer: the shared FloqR card loop (FloqMedia ↔ FROM @handle, 6s each on FLOQRFrameLoop) */
 .heist-identity-shell{
-  animation:heistIdentityShellBurst 3s cubic-bezier(.2,.8,.2,1) infinite!important;
+  animation:floqrIdentityCardIn .5s cubic-bezier(.2,.8,.2,1) both,floqrIdentityCardPulse 6s ease-in-out .5s infinite!important;
 }
 .heist-identity-rail .classic-identity-particles i{
-  animation:heistIdentityParticle 3s ease-out infinite!important;
+  animation:floqrIdentityParticleBurst 1.4s ease-out 1 both!important;
 }
 .heist-identity-shell small:empty{display:none!important}
-@keyframes heistIdentityShellBurst{
-  0%,72%{opacity:1;transform:scale(1);filter:blur(0)}
-  82%{opacity:1;transform:scale(1.055);filter:brightness(1.35)}
-  100%{opacity:0;transform:scale(1.42);filter:blur(8px)}
-}
-@keyframes heistIdentityParticle{
-  0%,74%{opacity:0;transform:translate(0,0) rotate(0deg) scale(.5)}
-  80%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
-  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(390deg) scale(.15)}
-}
 @media(prefers-reduced-motion:reduce){
   .heist-identity-shell,.heist-identity-rail .classic-identity-particles i{animation:none!important}
 }

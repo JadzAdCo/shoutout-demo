@@ -23,7 +23,7 @@ test("display-app always dual-loops NFL photo kits and FloqR brand cycle", () =>
   assert.match(js, /const nflDualActive = sport === "nfl" && usePhotoBack/);
   assert.match(js, /baseName = Math\.min\(7\.04/);
   assert.match(js, /baseNumber = Math\.min\(27/);
-  assert.match(js, /cycleWithBrand: !isIdleCta && \(nflDualActive \|\| !!cardValue\)/);
+  assert.match(js, /baseClass: "display-identity-rail classic-bw-identity soccer-jersey-rail floqr-card-bottom"/);
   assert.match(js, /startFrameLoop\(canvas, refitNflShoutOnCopy\)/);
   assert.match(js, /rail\.parentElement !== canvas/);
   assert.match(js, /canvas\.appendChild\(rail\)/);

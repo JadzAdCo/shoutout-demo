@@ -530,139 +530,33 @@
     return Math.max(minPx, lo);
   }
 
-  function classicIdentityPresentation(subText, options = {}) {
-    const raw = String(subText || "").trim();
-    const forceHandle = options.asHandle === true;
-    const withAt = forceHandle
-      ? (raw ? `@${raw.replace(/^@+/, "")}` : "")
-      : (raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw);
-    const supplied = glyphSlice(cleanBoardText(withAt), 0, 22);
-    const brandFallback = glyphSlice(cleanBoardText(options.brand || DEFAULT_FLOQR_CARD_BRAND), 0, 22) || DEFAULT_FLOQR_CARD_BRAND;
-    return {
-      supplied:!!supplied,
-      kicker:supplied ? "FROM" : "PRESENTED BY",
-      value:supplied || brandFallback
-    };
-  }
+  const identityCard = () => window.FLOQRIdentityCard || null;
 
   function stopFloqrCardCycle() {
-    if (window.__floqrCardCycleTimer) {
-      window.clearInterval(window.__floqrCardCycleTimer);
-      window.__floqrCardCycleTimer = null;
-    }
+    identityCard()?.stop?.();
   }
 
-  function paintFloqrCardFrame(rail, {kicker, value, extraClass = "", brandFallback = false} = {}) {
-    if (!rail) return;
-    rail.className = [
-      "display-identity-rail",
-      "classic-bw-identity",
-      extraClass,
-      brandFallback ? "uses-brand-fallback" : "has-attribution"
-    ].filter(Boolean).join(" ");
-    rail.setAttribute("aria-label", `${kicker} ${value}`);
-    rail.setAttribute("aria-hidden", "false");
-    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(kicker)}</small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-  }
-
-  /** FloqR card: PRESENTED BY FloqMedia always; when @handle opted in, alternate with FROM @handle. */
-  function startFloqrCardCycle(rail, {
-    handle = "",
-    extraClass = "",
-    holdMs = 6000
-  } = {}) {
-    stopFloqrCardCycle();
-    if (!rail) return null;
-    const brand = classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND});
-    const cleanHandle = String(handle || "").trim().replace(/^@+/, "");
-    const paintBrand = () => paintFloqrCardFrame(rail, {
-      kicker: brand.kicker,
-      value: brand.value,
-      extraClass,
-      brandFallback: true
-    });
-    if (!cleanHandle) {
-      paintBrand();
-      return brand;
+  /**
+   * FloqR card on any host (#displaySub on classic / Heist, #displayIdentityRail elsewhere): PRESENTED BY FloqMedia,
+   * then FROM @handle when the patron opted in, 6s per phase on FLOQRFrameLoop. Always visible.
+   */
+  function mountFloqrCard(host, {data = {}, idle = false, legacySubText = false, defaultSub = "", baseClass = "", hostClass = "", shellClass = ""} = {}) {
+    if (!host) return null;
+    if (baseClass) host.className = baseClass;
+    const card = identityCard();
+    if (card?.mount) {
+      return card.mount(host, {data, idle, legacySubText, defaultSub, hostClass, shellClass, escape: esc});
     }
-    const fromIdentity = classicIdentityPresentation(cleanHandle, {asHandle: true});
-    let showHandle = false;
-    const paint = () => {
-      if (showHandle) {
-        paintFloqrCardFrame(rail, {
-          kicker: fromIdentity.kicker,
-          value: fromIdentity.value,
-          extraClass,
-          brandFallback: false
-        });
-      } else {
-        paintBrand();
-      }
-      showHandle = !showHandle;
-    };
-    paint();
-    window.__floqrCardCycleTimer = window.setInterval(paint, Math.max(3000, Number(holdMs) || 6000));
-    return fromIdentity;
-  }
-
-  /** Reusable FloqR card (identity rail) — classic / soccer / NFL / split-media. */
-  function paintFloqrCard(rail, {
-    attribution = "",
-    asHandle = false,
-    defaultScreen = false,
-    extraClass = "",
-    cycleWithBrand = false
-  } = {}) {
-    if (!rail) return null;
-    stopFloqrCardCycle();
-    if (defaultScreen || cycleWithBrand) {
-      return startFloqrCardCycle(rail, {
-        handle: defaultScreen ? "" : attribution,
-        extraClass
-      });
-    }
-    if (!String(attribution || "").trim()) {
-      return startFloqrCardCycle(rail, {handle: "", extraClass});
-    }
-    const identity = classicIdentityPresentation(attribution, {asHandle: true});
-    paintFloqrCardFrame(rail, {
-      kicker: identity.kicker,
-      value: identity.value,
-      extraClass,
-      brandFallback: !identity.supplied
-    });
-    return identity;
-  }
-
-  function floqrCardAttributionFromData(data = {}) {
-    // Opt-in only. Jersey name stays on the fabric. The stored attribution string is the choice.
-    const direct = String(data.attribution || "").trim();
-    const optedIn = data.includeAttribution === true || data.includeAttribution === "1" || !!direct;
-    if (!optedIn) return {value:"", asHandle:false};
-    const choice = String(data.attributionChoice || "displayName").trim();
-    const asHandle = choice === "floqrHandle" || choice === "instagram" || choice === "username";
-    return {value:direct, asHandle};
-  }
-
-  function christineFloqrHandle(data = {}) {
-    const card = floqrCardAttributionFromData(data);
-    const direct = typeof card === "string" ? card : String(card.value || "").trim();
-    if (direct) return direct.replace(/^@+/, "");
-    const fallbacks = [
-      data.floqrHandle,
-      data.instagram,
-      data.username,
-      data.displayName,
-      data.attribution,
-      data.subText
-    ];
-    for (const raw of fallbacks) {
-      const value = String(raw || "").trim().replace(/^@+/, "");
-      if (value && !/^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i.test(value)) {
-        return value.slice(0, 30);
-      }
-    }
-    return "FloqR";
+    // Without floqr-identity-card.js the card still shows the brand and never a patron value.
+    const brand = cleanBoardText(DEFAULT_FLOQR_CARD_BRAND);
+    String(hostClass).split(/\s+/).filter(Boolean).forEach(name => host.classList.add(name));
+    host.classList.remove("hidden", "classic-bw-sub-hidden", "has-attribution");
+    host.classList.add("floqr-identity-card", "uses-brand-fallback");
+    host.setAttribute("data-identity-phase", "brand");
+    host.setAttribute("aria-label", `PRESENTED BY ${brand}`);
+    host.setAttribute("aria-hidden", "false");
+    host.innerHTML = `<span class="classic-identity-shell ${esc(shellClass)}"><small>PRESENTED BY</small><strong>${esc(brand)}</strong></span>`;
+    return {phases: [{kind: "brand", kicker: "PRESENTED BY", value: brand}]};
   }
 
   function isTextOverlayTemplate(template = {}, templateId = "") {
@@ -988,21 +882,8 @@
     return true;
   }
 
-  function heistIdentityMessages(template = {}) {
-    const custom = Array.isArray(template.identityMessages) ? template.identityMessages.filter(Boolean) : [];
-    const lines = custom.length ? custom.map(String) : ["Caught in a HEIST", "Powered by FloqR Social OS"];
-    // Normalize legacy "$Caught…" / "Caught in HEISTS" copy.
-    return lines
-      .map(line => String(line || "").replace(/^\$\s*/, "").trim())
-      .map(line => /^caught in heists?$/i.test(line) ? "Caught in a HEIST" : line)
-      .filter(Boolean);
-  }
-
   function stopHeistIdentityCycle() {
-    if (window.__floqrHeistIdentityTimer) {
-      window.clearInterval(window.__floqrHeistIdentityTimer);
-      window.__floqrHeistIdentityTimer = null;
-    }
+    stopFloqrCardCycle();
   }
 
   function stopHeistPhaseTimers() {
@@ -1054,27 +935,6 @@
       console.warn("FLOQRFrameLoop.start failed; using fallback", err);
       startFrameLoopFallback(canvas, onAdvance);
     }
-  }
-
-  function splitMediaIdentityPresentation(data = {}, subText = "") {
-    const attrib = glyphSlice(cleanBoardText(data.attribution || ""), 0, 20);
-    const sub = glyphSlice(cleanBoardText(subText), 0, 20);
-    const celebration = /^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i.test(sub);
-    const handle = attrib || (!celebration && sub) || "";
-    return {
-      kicker: "FLOQR",
-      value: handle || "ShoutOut",
-      extraCopy: handle ? "" : sub
-    };
-  }
-
-  function renderSplitMediaIdentityRail(identity) {
-    const rail = byId("displayIdentityRail");
-    if (!rail) return;
-    rail.className = "display-identity-rail split-media-identity" + (identity.value === "ShoutOut" ? " uses-brand-fallback" : " has-attribution");
-    rail.setAttribute("aria-hidden", "false");
-    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
   }
 
   function refitNflShoutOnCopy(phase, canvas) {
@@ -1142,50 +1002,28 @@
         hideHeistBrandSlide();
         startTypedLine();
         // Restart the identity rail and message phase for continuous venue playback.
-        if (template.identityRail !== false) {
-          const subText = String(byId("displaySub")?.getAttribute("data-patron-sub") || "");
-          renderHeistIdentityRail(template, subText);
-        }
+        if (template.identityRail !== false) renderHeistIdentityRail(template);
         scheduleHeistMessageThenBrandSlide(template);
       }, brandSeconds * 1000);
     }, messageSeconds * 1000);
   }
 
-  function renderHeistIdentityRail(template = {}, patronSubText = "") {
+  // Heist / text-overlay footer: the shared FloqR card. Kept so the brand-slide loop can repaint it.
+  let heistCard = {data: {}, idle: false};
+  function renderHeistIdentityRail(template = {}, data = heistCard.data, idle = heistCard.idle) {
     stopHeistIdentityCycle();
     const sub = byId("displaySub");
     if (!sub) return;
-
-    // Optional patron attribution (display name / Mingl / Instagram). When present it
-    // leads the cycle; when absent the brand lines still run on their own.
-    const supplied = glyphSlice(cleanBoardText(patronSubText), 0, 28);
-    sub.setAttribute("data-patron-sub", supplied);
-    const brandLines = heistIdentityMessages(template);
-    const queue = [];
-    if (supplied) queue.push({kicker: "FROM", value: supplied, attributed: true});
-    brandLines.forEach(value => {
-      const line = String(value || "").trim();
-      if (line) queue.push({kicker: "", value: line, attributed: false});
+    heistCard = {data: data || {}, idle: !!idle};
+    sub.classList.remove("text-overlay-identity");
+    mountFloqrCard(sub, {
+      data: heistCard.data,
+      idle: heistCard.idle,
+      legacySubText: true,
+      defaultSub: template.defaultSub || "",
+      hostClass: "classic-bw-identity heist-identity-rail",
+      shellClass: "heist-identity-shell"
     });
-    if (!queue.length) return;
-
-    sub.classList.remove("classic-bw-sub-hidden", "text-overlay-identity");
-    sub.classList.add("classic-bw-identity", "heist-identity-rail");
-
-    let index = 0;
-    const holdSeconds = Math.max(1, Number(template.identityAnimationSeconds) || 3);
-    const HOLD_MS = Math.round(holdSeconds * 1000);
-    const paint = () => {
-      const item = queue[index % queue.length];
-      index += 1;
-      sub.classList.toggle("has-attribution", !!item.attributed);
-      sub.classList.toggle("uses-brand-fallback", !item.attributed);
-      sub.setAttribute("aria-label", item.kicker ? `${item.kicker} ${item.value}` : item.value);
-      const kickerHtml = item.kicker ? `<small>${esc(item.kicker)}</small>` : "";
-      sub.innerHTML = `<span class="classic-identity-shell heist-identity-shell">${kickerHtml}<strong>${esc(item.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-    };
-    paint();
-    window.__floqrHeistIdentityTimer = window.setInterval(paint, HOLD_MS);
   }
 
   function urlSearchParams() {
@@ -2127,17 +1965,11 @@
         canvas.appendChild(rail);
       }
       if (rail && t.identityRail !== false) {
-        const cardAttribution = floqrCardAttributionFromData(data);
-        const cardValue = isIdleCta
-          ? ""
-          : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
-        // NFL photo dual always paints FloqR — never leave the rail empty/hidden.
-        paintFloqrCard(rail, {
-          attribution: cardValue,
-          asHandle: true,
-          defaultScreen: isIdleCta || (nflDualActive && !cardValue),
-          cycleWithBrand: !isIdleCta && (nflDualActive || !!cardValue),
-          extraClass: "soccer-jersey-rail floqr-card-bottom"
+        // Jersey subText is the jersey mark, so only the opted-in attribution can credit the patron.
+        mountFloqrCard(rail, {
+          data,
+          idle: isIdleCta,
+          baseClass: "display-identity-rail classic-bw-identity soccer-jersey-rail floqr-card-bottom"
         });
         rail.classList.remove("hidden");
         rail.setAttribute("aria-hidden", "false");
@@ -2185,7 +2017,7 @@
         byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
       }
       if (t.identityRail !== false) {
-        renderHeistIdentityRail(t, subText);
+        renderHeistIdentityRail(t, data, isIdleCta);
       } else {
         stopHeistIdentityCycle();
         byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
@@ -2204,11 +2036,6 @@
       hideHeistBrandSlide();
       const idleText = isIdleCta ? idleBoardText(mainText) : "";
       const rows = isIdleCta ? idleBoardRows(idleText) : classicBoardRows(mainText, textCaps);
-      const cardAttribution = floqrCardAttributionFromData(data);
-      const cardValue = isIdleCta ? "" : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
-      const identity = isIdleCta
-        ? classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND})
-        : classicIdentityPresentation(cardValue, {asHandle: true});
       byId("displayMain").classList.add("classic-bw-board");
       if (isIdleCta) {
         byId("displayMain").style.setProperty("--board-lines", String(rows.length));
@@ -2217,15 +2044,7 @@
         byId("displayMain").style.removeProperty("--board-lines");
         byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
       }
-      if (!isIdleCta && !cardValue) {
-        byId("displaySub").classList.add("classic-bw-sub-hidden");
-        byId("displaySub").removeAttribute("aria-label");
-        byId("displaySub").innerHTML = "";
-      } else {
-        byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
-        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-        byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-      }
+      mountFloqrCard(byId("displaySub"), {data, idle: isIdleCta, hostClass: "classic-bw-identity"});
     } else {
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
@@ -2253,21 +2072,13 @@
         runMessageFit();
         requestAnimationFrame(runMessageFit);
       });
-      const identity = usesSplitMedia && !isChristine ? splitMediaIdentityPresentation(data, subText) : null;
       if (isChristine) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = "";
-        const cardAttribution = floqrCardAttributionFromData(data);
-        const handle = String(
-          (typeof cardAttribution === "string" ? cardAttribution : cardAttribution.value)
-          || ""
-        ).trim();
-        paintFloqrCard(byId("displayIdentityRail"), {
-          attribution: handle,
-          asHandle: true,
-          defaultScreen: !handle,
-          cycleWithBrand: !!handle,
-          extraClass: "split-media-identity christine-floqr-card floqr-card-bottom"
+        mountFloqrCard(byId("displayIdentityRail"), {
+          data,
+          idle: isIdleCta,
+          baseClass: "display-identity-rail classic-bw-identity split-media-identity christine-floqr-card floqr-card-bottom"
         });
         // Force loop classes even if FLOQRFrameLoop is late; then start the 6s rotation.
         canvas.classList.add("split-media-loop");
@@ -2279,10 +2090,17 @@
             });
           }
         });
-      } else if (usesSplitMedia && identity) {
+      } else if (usesSplitMedia) {
+        const card = mountFloqrCard(byId("displayIdentityRail"), {
+          data,
+          idle: isIdleCta,
+          legacySubText: true,
+          defaultSub: t.defaultSub || "",
+          baseClass: "display-identity-rail split-media-identity"
+        });
+        const credited = (card?.phases || []).length > 1;
         byId("displaySub").classList.add("classic-bw-sub-hidden");
-        byId("displaySub").textContent = identity.extraCopy || "";
-        renderSplitMediaIdentityRail(identity);
+        byId("displaySub").textContent = credited ? "" : glyphSlice(cleanBoardText(subText), 0, 20);
         const family = window.FLOQRScreenDatapoints?.familyOf?.(screenFormatId) || "";
         if (family === "64x48" || family === "64x32") startFrameLoop(canvas);
       } else {

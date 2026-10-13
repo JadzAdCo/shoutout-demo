@@ -1086,7 +1086,7 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:16, maxMainCharacters:48, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR ShoutOut so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:16, maxMainCharacters:48, maxSubCharacters:20, identityRail:true, identityAnimation:'identity-loop', identityAnimationSeconds:6, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while the FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle (or their display name). The card never disappears, so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
   birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'96×48: 3-line side-by-side photo + shoutout. 64×48 and 64×32: GIF loop of the photo then 3-line shoutout, with a FLOQR + handle card on every frame.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'96×48 side-by-side; 64×48 and 64×32 loop photo then 3-line copy with FLOQR + handle card.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'96×48 side-by-side; 64×48 and 64×32 loop photo then 3-line copy with FLOQR + handle card.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
@@ -1200,9 +1200,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultFrameOverlayUrl:'',
     defaultBackgroundUrl:'./images/heist/heist-jail-bars.png',
     identityRail:true,
-    identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
-    identityAnimation:'burst-away',
-    identityAnimationSeconds:3,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1234,9 +1233,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultFrameOverlayUrl:'',
     defaultBackgroundUrl:'./images/heist/heist-police-car.png',
     identityRail:true,
-    identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
-    identityAnimation:'burst-away',
-    identityAnimationSeconds:3,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1268,9 +1266,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultFrameOverlayUrl:'',
     defaultBackgroundUrl:'./images/heist/heist-interrogation.png',
     identityRail:true,
-    identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
-    identityAnimation:'burst-away',
-    identityAnimationSeconds:3,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
     messageDurationSeconds:20,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1309,9 +1306,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultFrameOverlayUrl:'',
     defaultBackgroundUrl:'./images/heist/vault-night.jpg',
     identityRail:true,
-    identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
-    identityAnimation:'burst-away',
-    identityAnimationSeconds:3,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
     messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1350,9 +1346,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultFrameOverlayUrl:'',
     defaultBackgroundUrl:'./images/heist/vault-night.jpg',
     identityRail:true,
-    identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
-    identityAnimation:'burst-away',
-    identityAnimationSeconds:3,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
     messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,
@@ -1427,7 +1422,7 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     formats:{
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:18,minimumFontPixels:46},
-      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; identity rail stays PRESENTED BY FLOQR ShoutOut when blank."}
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; FloqR card stays PRESENTED BY FloqMedia when no handle is shared."}
     }
   },
   christine: {

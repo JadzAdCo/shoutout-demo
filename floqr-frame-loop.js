@@ -77,6 +77,38 @@
     }, holdMs);
   }
 
+  // Named phase cycles (e.g. the FloqR identity card) share the same 6s hold without owning a canvas.
+  const cycles = new Map();
+
+  function stopCycle(name) {
+    const key = String(name || "");
+    const entry = cycles.get(key);
+    if (entry?.timer) g.clearInterval(entry.timer);
+    cycles.delete(key);
+  }
+
+  function cycle(name, options = {}) {
+    const key = String(name || "");
+    stopCycle(key);
+    const count = Math.max(1, Math.floor(Number(options.count) || 1));
+    const holdMs = Number(options.holdMs) > 0 ? Number(options.holdMs) : HOLD_MS;
+    const onAdvance = typeof options.onAdvance === "function" ? options.onAdvance : () => {};
+    const entry = {index: 0, count, timer: null};
+    cycles.set(key, entry);
+    onAdvance(0);
+    if (count > 1) {
+      entry.timer = g.setInterval(() => {
+        if (cycles.get(key) !== entry) return;
+        entry.index = (entry.index + 1) % count;
+        onAdvance(entry.index);
+      }, holdMs);
+    }
+    return {
+      stop: () => { if (cycles.get(key) === entry) stopCycle(key); },
+      index: () => entry.index
+    };
+  }
+
   return {
     HOLD_MS,
     LOOP,
@@ -84,6 +116,8 @@
     PHASE_COPY,
     start,
     stop,
-    phaseOf
+    phaseOf,
+    cycle,
+    stopCycle
   };
 });

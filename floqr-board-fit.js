@@ -365,7 +365,7 @@
     liveContentDecision, liveExpiryMillis,
     packWordsWithoutSplitting, shrinkFactor,
     IDLE_MAX_ROWS, IDLE_MAX_GLYPHS, IDLE_LINE_EM, idleTokens, rankIdleRows, pickIdleRows, uniformFitPx, fitIdleHost,
-    fitBoard, scheduleFit, rowHtml
+    fitBoard, fitIdentity, scheduleFit, rowHtml
   };
   global.FLOQRBoardFit = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
