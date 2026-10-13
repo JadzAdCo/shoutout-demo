@@ -47,6 +47,8 @@ On expiry the board shows the idle board and remembers `expiredLiveKey` so the s
 
 ## F — Idle CTA fit (s3.1.40)
 
+**Owner principle (Oct 13 2026): visibility first — biggest font wins.** Start from the biggest size the board can hold, try every row arrangement at that size, and step down to the next size only when no arrangement fits (whole words, nothing cut, safe margins). All rows share that one size. Apply the same principle to any future board text fit.
+
 Applies **only** to the idle / default classic board (`isIdlePayload`: `status: default` or `idleCta`, template `blackwhite`, `classic-bw-idle`). Live patron ShoutOuts keep E above, the 48-char cap and `classicFitStyle` per-row sizing.
 
 - **No cap.** `display-app.js` skips the classic `mainSource.slice(0, mainLimit + lineCount - 1)` and the `classicBoardRows` / `maxMainCharacters` path for idle. `idleBoardText` uppercases, collapses whitespace, and only guards against junk at `FLOQRBoardFit.IDLE_MAX_GLYPHS` (160, whole words). Before s3.1.40 the 64×32 cap (30) turned Heist into `USE / SHOUTOUT @ / HEIST`.
