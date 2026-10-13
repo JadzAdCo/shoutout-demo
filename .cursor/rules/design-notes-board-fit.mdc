@@ -52,6 +52,27 @@ On expiry the board shows the idle board and remembers `expiredLiveKey` so the s
 - `display-app.js` preview mode (`isUrlPreviewMode`): `paintUrlPreviewNow()` paints from packaged data at once, then `hydrateUrlPreviewFromFirestore()` loads Firestore templates + venue (same `mergeLiveVenue`) and re-renders the last payload given to `window.renderShoutOutDisplay` (or rebuilds the URL payload). Preview never calls Display Security.
 - Preview URLs still never carry `?v=`; Xibo URLs stay `display.html?location=` / `display2.html?location=`.
 
+## Safe render (s3.1.39)
+
+Origin: preview mode needs no auth, so `display.html?location=…&preview=1&template=zebbiesFootballTeamIntro&backgroundUrl=x><b id=floqrprobe>` injected markup on the Pages origin (the Firebase session lives there). Patron-set fields also reached public `liveContent` through Club Admin approve, and the queue Preview link opened the patron's URL on the admin's origin.
+
+Module: `floqr-safe-render.js` → `window.FLOQRSafeRender` (also `module.exports`). Load it **before** `display-app.js`, `floqr-template-preview.js` and `admin-app.js`. Without it, `display-app.js` fails closed (no URL / color / gradient from data reaches the board).
+
+| API | Contract |
+|---|---|
+| `escapeHtml(v)` | `& < > " ' \`` |
+| `safeUrl(v, {allowBlob, allowDataImage})` | absolute `http(s)` (no credentials, normalized `href`) or same-origin `images/…` (no `..`); opt-in `blob:http(s)://` and raster base64 `data:image/png|jpeg|gif|webp|avif`. Everything else (`javascript:`, `data:text`, SVG data, `//host`, control chars, >2048) → `""` |
+| `cssUrl(v, opts)` | `url("…")` with `" ' ( ) \ < >` and whitespace percent-encoded, or `""` |
+| `safeColor(v, fallback)` | hex 3/4/6/8, `rgb/rgba/hsl/hsla(numbers)`, or a 3–20 letter name |
+| `safeGradient(v, fallback)` | `linear-gradient(...)` charset only, ≤400, balanced parens, no `url( var( attr( env( expression image-set` |
+| `styleAttr(decls)` | joins with `;` and HTML-escapes the whole value |
+
+Every innerHTML / style sink in `display-app.js` (background layer, frame overlay, Football Intro stage + player media, split media, jersey colors, Heist logo) uses these. `floqr-template-preview.js` escapes Firestore `screenFormatIds`. Patron composer sanitizes football background / media inputs and the jersey mini preview. Club Admin approve (`boardUrl` / `boardColor` / `boardTeamMembers`) vets every render field before writing `liveContent`; the queue Preview link has `rel="noopener"`.
+
+Rules (`firestore.rules` `validBoardRenderFields`): patron shoutout create (paid + free), owner edit, and every `liveContent` create/update must pass the same URL / color / gradient allowlists (RE2 mirrors of the helper). Rules cannot check list elements (`teamMembers`) — render + approve sanitize those. Club manager updates on `shoutouts` are not validated so admins can still reject bad docs.
+
+Test: `functions/display-safe-render.test.js` (fake-DOM render of `display-app.js` with the probe + `"`, `)`, `</style>`, `javascript:`, newline variants; asserts no injected tag/attribute and quoted-safe CSS).
+
 ## Intentionally untouched
 
 - **C:** `classicFitStyle` compact / primary-format logic (Display 2 sizing on `64x32` uses `loc.primaryDisplayScreenFormatId`). Guarded by a test in `board-fit.test.js`.

@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.1.26-security-phase-1
+// FLOQR FIRESTORE RULES VERSION: s3.1.39-board-render-fields
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.26-security-phase-1
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.24-rules-stage-2-3
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.21-data-classification
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.11-template-rbac
@@ -817,8 +818,38 @@ service cloud.firestore {
  allow delete: if signedIn() && canAdministerTemplates(resource.data.clubLocationId);
  }
 
+ // Board render fields (s3.1.39) — design notes: .cursor/rules/design-notes-board-fit.mdc (Safe render)
+ function boardUrlOk(data, field) {
+ return !(field in data) || data[field] == null
+ || (data[field] is string && data[field].size() <= 2048
+ && (data[field] == '' || data[field].matches('^(https?://[^\\s"\'<>\\x60\\\\]+|(\\./)?images/[A-Za-z0-9._~%/-]+)$')));
+ }
+
+ function boardColorOk(data, field) {
+ return !(field in data) || data[field] == null
+ || (data[field] is string
+ && (data[field] == '' || data[field].matches('^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{3,20}|(rgb|rgba|hsl|hsla)\\([0-9., %/]+\\))$')));
+ }
+
+ function boardGradientOk(data, field) {
+ return !(field in data) || data[field] == null
+ || (data[field] is string && data[field].size() <= 400
+ && (data[field] == ''
+ || (data[field].matches('^linear-gradient\\([#0-9a-zA-Z., %()+-]+\\)$')
+ && !data[field].matches('.*(url|expression|var|attr|env|image-set) *\\(.*'))));
+ }
+
+ function validBoardRenderFields(data) {
+ return boardUrlOk(data, 'backgroundUrl') && boardUrlOk(data, 'mediaUrl') && boardUrlOk(data, 'frameOverlayUrl')
+ && boardUrlOk(data, 'originalMediaUrl') && boardUrlOk(data, 'enhancedMediaUrl') && boardUrlOk(data, 'trimmedMediaUrl')
+ && boardColorOk(data, 'backgroundColor') && boardColorOk(data, 'themeAccent')
+ && boardColorOk(data, 'jerseyPrimary') && boardColorOk(data, 'jerseySecondary') && boardColorOk(data, 'jerseyAccent')
+ && boardGradientOk(data, 'backgroundGradient');
+ }
+
  function validPatronShoutoutCreate() {
  return signedIn()
+ && validBoardRenderFields(request.resource.data)
  && request.resource.data.keys().hasAll([
  'template', 'screenFormatId', 'mainText', 'subText', 'submittedByUid',
  'maxMainCharacters', 'maxSubCharacters', 'lineCount', 'maxCharactersPerLine'
@@ -855,6 +886,7 @@ service cloud.firestore {
  // Free (no priceCents) templates other than Traditional B&W and paid football/heist art.
  function validFreePatronShoutoutCreate() {
  return signedIn()
+ && validBoardRenderFields(request.resource.data)
  && request.resource.data.keys().hasAll(['template', 'mainText', 'submittedByUid'])
  && request.resource.data.template is string
  && request.resource.data.template != 'blackwhite'
@@ -871,6 +903,7 @@ service cloud.firestore {
  // Owner edits keep the club, the owner and every payment / approval field; status only back to pending or cancelled.
  function isOwnerShoutoutEdit() {
  return ownsSubmission(resource.data, "submittedByUid", "submittedBy")
+ && validBoardRenderFields(request.resource.data)
  && keepsField("submittedByUid")
  && keepsField("clubLocationId")
  && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
@@ -894,7 +927,8 @@ service cloud.firestore {
 
  match /liveContent/{id} {
  allow read: if true;
- allow write: if isMasterAdmin() || isClubManager(id);
+ allow create, update: if (isMasterAdmin() || isClubManager(id)) && validBoardRenderFields(request.resource.data);
+ allow delete: if isMasterAdmin() || isClubManager(id);
  }
 
  // LED player device → club binding. Public read so display.html?ip= can resolve without auth.

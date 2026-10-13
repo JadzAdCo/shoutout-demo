@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.38 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.39 (stable)
+
+- s3.1.39: Security fix for the LED boards. A crafted Display preview link (or a ShoutOut with a crafted background / photo link) could slip page code into the board and the Club Admin preview. Boards, template previews, the ShoutOut composer and Club Admin approve now only accept normal web image links (https or FLOQR's own images), plain colors and simple gradients, and escape everything else. Firestore rules refuse unsafe links and colors on ShoutOuts and on the live board record. Nothing changes for patrons or venues using normal ShoutOuts.
 
 - s3.1.38: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and FloqAi search ("Shiloh", "cat template") in all 11 languages.
 

@@ -6,6 +6,9 @@
   const IMG = "./images/template-preview/";
   const SIZE_LABELS = {"led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32"};
   const FORMAT_ORDER = ["led-96x48", "led-64x48", "led-64x32"];
+  const esc = value => global.FLOQRSafeRender
+    ? global.FLOQRSafeRender.escapeHtml(value)
+    : String(value ?? "").replace(/[&<>"'`]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;"}[c]));
   const SPLIT_SAMPLES = {
     birthdayMedia: {main: "HAPPY BIRTHDAY MAYA!", sub: "FROM THE CREW", media: "sample-birthday.jpg"},
     anniversaryMedia: {main: "HAPPY 10 YEARS BABE!", sub: "TABLE 12", media: "sample-romance.jpg"},
@@ -162,7 +165,7 @@
       frame.src = previewUrl(template, {...options, formatId});
       sizes.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.previewFormat === formatId));
     };
-    sizes.innerHTML = formats.map(fid => `<button type="button" class="secondary" data-preview-format="${fid}">${SIZE_LABELS[fid] || fid}</button>`).join("");
+    sizes.innerHTML = formats.map(fid => `<button type="button" class="secondary" data-preview-format="${esc(fid)}">${esc(SIZE_LABELS[fid] || fid)}</button>`).join("");
     sizes.querySelectorAll("button").forEach(b => b.addEventListener("click", () => show(b.dataset.previewFormat)));
     root.classList.remove("hidden");
     show(formats[0]);
