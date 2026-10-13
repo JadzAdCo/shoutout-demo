@@ -451,6 +451,38 @@
     });
   }
 
+  /**
+   * Idle CTA ("Use ShoutOut @ {club}") is system text: no patron character cap, every word shown, one size for all rows.
+   * Design notes: .cursor/rules/design-notes-board-fit.mdc (F — idle CTA fit)
+   */
+  function idleBoardText(mainText) {
+    const text = String(mainText || "")
+      .normalize("NFC")
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toUpperCase();
+    return wholeWordSlice(text, Number(window.FLOQRBoardFit?.IDLE_MAX_GLYPHS || 160));
+  }
+
+  function idleBoardRows(idleText) {
+    const fit = window.FLOQRBoardFit;
+    if (fit?.pickIdleRows) {
+      const host = byId("displayMain");
+      const width = (host?.clientWidth || 0) * (1 - 2 * fit.SAFE_X);
+      const height = (host?.clientHeight || 0) * (1 - 2 * fit.SAFE_Y);
+      return fit.pickIdleRows(idleText, width || 2, height || 1);
+    }
+    const rows = displayTextRows(idleText, {lineCount: 4, maxCharactersPerLine: 14, maxMainCharacters: 160}, {preserveAll: true}).filter(Boolean);
+    return rows.length ? rows : [""];
+  }
+
+  function idleBoardLinesHtml(idleText, rows, mainSize) {
+    const longest = rows.reduce((a, b) => (glyphLen(b) > glyphLen(a) ? b : a), "");
+    const style = classicFitStyle(longest, rows, mainSize);
+    return `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}" data-idle-fit="1" data-idle-text="${esc(idleText)}">${rows.map(row => boardRowHtml(row, style)).join("")}</span>`;
+  }
+
   /** Dynamic max fit: binary search for the largest uniform px where every nowrap line fits (no word drop). */
   function fitDisplayMessageLines(host, options = {}) {
     if (!host) return 0;
@@ -1833,6 +1865,8 @@
       ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit)
       : isSoccerJersey
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
+      : isClassicBoard && isIdleCta && !isTextOverlay
+      ? mainSource
       : isClassicBoard
       ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
       // Soft composer caps guide writing; display packs all words then shrinks type (no drop).
@@ -2168,14 +2202,21 @@
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
-      const rows = classicBoardRows(mainText, textCaps);
+      const idleText = isIdleCta ? idleBoardText(mainText) : "";
+      const rows = isIdleCta ? idleBoardRows(idleText) : classicBoardRows(mainText, textCaps);
       const cardAttribution = floqrCardAttributionFromData(data);
       const cardValue = isIdleCta ? "" : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
       const identity = isIdleCta
         ? classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND})
         : classicIdentityPresentation(cardValue, {asHandle: true});
       byId("displayMain").classList.add("classic-bw-board");
-      byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
+      if (isIdleCta) {
+        byId("displayMain").style.setProperty("--board-lines", String(rows.length));
+        byId("displayMain").innerHTML = idleBoardLinesHtml(idleText, rows, mainSize);
+      } else {
+        byId("displayMain").style.removeProperty("--board-lines");
+        byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
+      }
       if (!isIdleCta && !cardValue) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").removeAttribute("aria-label");

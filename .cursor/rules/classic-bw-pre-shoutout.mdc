@@ -22,6 +22,8 @@ When `display-app.js` renders `blackwhite` with `idleCta` / `status: default`, t
 
 **Do not** apply `classic-bw-idle` to approved/live patron ShoutOuts — only idle/default CTA.
 
+**Idle text fit (s3.1.40):** the idle CTA is system text — never cut by the patron cap (64×32 used to drop "WASHINGTON DC"). Whole words wrap onto as many rows as needed, `@` stays with SHOUTOUT, and all rows share one size via `FLOQRBoardFit.fitIdleHost` inside the safe area. Details: `design-notes-board-fit.mdc` → F.
+
 ### CSS contract (`display.css`)
 
 - `.classic-bw.classic-bw-idle .display-center:after` → dark panel background
