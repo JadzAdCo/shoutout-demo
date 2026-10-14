@@ -146,8 +146,18 @@
     document.title = `${name} | FLOQR`;
   }
 
+  function tr(key, fallback) {
+    const value = window.FLOQRI18n?.t?.(key);
+    return value && value !== key ? value : fallback;
+  }
+
+  function shoutoutHref(eventId = "") {
+    return window.FLOQRNav?.shoutoutLink?.({locationId, eventId})
+      || `./?start=shoutout&location=${encodeURIComponent(locationId)}${eventId ? `&event=${encodeURIComponent(eventId)}` : ""}`;
+  }
+
   function renderActions() {
-    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}`;
+    byId("clubShoutoutLink").href = shoutoutHref();
     byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}`;
     const address = window.FLOQRAddress?.fullAddress(club) || club.fullAddress || club.address || [club.city, club.region, club.country].filter(Boolean).join(", ");
     byId("clubDirectionsLink").href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -200,7 +210,7 @@
       ${event.imageUrl ? `<img src="${esc(event.imageUrl)}" alt="${esc(name)}"/>` : ""}
       <div><small>${esc(date)}${event.eventTime ? ` · ${esc(event.eventTime)}` : ""}</small><h3>${esc(name)}</h3>
       ${talent.length ? `<p>${esc(talent.slice(0,4).join(" · "))}</p>` : ""}
-      ${link && !past ? `<a class="buttonlike" target="_blank" rel="noopener" href="${esc(link)}">Tickets / Details</a>` : ""}</div>
+      ${past ? "" : `<div class="button-row"><a class="buttonlike primary" data-event-shoutout href="${esc(shoutoutHref(event.id))}">${esc(tr("page.clubProfile.shoutout", "Throw a ShoutOut"))}</a>${link ? `<a class="buttonlike" target="_blank" rel="noopener" href="${esc(link)}">Tickets / Details</a>` : ""}</div>`}</div>
     </article>`;
   }
 

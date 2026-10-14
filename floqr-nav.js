@@ -63,6 +63,19 @@
     searchHome() {
       return `./?start=search`;
     },
+    /** Throw a ShoutOut at one venue or event: Search shows that venue's ad splash, then its ShoutOut landing. */
+    shoutoutLink({ locationId = "", eventId = "" } = {}) {
+      const location = String(locationId || "").trim();
+      const event = String(eventId || "").trim();
+      if (!location && !event) return this.searchHome();
+      return buildUrl("./", { start: "shoutout", location, event });
+    },
+    /** Absolute form of shoutoutLink for iframes on club websites and copied links. */
+    shoutoutUrl(target = {}) {
+      const href = this.shoutoutLink(target);
+      try { return new URL(href, global.location.href).toString(); }
+      catch (e) { return href; }
+    },
     adminHome(extra = {}) {
       const extraLocation = extra.location;
       const locationId = extraLocation != null && String(extraLocation).trim() !== ""

@@ -14,3 +14,20 @@ Resume: `@shoutout-entry$`.
 - Ad splash: `#splashFloqrLogoWrap` has no frame/background; FloqMedia house-card links are `text-decoration:none`.
 
 Test: `functions/search-shoutout-entry.test.js`.
+
+## Venue / event ShoutOut deep link (s3.1.43)
+
+Two paths into the composer, by design (owner, Oct 13 2026):
+
+| Entry | Path |
+|---|---|
+| Search (club unknown) | ShoutOut → house-card splash → Choose Location for ShoutOut → pick club → template selection |
+| Club / event public page, club website embed, FloqAi assistant venue/event result, Venue Links "ShoutOut link", Club Admin public-profile report (club known) | **venue** ad splash for that club → **straight to template selection** for that club (event name + date on the meta line). No Choose Location, no "tap the club" step. |
+
+- One builder: `FLOQRNav.shoutoutLink({locationId, eventId})` → `./?start=shoutout&location=<id>[&event=<id>]` (no `v`); `FLOQRNav.shoutoutUrl(...)` = absolute on the current host (iframes, copy links). Never hand-build `./?location=` for ShoutOut.
+- `patron-app.js` `continueToMainCategories` → `openDirectVenueShoutout()` (once per page load): event id → its `locationId`; alias-resolve; venue must exist **and** pass `visibleLocationEntry` (no Zebbies fallback) else Search + `app.directShoutoutUnavailable`; then `showAdSplash("shoutout", () => selectLocationForShoutOut(id, {event}), {venue: true})`.
+- Root cause fixed: the old `?location=` handler ran `openCategory("shoutout")` (house-card splash whose callback opens Choose Location) **and** a 400 ms timer to `selectLocationForShoutOut` — the timer hid the splash early, then the splash callback yanked the patron back to the Search listing.
+- Signed out: index is the sign-in page, so `location` / `event` stay in the URL through sign-in / create-profile; club-profile's own `returnTo` keeps `location`; `safeReturnTo` keeps `start` / `location` / `event` and drops only `v`.
+- Old `./?location=<id>` links still work (same handler).
+
+Test: `functions/venue-shoutout-deeplink.test.js`.

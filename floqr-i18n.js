@@ -719,6 +719,8 @@
       "page.clubProfile.share": "Copy Link",
       "page.clubProfile.shop": "Shop",
       "page.clubProfile.shoutout": "Throw a ShoutOut",
+
+      "app.directShoutoutUnavailable": "That venue isn't available for ShoutOuts right now. Search for another venue below.",
       "page.clubProfile.title": "Club Profile | FLOQR",
       "page.clubProfile.website": "Official Website",
       "page.commerce.browseHint": "Browse randomly featured products from US-based patrons and service members.",
@@ -1710,6 +1712,8 @@
       "page.clubProfile.share": "Copier le lien",
       "page.clubProfile.shop": "Boutique",
       "page.clubProfile.shoutout": "Lancer un ShoutOut",
+
+      "app.directShoutoutUnavailable": "Ce lieu n'accepte pas de ShoutOut pour le moment. Recherchez un autre lieu ci-dessous.",
       "page.clubProfile.title": "Profil du club | FLOQR",
       "page.clubProfile.website": "Site officiel",
       "page.commerce.browseHint": "Parcourez des produits mis en avant de patrons et membres de service aux États-Unis.",
@@ -2701,6 +2705,8 @@
       "page.clubProfile.share": "Link kopieren",
       "page.clubProfile.shop": "Shop",
       "page.clubProfile.shoutout": "Einen ShoutOut senden",
+
+      "app.directShoutoutUnavailable": "Diese Location ist für ShoutOuts gerade nicht verfügbar. Suche unten nach einer anderen Location.",
       "page.clubProfile.title": "Clubprofil | FLOQR",
       "page.clubProfile.website": "Offizielle Website",
       "page.commerce.browseHint": "Zufällig hervorgehobene Produkte von Gästen und Service-Mitgliedern in den USA.",
@@ -3692,6 +3698,8 @@
       "page.clubProfile.share": "Copiar enlace",
       "page.clubProfile.shop": "Tienda",
       "page.clubProfile.shoutout": "Enviar un ShoutOut",
+
+      "app.directShoutoutUnavailable": "Ese local no está disponible para ShoutOuts en este momento. Busca otro local abajo.",
       "page.clubProfile.title": "Perfil del club | FLOQR",
       "page.clubProfile.website": "Sitio web oficial",
       "page.commerce.browseHint": "Explora productos destacados al azar de visitantes y miembros de servicio en EE. UU.",
@@ -4683,6 +4691,8 @@
       "page.clubProfile.share": "Link kopiëren",
       "page.clubProfile.shop": "Winkel",
       "page.clubProfile.shoutout": "Een ShoutOut sturen",
+
+      "app.directShoutoutUnavailable": "Deze locatie is nu niet beschikbaar voor ShoutOuts. Zoek hieronder een andere locatie.",
       "page.clubProfile.title": "Clubprofiel | FLOQR",
       "page.clubProfile.website": "Officiële website",
       "page.commerce.browseHint": "Blader door willekeurig uitgelichte producten van bezoekers en servicemedewerkers in de VS.",
@@ -5674,6 +5684,8 @@
       "page.clubProfile.share": "Копировать ссылку",
       "page.clubProfile.shop": "Магазин",
       "page.clubProfile.shoutout": "Отправить ShoutOut",
+
+      "app.directShoutoutUnavailable": "Это заведение сейчас не принимает ShoutOut. Найдите другое заведение ниже.",
       "page.clubProfile.title": "Профиль клуба | FLOQR",
       "page.clubProfile.website": "Официальный сайт",
       "page.commerce.browseHint": "Случайные товары от посетителей и участников сервиса из США.",
@@ -6665,6 +6677,8 @@
       "page.clubProfile.share": "Copia collegamento",
       "page.clubProfile.shop": "Negozio",
       "page.clubProfile.shoutout": "Lancia un ShoutOut",
+
+      "app.directShoutoutUnavailable": "Questo locale non è disponibile per gli ShoutOut in questo momento. Cerca un altro locale qui sotto.",
       "page.clubProfile.title": "Profilo del club | FLOQR",
       "page.clubProfile.website": "Sito ufficiale",
       "page.commerce.browseHint": "Sfoglia i prodotti presentati in modo casuale da utenti e membri del servizio con sede negli Stati Uniti.",
@@ -7656,6 +7670,8 @@
       "page.clubProfile.share": "Copiar link",
       "page.clubProfile.shop": "Loja",
       "page.clubProfile.shoutout": "Jogar um ShoutOut",
+
+      "app.directShoutoutUnavailable": "Este local não está disponível para ShoutOuts neste momento. Pesquise outro local abaixo.",
       "page.clubProfile.title": "Perfil do Clube | FLOQR",
       "page.clubProfile.website": "Website oficial",
       "page.commerce.browseHint": "Navegue por produtos apresentados aleatoriamente por patronos e membros do serviço baseados nos EUA.",
@@ -8647,6 +8663,8 @@
       "page.clubProfile.share": "Αντιγραφή συνδέσμου",
       "page.clubProfile.shop": "Κατάστημα",
       "page.clubProfile.shoutout": "Ρίξε ένα ShoutOut",
+
+      "app.directShoutoutUnavailable": "Αυτός ο χώρος δεν είναι διαθέσιμος για ShoutOut αυτή τη στιγμή. Αναζητήστε άλλο χώρο παρακάτω.",
       "page.clubProfile.title": "Προφίλ ομάδας | FLOQR",
       "page.clubProfile.website": "Επίσημος Ιστότοπος",
       "page.commerce.browseHint": "Περιήγηση τυχαία επιλεγμένων προϊόντων από υποστηρικτές και μέλη υπηρεσιών με έδρα τις ΗΠΑ.",
@@ -9638,6 +9656,8 @@
       "page.clubProfile.share": "Skopiuj łącze",
       "page.clubProfile.shop": "Sklep",
       "page.clubProfile.shoutout": "Rzuć ShoutOut",
+
+      "app.directShoutoutUnavailable": "Ten lokal nie przyjmuje teraz ShoutOutów. Wyszukaj inny lokal poniżej.",
       "page.clubProfile.title": "Profil klubowy | FLOQR",
       "page.clubProfile.website": "Oficjalna strona internetowa",
       "page.commerce.browseHint": "Przeglądaj losowo polecane produkty od patronów i członków usług z USA.",
@@ -10629,6 +10649,8 @@
       "page.clubProfile.share": "نسخ الرابط",
       "page.clubProfile.shop": "تسوق",
       "page.clubProfile.shoutout": "ارمِ ShoutOut",
+
+      "app.directShoutoutUnavailable": "هذا المكان غير متاح لـ ShoutOut حاليًا. ابحث عن مكان آخر أدناه.",
       "page.clubProfile.title": "الملف الشخصي للنادي | FLOQR",
       "page.clubProfile.website": "موقع الويب الرسمي",
       "page.commerce.browseHint": "تصفح المنتجات المميزة عشوائيًا من العملاء وأعضاء الخدمة المقيمين في الولايات المتحدة.",

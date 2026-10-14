@@ -50,6 +50,7 @@
       display1: {label: "Display 1", hint: "Primary LED board. Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 1", url: absoluteUrl(displayUrl)}]},
       display2: {label: "Display 2", hint: "Secondary LED board (supRstar). Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 2", url: absoluteUrl(display2Url)}]},
       profile: {label: "Public profile", hint: "Patron-facing Club Public Profile.", links: [{name: "Public profile", url: absoluteUrl(profileUrl)}]},
+      shoutout: {label: "ShoutOut link", hint: "Opens this venue's ad splash, then its Throw a ShoutOut page (sign-in first when needed). Share it on flyers, QR codes and social posts.", links: [{name: "Throw a ShoutOut", url: window.FLOQRNav?.shoutoutUrl?.({locationId: id}) || absoluteUrl(`./?start=shoutout&location=${encodeURIComponent(id)}`)}]},
       xibo: {label: "Xibo Diag", hint: "Paste into the Xibo Webpage widget on each board's error / fallback layout. Load failures appear under Diagnostics → Display / Xibo Load Errors.", links: [
         {name: "Display 1 fallback", url: xiboDiagUrl(id, 1)},
         {name: "Display 2 fallback", url: xiboDiagUrl(id, 2)}
