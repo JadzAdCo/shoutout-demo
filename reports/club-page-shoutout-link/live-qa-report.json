@@ -1,0 +1,269 @@
+{
+  "base": "https://jadzadco.github.io/shoutout-demo",
+  "at": "2026-10-15T18:03:15.867Z",
+  "cases": [
+    {
+      "kind": "club-page",
+      "slug": "aurelia",
+      "locationId": "temp-democlub-1",
+      "signedOutRedirect": "https://jadzadco.github.io/shoutout-demo/?returnTo=club-profile.html%3Flocation%3Dtemp-democlub-1&profileRequired=sign-in",
+      "loadResult": "rendered",
+      "info": {
+        "url": "https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1",
+        "shoutoutHref": "./?start=shoutout&location=temp-democlub-1",
+        "eventHrefs": [],
+        "title": "Aurelia (Demo Club) | FLOQR"
+      },
+      "file": "01-club-page-aurelia.png",
+      "errors": []
+    },
+    {
+      "kind": "club-link",
+      "slug": "aurelia-club",
+      "href": "./?start=shoutout&location=temp-democlub-1",
+      "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=temp-democlub-1",
+      "signedOut": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=temp-democlub-1",
+        "activePage": "landingPage",
+        "adTitle": "Get Ready",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "welcome": "03-aurelia-club-signed-out-sign-in.png",
+      "hook": "function",
+      "splash": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=temp-democlub-1",
+        "activePage": "adSplashPage",
+        "adTitle": "Aurelia (Demo Club)",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "template": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=temp-democlub-1",
+        "activePage": "templateSelectPage",
+        "adTitle": "Aurelia (Demo Club)",
+        "venueHeader": true,
+        "clubTitle": "Aurelia (Demo Club)",
+        "clubMeta": "New York, New York • House / R&B / Open Format",
+        "templateCards": 0,
+        "vars": {
+          "selectedLocationId": "temp-democlub-1",
+          "pendingDirectLocation": "temp-democlub-1",
+          "pendingDirectEvent": ""
+        },
+        "after8s": {
+          "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=temp-democlub-1",
+          "activePage": "templateSelectPage",
+          "adTitle": "Aurelia (Demo Club)",
+          "venueHeader": true,
+          "clubTitle": "Aurelia (Demo Club)",
+          "clubMeta": "New York, New York • House / R&B / Open Format",
+          "templateCards": 0
+        }
+      },
+      "files": {
+        "splash": "04-aurelia-club-venue-ad-splash.png",
+        "template": "05-aurelia-club-template-selection.png"
+      },
+      "errors": []
+    },
+    {
+      "kind": "club-page",
+      "slug": "zebbies",
+      "locationId": "zebbies-garden-washington-dc",
+      "signedOutRedirect": "https://jadzadco.github.io/shoutout-demo/?returnTo=club-profile.html%3Flocation%3Dzebbies-garden-washington-dc&profileRequired=sign-in",
+      "loadResult": "rendered",
+      "info": {
+        "url": "https://jadzadco.github.io/shoutout-demo/club-profile.html?location=zebbies-garden-washington-dc",
+        "shoutoutHref": "./?start=shoutout&location=zebbies-garden-washington-dc",
+        "eventHrefs": [],
+        "title": "Zebbies Garden DC | FLOQR"
+      },
+      "file": "01-club-page-zebbies.png",
+      "errors": []
+    },
+    {
+      "kind": "club-link",
+      "slug": "zebbies-club",
+      "href": "./?start=shoutout&location=zebbies-garden-washington-dc",
+      "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=zebbies-garden-washington-dc",
+      "signedOut": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=zebbies-garden-washington-dc",
+        "activePage": "landingPage",
+        "adTitle": "Get Ready",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "welcome": "03-zebbies-club-signed-out-sign-in.png",
+      "hook": "function",
+      "splash": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=zebbies-garden-washington-dc",
+        "activePage": "adSplashPage",
+        "adTitle": "Zebbies Garden DC",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "template": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=zebbies-garden-washington-dc",
+        "activePage": "templateSelectPage",
+        "adTitle": "Zebbies Garden DC",
+        "venueHeader": true,
+        "clubTitle": "Zebbies Garden DC",
+        "clubMeta": "Washington, District of Columbia • Hip Hop / Afro Beats / EDM / International",
+        "templateCards": 0,
+        "vars": {
+          "selectedLocationId": "zebbies-garden-washington-dc",
+          "pendingDirectLocation": "zebbies-garden-washington-dc",
+          "pendingDirectEvent": ""
+        },
+        "after8s": {
+          "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=zebbies-garden-washington-dc",
+          "activePage": "templateSelectPage",
+          "adTitle": "Zebbies Garden DC",
+          "venueHeader": true,
+          "clubTitle": "Zebbies Garden DC",
+          "clubMeta": "Washington, District of Columbia • Hip Hop / Afro Beats / EDM / International",
+          "templateCards": 0
+        }
+      },
+      "files": {
+        "splash": "04-zebbies-club-venue-ad-splash.png",
+        "template": "05-zebbies-club-template-selection.png"
+      },
+      "errors": []
+    },
+    {
+      "kind": "club-page",
+      "slug": "josephine",
+      "locationId": "josephine-atlanta-ga",
+      "signedOutRedirect": "https://jadzadco.github.io/shoutout-demo/?returnTo=club-profile.html%3Flocation%3Djosephine-atlanta-ga&profileRequired=sign-in",
+      "loadResult": "rendered",
+      "info": {
+        "url": "https://jadzadco.github.io/shoutout-demo/club-profile.html?location=josephine-atlanta-ga",
+        "shoutoutHref": "./?start=shoutout&location=josephine-atlanta-ga",
+        "eventHrefs": [
+          "./?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip"
+        ],
+        "title": "Josephine Lounge Club Atlanta | FLOQR"
+      },
+      "file": "01-club-page-josephine.png",
+      "errors": []
+    },
+    {
+      "kind": "club-link",
+      "slug": "josephine-club",
+      "href": "./?start=shoutout&location=josephine-atlanta-ga",
+      "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga",
+      "signedOut": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga",
+        "activePage": "landingPage",
+        "adTitle": "Get Ready",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "welcome": "03-josephine-club-signed-out-sign-in.png",
+      "hook": "function",
+      "splash": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga",
+        "activePage": "adSplashPage",
+        "adTitle": "Josephine Lounge Club Atlanta",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "template": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga",
+        "activePage": "templateSelectPage",
+        "adTitle": "Josephine Lounge Club Atlanta",
+        "venueHeader": true,
+        "clubTitle": "Josephine Lounge Club Atlanta",
+        "clubMeta": "Atlanta, Georgia • Hip Hop / R&B / Afro Beats / Open Format",
+        "templateCards": 0,
+        "vars": {
+          "selectedLocationId": "josephine-atlanta-ga",
+          "pendingDirectLocation": "josephine-atlanta-ga",
+          "pendingDirectEvent": ""
+        },
+        "after8s": {
+          "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga",
+          "activePage": "templateSelectPage",
+          "adTitle": "Josephine Lounge Club Atlanta",
+          "venueHeader": true,
+          "clubTitle": "Josephine Lounge Club Atlanta",
+          "clubMeta": "Atlanta, Georgia • Hip Hop / R&B / Afro Beats / Open Format",
+          "templateCards": 0
+        }
+      },
+      "files": {
+        "splash": "04-josephine-club-venue-ad-splash.png",
+        "template": "05-josephine-club-template-selection.png"
+      },
+      "errors": []
+    },
+    {
+      "kind": "event-link",
+      "slug": "josephine-event",
+      "href": "./?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+      "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+      "signedOut": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+        "activePage": "landingPage",
+        "adTitle": "Get Ready",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "welcome": "03-josephine-event-signed-out-sign-in.png",
+      "hook": "function",
+      "splash": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+        "activePage": "adSplashPage",
+        "adTitle": "Josephine Lounge Club Atlanta",
+        "venueHeader": true,
+        "clubTitle": "Location",
+        "clubMeta": "",
+        "templateCards": 0
+      },
+      "template": {
+        "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+        "activePage": "templateSelectPage",
+        "adTitle": "Josephine Lounge Club Atlanta",
+        "venueHeader": true,
+        "clubTitle": "Josephine Lounge Club Atlanta",
+        "clubMeta": "Josephine Atlanta Saturday VIP · Recurring Saturday • Atlanta, Georgia • Hip Hop / R&B / Afro Beats / Open Format",
+        "templateCards": 0,
+        "vars": {
+          "selectedLocationId": "josephine-atlanta-ga",
+          "pendingDirectLocation": "josephine-atlanta-ga",
+          "pendingDirectEvent": "josephine-saturday-vip"
+        },
+        "after8s": {
+          "url": "https://jadzadco.github.io/shoutout-demo/?start=shoutout&location=josephine-atlanta-ga&event=josephine-saturday-vip",
+          "activePage": "templateSelectPage",
+          "adTitle": "Josephine Lounge Club Atlanta",
+          "venueHeader": true,
+          "clubTitle": "Josephine Lounge Club Atlanta",
+          "clubMeta": "Josephine Atlanta Saturday VIP · Recurring Saturday • Atlanta, Georgia • Hip Hop / R&B / Afro Beats / Open Format",
+          "templateCards": 0
+        }
+      },
+      "files": {
+        "splash": "04-josephine-event-venue-ad-splash.png",
+        "template": "05-josephine-event-template-selection.png"
+      },
+      "errors": []
+    }
+  ]
+}
