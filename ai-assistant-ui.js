@@ -109,8 +109,9 @@
   }
 
   function suggestedAction(item) {
-    if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}`};
-    if (item.type === "event") return {label:`View ${item.title}`, href:`./`};
+    const shoutoutLink = target => window.FLOQRNav?.shoutoutLink?.(target) || "./";
+    if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:shoutoutLink({locationId:item.id})};
+    if (item.type === "event") return {label:`View ${item.title}`, href:shoutoutLink({eventId:item.id})};
     if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./"};
     return null;
   }

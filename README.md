@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.42 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.43 (stable)
+
+- s3.1.43: Throw a ShoutOut from a club or event page goes straight to that club. The Throw a ShoutOut button on a Club Public Profile (and the new one on each upcoming event there) used to show a generic ad and then drop the patron back on Search. Now it shows the in-app ad for that club and then opens template selection for that club (the event name and date show under the club name). Signed-out patrons sign in first and land in the same place. The same link is used by the club website embed (new Throw a ShoutOut button and per-event link), FloqAi assistant venue and event results, Master Admin Venue Links (new "ShoutOut link") and the Club Admin public profile report. If the venue is not available the patron lands on Search with a short message. Search itself is unchanged.
 
 - s3.1.42: Heist FloqR card. On every Heist ShoutOut the card now plays "Caught in a HEIST", then "Presented by FloqMedia", then "Powered by FloqR Social OS", then "From @handle" when the patron shares a handle - 6 seconds each, then repeats. Without a handle it plays the first three. The card never disappears, and the Heist message stays on screen long enough for every line before the HEIST logo slide. Every other template is unchanged.
 

@@ -13,7 +13,9 @@ body.club-embed.theme-light{background:#fff;color:#111827}
 .club-embed-event img,.club-embed-event .club-embed-flyer{width:72px;height:72px;border-radius:10px;object-fit:cover;background:#1f2a44}
 .club-embed-event strong{display:block;font-size:15px}
 .club-embed-event small{display:block;opacity:.75;margin-top:2px}
-.club-embed-event a{display:inline-block;margin-top:6px;color:#7cc4ff;font-weight:600;text-decoration:none}
+.club-embed-event a{display:inline-block;margin-top:6px;margin-right:12px;color:#7cc4ff;font-weight:600;text-decoration:none}
+.club-embed-shoutout{margin-left:auto;padding:9px 14px;border-radius:999px;background:#ff2d75;color:#fff;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+@media(max-width:420px){.club-embed-head{flex-wrap:wrap}.club-embed-shoutout{margin-left:0}}
 .club-embed-people{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .club-embed-person{padding:10px;border-radius:14px;background:rgba(255,255,255,.06);text-align:center}
 .club-embed-person img,.club-embed-person .club-embed-initial{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#1f2a44;font-size:30px;font-weight:700;color:#e8f0ff}

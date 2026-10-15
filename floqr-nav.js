@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.1.42";
+  const APP_V = "s3.1.43";
 
   function navT(key, fallback) {
     try {
@@ -62,6 +62,19 @@
     },
     searchHome() {
       return `./?start=search`;
+    },
+    /** Throw a ShoutOut at one venue or event: Search shows that venue's ad splash, then its ShoutOut landing. */
+    shoutoutLink({ locationId = "", eventId = "" } = {}) {
+      const location = String(locationId || "").trim();
+      const event = String(eventId || "").trim();
+      if (!location && !event) return this.searchHome();
+      return buildUrl("./", { start: "shoutout", location, event });
+    },
+    /** Absolute form of shoutoutLink for iframes on club websites and copied links. */
+    shoutoutUrl(target = {}) {
+      const href = this.shoutoutLink(target);
+      try { return new URL(href, global.location.href).toString(); }
+      catch (e) { return href; }
     },
     adminHome(extra = {}) {
       const extraLocation = extra.location;

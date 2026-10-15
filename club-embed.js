@@ -35,14 +35,20 @@
     return [event.date, event.time].filter(Boolean).join(" · ");
   }
 
+  function shoutoutUrl(eventId = "") {
+    return window.FLOQRNav?.shoutoutUrl?.({locationId, eventId}) || "";
+  }
+
   function eventHtml(event) {
     const img = safeUrl(event.imageUrl);
     const ticket = safeUrl(event.ticketUrl);
+    const shoutout = shoutoutUrl(event.id);
     return `<article class="club-embed-event">
       ${img ? `<img src="${esc(img)}" alt="" loading="lazy"/>` : `<span class="club-embed-flyer"></span>`}
       <div><strong>${esc(event.name)}</strong>
         <small>${esc(eventWhen(event))}</small>
         ${event.artists?.length ? `<small>${esc(event.artists.join(" · "))}</small>` : ""}
+        ${shoutout ? `<a href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(t("page.clubProfile.shoutout", {}, "Throw a ShoutOut"))}</a>` : ""}
         ${ticket ? `<a href="${esc(ticket)}" target="_blank" rel="noopener">${esc(t("page.clubEmbed.tickets", {}, "Tickets"))}</a>` : ""}
       </div>
     </article>`;
@@ -85,6 +91,8 @@
     if (logo) Object.assign(byId("clubEmbedLogo"), {src: logo, hidden: false});
     const pageUrl = safeUrl(profile.publicPageUrl);
     if (pageUrl) Object.assign(byId("clubEmbedOpen"), {href: pageUrl, hidden: false});
+    const shoutout = shoutoutUrl();
+    if (shoutout) Object.assign(byId("clubEmbedShoutout"), {href: shoutout, hidden: false});
     if (sections.includes("events")) fill("clubEmbedEvents", data.events || [], eventHtml, t("page.clubEmbed.noEvents", {}, "No upcoming events yet."));
     if (sections.includes("djs")) fill("clubEmbedDjs", data.djs || [], personHtml);
     if (sections.includes("staff")) fill("clubEmbedStaff", data.staff || [], personHtml);

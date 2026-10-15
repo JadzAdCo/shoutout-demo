@@ -45,6 +45,8 @@
   let templates = {};
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
+  let pendingDirectEvent = qs("event", "");
+  let directVenueShoutoutOpened = false;
   let pendingReturnTo = qs("returnTo", "");
   let cachedUserProfile = null;
   let lastProfileReadError = null;
@@ -1271,9 +1273,8 @@
     window.FLOQRNav?.applyStartPage(showPage);
     if (byId("minglLandingPage")?.classList.contains("active") && !featureServiceAllows("mingl")) showPage("categoryPage");
     if (byId("intentSearchPage")?.classList.contains("active") && !featureServiceAllows("floqAi")) showPage("categoryPage");
-    if (pendingDirectLocation) {
-      openCategory("shoutout");
-      setTimeout(() => selectLocationForShoutOut(pendingDirectLocation), 400);
+    if (pendingDirectLocation || pendingDirectEvent) {
+      await openDirectVenueShoutout();
       return;
     }
     runStartVenueQuery();
@@ -3304,7 +3305,7 @@
       card.querySelector("button").addEventListener("click", () => {
         const msg = "Ticket checkout will be connected in the next payment integration. For now, you can throw a ShoutOut at this event location.";
         alert(msg);
-        selectLocationForShoutOut(e.locationId);
+        selectLocationForShoutOut(e.locationId, {event: {id, ...e}});
       });
       grid.appendChild(card);
     });
@@ -3357,14 +3358,53 @@
     });
   }
 
-  async function selectLocationForShoutOut(id) {
+  async function loadEventById(id) {
+    const key = String(id || "").trim();
+    if (!key) return null;
+    const known = events[key] || (window.SHOUTOUT_EVENTS || {})[key];
+    if (known) return {id: key, ...known};
+    try {
+      const doc = await db.collection("events").doc(key).get();
+      if (doc.exists && String(doc.data()?.status || "active").toLowerCase() !== "deleted") {
+        events[doc.id] = {id: doc.id, ...doc.data()};
+        return events[doc.id];
+      }
+    } catch (e) {
+      console.warn("Event deep link lookup failed", e?.message || e);
+    }
+    return null;
+  }
+
+  /** Club / event public page, club website and FloqAi links: the same path as picking that venue on Search. */
+  async function openDirectVenueShoutout() {
+    if (directVenueShoutoutOpened) return;
+    directVenueShoutoutOpened = true;
+    const event = await loadEventById(pendingDirectEvent);
+    const requested = pendingDirectLocation || event?.locationId || event?.clubLocationId || "";
+    const venueId = requested ? await resolveLocationAlias(requested) : "";
+    if (venueId) await loadLocationById(venueId);
+    const venue = venueId ? (locations[venueId] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[venueId]) : null;
+    if (!venue || !visibleLocationEntry([venueId, venue])) {
+      pendingDirectLocation = "";
+      pendingDirectEvent = "";
+      showPage("categoryPage");
+      setStatus(tt("app.directShoutoutUnavailable", {}, "That venue isn't available for ShoutOuts right now. Search for another venue below."));
+      return;
+    }
+    pendingDirectLocation = venueId;
+    selectedLocationId = venueId;
+    showAdSplash("shoutout", () => selectLocationForShoutOut(venueId, {event}), {venue: true});
+  }
+
+  async function selectLocationForShoutOut(id, {event = null} = {}) {
     selectedLocationId = await resolveLocationAlias(id);
     const loc = await loadLocationById(selectedLocationId);
     setText("selectedClubTitle", loc.locationName);
     const Place = window.FLOQRPlaceI18n;
     const metaPlace = Place?.placeLine?.(loc) || loc.locationLabel || "";
     const metaGenres = (Place?.genres?.(loc.genres) || loc.genres || []).join(" / ");
-    setText("selectedClubMeta", `${metaPlace} • ${metaGenres}`);
+    const eventLine = event ? [event.eventName || event.title, event.eventDate || event.date].filter(Boolean).join(" · ") : "";
+    setText("selectedClubMeta", [eventLine, `${metaPlace} • ${metaGenres}`].filter(Boolean).join(" • "));
     const draft = readReuseShoutoutDraft();
     selectedTemplate = draft?.template || "blackwhite";
     selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";

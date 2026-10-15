@@ -390,6 +390,7 @@
         ["Subscription required for edits", publicClubProfile.subscriptionRequiredForPublicProfileEdits === false ? "No" : "Yes"],
         ["AI index", "Public profile fields only"]
         ,["Public page", publicProfileUrl()]
+        ,[window.FLOQRI18n?.t?.("page.clubProfile.shoutout") || "Throw a ShoutOut", window.FLOQRNav?.shoutoutUrl?.({locationId}) || ""]
         ,["Display URL", stableVenueDisplayUrl()]
       ]);
     }
