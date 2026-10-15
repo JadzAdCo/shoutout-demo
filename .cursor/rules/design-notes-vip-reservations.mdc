@@ -5,7 +5,7 @@ alwaysApply: false
 
 # VIP / Table Reservations — design notes
 
-Resume: `@vip$` / `$vip-tables$`. Status: **PROPOSAL — awaiting owner approval. Not built, not published, no Firestore / Functions / rules / Stripe changes.** Full proposal: `reports/vip-reservations-proposal.md`. Floor plans: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `preview.html`). Translation follow-up: `vip-reservations-translation-incomplete.mdc`.
+Resume: `@vip$` / `$vip-tables$`. Status: **PROPOSAL — awaiting owner approval. Not built, not published, no Firestore / Functions / rules / Stripe changes.** Full proposal: `reports/vip-reservations-proposal.md`. Floor plans: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `legend.json`, `preview.html` + `viewer.js`). Translation follow-up: `vip-reservations-translation-incomplete.mdc`.
 
 Do **not** start building until the owner approves and answers the open questions (proposal §20), including principle 14 ("Give club admins the capability to …" was cut off).
 
@@ -25,14 +25,56 @@ Do **not** start building until the owner approves and answers the open question
 | Public | Club page + `club-embed` VIP section + `venuePublicFeed dataset=vip` (publish key); scoped API keys issued by Master Admin (`availability:read`, origins allowlist, token-bucket rate limit, 7-day rotation overlap, no PII); `bookUrl` from the single canonical-origin helper |
 | Translation | Last; tier A patrons, tier B admins / promoters / VIP Managers / counsel; `vip.*` keys from day one; Terms translated by counsel, never machine; Live blocked until both tiers pass |
 
-## Attached maps (owner principle 13)
+## Attached maps (owner principle 13; owner feedback Oct 15 2026)
 
-- Decades (1024×619): 11 bookable (C1–C5 + C10–C11 VIP tables, C6–C9 floor tables), 2 areas labeled "VIP TABLES", non-bookable BAR, DJ BOOTH, Emergency Exit, stairs, 1 unlabeled enclosure.
-- Lima Twist (1024×382): 30 bookable — 101–106, 201–209, 301–307, 401–403 tables, 501–503 round, BAR1/BAR2 bar (confirm reservable). No exits drawn — request the full plan.
-- Capacities / amounts are placeholders. Regenerate with `node reports/vip-floorplans/build-plans.js reports/vip-floorplans`.
+Owner: "The Decades floor plan is wonderful." / "the Lima Twist one can be separated into four areas.. this will help smaller screens; also the DJ Booth is 106. Make DJ Booth color Blue, consistent throughout the floor plans. Denote Green for available and Red for booked tables. For floor maps ensure they are viewable from the phone."
+
+- Decades (1024×619): 11 bookable, 3 areas — `decades-north-vip` "North VIP" (printed VIP TABLES: C1–C5), `decades-floor` "Floor" (polygon: C6–C9 + DJ BOOTH), `decades-south-vip` "South VIP" (printed VIP TABLES: C10–C11). Non-bookable BAR, DJ BOOTH, Emergency Exit, stairs, 1 unlabeled enclosure.
+- LIMA Twist (1024×382): **29 bookable**; **106 = DJ BOOTH** (`{label:"106", name:"DJ BOOTH", type:"djBooth", bookable:false}` — printed label kept). 4 areas: A "Area A · 200 Row" (201–209), B "Area B · DJ & 100 Row" (101–105 + 106), C "Area C · Bar & 400s" (401–403, BAR1/BAR2 — confirm reservable), D "Area D · 300s & Rounds" (301–307, 501–503). Spelling Twist vs Twyst unconfirmed. No walls / exits drawn — request the full plan.
+- Schema `floqr.vipFloorPlan/2`: `areas[] {id, label (printed or null), name (club-editable), shape + rect|polygon, bounds, viewBox (phone zoom target), sectionIds, nonBookableIds}`; every bookable section in exactly one area; non-bookable items carry `type`, `state` (`djBooth` | `notBookable`), `areaId?`.
+- Capacities / amounts are placeholders. Regenerate with `node reports/vip-floorplans/build-plans.js reports/vip-floorplans`; screenshots `node reports/vip-floorplans/shoot.mjs`.
+
+## Shared color legend (one spec: `reports/vip-floorplans/legend.json`)
+
+| State | Color | Icon | Pattern |
+|---|---|---|---|
+| Available | green `#22c55e` / stroke `#4ade80` | check | solid |
+| Held | amber `#f59e0b` / `#fbbf24` | clock | diagonal stripes |
+| Booked | red `#ef4444` / `#f87171` | cross | cross-hatch |
+| Not bookable | grey `#9ca3af` dashed | lock | dots |
+| DJ booth (every plan) | blue `#3b82f6` / `#60a5fa` | music | solid |
+| Selected | yellow `#fde047` 4px ring, pulse (off under reduced motion) | — | — |
+
+- **Use everywhere:** map, list, area chips, door view, 360 hotspots and embed. Clubs cannot recolor states; they can only rename areas.
+- **Not color alone (WCAG 1.4.1):** every state also has an icon, a pattern and text, plus an on-map legend.
+- **Contrast (1.4.11):** strokes are ≥ 3:1 on the map backgrounds. The build fails below that.
+
+## Phone-first viewer
+
+| Width | Behavior |
+|---|---|
+| ≤ 600px | Opens on the first area. Area chips with free counts. Zoom so the narrowest bookable section is ≥ 44px; hit rects padded to 44×44. Pinch and pan. Minimap + zoom buttons sit **under** the map, never over tables. The Overview shows one 44px badge per area, and table details open in a bottom sheet. |
+| Tablet / PC | Full map with dashed area outlines; targets ≥ 24px; side or below details. |
+
+There is always an accessible list grouped by area. Demo files: `preview.html`, `viewer.js`, `viewer.css`. QA uses `shoot.mjs`, which runs CDP device emulation. Do not use `--window-size` screenshots: headless enforces a ~500px minimum width, so a 390px shot is really a crop of a wider layout. Each shot reports the smallest target and the horizontal overflow.
+
+## 3D / interactive ("Explore the room")
+
+- **Must:** the 2D floor plan stays the booking UI.
+- **Should:** an optional 360° panorama (Pannellum / Marzipano / Photo Sphere Viewer).
+  - Hotspots `{sectionId, yaw, pitch}` in `vipPanoramas`.
+  - A hotspot opens the same `select(sectionId)` → `createVipHold`, never a second booking path.
+  - Lazy-loaded; first view ≤ 1.5 MB.
+  - Capture is one position per area, with the venue closed and faces blurred.
+  - The master image is CC (private) and deleted 30 days after replacement; published tiles are P.
+  - Publish goes through `FLOQRReasonPrompt` and a chained audit row.
+- **Could:** stylized three.js extrusion (needs walls), Gaussian splats (dark rooms reconstruct poorly), and a Matterport link-out only when a venue already has a tour.
+- Full comparison, capture guide and budgets: proposal §13.6.
+
+POS integrations: `reports/vip-pos-integrations.md` (separate worker; linked from proposal §4.3).
 
 ## FIX PROMPT
 
 ```
-VIP Reservations (PROPOSAL, not approved): do not build until the owner approves reports/vip-reservations-proposal.md and answers §20. When approved: feature key vipReservations (beta) via Features & Services; club certified → enable; roles VIP Manager / Club Owner / counsel; Functions-only writes; vipAuditLogs chain + RFC 3161 anchors; Stripe Connect destination charges for deposits, Model A $20/mo subscription or Model B application fee; legal docs with passkey signatures; floor plans in normalized coordinates (reports/vip-floorplans). Translation last (vip-reservations-translation-incomplete.mdc). Design notes: design-notes-vip-reservations.mdc
+VIP Reservations (PROPOSAL, not approved): do not build until the owner approves reports/vip-reservations-proposal.md and answers §20. When approved: feature key vipReservations (beta) via Features & Services; club certified → enable; roles VIP Manager / Club Owner / counsel; Functions-only writes; vipAuditLogs chain + RFC 3161 anchors; Stripe Connect destination charges for deposits, Model A $20/mo subscription or Model B application fee; legal docs with passkey signatures; floor plans in normalized coordinates with areas (reports/vip-floorplans, schema floqr.vipFloorPlan/2; LIMA Twist 106 = DJ BOOTH); shared legend.json (DJ blue, Available green, Booked red, Held amber, Not bookable grey + icons/patterns); phone opens on an area with ≥44px targets; optional 360 "Explore the room" hotspots → same sectionId booking. Translation last (vip-reservations-translation-incomplete.mdc). Design notes: design-notes-vip-reservations.mdc
 ```

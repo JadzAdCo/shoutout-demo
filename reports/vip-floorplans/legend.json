@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "floqr.vipLegend/1",
+  "status": "PROPOSAL — owner-approved colors Oct 15 2026: DJ Booth blue, Available green, Booked red; Held, Not bookable, Selected proposed",
+  "rule": "Color is never the only cue (WCAG 2.2 SC 1.4.1): every state also has an icon badge, a fill pattern and a text label in the list view and the on-map legend. Strokes keep ≥ 3:1 against the dark map background (SC 1.4.11).",
+  "backgrounds": {
+    "decades": "#222222",
+    "limaTwist": "#2d3240",
+    "appDark": "#111111"
+  },
+  "states": [
+    {
+      "state": "available",
+      "label": "Available",
+      "color": "#22c55e",
+      "stroke": "#4ade80",
+      "fillOpacity": 0.35,
+      "icon": "check",
+      "pattern": "none",
+      "text": "Available",
+      "strokeContrast": {
+        "decades": 9.13,
+        "limaTwist": 7.34,
+        "appDark": 10.84
+      }
+    },
+    {
+      "state": "held",
+      "label": "Held / pending",
+      "color": "#f59e0b",
+      "stroke": "#fbbf24",
+      "fillOpacity": 0.5,
+      "icon": "clock",
+      "pattern": "diagonal-stripes",
+      "text": "Held",
+      "strokeContrast": {
+        "decades": 9.53,
+        "limaTwist": 7.66,
+        "appDark": 11.31
+      }
+    },
+    {
+      "state": "booked",
+      "label": "Booked",
+      "color": "#ef4444",
+      "stroke": "#f87171",
+      "fillOpacity": 0.55,
+      "icon": "cross",
+      "pattern": "cross-hatch",
+      "text": "Booked",
+      "strokeContrast": {
+        "decades": 5.75,
+        "limaTwist": 4.62,
+        "appDark": 6.83
+      }
+    },
+    {
+      "state": "notBookable",
+      "label": "Not bookable",
+      "color": "#9ca3af",
+      "stroke": "#9ca3af",
+      "fillOpacity": 0.22,
+      "icon": "lock",
+      "pattern": "dots",
+      "strokeDash": "4 3",
+      "text": "Not bookable",
+      "strokeContrast": {
+        "decades": 6.27,
+        "limaTwist": 5.04,
+        "appDark": 7.44
+      }
+    },
+    {
+      "state": "djBooth",
+      "label": "DJ Booth",
+      "color": "#3b82f6",
+      "stroke": "#60a5fa",
+      "fillOpacity": 0.45,
+      "icon": "music",
+      "pattern": "none",
+      "text": "DJ Booth",
+      "strokeContrast": {
+        "decades": 6.26,
+        "limaTwist": 5.03,
+        "appDark": 7.43
+      }
+    },
+    {
+      "state": "selected",
+      "label": "Selected",
+      "color": "#ffffff",
+      "stroke": "#fde047",
+      "fillOpacity": 0,
+      "icon": "none",
+      "pattern": "none",
+      "strokeWidthPx": 4,
+      "animation": "pulse (off when prefers-reduced-motion)",
+      "text": "Selected",
+      "strokeContrast": {
+        "decades": 12.07,
+        "limaTwist": 9.7,
+        "appDark": 14.32
+      }
+    }
+  ],
+  "areaOutline": {
+    "stroke": "#e5e7eb",
+    "strokeDash": "8 5",
+    "labelColor": "#ffffff",
+    "note": "Neutral outline so it never competes with state colors"
+  },
+  "tapTargetMinPx": 44,
+  "appliesTo": "Every element with type djBooth renders as djBooth in every floor plan, whatever its printed label"
+}

@@ -2,105 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIP floor-plan overlay preview (proposal)</title>
-<style>
-  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #111; color: #eee; }
-  header { padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  header h1 { font-size: 16px; margin: 0 12px 0 0; }
-  button, label { background: #222; color: #eee; border: 1px solid #444; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
-  button[aria-pressed="true"] { background: #6a3df0; border-color: #6a3df0; }
-  main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; padding: 0 16px 16px; }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
-  .stage { position: relative; width: 100%; }
-  .stage img { display: block; width: 100%; height: auto; }
-  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .sec { fill: rgba(106, 61, 240, .28); stroke: #b69cff; stroke-width: 2; vector-effect: non-scaling-stroke; cursor: pointer; }
-  .sec:hover, .sec.sel { fill: rgba(255, 196, 0, .45); stroke: #ffc400; }
-  .area { fill: rgba(0, 180, 255, .08); stroke: #39b6ff; stroke-dasharray: 6 4; stroke-width: 2; vector-effect: non-scaling-stroke; }
-  .nb { fill: rgba(255, 60, 60, .18); stroke: #ff5252; stroke-dasharray: 3 3; stroke-width: 2; vector-effect: non-scaling-stroke; }
-  .tag { font: 700 13px system-ui; fill: #fff; paint-order: stroke; stroke: #000; stroke-width: 3px; pointer-events: none; }
-  aside { background: #1b1b1b; border: 1px solid #333; border-radius: 8px; padding: 12px; }
-  aside dt { color: #aaa; margin-top: 6px; } aside dd { margin: 0; }
-  .legend span { display: inline-block; width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; }
-  .hide-nb .nb, .hide-areas .area { display: none; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VIP floor map viewer (proposal)</title>
+<link rel="stylesheet" href="viewer.css">
 </head>
 <body>
 <header>
-  <h1>VIP floor-plan overlay — PROPOSAL</h1>
-  <button type="button" data-plan="decades.json" aria-pressed="true">Decades</button>
-  <button type="button" data-plan="lima-twist.json" aria-pressed="false">Lima Twist</button>
-  <label><input type="checkbox" id="showAreas" checked> Areas</label>
-  <label><input type="checkbox" id="showNb" checked> Not bookable</label>
-  <span class="legend"><span style="background:#b69cff"></span>bookable <span style="background:#39b6ff"></span>area <span style="background:#ff5252"></span>not bookable</span>
+  <h1>VIP floor map — PROPOSAL</h1>
+  <button type="button" data-plan="decades.json" aria-pressed="false">Decades</button>
+  <button type="button" data-plan="lima-twist.json" aria-pressed="false">LIMA Twist</button>
+  <p class="demo">Demo: some tables are shown as Booked or Held (simulated). Pinch or scroll to zoom, drag to move. URL options: <code>?plan=lima-twist.json&amp;area=lima-twist-area-d&amp;sel=lima-twist-305</code></p>
 </header>
-<main>
-  <div class="stage" id="stage"><img id="img" alt=""><svg id="svg" preserveAspectRatio="none"></svg></div>
-  <aside id="info"><p>Click a section.</p></aside>
-</main>
+<nav class="chips" id="chips" role="tablist" aria-label="Areas"></nav>
+<div class="layout">
+  <div class="map-col">
+    <div class="legend" id="legend" aria-label="Map legend"></div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <svg class="map" id="map" role="group" aria-label="Floor map"></svg>
+      </div>
+      <div class="tools">
+        <svg class="minimap" id="minimap" role="img" aria-label="Overview of the whole room — tap to move there" hidden></svg>
+        <div class="zoom">
+          <button type="button" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" id="zfit" aria-label="Fit area">⤢</button>
+        </div>
+      </div>
+    </div>
+    <ul class="list" id="list" aria-label="Tables"></ul>
+  </div>
+  <aside class="info" id="info" aria-live="polite"></aside>
+</div>
 <script src="plans.js"></script>
-<script>
-const NS = "http://www.w3.org/2000/svg";
-const stage = document.getElementById("stage"), svg = document.getElementById("svg"), info = document.getElementById("info");
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
-
-function shapeEl(item, cls, W, H) {
-  let el;
-  if (item.shape === "circle" && item.circle) {
-    el = document.createElementNS(NS, "ellipse");
-    el.setAttribute("cx", item.circle.cx * W); el.setAttribute("cy", item.circle.cy * H);
-    el.setAttribute("rx", item.circle.rx * W); el.setAttribute("ry", item.circle.ry * H);
-  } else {
-    el = document.createElementNS(NS, "polygon");
-    el.setAttribute("points", item.polygon.map(([x, y]) => `${x * W},${y * H}`).join(" "));
-  }
-  el.setAttribute("class", cls);
-  return el;
-}
-
-function show(item, kind) {
-  const money = m => m && m.amountCents != null ? `$${(m.amountCents / 100).toFixed(2)}` : "not set (placeholder)";
-  info.innerHTML = `<h2>${esc(item.label ?? "(unlabeled)")}</h2><dl>
-    <dt>Kind</dt><dd>${esc(kind)} · ${esc(item.type)}</dd>
-    ${item.capacity ? `<dt>Capacity</dt><dd>${item.capacity.min}–${item.capacity.max} (${esc(item.capacity.note)})</dd>` : ""}
-    ${item.minimumSpend ? `<dt>Minimum spend</dt><dd>${money(item.minimumSpend)}</dd>` : ""}
-    ${item.reason ? `<dt>Why not bookable</dt><dd>${esc(item.reason)}</dd>` : ""}
-    <dt>Description</dt><dd>${esc(item.description || item.bookableNote || "—")}</dd>
-    <dt>Pixel box</dt><dd>${esc(JSON.stringify(item.pixelBox))}</dd>
-    <dt>Normalized rect</dt><dd>${item.rect ? esc(JSON.stringify(item.rect)) : "polygon"}</dd></dl>`;
-}
-
-async function load(file) {
-  let plan;
-  try { plan = await (await fetch(file, {cache: "no-store"})).json(); }
-  catch { plan = (window.FLOQR_VIP_PLANS || {})[file]; }
-  if (!plan) { info.textContent = `Could not load ${file}.`; return; }
-  const W = plan.image.widthPx, H = plan.image.heightPx;
-  document.getElementById("img").src = plan.image.file;
-  document.getElementById("img").alt = `${plan.venue.name} floor map`;
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.replaceChildren();
-  for (const a of plan.areas || []) svg.append(shapeEl(a, "area", W, H));
-  for (const n of plan.nonBookable || []) {
-    const el = shapeEl(n, "nb", W, H);
-    el.addEventListener("click", () => show(n, "not bookable"));
-    svg.append(el);
-  }
-  for (const s of plan.sections) {
-    const el = shapeEl(s, "sec", W, H);
-    el.setAttribute("tabindex", "0");
-    el.setAttribute("aria-label", `${s.label} ${s.type}`);
-    el.addEventListener("click", () => { svg.querySelectorAll(".sel").forEach(x => x.classList.remove("sel")); el.classList.add("sel"); show(s, "bookable section"); });
-    svg.append(el);
-  }
-  info.innerHTML = `<h2>${esc(plan.venue.name)}</h2><p>${plan.counts.bookableSections} bookable sections, ${plan.counts.areas} areas, ${plan.counts.nonBookable} not bookable.</p><p>Click a section.</p>`;
-  document.querySelectorAll("[data-plan]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.plan === file)));
-}
-document.querySelectorAll("[data-plan]").forEach(b => b.addEventListener("click", () => load(b.dataset.plan)));
-document.getElementById("showAreas").addEventListener("change", e => stage.classList.toggle("hide-areas", !e.target.checked));
-document.getElementById("showNb").addEventListener("change", e => stage.classList.toggle("hide-nb", !e.target.checked));
-load(new URLSearchParams(location.search).get("plan") || "decades.json");
-</script>
+<script src="viewer.js"></script>
 </body>
 </html>

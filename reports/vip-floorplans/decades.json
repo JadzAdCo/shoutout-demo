@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "floqr.vipFloorPlan/1",
-  "status": "PROPOSAL — derived from the owner-supplied image; capacities and amounts are placeholders",
+  "schemaVersion": "floqr.vipFloorPlan/2",
+  "status": "PROPOSAL — owner: \"The Decades floor plan is wonderful.\" Capacities and amounts are placeholders",
   "venue": {
     "name": "Decades",
     "city": "Washington, DC",
     "country": "US",
-    "clubLocationIdHint": null
+    "clubLocationIdHint": "decades-washington-dc"
   },
   "image": {
     "file": "decades-floor-map.png",
@@ -13,15 +13,16 @@
     "heightPx": 619,
     "source": "owner attachment Oct 15 2026 (image 1)"
   },
-  "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels.",
+  "legendRef": "legend.json",
+  "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels. Areas: bounds/polygon = outline drawn on the map, viewBox = zoom target for the phone area view.",
   "detection": "Table squares found by color segmentation (green fill, 11 components); areas traced from the wall lines.",
   "areas": [
     {
-      "id": "decades-vip-tables-north",
+      "id": "decades-north-vip",
       "label": "VIP TABLES",
+      "name": "North VIP",
+      "nameEditable": true,
       "type": "vipArea",
-      "bookable": false,
-      "buyoutCandidate": true,
       "shape": "rect",
       "pixelBox": [
         494,
@@ -53,64 +54,40 @@
           0.202
         ]
       ],
-      "tableLabels": [
-        "C1",
-        "C2",
-        "C3",
-        "C4",
-        "C5"
+      "bounds": {
+        "x": 0.4824,
+        "y": 0.0291,
+        "w": 0.501,
+        "h": 0.1729
+      },
+      "viewBox": {
+        "x": 0.4912,
+        "y": 0.0501,
+        "w": 0.4717,
+        "h": 0.1422
+      },
+      "viewPixelBox": [
+        503,
+        31,
+        985,
+        118
       ],
+      "sectionIds": [
+        "decades-c1",
+        "decades-c2",
+        "decades-c3",
+        "decades-c4",
+        "decades-c5"
+      ],
+      "nonBookableIds": [],
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating."
     },
     {
-      "id": "decades-vip-tables-south",
-      "label": "VIP TABLES",
-      "type": "vipArea",
-      "bookable": false,
-      "buyoutCandidate": true,
-      "shape": "rect",
-      "pixelBox": [
-        517,
-        437,
-        1006,
-        590
-      ],
-      "rect": {
-        "x": 0.5049,
-        "y": 0.706,
-        "w": 0.4785,
-        "h": 0.2488
-      },
-      "polygon": [
-        [
-          0.5049,
-          0.706
-        ],
-        [
-          0.9834,
-          0.706
-        ],
-        [
-          0.9834,
-          0.9548
-        ],
-        [
-          0.5049,
-          0.9548
-        ]
-      ],
-      "tableLabels": [
-        "C10",
-        "C11"
-      ],
-      "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm."
-    },
-    {
-      "id": "decades-main-floor",
+      "id": "decades-floor",
       "label": null,
-      "printedText": "Decades (logo wordmark on the floor)",
+      "name": "Floor",
+      "nameEditable": true,
       "type": "floorZone",
-      "bookable": false,
       "shape": "polygon",
       "pixelBox": [
         60,
@@ -152,13 +129,91 @@
           0.8401
         ]
       ],
-      "tableLabels": [
-        "C6",
-        "C7",
-        "C8",
-        "C9"
+      "bounds": null,
+      "viewBox": {
+        "x": 0.5313,
+        "y": 0.2229,
+        "w": 0.4629,
+        "h": 0.4313
+      },
+      "viewPixelBox": [
+        544,
+        138,
+        1017,
+        404
       ],
-      "description": "Unlabeled main floor / dance floor. Holds floor tables C6–C9."
+      "sectionIds": [
+        "decades-c6",
+        "decades-c7",
+        "decades-c8",
+        "decades-c9"
+      ],
+      "nonBookableIds": [
+        "decades-dj-booth"
+      ],
+      "description": "Unlabeled main floor / dance floor (Decades logo). Holds floor tables C6–C9 and the DJ BOOTH."
+    },
+    {
+      "id": "decades-south-vip",
+      "label": "VIP TABLES",
+      "name": "South VIP",
+      "nameEditable": true,
+      "type": "vipArea",
+      "shape": "rect",
+      "pixelBox": [
+        517,
+        437,
+        1006,
+        590
+      ],
+      "rect": {
+        "x": 0.5049,
+        "y": 0.706,
+        "w": 0.4785,
+        "h": 0.2488
+      },
+      "polygon": [
+        [
+          0.5049,
+          0.706
+        ],
+        [
+          0.9834,
+          0.706
+        ],
+        [
+          0.9834,
+          0.9548
+        ],
+        [
+          0.5049,
+          0.9548
+        ]
+      ],
+      "bounds": {
+        "x": 0.5049,
+        "y": 0.706,
+        "w": 0.4785,
+        "h": 0.2488
+      },
+      "viewBox": {
+        "x": 0.5479,
+        "y": 0.7544,
+        "w": 0.3076,
+        "h": 0.1405
+      },
+      "viewPixelBox": [
+        561,
+        467,
+        875,
+        553
+      ],
+      "sectionIds": [
+        "decades-c10",
+        "decades-c11"
+      ],
+      "nonBookableIds": [],
+      "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm."
     }
   ],
   "sections": [
@@ -167,7 +222,7 @@
       "label": "C1",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-north",
+      "areaId": "decades-north-vip",
       "shape": "rect",
       "pixelBox": [
         521,
@@ -229,7 +284,7 @@
       "label": "C2",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-north",
+      "areaId": "decades-north-vip",
       "shape": "rect",
       "pixelBox": [
         618,
@@ -291,7 +346,7 @@
       "label": "C3",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-north",
+      "areaId": "decades-north-vip",
       "shape": "rect",
       "pixelBox": [
         715,
@@ -353,7 +408,7 @@
       "label": "C4",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-north",
+      "areaId": "decades-north-vip",
       "shape": "rect",
       "pixelBox": [
         818,
@@ -415,7 +470,7 @@
       "label": "C5",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-north",
+      "areaId": "decades-north-vip",
       "shape": "rect",
       "pixelBox": [
         920,
@@ -477,7 +532,7 @@
       "label": "C6",
       "type": "table",
       "bookable": true,
-      "areaId": "decades-main-floor",
+      "areaId": "decades-floor",
       "shape": "rect",
       "pixelBox": [
         849,
@@ -539,7 +594,7 @@
       "label": "C7",
       "type": "table",
       "bookable": true,
-      "areaId": "decades-main-floor",
+      "areaId": "decades-floor",
       "shape": "rect",
       "pixelBox": [
         765,
@@ -601,7 +656,7 @@
       "label": "C8",
       "type": "table",
       "bookable": true,
-      "areaId": "decades-main-floor",
+      "areaId": "decades-floor",
       "shape": "rect",
       "pixelBox": [
         669,
@@ -663,7 +718,7 @@
       "label": "C9",
       "type": "table",
       "bookable": true,
-      "areaId": "decades-main-floor",
+      "areaId": "decades-floor",
       "shape": "rect",
       "pixelBox": [
         562,
@@ -725,7 +780,7 @@
       "label": "C10",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-south",
+      "areaId": "decades-south-vip",
       "shape": "rect",
       "pixelBox": [
         579,
@@ -787,7 +842,7 @@
       "label": "C11",
       "type": "vipTable",
       "bookable": true,
-      "areaId": "decades-vip-tables-south",
+      "areaId": "decades-south-vip",
       "shape": "rect",
       "pixelBox": [
         810,
@@ -850,6 +905,7 @@
       "id": "decades-bar",
       "label": "BAR",
       "type": "bar",
+      "state": "notBookable",
       "reason": "Service bar — not reservable",
       "shape": "rect",
       "pixelBox": [
@@ -881,12 +937,15 @@
           0.0176,
           0.202
         ]
-      ]
+      ],
+      "bookable": false
     },
     {
       "id": "decades-dj-booth",
       "label": "DJ BOOTH",
       "type": "djBooth",
+      "state": "djBooth",
+      "areaId": "decades-floor",
       "reason": "Performer area",
       "shape": "rect",
       "pixelBox": [
@@ -918,12 +977,14 @@
           0.8848,
           0.6123
         ]
-      ]
+      ],
+      "bookable": false
     },
     {
       "id": "decades-emergency-exit",
       "label": "Emergency Exit",
       "type": "exit",
+      "state": "notBookable",
       "reason": "Life safety — must stay clear; never place a section here",
       "shape": "rect",
       "pixelBox": [
@@ -955,12 +1016,14 @@
           0.0186,
           0.559
         ]
-      ]
+      ],
+      "bookable": false
     },
     {
       "id": "decades-stairs",
       "label": "stairs",
       "type": "stairs",
+      "state": "notBookable",
       "reason": "Circulation — must stay clear",
       "shape": "rect",
       "pixelBox": [
@@ -992,12 +1055,14 @@
           0.0176,
           0.9644
         ]
-      ]
+      ],
+      "bookable": false
     },
     {
       "id": "decades-unlabeled-room",
       "label": null,
       "type": "unlabeled",
+      "state": "notBookable",
       "reason": "Unlabeled enclosure west of the south VIP TABLES — ask the venue what it is",
       "shape": "rect",
       "pixelBox": [
@@ -1029,7 +1094,8 @@
           0.4307,
           0.9645
         ]
-      ]
+      ],
+      "bookable": false
     }
   ],
   "ignoredArtifacts": [
@@ -1077,6 +1143,7 @@
     },
     "areas": 3,
     "nonBookable": 5,
+    "djBooths": 1,
     "totalSeatsMaxPlaceholder": 80
   }
 }

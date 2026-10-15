@@ -1,11 +1,12 @@
 {
-  "schemaVersion": "floqr.vipFloorPlan/1",
-  "status": "PROPOSAL — derived from the owner-supplied image; capacities and amounts are placeholders",
+  "schemaVersion": "floqr.vipFloorPlan/2",
+  "status": "PROPOSAL — derived from the owner-supplied image; capacities and amounts are placeholders; area names are suggestions the owner can rename",
   "venue": {
-    "name": "Lima Twist",
+    "name": "LIMA Twist",
+    "nameNote": "Spelled \"LIMA Twist\" in shared-data.js / limatwist.com — owner to confirm (Twist vs Twyst)",
     "city": "Washington, DC",
     "country": "US",
-    "clubLocationIdHint": null
+    "clubLocationIdHint": "lima-twist-washington-dc"
   },
   "image": {
     "file": "lima-twist-table-map.png",
@@ -13,75 +14,280 @@
     "heightPx": 382,
     "source": "owner attachment Oct 15 2026 (image 2)"
   },
-  "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels.",
-  "detection": "Table shapes found by brightness segmentation (30 components = 30 printed labels). Chair marks are included in each box.",
-  "areas": [],
-  "suggestedZones": [
+  "legendRef": "legend.json",
+  "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels. Areas: bounds/polygon = outline drawn on the map, viewBox = zoom target for the phone area view.",
+  "detection": "Table shapes found by brightness segmentation (30 components = 30 printed labels; 106 is the DJ BOOTH). Chair marks are included in each box.",
+  "areas": [
     {
-      "id": "100s",
-      "printed": false,
-      "labels": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106"
-      ]
+      "id": "lima-twist-area-a",
+      "label": null,
+      "name": "Area A · 200 Row",
+      "nameEditable": true,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        19,
+        42,
+        476,
+        103
+      ],
+      "rect": {
+        "x": 0.0186,
+        "y": 0.1099,
+        "w": 0.4473,
+        "h": 0.1623
+      },
+      "polygon": [
+        [
+          0.0186,
+          0.1099
+        ],
+        [
+          0.4659,
+          0.1099
+        ],
+        [
+          0.4659,
+          0.2722
+        ],
+        [
+          0.0186,
+          0.2722
+        ]
+      ],
+      "bounds": {
+        "x": 0.0186,
+        "y": 0.1099,
+        "w": 0.4473,
+        "h": 0.1623
+      },
+      "viewBox": {
+        "x": 0.0186,
+        "y": 0.1099,
+        "w": 0.4473,
+        "h": 0.1623
+      },
+      "viewPixelBox": [
+        19,
+        42,
+        476,
+        103
+      ],
+      "sectionIds": [
+        "lima-twist-209",
+        "lima-twist-208",
+        "lima-twist-207",
+        "lima-twist-206",
+        "lima-twist-205",
+        "lima-twist-204",
+        "lima-twist-203",
+        "lima-twist-202",
+        "lima-twist-201"
+      ],
+      "nonBookableIds": [],
+      "description": "Top-left row, tables 201–209."
     },
     {
-      "id": "200s",
-      "printed": false,
-      "labels": [
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-        "209"
-      ]
+      "id": "lima-twist-area-b",
+      "label": null,
+      "name": "Area B · DJ & 100 Row",
+      "nameEditable": true,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        497,
+        42,
+        913,
+        104
+      ],
+      "rect": {
+        "x": 0.4854,
+        "y": 0.1099,
+        "w": 0.4072,
+        "h": 0.1649
+      },
+      "polygon": [
+        [
+          0.4854,
+          0.1099
+        ],
+        [
+          0.8926,
+          0.1099
+        ],
+        [
+          0.8926,
+          0.2748
+        ],
+        [
+          0.4854,
+          0.2748
+        ]
+      ],
+      "bounds": {
+        "x": 0.4854,
+        "y": 0.1099,
+        "w": 0.4072,
+        "h": 0.1649
+      },
+      "viewBox": {
+        "x": 0.4854,
+        "y": 0.1099,
+        "w": 0.4072,
+        "h": 0.1649
+      },
+      "viewPixelBox": [
+        497,
+        42,
+        913,
+        104
+      ],
+      "sectionIds": [
+        "lima-twist-105",
+        "lima-twist-104",
+        "lima-twist-103",
+        "lima-twist-102",
+        "lima-twist-101"
+      ],
+      "nonBookableIds": [
+        "lima-twist-106"
+      ],
+      "description": "Top-right row, tables 101–105 beside the DJ BOOTH (106)."
     },
     {
-      "id": "300s",
-      "printed": false,
-      "labels": [
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "307"
-      ]
+      "id": "lima-twist-area-c",
+      "label": null,
+      "name": "Area C · Bar & 400s",
+      "nameEditable": true,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        0,
+        261,
+        493,
+        335
+      ],
+      "rect": {
+        "x": 0,
+        "y": 0.6832,
+        "w": 0.4824,
+        "h": 0.1963
+      },
+      "polygon": [
+        [
+          0,
+          0.6832
+        ],
+        [
+          0.4824,
+          0.6832
+        ],
+        [
+          0.4824,
+          0.8795
+        ],
+        [
+          0,
+          0.8795
+        ]
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0.6832,
+        "w": 0.4824,
+        "h": 0.1963
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 0.6832,
+        "w": 0.4824,
+        "h": 0.1963
+      },
+      "viewPixelBox": [
+        0,
+        261,
+        493,
+        335
+      ],
+      "sectionIds": [
+        "lima-twist-403",
+        "lima-twist-402",
+        "lima-twist-401",
+        "lima-twist-bar2",
+        "lima-twist-bar1"
+      ],
+      "nonBookableIds": [],
+      "description": "Bottom-left: tables 401–403 and bar seating BAR1 / BAR2."
     },
     {
-      "id": "400s",
-      "printed": false,
-      "labels": [
-        "401",
-        "402",
-        "403"
-      ]
-    },
-    {
-      "id": "500s",
-      "printed": false,
-      "labels": [
-        "501",
-        "502",
-        "503"
-      ]
-    },
-    {
-      "id": "bar",
-      "printed": false,
-      "labels": [
-        "BAR1",
-        "BAR2"
-      ]
+      "id": "lima-twist-area-d",
+      "label": null,
+      "name": "Area D · 300s & Rounds",
+      "nameEditable": true,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        555,
+        181,
+        1023,
+        333
+      ],
+      "rect": {
+        "x": 0.542,
+        "y": 0.4738,
+        "w": 0.458,
+        "h": 0.4005
+      },
+      "polygon": [
+        [
+          0.542,
+          0.4738
+        ],
+        [
+          1,
+          0.4738
+        ],
+        [
+          1,
+          0.8743
+        ],
+        [
+          0.542,
+          0.8743
+        ]
+      ],
+      "bounds": {
+        "x": 0.542,
+        "y": 0.4738,
+        "w": 0.458,
+        "h": 0.4005
+      },
+      "viewBox": {
+        "x": 0.542,
+        "y": 0.4738,
+        "w": 0.458,
+        "h": 0.4005
+      },
+      "viewPixelBox": [
+        555,
+        181,
+        1023,
+        333
+      ],
+      "sectionIds": [
+        "lima-twist-503",
+        "lima-twist-502",
+        "lima-twist-501",
+        "lima-twist-307",
+        "lima-twist-306",
+        "lima-twist-305",
+        "lima-twist-304",
+        "lima-twist-303",
+        "lima-twist-302",
+        "lima-twist-301"
+      ],
+      "nonBookableIds": [],
+      "description": "Bottom-right: tables 301–307 and round tables 501–503."
     }
   ],
   "sections": [
@@ -90,7 +296,7 @@
       "label": "209",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         37,
@@ -152,7 +358,7 @@
       "label": "208",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         84,
@@ -214,7 +420,7 @@
       "label": "207",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         132,
@@ -276,7 +482,7 @@
       "label": "206",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         183,
@@ -338,7 +544,7 @@
       "label": "205",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         229,
@@ -400,7 +606,7 @@
       "label": "204",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         278,
@@ -462,7 +668,7 @@
       "label": "203",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         323,
@@ -524,7 +730,7 @@
       "label": "202",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         371,
@@ -586,7 +792,7 @@
       "label": "201",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "200s",
+      "areaId": "lima-twist-area-a",
       "shape": "rect",
       "pixelBox": [
         422,
@@ -644,73 +850,11 @@
       }
     },
     {
-      "id": "lima-twist-106",
-      "label": "106",
-      "type": "table",
-      "bookable": true,
-      "suggestedZone": "100s",
-      "shape": "rect",
-      "pixelBox": [
-        515,
-        60,
-        551,
-        86
-      ],
-      "rect": {
-        "x": 0.5029,
-        "y": 0.1571,
-        "w": 0.0361,
-        "h": 0.0707
-      },
-      "polygon": [
-        [
-          0.5029,
-          0.1571
-        ],
-        [
-          0.539,
-          0.1571
-        ],
-        [
-          0.539,
-          0.2278
-        ],
-        [
-          0.5029,
-          0.2278
-        ]
-      ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "deposit": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "description": "Placeholder — venue to confirm.",
-      "photos": [],
-      "availability": {
-        "defaultNights": [],
-        "note": "Set per night / event by the VIP Manager"
-      }
-    },
-    {
       "id": "lima-twist-105",
       "label": "105",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "100s",
+      "areaId": "lima-twist-area-b",
       "shape": "rect",
       "pixelBox": [
         589,
@@ -772,7 +916,7 @@
       "label": "104",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "100s",
+      "areaId": "lima-twist-area-b",
       "shape": "rect",
       "pixelBox": [
         653,
@@ -834,7 +978,7 @@
       "label": "103",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "100s",
+      "areaId": "lima-twist-area-b",
       "shape": "rect",
       "pixelBox": [
         722,
@@ -896,7 +1040,7 @@
       "label": "102",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "100s",
+      "areaId": "lima-twist-area-b",
       "shape": "rect",
       "pixelBox": [
         795,
@@ -958,7 +1102,7 @@
       "label": "101",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "100s",
+      "areaId": "lima-twist-area-b",
       "shape": "rect",
       "pixelBox": [
         860,
@@ -1020,7 +1164,7 @@
       "label": "503",
       "type": "round",
       "bookable": true,
-      "suggestedZone": "500s",
+      "areaId": "lima-twist-area-d",
       "shape": "circle",
       "pixelBox": [
         699,
@@ -1088,7 +1232,7 @@
       "label": "502",
       "type": "round",
       "bookable": true,
-      "suggestedZone": "500s",
+      "areaId": "lima-twist-area-d",
       "shape": "circle",
       "pixelBox": [
         779,
@@ -1156,7 +1300,7 @@
       "label": "501",
       "type": "round",
       "bookable": true,
-      "suggestedZone": "500s",
+      "areaId": "lima-twist-area-d",
       "shape": "circle",
       "pixelBox": [
         859,
@@ -1224,7 +1368,7 @@
       "label": "403",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "400s",
+      "areaId": "lima-twist-area-c",
       "shape": "rect",
       "pixelBox": [
         9,
@@ -1286,7 +1430,7 @@
       "label": "402",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "400s",
+      "areaId": "lima-twist-area-c",
       "shape": "rect",
       "pixelBox": [
         80,
@@ -1348,7 +1492,7 @@
       "label": "401",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "400s",
+      "areaId": "lima-twist-area-c",
       "shape": "rect",
       "pixelBox": [
         150,
@@ -1410,8 +1554,8 @@
       "label": "BAR2",
       "type": "bar",
       "bookable": true,
+      "areaId": "lima-twist-area-c",
       "bookableNote": "Printed as a table on the map; confirm with the venue whether bar seats are reservable",
-      "suggestedZone": "bar",
       "shape": "rect",
       "pixelBox": [
         266,
@@ -1473,8 +1617,8 @@
       "label": "BAR1",
       "type": "bar",
       "bookable": true,
+      "areaId": "lima-twist-area-c",
       "bookableNote": "Printed as a table on the map; confirm with the venue whether bar seats are reservable",
-      "suggestedZone": "bar",
       "shape": "rect",
       "pixelBox": [
         378,
@@ -1536,7 +1680,7 @@
       "label": "307",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         573,
@@ -1598,7 +1742,7 @@
       "label": "306",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         632,
@@ -1660,7 +1804,7 @@
       "label": "305",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         706,
@@ -1722,7 +1866,7 @@
       "label": "304",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         775,
@@ -1784,7 +1928,7 @@
       "label": "303",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         843,
@@ -1846,7 +1990,7 @@
       "label": "302",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         906,
@@ -1908,7 +2052,7 @@
       "label": "301",
       "type": "table",
       "bookable": true,
-      "suggestedZone": "300s",
+      "areaId": "lima-twist-area-d",
       "shape": "rect",
       "pixelBox": [
         972,
@@ -1966,17 +2110,60 @@
       }
     }
   ],
-  "nonBookable": [],
-  "nonBookableNote": "The Lima Twist map shows tables only — no printed bar area, DJ booth, exits or stairs. Ask the venue for a full floor plan before go-live (exits must be marked).",
+  "nonBookable": [
+    {
+      "id": "lima-twist-106",
+      "label": "106",
+      "name": "DJ BOOTH",
+      "type": "djBooth",
+      "state": "djBooth",
+      "bookable": false,
+      "areaId": "lima-twist-area-b",
+      "reason": "Owner Oct 15 2026: 106 is the DJ BOOTH (printed label kept as 106)",
+      "shape": "rect",
+      "pixelBox": [
+        515,
+        60,
+        551,
+        86
+      ],
+      "rect": {
+        "x": 0.5029,
+        "y": 0.1571,
+        "w": 0.0361,
+        "h": 0.0707
+      },
+      "polygon": [
+        [
+          0.5029,
+          0.1571
+        ],
+        [
+          0.539,
+          0.1571
+        ],
+        [
+          0.539,
+          0.2278
+        ],
+        [
+          0.5029,
+          0.2278
+        ]
+      ]
+    }
+  ],
+  "nonBookableNote": "The LIMA Twist drawing shows tables only — no walls, bar counter, exits or stairs. Ask the venue for a full floor plan before go-live (exits must be marked).",
   "counts": {
-    "bookableSections": 30,
+    "bookableSections": 29,
     "byType": {
-      "table": 25,
+      "table": 24,
       "round": 3,
       "bar": 2
     },
-    "areas": 0,
-    "nonBookable": 0,
-    "totalSeatsMaxPlaceholder": 108
+    "areas": 4,
+    "nonBookable": 1,
+    "djBooths": 1,
+    "totalSeatsMaxPlaceholder": 106
   }
 }
