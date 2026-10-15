@@ -2,8 +2,8 @@
   "schemaVersion": "floqr.vipFloorPlan/2",
   "status": "PROPOSAL — derived from the owner-supplied image; capacities and amounts are placeholders; area names are suggestions the owner can rename",
   "venue": {
-    "name": "LIMA Twist",
-    "nameNote": "Spelled \"LIMA Twist\" in shared-data.js / limatwist.com — owner to confirm (Twist vs Twyst)",
+    "name": "Lima Twist Club",
+    "nameNote": "Owner Oct 15 2026: display name \"Lima Twist Club\" (spelling Twist); printed table labels unchanged",
     "city": "Washington, DC",
     "country": "US",
     "clubLocationIdHint": "lima-twist-washington-dc"
@@ -12,17 +12,20 @@
     "file": "lima-twist-table-map.png",
     "widthPx": 1024,
     "heightPx": 382,
-    "source": "owner attachment Oct 15 2026 (image 2)"
+    "source": "owner attachment Oct 15 2026 (image 2) — owner considers it the complete plan"
   },
   "legendRef": "legend.json",
   "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels. Areas: bounds/polygon = outline drawn on the map, viewBox = zoom target for the phone area view.",
-  "detection": "Table shapes found by brightness segmentation (30 components = 30 printed labels; 106 is the DJ BOOTH). Chair marks are included in each box.",
+  "detection": "Table shapes found by brightness segmentation (30 components = 30 printed labels: 27 bookable, 106 DJ BOOTH, BAR1 + BAR2 not bookable). Chair marks are included in each box.",
   "areas": [
     {
       "id": "lima-twist-area-a",
       "label": null,
+      "defaultName": "Area A · 200 Row",
       "name": "Area A · 200 Row",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "area",
       "shape": "rect",
       "pixelBox": [
@@ -90,8 +93,11 @@
     {
       "id": "lima-twist-area-b",
       "label": null,
+      "defaultName": "Area B · DJ & 100 Row",
       "name": "Area B · DJ & 100 Row",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "area",
       "shape": "rect",
       "pixelBox": [
@@ -157,8 +163,11 @@
     {
       "id": "lima-twist-area-c",
       "label": null,
+      "defaultName": "Area C · Bar & 400s",
       "name": "Area C · Bar & 400s",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "area",
       "shape": "rect",
       "pixelBox": [
@@ -212,18 +221,22 @@
       "sectionIds": [
         "lima-twist-403",
         "lima-twist-402",
-        "lima-twist-401",
+        "lima-twist-401"
+      ],
+      "nonBookableIds": [
         "lima-twist-bar2",
         "lima-twist-bar1"
       ],
-      "nonBookableIds": [],
-      "description": "Bottom-left: tables 401–403 and bar seating BAR1 / BAR2."
+      "description": "Bottom-left: tables 401–403 beside the bars BAR1 / BAR2 (bars are not bookable)."
     },
     {
       "id": "lima-twist-area-d",
       "label": null,
+      "defaultName": "Area D · 300s & Rounds",
       "name": "Area D · 300s & Rounds",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "area",
       "shape": "rect",
       "pixelBox": [
@@ -328,23 +341,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -390,23 +402,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -452,23 +463,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -514,23 +524,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -576,23 +585,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -638,23 +646,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -700,23 +707,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -762,23 +768,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -824,23 +829,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -886,23 +890,22 @@
           0.2278
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -948,23 +951,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1010,23 +1012,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1072,23 +1073,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1134,23 +1134,22 @@
           0.2252
         ]
       ],
-      "capacity": {
-        "min": 1,
-        "max": 2,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 1 chair mark each side"
-      },
-      "minimumSpend": {
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 1 chair mark each side",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1202,23 +1201,22 @@
         "rx": 0.0205,
         "ry": 0.055
       },
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 4 chair marks"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 4 chair marks",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1270,23 +1268,22 @@
         "rx": 0.0205,
         "ry": 0.055
       },
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 4 chair marks"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 4 chair marks",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1338,23 +1335,22 @@
         "rx": 0.0205,
         "ry": 0.055
       },
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 4 chair marks"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 4 chair marks",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1400,23 +1396,27 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 3 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 3 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1462,23 +1462,27 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 3 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 3 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1524,149 +1528,27 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 3 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 3 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "description": "Placeholder — venue to confirm.",
-      "photos": [],
-      "availability": {
-        "defaultNights": [],
-        "note": "Set per night / event by the VIP Manager"
-      }
-    },
-    {
-      "id": "lima-twist-bar2",
-      "label": "BAR2",
-      "type": "bar",
-      "bookable": true,
-      "areaId": "lima-twist-area-c",
-      "bookableNote": "Printed as a table on the map; confirm with the venue whether bar seats are reservable",
-      "shape": "rect",
-      "pixelBox": [
-        266,
-        281,
-        363,
-        317
-      ],
-      "rect": {
-        "x": 0.2598,
-        "y": 0.7356,
-        "w": 0.0957,
-        "h": 0.0969
-      },
-      "polygon": [
-        [
-          0.2598,
-          0.7356
-        ],
-        [
-          0.3555,
-          0.7356
-        ],
-        [
-          0.3555,
-          0.8325
-        ],
-        [
-          0.2598,
-          0.8325
-        ]
-      ],
-      "capacity": {
-        "min": 6,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 4 chair marks on each long side"
-      },
-      "minimumSpend": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "deposit": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "description": "Placeholder — venue to confirm.",
-      "photos": [],
-      "availability": {
-        "defaultNights": [],
-        "note": "Set per night / event by the VIP Manager"
-      }
-    },
-    {
-      "id": "lima-twist-bar1",
-      "label": "BAR1",
-      "type": "bar",
-      "bookable": true,
-      "areaId": "lima-twist-area-c",
-      "bookableNote": "Printed as a table on the map; confirm with the venue whether bar seats are reservable",
-      "shape": "rect",
-      "pixelBox": [
-        378,
-        281,
-        475,
-        317
-      ],
-      "rect": {
-        "x": 0.3691,
-        "y": 0.7356,
-        "w": 0.0957,
-        "h": 0.0969
-      },
-      "polygon": [
-        [
-          0.3691,
-          0.7356
-        ],
-        [
-          0.4648,
-          0.7356
-        ],
-        [
-          0.4648,
-          0.8325
-        ],
-        [
-          0.3691,
-          0.8325
-        ]
-      ],
-      "capacity": {
-        "min": 6,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 4 chair marks on each long side"
-      },
-      "minimumSpend": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
-      },
-      "deposit": {
-        "amountCents": null,
-        "currency": "USD",
-        "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1712,23 +1594,27 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 3 chair marks on each long side (vertical table)"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 3 chair marks on each long side (vertical table)",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1774,23 +1660,22 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 2 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 2 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1836,23 +1721,22 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 2 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 2 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1898,23 +1782,22 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 2 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 2 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -1960,23 +1843,22 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 2 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 2 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -2022,23 +1904,22 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 4,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 2 chair marks top and bottom"
-      },
-      "minimumSpend": {
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 2 chair marks top and bottom",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
       },
+      "extraGuestFee": null,
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -2084,23 +1965,27 @@
           0.8273
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder from the drawing: 3 chair marks on each long side (vertical table)"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder from the drawing: 3 chair marks on each long side (vertical table)",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — venue to confirm.",
       "photos": [],
@@ -2151,19 +2036,105 @@
           0.2278
         ]
       ]
+    },
+    {
+      "id": "lima-twist-bar2",
+      "label": "BAR2",
+      "type": "bar",
+      "state": "notBookable",
+      "bookable": false,
+      "areaId": "lima-twist-area-c",
+      "reason": "Owner Oct 15 2026: bars cannot be booked",
+      "shape": "rect",
+      "pixelBox": [
+        266,
+        281,
+        363,
+        317
+      ],
+      "rect": {
+        "x": 0.2598,
+        "y": 0.7356,
+        "w": 0.0957,
+        "h": 0.0969
+      },
+      "polygon": [
+        [
+          0.2598,
+          0.7356
+        ],
+        [
+          0.3555,
+          0.7356
+        ],
+        [
+          0.3555,
+          0.8325
+        ],
+        [
+          0.2598,
+          0.8325
+        ]
+      ]
+    },
+    {
+      "id": "lima-twist-bar1",
+      "label": "BAR1",
+      "type": "bar",
+      "state": "notBookable",
+      "bookable": false,
+      "areaId": "lima-twist-area-c",
+      "reason": "Owner Oct 15 2026: bars cannot be booked",
+      "shape": "rect",
+      "pixelBox": [
+        378,
+        281,
+        475,
+        317
+      ],
+      "rect": {
+        "x": 0.3691,
+        "y": 0.7356,
+        "w": 0.0957,
+        "h": 0.0969
+      },
+      "polygon": [
+        [
+          0.3691,
+          0.7356
+        ],
+        [
+          0.4648,
+          0.7356
+        ],
+        [
+          0.4648,
+          0.8325
+        ],
+        [
+          0.3691,
+          0.8325
+        ]
+      ]
     }
   ],
-  "nonBookableNote": "The LIMA Twist drawing shows tables only — no walls, bar counter, exits or stairs. Ask the venue for a full floor plan before go-live (exits must be marked).",
+  "nonBookableNote": "Owner Oct 15 2026: this image is the complete Lima Twist Club plan. It shows no walls, exits or stairs; door staff keep exits clear per the venue's own fire plan.",
+  "openQuestions": [
+    "Confirm or rename the suggested areas (Area A · 200 Row, Area B · DJ & 100 Row, Area C · Bar & 400s, Area D · 300s & Rounds).",
+    "Confirm maxCapacity and includedGuests per table (placeholders from the chair marks).",
+    "Set minimumAmount, deposit and any extraGuestFee per table (all placeholders, no prices invented).",
+    "Which tables are wheelchair accessible?"
+  ],
   "counts": {
-    "bookableSections": 29,
+    "bookableSections": 27,
     "byType": {
       "table": 24,
-      "round": 3,
-      "bar": 2
+      "round": 3
     },
     "areas": 4,
-    "nonBookable": 1,
+    "nonBookable": 3,
     "djBooths": 1,
-    "totalSeatsMaxPlaceholder": 106
+    "maxCapacityTotalPlaceholder": 90,
+    "includedGuestsTotalPlaceholder": 80
   }
 }

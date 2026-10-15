@@ -19,6 +19,7 @@ const BASE = pathToFileURL(join(DIR, "preview.html")).href;
 const SHOTS = [
   ["preview-lima-twist-390-area.png", 390, 844, "plan=lima-twist.json&area=lima-twist-area-d"],
   ["preview-lima-twist-390-overview.png", 390, 844, "plan=lima-twist.json&area=all"],
+  ["preview-lima-twist-390-book.png", 390, 844, "plan=lima-twist.json&area=lima-twist-area-c&sel=lima-twist-402&party=6"],
   ["preview-lima-twist-820.png", 820, 1000, "plan=lima-twist.json&sel=lima-twist-305"],
   ["preview-lima-twist.png", 1280, 760, "plan=lima-twist.json&sel=lima-twist-305"],
   ["preview-decades-390-area.png", 390, 844, "plan=decades.json&area=decades-north-vip"],

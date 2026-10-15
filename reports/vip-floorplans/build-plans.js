@@ -24,15 +24,23 @@ function area(def, members, W, H, pad = 18) {
     Math.min(W - 1, Math.max(...boxes.map(b => b[2])) + pad), Math.min(H - 1, Math.max(...boxes.map(b => b[3])) + pad)];
   const outline = def.outline ? (Array.isArray(def.outline[0]) ? polyGeom(def.outline, W, H) : geom(def.outline, W, H)) : geom(vb, W, H);
   return {
-    id: def.id, label: def.label ?? null, name: def.name, nameEditable: true, type: def.type || "area",
+    id: def.id, label: def.label ?? null, defaultName: def.name, name: def.name, nameEditable: true, nameSetByUid: null, nameSetAtMs: null,
+    type: def.type || "area",
     ...outline, bounds: outline.rect || null, viewBox: geom(vb, W, H).rect, viewPixelBox: vb,
     sectionIds: members.filter(m => m.bookable).map(m => m.id),
     nonBookableIds: members.filter(m => !m.bookable).map(m => m.id),
     description: def.description
   };
 }
-const placeholderMoney = {amountCents: null, currency: "USD", placeholder: true, note: "Club Admin sets the minimum spend / deposit per section"};
-const cap = (min, max, note) => ({min, max, placeholder: true, note});
+const money = note => ({amountCents: null, currency: "USD", placeholder: true, note});
+// Owner Oct 15 2026: maxCapacity (max guests allowed), includedGuests (covered by the minimum),
+// extraGuestFee (optional VIP entry fee per guest beyond includedGuests), minimumAmount.
+const guests = (maxCapacity, includedGuests, note) => ({
+  maxCapacity, includedGuests, capacityPlaceholder: true, capacityNote: note,
+  minimumAmount: money("Club Admin sets the minimum spend for this section (covers includedGuests)"),
+  extraGuestFee: includedGuests < maxCapacity ? money("Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee") : null,
+  deposit: money("Club Admin sets the deposit (fixed, % of minimumAmount, or full)")
+});
 const availability = {defaultNights: [], note: "Set per night / event by the VIP Manager"};
 
 // ---------- Shared legend (one spec for every floor plan) ----------
@@ -86,13 +94,12 @@ const dDesc = {
 const dSections = dTables.map(([label, box, type, areaId]) => ({
   id: `decades-${label.toLowerCase()}`, label, type, bookable: true, areaId,
   ...geom(box, DW, DH),
-  capacity: type === "vipTable" ? cap(4, 8, "placeholder — confirm with venue") : cap(2, 6, "placeholder — confirm with venue"),
-  minimumSpend: placeholderMoney, deposit: placeholderMoney,
+  ...(type === "vipTable" ? guests(8, 6, "placeholder — confirm with venue") : guests(6, 4, "placeholder — confirm with venue")),
   description: dDesc[areaId] + (label === "C6" ? " Next to the DJ BOOTH." : ""),
   photos: [], availability
 }));
 const dNonBookable = [
-  {id: "decades-bar", label: "BAR", type: "bar", state: "notBookable", reason: "Service bar — not reservable", ...geom([18, 18, 448, 124], DW, DH)},
+  {id: "decades-bar", label: "BAR", type: "bar", state: "notBookable", reason: "Owner Oct 15 2026: bars cannot be booked", ...geom([18, 18, 448, 124], DW, DH)},
   {id: "decades-dj-booth", label: "DJ BOOTH", type: "djBooth", state: "djBooth", areaId: "decades-floor", reason: "Performer area", ...geom([906, 232, 999, 378], DW, DH)},
   {id: "decades-emergency-exit", label: "Emergency Exit", type: "exit", state: "notBookable", reason: "Life safety — must stay clear; never place a section here", ...geom([19, 171, 55, 345], DW, DH)},
   {id: "decades-stairs", label: "stairs", type: "stairs", state: "notBookable", reason: "Circulation — must stay clear", ...geom([18, 523, 110, 596], DW, DH)},
@@ -116,7 +123,14 @@ const decades = {
   ],
   sections: dSections,
   nonBookable: dNonBookable,
-  ignoredArtifacts: [{printedText: "?", reason: "Help icon from the source app's screenshot, not part of the venue", ...geom([985, 572, 1015, 603], DW, DH)}]
+  ignoredArtifacts: [{printedText: "?", reason: "Help icon from the source app's screenshot, not part of the venue", ...geom([985, 572, 1015, 603], DW, DH)}],
+  openQuestions: [
+    "Confirm or rename the areas North VIP / Floor / South VIP (printed label \"VIP TABLES\" stays on the map).",
+    "Confirm maxCapacity and includedGuests per table (placeholders from the drawing).",
+    "Set minimumAmount, deposit and any extraGuestFee per table (all placeholders, no prices invented).",
+    "Which tables are wheelchair accessible?",
+    "Confirm exit and stairs positions so no table blocks them."
+  ]
 };
 
 // ---------- LIMA Twist ----------
@@ -129,52 +143,59 @@ const L = [
   ["102", [795, 60, 830, 85]], ["101", [860, 60, 895, 85]],
   ["503", [699, 199, 740, 240], "circle"], ["502", [779, 199, 820, 240], "circle"], ["501", [859, 199, 900, 240], "circle"],
   ["403", [9, 279, 73, 315]], ["402", [80, 279, 144, 315]], ["401", [150, 279, 214, 315]],
-  ["BAR2", [266, 281, 363, 317]], ["BAR1", [378, 281, 475, 317]],
   ["307", [573, 251, 608, 315]], ["306", [632, 279, 677, 315]], ["305", [706, 279, 751, 315]], ["304", [775, 279, 820, 315]],
   ["303", [843, 279, 888, 315]], ["302", [906, 279, 951, 315]], ["301", [972, 251, 1008, 315]]
 ];
+// seats = chair marks on the drawing (maxCapacity placeholder); included = guests covered by the minimum (placeholder).
 function limaType(label) {
-  if (label.startsWith("BAR")) return {type: "bar", areaId: "lima-twist-area-c", seats: 8, seatNote: "4 chair marks on each long side"};
-  if (label.startsWith("5")) return {type: "round", areaId: "lima-twist-area-d", seats: 4, seatNote: "4 chair marks"};
-  if (label === "301" || label === "307") return {type: "table", areaId: "lima-twist-area-d", seats: 6, seatNote: "3 chair marks on each long side (vertical table)"};
-  if (label.startsWith("3")) return {type: "table", areaId: "lima-twist-area-d", seats: 4, seatNote: "2 chair marks top and bottom"};
-  if (label.startsWith("4")) return {type: "table", areaId: "lima-twist-area-c", seats: 6, seatNote: "3 chair marks top and bottom"};
-  if (label.startsWith("2")) return {type: "table", areaId: "lima-twist-area-a", seats: 2, seatNote: "1 chair mark each side"};
-  return {type: "table", areaId: "lima-twist-area-b", seats: 2, seatNote: "1 chair mark each side"};
+  if (label.startsWith("5")) return {type: "round", areaId: "lima-twist-area-d", seats: 4, included: 4, seatNote: "4 chair marks"};
+  if (label === "301" || label === "307") return {type: "table", areaId: "lima-twist-area-d", seats: 6, included: 4, seatNote: "3 chair marks on each long side (vertical table)"};
+  if (label.startsWith("3")) return {type: "table", areaId: "lima-twist-area-d", seats: 4, included: 4, seatNote: "2 chair marks top and bottom"};
+  if (label.startsWith("4")) return {type: "table", areaId: "lima-twist-area-c", seats: 6, included: 4, seatNote: "3 chair marks top and bottom"};
+  if (label.startsWith("2")) return {type: "table", areaId: "lima-twist-area-a", seats: 2, included: 2, seatNote: "1 chair mark each side"};
+  return {type: "table", areaId: "lima-twist-area-b", seats: 2, included: 2, seatNote: "1 chair mark each side"};
 }
 const lSections = L.map(([label, box, shape]) => {
   const t = limaType(label);
   return {
     id: `lima-twist-${label.toLowerCase()}`, label, type: t.type, bookable: true, areaId: t.areaId,
-    bookableNote: t.type === "bar" ? "Printed as a table on the map; confirm with the venue whether bar seats are reservable" : undefined,
     ...geom(box, LW, LH, shape || "rect"),
-    capacity: cap(Math.max(1, t.seats - 2), t.seats, `placeholder from the drawing: ${t.seatNote}`),
-    minimumSpend: placeholderMoney, deposit: placeholderMoney,
+    ...guests(t.seats, t.included, `placeholder from the drawing: ${t.seatNote}`),
     description: "Placeholder — venue to confirm.", photos: [], availability
   };
 });
 const lNonBookable = [
   {id: "lima-twist-106", label: "106", name: "DJ BOOTH", type: "djBooth", state: "djBooth", bookable: false, areaId: "lima-twist-area-b",
-    reason: "Owner Oct 15 2026: 106 is the DJ BOOTH (printed label kept as 106)", ...geom([515, 60, 551, 86], LW, LH)}
+    reason: "Owner Oct 15 2026: 106 is the DJ BOOTH (printed label kept as 106)", ...geom([515, 60, 551, 86], LW, LH)},
+  {id: "lima-twist-bar2", label: "BAR2", type: "bar", state: "notBookable", bookable: false, areaId: "lima-twist-area-c",
+    reason: "Owner Oct 15 2026: bars cannot be booked", ...geom([266, 281, 363, 317], LW, LH)},
+  {id: "lima-twist-bar1", label: "BAR1", type: "bar", state: "notBookable", bookable: false, areaId: "lima-twist-area-c",
+    reason: "Owner Oct 15 2026: bars cannot be booked", ...geom([378, 281, 475, 317], LW, LH)}
 ];
 const lMembers = id => [...lSections, ...lNonBookable].filter(m => m.areaId === id);
 const lima = {
   schemaVersion: "floqr.vipFloorPlan/2",
   status: "PROPOSAL — derived from the owner-supplied image; capacities and amounts are placeholders; area names are suggestions the owner can rename",
-  venue: {name: "LIMA Twist", nameNote: "Spelled \"LIMA Twist\" in shared-data.js / limatwist.com — owner to confirm (Twist vs Twyst)", city: "Washington, DC", country: "US", clubLocationIdHint: "lima-twist-washington-dc"},
-  image: {file: "lima-twist-table-map.png", widthPx: LW, heightPx: LH, source: "owner attachment Oct 15 2026 (image 2)"},
+  venue: {name: "Lima Twist Club", nameNote: "Owner Oct 15 2026: display name \"Lima Twist Club\" (spelling Twist); printed table labels unchanged", city: "Washington, DC", country: "US", clubLocationIdHint: "lima-twist-washington-dc"},
+  image: {file: "lima-twist-table-map.png", widthPx: LW, heightPx: LH, source: "owner attachment Oct 15 2026 (image 2) — owner considers it the complete plan"},
   legendRef: "legend.json",
   coordinateSystem: decades.coordinateSystem,
-  detection: "Table shapes found by brightness segmentation (30 components = 30 printed labels; 106 is the DJ BOOTH). Chair marks are included in each box.",
+  detection: "Table shapes found by brightness segmentation (30 components = 30 printed labels: 27 bookable, 106 DJ BOOTH, BAR1 + BAR2 not bookable). Chair marks are included in each box.",
   areas: [
     area({id: "lima-twist-area-a", name: "Area A · 200 Row", description: "Top-left row, tables 201–209."}, lMembers("lima-twist-area-a"), LW, LH),
     area({id: "lima-twist-area-b", name: "Area B · DJ & 100 Row", description: "Top-right row, tables 101–105 beside the DJ BOOTH (106)."}, lMembers("lima-twist-area-b"), LW, LH),
-    area({id: "lima-twist-area-c", name: "Area C · Bar & 400s", description: "Bottom-left: tables 401–403 and bar seating BAR1 / BAR2."}, lMembers("lima-twist-area-c"), LW, LH),
+    area({id: "lima-twist-area-c", name: "Area C · Bar & 400s", description: "Bottom-left: tables 401–403 beside the bars BAR1 / BAR2 (bars are not bookable)."}, lMembers("lima-twist-area-c"), LW, LH),
     area({id: "lima-twist-area-d", name: "Area D · 300s & Rounds", description: "Bottom-right: tables 301–307 and round tables 501–503."}, lMembers("lima-twist-area-d"), LW, LH)
   ],
   sections: lSections,
   nonBookable: lNonBookable,
-  nonBookableNote: "The LIMA Twist drawing shows tables only — no walls, bar counter, exits or stairs. Ask the venue for a full floor plan before go-live (exits must be marked)."
+  nonBookableNote: "Owner Oct 15 2026: this image is the complete Lima Twist Club plan. It shows no walls, exits or stairs; door staff keep exits clear per the venue's own fire plan.",
+  openQuestions: [
+    "Confirm or rename the suggested areas (Area A · 200 Row, Area B · DJ & 100 Row, Area C · Bar & 400s, Area D · 300s & Rounds).",
+    "Confirm maxCapacity and includedGuests per table (placeholders from the chair marks).",
+    "Set minimumAmount, deposit and any extraGuestFee per table (all placeholders, no prices invented).",
+    "Which tables are wheelchair accessible?"
+  ]
 };
 
 for (const [name, doc] of [["decades.json", decades], ["lima-twist.json", lima]]) {
@@ -182,12 +203,23 @@ for (const [name, doc] of [["decades.json", decades], ["lima-twist.json", lima]]
   for (const a of doc.areas) for (const id of [...a.sectionIds, ...a.nonBookableIds]) if (!all.some(m => m.id === id)) throw new Error(`${name}: area ${a.id} lists unknown ${id}`);
   const orphans = doc.sections.filter(s => !doc.areas.some(a => a.sectionIds.includes(s.id)));
   if (orphans.length) throw new Error(`${name}: sections without an area: ${orphans.map(s => s.label)}`);
+  const neverBookable = new Set(["bar", "djBooth", "exit", "stairs", "restroom", "stage"]);
+  const wrong = doc.sections.filter(s => neverBookable.has(s.type));
+  if (wrong.length) throw new Error(`${name}: never-bookable types listed as sections: ${wrong.map(s => s.label)}`);
+  const badCap = doc.sections.filter(s => !(s.includedGuests >= 1 && s.includedGuests <= s.maxCapacity));
+  if (badCap.length) throw new Error(`${name}: includedGuests must be 1..maxCapacity: ${badCap.map(s => s.label)}`);
+  const badFee = doc.sections.filter(s => s.includedGuests === s.maxCapacity && s.extraGuestFee !== null);
+  if (badFee.length) throw new Error(`${name}: extraGuestFee must be null when includedGuests = maxCapacity: ${badFee.map(s => s.label)}`);
+  const labels = all.map(m => m.label).filter(Boolean);
+  const dupes = labels.filter((l, i) => labels.indexOf(l) !== i);
+  if (dupes.length) throw new Error(`${name}: duplicate printed labels: ${[...new Set(dupes)]}`);
   doc.counts = {
     bookableSections: doc.sections.filter(s => s.bookable).length,
     byType: doc.sections.reduce((m, s) => ({...m, [s.type]: (m[s.type] || 0) + 1}), {}),
     areas: doc.areas.length, nonBookable: doc.nonBookable.length,
     djBooths: doc.nonBookable.filter(n => n.type === "djBooth").length,
-    totalSeatsMaxPlaceholder: doc.sections.reduce((n, s) => n + s.capacity.max, 0)
+    maxCapacityTotalPlaceholder: doc.sections.reduce((n, s) => n + s.maxCapacity, 0),
+    includedGuestsTotalPlaceholder: doc.sections.reduce((n, s) => n + s.includedGuests, 0)
   };
   fs.writeFileSync(path.join(out, name), JSON.stringify(doc, null, 2) + "\n");
   console.log(name, JSON.stringify(doc.counts));

@@ -56,6 +56,16 @@ aside.info h2 { margin: 0 0 6px; font-size: 18px; display: flex; gap: 8px; align
 aside.info dt { color: var(--muted); margin-top: 6px; font-size: 13px; }
 aside.info dd { margin: 0; }
 aside.info .close { display: none; }
+aside.info .party { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+aside.info .stepper { display: flex; align-items: center; gap: 8px; }
+aside.info .stepper button { width: var(--tap); padding: 0; font-size: 20px; border-radius: 10px; }
+aside.info .stepper button:disabled { opacity: .4; cursor: default; }
+aside.info .stepper output { min-width: 56px; text-align: center; font-weight: 700; }
+aside.info .fees { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+aside.info .fees td { padding: 4px 0; border-top: 1px solid var(--line); vertical-align: top; }
+aside.info .fees td:last-child { text-align: right; white-space: nowrap; padding-left: 8px; }
+aside.info .fees .sub td { font-weight: 700; }
+aside.info .fees .note td { color: var(--muted); font-size: 12px; border-top: 0; }
 aside.info .book { margin-top: 12px; width: 100%; background: #16a34a; border-color: #16a34a; }
 aside.info .book:disabled { background: #333; border-color: #444; color: var(--muted); }
 

@@ -20,8 +20,11 @@
     {
       "id": "decades-north-vip",
       "label": "VIP TABLES",
+      "defaultName": "North VIP",
       "name": "North VIP",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "vipArea",
       "shape": "rect",
       "pixelBox": [
@@ -85,8 +88,11 @@
     {
       "id": "decades-floor",
       "label": null,
+      "defaultName": "Floor",
       "name": "Floor",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "floorZone",
       "shape": "polygon",
       "pixelBox": [
@@ -156,8 +162,11 @@
     {
       "id": "decades-south-vip",
       "label": "VIP TABLES",
+      "defaultName": "South VIP",
       "name": "South VIP",
       "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
       "type": "vipArea",
       "shape": "rect",
       "pixelBox": [
@@ -254,23 +263,27 @@
           0.1567
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
       "photos": [],
@@ -316,23 +329,27 @@
           0.1567
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
       "photos": [],
@@ -378,23 +395,27 @@
           0.1567
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
       "photos": [],
@@ -440,23 +461,27 @@
           0.1632
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
       "photos": [],
@@ -502,23 +527,27 @@
           0.1632
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
       "photos": [],
@@ -564,23 +593,27 @@
           0.6252
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm. Next to the DJ BOOTH.",
       "photos": [],
@@ -626,23 +659,27 @@
           0.3425
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
       "photos": [],
@@ -688,23 +725,27 @@
           0.336
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
       "photos": [],
@@ -750,23 +791,27 @@
           0.3312
         ]
       ],
-      "capacity": {
-        "min": 2,
-        "max": 6,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
       "photos": [],
@@ -812,23 +857,27 @@
           0.8627
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm.",
       "photos": [],
@@ -874,23 +923,27 @@
           0.866
         ]
       ],
-      "capacity": {
-        "min": 4,
-        "max": 8,
-        "placeholder": true,
-        "note": "placeholder — confirm with venue"
-      },
-      "minimumSpend": {
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
       },
       "deposit": {
         "amountCents": null,
         "currency": "USD",
         "placeholder": true,
-        "note": "Club Admin sets the minimum spend / deposit per section"
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
       },
       "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm.",
       "photos": [],
@@ -906,7 +959,7 @@
       "label": "BAR",
       "type": "bar",
       "state": "notBookable",
-      "reason": "Service bar — not reservable",
+      "reason": "Owner Oct 15 2026: bars cannot be booked",
       "shape": "rect",
       "pixelBox": [
         18,
@@ -1135,6 +1188,13 @@
       ]
     }
   ],
+  "openQuestions": [
+    "Confirm or rename the areas North VIP / Floor / South VIP (printed label \"VIP TABLES\" stays on the map).",
+    "Confirm maxCapacity and includedGuests per table (placeholders from the drawing).",
+    "Set minimumAmount, deposit and any extraGuestFee per table (all placeholders, no prices invented).",
+    "Which tables are wheelchair accessible?",
+    "Confirm exit and stairs positions so no table blocks them."
+  ],
   "counts": {
     "bookableSections": 11,
     "byType": {
@@ -1144,6 +1204,7 @@
     "areas": 3,
     "nonBookable": 5,
     "djBooths": 1,
-    "totalSeatsMaxPlaceholder": 80
+    "maxCapacityTotalPlaceholder": 80,
+    "includedGuestsTotalPlaceholder": 58
   }
 }

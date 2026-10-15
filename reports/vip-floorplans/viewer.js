@@ -12,7 +12,7 @@
   const DEMO_STATES = {
     "decades.json": {"decades-c2": "booked", "decades-c4": "booked", "decades-c8": "held", "decades-c10": "booked"},
     "lima-twist.json": {"lima-twist-203": "booked", "lima-twist-207": "held", "lima-twist-102": "booked", "lima-twist-401": "booked",
-      "lima-twist-bar1": "held", "lima-twist-304": "booked", "lima-twist-502": "booked", "lima-twist-307": "held"}
+      "lima-twist-206": "held", "lima-twist-304": "booked", "lima-twist-502": "booked", "lima-twist-307": "held"}
   };
   const ICONS = {
     check: "M5 12.5l4.5 4.5L19 7.5",
@@ -120,7 +120,7 @@
 
   function ariaLabel(item) {
     const st = stDef(itemState(item));
-    const guests = item.capacity ? `, ${item.capacity.min} to ${item.capacity.max} guests` : "";
+    const guests = item.bookable ? `, up to ${item.maxCapacity} guests` : "";
     return `${item.label ?? "Unlabeled"}${item.name ? " " + item.name : ""}, ${item.type}${guests}, ${st.text}`;
   }
 
@@ -298,7 +298,7 @@
       const rows = [...a.sectionIds, ...a.nonBookableIds].map(byId).map(item => {
         const st = stDef(itemState(item));
         return `<li><button type="button" data-id="${esc(item.id)}" aria-label="${esc(ariaLabel(item))}">${iconSvg(st)}` +
-          `<span><b>${esc(item.label ?? "Unlabeled")}</b>${item.name ? " · " + esc(item.name) : ""} <small>${esc(item.type)}${item.capacity ? ` · ${item.capacity.min}–${item.capacity.max} guests` : ""}</small></span>` +
+          `<span><b>${esc(item.label ?? "Unlabeled")}</b>${item.name ? " · " + esc(item.name) : ""} <small>${esc(item.type)}${item.bookable ? ` · up to ${item.maxCapacity} guests` : ""}</small></span>` +
           `<span class="st">${esc(st.text)}</span></button></li>`;
       }).join("");
       return `<li><h3>${esc(a.name)}</h3></li>${rows}`;
@@ -315,14 +315,47 @@
       return;
     }
     const state = itemState(item), st = stDef(state), area = areaOf(item.id);
+    const canBook = item.bookable && state === "available";
     info.hidden = false;
     info.innerHTML = `<h2>${iconSvg(st)} ${esc(item.label ?? "Unlabeled")}${item.name ? " · " + esc(item.name) : ""}<button type="button" class="close" aria-label="Close">×</button></h2><dl>` +
       `<dt>Status</dt><dd>${esc(st.text)}</dd><dt>Area</dt><dd>${esc(area ? area.name : "—")}</dd><dt>Type</dt><dd>${esc(item.type)}</dd>` +
-      (item.capacity ? `<dt>Guests</dt><dd>${item.capacity.min}–${item.capacity.max} (placeholder)</dd><dt>Minimum spend</dt><dd>Set by the club (placeholder)</dd>` : "") +
-      (item.reason ? `<dt>Why not bookable</dt><dd>${esc(item.reason)}</dd>` : "") +
-      (item.bookableNote ? `<dt>Note</dt><dd>${esc(item.bookableNote)}</dd>` : "") + `</dl>` +
-      (item.bookable ? `<button type="button" class="book" ${state === "available" ? "" : "disabled"}>${state === "available" ? "Book this table (demo)" : esc(st.text) + " — pick another table"}</button>` : "");
+      (item.bookable ? `<dt>Guests</dt><dd>Up to ${item.maxCapacity} · minimum covers ${item.includedGuests}</dd>` : "") +
+      (item.reason ? `<dt>Why not bookable</dt><dd>${esc(item.reason)}</dd>` : "") + `</dl>` +
+      (canBook ? `<div class="party"><span id="partyLabel">Party size</span><div class="stepper" role="group" aria-labelledby="partyLabel">` +
+        `<button type="button" data-step="-1" aria-label="Fewer guests">−</button><output id="partySize" aria-live="polite"></output>` +
+        `<button type="button" data-step="1" aria-label="More guests">+</button></div></div><table class="fees" id="fees"></table>` : "") +
+      (item.bookable ? `<button type="button" class="book" ${canBook ? "" : "disabled"}>${canBook ? "Book this table (demo)" : esc(st.text) + " — pick another table"}</button>` : "");
     info.querySelector(".close").addEventListener("click", () => { selectedId = null; renderOverlay(); showInfo(null); });
+    if (canBook) bindParty(item);
+  }
+
+  // Demo amounts only — real minimums / fees come from the section's minimumAmount / extraGuestFee / deposit.
+  function demoPrices(item) {
+    const minimum = item.type === "vipTable" ? 1000 : item.maxCapacity >= 6 ? 500 : item.maxCapacity >= 4 ? 300 : 150;
+    return {minimum, extraFee: item.extraGuestFee ? (item.type === "vipTable" ? 50 : 40) : 0, depositRate: 0.25};
+  }
+
+  function bindParty(item) {
+    const p = demoPrices(item);
+    const asked = item.id === params.get("sel") ? Number(params.get("party")) : NaN;
+    let party = Number.isInteger(asked) ? Math.min(item.maxCapacity, Math.max(1, asked)) : item.includedGuests;
+    const usd = n => "$" + n.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const draw = () => {
+      const extra = Math.max(0, party - item.includedGuests), extraTotal = extra * p.extraFee, deposit = p.minimum * p.depositRate;
+      info.querySelector("#partySize").textContent = `${party} of ${item.maxCapacity}`;
+      info.querySelectorAll(".stepper button").forEach(b => { b.disabled = b.dataset.step === "-1" ? party <= 1 : party >= item.maxCapacity; });
+      info.querySelector("#fees").innerHTML =
+        `<tr><td>Minimum spend (covers ${item.includedGuests} guests)</td><td>${usd(p.minimum)}</td></tr>` +
+        (p.extraFee ? `<tr><td>Extra guests: ${extra} × ${usd(p.extraFee)} VIP entry</td><td>${usd(extraTotal)}</td></tr>` : "") +
+        `<tr class="sub"><td>Pay today: deposit (25% of minimum)${extraTotal ? " + extra-guest fees" : ""}</td><td>${usd(deposit + extraTotal)}</td></tr>` +
+        `<tr class="sub"><td>Balance of minimum at the venue</td><td>${usd(p.minimum - deposit)}</td></tr>` +
+        `<tr class="note"><td colspan="2">Demo amounts — the club sets the real ones.</td></tr>`;
+    };
+    info.querySelectorAll(".stepper button").forEach(b => b.addEventListener("click", () => {
+      party = Math.min(item.maxCapacity, Math.max(1, party + Number(b.dataset.step)));
+      draw();
+    }));
+    draw();
   }
 
   function select(id, center) {
@@ -337,6 +370,8 @@
     }
     applyView(true);
     showInfo(item);
+    // The phone bottom sheet covers the lower half of the screen; keep the map above it.
+    if (isPhone()) legendBar.scrollIntoView({block: "start"});
   }
 
   function setMode(next) {

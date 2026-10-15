@@ -4,6 +4,13 @@ Status: **PROPOSAL — awaiting owner approval. Nothing is built, published or d
 Date: Oct 15 2026 · Workspace package at writing: s3.1.42 · Resume: `@vip$` / `$vip-tables$`
 Companion files: `reports/vip-floorplans/` (floor-plan JSON + overlay preview), `.cursor/rules/design-notes-vip-reservations.mdc`, `.cursor/rules/vip-reservations-translation-incomplete.mdc`.
 
+**Related documents**
+
+- [`vip-notifications-billing.md`](vip-notifications-billing.md) — notifications, receipts, invoicing and the AR/AP ledger
+- [`vip-pos-integrations.md`](vip-pos-integrations.md) — POS integrations (Toast, Square, SpotOn, Clover + generic)
+- [`vip-aurelia-demo/`](vip-aurelia-demo/) — Aurelia demo walkthrough (separate work in progress)
+- [`vip-floorplans/`](vip-floorplans/) — floor-plan JSON, viewer, screenshots and [`photo-match.md`](vip-floorplans/photo-match.md); ingest procedure `.cursor/rules/vip-floorplan-ingest.mdc`
+
 > Not legal advice. Every legal / compliance statement below is a checklist for the owner's counsel to confirm, not a conclusion.
 
 ---
@@ -31,7 +38,7 @@ Companion files: `reports/vip-floorplans/` (floor-plan JSON + overlay preview), 
 
 **Legal.** No club goes live until a **signed agreement** (subscription model + fees) and **counsel-approved Terms** exist. Signatures: in-app **passkey (WebAuthn) signing** over the document's SHA-256 + an **RFC 3161 trusted timestamp** + the chained audit (beta); an e-sign provider (Dropbox Sign / DocuSign / Adobe) for contracts that need a provider certificate; physical signature upload with hash verification as a fallback. IP is recorded as supporting evidence; location only with explicit opt-in — neither is the signature itself.
 
-**Floor maps.** The two attached maps are already broken down: **Decades = 11 bookable tables (C1–C11) in 3 areas (North VIP, Floor, South VIP), 5 non-bookable elements incl. the DJ BOOTH**; **LIMA Twist = 29 bookable sections (24 tables, 3 rounds 501–503, BAR1 + BAR2) in 4 areas (A–D), and 106 = DJ BOOTH (not bookable)**. One shared color legend everywhere: **DJ booth blue, Available green, Booked red**, Held amber, Not bookable grey, Selected yellow outline — always with an icon + pattern + text too. The viewer is phone-first: on a phone you pick an area, then tap tables at ≥ 44 px. Overlays verified pixel-aligned at 390 / 820 / 1280 px (§13). An optional **"Explore the room" 360° view** (Could, after beta) opens the same table booking from photo hotspots (§13.6).
+**Floor maps.** The two attached maps are already broken down: **Decades = 11 bookable tables (C1–C11) in 3 areas (North VIP, Floor, South VIP), 5 non-bookable elements incl. the DJ BOOTH**; **Lima Twist Club = 27 bookable sections (24 tables + 3 rounds 501–503) in 4 areas (A–D); 106 = DJ BOOTH and BAR1 / BAR2 are not bookable** (owner: bars cannot be booked; Decades BAR likewise). Each section has `maxCapacity`, `includedGuests`, `minimumAmount` and an optional per-guest `extraGuestFee` (VIP entry beyond the included guests). Every floor plan goes through Master Admin processing and club review before it is loaded (always-on ingest procedure `.cursor/rules/vip-floorplan-ingest.mdc`). One shared color legend everywhere: **DJ booth blue, Available green, Booked red**, Held amber, Not bookable grey, Selected yellow outline — always with an icon + pattern + text too. The viewer is phone-first: on a phone you pick an area, then tap tables at ≥ 44 px. Overlays verified pixel-aligned at 390 / 820 / 1280 px (§13). An optional **"Explore the room" 360° view** (Could, after beta) opens the same table booking from photo hotspots (§13.6).
 
 **Effort.** ~13–18 engineering weeks in 6 phases, beta with 2 DC venues after Phase 2 (~6–7 weeks). Translation is last (two tiers), tracked by an always-on INCOMPLETE rule.
 
@@ -75,8 +82,14 @@ All pages follow existing contracts: satellites load `floqr-session-shell.js` (s
 4. **Venue picker** — only venues with `vipReservationsEnabled=1` (and not suspended). FloqAi "book a table near me" resolves here.
 5. **Night / event** — calendar of open nights (`vipNights`), events overlaid; sold-out nights greyed.
 6. **Floor map** — published plan image with the clickable overlay (as in `reports/vip-floorplans/preview.html`). Colors from the shared legend (§13.4): Available green, Held amber, Booked red, Not bookable grey, DJ booth blue, each with an icon + pattern. On phones the map opens on an area, with area chips and ≥ 44 px targets (§13.5). Optional "Explore the room" 360° view (§13.6). **List view** toggle (accessible alternative: every section as a row with label, capacity, minimum).
-7. **Section sheet** — label (exact), description, photos, capacity min–max, minimum spend, deposit, what's included (bottle package — Should).
-8. **Party size** — stepper inside the section's capacity; guest names optional (guest-list integration).
+7. **Section sheet** — label (exact), description, confirmed photos (`photo-match.md`), "Up to {maxCapacity} guests · minimum covers {includedGuests}", minimum spend, extra-guest fee (if any), deposit, what's included (bottle package — Should).
+8. **Party size** — a stepper from 1 to `maxCapacity` (the server rejects anything higher), defaulting to `includedGuests`. Fee lines update live:
+   - Minimum spend (covers N guests) …… $X
+   - Extra guests: k × $fee VIP entry …… $Y (shown only when the section has an `extraGuestFee`)
+   - **Pay today:** deposit + extra-guest fees …… $Z
+   - Balance of minimum at the venue …… $B
+
+   Guest names are optional (guest-list integration). Demo: `preview-lima-twist-390-book.png` (§13.5).
 9. **Hold** — server creates a 30-minute hold (Stripe Checkout's minimum `expires_at`), countdown shown.
 10. **Terms & consent** — the venue's counsel-approved Terms (versioned, hash shown in the footer), with separate required checkboxes: Terms + refund/cancellation, no-show/forfeit, age 21+ with valid ID, minimum-spend / gratuity disclosure; optional marketing opt-in. Consent is recorded server-side before checkout.
 11. **Pay** — Stripe Checkout (deposit or full minimum, per section), destination charge to the club's connected account.
@@ -101,7 +114,10 @@ Preconditions (server-checked): active promoter VIP subscription **and** `clubPr
 Subtabs (each a `FLOQRTabGates` panel, gated by subscription state):
 
 1. **Subscription** — Apply → choose model (A $20/month or B %) → see Master Admin counter-offer (if any) → sign the agreement → Stripe (subscription checkout and/or Connect onboarding via existing `createFloqrConnectOnboardingLink`) → certification checklist → **Enable** toggle (only after `certified`).
-2. **Floor plans** — upload, section editor (§13), publish a version.
+2. **Floor plans** — the club admin **uploads**, and a Master Admin **processes** it (labels, sections, areas, preview; procedure `vip-floorplan-ingest.mdc`).
+   - The club admin then **reviews**: confirms labels, renames areas, and sets per section `maxCapacity`, `includedGuests`, `minimumAmount`, optional `extraGuestFee` and deposit in the section editor (§13.2).
+   - The Master Admin **loads / publishes** the plan.
+   - A club cannot take bookings on a plan until it is published. Each publish is a new version.
 3. **Nights & pricing** — default weekly nights, per-event overrides, per-section minimum spend + deposit per night, cut-off times, blackout dates.
 4. **Terms & policies** — structured Terms builder (clauses from §17 checklist) → submit to counsel → see approval / signatures → publish version. Patron-facing preview.
 5. **Team** — appoint / remove **VIP Managers** (people picker from the club roster, like Employee Network; confirm dialog; reason prompt).
@@ -246,17 +262,17 @@ Conventions: owner's `0|1` datapoints on flags; `…AtMs` numbers + server times
 
 **`vipFloorPlans/{planId}`** — P when `status=published`, CC while draft
 
-`clubLocationId`, `name` ("Main room"), `version`, `status` `draft|published|archived`, `sourceFormat` `png|jpg|webp|heic|pdf|svg`, `sourceSha256`, `sourcePath` (Storage, CC), `renderPath` (public PNG/WebP), `widthPx`, `heightPx`, `nonBookable[]` (label, type, polygon), `areas[]`, `publishedAtMs`, `publishedByUid`.
+`clubLocationId`, `name` ("Main room"), `version`, `status` `uploaded|processing|review|approved|published|rejected|archived` (Master Admin processes and loads; club admin reviews — `vip-floorplan-ingest.mdc`), `processedByUid`, `reviewedByUid`, `reviewedAtMs`, `openQuestions[]`, `sourceFormat` `png|jpg|webp|heic|pdf|svg`, `sourceSha256`, `sourcePath` (Storage, CC), `renderPath` (public PNG/WebP), `widthPx`, `heightPx`, `nonBookable[]` (label, type, polygon), `areas[]`, `publishedAtMs`, `publishedByUid`.
 
 `areas[]` entries (schema `floqr.vipFloorPlan/2`): `id`, `label` (exact printed text or `null`), `name` (club-editable display name, e.g. "Area D · 300s & Rounds"), `shape` `rect|polygon` + `rect`/`polygon` (normalized outline), `bounds` (normalized bounding box), `viewBox` (normalized zoom target with padding — what a phone zooms to when the area chip is tapped), `sectionIds[]`, `nonBookableIds[]`, `description`. `nonBookable[]` entries carry `type` (`djBooth|bar|exit|stairs|enclosure|…`), `state` (`djBooth` or `notBookable`), `bookable: false`, `areaId?`. Every bookable section must belong to exactly one area (publish validation).
 
 **`vipSections/{sectionId}`** — P
 
-`planId`, `clubLocationId`, `label` (exact printed text), `type` `table|booth|bar|round|vipArea|standing`, `shape` `rect|polygon|circle`, `rect`, `polygon`, `circle`, `areaId`, `capacityMin`, `capacityMax`, `minimumSpendCents`, `depositMode` `fixed|percent|full`, `depositCents`/`depositBps`, `currency`, `description`, `photos[]` (https, club media), `IsBookable` 0\|1, `IsAccessible` 0\|1 (step-free), `includes[]` (package text), `sortOrder`. Schema = the JSON in `reports/vip-floorplans/*.json`.
+`planId`, `clubLocationId`, `label` (exact printed text), `type` `table|booth|bar|round|vipArea|standing`, `shape` `rect|polygon|circle`, `rect`, `polygon`, `circle`, `areaId`, **`maxCapacity`** (max guests allowed), **`includedGuests`** (guests covered by the minimum, 1..maxCapacity), **`minimumAmountCents`**, **`extraGuestFeeCents`** (optional VIP entry fee per guest beyond includedGuests; null = none), `depositMode` `fixed|percent|full`, `depositCents`/`depositBps`, `currency`, `description`, `photos[]` (references into club media with rights, privacy review and match confidence — field list in `reports/vip-floorplans/photo-match.md`), `IsBookable` 0\|1, `IsAccessible` 0\|1 (step-free), `includes[]` (package text), `sortOrder`. Schema = the JSON in `reports/vip-floorplans/*.json`.
 
 **`vipNights/{clubId}__{yyyy-mm-dd}`** — P (availability only)
 
-`open` 0\|1, `eventId`, `bookingOpensAtMs`, `cutoffAtMs`, `sectionOverrides {sectionId: {minimumSpendCents, depositCents, IsBookable}}`, `promoterAllocations {sectionId: promoterUid}` (CC → stored in a sibling CC doc, not on the public doc).
+`open` 0\|1, `eventId`, `bookingOpensAtMs`, `cutoffAtMs`, `sectionOverrides {sectionId: {minimumAmountCents, extraGuestFeeCents, includedGuests, depositCents, IsBookable}}` (`maxCapacity` is never raised per night — occupancy limit), `promoterAllocations {sectionId: promoterUid}` (CC → stored in a sibling CC doc, not on the public doc).
 
 **`vipInventory/{clubId}__{night}__{sectionId}`** — status only is P (via feed); doc itself Functions-only
 
@@ -266,7 +282,7 @@ Conventions: owner's `0|1` datapoints on flags; `…AtMs` numbers + server times
 
 **`vipReservations/{id}`** — R (PII). Read: patron (own), promoter (own bookings, contact masked), club staff with `manageVip` / Club Admin, Master Admin. Writes: Functions only.
 
-`clubLocationId`, `night`, `eventId`, `sectionId`, `sectionLabel`, `planVersion`, `partySize`, `patronUid`, `leadGuestName` (R), `contactPhone`/`contactEmail` (R, copied at booking for door contact), `guests[]` (R, optional), `bookedByType` `patron|promoter|staff`, `promoterUid`, `status` (§9.6), `termsDocId`, `termsVersion`, `termsSha256`, `consentId`, `amounts {minimumSpendCents, depositCents, chargedCents, applicationFeeCents, refundedCents, currency}`, `stripe {checkoutSessionId, paymentIntentId, chargeId}` (R), `qrTokenHash` (S), `checkIn {atMs, byUid, id21Checked 0|1, method}`, `noShowAtMs`, `cancel {atMs, byUid, reason, refundCents}`, `disputeStatus`, `IsCheckedIn` 0\|1, `IsNoShow` 0\|1, `IsRefunded` 0\|1.
+`clubLocationId`, `night`, `eventId`, `sectionId`, `sectionLabel`, `planVersion`, `partySize` (planned guests, ≤ the section's `maxCapacity` at booking), `includedGuests` (snapshot), `extraGuests` (= max(0, partySize − includedGuests)), `extraGuestFeeCents` (snapshot, per guest), `extraGuestFeeTotalCents` (computed server-side), `patronUid`, `leadGuestName` (R), `contactPhone`/`contactEmail` (R, copied at booking for door contact), `guests[]` (R, optional), `bookedByType` `patron|promoter|staff`, `promoterUid`, `status` (§9.6), `termsDocId`, `termsVersion`, `termsSha256`, `consentId`, `amounts {minimumAmountCents, depositCents, extraGuestFeeTotalCents, chargedCents, applicationFeeCents, refundedCents, currency}`, `stripe {checkoutSessionId, paymentIntentId, chargeId}` (R), `qrTokenHash` (S), `checkIn {atMs, byUid, id21Checked 0|1, method}`, `noShowAtMs`, `cancel {atMs, byUid, reason, refundCents}`, `disputeStatus`, `IsCheckedIn` 0\|1, `IsNoShow` 0\|1, `IsRefunded` 0\|1.
 
 **`vipHolds/{holdId}`** — Functions only (S). `uid`, `inventoryKey`, `expiresAtMs`, `checkoutSessionId`.
 
@@ -339,7 +355,7 @@ All `onCall` in us-central1, App Check verdict recorded (enforced once hubs send
 
 **Patron / promoter**
 - `getVipAvailability({clubLocationId, night})` — sections + status (also served by the public feed).
-- `createVipHold({clubLocationId, night, sectionId, partySize, bookedFor?})` — transaction on `vipInventory`; 30 min; one active hold per uid per night; throttle.
+- `createVipHold({clubLocationId, night, sectionId, partySize, bookedFor?})` — transaction on `vipInventory`; 30 min; one active hold per uid per night; throttle. Rejects `partySize < 1` or `> maxCapacity`. Computes `extraGuests` and `extraGuestFeeTotalCents` from the **published** section and night override; client amounts are never trusted. Snapshots them on the hold.
 - `releaseVipHold({holdId})`.
 - `recordVipConsent({holdId, termsDocId, termsVersion, checks})` — server re-reads the published Terms hash; captures IP/UA.
 - `createFloqrCheckoutSession({orderType: "vipReservation", holdId, consentId})` — extends the existing callable.
@@ -570,6 +586,17 @@ Charge type: keep **destination charges** (consistent with existing code) with *
 
 Holds: Checkout `expires_at` minimum is 30 minutes → inventory hold = 30 minutes, released on `checkout.session.expired` or by the sweep.
 
+**Checkout line items (built server-side from the hold snapshot, never from the client):**
+
+| Line | Stripe `line_items[]` | Amount | Shown when |
+|---|---|---|---|
+| "Table {label} deposit — {club}, {night} (covers {includedGuests} guests)" | `price_data.unit_amount = depositCents`, `quantity: 1` | deposit (or the full minimum when the section prepays) | always |
+| "Extra guests — VIP entry" | `price_data.unit_amount = extraGuestFeeCents`, **`quantity: extraGuests`** | k × fee | `extraGuests > 0` and the section has `extraGuestFeeCents` |
+
+- `metadata`: `reservationId`, `sectionId`, `partySize`, `includedGuests`, `extraGuests`. `application_fee_amount` (Model B) is computed on the **total charged**; whether the extra-guest fee counts toward "% of collected fees" is an owner question (§20).
+- Refunds follow the venue policy per line. Extra-guest fees for guests who never arrive are refundable only if the Terms say so (counsel checklist §17).
+- The confirmation, Inbox, email and receipt repeat the same lines, plus the "balance of minimum due at the venue".
+
 ### 11.3 Disputes and fraud
 
 `charge.dispute.created` → reservation `disputed`, club notified, **auto-built evidence pack**: Terms version + SHA-256, consent record (timestamp, checkboxes, IP), confirmation email, QR check-in time / no-show record, refund policy text. Radar rules (Should): block prepaid cards above X, velocity per uid / device, high-risk countries for DC venues. Promoter fraud: per-promoter caps and club allocation limits.
@@ -625,15 +652,29 @@ For clubs that want availability on their own site / app, beyond the publish key
 
 Source hash (`sourceSha256`) stored; every publish creates a new version so past reservations keep pointing at the map they were booked on.
 
+**Ingest workflow (owner Oct 15 2026).** A floor plan moves through **uploaded → processing (Master Admin) → review (club admin) → approved → published**. Club admins cannot use a plan until a Master Admin has processed and loaded it.
+
+- **Processing** follows the always-on procedure `.cursor/rules/vip-floorplan-ingest.mdc`:
+  - exact labels and never-bookable classification;
+  - sections in 0–1 coordinates and ≤ 4–5 areas;
+  - capacity placeholders;
+  - JSON, preview, and 390 / 820 / 1280 screenshots with the ≥ 44 px check;
+  - photo matches and open questions.
+- **Review** — the club admin confirms labels, renames areas, and sets capacity, prices and extra-guest fees.
+- **Publish** — the Master Admin loads the approved version, with a reason and a chained audit row.
+
 ### 13.2 Section editor
 
 - Canvas = rendered image + SVG overlay in normalized coordinates (exactly the JSON schema in `reports/vip-floorplans/`).
 - Tools: rectangle, polygon, circle (round tables), area (group), non-bookable (bar, DJ booth, exit, stairs); select / move / resize; duplicate with auto-increment label (C1 → C2); arrow-key nudge; snap to grid; zoom / pan (pinch on touch); undo / redo.
-- Side panel per section: Label (exact), Type, Description, Capacity min–max, Minimum spend, Deposit, Photos (from club media), Accessible, Bookable toggle, Area.
-- **Auto-detect assist** (Should): color / brightness segmentation (the method used for the two maps — 11/11 and 30/30 shapes found; on LIMA Twist one of the 30 is 106, the DJ BOOTH) + OCR (Tesseract.js in the browser, or Cloud Vision server-side) to propose boxes + labels; admin confirms each one. Never auto-publish.
+- Side panel per section: Label (exact), Type, Description, **Max guests (`maxCapacity`)**, **Guests included in the minimum (`includedGuests`)**, **Minimum spend (`minimumAmount`)**, **Extra-guest VIP entry fee per guest (`extraGuestFee`, optional; hidden when included = max)**, Deposit, Photos (from club media, confirmed matches only), Accessible, Area.
+  - Bookable is decided by type: bars, DJ booth, exits, stairs, restrooms and stages are never bookable.
+  - Inline preview: "Party of {max}: minimum $X + {max − included} × $fee".
+  - Validation: `1 ≤ included ≤ max`; the fee must be ≥ 0 when set.
+- **Auto-detect assist** (Should): color / brightness segmentation (the method used for the two maps — 11/11 and 30/30 shapes found; on Lima Twist Club the 30 are 27 tables plus 106 DJ BOOTH, BAR1 and BAR2, which are not bookable) + OCR (Tesseract.js in the browser, or Cloud Vision server-side) to propose boxes + labels; admin confirms each one. Never auto-publish.
 - Validation before publish: unique labels, no overlap with Emergency Exit / stairs regions, every bookable section has capacity and minimum, map has at least one exit marked (warning).
 - Devices: PC / tablet = full editor; phone = view, edit attributes, move existing shapes (drawing new polygons on a phone is error-prone — supported but not the primary path).
-- Accessible booking: the list view mirrors the map; keyboard focus order follows labels; shapes carry `aria-label` ("C3, VIP table, 4–8 guests, $1,000 minimum").
+- Accessible booking: the list view mirrors the map; keyboard focus order follows labels; shapes carry `aria-label` ("C3, VIP table, up to 8 guests, minimum covers 6, $1,000 minimum").
 
 ### 13.3 The two attached maps (owner principle 13)
 
@@ -661,24 +702,26 @@ Files: `reports/vip-floorplans/decades.json`, `lima-twist.json`, `legend.json` (
 | C10 | vipTable | South VIP (printed "VIP TABLES") | 0.5654, 0.7835, 0.0479, 0.0792 |
 | C11 | vipTable | South VIP (printed "VIP TABLES") | 0.7910, 0.7868, 0.0469, 0.0792 |
 
-Non-bookable: **BAR**, **DJ BOOTH**, **Emergency Exit**, **stairs**, one unlabeled enclosure west of the south VIP TABLES (ask the venue). Ignored: the "?" help icon (screenshot artifact). Capacities (4–8 VIP, 2–6 floor) and all amounts are placeholders.
+Non-bookable: **BAR** (owner: bars cannot be booked), **DJ BOOTH**, **Emergency Exit**, **stairs**, one unlabeled enclosure west of the south VIP TABLES (ask the venue). Ignored: the "?" help icon (screenshot artifact).
 
-**LIMA Twist (1024 × 382)** — 29 bookable · 4 areas (none printed — suggested by owner feedback, Oct 2026) · **106 = DJ BOOTH** (owner-confirmed, not bookable, blue)
+Guest placeholders: VIP tables `maxCapacity 8 / includedGuests 6`; floor tables `6 / 4` (extra-guest fee applies above the included guests). Totals: 80 max / 58 included. All amounts are placeholders.
 
-| Area id | Name (editable suggestion) | Members | Type | Seats from chair marks (placeholder) |
+**Lima Twist Club (1024 × 382)** — **27 bookable** · 4 areas (none printed; default names, club-editable) · 3 not bookable: **106 = DJ BOOTH** (blue), **BAR1**, **BAR2** (grey — owner: bars cannot be booked). The owner considers this image the complete plan.
+
+| Area id | Default name (club-editable) | Bookable members | Not bookable | maxCapacity / includedGuests (placeholders from chair marks) |
 |---|---|---|---|---|
-| `lima-twist-area-a` | Area A · 200 Row | 201, 202, 203, 204, 205, 206, 207, 208, 209 | table | 2 each |
-| `lima-twist-area-b` | Area B · DJ & 100 Row | 101, 102, 103, 104, 105 + **106 DJ BOOTH** (not bookable) | table | 2 each |
-| `lima-twist-area-c` | Area C · Bar & 400s | 401, 402, 403 · BAR1, BAR2 | table · bar | 6 each · 8 each (confirm bar seats are reservable) |
-| `lima-twist-area-d` | Area D · 300s & Rounds | 301, 307 (vertical) · 302, 303, 304, 305, 306 · 501, 502, 503 | table · round | 6 · 4 · 4 each |
+| `lima-twist-area-a` | Area A · 200 Row | 201–209 (9 tables) | — | 2 / 2 |
+| `lima-twist-area-b` | Area B · DJ & 100 Row | 101–105 (5 tables) | 106 DJ BOOTH | 2 / 2 |
+| `lima-twist-area-c` | Area C · Bar & 400s | 401, 402, 403 | BAR1, BAR2 | 6 / 4 |
+| `lima-twist-area-d` | Area D · 300s & Rounds | 301–307 (7 tables), 501–503 (3 rounds) | — | 301 / 307 vertical 6 / 4 · 302–306 4 / 4 · rounds 4 / 4 |
 
-The printed label "106" is kept exactly; the item is `{label: "106", name: "DJ BOOTH", type: "djBooth", bookable: false}`. The LIMA Twist drawing still has no exits, walls or bar outline — request the full floor plan before go-live (exits must be marked).
+Totals: 90 max / 80 included. The printed labels "106", "BAR1" and "BAR2" are kept exactly; each item is `{label, name?, type: "djBooth" | "bar", bookable: false}`. Display name **"Lima Twist Club"** (spelling Twist); ids and file names stay `lima-twist-*`.
 
 ### 13.4 Shared color legend (every floor plan, every surface)
 
 One spec — `reports/vip-floorplans/legend.json` — used by the map, the area chips, the list view, the VIP Manager door view, the 360 hotspots (§13.6) and the club embed. Clubs cannot recolor states (consistency across venues is the point); they can only rename areas.
 
-| State | Fill | Stroke | Icon | Pattern | Text | Stroke contrast on Decades #222 / LIMA #2d3240 / app #111 |
+| State | Fill | Stroke | Icon | Pattern | Text | Stroke contrast on Decades #222 / Lima Twist Club #2d3240 / app #111 |
 |---|---|---|---|---|---|---|
 | Available | green `#22c55e` | `#4ade80` | ✓ check | none (solid) | "Available" | 9.13 / 7.34 / 10.84 |
 | Held / pending (someone is paying) | amber `#f59e0b` | `#fbbf24` | clock | diagonal stripes | "Held" | 9.53 / 7.66 / 11.31 |
@@ -711,26 +754,32 @@ Every table is also in an accessible list grouped by area, with rows ≥ 44 px a
 The demo simulates bookings so the colors can be reviewed:
 
 - **Decades** — C2, C4 and C10 booked; C8 held.
-- **LIMA Twist** — 102, 203, 304, 401 and 502 booked; 207, 307 and BAR1 held.
+- **Lima Twist Club** — 102, 203, 304, 401 and 502 booked; 206, 207 and 307 held. BAR1 / BAR2 are grey and locked.
+
+Selecting an available table shows the **party-size stepper** (1..`maxCapacity`, starting at `includedGuests`) and live fee lines: minimum, extra guests × fee, pay today, and the balance at the venue. Amounts are demo values. The URL option `party=N` presets the stepper for screenshots.
 
 **Verification.** `shoot.mjs` runs headless Chrome with true device emulation (CDP). For each shot it records the smallest on-screen target in the current view and checks for horizontal overflow:
 
 | Shot | Smallest target | Horizontal overflow |
 |---|---|---|
 | Decades 390 area / overview / 820 / 1280 | 44 / 44 / 28 / 33 px | 0 |
-| LIMA Twist 390 area / overview / 820 / 1280 | 44 / 44 / 24 / 24 px | 0 |
+| Lima Twist Club 390 area / overview / book / 820 / 1280 | 44 / 44 / 44 / 24 / 24 px | 0 |
 
-LIMA Twist — phone, Area D (390 px):
+Lima Twist Club — phone, Area D (390 px):
 
-![LIMA Twist phone area view — Area D zoomed, ≥ 44 px targets, minimap + zoom under the map](vip-floorplans/preview-lima-twist-390-area.png)
+![Lima Twist Club phone area view — Area D zoomed, ≥ 44 px targets, minimap + zoom under the map](vip-floorplans/preview-lima-twist-390-area.png)
 
-LIMA Twist — phone overview (390 px):
+Lima Twist Club — phone overview (390 px):
 
-![LIMA Twist phone overview — one tappable badge per area](vip-floorplans/preview-lima-twist-390-overview.png)
+![Lima Twist Club phone overview — one tappable badge per area](vip-floorplans/preview-lima-twist-390-overview.png)
 
-LIMA Twist — PC (1280 px), 305 selected; 106 is the blue DJ BOOTH:
+Lima Twist Club — phone booking sheet (390 px): table 402, party of 6 (minimum covers 4), so 2 × $40 VIP entry. BAR1 / BAR2 are grey and not bookable:
 
-![LIMA Twist PC view — four areas outlined, 106 DJ BOOTH in blue, 305 selected](vip-floorplans/preview-lima-twist.png)
+![Lima Twist Club phone booking sheet — party-size stepper and fee lines](vip-floorplans/preview-lima-twist-390-book.png)
+
+Lima Twist Club — PC (1280 px), 305 selected; 106 is the blue DJ BOOTH; BAR1 / BAR2 grey:
+
+![Lima Twist Club PC view — four areas outlined, 106 DJ BOOTH in blue, bars grey, 305 selected](vip-floorplans/preview-lima-twist.png)
 
 Decades — PC (1280 px), C3 selected:
 
@@ -739,6 +788,15 @@ Decades — PC (1280 px), C3 selected:
 Also saved: `preview-decades-390-area.png`, `preview-decades-390-overview.png`, `preview-decades-820.png`, `preview-lima-twist-820.png`.
 
 ### 13.6 3D / interactive environment ("Explore the room")
+
+**Owner Oct 15 2026:** the 360° photo shoot is a **yes, later**. Meanwhile the current public photos were checked read-only (`reports/vip-floorplans/photo-match.md`):
+
+- Each venue has only **one** public profile photo and an empty gallery.
+- Neither photo can be matched to a table, the DJ booth or a bar with useful confidence.
+- The Decades cover shows identifiable patrons; the Lima Twist Club cover is a food close-up.
+- Neither is usable for the 360 view or for section thumbnails.
+- Next step: ask each club for rights-cleared, closed-venue stills per area and per section (list in `photo-match.md`).
+- Per-section photo fields are proposed there too: `photos[]` with `mediaRef`, `kind`, `rights`, `peopleVisible`, `privacyReview` and `match.confidence`. Patrons see only `confirmed` matches.
 
 **Recommendation.** The **2D floor plan stays the primary booking UI** (Must). It is fast and accessible, works on every phone, and is what door staff use. On top of it, add an optional **"Explore the room" 360° panorama view** (**Should**, after the core beta booking loop works). Its table hotspots open **exactly the same section booking**: the same `sectionId`, the same availability colors, and the same `createVipHold`. The 360 view never becomes a second booking path with its own state.
 
@@ -749,7 +807,7 @@ Also saved: `preview-decades-390-area.png`, `preview-decades-390-overview.png`, 
 | **360° panoramas + hotspots** | Equirectangular photos in Pannellum (MIT), Marzipano (Apache-2.0) or Photo Sphere Viewer (MIT, markers plugin) | Free libraries. A one-shot 360 camera costs a few hundred USD, or use a phone + panorama head | Good — a single position with HDR bracketing handles low light | Multires tiles: ~1–1.5 MB to first view; smooth on mid-tier phones | Open source, our own Storage, no vendor | **Should** |
 | Photogrammetry / Gaussian splats | Polycam / Luma / Scaniverse capture → `.ply` / `.splat` / `.spz` → three.js + a splat renderer | Capture apps are free to low-cost; heavy processing | Poor — moving lights, haze, mirrors and LED walls break reconstruction | 20–200 MB (compressed `.spz` smaller); heavy on phone GPUs | Varies by app export terms; check before use | **Could** (research only) |
 | Matterport | Commercial capture + hosted digital twin; Showcase SDK | Paid subscription per active space; SDK needs a qualifying plan + SDK key; Pro cameras cost thousands (verify current pricing) | Good with their camera | Hosted by Matterport; heavier iframe | Content lives on Matterport's cloud under their terms; SDK branding / usage limits; lock-in | **Could** — only if a venue already has a tour (link out, no SDK in beta) |
-| Stylized three.js extrusion | Extrude our floor-plan JSON (tables as boxes / cylinders, walls if supplied) | Dev time only | N/A (no photos) | Small (three.js ~170 KB gz + JSON); fine on phones | MIT, no photos → no privacy issue | **Could** — needs walls / exits (LIMA Twist lacks them) and reads "gamey" |
+| Stylized three.js extrusion | Extrude our floor-plan JSON (tables as boxes / cylinders, walls if supplied) | Dev time only | N/A (no photos) | Small (three.js ~170 KB gz + JSON); fine on phones | MIT, no photos → no privacy issue | **Could** — needs walls / exits (the Lima Twist Club plan, complete per the owner, does not draw them) and reads "gamey" |
 
 #### How a hotspot books a table
 
@@ -773,7 +831,7 @@ flowchart LR
 |---|---|
 | Equipment | One-shot 360 camera on a light stand / monopod (preferred), or phone + nodal panorama head. No hand-held stitching. |
 | Shots per position | 360 camera: **1 position × 3–5 bracketed exposures** (±2 EV). Phone: **3 rows (−45°, 0°, +45°) × 8–12 shots + zenith + nadir ≈ 26–38 shots**, **30–50 % overlap**. |
-| Positions | **One per area** (Decades 3, LIMA Twist 4), plus the entrance. Place each one central to its tables, **3–6 m from the furthest table** so labels and table numbers are legible. Height ~1.5 m (standing) or ~1.2 m (seated view for VIP booths). Keep ≥ 1 m from LED walls and mirrors. |
+| Positions | **One per area** (Decades 3, Lima Twist Club 4), plus the entrance. Place each one central to its tables, **3–6 m from the furthest table** so labels and table numbers are legible. Height ~1.5 m (standing) or ~1.2 m (seated view for VIP booths). Keep ≥ 1 m from LED walls and mirrors. |
 | Lighting | Shoot during setup with **service-level lighting** (not house-lights-full, not show mode). Strobes, moving heads and haze / fog off. LED walls on a static brand slide. Fixed white balance for every position. No flash. |
 | Privacy | **Venue closed, no patrons.** Staff only with written consent, otherwise blur. Blur faces, POS / phone screens, ID or cash, and license plates visible through windows. No minors. Strip EXIF GPS before upload. |
 | Formats | Master: equirectangular **2:1 JPEG, 8192 × 4096** (min 4096 × 2048), sRGB. Published: multires cube tiles (512 px, WebP q80 + JPEG fallback) + a 1024 × 512 preview. Masters are never served. |
@@ -853,7 +911,7 @@ Opening a link never mutates state. SMS/WhatsApp marketing needs TCPA-compliant 
 | `help-vip-promoter-booking` | promoter (serviceMember) | Getting approved by a club, booking for guests, pay links |
 | `help-vip-subscription` | venueAdmin | Subscribing, the two billing models, certification |
 | `help-vip-floor-plan-upload` | venueAdmin | Supported formats, exporting from CAD to PDF |
-| `help-vip-section-editor` | venueAdmin | Drawing sections, labels, minimums, auto-detect |
+| `help-vip-section-editor` | venueAdmin | Reviewing a processed plan: area names, max guests, guests included, minimums, extra-guest fees |
 | `help-vip-nights-pricing` | venueAdmin | Nights, overrides, cut-offs, blocks |
 | `help-vip-terms-builder` | venueAdmin | Terms clauses, counsel approval, publishing versions |
 | `help-vip-managers` | venueAdmin | Appointing VIP Managers and what they can do |
@@ -863,6 +921,17 @@ Opening a link never mutates state. SMS/WhatsApp marketing needs TCPA-compliant 
 | `help-vip-activity-log` | venueAdmin | Reading the activity log incl. Master Admin access |
 | `help-legal-docs-counsel` | counsel (venueAdmin audience) | Drafting, reviewing, signing with a passkey, wet-ink upload |
 | `help-master-vip-admin` | masterAdmin | Offers, certification, suspension, keys, break-glass |
+| `help-vip-floorplan-ingest` | masterAdmin | Processing and loading a club's floor plan (draft below) |
+
+**Draft — `help-vip-floorplan-ingest`** (masterAdmin; register in `floqai-help-repository.js` when the feature is built, not now):
+
+- **title:** "Process and load a club floor plan"
+- **body:**
+  - "Club admins upload their floor plan (PNG, JPG, WebP, PDF, SVG or an iPhone HEIC photo; ask for a PDF export instead of DWG). It waits in **Uploaded** until you process it. Clubs cannot take table bookings until you have loaded their plan."
+  - "1) Open the plan and press **Process**. Every printed label is kept exactly as printed. Bars, DJ booths, exits, stairs, restrooms and stages are marked not bookable; the DJ booth shows in blue. 2) Check each table outline on the preview and group tables into up to five areas so phones can zoom to one area at a time. 3) Look at the phone, tablet and PC previews. Every table must be easy to tap on a phone. 4) Add any questions for the club, then press **Send for review**."
+  - "The club admin confirms labels, renames areas if they like, and sets each table's maximum guests, guests included in the minimum, minimum spend, optional extra-guest fee and deposit. When they approve, press **Load** and give a reason. Loading publishes a new version; past bookings keep the version they were made on."
+- **searchPhrases:** "floor plan", "load floor plan", "process floor plan", "upload table map", "VIP map", "table map review", "DJ booth blue", "bar not bookable", "club floor plan waiting", "publish floor plan", "areas for phones"
+- **links:** Master Admin → Features & Services → VIP Reservations → Floor plans (route decided at build time; no `v=`).
 
 FloqAi intents (`PRODUCT_INTENTS` / `HELP_INTENTS`): "book a table", "VIP table", "reserve a booth", "bottle service", "table reservation", "VIP section", "get a table at {club}", "minimum spend", "cancel my table", "table deposit refund". New audiences must be added to `INTENT_AUDIENCES` and `functions/floqai-content-classes.json` (fail closed).
 
@@ -945,6 +1014,10 @@ Total ≈ **13–18 weeks** plus translation. Publishing, Functions deploys and 
 | Club Activity log incl. Master Admin access | **Must** | Principle 3 |
 | Accessibility (list view, keyboard, accessible-seating flag) | **Must** | |
 | Floor-plan areas + phone area view (≥ 44 px targets, minimap, pinch / pan) | **Must** | §13.5 |
+| Section capacity: `maxCapacity`, `includedGuests`, optional `extraGuestFee`; party-size stepper + fee lines | **Must** | §6.2, §6.3, §11.2 — server computes extra-guest fees from the hold snapshot |
+| Floor-plan ingest workflow (uploaded → processing → review → published) | **Must** | `.cursor/rules/vip-floorplan-ingest.mdc`; clubs cannot book until a Master Admin loads the plan |
+| Area names editable by club admins (defaults kept) | **Must** | `areas[].defaultName` / `name`; printed table labels never change |
+| Per-section / per-area photos matched to the map | **Should** | `vip-floorplans/photo-match.md`; patrons see only `confirmed` matches |
 | Shared color legend (DJ blue · Available green · Booked red · Held amber · Not bookable grey) with icons + patterns | **Must** | §13.4, `legend.json` |
 | "Explore the room" 360° panorama with booking hotspots | **Should** | §13.6 — after the core loop; hotspots reuse `sectionId` + `createVipHold` |
 | Admin panorama upload + privacy pass + hotspot placement | **Should** | Ships with the 360 view |
@@ -996,10 +1069,22 @@ Total ≈ **13–18 weeks** plus translation. Publishing, Functions deploys and 
 12. **Signer geolocation** — capture opt-in browser location for counsel signatures at all? (Recommend IP + passkey + bar verification, geolocation optional.)
 13. **EU / non-US clubs in scope?** (eIDAS AdES/QES, GDPR as controller, SCA for off-session charges.)
 14. **Canonical origin for booking links** — `www.floqr.com` (cutover rule) or `www.floqr.app` (`reports/azure-floqr-app-plan.md`)? The API and embed must use one helper either way.
-15. **LIMA Twist** — (a) spelling: "Twist" (the map's file name) or "Twyst"? (b) are BAR1 / BAR2 bar seats reservable, or should they become non-bookable like 106? (c) can we get the full floor plan with walls, entrance and exits (required before go-live)? (d) confirm 106 is the only DJ booth.
+15. ~~**Lima Twist Club** spelling / bars / full plan~~ — **answered Oct 15 2026:**
+    - The name is "Lima Twist Club" (Washington DC).
+    - BAR1, BAR2 and the Decades BAR are not bookable.
+    - Image 2 is the complete plan.
+    - Still open: confirm 106 is the only DJ booth.
 16. **Decades** — what is the unlabeled enclosure west of the south VIP TABLES? Are the two VIP TABLES areas bookable as full buyouts?
-17. **Area names** — confirm or rename: Decades "North VIP" / "Floor" / "South VIP"; LIMA Twist "Area A · 200 Row" / "Area B · DJ & 100 Row" / "Area C · Bar & 400s" / "Area D · 300s & Rounds". (Clubs will be able to rename areas; printed table labels never change.)
-18. **360 tour** — is a closed-venue photo session at each beta club realistic (club staff vs FloqMedia photographer), and is "Explore the room" wanted in beta or right after?
+17. ~~**Area names**~~ — **answered:** club admins name their areas. The current names stay as defaults (`areas[].defaultName`, editable `name`).
+18. ~~**360 tour**~~ — **answered:** the shoot will happen later. Current public photos are not usable (`vip-floorplans/photo-match.md`). Still open: who shoots (club staff or a FloqMedia photographer)?
+23. **Extra-guest fee** — three questions:
+    - (a) Is it prepaid at booking? The demo assumes yes, as a separate Checkout line.
+    - (b) Does it count toward the Model B "% of collected fees"?
+    - (c) Is it refundable under the same cancellation policy as the deposit, or always refundable for a no-show guest?
+24. **Capacity defaults** — the placeholder seats are read from the printed shapes and must be confirmed by each club:
+    - Decades VIP 8 / 6 included, tables 6 / 4.
+    - Lima Twist Club 2–6 per table.
+    - Is `includedGuests` usually equal to `maxCapacity` (no extra-guest fee)?
 19. **Beta venues** — Decades and Lima Twist as the first two? Is there an existing `clubLocations` id for each?
 20. **Club Owner vs Club Admin** — who at each venue is the Owner (signs agreements) at onboarding?
 21. **Translation** — confirm Live is blocked until both tiers pass (recommended), and which languages counsel will approve Terms in first.
@@ -1033,8 +1118,12 @@ Total ≈ **13–18 weeks** plus translation. Publishing, Functions deploys and 
 - `reports/vip-floorplans/legend.json` — the shared color legend (states, icons, patterns, contrast ratios)
 - `reports/vip-floorplans/preview.html`, `viewer.js`, `viewer.css` (+ `plans.js` generated fallback for opening from disk) — phone-first demo viewer
 - `reports/vip-floorplans/decades-floor-map.png`, `lima-twist-table-map.png` — source images
-- `reports/vip-floorplans/preview-{decades,lima-twist}{-390-area,-390-overview,-820,}.png` — verification screenshots (390 / 820 / 1280 px)
+- `reports/vip-floorplans/preview-{decades,lima-twist}{-390-area,-390-overview,-820,}.png` + `preview-lima-twist-390-book.png` — verification screenshots (390 / 820 / 1280 px; booking sheet with party size + fee lines)
+- `reports/vip-floorplans/photo-match.md` — public profile photo check, photo → area matches, proposed `photos[]` fields
+- `.cursor/rules/vip-floorplan-ingest.mdc` — always-on floor-plan ingest prompt / procedure (workflow, legend, schema)
 - `reports/vip-floorplans/build-plans.js`, `detect-shapes.ps1`, `shoot.mjs` — reproducible generation / measurement / screenshots
 - `reports/vip-pos-integrations.md` — POS integrations (separate report, linked from §4.3)
+- `reports/vip-notifications-billing.md` — notifications, receipts, invoicing, AR/AP ledger (separate report)
+- `reports/vip-aurelia-demo/` — Aurelia demo (separate work in progress)
 - `.cursor/rules/design-notes-vip-reservations.mdc` — design decisions (PROPOSAL)
 - `.cursor/rules/vip-reservations-translation-incomplete.mdc` — always-on translation follow-up
