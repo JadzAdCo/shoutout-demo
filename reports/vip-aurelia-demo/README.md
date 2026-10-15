@@ -6,15 +6,27 @@ Schema: `floqr.vipFloorPlan/2` (`aurelia.json`) · legend: `../vip-floorplans/le
 
 ## How to open
 
-From the **repo root**:
+Serve from the **repo root** (so relative photo / three.js paths resolve). ES modules need HTTP, not `file://`.
 
-```bash
-python -m http.server 8787
+**Windows (recommended — no Python):** Node is usually already installed with this repo’s tooling. From the repo root in PowerShell or cmd:
+
+```powershell
+npx --yes http-server -p 8787 -c-1 .
+```
+
+If `npx` is slow or unavailable, this one-liner also works (Node 18+):
+
+```powershell
+node -e "const http=require('http');const fs=require('fs');const path=require('path');const root=process.cwd();const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml'};http.createServer((req,res)=>{let u=decodeURIComponent((req.url||'/').split('?')[0]);if(u.endsWith('/'))u+='index.html';const f=path.normalize(path.join(root,u));if(!f.startsWith(root)){res.writeHead(403);return res.end();}fs.readFile(f,(e,d)=>{if(e){res.writeHead(404);return res.end('Not found');}res.writeHead(200,{'Content-Type':mime[path.extname(f).toLowerCase()]||'application/octet-stream'});res.end(d);});}).listen(8787,'127.0.0.1',()=>console.log('http://127.0.0.1:8787/'));"
+```
+
+**Optional (real Python only):** do **not** use the Microsoft Store `python` / `python3` stub (“Python was not found”). If you installed Python from python.org and `py -3` works:
+
+```powershell
+py -3 -m http.server 8787
 ```
 
 Then open: [http://127.0.0.1:8787/reports/vip-aurelia-demo/](http://127.0.0.1:8787/reports/vip-aurelia-demo/)
-
-(Any static server that serves the repo root works. ES modules need HTTP, not `file://`.)
 
 ## What you get
 
