@@ -4,6 +4,8 @@ Demo only. Modeled layout for **Aurelia / `temp-democlub-1`**, inspired by the c
 
 Schema: `floqr.vipFloorPlan/2` (`aurelia.json`) · legend: `../vip-floorplans/legend.json`.
 
+**Scene standard (AI movies / repeated 3D):** locked geometry, cameras, and film pipeline — [`../aurelia-scene-standard/`](../aurelia-scene-standard/README.md) · agent rule `.cursor/rules/design-notes-aurelia-scene-standard.mdc` (`@aurelia-scene$` / `$ai-movie$`).
+
 ## How to open
 
 Serve from the **repo root** (so relative photo / three.js paths resolve). ES modules need HTTP, not `file://`.
