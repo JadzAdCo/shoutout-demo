@@ -164,6 +164,7 @@ test("every Throw a ShoutOut entry point goes through FLOQRNav.shoutoutLink / sh
   assert.match(assistant, /shoutoutLink\(\{locationId:item\.id\}\)/);
   assert.match(assistant, /shoutoutLink\(\{eventId:item\.id\}\)/);
   assert.doesNotMatch(assistant, /\.\/\?location=/);
+  assert.doesNotMatch(read("intent-search.js"), /pageUrl\("\.\/", \{[^}]*\blocation:/, "FloqAi results never hand-build a Search ?location= link");
 
   assert.match(read("entity-management.js"), /shoutout: \{label: "ShoutOut link"[\s\S]*?FLOQRNav\?\.shoutoutUrl\?\.\(\{locationId: id\}\)/);
   assert.match(read("admin-app.js"), /FLOQRNav\?\.shoutoutUrl\?\.\(\{locationId\}\)/);
