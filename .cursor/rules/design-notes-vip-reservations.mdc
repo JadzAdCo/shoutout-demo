@@ -1,0 +1,38 @@
+---
+description: VIP / Table Reservations (beta) — PROPOSAL awaiting owner approval (Oct 15 2026). Feature key vipReservations, roles (VIP Manager, Club Owner, Club / FloqMedia Counsel), subscription + legal state machines, Stripe Connect for deposits, floor-plan section schema, audit chain vipAuditLogs, public API keys. Nothing built.
+alwaysApply: false
+---
+
+# VIP / Table Reservations — design notes
+
+Resume: `@vip$` / `$vip-tables$`. Status: **PROPOSAL — awaiting owner approval. Not built, not published, no Firestore / Functions / rules / Stripe changes.** Full proposal: `reports/vip-reservations-proposal.md`. Floor plans: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `preview.html`). Translation follow-up: `vip-reservations-translation-incomplete.mdc`.
+
+Do **not** start building until the owner approves and answers the open questions (proposal §20), including principle 14 ("Give club admins the capability to …" was cut off).
+
+## Decisions proposed
+
+| Area | Proposal |
+|---|---|
+| Gate | Features & Services key `vipReservations` {IsFeatureEnabled 0, IsTestFeature 1}, beta-eligible; Search tile `data-feature-key="vipReservations"` (book + "VIP" icon); `data-floqr-feature` on `vip.html`, `vip-door.html`, `legal-docs.html`; `assertFeatureAccess` on every patron / promoter / staff callable and `createFloqrCheckoutSession` `orderType: "vipReservation"` |
+| Second gate | Club must be `certified` then toggle `vipReservationsEnabled=1`; fields `vipReservationsSubscribed / Certified / Enabled / Suspended`, `vipPublicListing` (0\|1, server-written) |
+| Roles | VIP Manager `vipManagerAssignments/{clubId}_{uid}` (per club, appointed by Club Admin / Owner); Club Owner `clubLocations.ownerUids` (signs agreements); Club Counsel / FloqMedia Counsel `counselAssignments/{scope}_{uid}` with bar verification; promoters need `clubPromoterApprovals` approved + own subscription |
+| Master Admin | Administers via F&S → VIP panel; SOS2FA + `FLOQRReasonPrompt` + chained audit; passkey step-up on high-risk actions; break-glass (30 min) for patron PII; club owner notified of every Master Admin change / access |
+| Audit | New chain `vipAuditLogs` + `vipAuditHead` (same `buildAuditRecord`), daily RFC 3161 anchor `vipAuditAnchors`, WORM export; retention: audit 7 y, contracts term + 7 y, consents 7 y (full IP 18 months), finance 7 y, reservation PII 24 months then anonymize, no card data, no ID images |
+| Money | Stripe Connect required for every club taking deposits (destination charges, `on_behalf_of` club — owner to confirm vs direct charges). Model A $20/month Billing subscription + fee 0; Model B `application_fee_amount = feeBps × charge`. Deposit captured at booking (default); holds 30 min (Checkout `expires_at` minimum). Refunds `reverse_transfer: true` |
+| Legal | `legalDocuments` + `versions` + `signatures`; state machine draft → inReview → approved → published / awaitingSignatures → executed → superseded / revoked; wet-ink branch with SHA-256 + TSA. Signing = passkey (WebAuthn) over the document hash + RFC 3161 + email OTP + IP; e-sign provider optional; geolocation opt-in only and never proof |
+| Data | `vipFloorPlans`, `vipSections`, `vipNights`, `vipInventory` (one doc per section-night = lock), `vipHolds`, `vipReservations` (restricted), `vipConsents` (immutable), `vipSubscriptions`, `promoterFeeAgreements`, `vipApiKeys` (hash only). All Functions-write; every collection needs a data-classification register row |
+| Floor plans | Normalized 0–1 coordinates (`rect`, `polygon`, `circle`, `pixelBox`); labels exactly as printed; non-bookable elements separate. PNG/JPG/WebP/PDF/SVG (sanitized + rasterized)/HEIC (client convert); DWG not in beta |
+| Public | Club page + `club-embed` VIP section + `venuePublicFeed dataset=vip` (publish key); scoped API keys issued by Master Admin (`availability:read`, origins allowlist, token-bucket rate limit, 7-day rotation overlap, no PII); `bookUrl` from the single canonical-origin helper |
+| Translation | Last; tier A patrons, tier B admins / promoters / VIP Managers / counsel; `vip.*` keys from day one; Terms translated by counsel, never machine; Live blocked until both tiers pass |
+
+## Attached maps (owner principle 13)
+
+- Decades (1024×619): 11 bookable (C1–C5 + C10–C11 VIP tables, C6–C9 floor tables), 2 areas labeled "VIP TABLES", non-bookable BAR, DJ BOOTH, Emergency Exit, stairs, 1 unlabeled enclosure.
+- Lima Twist (1024×382): 30 bookable — 101–106, 201–209, 301–307, 401–403 tables, 501–503 round, BAR1/BAR2 bar (confirm reservable). No exits drawn — request the full plan.
+- Capacities / amounts are placeholders. Regenerate with `node reports/vip-floorplans/build-plans.js reports/vip-floorplans`.
+
+## FIX PROMPT
+
+```
+VIP Reservations (PROPOSAL, not approved): do not build until the owner approves reports/vip-reservations-proposal.md and answers §20. When approved: feature key vipReservations (beta) via Features & Services; club certified → enable; roles VIP Manager / Club Owner / counsel; Functions-only writes; vipAuditLogs chain + RFC 3161 anchors; Stripe Connect destination charges for deposits, Model A $20/mo subscription or Model B application fee; legal docs with passkey signatures; floor plans in normalized coordinates (reports/vip-floorplans). Translation last (vip-reservations-translation-incomplete.mdc). Design notes: design-notes-vip-reservations.mdc
+```
