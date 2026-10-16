@@ -926,7 +926,22 @@ This sits next to the panels in proposal §3.6 and is SOS2FA-gated. Tabs:
 
 Decided Oct 15 2026 and removed from this list: (1) path (a) Stripe fee → patron service fee; (2) full refunds only / uncollected = nobody earns / no-show per club policy; (3) promoter commissions → corporate check AP + ledger. See the decisions block at the top and §4–§7.6.
 
-1. **Model B for POS and pay-at-venue clubs** — allowed (fees invoiced monthly, attestation required), or Model B only with path (a) / (b)?
+Cross-ref: `reports/vip-owner-decision-sheet.md` (IDs VIP-B-* / VIP-P-*). Standing: every decision ships with FloqAi/help before that surface goes Live.
+
+### Decided Batch 1 (Oct 16 2026) — money / brand / rollout that touch this doc
+
+| Sheet ID | Decision (verbatim) | Help when built |
+|---|---|---|
+| **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | `help-vip-deposit-settings`; Master Admin F&S **VIP ReserV** management; club charge-at-booking settings |
+| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | Booking / embed / API / receipt deep links use `www.floqr.app`. **Open conflict** with cutover `www.floqr.com` — owner reconcile later |
+| **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | `help-vip-reserv-brand`; protected never-translate |
+| **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | Club codes / onboarding / invoice prefixes for these three |
+
+**Still OPEN (Batch 1 money — owner clarifying; do not invent):** VIP-B-01 (destination vs direct), VIP-B-02 (Model A Connect required?), VIP-B-03 (Model B % scope/default), VIP-B-10 (Model B for POS / pay-at-venue) — maps to item 1 below and sheet money rows.
+
+### Still open (this document)
+
+1. **Model B for POS and pay-at-venue clubs** — allowed (fees invoiced monthly, attestation required), or Model B only with path (a) / (b)? *(sheet VIP-B-10 — still OPEN)*
 2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.)
 3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off.
 4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff?
@@ -937,7 +952,7 @@ Decided Oct 15 2026 and removed from this list: (1) path (a) Stripe fee → patr
 9. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only?
 10. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now?
 11. **Sales tax** — is FLOQR's fee (SaaS / booking service) taxable in DC and other launch states? Are deposits taxable at booking or at service? Stripe Tax on or off?
-12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for LIMA Twist).
+12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for Lima Twist Club, Aurelia TBD).
 13. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records.
 14. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them.
 15. **Self-billing vs promoter-issued invoices** — which is the default for club → promoter and FloqMedia → promoter commissions? Counsel to confirm self-billing agreement language.
