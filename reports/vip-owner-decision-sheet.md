@@ -22,6 +22,19 @@ Created: 2026-10-16.
 | Area names | **Club-editable** (`defaultName` → editable `name`) |
 | 360 tour | **Yes, later** (2D map is primary for beta) |
 
+### Batch 1 decided (Oct 16 2026) — status also on rows below
+
+Standing requirement (owner): **whatever decisions are made here, help is adequately documented.** Each DECIDED row carries help ids to add/update when that surface is built (FloqAi / `floqai-help-repository` + `floqr-i18n-help` when translated; beta English-only OK per `vip-reservations-translation-incomplete.mdc`).
+
+| ID | Owner answer (verbatim) | Help when built |
+|---|---|---|
+| **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | [ ] `help-vip-deposit-settings` — club charge-at-booking / deposit-or-prepay amount in F&S / club VIP settings · [ ] Master Admin F&S **VIP ReserV** management (deposit policy fields) · [ ] Club Admin settings for charge-at-booking |
+| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | [ ] `help-vip-booking-links` / embed & API docs — booking, embed, and API base URLs use `www.floqr.app` · **Open conflict** with `cutoffrequirement.mdc` (`www.floqr.com` main app) — owner reconcile later |
+| **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand` — Search tile, F&S row label, patron/admin chrome use **VIP ReserV** · protected never-translate |
+| **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | [ ] Master Admin / Club Admin onboarding help — beta venue list · [ ] floor-plan ingest topics for all three |
+
+**Still OPEN (Batch 1 — owner asked for clarification; do not invent):** VIP-B-01, VIP-B-02, VIP-B-03, VIP-B-10.
+
 ---
 
 ## A — Money & Stripe
@@ -32,7 +45,7 @@ Created: 2026-10-16.
 | VIP-B-02 | Proposal §20 Q3 | Must Model A ($20/mo) clubs still complete Stripe Connect to receive deposits? | **Yes — Connect required for any deposit-taking club** | Avoids FloqMedia holding club funds / money-transmission risk | OPEN |
 | VIP-B-03 | Proposal §20 Q4 | Model B “% of collected fees”: deposits/prepaid only, or also in-venue spend? Default %? | **Deposits + prepaid extras only · 10% (1000 bps)** | Measurable from FLOQR/POS webhooks; in-venue spend needs attestation and is Phase 2+ | OPEN |
 | VIP-B-04 | Proposal §20 Q5 | Charge patrons a FLOQR booking fee on top of deposit? | **No patron booking fee in beta** | All-in price stays the club’s deposit; Stripe processing already on patron (Oct 15) | OPEN |
-| VIP-B-05 | Proposal §20 Q6 | Default charge at booking: partial deposit % of minimum, or full minimum prepay? | **Full minimum prepay** | Strongest no-show protection; simplest refunds (full-or-none) | OPEN |
+| VIP-B-05 | Proposal §20 Q6 | Default charge at booking: partial deposit % of minimum, or full minimum prepay? | **Full minimum prepay** | Strongest no-show protection; simplest refunds (full-or-none) | **DECIDED Oct 16 2026** — D: Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. |
 | VIP-B-06 | Proposal §20 Q7 | Refund FloqMedia’s application / Model B fee when a booking is cancelled? | **Refund fee only on club-caused cancellations** | Patron cancels → platform kept work; club cancels → make patron and club whole | OPEN |
 | VIP-B-07 | Proposal §20 Q23(a) | Is the extra-guest VIP entry fee prepaid at booking? | **Yes — separate Checkout line** | Matches demo; door does not chase unpaid entry | OPEN |
 | VIP-B-08 | Proposal §20 Q23(b) | Does extra-guest fee count toward Model B %? | **Yes** | It is money FLOQR collected / attested; same fee base as deposit | OPEN |
@@ -97,10 +110,10 @@ Created: 2026-10-16.
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-P-13 | Proposal §20 Q14 · cutover rule | Canonical origin for booking / embed / API links: `www.floqr.com` or `www.floqr.app`? | **`https://www.floqr.com`** | Matches cutover canonical origin; single helper | OPEN |
-| VIP-P-14 | Proposal §20 Q19 | Beta venues: Decades + Lima Twist first? Existing `clubLocations` ids? | **Yes those two · confirm/create ids at Phase 1** | Maps already ingested; owner knows both rooms | OPEN |
+| VIP-P-13 | Proposal §20 Q14 · cutover rule | Canonical origin for booking / embed / API links: `www.floqr.com` or `www.floqr.app`? | **`https://www.floqr.com`** | Matches cutover canonical origin; single helper | **DECIDED Oct 16 2026** — B: `https://www.floqr.app` (canonical host for VIP booking/embed/API links). **Open conflict** with `cutoffrequirement.mdc` (`www.floqr.com` for main app) — owner to reconcile later if needed. |
+| VIP-P-14 | Proposal §20 Q19 | Beta venues: Decades + Lima Twist first? Existing `clubLocations` ids? | **Yes those two · confirm/create ids at Phase 1** | Maps already ingested; owner knows both rooms | **DECIDED Oct 16 2026** — D: First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). |
 | VIP-P-15 | Proposal §20 Q21 | Block Live until both translation tiers pass? Which languages get counsel Terms first? | **Block Live until tiers pass · Terms EN first, then FR/ES** | Matches `vip-reservations-translation-incomplete.mdc` | OPEN |
-| VIP-P-16 | Proposal §20 Q22 | Product name: “VIP Tables”, “VIP Reservations”, or a protected brand? | **VIP Reservations** (protected brand string) | Matches feature key `vipReservations` and F&S naming | OPEN |
+| VIP-P-16 | Proposal §20 Q22 | Product name: “VIP Tables”, “VIP Reservations”, or a protected brand? | **VIP Reservations** (protected brand string) | Matches feature key `vipReservations` and F&S naming | **DECIDED Oct 16 2026** — C: Product brand name **VIP ReserV** (owner spelling). Protected / never-translate. |
 
 ---
 
@@ -218,12 +231,13 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 
 | Group | Open IDs |
 |---|---|
-| A Money & Stripe | VIP-B-01…14 (14) |
+| A Money & Stripe | VIP-B-01…04, 06…14 (13) — B-05 decided; B-01/02/03/10 still clarifying |
 | B Roles & legal | VIP-P-01…08 (8) |
 | C Booking UX & floor plans | VIP-P-09…12 (4) |
 | D Notifications & receipts | VIP-B-15…19 (5) |
 | E Promoters & ledger | VIP-B-20…22 (3) |
-| F Brand / origin / beta | VIP-P-13…16 (4) |
+| F Brand / origin / beta | VIP-P-15 only (1) — P-13/14/16 decided |
 | G Other | VIP-B-23…24 (2) |
-| **Total OPEN** | **40** |
+| **Total OPEN** | **36** |
 | Skipped (Oct 15) | Stripe fee payer · full-or-none refunds · promoter corporate check · Lima name · bars · area names · 360 timing |
+| Decided Batch 1 (Oct 16) | VIP-B-05 · VIP-P-13 · VIP-P-14 · VIP-P-16 |

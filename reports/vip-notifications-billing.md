@@ -6,14 +6,6 @@ Companion to: [`vip-reservations-proposal.md`](vip-reservations-proposal.md) (§
 
 > Not legal, tax or accounting advice. Every compliance, tax and accounting statement below is a checklist for the owner's counsel and accountant to confirm.
 
-### Owner decisions (Oct 15 2026)
-
-Recorded verbatim-ish from the owner. Prototype that encodes them: `reports/vip-ledger-prototype/` (pure Node, no Firebase; pending approval — not wired into any page or Function).
-
-1. **Stripe processing fee on path (a):** the **patron** pays it, shown as a **service fee** line at checkout.
-2. **Refunds — no partials.** If the club / event venue policy requires a refund, it is a **full refund funded by the club / venue**. If Stripe did not collect a payment, nobody collects anything (no FLOQR fee, no commission). No-shows: per club / venue policy, either **no refund** (all commissions calculated normally) or **full refund**. Owner quote: *"I hate partial payments for refund. If a policy requires full refund, it is full refund by the clubs or event venue. If Stripe does not collect payment so does nobody. For no shows, depending on club or event venue policy, either no refund (all commissions are calculated appropriately) or full refund.. again based on clubs policy."*
-3. **Promoter commissions:** *"Invoiced and paid out via Corporate check. Account payable enters a reference payout information in a ledger. Develop these clean ledger and wire them appropriately."* → promoter invoice (or FLOQR-generated self-billing statement) → club / FloqMedia AP approval → corporate check → AP clerk records payout reference → ledger clears the payable → reconciliation when the check clears / is voided / stale-dated / reissued. See §7.6.
-
 ---
 
 ## 1. Executive summary
@@ -269,27 +261,33 @@ Each club picks a **payment mode** in Billing → Payment settings: `stripe` (a)
 
 ### 4.1 (a) FLOQR / Stripe Connect collects
 
-As in proposal §11, with the Oct 15 2026 owner decision that the **patron pays the Stripe processing fee**:
+As in proposal §11:
 
-- **Charge.** A destination charge to the club's connected account, with `on_behalf_of` the club. Checkout total = booking amount (deposit + entry fees) + **patron service fee** (gross-up so the booking amount survives Stripe's ~2.9% + 30¢). The service fee is a separate checkout line ("Service fee"). Model B adds `application_fee_amount = feeBps × bookingAmount` (not on the service fee).
-- **Refunds.** Full refund only (`refunds.create({reverse_transfer: true, refund_application_fee: true})` when the club/venue policy requires a refund). The patron service fee and the FLOQR application fee are both returned. Stripe does **not** return its processing fee; that cost is recharged to the club as a recoverable (see §5 / §7.4). Partial refunds are refused.
-- **Ledger posting.** The webhook (`stripeFloqrWebhook`, `orderType: "vipReservation"`) posts to the ledger from the actual **balance transactions**: charge (incl. service fee), transfer to club, application fee and Stripe fee. Prototype: `recordStripeBooking` / `refundFull` in `reports/vip-ledger-prototype/`.
+- **Charge.** A destination charge to the club's connected account, with `on_behalf_of` the club. Model B adds `application_fee_amount = feeBps × amount`.
+- **Refunds.** `refunds.create({reverse_transfer: true, refund_application_fee: <per agreement>})`.
+- **Ledger posting.** The webhook (`stripeFloqrWebhook`, `orderType: "vipReservation"`) posts to the ledger from the actual **balance transactions**: charge, transfer, application fee and Stripe fee.
+
+**Processing cost under Model A (owner decision).** With destination charges the **platform pays the Stripe processing fee**. The proposal's Model A sets `application_fee_amount = 0`, which would make FloqMedia pay about 2.9% + 30¢ on every deposit while earning only $20/month. Options:
+
+- set `application_fee_amount` to a processing pass-through (recommended);
+- use direct charges on Standard accounts, so the club pays the fees;
+- price Model A to absorb the cost.
 
 ```mermaid
 flowchart LR
-  P["Patron card"] -->|"$330 booking + ~$10.16 service fee"| SC["Stripe Checkout - destination charge, on_behalf_of club"]
-  SC -->|"charge $340.16"| PB["FloqMedia platform balance"]
-  PB -->|"transfer $297 (booking − FLOQR fee)"| CA["Club connected account"]
-  PB -->|"FLOQR fee $33 (Model B, retained)"| FE["4010 fee revenue"]
-  PB -->|"service fee $10.16"| SF["4030 service fee revenue"]
-  PB -->|"Stripe fee $10.16"| ST["Stripe"]
+  P["Patron card"] -->|"$330 deposit + entry fee"| SC["Stripe Checkout - destination charge, on_behalf_of club"]
+  SC -->|"charge $330"| PB["FloqMedia platform balance"]
+  PB -->|"transfer $330"| CA["Club connected account"]
+  CA -->|"application fee $33 (Model B)"| PB
+  PB -->|"Stripe fee ~$9.87 (platform pays)"| ST["Stripe"]
   CA -->|"payout"| CB["Club bank"]
-  CA -.->|"full refund: reverse_transfer + refund_application_fee"| PB
-  PB -.->|"full refund of booking + service fee"| P
-  CA -.->|"promoter commission → corporate check AP"| PR["Promoter"]
+  PB -->|"payout"| FB["FloqMedia bank"]
+  CA -.->|"refund: reverse_transfer"| PB
+  PB -.->|"refund $"| P
+  CA -.->|"promoter commission (memo, off-platform in beta)"| PR["Promoter"]
 ```
 
-Amounts are illustrative: a $250 deposit + 2 × $40 extra-guest entry = $330, Model B at 10% ($33), US card list rate. The exact service fee is computed so the net after Stripe equals the booking (see `serviceFeeCents` in the prototype).
+Amounts are illustrative: a $250 deposit + 2 × $40 extra-guest entry, no tax, Model B at 10%. The Stripe fee shown is the US card list rate and will vary.
 
 ### 4.2 (b) The club's POS processes the payment
 
@@ -299,7 +297,7 @@ FLOQR still owns the reservation, the inventory lock, consent, the receipt and t
 2. **Payment confirmation.** The POS webhook arrives — for example a Square `payment.updated` with status `COMPLETED`, or the Toast / Clover / SpotOn equivalent. `vipPosWebhook?provider=` verifies the provider signature, rejects replays (`posWebhookEvents` claim, like `stripeWebhookEvents`), and maps `reference_id` back to the reservation. It stores a `vipPosPayments` doc with provider ids only (no card data).
 3. **Confirm and receipt.** The reservation becomes `confirmed`, a `VR` receipt is issued ("Payment processed by Square for {club}"), and the notifications go out. The POS also prints or emails its own sales receipt; the FLOQR receipt says so, which avoids the patron reading it as a double charge.
 4. **Fees owed to FLOQR.** Under Model B, each confirmed POS payment posts an accrual: Dr AR-club / Cr fee revenue. The fee is billed on the monthly invoice (§6). Under Model A, nothing accrues beyond the subscription.
-5. **Refunds / disputes.** Full refund only, funded by the club through the POS. The POS refund webhook issues a `VC` credit receipt and **reverses the FLOQR fee accrual** (credit on the next invoice / AR). Partial refunds are refused. Disputes are handled by the POS processor; FLOQR records them for statistics and the evidence pack only. If the POS never collected, nobody collects (no FLOQR fee, no commission).
+5. **Refunds / disputes.** The POS refund webhook issues a `VC` credit receipt. If the refund happens in the same or the next period, the fee accrual is reversed by a credit line on the next invoice (policy: owner decision). Disputes are handled by the POS processor; FLOQR records them for statistics and the evidence pack only.
 6. **Settlement reconciliation.** Where the POS exposes settlements or payouts (for example Square Payouts), FLOQR matches each confirmed payment to a settlement. POSes without a settlement API rely on a monthly club attestation (§8.3).
 
 ```mermaid
@@ -324,7 +322,7 @@ flowchart LR
   - variance flags (reservations checked in with no payment recorded);
   - the subscription agreement grants audit rights.
 
-  Alternatively, Model B clubs may be restricted to paths (a) and (b) (still open — §14).
+  Alternatively, Model B clubs may be restricted to paths (a) and (b) (owner decision).
 
 ```mermaid
 flowchart LR
@@ -335,7 +333,6 @@ flowchart LR
   L -->|"monthly invoice FI"| V
   V -->|"pays invoice via Stripe"| PB["FloqMedia platform balance"]
   V -.->|"monthly attestation (passkey)"| L
-  V -.->|"full refund per policy; fee accrual reversed"| L
 ```
 
 ### 4.4 Who owes whom (by path)
@@ -343,31 +340,19 @@ flowchart LR
 | Obligation | (a) Stripe collects | (b) POS collects | (c) Pay at venue |
 |---|---|---|---|
 | Patron → club (deposit, entry fee) | Settled at checkout into the club's connected account | Settled by the POS | Settled at the venue |
-| Patron → FloqMedia: Stripe service fee | **Paid at checkout** (service fee line); FloqMedia uses it to cover Stripe's processing fee | — (POS fees stay with the club / POS) | — |
 | Club → FloqMedia: % fee (Model B) | **Taken at source** (`application_fee_amount`); nothing to invoice | **AR**: monthly invoice | **AR**: monthly invoice |
 | Club → FloqMedia: $20/month (Model A) | AR: subscription invoice (auto-charged) | Same | Same |
+| Club → FloqMedia: processing pass-through (Model A, if approved) | Taken at source | — | — |
 | FloqMedia → club: payout of patron funds | **None** — destination charges settle to the club, so FloqMedia never holds club funds | None | None |
-| Club → FloqMedia: Stripe fee on a full refund | **AR** (`1150`) — Stripe does not return its fee; recharged to the club | — | — |
-| Club → FloqMedia: dispute / chargeback recovery | **AR** (`1150`) until the transfer reversal or a debit succeeds | — (POS processor bears it) | — |
-| Club → promoter: commission (default) | **AP** in the club book → corporate check AP flow (§7.6); club pays | Same | Same |
-| FloqMedia → promoter: platform commission (if a FloqMedia–promoter agreement grants one) | **AP** (`2010`) → corporate check AP flow on the platform book | Same | Same |
+| Club → FloqMedia: dispute / refund loss recovery | **AR** (`1150`) until the transfer reversal or a debit succeeds | — (POS processor bears it) | — |
+| Club → promoter: commission | Memo AP in the club book; paid off-platform in beta (optional Connect transfer later, if the agreement authorizes it) | Same | Same |
+| FloqMedia → promoter: platform commission (if a FloqMedia–promoter agreement grants one) | **AP** (`2010`), paid by a Connect transfer or manually | Same | Same |
 | Promoter → FloqMedia: subscription | AR (`1110`), Billing subscription | Same | Same |
-| FloqMedia → patron: full refund | Platform refunds booking + service fee; club funds via `reverse_transfer` + `refund_application_fee` | None (POS refunds) | None (club refunds) |
-| Uncollected payment | No Stripe charge → **no entries**, no FLOQR fee, no commission | Same (no POS capture) | Comp / never paid → `recordUncollected` |
+| FloqMedia → patron: refund | Platform refunds, then recovered from the club by `reverse_transfer` | None (POS refunds) | None (club refunds) |
 
 ---
 
 ## 5. Refunds, chargebacks and promoter commissions in the money flow
-
-**Rules (owner, Oct 15 2026):** no partial refunds. A policy that requires a refund means a **full** refund funded by the club / event venue. If nothing was collected, nobody earns anything. No-shows follow the club / venue policy: **no refund** (fees and commissions stay) or **full refund**.
-
-| Event | Path (a) Stripe | Path (b) POS | Path (c) Venue |
-|---|---|---|---|
-| Full refund | Refund booking + service fee to patron; `reverse_transfer` + `refund_application_fee`; reverse FLOQR fee + service fee in the ledger; reverse / claw back promoter commissions; recharge unreturned Stripe fee to club AR `1150` | POS refunds patron; reverse FLOQR fee AR + club Due to FloqMedia; reverse commissions | Club refunds patron; same fee and commission reversals as (b) |
-| No-show, no refund | Keep booking, service fee, FLOQR fee; forfeit deposit to club revenue; commissions accrue normally | Same | Same |
-| No-show, full refund | Same journals as full refund | Same | Same |
-| Uncollected | No charge → no journals | No webhook → no journals | Comp / never paid → no journals |
-| Partial refund | **Rejected** (`PARTIAL_REFUND_FORBIDDEN`) | Rejected | Rejected |
 
 ```mermaid
 sequenceDiagram
@@ -376,16 +361,12 @@ sequenceDiagram
   participant St as Stripe (platform)
   participant Cl as Club connected account
   participant LG as Ledger
-  participant PR as Promoter AP
-  Pt->>FL: cancelVipReservation (policy requires refund)
-  Note over FL: Full refund only — partials refused
-  FL->>St: refunds.create(reverse_transfer, refund_application_fee true)
-  St->>Pt: full refund (booking + service fee)
+  Pt->>FL: cancelVipReservation (within policy)
+  FL->>St: refunds.create(reverse_transfer, refund_application_fee per agreement)
+  St->>Pt: refund
   Cl->>St: transfer reversal
   St-->>FL: charge.refunded webhook
-  FL->>LG: reverse FLOQR fee + service fee; recharge Stripe fee to club AR
-  FL->>LG: reverse / claw back promoter commissions
-  FL->>PR: payable reduced (or clawback if already invoiced)
+  FL->>LG: post reversal entries from balance transactions
   FL->>Pt: credit receipt VC (Inbox + email)
   FL->>Cl: vip.refund.issued notification
   Note over St,Cl: Dispute: platform balance is debited first
@@ -523,47 +504,47 @@ Model A Billing subscriptions use the same timeline through Stripe's subscriptio
 
 ### 7.3 Example journals
 
-The worked example is a $250 deposit + 2 × $40 extra-guest entry = **$330**, with Model B at 10% (**$33**), a patron service fee of **$10.16** (so Stripe's ~$10.16 fee is covered), and a promoter commission of 10% of the deposit (**$25**). Prototype account codes differ slightly from the chart above where the prototype is more specific (e.g. `2500` club payouts in transit, `2015` accrued commissions); the mapping is in `reports/vip-ledger-prototype/README.md`.
+The worked example is a $250 deposit + 2 × $40 extra-guest entry = **$330**, with Model B at 10% (**$33**), a Stripe fee of about **$9.87**, and a promoter commission of 10% of the deposit (**$25**).
 
-**(a) Stripe collects** — patron pays the service fee (owner decision):
+**(a) Stripe collects** — posted from the balance transactions:
 
 | Book | Dr | Cr | Amount |
 |---|---|---|---|
-| platform | 1000 Stripe balance | 2500 Club payouts in transit + 4030 Service fee | 330.00 + 10.16 |
-| platform | 2500 Club payouts in transit | 1000 (transfer to club) + 4010 FLOQR fee | 297.00 + 33.00 |
-| platform | 5000 Stripe fees | 1000 Stripe balance | 10.16 |
-| club | Connected account balance + Fees to FloqMedia | Deposits held + Entry fee revenue | 297.00 + 33.00 → 250.00 + 80.00 |
-| club | Promoter commission expense | Accrued promoter commissions (2015) | 25.00 |
+| platform | 1000 Stripe balance | 1200 Patron funds clearing | 330.00 |
+| platform | 1200 Patron funds clearing | 1000 Stripe balance (transfer to club) | 330.00 |
+| platform | 1000 Stripe balance | 4010 Percentage fees (application fee) | 33.00 |
+| platform | 5000 Stripe fees | 1000 Stripe balance | 9.87 |
+| club | Connected account balance | Customer deposits to apply to tab | 250.00 |
+| club | Connected account balance | Entry fee revenue | 80.00 |
+| club | Fees to FloqMedia | Connected account balance | 33.00 |
+| club | Promoter commission expense | Due to promoters (promoter X) | 25.00 |
 
-**(b) POS collects** — at the webhook, then at invoicing (no patron service fee):
+**(b) POS collects** — at the webhook, then at invoicing:
 
 | Book | Dr | Cr | Amount | When |
 |---|---|---|---|---|
-| club | POS clearing | Deposits held / Entry fee revenue | 250.00 / 80.00 | POS payment confirmed |
-| platform | 1100 AR — club | 4010 FLOQR fee | 33.00 | Same webhook (accrual) |
+| club | POS clearing | Customer deposits / Entry fee revenue | 250.00 / 80.00 | POS payment confirmed |
+| platform | 1100 AR — club | 4010 Percentage fees | 33.00 | Same webhook (accrual) |
 | club | Fees to FloqMedia | Due to FloqMedia | 33.00 | Same |
 | platform | 1000 Stripe balance (net) + 5000 fees | 1100 AR — club | 33.00 | `invoice.paid` for FI-… |
 | club | Due to FloqMedia | POS clearing / bank (memo) | 33.00 | Same |
 
-**(c) Pay at venue:** the same as (b), with `Cash / terminal at venue` replacing `POS clearing`, posted when the VIP Manager presses **Mark paid**. Uncollected / comps: **no journals**.
+**(c) Pay at venue:** the same as (b), with `Cash / terminal at venue` replacing `POS clearing`, posted when the VIP Manager presses **Mark paid**.
 
 **Model A subscription (any path):** at `invoice.finalized`, Dr 1100 AR / Cr 2300 Deferred revenue $20. At `invoice.paid`, Dr 1000 / Cr 1100. Across the service period, Dr 2300 / Cr 4000. Recognition is daily or at month end (accountant to choose).
 
 ### 7.4 Refunds, disputes and chargebacks in the ledger
 
-Partial refunds are **not posted** — the Functions callable rejects them. Full refunds reverse every component that was collected.
-
 | Event | Path | Entries (platform book unless noted) |
 |---|---|---|
-| Full refund (`refund_application_fee: true`) | a | Reverse FLOQR fee (4010) and service fee (4030) against Stripe balance; recharge unreturned Stripe fee to club AR 1150 (and club Due to FloqMedia / refund processing cost); reverse club deposits held + entry fee; reverse / claw back promoter commissions |
-| No-show, no refund | a/b/c | Club: Dr deposits held / Cr forfeited deposits. Fees and commissions **unchanged** |
-| No-show, full refund | a/b/c | Same as full refund |
-| Uncollected | any | No entries |
+| Full refund, club-caused (`refund_application_fee: true`) | a | Reverse the charge, transfer and fee from balance transactions. The Stripe fee is **not** returned by Stripe and stays in 5000 |
+| Refund, patron-caused, fee kept per agreement | a | Charge and transfer reversed. The fee stays in 4010 and the club memo book shows the fee as a club cost |
 | Dispute opened | a | Dr 1150 Recoverable (club) / Cr 1000 (amount + dispute fee) |
 | Dispute recovered by transfer reversal | a | Dr 1000 / Cr 1150 |
 | Dispute won | a | Stripe returns the funds: Dr 1000 / Cr 1150. The dispute fee stays in 5010 unless Stripe returns it |
 | Recovery fails | a | Stays in 1150 and ages like AR; written off to 5010 by Master Admin (SOS2FA + reason + second approver) |
-| POS / venue full refund | b, c | Dr 4010 / Cr 1100 (credit on the next invoice); club reverses deposits / entry fee and Due to FloqMedia; reverse commissions |
+| POS refund reported | b | Dr 4010 / Cr 1100 (credit line on the next invoice), within the fee-refund policy window |
+| Venue refund recorded | c | Same as b |
 | Invoice uncollectible | b, c | Dr 5020 Bad debt / Cr 1100 |
 
 ### 7.5 Aging, statements and balances
@@ -575,48 +556,12 @@ Partial refunds are **not posted** — the Functions callable rejects them. Full
 - **Statements.** Monthly per party (club, promoter) at period close: opening balance, activity (invoices, payments, credits, fees withheld at source, commissions), closing balance, aging, and the list of receipts. Each statement is a PDF + Inbox + email (`vip.statement.ready`), numbered `ST-{CLUB}-{YYYY}-{MM}`, and kept 7 years.
 - **Balances.** `vipLedgerBalances/{book}_{account}_{party}` holds the projections, updated in the posting transaction. A nightly `verifyVipLedger` recomputes them from the entries and alerts on any drift.
 
-### 7.6 Promoter commissions (corporate check AP — owner decision Oct 15 2026)
+### 7.6 Promoter commissions
 
-Commissions are **invoiced and paid out via corporate check**. Account Payable records payout reference information in the ledger. Prototype: `accrueCommission` → `approvePromoterInvoice` → `recordCheckPayout` → `recordCheckCleared` / `voidCheck` / `reissueCheck` in `reports/vip-ledger-prototype/`.
-
-#### Who pays the promoter
-
-| Agreement | Book | Who issues the check |
-|---|---|---|
-| Club ↔ promoter (default) | `club:{clubId}` memo book | The **club** (Club Owner / Club Admin approves; club AP clerk records the check) |
-| FloqMedia ↔ promoter (platform commission) | `platform` book | **FloqMedia** (Master Admin approves with SOS2FA + `FLOQRReasonPrompt`; FloqMedia AP clerk records the check; segregation of duties — approver ≠ payout clerk) |
-
-#### AP flow
-
-```mermaid
-flowchart TD
-  A["Commission accrued on settlement<br/>Dr 5030 / Cr 2015"] --> B["Promoter invoice OR FLOQR self-billing statement"]
-  B --> C{"Approver"}
-  C -->|"Club book: Owner / Club Admin"| D["Approve (reason >= 8)"]
-  C -->|"Platform book: Master Admin<br/>SOS2FA + FLOQRReasonPrompt"| D
-  D -->|"Dr 2015 / Cr 2010"| E["Corporate check issued"]
-  E --> F["AP clerk records payout reference<br/>check #, bank, date, amount, payee, memo, stub SHA optional"]
-  F -->|"Dr 2010 / Cr 2050 Outstanding checks"| G["vipPayouts method=check"]
-  G --> H{"Reconciliation"}
-  H -->|"Clears the bank"| I["Dr 2050 / Cr bank · status cleared"]
-  H -->|"Void / stale-dated (e.g. 180 days)"| J["Dr 2050 / Cr 2010 · payable reopens"]
-  J --> K["Reissue with a new check number"]
-  K --> F
-```
-
-1. **Accrue** on settlement (check-in / completed night): Dr 5030 / Cr 2015. Terms from `promoterFeeAgreements` (`percentOfDeposit`, `flatPerTable`, `percentOfMinimum`). Reversed on full refund; kept on a no-show only when the club policy is no-refund.
-2. **Document.** The promoter sends an invoice, **or** FLOQR generates a self-billing statement under a signed self-billing agreement (`documentType: promoterInvoice | selfBillingStatement`).
-3. **Approve.** Club book: Club Owner / Club Admin. Platform book: Master Admin with SOS2FA session + `FLOQRReasonPrompt` (reason ≥ 8). Moves 2015 → 2010 AP.
-4. **Corporate check issued** outside FLOQR (the club's or FloqMedia's bank).
-5. **AP clerk records the payout reference** in `vipPayouts`: `method: "check"`, `checkNumber`, `bankName`, `checkDateMs`, `amountCents` (must equal the approved invoice), `payee`, `memo`, optional `stubSha256` of a scanned stub. Posts Dr 2010 / Cr 2050. Idempotent; duplicate check numbers on the same bank are refused.
-6. **Clear.** When the check clears the bank statement: Dr 2050 / Cr operating bank; `status: cleared`, `clearedAtMs`.
-7. **Void / stale-dated / reissue.** Outstanding checks older than e.g. **180 days** are flagged. Void (approver role + reason) reopens AP 2010. Reissue requires a **new** check number; the original stays `void` with `reissueOf` on the new payout.
-
-#### Tax note (flag for counsel — not advice)
-
-US promoters paid by corporate check likely need a **W-9** on file and may receive a **1099-NEC** (or successor form) from the paying entity (club or FloqMedia). The current filing threshold and backup-withholding rules change; **counsel and the accountant must confirm** before go-live. FLOQR should store `taxIdOnFile` / `w9ReceivedAtMs` flags on the promoter party and produce year-end export totals from the payer's book — it must not file forms itself without counsel sign-off.
-
-Stripe Connect transfers for promoter payouts remain an optional later path (`method: "stripe"` on `vipPayouts`) and need a money-transmission review before enablement.
+- **Commission terms** come from `promoterFeeAgreements` (proposal §6.6): `percentOfDeposit`, `flatPerTable` or `percentOfMinimum`. Commissions are **earned on settlement**, meaning check-in or a completed night, not on booking. They are reversed on cancellation and refund, and kept on a no-show only if the agreement says so.
+- **Club → promoter commissions** (beta default): tracked in the club memo book as `Due to promoters`. The club pays off-platform and records **Mark commission paid** (amount, method, date). The promoter sees the same lines on their statement and can **Confirm received** or **Dispute**.
+- **Optional later:** if the club's agreement authorizes it, FLOQR raises `application_fee_amount` by the commission and pays the promoter by a Connect transfer. FloqMedia then temporarily holds promoter money (2010 AP). That needs counsel review (money-transmission analysis) before it is enabled.
+- **FloqMedia → promoter commissions:** AP 2010, paid by a Connect transfer when the promoter has a connected account, otherwise manually. Year-end tax forms (1099-NEC for US promoters; the threshold changed recently, so the accountant must confirm the current amount) are produced from the `promoter:{uid}` book.
 
 ### 7.7 Period close
 
@@ -745,7 +690,7 @@ Classification follows `design-notes-data-classification.mdc`: **P**ublic · **I
 | `vipLedgerPeriods/{book}_{yyyy-mm}` | `status` `open\|closing\|closed\|reopened`, `checklist {...}`, `closedByUid`, `closedAtMs`, `reopenApprovals[]`, `trialBalanceSha256` | I | master, finance; club sees status | Functions |
 | `vipAgingSnapshots/{yyyy-mm-dd}_{book}` | `asOfMs`, `rows [{partyType, partyId, current, d0_30, d31_60, d61_90, d90p}]`, `totals` | CC | master, finance; party for own row via callable | Functions |
 | `vipStatements/{id}` | `number` (ST-), `partyType`, `partyId`, `periodId`, `openingCents`, `closingCents`, `pdfPath`, `pdfSha256`, `issuedAtMs` | CC | party admins, master, finance | Functions |
-| `vipPayouts/{id}` | `method` `check\|stripe`, `kind` `clubConnectPayout\|promoterTransfer\|platformPayout\|promoterCheck`, `invoiceId`, `partyId` / `promoterUid`, `amountCents`, `status` `issued\|cleared\|void`, for checks: `checkNumber`, `bankName`, `checkDateMs`, `payee`, `memo`, `stubSha256`, `clearedAtMs`, `voidReason`, `staleDated`, `reissueOf`; for Stripe: `stripePayoutId` / `transferId`, `arrivalDateMs`, `balanceTxnIds[]` | CC | party admins, master, finance | Functions |
+| `vipPayouts/{id}` | `kind` `clubConnectPayout\|promoterTransfer\|platformPayout`, `stripePayoutId` / `transferId`, `partyId`, `amountCents`, `arrivalDateMs`, `status`, `balanceTxnIds[]` | CC | party admins, master, finance | Functions |
 | `vipSettlements/{id}` | `provider` `stripe\|square\|toast\|spoton\|clover\|venue`, `clubLocationId`, `periodStartMs`, `periodEndMs`, `grossCents`, `feesCents`, `netCents`, `matchedPaymentIds[]`, `unmatched[]`, `status` | CC | club managers, master, finance | Functions |
 | `vipReconciliations/{yyyy-mm-dd}` | `cursor`, `matched`, `exceptions [{type, sourceId, suggested, resolvedBy, reason}]` | I | master, finance | Functions |
 | `vipAttestations/{clubId}_{yyyymm}` | `totals`, `signerUid`, `webauthn {...}`, `tsaToken`, `signedAtMs` | CC | club owner, master | Functions |
@@ -924,27 +869,41 @@ This sits next to the panels in proposal §3.6 and is SOS2FA-gated. Tabs:
 
 ## 14. Open owner decisions
 
-Decided Oct 15 2026 and removed from this list: (1) path (a) Stripe fee → patron service fee; (2) full refunds only / uncollected = nobody earns / no-show per club policy; (3) promoter commissions → corporate check AP + ledger. See the decisions block at the top and §4–§7.6.
+Cross-ref: `reports/vip-owner-decision-sheet.md` (IDs VIP-B-* / VIP-P-*). Standing: every decision ships with FloqAi/help before that surface goes Live.
 
-1. **Model B for POS and pay-at-venue clubs** — allowed (fees invoiced monthly, attestation required), or Model B only with path (a) / (b)?
-2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.)
-3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off.
-4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff?
-5. **Receipt issuer** — the club as merchant of record with "processed by FLOQR" (recommended), or FloqMedia as the issuer?
-6. **Receipts in path (c)** — should FLOQR always issue them, or may the club opt out because its own POS / terminal already issues one?
-7. **Dunning timeline** — the days in §6.4, and whether new bookings pause at day 21.
-8. **Credit-note threshold for a second approver** — suggested $500.
-9. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only?
-10. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now?
-11. **Sales tax** — is FLOQR's fee (SaaS / booking service) taxable in DC and other launch states? Are deposits taxable at booking or at service? Stripe Tax on or off?
-12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for LIMA Twist).
-13. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records.
-14. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them.
-15. **Self-billing vs promoter-issued invoices** — which is the default for club → promoter and FloqMedia → promoter commissions? Counsel to confirm self-billing agreement language.
-16. **Stale-dated check window** — confirm 180 days (or the bank's policy) before an outstanding check is auto-flagged for void / reissue.
-17. **1099 / W-9** — counsel confirms the US promoter tax package (W-9 collection, 1099-NEC threshold, which entity files when the club vs FloqMedia pays).
+### Decided Batch 1 (Oct 16 2026) — money / brand / rollout that touch this doc
+
+| Sheet ID | Decision (verbatim) | Help when built |
+|---|---|---|
+| **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | `help-vip-deposit-settings`; Master Admin F&S **VIP ReserV** management; club charge-at-booking settings |
+| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | Booking / embed / API / receipt deep links use `www.floqr.app`. **Open conflict** with cutover `www.floqr.com` — owner reconcile later |
+| **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | `help-vip-reserv-brand`; protected never-translate |
+| **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | Club codes / onboarding / invoice prefixes for these three |
+
+**Still OPEN (Batch 1 money — owner clarifying; do not invent):** VIP-B-01 (destination vs direct), VIP-B-02 (Model A Connect required?), VIP-B-03 (Model B % scope/default), VIP-B-10 (Model B for POS / pay-at-venue) — maps to items 1–2 below.
+
+### Still open (this document)
+
+1. **Model A processing cost** — with destination charges FloqMedia pays the Stripe fee. Pass it through as `application_fee_amount` (recommended), switch to direct charges, or absorb it? *(related: sheet VIP-B-01 — still OPEN)*
+2. **Model B for POS and pay-at-venue clubs** — allowed (fees invoiced monthly, attestation required), or Model B only with path (a) / (b)? *(sheet VIP-B-10 — still OPEN)*
+3. **Fee on refunds and no-shows** — is FLOQR's % fee returned on club-caused refunds, patron-caused refunds and POS refunds reported later? For how many days after the payment?
+4. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.)
+5. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off.
+6. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff?
+7. **Receipt issuer** — the club as merchant of record with "processed by FLOQR" (recommended), or FloqMedia as the issuer?
+8. **Receipts in path (c)** — should FLOQR always issue them, or may the club opt out because its own POS / terminal already issues one?
+9. **Dunning timeline** — the days in §6.4, and whether new bookings pause at day 21.
+10. **Credit-note threshold for a second approver** — suggested $500.
+11. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only?
+12. **Promoter commissions** — off-platform tracking only in beta (recommended), or FLOQR pays promoters by Connect transfer (needs counsel's money-transmission review)?
+13. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now?
+14. **Sales tax** — is FLOQR's fee (SaaS / booking service) taxable in DC and other launch states? Are deposits taxable at booking or at service? Stripe Tax on or off?
+15. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for Lima Twist Club, Aurelia TBD).
+16. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records.
+17. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them.
+
+---
 
 ## 15. Files
 
-- `reports/vip-notifications-billing.md` — this document (new).
-- `reports/vip-ledger-prototype/` — tested pure-Node double-entry ledger prototype (pending owner approval; not wired into app/Functions). It reuses: `functions/mail-log.js`, `functions/twilio-log.js`, `functions/secret-redaction.js`, `functions/receipt-delivery.js`, `functions/messaging-core.js` (`selectedClubAlertChannels`, `describeOutboundSkip`), `functions/commerce-functions.js` (`createFloqrCheckoutSession`, `stripeFloqrWebhook`, `claimStripeWebhookEvent`, `recordRefundEvent`, `recordDisputeEvent`, `syncSchedulingSubscriptionFromStripe`), `admin-notifications.js` (`messageTemplates` pane), and `firestore.rules` (`isConstrainedInboxCreate`, `clubNotificationSettings`, Twilio log reads).
+- `reports/vip-notifications-billing.md` — this document (new). It reuses: `functions/mail-log.js`, `functions/twilio-log.js`, `functions/secret-redaction.js`, `functions/receipt-delivery.js`, `functions/messaging-core.js` (`selectedClubAlertChannels`, `describeOutboundSkip`), `functions/commerce-functions.js` (`createFloqrCheckoutSession`, `stripeFloqrWebhook`, `claimStripeWebhookEvent`, `recordRefundEvent`, `recordDisputeEvent`, `syncSchedulingSubscriptionFromStripe`), `admin-notifications.js` (`messageTemplates` pane), and `firestore.rules` (`isConstrainedInboxCreate`, `clubNotificationSettings`, Twilio log reads).
