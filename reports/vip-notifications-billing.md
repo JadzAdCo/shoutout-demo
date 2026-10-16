@@ -14,6 +14,19 @@ Recorded verbatim-ish from the owner. Prototype that encodes them: `reports/vip-
 2. **Refunds — no partials.** If the club / event venue policy requires a refund, it is a **full refund funded by the club / venue**. If Stripe did not collect a payment, nobody collects anything (no FLOQR fee, no commission). No-shows: per club / venue policy, either **no refund** (all commissions calculated normally) or **full refund**. Owner quote: *"I hate partial payments for refund. If a policy requires full refund, it is full refund by the clubs or event venue. If Stripe does not collect payment so does nobody. For no shows, depending on club or event venue policy, either no refund (all commissions are calculated appropriately) or full refund.. again based on clubs policy."*
 3. **Promoter commissions:** *"Invoiced and paid out via Corporate check. Account payable enters a reference payout information in a ledger. Develop these clean ledger and wire them appropriately."* → promoter invoice (or FLOQR-generated self-billing statement) → club / FloqMedia AP approval → corporate check → AP clerk records payout reference → ledger clears the payable → reconciliation when the check clears / is voided / stale-dated / reissued. See §7.6.
 
+### Owner decisions (Oct 16 2026) — payment collector & Model B (sheet IDs)
+
+Standing: every decision ships with FloqAi/help before that surface goes Live. Full rows + help-id checklists: §14 and `reports/vip-owner-decision-sheet.md`.
+
+| ID | Decision | Help when built |
+|---|---|---|
+| **VIP-B-01** | Payment collector chosen at management level (Master Admin + club in Services & Features / VIP ReserV): (1) **Club POS** — Master Admin connects club POS; collection via that integration. (2) **Club Stripe** — club’s own Stripe Connect. (3) **FloqR Stripe** — FloqR platform Stripe. | [ ] `help-vip-payment-collector` |
+| **VIP-B-02** | Derived from B-01 (not blanket for $20/mo): Club Stripe → Connect required; FloqR Stripe → Connect not required; Club POS → POS connection required, Connect not required for collection. Model A vs B separate from collector. | [ ] Covered by `help-vip-payment-collector` |
+| **VIP-B-03** | C — Model B % includes **in-venue spend** (not only app deposit/prepaid). POS needed to measure in-venue spend. | [ ] `help-vip-model-b-in-venue-percent` |
+| **VIP-B-10** | A — Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). | [ ] `help-vip-model-b-pos` |
+
+**Open follow-up:** **VIP-B-03b** — what percent number? (placeholder recommend **10%** until answered).
+
 ---
 
 ## 1. Executive summary
@@ -932,16 +945,23 @@ Cross-ref: `reports/vip-owner-decision-sheet.md` (IDs VIP-B-* / VIP-P-*). Standi
 
 | Sheet ID | Decision (verbatim) | Help when built |
 |---|---|---|
-| **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | `help-vip-deposit-settings`; Master Admin F&S **VIP ReserV** management; club charge-at-booking settings |
+| **VIP-B-01** | Payment collector chosen at management level (Master Admin + club in Services & Features / VIP ReserV): (1) Club POS — Master Admin connects club POS; collection via that integration. (2) Club Stripe — club’s own Stripe Connect. (3) FloqR Stripe — FloqR platform Stripe. Owner quote: *If Clubs has an integrated POS system so if it chooses to have Master Admin connect the club's own POS system then this will be controlled at the management level, or they can opt for stripe (club's stripe) or opt to use FloqR's Stripe.* | [ ] `help-vip-payment-collector` |
+| **VIP-B-02** | Derived from B-01 (not blanket for $20/mo): Club Stripe → Connect required; FloqR Stripe → Connect not required; Club POS → POS connection required, Connect not required for collection. Model A vs B separate from collector choice. | [ ] Covered by `help-vip-payment-collector` |
+| **VIP-B-03** | C — Model B percent includes in-venue spend (not only app deposit/prepaid). POS needed to measure in-venue spend. | [ ] `help-vip-model-b-in-venue-percent` |
+| **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | [ ] `help-vip-deposit-settings`; Master Admin F&S **VIP ReserV** management; club charge-at-booking settings |
+| **VIP-B-10** | A — Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). | [ ] `help-vip-model-b-pos` |
 | **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | Booking / embed / API / receipt deep links use `www.floqr.app`. **Open conflict** with cutover `www.floqr.com` — owner reconcile later |
-| **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | `help-vip-reserv-brand`; protected never-translate |
+| **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand`; protected never-translate |
 | **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | Club codes / onboarding / invoice prefixes for these three |
 
-**Still OPEN (Batch 1 money — owner clarifying; do not invent):** VIP-B-01 (destination vs direct), VIP-B-02 (Model A Connect required?), VIP-B-03 (Model B % scope/default), VIP-B-10 (Model B for POS / pay-at-venue) — maps to item 1 below and sheet money rows.
+**Open follow-up (do not invent):** **VIP-B-03b** — what Model B percent number? (placeholder recommend **10%** until answered).
+
+Maps to payment paths in §1 / §4: Club POS ≈ path (b); Club Stripe / FloqR Stripe ≈ path (a) variants; pay-at-venue remains path (c). Model B on (b)/(c) is **DECIDED** (VIP-B-10).
 
 ### Still open (this document)
 
-1. **Model B for POS and pay-at-venue clubs** — allowed (fees invoiced monthly, attestation required), or Model B only with path (a) / (b)? *(sheet VIP-B-10 — still OPEN)*
+1. ~~**Model B for POS and pay-at-venue clubs**~~ — **DECIDED VIP-B-10 A** (allow; monthly invoice + attestation or POS webhooks). Help: [ ] `help-vip-model-b-pos`.
+1b. **VIP-B-03b — Model B percent number** — what % of collected fees (incl. in-venue spend per VIP-B-03)? Placeholder recommend **10%** until answered. Help: [ ] `help-vip-model-b-in-venue-percent`.
 2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.)
 3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off.
 4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff?
