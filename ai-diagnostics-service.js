@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.53";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.54";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.54",
+      title: "VIP reserV Terms page + venue-first + confirmation",
+      checks: [
+        {label:"VIP Terms page", file:"vip-terms.html", includes:["vip-terms-app.js", "vipCheckTerms", "FLOQRSessionShell"]},
+        {label:"Single Terms consent expand", file:"functions/vip-core.js", includes:["expandConsentChecks", "REQUIRED_CONSENT_CHECKS", "vip-beta-terms-v2"]},
+        {label:"Continue to Terms CTA", file:"vip-app.js", includes:["FLOQR_VIP_HOLD", "vip-terms.html", "vipConfirmation"]},
+        {label:"Mobile info below map", file:"vip-floor-viewer.css", includes:["order: 2", "position: static"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.54\""]}
+      ]
+    },
     {
       version: "v28.44-ai",
       title: "FLOQR AI Core Layer",
@@ -1471,12 +1482,21 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-54-vip-terms-page-venue-first",
+      area:"VIP reserV / Terms / Mobile / Confirmation",
+      feature:"Venue search first → map → separate Terms page (one checkbox) → deposit → receipt",
+      changed:"vip-terms.html with full Terms verbiage + single accept; hold handoff via sessionStorage FLOQR_VIP_HOLD; recordVipConsent expands audit checks server-side; mobile selected-table info below map; vipPaid confirmation receipt card (ShoutOut-like). Package s3.1.54.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?v=s3.1.54 — venue search is first (no map until Select venue). 2) Select Aurelia → night + floor map. On a phone width, tap a green table — selected table details appear below the map (not a fixed overlay). PC keeps the side panel. 3) Hold this table → Continue to Terms → vip-terms.html shows scrollable Terms + one required checkbox (+ optional marketing) → Pay deposit (Stripe 4242…). 4) Return vipPaid=1 → confirmation receipt with Open door pass. 5) FloqAi: vip terms / accept terms vip.",
+      expected:"One Terms checkbox on a separate page with readable verbiage; venue-first workflow; mobile info below map; confirmation receipt after pay; pass link works.",
+      troubleshoot:"Multi-checkbox still on vip.html → hard refresh cache-bust s3.1.54. Terms page missing hold → sessionStorage cleared or hold expired; re-hold on map. Consent fails → Functions need expandConsentChecks deploy ([firebase-deploy]). Mobile overlay → vip-floor-viewer.css ≤600px must use position:static for aside.info."
+    },
+    {
       id:"s3-1-50-vip-aurelia-hold-checkout",
       area:"VIP reserV / Aurelia / Checkout",
       feature:"Aurelia hold → Terms → FloqR Stripe deposit (Functions live)",
       changed:"Aurelia featureGates.vipReservations=true in Firestore. Functions redeployed with aurelia.json catalog (25 tables). VIP UX: inventory summary status, Accept all required Terms, map scroll-into-view. Package s3.1.50.",
-      howToTest:"1) Sign in (beta VIP grant or Master Admin). Package s3.1.51. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=temp-democlub-1 — Aurelia map loads; status shows available/held/booked counts. 3) Tap a green table → Hold this table. 4) Accept all required Terms → Pay deposit (Stripe test card 4242…). 5) Return vipPaid=1 → portal Guest List & reserV → Show pass. Optional: Explore 3D walk-through.",
-      expected:"Hold lasts 30 min; consent required; Stripe Checkout opens; confirmed reservation + pass after pay. No “not bookable yet” on Aurelia. Stripe tip visible under Pay deposit.",
+      howToTest:"1) Sign in (beta VIP grant or Master Admin). Package s3.1.54. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=temp-democlub-1 — Aurelia map loads; status shows available/held/booked counts. 3) Tap a green table → Hold this table. 4) Continue to Terms → accept once → Pay deposit (Stripe test card 4242…). 5) Return vipPaid=1 → confirmation + portal Guest List & reserV → Show pass. Optional: Explore 3D walk-through.",
+      expected:"Hold lasts 30 min; Terms page required; Stripe Checkout opens; confirmed reservation + pass after pay. No “not bookable yet” on Aurelia.",
       troubleshoot:"not bookable yet → Functions still on old vip-core (pending Aurelia); MCP/redeploy vip-functions with aurelia.json catalog. Inventory failed → feature grant vipReservations + signed-in session. Checkout missing → commerce-functions vipReservation branch. Gate missing → clubLocations/temp-democlub-1.featureGates.vipReservations must be true."
     },
     {

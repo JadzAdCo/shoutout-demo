@@ -1,6 +1,8 @@
-/* VIP reserV — ShoutOut-style venue search → night → hold → consent → Checkout. */
+/* VIP reserV — venue search → floor map → Terms page → Checkout → confirmation. */
 (function () {
   "use strict";
+
+  const HOLD_KEY = "FLOQR_VIP_HOLD";
 
   /** Static floor plans for beta / subscribed clubs (under vip-plans/). */
   const PLAN_BY_ID = Object.freeze({
@@ -17,6 +19,7 @@
   const statusEl = document.getElementById("vipStatus");
   const gateEl = document.getElementById("vipGate");
   const appEl = document.getElementById("vipApp");
+  const confirmEl = document.getElementById("vipConfirmation");
   const searchEl = document.getElementById("vipVenueSearch");
   const gridEl = document.getElementById("vipVenueGrid");
   const countEl = document.getElementById("vipVenueCount");
@@ -27,7 +30,6 @@
   const mapTitle = document.getElementById("vipMapTitle");
   const nightEl = document.getElementById("vipNight");
   const holdBanner = document.getElementById("vipHoldBanner");
-  const consentEl = document.getElementById("vipConsent");
 
   function setExplore3d(venue) {
     if (!explore3dEl) return;
@@ -45,7 +47,6 @@
   let currentUser = null;
   let activeHold = null;
   let holdTimer = null;
-  let consentId = null;
 
   function t(key, fallback) {
     try {
@@ -75,19 +76,43 @@
     return "$" + (Number(cents || 0) / 100).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
 
-  function fillNights() {
+  function storeHold(hold) {
+    try {
+      sessionStorage.setItem(HOLD_KEY, JSON.stringify(hold || {}));
+    } catch (_) { /* ignore */ }
+  }
+
+  function clearHoldStorage() {
+    try { sessionStorage.removeItem(HOLD_KEY); } catch (_) { /* ignore */ }
+  }
+
+  function termsUrl(hold) {
+    const u = new URL("./vip-terms.html", location.href);
+    if (hold?.holdId) u.searchParams.set("holdId", hold.holdId);
+    if (hold?.clubLocationId) u.searchParams.set("location", hold.clubLocationId);
+    if (hold?.night) u.searchParams.set("night", hold.night);
+    return u.pathname.split("/").pop() + u.search;
+  }
+
+  function fillNights(preferred) {
     if (!nightEl) return;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     nightEl.innerHTML = "";
+    let matched = false;
     for (let i = 0; i < 14; i += 1) {
       const d = new Date(today.getTime() + i * 86400000);
       const iso = d.toISOString().slice(0, 10);
       const opt = document.createElement("option");
       opt.value = iso;
       opt.textContent = d.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"});
+      if (preferred && preferred === iso) {
+        opt.selected = true;
+        matched = true;
+      }
       nightEl.appendChild(opt);
     }
+    if (preferred && !matched) nightEl.value = nightEl.options[0]?.value || "";
   }
 
   function selectedNight() {
@@ -143,14 +168,18 @@
 
   function clearHoldUi() {
     activeHold = null;
-    consentId = null;
     if (holdTimer) clearInterval(holdTimer);
     holdTimer = null;
     if (holdBanner) {
       holdBanner.classList.add("hidden");
       holdBanner.innerHTML = "";
     }
-    if (consentEl) consentEl.classList.add("hidden");
+  }
+
+  function goToTerms() {
+    if (!activeHold?.holdId) return;
+    storeHold(activeHold);
+    location.href = termsUrl(activeHold);
   }
 
   function renderHoldBanner() {
@@ -167,11 +196,12 @@
         `${t("page.vip.payToday", "Pay today")} ${money(amounts.chargedCents)} · ` +
         `<span id="vipHoldClock">${mins}:${String(secs).padStart(2, "0")}</span>` +
         ` <button type="button" id="vipReleaseHold" class="buttonlike">${t("page.vip.releaseHold", "Release hold")}</button>` +
-        ` <button type="button" id="vipContinueConsent" class="primary">${t("page.vip.continueTerms", "Accept Terms & pay")}</button>`;
+        ` <button type="button" id="vipContinueConsent" class="primary">${t("page.vip.continueTerms", "Continue to Terms")}</button>`;
       document.getElementById("vipReleaseHold")?.addEventListener("click", releaseHold);
-      document.getElementById("vipContinueConsent")?.addEventListener("click", showConsent);
+      document.getElementById("vipContinueConsent")?.addEventListener("click", goToTerms);
       if (left <= 0) {
         clearHoldUi();
+        clearHoldStorage();
         setStatus(t("page.vip.holdExpired", "Your hold expired. Pick a table again."));
         refreshAvailability();
       }
@@ -179,12 +209,6 @@
     tick();
     if (holdTimer) clearInterval(holdTimer);
     holdTimer = setInterval(tick, 1000);
-  }
-
-  function showConsent() {
-    if (!consentEl || !activeHold) return;
-    consentEl.classList.remove("hidden");
-    consentEl.scrollIntoView({block: "nearest", behavior: "smooth"});
   }
 
   async function releaseHold() {
@@ -195,6 +219,7 @@
       console.warn(err);
     }
     clearHoldUi();
+    clearHoldStorage();
     setStatus(t("page.vip.holdReleased", "Hold released."));
     refreshAvailability();
   }
@@ -209,50 +234,17 @@
         sectionId,
         partySize
       });
-      activeHold = res.data;
-      consentId = null;
+      activeHold = Object.assign({}, res.data || {}, {
+        venueName: currentVenue.label || res.data?.venueName || "",
+        clubLocationId: currentVenue.id
+      });
+      storeHold(activeHold);
       renderHoldBanner();
-      showConsent();
-      setStatus(t("page.vip.holdReady", "Table held for 30 minutes. Accept Terms, then pay the deposit."));
+      setStatus(t("page.vip.holdReady", "Table held for 30 minutes. Continue to Terms, then pay the deposit."));
       refreshAvailability();
     } catch (err) {
       const msg = err?.message || err?.details || String(err);
       setStatus(msg.replace(/^.*?:\s*/, "") || t("page.vip.holdFailed", "Could not hold that table."));
-    }
-  }
-
-  async function submitConsentAndPay() {
-    if (!activeHold?.holdId) return;
-    const checks = {
-      terms: !!document.getElementById("vipCheckTerms")?.checked,
-      refund: !!document.getElementById("vipCheckRefund")?.checked,
-      noShow: !!document.getElementById("vipCheckNoShow")?.checked,
-      age21: !!document.getElementById("vipCheckAge")?.checked,
-      minimumSpend: !!document.getElementById("vipCheckMinimum")?.checked,
-      marketing: !!document.getElementById("vipCheckMarketing")?.checked
-    };
-    if (!checks.terms || !checks.refund || !checks.noShow || !checks.age21 || !checks.minimumSpend) {
-      setStatus(t("page.vip.consentRequired", "Check all required Terms boxes before paying."));
-      return;
-    }
-    setStatus(t("page.vip.recordingConsent", "Recording consent…"));
-    try {
-      const consentRes = await callable("recordVipConsent")({
-        holdId: activeHold.holdId,
-        checks
-      });
-      consentId = consentRes.data?.consentId;
-      setStatus(t("page.vip.openingCheckout", "Opening deposit checkout…"));
-      const pay = await callable("createFloqrCheckoutSession")({
-        orderType: "vipReservation",
-        payload: {holdId: activeHold.holdId, consentId}
-      });
-      const url = pay.data?.checkoutUrl;
-      if (!url) throw new Error("Checkout URL missing");
-      location.href = url;
-    } catch (err) {
-      const msg = err?.message || String(err);
-      setStatus(msg.replace(/^.*?:\s*/, "") || t("page.vip.checkoutFailed", "Checkout could not start."));
     }
   }
 
@@ -427,27 +419,98 @@
     } catch (_) { /* ignore */ }
   }
 
-  function acceptRequiredTerms() {
-    ["vipCheckTerms", "vipCheckRefund", "vipCheckNoShow", "vipCheckAge", "vipCheckMinimum"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.checked = true;
-    });
-    setStatus(t("page.vip.requiredAccepted", "Required Terms checked — optional marketing left unchecked. Tap Pay deposit."));
+  function setConfirmField(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value || "—";
+  }
+
+  async function showPaidConfirmation(params) {
+    clearHoldStorage();
+    clearHoldUi();
+    if (appEl) appEl.classList.add("hidden");
+    if (confirmEl) confirmEl.classList.remove("hidden");
+    const orderId = params.get("order") || "";
+    setConfirmField("vipConfirmOrder", orderId || "—");
+    setConfirmField("vipConfirmRef", orderId ? `VR-${orderId.slice(0, 8).toUpperCase()}` : "—");
+    setConfirmField("vipConfirmVenue", "—");
+    setConfirmField("vipConfirmNight", "—");
+    setConfirmField("vipConfirmTable", "—");
+    setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
+
+    const passLink = document.getElementById("vipConfirmPass");
+    if (passLink && window.FLOQRNav?.portalLink) {
+      passLink.href = window.FLOQRNav.portalLink({tab: "guest-list-reserv"});
+    } else if (passLink && window.FLOQRNav?.portalHome) {
+      const home = window.FLOQRNav.portalHome();
+      passLink.href = home + (home.includes("?") ? "&" : "?") + "tab=guest-list-reserv";
+    }
+
+    try {
+      const res = await callable("getMyVipReservations")({});
+      const rows = res.data?.reservations || res.data || [];
+      const list = Array.isArray(rows) ? rows : [];
+      const match = list.find(r => orderId && (r.orderId === orderId || r.commerceOrderId === orderId)) ||
+        list.find(r => r.status === "confirmed") ||
+        list[0];
+      if (match) {
+        setConfirmField("vipConfirmVenue", match.venueName || match.clubLocationId || "—");
+        setConfirmField("vipConfirmNight", match.night || "—");
+        setConfirmField("vipConfirmTable", match.sectionLabel || match.sectionId || "—");
+        if (match.reservationId && passLink) {
+          if (window.FLOQRNav?.portalLink) {
+            passLink.href = window.FLOQRNav.portalLink({tab: "guest-list-reserv", id: match.reservationId});
+          } else {
+            const base = passLink.href.split("?")[0];
+            passLink.href = `${base}?tab=guest-list-reserv&id=${encodeURIComponent(match.reservationId)}`;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("VIP confirmation receipt", err);
+    }
+  }
+
+  function hideConfirmation() {
+    if (confirmEl) confirmEl.classList.add("hidden");
+    if (appEl) appEl.classList.remove("hidden");
+    try {
+      const u = new URL(location.href);
+      u.searchParams.delete("vipPaid");
+      u.searchParams.delete("vipCancelled");
+      u.searchParams.delete("order");
+      u.searchParams.delete("session_id");
+      history.replaceState({}, "", u.pathname + u.search + u.hash);
+    } catch (_) { /* ignore */ }
   }
 
   async function showApp(user) {
     currentUser = user;
     if (gateEl) gateEl.classList.add("hidden");
-    if (appEl) appEl.classList.remove("hidden");
-    setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
-    fillNights();
-    await loadSubscribedVenues();
     const params = new URLSearchParams(location.search);
+    fillNights(params.get("night") || "");
+    await loadSubscribedVenues();
+
     if (params.get("vipPaid") === "1") {
-      setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
-    } else if (params.get("vipCancelled") === "1") {
-      setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it."));
+      await showPaidConfirmation(params);
+      return;
     }
+
+    if (appEl) appEl.classList.remove("hidden");
+    if (confirmEl) confirmEl.classList.add("hidden");
+
+    if (params.get("vipCancelled") === "1") {
+      setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — continue to Terms & pay, or release it."));
+      try {
+        const stored = JSON.parse(sessionStorage.getItem(HOLD_KEY) || "null");
+        if (stored?.holdId && Number(stored.expiresAtMs || 0) > Date.now()) {
+          activeHold = stored;
+          renderHoldBanner();
+        }
+      } catch (_) { /* ignore */ }
+    } else {
+      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+    }
+
     const loc = params.get("location");
     const match = venueCatalog.find(v => v.id === loc);
     if (match) selectVenue(match, {silent: true});
@@ -477,12 +540,13 @@
     });
     nightEl?.addEventListener("change", () => {
       clearHoldUi();
+      clearHoldStorage();
       refreshAvailability();
     });
-    document.getElementById("vipConsentPay")?.addEventListener("click", submitConsentAndPay);
-    document.getElementById("vipAcceptRequired")?.addEventListener("click", acceptRequiredTerms);
-    document.getElementById("vipConsentCancel")?.addEventListener("click", () => {
-      if (consentEl) consentEl.classList.add("hidden");
+    document.getElementById("vipConfirmAgain")?.addEventListener("click", () => {
+      hideConfirmation();
+      showSearchMode();
+      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
     });
 
     const auth = firebase.auth();
@@ -509,6 +573,7 @@
           currentUser = null;
           clearHoldUi();
           if (appEl) appEl.classList.add("hidden");
+          if (confirmEl) confirmEl.classList.add("hidden");
           if (gateEl) gateEl.classList.remove("hidden");
           setStatus(t("page.vip.needSignIn", "Sign in to explore VIP reserV floor maps."));
           return;

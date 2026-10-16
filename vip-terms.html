@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title data-i18n="page.vipTerms.title">VIP reserV Terms | FLOQR</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.54"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.54"/>
+  <link rel="stylesheet" href="./vip.css?v=s3.1.54"/>
+</head>
+<body class="vip-page vip-terms-page" data-floqr-feature="vipReservations">
+<main class="app admin-shell vip-shell">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="vip" href="./vip.html">&larr; Back to VIP reserV</a>
+  <section class="page active product-page vip-product-page">
+    <header class="topbar vip-hero">
+      <div>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./images/vip-reserv-icon.svg?v=s3.1.54" alt="VIP reserV" class="product-logo vip-hero-logo"/>
+        </div>
+        <p class="eyebrow" data-i18n="page.vipTerms.eyebrow">VIP reserV · Terms</p>
+        <h1 class="brand-mixed-case" data-i18n="page.vipTerms.title">Terms of use</h1>
+        <p class="sub" data-i18n="page.vipTerms.sub">Read the venue Terms, then accept once before paying your table deposit — same idea as confirming a paid ShoutOut.</p>
+      </div>
+      <details class="help-popout" data-floqr-help-id="help-vip-terms-consent">
+        <summary aria-label="Help">?</summary>
+        <div class="help-popout-body">
+          <strong data-i18n="help.vip.terms.title">Why accept Terms</strong>
+          <p data-i18n="help.vip.terms.body">You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.</p>
+        </div>
+      </details>
+    </header>
+
+    <p id="vipTermsStatus" class="status" aria-live="polite" data-i18n="page.vip.restoring">Restoring your FLOQR session…</p>
+
+    <div id="vipTermsGate" class="card vip-gate hidden" data-floqr-auth-chrome>
+      <p data-i18n="page.vip.signInHint">Sign in on Search / My Profile to use VIP reserV, or continue with Google if this tab has no session yet.</p>
+      <button type="button" class="primary" data-floqr-login-btn data-i18n="page.vip.googleSignIn">Google sign-in</button>
+      <p class="sub small"><a id="vipTermsOpenProfile" href="./patron-portal.html?tab=profile" data-i18n="page.vip.openProfile">Open My Profile &amp; Settings</a></p>
+    </div>
+
+    <div id="vipTermsApp" class="vip-terms-app hidden">
+      <div id="vipTermsHoldSummary" class="vip-hold-banner" aria-live="polite"></div>
+
+      <div class="card vip-consent vip-terms-card">
+        <h2 data-i18n="page.vip.termsTitle">Terms &amp; consent</h2>
+        <p class="sub small" data-i18n="page.vip.termsSub">Beta Terms — counsel publishes Live venue Terms. Read the full text below, then accept once before deposit checkout.</p>
+
+        <article id="vipTermsBody" class="vip-terms-body" aria-label="VIP reserV Terms of use">
+          <h3 data-i18n="page.vipTerms.docTitle">VIP reserV Terms of use (beta)</h3>
+          <p class="sub small" data-i18n="page.vipTerms.p1">These beta Terms apply to VIP reserV table holds and deposit payments on FLOQR. Live venue Terms will replace this placeholder when counsel publishes them. By accepting, you agree to the rules below for the club, night, and table you selected.</p>
+          <h4 data-i18n="page.vipTerms.hReservation">Reservation &amp; hold</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pReservation">A green table hold lasts 30 minutes. Paying the deposit confirms the reservation for that night and section. Bars, DJ booths, and other non-bookable areas cannot be reserved.</p>
+          <h4 data-i18n="page.vipTerms.hDeposit">Deposit, refund &amp; cancellation</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pDeposit">The amount shown as “Pay today” is charged now via FloqR Stripe Checkout. Refund and cancellation follow the venue’s published policy. Untimely cancellation or failure to arrive may forfeit the deposit in whole or in part.</p>
+          <h4 data-i18n="page.vipTerms.hNoShow">No-show</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pNoShow">If your party does not check in by the venue’s cutoff, the club may mark a no-show and keep the deposit. Opening a notify or Inbox link never changes reservation status by itself.</p>
+          <h4 data-i18n="page.vipTerms.hAge">Age &amp; ID</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pAge">You confirm you are 21 or older and will present valid government ID at the door for every guest who requires it under local law or venue policy.</p>
+          <h4 data-i18n="page.vipTerms.hMinimum">Minimum spend &amp; gratuity</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pMinimum">Table minimums, extra-guest fees, and gratuity are disclosed on the floor map before you hold. The deposit may apply toward the minimum; remaining balance is paid at the venue.</p>
+          <h4 data-i18n="page.vipTerms.hPrivacy">Privacy</h4>
+          <p class="sub small" data-i18n="page.vipTerms.pPrivacy">FLOQR stores your consent with Terms version and hash for audit. Marketing messages from the venue are optional and separate from this required acceptance.</p>
+        </article>
+
+        <label class="consent-line vip-check" for="vipCheckTerms">
+          <input type="checkbox" id="vipCheckTerms"/>
+          <span data-i18n="page.vip.checkTerms">I have read and accept the VIP reserV / venue Terms (including refund, no-show, age 21+, and minimum-spend rules)</span>
+        </label>
+        <label class="consent-line vip-check" for="vipCheckMarketing">
+          <input type="checkbox" id="vipCheckMarketing"/>
+          <span data-i18n="page.vip.checkMarketing">Optional: venue marketing messages</span>
+        </label>
+
+        <div class="vip-consent-actions button-row">
+          <a id="vipTermsBack" class="buttonlike" href="./vip.html" data-i18n="page.vip.consentCancel">Back to map</a>
+          <button type="button" id="vipConsentPay" class="primary" data-i18n="page.vip.consentPay">Pay deposit</button>
+        </div>
+        <p class="sub small vip-stripe-hint" data-i18n="page.vip.stripeTestHint">Stripe test card: 4242 4242 4242 4242 · any future expiry · any CVC.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.1.54"></script>
+<script src="./floqr-session-shell.js?v=s3.1.54"></script>
+<script src="./feature-gates.js?v=s3.1.54"></script>
+<script src="./floqr-i18n.js?v=s3.1.54"></script>
+<script src="./floqr-feature-services.js?v=s3.1.54"></script>
+<script src="./floqr-nav.js?v=s3.1.54"></script>
+<script src="./floqai-help-repository.js?v=s3.1.54"></script>
+<script src="./helper-popouts.js?v=s3.1.54"></script>
+<script src="./global-profile-status.js?v=s3.1.54"></script>
+<script src="./vip-terms-app.js?v=s3.1.54"></script>
+</body>
+</html>

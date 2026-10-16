@@ -330,7 +330,9 @@ When adding a section, use this skeleton:
 | **Brand** | VIP reserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
-| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero (ShoutOut-like), venue search of `venueMayUse("vipReservations")` clubs only, night picker, 30‑min hold, Terms consent, FloqR Stripe deposit |
+| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero (ShoutOut-like). **Workflow:** venue search first → select club → floor map + night → 30‑min hold → `vip-terms.html` (full Terms verbiage + one accept checkbox) → FloqR Stripe deposit → confirmation receipt on `vip.html?vipPaid=1` |
+| **Terms page** | `vip-terms.html` + `vip-terms-app.js` — satellite session shell; hold via `sessionStorage` `FLOQR_VIP_HOLD` + `?holdId=`; single required `checks.terms` (server `expandConsentChecks` fills refund/noShow/age21/minimumSpend; marketing optional) |
+| **Mobile map** | `vip-floor-viewer.css` ≤600px — selected table `#info` in document flow **below** the map (not fixed bottom sheet). Desktop sticky side panel unchanged |
 | **Profile menu** | `global-profile-status.js` `featureLink("vipReservations", …, "VIP reserV")` — same Features & Services gate as Search tile |
 | **VCC tab** | Club Admin `panelFloqCast` label forced to **floqCast** (never legacy `supRstar`) |
 | **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
@@ -338,8 +340,8 @@ When adding a section, use this skeleton:
 | **Search icon** | `images/vip-reserv-icon.svg` + `shoutout-icon-card` (same 132/116px as ShoutOut) |
 | **Floor plans** | Static `vip-plans/` (`decades.json`, `lima-twist.json`, `aurelia.json`) + `functions/vip-beta-catalog.js`. Aurelia 2D published; 3D walk-through at `reports/vip-aurelia-demo/` (Explore 3D CTA on `vip.html`) |
 | **Product chrome** | Same pink/cyan body + glass cards as ShoutOut — `styles.css` + scoped `vip-floor-viewer.css` (never global `:root`/`body` flat black). Rule: `.cursor/rules/design-notes-product-chrome.mdc` |
-| **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-door.html` |
-| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent`, `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`. Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
+| **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-terms.html` / `vip-door.html` |
+| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent` (single Terms check + expand), `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`. Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
 | **Data** | `vipInventory`, `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
 | **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
@@ -347,7 +349,7 @@ When adding a section, use this skeleton:
 | **Not yet** | Club Admin VIP tab, promoter path, counsel Live Terms, Model B invoicing |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc`, `.cursor/rules/design-notes-product-chrome.mdc`, `.cursor/rules/design-notes-aurelia-scene-standard.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
-| **Package** | s3.1.51 |
+| **Package** | s3.1.54 |
 
 ## Feature & Orders (patron portal)
 

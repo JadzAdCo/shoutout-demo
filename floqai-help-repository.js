@@ -399,7 +399,7 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick), choose a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
+      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick). Choose a venue first, then the floor map and night, tap a green table, hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
@@ -427,10 +427,11 @@
     {
       id: "help-vip-terms-consent",
       title: "VIP reserV Terms & consent",
-      body: "Before deposit checkout you must accept the venue Terms, refund/cancellation, no-show/forfeit, age 21+ with ID, and minimum-spend disclosure. Consent is recorded server-side with the Terms version hash. Marketing opt-in is optional.",
-      searchPhrases: ["vip terms", "table terms", "vip consent", "accept terms vip", "minimum spend disclosure"],
+      body: "After you hold a table, VIP reserV opens a separate Terms page with the full venue Terms text. Accept once (covers refund, no-show, age 21+, and minimum spend). Optional marketing is separate. Consent is stored with the Terms version hash before FloqR Stripe Checkout — then receipt and door pass, like a paid ShoutOut.",
+      searchPhrases: ["vip terms", "table terms", "vip consent", "accept terms vip", "minimum spend disclosure", "vip terms of use"],
       links: [
-        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
+        {label: "VIP Terms page", href: pageUrl("./vip-terms.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin"]

@@ -7,13 +7,17 @@ const crypto = require("crypto");
 
 const HOLD_MS = 30 * 60 * 1000;
 const BETA_TERMS = Object.freeze({
-  termsDocId: "vip-beta-terms-v1",
-  termsVersion: "1",
+  termsDocId: "vip-beta-terms-v2",
+  termsVersion: "2",
   termsSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  title: "VIP reserV beta Terms (placeholder — counsel publishes Live Terms)"
+  title: "VIP reserV Terms of use (beta — counsel publishes Live Terms)"
 });
 
-const REQUIRED_CONSENT_CHECKS = Object.freeze([
+/** Single patron checkbox on vip-terms.html; server expands to full audit checks. */
+const REQUIRED_CONSENT_CHECKS = Object.freeze(["terms"]);
+
+/** Stored on vipConsents for refund / door / counsel audit (all true when Terms accepted). */
+const EXPANDED_CONSENT_CHECKS = Object.freeze([
   "terms",
   "refund",
   "noShow",
@@ -125,6 +129,14 @@ function consentChecksComplete(checks = {}) {
   return REQUIRED_CONSENT_CHECKS.every(key => checks[key] === true);
 }
 
+/** Expand one Terms acceptance into the full audit checklist (marketing stays optional). */
+function expandConsentChecks(checks = {}) {
+  const out = {};
+  EXPANDED_CONSENT_CHECKS.forEach(key => { out[key] = true; });
+  out.marketing = checks.marketing === true;
+  return out;
+}
+
 function holdExpiresAtMs(nowMs = Date.now()) {
   return nowMs + HOLD_MS;
 }
@@ -139,6 +151,7 @@ module.exports = {
   HOLD_MS,
   BETA_TERMS,
   REQUIRED_CONSENT_CHECKS,
+  EXPANDED_CONSENT_CHECKS,
   BETA_VENUES,
   text,
   inventoryKey,
@@ -150,6 +163,7 @@ module.exports = {
   hashToken,
   newQrToken,
   consentChecksComplete,
+  expandConsentChecks,
   holdExpiresAtMs,
   sectionFromPlan
 };

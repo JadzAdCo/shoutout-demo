@@ -34,6 +34,7 @@ This failed in production as: parent `patron-portal.html` signed in, child ifram
 | `promoter-admin.html` | Promoter tools |
 | `floqcast-search.html` / `floqcast-preview.html` | floqCast |
 | `template-tags.html` | Club Admin “Manage template tags” + Inbox `templateRole` |
+| `vip.html` / `vip-terms.html` / `vip-door.html` | VIP reserV book → Terms → door |
 
 **Exceptions (no patron session UI):** `display.html` / `display2.html` (Xibo), seed/debug/onboarding tools.
 

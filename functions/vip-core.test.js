@@ -20,11 +20,16 @@ test("computePartyAmounts uses beta demo pricing and never trusts client fees", 
   assert.equal(amounts.currency, "USD");
 });
 
-test("consentChecksComplete requires all mandatory boxes", () => {
+test("consentChecksComplete requires the single Terms acceptance", () => {
   assert.equal(core.consentChecksComplete({}), false);
-  assert.equal(core.consentChecksComplete({
-    terms: true, refund: true, noShow: true, age21: true, minimumSpend: true
-  }), true);
+  assert.equal(core.consentChecksComplete({terms: true}), true);
+  const expanded = core.expandConsentChecks({terms: true, marketing: true});
+  assert.equal(expanded.terms, true);
+  assert.equal(expanded.refund, true);
+  assert.equal(expanded.noShow, true);
+  assert.equal(expanded.age21, true);
+  assert.equal(expanded.minimumSpend, true);
+  assert.equal(expanded.marketing, true);
 });
 
 test("beta catalog covers Decades, Lima Twist, and Aurelia bookable sections", () => {
