@@ -121,9 +121,9 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-B-20 | Proposal §20 Q8 (price only; payout = corporate check) | Promoter platform subscription also $20/month? | **Yes — $20/month** | Same Model A as clubs; simple catalog | OPEN |
-| VIP-B-21 | Billing §14 Q13 | Revenue recognition system: QuickBooks Online or Xero? Daily or monthly sub recognition? Map chart now? | **QuickBooks Online · monthly recognition · map chart at Phase 6** | Common for US SMBs; CSV export covers beta | OPEN |
-| VIP-B-22 | Billing §14 Q15 | Confirm 3–5 letter club codes for numbering (e.g. `DEC`, `LIMA`)? | **Yes — Master Admin sets code at certification** | Stable receipt / invoice / statement prefixes | OPEN |
+| VIP-B-20 | Proposal §20 Q8 (price only; payout = corporate check) | Promoter platform subscription also $20/month? | **Yes — $20/month** | Same Model A as clubs; simple catalog | **DECIDED Oct 16 2026** — C: **Free for promoters in beta**; **configurable in production** (Master Admin / VIP ReserV management). Help: [ ] `help-vip-promoter-subscription` |
+| VIP-B-21 | Billing §14 Q13 | Revenue recognition system: QuickBooks Online or Xero? Daily or monthly sub recognition? Map chart now? | **QuickBooks Online · monthly recognition · map chart at Phase 6** | Common for US SMBs; CSV export covers beta | **DECIDED Oct 16 2026** — C: **CSV export only in beta**; pick QBO/Xero later. Help: [ ] `help-vip-ledger-csv-export` |
+| VIP-B-22 | Billing §14 Q15 | Confirm 3–5 letter club codes for numbering (e.g. `DEC`, `LIMA`)? | **Yes — Master Admin sets code at certification** | Stable receipt / invoice / statement prefixes | **DECIDED Oct 16 2026** — B: **Auto from slug** (e.g. truncated locationId / brand slug). Help: [ ] `help-vip-club-code` |
 
 ---
 
@@ -133,7 +133,7 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 |---|---|---|---|---|---|
 | VIP-P-13 | Proposal §20 Q14 · cutover rule | Canonical origin for booking / embed / API links: `www.floqr.com` or `www.floqr.app`? | **`https://www.floqr.com`** | Matches cutover canonical origin; single helper | **DECIDED Oct 16 2026** — B: `https://www.floqr.app` (canonical host for VIP booking/embed/API links). **Open conflict** with `cutoffrequirement.mdc` (`www.floqr.com` for main app) — owner to reconcile later if needed. |
 | VIP-P-14 | Proposal §20 Q19 | Beta venues: Decades + Lima Twist first? Existing `clubLocations` ids? | **Yes those two · confirm/create ids at Phase 1** | Maps already ingested; owner knows both rooms | **DECIDED Oct 16 2026** — D: First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). |
-| VIP-P-15 | Proposal §20 Q21 | Block Live until both translation tiers pass? Which languages get counsel Terms first? | **Block Live until tiers pass · Terms EN first, then FR/ES** | Matches `vip-reservations-translation-incomplete.mdc` | OPEN |
+| VIP-P-15 | Proposal §20 Q21 | Block Live until both translation tiers pass? Which languages get counsel Terms first? | **Block Live until tiers pass · Terms EN first, then FR/ES** | Matches `vip-reservations-translation-incomplete.mdc` | **DECIDED Oct 16 2026** — C: **Allow English-only Live; translate after**. Updates `vip-reservations-translation-incomplete.mdc` (translation still open work; does **not** block Live). Help: [ ] `help-vip-i18n-live` |
 | VIP-P-16 | Proposal §20 Q22 | Product name: “VIP Tables”, “VIP Reservations”, or a protected brand? | **VIP Reservations** (protected brand string) | Matches feature key `vipReservations` and F&S naming | **DECIDED Oct 16 2026** — C: Product brand name **VIP ReserV** (owner spelling). Protected / never-translate. |
 
 ---
@@ -142,8 +142,8 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-B-23 | Billing §14 Q16 | Retention: 7 years receipts/invoices/ledger/statements; 13 months notification delivery logs? | **Confirm as written** | Aligns with finance + PCI-ish log practice already in proposal | OPEN |
-| VIP-B-24 | Billing §14 Q17 | Schedule separate fixes: VIP receipt SMS via `sendTwilioMessagesApi`; stop redactor masking `FLOQR-…` invoice numbers? | **Yes — schedule before VIP Functions ship** | Open security / ops findings; do not copy the bug into VIP | OPEN |
+| VIP-B-23 | Billing §14 Q16 | Retention: 7 years receipts/invoices/ledger/statements; 13 months notification delivery logs? | **Confirm as written** | Aligns with finance + PCI-ish log practice already in proposal | **DECIDED Oct 16 2026** — D: **Counsel sets retention before Live** (leave TBD until counsel). Help: [ ] `help-vip-retention` |
+| VIP-B-24 | Billing §14 Q17 | Schedule separate fixes: VIP receipt SMS via `sendTwilioMessagesApi`; stop redactor masking `FLOQR-…` invoice numbers? | **Yes — schedule before VIP Functions ship** | Open security / ops findings; do not copy the bug into VIP | **DECIDED Oct 16 2026** — A: **Yes — schedule both before VIP Functions ship**. Help: [ ] `help-vip-receipt-sms-redaction-fixes` |
 
 ---
 
@@ -256,14 +256,16 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 | B Roles & legal | **none** — Batch 3a decided |
 | C Booking UX & floor plans | **none** — Batch 3c decided |
 | D Notifications & receipts | **none** — Batch 3b decided |
-| E Promoters & ledger | VIP-B-20…22 (3) |
-| F Brand / origin / beta | VIP-P-15 only (1) — P-13/14/16 decided |
-| G Other | VIP-B-23…24 (2) |
-| **Total OPEN** | **6** |
+| E Promoters & ledger | **none** — Batch 4 decided |
+| F Brand / origin / beta | **none** — P-13/14/15/16 decided |
+| G Other | **none** — Batch 4 decided |
+| **Total OPEN (sheet IDs)** | **0** |
+| Counsel-adjacent (not sheet IDs) | Self-billing vs promoter invoices · stale-dated check window · 1099/W-9 |
 | Skipped (Oct 15) | Stripe fee payer · full-or-none refunds · promoter corporate check · Lima name · bars · area names · 360 timing |
 | Decided Batch 1 (Oct 16) | VIP-B-01 · VIP-B-02 · VIP-B-03 · VIP-B-03b · VIP-B-05 · VIP-B-10 · VIP-P-13 · VIP-P-14 · VIP-P-16 |
 | Decided Batch 2 (Oct 16) | VIP-B-04 · VIP-B-06 · VIP-B-07 · VIP-B-08 · VIP-B-09 · VIP-B-11 · VIP-B-12 · VIP-B-13 · VIP-B-14 |
 | Decided Batch 3a–3c (Oct 16) | VIP-P-01…12 · VIP-B-15…19 |
+| Decided Batch 4 (Oct 16) | VIP-B-20 · VIP-B-21 · VIP-B-22 · VIP-P-15 · VIP-B-23 · VIP-B-24 |
 
 ---
 
@@ -289,7 +291,18 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 | VIP-P-11 | A — Club staff 360 + FloqMedia guide/review | [ ] `help-vip-360-capture` |
 | VIP-P-12 | A — Capacity placeholders OK; included often = max | [ ] `help-vip-capacity-placeholders` |
 
-Remaining OPEN: VIP-B-20…22 · VIP-P-15 · VIP-B-23…24 (Batch 4).
+## Batch 4 (DECIDED Oct 16 2026) — promoters / accounting / Live gate / retention / pre-ship fixes
+
+| ID | Decision (short) | Help |
+|---|---|---|
+| VIP-B-20 | C — Promoters **free in beta**; **configurable in production** | [ ] `help-vip-promoter-subscription` |
+| VIP-B-21 | C — CSV export only in beta; QBO/Xero later | [ ] `help-vip-ledger-csv-export` |
+| VIP-B-22 | B — Club codes **auto from slug** | [ ] `help-vip-club-code` |
+| VIP-P-15 | C — **English-only Live allowed**; translate after | [ ] `help-vip-i18n-live` |
+| VIP-B-23 | D — Retention **counsel sets before Live** (TBD) | [ ] `help-vip-retention` |
+| VIP-B-24 | A — Schedule receipt-SMS + invoice-redactor fixes **before VIP Functions ship** | [ ] `help-vip-receipt-sms-redaction-fixes` |
+
+Sheet IDs: **0 OPEN**. Counsel still open: self-billing · stale check · 1099/W-9.
 
 ## Batch 2 (DECIDED Oct 16 2026) — remaining money
 
