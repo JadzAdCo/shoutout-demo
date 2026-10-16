@@ -185,3 +185,5 @@ body.vip-page {
   .vip-hero { flex-direction: column; }
   .vip-hero-logo { width: min(132px, 40vw); max-height: 100px; }
 }
+
+.vip-stripe-hint{margin:.55rem 0 0;opacity:.85;}

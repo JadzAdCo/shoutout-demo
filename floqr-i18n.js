@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.50";
+  const VERSION = "s3.1.51";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1350,6 +1350,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Back",
       "page.vip.consentPay": "Pay deposit",
+      "page.vip.stripeTestHint": "Stripe test card: 4242 4242 4242 4242 · any future expiry · any CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -2426,6 +2427,7 @@
       "page.vip.checkMarketing": "Optionnel : messages marketing du lieu",
       "page.vip.consentCancel": "Retour",
       "page.vip.consentPay": "Payer l’acompte",
+      "page.vip.stripeTestHint": "Carte test Stripe : 4242 4242 4242 4242 · date future · CVC quelconque.",
       "page.vip.consentRequired": "Cochez toutes les cases obligatoires avant de payer.",
       "page.vip.recordingConsent": "Enregistrement du consentement…",
       "page.vip.openingCheckout": "Ouverture du paiement…",
@@ -3502,6 +3504,7 @@
       "page.vip.checkMarketing": "Optional: Marketing der Location",
       "page.vip.consentCancel": "Zurück",
       "page.vip.consentPay": "Anzahlung zahlen",
+      "page.vip.stripeTestHint": "Stripe-Testkarte: 4242 4242 4242 4242 · beliebiges künftiges Datum · beliebiger CVC.",
       "page.vip.consentRequired": "Bitte alle Pflichtkästchen setzen.",
       "page.vip.recordingConsent": "Einwilligung wird gespeichert…",
       "page.vip.openingCheckout": "Checkout wird geöffnet…",
@@ -4578,6 +4581,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Volver",
       "page.vip.consentPay": "Pagar depósito",
+      "page.vip.stripeTestHint": "Tarjeta de prueba Stripe: 4242 4242 4242 4242 · caducidad futura · cualquier CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -5654,6 +5658,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Terug",
       "page.vip.consentPay": "Borg betalen",
+      "page.vip.stripeTestHint": "Stripe-testkaart: 4242 4242 4242 4242 · toekomstige datum · willekeurige CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -6730,6 +6735,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Назад",
       "page.vip.consentPay": "Оплатить депозит",
+      "page.vip.stripeTestHint": "Тестовая карта Stripe: 4242 4242 4242 4242 · любой будущий срок · любой CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -7806,6 +7812,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Indietro",
       "page.vip.consentPay": "Paga deposito",
+      "page.vip.stripeTestHint": "Carta test Stripe: 4242 4242 4242 4242 · scadenza futura · qualsiasi CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -8882,6 +8889,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Voltar",
       "page.vip.consentPay": "Pagar depósito",
+      "page.vip.stripeTestHint": "Tarjeta de prueba Stripe: 4242 4242 4242 4242 · caducidad futura · cualquier CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -9958,6 +9966,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Πίσω",
       "page.vip.consentPay": "Πληρωμή προκαταβολής",
+      "page.vip.stripeTestHint": "Δοκιμαστική κάρτα Stripe: 4242 4242 4242 4242 · μελλοντική λήξη · οποιοδήποτε CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -11034,6 +11043,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "Wstecz",
       "page.vip.consentPay": "Zapłać depozyt",
+      "page.vip.stripeTestHint": "Karta testowa Stripe: 4242 4242 4242 4242 · przyszła data · dowolny CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",
@@ -12110,6 +12120,7 @@
       "page.vip.checkMarketing": "Optional: venue marketing messages",
       "page.vip.consentCancel": "رجوع",
       "page.vip.consentPay": "دفع العربون",
+      "page.vip.stripeTestHint": "بطاقة اختبار Stripe: 4242 4242 4242 4242 · أي تاريخ مستقبلي · أي CVC.",
       "page.vip.consentRequired": "Check all required Terms boxes before paying.",
       "page.vip.recordingConsent": "Recording consent…",
       "page.vip.openingCheckout": "Opening deposit checkout…",

@@ -336,7 +336,7 @@ When adding a section, use this skeleton:
 | **Not yet** | Club Admin VIP tab, promoter path, counsel Live Terms, Model B invoicing |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc`, `.cursor/rules/design-notes-product-chrome.mdc`, `.cursor/rules/design-notes-aurelia-scene-standard.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
-| **Package** | s3.1.50 |
+| **Package** | s3.1.51 |
 
 ## Feature & Orders (patron portal)
 

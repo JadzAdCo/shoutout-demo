@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.50 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.51 (stable)
+
+- s3.1.51: VIP Aurelia Functions live; Stripe test-card tip on Pay deposit; Accept-all Terms; inventory summary.
 
 - s3.1.50: VIP Aurelia hold/checkout live; Accept-all Terms; inventory summary status; featureGates.vipReservations on Aurelia.
 
