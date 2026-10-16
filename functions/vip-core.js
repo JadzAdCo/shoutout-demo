@@ -1,5 +1,6 @@
 /* VIP reserV Phase 2 — pure helpers (holds, pricing, nights, consent).
-   Design: .cursor/rules/design-notes-vip-reservations.mdc */
+   Design: .cursor/rules/design-notes-vip-reservations.mdc
+   Aurelia (temp-democlub-1) planFile aurelia.json — bookable as of s3.1.50. */
 "use strict";
 
 const crypto = require("crypto");
