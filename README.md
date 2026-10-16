@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.52 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.53 (stable)
+
+- s3.1.53: Master Admin hang fix: lazy network reports; Features beta/audit parallel load.
 
 - s3.1.52: Features / Svc Status Mgmt rename; beta invite UX; agent audit attribution; classification+security always-apply.
 

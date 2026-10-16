@@ -322,9 +322,13 @@ test("Master Admin Features / Svc Status Mgmt tab is SOS2FA gated", () => {
   assert.match(app, /featureKeys/);
   assert.match(app, /syncInviteSubmitState|selectedInviteUid/);
   assert.match(app, /is-ready/);
+  assert.match(app, /Promise\.allSettled/);
+  assert.match(app, /withTimeout/);
   assert.match(read("sos2fa.js"), /"featuresServices"/);
   assert.match(read("master-admin-app.js"), /"featuresServices"/);
   assert.match(read("master-admin-app.js"), /Features \/ Svc Status Mgmt/);
+  assert.match(read("master-admin-app.js"), /loadLightLocations/);
+  assert.match(read("master-admin-app.js"), /Do not pull 1000 users/);
 });
 
 test("agent clients are attributed as agent on feature access denials", () => {

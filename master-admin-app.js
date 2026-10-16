@@ -231,6 +231,7 @@
       if (/^twilio(Sms|WhatsApp|Feature|Compliance)Logs$/.test(panelId) || panelId === "twilioLogging") {
         window.FLOQRTwilioLogging?.mount?.(panelId);
       }
+      if (panelId === "networkDashboard") loadNetworkReports({force: false});
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
@@ -401,15 +402,32 @@
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
 
-  async function getCollectionSafe(name, limit=1000) {
+  /** Lean reads — never default to 1000 fat docs (that freezes Master Admin on sign-in). */
+  async function getCollectionSafe(name, limit = 200, fields = null) {
     try {
       const snap = await db.collection(name).limit(limit).get();
-      return snap.docs.map(d => ({id:d.id, ...d.data()}));
+      return snap.docs.map(d => {
+        const data = d.data() || {};
+        if (!fields || !fields.length) return {id: d.id, ...data};
+        const lean = {id: d.id};
+        fields.forEach(key => {
+          if (Object.prototype.hasOwnProperty.call(data, key)) lean[key] = data[key];
+        });
+        return lean;
+      });
     } catch(e) {
       console.warn(`Could not read ${name}:`, e.message);
       return window.FLOQRAccessNotice?.report(name, e) || [];
     }
   }
+
+  const USER_REPORT_FIELDS = [
+    "uid", "email", "displayName", "fullName", "floqrHandle", "phone", "phoneNumber",
+    "city", "favoriteGenres", "marketingConsent", "analyticsConsent", "photoURL"
+  ];
+  let networkReportsPromise = null;
+  let networkReportsLoadedAt = 0;
+  let lightLocationsPromise = null;
 
   function countBy(items, fn) {
     const out = {};
@@ -715,7 +733,8 @@
       await saveClubOnboarding(payload);
       renderOnboardingResult(payload);
       setText("clubOnboardingStatus", `Created ${payload.locationName}.`);
-      await loadNetworkReports();
+      await loadLightLocations();
+      if (byId("networkDashboard")?.classList.contains("active")) await loadNetworkReports({force: true});
     } catch (e) {
       setText("clubOnboardingStatus", `Club onboarding failed: ${e.message || e}`);
     }
@@ -786,7 +805,8 @@
       }).join("");
     }
     setText("clubOnboardingStatus", `Imported ${imported.length} club(s).`);
-    await loadNetworkReports();
+    await loadLightLocations();
+    if (byId("networkDashboard")?.classList.contains("active")) await loadNetworkReports({force: true});
   }
 
   async function createPromoterOnboarding() {
@@ -1724,19 +1744,52 @@
     }
   }
 
-  async function loadNetworkReports() {
+  /** Light club list for Entity Management — does not pull patrons/shoutouts. */
+  async function loadLightLocations() {
+    if (lightLocationsPromise) return lightLocationsPromise;
+    lightLocationsPromise = (async () => {
+      const [locations, clubs] = await Promise.all([
+        getCollectionSafe("clubLocations", 300),
+        getCollectionSafe("clubs", 200)
+      ]);
+      const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
+      const staticById = new Map(fallbackLocations.map(row => [row.id, row]));
+      const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => {
+        const staticRow = staticById.get(row.id) || {};
+        return [row.id, {...staticRow, ...row}];
+      }));
+      fallbackLocations.forEach(row => {
+        if (!locationMap.has(row.id) && (row.qaTemp || row.demo || /^temp-democlub-/.test(row.id))) {
+          locationMap.set(row.id, row);
+        }
+      });
+      networkLocations = mergeClubSnapshots(Array.from(locationMap.values()), clubs);
+      renderEntityClubResults();
+      return networkLocations;
+    })().finally(() => { lightLocationsPromise = null; });
+    return lightLocationsPromise;
+  }
+
+  async function loadNetworkReports(opts = {}) {
+    const force = !!opts.force;
+    const staleMs = 60 * 1000;
+    if (!force && networkReportsLoadedAt && Date.now() - networkReportsLoadedAt < staleMs && networkUsers.length) {
+      return {cached: true};
+    }
+    if (networkReportsPromise) return networkReportsPromise;
+    networkReportsPromise = (async () => {
     const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords, promoterOnboarding, templateDocs] = await Promise.all([
-      getCollectionSafe("users"),
-      getCollectionSafe("shoutouts"),
-      getCollectionSafe("liveContent"),
-      getCollectionSafe("clubLocations"),
-      getCollectionSafe("clubs"),
-      getCollectionSafe("events"),
-      getCollectionSafe("guestListRequests"),
-      getCollectionSafe("clubOnboardingRecords"),
-      getCollectionSafe("aiDiscoveryQueue"),
-      getCollectionSafe("promoterOnboardingRecords"),
-      getCollectionSafe("templates")
+      getCollectionSafe("users", 200, USER_REPORT_FIELDS),
+      getCollectionSafe("shoutouts", 250, ["status", "locationName", "clubName", "clubLocationId", "location", "createdAtMs"]),
+      getCollectionSafe("liveContent", 100, ["locationId", "updatedAtMs"]),
+      getCollectionSafe("clubLocations", 300),
+      getCollectionSafe("clubs", 200),
+      getCollectionSafe("events", 200, ["title", "eventName", "locationId", "genres"]),
+      getCollectionSafe("guestListRequests", 100, ["status", "locationId"]),
+      getCollectionSafe("clubOnboardingRecords", 100),
+      getCollectionSafe("aiDiscoveryQueue", 100, ["proposedType", "categories", "proposedTitle", "proposedLocationName", "city", "country", "proposedAddress", "address"]),
+      getCollectionSafe("promoterOnboardingRecords", 50),
+      getCollectionSafe("templates", 150)
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
@@ -1779,6 +1832,7 @@
     });
     const locationRows = mergeClubSnapshots(Array.from(locationMap.values()), clubs);
     networkUsers = users.map(row => ({...row, uid:row.uid || row.id}));
+    try { window.networkUsers = networkUsers; } catch (_) { /* ignore */ }
     networkLocations = locationRows;
     renderEntityClubResults();
     renderEntityPatronResults();
@@ -1933,6 +1987,10 @@
         </small>
       </div>`;
     }).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+    networkReportsLoadedAt = Date.now();
+    return {ok: true};
+    })().finally(() => { networkReportsPromise = null; });
+    return networkReportsPromise;
   }
 
   async function purgeAllPendingShoutoutQueues() {
@@ -1961,7 +2019,7 @@
       if (statusEl) {
         statusEl.textContent = `Purged ${data.purged || 0} pending ShoutOut(s); refunded ${data.refunded || 0}. Errors: ${(data.errors || []).length}.`;
       }
-      await loadNetworkReports();
+      await loadNetworkReports({force: true});
     } catch (error) {
       if (statusEl) statusEl.textContent = error?.message || String(error);
     }
@@ -1989,7 +2047,7 @@
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
     bind("refreshNetworkReconBtn", loadNetworkPaymentLedger);
     bind("purgeTestPaymentsReconBtn", purgeNetworkTestPayments);
-    bind("refreshAllQueuesBtn", loadNetworkReports);
+    bind("refreshAllQueuesBtn", () => loadNetworkReports({force: true}));
     bind("purgePendingShoutoutQueuesBtn", purgeAllPendingShoutoutQueues);
     bind("previewManagedTemplateBtn", () => viewManagedTemplate(currentManagedTemplateDraft()));
     bind("saveManagedTemplateBtn", saveManagedTemplate);
@@ -2056,11 +2114,16 @@
       } else if (resumed) {
         setText("masterActionFeedback", `Opened ${panelLabel(resumed)}.`);
       }
-      loadNetworkReports().then(() => {
+      /* Do not pull 1000 users/shoutouts on every sign-in — that freezes Master Admin
+         (Features / Svc, Entity Mgmt, deep links). Dashboard stats load on demand. */
+      loadLightLocations().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});
         }
-      });
+      }).catch(error => console.warn("Light locations load failed", error?.message || error));
+      if (hashPanelId() === "networkDashboard" || resumed === "networkDashboard") {
+        loadNetworkReports({force: false});
+      }
       loadManagedTemplates();
       loadRecommendationModeration();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});

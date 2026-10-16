@@ -5,10 +5,12 @@
 
   const SCOPE = "entityManagement";
   const PANEL_ID = "featuresServices";
-  const AUDIT_LIMIT = 50;
-  const USER_SCAN_LIMIT = 500;
+  const AUDIT_LIMIT = 40;
+  const USER_SCAN_LIMIT = 120;
   const RESULT_LIMIT = 20;
   const REASON_MIN = 8;
+  const LOAD_TIMEOUT_MS = 20000;
+  const AUDIT_JSON_MAX = 1200;
 
   let bound = false;
   let seededOnce = false;
@@ -50,6 +52,16 @@
 
   function errorText(error) {
     return String(error?.message || error || "Request failed.").replace(/^.*?:\s(?=[A-Z])/, "");
+  }
+
+  function withTimeout(promise, label, ms = LOAD_TIMEOUT_MS) {
+    let timer;
+    return Promise.race([
+      Promise.resolve(promise).finally(() => clearTimeout(timer)),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s. Tap Reload.`)), ms);
+      })
+    ]);
   }
 
   function formatWhen(ms) {
@@ -250,10 +262,35 @@
     }
   }
 
+  function leanUser(doc) {
+    const data = doc.data() || {};
+    return {
+      uid: doc.id,
+      displayName: data.displayName || "",
+      fullName: data.fullName || "",
+      floqrHandle: data.floqrHandle || "",
+      email: data.email || "",
+      phone: data.phone || data.phoneNumber || ""
+    };
+  }
+
   async function loadUsers() {
     if (userCache) return userCache;
-    const snap = await db().collection("users").limit(USER_SCAN_LIMIT).get();
-    userCache = snap.docs.map(doc => ({uid: doc.id, ...doc.data()}));
+    /* Prefer Network Dashboard lean cache when present — avoids a second fat users scan. */
+    const shared = root.networkUsers;
+    if (Array.isArray(shared) && shared.length) {
+      userCache = shared.map(row => ({
+        uid: row.uid || row.id,
+        displayName: row.displayName || "",
+        fullName: row.fullName || "",
+        floqrHandle: row.floqrHandle || "",
+        email: row.email || "",
+        phone: row.phone || row.phoneNumber || ""
+      }));
+      return userCache;
+    }
+    const snap = await withTimeout(db().collection("users").limit(USER_SCAN_LIMIT).get(), "Patron search");
+    userCache = snap.docs.map(leanUser);
     return userCache;
   }
 
@@ -275,11 +312,11 @@
     out.innerHTML = "<p class=\"sub small\">Searching…</p>";
     try {
       const users = await loadUsers();
-      const hits = users.filter(user => [user.displayName, user.fullName, user.floqrHandle, user.email, user.phone, user.phoneNumber, user.uid]
+      const hits = users.filter(user => [user.displayName, user.fullName, user.floqrHandle, user.email, user.phone, user.uid]
         .some(value => String(value || "").toLowerCase().includes(query))).slice(0, RESULT_LIMIT);
       out.innerHTML = hits.length
         ? hits.map(user => `<label class="queue-item beta-patron-pick"><input type="radio" name="betaInvitePick" value="${esc(user.uid)}"/> <span><strong>${esc(userLabel(user))}</strong> <small>${esc(user.email || "")}</small></span></label>`).join("")
-        : "<p class=\"sub small\">No patrons match.</p>";
+        : "<p class=\"sub small\">No patrons match in the first search window. Try a more specific email.</p>";
     } catch (error) {
       out.innerHTML = `<p class="sub small">${esc(errorText(error))}</p>`;
     }
@@ -332,12 +369,17 @@
   async function loadBeta() {
     const testersEl = byId("betaTesterList");
     const invitesEl = byId("betaInviteList");
-    try {
-      const [testers, invites] = await Promise.all([
-        db().collection("betaTesters").where("status", "==", "active").limit(200).get(),
-        db().collection("betaInvites").where("status", "==", "pending").limit(100).get()
-      ]);
-      if (testersEl) {
+    if (testersEl) testersEl.innerHTML = "<p class=\"sub small\">Loading beta testers…</p>";
+    if (invitesEl) invitesEl.innerHTML = "<p class=\"sub small\">Loading pending invites…</p>";
+    const [testersResult, invitesResult] = await Promise.allSettled([
+      withTimeout(db().collection("betaTesters").where("status", "==", "active").limit(100).get(), "Beta testers"),
+      withTimeout(db().collection("betaInvites").where("status", "==", "pending").limit(100).get(), "Pending invites")
+    ]);
+    if (testersEl) {
+      if (testersResult.status === "rejected") {
+        testersEl.innerHTML = `<p class="sub small">${esc(errorText(testersResult.reason))}</p>`;
+      } else {
+        const testers = testersResult.value;
         testersEl.innerHTML = testers.empty ? "<p class=\"sub small\">No active beta testers.</p>" : testers.docs.map(doc => {
           const row = doc.data();
           const uid = esc(doc.id);
@@ -347,15 +389,18 @@
             <button type="button" class="ghost" data-beta-revoke="${uid}">Revoke</button></div>`;
         }).join("");
       }
-      if (invitesEl) {
+    }
+    if (invitesEl) {
+      if (invitesResult.status === "rejected") {
+        invitesEl.innerHTML = `<p class="sub small">${esc(errorText(invitesResult.reason))}</p>`;
+      } else {
+        const invites = invitesResult.value;
         const rows = invites.docs.map(doc => doc.data()).sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
         invitesEl.innerHTML = rows.length ? rows.map(row => `<div class="queue-item"><strong>${esc(row.targetName || row.targetEmailMasked || row.targetUid)}</strong>
             <small>${esc(row.targetEmailMasked || "")} · expires ${esc(formatWhen(row.expiresAtMs))} · by ${esc(row.createdByEmail || "")}</small>
             <button type="button" class="ghost" data-invite-revoke="${esc(row.inviteId)}">Revoke invite</button></div>`).join("")
           : "<p class=\"sub small\">No pending invitations.</p>";
       }
-    } catch (error) {
-      if (testersEl) testersEl.innerHTML = `<p class="sub small">${esc(errorText(error))}</p>`;
     }
   }
 
@@ -438,7 +483,8 @@
 
   function auditChange(row) {
     if (!row.before && !row.after) return "";
-    const text = `${JSON.stringify(row.before || {}, null, 1)}\n→\n${JSON.stringify(row.after || {}, null, 1)}`;
+    let text = `${JSON.stringify(row.before || {}, null, 1)}\n→\n${JSON.stringify(row.after || {}, null, 1)}`;
+    if (text.length > AUDIT_JSON_MAX) text = `${text.slice(0, AUDIT_JSON_MAX)}\n… (truncated)`;
     return `<details class="audit-change"><summary>Before → after</summary><pre class="audit-json">${esc(text)}</pre></details>`;
   }
 
@@ -464,12 +510,18 @@
   async function loadAudit() {
     const tbody = byId("featureAuditRows");
     if (!tbody) return;
+    tbody.innerHTML = "<tr class=\"audit-empty\"><td colspan=\"6\">Loading audit trail…</td></tr>";
+    setStatus("featureAuditStatus", "");
     try {
-      const snap = await db().collection("featureServiceAuditLogs").orderBy("createdAtMs", "desc").limit(AUDIT_LIMIT).get();
+      const snap = await withTimeout(
+        db().collection("featureServiceAuditLogs").orderBy("createdAtMs", "desc").limit(AUDIT_LIMIT).get(),
+        "Audit trail"
+      );
       tbody.innerHTML = snap.empty
         ? "<tr class=\"audit-empty\"><td colspan=\"6\">No activity yet.</td></tr>"
         : snap.docs.map(doc => auditRowHtml(doc.data())).join("");
     } catch (error) {
+      tbody.innerHTML = `<tr class="audit-empty"><td colspan="6">${esc(errorText(error))}</td></tr>`;
       setStatus("featureAuditStatus", `Could not load audit trail: ${errorText(error)}`);
     }
   }
@@ -540,8 +592,19 @@
       setStatus("featureServicesStatus", "Unlock with SOS2FA to manage features.");
       return;
     }
-    await refreshFeatures();
-    await Promise.all([loadBeta(), loadAudit()]);
+    setStatus("featureServicesStatus", "Loading features, beta lists, and audit…");
+    /* Never block beta/audit on seed — a hung seed made the panel look empty. */
+    const results = await Promise.allSettled([
+      refreshFeatures(),
+      loadBeta(),
+      loadAudit()
+    ]);
+    const failed = results.filter(row => row.status === "rejected");
+    if (failed.length) {
+      setStatus("featureServicesStatus", failed.map(row => errorText(row.reason)).join(" · "));
+    } else if (!String(byId("featureServicesStatus")?.textContent || "").trim()) {
+      setStatus("featureServicesStatus", "");
+    }
   }
 
   function mount() {

@@ -111,6 +111,12 @@ Master Admin nav + panel title: **Features / Svc Status Mgmt** (`data-i18n="mast
 - Token: 32 random bytes (base64url); only its SHA-256 is stored. Link is useless on another account (`wrong-account`), after 7 days, or once used. `beta-invite.html` strips `t` from the address bar after responding and sets `no-referrer`.
 - Inbox button label: **Review beta invite** (`patron-portal-app.js` `inboxLinkLabel`).
 
+## Master Admin load performance (s3.1.53)
+
+- Root cause of “page isn’t responding” on Features / Svc: `loadNetworkReports()` pulled up to **1000** full `users` (+ shoutouts, etc.) on **every** Master Admin sign-in, freezing the main thread before beta/audit could paint. Data was still in Firestore.
+- Fix: sign-in loads **light clubLocations only** (`loadLightLocations`). Full network reports load when opening **Network Dashboard** (or Refresh), lean field masks, ≤200 users.
+- Features panel `loadAll` runs features / beta / audit in **parallel** with timeouts; invite errors no longer wipe the pending list; audit before/after JSON truncated.
+
 ## Agent audit attribution
 
 Cursor cloud agents, curl/scripted probes, and headless browsers must **not** show as blank **— patron** on the Features audit trail.

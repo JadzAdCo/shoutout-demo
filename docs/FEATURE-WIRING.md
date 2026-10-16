@@ -320,7 +320,8 @@ When adding a section, use this skeleton:
 | **Beta invite** | Search beside Find patron; select radio; Note + Invite (disabled until patron + note ≥3); tablet/phone hide feature checklist until selection |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
-| **Package** | s3.1.52 |
+| **Load perf** | Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand; Features beta/audit load in parallel with timeouts |
+| **Package** | s3.1.53 |
 
 ## VIP reserV (`vipReservations`) — Phase 2
 
