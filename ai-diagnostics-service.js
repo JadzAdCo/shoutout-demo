@@ -1471,6 +1471,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-45-vip-reserv-phase1",
+      area:"Search / VIP ReserV",
+      feature:"VIP ReserV Phase 1 — beta feature key, Search tile, floor maps for Decades and Lima Twist Club",
+      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP ReserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia is marked soon. FloqAi finds book a table / VIP ReserV. Holds and deposits are Phase 2.",
+      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP ReserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP ReserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club. Signed out → home sign-in with returnTo. FloqAi: book a table.",
+      expected:"Map loads for Decades and Lima Twist; bars/DJ not bookable; Hold this table says Phase 2. Aurelia chip disabled with soon. Feature off → not-available gate.",
+      troubleshoot:"Tile missing → seedFeatureServices and beta grant for vipReservations. Blank map → check vip-plans/*.json and PNG paths, hard refresh ?v=. Hold error is expected until Phase 2."
+    },
+    {
       id:"s3-0-110-beta-rbac-login-redirect",
       area:"Sign-in / Master Admin / Search",
       feature:"Welcome buttons share the FloqAi blue-to-purple look; SMS OTP is US & Canada; beta testers get only the features chosen for them; opening any page signed out goes to the sign-in page",

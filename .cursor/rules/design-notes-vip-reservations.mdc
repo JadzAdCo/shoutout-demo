@@ -1,13 +1,13 @@
 ---
-description: VIP ReserV (beta) — PROPOSAL; Batches 1–4 sheet IDs all DECIDED. English-only Live OK (P-15 C); promoters free in beta then configurable; CSV ledger in beta; club codes from slug; retention counsel TBD; pre-ship SMS/redactor fixes. Feature key vipReservations, brand VIP ReserV, VIP host www.floqr.app. Every owner decision ships with FloqAi/help mirror before that surface goes Live.
+description: VIP ReserV (beta) — BUILDING Phase 1 (owner go-ahead Oct 16 2026). Feature key vipReservations, brand VIP ReserV, vip.html floor maps for Decades + Lima Twist. Batches 1–4 decided. Phase 2 = holds/deposits/door. Every owner decision ships with FloqAi/help mirror before that surface goes Live.
 alwaysApply: true
 ---
 
 # VIP ReserV — design notes
 
-Resume: `@vip$` / `$vip-tables$` / `$vip-reserv$`. Status: **PROPOSAL — sheet decisions complete (Batches 1–4). Awaiting owner build go-ahead. Not built, not published, no Firestore / Functions / rules / Stripe changes.** Product brand: **VIP ReserV** (owner spelling Oct 16 2026; protected / never-translate). Full proposal: `reports/vip-reservations-proposal.md`. Owner sheet: `reports/vip-owner-decision-sheet.md`. Floor plans: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `legend.json`, `preview.html` + `viewer.js`). Translation follow-up: `vip-reservations-translation-incomplete.mdc` (open work; **does not block Live** per VIP-P-15 C).
+Resume: `@vip$` / `$vip-tables$` / `$vip-reserv$`. Status: **BUILDING — Phase 1 foundations (owner go-ahead Oct 16 2026).** Product brand: **VIP ReserV** (protected / never-translate). Feature key `vipReservations` (`IsFeatureEnabled=0`, `IsTestFeature=1` until Master Admin seeds/enables). Surfaces: `vip.html`, Search tile `vipReservBtnCard`, FloqAi intent `vip-reserv`, plans in `vip-plans/`. Full proposal: `reports/vip-reservations-proposal.md`. Owner sheet: `reports/vip-owner-decision-sheet.md`. Translation: `vip-reservations-translation-incomplete.mdc` (does **not** block Live per VIP-P-15 C).
 
-Do **not** start building until the owner approves a build go-ahead. Principle 14 / club-admin capabilities = **all a–i in beta** (VIP-P-01 B). Sheet IDs: **0 OPEN**. Counsel-adjacent still open: self-billing · stale check · 1099/W-9.
+**Phase 1 shipped (this iteration):** catalog + beta gate, patron floor-map viewer (Decades + Lima Twist), help/FloqAi, `getVipBetaVenues` / stub `createVipHold`. **Phase 2 next:** inventory holds, Checkout deposits, Terms consent, My Profile Reservations, `vip-door.html`. Sheet IDs: **0 OPEN**. Counsel-adjacent still open: self-billing · stale check · 1099/W-9.
 
 ## Help mirror (always — every owner decision)
 
@@ -151,5 +151,5 @@ Related documents: `reports/vip-notifications-billing.md` (notifications, receip
 ## FIX PROMPT
 
 ```
-VIP ReserV (PROPOSAL): Batches 1–4 sheet IDs DECIDED (0 OPEN). Do not build until owner go-ahead. Feature key vipReservations (beta), brand VIP ReserV; VIP host https://www.floqr.app; English-only Live OK (P-15 C); promoters free in beta then configurable (B-20 C); CSV ledger in beta (B-21 C); club codes from slug (B-22 B); retention counsel TBD (B-23 D); pre-ship SMS+redactor fixes (B-24 A). Every decision ships FloqAi/help before Live. Design notes: design-notes-vip-reservations.mdc · sheet: reports/vip-owner-decision-sheet.md
+VIP ReserV (BUILDING Phase 1): owner go-ahead Oct 16 2026. Feature key vipReservations (beta), brand VIP ReserV, vip.html + vip-plans/ (Decades, Lima Twist), Search tile, FloqAi help-vip-book-table / help-vip-floor-map, getVipBetaVenues. Phase 2 = holds/deposits/door. English-only Live OK (P-15 C). Every decision ships FloqAi/help before Live. Design notes: design-notes-vip-reservations.mdc · sheet: reports/vip-owner-decision-sheet.md · wiring: docs/FEATURE-WIRING.md#vip-reserv
 ```

@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.44 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.45 (stable)
+
+- s3.1.45: VIP ReserV Phase 1 foundations — feature key vipReservations (beta), Search tile, vip.html floor-map viewer for Decades and Lima Twist Club, FloqAi/help, getVipBetaVenues stub. Booking holds/deposits Phase 2.
 
 - s3.1.44: Rename product brand supRstar / SupRstR / suprstr to floqCast (feature key floqCast with legacy supRstar dual-read; pages floqcast-*.html; Firestore collection ids suprstrLive / suprstrSessions / suprstarRequests kept as storage ids).
 

@@ -246,5 +246,13 @@
   "help-scheduling-schedule-for": {
     "title": "Staff Scheduling",
     "body": "Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each calendar has its own $20/month subscription. Shifts sent to you appear under My assignments, where you confirm or decline them."
+  },
+  "help-vip-book-table": {
+    "title": "Book a VIP table (VIP ReserV)",
+    "body": "VIP ReserV lets you explore a club floor map and reserve a table. Phase 1 (beta): open VIP ReserV from Search (when granted), pick Decades or Lima Twist Club, tap a green available section, and review capacity and fees. Holding, deposits, and door check-in ship in Phase 2. Bars and the DJ booth are never bookable. Brand name VIP ReserV is never translated."
+  },
+  "help-vip-floor-map": {
+    "title": "VIP ReserV floor map",
+    "body": "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
   }
 }

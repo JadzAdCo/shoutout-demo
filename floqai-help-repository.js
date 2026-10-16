@@ -397,6 +397,31 @@
       audiences: ["patron"]
     },
     {
+      id: "help-vip-book-table",
+      title: "Book a VIP table (VIP ReserV)",
+      body: "VIP ReserV lets you explore a club floor map and reserve a table. Phase 1 (beta): open VIP ReserV from Search (when granted), pick Decades or Lima Twist Club, tap a green available section, and review capacity and fees. Holding, deposits, and door check-in ship in Phase 2. Bars and the DJ booth are never bookable. Brand name VIP ReserV is never translated.",
+      searchPhrases: [
+        "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
+        "table reservation", "vip booth", "floor map", "decades table", "lima twist table"
+      ],
+      links: [
+        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-floor-map",
+      title: "VIP ReserV floor map",
+      body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn.",
+      searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green"],
+      links: [
+        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "venueAdmin", "masterAdmin"]
+    },
+    {
       id: "help-become-club-admin",
       title: "Become a Club Admin",
       body: "Request Club Admin access, then get venue approval.",

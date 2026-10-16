@@ -17,6 +17,7 @@ module.exports = {
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),
+  ...require("./vip-functions"),
   ...require("./privacy-dsar-functions"),
   ...require("./venue-geocode-functions"),
   ...require("./whatsapp-otp-functions"),

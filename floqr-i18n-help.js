@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.88";
+  const VERSION = "s3.1.45";
 
   const packs = {
     ru: {
@@ -79,6 +79,14 @@
       "help-floqcast": {
         title: "Сделать меня floqCast / superstar",
         body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
+      },
+      "help-vip-book-table": {
+        title: "Забронировать VIP-стол (VIP ReserV)",
+        body: "VIP ReserV позволяет изучить план зала и забронировать стол. Фаза 1 (бета): откройте VIP ReserV из Поиска (если доступно), выберите Decades или Lima Twist Club, нажмите зелёную свободную зону и проверьте вместимость и сборы. Удержание, депозиты и вход у двери — в фазе 2. Бары и DJ-пульт никогда не бронируются. Бренд VIP ReserV не переводится."
+      },
+      "help-vip-floor-map": {
+        title: "План зала VIP ReserV",
+        body: "Зелёный = свободно, янтарный = удержано, красный = занято, серый = не бронируется, синий = DJ-пульт. На телефоне карта открывается по зоне с чипами; pinch и pan; цели не меньше 44px. Имена зон редактирует клуб; печатные метки столов не меняются."
       },
       "help-become-club-admin": {
         title: "Стать Club Admin",
@@ -332,6 +340,14 @@
         title: "Maak me een floqCast / superstar",
         body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de floqCast Queue → Go live op het floqCast-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
       },
+      "help-vip-book-table": {
+        title: "VIP-tafel boeken (VIP ReserV)",
+        body: "VIP ReserV laat je een clubplattegrond verkennen en een tafel reserveren. Fase 1 (beta): open VIP ReserV via Zoeken (indien toegekend), kies Decades of Lima Twist Club, tik op een groene beschikbare sectie en bekijk capaciteit en kosten. Vasthouden, stortingen en deurcheck-in komen in fase 2. Bars en de DJ-booth zijn nooit boekbaar. Merknaam VIP ReserV wordt nooit vertaald."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV-plattegrond",
+        body: "Groen = beschikbaar, amber = vastgehouden, rood = geboekt, grijs = niet boekbaar, blauw = DJ-booth. Op telefoons opent de kaart op één gebied met chips; knijp en sleep; targets minstens 44px. Gebiedsnamen zijn door clubs bewerkbaar; gedrukte tafellabels blijven staan."
+      },
       "help-become-club-admin": {
         title: "Word Club Admin",
         body: "Vraag Club Admin-toegang aan en krijg goedkeuring van de venue."
@@ -583,6 +599,14 @@
       "help-floqcast": {
         title: "Fais de moi une floqCast / superstar",
         body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
+      },
+      "help-vip-book-table": {
+        title: "Réserver une table VIP (VIP ReserV)",
+        body: "VIP ReserV permet d’explorer le plan d’un club et de réserver une table. Phase 1 (bêta) : ouvrez VIP ReserV depuis Recherche (si accordé), choisissez Decades ou Lima Twist Club, touchez une section verte disponible et vérifiez capacité et frais. Retenue, dépôts et contrôle à la porte arrivent en phase 2. Les bars et la cabine DJ ne sont jamais réservables. La marque VIP ReserV n’est jamais traduite."
+      },
+      "help-vip-floor-map": {
+        title: "Plan VIP ReserV",
+        body: "Vert = disponible, ambre = tenu, rouge = réservé, gris = non réservable, bleu = cabine DJ. Sur téléphone le plan s’ouvre sur une zone avec des puces ; pincez et faites glisser ; cibles ≥ 44px. Les noms de zones sont modifiables par le club ; les libellés imprimés des tables restent."
       },
       "help-become-club-admin": {
         title: "Devenez un Club Admin",
@@ -836,6 +860,14 @@
         title: "Mach mich zu einem floqCast/Superstar",
         body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
       },
+      "help-vip-book-table": {
+        title: "VIP-Tisch buchen (VIP ReserV)",
+        body: "VIP ReserV lässt dich einen Club-Saalplan erkunden und einen Tisch reservieren. Phase 1 (Beta): VIP ReserV aus der Suche öffnen (wenn freigeschaltet), Decades oder Lima Twist Club wählen, einen grünen freien Bereich tippen und Kapazität sowie Gebühren prüfen. Halten, Anzahlungen und Tür-Check-in kommen in Phase 2. Bars und DJ-Booth sind nie buchbar. Markenname VIP ReserV wird nie übersetzt."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV-Saalplan",
+        body: "Grün = verfügbar, Bernstein = gehalten, Rot = gebucht, Grau = nicht buchbar, Blau = DJ-Booth. Auf dem Telefon öffnet die Karte einen Bereich mit Chips; kneifen und schieben; Ziele ≥ 44px. Bereichsnamen sind vom Club editierbar; gedruckte Tischlabels bleiben."
+      },
       "help-become-club-admin": {
         title: "Werde ein Club Admin",
         body: "Fordern Sie Club Admin Zugang an und holen Sie dann die Genehmigung für den Veranstaltungsort ein."
@@ -1087,6 +1119,14 @@
       "help-floqcast": {
         title: "Hazme un floqCast / superestrella",
         body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
+      },
+      "help-vip-book-table": {
+        title: "Reservar mesa VIP (VIP ReserV)",
+        body: "VIP ReserV te permite explorar el plano de un club y reservar una mesa. Fase 1 (beta): abre VIP ReserV desde Buscar (si tienes acceso), elige Decades o Lima Twist Club, toca una sección verde disponible y revisa capacidad y tarifas. Retención, depósitos y check-in en puerta llegan en la fase 2. Las barras y la cabina DJ nunca se reservan. La marca VIP ReserV nunca se traduce."
+      },
+      "help-vip-floor-map": {
+        title: "Plano VIP ReserV",
+        body: "Verde = disponible, ámbar = retenido, rojo = reservado, gris = no reservable, azul = cabina DJ. En el teléfono el mapa abre un área con chips; pellizca y arrastra; objetivos ≥ 44px. Los nombres de área los edita el club; las etiquetas impresas de mesa no cambian."
       },
       "help-become-club-admin": {
         title: "Conviértete en un Club Admin",
@@ -1340,6 +1380,14 @@
         title: "Fammi un floqCast / superstar",
         body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
       },
+      "help-vip-book-table": {
+        title: "Prenota un tavolo VIP (VIP ReserV)",
+        body: "VIP ReserV ti permette di esplorare la pianta di un club e prenotare un tavolo. Fase 1 (beta): apri VIP ReserV da Cerca (se concesso), scegli Decades o Lima Twist Club, tocca una sezione verde disponibile e controlla capienza e tariffe. Blocco, depositi e check-in alla porta arrivano in fase 2. Bar e cabina DJ non sono mai prenotabili. Il marchio VIP ReserV non si traduce mai."
+      },
+      "help-vip-floor-map": {
+        title: "Pianta VIP ReserV",
+        body: "Verde = disponibile, ambra = trattenuto, rosso = prenotato, grigio = non prenotabile, blu = cabina DJ. Sul telefono la mappa apre un’area con chip; pizzica e trascina; target ≥ 44px. I nomi area sono modificabili dal club; le etichette stampate dei tavoli restano."
+      },
       "help-become-club-admin": {
         title: "Diventa un Club Admin",
         body: "Richiedi l'accesso Club Admin, quindi ottieni l'approvazione della sede."
@@ -1591,6 +1639,14 @@
       "help-floqcast": {
         title: "Faça de mim um floqCast / superstar",
         body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+      },
+      "help-vip-book-table": {
+        title: "Reservar mesa VIP (VIP ReserV)",
+        body: "VIP ReserV permite explorar o mapa de um clube e reservar uma mesa. Fase 1 (beta): abra VIP ReserV em Pesquisa (se concedido), escolha Decades ou Lima Twist Club, toque numa secção verde disponível e reveja capacidade e taxas. Retenção, depósitos e check-in à porta chegam na fase 2. Barras e cabine DJ nunca são reserváveis. A marca VIP ReserV nunca é traduzida."
+      },
+      "help-vip-floor-map": {
+        title: "Mapa VIP ReserV",
+        body: "Verde = disponível, âmbar = retido, vermelho = reservado, cinza = não reservável, azul = cabine DJ. No telefone o mapa abre numa área com chips; pinça e arrasta; alvos ≥ 44px. Os nomes das áreas são editáveis pelo clube; as etiquetas impressas das mesas mantêm-se."
       },
       "help-become-club-admin": {
         title: "Torne-se um Club Admin",
@@ -1844,6 +1900,14 @@
         title: "Κάνε με floqCast / σούπερ σταρ",
         body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά floqCast → Go live στον πίνακα floqCast. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
       },
+      "help-vip-book-table": {
+        title: "Κράτηση VIP τραπεζιού (VIP ReserV)",
+        body: "Το VIP ReserV σου επιτρέπει να εξερευνήσεις την κάτοψη ενός club και να κλείσεις τραπέζι. Φάση 1 (beta): άνοιξε VIP ReserV από Αναζήτηση (αν σου έχει δοθεί), διάλεξε Decades ή Lima Twist Club, πάτα πράσινη διαθέσιμη ενότητα και δες χωρητικότητα και χρεώσεις. Κράτηση, προκαταβολές και check-in στην είσοδο στη φάση 2. Μπαρ και DJ booth δεν κλείνονται ποτέ. Το brand VIP ReserV δεν μεταφράζεται ποτέ."
+      },
+      "help-vip-floor-map": {
+        title: "Κάτοψη VIP ReserV",
+        body: "Πράσινο = διαθέσιμο, κεχριμπαρί = κρατημένο, κόκκινο = κλεισμένο, γκρι = μη κρατήσιμο, μπλε = DJ booth. Στο τηλέφωνο η κάτοψη ανοίγει σε μία περιοχή με chips· τσίμπημα και μετακίνηση· στόχοι ≥ 44px. Τα ονόματα περιοχών τα επεξεργάζεται το club· οι τυπωμένες ετικέτες τραπεζιών μένουν."
+      },
       "help-become-club-admin": {
         title: "Γίνε Club Admin",
         body: "Ζητήστε πρόσβαση Club Admin και, στη συνέχεια, λάβετε έγκριση του χώρου."
@@ -2096,6 +2160,14 @@
         title: "Zrób mi floqCast / supergwiazdę",
         body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce floqCast → Go live na tablicy floqCast. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
       },
+      "help-vip-book-table": {
+        title: "Zarezerwuj stolik VIP (VIP ReserV)",
+        body: "VIP ReserV pozwala zbadać plan sali klubu i zarezerwować stolik. Faza 1 (beta): otwórz VIP ReserV z Szukaj (jeśli przyznano), wybierz Decades lub Lima Twist Club, stuknij zieloną dostępną sekcję i sprawdź pojemność oraz opłaty. Blokada, zaliczki i check-in przy drzwiach w fazie 2. Bary i booth DJ nigdy nie są rezerwowalne. Marka VIP ReserV nigdy nie jest tłumaczona."
+      },
+      "help-vip-floor-map": {
+        title: "Plan VIP ReserV",
+        body: "Zielony = dostępny, bursztyn = wstrzymany, czerwony = zarezerwowany, szary = nie do rezerwacji, niebieski = booth DJ. Na telefonie mapa otwiera jeden obszar z chipami; uszczypnij i przeciągnij; cele ≥ 44px. Nazwy obszarów edytuje klub; drukowane etykiety stolików zostają."
+      },
       "help-become-club-admin": {
         title: "Zostań Club Admin",
         body: "Poproś o dostęp do Club Admin, a następnie uzyskaj zatwierdzenie miejsca."
@@ -2347,6 +2419,14 @@
       "help-floqcast": {
         title: "اصنع لي floqCast / نجمة مشهورة",
         body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة floqCast → Go live على لوح floqCast. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
+      },
+      "help-vip-book-table": {
+        title: "احجز طاولة VIP (VIP ReserV)",
+        body: "يتيح VIP ReserV استكشاف خريطة النادي وحجز طاولة. المرحلة 1 (تجريبي): افتح VIP ReserV من البحث (إن مُنح)، اختر Decades أو Lima Twist Club، المس قسماً أخضر متاحاً وراجع السعة والرسوم. الحجز والعربون وفحص الباب في المرحلة 2. الحانات وكابينة الدي جي غير قابلة للحجز أبداً. علامة VIP ReserV لا تُترجم أبداً."
+      },
+      "help-vip-floor-map": {
+        title: "خريطة VIP ReserV",
+        body: "أخضر = متاح، كهرماني = محتجز، أحمر = محجوز، رمادي = غير قابل للحجز، أزرق = كابينة الدي جي. على الهاتف تفتح الخريطة على منطقة مع شرائح؛ قرّب واسحب؛ الأهداف ≥ 44px. أسماء المناطق يعدّلها النادي؛ ملصقات الطاولات المطبوعة تبقى."
       },
       "help-become-club-admin": {
         title: "كن Club Admin",

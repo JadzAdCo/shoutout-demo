@@ -1,0 +1,1211 @@
+{
+  "schemaVersion": "floqr.vipFloorPlan/2",
+  "status": "PROPOSAL — owner: \"The Decades floor plan is wonderful.\" Capacities and amounts are placeholders",
+  "venue": {
+    "name": "Decades",
+    "city": "Washington, DC",
+    "country": "US",
+    "clubLocationIdHint": "decades-washington-dc"
+  },
+  "image": {
+    "file": "vip-plans/decades-floor-map.png",
+    "widthPx": 1024,
+    "heightPx": 619,
+    "source": "owner attachment Oct 15 2026 (image 1)"
+  },
+  "legendRef": "legend.json",
+  "coordinateSystem": "Normalized 0–1 of the image; origin top-left; rect = {x, y, w, h}; polygon = [[x, y], …] clockwise; pixelBox = [x0, y0, x1, y1] inclusive, in source pixels. Areas: bounds/polygon = outline drawn on the map, viewBox = zoom target for the phone area view.",
+  "detection": "Table squares found by color segmentation (green fill, 11 components); areas traced from the wall lines.",
+  "areas": [
+    {
+      "id": "decades-north-vip",
+      "label": "VIP TABLES",
+      "defaultName": "North VIP",
+      "name": "North VIP",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "vipArea",
+      "shape": "rect",
+      "pixelBox": [
+        494,
+        18,
+        1006,
+        124
+      ],
+      "rect": {
+        "x": 0.4824,
+        "y": 0.0291,
+        "w": 0.501,
+        "h": 0.1729
+      },
+      "polygon": [
+        [
+          0.4824,
+          0.0291
+        ],
+        [
+          0.9834,
+          0.0291
+        ],
+        [
+          0.9834,
+          0.202
+        ],
+        [
+          0.4824,
+          0.202
+        ]
+      ],
+      "bounds": {
+        "x": 0.4824,
+        "y": 0.0291,
+        "w": 0.501,
+        "h": 0.1729
+      },
+      "viewBox": {
+        "x": 0.4912,
+        "y": 0.0501,
+        "w": 0.4717,
+        "h": 0.1422
+      },
+      "viewPixelBox": [
+        503,
+        31,
+        985,
+        118
+      ],
+      "sectionIds": [
+        "decades-c1",
+        "decades-c2",
+        "decades-c3",
+        "decades-c4",
+        "decades-c5"
+      ],
+      "nonBookableIds": [],
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating."
+    },
+    {
+      "id": "decades-floor",
+      "label": null,
+      "defaultName": "Floor",
+      "name": "Floor",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "floorZone",
+      "shape": "polygon",
+      "pixelBox": [
+        60,
+        133,
+        1006,
+        596
+      ],
+      "polygon": [
+        [
+          0.0586,
+          0.2149
+        ],
+        [
+          0.9824,
+          0.2149
+        ],
+        [
+          0.9824,
+          0.6882
+        ],
+        [
+          0.4219,
+          0.6882
+        ],
+        [
+          0.4219,
+          0.9628
+        ],
+        [
+          0.1123,
+          0.9628
+        ],
+        [
+          0.1123,
+          0.8401
+        ],
+        [
+          0.0586,
+          0.8401
+        ]
+      ],
+      "bounds": null,
+      "viewBox": {
+        "x": 0.5313,
+        "y": 0.2229,
+        "w": 0.4629,
+        "h": 0.4313
+      },
+      "viewPixelBox": [
+        544,
+        138,
+        1017,
+        404
+      ],
+      "sectionIds": [
+        "decades-c6",
+        "decades-c7",
+        "decades-c8",
+        "decades-c9"
+      ],
+      "nonBookableIds": [
+        "decades-dj-booth"
+      ],
+      "description": "Unlabeled main floor / dance floor (Decades logo). Holds floor tables C6–C9 and the DJ BOOTH."
+    },
+    {
+      "id": "decades-south-vip",
+      "label": "VIP TABLES",
+      "defaultName": "South VIP",
+      "name": "South VIP",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "vipArea",
+      "shape": "rect",
+      "pixelBox": [
+        517,
+        437,
+        1006,
+        590
+      ],
+      "rect": {
+        "x": 0.5049,
+        "y": 0.706,
+        "w": 0.4785,
+        "h": 0.2488
+      },
+      "polygon": [
+        [
+          0.5049,
+          0.706
+        ],
+        [
+          0.9834,
+          0.706
+        ],
+        [
+          0.9834,
+          0.9548
+        ],
+        [
+          0.5049,
+          0.9548
+        ]
+      ],
+      "bounds": {
+        "x": 0.5049,
+        "y": 0.706,
+        "w": 0.4785,
+        "h": 0.2488
+      },
+      "viewBox": {
+        "x": 0.5479,
+        "y": 0.7544,
+        "w": 0.3076,
+        "h": 0.1405
+      },
+      "viewPixelBox": [
+        561,
+        467,
+        875,
+        553
+      ],
+      "sectionIds": [
+        "decades-c10",
+        "decades-c11"
+      ],
+      "nonBookableIds": [],
+      "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm."
+    }
+  ],
+  "sections": [
+    {
+      "id": "decades-c1",
+      "label": "C1",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-north-vip",
+      "shape": "rect",
+      "pixelBox": [
+        521,
+        49,
+        568,
+        96
+      ],
+      "rect": {
+        "x": 0.5088,
+        "y": 0.0792,
+        "w": 0.0469,
+        "h": 0.0775
+      },
+      "polygon": [
+        [
+          0.5088,
+          0.0792
+        ],
+        [
+          0.5557,
+          0.0792
+        ],
+        [
+          0.5557,
+          0.1567
+        ],
+        [
+          0.5088,
+          0.1567
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c2",
+      "label": "C2",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-north-vip",
+      "shape": "rect",
+      "pixelBox": [
+        618,
+        49,
+        666,
+        96
+      ],
+      "rect": {
+        "x": 0.6035,
+        "y": 0.0792,
+        "w": 0.0479,
+        "h": 0.0775
+      },
+      "polygon": [
+        [
+          0.6035,
+          0.0792
+        ],
+        [
+          0.6514,
+          0.0792
+        ],
+        [
+          0.6514,
+          0.1567
+        ],
+        [
+          0.6035,
+          0.1567
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c3",
+      "label": "C3",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-north-vip",
+      "shape": "rect",
+      "pixelBox": [
+        715,
+        49,
+        763,
+        96
+      ],
+      "rect": {
+        "x": 0.6982,
+        "y": 0.0792,
+        "w": 0.0479,
+        "h": 0.0775
+      },
+      "polygon": [
+        [
+          0.6982,
+          0.0792
+        ],
+        [
+          0.7461,
+          0.0792
+        ],
+        [
+          0.7461,
+          0.1567
+        ],
+        [
+          0.6982,
+          0.1567
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c4",
+      "label": "C4",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-north-vip",
+      "shape": "rect",
+      "pixelBox": [
+        818,
+        52,
+        865,
+        100
+      ],
+      "rect": {
+        "x": 0.7988,
+        "y": 0.084,
+        "w": 0.0469,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.7988,
+          0.084
+        ],
+        [
+          0.8457,
+          0.084
+        ],
+        [
+          0.8457,
+          0.1632
+        ],
+        [
+          0.7988,
+          0.1632
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c5",
+      "label": "C5",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-north-vip",
+      "shape": "rect",
+      "pixelBox": [
+        920,
+        52,
+        967,
+        100
+      ],
+      "rect": {
+        "x": 0.8984,
+        "y": 0.084,
+        "w": 0.0469,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.8984,
+          0.084
+        ],
+        [
+          0.9453,
+          0.084
+        ],
+        [
+          0.9453,
+          0.1632
+        ],
+        [
+          0.8984,
+          0.1632
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP row along the north wall (VIP TABLES). Venue to confirm view, bottle service and seating.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c6",
+      "label": "C6",
+      "type": "table",
+      "bookable": true,
+      "areaId": "decades-floor",
+      "shape": "rect",
+      "pixelBox": [
+        849,
+        339,
+        896,
+        386
+      ],
+      "rect": {
+        "x": 0.8291,
+        "y": 0.5477,
+        "w": 0.0469,
+        "h": 0.0775
+      },
+      "polygon": [
+        [
+          0.8291,
+          0.5477
+        ],
+        [
+          0.876,
+          0.5477
+        ],
+        [
+          0.876,
+          0.6252
+        ],
+        [
+          0.8291,
+          0.6252
+        ]
+      ],
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm. Next to the DJ BOOTH.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c7",
+      "label": "C7",
+      "type": "table",
+      "bookable": true,
+      "areaId": "decades-floor",
+      "shape": "rect",
+      "pixelBox": [
+        765,
+        163,
+        813,
+        211
+      ],
+      "rect": {
+        "x": 0.7471,
+        "y": 0.2633,
+        "w": 0.0479,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.7471,
+          0.2633
+        ],
+        [
+          0.795,
+          0.2633
+        ],
+        [
+          0.795,
+          0.3425
+        ],
+        [
+          0.7471,
+          0.3425
+        ]
+      ],
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c8",
+      "label": "C8",
+      "type": "table",
+      "bookable": true,
+      "areaId": "decades-floor",
+      "shape": "rect",
+      "pixelBox": [
+        669,
+        160,
+        717,
+        207
+      ],
+      "rect": {
+        "x": 0.6533,
+        "y": 0.2585,
+        "w": 0.0479,
+        "h": 0.0775
+      },
+      "polygon": [
+        [
+          0.6533,
+          0.2585
+        ],
+        [
+          0.7012,
+          0.2585
+        ],
+        [
+          0.7012,
+          0.336
+        ],
+        [
+          0.6533,
+          0.336
+        ]
+      ],
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c9",
+      "label": "C9",
+      "type": "table",
+      "bookable": true,
+      "areaId": "decades-floor",
+      "shape": "rect",
+      "pixelBox": [
+        562,
+        156,
+        609,
+        204
+      ],
+      "rect": {
+        "x": 0.5488,
+        "y": 0.252,
+        "w": 0.0469,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.5488,
+          0.252
+        ],
+        [
+          0.5957,
+          0.252
+        ],
+        [
+          0.5957,
+          0.3312
+        ],
+        [
+          0.5488,
+          0.3312
+        ]
+      ],
+      "maxCapacity": 6,
+      "includedGuests": 4,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — table on the main floor between the VIP row and the dance floor. Venue to confirm.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c10",
+      "label": "C10",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-south-vip",
+      "shape": "rect",
+      "pixelBox": [
+        579,
+        485,
+        627,
+        533
+      ],
+      "rect": {
+        "x": 0.5654,
+        "y": 0.7835,
+        "w": 0.0479,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.5654,
+          0.7835
+        ],
+        [
+          0.6133,
+          0.7835
+        ],
+        [
+          0.6133,
+          0.8627
+        ],
+        [
+          0.5654,
+          0.8627
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    },
+    {
+      "id": "decades-c11",
+      "label": "C11",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "decades-south-vip",
+      "shape": "rect",
+      "pixelBox": [
+        810,
+        487,
+        857,
+        535
+      ],
+      "rect": {
+        "x": 0.791,
+        "y": 0.7868,
+        "w": 0.0469,
+        "h": 0.0792
+      },
+      "polygon": [
+        [
+          0.791,
+          0.7868
+        ],
+        [
+          0.8379,
+          0.7868
+        ],
+        [
+          0.8379,
+          0.866
+        ],
+        [
+          0.791,
+          0.866
+        ]
+      ],
+      "maxCapacity": 8,
+      "includedGuests": 6,
+      "capacityPlaceholder": true,
+      "capacityNote": "placeholder — confirm with venue",
+      "minimumAmount": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the minimum spend for this section (covers includedGuests)"
+      },
+      "extraGuestFee": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Optional VIP entry fee per guest beyond includedGuests; null = no extra-guest fee"
+      },
+      "deposit": {
+        "amountCents": null,
+        "currency": "USD",
+        "placeholder": true,
+        "note": "Club Admin sets the deposit (fixed, % of minimumAmount, or full)"
+      },
+      "description": "Placeholder — VIP section on the south side (VIP TABLES). Venue to confirm.",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "Set per night / event by the VIP Manager"
+      }
+    }
+  ],
+  "nonBookable": [
+    {
+      "id": "decades-bar",
+      "label": "BAR",
+      "type": "bar",
+      "state": "notBookable",
+      "reason": "Owner Oct 15 2026: bars cannot be booked",
+      "shape": "rect",
+      "pixelBox": [
+        18,
+        18,
+        448,
+        124
+      ],
+      "rect": {
+        "x": 0.0176,
+        "y": 0.0291,
+        "w": 0.4209,
+        "h": 0.1729
+      },
+      "polygon": [
+        [
+          0.0176,
+          0.0291
+        ],
+        [
+          0.4385,
+          0.0291
+        ],
+        [
+          0.4385,
+          0.202
+        ],
+        [
+          0.0176,
+          0.202
+        ]
+      ],
+      "bookable": false
+    },
+    {
+      "id": "decades-dj-booth",
+      "label": "DJ BOOTH",
+      "type": "djBooth",
+      "state": "djBooth",
+      "areaId": "decades-floor",
+      "reason": "Performer area",
+      "shape": "rect",
+      "pixelBox": [
+        906,
+        232,
+        999,
+        378
+      ],
+      "rect": {
+        "x": 0.8848,
+        "y": 0.3748,
+        "w": 0.0918,
+        "h": 0.2375
+      },
+      "polygon": [
+        [
+          0.8848,
+          0.3748
+        ],
+        [
+          0.9766,
+          0.3748
+        ],
+        [
+          0.9766,
+          0.6123
+        ],
+        [
+          0.8848,
+          0.6123
+        ]
+      ],
+      "bookable": false
+    },
+    {
+      "id": "decades-emergency-exit",
+      "label": "Emergency Exit",
+      "type": "exit",
+      "state": "notBookable",
+      "reason": "Life safety — must stay clear; never place a section here",
+      "shape": "rect",
+      "pixelBox": [
+        19,
+        171,
+        55,
+        345
+      ],
+      "rect": {
+        "x": 0.0186,
+        "y": 0.2763,
+        "w": 0.0361,
+        "h": 0.2827
+      },
+      "polygon": [
+        [
+          0.0186,
+          0.2763
+        ],
+        [
+          0.0547,
+          0.2763
+        ],
+        [
+          0.0547,
+          0.559
+        ],
+        [
+          0.0186,
+          0.559
+        ]
+      ],
+      "bookable": false
+    },
+    {
+      "id": "decades-stairs",
+      "label": "stairs",
+      "type": "stairs",
+      "state": "notBookable",
+      "reason": "Circulation — must stay clear",
+      "shape": "rect",
+      "pixelBox": [
+        18,
+        523,
+        110,
+        596
+      ],
+      "rect": {
+        "x": 0.0176,
+        "y": 0.8449,
+        "w": 0.0908,
+        "h": 0.1195
+      },
+      "polygon": [
+        [
+          0.0176,
+          0.8449
+        ],
+        [
+          0.1084,
+          0.8449
+        ],
+        [
+          0.1084,
+          0.9644
+        ],
+        [
+          0.0176,
+          0.9644
+        ]
+      ],
+      "bookable": false
+    },
+    {
+      "id": "decades-unlabeled-room",
+      "label": null,
+      "type": "unlabeled",
+      "state": "notBookable",
+      "reason": "Unlabeled enclosure west of the south VIP TABLES — ask the venue what it is",
+      "shape": "rect",
+      "pixelBox": [
+        441,
+        437,
+        515,
+        596
+      ],
+      "rect": {
+        "x": 0.4307,
+        "y": 0.706,
+        "w": 0.0732,
+        "h": 0.2585
+      },
+      "polygon": [
+        [
+          0.4307,
+          0.706
+        ],
+        [
+          0.5039,
+          0.706
+        ],
+        [
+          0.5039,
+          0.9645
+        ],
+        [
+          0.4307,
+          0.9645
+        ]
+      ],
+      "bookable": false
+    }
+  ],
+  "ignoredArtifacts": [
+    {
+      "printedText": "?",
+      "reason": "Help icon from the source app's screenshot, not part of the venue",
+      "shape": "rect",
+      "pixelBox": [
+        985,
+        572,
+        1015,
+        603
+      ],
+      "rect": {
+        "x": 0.9619,
+        "y": 0.9241,
+        "w": 0.0303,
+        "h": 0.0517
+      },
+      "polygon": [
+        [
+          0.9619,
+          0.9241
+        ],
+        [
+          0.9922,
+          0.9241
+        ],
+        [
+          0.9922,
+          0.9758
+        ],
+        [
+          0.9619,
+          0.9758
+        ]
+      ]
+    }
+  ],
+  "openQuestions": [
+    "Confirm or rename the areas North VIP / Floor / South VIP (printed label \"VIP TABLES\" stays on the map).",
+    "Confirm maxCapacity and includedGuests per table (placeholders from the drawing).",
+    "Set minimumAmount, deposit and any extraGuestFee per table (all placeholders, no prices invented).",
+    "Which tables are wheelchair accessible?",
+    "Confirm exit and stairs positions so no table blocks them."
+  ],
+  "counts": {
+    "bookableSections": 11,
+    "byType": {
+      "vipTable": 7,
+      "table": 4
+    },
+    "areas": 3,
+    "nonBookable": 5,
+    "djBooths": 1,
+    "maxCapacityTotalPlaceholder": 80,
+    "includedGuestsTotalPlaceholder": 58
+  },
+  "phase1Note": "Phase 1 foundations — published floor plan demo for VIP ReserV beta"
+}
