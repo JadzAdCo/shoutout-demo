@@ -33,7 +33,7 @@ const SOS2FA_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 const SOS2FA_RECOVERY_CODE = defineSecret("SOS2FA_RECOVERY_CODE");
 // Break-glass while SendGrid and Twilio are unpaid. Extending it is a deliberate code change.
-const RECOVERY_UNTIL_ISO = "2026-10-16T04:00:00Z";
+const RECOVERY_UNTIL_ISO = "2026-11-15T04:00:00Z";
 
 const SOS2FA_SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, SOS2FA_PEPPER, SENDGRID_API_KEY];
 const SOS2FA_FROM_EMAIL = "login@floqr.com";
