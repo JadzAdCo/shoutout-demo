@@ -62,10 +62,14 @@ jobs:
   deploy:
     name: Deploy Firebase Functions and rules
     needs: test
+    # workflow_dispatch deploy=true (preferred) OR push to main whose commit
+    # message contains [firebase-deploy] (agent path when dispatch is 403).
     if: >
-      github.event_name == 'workflow_dispatch' &&
-      inputs.deploy == 'true' &&
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/main' &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true') ||
+        (github.event_name == 'push' && contains(github.event.head_commit.message, '[firebase-deploy]'))
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
