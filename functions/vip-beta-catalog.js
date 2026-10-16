@@ -1,4 +1,4 @@
-/* Auto-generated beta section catalog for VIP ReserV Phase 2. Source: vip-plans/*.json */
+/* Auto-generated beta section catalog for VIP reserV Phase 2. Source: vip-plans/*.json */
 "use strict";
 module.exports = {
   "decades-washington-dc": {

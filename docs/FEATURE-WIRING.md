@@ -171,20 +171,34 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
+## FLOQR service receipts (site-wide)
+
+**Purpose:** One VIP reserV–style receipt contract for every paid/fulfilled service. Rule: `.cursor/rules/floqr-service-receipts.mdc`.
+
+| Layer | Wiring |
+|---|---|
+| Shared builder | `functions/receipt-delivery.js` — `shoutoutReceiptTitle`, `buildVipReservationReceipt`, `buildTempShoutoutReceipt`, `promoteShoutoutReceipt`, `deliverServiceReceipt({routeToInbox, sendEmail})` |
+| Checkout / fulfill | `functions/commerce-functions.js` — descriptive `itemName`, `cardFieldsFromSession` (last4), VIP fulfill → Inbox+email; pending paid ShoutOut → `routeToInbox:false` / `sendEmail:false` |
+| Club approve | `admin-app.js` `createStatusNotification` — completed → Inbox type `paidShoutoutReceipt` + Feature & Orders Completed deep link |
+| Portal invoices | `patron-portal-app.js` My Invoices — title, venue, when, card •••• last4 |
+| Datapoints | title (service + venue + when), `cardLast4`/`cardBrand`, `venueName`, `serviceDate`/`serviceTime`, `servicesRendered`, optional `clientIp`/`clientGeo` when lawful |
+| Routing | Saved/Pending → Feature & Orders only; Completed/VIP deposit confirmed → FloqR Inbox + email when SendGrid healthy |
+
 ## ShoutOut paid receipt (screen + venue)
 
-**Purpose:** Confirmation splash, Stripe return page, FloqR Inbox, email PDF, and SMS carry the chosen display screen size plus venue name/address — not only reference/template.
+**Purpose:** Confirmation splash, Stripe return page, Feature & Orders, FloqR Inbox (completed only), email PDF, and SMS carry screen size + venue — not thin “FLOQR paid ShoutOut” stubs.
 
 | Layer | Wiring |
 |---|---|
 | Patron confirm UI | `index.html` `#confirmationPage` — Venue, Address, Screen size; `patron-app.js` `showShoutoutConfirmation` |
+| Save draft | `patron-app.js` `commitShoutout({mode:"saved"})` + `#saveShoutoutDraftBtn` → status `saved`; portal Saved pane |
 | Payment return | `payment-return-app.js` shoutout receipt block |
-| Submit payload | `patron-app.js` — `screenFormatId` / `screenFormatLabel`, `streetAddress`, `fullAddress` / `locationAddress`, city/region/postal/country |
-| Backend | `functions/receipt-delivery.js` — `buildTempShoutoutReceipt`, `receiptBodyLines`, `screenFormatLabel`, `venueAddress` |
+| Submit payload | `patron-app.js` — `screenFormatId` / `screenFormatLabel`, address, `clientIp` |
+| Backend | `functions/receipt-delivery.js` — shared deliverer |
 | Checkout | `functions/commerce-functions.js` stores `order.receipt` at checkout create; promotes on paid |
-| Delivery | Inbox `paidShoutoutReceipt` + SendGrid PDF + optional Twilio SMS |
+| Delivery | Pending: Feature & Orders only. Completed: Inbox `paidShoutoutReceipt` + SendGrid PDF when available |
 
-**Contract:** Screen label prefers `FLOQR_DISPLAY_FORMATS` / `SCREEN_FORMAT_LABELS` (e.g. `led-96x48` → `96 x 48 cm`). Address prefers `fullAddress`, else street + city/region + postal + country.
+**Contract:** Titles like `Football Intro @ Aurelia — 2026-10-16`. Screen label prefers `FLOQR_DISPLAY_FORMATS`. Address prefers `fullAddress`.
 
 ---
 
@@ -298,19 +312,20 @@ When adding a section, use this skeleton:
 
 ---
 
-## VIP ReserV (`vipReservations`) — Phase 2
+## VIP reserV (`vipReservations`) — Phase 2
 
 | Piece | Where |
 |---|---|
-| **Brand** | VIP ReserV (never translate) |
+| **Brand** | VIP reserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
 | **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — night picker, 30‑min hold, Terms consent, FloqR Stripe deposit |
 | **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
-| **My Profile** | `patron-portal.html` `#portalVipReservations` (`?tab=reservations`) — list + Show pass |
+| **My Profile** | Feature & Orders → Guest List & reserV (`?tab=guest-list-reserv` / legacy `?tab=reservations`) — list + Show pass |
+| **Search icon** | `images/vip-reserv-icon.svg` + `shoutout-icon-card` (same 132/116px as ShoutOut) |
 | **Floor plans** | Static `vip-plans/` + server `functions/vip-beta-catalog.js`. Aurelia 2D pending |
 | **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-door.html` |
-| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent`, `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`. Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms `vipReservations` + books `vipInventory` |
+| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent`, `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`. Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
 | **Data** | `vipInventory`, `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
 | **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
@@ -318,4 +333,13 @@ When adding a section, use this skeleton:
 | **Not yet** | Club Admin VIP tab, promoter path, counsel Live Terms, Model B invoicing, Aurelia 2D |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
-| **Package** | s3.1.46 |
+| **Package** | s3.1.47 |
+
+## Feature & Orders (patron portal)
+
+| Piece | Where |
+|---|---|
+| **Tab** | `patron-portal.html` `#portalFeatureOrders` — renamed from Paid Services & Orders |
+| **Nested** | Status (default), Guest List & reserV, My ShoutOuts (Saved/Pending/Completed/Archive/Templates), My FloqCasts, My Invoices |
+| **JS** | `patron-portal-app.js` `showFeatureOrdersPane`, `renderFeatureOrdersStatus`, deep links `tab=feature-orders\|shoutouts\|guest-list-reserv\|invoices` |
+| **i18n** | `nav.featureOrders`, `nav.guestListReserv`, `portal.fo.*`, `portal.savedShoutouts*` — all supported langs |

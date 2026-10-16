@@ -1,4 +1,4 @@
-/* VIP ReserV Phase 2 — pure helpers (holds, pricing, nights, consent).
+/* VIP reserV Phase 2 — pure helpers (holds, pricing, nights, consent).
    Design: .cursor/rules/design-notes-vip-reservations.mdc */
 "use strict";
 
@@ -9,7 +9,7 @@ const BETA_TERMS = Object.freeze({
   termsDocId: "vip-beta-terms-v1",
   termsVersion: "1",
   termsSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  title: "VIP ReserV beta Terms (placeholder — counsel publishes Live Terms)"
+  title: "VIP reserV beta Terms (placeholder — counsel publishes Live Terms)"
 });
 
 const REQUIRED_CONSENT_CHECKS = Object.freeze([

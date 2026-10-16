@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.46";
+  const VERSION = "s3.1.47";
 
   const packs = {
     "ru": {
@@ -79,11 +79,11 @@
         body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
       },
       "help-vip-book-table": {
-        title: "Забронировать VIP-стол (VIP ReserV)",
-        body: "VIP ReserV позволяет изучить план зала и забронировать стол. Откройте VIP ReserV из Поиска, выберите Decades или Lima Twist Club и вечер, нажмите зелёный стол, удержите 30 минут, примите условия и оплатите депозит через FloqR Stripe. Бары и DJ не бронируются. Бренд VIP ReserV не переводится."
+        title: "Забронировать VIP-стол (VIP reserV)",
+        body: "VIP reserV позволяет изучить план зала и забронировать стол. Откройте VIP reserV из Поиска, выберите Decades или Lima Twist Club и вечер, нажмите зелёный стол, удержите 30 минут, примите условия и оплатите депозит через FloqR Stripe. Бары и DJ не бронируются. Бренд VIP reserV не переводится."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -263,16 +263,16 @@
         body: "Выберите несколько изображений или коротких видео сразу, затем задайте их порядок в публичном профиле. Профили поддерживают до 8 изображений и 2 коротких видео."
       },
       "help-vip-terms-consent": {
-        title: "Условия и согласие VIP ReserV",
+        title: "Условия и согласие VIP reserV",
         body: "Перед оплатой депозита нужно принять условия площадки, правила возврата, no-show, возраст 21+ с ID и раскрытие минимального расхода. Согласие пишется на сервере с хешем версии условий. Маркетинг — по желанию."
       },
       "help-vip-door-pass": {
-        title: "Пропуск VIP ReserV",
-        body: "После подтверждения депозита откройте Мой профиль → Бронирования и нажмите Show pass для одноразового QR. Возьмите ID 21+. Персонал двери использует VIP ReserV Door."
+        title: "Пропуск VIP reserV",
+        body: "После подтверждения депозита откройте Мой профиль → Бронирования и нажмите Show pass для одноразового QR. Возьмите ID 21+. Персонал двери использует VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in у двери VIP ReserV",
-        body: "VIP Manager открывает VIP ReserV Door на сегодня. Сканируйте или вставьте токен, подтвердите ID 21+, затем check-in. No-show только после grace. Ссылка notify не меняет статус."
+        title: "Check-in у двери VIP reserV",
+        body: "VIP Manager открывает VIP reserV Door на сегодня. Сканируйте или вставьте токен, подтвердите ID 21+, затем check-in. No-show только после grace. Ссылка notify не меняет статус."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS чеков VIP и редакция счетов",
@@ -353,11 +353,11 @@
         body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de floqCast Queue → Go live op het floqCast-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
       },
       "help-vip-book-table": {
-        title: "VIP-tafel boeken (VIP ReserV)",
-        body: "VIP ReserV toont de plattegrond en boekt tafels. Open VIP ReserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar."
+        title: "VIP-tafel boeken (VIP reserV)",
+        body: "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -537,16 +537,16 @@
         body: "Kies meerdere afbeeldingen of korte video's tegelijk en rangschik daarna hun volgorde op het openbare profiel. Profielen ondersteunen tot 8 afbeeldingen en 2 korte video's."
       },
       "help-vip-terms-consent": {
-        title: "VIP ReserV voorwaarden & toestemming",
+        title: "VIP reserV voorwaarden & toestemming",
         body: "Voor de borg accepteer je locatievoorwaarden, restitutie, no-show, 21+ met ID en minimum. Toestemming wordt server-side opgeslagen met de Terms-hash. Marketing optioneel."
       },
       "help-vip-door-pass": {
-        title: "VIP ReserV deurpass",
-        body: "Na bevestigde borg: Mijn profiel → Reserveringen → Toon pass voor een eenmalige QR. Neem ID 21+ mee. Deurstaf gebruikt VIP ReserV Door."
+        title: "VIP reserV deurpass",
+        body: "Na bevestigde borg: Mijn profiel → Reserveringen → Toon pass voor een eenmalige QR. Neem ID 21+ mee. Deurstaf gebruikt VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "VIP ReserV deur check-in",
-        body: "VIP Managers openen VIP ReserV Door voor vanavond. Scan of plak de token, bevestig ID 21+, check in. No-show alleen na grace. Een notify-link wijzigt de status niet."
+        title: "VIP reserV deur check-in",
+        body: "VIP Managers openen VIP reserV Door voor vanavond. Scan of plak de token, bevestig ID 21+, check in. No-show alleen na grace. Een notify-link wijzigt de status niet."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "VIP ontvangst-SMS & factuurredactie",
@@ -627,11 +627,11 @@
         body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
       },
       "help-vip-book-table": {
-        title: "Réserver une table VIP (VIP ReserV)",
-        body: "VIP ReserV explore le plan et réserve une table. Ouvrez VIP ReserV depuis Recherche, choisissez Decades ou Lima Twist Club et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez l’acompte avec FloqR Stripe. Bars et DJ non réservables. La marque VIP ReserV n’est pas traduite."
+        title: "Réserver une table VIP (VIP reserV)",
+        body: "VIP reserV explore le plan et réserve une table. Ouvrez VIP reserV depuis Recherche, choisissez Decades ou Lima Twist Club et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez l’acompte avec FloqR Stripe. Bars et DJ non réservables. La marque VIP reserV n’est pas traduite."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -811,16 +811,16 @@
         body: "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
       },
       "help-vip-terms-consent": {
-        title: "Conditions et consentement VIP ReserV",
+        title: "Conditions et consentement VIP reserV",
         body: "Avant l’acompte, acceptez les Conditions du lieu, remboursement, no-show, 21+ avec ID et minimum. Le consentement est enregistré côté serveur avec le hash des Conditions. Marketing optionnel."
       },
       "help-vip-door-pass": {
-        title: "Pass porte VIP ReserV",
-        body: "Après confirmation de l’acompte, Mon profil → Réservations → Afficher le pass pour un jeton QR unique. Apportez une ID 21+. Le personnel utilise VIP ReserV Door."
+        title: "Pass porte VIP reserV",
+        body: "Après confirmation de l’acompte, Mon profil → Réservations → Afficher le pass pour un jeton QR unique. Apportez une ID 21+. Le personnel utilise VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Enregistrement porte VIP ReserV",
-        body: "Les VIP Managers ouvrent VIP ReserV Door pour ce soir. Scannez ou collez le jeton, confirmez ID 21+, enregistrez. No-show seulement après grâce. Un lien notify ne change pas le statut."
+        title: "Enregistrement porte VIP reserV",
+        body: "Les VIP Managers ouvrent VIP reserV Door pour ce soir. Scannez ou collez le jeton, confirmez ID 21+, enregistrez. No-show seulement après grâce. Un lien notify ne change pas le statut."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS de reçu VIP et rédaction des factures",
@@ -901,11 +901,11 @@
         body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
       },
       "help-vip-book-table": {
-        title: "VIP-Tisch buchen (VIP ReserV)",
-        body: "VIP ReserV zeigt den Saalplan und bucht Tische. Öffne VIP ReserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP ReserV wird nicht übersetzt."
+        title: "VIP-Tisch buchen (VIP reserV)",
+        body: "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV wird nicht übersetzt."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -1085,16 +1085,16 @@
         body: "Wähle mehrere Bilder oder kurze Videos auf einmal aus und lege dann ihre Reihenfolge im öffentlichen Profil fest. Profile unterstützen bis zu 8 Bilder und 2 kurze Videos."
       },
       "help-vip-terms-consent": {
-        title: "VIP ReserV AGB & Einwilligung",
+        title: "VIP reserV AGB & Einwilligung",
         body: "Vor der Anzahlung musst du Location-AGB, Rückerstattung, No-Show, 21+ mit Ausweis und Mindestumsatz akzeptieren. Einwilligung wird serverseitig mit Terms-Hash gespeichert. Marketing optional."
       },
       "help-vip-door-pass": {
-        title: "VIP ReserV Tür-Pass",
-        body: "Nach bestätigter Anzahlung: Mein Profil → Reservierungen → Pass anzeigen für einmaligen QR. Ausweis 21+ mitbringen. Türpersonal nutzt VIP ReserV Door."
+        title: "VIP reserV Tür-Pass",
+        body: "Nach bestätigter Anzahlung: Mein Profil → Reservierungen → Pass anzeigen für einmaligen QR. Ausweis 21+ mitbringen. Türpersonal nutzt VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "VIP ReserV Tür-Check-in",
-        body: "VIP Manager öffnen VIP ReserV Door für heute. Token scannen/einfügen, ID 21+ prüfen, einchecken. No-Show erst nach Grace. Notify-Links ändern den Status nicht."
+        title: "VIP reserV Tür-Check-in",
+        body: "VIP Manager öffnen VIP reserV Door für heute. Token scannen/einfügen, ID 21+ prüfen, einchecken. No-Show erst nach Grace. Notify-Links ändern den Status nicht."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "VIP-Beleg-SMS & Rechnungsredaktion",
@@ -1175,11 +1175,11 @@
         body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
       },
       "help-vip-book-table": {
-        title: "Reservar mesa VIP (VIP ReserV)",
-        body: "VIP ReserV muestra el mapa y reserva mesas. Abre VIP ReserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables."
+        title: "Reservar mesa VIP (VIP reserV)",
+        body: "VIP reserV muestra el mapa y reserva mesas. Abre VIP reserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -1359,16 +1359,16 @@
         body: "Elige varias imágenes o videos cortos a la vez y luego ordena su posición en el perfil público. Los perfiles admiten hasta 8 imágenes y 2 videos cortos."
       },
       "help-vip-terms-consent": {
-        title: "Términos y consentimiento VIP ReserV",
+        title: "Términos y consentimiento VIP reserV",
         body: "Antes del depósito acepta Términos del local, reembolso, no-show, 21+ con ID y mínimo. El consentimiento se guarda en servidor con el hash de Términos. Marketing opcional."
       },
       "help-vip-door-pass": {
-        title: "Pase de puerta VIP ReserV",
-        body: "Tras confirmar el depósito, Mi perfil → Reservas → Mostrar pase para un QR de un solo uso. Trae ID 21+. El personal usa VIP ReserV Door."
+        title: "Pase de puerta VIP reserV",
+        body: "Tras confirmar el depósito, Mi perfil → Reservas → Mostrar pase para un QR de un solo uso. Trae ID 21+. El personal usa VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in en puerta VIP ReserV",
-        body: "Los VIP Managers abren VIP ReserV Door para esta noche. Escanea o pega el token, confirma ID 21+, check-in. No-show solo tras gracia. Un enlace notify no cambia el estado."
+        title: "Check-in en puerta VIP reserV",
+        body: "Los VIP Managers abren VIP reserV Door para esta noche. Escanea o pega el token, confirma ID 21+, check-in. No-show solo tras gracia. Un enlace notify no cambia el estado."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS de recibo VIP y redacción de facturas",
@@ -1449,11 +1449,11 @@
         body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
       },
       "help-vip-book-table": {
-        title: "Prenota un tavolo VIP (VIP ReserV)",
-        body: "VIP ReserV mostra la mappa e prenota tavoli. Apri VIP ReserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili."
+        title: "Prenota un tavolo VIP (VIP reserV)",
+        body: "VIP reserV mostra la mappa e prenota tavoli. Apri VIP reserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -1633,16 +1633,16 @@
         body: "Scegli più immagini o brevi video insieme, poi definisci l'ordine nel profilo pubblico. I profili supportano fino a 8 immagini e 2 brevi video."
       },
       "help-vip-terms-consent": {
-        title: "Termini e consenso VIP ReserV",
+        title: "Termini e consenso VIP reserV",
         body: "Prima del deposito accetta i Termini del locale, rimborso, no-show, 21+ con ID e minimo. Il consenso è registrato sul server con l’hash dei Termini. Marketing opzionale."
       },
       "help-vip-door-pass": {
-        title: "Pass porta VIP ReserV",
-        body: "Dopo la conferma del deposito, Il mio profilo → Prenotazioni → Mostra pass per un QR monouso. Porta ID 21+. Lo staff usa VIP ReserV Door."
+        title: "Pass porta VIP reserV",
+        body: "Dopo la conferma del deposito, Il mio profilo → Prenotazioni → Mostra pass per un QR monouso. Porta ID 21+. Lo staff usa VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in porta VIP ReserV",
-        body: "I VIP Manager aprono VIP ReserV Door per stasera. Scansiona o incolla il token, conferma ID 21+, check-in. No-show solo dopo grace. Un link notify non cambia lo stato."
+        title: "Check-in porta VIP reserV",
+        body: "I VIP Manager aprono VIP reserV Door per stasera. Scansiona o incolla il token, conferma ID 21+, check-in. No-show solo dopo grace. Un link notify non cambia lo stato."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS ricevuta VIP e redazione fatture",
@@ -1723,11 +1723,11 @@
         body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
       },
       "help-vip-book-table": {
-        title: "Reservar mesa VIP (VIP ReserV)",
-        body: "VIP ReserV mostra o mapa e reserva mesas. Abra VIP ReserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis."
+        title: "Reservar mesa VIP (VIP reserV)",
+        body: "VIP reserV mostra o mapa e reserva mesas. Abra VIP reserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -1907,16 +1907,16 @@
         body: "Escolha várias imagens ou vídeos curtos de uma vez e organize a ordem no perfil público. Os perfis suportam até 8 imagens e 2 vídeos curtos."
       },
       "help-vip-terms-consent": {
-        title: "Termos e consentimento VIP ReserV",
+        title: "Termos e consentimento VIP reserV",
         body: "Antes do depósito aceite os Termos do local, reembolso, no-show, 21+ com ID e mínimo. O consentimento é gravado no servidor com o hash dos Termos. Marketing opcional."
       },
       "help-vip-door-pass": {
-        title: "Passe de porta VIP ReserV",
-        body: "Após confirmar o depósito, Meu perfil → Reservas → Mostrar passe para um QR de uso único. Traga ID 21+. A equipa usa VIP ReserV Door."
+        title: "Passe de porta VIP reserV",
+        body: "Após confirmar o depósito, Meu perfil → Reservas → Mostrar passe para um QR de uso único. Traga ID 21+. A equipa usa VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in na porta VIP ReserV",
-        body: "VIP Managers abrem VIP ReserV Door para esta noite. Digitalize ou cole o token, confirme ID 21+, faça check-in. No-show só após grace. Um link notify não altera o estado."
+        title: "Check-in na porta VIP reserV",
+        body: "VIP Managers abrem VIP reserV Door para esta noite. Digitalize ou cole o token, confirme ID 21+, faça check-in. No-show só após grace. Um link notify não altera o estado."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS de recibo VIP e redação de faturas",
@@ -1997,11 +1997,11 @@
         body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά floqCast → Go live στον πίνακα floqCast. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
       },
       "help-vip-book-table": {
-        title: "Κράτηση VIP τραπεζιού (VIP ReserV)",
-        body: "Το VIP ReserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP ReserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα."
+        title: "Κράτηση VIP τραπεζιού (VIP reserV)",
+        body: "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -2181,16 +2181,16 @@
         body: "Επιλέξτε πολλές εικόνες ή σύντομα βίντεο μαζί και στη συνέχεια ρυθμίστε τη σειρά τους στο δημόσιο προφίλ. Τα προφίλ υποστηρίζουν έως 8 εικόνες και 2 σύντομα βίντεο."
       },
       "help-vip-terms-consent": {
-        title: "Όροι και συναίνεση VIP ReserV",
+        title: "Όροι και συναίνεση VIP reserV",
         body: "Πριν την προκαταβολή αποδεχτείτε Όρους χώρου, επιστροφή, no-show, 21+ με ID και ελάχιστο. Η συναίνεση αποθηκεύεται στον server με hash Όρων. Marketing προαιρετικό."
       },
       "help-vip-door-pass": {
-        title: "Πάσο πόρτας VIP ReserV",
-        body: "Μετά την επιβεβαίωση προκαταβολής, Το προφίλ μου → Κρατήσεις → Εμφάνιση πάσου για QR μίας χρήσης. Φέρτε ID 21+. Το προσωπικό χρησιμοποιεί VIP ReserV Door."
+        title: "Πάσο πόρτας VIP reserV",
+        body: "Μετά την επιβεβαίωση προκαταβολής, Το προφίλ μου → Κρατήσεις → Εμφάνιση πάσου για QR μίας χρήσης. Φέρτε ID 21+. Το προσωπικό χρησιμοποιεί VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in πόρτας VIP ReserV",
-        body: "Οι VIP Managers ανοίγουν VIP ReserV Door για απόψε. Σαρώστε ή επικολλήστε token, επιβεβαιώστε ID 21+, check-in. No-show μόνο μετά από grace. Σύνδεσμος notify δεν αλλάζει κατάσταση."
+        title: "Check-in πόρτας VIP reserV",
+        body: "Οι VIP Managers ανοίγουν VIP reserV Door για απόψε. Σαρώστε ή επικολλήστε token, επιβεβαιώστε ID 21+, check-in. No-show μόνο μετά από grace. Σύνδεσμος notify δεν αλλάζει κατάσταση."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS απόδειξης VIP και σύνταξη τιμολογίων",
@@ -2271,11 +2271,11 @@
         body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce floqCast → Go live na tablicy floqCast. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
       },
       "help-vip-book-table": {
-        title: "Zarezerwuj stolik VIP (VIP ReserV)",
-        body: "VIP ReserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP ReserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji."
+        title: "Zarezerwuj stolik VIP (VIP reserV)",
+        body: "VIP reserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP reserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -2455,16 +2455,16 @@
         body: "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
       },
       "help-vip-terms-consent": {
-        title: "Warunki i zgoda VIP ReserV",
+        title: "Warunki i zgoda VIP reserV",
         body: "Przed depozytem zaakceptuj warunki klubu, zwrot, no-show, 21+ z ID i minimum. Zgoda jest zapisywana po stronie serwera z hashem warunków. Marketing opcjonalny."
       },
       "help-vip-door-pass": {
-        title: "Pass drzwi VIP ReserV",
-        body: "Po potwierdzeniu depozytu: Mój profil → Rezerwacje → Pokaż pass dla jednorazowego QR. Weź ID 21+. Personel używa VIP ReserV Door."
+        title: "Pass drzwi VIP reserV",
+        body: "Po potwierdzeniu depozytu: Mój profil → Rezerwacje → Pokaż pass dla jednorazowego QR. Weź ID 21+. Personel używa VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "Check-in drzwi VIP ReserV",
-        body: "VIP Managerowie otwierają VIP ReserV Door na dziś. Zeskanuj lub wklej token, potwierdź ID 21+, check-in. No-show dopiero po grace. Link notify nie zmienia statusu."
+        title: "Check-in drzwi VIP reserV",
+        body: "VIP Managerowie otwierają VIP reserV Door na dziś. Zeskanuj lub wklej token, potwierdź ID 21+, check-in. No-show dopiero po grace. Link notify nie zmienia statusu."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS paragonu VIP i redakcja faktur",
@@ -2545,11 +2545,11 @@
         body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة floqCast → Go live على لوح floqCast. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
       },
       "help-vip-book-table": {
-        title: "حجز طاولة VIP (VIP ReserV)",
-        body: "VIP ReserV يعرض خريطة القاعة ويحجز الطاولات. افتح VIP ReserV من البحث، اختر Decades أو Lima Twist Club وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع العربون عبر FloqR Stripe. البارات وDJ غير قابلة للحجز."
+        title: "حجز طاولة VIP (VIP reserV)",
+        body: "VIP reserV يعرض خريطة القاعة ويحجز الطاولات. افتح VIP reserV من البحث، اختر Decades أو Lima Twist Club وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع العربون عبر FloqR Stripe. البارات وDJ غير قابلة للحجز."
       },
       "help-vip-floor-map": {
-        title: "VIP ReserV floor map",
+        title: "VIP reserV floor map",
         body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
@@ -2729,16 +2729,16 @@
         body: "اختر عدة صور أو مقاطع فيديو قصيرة دفعة واحدة، ثم رتّب ترتيبها في الملف العام. تدعم الملفات حتى 8 صور ومقطعي فيديو قصيرين."
       },
       "help-vip-terms-consent": {
-        title: "شروط وموافقة VIP ReserV",
+        title: "شروط وموافقة VIP reserV",
         body: "قبل العربون اقبل شروط المكان والاسترداد وno-show و21+ مع الهوية والحد الأدنى. تُسجَّل الموافقة على الخادم مع هاش الشروط. التسويق اختياري."
       },
       "help-vip-door-pass": {
-        title: "تصريح باب VIP ReserV",
-        body: "بعد تأكيد العربون، ملفي → الحجوزات → عرض التصريح لرمز QR لمرة واحدة. أحضر هوية 21+. يستخدم طاقم الباب VIP ReserV Door."
+        title: "تصريح باب VIP reserV",
+        body: "بعد تأكيد العربون، ملفي → الحجوزات → عرض التصريح لرمز QR لمرة واحدة. أحضر هوية 21+. يستخدم طاقم الباب VIP reserV Door."
       },
       "help-vip-door-ops": {
-        title: "تسجيل الدخول عند الباب VIP ReserV",
-        body: "يفتح VIP Managers صفحة VIP ReserV Door لهذه الليلة. امسح أو الصق الرمز، أكّد هوية 21+، ثم check-in. No-show فقط بعد المهلة. رابط notify لا يغيّر الحالة."
+        title: "تسجيل الدخول عند الباب VIP reserV",
+        body: "يفتح VIP Managers صفحة VIP reserV Door لهذه الليلة. امسح أو الصق الرمز، أكّد هوية 21+، ثم check-in. No-show فقط بعد المهلة. رابط notify لا يغيّر الحالة."
       },
       "help-vip-receipt-sms-redaction-fixes": {
         title: "SMS إيصال VIP وتنقيح الفواتير",

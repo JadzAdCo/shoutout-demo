@@ -82,6 +82,6 @@ test("invoice PDF is a valid base64 PDF header", () => {
 test("receipt SMS uses sendTwilioMessagesApi (VIP-B-24)", () => {
   const src = fs.readFileSync(path.join(__dirname, "receipt-delivery.js"), "utf8");
   assert.match(src, /sendTwilioMessagesApi/);
-  assert.match(src, /source:\s*"deliverPaidShoutoutReceipt"/);
+  assert.match(src, /source:\s*"deliverServiceReceipt"/);
   assert.doesNotMatch(src, /api\.twilio\.com\/2010-04-01\/Accounts/);
 });

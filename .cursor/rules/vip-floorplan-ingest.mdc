@@ -5,7 +5,7 @@ alwaysApply: true
 
 # VIP floor-plan ingest (always)
 
-Resume: `@floorplan$` / `$vip-floorplan$`. Status: **BUILDING** — VIP ReserV Phase 2 uses static `vip-plans/` + `functions/vip-beta-catalog.js`. Full Firestore ingest still waits on Club Admin floor-plan publish; keep proposal outputs in `reports/vip-floorplans/` until then.
+Resume: `@floorplan$` / `$vip-floorplan$`. Status: **BUILDING** — VIP reserV Phase 2 uses static `vip-plans/` + `functions/vip-beta-catalog.js`. Full Firestore ingest still waits on Club Admin floor-plan publish; keep proposal outputs in `reports/vip-floorplans/` until then.
 
 Use this **every time** the owner, a Master Admin or a club admin provides a floor plan (club, event or venue). Reference outputs: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `legend.json`, `build-plans.js`, `viewer.js`, `shoot.mjs`, `photo-match.md`).
 

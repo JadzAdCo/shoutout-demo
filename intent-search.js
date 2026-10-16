@@ -106,7 +106,7 @@
       id: "vip-reserv",
       kind: "product",
       featureKey: "vipReservations",
-      label: "VIP ReserV — book a VIP table",
+      label: "VIP reserV — book a VIP table",
       blurb: "Explore a club floor map and reserve a VIP table. Beta: Decades, Lima Twist Club, Aurelia.",
       href: pageUrl("./vip.html", {from: "floqai"}),
       searchPhrases: [

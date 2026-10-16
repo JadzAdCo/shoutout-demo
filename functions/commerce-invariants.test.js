@@ -77,7 +77,8 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
   assert.match(floqrIdentity, /resolvePlayerIdentityLabel/);
   assert.match(backend, /const pricedAmountCents = footballTeamIntro/);
   assert.match(backend, /normalizeFootballTeamMembers/);
-  assert.match(backend, /Football Intro ShoutOut/);
+  assert.match(backend, /shoutoutReceiptTitle/);
+  assert.match(backend, /templateName[\s\S]*Football Intro/);
   assert.match(backend, /members\.length !== 4/);
   assert.match(patronApp, /priceCents > 0/);
   assert.match(patronApp, /Continue to \$30 FloqR Checkout/);

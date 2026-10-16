@@ -1,4 +1,4 @@
-/* VIP ReserV Phase 2 — venue → night → hold → consent → Checkout deposit. */
+/* VIP reserV Phase 2 — venue → night → hold → consent → Checkout deposit. */
 (function () {
   "use strict";
 
@@ -205,7 +205,7 @@
     fillNights();
     const params = new URLSearchParams(location.search);
     if (params.get("vipPaid") === "1") {
-      setStatus(t("page.vip.paidOk", "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass."));
+      setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
     } else if (params.get("vipCancelled") === "1") {
       setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it."));
     }
@@ -232,7 +232,7 @@
 
   function selectVenue(venue, opts) {
     if (!venue || venue.pending) {
-      setStatus(t("page.vip.aureliaPending", "Aurelia’s interactive 3D demo is in reports; the 2D VIP ReserV map lands next."));
+      setStatus(t("page.vip.aureliaPending", "Aurelia’s interactive 3D demo is in reports; the 2D VIP reserV map lands next."));
       return;
     }
     currentVenue = venue;
@@ -301,7 +301,7 @@
           clearHoldUi();
           if (appEl) appEl.classList.add("hidden");
           if (gateEl) gateEl.classList.remove("hidden");
-          setStatus(t("page.vip.needSignIn", "Sign in to explore VIP ReserV floor maps."));
+          setStatus(t("page.vip.needSignIn", "Sign in to explore VIP reserV floor maps."));
           return;
         }
         showApp(user);

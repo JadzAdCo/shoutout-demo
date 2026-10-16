@@ -398,60 +398,60 @@
     },
     {
       id: "help-vip-book-table",
-      title: "Book a VIP table (VIP ReserV)",
-      body: "VIP ReserV lets you explore a club floor map and reserve a table. Open VIP ReserV from Search (when granted), pick Decades or Lima Twist Club and a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP ReserV is never translated.",
+      title: "Book a VIP table (VIP reserV)",
+      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted), pick Decades or Lima Twist Club and a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
         "table deposit", "hold a table"
       ],
       links: [
-        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]
     },
     {
       id: "help-vip-floor-map",
-      title: "VIP ReserV floor map",
+      title: "VIP reserV floor map",
       body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn.",
       searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green"],
       links: [
-        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]
     },
     {
       id: "help-vip-terms-consent",
-      title: "VIP ReserV Terms & consent",
+      title: "VIP reserV Terms & consent",
       body: "Before deposit checkout you must accept the venue Terms, refund/cancellation, no-show/forfeit, age 21+ with ID, and minimum-spend disclosure. Consent is recorded server-side with the Terms version hash. Marketing opt-in is optional.",
       searchPhrases: ["vip terms", "table terms", "vip consent", "accept terms vip", "minimum spend disclosure"],
       links: [
-        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin"]
     },
     {
       id: "help-vip-door-pass",
-      title: "VIP ReserV door pass",
-      body: "After your deposit confirms, open My Profile → Reservations and tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue cutoff. Door staff use VIP ReserV Door to check you in.",
+      title: "VIP reserV door pass",
+      body: "After your deposit confirms, open My Profile → Reservations and tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue cutoff. Door staff use VIP reserV Door to check you in.",
       searchPhrases: ["vip pass", "door pass", "qr table", "vip qr", "show pass", "table check in"],
       links: [
         {label: "My Reservations", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "reservations"})},
-        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "serviceMember", "venueAdmin"]
     },
     {
       id: "help-vip-door-ops",
-      title: "VIP ReserV door check-in",
-      body: "VIP Managers open VIP ReserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status.",
+      title: "VIP reserV door check-in",
+      body: "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status.",
       searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door"],
       links: [
-        {label: "VIP ReserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
+        {label: "VIP reserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["serviceMember", "venueAdmin", "masterAdmin"]

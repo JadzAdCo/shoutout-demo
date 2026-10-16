@@ -234,11 +234,12 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   const portalApp = readReleaseFile("patron-portal-app.js");
   assert.match(portalApp, /lang\.aiGrammar/);
   assert.match(portalApp, /floqr:ui-language/);
-  assert.match(portalApp, /shoutouts\s*:\s*["']portalShoutouts["']/);
-  assert.match(portalApp, /Open My ShoutOuts/);
+  assert.match(portalApp, /shoutouts\s*:\s*["']portalFeatureOrders["']/);
+  assert.match(portalApp, /showFeatureOrdersPane/);
   assert.match(portalApp, /isPendingShoutout/);
+  assert.match(portalApp, /isSavedShoutout/);
   assert.match(portalApp, /applyShoutoutHistoryRetention/);
-  assert.match(portalApp, /templates\s*:\s*["']portalShoutouts["']/);
+  assert.match(portalApp, /templates\s*:\s*["']portalFeatureOrders["']/);
   assert.match(portalApp, /_recoveredFromOrder/);
   assert.match(portalApp, /patronShoutoutArchives/);
 });
@@ -256,13 +257,15 @@ test("club approve keeps shoutout docs for Completed history", () => {
 test("paid receipt deep links open My ShoutOuts in the patron portal", () => {
   const receipt = readReleaseFile("functions/receipt-delivery.js");
   assert.match(receipt, /patron-portal\.html\?tab=shoutouts/);
-  assert.match(receipt, /View My ShoutOuts/);
+  assert.match(receipt, /deliverServiceReceipt/);
   const paymentReturn = readReleaseFile("payment-return.html");
   assert.match(paymentReturn, /patron-portal\.html\?tab=shoutouts/);
   const portal = readReleaseFile("patron-portal.html");
-  assert.match(portal, /id="portalShoutouts"/);
-  assert.match(portal, /data-panel="portalShoutouts"/);
+  assert.match(portal, /id="portalFeatureOrders"/);
+  assert.match(portal, /data-panel="portalFeatureOrders"/);
+  assert.match(portal, /id="foShoutoutsPane"/);
   assert.match(portal, /id="shoutoutSubtabs"/);
+  assert.match(portal, /data-so-pane="shoutoutSavedPane"/);
   assert.match(portal, /data-so-pane="shoutoutPendingPane"/);
   assert.match(portal, /data-so-pane="shoutoutCompletedPane"/);
   assert.match(portal, /data-so-pane="shoutoutTemplatesPane"/);

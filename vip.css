@@ -1,4 +1,4 @@
-/* VIP ReserV Phase 2 — patron shell + hold / consent chrome */
+/* VIP reserV Phase 2 — patron shell + hold / consent chrome */
 .vip-shell { max-width: 1100px; }
 .vip-hero { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; }
 .vip-hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0.2rem 0; letter-spacing: 0.02em; }

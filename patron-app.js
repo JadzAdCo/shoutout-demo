@@ -4382,7 +4382,16 @@
     } catch(e) { box.innerHTML = `<p>${esc(e.message)}</p>`; }
   }
 
+  async function saveShoutoutDraft() {
+    return commitShoutout({mode: "saved"});
+  }
+
   async function submitShoutout() {
+    return commitShoutout({mode: "submit"});
+  }
+
+  async function commitShoutout({mode = "submit"} = {}) {
+    const saveOnly = mode === "saved";
     const status=byId("submitStatus");
     const correlationId = window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`;
     try {
@@ -4409,15 +4418,16 @@
         window.FLOQRLog.write({
           level: "info",
           category: "shoutout",
-          action: "submit_start",
-          message: `Submitting ${selectedTemplate || "shoutout"} for ${locationId()}`,
+          action: saveOnly ? "save_draft_start" : "submit_start",
+          message: `${saveOnly ? "Saving" : "Submitting"} ${selectedTemplate || "shoutout"} for ${locationId()}`,
           correlationId,
           details: {
             template: selectedTemplate,
             locationId: locationId(),
             screenFormatId: caps.formatId || selectedScreenFormatId,
             footballIntro: !!footballIntro,
-            paymentModel: Number(t.priceCents || 0) > 0 ? "floqr-platform" : "free"
+            paymentModel: Number(t.priceCents || 0) > 0 ? "floqr-platform" : "free",
+            mode: saveOnly ? "saved" : "submit"
           }
         });
       }
@@ -4529,7 +4539,40 @@
       const mainRaw = byId("mainText").value.trim();
       try { await window.FLOQRClientIp?.ensure?.(); } catch (_) {}
       const sessionIp = window.FLOQRClientIp?.current?.() || {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status: saveOnly ? "saved" : "pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), savedAt: saveOnly ? firebase.firestore.FieldValue.serverTimestamp() : null, referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
+      if (saveOnly) {
+        status.textContent = tt("page.shoutout.savingDraft", null, "Saving ShoutOut draft…");
+        const shoutoutRef = await db.collection("shoutouts").add({
+          ...payload,
+          paymentRequired: false,
+          paymentStatus: "unpaid",
+          draft: true
+        });
+        payload.shoutoutId = shoutoutRef.id;
+        payload.modifyLink = `./patron-portal.html?tab=shoutouts&pane=saved&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}`;
+        await db.collection("shoutoutAudit").add({
+          shoutoutId: shoutoutRef.id,
+          action: "saved",
+          referenceNumber: payload.referenceNumber,
+          ownerUid: currentUser.uid,
+          actorUid: currentUser.uid,
+          actorEmail: safeUser(),
+          clientIp: payload.clientIp || "",
+          ipSource: payload.ipSource || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        status.textContent = tt("page.shoutout.savedDraft", null, "Saved. Open Feature & Orders → My ShoutOuts → Saved to finish later.");
+        showShoutoutConfirmation(payload, l, t, {
+          redirectMs: 2200,
+          redirectLabel: tt("page.shoutout.openSaved", null, "Opening Saved ShoutOuts"),
+          onRedirect: () => {
+            clearConfirmationTimers();
+            window.location.assign(window.FLOQRNav?.portalLink?.("./patron-portal.html", {tab: "shoutouts", pane: "saved", id: shoutoutRef.id})
+              || `./patron-portal.html?tab=shoutouts&pane=saved&id=${encodeURIComponent(shoutoutRef.id)}`);
+          }
+        });
+        return;
+      }
       const priceCents = Math.max(0, Math.round(Number(canonicalTemplate.priceCents || t.priceCents || mediaPayload.priceCents || 0)));
       if (priceCents > 0) {
         const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
@@ -4897,7 +4940,7 @@
     bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list"), { venue: true }));
     bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry"), { venue: true }));
     bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry"), { venue: true }));
-    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"), { venue: true })); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
+    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"), { venue: true })); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("saveShoutoutDraftBtn", saveShoutoutDraft); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);

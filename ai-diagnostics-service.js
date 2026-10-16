@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.46";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.47";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1471,20 +1471,29 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-47-feature-orders-receipts",
+      area:"My Profile / Feature & Orders / Receipts / Search",
+      feature:"Feature & Orders nest, VIP reserV receipts → Inbox, Save ShoutOut, standardized receipt titles",
+      changed:"Paid Services renamed Feature & Orders with Status / Guest List & reserV / My ShoutOuts (Saved+Pending+Completed) / FloqCasts / Invoices. VIP deposit deliverServiceReceipt routeToInbox true. Pending ShoutOut receipts stay off Inbox. Save ShoutOut draft. Brand VIP reserV + Search icon. Package s3.1.47.",
+      howToTest:"1) Hard-refresh portal → Feature & Orders → Status default. 2) Pay VIP deposit → FloqR Inbox shows descriptive Table … deposit — Venue, date (not a stub). My Invoices shows same title + card last4 when available. 3) Compose ShoutOut → Save ShoutOut → Feature & Orders → My ShoutOuts → Saved. 4) Submit/pay ShoutOut → Pending (not Inbox). 5) Club Admin approve → Inbox paidShoutoutReceipt with descriptive title. 6) Search VIP reserV icon same size as ShoutOut.",
+      expected:"VIP receipt in Inbox; pending ShoutOut not in Inbox; Saved drafts listed; tab labels Feature & Orders / Guest List & reserV; icon 132/116px.",
+      troubleshoot:"No VIP Inbox → redeploy commerce-functions + receipt-delivery; confirm webhook expanded session. Thin ShoutOut title → order.itemName/receipt.title from shoutoutReceiptTitle. Save missing → cache-bust patron-app.js / index.html. Tabs wrong → hard refresh patron-portal ?v=s3.1.47."
+    },
+    {
       id:"s3-1-46-vip-reserv-phase2",
-      area:"Search / VIP ReserV / Portal / Door",
-      feature:"VIP ReserV Phase 2 — holds, Terms consent, FloqR Stripe deposit, Reservations tab, door check-in",
-      changed:"createVipHold / recordVipConsent / createFloqrCheckoutSession orderType vipReservation; vip.html night + hold countdown + consent; patron-portal Reservations; vip-door.html check-in/no-show; VIP-B-24 receipt SMS + FLOQR invoice redactor. Package s3.1.46.",
-      howToTest:"1) Master Admin F&S: seed/enable vipReservations Test=1, grant beta tester. 2) Hard-refresh Search → VIP ReserV. 3) vip.html → Decades → pick tonight → Hold this table → accept all required Terms → Pay deposit (Stripe test). 4) Return vipPaid=1 → portal ?tab=reservations → Show pass. 5) vip-door.html?location=decades-washington-dc → check in with token or list button. FloqAi: book a table / door pass.",
+      area:"Search / VIP reserV / Portal / Door",
+      feature:"VIP reserV Phase 2 — holds, Terms consent, FloqR Stripe deposit, Guest List & reserV, door check-in",
+      changed:"createVipHold / recordVipConsent / createFloqrCheckoutSession orderType vipReservation; vip.html night + hold countdown + consent; patron-portal Guest List & reserV; vip-door.html check-in/no-show; VIP-B-24 receipt SMS + FLOQR invoice redactor. Package s3.1.46.",
+      howToTest:"1) Master Admin F&S: seed/enable vipReservations Test=1, grant beta tester. 2) Hard-refresh Search → VIP reserV. 3) vip.html → Decades → pick tonight → Hold this table → accept all required Terms → Pay deposit (Stripe test). 4) Return vipPaid=1 → portal ?tab=guest-list-reserv → Show pass. 5) vip-door.html?location=decades-washington-dc → check in with token or list button. FloqAi: book a table / door pass.",
       expected:"Hold lasts 30 min; consent required before Checkout; deposit confirms reservation; pass token works at door; no-show blocked after check-in. Aurelia still soon.",
       troubleshoot:"Hold fails → Functions deploy vip-functions + feature grant. Checkout unsupported type → commerce-functions vipReservation branch deployed. Pass missing → reservation status must be confirmed. Tile missing → seedFeatureServices."
     },
     {
       id:"s3-1-45-vip-reserv-phase1",
-      area:"Search / VIP ReserV",
-      feature:"VIP ReserV Phase 1 — beta feature key, Search tile, floor maps for Decades and Lima Twist Club",
-      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP ReserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia is marked soon. FloqAi finds book a table / VIP ReserV. Holds and deposits are Phase 2.",
-      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP ReserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP ReserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club. Signed out → home sign-in with returnTo. FloqAi: book a table.",
+      area:"Search / VIP reserV",
+      feature:"VIP reserV Phase 1 — beta feature key, Search tile, floor maps for Decades and Lima Twist Club",
+      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP reserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia is marked soon. FloqAi finds book a table / VIP reserV. Holds and deposits are Phase 2.",
+      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP reserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP reserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club. Signed out → home sign-in with returnTo. FloqAi: book a table.",
       expected:"Map loads for Decades and Lima Twist; bars/DJ not bookable. Aurelia chip disabled with soon. Feature off → not-available gate.",
       troubleshoot:"Tile missing → seedFeatureServices and beta grant for vipReservations. Blank map → check vip-plans/*.json and PNG paths, hard refresh ?v=."
     },

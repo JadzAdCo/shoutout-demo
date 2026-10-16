@@ -1,4 +1,4 @@
-// Phone-first VIP ReserV floor-map viewer (Phase 1). Reads decades.json / lima-twist.json / legend.json, or plans.js when opened from disk.
+// Phone-first VIP reserV floor-map viewer (Phase 1). Reads decades.json / lima-twist.json / legend.json, or plans.js when opened from disk.
 (() => {
   "use strict";
   const NS = "http://www.w3.org/2000/svg";

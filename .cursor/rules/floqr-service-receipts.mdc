@@ -1,0 +1,44 @@
+---
+description: Site-wide FLOQR service receipt standard (Paid Services / Feature & Orders / FloqR Inbox)
+alwaysApply: true
+---
+# FLOQR service receipts (always)
+
+Every paid or fulfilled FLOQR service (ShoutOut, VIP reserV, FloqCast, guest list, ads, etc.) uses **one receipt contract**. Prefer the VIP reserV descriptive style over thin labels like “FLOQR paid ShoutOut”.
+
+## Required datapoints (every receipt)
+
+| Field | Examples |
+|---|---|
+| Identity | `invoiceNumber` / `referenceNumber` (`FLOQR-YYYYMMDD-…`), `orderId`, `orderType` |
+| Title | Human service line, not a product-only stub — e.g. `Table C10 deposit — Decades, 2026-10-16` or `Football Intro @ Aurelia — Fri 10pm LED` |
+| Venue | `venueName` / `locationName`, `clubLocationId`, address when known |
+| When | `serviceDate` / `night`, `serviceTime` / event time, `paidAtIso` / `createdAt` |
+| Commerce | `amountCents`, `currency`, `paymentStatus`, `fulfillmentStatus` |
+| Card (if card pay) | `cardBrand`, **`cardLast4`** only (never full PAN / CVV) |
+| Services rendered | `itemName`, line items / `servicesRendered[]`, template / section / screen when relevant |
+| Provenance (when lawful) | `clientIp` (request IP), `clientGeo` / approximate GPS **only with explicit patron consent** or venue ops need; never sell; redact in public logs |
+
+## Routing
+
+| Outcome | FloqR Inbox | Email (SendGrid) | Feature & Orders |
+|---|---|---|---|
+| **Saved** draft (unsubmitted ShoutOut) | No | No | My ShoutOuts → Saved |
+| **Pending** (submitted / awaiting club / unpaid hold) | No | No | Status + My ShoutOuts → Pending |
+| **Completed / paid confirmed** | Yes (`inboxNotifications`) | Yes when SendGrid healthy | Status + My Invoices / Paid history |
+
+VIP reserV paid deposits are **completed** commerce → Inbox + invoice row (same as paid ShoutOut final receipt).
+
+## Writers
+
+- Build via shared receipt helpers (`functions/receipt-delivery.js` or successor). Do not invent one-off titles per product.
+- Paid checkout fulfill paths must call the shared deliverer (Inbox + optional email), not only mutate `serviceOrders`.
+- Portal **Feature & Orders** lists use the same title fields patrons see on the receipt.
+
+## Checklist before ship
+
+- [ ] Title reads like VIP reserV (service + venue + when), not a bare brand stub
+- [ ] `cardLast4` stored when Stripe payment_method is card
+- [ ] Completed → Inbox; Pending/Saved → not Inbox
+- [ ] IP/geo only with consent policy respected
+- [ ] i18n chrome for new Feature & Orders labels in all supported langs

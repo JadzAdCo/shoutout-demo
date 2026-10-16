@@ -22,8 +22,11 @@ const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
 const {
   buildTempShoutoutReceipt,
+  buildVipReservationReceipt,
   promoteShoutoutReceipt,
   deliverFinalPaidShoutoutReceipt,
+  deliverServiceReceipt,
+  shoutoutReceiptTitle,
   formatPaidAt
 } = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
@@ -163,6 +166,41 @@ function testPaymentFields(session = null, existing = {}) {
     testPaymentMarker:isTestPayment ? "stripe-test" : "",
     environment:isTestPayment ? "test" : "live"
   };
+}
+
+/** Last4 + brand from Checkout session / PaymentIntent when present. */
+function cardFieldsFromSession(session = null, existing = {}) {
+  const pi = typeof session?.payment_intent === "object" ? session.payment_intent : null;
+  const charge = pi?.charges?.data?.[0]
+    || session?.charges?.data?.[0]
+    || null;
+  const details = session?.payment_method_details?.card
+    || charge?.payment_method_details?.card
+    || (typeof pi?.payment_method === "object" ? pi.payment_method?.card : null)
+    || null;
+  const last4 = text(details?.last4 || existing.cardLast4, 4);
+  const brand = text(details?.brand || existing.cardBrand, 40);
+  return {
+    ...(last4 ? {cardLast4: last4} : {}),
+    ...(brand ? {cardBrand: brand} : {})
+  };
+}
+
+/** Prefer expanded Checkout session so card last4 is available for receipts. */
+async function retrieveCheckoutSessionForReceipt(stripe, sessionId) {
+  const id = text(sessionId, 200);
+  if (!id || !stripe) return null;
+  try {
+    return await stripe.checkout.sessions.retrieve(id, {
+      expand: ["payment_intent", "payment_intent.payment_method", "payment_intent.latest_charge"]
+    });
+  } catch (_) {
+    try {
+      return await stripe.checkout.sessions.retrieve(id, {expand: ["payment_intent"]});
+    } catch (err2) {
+      return await stripe.checkout.sessions.retrieve(id);
+    }
+  }
 }
 
 function text(value = "", max = 500) {
@@ -685,9 +723,21 @@ exports.createFloqrConnectOnboardingLink = onCall({
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && !FOOTBALL_TEAM_INTRO_LOCATION_IDS.has(clubId)) throw new HttpsError("failed-precondition", FOOTBALL_TEAM_INTRO_VENUE_MESSAGE);
     if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
+    const venueName = text(shoutout.locationName || shoutout.clubName || shoutout.brandName || clubId, 80);
+    const templateName = footballTeamIntro
+      ? "Football Intro"
+      : heistArt
+        ? "Heist Art"
+        : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
+    const itemName = shoutoutReceiptTitle({
+      templateName,
+      locationName: venueName,
+      screenFormatLabel: text(shoutout.screenFormatLabel, 40),
+      serviceDate: text(shoutout.serviceDate || shoutout.eventDate, 40)
+    }) || `${templateName} @ ${venueName}`;
     return {
       amountCents:pricedAmountCents,
-      itemName:footballTeamIntro ? "Football Intro ShoutOut" : heistArt ? "Heist Art ShoutOut" : "FLOQR paid ShoutOut",
+      itemName,
       description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
@@ -695,7 +745,8 @@ exports.createFloqrConnectOnboardingLink = onCall({
       clubSharePercent:SHOUTOUT_CLUB_SHARE_PERCENT,
       paymentModel:"floqr-platform",
       settlementStatus:"accrued-pending-payout",
-      clubLocationId:clubId
+      clubLocationId:clubId,
+      venueName
     };
   }
 
@@ -902,7 +953,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
   if (type === "vipReservation") {
     const holdId = text(payload.holdId, 120);
     const consentId = text(payload.consentId, 120);
-    if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP ReserV needs holdId and consentId.");
+    if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP reserV needs holdId and consentId.");
     const holdSnap = await db.collection("vipHolds").doc(holdId).get();
     if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
     const hold = holdSnap.data() || {};
@@ -917,7 +968,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
       unitAmountCents: charged,
       quantity: 1,
       itemName: `Table ${label} deposit — ${club}, ${night}`,
-      description: `VIP ReserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. FloqR Stripe collector (beta).`,
+      description: `VIP reserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. FloqR Stripe collector (beta).`,
       floqrShareCents: charged,
       venueShareCents: 0,
       paymentModel: "floqr-platform",
@@ -925,8 +976,10 @@ exports.createFloqrConnectOnboardingLink = onCall({
       holdId,
       consentId,
       clubLocationId: text(hold.clubLocationId, 120),
+      venueName: club,
       night,
-      sectionId: text(hold.sectionId, 80)
+      sectionId: text(hold.sectionId, 80),
+      sectionLabel: label
     };
   }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
@@ -1077,7 +1130,7 @@ exports.createFloqrCheckoutSession = onCall({
     if (type === "vipReservation") {
       const holdId = text(payload.holdId, 120);
       const consentId = text(payload.consentId, 120);
-      if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP ReserV checkout needs holdId and consentId.");
+      if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP reserV checkout needs holdId and consentId.");
       const holdSnap = await db.collection("vipHolds").doc(holdId).get();
       if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
       const hold = holdSnap.data() || {};
@@ -1415,7 +1468,7 @@ exports.confirmFloqrCheckoutSession = onCall({
   const sessionId = text(request.data?.sessionId, 200) || text(order.stripeCheckoutSessionId, 200);
   if (!sessionId) throw new HttpsError("failed-precondition", "Stripe session id is missing.");
   const stripe = new Stripe(STRIPE_SECRET_KEY.value(), {apiVersion: STRIPE_API_VERSION});
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const session = await retrieveCheckoutSessionForReceipt(stripe, sessionId);
   const sessionOrderId = text(session.metadata?.orderId || session.client_reference_id, 160);
   if (sessionOrderId && sessionOrderId !== orderId) {
     throw new HttpsError("failed-precondition", "Stripe session does not match this order.");
@@ -1770,6 +1823,7 @@ async function finalizePaidOrder(orderId, session) {
   const paidAt = order.paidAt || admin.firestore.FieldValue.serverTimestamp();
   const shipping = session?.shipping_details || session?.collected_information?.shipping_details || null;
   const testFields = testPaymentFields(session, order);
+  const cardFields = cardFieldsFromSession(session, order);
   await ref.set({
     status:"paid",
     paymentStatus:"paid",
@@ -1780,7 +1834,8 @@ async function finalizePaidOrder(orderId, session) {
     customerEmail:session?.customer_details?.email || order.ownerEmail || "",
     shippingDetails:shipping || null,
     shippingStatus:order.orderType === "commerce" && order.requiresShipping ? "paid-awaiting-fulfillment" : order.shippingStatus,
-    ...testFields
+    ...testFields,
+    ...cardFields
   }, {merge:true});
 
   if (order.orderType === "shoutout" && order.payload?.shoutout) {
@@ -1793,7 +1848,10 @@ async function finalizePaidOrder(orderId, session) {
       shoutout,
       orderId,
       invoiceNumber:order.invoiceNumber || "",
-      amountCents:order.amountCents
+      amountCents:order.amountCents,
+      cardLast4: cardFields.cardLast4 || order.cardLast4 || "",
+      cardBrand: cardFields.cardBrand || order.cardBrand || "",
+      clientIp: text(order.clientIp || shoutout.clientIp, 80)
     }), {
       paidAt,
       paidAtIso,
@@ -1802,7 +1860,12 @@ async function finalizePaidOrder(orderId, session) {
       invoiceNumber:order.invoiceNumber || "",
       amountCents:order.amountCents,
       currency:order.currency || "usd",
-      shoutoutId:shoutoutRef.id
+      shoutoutId:shoutoutRef.id,
+      itemName: text(order.itemName, 160),
+      cardLast4: cardFields.cardLast4 || order.cardLast4 || "",
+      cardBrand: cardFields.cardBrand || order.cardBrand || "",
+      clientIp: text(order.clientIp || shoutout.clientIp, 80),
+      statusLabel: "Pending Location Approval"
     });
     await shoutoutRef.set({
       ...shoutout,
@@ -1868,12 +1931,16 @@ async function finalizePaidOrder(orderId, session) {
         const userSnap = await db.collection("users").doc(order.ownerUid).get();
         ownerPhone = text(userSnap.data()?.phone || userSnap.data()?.smsPhone || "", 40);
       }
+      // Pending paid ShoutOuts stay on Feature & Orders → Pending (no FloqR Inbox).
+      // Completed (club-approved) receipts route to Inbox + email from Club Admin approve.
       const delivery = await deliverFinalPaidShoutoutReceipt({
-        order:{...order, customerEmail:session?.customer_details?.email || order.customerEmail || order.ownerEmail || ""},
+        order:{...order, customerEmail:session?.customer_details?.email || order.customerEmail || order.ownerEmail || "", ...cardFields},
         receipt:finalReceipt,
         shoutoutId:shoutoutRef.id,
         sendgridApiKey:secretValueSafe(SENDGRID_API_KEY, "SENDGRID_API_KEY"),
         fromEmail:RECEIPT_FROM_EMAIL,
+        routeToInbox: false,
+        sendEmail: false,
         twilio:{
           accountSid:secretValueSafe(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
           authToken:secretValueSafe(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
@@ -2175,16 +2242,67 @@ async function finalizePaidOrder(orderId, session) {
 
   if (order.orderType === "vipReservation") {
     const {fulfillVipReservationOrder} = require("./vip-functions").__vipHelpers;
+    const paidAtIso = formatPaidAt(new Date());
     const fulfilled = await fulfillVipReservationOrder(orderId, {
       ...order,
+      ...cardFields,
       stripeCheckoutSessionId: text(session?.id || order.stripeCheckoutSessionId, 160),
       stripePaymentIntentId: text(session?.payment_intent || order.stripePaymentIntentId, 160)
+    });
+    const vipReceipt = buildVipReservationReceipt({
+      order: {
+        ...order,
+        id: orderId,
+        ...cardFields,
+        venueName: order.venueName || order.itemName
+      },
+      reservationId: fulfilled.reservationId,
+      payment: {
+        paidAt,
+        paidAtIso,
+        stripeCheckoutSessionId: text(session?.id || order.stripeCheckoutSessionId, 160),
+        stripePaymentIntentId: text(session?.payment_intent || order.stripePaymentIntentId, 160),
+        ...cardFields
+      }
     });
     await ref.set({
       fulfillmentStatus: "vip-reservation-confirmed",
       fulfilledRecordId: text(fulfilled.reservationId, 160),
-      vipReservationId: text(fulfilled.reservationId, 160)
+      vipReservationId: text(fulfilled.reservationId, 160),
+      receipt: vipReceipt,
+      receiptStatus: "final",
+      paidAtIso,
+      itemName: text(vipReceipt.itemName || order.itemName, 160)
     }, {merge: true});
+    try {
+      let ownerPhone = "";
+      if (order.ownerUid) {
+        const userSnap = await db.collection("users").doc(order.ownerUid).get();
+        ownerPhone = text(userSnap.data()?.phone || userSnap.data()?.smsPhone || "", 40);
+      }
+      await deliverServiceReceipt({
+        order: {
+          ...order,
+          customerEmail: session?.customer_details?.email || order.customerEmail || order.ownerEmail || "",
+          ...cardFields
+        },
+        receipt: vipReceipt,
+        reservationId: fulfilled.reservationId,
+        sendgridApiKey: secretValueSafe(SENDGRID_API_KEY, "SENDGRID_API_KEY"),
+        fromEmail: RECEIPT_FROM_EMAIL,
+        routeToInbox: true,
+        sendEmail: true,
+        portalLink: `./patron-portal.html?tab=guest-list-reserv&id=${encodeURIComponent(fulfilled.reservationId || "")}`,
+        twilio: {
+          accountSid: secretValueSafe(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
+          authToken: secretValueSafe(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
+          fromNumber: secretValueSafe(TWILIO_FROM_NUMBER, "TWILIO_FROM_NUMBER"),
+          toPhone: ownerPhone
+        }
+      });
+    } catch (vipReceiptErr) {
+      console.warn("VIP reserV receipt delivery failed", vipReceiptErr?.message || vipReceiptErr);
+    }
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});
 }
@@ -2324,7 +2442,7 @@ async function syncSchedulingSubscriptionFromStripe(subscription = {}) {
 
 exports.stripeFloqrWebhook = onRequest({
   region:"us-central1",
-  secrets:[STRIPE_WEBHOOK_SECRET, SENDGRID_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER],
+  secrets:[STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SENDGRID_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER],
   timeoutSeconds:60,
   memory:"256MiB"
 }, async (request, response) => {
@@ -2348,7 +2466,15 @@ exports.stripeFloqrWebhook = onRequest({
     const orderId = text(session.metadata?.orderId || session.client_reference_id, 160);
     if (["checkout.session.completed", "checkout.session.async_payment_succeeded"].includes(event.type)) {
       const paid = session.payment_status === "paid" || (session.mode === "subscription" && ["paid", "no_payment_required"].includes(session.payment_status));
-      if (paid && orderId) await finalizePaidOrder(orderId, session);
+      if (paid && orderId) {
+        let receiptSession = session;
+        try {
+          const stripe = new Stripe(STRIPE_SECRET_KEY.value(), {apiVersion: STRIPE_API_VERSION});
+          const expanded = await retrieveCheckoutSessionForReceipt(stripe, session.id || "");
+          if (expanded) receiptSession = expanded;
+        } catch (_) { /* keep webhook session */ }
+        await finalizePaidOrder(orderId, receiptSession);
+      }
       else await updateCheckoutOrderStatus(session, {status:"payment-processing", paymentStatus:"processing"});
     } else if (event.type === "checkout.session.async_payment_failed") {
       await updateCheckoutOrderStatus(session, {status:"payment-failed", paymentStatus:"failed"});

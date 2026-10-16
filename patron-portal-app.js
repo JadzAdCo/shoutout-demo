@@ -93,6 +93,9 @@
     if (isScheduleInboxMessage(x)) return "Review & confirm shift";
     if (type === "betainvite" || /beta-invite\.html/.test(href)) return "Review beta invite";
     if (type === "templaterole" || /template-tags\.html/.test(href)) return "Open template tags";
+    if (type === "paidvipreservreceipt" || /guest-list-reserv|vip-reservations|tab=vip/.test(href)) {
+      return "Open Guest List & reserV";
+    }
     if (
       type === "paidshoutoutreceipt"
       || type === "shoutoutsubmitted"
@@ -101,7 +104,7 @@
     ) {
       return "Open My ShoutOuts";
     }
-    return href ? "Open link" : "Open Related ShoutOut";
+    return href ? "Open link" : "Open link";
   }
   const fmtDate = value => {
     if (!value) return "-";
@@ -374,15 +377,69 @@
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
   function showPortalPanel(panelId, tabPanelId = "") {
-    document.querySelectorAll(".admin-tab").forEach(btn => btn.classList.toggle("active", !!tabPanelId && btn.dataset.panel === tabPanelId));
+    let resolved = panelId;
+    let foPane = "";
+    if (panelId === "portalShoutouts") { resolved = "portalFeatureOrders"; foPane = "foShoutoutsPane"; }
+    if (panelId === "portalVipReservations") { resolved = "portalFeatureOrders"; foPane = "foVipPane"; }
+    if (panelId === "portalPaidServices") { resolved = "portalFeatureOrders"; foPane = "foInvoicesPane"; }
+    const tabId = tabPanelId === "portalShoutouts" || tabPanelId === "portalVipReservations" || tabPanelId === "portalPaidServices"
+      ? "portalFeatureOrders"
+      : (tabPanelId || resolved);
+    document.querySelectorAll(".admin-tab").forEach(btn => btn.classList.toggle("active", !!tabId && btn.dataset.panel === tabId));
     document.querySelectorAll(".admin-panel-section").forEach(section => section.classList.remove("active"));
-    byId(panelId)?.classList.add("active");
-    if (panelId === "portalShoutouts") {
-      // Default pending unless a deep link already chose a sub-pane.
-      const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
-      if (!activeSub) showShoutoutPane("shoutoutPendingPane");
+    byId(resolved)?.classList.add("active");
+    if (resolved === "portalFeatureOrders") {
+      if (foPane) showFeatureOrdersPane(foPane);
+      else {
+        const activeFo = document.querySelector("#featureOrdersSubtabs .admin-subtab.active");
+        showFeatureOrdersPane(activeFo?.dataset?.foPane || "foStatusPane");
+      }
     }
-    if (panelId === "portalVipReservations") loadVipReservationsPanel();
+  }
+
+  function showFeatureOrdersPane(paneId) {
+    const target = String(paneId || "foStatusPane");
+    ["foStatusPane", "foVipPane", "foShoutoutsPane", "foFloqCastsPane", "foInvoicesPane"].forEach(id => {
+      byId(id)?.classList.toggle("hidden", id !== target);
+    });
+    document.querySelectorAll("#featureOrdersSubtabs .admin-subtab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.foPane === target);
+    });
+    if (target === "foVipPane") loadVipReservationsPanel();
+    if (target === "foStatusPane") renderFeatureOrdersStatus();
+    if (target === "foShoutoutsPane") {
+      const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
+      if (!activeSub) showShoutoutPane("shoutoutSavedPane");
+    }
+  }
+
+  function renderFeatureOrdersStatus() {
+    const host = byId("featureOrdersStatusReport");
+    if (!host) return;
+    const t = (k, fallback) => window.FLOQRI18n?.t?.(k) || fallback;
+    const shoutouts = Array.isArray(window.__floqrPortalShoutoutsCache) ? window.__floqrPortalShoutoutsCache : [];
+    const saved = shoutouts.filter(s => String(s.status || "").toLowerCase() === "saved").length;
+    const pending = shoutouts.filter(s => isPendingShoutout(s) && String(s.status || "").toLowerCase() !== "saved").length;
+    const completed = shoutouts.filter(s => isCompletedShoutout(s) && !isPendingShoutout(s)).length;
+    const shoutStatus = saved ? `Saved (${saved})` : pending ? `Pending (${pending})` : completed ? `Completed (${completed})` : "None this period";
+    const vipBtn = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foVipPane"]');
+    const vipOn = vipBtn && !vipBtn.hidden && !vipBtn.classList.contains("hidden");
+    const castBtn = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foFloqCastsPane"]');
+    const castOn = castBtn && !castBtn.hidden && !castBtn.classList.contains("hidden");
+    const rows = [
+      {label: t("nav.myShoutouts", "My ShoutOuts"), status: shoutStatus, pane: "foShoutoutsPane"},
+      vipOn ? {label: t("nav.guestListReserv", "Guest List & reserV"), status: t("portal.fo.periodActive", "Active this period"), pane: "foVipPane"} : null,
+      castOn ? {label: t("nav.myFloqCasts", "My FloqCasts"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
+      {label: t("nav.myInvoices", "My Invoices"), status: t("portal.fo.invoicesHint", "Open for paid receipts"), pane: "foInvoicesPane"}
+    ].filter(Boolean);
+    host.innerHTML = rows.map(r =>
+      `<button type="button" class="queue-item fo-status-row" data-fo-jump="${esc(r.pane)}">` +
+      `<div class="message-envelope-head"><strong>${esc(r.label)}</strong><span>${esc(r.status)}</span></div>` +
+      `</button>`
+    ).join("") || `<p class="sub">${esc(t("portal.fo.noFeatures", "No features enabled yet."))}</p>`;
+    host.querySelectorAll("[data-fo-jump]").forEach(btn => {
+      btn.addEventListener("click", () => showFeatureOrdersPane(btn.getAttribute("data-fo-jump")));
+    });
   }
 
   async function loadVipReservationsPanel() {
@@ -399,7 +456,7 @@
       const res = await call({});
       const rows = res.data?.reservations || [];
       if (!rows.length) {
-        list.innerHTML = `<p class="sub">${esc(window.FLOQRI18n?.t?.("portal.vipReservations.empty") || "No VIP ReserV bookings yet.")}</p>`;
+        list.innerHTML = `<p class="sub">${esc(window.FLOQRI18n?.t?.("portal.vipReservations.empty") || "No VIP reserV bookings yet.")}</p>`;
         if (status) status.textContent = "";
         return;
       }
@@ -447,8 +504,8 @@
   }
 
   function showShoutoutPane(paneId) {
-    const target = String(paneId || "shoutoutPendingPane");
-    ["shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutArchivePane", "shoutoutTemplatesPane"].forEach(id => {
+    const target = String(paneId || "shoutoutSavedPane");
+    ["shoutoutSavedPane", "shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutArchivePane", "shoutoutTemplatesPane"].forEach(id => {
       byId(id)?.classList.toggle("hidden", id !== target);
     });
     document.querySelectorAll("#shoutoutSubtabs .admin-subtab").forEach(btn => {
@@ -460,9 +517,13 @@
     document.querySelectorAll(".admin-tab[data-panel]").forEach(btn => {
       btn.addEventListener("click", () => {
         showPortalPanel(btn.dataset.panel, btn.dataset.panel);
-        if (btn.dataset.panel === "portalShoutouts") showShoutoutPane("shoutoutPendingPane");
-        if (btn.dataset.panel === "portalVipReservations") loadVipReservationsPanel();
+        if (btn.dataset.panel === "portalFeatureOrders") showFeatureOrdersPane("foStatusPane");
       });
+    });
+    document.getElementById("featureOrdersSubtabs")?.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-fo-pane]");
+      if (!btn) return;
+      showFeatureOrdersPane(btn.dataset.foPane);
     });
     document.getElementById("shoutoutSubtabs")?.addEventListener("click", event => {
       const btn = event.target?.closest?.("[data-so-pane]");
@@ -490,9 +551,8 @@
         "language-settings":"portalLanguageSettings",
         "my-privacy":"portalPrivacy",
         "ai-notifications":"portalAiNotifications",
-        // Legacy top-level Templates tab → My ShoutOuts → Templates sub-tab
-        templates:"portalShoutouts",
-        "my-templates":"portalShoutouts",
+        templates:"portalFeatureOrders",
+        "my-templates":"portalFeatureOrders",
         privacy:"portalPrivacy",
         bartr:"portalBartrStore",
         commerce:"portalBartrStore",
@@ -510,25 +570,43 @@
         "service-members":"portalServiceMembers",
         servicemembers:"portalServiceMembers",
         "role-request":"portalServiceMembers",
-        // Receipts / FloqAi / modify links: ?tab=shoutouts → My ShoutOuts (receipts stay in Inbox)
-        shoutouts:"portalShoutouts",
-        myshoutouts:"portalShoutouts",
-        "my-shoutouts":"portalShoutouts",
-        shoutout:"portalShoutouts",
-        reservations:"portalVipReservations",
-        vip:"portalVipReservations",
-        "vip-reservations":"portalVipReservations",
-        vipreservations:"portalVipReservations"
+        shoutouts:"portalFeatureOrders",
+        myshoutouts:"portalFeatureOrders",
+        "my-shoutouts":"portalFeatureOrders",
+        shoutout:"portalFeatureOrders",
+        "feature-orders":"portalFeatureOrders",
+        featureorders:"portalFeatureOrders",
+        "paid-services":"portalFeatureOrders",
+        invoices:"portalFeatureOrders",
+        reservations:"portalFeatureOrders",
+        "guest-list-reserv":"portalFeatureOrders",
+        vip:"portalFeatureOrders",
+        "vip-reservations":"portalFeatureOrders",
+        vipreservations:"portalFeatureOrders"
       };
-      const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
+      const mapped = map[tab] || "";
+      const btn = document.querySelector(`[data-panel='${mapped}']`);
       if (btn) btn.click();
-      else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
-      if (map[tab] === "portalShoutouts") {
-        const sub = String(new URL(window.location.href).searchParams.get("sub") || "").trim().toLowerCase();
-        if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
-        else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
-        else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
-        else showShoutoutPane("shoutoutPendingPane");
+      else if (mapped) showPortalPanel(mapped, mapped);
+      if (mapped === "portalFeatureOrders") {
+        const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
+        if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations"].includes(tab) || sub === "vip" || sub === "reserv") {
+          showFeatureOrdersPane("foVipPane");
+        } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
+          showFeatureOrdersPane("foShoutoutsPane");
+          if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
+          else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+          else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
+          else if (sub === "saved") showShoutoutPane("shoutoutSavedPane");
+          else if (sub === "pending") showShoutoutPane("shoutoutPendingPane");
+          else showShoutoutPane("shoutoutSavedPane");
+        } else if (["paid-services", "invoices"].includes(tab) || sub === "invoices") {
+          showFeatureOrdersPane("foInvoicesPane");
+        } else if (sub === "floqcast" || sub === "floqcasts") {
+          showFeatureOrdersPane("foFloqCastsPane");
+        } else {
+          showFeatureOrdersPane("foStatusPane");
+        }
       }
     }
   }
@@ -693,8 +771,9 @@
     "approved", "live", "playing", "displayed", "completed", "done", "finished",
     "ended", "expired", "played", "archived", "refunded", "cancelled", "canceled", "rejected"
   ]);
+  const SHOUTOUT_SAVED_STATUSES = new Set(["saved", "draft"]);
   const SHOUTOUT_PENDING_STATUSES = new Set([
-    "draft", "preview", "unpaid", "pending", "pending_payment", "pending_approval",
+    "preview", "unpaid", "pending", "pending_payment", "pending_approval",
     "awaiting_payment", "payment_pending", "needs_revision"
   ]);
   const SHOUTOUT_HISTORY_DAYS = 60;
@@ -748,9 +827,15 @@
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  /** Pending = not yet club-approved (paid receipts can still be pending). */
+  function isSavedShoutout(row) {
+    if (row?.complianceArchived) return false;
+    return SHOUTOUT_SAVED_STATUSES.has(shoutoutStatus(row));
+  }
+
+  /** Pending = submitted / awaiting payment or club approval (not Saved drafts). */
   function isPendingShoutout(row) {
     if (row?.complianceArchived) return false;
+    if (isSavedShoutout(row)) return false;
     if (shoutoutDisplayFinished(row)) return false;
     const status = shoutoutStatus(row);
     if (SHOUTOUT_APPROVED_OR_DONE.has(status)) return false;
@@ -887,16 +972,20 @@
     const paid = shoutoutPaid(x) ? tt("portal.paid", {}, "Paid") : tt("portal.unpaid", {}, "Unpaid");
     const canSaveTemplate = (mode === "completed" || mode === "archive") && shoutoutTemplateIsModifiable(x);
     const canReuse = mode === "completed" || mode === "archive";
+    const canContinueSaved = mode === "saved";
     const mediaThumb = String(x.mediaUrl || x.archivedMediaUrl || x.photoUrl || "").trim();
     const mediaBadge = shoutoutHasMedia(x) || mediaThumb
       ? ` - ${esc(tt("portal.hasMedia", {}, "Media"))}`
       : "";
+    const continueHref = window.FLOQRNav?.portalLink?.("./", {start: "editor", savedId: x.id || ""})
+      || `./?start=editor&savedId=${encodeURIComponent(x.id || "")}`;
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
       ${mediaThumb && mode === "archive" ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
       <strong>${esc(x.mainText || "ShoutOut")}</strong>
       <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}${mediaBadge}</p>
-      <small>${esc(fmtDate(x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
+      <small>${esc(fmtDate(x.savedAt || x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
       <p class="queue-actions">
+        ${canContinueSaved ? `<a class="buttonlike continue-saved-shoutout-btn" href="${esc(continueHref)}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</a>` : ""}
         ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
         ${canReuse ? `<button class="buttonlike reuse-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.reuseShoutout", {}, "Re-Use ShoutOut"))}</button>` : ""}
         ${canSaveTemplate ? `<button class="buttonlike save-shoutout-template-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveAsTemplate", {}, "Save as my template"))}</button>` : ""}
@@ -4333,11 +4422,33 @@
     } else if (businessOk) {
       window.FLOQRPatronAdCampaigns.refreshMine?.(user);
     }
-    if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or BartR orders yet.</p>";
+    if (byId("paidServicesReport")) {
+      byId("paidServicesReport").innerHTML = serviceOrders.length
+        ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => {
+          const receipt = order.receipt && typeof order.receipt === "object" ? order.receipt : {};
+          const title = order.itemName || receipt.title || receipt.itemName || order.orderType || "FLOQR service";
+          const venue = receipt.venueName || receipt.locationName || order.venueName || order.clubLocationId || "";
+          const when = receipt.serviceDate || receipt.night || receipt.paidAtIso || "";
+          const card = receipt.cardLast4 || order.cardLast4
+            ? `${receipt.cardBrand || order.cardBrand || "Card"} •••• ${receipt.cardLast4 || order.cardLast4}`
+            : "";
+          return `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(title)}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div>` +
+            `<p>${esc(order.invoiceNumber || order.id)}</p>` +
+            `<small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)}` +
+            `${venue ? ` · ${esc(venue)}` : ""}` +
+            `${when ? ` · ${esc(String(when).slice(0, 19))}` : ""}` +
+            `${card ? ` · ${esc(card)}` : ""}` +
+            ` · Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}` +
+            `${order.trackingNumber ? ` · Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`;
+        }).join("")
+        : "<p class='sub'>No paid services or BartR orders yet.</p>";
+    }
 
     currentShoutouts = applyShoutoutHistoryRetention(shoutouts);
+    window.__floqrPortalShoutoutsCache = currentShoutouts;
+    const savedShoutouts = currentShoutouts.filter(isSavedShoutout);
     const pendingShoutouts = currentShoutouts.filter(isPendingShoutout);
-    const completedShoutouts = currentShoutouts.filter(row => isCompletedShoutout(row) && !isPendingShoutout(row));
+    const completedShoutouts = currentShoutouts.filter(row => isCompletedShoutout(row) && !isPendingShoutout(row) && !isSavedShoutout(row));
     currentArchivedShoutouts = (shoutouts || [])
       .filter(row => row?._fromArchive || row?.complianceArchived)
       .map(row => ({
@@ -4370,9 +4481,16 @@
         }).sort((a, b) => shoutoutActivityMs(b) - shoutoutActivityMs(a));
       }
     } catch (_e) {}
+    const savedHost = byId("savedShoutouts");
     const pendingHost = byId("myShoutouts");
     const completedHost = byId("completedShoutouts");
     const archiveHost = byId("archivedShoutouts");
+    if (savedHost) {
+      savedHost.innerHTML = savedShoutouts.length
+        ? savedShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "saved")).join("")
+        : `<p class="sub">${esc(tt("portal.noSavedShoutouts", {}, "No saved ShoutOut drafts yet."))}</p>`;
+      bindShoutoutListActions(savedHost);
+    }
     if (pendingHost) {
       pendingHost.innerHTML = pendingShoutouts.length
         ? pendingShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "open")).join("")

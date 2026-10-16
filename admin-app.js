@@ -2516,20 +2516,40 @@
 
   async function createStatusNotification(item, status, title) {
     try {
+      const receipt = item.receipt && typeof item.receipt === "object" ? item.receipt : {};
+      const descriptive = String(receipt.title || receipt.itemName || item.itemName
+        || [item.templateName || item.template, item.locationName || loc.locationName].filter(Boolean).join(" @ ")
+        || "ShoutOut").slice(0, 160);
+      const isCompleted = status === "approved";
+      const lines = [
+        isCompleted
+          ? `Your ShoutOut is approved and completed: ${descriptive}`
+          : `Your ShoutOut status is now ${status}.`,
+        receipt.invoiceNumber ? `Invoice: ${receipt.invoiceNumber}` : "",
+        receipt.amountCents != null ? `Total: $${(Number(receipt.amountCents) / 100).toFixed(2)}` : "",
+        receipt.cardLast4 ? `Card: ${receipt.cardBrand || "Card"} •••• ${receipt.cardLast4}` : "",
+        receipt.paidAtIso ? `Paid at: ${receipt.paidAtIso}` : "",
+        item.locationName || loc.locationName ? `Venue: ${item.locationName || loc.locationName}` : ""
+      ].filter(Boolean);
       await db.collection("inboxNotifications").add({
         recipientUid: item.submittedByUid || "",
         recipientEmail: item.submittedBy || item.submittedByEmail || "",
         createdByUid: firebase.auth().currentUser?.uid || "",
-        type: "shoutoutStatus",
-        title: title || `ShoutOut ${status}`,
-        body: `Your ShoutOut status is now ${status}.`,
-        referenceNumber: item.referenceNumber || "",
+        /* Completed receipts use paidShoutoutReceipt so Inbox CTA opens Feature & Orders / My ShoutOuts. */
+        type: isCompleted ? "paidShoutoutReceipt" : "shoutoutStatus",
+        title: isCompleted ? (descriptive || title || "ShoutOut Approved") : (title || `ShoutOut ${status}`),
+        body: lines.join("\n"),
+        referenceNumber: item.referenceNumber || receipt.referenceNumber || "",
+        shoutoutId: item.id || item.shoutoutId || "",
+        orderId: item.serviceOrderId || receipt.orderId || "",
+        invoiceNumber: receipt.invoiceNumber || item.invoiceNumber || "",
         clubLocationId: item.clubLocationId || locationId,
         locationName: item.locationName || loc.locationName || locationId,
         status,
+        kind: "shoutout",
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts"
+        link:"./patron-portal.html?tab=shoutouts&pane=completed"
       });
     } catch(e) {}
   }

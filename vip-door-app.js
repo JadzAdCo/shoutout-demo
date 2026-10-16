@@ -1,4 +1,4 @@
-/* VIP ReserV door — satellite session shell, list + check-in / no-show. */
+/* VIP reserV door — satellite session shell, list + check-in / no-show. */
 (function () {
   "use strict";
 
@@ -143,7 +143,7 @@
         if (!user) {
           if (appEl) appEl.classList.add("hidden");
           if (gateEl) gateEl.classList.remove("hidden");
-          setStatus(t("page.vipDoor.needSignIn", "Sign in to use VIP ReserV door."));
+          setStatus(t("page.vipDoor.needSignIn", "Sign in to use VIP reserV door."));
           return;
         }
         showApp();

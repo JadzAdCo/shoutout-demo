@@ -16,7 +16,7 @@
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "vipReservations", label: "VIP ReserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1}
+    {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));

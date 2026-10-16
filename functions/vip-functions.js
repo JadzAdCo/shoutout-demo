@@ -1,4 +1,4 @@
-/* VIP ReserV Phase 2 — holds, consent, reservations, door check-in.
+/* VIP reserV Phase 2 — holds, consent, reservations, door check-in.
    Design: .cursor/rules/design-notes-vip-reservations.mdc · VIP-B-24 pre-ship done in receipt/redaction. */
 "use strict";
 
@@ -33,7 +33,7 @@ function clientMeta(request) {
 function resolveSection(clubLocationId, sectionId) {
   const club = text(clubLocationId, 120);
   const catalog = betaCatalog[club];
-  if (!catalog) throw new HttpsError("failed-precondition", "This venue is not on VIP ReserV beta yet.");
+  if (!catalog) throw new HttpsError("failed-precondition", "This venue is not on VIP reserV beta yet.");
   const section = (catalog.sections || []).find(s => s.id === text(sectionId, 80));
   if (!section) throw new HttpsError("not-found", "That table section was not found.");
   return {catalog, section};
@@ -79,7 +79,7 @@ exports.getVipBetaVenues = onCall(CALL_OPTS, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   return {
     phase: 2,
-    brand: "VIP ReserV",
+    brand: "VIP reserV",
     terms: BETA_TERMS,
     holdMinutes: Math.round(HOLD_MS / 60000),
     venues: BETA_VENUES.map(v => ({
@@ -99,7 +99,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
   const night = validateNight(request.data?.night);
   if (!clubLocationId || !night) throw new HttpsError("invalid-argument", "clubLocationId and night (YYYY-MM-DD) are required.");
   const venue = betaVenue(clubLocationId);
-  if (!venue || venue.pending) throw new HttpsError("failed-precondition", "This venue is not bookable on VIP ReserV yet.");
+  if (!venue || venue.pending) throw new HttpsError("failed-precondition", "This venue is not bookable on VIP reserV yet.");
   const catalog = betaCatalog[clubLocationId];
   if (!catalog) throw new HttpsError("failed-precondition", "Floor plan catalog missing for this venue.");
 
@@ -147,7 +147,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
     throw new HttpsError("invalid-argument", "clubLocationId, night, and sectionId are required.");
   }
   const venue = betaVenue(clubLocationId);
-  if (!venue || venue.pending) throw new HttpsError("failed-precondition", "This venue is not bookable on VIP ReserV yet.");
+  if (!venue || venue.pending) throw new HttpsError("failed-precondition", "This venue is not bookable on VIP reserV yet.");
   const {catalog, section} = resolveSection(clubLocationId, sectionId);
   if (partySize < 1 || partySize > Number(section.maxCapacity || 0)) {
     throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
@@ -279,7 +279,7 @@ exports.recordVipConsent = onCall(CALL_OPTS, async request => {
   const checks = request.data?.checks && typeof request.data.checks === "object" ? request.data.checks : {};
   if (!holdId) throw new HttpsError("invalid-argument", "holdId is required.");
   if (!consentChecksComplete(checks)) {
-    throw new HttpsError("invalid-argument", "Accept all required VIP ReserV Terms checkboxes.");
+    throw new HttpsError("invalid-argument", "Accept all required VIP reserV Terms checkboxes.");
   }
   const holdSnap = await db.collection("vipHolds").doc(holdId).get();
   if (!holdSnap.exists) throw new HttpsError("not-found", "Hold not found.");

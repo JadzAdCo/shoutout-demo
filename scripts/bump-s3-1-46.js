@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* s3.1.45 → s3.1.46 bump. VIP ReserV Phase 2 booking MVP + VIP-B-24.
+/* s3.1.45 → s3.1.46 bump. VIP reserV Phase 2 booking MVP + VIP-B-24.
  * Usage: node scripts/bump-s3-1-46.js [repoRoot] */
 "use strict";
 
@@ -57,7 +57,7 @@ function run(root) {
     if (!head.test(src)) throw new Error("README head");
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
-    const note = `- ${NEXT}: VIP ReserV Phase 2 — inventory holds, Terms consent, FloqR Stripe deposit checkout, My Profile Reservations, vip-door.html check-in; VIP-B-24 receipt SMS + invoice redactor fixes.`;
+    const note = `- ${NEXT}: VIP reserV Phase 2 — inventory holds, Terms consent, FloqR Stripe deposit checkout, My Profile Reservations, vip-door.html check-in; VIP-B-24 receipt SMS + invoice redactor fixes.`;
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
   });
 
