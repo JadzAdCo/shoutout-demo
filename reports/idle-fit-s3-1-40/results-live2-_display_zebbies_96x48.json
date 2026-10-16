@@ -1,0 +1,60 @@
+[
+  {
+    "name": "display-zebbies-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Zebbies Garden DC",
+    "file": "live2-display-zebbies-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 58,
+          "runW": 402,
+          "runH": 49,
+          "rect": {
+            "x": 111,
+            "y": 67,
+            "w": 402,
+            "h": 49
+          }
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "fontPx": 58,
+          "runW": 457,
+          "runH": 49,
+          "rect": {
+            "x": 84,
+            "y": 145,
+            "w": 457,
+            "h": 49
+          }
+        }
+      ],
+      "fontSizes": [
+        58
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "58",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

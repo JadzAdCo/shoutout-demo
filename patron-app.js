@@ -1618,7 +1618,7 @@
     }
   }
   function emailHaveCodeHint() {
-    return otpText("app.emailHaveCodeHint", "Enter the 8-character code you were given, then press Verify and Continue.");
+    return otpText("app.emailHaveCodeHint", "Have a code already? Press I already have a code, enter the 8-character code, then Verify and Continue.");
   }
   /* Same id the server uses for the challenge (sha256 of the email), so a code issued elsewhere can be verified here. */
   async function emailOtpChallengeIdFor(email) {
@@ -4702,10 +4702,25 @@
 
     const chats = upsert("chats", "a", "profile-menu-link");
     chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal";
+    if (!chats.dataset.floqrFeatureLink) {
+      chats.dataset.floqrFeatureLink = "mingl";
+      chats.classList.add("hidden");
+      chats.hidden = true;
+    }
     if (!chats.dataset.count) chats.dataset.count = "0/0";
     chats.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chats.dataset.count})`;
 
+    applyMenuFeatureLinks(user);
     updateProfileMenuCounts(user.uid);
+  }
+
+  function applyMenuFeatureLinks(user) {
+    const fs = window.FLOQRFeatureServices;
+    const host = byId("userDropdown");
+    if (!fs?.ensureLoaded || !host || !user) return;
+    fs.ensureLoaded({db, user, profile: cachedUserProfile})
+      .then(() => fs.applyFeatureLinks(host))
+      .catch(error => console.warn("Profile menu feature links", error?.message || error));
   }
 
   async function updateProfileMenuCounts(uid) {
@@ -4730,27 +4745,12 @@
         const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(1000).get();
         totalMessages += noteSnap.size;
         noteSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
-    if (!chats.dataset.floqrFeatureLink) {
-      chats.dataset.floqrFeatureLink = "mingl";
-      chats.classList.add("hidden");
-      chats.hidden = true;
-    }
       } catch(e) {}
 
       try {
-    applyMenuFeatureLinks(user);
         const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(1000).get();
         totalChats = chatSnap.size;
         chatSnap.forEach(d => {
-  function applyMenuFeatureLinks(user) {
-    const fs = window.FLOQRFeatureServices;
-    const host = byId("userDropdown");
-    if (!fs?.ensureLoaded || !host || !user) return;
-    fs.ensureLoaded({db, user, profile: cachedUserProfile})
-      .then(() => fs.applyFeatureLinks(host))
-      .catch(error => console.warn("Profile menu feature links", error?.message || error));
-  }
-
           const unread = d.data().unreadCounts && d.data().unreadCounts[uid] ? Number(d.data().unreadCounts[uid]) : 0;
           unreadChats += unread;
         });
@@ -4766,6 +4766,7 @@
       if (chatEl) {
         chatEl.dataset.count = `${unreadChats}/${totalChats}`;
         chatEl.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chatEl.dataset.count})`;
+        applyMenuFeatureLinks(currentUser);
       }
     } catch(e) {
       console.warn("Could not update profile menu counts", e);
@@ -4794,7 +4795,6 @@
       }
       if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
       await afterLogin();
-        applyMenuFeatureLinks(currentUser);
     });
     bindCategoryFloqAi();
     window.addEventListener("floqr:location-updated", () => {
@@ -5026,6 +5026,12 @@
       if (signOut) host.insertBefore(block.firstChild, signOut);
       else host.appendChild(block.firstChild);
     }
+    const fs = window.FLOQRFeatureServices;
+    if (fs?.ensureLoaded) {
+      fs.ensureLoaded({db: firebase.firestore(), user})
+        .then(() => fs.applyFeatureLinks(host))
+        .catch(error => console.warn("Profile menu feature links", error?.message || error));
+    }
   }
 
   document.addEventListener("click", function(e){
@@ -5054,12 +5060,6 @@
         clearInterval(waitAuth);
         firebase.auth().onAuthStateChanged(user => {
           if(user) setTimeout(() => enhanceMenu(user), 350);
-    const fs = window.FLOQRFeatureServices;
-    if (fs?.ensureLoaded) {
-      fs.ensureLoaded({db: firebase.firestore(), user})
-        .then(() => fs.applyFeatureLinks(host))
-        .catch(error => console.warn("Profile menu feature links", error?.message || error));
-    }
         });
       }
     }catch(e){}

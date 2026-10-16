@@ -17,6 +17,7 @@ const crypto = require("crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
+const {stripExpiredMailDiagnostics} = require("./mail-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -949,7 +950,8 @@ async function deleteOldAppLogsByTimestamp(olderThanMs, batchLimit = 400) {
  * Feature: retention sweeper
  * - Diagnostic appLogs: delete after 30 days
  * - Security displayAccessLogs: delete after 90 days
- * - System mail logs: delete after 90 days
+ * - System mail diagnostic bodies/headers: strip after 30 days
+ * - System mail security events: delete after 90 days
  * - Deleted/expired security system messages (soft-deleted) cleanup after 90 days
  */
 exports.purgeLogRetention = onSchedule({
@@ -964,6 +966,7 @@ exports.purgeLogRetention = onSchedule({
   let securityDeleted = 0;
   let securityMessagesDeleted = 0;
   let mailLogDeleted = 0;
+  let mailDiagnosticStripped = 0;
 
   for (let i = 0; i < 5; i += 1) {
     const n = await deleteOldAppLogsByTimestamp(now - DIAGNOSTIC_LOG_RETENTION_MS);
@@ -979,6 +982,11 @@ exports.purgeLogRetention = onSchedule({
   for (let i = 0; i < 5; i += 1) {
     const n = await deleteOldByCreatedAtMs("entityManagementAuditLogs", now - SECURITY_LOG_RETENTION_MS);
     entityMgmtAuditDeleted += n;
+    if (n < 400) break;
+  }
+  for (let i = 0; i < 5; i += 1) {
+    const n = await stripExpiredMailDiagnostics(now);
+    mailDiagnosticStripped += n;
     if (n < 400) break;
   }
   for (let i = 0; i < 5; i += 1) {

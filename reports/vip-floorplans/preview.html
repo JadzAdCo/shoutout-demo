@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VIP floor map viewer (proposal)</title>
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<header>
+  <h1>VIP floor map — PROPOSAL</h1>
+  <button type="button" data-plan="decades.json" aria-pressed="false">Decades</button>
+  <button type="button" data-plan="lima-twist.json" aria-pressed="false">Lima Twist Club</button>
+  <p class="demo">Demo: some tables are shown as Booked or Held (simulated). Pinch or scroll to zoom, drag to move. URL options: <code>?plan=lima-twist.json&amp;area=lima-twist-area-c&amp;sel=lima-twist-402&amp;party=6</code></p>
+</header>
+<nav class="chips" id="chips" role="tablist" aria-label="Areas"></nav>
+<div class="layout">
+  <div class="map-col">
+    <div class="legend" id="legend" aria-label="Map legend"></div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <svg class="map" id="map" role="group" aria-label="Floor map"></svg>
+      </div>
+      <div class="tools">
+        <svg class="minimap" id="minimap" role="img" aria-label="Overview of the whole room — tap to move there" hidden></svg>
+        <div class="zoom">
+          <button type="button" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" id="zfit" aria-label="Fit area">⤢</button>
+        </div>
+      </div>
+    </div>
+    <ul class="list" id="list" aria-label="Tables"></ul>
+  </div>
+  <aside class="info" id="info" aria-live="polite"></aside>
+</div>
+<script src="plans.js"></script>
+<script src="viewer.js"></script>
+</body>
+</html>

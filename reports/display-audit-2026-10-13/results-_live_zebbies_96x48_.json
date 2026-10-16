@@ -1,0 +1,172 @@
+[
+  {
+    "name": "live-zebbies-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+    "size": "96x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDENDC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 348,
+          "safeW": 460,
+          "computedFont": "50.2944px",
+          "inlineFont": "",
+          "fitSize": "clamp(38px,8.06vw,94px)",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 330,
+          "safeW": 460,
+          "computedFont": "50.2944px",
+          "inlineFont": "",
+          "fitSize": "clamp(38px,8.06vw,94px)",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "DC",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 68,
+          "safeW": 460,
+          "computedFont": "60px",
+          "inlineFont": "60px",
+          "fitSize": "clamp(38px,11.18vw,153px)",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "1",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 93,
+          "y": 255,
+          "w": 438,
+          "h": 37
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 1983,
+            "durationMs": 20000,
+            "progress": 0.099
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-zebbies-96x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDENDC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 348,
+          "safeW": 460,
+          "computedFont": "50.2944px",
+          "inlineFont": "",
+          "fitSize": "clamp(38px,8.06vw,94px)",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 330,
+          "safeW": 460,
+          "computedFont": "50.2944px",
+          "inlineFont": "",
+          "fitSize": "clamp(38px,8.06vw,94px)",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "DC",
+          "rowClientW": 500,
+          "rowScrollW": 500,
+          "runW": 68,
+          "safeW": 460,
+          "computedFont": "60px",
+          "inlineFont": "60px",
+          "fitSize": "clamp(38px,11.18vw,153px)",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 10333,
+            "durationMs": 20000,
+            "progress": 0.517
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-zebbies-96x48-later.png",
+    "console": [
+      "[2026-10-13T19:04:14.107Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  }
+]

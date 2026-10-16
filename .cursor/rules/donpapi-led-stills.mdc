@@ -1,0 +1,17 @@
+---
+description: DonPapi LED ShoutOut stills — size, carry, footer, standing board.
+alwaysApply: true
+---
+
+# DonPapi LED stills (always)
+
+When generating or editing DonPapi / ShoutOut LED photos:
+
+1. **64×32 cm** — bezeless (pixels to the edge, no black frame). **One person.** Carried **above the head** (arms extended up). Never chest-height. Never two people.
+2. **96×64 cm** — **only** size two people carry, also **above both heads**.
+3. **>45 characters** of ShoutOut copy → tall **non-VIP standing** portrait board (Maya Happy Birthday floor pillar). Not carried. Not a tombstone on a metal stand.
+4. Footer on the LED, exactly: **Powered by DonPapi and Social OS**
+5. Short copy stays on carried panels: “Ridin' Rari”; “Happy B-Day to my gorgeous Wife D'”; use 👏 / 🐱 not the words Clapping/Kitty.
+6. Multiple stills per temp club (approach / mid / table) so an external video renderer can animate. This environment does not output video files.
+
+Overwrite the canonical `images/temp-qa` DonPapi files and wire `floqr-temp-qa-showcase.js` + `temp-qa-images-preview.html`.

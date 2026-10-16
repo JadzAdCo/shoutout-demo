@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <title>Aurelia (Demo Club) — VIP floor plan 3D demo</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">{"imports": {"three": "./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>Aurelia</strong> <span class="muted">(Demo Club) · VIP tables</span>
+      <span class="demo-pill" title="Modeled demo layout. Prices and capacities are demo values.">DEMO</span>
+    </div>
+    <nav class="views" aria-label="View">
+      <button type="button" id="view3d" class="seg" aria-pressed="true">3D</button>
+      <button type="button" id="viewWalk" class="seg" aria-pressed="false">Walk</button>
+      <button type="button" id="view2d" class="seg" aria-pressed="false">2D plan</button>
+      <button type="button" id="viewList" class="seg" aria-pressed="false" aria-controls="listPanel">Table list</button>
+    </nav>
+  </header>
+
+  <div class="chips" role="toolbar" aria-label="Jump to area" id="chips">
+    <button type="button" class="chip" data-area="overview">Whole club</button>
+  </div>
+
+  <main class="stage" id="stage">
+    <canvas id="c3d" aria-label="3D model of Aurelia. Use the table list or 2D plan for keyboard and screen reader access." tabindex="0"></canvas>
+    <div id="plan2d" class="plan2d" hidden></div>
+    <p id="fallback" class="fallback" hidden>3D is not available on this device. Showing the 2D plan instead.</p>
+
+    <div id="walkHint" class="walk-hint" hidden>
+      <span>W A S D / arrow keys to move · drag to look · Esc to leave walk</span>
+    </div>
+    <div id="joystick" class="joystick" hidden aria-hidden="true"><div class="knob"></div></div>
+
+    <section class="legend" aria-label="Legend" id="legend"></section>
+  </main>
+
+  <section id="listPanel" class="list-panel" hidden aria-label="Tables by area">
+    <div class="panel-head">
+      <h2>Tables</h2>
+      <button type="button" class="icon-btn" id="closeList" aria-label="Close table list">✕</button>
+    </div>
+    <div id="listBody"></div>
+  </section>
+
+  <aside id="sheet" class="sheet" hidden role="dialog" aria-modal="false" aria-labelledby="sheetTitle">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="panel-head">
+      <h2 id="sheetTitle" tabindex="-1">Table</h2>
+      <button type="button" class="icon-btn" id="closeSheet" aria-label="Close table details">✕</button>
+    </div>
+    <div id="sheetBody"></div>
+  </aside>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

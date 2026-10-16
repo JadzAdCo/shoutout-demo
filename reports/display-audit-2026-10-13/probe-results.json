@@ -1,0 +1,18 @@
+{
+  "football": {
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&template=zebbiesFootballTeamIntro&screen=led-96x48&backgroundUrl=x%3E%3Cb%20id%3Dfloqrprobe%3EPROBE%3C%2Fb%3E%3Ci%20",
+    "canvasClass": "display-canvas football-team-intro custom-background-active",
+    "probeFootball": false,
+    "probeMain": false,
+    "probeMedia": false,
+    "stageOuter": "<section class=\"football-intro-stage football-team-ready\" data-theme=\"stadiumGold\" style=\"--football-accent:#dfff5a;--football-field:#06180f;--football-ink:#ffffff;--football-frame:#5c4700\" aria-label=\"20-second Football Intro\">\n        <div class=\"football-stadium-lights\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i><i></i><i></i></div>\n        <div class=\"football-field-lines\" aria-hidden=\"tru"
+  },
+  "neon": {
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&template=neon&backgroundUrl=x%3E%3Cb%20id%3Dfloqrprobe%3EPROBE%3C%2Fb%3E%3Ci%20&main=%3Cb%20id%3Dfloqrprobe2%3Ex%3C%2Fb%3E&media=x%22%3E%3Cb%20id%3Dfloqrprobe3%3Em%3C%2Fb%3E",
+    "canvasClass": "display-canvas custom-background-active",
+    "probeFootball": false,
+    "probeMain": false,
+    "probeMedia": false,
+    "stageOuter": ""
+  }
+}

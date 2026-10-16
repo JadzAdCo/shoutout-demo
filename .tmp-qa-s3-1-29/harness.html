@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QA harness s3.1.29 (not committed)</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <link rel="stylesheet" href="../admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar admin-topbar">
+      <div>
+        <h1>Network Intelligence Center</h1>
+        <p class="status">Signed in as Master Admin.</p>
+      </div>
+      <div class="card admin-club-card">
+        <h2 id="allLocHeading"
+          data-floqr-help-id="help-master-network-intelligence"
+          data-floqr-help-title="All Locations"
+          data-floqr-help-body="This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOuts counts ShoutOuts waiting for approval at every venue; Estimated Network Revenue is a rough estimate from pending ShoutOuts and live boards, not booked revenue. Top Locations lists the venues with the most pending ShoutOuts. To work on one venue, open Entity Management → Manage Entities, unlock with SOS2FA, search for the venue and use Manage selected, or open Venue Links to copy its Club Admin and Display links. Master Admin is for FLOQR internal use only."
+          data-floqr-help-search="all locations">All Locations</h2>
+      </div>
+    </header>
+    <div class="card">
+      <p class="eyebrow">Audit trail</p>
+      <h2>Feature & beta activity</h2>
+      <p class="sub small">Newest 50 events. Each record is hash-chained to the one before it; Verify integrity detects edits or gaps.</p>
+      <div class="queue-actions">
+        <button type="button">Reload</button>
+        <button type="button">Verify integrity</button>
+      </div>
+      <div class="report-block audit-log-wrap">
+        <table class="admin-table audit-log-table">
+          <thead>
+            <tr>
+              <th scope="col">When (UTC)</th>
+              <th scope="col">Event</th>
+              <th scope="col">Who</th>
+              <th scope="col">Target</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">Reason</th>
+            </tr>
+          </thead>
+          <tbody id="featureAuditRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="../floqai-help-repository.js"></script>
+<script src="../help-attach.js"></script>
+<script src="../helper-popouts.js"></script>
+<script src="../master-feature-services.js"></script>
+<script>
+  const big = {};
+  ["users","inboxNotifications","clubEmployeeDesignations","messages","roleRequests","shoutouts","guestListRequests","events","clubMedia","featureServiceAuditLogs"].forEach(k => {
+    big[k + "__classification"] = {isPublicAccessible: 0, isPatronAccessible: 1, isRegularEmployeeAccessible: 1, isPrivilegedEmployeeAccessible: 1, isClubAdminAccessible: 1, isMasterAdminAccessible: 1, retentionDays: 0};
+  });
+  const rows = [
+    {createdAtIso: "2026-10-09T08:12:40.303Z", chained: false, eventType: "bartr.seed.denied", actorRole: "anonymous", sourceIpTruncated: "69.243.87.0/24", targetType: "bartrSeller", targetId: "", outcome: "denied", reason: ""},
+    {createdAtIso: "2026-10-09T07:55:02.118Z", chained: true, seq: 3, hash: "4d8700c1f2a9b3e4d5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c", eventType: "dataClass.savedAll", actorEmail: "bans.don@gmail.com", actorRole: "masterAdmin", sourceIpTruncated: "2601:4d:8700::/48", targetType: "dataClassification", targetId: "all", outcome: "success", reason: "Owner review of the classification register", before: big, after: {created: Object.keys(big), changed: [], unchangedCount: 118}},
+    {createdAtIso: "2026-10-08T21:04:11.000Z", chained: true, seq: 2, hash: "9f0e1d2c3b4a59687766554433221100ffeeddccbbaa99887766554433221100", eventType: "feature.flags_changed", actorEmail: "don.b@jadzholdings.com", actorRole: "masterAdmin", sourceIpTruncated: "69.243.87.0/24", targetType: "featureServices", targetId: "floqAi", outcome: "success", reason: "Beta round 2 for FloqAi", before: {IsFeatureEnabled: 0, IsTestFeature: 1}, after: {IsFeatureEnabled: 1, IsTestFeature: 1}}
+  ];
+  document.getElementById("featureAuditRows").innerHTML = rows.map(r => window.FLOQRMasterFeatureServices.auditRowHtml(r)).join("");
+  setTimeout(() => {
+    if (/open=help/.test(location.search)) document.querySelector("#allLocHeading details.help-popout")?.setAttribute("open", "");
+    if (/open=change/.test(location.search)) document.querySelectorAll(".audit-change")[1]?.setAttribute("open", "");
+  }, 300);
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 /**
  * FLOQR system mail: SendGrid send + Firestore Mail Logging.
- * Every system-generated email is logged (queued / accepted / failed + delivery events).
+ * Security event (ISO/IEC 27001:2022 A.8.15): 90-day — outcome, TLS, masked recipient, hashes.
+ * Diagnostic evidence (headers/body): 30-day, then stripped. No PCI; PII minimized.
  * API calls to SendGrid request TLS 1.3 (minVersion). Recipient hop uses SendGrid Enforced TLS.
  */
 "use strict";
@@ -18,6 +19,11 @@ const COLLECTION = "systemMailLogs";
 const TEXT_MAX = 12000;
 const HTML_MAX = 16000;
 const HEADER_VAL_MAX = 500;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DIAGNOSTIC_RETENTION_MS = 30 * DAY_MS;
+const SECURITY_RETENTION_MS = 90 * DAY_MS;
+const EMAIL_HASH_PREFIX = "floqr-mail:";
+const LOG_STANDARD = "ISO/IEC 27001:2022 A.8.15";
 
 let enforcedTlsCache = {atMs: 0, value: null};
 
@@ -36,6 +42,41 @@ function emailsOf(to) {
     if (row && typeof row === "object") return text(row.email || row.to, 200).toLowerCase();
     return text(row, 200).toLowerCase();
   }).filter((v) => v.includes("@")))];
+}
+
+function stripPci(value) {
+  return String(value == null ? "" : value)
+    .replace(/\b(?:\d[ \-]*?){13,19}\b/g, "[card redacted]")
+    .replace(/\b(cvv|cvc|cid)\s*[:#]?\s*\d{3,4}\b/gi, "$1 [redacted]");
+}
+
+function maskEmail(email) {
+  const raw = text(email, 200).toLowerCase();
+  const at = raw.indexOf("@");
+  if (at < 1) return "***";
+  const local = raw.slice(0, at);
+  const domain = raw.slice(at + 1);
+  const localMask = `${local.slice(0, 1)}***`;
+  const parts = domain.split(".");
+  const host = parts[0] || "";
+  const rest = parts.slice(1).join(".");
+  return rest ? `${localMask}@${host.slice(0, 1)}***.${rest}` : `${localMask}@${host.slice(0, 1)}***`;
+}
+
+function hashEmail(email) {
+  return crypto.createHash("sha256")
+    .update(`${EMAIL_HASH_PREFIX}${text(email, 200).toLowerCase()}`)
+    .digest("hex");
+}
+
+function emailDomain(email) {
+  const raw = text(email, 200).toLowerCase();
+  const at = raw.indexOf("@");
+  return at > 0 ? raw.slice(at + 1) : "";
+}
+
+function sanitizeBody(value, redactBody) {
+  return redactBody ? "" : redactSecrets(stripPci(value));
 }
 
 function clip(value, max) {
@@ -174,7 +215,7 @@ function mergeDeliveryStatus(current, incoming) {
 /**
  * Send a system email via SendGrid over TLS 1.3 and persist a Mail Logging row.
  * Codes are masked in every stored subject/body. With redactBody (OTP / SOS2FA) the body
- * is not stored at all: only bodyTemplateId + a masked bodyPreview.
+ * is not stored at all: only bodyTemplateId + a masked bodyPreview. PAN-like digit runs are stripped.
  */
 async function sendSystemMail({
   apiKey,
@@ -198,21 +239,35 @@ async function sendSystemMail({
   const recipients = emailsOf(to);
   const fromEmail = text(from, 200).toLowerCase();
   const now = Date.now();
-  const storeText = redactBody ? "" : redactSecrets(textBody);
-  const storeHtml = redactBody ? "" : redactSecrets(htmlBody);
-  const bodyPreview = redactBody ? plainPreview(textBody || htmlBody) : "";
+  const storeText = sanitizeBody(textBody, redactBody);
+  const storeHtml = sanitizeBody(htmlBody, redactBody);
+  const bodyPreview = redactBody ? plainPreview(stripPci(textBody || htmlBody)) : "";
   const attachmentNames = (attachments || []).map((row) => text(row.filename || row.name, 120)).filter(Boolean);
+  const extraIn = extra && typeof extra === "object" ? extra : {};
+  const sourceIp = text(extraIn.ip || extraIn.sourceIp, 80);
+  const userAgent = text(extraIn.userAgent || extraIn.ua, 300);
+  const requestHeaders = {
+    host: SENDGRID_HOST,
+    path: MAIL_SEND_PATH,
+    "content-type": "application/json",
+    "tls-min": TLS_MIN,
+    "x-floqr-mail-log-id": mailLogId
+  };
 
   const baseLog = {
+    logClass: "security",
+    logStandard: LOG_STANDARD,
+    piiMinimized: true,
+    pciExcluded: true,
     kind: text(kind, 80),
     source: text(source, 120),
     trigger: text(trigger, 40),
-    to: recipients,
-    toLower: recipients[0] || "",
-    from: fromEmail,
-    subject: text(redactSecrets(subject), 300),
-    textBody: clip(storeText, TEXT_MAX),
-    htmlBody: clip(storeHtml, HTML_MAX),
+    toMasked: recipients.map(maskEmail),
+    toHashes: recipients.map(hashEmail),
+    toDomains: [...new Set(recipients.map(emailDomain).filter(Boolean))],
+    fromMasked: maskEmail(fromEmail),
+    fromHash: fromEmail ? hashEmail(fromEmail) : "",
+    subject: text(redactSecrets(stripPci(subject)), 300),
     bodyRedacted: !!redactBody,
     bodyStored: !redactBody,
     bodyTemplateId: text(templateId || kind, 80),
@@ -227,15 +282,20 @@ async function sendSystemMail({
     tlsProtocol: "",
     tlsApiOk: false,
     enforcedTls: {},
-    requestHeaders: {
-      host: SENDGRID_HOST,
-      path: MAIL_SEND_PATH,
-      "content-type": "application/json",
-      "tls-min": TLS_MIN,
-      "x-floqr-mail-log-id": mailLogId
+    sourceIp,
+    userAgent,
+    diagnosticExpireAtMs: now + DIAGNOSTIC_RETENTION_MS,
+    securityExpireAtMs: now + SECURITY_RETENTION_MS,
+    diagnosticPurged: false,
+    diagnostic: {
+      to: recipients,
+      from: fromEmail,
+      textBody: clip(storeText, TEXT_MAX),
+      htmlBody: clip(storeHtml, HTML_MAX),
+      requestHeaders,
+      responseHeaders: {},
+      extra: {ip: sourceIp, userAgent}
     },
-    responseHeaders: {},
-    extra: extra && typeof extra === "object" ? extra : {},
     events: [],
     error: "",
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -332,7 +392,7 @@ async function sendSystemMail({
       tlsProtocol: res.tlsProtocol || "",
       tlsApiOk,
       enforcedTls,
-      responseHeaders: headerMap(res.headers),
+      "diagnostic.responseHeaders": headerMap(res.headers),
       error,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAtMs: Date.now()
@@ -406,11 +466,13 @@ async function applyMailEvents(events = []) {
                     : (eventName === "spamreport" || eventName === "unsubscribe" || eventName === "group_unsubscribe") ? "complained"
                       : ""
     );
+    const eventEmail = text(raw.email, 200).toLowerCase();
     const eventRow = {
       event: eventName,
-      email: text(raw.email, 200).toLowerCase(),
+      emailMasked: eventEmail ? maskEmail(eventEmail) : "",
+      emailHash: eventEmail ? hashEmail(eventEmail) : "",
       timestamp: Number(raw.timestamp || 0) || Date.now(),
-      reason: text(raw.reason || raw.response || raw.status, 400),
+      reason: text(stripPci(raw.reason || raw.response || raw.status), 400),
       sgMessageId: sgId,
       tls: text(raw.tls, 40),
       ip: text(raw.ip, 80)
@@ -433,12 +495,87 @@ async function applyMailEvents(events = []) {
   return {ok: true, received: list.length, updated};
 }
 
+function maskStoredEvents(events) {
+  return (Array.isArray(events) ? events : []).map((ev) => {
+    const email = text(ev.email, 200).toLowerCase();
+    return {
+      event: text(ev.event, 40),
+      emailMasked: ev.emailMasked || (email ? maskEmail(email) : ""),
+      emailHash: ev.emailHash || (email ? hashEmail(email) : ""),
+      timestamp: Number(ev.timestamp || 0),
+      reason: text(stripPci(ev.reason), 400),
+      sgMessageId: text(ev.sgMessageId, 200),
+      tls: text(ev.tls, 40),
+      ip: text(ev.ip, 80)
+    };
+  });
+}
+
+/**
+ * After 30 days, drop diagnostic evidence (bodies, headers, plaintext addresses).
+ * Keep the ISO 27001 security event until 90-day deletion.
+ */
+async function stripExpiredMailDiagnostics(now = Date.now(), batchLimit = 400) {
+  const cutoff = now - DIAGNOSTIC_RETENTION_MS;
+  const snap = await db().collection(COLLECTION)
+    .where("createdAtMs", "<", cutoff)
+    .orderBy("createdAtMs", "asc")
+    .limit(batchLimit)
+    .get();
+  if (snap.empty) return 0;
+  const batch = db().batch();
+  let count = 0;
+  snap.docs.forEach((doc) => {
+    const row = doc.data() || {};
+    const already = row.diagnosticPurged === true
+      && !row.diagnostic
+      && row.textBody == null
+      && row.htmlBody == null
+      && row.to == null;
+    if (already) return;
+    batch.set(doc.ref, {
+      diagnosticPurged: true,
+      diagnosticPurgedAtMs: now,
+      diagnostic: admin.firestore.FieldValue.delete(),
+      textBody: admin.firestore.FieldValue.delete(),
+      htmlBody: admin.firestore.FieldValue.delete(),
+      requestHeaders: admin.firestore.FieldValue.delete(),
+      responseHeaders: admin.firestore.FieldValue.delete(),
+      extra: admin.firestore.FieldValue.delete(),
+      to: admin.firestore.FieldValue.delete(),
+      toLower: admin.firestore.FieldValue.delete(),
+      from: admin.firestore.FieldValue.delete(),
+      events: maskStoredEvents(row.events),
+      toMasked: Array.isArray(row.toMasked) && row.toMasked.length
+        ? row.toMasked
+        : emailsOf(row.to || row.toLower).map(maskEmail),
+      toHashes: Array.isArray(row.toHashes) && row.toHashes.length
+        ? row.toHashes
+        : emailsOf(row.to || row.toLower).map(hashEmail),
+      fromMasked: row.fromMasked || (row.from ? maskEmail(row.from) : ""),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAtMs: now
+    }, {merge: true});
+    count += 1;
+  });
+  if (count) await batch.commit();
+  return count;
+}
+
 module.exports = {
   COLLECTION,
   TLS_MIN,
+  DIAGNOSTIC_RETENTION_MS,
+  SECURITY_RETENTION_MS,
+  EMAIL_HASH_PREFIX,
+  LOG_STANDARD,
   sendSystemMail,
   applyMailEvents,
+  stripExpiredMailDiagnostics,
   redactSecrets,
+  stripPci,
+  maskEmail,
+  hashEmail,
   emailsOf,
   httpsJson
 };

@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "email": "info@testclub.com",
+  "ig": "@testclub",
+  "hours": "Fri 22:00–03:00",
+  "hs": true,
+  "amenities": [
+    "VIP tables",
+    "Bottle service"
+  ],
+  "dress": "upscale",
+  "age": "21+",
+  "tz": "Europe/Paris",
+  "djs": [
+    "Marco"
+  ],
+  "promoters": [
+    "Night Collective DJ Marco"
+  ],
+  "captured": 14,
+  "total": 41
+}

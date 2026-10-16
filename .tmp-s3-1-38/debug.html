@@ -1,0 +1,18 @@
+<!doctype html><html><body style="margin:0">
+<iframe id="f" style="border:0"></iframe><pre id="out">pending</pre>
+<script>
+const q = new URLSearchParams(location.search);
+const f = document.getElementById("f");
+f.style.width = q.get("w") + "px"; f.style.height = q.get("h") + "px";
+f.src = "../display.html?location=temp-democlub-1&template=" + (q.get("t") || "shiloh") + "&main=" + encodeURIComponent(q.get("m") || "HAPPY BIRTHDAY MAYA! \u{1F389} Shiloh says purr") + "&sub=%40FloqrStar&screen=" + q.get("s") + "&preview=1";
+setTimeout(() => {
+  const d = f.contentDocument, w = f.contentWindow;
+  const box = el => { if (!el) return null; const r = el.getBoundingClientRect(); const cs = w.getComputedStyle(el); return {x:r.x|0,y:r.y|0,w:r.width|0,h:r.height|0,cw:el.clientWidth,ch:el.clientHeight,sw:el.scrollWidth,fs:cs.fontSize,disp:cs.display,pos:cs.position,cls:el.className}; };
+  const main = d.getElementById("displayMain");
+  document.getElementById("out").textContent = JSON.stringify({
+    canvas: box(d.getElementById("displayCanvas")), overlay: box(d.querySelector(".display-text-overlay")), slot: box(d.querySelector(".display-compose-slot")),
+    center: box(d.querySelector(".display-center")), main: box(main), sub: box(d.getElementById("displaySub")),
+    spans: Array.from(main.children).map(box)
+  }, null, 1);
+}, 5000);
+</script></body></html>

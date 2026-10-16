@@ -1,0 +1,1588 @@
+[
+  {
+    "name": "live-default-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html",
+    "size": "96x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 402,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "1",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 93,
+          "y": 255,
+          "w": 438,
+          "h": 37
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 4766,
+            "durationMs": 20000,
+            "progress": 0.238
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-default-96x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 402,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 13666,
+            "durationMs": 20000,
+            "progress": 0.683
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-default-96x48-later.png",
+    "console": [
+      "[2026-10-13T21:09:46.827Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-default-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html",
+    "size": "64x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display",
+      "bodyClass": "display display-booting display-board-primary",
+      "canvasClass": "display-canvas",
+      "formatAttr": null,
+      "canvasDataAttrs": "data-display-board=primary",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "",
+      "denied": false,
+      "rows": [],
+      "identity": null,
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": ""
+    },
+    "shot1": "live-default-64x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 312,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 144,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 202,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "1",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 46,
+          "y": 255,
+          "w": 325,
+          "h": 37
+        },
+        "inViewport": true,
+        "strongClientW": 67,
+        "strongScrollW": 67,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 1617,
+            "durationMs": 20000,
+            "progress": 0.081
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-default-64x48-later.png",
+    "console": [
+      "[2026-10-13T21:10:09.307Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-default-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html",
+    "size": "xibo1080",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 431,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 601,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 6750,
+            "durationMs": 20000,
+            "progress": 0.337
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-default-xibo1080.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 431,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 601,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 15733,
+            "durationMs": 20000,
+            "progress": 0.787
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-default-xibo1080-later.png",
+    "console": [
+      "[2026-10-13T21:10:25.823Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-zebbies-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+    "size": "96x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 402,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0.032096",
+        "transform": "matrix(1.40828, 0, 0, 1.40828, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 4,
+          "y": 248,
+          "w": 617,
+          "h": 52
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 6100,
+            "durationMs": 20000,
+            "progress": 0.305
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-zebbies-96x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @ZEBBIES GARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 402,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "58px",
+          "inlineFont": "58px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 14566,
+            "durationMs": 20000,
+            "progress": 0.728
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-zebbies-96x48-later.png",
+    "console": [
+      "[2026-10-13T21:10:46.689Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-zebbies-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+    "size": "64x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 312,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 144,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 202,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0.142029",
+        "transform": "matrix(1.36816, 0, 0, 1.36816, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": -14,
+          "y": 248,
+          "w": 445,
+          "h": 51
+        },
+        "inViewport": false,
+        "strongClientW": 67,
+        "strongScrollW": 67,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 5800,
+            "durationMs": 20000,
+            "progress": 0.29
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-zebbies-64x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 312,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 144,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 202,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": -23,
+          "y": 247,
+          "w": 461,
+          "h": 53
+        },
+        "inViewport": false,
+        "strongClientW": 67,
+        "strongScrollW": 67,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 14083,
+            "durationMs": 20000,
+            "progress": 0.704
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-zebbies-64x48-later.png",
+    "console": [
+      "[2026-10-13T21:11:06.413Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-zebbies-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+    "size": "xibo1080",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 431,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 601,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 6850,
+            "durationMs": 20000,
+            "progress": 0.342
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-zebbies-xibo1080.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc",
+      "title": "FLOQR ShoutOut Display · Zebbies Garden DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-64x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-64x48 data-is96x48=0 data-is64x48=1 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @ZEBBIESGARDEN DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "ZEBBIES",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 431,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "GARDEN DC",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 601,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 15816,
+            "durationMs": 20000,
+            "progress": 0.791
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-zebbies-xibo1080-later.png",
+    "console": [
+      "[2026-10-13T21:11:24.931Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-heist-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc",
+    "size": "96x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc",
+      "title": "FLOQR ShoutOut Display · Heist Washington DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @HEISTWASHINGTON DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 374,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "HEIST",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 124,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "WASHINGTON DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 363,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 7000,
+            "durationMs": 20000,
+            "progress": 0.35
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-heist-96x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc",
+      "title": "FLOQR ShoutOut Display · Heist Washington DC",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @HEISTWASHINGTON DC",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 374,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "HEIST",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 124,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "WASHINGTON DC",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 363,
+          "safeW": 423,
+          "computedFont": "54px",
+          "inlineFont": "54px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 15199,
+            "durationMs": 20000,
+            "progress": 0.76
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-heist-96x48-later.png",
+    "console": [
+      "[2026-10-13T21:11:44.339Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-aurelia-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+    "size": "64x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "USE SHOUTOUT @AURELIA(DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 312,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "AURELIA",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 146,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 233,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0.0198614",
+        "transform": "matrix(1.41275, 0, 0, 1.41275, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": -22,
+          "y": 248,
+          "w": 459,
+          "h": 53
+        },
+        "inViewport": false,
+        "strongClientW": 67,
+        "strongScrollW": 67,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 6183,
+            "durationMs": 20000,
+            "progress": 0.309
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-aurelia-64x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "416x312",
+      "mainText": "USE SHOUTOUT @AURELIA(DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 312,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "AURELIA",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 146,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "rowClientW": 313,
+          "rowScrollW": 313,
+          "runW": 233,
+          "safeW": 288,
+          "computedFont": "45px",
+          "inlineFont": "45px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": -23,
+          "y": 247,
+          "w": 461,
+          "h": 53
+        },
+        "inViewport": false,
+        "strongClientW": 67,
+        "strongScrollW": 67,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 14283,
+            "durationMs": 20000,
+            "progress": 0.714
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-aurelia-64x48-later.png",
+    "console": [
+      "[2026-10-13T21:12:02.810Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-aurelia-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+    "size": "96x48",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @AURELIA (DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 367,
+          "safeW": 423,
+          "computedFont": "53px",
+          "inlineFont": "53px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "53px",
+          "inlineFont": "53px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 7683,
+            "durationMs": 20000,
+            "progress": 0.384
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-aurelia-96x48.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "624x312",
+      "mainText": "USE SHOUTOUT @AURELIA (DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 367,
+          "safeW": 423,
+          "computedFont": "53px",
+          "inlineFont": "53px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "rowClientW": 460,
+          "rowScrollW": 460,
+          "runW": 457,
+          "safeW": 423,
+          "computedFont": "53px",
+          "inlineFont": "53px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 1,
+          "y": 247,
+          "w": 622,
+          "h": 53
+        },
+        "inViewport": true,
+        "strongClientW": 101,
+        "strongScrollW": 101,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 15783,
+            "durationMs": 20000,
+            "progress": 0.789
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-aurelia-96x48-later.png",
+    "console": [
+      "[2026-10-13T21:12:20.333Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  },
+  {
+    "name": "live-aurelia-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+    "size": "xibo1080",
+    "measure": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @AURELIA(DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "AURELIA",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 437,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 695,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 7666,
+            "durationMs": 20000,
+            "progress": 0.383
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot1": "live-aurelia-xibo1080.png",
+    "measure2": {
+      "href": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1",
+      "title": "FLOQR ShoutOut Display · Aurelia (Demo Club)",
+      "bodyClass": "display display-board-primary display-ready",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "formatAttr": "led-96x48",
+      "canvasDataAttrs": "data-display-board=primary data-template-id=blackwhite data-screen-format-id=led-96x48 data-is96x48=1 data-is64x48=0 data-is64x32=0 data-text-profile=classicBoard",
+      "is": "96x48=null,64x48=null,64x32=null",
+      "viewport": "1920x1080",
+      "mainText": "USE SHOUTOUT @AURELIA(DEMO CLUB)",
+      "denied": false,
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 929,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": true
+        },
+        {
+          "text": "AURELIA",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 437,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "rowClientW": 931,
+          "rowScrollW": 931,
+          "runW": 695,
+          "safeW": 857,
+          "computedFont": "132px",
+          "inlineFont": "132px",
+          "fitSize": "",
+          "overflows": false,
+          "outsideSafe": false
+        }
+      ],
+      "identity": {
+        "subClass": "classic-bw-identity uses-brand-fallback",
+        "ariaLabel": "PRESENTED BY FLOQMEDIA",
+        "text": "PRESENTED BYFLOQMEDIA",
+        "opacity": "0",
+        "transform": "matrix(1.42, 0, 0, 1.42, 0, 0)",
+        "display": "grid",
+        "visibility": "visible",
+        "rect": {
+          "x": 327,
+          "y": 797,
+          "w": 1266,
+          "h": 149
+        },
+        "inViewport": true,
+        "strongClientW": 216,
+        "strongScrollW": 216,
+        "animations": [
+          {
+            "name": "classicIdentityShellBurst",
+            "currentTimeMs": 15999,
+            "durationMs": 20000,
+            "progress": 0.8
+          }
+        ]
+      },
+      "railClass": "display-identity-rail hidden",
+      "railAria": null,
+      "reducedMotion": false,
+      "boardFitLoaded": true,
+      "accessIp": "69.243.87.16"
+    },
+    "shot2": "live-aurelia-xibo1080-later.png",
+    "console": [
+      "[2026-10-13T21:12:37.808Z]  @firebase/firestore: Firestore (10.12.5): enableMultiTabIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead."
+    ]
+  }
+]

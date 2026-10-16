@@ -1,0 +1,66 @@
+[
+  {
+    "name": "display2-default-64x32",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-default-64x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-default-96x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-default-xibo1080",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-zebbies-64x32",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-zebbies-64x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-zebbies-96x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-zebbies-xibo1080",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-heist-64x32",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-heist-64x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-heist-96x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-heist-xibo1080",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-aurelia-64x32",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-aurelia-64x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-aurelia-96x48",
+    "error": "TypeError: fetch failed"
+  },
+  {
+    "name": "display2-aurelia-xibo1080",
+    "error": "TypeError: fetch failed"
+  }
+]

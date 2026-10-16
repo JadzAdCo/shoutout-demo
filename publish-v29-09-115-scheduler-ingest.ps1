@@ -52,7 +52,7 @@ $indexPath = Join-Path $stage "functions\index.js"
 $index = Get-Content -LiteralPath $indexPath -Raw
 if ($index -notmatch 'venue-ingest-functions') {
   if ($index -notmatch [regex]::Escape('...require("./scheduling-functions"),')) {
-    throw "Could not patch functions/index.js — scheduling-functions export missing on live main."
+    throw "Could not patch functions/index.js: scheduling-functions export missing on live main."
   }
   $index = $index.Replace(
     '...require("./scheduling-functions"),',

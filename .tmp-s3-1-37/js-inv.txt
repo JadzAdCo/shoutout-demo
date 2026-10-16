@@ -1,0 +1,162 @@
+﻿
+ad-submit-app.js:102: const v = window.FLOQRNav?.appVersion || "";
+ad-submit-app.js:103: return `./ad-invoice.html?v=${encodeURIComponent(v)}&t=${encodeURIComponent(token)}`;
+admin-app.js:11: const CURRENT_VERSION = window.FLOQRNav?.appVersion || "";
+admin-app.js:102: if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: 
+locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
+admin-app.js:104: if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || 
+`./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
+admin-app.js:193: return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, 
+window.location.href).toString();
+admin-app.js:969: if (!url.searchParams.get("v") && CURRENT_VERSION) url.searchParams.set("v", CURRENT_VERSION);
+admin-app.js:2411: const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, 
+campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` o
+admin-app.js:2532: link:"./patron-portal.html?tab=shoutouts&v=29.09.8"
+admin-rep-extension.js:102: link: 
+`./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
+admin-rep-extension.js:153: const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, 
+campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", c
+admin-rep-extension.js:164: if (tagsLink) tagsLink.href = 
+`./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`;
+admin-scheduling.js:440: if (handle) return `./?v=${v}&start=mingl&q=${encodeURIComponent(handle)}`;
+admin-scheduling.js:441: if (worker.uid) return `./services.html?v=${v}&q=${encodeURIComponent(worker.name || 
+worker.email || worker.uid)}`;
+admin-scheduling.js:442: return `./services.html?v=${v}`;
+ai-assistant-ui.js:85: actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications&v=29.09.8"}]
+ai-assistant-ui.js:112: if (item.type === "clubLocation") return {label:`Open ${item.title}`, 
+href:`./?location=${encodeURIComponent(item.id)}&v=29.09.8`};
+ai-assistant-ui.js:113: if (item.type === "event") return {label:`View ${item.title}`, href:`./?v=29.09.8`};
+ai-assistant-ui.js:114: if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return 
+{label:"Search templates", href:"./?v=29.09.8"};
+club-profile-app.js:30: const query = new URLSearchParams({v:"29.07", returnTo:appReturnPath(), 
+profileRequired:reason});
+club-profile-app.js:147: byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.09.8`;
+club-profile-app.js:148: byId("clubGuestListLink").href = 
+`./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
+club-profile-app.js:151: byId("clubPickupLink").href = 
+`./pickup.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
+club-profile-app.js:153: byId("clubCommerceLink").href = 
+`./commerce.html?club=${encodeURIComponent(locationId)}&v=29.09.8`;
+club-profile-app.js:361: byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p 
+class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.09.8">Return to FLOQR</a></p>`;
+display-app.js:715: const style = Object.entries(vars).map(([k, v]) => `--${k}:${v}`).join(";");
+display-error-app.js:89: appVersion: "29.09.90"
+entity-management.js:26: const v = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
+entity-management.js:27: return 
+`./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
+entity-management.js:35: /** Xibo fallback page per board; display-error.html never carries ?v=. */
+entity-management.js:47: const profileUrl = window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: 
+id})
+entity-management.js:48: || 
+`./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || 
+"s3.0.3")}`;
+floqai-help-repository.js:8: return String((global.FLOQRNav && global.FLOQRNav.appVersion) || "").trim();
+floqai-help-repository.js:35: const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+floqai-help-repository.js:1238: body: "Venue Admin Portal URLs are generated when you search ΓÇö they are not stored 
+with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the
+floqai-page.js:8: const stamped = nav()?.stampCurrentVersion?.(path, params);
+floqr-ad-composer.js:144: <label>${esc(T("ads.c.genders", "Gender"))}<select id="${id("Gender")}">${genders.map(([v, 
+l]) => `<option value="${v}">${esc(l)}</option>`).join("")}</select></label>
+floqr-ad-composer.js:274: const invoiceHref = row.invoiceNumber ? 
+root.FLOQRNav?.stampCurrentVersion?.("./ad-invoice.html", {n: row.invoiceNumber}) || 
+`./ad-invoice.html?n=${encodeURIComponent(row.invoiceNumber)}` : "";
+floqr-canonical.js:50: ? `?v=${encodeURIComponent(String(version).trim())}`
+floqr-canonical.js:52: return `./${file}${v}`;
+floqr-canonical.js:63: return localPath("privacy.html", version || global.FLOQRNav?.appVersion);
+floqr-feature-services.js:328: back.href = root.FLOQRNav?.stampCurrentVersion?.("./", {start: "search"}) || 
+"./?start=search";
+floqr-logger.js:76: appVersion: String(entry.appVersion || "29.09.4").slice(0, 40),
+floqr-nav.js:7: Never copy the page's ?v= ΓÇö old bookmarks would keep minting old Club Admin URLs. */
+floqr-nav.js:49: function currentVersion() {
+floqr-nav.js:59: appVersion: APP_V,
+floqr-nav.js:62: return buildUrl("./patron-portal.html", { v: APP_V, ...extra });
+floqr-nav.js:65: return `./?v=${APP_V}&start=search`;
+floqr-nav.js:73: const params = { ...extra, location: locationId, v: APP_V };
+floqr-nav.js:78: /** Club Admin URL for Venue Links / onboarding ΓÇö always current package, never page ?v=. */
+floqr-nav.js:83: stampCurrentVersion(href = "", extra = {}) {
+floqr-nav.js:90: return buildUrl(href, { v: APP_V, ...extra });
+floqr-nav.js:94: const href = buildUrl("./master-admin.html", { v: APP_V, ...params });
+floqr-nav.js:99: return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
+floqr-nav.js:103: return buildUrl(path, { v: APP_V, from: "portal", ...extra });
+floqr-nav.js:108: return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
+floqr-nav.js:112: return buildUrl(path, { v: APP_V, from: "master", ...extra });
+floqr-nav.js:114: /** Stable venue board URL ΓÇö no cache-bust ?v= (for LED devices and external embeds). */
+floqr-nav.js:166: return { href: `./?v=${APP_V}&start=mingl`, label: navT("nav.backToMingl", "ΓåÉ Back to Mingl") };
+floqr-nav.js:169: return { href: `./commerce.html?v=${APP_V}`, label: navT("nav.backToBartr", "ΓåÉ Back to BartR") };
+floqr-nav.js:203: global.location.replace(buildUrl("./floqai.html", { v: APP_V, ...(q ? { q } : {}) }));
+floqr-nav.js:209: return buildUrl("./floqai.html", { v: APP_V });
+floqr-session-shell.js:24: function appVersion() {
+floqr-session-shell.js:25: return String(root.FLOQRNav?.appVersion || "").trim();
+floqr-session-shell.js:71: const v = appVersion() || params().get("v") || "";
+floqr-session-shell.js:73: if (v) next.searchParams.set("v", v);
+floqr-session-shell.js:88: const v = appVersion() || params().get("v") || "";
+floqr-template-preview.js:108: /** display.html URL-preview link. Never carries ?v= (Display URLs stay cache-key 
+free). */
+global-profile-status.js:39: return window.FLOQRNav?.stampCurrentVersion?.(path, extra) || path;
+global-profile-status.js:50: const v = window.FLOQRNav?.appVersion || "";
+global-profile-status.js:51: script.src = `./floqr-feature-services.js${v ? `?v=${encodeURIComponent(v)}` : ""}`;
+guest-list-app.js:15: async function logout(){await auth.signOut();location.href="./?v=29.09.8&start=search";}
+intent-search.js:6: return String((global.FLOQRNav && global.FLOQRNav.appVersion) || "").trim();
+intent-search.js:11: const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+master-ad-management.js:206: <p class="small"><strong>Status:</strong> ${esc(c.status)} ┬╖ <strong>Payment:</strong> 
+${esc(c.paymentStatus || "unpaid")} (${esc(c.paymentMode || "ΓÇö")}) ┬╖ ${esc(money(c.priceCents))}${c.invoiceNumber
+master-admin-app.js:15: const CURRENT_VERSION = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || 
+"s3.0.3";
+master-admin-app.js:424: return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v]) => `${k} 
+(${v})`).join(", ") || "Not enough data yet";
+master-admin-app.js:436: url.searchParams.set("v", CURRENT_VERSION);
+master-display-security.js:187: <p class="sub small" style="margin-top:10px">Obfuscated URLs are not usable in Xibo. 
+Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
+master-feature-services.js:66: return nav?.stampCurrentVersion?.(path, {...params, from: "features-services"}) || 
+base.route;
+master-mail-logging.js:109: return entries.map(([k, v]) => `${k}: ${v}`).join("\n");
+master-services-extension.js:37: if (order?.ownerUid) await 
+db.collection("inboxNotifications").add({recipientUid:order.ownerUid, type:"orderTracking", title:"FLOQR order 
+update", body:`${order.invoiceNumber || id}: ${shippingStatus}
+media-source-picker.js:50: mediaUrl: `https://www.youtube.com/watch?v=${id}`,
+mingl-gist-app.js:321: cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?v=${APP_V}&start=mingl`;
+patron-app.js:2182: link:"./patron-portal.html?tab=inbox&v=29.09.8",
+patron-app.js:2183: minglLink:"./mingl-chat.html?v=29.09.33",
+patron-app.js:2225: const params = new URLSearchParams({ v: "29.09.8", from: "mingl" });
+patron-app.js:3343: card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(p
+laceLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><di
+patron-app.js:3787: window.location.href = "./commerce.html?v=29.09.33&from=search";
+patron-app.js:4509: payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.reference
+Number)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.09.8`;
+patron-app.js:4965: url.searchParams.set("v", window.FLOQRNav?.appVersion || "29.09.8");
+patron-app.js:5063: 
+window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new 
+URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("
+patron-app.js:5065: window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-po
+rtal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=29.09.8`;await note({type:
+patron-portal-app.js:70: if (window.FLOQRNav?.appVersion) next.searchParams.set("v", window.FLOQRNav.appVersion);
+patron-portal-app.js:427: const params = new URLSearchParams({v:"29.09.8", from:"portal"});
+patron-portal-app.js:489: async function logout() { await auth.signOut(); window.location.href = 
+window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
+patron-portal-app.js:954: const v = window.FLOQRNav?.appVersion;
+patron-portal-app.js:955: const params = new URLSearchParams({ ...(v ? { v } : {}), start: "shoutout", from: 
+"portal-reuse" });
+patron-portal-app.js:2425: ${alreadyMutual ? `<p><a class="buttonlike" 
+href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId 
+|| ""}` }) || `./mingl-chat.html?room
+patron-portal-app.js:2588: link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || 
+`./mingl-chat.html?room=${roomId}&v=29.09.8&from=portal`,
+patron-portal-app.js:3404: if (window.FLOQRNav?.appVersion) url.searchParams.set("v", window.FLOQRNav.appVersion);
+patron-portal-app.js:4162: ...(window.FLOQRNav?.appVersion ? { v: window.FLOQRNav.appVersion } : {}),
+patron-portal-app.js:4217: const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || 
+"./privacy.html?v=s3.0.103";
+payment-return-app.js:126: const previewUrl = previewToken ? 
+`./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.72` : "";
+payment-return-app.js:144: const portal = `./patron-portal.html?v=${encodeURIComponent(window.FLOQRNav?.appVersion || 
+"")}&tab=ad-campaigns`;
+payment-service.js:40: appVersion: "29.09.69"
+profile-access-guard.js:20: const query = new URLSearchParams({v:"29.04", profileRequired:reason, 
+returnTo:returnPath()});
+services-app.js:61: <div class="queue-actions"><button type="button" 
+data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow 
+service"}</button>${row.commerceEnabled ? `<a class="buttonlike" hr
+suprstar-preview.js:383: if (!url.searchParams.get("v")) url.searchParams.set("v", APP_V);
+suprstr-search.js:128: const fullUrl = path.includes("?") ? `${path}&v=${APP_V}&from=search` : 
+`${path}?v=${APP_V}&from=search`;
+
+

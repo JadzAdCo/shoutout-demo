@@ -176,7 +176,7 @@
           : "Secret: not generated yet.";
       }
       setIngestStatus(data.hint || "");
-    } catch (error) {
+  } catch (error) {
       setIngestStatus(error?.message || String(error));
     }
   }
@@ -184,7 +184,7 @@
   async function rotateIngestSecret() {
     if (!locationId) {
       setIngestStatus("Choose a venue first.");
-      return;
+    return;
     }
     if (!window.confirm("Rotate the website ingest secret? Existing JSON, RSS, and iframe URLs stop working immediately.")) return;
     setIngestStatus("Generating secret…");
@@ -1083,8 +1083,8 @@
         options.push(
           `<option value="${esc(worker.uid)}" data-name="${esc(worker.name)}" data-email="${esc(worker.email)}" data-phone="${esc(worker.phone)}" data-role="${esc(worker.role)}">${esc(worker.name)} · ${esc(worker.role)}</option>`
         );
-      });
-      select.innerHTML = options.join("");
+    });
+    select.innerHTML = options.join("");
     }
     renderGrid();
   }

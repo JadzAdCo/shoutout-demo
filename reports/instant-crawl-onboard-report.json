@@ -1,0 +1,1996 @@
+{
+  "crawlCompletedAt": "2026-09-25T07:50:55.411Z",
+  "sampled": 60,
+  "jobsAttempted": 8,
+  "jobSource": "fallback-spain-germany-hiphop",
+  "contactCompleteBeforePct": 0,
+  "contactCompleteAfterPct": 65,
+  "liftPctPoints": 65,
+  "gained": {
+    "phone": 9,
+    "email": 42,
+    "instagram": 46,
+    "facebook": 38
+  },
+  "onboardReadyCount": 3,
+  "onboardReadyPct": 5,
+  "missingDatapointFrequency": {
+    "Promoter(s)": 57,
+    "Email": 18,
+    "DJ(s)/Artist(s)": 17,
+    "Instagram": 14,
+    "Phone": 2
+  },
+  "baselines": {
+    "previousEngineContactCompletePct": 0,
+    "enrichV1ContactCompletePct": 37.8
+  },
+  "rows": [
+    {
+      "name": "Astra Kulturhaus",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.astra-berlin.de/",
+      "onboardReady": true,
+      "missingDatapoints": [],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Astra Kulturhaus",
+        "site": "http://www.astra-berlin.de/"
+      }
+    },
+    {
+      "name": "Badehaus Berlin",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.badehaus-berlin.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Badehaus Berlin",
+        "site": "http://www.badehaus-berlin.com/"
+      }
+    },
+    {
+      "name": "cassiopeia Club",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.cassiopeia-berlin.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "cassiopeia Club",
+        "site": "https://www.cassiopeia-berlin.de/"
+      }
+    },
+    {
+      "name": "Gretchen",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.gretchen-club.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Gretchen",
+        "site": "http://www.gretchen-club.de/"
+      }
+    },
+    {
+      "name": "Huxleys Neue Welt",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://huxleysneuewelt.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Huxleys Neue Welt",
+        "site": "https://huxleysneuewelt.com/"
+      }
+    },
+    {
+      "name": "MAXXIM CLUB BERLIN",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.maxxim-berlin.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "MAXXIM CLUB BERLIN",
+        "site": "http://www.maxxim-berlin.de/"
+      }
+    },
+    {
+      "name": "Tempodrom",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.tempodrom.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Tempodrom",
+        "site": "https://www.tempodrom.de/"
+      }
+    },
+    {
+      "name": "Weekend Rooftop - Club & Eventlocation",
+      "type": "event",
+      "country": "Germany",
+      "city": "Berlin",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.weekendclub.berlin/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Weekend Rooftop - Club & Eventlocation",
+        "site": "http://www.weekendclub.berlin/"
+      }
+    },
+    {
+      "name": "Bootshaus",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.bootshaus.tv/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Bootshaus",
+        "site": "http://www.bootshaus.tv/"
+      }
+    },
+    {
+      "name": "Club \"Bollwerk Cologne\"",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://bollwerk.cologne/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Club \"Bollwerk Cologne\"",
+        "site": "https://bollwerk.cologne/"
+      }
+    },
+    {
+      "name": "Club Nachtflug Köln",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.nachtflug.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Club Nachtflug Köln",
+        "site": "https://www.nachtflug.com/"
+      }
+    },
+    {
+      "name": "Ebony club Köln",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://maps.google.com/?cid=15763182383281925817&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Ebony club Köln",
+        "site": "https://maps.google.com/?cid=15763182383281925817&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA"
+      }
+    },
+    {
+      "name": "Klapsmühle",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "http://www.klapsmuehle.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Klapsmühle",
+        "site": "http://www.klapsmuehle.com/"
+      }
+    },
+    {
+      "name": "MTC Cologne - LIVE MUSIC CLUB",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://mtc-cologne.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "MTC Cologne - LIVE MUSIC CLUB",
+        "site": "https://mtc-cologne.de/"
+      }
+    },
+    {
+      "name": "Platinum Club Cologne",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": false,
+      "address": true,
+      "website": "https://www.tp-platinum.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Platinum Club Cologne",
+        "site": "https://www.tp-platinum.de/"
+      }
+    },
+    {
+      "name": "Vanity Club Cologne",
+      "type": "event",
+      "country": "Germany",
+      "city": "Cologne",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.vanity.cc/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Vanity Club Cologne",
+        "site": "http://www.vanity.cc/"
+      }
+    },
+    {
+      "name": "Golden Cut - Hamburg",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://golden-cut.club/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Golden Cut - Hamburg",
+        "site": "https://golden-cut.club/"
+      }
+    },
+    {
+      "name": "H1 Club & Lounge",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.h1club.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "H1 Club & Lounge",
+        "site": "https://www.h1club.com/"
+      }
+    },
+    {
+      "name": "HALO Club Hamburg",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://halo.club/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "HALO Club Hamburg",
+        "site": "https://halo.club/"
+      }
+    },
+    {
+      "name": "MashUp Music Bar",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.mashup.bar/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "MashUp Music Bar",
+        "site": "http://www.mashup.bar/"
+      }
+    },
+    {
+      "name": "Mojo Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.mojo.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Mojo Club",
+        "site": "https://www.mojo.de/"
+      }
+    },
+    {
+      "name": "NOHO Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.noho-club.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "NOHO Club",
+        "site": "https://www.noho-club.de/"
+      }
+    },
+    {
+      "name": "Roots Club & Lounge",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://caveclub.info/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Roots Club & Lounge",
+        "site": "https://caveclub.info/"
+      }
+    },
+    {
+      "name": "SUPERFLY Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Hamburg",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "http://superfly-hamburg.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "SUPERFLY Club",
+        "site": "http://superfly-hamburg.com/"
+      }
+    },
+    {
+      "name": "Bossy Munich",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.instagram.com/bossymunich/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Bossy Munich",
+        "site": "https://www.instagram.com/bossymunich/"
+      }
+    },
+    {
+      "name": "Mint Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://maps.google.com/?cid=16121379373870805009&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Mint Club",
+        "site": "https://maps.google.com/?cid=16121379373870805009&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA"
+      }
+    },
+    {
+      "name": "Nachtgalerie",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.nachtgalerie.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Nachtgalerie",
+        "site": "http://www.nachtgalerie.de/"
+      }
+    },
+    {
+      "name": "Neuraum",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.neuraum.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Neuraum",
+        "site": "http://www.neuraum.de/"
+      }
+    },
+    {
+      "name": "P1 Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.p1-club.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "P1 Club",
+        "site": "http://www.p1-club.de/"
+      }
+    },
+    {
+      "name": "Paradiso Tanzbar",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.paradiso-tanzbar.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Paradiso Tanzbar",
+        "site": "http://www.paradiso-tanzbar.de/"
+      }
+    },
+    {
+      "name": "Queens Tabledance & Nightclub",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://queenstabledance.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Queens Tabledance & Nightclub",
+        "site": "https://queenstabledance.com/"
+      }
+    },
+    {
+      "name": "Sweet Club",
+      "type": "club",
+      "country": "Germany",
+      "city": "Munich",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.sweet-club.de/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Sweet Club",
+        "site": "https://www.sweet-club.de/"
+      }
+    },
+    {
+      "name": "Golden Rose Party Barcelona",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.goldenroseparty.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Golden Rose Party Barcelona",
+        "site": "https://www.goldenroseparty.com/"
+      }
+    },
+    {
+      "name": "Input - High Fidelity Dance Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.inputbcn.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Input - High Fidelity Dance Club",
+        "site": "https://www.inputbcn.com/"
+      }
+    },
+    {
+      "name": "Jamboree Jazz & Dance Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.jamboreejazz.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Jamboree Jazz & Dance Club",
+        "site": "http://www.jamboreejazz.com/"
+      }
+    },
+    {
+      "name": "Ku Barcelona",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": false,
+      "address": true,
+      "website": "http://www.kubarcelona.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Ku Barcelona",
+        "site": "http://www.kubarcelona.com/"
+      }
+    },
+    {
+      "name": "Opium Barcelona",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://opiumbarcelona.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Opium Barcelona",
+        "site": "https://opiumbarcelona.com/"
+      }
+    },
+    {
+      "name": "Otto Zutz Barcelona",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.ottozutz.com/?utm_source=google&utm_medium=wix_google_business_profile&utm_campaign=97159066627511144",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Otto Zutz Barcelona",
+        "site": "https://www.ottozutz.com/?utm_source=google&utm_medium=wix_google_business_profile&utm_campaign=97159066627511144"
+      }
+    },
+    {
+      "name": "Sala Razzmatazz",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.salarazzmatazz.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Sala Razzmatazz",
+        "site": "http://www.salarazzmatazz.com/"
+      }
+    },
+    {
+      "name": "YouBarcelona - Lista Isaac (Discotecas / Night Clubs)",
+      "type": "club",
+      "country": "Spain",
+      "city": "Barcelona",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://youbarcelona.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "YouBarcelona - Lista Isaac (Discotecas / Night Clubs)",
+        "site": "https://youbarcelona.com/"
+      }
+    },
+    {
+      "name": "Calle 365 Discoteca y cócteles Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": false,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://calle365madrid.com/?utm_source=gmb&utm_medium=organic&utm_campaign=gmb_website",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Phone",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Calle 365 Discoteca y cócteles Madrid",
+        "site": "https://calle365madrid.com/?utm_source=gmb&utm_medium=organic&utm_campaign=gmb_website"
+      }
+    },
+    {
+      "name": "Costa Social Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.instagram.com/costasocialclub/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Costa Social Club",
+        "site": "https://www.instagram.com/costasocialclub/"
+      }
+    },
+    {
+      "name": "Discoteca Serrano 41",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://www.facebook.com/discotecaserrano41",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": true
+        },
+        "title": "Discoteca Serrano 41",
+        "site": "https://www.facebook.com/discotecaserrano41"
+      }
+    },
+    {
+      "name": "ICON Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://iconmadrid.com/en/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "ICON Madrid",
+        "site": "https://iconmadrid.com/en/"
+      }
+    },
+    {
+      "name": "Moondance Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": false,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://maps.google.com/?cid=13438356007564825843&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Phone",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Moondance Madrid",
+        "site": "https://maps.google.com/?cid=13438356007564825843&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA"
+      }
+    },
+    {
+      "name": "Planet Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.planetclub.es/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Planet Club",
+        "site": "https://www.planetclub.es/"
+      }
+    },
+    {
+      "name": "Shoko Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.shokomadrid.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Shoko Madrid",
+        "site": "http://www.shokomadrid.com/"
+      }
+    },
+    {
+      "name": "Studio 54 Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": false,
+      "address": true,
+      "website": "http://www.studio54madrid.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "Studio 54 Madrid",
+        "site": "http://www.studio54madrid.com/"
+      }
+    },
+    {
+      "name": "Teatro Kapital",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.teatrokapital.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Teatro Kapital",
+        "site": "http://www.teatrokapital.com/"
+      }
+    },
+    {
+      "name": "Tempo Audiophile Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://www.tempoclub.es/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Tempo Audiophile Club",
+        "site": "https://www.tempoclub.es/"
+      }
+    },
+    {
+      "name": "The Host Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "http://www.thehostclub.es/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "The Host Club",
+        "site": "http://www.thehostclub.es/"
+      }
+    },
+    {
+      "name": "The Room Madrid",
+      "type": "club",
+      "country": "Spain",
+      "city": "Madrid",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://theroommadrid.es/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "title": "The Room Madrid",
+        "site": "https://theroommadrid.es/"
+      }
+    },
+    {
+      "name": "Fox Congo",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": false,
+      "address": true,
+      "website": "https://www.facebook.com/FoxCongo1/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Email",
+        "Instagram"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": true
+        },
+        "title": "Fox Congo",
+        "site": "https://www.facebook.com/FoxCongo1/"
+      }
+    },
+    {
+      "name": "Hype Valencia",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "https://instagram.com/hypevalencia?utm_medium=copy_link",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "Hype Valencia",
+        "site": "https://instagram.com/hypevalencia?utm_medium=copy_link"
+      }
+    },
+    {
+      "name": "La 3 Club Valencia",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://la3club.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": false
+        },
+        "title": "La 3 Club Valencia",
+        "site": "https://la3club.com/"
+      }
+    },
+    {
+      "name": "Mya",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://umbracleterraza.com/mya",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "DJ(s)/Artist(s)",
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": true,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Mya",
+        "site": "http://umbracleterraza.com/mya"
+      }
+    },
+    {
+      "name": "Oven Club Centro",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": false,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.oven-club.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)",
+        "Email"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": false,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Oven Club Centro",
+        "site": "http://www.oven-club.com/"
+      }
+    },
+    {
+      "name": "PICCA CLUB VALENCIA",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://xceed.me/es/world/events/all/all-events/channel--picca-google",
+      "onboardReady": true,
+      "missingDatapoints": [],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "PICCA CLUB VALENCIA",
+        "site": "https://xceed.me/es/world/events/all/all-events/channel--picca-google"
+      }
+    },
+    {
+      "name": "Play Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "http://www.playclubvalencia.com/",
+      "onboardReady": false,
+      "missingDatapoints": [
+        "Promoter(s)"
+      ],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Play Club",
+        "site": "http://www.playclubvalencia.com/"
+      }
+    },
+    {
+      "name": "Roto Club",
+      "type": "club",
+      "country": "Spain",
+      "city": "Valencia",
+      "genre": "Hip Hop",
+      "phone": true,
+      "email": true,
+      "instagram": true,
+      "address": true,
+      "website": "https://xceed.me/es/world/events/all/all-events/channel--redes-sociales-roto",
+      "onboardReady": true,
+      "missingDatapoints": [],
+      "contactLift": {
+        "before": {
+          "phone": false,
+          "email": false,
+          "instagram": false,
+          "facebook": false
+        },
+        "after": {
+          "phone": true,
+          "email": true,
+          "instagram": true,
+          "facebook": true
+        },
+        "title": "Roto Club",
+        "site": "https://xceed.me/es/world/events/all/all-events/channel--redes-sociales-roto"
+      }
+    }
+  ],
+  "note": "Contact-complete = Phone + Email + Instagram. Onboard-ready = Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram."
+}

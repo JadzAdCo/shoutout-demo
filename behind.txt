@@ -1,0 +1,15 @@
+﻿a268141 Publish v29.09.52 soccer jersey consolidation and FloqAi template UX.
+78db9f4 Restore club idle Use ShoutOut CTA, sports jersey catalog, and $20 scheduling.
+2eefc62 Fix mojibake in patron back buttons and profile menu dots.
+7e79e5a Keep Club Admin Back links inside the venue portal.
+bebd25d Remove Screen N developer eyebrow tags from patron portal.
+7dc5b75 Remove club-entity search from Club Admin portals.
+cc22328 Lower soccer jersey name/mark and enlarge text.
+5d65b98 Fix soccer jersey black screens from multi-token className.
+0c5926e Publish v29.09.40: FloqAi intent page + Soccer  at Heist.
+c0fd09c Add Heist closing brand slide after 20s and rename Caught in a HEIST.
+9c11271 Remove USE SHOUTOUT flash and cycle Heist footer lines for 3s each.
+68e4986 Publish Heist floating transparent CSS frame and renamed templates.
+4cda1e4 Fix Heist transparent frame preview and classic-size overlay alignment.
+d11d44f Add transparent framed text overlay layer for Heist templates (3x14 chars).
+703872b Separate display background layer from transparent text overlay for Heist templates.

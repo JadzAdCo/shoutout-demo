@@ -148,4 +148,4 @@ if (Test-Path -LiteralPath $stagingRoot) {
 Write-Host "FLOQR v29.09.2 publication completed."
 Write-Host "Patron app: https://jadzadco.github.io/shoutout-demo/?v=29.09.2"
 Write-Host "Master Admin: https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.2"
-Write-Host "Zebbies Xibo: https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&v=29.09.2"
+Write-Host "Zebbies Xibo (stable, no ?v=): https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc"

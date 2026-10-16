@@ -1,0 +1,1811 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR ShoutOut Master Admin Portal v29.09.22 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Master Admin</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.24"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.30"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.30"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.1.31"/>
+</head>
+<body>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
+<main id="masterAdminPage" class="app admin-shell">
+  <section class="page active">
+    <header class="topbar admin-topbar">
+      <div>
+        <h1>Network Intelligence Center</h1>
+        <p id="masterStatus" class="status">Loading master admin app...</p>
+      </div>
+      <div class="card admin-club-card">
+        <h2
+          data-floqr-help-id="help-master-network-intelligence"
+          data-floqr-help-title="All Locations"
+          data-floqr-help-body="This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOuts counts ShoutOuts waiting for approval at every venue; Estimated Network Revenue is a rough estimate from pending ShoutOuts and live boards, not booked revenue. Top Locations lists the venues with the most pending ShoutOuts. To work on one venue, open Entity Management → Manage Entities, unlock with SOS2FA, search for the venue and use Manage selected, or open Venue Links to copy its Club Admin and Display links. Master Admin is for FLOQR internal use only."
+          data-floqr-help-search="all locations|network intelligence center|network intelligence|location picker|pick a location|choose a venue|network dashboard locations|which venue am i looking at|total locations|all pending shoutouts|estimated network revenue|top locations|all venues|network view|floqr master admin|master admin portal">All Locations</h2>
+      </div>
+    </header>
+
+    <div id="masterLogin" class="card">
+      <h2>Master admin sign-in</h2>
+      <p class="sub">Master admin access is controlled by <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong>. Domain enforcement is disabled during development.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Master Admin login uses the same popup configuration as the patron page for Google and Microsoft. Use auth-debug.html if Microsoft still fails.</p>
+      <div class="auth-grid">
+        <button id="masterGoogleLoginBtn" type="button">Master Google Login</button>
+        <button id="masterMicrosoftLoginBtn" type="button">Master Microsoft Login</button>
+      </div>
+      <button id="masterLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+    </div>
+
+    <div id="masterPanel" class="hidden">
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="networkDashboard" type="button" data-i18n="master.networkDashboard">Network Dashboard</button>
+        <div class="admin-tab-group" data-tab-group="entityManagement" data-default-panel="entityManagement">
+          <button class="admin-tab admin-tab-parent" data-group="entityManagement" type="button" aria-expanded="false" data-i18n="master.entityManagement">Entity Management</button>
+          <div class="admin-subtabs hidden" id="entityManagementSubtabs" role="group" aria-label="Entity Management pages">
+            <button class="admin-subtab" data-panel="entityManagement" type="button" data-i18n="master.manageEntities">Manage Entities</button>
+            <button class="admin-subtab" data-panel="clubAdminUrls" type="button" data-i18n="master.venueLinks">Venue Links</button>
+            <button class="admin-subtab" data-panel="allQueues" type="button" data-i18n="master.allQueues">All ShoutOut Queues</button>
+            <button class="admin-subtab" data-panel="clubOnboarding" type="button" data-i18n="master.onboarding">Entity Onboarding</button>
+            <button class="admin-subtab" data-panel="templateManagement" type="button" data-i18n="master.templates">Template Management</button>
+            <button class="admin-subtab" data-panel="recommendationModeration" type="button" data-i18n="master.recommendations">Unapproved Recommendations</button>
+            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Svc / Emp Mgmt</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
+          <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOut Mgmt</button>
+          <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
+            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Completed Log</button>
+            <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="twilio" data-default-panel="twilioSmsLogs">
+          <button class="admin-tab admin-tab-parent" data-group="twilio" type="button" aria-expanded="false" data-i18n="master.twilio">Twilio / SendGrid Mgmt</button>
+          <div class="admin-subtabs hidden" id="twilioSubtabs" role="group" aria-label="Twilio log types">
+            <button class="admin-subtab" data-panel="twilioSmsLogs" type="button" data-i18n="master.twilioSmsLogs">SMS Logs</button>
+            <button class="admin-subtab" data-panel="twilioWhatsAppLogs" type="button" data-i18n="master.twilioWhatsAppLogs">WhatsApp Logs</button>
+            <button class="admin-subtab" data-panel="twilioFeatureLogs" type="button" data-i18n="master.twilioFeatureLogs">Feature Logs</button>
+            <button class="admin-subtab" data-panel="twilioComplianceLogs" type="button" data-i18n="master.twilioComplianceLogs">Compliance Logs</button>
+            <button class="admin-subtab" data-panel="twilio_sendgridMailLogs" type="button" data-i18n="master.twilioSendgridMailLogs">SendGrid Mail Logs</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="security">
+          <button class="admin-tab admin-tab-parent" data-group="security" type="button" aria-expanded="false" data-i18n="master.security">Security</button>
+          <div class="admin-subtabs hidden" id="securitySubtabs" role="group" aria-label="Security pages">
+            <button class="admin-subtab" data-panel="securityLogs" type="button">Security Logs</button>
+            <button class="admin-subtab" id="securitySystemMessagesTab" data-panel="securitySystemMessages" type="button">Security System Messages</button>
+            <button class="admin-subtab" data-panel="displaySecurity" type="button">Display Security Setting</button>
+            <button class="admin-subtab" data-panel="dataClassification" type="button" data-i18n="master.securityDataClassification">Data classification</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="reports">
+          <button class="admin-tab admin-tab-parent" data-group="reports" type="button" aria-expanded="false" data-i18n="master.reports">Reports</button>
+          <div class="admin-subtabs hidden" id="reportsSubtabs" role="group" aria-label="Reports pages">
+            <button class="admin-subtab" data-panel="allReports" type="button">All Reports</button>
+            <button class="admin-subtab" data-panel="templateCatalogReport" type="button">Template Catalog</button>
+            <button class="admin-subtab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
+            <button class="admin-subtab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
+            <button class="admin-subtab" data-panel="duplicateRecords" type="button">Duplicate Records</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="adManagement" data-default-panel="adApprovalQueue">
+          <button class="admin-tab admin-tab-parent" data-group="adManagement" type="button" aria-expanded="false" data-i18n="master.adManagement">Ad Management</button>
+          <div class="admin-subtabs hidden" id="adManagementSubtabs" role="group" aria-label="Ad Management pages">
+            <button class="admin-subtab" data-panel="adApprovalQueue" type="button" data-i18n="master.adApprovalQueue">Approval queue</button>
+            <button class="admin-subtab" data-panel="adLiveCampaigns" type="button" data-i18n="master.adLiveCampaigns">Live &amp; scheduled</button>
+            <button class="admin-subtab" data-panel="adStatsPanel" type="button" data-i18n="master.adStats">Ad stats</button>
+            <button class="admin-subtab" data-panel="adIntakePanel" type="button" data-i18n="master.adIntake">SMS / WhatsApp intake</button>
+            <button class="admin-subtab" data-panel="adSettingsPanel" type="button" data-i18n="master.adSettings">Settings &amp; billing</button>
+            <button class="admin-subtab" data-panel="adCampaignManagement" type="button" data-i18n="master.adPackagedDemos">Packaged demos</button>
+          </div>
+        </div>
+        <button class="admin-tab" data-panel="translationOverrides" type="button" data-i18n="master.translationOverrides">Translation Overrides</button>
+        <button class="admin-tab" data-panel="promoterNetwork" type="button" data-i18n="master.promoters">Promoters</button>
+        <button class="admin-tab" data-panel="networkReconciliation" type="button" data-i18n="master.reconciliation">Network Reconciliation</button>
+        <button class="admin-tab" data-panel="servicesCommerce" type="button" data-i18n="master.services">Services & Commerce</button>
+        <button class="admin-tab" data-panel="featuresServices" type="button" data-i18n="master.featuresServices">Features & Services</button>
+        <div class="admin-tab-group" data-tab-group="diagnostics">
+          <button class="admin-tab admin-tab-parent" data-group="diagnostics" type="button" aria-expanded="false" data-i18n="master.diagnostics">Diagnostics</button>
+          <div class="admin-subtabs hidden" id="diagnosticsSubtabs" role="group" aria-label="Diagnostics pages">
+            <button class="admin-subtab" data-panel="diagnostics" type="button">Run Diagnostics</button>
+            <button class="admin-subtab" data-panel="diagnosticsManualTests" type="button">Manual Feature Tests</button>
+            <button class="admin-subtab" id="diagnosticsDisplayErrorsTab" data-panel="diagnosticsDisplayErrors" type="button">Display / Xibo Load Errors</button>
+            <button class="admin-subtab" data-panel="appLogging" type="button">Application Logging</button>
+            <button class="admin-subtab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
+            <button class="admin-subtab" data-panel="patronDiagnostics" type="button">Patron Datapoints</button>
+          </div>
+        </div>
+        <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
+        <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
+      </nav>
+
+      <section id="networkDashboard" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Total Locations</span><strong id="netLocations">0</strong></div>
+          <div class="metric-card"><span>Total Users</span><strong id="netUsers">0</strong></div>
+          <div class="metric-card"><span>All Pending ShoutOuts</span><strong id="netPending">0</strong></div>
+          <div class="metric-card"><span>Estimated Network Revenue</span><strong id="netRevenue">$0</strong></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card"><h2>Top Locations</h2><div id="topLocationsReport" class="report-block"></div></div>
+          <div class="card"><h2>Audience Intelligence</h2><div id="networkAudienceReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <div id="entityMgmtSos2faParking" class="hidden" aria-hidden="true">
+        <div id="sos2faGate" class="card sos2fa-gate hidden">
+          <h2
+            class="sos2fa-section-title"
+            data-floqr-help-id="help-sos2fa-entity-mgmt"
+            data-floqr-help-title="Privilege Admin Access"
+            data-floqr-help-search="sos2fa|social os 2fa|privilege admin access|entity management unlock|request sos2fa code|two factor"
+            data-floqr-help-body="Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days."
+          >Privilege Admin Access</h2>
+          <div class="sos2fa-gate-head">
+            <div class="sos2fa-mark" aria-hidden="true">SOS2FA</div>
+            <div>
+              <p class="eyebrow">Social OS - 2FA</p>
+            </div>
+          </div>
+          <div
+            class="queue-actions sos2fa-request-row"
+            data-floqr-help-id="help-sos2fa-request-channels"
+            data-floqr-help-title="Request SOS2FA Code"
+            data-floqr-help-search="sos2fa|notifications settings|general notifications|request sos2fa code"
+            data-floqr-help-body="Request is sent using your general Notifications settings"
+          >
+            <button id="sos2faSendBtn" class="primary" type="button">Request SOS2FA Code</button>
+          </div>
+          <p id="sos2faStatus" class="status" aria-live="polite"></p>
+          <div class="sos2fa-code-row">
+            <label for="sos2faCode">Enter SOS2FA Code:</label>
+            <input id="sos2faCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/>
+          </div>
+          <div id="sos2faActions" class="queue-actions">
+            <button id="sos2faVerifyBtn" type="button">Verify &amp; unlock</button>
+            <button id="sos2faLockBtn" type="button">Lock panel</button>
+          </div>
+          <details class="sos2fa-recovery">
+            <summary>No code arriving? Use recovery code</summary>
+            <div class="sos2fa-code-row">
+              <label for="sos2faRecoveryCode">Recovery code:</label>
+              <input id="sos2faRecoveryCode" type="password" autocomplete="off" spellcheck="false" maxlength="200"/>
+            </div>
+            <div class="queue-actions">
+              <button id="sos2faRecoveryBtn" type="button">Unlock with recovery code</button>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <section id="clubAdminUrls" class="admin-panel-section" data-entity-mgmt-gated="true">
+        <div class="card">
+          <p class="eyebrow">Entity management · URLs</p>
+          <h2
+            data-floqr-help-id="help-venue-links"
+            data-floqr-help-title="Venue Links"
+            data-floqr-help-search="venue links|venue admin portal url|club admin url|admin.html version|hardcoded version"
+            data-floqr-help-body="Venue Admin Portal URLs are generated when you search — they are not stored with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the latest release. Opening Master Admin with an old ?v= bookmark does not freeze these links. Display board URLs stay location-only with no ?v=."
+          >Venue Links</h2>
+          <p class="sub small" data-keep-visible="true">Search a club, then open or copy the <strong>Venue Admin Portal URL</strong> (<code>admin.html</code>) for each venue.</p>
+          <div class="profile-grid club-admin-url-search-row">
+            <label>Search club entity
+              <input id="clubAdminUrlSearch" autocomplete="off" placeholder="Search by club, city, ID, or address"/>
+            </label>
+            <div class="queue-actions club-admin-url-search-actions">
+              <button id="clubAdminUrlManageSearchBtn" class="primary" type="button">Search to manage</button>
+            </div>
+          </div>
+          <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="shoutoutCompletedLog" class="admin-panel-section">
+        <div class="card">
+          <h2
+            data-i18n="master.shoutoutCompletedLog"
+            data-floqr-help-id="help-master-completed-log"
+            data-floqr-help-title="Completed Log"
+            data-floqr-help-body="Network log of submitted, rejected, paid, and completed ShoutOuts for Master Admin review. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Venue list comes from clubLocations — pick a venue or type to filter. Rebuild reconstructs empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata is kept for 7 years. Media is deleted 90 days after completion. The default search window is 60 days — expand dates to search older retained records. Export to CSV downloads the current search results. FloqR does not forever-archive media for compliance."
+            data-floqr-help-search="completed log|completed shoutout log|shoutout compliance|compliance logs|master shoutouts|audit retention|soc 2|iso 27001|nist|venue search|export csv|rebuild compliance">Completed Log</h2>
+          <div class="profile-grid">
+            <label>Event / venue name
+              <input id="soComplianceVenue" list="soComplianceVenueList" placeholder="Type Zebbies, Heist, city, or club id" autocomplete="off"/>
+              <datalist id="soComplianceVenueList"></datalist>
+            </label>
+            <label>Lifecycle
+              <select id="soComplianceStatusFilter">
+                <option value="all">All (submitted + rejected + completed)</option>
+                <option value="submitted">Submitted / pending</option>
+                <option value="rejected">Rejected</option>
+                <option value="completed">Approved / completed</option>
+                <option value="stale">Stale / cleared</option>
+              </select>
+            </label>
+            <label>ShoutOut content<input id="soComplianceContent" placeholder="HAPPY BIRTHDAY, main text, SO-…"/></label>
+            <label>From date<input id="soComplianceFrom" type="date"/></label>
+            <label>To date<input id="soComplianceTo" type="date"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="soComplianceSearchBtn" class="primary" type="button">Search</button>
+            <button id="soComplianceRefreshBtn" type="button">Refresh</button>
+            <button id="soComplianceRebuildBtn" type="button">Rebuild compliance log</button>
+          </div>
+          <p id="soComplianceStatus" class="status"></p>
+          <div id="soComplianceResults" class="report-block"></div>
+          <div class="queue-actions" style="margin-top:1rem">
+            <button id="soComplianceExportCsvBtn" class="primary" type="button" data-i18n="master.shoutoutComplianceExportCsv">Export to CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="twilioComplianceLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioComplianceLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioComplianceLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2
+            data-i18n="master.twilioComplianceLogs"
+            data-floqr-help-id="help-twilio-compliance-logs"
+            data-floqr-help-title="Compliance Logs"
+            data-floqr-help-search="twilio compliance|grc sms|twilioComplianceLogs|compliance logs|dry-run compliance"
+            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs."
+          >Compliance Logs</h2>
+          <p class="sub small">Collection <code>twilioComplianceLogs</code>. Masked destinations; Auth Token never stored.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioComplianceLogsStatusFilter">
+                <option value="">All statuses</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioComplianceLogsSearch" placeholder="club, purpose, error, SID"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="twilioComplianceLogsRefreshBtn" type="button">Refresh</button>
+          </div>
+          <p id="twilioComplianceLogsStatus" class="status"></p>
+          <div id="twilioComplianceLogsList" class="report-block"></div>
+          <div id="twilioComplianceLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="shoutoutRetention" class="admin-panel-section">
+        <div class="card">
+          <h2
+            data-i18n="master.shoutoutRetention"
+            data-floqr-help-id="help-master-shoutout-retention"
+            data-floqr-help-title="Retention"
+            data-floqr-help-body="ShoutOut retention for Master Admin. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Default Completed Log search window: 60 days (expand dates for older retained rows). FloqR does not forever-archive media for compliance. Use Rebuild from ShoutOuts + Audit + Inbox when the Completed Log is empty."
+            data-floqr-help-search="retention|shoutout retention|audit retention|7 years|90 days|media purge|anonymize|completed log retention">Retention</h2>
+          <div class="queue-actions">
+            <button id="soRetentionRefreshBtn" type="button">Refresh policy</button>
+            <button id="soComplianceBackfillBtn" type="button">Rebuild from ShoutOuts + Audit + Inbox</button>
+          </div>
+          <p id="soRetentionStatus" class="status"></p>
+          <div id="soRetentionPolicy" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="securityLogs" class="admin-panel-section">
+        <div class="card">
+          <h2>Security Logs</h2>
+          <p class="sub small">
+            Board access attempts (allow/deny) for venue displays. These are <strong>security logs</strong>, not diagnostics.
+            Retention: <strong>90 days</strong>, then automatic deletion. Export anytime before expiry.
+          </p>
+          <div class="profile-grid">
+            <label>Filter by venue (optional)
+              <input id="securityLogVenueFilter" list="displaySecurityOptions" autocomplete="off" placeholder="All venues, or search Heist / location id…"/>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshDisplayAccessLogsBtn" type="button">Refresh security logs</button>
+            <button id="exportSecurityLogsBtn" class="primary" type="button">Export CSV (90-day window)</button>
+          </div>
+          <p id="displayAccessLogStatus" class="status"></p>
+          <div id="displayAccessLogReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="securitySystemMessages" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Security · not diagnostics</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Security System Messages</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                These are <strong>security</strong> alerts (display IP/token denies), not diagnostic logs.
+                Delete messages here anytime. Access attempt history stays under Security Logs (90-day retention).
+              </div>
+            </details>
+          </h2>
+          <p class="sub small">
+            Alerts when a display page is denied (IP or token). Unread messages blink the nested tab above.
+          </p>
+          <div class="queue-actions">
+            <button id="markSecurityMessagesReadBtn" type="button">Mark visible as read</button>
+            <button id="deleteReadSecurityMessagesBtn" type="button">Delete read messages</button>
+            <button id="refreshSecurityMessagesBtn" type="button">Refresh</button>
+          </div>
+          <p class="sub small">Messages are deletable. Security <em>logs</em> (access attempts) are not deleted here — they auto-purge after 90 days and remain exportable until then.</p>
+          <p id="securitySystemMessagesStatus" class="status"></p>
+          <div id="masterSystemMessages" class="report-block master-system-messages">No security system messages yet.</div>
+        </div>
+      </section>
+
+      <section id="dataClassification" class="admin-panel-section">
+        <!-- Design notes: .cursor/rules/design-notes-data-classification.mdc -->
+        <div class="card">
+          <p class="eyebrow">Security</p>
+          <h2
+            data-floqr-help-id="help-data-classification"
+            data-floqr-help-title="Data classification"
+            data-floqr-help-search="data classification|classify data|who can read|data access|personal data|pii|retention|exposure report|system access"
+            data-floqr-help-body="Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release."
+          ><span data-i18n="dataClass.title">Data classification</span></h2>
+          <div class="report-block">
+            <strong data-i18n="dataClass.purposeTitle">What to do on this screen</strong>
+            <ol class="sub small" style="margin:6px 0 0 1.2em;padding:0">
+              <li data-i18n="dataClass.purpose1">Each row is one type of FLOQR data. The ticks say who may read it.</li>
+              <li data-i18n="dataClass.purpose2">Check the rows marked Needs review first. Each one has a recommendation underneath.</li>
+              <li data-i18n="dataClass.purpose3">Change ticks where you disagree, write a reason, then press Save all classifications once.</li>
+              <li data-i18n="dataClass.purpose4">The saved register is what FloqAi and the exposure report use. Rows never saved use FLOQR's packaged defaults.</li>
+            </ol>
+          </div>
+          <p class="sub small" data-i18n="dataClass.intro">Each row is a Firestore collection. Tick who may read it. Higher tiers include lower ones, and Master Admins can read anything anyone else can. Turn every switch off to make a collection Secret.</p>
+          <p class="sub small" data-i18n="dataClass.systemNote">System is the FLOQR server. It can read every collection, but only from server code, for a stated job, and it never gives a person more than their own tier allows. It cannot be switched off here.</p>
+          <p class="sub small" data-i18n="dataClass.auditNote">Every change needs SOS2FA and a reason, and is written to the tamper-evident audit trail on Features &amp; Services.</p>
+          <p id="dataClassSummary" class="sub small" aria-live="polite"></p>
+          <p id="dataClassStatus" class="status" aria-live="polite"></p>
+          <label><span data-i18n="dataClass.reason">Reason for change (required, 8+ characters)</span>
+            <input id="dataClassReason" type="text" maxlength="500" autocomplete="off"/>
+          </label>
+          <div class="queue-actions" style="margin-top:8px">
+            <button type="button" id="dataClassSaveAllBtn" class="primary" data-i18n="dataClass.saveAll">Save all classifications</button>
+          </div>
+          <div class="profile-grid" style="align-items:end;margin-top:8px">
+            <label><span data-i18n="dataClass.filter">Filter collections</span>
+              <input id="dataClassFilter" type="search" autocomplete="off"/>
+            </label>
+            <label class="toggle-inline"><input id="dataClassOnlyReview" type="checkbox"/> <span data-i18n="dataClass.onlyReview">Show only rows that need review</span></label>
+            <div class="queue-actions">
+              <button type="button" id="dataClassReloadBtn" data-i18n="dataClass.reload">Reload</button>
+              <button type="button" id="dataClassExportBtn" data-i18n="dataClass.exportCsv">Export CSV</button>
+            </div>
+          </div>
+          <div class="report-block" style="overflow:auto;margin-top:12px">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align:left" data-i18n="dataClass.colCollection">Collection</th>
+                  <th scope="col" data-i18n="dataClass.colStatus">Status</th>
+                  <th scope="col" data-i18n="dataClass.colLevel">Level</th>
+                  <th scope="col"><span data-i18n="dataClass.colPublic">Public</span><br/><small>isPublicAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colPatron">Patron</span><br/><small>isPatronAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colRegular">Regular employee</span><br/><small>isRegularEmployeeAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colPrivileged">Privileged employee</span><br/><small>isPrivilegedEmployeeAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colClubAdmin">Club Admin</span><br/><small>isClubAdminAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colMaster">Master Admin</span><br/><small>isMasterAdminAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colSystem">System</span><br/><small>isSystemAccessible</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colOwn">Own record</span><br/><small>ownRecordReadable</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colPii">Personal data</span><br/><small>containsPII</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colRetention">Delete after (days)</span><br/><small data-i18n="dataClass.retentionHint">0 = no limit. Recorded only; nothing is deleted automatically yet.</small></th>
+                  <th scope="col" data-i18n="dataClass.colRules">Rules today (read / write)</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody id="dataClassRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-i18n="dataClass.fieldsTitle">Sensitive fields</h2>
+          <p class="sub small" data-i18n="dataClass.fieldsIntro">These fields are stricter than the rest of their collection. They change only with a release.</p>
+          <div class="report-block" style="overflow:auto">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <tbody id="dataClassFieldRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-i18n="dataClass.simTitle">Who can read what</h2>
+          <p class="sub small" data-i18n="dataClass.simIntro">Pick a role to see what it may read.</p>
+          <div class="profile-grid" style="align-items:end">
+            <label><span data-i18n="dataClass.simRole">Role</span>
+              <select id="dataClassSimRole"></select>
+            </label>
+            <label class="toggle-inline"><input id="dataClassSimSameClub" type="checkbox" checked/> <span data-i18n="dataClass.simSameClub">Record belongs to their club</span></label>
+            <label class="toggle-inline"><input id="dataClassSimOwn" type="checkbox"/> <span data-i18n="dataClass.simOwn">Reading their own record</span></label>
+          </div>
+          <div class="report-block" style="overflow:auto;margin-top:8px">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <tbody id="dataClassSimRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-i18n="dataClass.exposureTitle">Exposure report</h2>
+          <p class="sub small" data-i18n="dataClass.exposureIntro">Compares this register with the live security rules and lists collections that more people can read or write than the register allows.</p>
+          <div class="queue-actions"><button type="button" id="dataClassExposureBtn" data-i18n="dataClass.exposureRun">Run exposure report</button></div>
+          <p id="dataClassExposureStatus" class="status" aria-live="polite"></p>
+          <h3 data-i18n="dataClass.fixTitle">What needs fixing</h3>
+          <p class="sub small" data-i18n="dataClass.fixIntro">These are gaps between this register and the live security rules. They are fixed in code releases, not on this screen.</p>
+          <div id="dataClassFixList"></div>
+          <h3 data-i18n="dataClass.phasesTitle">Still to do (needs your go-ahead)</h3>
+          <ul class="sub small" style="margin:6px 0 0 1.2em;padding:0">
+            <li data-i18n="dataClass.phase.pii">Move email and phone out of the open patron records (dry run first; nothing changes without your approval).</li>
+            <li data-i18n="dataClass.phase.appCheck">Turn on App Check enforcement so only the real FLOQR app can call the server.</li>
+            <li data-i18n="dataClass.phase.rules">Generate the security rules from this register so they cannot drift apart again.</li>
+            <li data-i18n="dataClass.phase.retention">Delete records automatically after the number of days set in Delete after.</li>
+          </ul>
+          <div class="report-block" style="overflow:auto">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <tbody id="dataClassExposureRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="displaySecurity" class="admin-panel-section">
+        <div class="card display-security-card">
+          <h2 class="help-label">
+            <span class="help-label-text">Display Security Setting</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
+                Token URLs are for Xibo only. Access attempts appear under <strong>Security → Security Logs</strong>.
+              </div>
+            </details>
+          </h2>
+          <p class="sub small" data-keep-visible="true">
+            Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
+            Token URLs are for Xibo only — generate them in the section below. Access attempts appear under <strong>Security → Security Logs</strong>.
+            If Xibo cannot load a board page, use a fallback Webpage pointing at <code>display-error.html</code>
+            (copy the URL under <strong>Diagnostics → Display / Xibo Load Errors</strong>). That is a load failure, not an access deny.
+          </p>
+          <div class="profile-grid">
+            <label>
+              <span class="help-label">
+                <span class="help-label-text">Venue</span>
+                <details class="help-popout inline-help-popout">
+                  <summary>?</summary>
+                  <div>Search by club name, city, or location id, then click <strong>Load venue</strong> to pull IP allowlist, lock flags, tokens, and access logs for that venue.</div>
+                </details>
+              </span>
+              <input id="displaySecuritySearch" list="displaySecurityOptions" autocomplete="off" placeholder="Search Heist, Zebbies, location id…"/>
+              <datalist id="displaySecurityOptions"></datalist>
+            </label>
+            <label>Selected venue ID<input id="displaySecurityLocationId" readonly placeholder="heist-washington-dc"/></label>
+          </div>
+          <div class="queue-actions display-security-load-row">
+            <button id="loadDisplaySecurityBtn" type="button">Load venue</button>
+          </div>
+          <div class="display-security-current-status" aria-live="polite">
+            <p class="eyebrow">Current Status</p>
+            <div id="displaySecurityPreview" class="display-security-status-grid">
+              <p class="sub small">Load a venue to show IP restriction, token lock, and allowlist count.</p>
+            </div>
+            <p id="displaySecurityStatus" class="status"></p>
+          </div>
+          <label class="display-security-check">
+            <input id="displaySecurityRestrict" type="checkbox"/>
+            <span class="help-label">
+              <span class="help-label-text">Enable IP restriction (IPv4 + IPv6 allowlist)</span>
+              <details class="help-popout inline-help-popout">
+                <summary>?</summary>
+                <div>
+                  When ON, only allowlisted public IPs may open the idle or live board.
+                  Supports IPv4, IPv6, trailing <code>*</code>, IPv4 <code>/24</code>, and IPv6 <code>/64</code>.
+                  Client <code>?ip=</code> cannot bypass the allowlist.
+                </div>
+              </details>
+            </span>
+          </label>
+          <label class="display-security-check">
+            <input id="displaySecurityTokenRequired" type="checkbox" checked/>
+            <span class="help-label">
+              <span class="help-label-text">Lock display pages — require <code>?k=</code> token for idle and live (recommended)</span>
+              <details class="help-popout inline-help-popout">
+                <summary>?</summary>
+                <div>
+                  Independent of IP restriction. When ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
+                  Uncheck to test IP-only blocking. Uncheck only for temporary open testing.
+                </div>
+              </details>
+            </span>
+          </label>
+          <div class="display-security-ips-head">
+            <label class="display-security-ips-label" for="displaySecurityIps">Approved display IPs (one per line)</label>
+            <button id="saveDisplaySecurityBtn" class="primary" type="button">Save security settings</button>
+          </div>
+          <textarea id="displaySecurityIps" rows="6" placeholder="69.243.87.16&#10;2601:14d:8700:2fc0::/64&#10;198.51.100.0/24"></textarea>
+          <div class="queue-actions display-security-ip-tools">
+            <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
+            <button id="importIpsFromDisplayLogBtn" type="button">Add IPs from access log</button>
+          </div>
+          <p class="sub small">
+            Xibo often appears as IPv6 in the access log — paste the exact address, or prefer a stable
+            <code>/64</code> prefix so rotating host IPv6 still matches.
+          </p>
+          <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
+          <div class="queue-actions display-security-bottom-actions">
+            <button id="loadDisplaySecurityBtnBottom" type="button">Load venue</button>
+            <button id="saveDisplaySecurityBtnBottom" class="primary" type="button">Save security settings</button>
+          </div>
+        </div>
+        <div class="card">
+          <!-- Feature: Xibo board tokens (?k=) — obfuscated in portal; full value only on onboarding/rotate reveal -->
+          <h2>Display board tokens (Xibo URLs)</h2>
+          <p class="sub small">
+            One secret per board (Display 1 = ShoutOut, Display 2 = supRstar). Tokens are created at club onboarding and shown <strong>once</strong> there for Xibo.
+            This Security portal shows <strong>obfuscated</strong> values only. Use <em>Generate / rotate</em> to issue a new one-time full URL, then paste it into the Xibo Webpage widget.
+            Do not publish token URLs on Venue Links. Do not add <code>?v=</code>.
+          </p>
+          <div class="queue-actions">
+            <button id="reissueBothDisplayTokensBtn" class="primary" type="button">Re-issue BOTH Display tokens (one-time reveal)</button>
+            <button id="rotatePrimaryDisplayTokenBtn" type="button">Generate / rotate Display 1 token</button>
+            <button id="rotateSecondaryDisplayTokenBtn" type="button">Generate / rotate Display 2 token</button>
+            <button id="clearPrimaryDisplayTokenBtn" type="button">Clear Display 1 token</button>
+            <button id="clearSecondaryDisplayTokenBtn" type="button">Clear Display 2 token</button>
+          </div>
+          <p id="displayTokenStatus" class="status"></p>
+          <div id="displayTokenReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="entityManagement" class="admin-panel-section" data-entity-mgmt-gated="true">
+        <div id="entityManageSecureBody" class="hidden">
+        <div class="card">
+          <p class="eyebrow">Entity management · search</p>
+          <h2>Search to manage</h2>
+          <p class="sub small">Search venues, events, and patrons/entities. Enable or disable application access, set per-venue feature gates, or offboard an entity so its public profile and datapoints leave the WebApp. Results stay empty until you search.</p>
+          <div class="profile-grid">
+            <label>Search<input id="entityManageSearch" autocomplete="off" placeholder="Club, event, patron, city, email, or id"/></label>
+            <label>Type
+              <select id="entityManageTypeFilter">
+                <option value="all">All</option>
+                <option value="club">Clubs / venues</option>
+                <option value="event">Events</option>
+                <option value="user">Patrons / entities</option>
+              </select>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="entityManageRefreshBtn" type="button">Refresh catalog</button>
+            <button id="sos2faRelockBtn" type="button">Lock with SOS2FA</button>
+          </div>
+          <div class="entity-onboarding-grid">
+            <div><h3>Results</h3><div id="entityManageResults" class="report-block"></div></div>
+            <div><h3>Manage selected</h3><div id="entityManageDetail" class="report-block"></div></div>
+          </div>
+          <p id="entityManageStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Global patron feature gates</h2>
+          <p class="sub small">Manually enable/disable features for all patrons. Super Admin remains exempt.</p>
+          <div id="globalPatronGatesForm" class="privacy-datapoint-grid"></div>
+          <button id="saveGlobalPatronGatesBtn" class="primary" type="button">Save Global Patron Gates</button>
+        </div>
+        </div>
+      </section>
+
+      <section id="clubOnboarding" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Entity management · onboarding</p>
+          <h2>Entity Onboarding and Club Admin Assignment</h2>
+          <p class="sub small">Search or choose an imported/discovered club, then select a completed patron who explicitly elected an eligible service role: waiter/waitress, bottle service, promoter, DJ, bartender/barman, or videographer/camera operator.</p>
+          <div class="profile-grid">
+            <label>Select club entity<input id="entityClubSearch" list="entityClubOptions" autocomplete="off" placeholder="Search by club, city, ID, or address"/><datalist id="entityClubOptions"></datalist></label>
+            <label>Eligible service patron<input id="entityPatronSearch" list="entityPatronOptions" autocomplete="off" placeholder="Search elected service members only"/><datalist id="entityPatronOptions"></datalist></label>
+          </div>
+          <div class="entity-onboarding-grid">
+            <div><h3>1. Select an entity</h3><div id="entityClubResults" class="report-block"></div></div>
+            <div><h3>2. Select an eligible service patron</h3><div id="entityPatronResults" class="report-block"></div></div>
+          </div>
+          <div id="entityAssignmentSummary" class="report-block"></div>
+          <button id="assignEntityClubAdminBtn" class="primary" type="button" disabled>Assign Selected Patron as Club Admin</button>
+          <p id="entityOnboardingStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Club Onboarding</h2>
+          <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team. Creating a club also generates Display 1 + Display 2 Xibo tokens and shows them <strong>once</strong> in the result — paste into Xibo before leaving this page (afterwards only obfuscated tokens appear under Display Security).</p>
+          <div class="profile-grid">
+            <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
+            <label>Street address<input id="clubOnboardStreetAddress" autocomplete="address-line1" placeholder="1411 K St NW" required/></label>
+            <label>City<input id="clubOnboardCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>State / region<input id="clubOnboardRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
+            <label>Postal code<input id="clubOnboardPostalCode" autocomplete="postal-code" placeholder="20005"/></label>
+            <label>Country<input id="clubOnboardCountry" autocomplete="country-name" value="United States" required/></label>
+            <label><span class="field-icon">TEL</span> Telephone #<input id="clubOnboardPhone" placeholder="+1 202 789 2800"/></label>
+            <label><span class="field-icon">WEB</span> Website<input id="clubOnboardWebsite" placeholder="https://example.com"/></label>
+            <label><span class="field-icon">MAIL</span> Customer Email<input id="clubOnboardEmail" placeholder="info@example.com"/></label>
+            <label><span class="field-icon">IG</span> Instagram<input id="clubOnboardInstagram" placeholder="@club"/></label>
+            <label><span class="field-icon">FB</span> Facebook<input id="clubOnboardFacebook" placeholder="facebook.com/club"/></label>
+            <label><span class="field-icon">X</span> X<input id="clubOnboardX" placeholder="@club"/></label>
+            <label><span class="field-icon">TT</span> TikTok<input id="clubOnboardTiktok" placeholder="@club"/></label>
+            <label>Music Genres<input id="clubOnboardGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+          </div>
+          <fieldset id="clubOnboardDisplayTypeSetup" class="screen-format-fieldset">
+            <legend>Display type setup</legend>
+            <p class="sub small">Select every P1.56 panel installed at this venue (only three sizes), then choose the primary board for display.html.</p>
+            <div class="privacy-datapoint-grid">
+              <label><input data-onboard-screen-format="led-96x48" type="checkbox" checked/> P1.56 — VenueSupports96x48 (96 × 48 cm)</label>
+              <label><input data-onboard-screen-format="led-64x48" type="checkbox"/> P1.56 — VenueSupports64x48 (64 × 48 cm)</label>
+              <label><input data-onboard-screen-format="led-64x32" type="checkbox"/> P1.56 — VenueSupports64x32 (64 × 32 cm)</label>
+            </div>
+            <label>Primary display type
+              <select id="clubOnboardPrimaryDisplayFormat">
+                <option value="led-96x48">P1.56 — 96 × 48 cm</option>
+                <option value="led-64x48">P1.56 — 64 × 48 cm</option>
+                <option value="led-64x32">P1.56 — 64 × 32 cm</option>
+              </select>
+            </label>
+            <p class="sub small">Classic board templates keep the bottom rail <strong>PRESENTED BY FLOQR ShoutOut</strong> when no patron attribution is supplied.</p>
+          </fieldset>
+          <button id="createClubOnboardingBtn" class="primary" type="button">Create Club Venue</button>
+          <p id="clubOnboardingStatus" class="status"></p>
+          <div id="clubOnboardingPreview" class="report-block"></div>
+        </div>
+        <div id="clubDisplayTypeSetup" class="card">
+          <h2>Club Settings — Display type setup</h2>
+          <p class="sub small">Configure an existing club’s P1.56 boards (only three sizes). Example: Heist DC → primary <strong>64 × 32 cm</strong>. Saved to <code>clubLocations</code> and honored by <code>display.html?location=...</code>.</p>
+          <div class="profile-grid">
+            <label>Club location<input id="clubDisplaySetupSearch" list="clubDisplaySetupOptions" autocomplete="off" placeholder="Search Heist, Zebbies, location id…"/><datalist id="clubDisplaySetupOptions"></datalist></label>
+            <label>Selected club ID<input id="clubDisplaySetupLocationId" readonly placeholder="heist-washington-dc"/></label>
+          </div>
+          <fieldset class="screen-format-fieldset">
+            <legend>Installed display types</legend>
+            <div class="privacy-datapoint-grid">
+              <label><input data-club-settings-screen-format="led-96x48" type="checkbox"/> P1.56 — VenueSupports96x48 (96 × 48 cm)</label>
+              <label><input data-club-settings-screen-format="led-64x48" type="checkbox"/> P1.56 — VenueSupports64x48 (64 × 48 cm)</label>
+              <label><input data-club-settings-screen-format="led-64x32" type="checkbox"/> P1.56 — VenueSupports64x32 (64 × 32 cm)</label>
+            </div>
+            <label>Primary display type
+              <select id="clubDisplaySetupPrimaryFormat">
+                <option value="led-96x48">P1.56 — 96 × 48 cm</option>
+                <option value="led-64x48">P1.56 — 64 × 48 cm</option>
+                <option value="led-64x32">P1.56 — 64 × 32 cm</option>
+              </select>
+            </label>
+            <label>Display footer brand fallback<input id="clubDisplaySetupFooterBrand" value="FLOQR ShoutOut" placeholder="FLOQR ShoutOut"/></label>
+          </fieldset>
+          <div class="queue-actions">
+            <button id="loadClubDisplaySetupBtn" type="button">Load Club Display Settings</button>
+            <button id="applyHeist64x32PresetBtn" type="button">Apply Heist 64×32 LED preset</button>
+            <button id="saveClubDisplaySetupBtn" class="primary" type="button">Save Display Type Setup</button>
+          </div>
+          <p id="clubDisplaySetupStatus" class="status"></p>
+          <div id="clubDisplaySetupPreview" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Bulk Club CSV Onboarding</h2>
+          <p class="sub small">CSV headers: Club Name, Full Address, Telephone #, Website, Customer Email, Instagram, Facebook, X, Tic Tok, Music Genres.</p>
+          <label>CSV file<input id="clubOnboardingCsvFile" type="file" accept=".csv,text/csv"/></label>
+          <div class="queue-actions">
+            <button id="previewClubOnboardingCsvBtn" type="button">Preview CSV</button>
+            <button id="importClubOnboardingCsvBtn" class="primary" type="button">Import Previewed Clubs</button>
+          </div>
+          <div id="clubOnboardingCsvReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promoter Onboarding</h2>
+          <p class="sub small">Promoters must be patrons before they can be assigned to a club. A promoter can be independent or connected to a promotion company.</p>
+          <div class="profile-grid">
+            <label>Promoter Display Name<input id="promoterOnboardName" placeholder="Promoter name"/></label>
+            <label>Patron Email / Username<input id="promoterOnboardIdentity" placeholder="patron@example.com or @username"/></label>
+            <label>Promotion Company<input id="promoterOnboardCompany" placeholder="Company name, or leave blank"/></label>
+            <label>Affiliated Club Location ID<input id="promoterOnboardClubId" placeholder="lima-twist-washington-dc"/></label>
+          </div>
+          <label><input id="promoterOnboardIndependent" type="checkbox"/> Independent promoter</label>
+          <button id="createPromoterOnboardingBtn" class="primary" type="button">Create Promoter Onboarding Record</button>
+          <div id="promoterOnboardingReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="templateManagement" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Entity management · templates</p>
+          <h2>ShoutOut Template Management</h2>
+          <p class="sub small">Create or edit official template metadata, tags, media support, character limits, and compatible screen formats. Deactivated templates are hidden from patrons without deleting historical ShoutOut records.</p>
+          <div class="profile-grid">
+            <label>Template ID<input id="templateManageId" placeholder="birthday-wide"/></label>
+            <label>Template name<input id="templateManageName" placeholder="Birthday Wide"/></label>
+            <label>Visual class<select id="templateManageClass"><option value="neon">Neon</option><option value="gold">Gold</option><option value="ice">Ice</option><option value="fire">Fire</option><option value="classic-bw">Black & White</option><option value="celebration-media">Split Media</option></select></label>
+            <label>Category<input id="templateManageCategory" placeholder="Milestone"/></label>
+            <label>Tags<input id="templateManageTags" placeholder="birthday, celebration, photo"/></label>
+            <label>Main message total limit<input id="templateManageMainLimit" type="number" min="1" value="45"/></label>
+            <label>Maximum main-message lines<input id="templateManageLineCount" type="number" min="1" max="8" value="3"/></label>
+            <label>Characters per main-message line<input id="templateManageLineLimit" type="number" min="1" value="15"/></label>
+            <label>Subtext / attribution limit<input id="templateManageSubLimit" type="number" min="0" value="60"/></label>
+            <label>Main text size (% of display height)<input id="templateManageMainTextSize" type="number" min="4" max="40" step="0.1" value="20.8"/></label>
+            <label>Subtext size (% of display height)<input id="templateManageSubTextSize" type="number" min="2" max="20" step="0.1" value="7.8"/></label>
+            <label>Preview main text<input id="templateManagePreviewMain" value="SHOUTOUT" placeholder="SHOUTOUT"/></label>
+            <label>Price (USD)
+              <input id="templateManagePrice" type="number" min="0" step="0.01" value="0" placeholder="0.00"
+                data-floqr-help-id="help-template-price"
+                data-floqr-help-title="Template price"
+                data-floqr-help-search="template price|jersey cost|paid shoutout|soccer jersey price"
+                data-floqr-help-body="Master Admin sets the patron checkout price for this template. Soccer / sports jerseys are paid ShoutOuts (default $30). Checkout charges whatever you save here. $0 means the template is free."/>
+            </label>
+          </div>
+          <div class="privacy-datapoint-grid">
+            <label><input id="templateManageSupportsMedia" type="checkbox"/> Supports image/video</label>
+            <label><input id="templateManageBackgroundEditable" type="checkbox" checked/> Background can be customized (required for published templates)</label>
+            <label><input data-template-screen-format="led-96x48" type="checkbox" checked/> Is96x48 — P1.56 96 × 48 cm</label>
+            <label><input data-template-screen-format="led-64x48" type="checkbox" checked/> Is64x48 — P1.56 64 × 48 cm</label>
+            <label><input data-template-screen-format="led-64x32" type="checkbox" checked/> Is64x32 — P1.56 64 × 32 cm</label>
+          </div>
+          <label>Description<textarea id="templateManageDescription" rows="3"></textarea></label>
+          <div class="queue-actions"><button id="previewManagedTemplateBtn" type="button">Preview Template</button><button id="saveManagedTemplateBtn" class="primary" type="button">Save Template</button><button id="clearManagedTemplateBtn" type="button">Clear Form</button></div>
+          <p id="templateManagementStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Available Templates</h2>
+          <label>Search templates<input id="templateManagementSearch" placeholder="Name, ID, tag, screen size, category"/></label>
+          <div id="templateManagementList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="recommendationModeration" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Unapproved</span><strong id="recommendationPendingCount">0</strong></div>
+          <div class="metric-card"><span>Approved</span><strong id="recommendationApprovedCount">0</strong></div>
+          <div class="metric-card"><span>Rejected</span><strong id="recommendationRejectedCount">0</strong></div>
+          <div class="metric-card"><span>Original / Non-Lyrical</span><strong id="recommendationRightsCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Entity management · recommendations</p>
+          <h2>ShoutOut Recommendation Approval Queue</h2>
+          <p class="sub small">Recommendations remain invisible to patrons until a Master Admin approves them. Music may supply creative direction, but stored wording must be original and must not reproduce song lyrics.</p>
+          <div class="profile-grid">
+            <label>Review status
+              <select id="recommendationStatusFilter">
+                <option value="pending">Unapproved</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Search recommendations<input id="recommendationModerationSearch" placeholder="Artist, track, genre, tone, or message"/></label>
+          </div>
+          <p id="recommendationModerationStatus" class="status">Loading recommendation queue...</p>
+          <div id="recommendationModerationList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="demoEmployees" class="admin-panel-section" data-entity-mgmt-gated="true">
+        <!-- Design notes: .cursor/rules/design-notes-demo-signin.mdc -->
+        <div class="card">
+          <p class="eyebrow">Entity management · demo employees</p>
+          <h2
+            data-floqr-help-id="help-master-demo-signin"
+            data-floqr-help-title="Demo sign-in code"
+            data-floqr-help-search="demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
+            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here."
+          >Demo Svc / Emp Mgmt</h2>
+          <p id="demoEmpStatus" class="status" aria-live="polite"></p>
+          <div class="demo-emp-search-row">
+            <label>Search demo employees
+              <input id="demoEmpSearch" type="search" autocomplete="off" placeholder="Name, email, role, or club"/>
+            </label>
+            <label>Select demo employee
+              <select id="demoEmpSelect"></select>
+            </label>
+            <button id="demoEmpGenerateSelectedBtn" class="primary" type="button">Generate code</button>
+          </div>
+          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo employees. Click a row to select it.</p>
+          <div id="demoEmpList" class="demo-emp-list"></div>
+        </div>
+
+        <div class="card">
+          <h3>Not in the list?</h3>
+          <p class="sub small">Pick the role and demo club number. The account is created the first time it signs in.</p>
+          <div class="demo-emp-search-row">
+            <label>Role<select id="demoEmpRole"></select></label>
+            <label>Demo club<select id="demoEmpNumber"></select></label>
+            <button id="demoEmpManualGenerateBtn" type="button">Generate code</button>
+          </div>
+          <p class="sub small">Signs in as <span id="demoEmpManualEmail" class="demo-emp-email"></span></p>
+        </div>
+
+        <div id="demoEmpResult" class="card hidden" aria-live="polite">
+          <h3>Sign-in code for <span id="demoEmpResultEmail" class="demo-emp-email"></span></h3>
+          <div id="demoEmpCode" class="demo-emp-code"></div>
+          <p id="demoEmpCountdown" class="demo-emp-countdown"></p>
+          <div class="queue-actions">
+            <button id="demoEmpCopyCodeBtn" type="button">Copy code</button>
+            <button id="demoEmpCopyEmailBtn" type="button">Copy email</button>
+            <button id="demoEmpHideBtn" type="button">Hide code</button>
+          </div>
+          <ol class="demo-emp-steps">
+            <li>Open a private (incognito) window so you stay signed in here.</li>
+            <li>Go to <span id="demoEmpSearchUrl" class="demo-emp-url"></span></li>
+            <li>Press <strong>Continue with your own Email</strong> and type the demo email.</li>
+            <li>Press <strong>I already have a code</strong> (do not press Send), enter the code, then <strong>Verify and Continue</strong>.</li>
+          </ol>
+          <p class="sub small">The code works once, for 10 minutes, and only for this demo account. Generating a new code replaces it.</p>
+        </div>
+
+        <div class="card">
+          <h3>Recent codes issued</h3>
+          <p class="sub small">Who issued a code, for which demo account, and when. Codes are never stored or shown here.</p>
+          <div id="demoEmpRecent" class="report-block"></div>
+          <div class="queue-actions">
+            <button id="demoEmpReloadBtn" type="button">Reload</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="servicesCommerce" class="admin-panel-section">
+        <div class="metric-grid"><div class="metric-card"><span>Paid Services</span><strong id="serviceOrderCount">0</strong></div><div class="metric-card"><span>Gross Revenue</span><strong id="serviceGrossRevenue">$0</strong></div><div class="metric-card"><span>FloqR Share</span><strong id="serviceFloqrShare">$0</strong></div><div class="metric-card"><span>Seller / Club Payable</span><strong id="serviceEntityPayable">$0</strong></div></div>
+        <div class="card"><h2>Service Orders, Invoices & Shipping</h2><p class="sub small">Track ShoutOuts, targeted distribution, SMS services, and Commerce orders through payment and fulfillment.</p><div id="serviceOrdersReport" class="report-block"></div></div>
+        <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
+      </section>
+
+      <section id="twilioSmsLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioSmsLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioSmsLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2
+            data-i18n="master.twilioSmsLogs"
+            data-floqr-help-id="help-twilio-logging"
+            data-floqr-help-title="SMS Logs"
+            data-floqr-help-search="twilioSmsLogs|sms logs|sms log|marketing sms|twilio dry-run"
+            data-floqr-help-body="Outbound Twilio SMS for the whole network (club alerts, marketing tests, schedule notify). Dry-run means secrets or From were missing — nothing delivered. Club-originated campaigns also appear under that club’s Advertising → Messaging logs. GRC security rows are under Twilio → Compliance Logs. SendGrid email is under Twilio → SendGrid Mail Logs."
+          >SMS Logs</h2>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioSmsLogsStatusFilter">
+                <option value="">All</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+                <option value="invalid-to">invalid-to</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioSmsLogsSearch" placeholder="club, to, purpose, SID, error"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioSmsLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioSmsLogsStatus" class="status"></p>
+          <div id="twilioSmsLogsList" class="report-block"></div>
+          <div id="twilioSmsLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="twilioWhatsAppLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioWhatsAppLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioWhatsAppLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2 data-i18n="master.twilioWhatsAppLogs">WhatsApp Logs</h2>
+          <p class="sub small">Outbound WhatsApp via Twilio. Club campaigns show here and under that venue’s Club Admin logs.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioWhatsAppLogsStatusFilter">
+                <option value="">All</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioWhatsAppLogsSearch" placeholder="club, to, purpose, SID, error"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioWhatsAppLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioWhatsAppLogsStatus" class="status"></p>
+          <div id="twilioWhatsAppLogsList" class="report-block"></div>
+          <div id="twilioWhatsAppLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="twilioFeatureLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioFeatureLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioFeatureLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2 data-i18n="master.twilioFeatureLogs">Feature Logs</h2>
+          <p class="sub small">Debugger webhook and other non-SMS/WhatsApp Twilio features.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioFeatureLogsStatusFilter">
+                <option value="">All</option>
+                <option value="error">error</option>
+                <option value="warning">warning</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioFeatureLogsSearch" placeholder="error, SID, purpose"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioFeatureLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioFeatureLogsStatus" class="status"></p>
+          <div id="twilioFeatureLogsList" class="report-block"></div>
+          <div id="twilioFeatureLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="appLogging" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible Logs</span><strong id="appLogCount">0</strong></div>
+          <div class="metric-card"><span>Errors in View</span><strong id="appLogErrorCount">0</strong></div>
+          <div class="metric-card"><span>Unpaid Checkouts</span><strong id="unpaidCheckoutCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Diagnostics · application logs</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Application Logging</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>Operational <code>appLogs</code> (auth, checkout, media). Not security access logs. Auto-deletes after 30 days. Board denials are under <strong>Security</strong>.</div>
+            </details>
+          </h2>
+          <p class="sub small">
+            Operational / diagnostic application logs (<code>appLogs</code>). These are <strong>not</strong> security access logs.
+            Diagnostic logs auto-delete after <strong>30 days</strong>. Board deny alerts live under <strong>Security → Security System Messages</strong>.
+          </p>
+          <p class="sub small">Client and Cloud Functions write operational events here: auth, ShoutOut submit, Stripe checkout, Connect readiness, media uploads, and cancellations. Use this when a patron reports a failed paid ShoutOut.</p>
+          <div class="profile-grid">
+            <label>Level
+              <select id="appLogLevelFilter">
+                <option value="">All levels</option>
+                <option value="error">error</option>
+                <option value="warn">warn</option>
+                <option value="info">info</option>
+                <option value="debug">debug</option>
+              </select>
+            </label>
+            <label>Category contains<input id="appLogCategoryFilter" placeholder="checkout, stripe, shoutout, auth"/></label>
+            <label>Search<input id="appLogSearch" placeholder="message, email, correlation id"/></label>
+          </div>
+          <div class="button-row">
+            <button id="appLogRefreshBtn" type="button">Refresh Logs</button>
+            <button id="checkZebbiesConnectBtn" type="button">Check optional club Connect</button>
+            <button id="clearUnpaidCheckoutsBtn" class="ghost" type="button">Clear All Unpaid Checkouts</button>
+            <button id="purgeTestPaymentsLoggingBtn" class="ghost" type="button">Delete Stripe test payments</button>
+          </div>
+          <p id="appLoggingStatus" class="status">Open this tab while signed in as Master Admin.</p>
+          <div id="zebbiesConnectReadiness" class="report-block"></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Recent Log Events</h2>
+            <div id="appLogList" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Unpaid / Stuck Stripe Checkouts</h2>
+            <p class="sub small">Cancels open Stripe Checkout sessions when possible and marks FLOQR service orders as checkout-cancelled.</p>
+            <div id="unpaidCheckoutList" class="report-block"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="allQueues" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Entity management · queues</p>
+          <h2>All Pending ShoutOut Queues</h2>
+          <p class="sub small">Super Admins see every location's pending queue. Purge removes all pending ShoutOuts; paid items are refunded via Stripe before removal.</p>
+          <div class="queue-actions">
+            <button id="refreshAllQueuesBtn" type="button">Refresh queues</button>
+            <button id="purgePendingShoutoutQueuesBtn" class="danger" type="button">Purge all pending ShoutOuts</button>
+          </div>
+          <p id="allQueueStatus" class="status"></p>
+          <div id="allQueueList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="allReports" class="admin-panel-section">
+        <p class="eyebrow" style="margin:0 0 12px">Reports · network</p>
+        <div class="admin-grid">
+          <div class="card"><h2>Music Demand</h2><div id="networkMusicReport" class="report-block"></div></div>
+          <div class="card"><h2>Events / Ticketing</h2><div id="networkEventReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="templateCatalogReport" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Reports · templates</p>
+          <h2
+            data-floqr-help-id="help-template-catalog-report"
+            data-floqr-help-title="Template catalog report"
+            data-floqr-help-search="template catalog|template types|Is96x48|display sizes|which templates"
+            data-floqr-help-body="Network view of every ShoutOut template type and LED size flags (Is96x48, Is64x48, Is64x32). Split-media (birthday, anniversary, engagement, fiance) is 1 on 96×48 and 64×48 and 0 on 64×32. A club only offers a template when those flags overlap VenueSupports* on clubLocations."
+          >Template catalog</h2>
+          <p class="sub small" data-keep-visible="true">Packaged catalog plus Firestore <code>templates</code> overlays. Flags are 0 or 1 datapoints — not Xibo URL parameters.</p>
+          <div id="networkTemplateCatalogReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="advertiserReports" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Reports · advertisers</p>
+          <h2>Advertiser Intelligence</h2>
+          <div id="networkAdReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="adApprovalQueue" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · approval</p>
+          <h2
+            data-floqr-help-id="help-master-ad-approval"
+            data-floqr-help-title="Ad approval queue"
+            data-floqr-help-body="Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the payment reference. Reject asks for a reason the poster will see and can refund a card payment."
+            data-floqr-help-search="ad approval|approve ad|pending ads|reject ad|refund ad|waive payment|mark invoice paid|ad queue"
+          >Approval queue</h2>
+          <div id="adApprovalQueueHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adLiveCampaigns" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · live</p>
+          <h2
+            data-floqr-help-id="help-master-ad-live"
+            data-floqr-help-title="Live and scheduled ads"
+            data-floqr-help-body="Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log."
+            data-floqr-help-search="live ads|pause ad|end ad|resume ad|edit ad audience|ad dates|ad targeting"
+          >Live &amp; scheduled</h2>
+          <div id="adLiveCampaignsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adStatsPanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · measurement</p>
+          <h2
+            data-floqr-help-id="help-master-ad-stats"
+            data-floqr-help-title="Ad stats"
+            data-floqr-help-body="Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged."
+            data-floqr-help-search="ad stats|impressions|clicks|ctr|click rate|clear ad stats|reset ad stats|ad measurement"
+          >Ad stats</h2>
+          <div id="adStatsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adIntakePanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · SMS / WhatsApp</p>
+          <h2
+            data-floqr-help-id="help-master-ad-intake"
+            data-floqr-help-title="SMS and WhatsApp ad intake"
+            data-floqr-help-body="Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here."
+            data-floqr-help-search="text an ad|sms ad|whatsapp ad|ad intake|send flyer|ad payment link|delete ad submissions"
+          >SMS / WhatsApp intake</h2>
+          <div id="adIntakeHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adSettingsPanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · settings</p>
+          <h2
+            data-floqr-help-id="help-master-ad-settings"
+            data-floqr-help-title="Ad settings and billing"
+            data-floqr-help-body="Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad decision."
+            data-floqr-help-search="ad settings|splash ads|splash seconds|house ads|demo ads|invoice account|net terms|ad audit log"
+          >Settings &amp; billing</h2>
+          <div id="adSettingsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adCampaignManagement" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · packaged demos</p>
+          <h2
+            data-i18n="master.adPackagedDemos"
+            data-floqr-help-title="Packaged demos"
+            data-floqr-help-body="Packaged house and demo creatives that ship with FLOQR. They fill the rotation only when Settings allows it and no paid ad matches the patron. Paid ads are approved in the Approval queue, not here. Inline is $45 / 7 days on feature paths; Mingl Gist is $25 / 7 days in the story scroll."
+            data-floqr-help-search="packaged ads|house ads|demo ads|ad pool|inline ad|mingl gist ad|demo not live"
+          >Packaged demos</h2>
+          <h3
+            data-floqr-help-title="Live / packaged pool badge"
+            data-floqr-help-body="Top-right on each card: Status and Shows on. Status Demo (not live) = packaged demo for targeting tests, not a paid approved flight. Live = can serve patrons in the flight window. Shows on names the package (Inline / Mingl Gist) or the first feature path (for example ShoutOut path) where the creative may appear. Hover the badge for the full sentence. Preview creative is a separate button that opens the flyer or HTML."
+            data-floqr-help-search="demo not live|shows on|shoutout path|campaign status|live packaged pool|preview creative vs status"
+          >Live / packaged pool</h3>
+          <div id="adCampaignManagementSummary" class="report-block"></div>
+          <div id="adCampaignManagementList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="patronDiagnostics" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Diagnostics · patrons</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Patron Datapoints</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>Internal view of patron profile datapoints used for Mingl matching and audience targeting — not system health or display security.</div>
+            </details>
+          </h2>
+          <p class="sub small">Internal Master Admin view of patron profile datapoints used for Mingl matching and audience diagnostics.</p>
+          <div id="patronDatapointSummary" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Patrons With 2+ Common Datapoints</h2>
+          <div id="patronOverlapReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>All Patron Datapoints</h2>
+          <div id="patronDatapointTable" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="promoterNetwork" class="admin-panel-section">
+        <div class="card">
+          <h2
+            data-floqr-help-id="help-network-promoters"
+            data-floqr-help-title="Network Promoter Data"
+            data-floqr-help-search="promoters|promoter network|guest list referrals|temp promoter"
+            data-floqr-help-body="Shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub promoters), and Master Admin promoter onboarding records."
+          >Network Promoter Data</h2>
+          <p class="sub small" data-keep-visible="true">Guest-list referral rollups plus club-affiliated promotion groups. QA temp clubs seed Temp Promoter N Collective cards even before live referrals exist.</p>
+          <div id="promoterNetworkReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Club promotion groups</h2>
+          <div id="promoterClubGroupsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promoter onboarding records</h2>
+          <div id="promoterOnboardingNetworkReport" class="report-block"></div>
+        </div>
+      </section>
+      <section id="networkReconciliation" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Paid ShoutOut Gross</span><strong id="netReconGross">$0</strong></div>
+          <div class="metric-card"><span>Club Shares (20%)</span><strong id="netReconClubShare">$0</strong></div>
+          <div class="metric-card"><span>FloqR Share (80%)</span><strong id="netReconFloqrShare">$0</strong></div>
+          <div class="metric-card"><span>Ledger Entries</span><strong id="netReconCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2>Network Account Reconciliation</h2>
+          <p class="sub small">FloqR-charged priced ShoutOuts (currently the $30 Zebbies football intro). Clubs accrue 20%; free templates are not listed. Stripe is currently non-live — test payments are marked <code>isTestPayment</code> for later deletion.</p>
+          <div class="button-row">
+            <button id="refreshNetworkReconBtn" type="button">Refresh FloqR Ledger</button>
+            <button id="purgeTestPaymentsReconBtn" class="ghost" type="button">Delete Stripe test payments</button>
+          </div>
+          <p id="networkReconStatus" class="status">Open this tab while signed in as Master Admin. Test-marked ledger rows show a TEST badge.</p>
+          <div id="networkReconReport" class="report-block"></div>
+          <div id="networkReconList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="partnerIntegrations" class="admin-panel-section">
+        <div class="card">
+          <h2>Ticketing Partner Opportunities</h2>
+          <div id="ticketPartnerReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="translationOverrides" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Localization</p>
+          <h2
+            data-i18n="master.translationOverridesTitle"
+            data-floqr-help-id="help-translation-overrides"
+            data-floqr-help-title="Translation Overrides"
+            data-floqr-help-search="translation overrides|native speaker|german|arabic|de|ar|i18n"
+            data-floqr-help-body="Master Admin → Translation Overrides. Choose German or Arabic, search a UI string key, edit the wording, then Save language. Patrons see the fix on the next page load — overrides win over the packaged translation. German and Arabic ship first. FLOQR does not pick language from IP; patrons set FloqR webapp language under My Profile → Language Settings (or the first-use browser language prompt)."
+          >Translation Overrides</h2>
+          <p class="sub small" data-i18n="master.translationOverridesHint">Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs.</p>
+          <div class="profile-grid" style="align-items:end">
+            <label>Language
+              <div class="queue-actions" role="group" aria-label="Override language">
+                <button type="button" class="primary" id="translationOverridesLangDe" data-lang="de">German (de)</button>
+                <button type="button" id="translationOverridesLangAr" data-lang="ar">Arabic (ar)</button>
+              </div>
+            </label>
+            <label>Search keys<input id="translationOverridesSearch" type="search" placeholder="master.networkDashboard, app.search…" autocomplete="off"/></label>
+            <label>Filter
+              <select id="translationOverridesFilter">
+                <option value="all">All keys</option>
+                <option value="overridden">Overridden only</option>
+                <option value="missing">Missing override</option>
+              </select>
+            </label>
+          </div>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="translationOverridesReloadBtn">Reload</button>
+            <button type="button" class="primary" id="translationOverridesSaveBtn">Save language</button>
+          </div>
+          <p id="translationOverridesStatus" class="status" aria-live="polite"></p>
+          <div id="translationOverridesTableWrap" class="report-block" style="max-height:min(70vh,720px);overflow:auto;margin-top:12px">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align:left;width:22%">Key</th>
+                  <th scope="col" style="text-align:left;width:34%">English</th>
+                  <th scope="col" style="text-align:left">Override</th>
+                  <th scope="col" style="width:120px"></th>
+                </tr>
+              </thead>
+              <tbody id="translationOverridesRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="featuresServices" class="admin-panel-section">
+        <!-- Design notes: .cursor/rules/design-notes-feature-services.mdc -->
+        <div class="card">
+          <p class="eyebrow">Release control</p>
+          <h2
+            data-floqr-help-id="help-features-services"
+            data-floqr-help-title="Features & Services"
+            data-floqr-help-search="features and services|feature flags|enable feature|enable beta feature|disable feature|test feature|beta tester|beta testers|IsFeatureEnabled|IsTestFeature|feature links|revision|promote test to live"
+            data-floqr-help-body="Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link under the feature name in this table. Each feature has two switches. Enable Feature (IsFeatureEnabled) = 0 turns the feature off for everyone, including beta testers, Master Admins, and every menu link. With Enable Feature = 1 and Enable Beta Feature (IsTestFeature) = 0, every patron sees its Search tile and menu links. With both = 1, the feature is in testing: only beta testers you granted that feature see its links, marked Beta; Master Admins see it in their profile menu marked Beta and open it from this table instead of Search. Master Admins cannot be beta testers. When you press Save, FLOQR asks for a reason of at least 8 characters; it needs an SOS2FA unlock and is written to the tamper-evident audit trail below. Revision counts the saved changes to a feature. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
+          >Features & Services</h2>
+          <p id="featureServicesStatus" class="status" aria-live="polite"></p>
+          <div class="report-block feature-flags-wrap">
+            <table class="admin-table feature-flags-table">
+              <thead>
+                <tr>
+                  <th scope="col">Feature</th>
+                  <th scope="col" title="IsFeatureEnabled — 1 shows the feature's links; 0 turns it off for everyone">Enable Feature</th>
+                  <th scope="col" title="IsTestFeature — 1 limits the feature to granted beta testers (Beta pill); only applies when Enable Feature is 1">Enable Beta Feature</th>
+                  <th scope="col">Last change</th>
+                  <th scope="col"><span class="visually-hidden">Save</span></th>
+                </tr>
+              </thead>
+              <tbody id="featureServicesRows"></tbody>
+            </table>
+          </div>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="featureServicesReloadBtn">Reload</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Beta testers</p>
+          <h2>Invite a beta tester</h2>
+          <p class="sub small">Search patrons by name, email, or phone and pick the features they may test. The invite goes to their Inbox; they must accept while signed in to the same account. Links expire in 7 days. Master Admins cannot be beta testers.</p>
+          <div class="profile-grid" style="align-items:end">
+            <label>Find patron<input id="betaPatronSearch" type="search" placeholder="Name, email, phone" autocomplete="off"/></label>
+            <label>Note (optional)<input id="betaInviteNote" type="text" maxlength="200" placeholder="Why they were picked" autocomplete="off"/></label>
+          </div>
+          <fieldset id="betaInviteFeatures" class="report-block" style="margin-top:12px">
+            <legend>Features this tester may use</legend>
+          </fieldset>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="betaPatronSearchBtn">Search</button>
+          </div>
+          <div id="betaPatronResults" class="report-block"></div>
+          <p id="betaInviteStatus" class="status" aria-live="polite"></p>
+          <h3>Active beta testers</h3>
+          <div id="betaTesterList" class="report-block"></div>
+          <h3>Pending invites</h3>
+          <div id="betaInviteList" class="report-block"></div>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Test → live</p>
+          <h2>Promote test code to live</h2>
+          <p class="sub small">Records who promoted what and why, then opens the GitHub workflow that merges the <code>test</code> branch into <code>main</code> after tests pass. Turn the feature Live above once the promotion is published.</p>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" class="primary" id="featurePromotionBtn">Record promotion &amp; open workflow</button>
+          </div>
+          <p id="featurePromotionStatus" class="status" aria-live="polite"></p>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Audit trail</p>
+          <h2>Feature & beta activity</h2>
+          <p class="sub small">Newest 50 events. Each record is hash-chained to the one before it; Verify integrity detects edits or gaps.</p>
+          <div class="queue-actions">
+            <button type="button" id="featureAuditReloadBtn">Reload</button>
+            <button type="button" id="featureAuditVerifyBtn">Verify integrity</button>
+          </div>
+          <p id="featureAuditStatus" class="status" aria-live="polite"></p>
+          <div class="report-block audit-log-wrap">
+            <table class="admin-table audit-log-table">
+              <thead>
+                <tr>
+                  <th scope="col">When (UTC)</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Who</th>
+                  <th scope="col">Target</th>
+                  <th scope="col">Outcome</th>
+                  <th scope="col">Reason</th>
+                </tr>
+              </thead>
+              <tbody id="featureAuditRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="aiCrawling" class="admin-panel-section">
+        <!-- Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc -->
+        <div class="card">
+          <h2>AI Crawling</h2>
+          <p class="sub small">Set where and what to look for. FLOQR searches the internet (Google Places and public pages today), shows club and event candidates for your review, then publishes only what you approve. Ticketmaster confirmation is planned for a later release.</p>
+          <div id="aiCrawlingSummary" class="report-block"></div>
+          <div id="aiDiscoverySummary" class="report-block"></div>
+          <p id="aiDiscoveryStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Rating Criteria</h2>
+          <p class="sub small">Adjust how strongly each factor counts toward the 1–5 star score. Higher numbers matter more. Total does not need to equal 100.</p>
+          <div class="profile-grid" id="aiDiscoveryCriteriaWeights">
+            <label>Venue relevance<input id="weightVenueRelevance" type="number" min="0" max="100" step="1" value="20" data-weight-key="venueRelevance"/></label>
+            <label>Event quality<input id="weightEventQuality" type="number" min="0" max="100" step="1" value="20" data-weight-key="eventQuality"/></label>
+            <label>Brand fit<input id="weightBrandFit" type="number" min="0" max="100" step="1" value="20" data-weight-key="brandFit"/></label>
+            <label>Location value<input id="weightLocationValue" type="number" min="0" max="100" step="1" value="15" data-weight-key="locationValue"/></label>
+            <label>Source credibility<input id="weightSourceCredibility" type="number" min="0" max="100" step="1" value="15" data-weight-key="sourceCredibility"/></label>
+            <label>Patron interest match<input id="weightPatronInterestMatch" type="number" min="0" max="100" step="1" value="10" data-weight-key="patronInterestMatch"/></label>
+          </div>
+          <label>Notes<input id="aiDiscoveryCriteriaNotes" placeholder="Optional note for other Master Admins"/></label>
+          <details class="admin-detail json-disclosure">
+            <summary>Advanced: weight data (engineers)</summary>
+            <label>Weights data<textarea id="aiDiscoveryCriteriaJson" rows="7"></textarea></label>
+          </details>
+          <button id="saveAiDiscoveryCriteriaBtn" class="primary" type="button">Save Criteria</button>
+        </div>
+        <div class="card">
+          <h2>Review Discovery Queue</h2>
+          <p class="sub small">Fill in missing details on the card, then Approve when ready — or Needs research if someone must look up contacts later. You do not need to edit technical data dumps.</p>
+          <div id="aiDiscoveryCountryTabs" class="admin-subtabs discovery-country-tabs" role="tablist" aria-label="Filter by country"></div>
+          <div class="profile-grid">
+            <label>Status
+              <select id="aiDiscoveryStatusFilter">
+                <option value="pendingReview">Pending review</option>
+                <option value="needsResearch">Needs research</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="deleted">Deleted</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Onboard readiness
+              <select id="aiDiscoveryReadinessFilter">
+                <option value="all">All</option>
+                <option value="ready">Ready to onboard</option>
+                <option value="notReady">Not ready (show missing)</option>
+              </select>
+            </label>
+            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington, Miami"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="aiDiscoveryRefreshBtn" type="button">Refresh Discovery Queue</button>
+            <button id="aiDiscoverySelectReadyBtn" type="button">Select all ready</button>
+            <button id="aiDiscoveryClearSelectionBtn" type="button">Clear selection</button>
+            <button id="aiDiscoveryMassOnboardBtn" class="primary" type="button">Onboard selected (ready only)</button>
+          </div>
+          <p class="sub small">Mass onboard publishes only selected cards that already pass Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, and Instagram. Cards that are not ready stay listed with their missing datapoints.</p>
+          <div id="aiDiscoveryOnboardReport" class="report-block"></div>
+          <div id="aiDiscoveryQueueList" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Delete / Restore Listings</h2>
+          <p class="sub small">Soft delete hides clubs and events from patron searches without deleting ShoutOut history, guest list history, or audit logs.</p>
+          <div class="profile-grid">
+            <label>Search listings<input id="listingDeleteSearch" placeholder="Venue, event, city, country"/></label>
+            <label class="consent-line"><input id="listingIncludeDeleted" type="checkbox"/> Include deleted listings</label>
+          </div>
+          <div id="listingDeleteResults" class="report-block"></div>
+        </div>
+        <div class="card crawler-engine-card">
+          <h2>Refined Discovery Search</h2>
+          <p class="sub small">Master Admin defines city, genre, and venue-or-event type. FLOQR runs a crawl (Google Places + public pages today). Ticketmaster Discovery API will be added later for extra confirmation — not required now.</p>
+          <div class="profile-grid">
+            <label>First daily run (24-hour time)<input id="crawlPrimaryTime" type="time" value="00:00"/></label>
+            <label>Time zone<select id="crawlTimeZone"><option value="America/New_York">America/New_York</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="Europe/Paris">Europe/Paris</option><option value="Europe/Berlin">Europe/Berlin</option><option value="Europe/Madrid">Europe/Madrid</option><option value="Africa/Lagos">Africa/Lagos</option><option value="Asia/Dubai">Asia/Dubai</option><option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Tokyo">Asia/Tokyo</option></select></label>
+            <label>Runs per day<select id="crawlRunsPerDay"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option><option value="6">6</option></select></label>
+            <label>Language strategy<select id="crawlLanguageStrategy"><option value="nativePlusEnglish">Native market language + English</option><option value="nativeOnly">Native market language only</option><option value="selectedOnly">Only selected languages</option></select></label>
+            <label>Search languages<select id="crawlLanguageCriteria" multiple size="7"><option>English</option><option>Spanish</option><option>German</option><option>French</option><option>Italian</option><option>Portuguese</option><option>Dutch</option><option>Arabic</option><option>Turkish</option><option>Chinese</option><option>Thai</option><option>Catalan</option></select></label>
+            <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
+            <label>Music genres<select id="crawlGenreCriteria" multiple size="7"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option></select></label>
+            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="9"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="pool party">Pool Parties</option><option value="day club">Day Parties / Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option></select></label>
+            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington"/></label>
+          </div>
+          <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs and ticketed concerts in Germany and Spain, using native-language sources plus English sources."></textarea></label>
+          <input id="crawlSearchCriteria" type="hidden" value="nightlife venues, concerts, events and official ticket sources"/>
+          <input id="crawlRegionCriteria" type="hidden"/>
+          <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
+          <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
+          <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
+          <div class="queue-actions">
+            <button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button>
+            <button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button>
+            <button id="runManualCrawlBtn" type="button">Run Discovery Crawl</button>
+            <button id="runInstantCrawlBtn" class="primary" type="button">Instant Crawl Now</button>
+          </div>
+          <p class="sub small">Instant Crawl Now uses the <strong>saved schedule</strong> (or current form) and runs immediately with a short job cap — no waiting for the next 00/04/08 slot.</p>
+          <p class="sub small"><strong>Expected output:</strong> Name/Title, Genre, DJ(s)/Artist(s), Promoter(s), Phone, Email, Instagram, Physical address.</p>
+          <p class="sub small"><em>Ticketmaster confirmation: later</em></p>
+          <div id="crawlSearchPlanReport" class="report-block"></div>
+          <details class="admin-detail">
+            <summary>How the multilingual algorithm works</summary>
+            <p class="sub small">FLOQR expands each market into separate native-language and English queries, keeps the language and source URL on every record, normalizes duplicate venues across languages, and requires a final official venue or event-detail page before approval. Search-result pages are evidence sources, not publishable records.</p>
+          </details>
+        </div>
+        <div class="card">
+          <h2>Crawl Contact Export</h2>
+          <p class="sub small">Formatted club and event crawl contacts for review and CSV download.</p>
+          <div class="queue-actions">
+            <button id="downloadCrawlContactsCsvBtn" type="button">Download Crawl Contacts CSV</button>
+            <button id="testGeminiSourceExtractorBtn" type="button">Test Gemini Source Extractor</button>
+          </div>
+          <div id="crawlContactExportReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Source Detail Extraction</h2>
+          <p class="sub small">Add one club or event from a public webpage when the automatic crawl missed details.</p>
+          <ol class="crawl-extract-steps sub small">
+            <li>Open <strong>one</strong> specific Eventbrite, Ticketmaster, venue, or comedy <strong>detail</strong> page (not a search list).</li>
+            <li>Copy that page’s address into Source URL.</li>
+            <li>Optional: paste the visible title, date, address, phone, and links.</li>
+            <li>Extract, review the summary, then Save when it looks right.</li>
+          </ol>
+          <label>Source URL<input id="sourceExtractUrl" placeholder="https://www.eventbrite.com/e/... (one event page, not a search list)"/></label>
+          <p id="sourceExtractUrlHint" class="sub small" aria-live="polite"></p>
+          <label>Copied page details (optional)<textarea id="sourceExtractText" rows="7" placeholder="Title, date, time, address, phone, website, ticket link, description…"></textarea></label>
+          <div class="queue-actions">
+            <button id="extractSourceDetailsBtn" type="button">Extract details</button>
+            <button id="saveExtractedDiscoveryBtn" class="primary" type="button">Save for review</button>
+          </div>
+          <div id="sourceExtractionReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Club Admin profile handoff</h2>
+          <p class="sub small">Turn reviewed public club/event details into import drafts. Send a Club Admin link so they can fill only missing fields on their public profile — no technical editing required.</p>
+          <div class="queue-actions">
+            <button id="generateClubProfileJsonBtn" type="button">Prepare Club Admin imports</button>
+            <button id="saveClubProfileImportDraftsBtn" class="primary" type="button">Save import drafts</button>
+            <button id="backfillClubProfileFieldsBtn" type="button">Backfill missing field keys</button>
+          </div>
+          <details class="admin-detail json-disclosure"><summary>Advanced: generated data (engineers)</summary><label>Generated import data<textarea id="clubProfileImportJson" rows="10"></textarea></label></details>
+          <div id="clubProfileDiagnosticsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Crawl Activity Report</h2>
+          <div id="crawlActivityReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Consolidated Discovery Records</h2>
+          <p class="sub small">Groups matching clubs/events together and flags address conflicts before anything is approved or imported.</p>
+          <div id="crawlCollectedRecordsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Collected Data Analytics</h2>
+          <div id="crawlAnalyticsInsights" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="staleRecordCleanup" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Reports · cleanup</p>
+          <h2>Stale Record Cleanup</h2>
+          <p class="sub small">Search stale AI discovery queue records and stale club ShoutOut queue records, review why FLOQR considers them stale, and remove them from active review.</p>
+          <div class="profile-grid">
+            <label>Search stale records<input id="staleRecordSearchInput" placeholder="Singapore, old location, club name, reference number, rules version, source URL"/></label>
+            <label>Record source
+              <select id="staleRecordSourceFilter">
+                <option value="all">AI discovery + ShoutOut queues</option>
+                <option value="aiDiscoveryQueue">AI discovery queue records</option>
+                <option value="shoutouts">ShoutOut queue records</option>
+              </select>
+            </label>
+            <label>Status
+              <select id="staleRecordStatusFilter">
+                <option value="active">Active stale records</option>
+                <option value="removed">Already removed</option>
+                <option value="all">All stale records</option>
+              </select>
+            </label>
+            <label>Older than days<input id="staleRecordAgeDays" type="number" min="1" value="4"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="searchStaleRecordsBtn" type="button">Search Stale Records</button>
+            <button id="removeSelectedStaleRecordsBtn" type="button">Remove Selected</button>
+            <button id="removeAllFoundStaleRecordsBtn" type="button">Remove All Found</button>
+            <button id="clearCachedCrawlsBtn" type="button">Remove All Active Stale Records</button>
+          </div>
+          <p class="sub small">A stale record is a queue record older than 4 days, a record that references old Firestore/Storage rules, or a record that points to an old/unknown location. Remove means soft-clear: discovery records get `stale-cache-cleared`; ShoutOut queue records get `stale-shoutout-cleared`. Approved listings, live display content, user profiles, guest lists, and audit history are not changed.</p>
+          <p id="staleRecordCleanupStatus" class="status"></p>
+          <div id="staleRecordCleanupResults" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="duplicateRecords" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Reports · duplicates</p>
+          <h2>Duplicate Records</h2>
+          <p class="sub small">Find live Firestore club records that represent the same institution, choose a primary record, and complete/repair the merge. Completion means the duplicate clubLocation points to the primary with canonical fields; the separate alias collection is optional.</p>
+          <div id="duplicateRecordSummary" class="report-block"></div>
+          <div class="profile-grid">
+            <label>Search duplicates<input id="duplicateRecordSearch" placeholder="Shoko, Barcelona, beach club, club id"/></label>
+            <label>Manual primary club id<input id="duplicatePrimaryId" placeholder="shoko-barcelona-spain"/></label>
+            <label>Manual duplicate club id<input id="duplicateAliasId" placeholder="shoko-barcelona-beach-club-spain"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshDuplicateRecordsBtn" type="button">Refresh Duplicate Diagnostics</button>
+            <button id="mergeManualDuplicateBtn" type="button">Complete / Repair Manual Pair</button>
+            <button id="runDuplicateMergeDiagnosticBtn" type="button">Run Merge Diagnostic</button>
+          </div>
+          <p id="duplicateRecordStatus" class="status"></p>
+          <div id="duplicateMergeDiagnosticReport" class="report-block"></div>
+          <div id="duplicateRecordResults" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="diagnostics" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Diagnostics · not security</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Run Diagnostics</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>Automated health, feature matrix, package install checks, and Firebase rules smoke tests. Security deny alerts live under <strong>Security</strong>.</div>
+            </details>
+          </h2>
+          <p class="sub small">System-wide health, feature status, package checks, and Firebase rules compatibility. After every webapp change, use <strong>Email mobile preview links</strong> so testers can open the live URLs on iPhone.</p>
+          <div id="diagnosticsSummary" class="report-block"></div>
+          <button id="runFeatureDiagnosticsBtn" class="primary" type="button">Run Diagnostics</button>
+          <button id="diagnosticsRefreshBtn" type="button">Refresh Diagnostics</button>
+          <button id="exportDiagnosticsTxtBtn" type="button">Export Diagnostics TXT</button>
+          <button id="emailPreviewLinksBtn" type="button">Email mobile preview links</button>
+          <p id="diagnosticsStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Feature Diagnostics</h2>
+          <p class="sub small">Statuses: Pass, Soft Fail, Failed, and TBI. Soft Fail means the feature is present and safe, but has missing optional data, a fallback mode, or a non-blocking setup gap.</p>
+          <div id="diagnosticsFeatureMatrix" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Package Install Diagnostics</h2>
+          <p class="sub small">Checks feature markers added by each package after upload so Master Admin can confirm the installed files match the expected release behavior.</p>
+          <button id="runPackageDiagnosticsBtn" type="button">Run Package Install Diagnostics</button>
+          <button id="archivePassedPackageDiagnosticsBtn" type="button">Archive Passed Package Checks</button>
+          <button id="downloadPackageDiagnosticsArchiveCsvBtn" type="button">Download Package Archive CSV</button>
+          <p id="diagnosticsArchiveStatus" class="status"></p>
+          <div id="packageInstallDiagnosticsSummary" class="report-block"></div>
+          <div id="packageInstallDiagnosticsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Firebase Rules Smoke Test</h2>
+          <p class="sub small">Runs live Firestore, Mingl/chat query, and Storage checks against Firebase. A package rules note can pass while the live deployed Firebase rules still fail if the rules were not published in Firebase Console.</p>
+          <div id="rulesVersionStatus" class="report-block"></div>
+          <p class="sub small">Use this section this way: publish firestore.rules and storage.rules, click Run Rules Smoke Test, then use the suggested fixes or Export Diagnostics TXT if anything fails.</p>
+          <button id="runRulesSmokeTestBtn" class="primary" type="button">Run Rules Smoke Test</button>
+          <progress id="rulesSmokeTestProgress" class="hidden" max="100" value="0"></progress>
+          <div id="rulesSmokeTestRunMeta" class="report-block"></div>
+          <div class="queue-actions">
+            <label>Show<select id="rulesSmokeTestFilter"><option value="all">All checks</option><option value="Failed">Failures only</option><option value="Pass">Passed only</option><option value="Soft Fail">Soft fails only</option></select></label>
+            <button id="copyRulesSmokeFailuresBtn" type="button">Copy Failure Diagnostics</button>
+            <button id="downloadRulesSmokeJsonBtn" type="button">Download Smoke Test JSON</button>
+          </div>
+          <div id="rulesSmokeTestSummary" class="report-block"></div>
+          <div id="rulesSmokeTestReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="diagnosticsManualTests" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Diagnostics · manual QA</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Manual Feature Tests</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>Browser checklist after package upload. Automated Run Diagnostics proves files/rules exist; these checks confirm the feature works for a human tester.</div>
+            </details>
+          </h2>
+          <p class="sub small">Mark each implemented or changed feature Succeed or Failed, then copy the resolution prompt if anything fails.</p>
+          <div id="manualFeatureDiagnosticsSummary" class="report-block"></div>
+          <div id="manualFeatureDiagnosticsReport" class="report-block"></div>
+          <div class="queue-actions">
+            <button id="copyManualFeatureOutputBtn" type="button">Copy Manual Test Output</button>
+            <button id="downloadManualFeatureOutputBtn" type="button">Download Manual Test TXT</button>
+            <button id="archivePassedManualFeatureTestsBtn" type="button">Archive Passed Tests</button>
+            <button id="copyManualFeaturePromptBtn" class="primary" type="button">Copy Resolution Prompt</button>
+          </div>
+          <label>Manual diagnostic output<textarea id="manualFeatureDiagnosticsOutput" rows="10" readonly></textarea></label>
+          <label>Prompt for Codex<textarea id="manualFeatureDiagnosticsPrompt" rows="10" readonly></textarea></label>
+        </div>
+      </section>
+
+      <section id="diagnosticsDisplayErrors" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Diagnostics · Xibo / player</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Display / Xibo Load Errors</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                When Xibo cannot load <code>display.html</code> / <code>display2.html</code>, point a fallback layout or Webpage at
+                <code>display-error.html</code>. That page logs here (diagnostic, 30-day retention) — not under Security.
+              </div>
+            </details>
+          </h2>
+          <p class="sub small">
+            Xibo’s <em>Trigger on page load error</em> is usually a trigger code, not a URL. Use a second layout/region that opens the fallback Webpage URL below when that trigger fires.
+            Do not add <code>?v=</code> to display URLs.
+          </p>
+          <div class="profile-grid">
+            <label>Venue id for fallback URL
+              <input id="displayErrorVenueId" list="displaySecurityOptions" placeholder="heist-washington-dc"/>
+            </label>
+            <label>Board
+              <select id="displayErrorBoard">
+                <option value="2">Display 2 (supRstar)</option>
+                <option value="1">Display 1 (ShoutOut)</option>
+              </select>
+            </label>
+          </div>
+          <label>Xibo fallback Webpage URL (copy into fallback layout)
+            <input id="displayErrorFallbackUrl" readonly spellcheck="false"/>
+          </label>
+          <div class="queue-actions">
+            <button id="copyDisplayErrorFallbackUrlBtn" class="primary" type="button">Copy fallback URL</button>
+            <button id="openDisplayErrorFallbackBtn" type="button">Open fallback page</button>
+            <button id="refreshDisplayLoadErrorsBtn" type="button">Refresh error log</button>
+          </div>
+          <p id="displayLoadErrorsStatus" class="status"></p>
+          <div id="displayLoadErrorsReport" class="report-block">Load this page while signed in as Master Admin.</div>
+        </div>
+      </section>
+
+      <section id="twilio_sendgridMailLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible mails</span><strong id="mailLogCount">0</strong></div>
+          <div class="metric-card"><span>Failed in view</span><strong id="mailLogFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2
+            data-i18n="master.twilioSendgridMailLogs"
+            data-floqr-help-id="help-mail-logging"
+            data-floqr-help-title="SendGrid Mail Logs"
+            data-floqr-help-search="sendgrid mail logs|twilio_sendgridMailLogs|mail logging|email log|sendgrid|system mail|preview links email|tls 1.3|mail delivery"
+            data-floqr-help-body="Master Admin → Twilio / SendGrid Mgmt → SendGrid Mail Logs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days."
+          >SendGrid Mail Logs</h2>
+          <div class="profile-grid">
+            <label>Status
+              <select id="mailLogStatusFilter">
+                <option value="">All statuses</option>
+                <option value="sending">sending</option>
+                <option value="accepted">accepted</option>
+                <option value="processed">processed</option>
+                <option value="delivered">delivered</option>
+                <option value="failed">failed</option>
+                <option value="bounced">bounced</option>
+                <option value="dropped">dropped</option>
+                <option value="deferred">deferred</option>
+                <option value="blocked">blocked</option>
+                <option value="complained">complained</option>
+              </select>
+            </label>
+            <label>Kind
+              <select id="mailLogKindFilter">
+                <option value="">All kinds</option>
+              </select>
+            </label>
+            <label>Search
+              <input id="mailLogSearch" placeholder="to, subject, message id, kind, error"/>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="mailLogRefreshBtn" type="button">Refresh mail logs</button>
+          </div>
+          <p id="mailLoggingStatus" class="status">Open this tab while signed in as Master Admin.</p>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Recent system mail</h2>
+            <div id="mailLogList" class="report-block">Sign in as Master Admin to load mail logs.</div>
+          </div>
+          <div class="card">
+            <h2>Headers, body, delivery</h2>
+            <div id="mailLogDetail" class="report-block">Select a mail to view headers, content, TLS, and delivery.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="diagnosticArchives" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Diagnostics · archives</p>
+          <h2>Diagnostic Archives</h2>
+          <p class="sub small">Archived manual feature tests and package install checks that previously passed. Use Restore if a manual feature needs to be retested in the active checklist.</p>
+          <div id="manualFeatureArchiveSummary" class="report-block"></div>
+          <div id="manualFeatureArchiveReport" class="report-block"></div>
+          <h2>Package Diagnostic Archives</h2>
+          <div id="packageDiagnosticsArchiveSummary" class="report-block"></div>
+          <div id="packageDiagnosticsArchiveReport" class="report-block"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="templateViewModal" class="club-person-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templateViewName">
+  <div class="club-person-modal-card template-view-card">
+    <button id="templateViewCloseBtn" class="club-person-close" type="button" aria-label="Close template preview">&times;</button>
+    <p class="eyebrow">Display-aware template preview</p>
+    <h2 id="templateViewName">Template</h2>
+    <div class="profile-grid template-preview-controls">
+      <label>Display type<select id="templatePreviewDisplayType"></select></label>
+      <div id="templatePreviewDisplayMeta" class="template-preview-display-meta"></div>
+    </div>
+    <div id="templatePreviewDevice" class="template-preview-device">
+      <div id="templateViewPreview" class="template-view-preview"></div>
+    </div>
+    <p class="sub small">Scaled LED simulation. Layout and aspect ratio match the selected display type; final color and brightness depend on the physical display.</p>
+    <div id="templateViewDetails" class="report-block"></div>
+    <button id="templateViewCloseWindowBtn" type="button">Close Window</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./floqr-i18n.js?v=s3.1.31"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./floqr-app-check.js?v=s3.0.67"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
+<script src="./global-profile-status.js?v=s3.1.30"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.24"></script>
+<script src="./shared-data.js?v=s3.1.26"></script>
+<script src="./feature-gates.js?v=s3.1.26"></script>
+<script src="./sos2fa.js?v=s3.1.31"></script>
+<script src="./entity-management.js?v=s3.1.24"></script>
+<script src="./ai-service.js?v=29.09.22"></script>
+<script src="./ai-index-service.js?v=s3.1.26"></script>
+<script src="./ai-search-service.js?v=29.09.22"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
+<script src="./ai-discovery-service.js?v=s3.0.97"></script>
+<script src="./floqr-action-feedback.js?v=29.09.22"></script>
+<script src="./floqai-help-repository.js?v=s3.1.31"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.24"></script>
+<script src="./help-attach.js?v=s3.1.29"></script>
+<script src="./helper-popouts.js?v=s3.0.6"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.0.103"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
+<script src="./ad-campaigns.js?v=s3.1.0"></script>
+<script src="./ai-diagnostics-service.js?v=s3.1.26"></script>
+<script src="./duplicate-record-service.js?v=29.09.22"></script>
+<script src="./floqr-logger.js?v=29.09.90"></script>
+<script src="./payment-service.js?v=29.09.22"></script>
+<script src="./floqr-access-notice.js?v=s3.1.24"></script>
+<script src="./master-admin-app.js?v=s3.1.31"></script>
+<script src="./master-ad-management.js?v=s3.1.0"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
+<script src="./floqr-feature-services.js?v=s3.1.30"></script>
+<script src="./floqr-reason-prompt.js?v=s3.1.30"></script>
+<script src="./master-feature-services.js?v=s3.1.30"></script>
+<script src="./master-demo-employees.js?v=s3.1.31"></script>
+<script src="./floqr-data-classification.js?v=s3.1.24"></script>
+<script src="./master-data-classification.js?v=s3.1.24"></script>
+<script src="./master-admin-shoutouts.js?v=s3.0.98"></script>
+<script src="./master-display-security.js?v=29.09.92"></script>
+<script src="./master-diagnostics-panels.js?v=29.09.92"></script>
+<script src="./master-services-extension.js?v=29.09.22"></script>
+<script src="./master-logging-extension.js?v=29.09.22"></script>
+<script src="./master-mail-logging.js?v=s3.0.78"></script>
+<script src="./master-twilio-logging.js?v=s3.0.78"></script>
+<script src="./notification-center.js?v=29.09.22"></script>
+<script src="./profile-access-guard.js?v=29.09.9"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+</script>
+</body>
+</html>

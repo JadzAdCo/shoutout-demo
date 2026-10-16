@@ -2,7 +2,7 @@
 $ErrorActionPreference = "Stop"
 $env:GIT_PAGER = "cat"
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
-$stage = Join-Path $root ".publish-s3-0-41-nfl-dual-led-fix"
+$stage = Join-Path $root ".publish-s3-0-42-nfl-dual-led-fix"
 $git = "C:\Program Files\Git\cmd\git.exe"
 $files = @(
   "display.css",
@@ -33,7 +33,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "s3.0.41: NFL dual LED fix - solid black frame 2, FloqR card, nflJersey checkout caps"
+    & $git commit -m "s3.0.42: NFL dual shout-panel uses nflMainText slice (not soccer 14-char cap)"
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }
     & $git log -1 --oneline
@@ -42,4 +42,4 @@ try {
     Write-Host "No Pages file changes to publish"
   }
 } finally { Pop-Location }
-Write-Host "Published s3.0.41 Pages"
+Write-Host "Published s3.0.42 Pages"

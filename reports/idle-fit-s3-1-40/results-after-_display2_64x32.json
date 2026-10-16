@@ -1,0 +1,238 @@
+[
+  {
+    "name": "display2-default-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Club",
+    "file": "after-display2-default-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 59
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 102,
+          "bottom": 122,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 19.136,
+          "scrollW": 232,
+          "clientW": 232,
+          "top": 126,
+          "bottom": 146,
+          "left": 92,
+          "right": 324
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 151,
+          "bottom": 162,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-zebbies-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display2-zebbies-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 59
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 102,
+          "bottom": 122,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Zebbies Garden DC",
+          "fontPx": 19.136,
+          "scrollW": 382,
+          "clientW": 382,
+          "top": 126,
+          "bottom": 146,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 151,
+          "bottom": 162,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "after-display2-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 80
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 92,
+          "bottom": 112,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 19.136,
+          "scrollW": 383,
+          "clientW": 383,
+          "top": 116,
+          "bottom": 156,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 161,
+          "bottom": 172,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-aurelia-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=temp-democlub-1&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Aurelia (Demo Club)",
+    "file": "after-display2-aurelia-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 80
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 92,
+          "bottom": 112,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Aurelia (Demo Club)",
+          "fontPx": 19.136,
+          "scrollW": 383,
+          "clientW": 383,
+          "top": 116,
+          "bottom": 156,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 161,
+          "bottom": 172,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

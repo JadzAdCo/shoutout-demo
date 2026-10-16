@@ -1,0 +1,1540 @@
+/* FLOQR app-wide help repository — source of truth for FloqAi contextual search.
+ * Every "?" help popout verbiage must be registered here (static seed and/or runtime).
+ */
+(function (global) {
+  "use strict";
+
+  const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.49";
+  const byId = new Map();
+  /** Canonical FloqAi help partitions (one audience key each). */
+  const HELP_PARTITIONS = {
+    patron: "patronHelpverbiage",
+    serviceMember: "serviceMemberHelpverbiage",
+    venueAdmin: "venueAdminHelpverbiage",
+    masterAdmin: "masterAdminHelpverbiage"
+  };
+  const AUDIENCES = Object.keys(HELP_PARTITIONS);
+  const MASTER_ADMIN_EMAILS = new Set(
+    String(global.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
+      .split(",")
+      .map(value => String(value || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+  let viewerAudience = "patron";
+  let viewerAccessFlags = {
+    IsPatron: 0,
+    IsServiceMember: 0,
+    IsVenueAdmin: 0,
+    IsMasterAdmin: 0
+  };
+
+  function vUrl(path, params = {}) {
+    const qs = new URLSearchParams({v: APP_V, ...params});
+    return `${path}?${qs.toString()}`;
+  }
+
+  function normalize(value) {
+    return String(value || "")
+      .replace(/&amp;/g, "&")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function slug(value) {
+    return normalize(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "help";
+  }
+
+  function flagOn(value) {
+    return /^(1|true|yes)$/i.test(String(value ?? "").trim());
+  }
+
+  function normalizeAudiences(raw) {
+    const list = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+    const cleaned = list.map(value => {
+      const key = String(value || "").trim();
+      if (AUDIENCES.includes(key)) return key;
+      const fromPartition = Object.entries(HELP_PARTITIONS).find(([, name]) => name === key);
+      return fromPartition ? fromPartition[0] : "";
+    }).filter(Boolean);
+    return cleaned.length ? Array.from(new Set(cleaned)) : [];
+  }
+
+  /** Infer audience when a seed/popout omits audiences — one partition per entry. */
+  function inferAudiences(entry = {}) {
+    const explicit = normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition);
+    if (explicit.length) return explicit;
+    const blob = `${entry.id || ""} ${entry.title || ""} ${entry.page || ""} ${entry.body || ""} ${entry.source || ""}`.toLowerCase();
+    if (/sos2fa|social os|entity management|master-admin|master admin|purge queue|venue links|diagnostics|mail log|heist.*64\s*x\s*48|64x48.*heist|display setup|privilege admin|masteradminhelpverbiage/.test(blob)) {
+      return ["masterAdmin"];
+    }
+    if (/admin\.html|club admin|venue admin|club public profile|display screens|venuesupports|scheduling|suprstar queue|template catalog|message template|venueadminhelpverbiage/.test(blob)) {
+      return ["venueAdmin"];
+    }
+    if (/service member|work calendar|staff worksheet|role-request|become a dj|become a promoter|bartender|waitress|busboy|elect.*service|servicememberhelpverbiage/.test(blob)) {
+      return ["serviceMember"];
+    }
+    return ["patron"];
+  }
+
+  /**
+   * Partition access — design notes: .cursor/rules/design-notes-floqai-partitions.mdc
+   */
+  function canAccessPartition(audienceKey, flags = viewerAccessFlags) {
+    const f = flags || {};
+    if (flagOn(f.IsMasterAdmin)) return true;
+    switch (audienceKey) {
+      case "patron": return flagOn(f.IsPatron);
+      case "serviceMember": return flagOn(f.IsServiceMember);
+      case "venueAdmin": return flagOn(f.IsVenueAdmin);
+      case "masterAdmin": return false;
+      default: return false;
+    }
+  }
+
+  function canAccessHelpEntry(entry, flags = viewerAccessFlags) {
+    const audiences = normalizeAudiences(entry?.audiences || entry?.audience);
+    const keys = audiences.length ? audiences : ["patron"];
+    return keys.some(key => canAccessPartition(key, flags));
+  }
+
+  function register(entry = {}) {
+    const title = normalize(entry.title || entry.label || "");
+    if (!title && !normalize(entry.body)) return null;
+    const id = String(entry.id || `help-${slug(title)}`).trim();
+    const existing = byId.get(id) || {};
+    const links = Array.isArray(entry.links) ? entry.links.filter(link => link && link.href) : (existing.links || []);
+    const searchPhrases = Array.from(new Set([
+      ...(existing.searchPhrases || []),
+      ...(entry.searchPhrases || []),
+      title,
+      ...links.map(link => normalize(link.label))
+    ].map(normalize).filter(Boolean)));
+    const steps = Array.isArray(entry.steps)
+      ? entry.steps.map(normalize).filter(Boolean)
+      : (existing.steps || []);
+    const audiences = normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition).length
+      ? normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition)
+      : (existing.audiences?.length ? existing.audiences : inferAudiences({...existing, ...entry, id, title}));
+    const helpPartition = HELP_PARTITIONS[audiences[0]] || HELP_PARTITIONS.patron;
+    const next = {
+      id,
+      title: title || existing.title || id,
+      body: normalize(entry.body || existing.body || ""),
+      steps,
+      links: links.length ? links : (existing.links || []),
+      searchPhrases,
+      audiences,
+      helpPartition,
+      source: entry.source || existing.source || "help-repository",
+      page: entry.page || existing.page || "",
+      kind: entry.kind || existing.kind || "help",
+      locales: entry.locales != null ? entry.locales : existing.locales
+    };
+    byId.set(id, next);
+    return next;
+  }
+
+  function resolveUiLanguage() {
+    try {
+      if (global.FLOQRI18n?.getLanguage) return global.FLOQRI18n.getLanguage() || "en";
+      if (global.FLOQRI18n?.current) return global.FLOQRI18n.current;
+      return localStorage.getItem("floqr.uiLanguage") || "en";
+    } catch (_) {
+      return "en";
+    }
+  }
+
+  function localizeEntry(entry) {
+    if (!entry) return entry;
+    const lang = resolveUiLanguage();
+    if (global.FLOQRI18nHelp?.localize) {
+      return global.FLOQRI18nHelp.localize(entry, lang);
+    }
+    const code = String(lang || "en").toLowerCase().split(/[-_]/)[0];
+    const row = entry.locales && entry.locales[code];
+    if (!row) return entry;
+    return Object.assign({}, entry, {
+      title: row.title || entry.title,
+      body: row.body || entry.body
+    });
+  }
+
+  function registerMany(entries) {
+    (entries || []).forEach(register);
+  }
+
+  function registerFromHelpNode(node, meta = {}) {
+    if (!node || node.nodeType !== 1) return null;
+    if (node.dataset?.floqaiHelpRegistered === "1") return byId.get(node.dataset.floqaiHelpId || "") || null;
+    const title = normalize(meta.title || node.getAttribute("aria-label") || node.querySelector?.("summary")?.getAttribute("aria-label") || "Help");
+    const bodyRoot = node.querySelector?.(".floqai-help-body, .help-popout-body, div:not(summary)") || node;
+    const body = normalize(meta.body || bodyRoot?.innerText || node.innerText || "");
+    const links = [...(node.querySelectorAll?.("a[href]") || [])].map(anchor => ({
+      label: normalize(anchor.textContent),
+      href: anchor.getAttribute("href") || "",
+      searchPhrases: String(anchor.getAttribute("data-search") || "").split("|").map(normalize).filter(Boolean),
+      blurb: normalize(anchor.getAttribute("data-blurb") || "")
+    })).filter(link => link.href && link.label);
+    const id = meta.id || `popout-${slug(title)}-${slug(body).slice(0, 24)}`;
+    const entry = register({
+      id,
+      title,
+      body,
+      links: links.map(link => ({label: link.label, href: link.href})),
+      searchPhrases: [
+        title,
+        body,
+        ...(meta.searchPhrases || []),
+        ...links.flatMap(link => [link.label, ...(link.searchPhrases || [])])
+      ],
+      source: meta.source || "help-popout",
+      page: meta.page || (global.location && global.location.pathname) || ""
+    });
+    // Also register each link as its own searchable help row.
+    links.forEach((link, index) => {
+      register({
+        id: `${id}-link-${index}`,
+        title: link.label,
+        body: link.blurb || body || `Open “${link.label}” from in-app help.`,
+        links: [{label: link.label, href: link.href}],
+        searchPhrases: [link.label, ...(link.searchPhrases || [])],
+        source: "help-popout-link",
+        page: entry.page
+      });
+    });
+    node.dataset.floqaiHelpRegistered = "1";
+    node.dataset.floqaiHelpId = id;
+    return entry;
+  }
+
+  function registerDomHelpPopouts(root = global.document) {
+    if (!root || typeof root.querySelectorAll !== "function") return [];
+    const nodes = [
+      ...root.querySelectorAll("#floqAiHelpPopout"),
+      ...root.querySelectorAll("details.help-popout"),
+      ...root.querySelectorAll(".floqai-help-popout"),
+      ...root.querySelectorAll("[data-floqai-help-entry]")
+    ];
+    return nodes.map(node => registerFromHelpNode(node, {
+      title: node.getAttribute("aria-label") || node.querySelector("summary")?.getAttribute("aria-label") || node.querySelector(".eyebrow")?.textContent || "Help",
+      page: global.location?.pathname || ""
+    })).filter(Boolean);
+  }
+
+  function entries(filterAudience) {
+    const all = Array.from(byId.values());
+    if (!filterAudience) return all;
+    if (filterAudience === true || filterAudience === "accessible") {
+      return all.filter(entry => canAccessHelpEntry(entry, viewerAccessFlags));
+    }
+    return all.filter(entry => (entry.audiences || []).includes(filterAudience));
+  }
+
+  function setViewerAudience(audience) {
+    viewerAudience = AUDIENCES.includes(audience) ? audience : "patron";
+    return viewerAudience;
+  }
+
+  function getViewerAudience() {
+    return viewerAudience;
+  }
+
+  function getViewerAccessFlags() {
+    return {...viewerAccessFlags};
+  }
+
+  function setViewerAccessFlags(flags = {}) {
+    viewerAccessFlags = {
+      IsPatron: flagOn(flags.IsPatron) ? 1 : 0,
+      IsServiceMember: flagOn(flags.IsServiceMember) ? 1 : 0,
+      IsVenueAdmin: flagOn(flags.IsVenueAdmin) ? 1 : 0,
+      IsMasterAdmin: flagOn(flags.IsMasterAdmin) ? 1 : 0
+    };
+    if (viewerAccessFlags.IsMasterAdmin) viewerAudience = "masterAdmin";
+    else if (viewerAccessFlags.IsVenueAdmin) viewerAudience = "venueAdmin";
+    else if (viewerAccessFlags.IsServiceMember) viewerAudience = "serviceMember";
+    else if (viewerAccessFlags.IsPatron) viewerAudience = "patron";
+    else viewerAudience = "patron";
+    return getViewerAccessFlags();
+  }
+
+  function resolveAccessFlagsFromProfile({authUser = null, userDoc = null, tokenClaims = null} = {}) {
+    const user = authUser || global.firebase?.auth?.()?.currentUser || null;
+    const profile = userDoc || {};
+    const email = String(user?.email || profile.email || "").trim().toLowerCase();
+    let claims = tokenClaims || {};
+    const isMaster = !!(
+      flagOn(profile.IsMasterAdmin)
+      || flagOn(profile.isMasterAdmin)
+      || claims.masterAdmin === true
+      || claims.IsMasterAdmin === true
+      || (email && MASTER_ADMIN_EMAILS.has(email))
+    );
+    const isVenue = !!(
+      flagOn(profile.IsVenueAdmin)
+      || flagOn(profile.isVenueAdmin)
+      || flagOn(profile.IsClubAdmin)
+      || flagOn(profile.isClubAdmin)
+      || flagOn(profile.clubAdmin)
+      || claims.clubAdmin === true
+      || claims.IsVenueAdmin === true
+      || (Array.isArray(profile.adminClubIds) && profile.adminClubIds.length > 0)
+    );
+    const isService = !!(
+      flagOn(profile.IsServiceMember)
+      || flagOn(profile.IsserviceMember)
+      || flagOn(profile.serviceMember)
+      || claims.serviceMember === true
+    );
+    // Patrons: explicit IsPatron=1, or signed-in user who has not elected service member.
+    let isPatron = flagOn(profile.IsPatron);
+    if (!isPatron && user && !isService && !isVenue && !isMaster && profile.IsPatron == null && profile.IsServiceMember == null) {
+      isPatron = true;
+    }
+    return {
+      IsPatron: isPatron ? 1 : 0,
+      IsServiceMember: isService ? 1 : 0,
+      IsVenueAdmin: isVenue ? 1 : 0,
+      IsMasterAdmin: isMaster ? 1 : 0
+    };
+  }
+
+  async function resolveViewerAudience({authUser = null, userDoc = null, tokenClaims = null} = {}) {
+    const user = authUser || global.firebase?.auth?.()?.currentUser || null;
+    let claims = tokenClaims;
+    if (user && !claims && typeof user.getIdTokenResult === "function") {
+      try { claims = (await user.getIdTokenResult()).claims || {}; } catch (_) { claims = {}; }
+    }
+    const flags = resolveAccessFlagsFromProfile({authUser: user, userDoc, tokenClaims: claims || {}});
+    setViewerAccessFlags(flags);
+    return viewerAudience;
+  }
+
+  function toSearchIntents(audienceOrFlags) {
+    let list;
+    if (audienceOrFlags && typeof audienceOrFlags === "object" && !Array.isArray(audienceOrFlags)) {
+      list = Array.from(byId.values()).filter(entry => canAccessHelpEntry(entry, audienceOrFlags));
+    } else if (typeof audienceOrFlags === "string" && AUDIENCES.includes(audienceOrFlags)) {
+      // Legacy single-audience calls: still apply datapoint gate for the current viewer.
+      list = entries(audienceOrFlags).filter(entry => canAccessHelpEntry(entry, viewerAccessFlags));
+    } else {
+      list = entries("accessible");
+    }
+    return list.map(entry => {
+      const localized = localizeEntry(entry) || entry;
+      const searchPhrases = Array.from(new Set([
+        ...(entry.searchPhrases || []),
+        ...(localized.searchPhrases || []),
+        localized.title,
+        localized.body
+      ].map(normalize).filter(Boolean)));
+      return {
+        id: entry.id,
+        kind: "help",
+        source: entry.source,
+        label: localized.title || entry.title,
+        blurb: localized.body || entry.body || entry.title,
+        steps: entry.steps || [],
+        audiences: entry.audiences || ["patron"],
+        helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
+        links: (entry.links || []).length
+          ? entry.links
+          : [{label: localized.title || entry.title, href: `./floqai.html?v=${APP_V}`}],
+        searchPhrases,
+        patterns: []
+      };
+    });
+  }
+
+  /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
+  registerMany([
+    {
+      id: "floqai-ask-floqr",
+      title: "Ask FloqR with FloqAi",
+      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
+      links: [
+        {label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`},
+        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "index.html#floqAiHelpPopout"
+    },
+    {
+      id: "help-floqai-page",
+      title: "FloqAi",
+      body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, supRstar, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
+      searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
+      links: [{label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "floqai.html#floqAiHelpPopout"
+    },
+    {
+      id: "help-soccer-jersey",
+      title: "Soccer jersey ShoutOut",
+      body: "Search Soccer, Jersey, or a country/club (Tanzania, Chelsea). Each photo kit card is the LED back you will see on ShoutOut — Soccer · Jersey · Country or Club. Sizes 96×48, 64×48, 64×32. Name and 2-character mark overlay the kit; numbers stay center-justified.",
+      searchPhrases: ["soccer jersey", "jersey", "tanzania jersey", "football kit", "country jersey", "club jersey", "chelsea jersey"],
+      links: [
+        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`}
+      ],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-suprstar",
+      title: "Make me a supRstar / superstar",
+      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
+      searchPhrases: [
+        "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
+        "superstar", "super star", "super-star", "suprstr", "suprstar", "supr str", "supr star", "go live",
+        "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
+      ],
+      links: [
+        {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron"]
+    },
+    {
+      id: "help-become-club-admin",
+      title: "Become a Club Admin",
+      body: "Request Club Admin access, then get venue approval.",
+      searchPhrases: ["become a club admin", "club admin", "be an admin", "I want to be a club admin"],
+      links: [{label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-become-dj",
+      title: "Become a DJ",
+      body: "Elect DJ as your service role and associate with clubs.",
+      searchPhrases: ["become a dj", "dj access", "I want to be a dj", "disc jockey"],
+      links: [{label: "Request DJ access", href: vUrl("./role-request.html", {from: "floqai", type: "dj"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-become-promoter",
+      title: "Become a Promoter",
+      body: "Request Promoter access for guest lists and campaigns.",
+      searchPhrases: ["become a promoter", "promoter access", "promotion company"],
+      links: [{label: "Request Promoter access", href: vUrl("./role-request.html", {from: "floqai", type: "promoter"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-role-profiles",
+      title: "Role profiles overview",
+      body: "See how Club Admin, DJ, Promoter, and hospitality roles work.",
+      searchPhrases: ["role profiles", "role profiles overview", "how roles work", "service roles"],
+      links: [{label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-staff-scheduling",
+      title: "Calendar & Scheduler",
+      body: "Club Admin Calendar shows Draft (purple), Pending (amber), Confirmed (green), and Open/unfilled cards — each with a written status, not color alone. Scheduler is the people × days draft/publish grid. Website ingest / publicVenueCalendar returns Confirmed assignments only. A green Paid this month pill is shown to Club Admins when staffSchedulingPaid=1.",
+      searchPhrases: [
+        "staff scheduling", "scheduling subscription", "subscribe $20", "resubscribe", "staffSchedulingPaid",
+        "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule",
+        "draft shift", "purple card", "pending shift", "confirmed shift", "open shift", "unfilled", "assignment card",
+        "website ingest", "confirmed only", "public calendar"
+      ],
+      links: [
+        {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
+        {label: "Club Admin Calendar & Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Draft / Pending / Confirmed / Open cards plus Scheduler drafts"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelScheduling"
+    },
+    {
+      id: "help-club-notification-subscriptions",
+      title: "Club SMS and WhatsApp notification subscriptions",
+      body: "Club Admin → Notifications: Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Green pill = Firebase subscription 1 (prepaid $10 pack); red = 0. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK).",
+      searchPhrases: [
+        "sms notification subscription", "whatsapp notification subscription", "save notification choices",
+        "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
+        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp",
+        "invalid username", "twilio account sid", "send test alert", "authentication error",
+        "in-app notification", "system message", "floqr inbox test"
+      ],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-club-sms-notification",
+      title: "SMS notification subscription",
+      body: "The SMS pill is green when Firebase smsSubscribed is 1 (prepaid $10 pack, 466 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck SMS and Save to pause alerts without losing the paid pack.",
+      searchPhrases: ["sms", "sms credits", "sms subscribe", "green sms", "466 credits"],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-club-whatsapp-notification",
+      title: "WhatsApp notification subscription",
+      body: "The WhatsApp pill is green when Firebase whatsappSubscribed is 1 (prepaid $10 pack, 233 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck WhatsApp and Save to pause alerts without losing the paid pack.",
+      searchPhrases: ["whatsapp", "whatsapp credits", "whatsapp subscribe", "red whatsapp", "233 credits"],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-schedule-message-templates",
+      title: "Schedule message templates",
+      body: "Club Admin → Notifications → Message templates. These are System Messages (Inbox / Email / SMS / WhatsApp), not ShoutOuts. Edit title and body for New shift needs confirmation, Schedule update, Shift confirmed, and Shift declined. Placeholders: {club} {role} {when} {link} {worker}. Worker inbox uses Review & confirm shift — never Open Related ShoutOut.",
+      searchPhrases: [
+        "message template", "system message", "schedule invite", "shift confirmation message",
+        "open related shoutout", "new shift needs your confirmation", "edit system message",
+        "notification templates", "confirm or decline this shift"
+      ],
+      links: [
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#notifyTemplatesPane"
+    },
+    {
+      id: "help-ad-campaigns",
+      title: "Ad Campaigns",
+      body: "Post a flyer image or a video of 30 seconds or less for your business, club, promotion group or service (DJ, photographer, promoter, FloqQ). Choose Inline ($45 / 7 days — Search loading splash and feature screens) or Mingl Gist ($25 / 7 days — story scroll), the run length and who should see it (age, gender, cities, interests). Pay by card or monthly subscription; approved accounts can use an invoice. FLOQR reviews every paid ad before it runs, and rejected ads are refunded. My ads shows the status, views, clicks and your invoice.",
+      searchPhrases: [
+        "ad campaigns", "advertise", "business account", "inline ad", "mingl gist ad",
+        "flyer ad", "html ad", "sponsored", "post an ad", "advertisement"
+      ],
+      links: [
+        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
+        {label: "Ad Campaigns", href: vUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalAdCampaigns",
+      audiences: ["patron"]
+    },
+    {
+      id: "help-ad-campaign-mgmt",
+      title: "Ad Management",
+      body: "Master Admin → Ad Management. Approval queue: approve, waive payment with a reason, mark an invoice paid, or reject with an optional refund. Live & scheduled: pause, resume, end, edit audience and dates. Ad stats: measured impressions, clicks and click rate, with Clear for one ad or all. SMS / WhatsApp intake: texted flyers and videos waiting for payment. Settings & billing: splash on/off and seconds, house and demo ads, intake on/off, invoice accounts and the ad audit log. Packaged demos: the built-in house creatives. Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
+      searchPhrases: [
+        "ad management", "ad campaign mgmt", "approve ad", "preview creative", "match tags",
+        "schedule ad flight", "inline package", "mingl gist package", "demo not live",
+        "packaged demos", "house ads", "campaign status badge"
+      ],
+      links: [
+        {label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"},
+        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#adApprovalQueue"
+    },
+    {
+      id: "help-master-ad-approval",
+      title: "Ad approval queue",
+      body: "Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the payment reference. Reject asks for a reason the poster will see and can refund a card payment.",
+      searchPhrases: ["ad approval", "approve ad", "pending ads", "reject ad", "refund ad", "waive payment", "mark invoice paid", "ad queue"],
+      links: [{label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adApprovalQueue"
+    },
+    {
+      id: "help-master-ad-live",
+      title: "Live and scheduled ads",
+      body: "Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log.",
+      searchPhrases: ["live ads", "pause ad", "end ad", "resume ad", "edit ad audience", "ad dates", "ad targeting"],
+      links: [{label: "Live & scheduled", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adLiveCampaigns"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adLiveCampaigns"
+    },
+    {
+      id: "help-master-ad-stats",
+      title: "Ad stats",
+      body: "Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged.",
+      searchPhrases: ["ad stats", "impressions", "clicks", "ctr", "click rate", "clear ad stats", "reset ad stats", "ad measurement"],
+      links: [{label: "Ad stats", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adStatsPanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adStatsPanel"
+    },
+    {
+      id: "help-master-ad-intake",
+      title: "SMS and WhatsApp ad intake",
+      body: "Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here.",
+      searchPhrases: ["text an ad", "sms ad", "whatsapp ad", "ad intake", "send flyer", "ad payment link", "delete ad submissions"],
+      links: [{label: "SMS / WhatsApp intake", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adIntakePanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adIntakePanel"
+    },
+    {
+      id: "help-master-ad-settings",
+      title: "Ad settings and billing",
+      body: "Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad decision.",
+      searchPhrases: ["ad settings", "splash ads", "splash seconds", "house ads", "demo ads", "invoice account", "net terms", "ad audit log"],
+      links: [{label: "Settings & billing", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adSettingsPanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adSettingsPanel"
+    },
+    {
+      id: "help-ad-campaign-status-badge",
+      title: "Ad campaign Status and Shows on",
+      body: "On each Ad Campaign Mgmt card, Status tells whether the creative is Live, Demo (not live), Awaiting approval, Needs verification, or Rejected. Shows on names the paid package (Inline or Mingl Gist) or the first feature path for packaged demos (for example ShoutOut path). Demo (not live) means a packaged test ad for targeting — it is not the same as the Preview creative button, which opens the flyer or HTML.",
+      searchPhrases: [
+        "preview shoutout", "preview · shoutout", "demo not live", "shows on shoutout",
+        "campaign badge", "status live", "shoutout path", "what does preview mean on ad"
+      ],
+      links: [
+        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#adCampaignManagement"
+    },
+    {
+      id: "help-completed-shoutouts",
+      title: "Completed ShoutOuts",
+      body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox.",
+      searchPhrases: [
+        "completed shoutouts", "completed shoutout", "archive shoutout", "archived shoutouts",
+        "re-use shoutout", "reuse shoutout", "shoutout history", "paid shoutout history",
+        "save as template", "modifiable template", "IsModifiable", "pending shoutouts",
+        "my shoutout templates", "shoutout receipt", "compressed shoutout"
+      ],
+      links: [
+        {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})},
+        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
+        {label: "FloqR Inbox", href: vUrl("./patron-portal.html", {from: "floqai", tab: "inbox"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalShoutouts"
+    },
+    {
+      id: "help-archived-shoutouts",
+      title: "Archived ShoutOuts",
+      body: "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive.",
+      searchPhrases: [
+        "archive shoutout", "archived shoutouts", "compressed shoutout media", "shoutout archive tab"
+      ],
+      links: [
+        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
+        {label: "Completed ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "completed"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#shoutoutArchivePane"
+    },
+    {
+      id: "help-schedule-confirm",
+      title: "Confirm assigned shifts",
+      body: "Inbox / Email / SMS links open Work Calendar. Look at each pending assignment, tick it (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve — Club Admin cannot confirm on their behalf.",
+      searchPhrases: [
+        "confirm shift", "approve shift", "select all shifts", "pending assignment",
+        "schedule notify", "review and confirm shift", "my assigned shifts", "decline shift"
+      ],
+      links: [
+        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalWorkCalendar"
+    },
+    {
+      id: "help-template-catalog-report",
+      title: "Template catalog report",
+      body: "Lists every ShoutOut template type and which LED sizes it supports (Is96x48, Is64x48, Is64x32). A venue only offers a template when at least one of those flags is 1 and the matching VenueSupports* flag is 1. Birthday / split-media templates are 1 on 96×48, 64×48, and 64×32. 96×48 is 3-line side-by-side; 64×48 and 64×32 loop the photo then the 3-line shoutout with a FLOQR + handle card.",
+      searchPhrases: [
+        "template catalog", "template types", "Is96x48", "display sizes", "which templates",
+        "split media", "birthday 64x32", "template report"
+      ],
+      links: [
+        {label: "Club Admin Reports", href: vUrl("./admin.html", {from: "floqai", tab: "reports"})},
+        {label: "Master Admin Template Catalog", href: vUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelReports"
+    },
+    {
+      id: "help-club-display-screens",
+      title: "FLOQR display screens",
+      body: "Firebase clubLocations stores VenueSupports96x48, VenueSupports64x48, and VenueSupports64x32 as 0 or 1. templates stores Is96x48, Is64x48, and Is64x32 the same way. A venue only lists a template when at least one pair is 1. Xibo URLs stay display.html?location=id and display2.html?location=id — screen size is not in the URL. Birthday is offered on all three sizes (3-line side-by-side on 96×48; photo/shoutout loop on 64×48 and 64×32). Primary is display.html. Secondary is display2.html.",
+      searchPhrases: [
+        "display screens", "64x48", "96x48", "64x32", "primary shoutout led",
+        "birthday template screen", "VenueSupports96x48", "Is96x48", "xibo display url",
+        "screen datapoint", "led size"
+      ],
+      links: [
+        {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
+        {label: "Display 1 (Xibo)", href: "./display.html"}
+      ],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html#panelPublicProfile"
+    },
+    {
+      id: "help-heist-enable-64x48",
+      title: "Enable 64×48 display choice at Heist",
+      body: "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: open Club Public Profile (or Master Admin for that club) → FLOQR display screens → tick 64 x 48 cm (keep 64×32 if that board stays live) → Save. Only set primary display to 64×48 if that board is the main Display 1. The Xibo URL stays display.html?location=heist-washington-dc with no extra query parameters.",
+      steps: [
+        "Open Club Public Profile (Club Admin) or Master Admin club display setup for heist-washington-dc",
+        "Tick 64 x 48 cm under FLOQR display screens and Save",
+        "Confirm composer offers 64×48 for Heist; Xibo stays display.html?location=heist-washington-dc"
+      ],
+      searchPhrases: [
+        "heist 64x48", "64x48 at heist", "set 64x48 heist", "enable 64x48 heist",
+        "heist display choice", "heist washington 64x48"
+      ],
+      links: [
+        {label: "Club Public Profile (display screens)", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-floqai-audience-sections",
+      title: "FloqAi help audiences",
+      body: "FloqAi shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
+      searchPhrases: [
+        "floqai audience", "help sections", "master admin help", "venue admin help",
+        "service member help", "patron help", "help security", "blank floqai answer"
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#floqAiHelpPopout"
+    },
+    {
+      id: "help-data-classification",
+      title: "Data classification",
+      body: "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release.",
+      searchPhrases: [
+        "data classification", "classify data", "who can read", "data access", "personal data", "pii",
+        "retention", "exposure report", "system access", "security tab", "floqai access",
+        "save all classifications", "needs review", "what needs fixing", "delete after", "seed classification"
+      ],
+      links: [{label: "Open Data classification", href: `./master-admin.html?v=${APP_V}#dataClassification`}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#dataClassification"
+    },
+    {
+      id: "help-donpapi-led-wall",
+      title: "DonPapi ShoutOut LED wall",
+      body: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other formats.",
+      searchPhrases: [
+        "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
+        "bus boys carry", "shoutout led", "checking in", "we're outside"
+      ],
+      links: [
+        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
+        {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "club-profile.html"
+    },
+    {
+      id: "help-staff-week-calendar",
+      title: "Scheduler",
+      body: "Club Admin Scheduler is a people × days week grid. Save shift closes the editor with Schedule card successfully saved. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club site. Default shift window = club open − 2 hours through close + 1 hour.",
+      searchPhrases: [
+        "scheduler", "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
+        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
+        "open minus two hours", "copy previous week", "public holiday",
+        "pending shift", "confirmed shift", "delete shift", "select shifts", "multi delete",
+        "user guide", "create a schedule", "schedule card successfully saved", "save shift"
+      ],
+      links: [
+        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-staff-schedule-user-guide",
+      title: "Staff Scheduling User Guide",
+      body: "Open the ? beside Scheduler on Club Admin Scheduling. Create draft shifts, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip.",
+      steps: [
+        "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Save closes the editor and shows Schedule card successfully saved. Optional: Round Robin fill or Copy previous week into drafts.",
+        "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
+        "Published chips stay pending until the worker confirms. Confirmed has a green outline.",
+        "To delete several: tap Select shifts. Filter Drafts, tap Wednesday’s column header, switch to All or Confirmed, tap a Thursday confirmed chip, then Delete selected."
+      ],
+      searchPhrases: [
+        "user guide", "staff scheduling user guide", "create a schedule", "create schedule",
+        "publish schedule", "how to schedule staff", "how to publish a schedule",
+        "make a schedule", "staff schedule steps", "scheduling help", "scheduler"
+      ],
+      links: [
+        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
+        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-create-publish-schedule",
+      title: "Create and publish a staff schedule",
+      body: "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff.",
+      steps: [
+        "Open Club Admin → Scheduling after the venue is paid this month.",
+        "Manual: tap + on a cell, set worker/role/times, Save as draft. Repeat, or use Round Robin / Copy previous week.",
+        "Tap Publish schedule. Shifts become pending and workers are notified to confirm.",
+        "The worker uses the Inbox / Email / SMS / WhatsApp confirm link. The chip then shows confirmed."
+      ],
+      searchPhrases: [
+        "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
+        "how to schedule staff", "make a work schedule", "assign shifts", "save as draft",
+        "pending until confirmed", "worker confirm shift"
+      ],
+      links: [
+        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-multi-delete-shifts",
+      title: "Delete multiple scheduled or draft shifts",
+      body: "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
+      steps: [
+        "On the week grid, tap Select shifts.",
+        "Choose Drafts, then tap the Wednesday column header to select every Wednesday draft.",
+        "Switch the filter to All or Confirmed and tap the Thursday confirmed chip (or any other chips you want gone).",
+        "Tap Delete selected and confirm. Drafts vanish quietly; pending and confirmed workers get a cancelled notice if they were already notified."
+      ],
+      searchPhrases: [
+        "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
+        "select shifts", "bulk delete shifts", "delete drafts", "delete thursday shift",
+        "remove several shifts", "multi-delete schedule"
+      ],
+      links: [
+        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-staff-worksheet",
+      title: "Work Sheet - Weekly Staff Calendar",
+      body: "Elected service members open Work Calendar in Settings. Inbox / Email / SMS confirmation links land here. Review pending assignments, tick each shift (or Select all), then Approve selected — opening the message does not confirm. The week grid shows published colleague shifts. Drafts stay in Club Admin.",
+      searchPhrases: [
+        "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
+        "colleague schedule", "who is working", "my shifts this week", "elected staff schedule",
+        "confirm shift", "approve selected", "my assigned shifts"
+      ],
+      links: [
+        {label: "Work Calendar tab", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "staff-worksheet.html"
+    },
+    {
+      id: "help-service-members",
+      title: "Services & Service Members",
+      body: "Everyone starts as a FLOQR patron. On My Profile & Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit at the bottom of this page.\n\nProfile template guide — patron social profiles stay on Public Media. Service roles use dedicated profile templates on My Profile:\n• Patron — music, travel, hobbies, nightlife style, looking to meet; 8 photos and 2 short videos.\n• Promoter — active cities, events, guest lists, VIP tables, venue relationships, promo media.\n• DJ — genres, residencies, booking availability, mix links, crowd style, performance media.\n• Waitress / Waitress / Bottle Girl — venue experience, service style, languages, nights, bottle service, professional media.\n• Bus Boys or Security — floor support, door, security stations, venue experience, professional media.\n• Venue Manager — venues managed, ops specialties, staff coordination, professional media.\n\nClub Admin approval — each club's Club Admin approves your association after you submit. Club Admins: open Club Admin → Employee/Workers → Pending Worker Requests (Approve or Reject), or on this tab open Review & elect.",
+      searchPhrases: [
+        "service members", "services and service members", "request club admin", "request access", "elect service member",
+        "worker association", "request dj access", "request promoter", "bus boys or security",
+        "venue manager", "approve worker request", "become a waitress", "bottle girl", "affiliate club",
+        "profile template guide", "approve waitress", "pending worker requests"
+      ],
+      links: [
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
+        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalServiceMembers"
+    },
+    {
+      id: "help-venue-website-ingest",
+      title: "Club website ingest (API, RSS, iframe)",
+      body: "Club Admin → Scheduling → Website ingest. Generate a secret (shown once; only a hash is stored). Pull published staff shifts onto the official club website with JSON (?format=json&dataset=schedule|hours|profile|all), RSS, or an iframe snippet. Drafts, worker email, and phone are never included. Rotate the secret if it leaks.",
+      searchPhrases: [
+        "website ingest", "club website schedule", "rss feed", "iframe schedule",
+        "schedule api", "ingest secret", "embed staff schedule", "official website",
+        "json schedule feed", "pull schedule onto website"
+      ],
+      links: [
+        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedWebsiteIngest"
+    },
+    {
+      id: "help-venue-hours-calendar",
+      title: "Venue opening hours",
+      body: "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. The public club page shows a Sun–Sat week grid with the date range (e.g. Sun 9 – Sat 15, Aug 2026) and calendar coloring. Upcoming public holidays list open/close hours and call out when they differ from the usual weekday. Staff Scheduling uses open − 2h through close + 1h. Guest List can suggest open nights.",
+      searchPhrases: [
+        "club hours", "opening times", "venue schedule", "hours exception", "period override",
+        "public holiday", "open closed days", "venue calendar"
+      ],
+      links: [
+        {label: "Club Public Profile", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#clubVenueHoursCard"
+    },
+    {
+      id: "help-venue-crawl-datapoints",
+      title: "AI crawl venue datapoints",
+      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Crawls also check venue website footers and contact pages for social handles. Each card shows when it was collected. Already-onboarded venues are scanned for lineup/event updates only. Use the country tabs to filter the queue. Approve when ready, or choose Needs research.",
+      searchPhrases: [
+        "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
+        "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
+        "club admin imports"
+      ],
+      links: [
+        {label: "Master Admin AI Crawling", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-network-promoters",
+      title: "Network Promoter Data",
+      body: "Master Admin → Promoters shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub Temp Promoter N Collective cards), and promoter onboarding records. Empty referrals does not mean there are no club promoters.",
+      searchPhrases: [
+        "promoters", "promoter network", "guest list referrals", "temp promoter",
+        "promotion groups", "network promoter data"
+      ],
+      links: [
+        {label: "Master Admin Promoters", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#promoterNetwork"
+    },
+    {
+      id: "help-club-admin-affiliation",
+      title: "Club Admin venue assignment",
+      body: "Club Admins only open the Venue Command Center for a club they are assigned to. Opening admin.html without a venue no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N. Unassigned admins request assignment from Master Admin.",
+      searchPhrases: [
+        "club admin assignment", "affiliated club", "request venue assignment", "temp_clubadmin",
+        "temp-democlub", "not an elected club admin", "zebbies default"
+      ],
+      links: [
+        {label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
+        {label: "Club Admin portal", href: vUrl("./admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#adminVenueGate"
+    },
+    {
+      id: "help-sos2fa-request-channels",
+      title: "Request SOS2FA Code",
+      body: "Request is sent using your general Notifications settings",
+      searchPhrases: [
+        "request sos2fa code", "sos2fa", "notifications settings", "general notifications",
+        "entity management unlock", "sos2fa email sms", "notifyEmail", "notifySms"
+      ],
+      links: [
+        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#entityManagement"
+    },
+    {
+      id: "help-general-notifications",
+      title: "General Notifications",
+      body: "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
+      searchPhrases: [
+        "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
+        "sos2fa email sms", "notification settings", "twilio", "paid sms",
+        "club admin notifications", "whatsapp twilio", "patron user record"
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPrivacy"
+    },
+    {
+      id: "help-do-not-sell",
+      title: "Do Not Sell or Share",
+      body: "Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically. Open the Privacy Policy for CCPA / CPRA details.",
+      searchPhrases: [
+        "do not sell", "do not share", "ccpa", "cpra", "gpc", "global privacy control",
+        "personalized ads", "privacy policy", "download my data", "delete my data", "dsar"
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPrivacy"
+    },
+    {
+      id: "help-welcome",
+      title: "Welcome to FLOQR",
+      body: "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",
+      searchPhrases: [
+        "welcome", "what is floqr", "what can i do on floqr", "about floqr",
+        "book nightlife", "send a live shoutout", "mingl with friends",
+        "what is otp", "one time password", "how does otp work", "sign in code",
+        "whatsapp otp", "whatsapp code", "sms otp", "sms code", "verification code"
+      ],
+      links: [
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
+        {label: "Mingl", href: vUrl("./", {start: "mingl", from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#landingPage"
+    },
+    {
+      id: "help-shoutout-recommendations",
+      title: "ShoutOut Recommendations",
+      body: "Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages.",
+      searchPhrases: ["shoutout recommendations","shoutout ideas","improve my shoutout","use past shoutout","what should i write","help me write a shoutout","recommendation style"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-ai-recommendations",
+      title: "AI Recommendations",
+      body: "Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it.",
+      searchPhrases: ["ai recommendations","ai shoutout","ai ideas","write my shoutout with ai","personalized shoutout"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-trending-shoutouts",
+      title: "Trending ShoutOuts",
+      body: "Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it.",
+      searchPhrases: ["trending shoutouts","popular shoutouts","top shoutouts","approved shoutouts"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-generic-shoutouts",
+      title: "Generic ShoutOuts",
+      body: "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own.",
+      searchPhrases: ["generic shoutouts","birthday shoutout ideas","celebration shoutout","ready made shoutout"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-location-search",
+      title: "Location-aware search",
+      body: "FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings.",
+      searchPhrases: [
+        "location", "my location", "use my location", "gps", "ip location", "why these results",
+        "closest first", "nearest first", "sorted by distance", "how are results sorted", "location access",
+        "turn off location", "location permission"
+      ],
+      links: [
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
+        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#listingPage"
+    },
+    {
+      id: "help-beta-tester",
+      title: "Beta testing",
+      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
+      searchPhrases: [
+        "beta", "beta tester", "beta testing", "become a beta tester", "test new features", "early access",
+        "beta invite", "beta invitation", "try new features", "beta label", "why can't i see mingl", "feature not available"
+      ],
+      links: [
+        {label: "My Profile Inbox", href: vUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})},
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "beta-invite.html"
+    },
+    {
+      id: "help-features-services",
+      title: "Features & Services",
+      body: "Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link under the feature name in this table. Each feature has two switches. Enable Feature (IsFeatureEnabled) = 0 turns the feature off for everyone, including beta testers, Master Admins, and every menu link. With Enable Feature = 1 and Enable Beta Feature (IsTestFeature) = 0, every patron sees its Search tile and menu links. With both = 1, the feature is in testing: only beta testers you granted that feature see its links, marked Beta; Master Admins see it in their profile menu marked Beta and open it from this table instead of Search. Master Admins cannot be beta testers. When you press Save, FLOQR asks for a reason of at least 8 characters; it needs an SOS2FA unlock and is written to the tamper-evident audit trail below. Revision counts the saved changes to a feature. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",
+      searchPhrases: [
+        "features and services", "feature flags", "enable feature", "enable beta feature", "disable feature", "test feature", "beta testers",
+        "invite beta tester", "IsFeatureEnabled", "IsTestFeature", "feature links", "beta pill", "revision", "reason for change",
+        "promote test to live", "feature audit trail"
+      ],
+      links: [
+        {label: "Features & Services (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#featuresServices"
+    },
+    {
+      id: "help-sos2fa-entity-mgmt",
+      title: "Privilege Admin Access",
+      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
+      searchPhrases: [
+        "sos2fa", "social os 2fa", "social os - 2fa", "entity management unlock", "request sos2fa code", "two factor",
+        "privilege admin access", "sos2fa sms", "entity management 2fa"
+      ],
+      links: [
+        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#entityManagement"
+    },
+    {
+      id: "help-master-ops-status",
+      title: "Master Admin security and action status",
+      body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask FloqAi about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",
+      searchPhrases: [
+        "ops status", "master ops", "ops status banner", "security status pending", "no admin action clicked yet",
+        "master admin status", "master security status", "admin action feedback", "master admin unlock status"
+      ],
+      links: [
+        {label: "Privilege Admin Access", href: vUrl("./master-admin.html", {from: "floqai"}), search: "privilege admin access"},
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-master-network-intelligence",
+      title: "All Locations",
+      body: "This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOuts counts ShoutOuts waiting for approval at every venue; Estimated Network Revenue is a rough estimate from pending ShoutOuts and live boards, not booked revenue. Top Locations lists the venues with the most pending ShoutOuts. To work on one venue, open Entity Management → Manage Entities, unlock with SOS2FA, search for the venue and use Manage selected, or open Venue Links to copy its Club Admin and Display links. Master Admin is for FLOQR internal use only.",
+      searchPhrases: [
+        "all locations", "network intelligence center", "network intelligence", "location picker", "pick a location",
+        "choose a venue", "network dashboard locations", "which venue am i looking at", "total locations",
+        "all pending shoutouts", "estimated network revenue", "top locations", "all venues", "network view",
+        "floqr master admin", "master admin portal"
+      ],
+      links: [
+        {label: "Network Dashboard", href: vUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"},
+        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}) + "#entityManagement", search: "manage entities"},
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubAdminUrls", search: "venue links"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-master-demo-signin",
+      title: "Demo sign-in code",
+      body: "Master Admin → Entity Management → Demo Svc / Emp Mgmt. Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Unlock SOS2FA, search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail and listed under Recent codes issued. Real patron accounts cannot get a code here.",
+      searchPhrases: [
+        "demo employee code", "temp code", "demo sign in", "sign in as demo", "demo sign-in code", "demo sign in code",
+        "demo signin", "sign in as demo account", "log in as demo account", "demo svc emp mgmt", "demo employees",
+        "demo service member", "temp waitress", "floqr-demo", "demo account login", "test account code",
+        "email code not arriving", "sendgrid not working", "demo account password"
+      ],
+      links: [
+        {label: "Demo Svc / Emp Mgmt", href: vUrl("./master-admin.html", {from: "floqai"}) + "#demoEmployees", search: "demo employee code"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#demoEmployees"
+    },
+    {
+      id: "help-master-completed-log",
+      title: "Completed Log",
+      body: "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata: 7 years. Media: deleted 90 days after completion. Default search window: 60 days. Export CSV downloads the current results. FloqR does not forever-archive media for compliance.",
+      searchPhrases: [
+        "completed log", "completed shoutout log", "shoutout compliance", "compliance logs", "master shoutouts",
+        "audit retention", "soc 2", "iso 27001", "nist", "rebuild compliance", "export csv shoutout"
+      ],
+      links: [
+        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"},
+        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#shoutoutCompletedLog"
+    },
+    {
+      id: "help-master-shoutout-retention",
+      title: "Retention",
+      body: "Master Admin → ShoutOut Mgmt → Retention. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Completed Log default search window is 60 days (expand dates for older retained rows). No forever media archive for compliance. Use Rebuild from ShoutOuts + Audit + Inbox when the Completed Log is empty.",
+      searchPhrases: [
+        "retention", "shoutout retention", "audit retention", "7 years", "90 days", "media purge",
+        "anonymize", "completed log retention", "master shoutout retention"
+      ],
+      links: [
+        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"},
+        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#shoutoutRetention"
+    },
+    {
+      id: "help-public-media-sharing",
+      title: "Public Media and Data Sharing",
+      body: "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.",
+      searchPhrases: [
+        "public media", "profile media", "upload photos", "profile pictures", "data sharing",
+        "public profile media", "8 photos", "profile videos"
+      ],
+      links: [
+        {label: "Public Media and Data Sharing", href: vUrl("./patron-portal.html", {from: "floqai", tab: "public-profile"}), search: "public media"}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPublicProfile"
+    },
+    {
+      id: "help-app-language",
+      title: "App language / FloqR webapp language",
+      body: "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it anytime under My Profile → Language Settings → FloqR webapp language (saved on this device and on your profile). FLOQR does not choose language from IP address or country. To fix AI-sounding German or Arabic wording for everyone, Master Admin uses Translation Overrides.",
+      searchPhrases: [
+        "app language", "webapp language", "dutch", "nederlands", "browser language", "first use language",
+        "change language", "switch language", "ui language", "detect language", "language settings",
+        "how language works", "ip language", "country language", "floqr language"
+      ],
+      links: [
+        {label: "Language Settings (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "language settings", blurb: "Choose FloqR chrome language"},
+        {label: "Translation Overrides (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides", search: "translation overrides", blurb: "Fix German and Arabic UI wording"}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalLanguageSettings"
+    },
+    {
+      id: "help-my-profile",
+      title: "My Profile & Settings",
+      body: "Open My Profile & Settings for roles, seller tools, and account options.",
+      searchPhrases: ["my profile", "profile and settings", "settings", "account", "my profile & settings"],
+      links: [{label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-onboarding",
+      title: "Onboarding",
+      body: "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues.",
+      searchPhrases: [
+        "onboarding", "link to onboarding", "onboard", "patron onboarding",
+        "role onboarding", "service member onboarding", "request access", "get started"
+      ],
+      links: [
+        {label: "Role / service onboarding", href: vUrl("./role-request.html", {from: "floqai"})},
+        {label: "Venue onboarding (Master Admin)", href: vUrl("./onboard-dc-venues.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-venue-links",
+      title: "Venue Links",
+      body: "Venue Admin Portal URLs are generated when you search — they are not stored with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the latest release. Opening Master Admin with an old ?v= bookmark does not freeze these links. Display board URLs stay location-only with no ?v=.",
+      searchPhrases: [
+        "venue links", "venue admin portal url", "club admin url", "admin.html version",
+        "hardcoded version", "club admin link", "master admin venue links"
+      ],
+      links: [
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#clubAdminUrls"
+    },
+    {
+      id: "help-translation-overrides",
+      title: "Translation Overrides",
+      body: "Master Admin → Translation Overrides. Choose German or Arabic, search a UI string key, edit the wording, then Save language. Patrons see the fix on the next page load — overrides win over the packaged translation. German and Arabic ship first. FLOQR does not pick language from IP; patrons set FloqR webapp language under My Profile → Language Settings (or the first-use browser language prompt).",
+      searchPhrases: [
+        "translation overrides", "edit translation", "fix german translation", "fix arabic translation",
+        "ai sounding translation", "native speaker edit", "override language", "german arabic chrome",
+        "how to edit language", "i18n override", "Übersetzungs-Anpassungen", "تعديلات الترجمة"
+      ],
+      links: [
+        {
+          label: "Translation Overrides",
+          href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides",
+          search: "translation overrides|edit translation|german|arabic|native speaker",
+          blurb: "Edit German and Arabic UI wording that sounds artificial."
+        }
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#translationOverrides"
+    },
+    {
+      id: "help-mail-logging",
+      title: "SendGrid Mail Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → SendGrid Mail Logs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
+      searchPhrases: [
+        "sendgrid mail logs", "twilio_sendgridMailLogs", "mail logging", "email log", "sendgrid", "system mail",
+        "preview links email", "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
+      ],
+      links: [
+        {label: "SendGrid Mail Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilio_sendgridMailLogs"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#twilio_sendgridMailLogs"
+    },
+    {
+      id: "help-twilio-logging",
+      title: "SMS Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → SMS Logs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → Compliance Logs. SendGrid email is under Twilio → SendGrid Mail Logs.",
+      searchPhrases: [
+        "sms logs", "twilio logging", "sms log", "whatsapp log", "twilio dry-run", "twilioSmsLogs",
+        "marketing sms", "why no sms", "send test debit", "twilio debugger"
+      ],
+      links: [
+        {label: "SMS Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioSmsLogs"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#twilioSmsLogs"
+    },
+    {
+      id: "help-twilio-compliance-logs",
+      title: "Compliance Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → Compliance Logs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
+      searchPhrases: [
+        "compliance logs", "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
+      ],
+      links: [
+        {label: "Compliance Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioComplianceLogs"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#twilioComplianceLogs"
+    },
+    {
+      id: "help-club-messaging-logs",
+      title: "SMS & WhatsApp delivery logs",
+      body: "Club Admin → Marketing → SMS & WhatsApp Logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked.",
+      searchPhrases: [
+        "messaging logs", "club sms log", "club whatsapp log", "twilioSmsLogs", "twilioWhatsAppLogs",
+        "marketing sms log", "send test debit", "why no sms"
+      ],
+      links: [
+        {label: "Club Marketing", href: vUrl("./admin.html", {tab: "marketing", from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelMessagingLogs"
+    },
+    {
+      id: "help-club-messaging-credit",
+      title: "SMS & WhatsApp Credit",
+      body: "Each $10 pack funds $7.00 of Twilio delivery capacity; FloqR keeps $3.00 as platform profit on the pack. SMS pack → 466 messages (≈ $0.015 all-in US SMS). WhatsApp pack → 233 messages (≈ $0.030 Twilio + Meta marketing). When balance reaches 0, buy another $10 messaging bundle before sending more campaign messages. Ops SMS unlock ($10) also grants one SMS pack. WhatsApp service ($10) grants one WhatsApp pack. Pack math: $10 → 466 SMS or 233 WhatsApp ($7.00 Twilio / $3.00 FloqR).",
+      searchPhrases: [
+        "messaging credit", "sms pack", "whatsapp pack", "buy sms bundle", "twilio credits", "466 sms"
+      ],
+      links: [
+        {label: "Messaging Credit", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMessagingCredit"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelMessagingCredit"
+    },
+    {
+      id: "help-club-marketing-campaigns",
+      title: "Marketing campaigns",
+      body: "Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS or WhatsApp credits from Messaging Credit.",
+      searchPhrases: [
+        "marketing campaign", "sms blast", "whatsapp campaign", "industry template", "send test marketing"
+      ],
+      links: [
+        {label: "Marketing Campaigns", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMarketingCampaigns"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelMarketingCampaigns"
+    },
+    {
+      id: "help-club-in-app-marketing",
+      title: "In-app marketing",
+      body: "Post a flyer or a video of 30 seconds or less as your club. Once it is paid and approved by FLOQR it shows on the Search loading splash, Mingl, RydR and other FLOQR screens. Club ad posters lets a team member post ads for the club (Club Ad Poster role). No SMS credits required.",
+      searchPhrases: [
+        "spot ad", "in-app marketing", "advertisement pool", "mingl ad", "rydr ad", "interstitial"
+      ],
+      links: [
+        {label: "In-App Marketing", href: vUrl("./admin.html", {from: "floqai"}) + "#panelInAppMarketing"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelInAppMarketing"
+    },
+    {
+      id: "help-venue-onboarding",
+      title: "Venue onboarding (Master Admin)",
+      body: "Master Admin venue onboarding — push crawled club profiles into Firestore.",
+      searchPhrases: ["venue onboarding", "onboard clubs", "onboard venues", "dc venues", "link to onboarding venues", "master admin onboarding"],
+      links: [{label: "Venue onboarding", href: vUrl("./onboard-dc-venues.html", {from: "floqai"})}],
+      source: "help-repository-seed"
+    },
+    {
+      id: "help-mingl-search",
+      title: "About Mingl search",
+      body: "Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.",
+      searchPhrases: ["mingl search", "search people", "mingl social playground", "find people"],
+      links: [{label: "Open Mingl", href: `./?v=${APP_V}&start=mingl`}],
+      source: "help-repository-seed",
+      page: "index.html#mingl"
+    },
+    {
+      id: "help-default-template",
+      title: "Default Template",
+      body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
+      searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-floqai-template-search",
+      title: "FloqAi template search",
+      body: "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.",
+      searchPhrases: ["floqai template", "sports jersey", "nba nfl cars humor"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-football-intro",
+      title: "Football Intro",
+      body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only.",
+      searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars template", "team intro", "four player intro"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-tengo-muchos-dolares",
+      title: "Tengo muchos dólares",
+      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault for 5 seconds; then the vault door blows open and $100 bills splash behind your words for 10 seconds. The board closes with the HEIST logo over Washington DC, then loops. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares... I just did a heist!” letter by letter. Plays on 96×48 displays only.",
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just did a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-club-template-repository",
+      title: "Your club's templates",
+      body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",
+      searchPhrases: ["club templates", "exclusive templates", "assign template", "remove template", "tengo muchos dolares", "heist templates"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-employee-network",
+      title: "Employee / Worker Network",
+      body: "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR).",
+      searchPhrases: ["employee network", "worker network", "elect patron", "elect role", "give staff a role", "add a waitress", "add staff", "club staff list", "designate csr", "customer service representative"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-staff-marketing-consent",
+      title: "Staff marketing consent",
+      body: "When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, YouTube and similar) without asking you again for each use. They may not publish your phone number or email. You can withdraw at any time in My Profile on the Services & Service Members tab. This stops new marketing; materials already printed or posted do not have to be recalled. Club Admins see each staff member's consent status in Employee / Worker Network and Featured service staff.",
+      searchPhrases: ["marketing consent", "staff marketing consent", "use my photos", "club can use my photos", "withdraw marketing consent", "photo consent staff", "instagram consent", "flyer photo consent"],
+      links: [
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-featured-staff",
+      title: "Featured service staff",
+      body: "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes. Before publishing photos, get each person's agreement and tick the photo consent box.",
+      searchPhrases: ["featured staff","featured service staff","staff on club page","show staff on club page","staff photo","waiters on club page","bottle service on club page"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-club-website-feed",
+      title: "Club website feed",
+      body: "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links.",
+      searchPhrases: ["club website feed","website feed","embed on my website","put events on my website","iframe","rss feed","club api","website widget","staff list on website"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-template-tags",
+      title: "Template tags",
+      body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",
+      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin", "serviceMember"],
+      source: "help-repository-seed",
+      page: "template-tags.html"
+    },
+    {
+      id: "help-template-preview",
+      title: "Preview a template",
+      body: "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos.",
+      searchPhrases: ["preview template", "template preview", "see template", "try template", "what does the template look like"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-display-idle-default",
+      title: "Idle board: Use ShoutOut @ venue",
+      body: "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away.",
+      searchPhrases: ["use shoutout @", "idle board", "default display message", "board stuck on shoutout", "reset display"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-mingl-requests",
+      title: "About Mingl Requests",
+      body: "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.",
+      searchPhrases: ["mingl requests", "friend request", "mingl chat"],
+      links: [{label: "Open Mingl", href: `./?v=${APP_V}&start=mingl`}],
+      source: "help-repository-seed",
+      page: "index.html#mingl"
+    }
+  ]);
+
+  function boot() {
+    try { registerDomHelpPopouts(global.document); } catch (error) {}
+  }
+
+  if (global.document?.readyState === "loading") {
+    global.document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  global.FLOQRHelpRepository = {
+    AUDIENCES,
+    HELP_PARTITIONS,
+    register,
+    registerMany,
+    registerFromHelpNode,
+    registerDomHelpPopouts,
+    entries,
+    toSearchIntents,
+    localizeEntry,
+    setViewerAudience,
+    getViewerAudience,
+    getViewerAccessFlags,
+    setViewerAccessFlags,
+    resolveAccessFlagsFromProfile,
+    resolveViewerAudience,
+    canAccessPartition,
+    canAccessHelpEntry,
+    inferAudiences,
+    vUrl
+  };
+})(window);

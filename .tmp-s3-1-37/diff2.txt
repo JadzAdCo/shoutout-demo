@@ -1,0 +1,2253 @@
+ad-campaign-preview-v28.99.html:20
+- <a href="./index.html?v=28.99">&larr; Back to app</a>
++ <a href="./index.html">&larr; Back to app</a>
+ad-submit-app.js:103
+- return `./ad-invoice.html?v=${encodeURIComponent(v)}&t=${encodeURIComponent(token)}`;
++ return `./ad-invoice.html?t=${encodeURIComponent(token)}`;
+admin-app.js:102
+- if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
++ if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&from=admin`;
+admin-app.js:104
+- if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
++ if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?from=admin&location=${encodeURIComponent(locationId)}`;
+admin-app.js:193
+- return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
++ return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}`, window.location.href).toString();
+admin-app.js:969
+- if (!url.searchParams.get("v") && CURRENT_VERSION) url.searchParams.set("v", CURRENT_VERSION);
++ url.searchParams.delete("v");
+admin-app.js:2411
+- const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDat
++ const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDat
+admin-app.js:2532
+- link:"./patron-portal.html?tab=shoutouts&v=29.09.8"
++ link:"./patron-portal.html?tab=shoutouts"
+admin-rep-extension.js:102
+- link: `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
++ link: `./template-tags.html?location=${encodeURIComponent(locationId)}`,
+admin-rep-extension.js:153
+- const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestLi
++ const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestLi
+admin-rep-extension.js:164
+- if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`;
++ if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}`;
+admin-scheduling.js:440
+- if (handle) return `./?v=${v}&start=mingl&q=${encodeURIComponent(handle)}`;
++ if (handle) return `./?start=mingl&q=${encodeURIComponent(handle)}`;
+admin-scheduling.js:441
+- if (worker.uid) return `./services.html?v=${v}&q=${encodeURIComponent(worker.name || worker.email || worker.uid)}`;
++ if (worker.uid) return `./services.html?q=${encodeURIComponent(worker.name || worker.email || worker.uid)}`;
+admin-scheduling.js:442
+- return `./services.html?v=${v}`;
++ return `./services.html`;
+admin.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=s3.1.36">&larr; Venue Command Center</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&larr; Venue Command Center</a>
+admin.html:51
+- <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?v=29.09.99&amp;type=clubAdmin&amp;from=admin">Request club association</a>
++ <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?type=clubAdmin&amp;from=admin">Request club association</a>
+admin.html:916
+- <p><a id="adminRoleProfilesLink" href="./role-profiles.html?v=29.09.44&from=admin">Open role/profile landing pages</a></p>
++ <p><a id="adminRoleProfilesLink" href="./role-profiles.html?from=admin">Open role/profile landing pages</a></p>
+ai-assistant-ui.js:85
+- actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications&v=29.09.8"}]
++ actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications"}]
+ai-assistant-ui.js:112
+- if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}&v=29.09.8`};
++ if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}`};
+ai-assistant-ui.js:113
+- if (item.type === "event") return {label:`View ${item.title}`, href:`./?v=29.09.8`};
++ if (item.type === "event") return {label:`View ${item.title}`, href:`./`};
+ai-assistant-ui.js:114
+- if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./?v=29.09.8"};
++ if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./"};
+ai-diagnostics-service.js:1486
+- howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.108 → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As
++ howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/ → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Adm
+ai-diagnostics-service.js:1494
+- howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.107. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp
++ howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp number, ta
+ai-diagnostics-service.js:1502
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.106 and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Neare
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your
+ai-diagnostics-service.js:1510
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.105. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You ma
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also sear
+ai-diagnostics-service.js:1518
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html?v=s3.0.103 (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?v=s3.0.103&tab=privacy: toggle Do Not Sell, Save, refresh; Download My 
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server expo
+ai-diagnostics-service.js:1534
+- howToTest:"Open index.html?v=s3.0.12&location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeam
++ howToTest:"Open index.html?location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerC
+ai-diagnostics-service.js:1542
+- howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?v=s3.0.10&location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&tem
++ howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&template=socc
+ai-diagnostics-service.js:1550
+- howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xi
++ howToTest:"Open soccer-jersey-preview.html then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xibo URLs s
+ai-diagnostics-service.js:1558
+- howToTest:"Hard-refresh master-admin.html?v=s3.0.78#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Op
++ howToTest:"Hard-refresh master-admin.html#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row
+ai-diagnostics-service.js:1566
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile li
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile links stay 
+ai-diagnostics-service.js:1574
+- howToTest:"Open master-admin.html?v=29.09.22#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.
++ howToTest:"Open master-admin.html#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.",
+ai-diagnostics-service.js:1575
+- expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&v=s3.0.3&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
++ expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
+ai-diagnostics-service.js:1582
+- howToTest:"Sign in on patron-portal.html?v=s3.0.3 as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.ht
++ howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from S
+ai-diagnostics-service.js:1590
+- howToTest:"Sign in on patron-portal.html?v=s3.0.2 as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — sam
++ howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — same session
+ai-diagnostics-service.js:1598
+- howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?v=s3.0.1&tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, c
++ howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, checkboxes
+ai-diagnostics-service.js:1606
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.116&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the edit
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the editor closes, t
+ai-diagnostics-service.js:1614
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.115&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/ifra
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/iframe. As an el
+ai-diagnostics-service.js:1622
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.114 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Gui
+ai-diagnostics-service.js:1630
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.113 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the 
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the chip: Delete
+ai-diagnostics-service.js:1638
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.112 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid user
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid username only). 
+ai-diagnostics-service.js:1646
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.111 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays red until p
+ai-diagnostics-service.js:1654
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1&v=29.09.108 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. 
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. Scheduling g
+ai-diagnostics-service.js:1670
+- howToTest:"Open rydr.html?v=29.09.9&from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
++ howToTest:"Open rydr.html?from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
+ai-diagnostics-service.js:5933
+- url.searchParams.set("v", "29.07-crawler-profile-import");
++ return url.href;
+ai-diagnostics-service.js:5934
+- return url.href;
++ }
+ai-diagnostics-service.js:5935
+- }
++ 
+ai-diagnostics-service.js:5936
+- 
++ async function saveClubProfileImportDrafts() {
+ai-diagnostics-service.js:5937
+- async function saveClubProfileImportDrafts() {
++ if (!state.db) return;
+ai-diagnostics-service.js:5938
+- if (!state.db) return;
++ let envelope;
+ai-diagnostics-service.js:5939
+- let envelope;
++ try {
+ai-diagnostics-service.js:5940
+- try {
++ envelope = parseProfileImportJson();
+ai-diagnostics-service.js:5941
+- envelope = parseProfileImportJson();
++ } catch (error) {
+ai-diagnostics-service.js:5942
+- } catch (error) {
++ setText("diagnosticsStatus", `Import data could not be read: ${error?.message || error}`);
+ai-diagnostics-service.js:5943
+- setText("diagnosticsStatus", `Import data could not be read: ${error?.message || error}`);
++ return;
+ai-diagnostics-service.js:5944
+- return;
++ }
+ai-diagnostics-service.js:5945
+- }
++ const drafts = envelope.records.map(cleanProfileImportDraft).filter(draft => draft.targetId);
+ai-diagnostics-service.js:5946
+- const drafts = envelope.records.map(cleanProfileImportDraft).filter(draft => draft.targetId);
++ if (!drafts.length) {
+ai-diagnostics-service.js:5947
+- if (!drafts.length) {
++ setText("diagnosticsStatus", "No Club Admin import records ready. Click Prepare Club Admin imports first.");
+ai-diagnostics-service.js:5948
+- setText("diagnosticsStatus", "No Club Admin import records ready. Click Prepare Club Admin imports first.");
++ return;
+ai-diagnostics-service.js:5949
+- return;
++ }
+ai-diagnostics-service.js:5950
+- }
++ const saved = [];
+ai-diagnostics-service.js:5951
+- const saved = [];
++ for (const draft of drafts) {
+ai-diagnostics-service.js:5952
+- for (const draft of drafts) {
++ const ref = state.db.collection("aiDiscoveryQueue").doc();
+ai-diagnostics-service.js:5953
+- const ref = state.db.collection("aiDiscoveryQueue").doc();
++ const importUrl = draft.targetCollection === "clubLocations" ? clubAdminImportUrl(ref.id, draft.targetId) : "";
+ai-diagnostics-service.js:5954
+- const importUrl = draft.targetCollection === "clubLocations" ? clubAdminImportUrl(ref.id, draft.targetId) : "";
++ await ref.set({
+ai-diagnostics-service.js:5955
+- await ref.set({
++ proposedType: draft.targetCollection === "events" ? "eventDestinationProfile" : "clubProfile",
+ai-diagnostics-service.js:5956
+- proposedType: draft.targetCollection === "events" ? "eventDestinationProfile" : "clubProfile",
++ proposedTitle: draft.displayName,
+ai-diagnostics-service.js:5957
+- proposedTitle: draft.displayName,
++ proposedDescription: draft.aiSummary,
+ai-diagnostics-service.js:5958
+- proposedDescription: draft.aiSummary,
++ proposedLocationName: draft.proposedLocationName || draft.displayName,
+ai-diagnostics-service.js:5959
+- proposedLocationName: draft.proposedLocationName || draft.displayName,
++ proposedAddress: draft.publicProfile.address || "",
+ai-diagnostics-service.js:5960
+- proposedAddress: draft.publicProfile.address || "",
++ streetAddress: draft.publicProfile.streetAddress || "",
+ai-diagnostics-service.js:5961
+- streetAddress: draft.publicProfile.streetAddress || "",
++ fullAddress: draft.publicProfile.fullAddress || draft.publicProfile.address || "",
+ai-diagnostics-service.js:5962
+- fullAddress: draft.publicProfile.fullAddress || draft.publicProfile.address || "",
++ city: draft.publicProfile.city || "",
+ai-diagnostics-service.js:5963
+- city: draft.publicProfile.city || "",
++ stateRegion: draft.publicProfile.stateRegion || "",
+ai-diagnostics-service.js:5964
+- stateRegion: draft.publicProfile.stateRegion || "",
++ postalCode: draft.publicProfile.postalCode || "",
+ai-diagnostics-service.js:5965
+- postalCode: draft.publicProfile.postalCode || "",
++ country: draft.publicProfile.country || "",
+ai-diagnostics-service.js:5966
+- country: draft.publicProfile.country || "",
++ locationLabel: draft.publicProfile.locationLabel || "",
+ai-diagnostics-service.js:5967
+- locationLabel: draft.publicProfile.locationLabel || "",
++ sourceUrl: draft.sourceUrl || draft.publicProfile.sourceUrl || "",
+ai-diagnostics-service.js:5968
+- sourceUrl: draft.sourceUrl || draft.publicProfile.sourceUrl || "",
++ sourceName: draft.sourceName || draft.publicProfile.sourceName || "AI crawler public source",
+ai-diagnostics-service.js:5969
+- sourceName: draft.sourceName || draft.publicProfile.sourceName || "AI crawler public source",
++ extractedTags: draft.publicProfile.tags || [],
+ai-diagnostics-service.js:5970
+- extractedTags: draft.publicProfile.tags || [],
++ categories: ["profile-import-draft", draft.targetType],
+ai-diagnostics-service.js:5971
+- categories: ["profile-import-draft", draft.targetType],
++ aiSummary: draft.aiSummary,
+ai-diagnostics-service.js:5972
+- aiSummary: draft.aiSummary,
++ aiConfidenceScore: draft.aiConfidenceScore,
+ai-diagnostics-service.js:5973
+- aiConfidenceScore: draft.aiConfidenceScore,
++ aiStarRating: draft.aiStarRating || 3,
+ai-diagnostics-service.js:5974
+- aiStarRating: draft.aiStarRating || 3,
++ aiRatingReasons: [
+ai-diagnostics-service.js:5975
+- aiRatingReasons: [
++ "Public-source profile/contact data requires review",
+ai-diagnostics-service.js:5976
+- "Public-source profile/contact data requires review",
++ "Applies missing fields only",
+ai-diagnostics-service.js:5977
+- "Applies missing fields only",
++ "Ready for Master Admin import or Club Admin import link"
+ai-diagnostics-service.js:5978
+- "Ready for Master Admin import or Club Admin import link"
++ ],
+ai-diagnostics-service.js:5979
+- ],
++ duplicateCandidateIds: [],
+ai-diagnostics-service.js:5980
+- duplicateCandidateIds: [],
++ status: "pendingReview",
+ai-diagnostics-service.js:5981
+- status: "pendingReview",
++ discoveryMode: "profile-import-draft",
+ai-diagnostics-service.js:5982
+- discoveryMode: "profile-import-draft",
++ profileImport: draft,
+ai-diagnostics-service.js:5983
+- profileImport: draft,
++ clubAdminImportUrl: importUrl,
+ai-diagnostics-service.js:5984
+- clubAdminImportUrl: importUrl,
++ createdByUid: state.auth?.currentUser?.uid || "",
+ai-diagnostics-service.js:5985
+- createdByUid: state.auth?.currentUser?.uid || "",
++ createdByEmail: state.auth?.currentUser?.email || "",
+ai-diagnostics-service.js:5986
+- createdByEmail: state.auth?.currentUser?.email || "",
++ createdAt: fieldValue(),
+ai-diagnostics-service.js:5987
+- createdAt: fieldValue(),
++ updatedAt: fieldValue()
+ai-diagnostics-service.js:5988
+- updatedAt: fieldValue()
++ });
+ai-diagnostics-service.js:5989
+- });
++ saved.push({id: ref.id, ...draft, clubAdminImportUrl: importUrl});
+ai-diagnostics-service.js:5990
+- saved.push({id: ref.id, ...draft, clubAdminImportUrl: importUrl});
++ }
+ai-diagnostics-service.js:5991
+- }
++ await refreshDiagnostics();
+ai-diagnostics-service.js:5992
+- await refreshDiagnostics();
++ renderClubProfileImportDrafts(saved, `Saved ${saved.length} crawler profile import draft(s) to aiDiscoveryQueue.`);
+ai-diagnostics-service.js:5993
+- renderClubProfileImportDrafts(saved, `Saved ${saved.length} crawler profile import draft(s) to aiDiscoveryQueue.`);
++ setText("diagnosticsStatus", `Saved ${saved.length} crawler profile import draft(s).`);
+ai-diagnostics-service.js:5994
+- setText("diagnosticsStatus", `Saved ${saved.length} crawler profile import draft(s).`);
++ }
+ai-diagnostics-service.js:5995
+- }
++ 
+ai-diagnostics-service.js:5996
+- 
++ function mergeMissingProfileFields(existing = {}, profile = {}) {
+ai-diagnostics-service.js:5997
+- function mergeMissingProfileFields(existing = {}, profile = {}) {
++ const payload = {};
+ai-diagnostics-service.js:5998
+- const payload = {};
++ const setIfMissing = (key, value) => {
+ai-diagnostics-service.js:5999
+- const setIfMissing = (key, value) => {
++ const clean = String(value || "").trim();
+ai-diagnostics-service.js:6000
+- const clean = String(value || "").trim();
++ if (clean && !String(existing[key] || "").trim()) payload[key] = clean;
+ai-diagnostics-service.js:6001
+- if (clean && !String(existing[key] || "").trim()) payload[key] = clean;
++ };
+ai-diagnostics-service.js:6002
+- };
++ setIfMissing("address", profile.address);
+ai-diagnostics-service.js:6003
+- setIfMissing("address", profile.address);
++ setIfMissing("officialWebsite", profile.officialWebsite || profile.website);
+ai-diagnostics-service.js:6004
+- setIfMissing("officialWebsite", profile.officialWebsite || profile.website);
++ setIfMissing("email", profile.email);
+ai-diagnostics-service.js:6005
+- setIfMissing("email", profile.email);
++ setIfMissing("telephone", profile.telephone || profile.phone);
+ai-diagnostics-service.js:6006
+- setIfMissing("telephone", profile.telephone || profile.phone);
++ if (profile.city && !existing.city) payload.city = profile.city;
+ai-diagnostics-service.js:6007
+- if (profile.city && !existing.city) payload.city = profile.city;
++ if (profile.stateRegion && !existing.stateRegion && !existing.region) payload.stateRegion = profile.stateRegion;
+ai-diagnostics-service.js:6008
+- if (profile.stateRegion && !existing.stateRegion && !existing.region) payload.stateRegion = profile.stateRegion;
++ if (profile.country && !existing.country) payload.country = profile.country;
+ai-diagnostics-service.js:6009
+- if (profile.country && !existing.country) payload.country = profile.country;
++ const existingSocials = existing.socialMediaHandles || existing.socialHandles || {};
+ai-diagnostics-service.js:6010
+- const existingSocials = existing.socialMediaHandles || existing.socialHandles || {};
++ const incomingSocials = profile.socialMediaHandles || {};
+ai-diagnostics-service.js:6011
+- const incomingSocials = profile.socialMediaHandles || {};
++ const mergedSocials = {...existingSocials};
+ai-diagnostics-service.js:6012
+- const mergedSocials = {...existingSocials};
++ ["instagram", "x", "tiktok", "facebook"].forEach(key => {
+ai-diagnostics-service.js:6013
+- ["instagram", "x", "tiktok", "facebook"].forEach(key => {
++ if (!String(mergedSocials[key] || "").trim() && String(incomingSocials[key] || "").trim()) {
+ai-diagnostics-service.js:6014
+- if (!String(mergedSocials[key] || "").trim() && String(incomingSocials[key] || "").trim()) {
++ mergedSocials[key] = incomingSocials[key].trim();
+ai-diagnostics-service.js:6015
+- mergedSocials[key] = incomingSocials[key].trim();
++ }
+ai-diagnostics-service.js:6016
+- }
++ });
+ai-diagnostics-service.js:6017
+- });
++ if (Object.keys(mergedSocials).length) payload.socialMediaHandles = mergedSocials;
+ai-diagnostics-service.js:6018
+- if (Object.keys(mergedSocials).length) payload.socialMediaHandles = mergedSocials;
++ payload.visibility = existing.visibility || "public";
+ai-diagnostics-service.js:6019
+- payload.visibility = existing.visibility || "public";
++ payload.publicProfileType = existing.publicProfileType || (profile.targetCollection === "events" ? "eventDestination" : "club");
+ai-diagnostics-service.js:6020
+- payload.publicProfileType = existing.publicProfileType || (profile.targetCollection === "events" ? "eventDestination" : "club");
++ payload.publicProfileImportUpdatedAt = fieldValue();
+ai-diagnostics-service.js:6021
+- payload.publicProfileImportUpdatedAt = fieldValue();
++ payload.publicProfileImportSourceUrl = profile.sourceUrl || "";
+ai-diagnostics-service.js:6022
+- payload.publicProfileImportSourceUrl = profile.sourceUrl || "";
++ payload.publicProfileImportMode = "missingOnly";
+ai-diagnostics-service.js:6023
+- payload.publicProfileImportMode = "missingOnly";
++ payload.updatedAt = fieldValue();
+ai-diagnostics-service.js:6024
+- payload.updatedAt = fieldValue();
++ payload.updatedByUid = state.auth?.currentUser?.uid || "";
+ai-diagnostics-service.js:6025
+- payload.updatedByUid = state.auth?.currentUser?.uid || "";
++ payload.updatedByEmail = state.auth?.currentUser?.email || "";
+ai-diagnostics-service.js:6026
+- payload.updatedByEmail = state.auth?.currentUser?.email || "";
++ return payload;
+ai-diagnostics-service.js:6027
+- return payload;
++ }
+ai-diagnostics-service.js:6028
+- }
++ 
+ai-diagnostics-service.js:6029
+- 
++ async function applyProfileImportDraft(draftId) {
+ai-diagnostics-service.js:6030
+- async function applyProfileImportDraft(draftId) {
++ if (!state.db || !draftId) return;
+ai-diagnostics-service.js:6031
+- if (!state.db || !draftId) return;
++ const ref = state.db.collection("aiDiscoveryQueue").doc(draftId);
+ai-diagnostics-service.js:6032
+- const ref = state.db.collection("aiDiscoveryQueue").doc(draftId);
++ const snap = await ref.get();
+ai-diagnostics-service.js:6033
+- const snap = await ref.get();
++ if (!snap.exists) throw new Error("Crawler profile import draft was not found.");
+ai-diagnostics-service.js:6034
+- if (!snap.exists) throw new Error("Crawler profile import draft was not found.");
++ const row = {id:snap.id, ...snap.data()};
+ai-diagnostics-service.js:6035
+- const row = {id:snap.id, ...snap.data()};
++ const draft = cleanProfileImportDraft(row.profileImport || {});
+ai-diagnostics-service.js:6036
+- const draft = cleanProfileImportDraft(row.profileImport || {});
++ const targetRef = state.db.collection(draft.targetCollection).doc(draft.targetId);
+ai-diagnostics-service.js:6037
+- const targetRef = state.db.collection(draft.targetCollection).doc(draft.targetId);
++ const targetSnap = await targetRef.get();
+ai-diagnostics-service.js:6038
+- const targetSnap = await targetRef.get();
++ const existing = targetSnap.exists ? targetSnap.data() : {};
+ai-diagnostics-service.js:6039
+- const existing = targetSnap.exists ? targetSnap.data() : {};
++ const payload = mergeMissingProfileFields(existing, {...draft.publicProfile, targetCollection:draft.targetCollection, sourceUrl:draft.sourceUrl});
+ai-diagnostics-service.js:6040
+- const payload = mergeMissingProfileFields(existing, {...draft.publicProfile, targetCollection:draft.targetCollection, sourceUrl:draft.sourceUrl});
++ await targetRef.set(payload, {merge:true});
+ai-diagnostics-service.js:6041
+- await targetRef.set(payload, {merge:true});
++ await ref.set({
+ai-diagnostics-service.js:6042
+- await ref.set({
++ status:"approved",
+ai-diagnostics-service.js:6043
+- status:"approved",
++ appliedAt:fieldValue(),
+ai-diagnostics-service.js:6044
+- appliedAt:fieldValue(),
++ appliedByUid:state.auth?.currentUser?.uid || "",
+ai-diagnostics-service.js:6045
+- appliedByUid:state.auth?.currentUser?.uid || "",
++ appliedByEmail:state.auth?.currentUser?.email || "",
+ai-diagnostics-service.js:6046
+- appliedByEmail:state.auth?.currentUser?.email || "",
++ appliedCollection:draft.targetCollection,
+ai-diagnostics-service.js:6047
+- appliedCollection:draft.targetCollection,
++ appliedRecordId:draft.targetId,
+ai-diagnostics-service.js:6048
+- appliedRecordId:draft.targetId,
++ updatedAt:fieldValue()
+ai-diagnostics-service.js:6049
+- updatedAt:fieldValue()
++ }, {merge:true});
+ai-diagnostics-service.js:6050
+- }, {merge:true});
++ setText("diagnosticsStatus", `Applied crawler profile import to ${draft.targetCollection}/${draft.targetId}. Existing values were preserved.`);
+ai-diagnostics-service.js:6051
+- setText("diagnosticsStatus", `Applied crawler profile import to ${draft.targetCollection}/${draft.targetId}. Existing values were preserved.`);
++ await refreshDiagnostics();
+ai-diagnostics-service.js:6052
+- await refreshDiagnostics();
++ }
+ai-diagnostics-service.js:6053
+- }
++ 
+ai-diagnostics-service.js:6054
+- 
++ function renderClubProfileImportDrafts(records = [], note = "") {
+ai-diagnostics-service.js:6055
+- function renderClubProfileImportDrafts(records = [], note = "") {
++ const wrap = byId("clubProfileDiagnosticsReport");
+ai-diagnostics-service.js:6056
+- const wrap = byId("clubProfileDiagnosticsReport");
++ if (!wrap) return;
+ai-diagnostics-service.js:6057
+- if (!wrap) return;
++ const rows = records.slice(0, 20);
+ai-diagnostics-service.js:6058
+- const rows = records.slice(0, 20);
++ const cards = rows.map(item => {
+ai-diagnostics-service.js:6059
+- const cards = rows.map(item => {
++ const id = item.id || "";
+ai-diagnostics-service.js:6060
+- const id = item.id || "";
++ const url = item.clubAdminImportUrl || "";
+ai-diagnostics-service.js:6061
+- const url = item.clubAdminImportUrl || "";
++ const target = `${item.targetCollection || "clubLocations"}/${item.targetId || ""}`;
+ai-diagnostics-service.js:6062
+- const target = `${item.targetCollection || "clubLocations"}/${item.targetId || ""}`;
++ return `<div class="queue-item">
+ai-diagnostics-service.js:6063
+- return `<div class="queue-item">
++ <div class="message-envelope-head">
+ai-diagnostics-service.js:6064
+- <div class="message-envelope-head">
++ <strong>${esc(item.displayName || item.proposedTitle || item.targetId || "Crawler profile draft")}</strong>
+ai-diagnostics-service.js:6065
+- <strong>${esc(item.displayName || item.proposedTitle || item.targetId || "Crawler profile draft")}</strong>
++ ${statusBadge(item.status || "Soft Fail")}
+ai-diagnostics-service.js:6066
+- ${statusBadge(item.status || "Soft Fail")}
++ </div>
+ai-diagnostics-service.js:6067
+- </div>
++ <p>${esc(target)} ${item.sourceName ? `- ${item.sourceName}` : ""}</p>
+ai-diagnostics-service.js:6068
+- <p>${esc(target)} ${item.sourceName ? `- ${item.sourceName}` : ""}</p>
++ <small>${esc(item.sourceUrl || item.publicProfile?.sourceUrl || "")}</small>
+ai-diagnostics-service.js:6069
+- <small>${esc(item.sourceUrl || item.publicProfile?.sourceUrl || "")}</small>
++ <div class="queue-actions">
+ai-diagnostics-service.js:6070
+- <div class="queue-actions">
++ ${id ? `<button type="button" data-profile-import-action="apply" data-id="${esc(id)}">Apply Missing Fields</button>` : ""}
+ai-diagnostics-service.js:6071
+- ${id ? `<button type="button" data-profile-import-action="apply" data-id="${esc(id)}">Apply Missing Fields</button>` : ""}
++ ${url ? `<button type="button" data-profile-import-action="copy" data-url="${esc(url)}">Copy Club Admin Import Link</button>` : ""}
+ai-diagnostics-service.js:6072
+- ${url ? `<button type="button" data-profile-import-action="copy" data-url="${esc(url)}">Copy Club Admin Import Link</button>` : ""}
++ </div>
+ai-diagnostics-service.js:6073
+- </div>
++ </div>`;
+ai-diagnostics-service.js:6074
+- </div>`;
++ }).join("");
+ai-diagnostics-service.js:6075
+- }).join("");
++ wrap.innerHTML = `${note ? `<p class="sub small">${esc(note)}</p>` : ""}${cards || simpleRows([
+ai-diagnostics-service.js:6076
+- wrap.innerHTML = `${note ? `<p class="sub small">${esc(note)}</p>` : ""}${cards || simpleRows([
++ ["Crawler profile import drafts", "No drafts generated yet."],
+ai-diagnostics-service.js:6077
+- ["Crawler profile import drafts", "No drafts generated yet."],
++ ["Next step", "Click Generate Crawler JSON after running or importing public-source crawl records."]
+ai-diagnostics-service.js:6078
+- ["Next step", "Click Generate Crawler JSON after running or importing public-source crawl records."]
++ ])}`;
+ai-diagnostics-service.js:6079
+- ])}`;
++ wrap.querySelectorAll("[data-profile-import-action='apply']").forEach(btn => {
+ai-diagnostics-service.js:6080
+- wrap.querySelectorAll("[data-profile-import-action='apply']").forEach(btn => {
++ btn.addEventListener("click", () => applyProfileImportDraft(btn.dataset.id).catch(error => {
+ai-diagnostics-service.js:6081
+- btn.addEventListener("click", () => applyProfileImportDraft(btn.dataset.id).catch(error => {
++ setText("diagnosticsStatus", `Profile import failed: ${error?.message || error}`);
+ai-diagnostics-service.js:6082
+- setText("diagnosticsStatus", `Profile import failed: ${error?.message || error}`);
++ }));
+ai-diagnostics-service.js:6083
+- }));
++ });
+ai-diagnostics-service.js:6084
+- });
++ wrap.querySelectorAll("[data-profile-import-action='copy']").forEach(btn => {
+ai-diagnostics-service.js:6085
+- wrap.querySelectorAll("[data-profile-import-action='copy']").forEach(btn => {
++ btn.addEventListener("click", async () => {
+ai-diagnostics-service.js:6086
+- btn.addEventListener("click", async () => {
++ await copyTextToClipboard(btn.dataset.url || "");
+ai-diagnostics-service.js:6087
+- await copyTextToClipboard(btn.dataset.url || "");
++ setText("diagnosticsStatus", "Club Admin import link copied.");
+ai-diagnostics-service.js:6088
+- setText("diagnosticsStatus", "Club Admin import link copied.");
++ });
+ai-diagnostics-service.js:6089
+- });
++ });
+ai-diagnostics-service.js:6090
+- });
++ }
+ai-diagnostics-service.js:6091
+- }
++ 
+ai-diagnostics-service.js:6092
+- 
++ async function backfillClubProfileFields() {
+ai-diagnostics-service.js:6093
+- async function backfillClubProfileFields() {
++ if (!state.db) return;
+ai-diagnostics-service.js:6094
+- if (!state.db) return;
++ setText("diagnosticsStatus", "Backfill Missing Club Profile Fields: scanning clubLocations...");
+ai-diagnostics-service.js:6095
+- setText("diagnosticsStatus", "Backfill Missing Club Profile Fields: scanning clubLocations...");
++ const snap = await state.db.collection("clubLocations").limit(1000).get();
+ai-diagnostics-service.js:6096
+- const snap = await state.db.collection("clubLocations").limit(1000).get();
++ let updated = 0;
+ai-diagnostics-service.js:6097
+- let updated = 0;
++ for (const doc of snap.docs) {
+ai-diagnostics-service.js:6098
+- for (const doc of snap.docs) {
++ const row = {id:doc.id, ...doc.data()};
+ai-diagnostics-service.js:6099
+- const row = {id:doc.id, ...doc.data()};
++ const payload = missingClubProfilePayload(row);
+ai-diagnostics-service.js:6100
+- const payload = missingClubProfilePayload(row);
++ if (Object.keys(payload).length) {
+ai-diagnostics-service.js:6101
+- if (Object.keys(payload).length) {
++ payload.updatedAt = fieldValue();
+ai-diagnostics-service.js:6102
+- payload.updatedAt = fieldValue();
++ await doc.ref.set(payload, {merge:true});
+ai-diagnostics-service.js:6103
+- await doc.ref.set(payload, {merge:true});
++ updated += 1;
+ai-diagnostics-service.js:6104
+- updated += 1;
++ }
+ai-diagnostics-service.js:6105
+- }
++ }
+ai-diagnostics-service.js:6106
+- }
++ setText("diagnosticsStatus", `Backfill Missing Club Profile Fields complete. ${updated} club record(s) received missing field keys. Existing values were not overwritten.`);
+ai-diagnostics-service.js:6107
+- setText("diagnosticsStatus", `Backfill Missing Club Profile Fields complete. ${updated} club record(s) received missing field keys. Existing values were not overwritten.`);
++ await refreshDiagnostics();
+ai-diagnostics-service.js:6108
+- await refreshDiagnostics();
++ }
+ai-diagnostics-service.js:6109
+- }
++ 
+ai-diagnostics-service.js:6110
+- 
++ function buildFeatureDiagnostics(data) {
+ai-diagnostics-service.js:6111
+- function buildFeatureDiagnostics(data) {
++ const aiIndexRows = data.aiIndex?.rows || [];
+ai-diagnostics-service.js:6112
+- const aiIndexRows = data.aiIndex?.rows || [];
++ const unsafeIndexRows = aiIndexRows.filter(row => {
+ai-diagnostics-service.js:6113
+- const unsafeIndexRows = aiIndexRows.filter(row => {
++ const type = normalized(row.sourceType);
+ai-diagnostics-service.js:6114
+- const type = normalized(row.sourceType);
++ const visibility = String(row.visibility || "").toLowerCase();
+ai-diagnostics-service.js:6115
+- const visibility = String(row.visibility || "").toLowerCase();
++ return type.includes("chat") || type.includes("message") || (visibility && !["public", "shared", "private"].includes(visibility));
+ai-diagnostics-service.js:6116
+- return type.includes("chat") || type.includes("message") || (visibility && !["public", "shared", "private"].includes(visibility));
++ });
+ai-diagnostics-service.js:6117
+- });
++ const clubProfile = clubProfileDiagnostics(data);
+ai-diagnostics-service.js:6118
+- const clubProfile = clubProfileDiagnostics(data);
++ const userLanguageRows = (data.users?.rows || []).filter(row => row.publicProfileLanguageMode || row.publicProfileBioEnglish || row.publicProfileTranslationStatus);
+ai-diagnostics-service.js:6119
+- const userLanguageRows = (data.users?.rows || []).filter(row => row.publicProfileLanguageMode || row.publicProfileBioEnglish || row.publicProfileTranslationStatus);
++ const scheduleRows = data.aiCrawlerSchedules?.rows || [];
+ai-diagnostics-service.js:6120
+- const scheduleRows = data.aiCrawlerSchedules?.rows || [];
++ const crawlRuns = data.aiCrawlRuns?.rows || [];
+ai-diagnostics-service.js:6121
+- const crawlRuns = data.aiCrawlRuns?.rows || [];
++ const discoveryQueue = data.aiDiscoveryQueue?.rows || [];
+ai-diagnostics-service.js:6122
+- const discoveryQueue = data.aiDiscoveryQueue?.rows || [];
++ const latestRulesReport = currentPackageRulesSmokeReport(data);
+ai-diagnostics-service.js:6123
+- const latestRulesReport = currentPackageRulesSmokeReport(data);
++ const latestAnyRulesReport = latestRulesSmokeReport(data);
+ai-diagnostics-service.js:6124
+- const latestAnyRulesReport = latestRulesSmokeReport(data);
++ const hasSearch = !!window.floqrSearch;
+ai-diagnostics-service.js:6125
+- const hasSearch = !!window.floqrSearch;
++ const hasDiscovery = !!window.FLOQRAIDiscovery;
+ai-diagnostics-service.js:6126
+- const hasDiscovery = !!window.FLOQRAIDiscovery;
++ const geminiMediaDiagnostic = state.lastGeminiMediaDiagnostic || {
+ai-diagnostics-service.js:6127
+- const geminiMediaDiagnostic = state.lastGeminiMediaDiagnostic || {
++ status:"Soft Fail",
+ai-diagnostics-service.js:6128
+- status:"Soft Fail",
++ evidence:"Run Diagnostics after deploying Firebase Functions and setting the GEMINI_API_KEY secret."
+ai-diagnostics-service.js:6129
+- evidence:"Run Diagnostics after deploying Firebase Functions and setting the GEMINI_API_KEY secret."
++ };
+ai-diagnostics-service.js:6130
+- };
++ 
+ai-diagnostics-service.js:6131
+- 
++ return [
+ai-diagnostics-service.js:6132
+- return [
++ ["Authentication", "Firebase config", window.firebaseConfig ? "Pass" : "Failed", window.firebaseConfig ? "window.firebaseConfig present." : "Missing Firebase config."],
+ai-diagnostics-service.js:6133
+- ["Authentication", "Firebase config", window.firebaseConfig ? "Pass" : "Failed", window.firebaseConfig ? "window.firebaseConfig present." : "Missing Firebase config."],
++ ["Authentication", "Firebase Auth session", state.auth?.currentUser ? "Pass" : "Soft Fail", state.auth?.currentUser ? "Master Admin is signed in." : "No active user in this diagnostics session."],
+ai-diagnostics-service.js:6134
+- ["Authentication", "Firebase Auth session", state.auth?.currentUser ? "Pass" : "Soft Fail", state.auth?.currentUser ? "Master Admin is signed in." : "No active user in this diagnostics session."],
++ ["Authentication", "Master Admin allow-list", state.auth?.currentUser ? "Pass" : "Failed", "Master Admin shell gates this page before diagnostics mount."],
+ai-diagnostics-service.js:6135
+- ["Authentication", "Master Admin allow-list", state.auth?.currentUser ? "Pass" : "Failed", "Master Admin shell gates this page before diagnostics mount."],
++ ["Authentication", "Role-based experiences", collectionStatus(data, "users", true), `${collectionCount(data, "users")} user records readable for role diagnostics.`],
+ai-diagnostics-service.js:6136
+- ["Authentication", "Role-based experiences", collectionStatus(data, "users", true), `${collectionCount(data, "users")} user records readable for role diagnostics.`],
++ ["Settings", "My Profile and Settings rename", byId("portalPublicProfile") ? "Soft Fail" : "Pass", "Patron portal source now uses My Profile and Settings; open patron-portal.html to visually confirm the page title after 
+ai-diagnostics-service.js:6137
+- ["Settings", "My Profile and Settings rename", byId("portalPublicProfile") ? "Soft Fail" : "Pass", "Patron portal source now uses My Profile and Settings; open patron-portal.html to visually confirm the page title after 
++ ["Settings", "My Privacy datapoint sharing", collectionStatus(data, "users"), "Profile privacy choices can store publicMinglDatapoints for Mingl matching and public/shared feature use."],
+ai-diagnostics-service.js:6138
+- ["Settings", "My Privacy datapoint sharing", collectionStatus(data, "users"), "Profile privacy choices can store publicMinglDatapoints for Mingl matching and public/shared feature use."],
++ ["Settings", "Public Media and Data Sharing", collectionStatus(data, "users"), "Profile media upload slots are under Public Media and Data Sharing with no captions and optional GPS-to-Travel metadata."],
+ai-diagnostics-service.js:6139
+- ["Settings", "Public Media and Data Sharing", collectionStatus(data, "users"), "Profile media upload slots are under Public Media and Data Sharing with no captions and optional GPS-to-Travel metadata."],
++ ["Settings", "Public profile preferred language", userLanguageRows.length ? "Pass" : "Soft Fail", userLanguageRows.length ? `${userLanguageRows.length} users have public profile language metadata.` : "Schema/UI ready; no
+ai-diagnostics-service.js:6140
+- ["Settings", "Public profile preferred language", userLanguageRows.length ? "Pass" : "Soft Fail", userLanguageRows.length ? `${userLanguageRows.length} users have public profile language metadata.` : "Schema/UI ready; no
++ ["Settings", "AI English translation scaffold", window.FLOQR_AI_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ENABLED ? "AI flag enabled, but translation should still route through a safe provider." : "Local placeholde
+ai-diagnostics-service.js:6141
+- ["Settings", "AI English translation scaffold", window.FLOQR_AI_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ENABLED ? "AI flag enabled, but translation should still route through a safe provider." : "Local placeholde
++ ["ShoutOut", "Submission queue", collectionStatus(data, "shoutouts"), `${collectionCount(data, "shoutouts")} ShoutOut records scanned.`],
+ai-diagnostics-service.js:6142
+- ["ShoutOut", "Submission queue", collectionStatus(data, "shoutouts"), `${collectionCount(data, "shoutouts")} ShoutOut records scanned.`],
++ ["ShoutOut", "Admin approval queue", collectionStatus(data, "shoutouts"), "Pending and approved ShoutOut records are readable for diagnostics."],
+ai-diagnostics-service.js:6143
+- ["ShoutOut", "Admin approval queue", collectionStatus(data, "shoutouts"), "Pending and approved ShoutOut records are readable for diagnostics."],
++ ["ShoutOut", "LED display content", collectionStatus(data, "liveContent", true), `${collectionCount(data, "liveContent")} live display records scanned.`],
+ai-diagnostics-service.js:6144
+- ["ShoutOut", "LED display content", collectionStatus(data, "liveContent", true), `${collectionCount(data, "liveContent")} live display records scanned.`],
++ ["ShoutOut", "Media AI panel", geminiMediaDiagnostic.status, geminiMediaDiagnostic.status === "Pass" ? geminiMediaDiagnostic.evidence : `${geminiMediaDiagnostic.evidence} Static filter/trim fallback remains available wit
+ai-diagnostics-service.js:6145
+- ["ShoutOut", "Media AI panel", geminiMediaDiagnostic.status, geminiMediaDiagnostic.status === "Pass" ? geminiMediaDiagnostic.evidence : `${geminiMediaDiagnostic.evidence} Static filter/trim fallback remains available wit
++ ["ShoutOut", "Improve My ShoutOut", hasSearch ? "Pass" : "Soft Fail", "Safe curated fallback should work when AI flags are false."],
+ai-diagnostics-service.js:6146
+- ["ShoutOut", "Improve My ShoutOut", hasSearch ? "Pass" : "Soft Fail", "Safe curated fallback should work when AI flags are false."],
++ ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
+ai-diagnostics-service.js:6147
+- ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
++ ["Mingl", "Mingl matching", minglFeatureStatus(data, "minglConnections"), minglScanEvidence(data, "minglConnections", "Mingl connection", "Mingl connection records")],
+ai-diagnostics-service.js:6148
+- ["Mingl", "Mingl matching", minglFeatureStatus(data, "minglConnections"), minglScanEvidence(data, "minglConnections", "Mingl connection", "Mingl connection records")],
++ ["Mingl", "Let's Mingl request workflow", minglFeatureStatus(data, "minglConnections"), minglRequestWorkflowEvidence(data)],
+ai-diagnostics-service.js:6149
+- ["Mingl", "Let's Mingl request workflow", minglFeatureStatus(data, "minglConnections"), minglRequestWorkflowEvidence(data)],
++ ["Mingl", "Mingl chat rooms", minglFeatureStatus(data, "chatRooms"), minglScanEvidence(data, "chatRooms", "Mingl chat room", "Mingl chat room records")],
+ai-diagnostics-service.js:6150
+- ["Mingl", "Mingl chat rooms", minglFeatureStatus(data, "chatRooms"), minglScanEvidence(data, "chatRooms", "Mingl chat room", "Mingl chat room records")],
++ ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publis
+ai-diagnostics-service.js:6151
+- ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publis
++ ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
+ai-diagnostics-service.js:6152
+- ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
++ ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
+ai-diagnostics-service.js:6153
+- ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
++ ["BartR", "Marketplace discovery/search", "Pass", "BartR shared frontend + US seller backend; personalized ranking still next iteration."],
+ai-diagnostics-service.js:6154
+- ["BartR", "Marketplace discovery/search", "Pass", "BartR shared frontend + US seller backend; personalized ranking still next iteration."],
++ ["AI Search", "floqrSearch local fallback", hasSearch ? "Pass" : "Failed", hasSearch ? `FLOQR_AI_ENABLED=${window.FLOQR_AI_ENABLED === true}; fallback=${window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search"}.` : "FL
+ai-diagnostics-service.js:6155
+- ["AI Search", "floqrSearch local fallback", hasSearch ? "Pass" : "Failed", hasSearch ? `FLOQR_AI_ENABLED=${window.FLOQR_AI_ENABLED === true}; fallback=${window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search"}.` : "FL
++ ["AI Search", "Privacy-respecting aiIndex", unsafeIndexRows.length ? "Failed" : "Pass", unsafeIndexRows.length ? `${unsafeIndexRows.length} aiIndex records need review.` : `${aiIndexRows.length} aiIndex records scanned w
+ai-diagnostics-service.js:6156
+- ["AI Search", "Privacy-respecting aiIndex", unsafeIndexRows.length ? "Failed" : "Pass", unsafeIndexRows.length ? `${unsafeIndexRows.length} aiIndex records need review.` : `${aiIndexRows.length} aiIndex records scanned w
++ ["AI Assistant", "Ask FLOQR scaffold", window.FLOQR_AI_ASSISTANT_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ASSISTANT_ENABLED ? "Assistant flag is on; verify provider/config before production." : "Assistant remains 
+ai-diagnostics-service.js:6157
+- ["AI Assistant", "Ask FLOQR scaffold", window.FLOQR_AI_ASSISTANT_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ASSISTANT_ENABLED ? "Assistant flag is on; verify provider/config before production." : "Assistant remains 
++ ["AI Notifications", "Notification preferences", collectionStatus(data, "aiUserNotificationPreferences", true), `${collectionCount(data, "aiUserNotificationPreferences")} preference records scanned.`],
+ai-diagnostics-service.js:6158
+- ["AI Notifications", "Notification preferences", collectionStatus(data, "aiUserNotificationPreferences", true), `${collectionCount(data, "aiUserNotificationPreferences")} preference records scanned.`],
++ ["Templates", "Patron template variants", collectionStatus(data, "patronTemplateVariants", true), `${collectionCount(data, "patronTemplateVariants")} patron template variants scanned.`],
+ai-diagnostics-service.js:6159
+- ["Templates", "Patron template variants", collectionStatus(data, "patronTemplateVariants", true), `${collectionCount(data, "patronTemplateVariants")} patron template variants scanned.`],
++ ["Templates", "FLOQR Studio background designer", window.FLOQR_AI_STUDIO_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_STUDIO_ENABLED ? "Studio flag on; live image generation still requires a safe provider." : "Studio 
+ai-diagnostics-service.js:6160
+- ["Templates", "FLOQR Studio background designer", window.FLOQR_AI_STUDIO_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_STUDIO_ENABLED ? "Studio flag on; live image generation still requires a safe provider." : "Studio 
++ ["Club Profiles", "Public club profile field support", clubProfile.fieldSupportReady ? "Pass" : "Soft Fail", clubProfile.fieldSupportReady ? "Club profile schema/UI and crawler import support are available." : "Club prof
+ai-diagnostics-service.js:6161
+- ["Club Profiles", "Public club profile field support", clubProfile.fieldSupportReady ? "Pass" : "Soft Fail", clubProfile.fieldSupportReady ? "Club profile schema/UI and crawler import support are available." : "Club prof
++ ["Club Profiles", "Filled public contact values", clubProfile.contentRows.length ? "Pass" : "Soft Fail", clubProfile.contentRows.length ? `${clubProfile.contentRows.length} club profiles include filled public contact val
+ai-diagnostics-service.js:6162
+- ["Club Profiles", "Filled public contact values", clubProfile.contentRows.length ? "Pass" : "Soft Fail", clubProfile.contentRows.length ? `${clubProfile.contentRows.length} club profiles include filled public contact val
++ ["Club Profiles", "Claimed club owner editing", "Soft Fail", "Club profile editing is scaffolded; production subscription/ownership enforcement needs backend rules or claims."],
+ai-diagnostics-service.js:6163
+- ["Club Profiles", "Claimed club owner editing", "Soft Fail", "Club profile editing is scaffolded; production subscription/ownership enforcement needs backend rules or claims."],
++ ["Ticketing", "Ticketmaster/Eventbrite discovery", "Soft Fail", "Search criteria and queue records include ticketing partners; live API credentials/partnerships are not configured in frontend."],
+ai-diagnostics-service.js:6164
+- ["Ticketing", "Ticketmaster/Eventbrite discovery", "Soft Fail", "Search criteria and queue records include ticketing partners; live API credentials/partnerships are not configured in frontend."],
++ ["Ticketing", "Approved resale partner flow", "TBI", "Partner contracts, affiliate tracking, and resale APIs must be configured later."],
+ai-diagnostics-service.js:6165
+- ["Ticketing", "Approved resale partner flow", "TBI", "Partner contracts, affiliate tracking, and resale APIs must be configured later."],
++ ["Transportation", "Third-party taxi hailing integration", "TBI", "Reserved as partner integration; not connected to current app workflows."],
+ai-diagnostics-service.js:6166
+- ["Transportation", "Third-party taxi hailing integration", "TBI", "Reserved as partner integration; not connected to current app workflows."],
++ ["AI Crawling", "Discovery review queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned under the AI Crawling tab.`],
+ai-diagnostics-service.js:6167
+- ["AI Crawling", "Discovery review queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned under the AI Crawling tab.`],
++ ["AI Crawling", "Approve/reject/delete review tools", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "Discovery review tools are mounted on the AI Crawling tab." : "FLOQRAIDiscovery module was not loaded."],
+ai-diagnostics-service.js:6168
+- ["AI Crawling", "Approve/reject/delete review tools", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "Discovery review tools are mounted on the AI Crawling tab." : "FLOQRAIDiscovery module was not loaded."],
++ ["AI Crawling", "Plain-English crawl input", byId("crawlNaturalLanguageInput") && byId("previewCrawlPlanBtn") ? "Pass" : "Failed", "Master Admin can type one contextual request and build an expanded search plan."],
+ai-diagnostics-service.js:6169
+- ["AI Crawling", "Plain-English crawl input", byId("crawlNaturalLanguageInput") && byId("previewCrawlPlanBtn") ? "Pass" : "Failed", "Master Admin can type one contextual request and build an expanded search plan."],
++ ["AI Crawling", "Manual crawl review records", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl creates reviewable records with required datapoint checklists in aiDiscoveryQueue."],
+ai-diagnostics-service.js:6170
+- ["AI Crawling", "Manual crawl review records", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl creates reviewable records with required datapoint checklists in aiDiscoveryQueue."],
++ ["AI Crawling", "Source detail extraction", byId("sourceExtractUrl") && byId("extractSourceDetailsBtn") ? "Pass" : "Failed", "Master Admin can extract followed Eventbrite/source page details into a review record."],
+ai-diagnostics-service.js:6171
+- ["AI Crawling", "Source detail extraction", byId("sourceExtractUrl") && byId("extractSourceDetailsBtn") ? "Pass" : "Failed", "Master Admin can extract followed Eventbrite/source page details into a review record."],
++ ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
+ai-diagnostics-service.js:6172
+- ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
++ ["AI Crawling", "Automatic crawl schedule", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Saved schedule includes structured crawl criteria and search-plan output." : "Save the schedule to persist au
+ai-diagnostics-service.js:6173
+- ["AI Crawling", "Automatic crawl schedule", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Saved schedule includes structured crawl criteria and search-plan output." : "Save the schedule to persist au
++ ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
+ai-diagnostics-service.js:6174
+- ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
++ ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
+ai-diagnostics-service.js:6175
+- ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
++ ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
+ai-diagnostics-service.js:6176
+- ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
++ ["Master Admin", "Stale record cleanup", byId("staleRecordCleanup") && byId("searchStaleRecordsBtn") ? "Pass" : "Failed", "Master Admin can search and soft-clear stale AI discovery and ShoutOut queue records."],
+ai-diagnostics-service.js:6177
+- ["Master Admin", "Stale record cleanup", byId("staleRecordCleanup") && byId("searchStaleRecordsBtn") ? "Pass" : "Failed", "Master Admin can search and soft-clear stale AI discovery and ShoutOut queue records."],
++ ["Master Admin", "Duplicate record diagnostics", byId("duplicateRecords") && window.FLOQRDuplicateRecords ? "Pass" : "Failed", "Master Admin can scan duplicate club records and merge duplicates into aliases."],
+ai-diagnostics-service.js:6178
+- ["Master Admin", "Duplicate record diagnostics", byId("duplicateRecords") && window.FLOQRDuplicateRecords ? "Pass" : "Failed", "Master Admin can scan duplicate club records and merge duplicates into aliases."],
++ ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
+ai-diagnostics-service.js:6179
+- ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
++ ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
+ai-diagnostics-service.js:6180
+- ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
++ ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRule
+ai-diagnostics-service.js:6181
+- ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRule
++ ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
+ai-diagnostics-service.js:6182
+- ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
++ }
+ai-diagnostics-service.js:6183
+- }
++ 
+ai-diagnostics-service.js:6184
+- 
++ function renderFeatureDiagnostics(features) {
+ai-diagnostics-service.js:6185
+- function renderFeatureDiagnostics(features) {
++ const wrap = byId("diagnosticsFeatureMatrix");
+ai-diagnostics-service.js:6186
+- const wrap = byId("diagnosticsFeatureMatrix");
++ if (!wrap) return;
+ai-diagnostics-service.js:6187
+- if (!wrap) return;
++ const visible = features.filter(item => item.status !== "Pass");
+ai-diagnostics-service.js:6188
+- const visible = features.filter(item => item.status !== "Pass");
++ const archived = features.filter(item => item.status === "Pass");
+ai-diagnostics-service.js:6189
+- const archived = features.filter(item => item.status === "Pass");
++ const rowHtml = item => `<div class="queue-item">
+ai-diagnostics-service.js:6190
+- const rowHtml = item => `<div class="queue-item">
++ <div class="message-envelope-head">
+ai-diagnostics-service.js:6191
+- <div class="message-envelope-head">
++ <strong>${esc(item.area)}: ${esc(item.feature)}</strong>
+ai-diagnostics-service.js:6192
+- <strong>${esc(item.area)}: ${esc(item.feature)}</strong>
++ ${statusBadge(item.status)}
+ai-diagnostics-service.js:6193
+- ${statusBadge(item.status)}
++ </div>
+ai-diagnostics-service.js:6194
+- </div>
++ <p>${esc(item.evidence)}</p>
+ai-diagnostics-service.js:6195
+- <p>${esc(item.evidence)}</p>
++ </div>`;
+ai-diagnostics-service.js:6196
+- </div>`;
++ const visibleHtml = visible.length
+ai-diagnostics-service.js:6197
+- const visibleHtml = visible.length
++ ? visible.map(rowHtml).join("")
+ai-diagnostics-service.js:6198
+- ? visible.map(rowHtml).join("")
++ : `<div class="queue-item"><strong>No active diagnostic issues.</strong><p>Failed, Soft Fail, and TBI checks are clear. Passed checks are archived below.</p></div>`;
+ai-diagnostics-service.js:6199
+- : `<div class="queue-item"><strong>No active diagnostic issues.</strong><p>Failed, Soft Fail, and TBI checks are clear. Passed checks are archived below.</p></div>`;
++ const archivedHtml = archived.length
+ai-diagnostics-service.js:6200
+- const archivedHtml = archived.length
++ ? `<details class="diagnostic-archive"><summary>View Archived Passed Diagnostics (${archived.length})</summary><div class="diagnostic-archive-list">${archived.map(rowHtml).join("")}</div></details>`
+ai-diagnostics-service.js:6201
+- ? `<details class="diagnostic-archive"><summary>View Archived Passed Diagnostics (${archived.length})</summary><div class="diagnostic-archive-list">${archived.map(rowHtml).join("")}</div></details>`
++ : "";
+ai-diagnostics-service.js:6202
+- : "";
++ wrap.innerHTML = `${visibleHtml}${archivedHtml}`;
+ai-diagnostics-service.js:6203
+- wrap.innerHTML = `${visibleHtml}${archivedHtml}`;
++ 
+ai-diagnostics-service.js:6204
+- 
++ const counts = countBy(features, item => item.status);
+ai-diagnostics-service.js:6205
+- const counts = countBy(features, item => item.status);
++ byId("diagnosticsSummary").innerHTML = simpleRows([
+ai-diagnostics-service.js:6206
+- byId("diagnosticsSummary").innerHTML = simpleRows([
++ ["Pass", counts.Pass || 0],
+ai-diagnostics-service.js:6207
+- ["Pass", counts.Pass || 0],
++ ["Soft Fail", counts["Soft Fail"] || 0],
+ai-diagnostics-service.js:6208
+- ["Soft Fail", counts["Soft Fail"] || 0],
++ ["Failed", counts.Failed || 0],
+ai-diagnostics-service.js:6209
+- ["Failed", counts.Failed || 0],
++ ["TBI", counts.TBI || 0],
+ai-diagnostics-service.js:6210
+- ["TBI", counts.TBI || 0],
++ ["Legend", Object.entries(STATUS_COPY).map(([key, text]) => `${key}: ${text}`).join(" | ")]
+ai-diagnostics-service.js:6211
+- ["Legend", Object.entries(STATUS_COPY).map(([key, text]) => `${key}: ${text}`).join(" | ")]
++ ]);
+ai-diagnostics-service.js:6212
+- ]);
++ }
+ai-diagnostics-service.js:6213
+- }
++ 
+ai-diagnostics-service.js:6214
+- 
++ function renderCrawlActivity(data, schedule) {
+ai-diagnostics-service.js:6215
+- function renderCrawlActivity(data, schedule) {
++ const runs = (data.aiCrawlRuns?.rows || []).slice().sort((a, b) => tsMillis(b.startedAt || b.completedAt) - tsMillis(a.startedAt || a.completedAt));
+ai-diagnostics-service.js:6216
+- const runs = (data.aiCrawlRuns?.rows || []).slice().sort((a, b) => tsMillis(b.startedAt || b.completedAt) - tsMillis(a.startedAt || a.completedAt));
++ const wrap = byId("crawlActivityReport");
+ai-diagnostics-service.js:6217
+- const wrap = byId("crawlActivityReport");
++ if (!wrap) return;
+ai-diagnostics-service.js:6218
+- if (!wrap) return;
++ const latestCompleted = runs.find(run => String(run.status || "").toLowerCase() === "completed") || null;
+ai-diagnostics-service.js:6219
+- const latestCompleted = runs.find(run => String(run.status || "").toLowerCase() === "completed") || null;
++ const scheduleRows = [
+ai-diagnostics-service.js:6220
+- const scheduleRows = [
++ ["Automatic crawl setting", schedule?.frequency || "Not saved"],
+ai-diagnostics-service.js:6221
+- ["Automatic crawl setting", schedule?.frequency || "Not saved"],
++ ["Schedule enabled", schedule?.enabled === false ? "No" : "Yes"],
+ai-diagnostics-service.js:6222
+- ["Schedule enabled", schedule?.enabled === false ? "No" : "Yes"],
++ ["Planned run times", joinList(schedule?.scheduleHours) || "00:00, 04:00, 08:00, 12:00, 16:00, 20:00"],
+ai-diagnostics-service.js:6223
+- ["Planned run times", joinList(schedule?.scheduleHours) || "00:00, 04:00, 08:00, 12:00, 16:00, 20:00"],
++ ["Last successful crawl", latestCompleted ? `${fmtDate(latestCompleted.completedAt || latestCompleted.startedAt)} (${latestCompleted.localSlot || latestCompleted.id || "run"})` : "No completed run loaded"],
+ai-diagnostics-service.js:6224
+- ["Last successful crawl", latestCompleted ? `${fmtDate(latestCompleted.completedAt || latestCompleted.startedAt)} (${latestCompleted.localSlot || latestCompleted.id || "run"})` : "No completed run loaded"],
++ ["Last successful record count", latestCompleted ? String(latestCompleted.resultCount ?? latestCompleted.createdRecordCount ?? 0) : "—"],
+ai-diagnostics-service.js:6225
+- ["Last successful record count", latestCompleted ? String(latestCompleted.resultCount ?? latestCompleted.createdRecordCount ?? 0) : "—"],
++ ["Manual crawl workflow", "Plain-English input creates structured review records with required datapoint checks"],
+ai-diagnostics-service.js:6226
+- ["Manual crawl workflow", "Plain-English input creates structured review records with required datapoint checks"],
++ ["Automatic execution path", "Firebase scheduledAiDiscoveryCrawl every 15 minutes; runs when a saved slot is due"]
+ai-diagnostics-service.js:6227
+- ["Automatic execution path", "Firebase scheduledAiDiscoveryCrawl every 15 minutes; runs when a saved slot is due"]
++ ];
+ai-diagnostics-service.js:6228
+- ];
++ const runHtml = runs.length ? runs.slice(0, 12).map(run => {
+ai-diagnostics-service.js:6229
+- const runHtml = runs.length ? runs.slice(0, 12).map(run => {
++ const records = run.resultCount ?? run.createdRecordCount ?? 0;
+ai-diagnostics-service.js:6230
+- const records = run.resultCount ?? run.createdRecordCount ?? 0;
++ const mode = run.mode || run.trigger || (run.scheduleId || String(run.id || "").startsWith("default_") ? "scheduled" : "manual");
+ai-diagnostics-service.js:6231
+- const mode = run.mode || run.trigger || (run.scheduleId || String(run.id || "").startsWith("default_") ? "scheduled" : "manual");
++ return `<div class="queue-item">
+ai-diagnostics-service.js:6232
+- return `<div class="queue-item">
++ <strong>${esc(run.status || "crawl run")} - ${esc(mode)}</strong>
+ai-diagnostics-service.js:6233
+- <strong>${esc(run.status || "crawl run")} - ${esc(mode)}</strong>
++ <p>Started: ${esc(fmtDate(run.startedAt))} | Completed: ${esc(fmtDate(run.completedAt))} | Records: ${esc(records)}</p>
+ai-diagnostics-service.js:6234
+- <p>Started: ${esc(fmtDate(run.startedAt))} | Completed: ${esc(fmtDate(run.completedAt))} | Records: ${esc(records)}</p>
++ <small>${esc(run.localSlot || run.requestedByEmail || run.note || run.id || "")}</small>
+ai-diagnostics-service.js:6235
+- <small>${esc(run.localSlot || run.requestedByEmail || run.note || run.id || "")}</small>
++ </div>`;
+ai-diagnostics-service.js:6236
+- </div>`;
++ }).join("") : "<p class='sub'>No crawl runs have been logged yet.</p>";
+ai-diagnostics-service.js:6237
+- }).join("") : "<p class='sub'>No crawl runs have been logged yet.</p>";
++ wrap.innerHTML = `${simpleRows(scheduleRows)}${runHtml}`;
+ai-diagnostics-service.js:6238
+- wrap.innerHTML = `${simpleRows(scheduleRows)}${runHtml}`;
++ }
+ai-diagnostics-service.js:6239
+- }
++ 
+ai-diagnostics-service.js:6240
+- 
++ function renderCollectedRecords(data) {
+ai-diagnostics-service.js:6241
+- function renderCollectedRecords(data) {
++ const queue = (data.aiDiscoveryQueue?.rows || []).slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+ai-diagnostics-service.js:6242
+- const queue = (data.aiDiscoveryQueue?.rows || []).slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
++ const wrap = byId("crawlCollectedRecordsReport");
+ai-diagnostics-service.js:6243
+- const wrap = byId("crawlCollectedRecordsReport");
++ if (!wrap) return;
+ai-diagnostics-service.js:6244
+- if (!wrap) return;
++ const groups = consolidateCrawlRecords(queue);
+ai-diagnostics-service.js:6245
+- const groups = consolidateCrawlRecords(queue);
++ wrap.innerHTML = groups.length ? groups.slice(0, 25).map(group => `<div class="queue-item">
+ai-diagnostics-service.js:6246
+- wrap.innerHTML = groups.length ? groups.slice(0, 25).map(group => `<div class="queue-item">
++ <div class="message-envelope-head">
+ai-diagnostics-service.js:6247
+- <div class="message-envelope-head">
++ <strong>${esc(group.name)}</strong>
+ai-diagnostics-service.js:6248
+- <strong>${esc(group.name)}</strong>
++ ${statusBadge(group.addressConflicts ? "Soft Fail" : "Pass")}
+ai-diagnostics-service.js:6249
+- ${statusBadge(group.addressConflicts ? "Soft Fail" : "Pass")}
++ </div>
+ai-diagnostics-service.js:6250
+- </div>
++ <p>${esc(group.city || "")}${group.country ? `, ${esc(group.country)}` : ""} | ${esc(group.family)} | ${esc(group.genreList.slice(0, 5).join(", "))}</p>
+ai-diagnostics-service.js:6251
+- <p>${esc(group.city || "")}${group.country ? `, ${esc(group.country)}` : ""} | ${esc(group.family)} | ${esc(group.genreList.slice(0, 5).join(", "))}</p>
++ <p>${group.descriptionList[0] ? `Description: ${esc(group.descriptionList[0])}` : "Description: missing"}</p>
+ai-diagnostics-service.js:6252
+- <p>${group.descriptionList[0] ? `Description: ${esc(group.descriptionList[0])}` : "Description: missing"}</p>
++ <p>${group.canonicalAddress ? `Address: ${esc(group.canonicalAddress)}` : "Address: not collected yet"}</p>
+ai-diagnostics-service.js:6253
+- <p>${group.canonicalAddress ? `Address: ${esc(group.canonicalAddress)}` : "Address: not collected yet"}</p>
++ <p>${group.phoneList[0] ? `Phone: ${esc(group.phoneList[0])}` : "Phone: not collected yet"}</p>
+ai-diagnostics-service.js:6254
+- <p>${group.phoneList[0] ? `Phone: ${esc(group.phoneList[0])}` : "Phone: not collected yet"}</p>
++ ${group.missingRequiredList.length ? `<p class="sub small">Missing required datapoints: ${esc(group.missingRequiredList.join(", "))}</p>` : ""}
+ai-diagnostics-service.js:6255
+- ${group.missingRequiredList.length ? `<p class="sub small">Missing required datapoints: ${esc(group.missingRequiredList.join(", "))}</p>` : ""}
++ ${group.addressConflicts ? `<p class="sub small">Address conflict: ${esc(group.addressOptions.map(item => `${item.address} (${item.count})`).join(" | "))}</p>` : ""}
+ai-diagnostics-service.js:6256
+- ${group.addressConflicts ? `<p class="sub small">Address conflict: ${esc(group.addressOptions.map(item => `${item.address} (${item.count})`).join(" | "))}</p>` : ""}
++ <small>Grouped records: ${esc(group.itemCount)} | Sources: ${esc(group.sourceList.join(", ") || "-")} | Max stars: ${esc(group.maxStar || "-")} | Max confidence: ${esc(group.maxConfidence || "-")}</small>
+ai-diagnostics-service.js:6257
+- <small>Grouped records: ${esc(group.itemCount)} | Sources: ${esc(group.sourceList.join(", ") || "-")} | Max stars: ${esc(group.maxStar || "-")} | Max confidence: ${esc(group.maxConfidence || "-")}</small>
++ </div>`).join("") : "<p class='sub'>No collected discovery records yet. Create crawl review records from the plain-English input to seed the queue.</p>";
+ai-diagnostics-service.js:6258
+- </div>`).join("") : "<p class='sub'>No collected discovery records yet. Create crawl review records from the plain-English input to seed the queue.</p>";
++ }
+ai-diagnostics-service.js:6259
+- }
++ 
+ai-diagnostics-service.js:6260
+- 
++ function firstFilled(values = []) {
+ai-diagnostics-service.js:6261
+- function firstFilled(values = []) {
++ return values.map(value => String(value || "").trim()).find(Boolean) || "";
+ai-diagnostics-service.js:6262
+- return values.map(value => String(value || "").trim()).find(Boolean) || "";
++ }
+ai-diagnostics-service.js:6263
+- }
++ 
+ai-diagnostics-service.js:6264
+- 
++ function crawlContactRows(data = state.lastData || {}) {
+ai-diagnostics-service.js:6265
+- function crawlContactRows(data = state.lastData || {}) {
++ const queue = data.aiDiscoveryQueue?.rows || [];
+ai-diagnostics-service.js:6266
+- const queue = data.aiDiscoveryQueue?.rows || [];
++ const groups = consolidateCrawlRecords(queue);
+ai-diagnostics-service.js:6267
+- const groups = consolidateCrawlRecords(queue);
++ return groups.map(group => {
+ai-diagnostics-service.js:6268
+- return groups.map(group => {
++ const socials = group.items.map(item => destinationSocials(item));
+ai-diagnostics-service.js:6269
+- const socials = group.items.map(item => destinationSocials(item));
++ return {
+ai-diagnostics-service.js:6270
+- return {
++ clubName: group.name || "",
+ai-diagnostics-service.js:6271
+- clubName: group.name || "",
++ address: group.canonicalAddress || firstFilled(group.items.map(destinationAddress)),
+ai-diagnostics-service.js:6272
+- address: group.canonicalAddress || firstFilled(group.items.map(destinationAddress)),
++ phoneNumber: firstFilled(group.phoneList.length ? group.phoneList : group.items.map(destinationPhone)),
+ai-diagnostics-service.js:6273
+- phoneNumber: firstFilled(group.phoneList.length ? group.phoneList : group.items.map(destinationPhone)),
++ website:firstFilled(group.items.map(destinationWebsite)),
+ai-diagnostics-service.js:6274
+- website:firstFilled(group.items.map(destinationWebsite)),
++ facebookHandle: firstFilled(socials.map(item => item.facebook)),
+ai-diagnostics-service.js:6275
+- facebookHandle: firstFilled(socials.map(item => item.facebook)),
++ instagramHandle: firstFilled(socials.map(item => item.instagram)),
+ai-diagnostics-service.js:6276
+- instagramHandle: firstFilled(socials.map(item => item.instagram)),
++ xHandle: firstFilled(socials.map(item => item.x)),
+ai-diagnostics-service.js:6277
+- xHandle: firstFilled(socials.map(item => item.x)),
++ ticTokHandle: firstFilled(socials.map(item => item.tiktok))
+ai-diagnostics-service.js:6278
+- ticTokHandle: firstFilled(socials.map(item => item.tiktok))
++ };
+ai-diagnostics-service.js:6279
+- };
++ }).filter(row => row.clubName || row.address || row.phoneNumber || row.website || row.facebookHandle || row.instagramHandle || row.xHandle || row.ticTokHandle);
+ai-diagnostics-service.js:6280
+- }).filter(row => row.clubName || row.address || row.phoneNumber || row.website || row.facebookHandle || row.instagramHandle || row.xHandle || row.ticTokHandle);
++ }
+ai-diagnostics-service.js:6281
+- }
++ 
+ai-diagnostics-service.js:6282
+- 
++ function csvCell(value) {
+ai-diagnostics-service.js:6283
+- function csvCell(value) {
++ const text = String(value ?? "");
+ai-diagnostics-service.js:6284
+- const text = String(value ?? "");
++ return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+ai-diagnostics-service.js:6285
+- return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
++ }
+ai-diagnostics-service.js:6286
+- }
++ 
+ai-diagnostics-service.js:6287
+- 
++ function buildCrawlContactsCsv(rows = crawlContactRows()) {
+ai-diagnostics-service.js:6288
+- function buildCrawlContactsCsv(rows = crawlContactRows()) {
++ const headers = ["Club/Event/Concert/Lounge Name", "Address", "Telephone #", "Website", "Facebook Handle", "Instagram Handle", "X Handle", "TikTok Handle"];
+ai-diagnostics-service.js:6289
+- const headers = ["Club/Event/Concert/Lounge Name", "Address", "Telephone #", "Website", "Facebook Handle", "Instagram Handle", "X Handle", "TikTok Handle"];
++ const lines = [headers.map(csvCell).join(",")];
+ai-diagnostics-service.js:6290
+- const lines = [headers.map(csvCell).join(",")];
++ rows.forEach(row => {
+ai-diagnostics-service.js:6291
+- rows.forEach(row => {
++ lines.push([
+ai-diagnostics-service.js:6292
+- lines.push([
++ row.clubName,
+ai-diagnostics-service.js:6293
+- row.clubName,
++ row.address,
+ai-diagnostics-service.js:6294
+- row.address,
++ row.phoneNumber,
+ai-diagnostics-service.js:6295
+- row.phoneNumber,
++ row.website,
+ai-diagnostics-service.js:6296
+- row.website,
++ row.facebookHandle,
+ai-diagnostics-service.js:6297
+- row.facebookHandle,
++ row.instagramHandle,
+ai-diagnostics-service.js:6298
+- row.instagramHandle,
++ row.xHandle,
+ai-diagnostics-service.js:6299
+- row.xHandle,
++ row.ticTokHandle
+ai-diagnostics-service.js:6300
+- row.ticTokHandle
++ ].map(csvCell).join(","));
+ai-diagnostics-service.js:6301
+- ].map(csvCell).join(","));
++ });
+ai-diagnostics-service.js:6302
+- });
++ return lines.join("\r\n");
+ai-diagnostics-service.js:6303
+- return lines.join("\r\n");
++ }
+ai-diagnostics-service.js:6304
+- }
++ 
+ai-diagnostics-service.js:6305
+- 
++ function renderCrawlContactExport(data = state.lastData || {}) {
+ai-diagnostics-service.js:6306
+- function renderCrawlContactExport(data = state.lastData || {}) {
++ const wrap = byId("crawlContactExportReport");
+ai-diagnostics-service.js:6307
+- const wrap = byId("crawlContactExportReport");
++ if (!wrap) return;
+ai-diagnostics-service.js:6308
+- if (!wrap) return;
++ const rows = crawlContactRows(data);
+ai-diagnostics-service.js:6309
+- const rows = crawlContactRows(data);
++ const extractorStatus = state.lastSourceExtractorStatus || {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Not tested in this browser session yet."};
+ai-diagnostics-service.js:6310
+- const extractorStatus = state.lastSourceExtractorStatus || {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Not tested in this browser session yet."};
++ const summary = simpleRows([
+ai-diagnostics-service.js:6311
+- const summary = simpleRows([
++ ["CSV rows ready", rows.length.toLocaleString()],
+ai-diagnostics-service.js:6312
+- ["CSV rows ready", rows.length.toLocaleString()],
++ ["CSV columns", "Club/Event/Concert/Lounge Name, Address, Telephone #, Website, Facebook Handle, Instagram Handle, X Handle, TikTok Handle"],
+ai-diagnostics-service.js:6313
+- ["CSV columns", "Club/Event/Concert/Lounge Name, Address, Telephone #, Website, Facebook Handle, Instagram Handle, X Handle, TikTok Handle"],
++ [extractorStatus.label, `${extractorStatus.status}: ${extractorStatus.evidence}`]
+ai-diagnostics-service.js:6314
+- [extractorStatus.label, `${extractorStatus.status}: ${extractorStatus.evidence}`]
++ ]);
+ai-diagnostics-service.js:6315
+- ]);
++ const table = rows.length ? `<div class="crawl-contact-table">
+ai-diagnostics-service.js:6316
+- const table = rows.length ? `<div class="crawl-contact-table">
++ <div class="crawl-contact-row crawl-contact-head">
+ai-diagnostics-service.js:6317
+- <div class="crawl-contact-row crawl-contact-head">
++ <strong>Name</strong><strong>Address</strong><strong>Telephone #</strong><strong>Website</strong><strong>Facebook</strong><strong>Instagram</strong><strong>X</strong><strong>TikTok</strong>
+ai-diagnostics-service.js:6318
+- <strong>Name</strong><strong>Address</strong><strong>Telephone #</strong><strong>Website</strong><strong>Facebook</strong><strong>Instagram</strong><strong>X</strong><strong>TikTok</strong>
++ </div>
+ai-diagnostics-service.js:6319
+- </div>
++ ${rows.slice(0, 50).map(row => `<div class="crawl-contact-row">
+ai-diagnostics-service.js:6320
+- ${rows.slice(0, 50).map(row => `<div class="crawl-contact-row">
++ <span>${esc(row.clubName)}</span>
+ai-diagnostics-service.js:6321
+- <span>${esc(row.clubName)}</span>
++ <span>${esc(row.address)}</span>
+ai-diagnostics-service.js:6322
+- <span>${esc(row.address)}</span>
++ <span>${esc(row.phoneNumber)}</span>
+ai-diagnostics-service.js:6323
+- <span>${esc(row.phoneNumber)}</span>
++ <span>${esc(row.website)}</span>
+ai-diagnostics-service.js:6324
+- <span>${esc(row.website)}</span>
++ <span>${esc(row.facebookHandle)}</span>
+ai-diagnostics-service.js:6325
+- <span>${esc(row.facebookHandle)}</span>
++ <span>${esc(row.instagramHandle)}</span>
+ai-diagnostics-service.js:6326
+- <span>${esc(row.instagramHandle)}</span>
++ <span>${esc(row.xHandle)}</span>
+ai-diagnostics-service.js:6327
+- <span>${esc(row.xHandle)}</span>
++ <span>${esc(row.ticTokHandle)}</span>
+ai-diagnostics-service.js:6328
+- <span>${esc(row.ticTokHandle)}</span>
++ </div>`).join("")}
+ai-diagnostics-service.js:6329
+- </div>`).join("")}
++ </div>` : "<p class='sub'>No crawl contact rows are ready yet. Run a crawl or save extracted source details first.</p>";
+ai-diagnostics-service.js:6330
+- </div>` : "<p class='sub'>No crawl contact rows are ready yet. Run a crawl or save extracted source details first.</p>";
++ wrap.innerHTML = `${summary}${table}`;
+ai-diagnostics-service.js:6331
+- wrap.innerHTML = `${summary}${table}`;
++ }
+ai-diagnostics-service.js:6332
+- }
++ 
+ai-diagnostics-service.js:6333
+- 
++ function downloadCrawlContactsCsv() {
+ai-diagnostics-service.js:6334
+- function downloadCrawlContactsCsv() {
++ const rows = crawlContactRows();
+ai-diagnostics-service.js:6335
+- const rows = crawlContactRows();
++ const filename = `floqr-crawl-contacts-${exportTimestamp()}.csv`;
+ai-diagnostics-service.js:6336
+- const filename = `floqr-crawl-contacts-${exportTimestamp()}.csv`;
++ downloadTextFile(filename, buildCrawlContactsCsv(rows));
+ai-diagnostics-service.js:6337
+- downloadTextFile(filename, buildCrawlContactsCsv(rows));
++ setText("diagnosticsStatus", `Crawl contacts CSV downloaded as ${filename}.`);
+ai-diagnostics-service.js:6338
+- setText("diagnosticsStatus", `Crawl contacts CSV downloaded as ${filename}.`);
++ }
+ai-diagnostics-service.js:6339
+- }
++ 
+ai-diagnostics-service.js:6340
+- 
++ async function testGeminiSourceExtractor() {
+ai-diagnostics-service.js:6341
+- async function testGeminiSourceExtractor() {
++ setText("diagnosticsStatus", "Testing Gemini/source extractor callable...");
+ai-diagnostics-service.js:6342
+- setText("diagnosticsStatus", "Testing Gemini/source extractor callable...");
++ const sampleUrl = "https://example.com/floqr-diagnostic-club";
+ai-diagnostics-service.js:6343
+- const sampleUrl = "https://example.com/floqr-diagnostic-club";
++ const sampleText = "FLOQR Diagnostic Club\n123 Test Street\nWashington, DC\nPhone: +1 202 555 0100\nInstagram: @floqrtest";
+ai-diagnostics-service.js:6344
+- const sampleText = "FLOQR Diagnostic Club\n123 Test Street\nWashington, DC\nPhone: +1 202 555 0100\nInstagram: @floqrtest";
++ const record = await tryBackendSourceExtraction(sampleUrl, sampleText);
+ai-diagnostics-service.js:6345
+- const record = await tryBackendSourceExtraction(sampleUrl, sampleText);
++ state.lastSourceExtractorStatus = record
+ai-diagnostics-service.js:6346
+- state.lastSourceExtractorStatus = record
++ ? {label:"Gemini/source extractor", status:"Pass", evidence:"Firebase callable aiExtractPublicSourceUrl returned structured data."}
+ai-diagnostics-service.js:6347
+- ? {label:"Gemini/source extractor", status:"Pass", evidence:"Firebase callable aiExtractPublicSourceUrl returned structured data."}
++ : {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Callable was unavailable or timed out; local source extraction fallback remains available."};
+ai-diagnostics-service.js:6348
+- : {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Callable was unavailable or timed out; local source extraction fallback remains available."};
++ renderCrawlContactExport();
+ai-diagnostics-service.js:6349
+- renderCrawlContactExport();
++ setText("diagnosticsStatus", `${state.lastSourceExtractorStatus.label}: ${state.lastSourceExtractorStatus.evidence}`);
+ai-diagnostics-service.js:6350
+- setText("diagnosticsStatus", `${state.lastSourceExtractorStatus.label}: ${state.lastSourceExtractorStatus.evidence}`);
++ }
+ai-diagnostics-service.js:6351
+- }
++ 
+ai-diagnostics-service.js:6352
+- 
++ function renderAnalyticsInsights(data) {
+ai-diagnostics-service.js:6353
+- function renderAnalyticsInsights(data) {
++ const queue = data.aiDiscoveryQueue?.rows || [];
+ai-diagnostics-service.js:6354
+- const queue = data.aiDiscoveryQueue?.rows || [];
++ const runs = data.aiCrawlRuns?.rows || [];
+ai-diagnostics-service.js:6355
+- const runs = data.aiCrawlRuns?.rows || [];
++ const groups = consolidateCrawlRecords(queue);
+ai-diagnostics-service.js:6356
+- const groups = consolidateCrawlRecords(queue);
++ const addressConflicts = groups.filter(group => group.addressConflicts);
+ai-diagnostics-service.js:6357
+- const addressConflicts = groups.filter(group => group.addressConflicts);
++ const byStatus = countBy(queue, item => item.status || "unknown");
+ai-diagnostics-service.js:6358
+- const byStatus = countBy(queue, item => item.status || "unknown");
++ const byType = countBy(queue, item => item.proposedType || "unknown");
+ai-diagnostics-service.js:6359
+- const byType = countBy(queue, item => item.proposedType || "unknown");
++ const byCity = countBy(queue, item => item.city || "unknown");
+ai-diagnostics-service.js:6360
+- const byCity = countBy(queue, item => item.city || "unknown");
++ const byCountry = countBy(queue, item => item.country || "unknown");
+ai-diagnostics-service.js:6361
+- const byCountry = countBy(queue, item => item.country || "unknown");
++ const bySource = countBy(queue, item => item.sourceName || "unknown");
+ai-diagnostics-service.js:6362
+- const bySource = countBy(queue, item => item.sourceName || "unknown");
++ const byStar = countBy(queue, item => `${item.aiStarRating || "unrated"} star`);
+ai-diagnostics-service.js:6363
+- const byStar = countBy(queue, item => `${item.aiStarRating || "unrated"} star`);
++ const genreCounts = {};
+ai-diagnostics-service.js:6364
+- const genreCounts = {};
++ queue.forEach(item => splitList(item.genres || item.extractedTags).forEach(genre => {
+ai-diagnostics-service.js:6365
+- queue.forEach(item => splitList(item.genres || item.extractedTags).forEach(genre => {
++ genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+ai-diagnostics-service.js:6366
+- genreCounts[genre] = (genreCounts[genre] || 0) + 1;
++ }));
+ai-diagnostics-service.js:6367
+- }));
++ const highValue = queue.filter(item => Number(item.aiStarRating || 0) >= 4 || Number(item.aiConfidenceScore || 0) >= 0.75);
+ai-diagnostics-service.js:6368
+- const highValue = queue.filter(item => Number(item.aiStarRating || 0) >= 4 || Number(item.aiConfidenceScore || 0) >= 0.75);
++ const targetMarkets = ["Dubai", "Istanbul", "Singapore", "Thailand", "Shanghai", "Barcelona", "London", "Paris", "Amsterdam", "Berlin", "Milan"];
+ai-diagnostics-service.js:6369
+- const targetMarkets = ["Dubai", "Istanbul", "Singapore", "Thailand", "Shanghai", "Barcelona", "London", "Paris", "Amsterdam", "Berlin", "Milan"];
++ const missingMarkets = targetMarkets.filter(market => !queue.some(item => normalized(item.city).includes(normalized(market)) || normalized(item.country).includes(normalized(market))));
+ai-diagnostics-service.js:6370
+- const missingMarkets = targetMarkets.filter(market => !queue.some(item => normalized(item.city).includes(normalized(market)) || normalized(item.country).includes(normalized(market))));
++ const insights = [
+ai-diagnostics-service.js:6371
+- const insights = [
++ ["Raw collected records", queue.length.toLocaleString()],
+ai-diagnostics-service.js:6372
+- ["Raw collected records", queue.length.toLocaleString()],
++ ["Consolidated destinations", groups.length.toLocaleString()],
+ai-diagnostics-service.js:6373
+- ["Consolidated destinations", groups.length.toLocaleString()],
++ ["Address conflicts to review", addressConflicts.length.toLocaleString()],
+ai-diagnostics-service.js:6374
+- ["Address conflicts to review", addressConflicts.length.toLocaleString()],
++ ["Crawl runs", runs.length.toLocaleString()],
+ai-diagnostics-service.js:6375
+- ["Crawl runs", runs.length.toLocaleString()],
++ ["Queue status mix", topList(byStatus, 8)],
+ai-diagnostics-service.js:6376
+- ["Queue status mix", topList(byStatus, 8)],
++ ["Top proposed types", topList(byType, 8)],
+ai-diagnostics-service.js:6377
+- ["Top proposed types", topList(byType, 8)],
++ ["Top cities", topList(byCity, 8)],
+ai-diagnostics-service.js:6378
+- ["Top cities", topList(byCity, 8)],
++ ["Top countries", topList(byCountry, 8)],
+ai-diagnostics-service.js:6379
+- ["Top countries", topList(byCountry, 8)],
++ ["Top genres/tags", topList(genreCounts, 8)],
+ai-diagnostics-service.js:6380
+- ["Top genres/tags", topList(genreCounts, 8)],
++ ["Star ratings", topList(byStar, 8)],
+ai-diagnostics-service.js:6381
+- ["Star ratings", topList(byStar, 8)],
++ ["Top sources", topList(bySource, 8)],
+ai-diagnostics-service.js:6382
+- ["Top sources", topList(bySource, 8)],
++ ["High-value candidates", highValue.length.toLocaleString()],
+ai-diagnostics-service.js:6383
+- ["High-value candidates", highValue.length.toLocaleString()],
++ ["Market gaps", missingMarkets.join(", ") || "No configured target gaps detected"]
+ai-diagnostics-service.js:6384
+- ["Market gaps", missingMarkets.join(", ") || "No configured target gaps detected"]
++ ];
+ai-diagnostics-service.js:6385
+- ];
++ const wrap = byId("crawlAnalyticsInsights");
+ai-diagnostics-service.js:6386
+- const wrap = byId("crawlAnalyticsInsights");
++ if (wrap) wrap.innerHTML = simpleRows(insights);
+ai-diagnostics-service.js:6387
+- if (wrap) wrap.innerHTML = simpleRows(insights);
++ }
+ai-diagnostics-service.js:6388
+- }
++ 
+ai-diagnostics-service.js:6389
+- 
++ function renderAiCrawlingSummary(data, schedule) {
+ai-diagnostics-service.js:6390
+- function renderAiCrawlingSummary(data, schedule) {
++ const wrap = byId("aiCrawlingSummary");
+ai-diagnostics-service.js:6391
+- const wrap = byId("aiCrawlingSummary");
++ if (!wrap) return;
+ai-diagnostics-service.js:6392
+- if (!wrap) return;
++ const queue = data.aiDiscoveryQueue?.rows || [];
+ai-diagnostics-service.js:6393
+- const queue = data.aiDiscoveryQueue?.rows || [];
++ const groups = consolidateCrawlRecords(queue);
+ai-diagnostics-service.js:6394
+- const groups = consolidateCrawlRecords(queue);
++ const addressConflicts = groups.filter(group => group.addressConflicts);
+ai-diagnostics-service.js:6395
+- const addressConflicts = groups.filter(group => group.addressConflicts);
++ const profileDrafts = queue.filter(item => item.discoveryMode === "profile-import-draft");
+ai-diagnostics-service.js:6396
+- const profileDrafts = queue.filter(item => item.discoveryMode === "profile-import-draft");
++ const plan = schedule?.criteria?.structuredPlan || state.lastCrawlPlan || buildCrawlSearchPlan(readCriteriaFromControls());
+ai-diagnostics-service.js:6397
+- const plan = schedule?.criteria?.structuredPlan || state.lastCrawlPlan || buildCrawlSearchPlan(readCriteriaFromControls());
++ wrap.innerHTML = simpleRows([
+ai-diagnostics-service.js:6398
+- wrap.innerHTML = simpleRows([
++ ["Active search-plan jobs", (plan?.jobCount || 0).toLocaleString()],
+ai-diagnostics-service.js:6399
+- ["Active search-plan jobs", (plan?.jobCount || 0).toLocaleString()],
++ ["Raw collected records", queue.length.toLocaleString()],
+ai-diagnostics-service.js:6400
+- ["Raw collected records", queue.length.toLocaleString()],
++ ["Consolidated clubs/events", groups.length.toLocaleString()],
+ai-diagnostics-service.js:6401
+- ["Consolidated clubs/events", groups.length.toLocaleString()],
++ ["Address conflicts", addressConflicts.length.toLocaleString()],
+ai-diagnostics-service.js:6402
+- ["Address conflicts", addressConflicts.length.toLocaleString()],
++ ["Profile import drafts", profileDrafts.length.toLocaleString()],
+ai-diagnostics-service.js:6403
+- ["Profile import drafts", profileDrafts.length.toLocaleString()],
++ ["Crawl schedule", schedule?.frequency || "Not saved"],
+ai-diagnostics-service.js:6404
+- ["Crawl schedule", schedule?.frequency || "Not saved"],
++ ["Daily run times", schedule?.scheduleHours?.join(", ") || "Not saved"],
+ai-diagnostics-service.js:6405
+- ["Daily run times", schedule?.scheduleHours?.join(", ") || "Not saved"],
++ ["Schedule time zone", schedule?.timeZone || "Not saved"],
+ai-diagnostics-service.js:6406
+- ["Schedule time zone", schedule?.timeZone || "Not saved"],
++ ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
+ai-diagnostics-service.js:6407
+- ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
++ ]);
+ai-diagnostics-service.js:6408
+- ]);
++ }
+ai-diagnostics-service.js:6409
+- }
++ 
+ai-diagnostics-service.js:6410
+- 
++ async function loadDiagnosticsData() {
+ai-diagnostics-service.js:6411
+- async function loadDiagnosticsData() {
++ const entries = await Promise.all(COLLECTIONS.map(async name => [name, await readCollectionSafe(name)]));
+ai-diagnostics-service.js:6412
+- const entries = await Promise.all(COLLECTIONS.map(async name => [name, await readCollectionSafe(name)]));
++ const data = Object.fromEntries(entries);
+ai-diagnostics-service.js:6413
+- const data = Object.fromEntries(entries);
++ state.lastData = data;
+ai-diagnostics-service.js:6414
+- state.lastData = data;
++ return data;
+ai-diagnostics-service.js:6415
+- return data;
++ }
+ai-diagnostics-service.js:6416
+- }
++ 
+ai-diagnostics-service.js:6417
+- 
++ async function exportDiagnosticsReport() {
+ai-diagnostics-service.js:6418
+- async function exportDiagnosticsReport() {
++ if (!state.db) {
+ai-diagnostics-service.js:6419
+- if (!state.db) {
++ setText("diagnosticsStatus", "Diagnostics export failed because Firestore is unavailable.");
+ai-diagnostics-service.js:6420
+- setText("diagnosticsStatus", "Diagnostics export failed because Firestore is unavailable.");
++ return;
+ai-diagnostics-service.js:6421
+- return;
++ }
+ai-diagnostics-service.js:6422
+- }
++ try {
+ai-diagnostics-service.js:6423
+- try {
++ setText("diagnosticsStatus", "Preparing diagnostics TXT export...");
+ai-diagnostics-service.js:6424
+- setText("diagnosticsStatus", "Preparing diagnostics TXT export...");
++ const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
+ai-diagnostics-service.js:6425
+- const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
++ if (schedule) applyScheduleToControls(schedule);
+ai-diagnostics-service.js:6426
+- if (schedule) applyScheduleToControls(schedule);
++ renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+ai-diagnostics-service.js:6427
+- renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
++ state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
+ai-diagnostics-service.js:6428
+- state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
++ const features = buildFeatureDiagnostics(data);
+ai-diagnostics-service.js:6429
+- const features = buildFeatureDiagnostics(data);
++ state.lastFeatures = features;
+ai-diagnostics-service.js:6430
+- state.lastFeatures = features;
++ state.lastSchedule = schedule || null;
+ai-diagnostics-service.js:6431
+- state.lastSchedule = schedule || null;
++ renderFeatureDiagnostics(features);
+ai-diagnostics-service.js:6432
+- renderFeatureDiagnostics(features);
++ await renderRulesVersionStatus(data);
+ai-diagnostics-service.js:6433
+- await renderRulesVersionStatus(data);
++ renderAiCrawlingSummary(data, schedule);
+ai-diagnostics-service.js:6434
+- renderAiCrawlingSummary(data, schedule);
++ renderClubProfileDiagnostics(data);
+ai-diagnostics-service.js:6435
+- renderClubProfileDiagnostics(data);
++ renderCrawlActivity(data, schedule);
+ai-diagnostics-service.js:6436
+- renderCrawlActivity(data, schedule);
++ renderCrawlContactExport(data);
+ai-diagnostics-service.js:6437
+- renderCrawlContactExport(data);
++ renderCollectedRecords(data);
+ai-diagnostics-service.js:6438
+- renderCollectedRecords(data);
++ renderAnalyticsInsights(data);
+ai-diagnostics-service.js:6439
+- renderAnalyticsInsights(data);
++ const packageResults = await runPackageInstallDiagnostics({silent:true});
+ai-diagnostics-service.js:6440
+- const packageResults = await runPackageInstallDiagnostics({silent:true});
++ const manualResults = manualFeatureRows();
+ai-diagnostics-service.js:6441
+- const manualResults = manualFeatureRows();
++ renderManualFeatureDiagnostics();
+ai-diagnostics-service.js:6442
+- renderManualFeatureDiagnostics();
++ const filename = `floqr-diagnostics-${exportTimestamp()}.txt`;
+ai-diagnostics-service.js:6443
+- const filename = `floqr-diagnostics-${exportTimestamp()}.txt`;
++ const text = buildDiagnosticsExport({data, schedule, features, packageResults, manualResults});
+ai-diagnostics-service.js:6444
+- const text = buildDiagnosticsExport({data, schedule, features, packageResults, manualResults});
++ downloadTextFile(filename, text);
+ai-diagnostics-service.js:6445
+- downloadTextFile(filename, text);
++ const issues = collectDiagnosticIssues({data, features, packageResults, manualResults, reports:data.aiDiagnosticsReports?.rows || []});
+ai-diagnostics-service.js:6446
+- const issues = collectDiagnosticIssues({data, features, packageResults, manualResults, reports:data.aiDiagnosticsReports?.rows || []});
++ setText("diagnosticsStatus", `Diagnostics export downloaded as ${filename}. ${issues.length} failed, soft-fail, or TBI item(s) included in the fix prompt.`);
+ai-diagnostics-service.js:6447
+- setText("diagnosticsStatus", `Diagnostics export downloaded as ${filename}. ${issues.length} failed, soft-fail, or TBI item(s) included in the fix prompt.`);
++ } catch (error) {
+ai-diagnostics-service.js:6448
+- } catch (error) {
++ setText("diagnosticsStatus", `Diagnostics export failed: ${error?.message || error}`);
+ai-diagnostics-service.js:6449
+- setText("diagnosticsStatus", `Diagnostics export failed: ${error?.message || error}`);
++ }
+ai-diagnostics-service.js:6450
+- }
++ }
+ai-diagnostics-service.js:6451
+- }
++ 
+ai-diagnostics-service.js:6452
+- 
++ async function refreshDiagnostics(options = {}) {
+ai-diagnostics-service.js:6453
+- async function refreshDiagnostics(options = {}) {
++ if (!state.db) return;
+ai-diagnostics-service.js:6454
+- if (!state.db) return;
++ setText("diagnosticsStatus", options.statusMessage || "Refreshing diagnostics...");
+ai-diagnostics-service.js:6455
+- setText("diagnosticsStatus", options.statusMessage || "Refreshing diagnostics...");
++ const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
+ai-diagnostics-service.js:6456
+- const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
++ if (schedule) applyScheduleToControls(schedule);
+ai-diagnostics-service.js:6457
+- if (schedule) applyScheduleToControls(schedule);
++ renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+ai-diagnostics-service.js:6458
+- renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
++ state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
+ai-diagnostics-service.js:6459
+- state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
++ const features = buildFeatureDiagnostics(data);
+ai-diagnostics-service.js:6460
+- const features = buildFeatureDiagnostics(data);
++ state.lastFeatures = features;
+ai-diagnostics-service.js:6461
+- state.lastFeatures = features;
++ state.lastSchedule = schedule || null;
+ai-diagnostics-service.js:6462
+- state.lastSchedule = schedule || null;
++ renderFeatureDiagnostics(features);
+ai-diagnostics-service.js:6463
+- renderFeatureDiagnostics(features);
++ await renderRulesVersionStatus(data);
+ai-diagnostics-service.js:6464
+- await renderRulesVersionStatus(data);
++ renderAiCrawlingSummary(data, schedule);
+ai-diagnostics-service.js:6465
+- renderAiCrawlingSummary(data, schedule);
++ renderSourceExtractionReport();
+ai-diagnostics-service.js:6466
+- renderSourceExtractionReport();
++ renderClubProfileDiagnostics(data);
+ai-diagnostics-service.js:6467
+- renderClubProfileDiagnostics(data);
++ renderCrawlActivity(data, schedule);
+ai-diagnostics-service.js:6468
+- renderCrawlActivity(data, schedule);
++ renderCrawlContactExport(data);
+ai-diagnostics-service.js:6469
+- renderCrawlContactExport(data);
++ renderCollectedRecords(data);
+ai-diagnostics-service.js:6470
+- renderCollectedRecords(data);
++ renderAnalyticsInsights(data);
+ai-diagnostics-service.js:6471
+- renderAnalyticsInsights(data);
++ await runPackageInstallDiagnostics({silent:true});
+ai-diagnostics-service.js:6472
+- await runPackageInstallDiagnostics({silent:true});
++ renderManualFeatureDiagnostics();
+ai-diagnostics-service.js:6473
+- renderManualFeatureDiagnostics();
++ const failures = features.filter(item => item.status === "Failed").length;
+ai-diagnostics-service.js:6474
+- const failures = features.filter(item => item.status === "Failed").length;
++ const soft = features.filter(item => item.status === "Soft Fail").length;
+ai-diagnostics-service.js:6475
+- const soft = features.filter(item => item.status === "Soft Fail").length;
++ const saved = options.saveFeatureReport ? await saveFeatureDiagnosticsReport(features) : null;
+ai-diagnostics-service.js:6476
+- const saved = options.saveFeatureReport ? await saveFeatureDiagnosticsReport(features) : null;
++ const savedText = saved ? ` ${saved.evidence}` : "";
+ai-diagnostics-service.js:6477
+- const savedText = saved ? ` ${saved.evidence}` : "";
++ setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.${savedText}`);
+ai-diagnostics-service.js:6478
+- setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.${savedText}`);
++ return {data, schedule, features, saved};
+ai-diagnostics-service.js:6479
+- return {data, schedule, features, saved};
++ }
+ai-diagnostics-service.js:6480
+- }
++ 
+ai-diagnostics-service.js:6481
+- 
++ async function runFeatureDiagnostics() {
+ai-diagnostics-service.js:6482
+- async function runFeatureDiagnostics() {
++ if (!state.db) {
+ai-diagnostics-service.js:6483
+- if (!state.db) {
++ setText("diagnosticsStatus", "Run Diagnostics failed because Firestore is unavailable.");
+ai-diagnostics-service.js:6484
+- setText("diagnosticsStatus", "Run Diagnostics failed because Firestore is unavailable.");
++ return null;
+ai-diagnostics-service.js:6485
+- return null;
++ }
+ai-diagnostics-service.js:6486
+- }
++ return refreshDiagnostics({
+ai-diagnostics-service.js:6487
+- return refreshDiagnostics({
++ saveFeatureReport:true,
+ai-diagnostics-service.js:6488
+- saveFeatureReport:true,
++ statusMessage:"Running feature diagnostics..."
+ai-diagnostics-service.js:6489
+- statusMessage:"Running feature diagnostics..."
++ });
+ai-diagnostics-service.js:6490
+- });
++ }
+ai-diagnostics-service.js:6491
+- }
++ 
+ai-diagnostics-service.js:6492
+- 
++ function buildPreviewLinksPayload(note = "") {
+ai-diagnostics-service.js:6493
+- function buildPreviewLinksPayload(note = "") {
++ const base = "https://jadzadco.github.io/shoutout-demo";
+ai-diagnostics-service.js:6494
+- const base = "https://jadzadco.github.io/shoutout-demo";
++ const v = PREVIEW_LINKS_PACKAGE;
+ai-diagnostics-service.js:6495
+- const v = PREVIEW_LINKS_PACKAGE;
++ return {
+ai-diagnostics-service.js:6496
+- return {
++ package: v,
+ai-diagnostics-service.js:6497
+- package: v,
++ note: note || `FLOQR s3.0.7 test notes:
+ai-diagnostics-service.js:6498
+- note: note || `FLOQR s3.0.7 test notes:
++ 1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, supRstar. Each must restore the FLOQR session — no Google-only gate, no auto popup.
+ai-diagnostics-service.js:6499
+- 1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, supRstar. Each must restore the FLOQR session — no Google-only gate, no auto popup.
++ 2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
+ai-diagnostics-service.js:6500
+- 2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
++ 3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,
+ai-diagnostics-service.js:6501
+- 3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,
++ links: [
+ai-diagnostics-service.js:6502
+- links: [
++ ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1`],
+ai-diagnostics-service.js:6503
+- ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
++ ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&tab=notifications`],
+ai-diagnostics-service.js:6504
+- ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
++ ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&tab=scheduling`],
+ai-diagnostics-service.js:6505
+- ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
++ ["Patron Service Members tab", `${base}/patron-portal.html?tab=service-members`],
+ai-diagnostics-service.js:6506
+- ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
++ ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?tab=work-calendar`],
+ai-diagnostics-service.js:6507
+- ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
++ ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&tab=notifications&notify=templates`],
+ai-diagnostics-service.js:6508
+- ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications&notify=templates`],
++ ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html`],
+ai-diagnostics-service.js:6509
+- ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
++ ["Work Sheet staff calendar", `${base}/staff-worksheet.html?location=temp-democlub-1`],
+ai-diagnostics-service.js:6510
+- ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
++ ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html`],
+ai-diagnostics-service.js:6511
+- ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
++ ["Master Admin diagnostics", `${base}/master-admin.html`],
+ai-diagnostics-service.js:6512
+- ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
++ ["Search / FloqAi", `${base}/?start=intent`],
+ai-diagnostics-service.js:6513
+- ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
++ ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1`]
+ai-diagnostics-service.js:6514
+- ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1`]
++ ]
+ai-diagnostics-service.js:6515
+- ]
++ };
+ai-diagnostics-service.js:6516
+- };
++ }
+ai-diagnostics-service.js:6517
+- }
++ 
+ai-diagnostics-service.js:6518
+- 
++ async function emailPreviewLinksToMobile() {
+ai-diagnostics-service.js:6519
+- async function emailPreviewLinksToMobile() {
++ const statusId = "diagnosticsStatus";
+ai-diagnostics-service.js:6520
+- const statusId = "diagnosticsStatus";
++ const user = state.auth?.currentUser;
+ai-diagnostics-service.js:6521
+- const user = state.auth?.currentUser;
++ const payload = buildPreviewLinksPayload();
+ai-diagnostics-service.js:6522
+- const payload = buildPreviewLinksPayload();
++ setText(statusId, "Sending mobile preview links to your email…");
+ai-diagnostics-service.js:6523
+- setText(statusId, "Sending mobile preview links to your email…");
++ try {
+ai-diagnostics-service.js:6524
+- try {
++ if (user && firebase.app().functions) {
+ai-diagnostics-service.js:6525
+- if (user && firebase.app().functions) {
++ const callable = firebase.app().functions("us-central1").httpsCallable("sendFloqrPreviewLinksEmail");
+ai-diagnostics-service.js:6526
+- const callable = firebase.app().functions("us-central1").httpsCallable("sendFloqrPreviewLinksEmail");
++ const result = await callable({
+ai-diagnostics-service.js:6527
+- const result = await callable({
++ package: payload.package,
+ai-diagnostics-service.js:6528
+- package: payload.package,
++ note: payload.note,
+ai-diagnostics-service.js:6529
+- note: payload.note,
++ links: payload.links,
+ai-diagnostics-service.js:6530
+- links: payload.links,
++ to: user.email || ""
+ai-diagnostics-service.js:6531
+- to: user.email || ""
++ });
+ai-diagnostics-service.js:6532
+- });
++ const data = result?.data || {};
+ai-diagnostics-service.js:6533
+- const data = result?.data || {};
++ setText(statusId, `Preview links emailed to ${data.to || user.email || "your inbox"} (${data.links || payload.links.length} links, v${data.package || payload.package}).`);
+ai-diagnostics-service.js:6534
+- setText(statusId, `Preview links emailed to ${data.to || user.email || "your inbox"} (${data.links || payload.links.length} links, v${data.package || payload.package}).`);
++ return data;
+ai-diagnostics-service.js:6535
+- return data;
++ }
+ai-diagnostics-service.js:6536
+- }
++ const response = await fetch(PREVIEW_LINKS_HTTP, {
+ai-diagnostics-service.js:6537
+- const response = await fetch(PREVIEW_LINKS_HTTP, {
++ method: "POST",
+ai-diagnostics-service.js:6538
+- method: "POST",
++ headers: {"content-type": "application/json"},
+ai-diagnostics-service.js:6539
+- headers: {"content-type": "application/json"},
++ body: JSON.stringify({...payload, to: "bans.don@gmail.com"})
+ai-diagnostics-service.js:6540
+- body: JSON.stringify({...payload, to: "bans.don@gmail.com"})
++ });
+ai-diagnostics-service.js:6541
+- });
++ const data = await response.json().catch(() => ({}));
+ai-diagnostics-service.js:6542
+- const data = await response.json().catch(() => ({}));
++ if (!response.ok || !data.ok) throw new Error(data.error || `Email request failed (${response.status})`);
+ai-diagnostics-service.js:6543
+- if (!response.ok || !data.ok) throw new Error(data.error || `Email request failed (${response.status})`);
++ setText(statusId, `Preview links emailed to ${data.to} (${data.links} links, v${data.package}).`);
+ai-diagnostics-service.js:6544
+- setText(statusId, `Preview links emailed to ${data.to} (${data.links} links, v${data.package}).`);
++ return data;
+ai-diagnostics-service.js:6545
+- return data;
++ } catch (error) {
+ai-diagnostics-service.js:6546
+- } catch (error) {
++ setText(statusId, `Preview link email failed: ${error?.message || error}`);
+ai-diagnostics-service.js:6547
+- setText(statusId, `Preview link email failed: ${error?.message || error}`);
++ throw error;
+ai-diagnostics-service.js:6548
+- throw error;
++ }
+ai-diagnostics-service.js:6549
+- }
++ }
+ai-diagnostics-service.js:6550
+- }
++ 
+ai-diagnostics-service.js:6551
+- 
++ function bindControls() {
+ai-diagnostics-service.js:6552
+- function bindControls() {
++ byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
+ai-diagnostics-service.js:6553
+- byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
++ byId("runFeatureDiagnosticsBtn")?.addEventListener("click", runFeatureDiagnostics);
+ai-diagnostics-service.js:6554
+- byId("runFeatureDiagnosticsBtn")?.addEventListener("click", runFeatureDiagnostics);
++ byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
+ai-diagnostics-service.js:6555
+- byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
++ byId("emailPreviewLinksBtn")?.addEventListener("click", () => {
+ai-diagnostics-service.js:6556
+- byId("emailPreviewLinksBtn")?.addEventListener("click", () => {
++ emailPreviewLinksToMobile().catch(error => setText("diagnosticsStatus", error?.message || String(error)));
+ai-diagnostics-service.js:6557
+- emailPreviewLinksToMobile().catch(error => setText("diagnosticsStatus", error?.message || String(error)));
++ });
+ai-diagnostics-service.js:6558
+- });
++ byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
+ai-diagnostics-service.js:6559
+- byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
++ byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
+ai-diagnostics-service.js:6560
+- byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
++ byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
+ai-diagnostics-service.js:6561
+- byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
++ byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
+ai-diagnostics-service.js:6562
+- byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
++ byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
+ai-diagnostics-service.js:6563
+- byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
++ byId("archivePassedPackageDiagnosticsBtn")?.addEventListener("click", archivePassedPackageDiagnostics);
+ai-diagnostics-service.js:6564
+- byId("archivePassedPackageDiagnosticsBtn")?.addEventListener("click", archivePassedPackageDiagnostics);
++ byId("downloadPackageDiagnosticsArchiveCsvBtn")?.addEventListener("click", downloadPackageDiagnosticsArchiveCsv);
+ai-diagnostics-service.js:6565
+- byId("downloadPackageDiagnosticsArchiveCsvBtn")?.addEventListener("click", downloadPackageDiagnosticsArchiveCsv);
++ byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
+ai-diagnostics-service.js:6566
+- byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
++ byId("rulesSmokeTestFilter")?.addEventListener("change", renderRulesSmokeResults);
+ai-diagnostics-service.js:6567
+- byId("rulesSmokeTestFilter")?.addEventListener("change", renderRulesSmokeResults);
++ byId("copyRulesSmokeFailuresBtn")?.addEventListener("click", copyRulesSmokeFailures);
+ai-diagnostics-service.js:6568
+- byId("copyRulesSmokeFailuresBtn")?.addEventListener("click", copyRulesSmokeFailures);
++ byId("downloadRulesSmokeJsonBtn")?.addEventListener("click", downloadRulesSmokeJson);
+ai-diagnostics-service.js:6569
+- byId("downloadRulesSmokeJsonBtn")?.addEventListener("click", downloadRulesSmokeJson);
++ byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
+ai-diagnostics-service.js:6570
+- byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
++ byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
+ai-diagnostics-service.js:6571
+- byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
++ byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
+ai-diagnostics-service.js:6572
+- byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
++ byId("runInstantCrawlBtn")?.addEventListener("click", runInstantCrawl);
+ai-diagnostics-service.js:6573
+- byId("runInstantCrawlBtn")?.addEventListener("click", runInstantCrawl);
++ byId("searchStaleRecordsBtn")?.addEventListener("click", () => searchStaleRecords());
+ai-diagnostics-service.js:6574
+- byId("searchStaleRecordsBtn")?.addEventListener("click", () => searchStaleRecords());
++ byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
+ai-diagnostics-service.js:6575
+- byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
++ byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);
+ai-diagnostics-service.js:6576
+- byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);
++ byId("clearCachedCrawlsBtn")?.addEventListener("click", clearCachedCrawlRecords);
+ai-diagnostics-service.js:6577
+- byId("clearCachedCrawlsBtn")?.addEventListener("click", clearCachedCrawlRecords);
++ byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
+ai-diagnostics-service.js:6578
+- byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
++ byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
+ai-diagnostics-service.js:6579
+- byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
++ byId("sourceExtractUrl")?.addEventListener("input", updateSourceExtractUrlHint);
+ai-diagnostics-service.js:6580
+- byId("sourceExtractUrl")?.addEventListener("input", updateSourceExtractUrlHint);
++ byId("sourceExtractUrl")?.addEventListener("change", updateSourceExtractUrlHint);
+ai-diagnostics-service.js:6581
+- byId("sourceExtractUrl")?.addEventListener("change", updateSourceExtractUrlHint);
++ byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
+ai-diagnostics-service.js:6582
+- byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
++ byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
+ai-diagnostics-service.js:6583
+- byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
++ byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
+ai-diagnostics-service.js:6584
+- byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
++ byId("downloadCrawlContactsCsvBtn")?.addEventListener("click", downloadCrawlContactsCsv);
+ai-diagnostics-service.js:6585
+- byId("downloadCrawlContactsCsvBtn")?.addEventListener("click", downloadCrawlContactsCsv);
++ byId("testGeminiSourceExtractorBtn")?.addEventListener("click", () => testGeminiSourceExtractor().catch(error => {
+ai-diagnostics-service.js:6586
+- byId("testGeminiSourceExtractorBtn")?.addEventListener("click", () => testGeminiSourceExtractor().catch(error => {
++ setText("diagnosticsStatus", `Gemini/source extractor test failed: ${error?.message || error}`);
+ai-diagnostics-service.js:6587
+- setText("diagnosticsStatus", `Gemini/source extractor test failed: ${error?.message || error}`);
++ }));
+ai-diagnostics-service.js:6588
+- }));
++ }
+ai-diagnostics-service.js:6589
+- }
++ 
+ai-diagnostics-service.js:6590
+- 
++ async function mount(options = {}) {
+ai-diagnostics-service.js:6591
+- async function mount(options = {}) {
++ state.db = options.db;
+ai-diagnostics-service.js:6592
+- state.db = options.db;
++ state.auth = options.auth;
+ai-diagnostics-service.js:6593
+- state.auth = options.auth;
++ state.storage = options.storage || (window.firebase?.storage ? firebase.storage() : null);
+ai-diagnostics-service.js:6594
+- state.storage = options.storage || (window.firebase?.storage ? firebase.storage() : null);
++ if (!state.db) {
+ai-diagnostics-service.js:6595
+- if (!state.db) {
++ setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
+ai-diagnostics-service.js:6596
+- setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
++ return;
+ai-diagnostics-service.js:6597
+- return;
++ }
+ai-diagnostics-service.js:6598
+- }
++ if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
+ai-diagnostics-service.js:6599
+- if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
++ hydrateDefaultControls();
+ai-diagnostics-service.js:6600
+- hydrateDefaultControls();
++ if (!state.mounted) {
+ai-diagnostics-service.js:6601
+- if (!state.mounted) {
++ state.mounted = true;
+ai-diagnostics-service.js:6602
+- state.mounted = true;
++ bindControls();
+ai-diagnostics-service.js:6603
+- bindControls();
++ }
+ai-diagnostics-service.js:6604
+- }
++ const schedule = await readScheduleSafe();
+ai-diagnostics-service.js:6605
+- const schedule = await readScheduleSafe();
++ if (schedule) applyScheduleToControls(schedule);
+ai-diagnostics-service.js:6606
+- if (schedule) applyScheduleToControls(schedule);
++ renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+ai-diagnostics-service.js:6607
+- renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
++ renderSourceExtractionReport();
+ai-diagnostics-service.js:6608
+- renderSourceExtractionReport();
++ renderCrawlContactExport();
+ai-diagnostics-service.js:6609
+- renderCrawlContactExport();
++ renderPackageDiagnosticsArchives();
+ai-diagnostics-service.js:6610
+- renderPackageDiagnosticsArchives();
++ await refreshDiagnostics();
+ai-diagnostics-service.js:6611
+- await refreshDiagnostics();
++ }
+ai-diagnostics-service.js:6612
+- }
++ 
+ai-diagnostics-service.js:6613
+- 
++ window.FLOQRDiagnostics = {
+ai-diagnostics-service.js:6614
+- window.FLOQRDiagnostics = {
++ mount,
+ai-diagnostics-service.js:6615
+- mount,
++ refreshDiagnostics,
+ai-diagnostics-service.js:6616
+- refreshDiagnostics,
++ runFeatureDiagnostics,
+ai-diagnostics-service.js:6617
+- runFeatureDiagnostics,
++ runPackageInstallDiagnostics,
+ai-diagnostics-service.js:6618
+- runPackageInstallDiagnostics,
++ runRulesSmokeTest,
+ai-diagnostics-service.js:6619
+- runRulesSmokeTest,
++ exportDiagnosticsReport,
+ai-diagnostics-service.js:6620
+- exportDiagnosticsReport,
++ renderManualFeatureDiagnostics,
+ai-diagnostics-service.js:6621
+- renderManualFeatureDiagnostics,
++ renderPackageDiagnosticsArchives,
+ai-diagnostics-service.js:6622
+- renderPackageDiagnosticsArchives,
++ renderManualFeatureArchives,
+ai-diagnostics-service.js:6623
+- renderManualFeatureArchives,
++ buildManualFeatureDiagnosticsText,
+ai-diagnostics-service.js:6624
+- buildManualFeatureDiagnosticsText,
++ buildManualFeatureDiagnosticsPrompt,
+ai-diagnostics-service.js:6625
+- buildManualFeatureDiagnosticsPrompt,
++ downloadCrawlContactsCsv,
+ai-diagnostics-service.js:6626
+- downloadCrawlContactsCsv,
++ renderCrawlContactExport,
+ai-diagnostics-service.js:6627
+- renderCrawlContactExport,
++ testGeminiSourceExtractor,
+ai-diagnostics-service.js:6628
+- testGeminiSourceExtractor,
++ extractSourceDetails,
+ai-diagnostics-service.js:6629
+- extractSourceDetails,
++ saveExtractedDiscoveryRecord,
+ai-diagnostics-service.js:6630
+- saveExtractedDiscoveryRecord,
++ searchStaleRecords,
+ai-diagnostics-service.js:6631
+- searchStaleRecords,
++ removeSelectedStaleRecords,
+ai-diagnostics-service.js:6632
+- removeSelectedStaleRecords,
++ removeAllFoundStaleRecords,
+ai-diagnostics-service.js:6633
+- removeAllFoundStaleRecords,
++ clearCachedCrawlRecords,
+ai-diagnostics-service.js:6634
+- clearCachedCrawlRecords,
++ DEFAULT_EVENT_TYPES,
+ai-diagnostics-service.js:6635
+- DEFAULT_EVENT_TYPES,
++ DEFAULT_GENRES,
+ai-diagnostics-service.js:6636
+- DEFAULT_GENRES,
++ DEFAULT_MARKET_LANGUAGE_PLAN
+ai-diagnostics-service.js:6637
+- DEFAULT_MARKET_LANGUAGE_PLAN
++ };
+ai-diagnostics-service.js:6638
+- };
++ })();
+ai-diagnostics-service.js:6639
+- })();
++ 

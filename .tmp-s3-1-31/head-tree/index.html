@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR ShoutOut Patron Portal v29.09.1 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ShoutOut App</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
+  <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
+</head>
+<body>
+
+<div id="userMenu" class="user-menu">
+  <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
+    <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
+    <span id="userInitials" class="user-initials">?</span>
+    <span class="user-dots" aria-hidden="true">&#8226;&#8226;&#8226;</span>
+  </button>
+  <div id="userDropdown" class="user-dropdown hidden">
+    <div class="user-dropdown-row">
+      <img id="dropdownUserPhoto" class="dropdown-user-photo hidden" alt="User profile"/>
+      <div>
+        <strong id="dropdownUserName">Not signed in</strong>
+        <p id="dropdownUserEmail">Guest</p>
+      </div>
+    </div>
+    <button id="dropdownSignInBtn" class="primary full" type="button" data-i18n="app.continue">Sign in</button>
+    <button id="dropdownSignOutBtn" class="ghost full hidden" type="button" data-i18n="app.signOut">Sign out</button>
+  </div>
+</div>
+
+<main class="app">
+  <section id="landingPage" class="page active">
+    <div class="login-wrap">
+      <div class="login-card">
+        <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+        <div class="hero-logo-fallback hidden">FLOQR</div>
+        <h2
+          data-i18n="app.welcome"
+          data-floqr-help-id="help-welcome"
+          data-floqr-help-title="Welcome to FLOQR"
+          data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout|what is otp|one time password|how does otp work|whatsapp otp|sms otp|sign in code"
+          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
+        >Welcome</h2>
+        <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
+
+        <div id="signedInActions" class="hidden">
+          <button id="logoutBtn1" class="ghost full" type="button" data-i18n="app.signOut">Sign out</button>
+        </div>
+
+        <div id="loginActions">
+          <button id="googleLoginBtn" class="signin google" type="button" data-i18n="app.google">
+            <span class="icon google-icon">
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+            </span>
+            Continue with Google
+          </button>
+          <button id="microsoftLoginBtn" class="signin microsoft" type="button" data-i18n="app.microsoft"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+          <button id="facebookLoginBtn" class="signin facebook" type="button" data-i18n="app.facebook"><span class="icon fb-icon">f</span>Continue with Facebook</button>
+
+          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false"><span class="icon mail-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3" fill="#fff"/><path d="M5.5 9.5 16 17.5l10.5-8" fill="none" stroke="#3a63ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Continue with your own Email</button>
+          <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
+            <label>Email address
+              <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
+            </label>
+            <div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 6-minute code</button><button id="emailOtpHaveCodeBtn" type="button" data-i18n="app.emailHaveCode">I already have a code</button></div>
+            <label>Enter 8-character code
+              <input id="emailOtpCode" maxlength="8" autocomplete="one-time-code" placeholder="Enter code from email"/>
+            </label>
+            <button id="verifyEmailOtpBtn" class="primary full" type="button">Verify and Continue</button>
+            <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 6 minutes after delivery.</p>
+          </div>
+
+          <button id="showSmsOtpBtn" class="signin sms has-sub" type="button" data-i18n="app.smsOtp" aria-controls="smsOtpPanel"><span class="icon sms-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 6h20a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H13l-6 5v-5H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z" fill="#fff"/><circle cx="10.5" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="16" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="21.5" cy="14.5" r="1.9" fill="#3a63ff"/></svg></span><span class="i18n-text signin-label">Continue with SMS OTP</span><span class="signin-sub" data-i18n="app.smsOtpRegion">(US &amp; Canada Only)</span></button>
+          <div id="smsOtpPanel" class="sms-otp-panel hidden">
+          <p class="sub small" data-i18n="otp.smsUsOnly">SMS codes go to US and Canadian numbers (+1) only. Everywhere else, use WhatsApp OTP.</p>
+          <div class="phone-row sms-number-row">
+            <label data-i18n="otp.countryCode">Country code
+              <select id="phoneCountryCode" autocomplete="tel-country-code">
+                <option value="+1">United States / Canada (+1)</option>
+              </select>
+            </label>
+            <label data-i18n="otp.phoneNumber">Phone number
+              <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
+            </label>
+            <input id="phoneNumber" type="hidden"/>
+            <button id="sendOtpBtn" class="signin sms phone" type="button" data-i18n="otp.sendSms">Send OTP</button>
+          </div>
+          <div id="recaptcha-container"></div>
+          <div id="phoneCodeBlock" class="hidden">
+            <label class="compact-label" data-i18n="otp.code">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
+            <button id="verifyOtpBtn" class="signin sms phone verify" type="button" data-i18n="otp.verifySms">Verify OTP</button>
+          </div>
+          </div>
+
+          <button id="showWhatsAppOtpBtn" class="signin whatsapp has-sub" type="button" data-i18n="app.whatsappOtp" aria-controls="whatsappOtpPanel" aria-expanded="false"><span class="icon wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3z"/><path fill="#25d366" d="M16 5.3a10.7 10.7 0 0 0-9.1 16.3l.3.4-1.1 4 4.1-1.1.4.2A10.7 10.7 0 1 0 16 5.3z"/><path fill="#fff" d="M12.2 9.6c-.3-.6-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4.1 6.4 5.6 3.2 1.2 3.8 1 4.5.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5l-2.4-1.2c-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7z"/></svg></span><span class="i18n-text signin-label">Continue with WhatsApp OTP</span><span class="signin-sub" data-i18n="app.whatsappOtpRegion">(Worldwide)</span></button>
+          <div id="whatsappOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
+            <p class="sub small" data-i18n="otp.whatsappNote">FLOQR sends one sign-in code to this WhatsApp number. It expires in 5 minutes.</p>
+            <div class="phone-row sms-number-row">
+              <label data-i18n="otp.countryCode">Country code
+                <select id="whatsappCountryCode" autocomplete="tel-country-code">
+                  <option value="+1">United States / Canada (+1)</option>
+                  <option value="+44">United Kingdom (+44)</option>
+                  <option value="+234">Nigeria (+234)</option>
+                  <option value="+34">Spain (+34)</option>
+                  <option value="+33">France (+33)</option>
+                  <option value="+49">Germany (+49)</option>
+                  <option value="+39">Italy (+39)</option>
+                  <option value="+971">United Arab Emirates (+971)</option>
+                  <option value="+52">Mexico (+52)</option>
+                  <option value="+55">Brazil (+55)</option>
+                  <option value="+91">India (+91)</option>
+                  <option value="+81">Japan (+81)</option>
+                  <option value="+61">Australia (+61)</option>
+                  <option value="+27">South Africa (+27)</option>
+                  <option value="+233">Ghana (+233)</option>
+                  <option value="+254">Kenya (+254)</option>
+                  <option value="+86">China (+86)</option>
+                  <option value="+82">South Korea (+82)</option>
+                  <option value="+65">Singapore (+65)</option>
+                  <option value="+60">Malaysia (+60)</option>
+                  <option value="+63">Philippines (+63)</option>
+                  <option value="+62">Indonesia (+62)</option>
+                  <option value="+66">Thailand (+66)</option>
+                  <option value="+31">Netherlands (+31)</option>
+                  <option value="+32">Belgium (+32)</option>
+                  <option value="+41">Switzerland (+41)</option>
+                  <option value="+46">Sweden (+46)</option>
+                  <option value="+47">Norway (+47)</option>
+                  <option value="+45">Denmark (+45)</option>
+                  <option value="+353">Ireland (+353)</option>
+                  <option value="+351">Portugal (+351)</option>
+                  <option value="+30">Greece (+30)</option>
+                  <option value="+48">Poland (+48)</option>
+                  <option value="+7">Russia (+7)</option>
+                  <option value="+377">Monaco (+377)</option>
+                  <option value="+90">Turkey (+90)</option>
+                  <option value="+972">Israel (+972)</option>
+                  <option value="+20">Egypt (+20)</option>
+                  <option value="+212">Morocco (+212)</option>
+                  <option value="+966">Saudi Arabia (+966)</option>
+                  <option value="+54">Argentina (+54)</option>
+                  <option value="+56">Chile (+56)</option>
+                  <option value="+57">Colombia (+57)</option>
+                  <option value="+51">Peru (+51)</option>
+                </select>
+              </label>
+              <label data-i18n="otp.phoneNumber">Phone number
+                <input id="whatsappNationalNumber" inputmode="tel" autocomplete="tel-national" placeholder="612345678"/>
+              </label>
+              <button id="requestWhatsAppOtpBtn" class="signin whatsapp phone" type="button" data-i18n="otp.sendWhatsapp">Send WhatsApp code</button>
+            </div>
+            <label data-i18n="otp.code">Verification code
+              <input id="whatsappOtpCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"/>
+            </label>
+            <button id="verifyWhatsAppOtpBtn" class="primary full" type="button" data-i18n="otp.verify">Verify and Continue</button>
+            <p id="whatsappOtpStatus" class="status" aria-live="polite"></p>
+          </div>
+        </div>
+        <p id="authStatus" class="status"></p>
+        <p class="login-legal"><a href="./privacy.html?v=s3.0.107" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.107#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="signupProfilePage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToWelcomeFromProfileBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
+        <h1>Create your profile</h1>
+        <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
+      </div>
+    </header>
+
+    <div class="card profile-card">
+      <div class="profile-grid">
+        <label>FloqR / Mingl handle *
+          <span class="label-inline-row">
+            <input id="profileUsername" maxlength="28" placeholder="@your_handle"/>
+            <button type="button" id="profileFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button>
+          </span>
+        </label>
+        <label>Display name
+          <input id="profileDisplayName" maxlength="60" placeholder="Your display name"/>
+        </label>
+        <label>Country
+          <input id="profileCountry" placeholder="United States"/>
+        </label>
+        <label>State / Region / Province
+          <input id="profileRegion" placeholder="District of Columbia"/>
+        </label>
+        <label>City
+          <input id="profileCity" placeholder="Washington"/>
+        </label>
+        <label>Taxi pickup address
+          <input id="profileTaxiPickupAddress" autocomplete="street-address" placeholder="Private address used by Pickup"/>
+        </label>
+        <label>Age range
+          <select id="profileAgeRange">
+            <option value="">Prefer not to say</option>
+            <option value="18-20">18-20</option>
+            <option value="21-24">21-24</option>
+            <option value="25-34">25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45+">45+</option>
+          </select>
+        </label>
+        <label>Gender
+          <select id="profileGender">
+            <option value="">Prefer not to say</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="nonbinary">Non-binary</option>
+            <option value="self-described">Self-described</option>
+          </select>
+        </label>
+        <label>Height
+          <div class="height-input-row">
+            <input id="profileHeight" placeholder="5'10&quot; or 1.78"/>
+            <select id="profileHeightUnit" aria-label="Height unit">
+              <option value="ftin">ft/in</option>
+              <option value="m">m</option>
+            </select>
+          </div>
+        </label>
+        <label>Favorite music genres
+          <input id="profileGenres" placeholder="Hip Hop, Afro House, EDM"/>
+        </label>
+        <label>Nightlife interests
+          <input id="profileInterests" placeholder="Clubs, Lounges, Beach Clubs, Events"/>
+        </label>
+        <label>Food choices
+          <input id="profileFoodChoices" placeholder="Sushi, tapas, steakhouse"/>
+        </label>
+        <label>Favorite beverage choices
+          <input id="profileBeverageChoices" placeholder="Champagne, tequila, mocktails"/>
+        </label>
+        <label>Instagram handle (optional)
+          <input id="profileInstagram" placeholder="@yourhandle"/>
+        </label>
+        <label>X handle (optional)
+          <input id="profileX" placeholder="@yourhandle"/>
+        </label>
+      </div>
+
+      <label class="consent-line">
+        <input id="profileAnalyticsConsent" type="checkbox"/>
+        I agree that FLOQR may use my activity in aggregate analytics to improve recommendations, venue insights, and advertising performance.
+      </label>
+
+      <label class="consent-line">
+        <input id="profileMarketingConsent" type="checkbox"/>
+        I want to receive nightlife offers, event promotions, and venue recommendations.
+      </label>
+
+      <button id="saveProfileBtn" class="primary" type="button">Continue</button>
+      <p id="profileStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="categoryPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToWelcomeBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
+      </div>
+      <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
+    </header>
+
+    <div class="category-brand-stack">
+      <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+    </div>
+
+    <div id="categoryFloqAiSearch" class="category-floqai-search">
+      <div class="category-floqai-intro">
+        <span class="category-floqai-mark" aria-hidden="true"><span class="category-floqai-mark-halo"></span><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
+        <p id="categoryFloqAiSpeech" class="category-floqai-speech" role="status" aria-live="polite" data-i18n="cat.floqaiWelcome">Welcome, type below to search for Events</p>
+      </div>
+      <form id="categoryFloqAiForm" class="category-floqai-form" role="search" autocomplete="off">
+        <input id="categoryFloqAiInput" type="search" enterkeyhint="search" data-i18n-placeholder="cat.floqaiPlaceholder" placeholder="Hip Hop Clubs in DC · EDM Events in New York" data-i18n="cat.floqaiLabel" data-i18n-attr="aria-label" aria-label="Search events and venues with FloqAi"/>
+        <button id="categoryFloqAiGo" class="primary" type="submit" data-i18n="cat.floqaiGo">Search</button>
+      </form>
+    </div>
+
+    <div class="category-grid compact-category-grid">
+      <div class="category-or" data-i18n="cat.or">Or</div>
+      <button id="shoutoutBtnCard" class="shoutout-icon-card" type="button" data-feature-key="shoutOut">
+        <img src="./shoutout-logo.png?v=29.09.33" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden')}"/>
+        <span class="shoutout-icon-title" data-i18n="cat.shoutout">Throw a ShoutOut</span>
+      </button>
+      <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
+      <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?v=s3.0.108&from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
+      <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?v=s3.0.108&from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
+      <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?v=s3.0.108&from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./floqai.html?v=s3.1.26&from=search" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
+    </div>
+  </section>
+
+  <section id="intentSearchPage" class="page intent-search-page floqai-intent-page">
+    <div class="intent-search-shell floqai-top-stack">
+      <div class="floqai-search-main intent-search-main">
+        <div class="floqai-brand-row">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <div class="hero-logo-fallback hidden">FLOQR</div>
+          <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="FloqAi help">?</button>
+        </div>
+        <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi help" aria-hidden="true">
+          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">&times;</button>
+          <p class="eyebrow">FloqAi</p>
+          <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
+          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>, <em>make me a superstar</em>, User Guide phrases like <em>create a schedule</em> / <em>publish schedule</em>, or <em>website ingest</em> / <em>staff calendar</em>.</p>
+          <div class="floqai-help-links" data-floqai-search-catalog="1">
+            <a href="./suprstr-search.html?v=29.09.66&from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.">Make me a supRstar / superstar</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
+            <a href="./role-profiles.html?v=29.09.48&from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profiles overview</a>
+            <a href="./patron-portal.html?v=29.09.48&from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &amp; Settings</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access.">Onboarding (role / service access)</a>
+            <a href="./onboard-dc-venues.html?v=29.09.48&from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push crawled club profiles into Firestore.">Venue onboarding (Master Admin)</a>
+          </div>
+          <p class="eyebrow floqai-catalog-heading">User Guide</p>
+          <div class="floqai-help-links" data-floqai-search-catalog="1">
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? beside Scheduler: add drafts on the week grid, Publish schedule, workers confirm pending until confirmed.">Create and publish a staff schedule</a>
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts, filter Drafts and tap Wednesday’s header, tap a Thursday confirmed chip, then Delete selected.">Delete multiple shifts</a>
+            <a href="./staff-worksheet.html?v=s3.0.1&from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected" data-blurb="Elected staff: review pending assignments (tick / Select all / Approve selected) plus a people × days grid of published colleague shifts.">Work Sheet - Weekly Staff Calendar</a>
+            <a href="./patron-portal.html?v=s3.0.1&from=floqai&tab=work-calendar" data-search="confirm shift|approve selected|select all shifts|pending assignment|review and confirm shift" data-blurb="Inbox confirmation links open Work Calendar. Tick shifts or Select all, then Approve selected. The link itself does not confirm.">Confirm assigned shifts</a>
+            <a href="./admin.html?v=s3.0.1&from=floqai&tab=notifications&notify=templates" data-search="message template|system message|schedule invite|open related shoutout|edit system message" data-blurb="Club Admin Notifications → Message templates: edit System Messages for shift invite, update, confirmed, and declined. Not ShoutOuts.">Schedule message templates</a>
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a secret, then pull published shifts onto the official club website with JSON, RSS, or iframe. Drafts never appear.">Club website ingest (API / RSS / iframe)</a>
+          </div>
+        </div>
+
+        <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
+          <label class="intent-search-label" for="intentSearchInput">
+            <span id="floqAiHelpText" class="intent-help">Tell me what you want to do</span>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Create a schedule · website ingest · Staff Calendar · Mingl / RydR / ShoutOut" aria-describedby="intentSearchHint"/>
+          </label>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: create a schedule · website ingest · staff calendar · make me a superstar · Onboarding · I want to be a Club Admin</p>
+          <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="shoutoutLandingPage" class="page product-page shoutout-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromShoutoutLandingBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./shoutout-logo.png?v=29.09.33" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
+          <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
+        </div>
+        <h1 data-i18n="page.shoutoutLanding.title">Throw a ShoutOut</h1>
+        <p class="sub" data-i18n="page.shoutoutLanding.sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display.</p>
+      </div>
+    </header>
+    <div class="product-action-row">
+      <button id="startShoutoutFlowBtn" class="category-card hot" type="button" data-i18n="page.shoutoutLanding.start">Start ShoutOut</button>
+      <button id="backToCategoriesFromShoutoutLandingBtn2" class="category-card" type="button" data-i18n="nav.backToSearch">Back to Search</button>
+    </div>
+  </section>
+
+  <section id="minglLandingPage" class="page product-page mingl-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromMinglBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
+        </div>
+        <div class="mingl-quick-actions" data-i18n-attr="aria-label" data-i18n="page.minglLanding.shortcutsAria" aria-label="Mingl shortcuts">
+          <button id="minglQuickChatBtn" class="icon-action-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 17 0Z"/><path d="M8 10h8M8 14h5"/></svg>
+            <span data-i18n="page.minglLanding.chat">Chat</span>
+          </button>
+          <button id="minglQuickSearchBtn" class="icon-action-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
+            <span data-i18n="page.minglLanding.searchPeople">Search for People</span>
+          </button>
+          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.33&from=mingl">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>
+            <span data-i18n="page.minglLanding.gist">Mingl Gist</span>
+          </a>
+        </div>
+      </div>
+    </header>
+    <div class="mingl-layout">
+      <div class="card mingl-discovery-card">
+        <div id="minglSelfCard" class="mingl-self-card"></div>
+        <div class="section-title-row">
+          <h2 data-floqr-help-id="help-mingl-search"
+              data-floqr-help-title="About Mingl search"
+              data-floqr-help-search="mingl search|search people|mingl social playground|find people"
+              data-floqr-help-body="Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet." data-i18n="page.minglLanding.socialTitle">Mingl Social Playground</h2>
+        </div>
+        <input id="minglSearch" class="search" data-i18n-placeholder="page.minglLanding.searchPlaceholder" placeholder="Try: girls interested in fast cars and Latina events"/>
+        <div id="minglPeopleGrid" class="mingl-people-grid"></div>
+      </div>
+      <div class="card mingl-requests-card">
+        <div class="section-title-row">
+          <div class="section-title-inline">
+            <h2 data-floqr-help-id="help-mingl-requests"
+                data-floqr-help-title="About Mingl Requests"
+                data-floqr-help-search="mingl requests|friend request|mingl chat"
+                data-floqr-help-body="Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat." data-i18n="page.minglLanding.requestsTitle">Mingl Requests</h2>
+          </div>
+          <button id="minglRequestStatusBtn" class="mingl-request-status-btn" type="button" aria-label="Mingl request status">(0/0)</button>
+        </div>
+        <div id="minglRequestStatusPopout" class="mingl-request-status-popout hidden" aria-live="polite"></div>
+        <div id="minglRequestsList" class="mingl-chat-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="clubActionsPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromActionsBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <h1 data-i18n="page.clubActions.title">What would you like to do?</h1>
+        <p class="sub" data-i18n="page.clubActions.sub">Choose a club action, then select the exact location.</p>
+      </div>
+      <button id="logoutBtnClubActions" type="button" data-i18n="app.signOut">Sign out</button>
+    </header>
+    <div class="category-grid">
+      <button id="clubShoutoutBtn" class="category-card hot" type="button" data-i18n="cat.shoutout">Throw a ShoutOut</button>
+      <button id="reserveTableBtn" class="category-card" type="button" data-i18n="page.clubActions.reserveTable">Reserve a Table</button>
+      <button id="joinGuestListBtn" class="category-card" type="button" data-i18n="page.clubActions.joinGuestList">Join Guest List</button>
+      <button id="payVipEntryBtn" class="category-card hot" type="button" data-i18n="page.clubActions.payVip">Pay VIP Entry</button>
+      <button id="payEventEntryBtn" class="category-card" type="button" data-i18n="page.clubActions.payEvent">Pay Event Entry</button>
+      <button id="payStdEntryBtn" class="category-card" type="button" data-i18n="page.clubActions.payStd">Pay Std. Entry</button>
+    </div>
+  </section>
+
+
+  <section id="adSplashPage" class="page">
+    <div class="splash-wrap">
+      <div class="splash-card">
+        <button id="backFromAdBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <div class="splash-logo-row">
+          <div id="splashClubLogoWrap" class="splash-logo-wrap">
+            <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
+            <div id="splashClubLogoFallback" class="hero-logo-fallback splash-fallback-logo">CLUB</div>
+          </div>
+          <div id="splashFloqrLogoWrap" class="splash-logo-wrap">
+            <img src="./images/floqr-color.png" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
+            <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
+          </div>
+        </div>
+        <h1 id="adTitle" data-i18n="ad.splash.getReady">Get Ready</h1>
+        <p id="adBody" class="sub" data-i18n="ad.splash.body">Your shoutout is almost live.</p>
+        <div id="splashHouseCard" class="splash-house hidden">
+          <h1 class="splash-house-title" data-i18n="ad.house.poweredBy">Ad Powered by FloqMedia</h1>
+          <p class="splash-house-contact" data-i18n="ad.house.contactUs">Contact Us</p>
+          <ul class="splash-house-list">
+            <li>Facebook &amp; Instagram: <a href="https://www.instagram.com/floqmedia" target="_blank" rel="noopener">@FloqMedia</a></li>
+            <li><span data-i18n="ad.house.web">Web</span>: <a href="https://www.floqmedia.com" target="_blank" rel="noopener">www.floqmedia.com</a></li>
+            <li><span data-i18n="ad.house.email">Email</span>: <a href="mailto:sales@floqmedia.com">sales@floqmedia.com</a></li>
+            <li><span data-i18n="ad.house.tel">Tel</span>: <a href="tel:+18889335677">+1 (888) WE-FLOQQ</a></li>
+          </ul>
+        </div>
+        <figure id="adCreative" class="splash-ad hidden" aria-label="Sponsored">
+          <span class="ad-badge splash-ad-badge" data-i18n="ad.splash.sponsored">Sponsored</span>
+          <div id="adCreativeMedia" class="splash-ad-media"></div>
+          <figcaption class="splash-ad-caption">
+            <strong id="adCreativeTitle"></strong>
+            <span id="adCreativeBody"></span>
+          </figcaption>
+          <a id="adCreativeCta" class="button-link splash-ad-cta hidden" target="_blank" rel="sponsored noopener" data-i18n="ad.splash.learnMore">Learn more</a>
+        </figure>
+        <div class="splash-statement-stack">
+          <p id="splashStatementPrimary" class="splash-statement">Powered by Papi</p>
+          <p id="splashStatementSecondary" class="splash-statement">and Social OS</p>
+        </div>
+        <p id="adLoadingSearch" class="splash-countdown" role="status" aria-live="polite" data-i18n="ad.splash.loadingSearch">…loading your search</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="listingPage" class="page">
+    <input type="hidden" id="listingType" value="clubs"/>
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <h1 id="listingTitle" data-i18n="listing.searchClubs">Search Clubs</h1>
+        <p id="listingIntro" class="sub" data-i18n="listing.intro">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
+      </div>
+      <button id="logoutBtn3" type="button" data-i18n="app.signOut">Sign out</button>
+    </header>
+    <div class="card">
+      <input id="locationSearch" class="search" data-i18n-placeholder="listing.searchPlaceholder" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
+      <p class="sub small listing-location-help"><span
+        data-i18n="listing.locationHelpLabel"
+        data-floqr-help-id="help-location-search"
+        data-floqr-help-title="Location-aware search"
+        data-floqr-help-search="location|my location|gps|ip location|closest first|nearest first|how are results sorted|turn off location"
+        data-floqr-help-body="FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings."
+      >Location-aware search</span></p>
+      <p id="locationRankingStatus" class="sub small" data-i18n="listing.rankingStatus">Results list the closest to you first (GPS, then IP estimate), then by name.</p>
+    </div>
+    <div id="locationGrid" class="club-grid"></div>
+  </section>
+
+  <section id="templateSelectPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToListingBtn" type="button" data-i18n="nav.backToClubSearch">&larr; Back to club search</button>
+        <h1 id="selectedClubTitle">Location</h1>
+        <p id="selectedClubMeta" class="sub"></p>
+      </div>
+      <button id="logoutBtn4" type="button" data-i18n="app.signOut">Sign out</button>
+    </header>
+    <div class="template-layout">
+      <div class="card template-pick-card">
+        <div id="templateSearchPanel" class="template-floqai-search-panel hidden">
+          <label class="intent-search-label" for="templateSearch">
+            <span class="intent-help" data-i18n="template.floqaiHelp">Tell FloqAi which template you want</span>
+            <input id="templateSearch" class="search" type="search" autocomplete="off" data-i18n-placeholder="template.searchPlaceholder" placeholder="Sports, Jersey, VIP, Humor, Cars, Video, Pictures, Ballers…"/>
+          </label>
+        </div>
+        <div id="templateGrid" class="template-grid"></div>
+      </div>
+      <div class="card template-selected-panel"><h2 data-i18n="template.selected">Selected template</h2><div id="selectedTemplateSummary" class="selected-summary" data-i18n="template.chooseContinue">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button" data-i18n="template.continueEditor">Continue to Editor</button></div>
+    </div>
+  </section>
+
+  <section id="editorPage" class="page">
+    <header class="topbar">
+      <div><button id="backToTemplatesBtn" type="button" data-i18n="nav.backToTemplates">&larr; Back to template selection</button><h1 id="editorClubTitle" data-i18n="editor.createMessage">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <button id="logoutBtn5" type="button" data-i18n="app.signOut">Sign out</button>
+    </header>
+    <div class="composer">
+      <div class="card">
+        <h2 data-i18n="editor.messageHeading">Message</h2>
+        <label>Main message<textarea id="mainText" rows="3" maxlength="160" data-i18n-placeholder="editor.mainPlaceholder" placeholder="Enter ShoutOut Here (emoji OK)"></textarea></label>
+        <div id="soccerJerseyFields" class="soccer-jersey-fields hidden">
+          <label>Team / club
+            <select id="soccerTeamId" aria-describedby="soccerTeamHint">
+              <option value="">Select a team…</option>
+            </select>
+          </label>
+          <p id="soccerTeamHint" class="sub small" data-keep-visible="true">Same $30 Soccer Jersey — pick the national team or club crest, then enter name and mark.</p>
+          <label>Display name
+            <select id="soccerNameSource">
+              <option value="displayName">Use my display name</option>
+              <option value="floqrHandle">Use my FloqR / Mingl handle</option>
+              <option value="instagram">Use my Instagram handle</option>
+              <option value="manual">Enter name manually</option>
+            </select>
+          </label>
+          <label id="soccerManualNameWrap" class="hidden">Jersey name
+            <input id="soccerManualName" type="text" maxlength="8" autocomplete="off" placeholder="Name on jersey (max 8)"/>
+          </label>
+          <label>Jersey mark (any 2 characters — emoji &amp; symbols OK)
+            <input id="soccerJerseyNumber" type="text" autocomplete="off" placeholder="e.g. 7, AB, *1, 🔥" aria-describedby="soccerJerseyNumberHint"/>
+          </label>
+          <p id="soccerJerseyNumberHint" class="sub small">Up to 2 characters of any kind (letters, numbers, symbols, or emoji). The mark stays fully visible above the animated holder.</p>
+        </div>
+        <div id="nameShoutoutFields" class="name-shoutout-fields hidden">
+          <label for="nameShoutoutInput" data-i18n="nameShoutout.label">Name or @handle</label>
+          <div class="name-shoutout-combo">
+            <input id="nameShoutoutInput" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="nameShoutoutSuggestions" aria-describedby="nameShoutoutHint" data-i18n-placeholder="nameShoutout.placeholder" placeholder="Name, @instagram or @mingl handle"/>
+            <ul id="nameShoutoutSuggestions" class="name-shoutout-suggestions hidden" role="listbox"></ul>
+          </div>
+          <p id="nameShoutoutHint" class="sub small" data-i18n="nameShoutout.hint">Type a name or start an @handle — pick from the suggestions. The board adds the rest of the line.</p>
+        </div>
+        <p id="templateCharacterCapHint" class="sub small" aria-live="polite">Choose a template and display to see its safe line and character limits.</p>
+        <label>Club display screen
+          <select id="shoutoutScreenFormat"></select>
+        </label>
+        <div class="attribution-controls">
+          <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Show my name or social handle on the FloqR card</span></label>
+          <label id="attributionChoiceWrap" class="hidden">Show as
+            <select id="attributionChoice">
+              <option value="displayName">Display name</option>
+              <option value="floqrHandle">FloqR / Mingl handle</option>
+              <option value="instagram">Instagram handle</option>
+            </select>
+          </label>
+          <input id="subText" type="hidden" value=""/>
+          <small class="sub small">Optional. FloqR card shows FROM @handle when checked; otherwise PRESENTED BY FLOQR ShoutOut. Jersey name (if any) stays separate.</small>
+        </div>
+        <div id="shoutoutMediaCard" class="media-upload-card hidden">
+          <h2>Media Upload</h2>
+          <p class="single-media-upload-note">Add media only when this template supports image or video.</p>
+          <label class="file-upload-label">Upload Image or Video
+            <input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"/>
+          </label>
+          <label>Picture framing
+            <select id="shoutoutMediaFit"><option value="contain">Show the complete picture (no crop)</option><option value="cover">Fill the frame (may crop edges)</option></select>
+          </label>
+          <div class="button-row">
+            <button id="removeShoutoutMediaBtn" type="button">Remove file</button>
+          </div>
+          <div id="shoutoutMediaPreview" class="media-preview-box hidden"></div>
+          <div id="videoTrimNotice" class="status"></div>
+          <input id="shoutoutMediaUrl" type="hidden"/>
+          <input id="shoutoutMediaType" type="hidden"/>
+        </div>
+        <div id="footballTeamIntroCard" class="football-team-editor hidden">
+          <div class="section-heading-row">
+            <div>
+              <p class="eyebrow">Advanced template</p>
+              <h2>Football Intro — four-player lineup</h2>
+            </div>
+            <strong class="football-template-price">$30</strong>
+          </div>
+          <p class="sub small">Upload exactly four authorized photos. FLOQR produces a reusable 20-second Football Intro sized to the panel selected above. Choose per-player identity, color theme, and optional portrait motion.</p>
+          <div class="football-player-upload-grid">
+            <article class="football-player-upload" data-football-slot="1">
+              <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
+              <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Player 1 identity<select id="footballTeamIdentity1" data-football-team-identity data-slot="1"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue1" data-football-team-identity-value data-slot="1" maxlength="14" placeholder="Resolved from your profile"/></label>
+              <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="2">
+              <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
+              <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Player 2 identity<select id="footballTeamIdentity2" data-football-team-identity data-slot="2"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue2" data-football-team-identity-value data-slot="2" maxlength="14" placeholder="Resolved from your profile"/></label>
+              <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="3">
+              <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
+              <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Player 3 identity<select id="footballTeamIdentity3" data-football-team-identity data-slot="3"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue3" data-football-team-identity-value data-slot="3" maxlength="14" placeholder="Resolved from your profile"/></label>
+              <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="4">
+              <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
+              <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Player 4 identity<select id="footballTeamIdentity4" data-football-team-identity data-slot="4"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue4" data-football-team-identity-value data-slot="4" maxlength="14" placeholder="Resolved from your profile"/></label>
+              <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
+            </article>
+          </div>
+          <label>Color theme
+            <select id="footballColorTheme"></select>
+          </label>
+          <label>Background color (optional)
+            <input id="footballBackgroundColor" type="color" value="#071713"/>
+          </label>
+          <div class="url-media-field">
+            <label>Background image (optional)
+              <input id="footballBackgroundFile" type="file" accept="image/*"/>
+            </label>
+            <div id="footballBackgroundPreview" class="url-media-preview hidden"></div>
+            <label>or paste URL
+              <input id="footballBackgroundUrl" type="url" placeholder="https://..."/>
+            </label>
+          </div>
+          <label class="football-stadium-message-label">Large stadium message
+            <textarea id="footballTeamMessage" rows="3" maxlength="54">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
+          </label>
+          <p id="footballTextCapHint" class="sub small" aria-live="polite">Choose a supported display to see stadium-message and player-name limits.</p>
+          <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Animate loaded portraits for the display (not filters); completes within 5 seconds or originals are used.</span></label>
+          <label class="consent-line football-photo-consent"><input id="footballPhotoConsent" type="checkbox"/> <span>I confirm that I have permission from all four people to upload and display these photos.</span></label>
+          <p id="footballTeamStatus" class="status"></p>
+        </div>
+        <input id="mediaUrl" type="hidden"/>
+        <p id="uploadStatus" class="status"></p>
+        <div class="button-row">
+          <button id="previewShoutoutBtn" type="button">Preview ShoutOut</button>
+        </div>
+        <p id="previewDurationHint" class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
+        <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
+        <p id="submitStatus" class="status"></p>
+      </div>
+      <div class="card shoutout-recommendations-card">
+        <div class="section-heading-row">
+          <h2 data-floqr-help-id="help-shoutout-recommendations" data-floqr-help-title="ShoutOut Recommendations" data-floqr-help-body="Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages." data-floqr-help-search="shoutout recommendations|shoutout ideas|improve my shoutout|use past shoutout">ShoutOut Recommendations</h2>
+        </div>
+        <label>Recommendation style
+          <select id="shoutoutTone">
+            <option value="party">Party</option>
+            <option value="vip">VIP</option>
+            <option value="funny">Funny</option>
+            <option value="romantic">Romantic</option>
+            <option value="birthday">Birthday</option>
+            <option value="classy">Classy</option>
+            <option value="corporate">Corporate</option>
+            <option value="graduation">Graduation</option>
+          </select>
+        </label>
+        <label>Event / audience context
+          <select id="shoutoutEventType">
+            <option value="">Auto-detect from venue and draft</option>
+            <option value="birthday">Birthday</option>
+            <option value="vip-table">VIP / Table</option>
+            <option value="rnb">R&amp;B night</option>
+            <option value="afrobeats">Afrobeats night</option>
+            <option value="latin-reggaeton">Latin / Reggaeton night</option>
+            <option value="romantic">Romantic / couples</option>
+            <option value="graduation">Graduation</option>
+            <option value="general-party">General party</option>
+          </select>
+        </label>
+        <div class="button-row">
+          <button id="aiSuggestBtn" type="button">Improve My ShoutOut</button>
+          <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
+        </div>
+        <div class="recommendation-group">
+          <h3 data-floqr-help-id="help-ai-recommendations" data-floqr-help-title="AI Recommendations" data-floqr-help-body="Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it." data-floqr-help-search="ai recommendations|ai shoutout|ai ideas">AI Recommendations</h3>
+          <div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small" data-keep-visible="true">Type a message or choose recommendation context to generate personalized ideas.</p></div>
+        </div>
+        <div class="recommendation-group">
+          <h3 data-floqr-help-id="help-trending-shoutouts" data-floqr-help-title="Trending ShoutOuts" data-floqr-help-body="Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it." data-floqr-help-search="trending shoutouts|popular shoutouts">Trending ShoutOuts</h3>
+          <div id="trendingSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
+        <div class="recommendation-group">
+          <h3 data-floqr-help-id="help-generic-shoutouts" data-floqr-help-title="Generic ShoutOuts" data-floqr-help-body="Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own." data-floqr-help-search="generic shoutouts|birthday shoutout ideas">Generic ShoutOuts</h3>
+          <div id="genericSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
+        <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
+      </div>
+    </div>
+    <div id="shoutoutPreviewModal" class="shoutout-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="shoutoutPreviewTitle">
+      <div class="shoutout-preview-dialog">
+        <div class="section-heading-row">
+          <h2 id="shoutoutPreviewTitle">Preview ShoutOut</h2>
+          <button id="closeShoutoutPreviewBtn" type="button" aria-label="Close preview">Close</button>
+        </div>
+        <iframe id="previewFrame" title="ShoutOut preview"></iframe>
+      </div>
+    </div>
+
+    <div id="emailOtpSentModal" class="email-otp-sent-modal hidden" role="dialog" aria-modal="true" aria-labelledby="emailOtpSentTitle" aria-describedby="emailOtpSentBody">
+      <div class="email-otp-sent-dialog" role="document">
+        <button id="emailOtpSentCloseX" class="email-otp-sent-x" type="button" aria-label="Close">×</button>
+        <h2 id="emailOtpSentTitle">Code sent</h2>
+        <p id="emailOtpSentBody" class="sub">A secure sign-in code was emailed. It expires in 6 minutes. Check your inbox (and spam) then enter the code below.</p>
+        <p id="emailOtpSentEmail" class="status"></p>
+        <div class="button-row"><button id="emailOtpSentCloseBtn" class="primary" type="button">Close</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="confirmationPage" class="page">
+    <div class="confirmation card">
+      <h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
+      <div class="receipt">
+        <p><strong>Reference:</strong> <span id="confirmRef">—</span></p>
+        <p><strong>Location:</strong> <span id="confirmClub">—</span></p>
+        <p><strong>Template:</strong> <span id="confirmTemplate">—</span></p>
+        <p><strong>Status:</strong> Pending Location Approval</p>
+        <div id="confirmPaidBlock" class="hidden">
+          <p><strong>Paid at:</strong> <span id="confirmPaidAt">—</span></p>
+          <p><strong>Invoice:</strong> <span id="confirmInvoice">—</span></p>
+          <p><strong>Total:</strong> <span id="confirmPaidTotal">—</span></p>
+        </div>
+      </div>
+      <p id="confirmationRedirectStatus" class="status">Returning to Search in <span id="confirmationCountdown">15</span> seconds...</p>
+      <div class="button-row confirmation-actions"><button id="skipConfirmationBtn" class="ghost" type="button">Skip</button></div>
+    </div>
+  </section>
+
+  <button id="floqAiAgent" class="floqai-agent hidden" type="button" aria-label="FloqAi — open contextual search" title="FloqAi">
+    <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
+      <img class="floqai-mark-img" src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/>
+    </span>
+  </button>
+  <div id="floqAiSpeech" class="floqai-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
+    <span id="floqAiSpeechText"></span>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./floqr-people-directory.js?v=s3.1.26"></script>
+<script src="./floqr-app-check.js?v=s3.0.67"></script>
+<script src="./floqr-nav.js?v=s3.1.26"></script>
+<script src="./floqr-i18n.js?v=s3.1.31"></script>
+<script src="./floqr-place-i18n.js?v=s3.0.87"></script>
+<script src="./floqai-help-repository.js?v=s3.1.31"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.26"></script>
+<script src="./floqr-venue-query.js?v=s3.0.106"></script>
+<script src="./intent-search.js?v=s3.1.30"></script>
+<script src="./floqai-search.js?v=s3.0.86"></script>
+<script src="./global-profile-status.js?v=s3.1.30"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.26"></script>
+<script src="./shared-data.js?v=s3.1.26"></script>
+<script src="./national-teams-data.js?v=s3.0.20"></script>
+<script src="./jersey-catalog.js?v=s3.0.62"></script>
+<script src="./feature-gates.js?v=s3.1.26"></script>
+<script src="./floqr-feature-services.js?v=s3.1.30"></script>
+<script src="./url-media-field.js?v=29.09.52"></script>
+<script src="./ai-service.js?v=29.09.33"></script>
+<script src="./ai-index-service.js?v=s3.1.26"></script>
+<script src="./ai-search-service.js?v=29.09.33"></script>
+<script src="./floqr-geo-search.js?v=s3.0.106"></script>
+<script src="./ai-location-service.js?v=s3.0.106"></script>
+<script src="./ai-notification-service.js?v=29.09.33"></script>
+<script src="./ai-template-studio.js?v=29.09.33"></script>
+<script src="./floqr-action-feedback.js?v=29.09.33"></script>
+<script src="./ai-grammar-service.js?v=29.09.33"></script>
+<script src="./help-attach.js?v=s3.0.28"></script>
+<script src="./helper-popouts.js?v=s3.0.6"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.4"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
+<script src="./floqr-consent-mode.js?v=s3.0.103"></script>
+<script src="./floqr-canonical.js?v=s3.0.103"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
+<script src="./ad-campaigns.js?v=s3.1.4"></script>
+<script src="./floqr-ad-tracking.js?v=s3.1.0"></script>
+<script src="./floqr-identity.js?v=29.09.33"></script>
+<script src="./floqr-blocks.js?v=s3.1.26"></script>
+<script src="./floqr-logger.js?v=29.09.33"></script>
+<script src="./floqr-client-ip.js?v=s3.0.69"></script>
+<script src="./payment-service.js?v=s3.0.69"></script>
+<script src="./welcome-button-gradient.js?v=s3.1.2"></script>
+<script src="./floqr-name-shoutout.js?v=s3.1.26"></script>
+<script src="./floqr-board-frame.js?v=s3.1.26"></script>
+<script src="./floqr-template-preview.js?v=s3.1.26"></script>
+<script src="./floqr-template-tags.js?v=s3.1.26"></script>
+<script src="./floqr-access-notice.js?v=s3.1.26"></script>
+<script src="./patron-app.js?v=s3.1.31"></script>
+<script src="./ai-assistant-ui.js?v=29.09.33"></script>
+<script src="./ai-media-service.js?v=29.09.33"></script>
+<script src="./notification-center.js?v=29.09.33"></script>
+</body>
+</html>

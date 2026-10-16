@@ -1,0 +1,13 @@
+{
+  "to": "bans.don@gmail.com",
+  "package": "s3.0.6",
+  "v": "s3.0.6",
+  "note": "FLOQR s3.0.6 (stable) — test now. This email is the tracker.\n\nWhat shipped\n- Search status card: profile links stay inside the dropdown. They no longer leak under the avatar over Clubs / Lounges.\n- Help ? sits immediately beside its heading on phones (not parked on the far right of the row).\n- Remaining Search chrome follows App language: Back to welcome, Beach Clubs, Clubs, Lounges, profile menu labels.\n\nHow to test on iPhone (hard refresh)\n1. https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search with Français. Avatar pill shows only initials until tapped. Opened menu is French and stays in the card. Back to welcome is ← Retour à l'accueil. Beach Clubs is Clubs de plage. Clubs is Boîtes de nuit. Lounges is Salons.\n2. Open Mingl from Search. The ? next to Mingl Social Playground / Mingl Requests sits beside the title, not across the screen.\n3. Language Settings: patron-portal.html?v=s3.0.6&tab=language — ? sits beside App language / Language Settings.\n\nXibo URLs (stable, location only — no ?v= or ?screen=)\n- https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1\n- https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1\n\nPages SHA 67ed617. Functions CI green. No Functions deploy (Pages-only).",
+  "links": [
+    {"label": "Patron Search s3.0.6 (hard refresh)", "url": "https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search"},
+    {"label": "Mingl help ? beside title", "url": "https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=mingl"},
+    {"label": "Language Settings help ?", "url": "https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=s3.0.6&tab=language"},
+    {"label": "Master Admin", "url": "https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.0.6"},
+    {"label": "Aurelia display.html (Xibo, no screen query)", "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1"}
+  ]
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img" aria-label="BartR">
+  <!-- Dark / blue backgrounds: white BartR text. Chevrons at ~30% prior size. Transparent canvas. -->
+  <defs>
+    <linearGradient id="bp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff4fc9"/>
+      <stop offset="1" stop-color="#ff2d8a"/>
+    </linearGradient>
+    <linearGradient id="bl" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8ff6a"/>
+      <stop offset="1" stop-color="#b8e000"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(360 110) scale(0.30) translate(-360 -150)">
+    <g fill="url(#bp)">
+      <path d="M120 86 L360 40 L600 86 L555 122 L360 86 L165 122 Z"/>
+      <rect x="36" y="108" width="70" height="12" rx="5"/>
+      <rect x="22" y="130" width="52" height="11" rx="5"/>
+      <rect x="40" y="151" width="36" height="10" rx="5"/>
+    </g>
+    <g fill="url(#bl)">
+      <path d="M120 214 L360 260 L600 214 L555 178 L360 214 L165 178 Z"/>
+      <rect x="614" y="178" width="70" height="12" rx="5"/>
+      <rect x="646" y="156" width="52" height="11" rx="5"/>
+      <rect x="644" y="136" width="36" height="10" rx="5"/>
+    </g>
+  </g>
+  <text x="360" y="128" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black, Impact, Segoe UI Black, sans-serif" font-size="118" font-weight="900" fill="#ffffff">BartR</text>
+</svg>

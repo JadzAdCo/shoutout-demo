@@ -1,0 +1,699 @@
+ad-campaign-preview-v28.99.html:20
+- <a href="./index.html?v=28.99">&larr; Back to app</a>
++ <a href="./index.html">&larr; Back to app</a>
+ad-submit-app.js:103
+- return `./ad-invoice.html?v=${encodeURIComponent(v)}&t=${encodeURIComponent(token)}`;
++ return `./ad-invoice.html?t=${encodeURIComponent(token)}`;
+admin-app.js:102
+- if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
++ if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&from=admin`;
+admin-app.js:104
+- if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
++ if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?from=admin&location=${encodeURIComponent(locationId)}`;
+admin-app.js:193
+- return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
++ return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}`, window.location.href).toString();
+admin-app.js:2411
+- const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDat
++ const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDat
+admin-app.js:2532
+- link:"./patron-portal.html?tab=shoutouts&v=29.09.8"
++ link:"./patron-portal.html?tab=shoutouts"
+admin-rep-extension.js:102
+- link: `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
++ link: `./template-tags.html?location=${encodeURIComponent(locationId)}`,
+admin-rep-extension.js:153
+- const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestLi
++ const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestLi
+admin-rep-extension.js:164
+- if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`;
++ if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}`;
+admin-scheduling.js:440
+- if (handle) return `./?v=${v}&start=mingl&q=${encodeURIComponent(handle)}`;
++ if (handle) return `./?start=mingl&q=${encodeURIComponent(handle)}`;
+admin-scheduling.js:441
+- if (worker.uid) return `./services.html?v=${v}&q=${encodeURIComponent(worker.name || worker.email || worker.uid)}`;
++ if (worker.uid) return `./services.html?q=${encodeURIComponent(worker.name || worker.email || worker.uid)}`;
+admin-scheduling.js:442
+- return `./services.html?v=${v}`;
++ return `./services.html`;
+admin.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=s3.1.36">&larr; Venue Command Center</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&larr; Venue Command Center</a>
+admin.html:51
+- <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?v=29.09.99&amp;type=clubAdmin&amp;from=admin">Request club association</a>
++ <a id="adminRoleRequestLink" class="buttonlike" href="./role-request.html?type=clubAdmin&amp;from=admin">Request club association</a>
+admin.html:916
+- <p><a id="adminRoleProfilesLink" href="./role-profiles.html?v=29.09.44&from=admin">Open role/profile landing pages</a></p>
++ <p><a id="adminRoleProfilesLink" href="./role-profiles.html?from=admin">Open role/profile landing pages</a></p>
+ai-assistant-ui.js:85
+- actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications&v=29.09.8"}]
++ actions: [{label:"Open Settings", href:"./patron-portal.html?tab=ai-notifications"}]
+ai-assistant-ui.js:112
+- if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}&v=29.09.8`};
++ if (item.type === "clubLocation") return {label:`Open ${item.title}`, href:`./?location=${encodeURIComponent(item.id)}`};
+ai-assistant-ui.js:113
+- if (item.type === "event") return {label:`View ${item.title}`, href:`./?v=29.09.8`};
++ if (item.type === "event") return {label:`View ${item.title}`, href:`./`};
+ai-assistant-ui.js:114
+- if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./?v=29.09.8"};
++ if (item.type === "publicTemplateVariant" || item.type === "officialTemplate") return {label:"Search templates", href:"./"};
+ai-diagnostics-service.js:1486
+- howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.108 → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As
++ howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/ → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Adm
+ai-diagnostics-service.js:1494
+- howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.107. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp
++ howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/ Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp number, tap
+ai-diagnostics-service.js:1502
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.106 and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Neare
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your
+ai-diagnostics-service.js:1510
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.105. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You ma
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also searc
+ai-diagnostics-service.js:1518
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html?v=s3.0.103 (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?v=s3.0.103&tab=privacy: toggle Do Not Sell, Save, refresh; Download My 
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server expo
+ai-diagnostics-service.js:1534
+- howToTest:"Open index.html?v=s3.0.12&location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeam
++ howToTest:"Open index.html?location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerC
+ai-diagnostics-service.js:1542
+- howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?v=s3.0.10&location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&tem
++ howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&template=socc
+ai-diagnostics-service.js:1550
+- howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xi
++ howToTest:"Open soccer-jersey-preview.html then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xibo URLs s
+ai-diagnostics-service.js:1558
+- howToTest:"Hard-refresh master-admin.html?v=s3.0.78#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Op
++ howToTest:"Hard-refresh master-admin.html#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row
+ai-diagnostics-service.js:1566
+- howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile li
++ howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile links stay 
+ai-diagnostics-service.js:1574
+- howToTest:"Open master-admin.html?v=29.09.22#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.
++ howToTest:"Open master-admin.html#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.",
+ai-diagnostics-service.js:1575
+- expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&v=s3.0.3&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
++ expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
+ai-diagnostics-service.js:1582
+- howToTest:"Sign in on patron-portal.html?v=s3.0.3 as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.ht
++ howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from S
+ai-diagnostics-service.js:1590
+- howToTest:"Sign in on patron-portal.html?v=s3.0.2 as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — sam
++ howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — same session
+ai-diagnostics-service.js:1598
+- howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?v=s3.0.1&tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, c
++ howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, checkboxes
+ai-diagnostics-service.js:1606
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.116&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the edit
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the editor closes, t
+ai-diagnostics-service.js:1614
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.115&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/ifra
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/iframe. As an el
+ai-diagnostics-service.js:1622
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.114 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Gui
+ai-diagnostics-service.js:1630
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.113 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the 
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the chip: Delete
+ai-diagnostics-service.js:1638
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.112 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid user
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid username only). 
+ai-diagnostics-service.js:1646
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.111 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays red until p
+ai-diagnostics-service.js:1654
+- howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1&v=29.09.108 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. 
++ howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. Scheduling g
+ai-diagnostics-service.js:1670
+- howToTest:"Open rydr.html?v=29.09.9&from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
++ howToTest:"Open rydr.html?from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
+ai-diagnostics-service.js:6503
+- ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
++ ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1`],
+ai-diagnostics-service.js:6504
+- ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
++ ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&tab=notifications`],
+ai-diagnostics-service.js:6505
+- ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
++ ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&tab=scheduling`],
+ai-diagnostics-service.js:6506
+- ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
++ ["Patron Service Members tab", `${base}/patron-portal.html?tab=service-members`],
+ai-diagnostics-service.js:6507
+- ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
++ ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?tab=work-calendar`],
+ai-diagnostics-service.js:6508
+- ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications&notify=templates`],
++ ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&tab=notifications&notify=templates`],
+ai-diagnostics-service.js:6509
+- ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
++ ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html`],
+ai-diagnostics-service.js:6510
+- ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
++ ["Work Sheet staff calendar", `${base}/staff-worksheet.html?location=temp-democlub-1`],
+ai-diagnostics-service.js:6511
+- ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
++ ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html`],
+ai-diagnostics-service.js:6512
+- ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
++ ["Master Admin diagnostics", `${base}/master-admin.html`],
+ai-diagnostics-service.js:6513
+- ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
++ ["Search / FloqAi", `${base}/?start=intent`],
+bartr.html:7
+- <meta http-equiv="refresh" content="0;url=./commerce.html?v=29.09.9&from=search"/>
++ <meta http-equiv="refresh" content="0;url=./commerce.html?from=search"/>
+bartr.html:11
+- <p><a href="./commerce.html?v=29.09.9&from=search" data-i18n="page.bartr.continue">Continue to BartR</a></p>
++ <p><a href="./commerce.html?from=search" data-i18n="page.bartr.continue">Continue to BartR</a></p>
+beta-invite.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html?v=s3.1.36">&larr; Back to My Profile and Settings</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
+beta-invite.html:25
+- <a class="buttonlike" id="betaPortalLink" href="./patron-portal.html?v=s3.1.36&from=beta-invite" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
++ <a class="buttonlike" id="betaPortalLink" href="./patron-portal.html?from=beta-invite" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
+club-profile-app.js:30
+- const query = new URLSearchParams({v:"29.07", returnTo:appReturnPath(), profileRequired:reason});
++ const query = new URLSearchParams({returnTo:appReturnPath(), profileRequired:reason});
+club-profile-app.js:147
+- byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.09.8`;
++ byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}`;
+club-profile-app.js:148
+- byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
++ byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}`;
+club-profile-app.js:151
+- byId("clubPickupLink").href = `./pickup.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
++ byId("clubPickupLink").href = `./pickup.html?location=${encodeURIComponent(locationId)}`;
+club-profile-app.js:153
+- byId("clubCommerceLink").href = `./commerce.html?club=${encodeURIComponent(locationId)}&v=29.09.8`;
++ byId("clubCommerceLink").href = `./commerce.html?club=${encodeURIComponent(locationId)}`;
+club-profile-app.js:361
+- byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.09.8">Return to FLOQR</a></p>`;
++ byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./">Return to FLOQR</a></p>`;
+club-profile.html:14
+- <a id="clubProfileBrandLink" class="club-profile-brand" href="./?v=29.09.44&start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
++ <a id="clubProfileBrandLink" class="club-profile-brand" href="./?start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
+club-profile.html:16
+- <a id="floqrGlobalBack" class="buttonlike" href="./admin.html?v=s3.1.36">â† Back</a>
++ <a id="floqrGlobalBack" class="buttonlike" href="./admin.html">â† Back</a>
+club-profile.html:17
+- <a id="clubProfileExploreLink" class="buttonlike" href="./?v=29.09.44&start=search" data-i18n="page.clubProfile.explore">Explore FLOQR</a>
++ <a id="clubProfileExploreLink" class="buttonlike" href="./?start=search" data-i18n="page.clubProfile.explore">Explore FLOQR</a>
+commerce.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.9&start=search">&larr; Back to Search</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&larr; Back to Search</a>
+commerce.html:68
+- <p class="sub small bartr-seller-hint">US vendors: open <a href="./patron-portal.html?tab=bartr&v=s3.1.36">My Profile and Settings â†’ BartR Store</a> to manage products, store info, and refund policy.</p>
++ <p class="sub small bartr-seller-hint">US vendors: open <a href="./patron-portal.html?tab=bartr">My Profile and Settings â†’ BartR Store</a> to manage products, store info, and refund policy.</p>
+demo-signin.html:9
+- <script>location.replace("./master-admin.html?v=s3.1.36#demoEmployees");</script>
++ <script>location.replace("./master-admin.html#demoEmployees");</script>
+demo-signin.html:14
+- <a href="./master-admin.html?v=s3.1.36#demoEmployees">Open Demo Svc / Emp Mgmt</a></p>
++ <a href="./master-admin.html#demoEmployees">Open Demo Svc / Emp Mgmt</a></p>
+entity-management.js:27
+- return `./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
++ return `./admin.html?location=${encodeURIComponent(id)}&from=master`;
+entity-management.js:48
+- || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`;
++ || `./club-profile.html?location=${encodeURIComponent(id)}`;
+firestore-rebrand-jadz-to-floqr-v28.31-f.html:12
+- <a class="global-back-btn buttonlike" href="./?v=28.43-f">&larr; Back to app</a>
++ <a class="global-back-btn buttonlike" href="./">&larr; Back to app</a>
+floqai-search.html:7
+- <meta http-equiv="refresh" content="0;url=./floqai.html?v=s3.1.36"/>
++ <meta http-equiv="refresh" content="0;url=./floqai.html"/>
+floqai-search.html:10
+- location.replace("./floqai.html?v=s3.1.36" + (new URL(location.href).searchParams.get("q") ? "&q=" + encodeURIComponent(new URL(location.href).searchParams.get("q")) : ""));
++ location.replace("./floqai.html" + (new URL(location.href).searchParams.get("q") ? "&q=" + encodeURIComponent(new URL(location.href).searchParams.get("q")) : ""));
+floqai-search.html:14
+- <p><a href="./floqai.html?v=s3.1.36">FloqAi</a></p>
++ <p><a href="./floqai.html">FloqAi</a></p>
+floqr-nav.js:65
+- return `./?v=${APP_V}&start=search`;
++ return `./?start=search`;
+floqr-nav.js:166
+- return { href: `./?v=${APP_V}&start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };
++ return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };
+floqr-nav.js:169
+- return { href: `./commerce.html?v=${APP_V}`, label: navT("nav.backToBartr", "← Back to BartR") };
++ return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };
+guest-list-app.js:15
+- async function logout(){await auth.signOut();location.href="./?v=29.09.8&start=search";}
++ async function logout(){await auth.signOut();location.href="./?start=search";}
+guest-list.html:5
+- <body data-guest-theme="midnight"><a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?v=29.09.44&start=search">&larr; Back</a><main class="app admin-shell guest-list-shell"><section class="page active">
++ <body data-guest-theme="midnight"><a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?start=search">&larr; Back</a><main class="app admin-shell guest-list-shell"><section class="page active">
+heist-frame-preview.html:25
+- <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
++ <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1" target="_blank">
+heist-frame-preview.html:27
+- <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=29.09.37"></iframe>
++ <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1"></iframe>
+heist-frame-preview.html:29
+- <a class="card" href="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
++ <a class="card" href="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1" target="_blank">
+heist-frame-preview.html:31
+- <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=29.09.37"></iframe>
++ <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1"></iframe>
+heist-frame-preview.html:33
+- <a class="card" href="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
++ <a class="card" href="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1" target="_blank">
+heist-frame-preview.html:35
+- <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=29.09.37"></iframe>
++ <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1"></iframe>
+heist-frame-preview.html:37
+- <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
++ <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1" target="_blank">
+heist-frame-preview.html:39
+- <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=29.09.37"></iframe>
++ <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1"></iframe>
+index.html:168
+- <p class="login-legal"><a href="./privacy.html?v=s3.0.107" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.107#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
++ <p class="login-legal"><a href="./privacy.html" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
+index.html:299
+- <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?v=s3.0.108&from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
++ <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
+index.html:300
+- <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?v=s3.0.108&from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
++ <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
+index.html:301
+- <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?v=s3.0.108&from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
++ <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
+index.html:302
+- <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./floqai.html?v=s3.1.36&from=search" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
++ <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./floqai.html?from=search" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
+index.html:320
+- <a href="./suprstr-search.html?v=29.09.66&from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" da
++ <a href="./suprstr-search.html?from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="P
+index.html:321
+- <a href="./role-request.html?v=29.09.48&from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Beco
++ <a href="./role-request.html?from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club A
+index.html:322
+- <a href="./role-request.html?v=29.09.48&from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
++ <a href="./role-request.html?from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
+index.html:323
+- <a href="./role-request.html?v=29.09.48&from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</
++ <a href="./role-request.html?from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
+index.html:324
+- <a href="./role-profiles.html?v=29.09.48&from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profil
++ <a href="./role-profiles.html?from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profiles overview
+index.html:325
+- <a href="./patron-portal.html?v=s3.1.36&from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &am
++ <a href="./patron-portal.html?from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &amp; Setting
+index.html:326
+- <a href="./role-request.html?v=29.09.48&from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding —
++ <a href="./role-request.html?from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Cl
+index.html:327
+- <a href="./onboard-dc-venues.html?v=29.09.48&from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding 
++ <a href="./onboard-dc-venues.html?from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push craw
+index.html:331
+- <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? b
++ <a href="./admin.html?from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? beside Sche
+index.html:332
+- <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts,
++ <a href="./admin.html?from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts, filter Dr
+index.html:333
+- <a href="./staff-worksheet.html?v=s3.0.1&from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected" data-blurb="Elected staff: review pendi
++ <a href="./staff-worksheet.html?from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected" data-blurb="Elected staff: review pending assign
+index.html:334
+- <a href="./patron-portal.html?v=s3.1.36&from=floqai&tab=work-calendar" data-search="confirm shift|approve selected|select all shifts|pending assignment|review and confirm shift" data-blurb="Inbox confirmation links open 
++ <a href="./patron-portal.html?from=floqai&tab=work-calendar" data-search="confirm shift|approve selected|select all shifts|pending assignment|review and confirm shift" data-blurb="Inbox confirmation links open Work Calen
+index.html:335
+- <a href="./admin.html?v=s3.1.36&from=floqai&tab=notifications&notify=templates" data-search="message template|system message|schedule invite|open related shoutout|edit system message" data-blurb="Club Admin Notifications
++ <a href="./admin.html?from=floqai&tab=notifications&notify=templates" data-search="message template|system message|schedule invite|open related shoutout|edit system message" data-blurb="Club Admin Notifications → Message
+index.html:336
+- <a href="./admin.html?v=s3.1.36&from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a sec
++ <a href="./admin.html?from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a secret, then 
+index.html:389
+- <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.33&from=mingl">
++ <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?from=mingl">
+jersey-preview-all.html:328
+- return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${cs
++ return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${cs
+jersey-preview-all.html:330
+- return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;
++ return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1`;
+master-ad-management.js:206
+- <p class="small"><strong>Status:</strong> ${esc(c.status)} · <strong>Payment:</strong> ${esc(c.paymentStatus || "unpaid")} (${esc(c.paymentMode || "—")}) · ${esc(money(c.priceCents))}${c.invoiceNumber ? ` · <a href="./ad
++ <p class="small"><strong>Status:</strong> ${esc(c.status)} · <strong>Payment:</strong> ${esc(c.paymentStatus || "unpaid")} (${esc(c.paymentMode || "—")}) · ${esc(money(c.priceCents))}${c.invoiceNumber ? ` · <a href="./ad
+master-services-extension.js:37
+- if (order?.ownerUid) await db.collection("inboxNotifications").add({recipientUid:order.ownerUid, type:"orderTracking", title:"FLOQR order update", body:`${order.invoiceNumber || id}: ${shippingStatus}${trackingNumber ? `
++ if (order?.ownerUid) await db.collection("inboxNotifications").add({recipientUid:order.ownerUid, type:"orderTracking", title:"FLOQR order update", body:`${order.invoiceNumber || id}: ${shippingStatus}${trackingNumber ? `
+mingl-chat.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.1.36">&larr; Back to My Profile and Settings</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
+mingl-gist-app.js:321
+- cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?v=${APP_V}&start=mingl`;
++ cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?start=mingl`;
+mingl-gist.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?v=29.09.14&start=mingl" data-from="mingl">&larr; Back to Mingl</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?start=mingl" data-from="mingl">&larr; Back to Mingl</a>
+mobile-test-checklist.js:19
+- href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}`
++ href: `${BASE}/admin.html?location=${CASAMARA}`
+mobile-test-checklist.js:25
+- href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
++ href: `${BASE}/admin.html?location=${CASAMARA}#panelMarketingAdPerformance`
+mobile-test-checklist.js:31
+- href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
++ href: `${BASE}/admin.html?location=${CASAMARA}#panelMarketingAdPerformance`
+mobile-test-checklist.js:37
+- href: `${BASE}/patron-portal.html?v=${V_PORTAL}`
++ href: `${BASE}/patron-portal.html`
+mobile-test-checklist.js:43
+- href: `${BASE}/index.html?v=${V_MINGL}&start=search`
++ href: `${BASE}/index.html?start=search`
+mobile-test-checklist.js:49
+- href: `${BASE}/mingl-gist.html?v=${V_GIST}&from=mingl`
++ href: `${BASE}/mingl-gist.html?from=mingl`
+mobile-test-checklist.js:55
+- href: `${BASE}/commerce.html?v=${V_COMMERCE}`
++ href: `${BASE}/commerce.html`
+mobile-test-checklist.js:61
+- href: `${BASE}/index.html?v=${V_MINGL}&start=search`
++ href: `${BASE}/index.html?start=search`
+mobile-test-checklist.js:67
+- href: `${BASE}/seed-v29-09-14.html?v=${V_SEED}`
++ href: `${BASE}/seed-v29-09-14.html`
+onboard-dc-venues.html:211
+- adminPortalUrl: `./admin.html?location=${id}&v=s3.1.36
++ adminPortalUrl: `./admin.html?location=${id}
+onboard-dc-venues.html:212
+- displayUrl: `./display.html?location=${id}&v=29.09.48`,
++ displayUrl: `./display.html?location=${id}`,
+onboard-dc-venues.html:213
+- publicProfileUrl: `./club-profile.html?location=${id}&v=29.09.48`,
++ publicProfileUrl: `./club-profile.html?location=${id}`,
+patron-app.js:2182
+- link:"./patron-portal.html?tab=inbox&v=29.09.8",
++ link:"./patron-portal.html?tab=inbox",
+patron-app.js:2183
+- minglLink:"./mingl-chat.html?v=29.09.33",
++ minglLink:"./mingl-chat.html",
+patron-app.js:2225
+- const params = new URLSearchParams({ v: "29.09.8", from: "mingl" });
++ const params = new URLSearchParams({ from: "mingl" });
+patron-app.js:3343
+- card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">
++ card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">
+patron-app.js:3787
+- window.location.href = "./commerce.html?v=29.09.33&from=search";
++ window.location.href = "./commerce.html?from=search";
+patron-app.js:4509
+- payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.09.8`;
++ payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}`;
+patron-app.js:5065
+- window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=29.09.8`;await note({type:"shoutoutSubmitted",
++ window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}`;await note({type:"shoutoutSubmitted",title:"Sho
+patron-portal-app.js:427
+- const params = new URLSearchParams({v:"29.09.8", from:"portal"});
++ const params = new URLSearchParams({from:"portal"});
+patron-portal-app.js:489
+- async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
++ async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?start=search"; }
+patron-portal-app.js:2425
+- ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.
++ ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.
+patron-portal-app.js:2588
+- link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&v=29.09.8&from=portal`,
++ link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&from=portal`,
+patron-portal-app.js:4217
+- const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || "./privacy.html?v=s3.0.103";
++ const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || "./privacy.html";
+patron-portal.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search" data-i18n="nav.backToSearchArrow">&larr; Back to Search</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search" data-i18n="nav.backToSearchArrow">&larr; Back to Search</a>
+patron-portal.html:44
+- <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="mingl" href="./mingl-chat.html?v=s3.1.30&from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
++ <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="mingl" href="./mingl-chat.html?from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
+patron-portal.html:45
+- <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal" data-i18n="nav.followServices">Follow Services</a>
++ <a class="admin-tab-link buttonlike" href="./services.html?from=portal" data-i18n="nav.followServices">Follow Services</a>
+patron-portal.html:46
+- <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="bartr" href="./commerce.html?v=s3.1.30&from=portal" data-i18n="nav.openBartr">Open BartR</a>
++ <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="bartr" href="./commerce.html?from=portal" data-i18n="nav.openBartr">Open BartR</a>
+patron-portal.html:332
+- <p class="sub small">US patrons and service members only. You manage products here; shoppers discover them on the shared <a href="./commerce.html?v=29.09.8&from=portal">BartR</a> frontend. FloqR is Merchant of Record; yo
++ <p class="sub small">US patrons and service members only. You manage products here; shoppers discover them on the shared <a href="./commerce.html?from=portal">BartR</a> frontend. FloqR is Merchant of Record; you ship ful
+patron-portal.html:599
+- <p class="sub small"><a id="privacyPolicyLink" href="./privacy.html?v=s3.0.103">Privacy Policy</a> · <a id="privacyDoNotSellLink" href="./privacy.html?v=s3.0.103#do-not-sell">Do Not Sell or Share</a></p>
++ <p class="sub small"><a id="privacyPolicyLink" href="./privacy.html">Privacy Policy</a> · <a id="privacyDoNotSellLink" href="./privacy.html#do-not-sell">Do Not Sell or Share</a></p>
+patron-portal.html:659
+- <iframe id="portalWorkCalendarFrame" class="work-calendar-frame" title="Work Calendar" src="./staff-worksheet.html?v=s3.0.5&embed=1&from=portal"></iframe>
++ <iframe id="portalWorkCalendarFrame" class="work-calendar-frame" title="Work Calendar" src="./staff-worksheet.html?embed=1&from=portal"></iframe>
+payment-return-app.js:126
+- const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.72` : "";
++ const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}` : "";
+payment-return-app.js:144
+- const portal = `./patron-portal.html?v=${encodeURIComponent(window.FLOQRNav?.appVersion || "")}&tab=ad-campaigns`;
++ const portal = `./patron-portal.html?tab=ad-campaigns`;
+payment-return.html:23
+- <a class="buttonlike primary" href="./patron-portal.html?tab=inbox&v=s3.1.36">Open FloqR Inbox</a>
++ <a class="buttonlike primary" href="./patron-portal.html?tab=inbox">Open FloqR Inbox</a>
+payment-return.html:24
+- <a class="buttonlike" href="./suprstr-search.html?v=s3.0.66&from=search">Open supRstar</a>
++ <a class="buttonlike" href="./suprstr-search.html?from=search">Open supRstar</a>
+payment-return.html:25
+- <a class="buttonlike" href="./patron-portal.html?tab=shoutouts&v=s3.1.36">View My ShoutOuts</a>
++ <a class="buttonlike" href="./patron-portal.html?tab=shoutouts">View My ShoutOuts</a>
+payment-return.html:26
+- <a class="buttonlike" href="./?v=s3.0.62">Return to FLOQR</a>
++ <a class="buttonlike" href="./">Return to FLOQR</a>
+pickup.html:12
+- <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?v=29.09.19&start=search">&larr; Back to Search</a>
++ <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?start=search">&larr; Back to Search</a>
+privacy.html:86
+- if (back) back.href = `./patron-portal.html?v=s3.1.36&tab=privacy`;
++ if (back) back.href = `./patron-portal.html?tab=privacy`;
+profile-access-guard.js:20
+- const query = new URLSearchParams({v:"29.04", profileRequired:reason, returnTo:returnPath()});
++ const query = new URLSearchParams({profileRequired:reason, returnTo:returnPath()});
+promoter-admin.html:11
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&larr; Back to Search</a>
+role-profiles.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="admin" href="./admin.html?v=s3.1.36">&larr; Back to Venue Command Center</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="admin" href="./admin.html">&larr; Back to Venue Command Center</a>
+role-profiles.html:32
+- <p><a href="./scheduling.html?v=s3.1.36&from=roles">Open Scheduling portal</a></p>
++ <p><a href="./scheduling.html?from=roles">Open Scheduling portal</a></p>
+role-profiles.html:43
+- <p><a href="./scheduling.html?v=s3.1.36&from=roles">Open DJ Scheduling</a></p>
++ <p><a href="./scheduling.html?from=roles">Open DJ Scheduling</a></p>
+role-request.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.1.36">&larr; Back to My Profile and Settings</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
+rydr.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.9&start=intent">&larr; Back to Search</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=intent">&larr; Back to Search</a>
+rydr.html:31
+- <a class="category-card rydr-card" href="./pickup.html?v=29.09.19&from=search">Robotaxi Â· pay &amp; hail</a>
++ <a class="category-card rydr-card" href="./pickup.html?from=search">Robotaxi Â· pay &amp; hail</a>
+scheduling.html:24
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.1.36">&larr; Back</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html">&larr; Back</a>
+scheduling.html:66
+- <a class="buttonlike" href="./admin.html?tab=scheduling&amp;v=s3.1.36" data-i18n="sched.clubAdminLink">Club Admin Scheduling tab</a>
++ <a class="buttonlike" href="./admin.html?tab=scheduling" data-i18n="sched.clubAdminLink">Club Admin Scheduling tab</a>
+services-app.js:61
+- <div class="queue-actions"><button type="button" data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow service"}</button>${row.commerceEnabled ? `<a class="buttonlike" href="./commerce.html?
++ <div class="queue-actions"><button type="button" data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow service"}</button>${row.commerceEnabled ? `<a class="buttonlike" href="./commerce.html?
+services.html:10
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.1.36">&larr; Back to My Profile and Settings</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
+staff-worksheet.html:7
+- <!-- Portal iframe: staff-worksheet.html?v=s3.0.3&embed=1&from=portal -->
++ <!-- Portal iframe: staff-worksheet.html?embed=1&from=portal -->
+staff-worksheet.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.1.36">&larr; Back</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html">&larr; Back</a>
+suprstar-preview.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./suprstr-search.html?v=29.09.66&from=search">&larr; Back to supRstar</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./suprstr-search.html?from=search">&larr; Back to supRstar</a>
+suprstar-preview.html:44
+- <a class="buttonlike" href="./suprstr-search.html?v=29.09.71&from=search">Start supRstar again</a>
++ <a class="buttonlike" href="./suprstr-search.html?from=search">Start supRstar again</a>
+suprstr-search.html:13
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.66&start=search">&larr; Back to Search</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&larr; Back to Search</a>
+suprstr-search.js:128
+- const fullUrl = path.includes("?") ? `${path}&v=${APP_V}&from=search` : `${path}?v=${APP_V}&from=search`;
++ const fullUrl = path.includes("?") ? `${path}&v=${APP_V}&from=search` : `${path}?from=search`;
+template-tags.html:12
+- <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html?v=s3.1.36">&larr; Back to My Profile and Settings</a>
++ <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
+template-tags.html:29
+- <a class="buttonlike" href="./patron-portal.html?v=s3.1.36&from=template-tags" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
++ <a class="buttonlike" href="./patron-portal.html?from=template-tags" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
+functions\ad-functions.js:452
+- link: `./master-admin.html?v=${APP_V}#adApprovalQueue`
++ link: `./master-admin.html#adApprovalQueue`
+functions\ad-functions.js:587
+- link: `./master-admin.html?v=${APP_V}#adApprovalQueue`
++ link: `./master-admin.html#adApprovalQueue`
+functions\ad-functions.js:598
+- successUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
++ successUrl: `${base}payment-return.html?order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
+functions\ad-functions.js:599
+- cancelUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&cancelled=1&kind=ad`,
++ cancelUrl: `${base}payment-return.html?order={ORDER_ID}&cancelled=1&kind=ad`,
+functions\ad-functions.js:624
+- successUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
++ successUrl: `${base}payment-return.html?order={ORDER_ID}&session_id={CHECKOUT_SESSION_ID}&kind=ad`,
+functions\ad-functions.js:625
+- cancelUrl: `${base}payment-return.html?v=${APP_V}&order={ORDER_ID}&cancelled=1&kind=ad`,
++ cancelUrl: `${base}payment-return.html?order={ORDER_ID}&cancelled=1&kind=ad`,
+functions\ad-functions.js:848
+- link: `./patron-portal.html?v=${APP_V}&tab=ad-campaigns`,
++ link: `./patron-portal.html?tab=ad-campaigns`,
+functions\ad-functions.js:898
+- link: `./patron-portal.html?v=${APP_V}&tab=ad-campaigns`,
++ link: `./patron-portal.html?tab=ad-campaigns`,
+functions\ad-functions.js:1257
+- const link = `${publicOrigin()}/ad-submit.html?v=${APP_V}&t=${encodeURIComponent(token)}`;
++ const link = `${publicOrigin()}/ad-submit.html?t=${encodeURIComponent(token)}`;
+functions\ad-functions.js:1369
+- successUrl: `${base}ad-submit.html?v=${APP_V}&t=${t}&paid=1&session_id={CHECKOUT_SESSION_ID}`,
++ successUrl: `${base}ad-submit.html?t=${t}&paid=1&session_id={CHECKOUT_SESSION_ID}`,
+functions\ad-functions.js:1370
+- cancelUrl: `${base}ad-submit.html?v=${APP_V}&t=${t}&cancelled=1`,
++ cancelUrl: `${base}ad-submit.html?t=${t}&cancelled=1`,
+functions\ad-functions.js:1459
+- const link = inv.intakeTokenHash ? "" : `${publicOrigin()}/ad-invoice.html?v=${APP_V}&invoice=${encodeURIComponent(inv.invoiceNumber)}`;
++ const link = inv.intakeTokenHash ? "" : `${publicOrigin()}/ad-invoice.html?invoice=${encodeURIComponent(inv.invoiceNumber)}`;
+functions\ai-discovery-functions.js:1883
+- ["Master seed (spot ads + Lucy/Cobra BartR)", `${base}/seed-v29-09-14.html?v=${v}`],
++ ["Master seed (spot ads + Lucy/Cobra BartR)", `${base}/seed-v29-09-14.html`],
+functions\ai-discovery-functions.js:1884
+- ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
++ ["Search / Mingl entry", `${base}/?start=search`],
+functions\ai-discovery-functions.js:1885
+- ["Mingl Gist (Stories)", `${base}/mingl-gist.html?v=${v}&from=mingl`],
++ ["Mingl Gist (Stories)", `${base}/mingl-gist.html?from=mingl`],
+functions\ai-discovery-functions.js:1886
+- ["RydR landing", `${base}/rydr.html?v=${v}&from=search`],
++ ["RydR landing", `${base}/rydr.html?from=search`],
+functions\ai-discovery-functions.js:1887
+- ["Pickup / RydR hail (Stripe fare + sim stages)", `${base}/pickup.html?v=${v}`],
++ ["Pickup / RydR hail (Stripe fare + sim stages)", `${base}/pickup.html`],
+functions\ai-discovery-functions.js:1888
+- ["BartR commerce", `${base}/commerce.html?v=${v}`],
++ ["BartR commerce", `${base}/commerce.html`],
+functions\ai-discovery-functions.js:1889
+- ["Casamara Club Admin (spot ads)", `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`],
++ ["Casamara Club Admin (spot ads)", `${base}/admin.html?location=casamara-rooftop-washington-dc`],
+functions\ai-discovery-functions.js:1890
+- ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
++ ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc`],
+functions\ai-discovery-functions.js:1891
+- ["Onyx Club Admin", `${base}/admin.html?location=onyx-rooftop-washington-dc&v=${v}`],
++ ["Onyx Club Admin", `${base}/admin.html?location=onyx-rooftop-washington-dc`],
+functions\ai-discovery-functions.js:1892
+- ["GAIA Club Admin", `${base}/admin.html?location=gaia-supperclub-washington-dc&v=${v}`],
++ ["GAIA Club Admin", `${base}/admin.html?location=gaia-supperclub-washington-dc`],
+functions\ai-discovery-functions.js:1893
+- ["Vera Club Admin", `${base}/admin.html?location=vera-cocina-washington-dc&v=${v}`],
++ ["Vera Club Admin", `${base}/admin.html?location=vera-cocina-washington-dc`],
+functions\ai-discovery-functions.js:1894
+- ["SAX Club Admin", `${base}/admin.html?location=sax-washington-dc&v=${v}`],
++ ["SAX Club Admin", `${base}/admin.html?location=sax-washington-dc`],
+functions\ai-discovery-functions.js:1895
+- ["Decades Club Admin", `${base}/admin.html?location=decades-washington-dc&v=${v}`],
++ ["Decades Club Admin", `${base}/admin.html?location=decades-washington-dc`],
+functions\ai-discovery-functions.js:1896
+- ["Mayflower Club Admin", `${base}/admin.html?location=mayflower-washington-dc&v=${v}`],
++ ["Mayflower Club Admin", `${base}/admin.html?location=mayflower-washington-dc`],
+functions\ai-discovery-functions.js:1897
+- ["Rosebar Club Admin", `${base}/admin.html?location=rosebar-lounge-washington-dc&v=${v}`],
++ ["Rosebar Club Admin", `${base}/admin.html?location=rosebar-lounge-washington-dc`],
+functions\ai-discovery-functions.js:1898
+- ["KATA Club Admin", `${base}/admin.html?location=kata-washington-dc&v=${v}`],
++ ["KATA Club Admin", `${base}/admin.html?location=kata-washington-dc`],
+functions\ai-discovery-functions.js:1899
+- ["LIMA Twist Club Admin", `${base}/admin.html?location=lima-twist-washington-dc&v=${v}`],
++ ["LIMA Twist Club Admin", `${base}/admin.html?location=lima-twist-washington-dc`],
+functions\ai-discovery-functions.js:1900
+- ["Zebbies Club Admin", `${base}/admin.html?location=zebbies-garden-washington-dc&v=${v}`],
++ ["Zebbies Club Admin", `${base}/admin.html?location=zebbies-garden-washington-dc`],
+functions\ai-discovery-functions.js:1901
+- ["Casamara public profile", `${base}/club-profile.html?location=casamara-rooftop-washington-dc&v=${v}`],
++ ["Casamara public profile", `${base}/club-profile.html?location=casamara-rooftop-washington-dc`],
+functions\ai-discovery-functions.js:1902
+- ["Onboard DC venues (Firestore)", `${base}/onboard-dc-venues.html?v=${v}`],
++ ["Onboard DC venues (Firestore)", `${base}/onboard-dc-venues.html`],
+functions\ai-discovery-functions.js:1969
+- open: `${base}/onboard-dc-venues.html?v=${v}`,
++ open: `${base}/onboard-dc-venues.html`,
+functions\ai-discovery-functions.js:1975
+- open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
++ open: `${base}/admin.html?location=casamara-rooftop-washington-dc`,
+functions\ai-discovery-functions.js:1981
+- open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
++ open: `${base}/admin.html?location=casamara-rooftop-washington-dc`,
+functions\ai-discovery-functions.js:1987
+- open: `${base}/seed-v29-09-14.html?v=${v}`,
++ open: `${base}/seed-v29-09-14.html`,
+functions\ai-discovery-functions.js:1993
+- open: `${base}/commerce.html?v=${v}`,
++ open: `${base}/commerce.html`,
+functions\ai-discovery-functions.js:1999
+- open: `${base}/pickup.html?v=${v}`,
++ open: `${base}/pickup.html`,
+functions\ai-discovery-functions.js:2005
+- open: `${base}/?v=${vMingl}&start=search`,
++ open: `${base}/?start=search`,
+functions\ai-discovery-functions.js:2006
+- do: `Open Mingl → see ad splash; people grid spot ads. Then open ${base}/mingl-gist.html?v=${v}&from=mingl`,
++ do: `Open Mingl → see ad splash; people grid spot ads. Then open ${base}/mingl-gist.html?from=mingl`,
+functions\ai-discovery-functions.js:2011
+- open: `${base}/?v=${vMingl}&start=search`,
++ open: `${base}/?start=search`,
+functions\ai-discovery-functions.js:2017
+- open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
++ open: `${base}/admin.html?location=casamara-rooftop-washington-dc`,
+functions\ai-discovery-functions.js:2114
+- const checklistUrl = `${base}/mobile-test-checklist.html?v=${checklistV}`;
++ const checklistUrl = `${base}/mobile-test-checklist.html`;
+functions\ai-discovery-functions.js:2276
+- ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
++ ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1`],
+functions\ai-discovery-functions.js:2277
+- ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
++ ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html`],
+functions\ai-discovery-functions.js:2278
+- ["Club Admin Notifications (test alert → selected channels / Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
++ ["Club Admin Notifications (test alert → selected channels / Inbox)", `${base}/admin.html?location=temp-democlub-1&tab=notifications`],
+functions\ai-discovery-functions.js:2279
+- ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
++ ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&tab=scheduling`],
+functions\ai-discovery-functions.js:2280
+- ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
++ ["Patron Service Members tab", `${base}/patron-portal.html?tab=service-members`],
+functions\ai-discovery-functions.js:2281
+- ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
++ ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?tab=work-calendar`],
+functions\ai-discovery-functions.js:2282
+- ["Temp Club Admin 1 Command Center (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
++ ["Temp Club Admin 1 Command Center (Aurelia, not Zebbies)", `${base}/admin.html`],
+functions\ai-discovery-functions.js:2283
+- ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
++ ["Work Sheet staff calendar", `${base}/staff-worksheet.html?location=temp-democlub-1`],
+functions\ai-discovery-functions.js:2284
+- ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
++ ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html`],
+functions\ai-discovery-functions.js:2285
+- ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
++ ["Master Admin Diagnostics", `${base}/master-admin.html`],
+functions\ai-discovery-functions.js:2286
+- ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
++ ["Search / FloqAi", `${base}/?start=intent`],
+functions\feature-services-functions.js:295
+- const invitePath = `./beta-invite.html?t=${token}&v=${PACKAGE_VERSION}&from=beta-invite`;
++ const invitePath = `./beta-invite.html?t=${token}&from=beta-invite`;
+functions\receipt-delivery.js:242
+- const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}&v=s3.0.62`;
++ const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}`;
+functions\scheduling-functions.js:877
+- link: `./admin.html?location=${encodeURIComponent(text(shift.ownerId, 160))}&tab=scheduling&shift=${encodeURIComponent(shiftId)}&v=s3.0.1`,
++ link: `./admin.html?location=${encodeURIComponent(text(shift.ownerId, 160))}&tab=scheduling&shift=${encodeURIComponent(shiftId)}`,

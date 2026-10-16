@@ -1,0 +1,35 @@
+# Firebase App Check (reCAPTCHA Enterprise)
+
+Resume: `@appcheck$`.
+
+## Status (s3 App Check pass)
+
+- Project: `shoutoutdemo-5b402`
+- Web app: `ShoutOut_Demo` (`1:858205816285:web:d5c1ea010001122ecfa234`)
+- Provider: **reCAPTCHA Enterprise** (score-based, invisible)
+- Existing key reused: display name `Captcha4ShoutOutDemo`
+- Domains on key: `jadzadco.github.io`, `shoutoutdemo-5b402.firebaseapp.com`, `shoutoutdemo-5b402.web.app`
+- App Check `recaptchaEnterpriseConfig` registered via API (TTL 3600s, minValidScore 0.5)
+- Client: `firebase-config.js` → `FLOQR_APP_CHECK.siteKey` + `floqr-app-check.js` after `firebase-app-check-compat.js`
+
+## Safety
+
+- Site key is **public** (intended for browser). There is no secret to paste into Pages.
+- Never put a reCAPTCHA **secret** / API private key in GitHub Pages.
+- Never add `localhost` to the production score key.
+- **Do not enable App Check enforcement** on Firestore / Functions / Storage / AI Logic until hubs send tokens and Console metrics look healthy.
+
+## Pages wiring
+
+Load order on hubs:
+
+1. `firebase-app-compat.js`
+2. `firebase-app-check-compat.js`
+3. other firebase compat SDKs
+4. `firebase-config.js`
+5. `floqr-app-check.js`
+6. page app (`initializeApp` → App Check activates)
+
+## Not Firebase Hosting
+
+FLOQR Pages are on GitHub Pages. `/firebase:deploy` is for Functions/rules in this repo, not the static site. App Check registration is Console/API state, not a Hosting deploy.

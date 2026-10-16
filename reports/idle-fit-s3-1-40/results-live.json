@@ -1,0 +1,1964 @@
+[
+  {
+    "name": "display-default-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Club",
+    "file": "live-display-default-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 42,
+          "runW": 292,
+          "runH": 34,
+          "rect": {
+            "x": 62,
+            "y": 44,
+            "w": 292,
+            "h": 34
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 42,
+          "runW": 87,
+          "runH": 34,
+          "rect": {
+            "x": 164,
+            "y": 94,
+            "w": 87,
+            "h": 34
+          }
+        }
+      ],
+      "fontSizes": [
+        42
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "42",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Club",
+    "file": "live-display-default-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE / SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE",
+          "fontPx": 54,
+          "runW": 82,
+          "runH": 45,
+          "rect": {
+            "x": 167,
+            "y": 56,
+            "w": 82,
+            "h": 45
+          }
+        },
+        {
+          "text": "SHOUTOUT @",
+          "fontPx": 54,
+          "runW": 283,
+          "runH": 45,
+          "rect": {
+            "x": 67,
+            "y": 107,
+            "w": 283,
+            "h": 45
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 54,
+          "runW": 112,
+          "runH": 45,
+          "rect": {
+            "x": 152,
+            "y": 159,
+            "w": 112,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        54
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "54",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Club",
+    "file": "live-display-default-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 66,
+          "runW": 457,
+          "runH": 55,
+          "rect": {
+            "x": 83,
+            "y": 64,
+            "w": 457,
+            "h": 55
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 66,
+          "runW": 137,
+          "runH": 55,
+          "rect": {
+            "x": 244,
+            "y": 141,
+            "w": 137,
+            "h": 55
+          }
+        }
+      ],
+      "fontSizes": [
+        66
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "66",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?preview=1",
+    "size": "xibo1080",
+    "venue": "Club",
+    "file": "live-display-default-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE / SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE",
+          "fontPx": 155,
+          "runW": 238,
+          "runH": 130,
+          "rect": {
+            "x": 841,
+            "y": 254,
+            "w": 238,
+            "h": 130
+          }
+        },
+        {
+          "text": "SHOUTOUT @",
+          "fontPx": 155,
+          "runW": 823,
+          "runH": 130,
+          "rect": {
+            "x": 548,
+            "y": 402,
+            "w": 823,
+            "h": 130
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 155,
+          "runW": 326,
+          "runH": 130,
+          "rect": {
+            "x": 797,
+            "y": 550,
+            "w": 326,
+            "h": 130
+          }
+        }
+      ],
+      "fontSizes": [
+        155
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "155",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display-zebbies-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 37,
+          "runW": 257,
+          "runH": 30,
+          "rect": {
+            "x": 79,
+            "y": 46,
+            "w": 257,
+            "h": 30
+          }
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "fontPx": 37,
+          "runW": 293,
+          "runH": 30,
+          "rect": {
+            "x": 62,
+            "y": 96,
+            "w": 293,
+            "h": 30
+          }
+        }
+      ],
+      "fontSizes": [
+        37
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "37",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display-zebbies-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES / GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "ZEBBIES",
+          "fontPx": 45,
+          "runW": 144,
+          "runH": 38,
+          "rect": {
+            "x": 136,
+            "y": 111,
+            "w": 144,
+            "h": 38
+          }
+        },
+        {
+          "text": "GARDEN DC",
+          "fontPx": 45,
+          "runW": 202,
+          "runH": 38,
+          "rect": {
+            "x": 107,
+            "y": 163,
+            "w": 202,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display-zebbies-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 574,
+        "h": 105
+      },
+      "host": null,
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display-zebbies-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES / GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "ZEBBIES",
+          "fontPx": 132,
+          "runW": 431,
+          "runH": 111,
+          "rect": {
+            "x": 745,
+            "y": 412,
+            "w": 431,
+            "h": 111
+          }
+        },
+        {
+          "text": "GARDEN DC",
+          "fontPx": 132,
+          "runW": 601,
+          "runH": 111,
+          "rect": {
+            "x": 660,
+            "y": 560,
+            "w": 601,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "live-display-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 35,
+          "runW": 243,
+          "runH": 28,
+          "rect": {
+            "x": 86,
+            "y": 38,
+            "w": 243,
+            "h": 28
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 35,
+          "runW": 80,
+          "runH": 28,
+          "rect": {
+            "x": 168,
+            "y": 71,
+            "w": 80,
+            "h": 28
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 35,
+          "runW": 236,
+          "runH": 28,
+          "rect": {
+            "x": 90,
+            "y": 105,
+            "w": 236,
+            "h": 28
+          }
+        }
+      ],
+      "fontSizes": [
+        35
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "35",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Heist Washington DC",
+    "file": "live-display-heist-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 45,
+          "runW": 103,
+          "runH": 38,
+          "rect": {
+            "x": 157,
+            "y": 111,
+            "w": 103,
+            "h": 38
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 45,
+          "runW": 303,
+          "runH": 38,
+          "rect": {
+            "x": 57,
+            "y": 163,
+            "w": 303,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Heist Washington DC",
+    "file": "live-display-heist-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 54,
+          "runW": 374,
+          "runH": 45,
+          "rect": {
+            "x": 125,
+            "y": 56,
+            "w": 374,
+            "h": 45
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 54,
+          "runW": 124,
+          "runH": 45,
+          "rect": {
+            "x": 250,
+            "y": 107,
+            "w": 124,
+            "h": 45
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 54,
+          "runW": 363,
+          "runH": 45,
+          "rect": {
+            "x": 130,
+            "y": 159,
+            "w": 363,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        54
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "54",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=heist-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Heist Washington DC",
+    "file": "live-display-heist-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 132,
+          "runW": 307,
+          "runH": 111,
+          "rect": {
+            "x": 806,
+            "y": 412,
+            "w": 307,
+            "h": 111
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 132,
+          "runW": 902,
+          "runH": 111,
+          "rect": {
+            "x": 509,
+            "y": 560,
+            "w": 902,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display-aurelia-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 34,
+          "runW": 237,
+          "runH": 27,
+          "rect": {
+            "x": 90,
+            "y": 47,
+            "w": 237,
+            "h": 27
+          }
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "fontPx": 34,
+          "runW": 294,
+          "runH": 27,
+          "rect": {
+            "x": 61,
+            "y": 97,
+            "w": 294,
+            "h": 27
+          }
+        }
+      ],
+      "fontSizes": [
+        34
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "34",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display-aurelia-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA / (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "AURELIA",
+          "fontPx": 45,
+          "runW": 146,
+          "runH": 38,
+          "rect": {
+            "x": 135,
+            "y": 111,
+            "w": 146,
+            "h": 38
+          }
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "fontPx": 45,
+          "runW": 233,
+          "runH": 38,
+          "rect": {
+            "x": 91,
+            "y": 163,
+            "w": 233,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display-aurelia-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 53,
+          "runW": 367,
+          "runH": 45,
+          "rect": {
+            "x": 128,
+            "y": 69,
+            "w": 367,
+            "h": 45
+          }
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "fontPx": 53,
+          "runW": 457,
+          "runH": 45,
+          "rect": {
+            "x": 84,
+            "y": 147,
+            "w": 457,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        53
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "53",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1&preview=1",
+    "size": "xibo1080",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display-aurelia-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA / (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "AURELIA",
+          "fontPx": 132,
+          "runW": 437,
+          "runH": 111,
+          "rect": {
+            "x": 741,
+            "y": 412,
+            "w": 437,
+            "h": 111
+          }
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "fontPx": 132,
+          "runW": 695,
+          "runH": 111,
+          "rect": {
+            "x": 612,
+            "y": 560,
+            "w": 695,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Club",
+    "file": "live-display2-default-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 59
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 102,
+          "bottom": 122,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 19.136,
+          "scrollW": 232,
+          "clientW": 232,
+          "top": 126,
+          "bottom": 146,
+          "left": 92,
+          "right": 324
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 151,
+          "bottom": 162,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Club",
+    "file": "live-display2-default-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 100
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 158,
+          "bottom": 190,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 28,
+          "scrollW": 340,
+          "clientW": 340,
+          "top": 198,
+          "bottom": 229,
+          "left": 38,
+          "right": 378
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 243,
+          "bottom": 259,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Club",
+    "file": "live-display2-default-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 110
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 154,
+          "bottom": 190,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 32.448,
+          "scrollW": 394,
+          "clientW": 394,
+          "top": 198,
+          "bottom": 234,
+          "left": 115,
+          "right": 509
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 248,
+          "bottom": 264,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?preview=1",
+    "size": "xibo1080",
+    "venue": "Club",
+    "file": "live-display2-default-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 213
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 603,
+          "bottom": 674,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 64,
+          "scrollW": 777,
+          "clientW": 777,
+          "top": 690,
+          "bottom": 762,
+          "left": 571,
+          "right": 1349
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 791,
+          "bottom": 816,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-zebbies-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display2-zebbies-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 59
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 102,
+          "bottom": 122,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Zebbies Garden DC",
+          "fontPx": 19.136,
+          "scrollW": 382,
+          "clientW": 382,
+          "top": 126,
+          "bottom": 146,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 151,
+          "bottom": 162,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-zebbies-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display2-zebbies-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 132
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 143,
+          "bottom": 174,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Zebbies Garden DC",
+          "fontPx": 28,
+          "scrollW": 391,
+          "clientW": 391,
+          "top": 182,
+          "bottom": 245,
+          "left": 12,
+          "right": 404
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 259,
+          "bottom": 275,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-zebbies-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display2-zebbies-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 147
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 135,
+          "bottom": 172,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Zebbies Garden DC",
+          "fontPx": 32.448,
+          "scrollW": 587,
+          "clientW": 587,
+          "top": 180,
+          "bottom": 252,
+          "left": 19,
+          "right": 605
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 266,
+          "bottom": 282,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-zebbies-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=zebbies-garden-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Zebbies Garden DC",
+    "file": "live-display2-zebbies-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 285
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 567,
+          "bottom": 639,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Zebbies Garden DC",
+          "fontPx": 64,
+          "scrollW": 900,
+          "clientW": 900,
+          "top": 655,
+          "bottom": 798,
+          "left": 510,
+          "right": 1410
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 827,
+          "bottom": 851,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "live-display2-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 80
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 92,
+          "bottom": 112,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 19.136,
+          "scrollW": 383,
+          "clientW": 383,
+          "top": 116,
+          "bottom": 156,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 161,
+          "bottom": 172,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=heist-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Heist Washington DC",
+    "file": "live-display2-heist-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 132
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 143,
+          "bottom": 174,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 28,
+          "scrollW": 391,
+          "clientW": 391,
+          "top": 182,
+          "bottom": 245,
+          "left": 12,
+          "right": 404
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 259,
+          "bottom": 275,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=heist-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Heist Washington DC",
+    "file": "live-display2-heist-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 147
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 135,
+          "bottom": 172,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 32.448,
+          "scrollW": 587,
+          "clientW": 587,
+          "top": 180,
+          "bottom": 252,
+          "left": 19,
+          "right": 605
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 266,
+          "bottom": 282,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=heist-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Heist Washington DC",
+    "file": "live-display2-heist-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 285
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 567,
+          "bottom": 639,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 64,
+          "scrollW": 900,
+          "clientW": 900,
+          "top": 655,
+          "bottom": 798,
+          "left": 510,
+          "right": 1410
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 827,
+          "bottom": 851,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-aurelia-64x32",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display2-aurelia-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 383,
+        "h": 80
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 19.136,
+          "scrollW": 211,
+          "clientW": 211,
+          "top": 92,
+          "bottom": 112,
+          "left": 102,
+          "right": 314
+        },
+        {
+          "text": "Be a SupRstar @ Aurelia (Demo Club)",
+          "fontPx": 19.136,
+          "scrollW": 383,
+          "clientW": 383,
+          "top": 116,
+          "bottom": 156,
+          "left": 17,
+          "right": 399
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 10.4,
+          "scrollW": 191,
+          "clientW": 191,
+          "top": 161,
+          "bottom": 172,
+          "left": 112,
+          "right": 304
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-aurelia-64x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display2-aurelia-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 132
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 143,
+          "bottom": 174,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Aurelia (Demo Club)",
+          "fontPx": 28,
+          "scrollW": 391,
+          "clientW": 391,
+          "top": 182,
+          "bottom": 245,
+          "left": 12,
+          "right": 404
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 259,
+          "bottom": 275,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-aurelia-96x48",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display2-aurelia-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 147
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 135,
+          "bottom": 172,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Aurelia (Demo Club)",
+          "fontPx": 32.448,
+          "scrollW": 587,
+          "clientW": 587,
+          "top": 180,
+          "bottom": 252,
+          "left": 19,
+          "right": 605
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 266,
+          "bottom": 282,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-aurelia-xibo1080",
+    "url": "https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1&preview=1",
+    "size": "xibo1080",
+    "venue": "Aurelia (Demo Club)",
+    "file": "live-display2-aurelia-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 285
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 567,
+          "bottom": 639,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Aurelia (Demo Club)",
+          "fontPx": 64,
+          "scrollW": 900,
+          "clientW": 900,
+          "top": 655,
+          "bottom": 798,
+          "left": 510,
+          "right": 1410
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 827,
+          "bottom": 851,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

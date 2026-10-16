@@ -1,0 +1,120 @@
+---
+description: VIP floor-plan ingest — reusable procedure + AI prompt for turning any club / event / venue floor plan into the FLOQR floor-plan JSON, preview, screenshots, photo matches and open questions, then loading it (Master Admin processes; club admin reviews; then publish).
+alwaysApply: true
+---
+
+# VIP floor-plan ingest (always)
+
+Resume: `@floorplan$` / `$vip-floorplan$`. Status: **PROPOSAL** — VIP Reservations is not built yet (`design-notes-vip-reservations.mdc`). Until it is, run this procedure into `reports/vip-floorplans/` only. Never write Firestore / Storage / Functions for it without an owner go-ahead.
+
+Use this **every time** the owner, a Master Admin or a club admin provides a floor plan (club, event or venue). Reference outputs: `reports/vip-floorplans/` (`decades.json`, `lima-twist.json`, `legend.json`, `build-plans.js`, `viewer.js`, `shoot.mjs`, `photo-match.md`).
+
+## Workflow / state (club admins cannot use a plan until it is loaded)
+
+```
+uploaded ──(Master Admin starts)──▶ processing ──(JSON + preview + screenshots ready)──▶ review
+review ──(club admin confirms labels / areas / capacities / prices)──▶ approved ──(Master Admin loads, reason + audit)──▶ published
+review ──(club admin requests changes)──▶ processing          published ──(new upload)──▶ uploaded (new version; old version stays for past bookings)
+any ──(Master Admin)──▶ rejected (reason)
+```
+
+- **Who can upload:** Club Admin / Owner / VIP Manager, or a Master Admin on the club's behalf.
+- **Who processes and loads:** **Master Admin only** (SOS2FA + `FLOQRReasonPrompt` + chained audit `vip.floorplan_*`).
+- **What the club admin does in `review`:** confirms or edits area names, capacities and prices. Club admins **cannot** change printed labels or geometry; those changes go back to `processing`.
+- **Patrons:** see a plan only when it is `published` **and** the club is VIP-enabled.
+
+## Accepted formats
+
+| Format | Handling |
+|---|---|
+| PNG / JPG / WebP | Direct. Strip EXIF; longest side capped at 6000 px. |
+| HEIC | Convert client-side to PNG first. |
+| PDF | Render the chosen page at 2×; ask which page if there are several. |
+| SVG | Sanitize (no script / foreignObject / handlers / external refs), then rasterize. Never serve the raw SVG. |
+| Photo of a printed plan | Accept, but de-skew / crop to the plan first. Flag low confidence. |
+| DWG / DXF | Not accepted. Ask for a PDF export. |
+| Hand sketch | Accept for review only. Every label needs club confirmation. |
+
+## AI PROMPT (run this on the image)
+
+```
+You are ingesting a venue floor plan for FLOQR VIP Reservations. Image: <file> (<W>×<H> px). Venue: <display name>, <city>; clubLocationId hint: <id>; event (optional): <event>.
+1. LABELS — Read every printed label EXACTLY as printed (case, spaces, punctuation: "C1", "VIP TABLES", "DJ BOOTH", "106", "BAR1", "Emergency Exit", "stairs"). Never renumber, translate, merge or invent labels. Unlabeled shapes get label null + a question for the club. Ignore screenshot chrome (help "?" icons, app toolbars) and list it under ignoredArtifacts.
+2. CLASSIFY each element:
+   - bookable section: table | vipTable | booth | round | standing | vipArea
+   - never bookable (nonBookable[], bookable:false): bar, djBooth, exit, stairs, restroom, stage, kitchen, coatCheck, entrance, walkway, enclosure/unlabeled.
+   - Bars, DJ booths, exits, stairs, restrooms and stages are NEVER bookable, even when they carry a table-style number.
+   - Every DJ booth gets type "djBooth" / state "djBooth" (blue), whatever its printed label.
+   - If the owner / club says an item is something else (e.g. "106 is the DJ booth"), keep the printed label and set name + type.
+3. GEOMETRY — Measure each element (color/brightness segmentation, then verify by eye). Store normalized 0–1 coordinates, origin top-left: rect {x,y,w,h}; polygon [[x,y],…] clockwise; circle {cx,cy,rx,ry} for rounds; plus pixelBox [x0,y0,x1,y1] inclusive in source pixels. Include chair marks inside the section box.
+4. AREAS — Group sections into ≤ 4–5 areas so phones can zoom to one area at a time (fewer if the plan is small). Use printed zone labels when present (label = printed text). Otherwise label null and a default name ("Area A · 200 Row", "North VIP"). name is club-editable (defaultName keeps the original). Every bookable section belongs to exactly one area; non-bookable items may carry areaId. Each area: outline (rect or polygon), bounds, viewBox (members' box + padding = phone zoom target).
+5. CAPACITY (placeholders until the club confirms): maxCapacity (max guests allowed, from chair marks), includedGuests (guests covered by the minimum, 1..maxCapacity), minimumAmount, extraGuestFee (optional VIP entry fee per guest beyond includedGuests; null if none or if includedGuests = maxCapacity), deposit. Amounts are null + placeholder:true — never invent prices.
+6. OUTPUT the plan JSON (schema below) + counts, and run the validations.
+7. PREVIEW — Render the plan in viewer.js with the shared legend; take screenshots at 390 px (area view + overview), 820 px and 1280 px with CDP device emulation (shoot.mjs, not --window-size). Verify every overlay sits on its printed shape, phone targets are ≥ 44 px (data-min-tap-px), and there is no horizontal overflow.
+8. PHOTOS — Check the club's public profile photos only (clubLocations main/cover/publicGallery, clubMedia), read-only. Match photo → area / section with confidence (confirmed | high | medium | low). Reject photos with identifiable patrons. Write photo-match.md.
+9. OPEN QUESTIONS — List everything the club must confirm: unknown / unlabeled shapes, bookable or not, area names, capacities, minimums, extra-guest fees, deposits, accessible tables, exits.
+10. Stop at "review". Load / publish only after club confirmation and a Master Admin go-ahead.
+```
+
+## Shared legend (do not change per club; `legend.json`)
+
+| State | Fill / stroke | Icon | Pattern |
+|---|---|---|---|
+| Available | green `#22c55e` / `#4ade80` | check | solid |
+| Held / pending | amber `#f59e0b` / `#fbbf24` | clock | diagonal stripes |
+| Booked | red `#ef4444` / `#f87171` | cross | cross-hatch |
+| Not bookable (bar, exit, stairs, restroom, stage…) | grey `#9ca3af` dashed | lock | dots |
+| DJ booth | blue `#3b82f6` / `#60a5fa` | music | solid |
+| Selected | yellow `#fde047` 4 px ring, pulse (off under reduced motion) | — | — |
+
+Color is never the only cue: always show the icon, the pattern and the text, plus the on-map legend. Strokes must be ≥ 3:1 against the map background (the build fails otherwise). Area outlines are `#e5e7eb` dashed `8 5`.
+
+## Schema `floqr.vipFloorPlan/2` (one JSON per plan version)
+
+```json
+{
+  "schemaVersion": "floqr.vipFloorPlan/2",
+  "status": "uploaded | processing | review | approved | published | rejected",
+  "venue": {"name": "Lima Twist Club", "city": "Washington, DC", "country": "US", "clubLocationIdHint": "lima-twist-washington-dc", "eventId": null},
+  "image": {"file": "…png", "widthPx": 1024, "heightPx": 382, "source": "who supplied it, when", "sha256": "…"},
+  "legendRef": "legend.json",
+  "areas": [{"id": "…-area-a", "label": null, "defaultName": "Area A · 200 Row", "name": "Area A · 200 Row", "nameEditable": true,
+             "nameSetByUid": null, "nameSetAtMs": null, "type": "area | vipArea | floorZone", "shape": "rect | polygon", "rect": {}, "polygon": [],
+             "bounds": {"x": 0, "y": 0, "w": 0, "h": 0}, "viewBox": {"x": 0, "y": 0, "w": 0, "h": 0}, "sectionIds": [], "nonBookableIds": [], "photos": []}],
+  "sections": [{"id": "…-305", "label": "305", "type": "table", "bookable": true, "areaId": "…-area-d", "shape": "rect | polygon | circle",
+                "rect": {}, "polygon": [], "circle": null, "pixelBox": [0, 0, 0, 0],
+                "maxCapacity": 4, "includedGuests": 4, "capacityPlaceholder": true,
+                "minimumAmount": {"amountCents": null, "currency": "USD", "placeholder": true},
+                "extraGuestFee": null, "deposit": {"amountCents": null, "currency": "USD", "placeholder": true},
+                "isAccessible": null, "description": "", "photos": []}],
+  "nonBookable": [{"id": "…-106", "label": "106", "name": "DJ BOOTH", "type": "djBooth", "state": "djBooth", "bookable": false, "areaId": "…-area-b", "reason": "…", "pixelBox": [0, 0, 0, 0]}],
+  "ignoredArtifacts": [],
+  "openQuestions": [],
+  "counts": {"bookableSections": 0, "byType": {}, "areas": 0, "nonBookable": 0, "djBooths": 0, "maxCapacityTotalPlaceholder": 0, "includedGuestsTotalPlaceholder": 0}
+}
+```
+
+Validations (`build-plans.js` enforces them):
+
+- every area member exists, and every bookable section is in exactly one area;
+- no never-bookable type in `sections`;
+- `1 ≤ includedGuests ≤ maxCapacity`;
+- `extraGuestFee` is null when `includedGuests = maxCapacity`;
+- labels are unique per plan;
+- no section overlaps an exit or stairs;
+- legend contrast is ≥ 3:1.
+
+A booking stores `partySize ≤ maxCapacity`, `extraGuests = max(0, partySize − includedGuests)` and `extraGuestFeeTotal = extraGuests × extraGuestFee`.
+
+## Deliverables per plan
+
+`<venue>.json` · plan image · preview (`viewer.js`, with the venue added to the plan picker) · screenshots `preview-<venue>{-390-area,-390-overview,-820,}.png` · a `photo-match.md` section · open-questions list. After loading: Firestore `vipFloorPlans/{planId}` (+ `vipSections`) written by a Functions callable only, with a `vip.floorplan_published` chained audit row.
+
+## Do not
+
+- Do not rename printed labels or "tidy" numbering.
+- Do not make bars, DJ booths, exits, stairs, restrooms or stages bookable.
+- Do not invent prices or capacities. Use placeholders and ask.
+- Do not publish without club review and a Master Admin load.
+- Do not use patron photos with identifiable faces, or copy photos from venue websites without the club's rights.
+- Do not put this procedure into FloqAi help bodies. Help gets the short Master Admin topic only (proposal §15, `help-vip-floorplan-ingest`).

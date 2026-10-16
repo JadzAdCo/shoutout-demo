@@ -113,3 +113,19 @@
   background:transparent;
   border:1px dashed rgba(255,255,255,.25);
 }
+.suprstar-stage-actions{
+  width:100%;
+  max-width:420px;
+  display:grid;
+  gap:8px;
+}
+.suprstar-stage-actions .category-card{
+  width:100%;
+  justify-content:center;
+  text-align:center;
+}
+.suprstar-stage-actions .category-card:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  filter:grayscale(.25);
+}

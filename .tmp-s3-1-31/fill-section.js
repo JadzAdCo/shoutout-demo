@@ -1,0 +1,12 @@
+const fs = require("fs");
+const html = fs.readFileSync("master-admin.html", "utf8").replace(/\r\n/g, "\n");
+const s = html.indexOf('\n      <section id="demoEmployees"');
+const endTag = "      </section>\n";
+const e = html.indexOf(endTag, s) + endTag.length;
+const section = html.slice(s, e);
+if (/`|\$\{/.test(section)) throw new Error("needs escaping");
+const p = "scripts/apply-s3-1-31-demo-employees-tab.js";
+const src = fs.readFileSync(p, "utf8");
+if (!src.includes("__SECTION__")) throw new Error("placeholder gone");
+fs.writeFileSync(p, src.replace("__SECTION__", () => "`" + section + "`"));
+console.log("section lines", section.split("\n").length);

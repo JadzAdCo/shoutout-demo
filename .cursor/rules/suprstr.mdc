@@ -1,0 +1,76 @@
+---
+description: supRstar live video — pay/approve/display2 path, WebRTC reliability phases. Resume @supRstr$
+alwaysApply: true
+---
+
+# supRstar (always)
+
+Live video to the venue **SupRStar board** (`display2.html?location=<id>` only — never `?v=` or `?screen=`). Like a ShoutOut, but phone camera. **Not** Display 1 unless Club Admin later picks a board.
+
+Resume / continue this work: **`@supRstr$`** (also `$supRstr$`).
+
+## Product path (do not invent a second loop)
+
+1. Search `suprstr-search.html` — signed-in patron (`FLOQRSessionShell`; this is a **satellite**), venue with feature gate `supRstar`, `displayBoard: "secondary"`.
+2. `createSuprstarRequest` → `suprstarRequests/{accessToken}` (`status: preview`). Preview URL is `suprstar-preview.html?t=<token>` (token **is** the doc id; never guessable from club id).
+3. Private `getUserMedia` on the preview tab — **not** on the LED yet.
+4. Stripe `orderType: "suprstarRequest"` ~$20 → fulfillment `markSuprstarRequestPaid` → `pending_approval` + Club Admin inbox.
+5. Club Admin **supRstar Queue** → `approveSuprstarRequest` / reject. Patron inbox: return to preview tab.
+6. **Go live** → `startSuprstrLive` writes `suprstrSessions/{sessionId}` and `suprstrLive/{locationId}__secondary` `{status: live, sessionId}`. Phone `startBroadcast` (offer + `callerCandidates`). display2 `display-suprstr.js` watches the live doc → `joinAsDisplay` (answer + `calleeCandidates`).
+7. **End live** → `endSuprstrLive` idles the live pointer. Keep the preview tab open while streaming.
+
+Key files: `suprstr-search.js`, `suprstar-preview.js`, `suprstr-webrtc.js`, `display-suprstr.js`, `display2.html`, `functions/suprstr-functions.js`, `functions/commerce-functions.js` (`suprstarRequest`), `admin-app.js` queue, `firestore.rules` (`suprstrLive` / `suprstrSessions` public read for kiosk).
+
+## Unpublished vs live
+
+Workspace dirty WebRTC reliability (`startBroadcast` rebuild when a new answer arrives after `currentRemoteDescription`; `joinAsDisplay` re-answers on new offer SDP; overlay Connecting / Linked / errors; `forceVideoPlay` muted kiosk autoplay; `.suprstar-stage-actions`; default master-admin emails) is **not** the product until it is on **`origin/main`** (Pages) and Functions are deployed if backend changed. Source contract: `functions/suprstr-webrtc-reliability.test.js`. **Do not dump onto main unless the user asks to publish.**
+
+## FIX PROMPT — `@supRstr$` continuation (club-grade media)
+
+The pay → approve → Go live **business loop is complete**. Missing is **keeping the stream alive in a club**. Implement in this order. Do not add prepaid slots, recording, or a Display 1 patron path unless asked.
+
+### Phase 1 — survive the room (do first)
+
+- **Ship** the unpublished renegotiate pass when publishing is requested.
+- Phone: on `connectionState` / `iceConnectionState` `failed` | `disconnected`, close peer and `publishOffer` again (same rebuild as a new answer).
+- display2: if the peer is dead, **do not** skip `attachSession` because `sessionId === activeSessionId`. `stop()` the dead join and `joinAsDisplay` again.
+- Phone writes `lastHeartbeatAt` on `suprstrLive` ~every 5s. display2 re-joins if heartbeat is stale (~15s). Stale heartbeat → idle the live doc (next `startSuprstrLive` or a small watchdog).
+- Preview `pagehide` / `visibilitychange` → `endSuprstrLive` (keepalive so tab close still fires).
+- Club Admin queue: **End live** using `endSuprstrLive`, gated like approve (`isClubManagerAuth`). Door staff need a kill switch.
+
+### Phase 2 — TURN
+
+`createPeer()` is Google **STUN only**. Add callable `getSuprstrIceServers` with **time-limited TURN** (Twilio Network Traversal or coturn). Secrets in Functions env, never in the Pages bundle. Phone and display2 both fetch ICE before offer/answer.
+
+### Phase 3 — stored guards that are unused
+
+- Honor `expiresAt` (3h is already written) in checkout, approve, and `startSuprstrLive`. Preview: expired → start again from Search.
+- Max live duration (e.g. 2–3 min): `liveUntil` on start; phone timer + auto `endSuprstrLive`.
+
+### Phase 4 — only if product asks
+
+- **LED audio:** keep display2 **muted** for kiosk autoplay. Room sound is a separate unmuted sink, not Xibo WebView unmute.
+- **Display 1:** search always books `__secondary`. `display.html` watches the primary live doc; this flow does not write it.
+
+### Board auth (s3.1.26)
+
+Boards authenticate **only** by display token (`?k=` → `checkDisplayAccess`) and/or approved IP — never a person login; Xibo URL stays `display2.html?location=<id>`. Rules now make the board's `answer` on `suprstrSessions` **write-once** (must be null first; keys `answer/status/answeredAt/updatedAt`; `{type:"answer", sdp ≤ 20000}`), and the broadcaster cannot overwrite an answer. A board that re-joins a session that already has an answer must wait for the phone to re-offer (`answer: null`) — Phase 1 "rebuild on drop" should publish a fresh offer, not re-answer. `broadcasterEmail` is no longer on the public session doc.
+
+Pending: display-token-derived identity — callable `getSuprstrDisplaySession` (validates token/IP like `checkDisplayAccess`) → `createCustomToken("display-<locationId>", {displayLocationId})` → display2 signs in on a secondary Firebase app; rules then require `request.auth.token.displayLocationId == resource.data.locationId` for answers and callee candidates. Needs **Service Account Token Creator** on the Functions runtime service account (owner IAM grant).
+
+### Do not “fix” first
+
+Public SDP (`suprstrLive` / sessions readable so Xibo can attach without login) is a kiosk tradeoff. Join tokens later. Do not put `?v=` on Xibo Display URLs.
+
+## Checklist
+
+- [ ] Satellite shell on search + preview
+- [ ] Live pointer is `{locationId}__secondary` for display2
+- [ ] Rebuild offer/answer on board drop **and** hung peer without full reload
+- [ ] Heartbeat + tab-close end + admin End live
+- [ ] TURN before declaring “Go live does nothing” a UI bug
+- [ ] `expiresAt` + duration enforced
+- [ ] Reliability on `origin/main` only when asked; Functions deploy when backend changed
+- [ ] `functions/suprstr-webrtc-reliability.test.js` still green
+
+Resume: `@supRstr$` / `$supRstr$`.

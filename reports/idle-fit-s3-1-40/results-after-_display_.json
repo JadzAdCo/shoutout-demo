@@ -1,0 +1,1050 @@
+[
+  {
+    "name": "display-default-64x32",
+    "url": "http://127.0.0.1:8765/display.html?preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Club",
+    "file": "after-display-default-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 42,
+          "runW": 292,
+          "runH": 34,
+          "rect": {
+            "x": 62,
+            "y": 44,
+            "w": 292,
+            "h": 34
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 42,
+          "runW": 87,
+          "runH": 34,
+          "rect": {
+            "x": 164,
+            "y": 94,
+            "w": 87,
+            "h": 34
+          }
+        }
+      ],
+      "fontSizes": [
+        42
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "42",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-64x48",
+    "url": "http://127.0.0.1:8765/display.html?preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Club",
+    "file": "after-display-default-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE / SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE",
+          "fontPx": 54,
+          "runW": 82,
+          "runH": 45,
+          "rect": {
+            "x": 167,
+            "y": 56,
+            "w": 82,
+            "h": 45
+          }
+        },
+        {
+          "text": "SHOUTOUT @",
+          "fontPx": 54,
+          "runW": 283,
+          "runH": 45,
+          "rect": {
+            "x": 67,
+            "y": 107,
+            "w": 283,
+            "h": 45
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 54,
+          "runW": 112,
+          "runH": 45,
+          "rect": {
+            "x": 152,
+            "y": 159,
+            "w": 112,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        54
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "54",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-96x48",
+    "url": "http://127.0.0.1:8765/display.html?preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Club",
+    "file": "after-display-default-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 66,
+          "runW": 457,
+          "runH": 55,
+          "rect": {
+            "x": 83,
+            "y": 64,
+            "w": 457,
+            "h": 55
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 66,
+          "runW": 137,
+          "runH": 55,
+          "rect": {
+            "x": 244,
+            "y": 141,
+            "w": 137,
+            "h": 55
+          }
+        }
+      ],
+      "fontSizes": [
+        66
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "66",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-default-xibo1080",
+    "url": "http://127.0.0.1:8765/display.html?preview=1",
+    "size": "xibo1080",
+    "venue": "Club",
+    "file": "after-display-default-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE / SHOUTOUT @ / CLUB",
+      "rows": [
+        {
+          "text": "USE",
+          "fontPx": 155,
+          "runW": 238,
+          "runH": 130,
+          "rect": {
+            "x": 841,
+            "y": 254,
+            "w": 238,
+            "h": 130
+          }
+        },
+        {
+          "text": "SHOUTOUT @",
+          "fontPx": 155,
+          "runW": 823,
+          "runH": 130,
+          "rect": {
+            "x": 548,
+            "y": 402,
+            "w": 823,
+            "h": 130
+          }
+        },
+        {
+          "text": "CLUB",
+          "fontPx": 155,
+          "runW": 326,
+          "runH": 130,
+          "rect": {
+            "x": 797,
+            "y": 550,
+            "w": 326,
+            "h": 130
+          }
+        }
+      ],
+      "fontSizes": [
+        155
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "155",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display-zebbies-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 37,
+          "runW": 257,
+          "runH": 30,
+          "rect": {
+            "x": 79,
+            "y": 46,
+            "w": 257,
+            "h": 30
+          }
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "fontPx": 37,
+          "runW": 293,
+          "runH": 30,
+          "rect": {
+            "x": 62,
+            "y": 96,
+            "w": 293,
+            "h": 30
+          }
+        }
+      ],
+      "fontSizes": [
+        37
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "37",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-64x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display-zebbies-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES / GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "ZEBBIES",
+          "fontPx": 45,
+          "runW": 144,
+          "runH": 38,
+          "rect": {
+            "x": 136,
+            "y": 111,
+            "w": 144,
+            "h": 38
+          }
+        },
+        {
+          "text": "GARDEN DC",
+          "fontPx": 45,
+          "runW": 202,
+          "runH": 38,
+          "rect": {
+            "x": 107,
+            "y": 163,
+            "w": 202,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-96x48",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display-zebbies-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 58,
+          "runW": 402,
+          "runH": 49,
+          "rect": {
+            "x": 111,
+            "y": 67,
+            "w": 402,
+            "h": 49
+          }
+        },
+        {
+          "text": "ZEBBIES GARDEN DC",
+          "fontPx": 58,
+          "runW": 457,
+          "runH": 49,
+          "rect": {
+            "x": 84,
+            "y": 145,
+            "w": 457,
+            "h": 49
+          }
+        }
+      ],
+      "fontSizes": [
+        58
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "58",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-zebbies-xibo1080",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display-zebbies-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES / GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "ZEBBIES",
+          "fontPx": 132,
+          "runW": 431,
+          "runH": 111,
+          "rect": {
+            "x": 745,
+            "y": 412,
+            "w": 431,
+            "h": 111
+          }
+        },
+        {
+          "text": "GARDEN DC",
+          "fontPx": 132,
+          "runW": 601,
+          "runH": 111,
+          "rect": {
+            "x": 660,
+            "y": 560,
+            "w": 601,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "after-display-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 35,
+          "runW": 243,
+          "runH": 28,
+          "rect": {
+            "x": 86,
+            "y": 38,
+            "w": 243,
+            "h": 28
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 35,
+          "runW": 80,
+          "runH": 28,
+          "rect": {
+            "x": 168,
+            "y": 71,
+            "w": 80,
+            "h": 28
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 35,
+          "runW": 236,
+          "runH": 28,
+          "rect": {
+            "x": 90,
+            "y": 105,
+            "w": 236,
+            "h": 28
+          }
+        }
+      ],
+      "fontSizes": [
+        35
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "35",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-64x48",
+    "url": "http://127.0.0.1:8765/display.html?location=heist-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Heist Washington DC",
+    "file": "after-display-heist-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 45,
+          "runW": 103,
+          "runH": 38,
+          "rect": {
+            "x": 157,
+            "y": 111,
+            "w": 103,
+            "h": 38
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 45,
+          "runW": 303,
+          "runH": 38,
+          "rect": {
+            "x": 57,
+            "y": 163,
+            "w": 303,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-96x48",
+    "url": "http://127.0.0.1:8765/display.html?location=heist-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Heist Washington DC",
+    "file": "after-display-heist-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 54,
+          "runW": 374,
+          "runH": 45,
+          "rect": {
+            "x": 125,
+            "y": 56,
+            "w": 374,
+            "h": 45
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 54,
+          "runW": 124,
+          "runH": 45,
+          "rect": {
+            "x": 250,
+            "y": 107,
+            "w": 124,
+            "h": 45
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 54,
+          "runW": 363,
+          "runH": 45,
+          "rect": {
+            "x": 130,
+            "y": 159,
+            "w": 363,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        54
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "54",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-xibo1080",
+    "url": "http://127.0.0.1:8765/display.html?location=heist-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Heist Washington DC",
+    "file": "after-display-heist-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 132,
+          "runW": 307,
+          "runH": 111,
+          "rect": {
+            "x": 806,
+            "y": 412,
+            "w": 307,
+            "h": 111
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 132,
+          "runW": 902,
+          "runH": 111,
+          "rect": {
+            "x": 509,
+            "y": 560,
+            "w": 902,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=temp-democlub-1&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Aurelia (Demo Club)",
+    "file": "after-display-aurelia-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 34,
+          "runW": 237,
+          "runH": 27,
+          "rect": {
+            "x": 90,
+            "y": 47,
+            "w": 237,
+            "h": 27
+          }
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "fontPx": 34,
+          "runW": 294,
+          "runH": 27,
+          "rect": {
+            "x": 61,
+            "y": 97,
+            "w": 294,
+            "h": 27
+          }
+        }
+      ],
+      "fontSizes": [
+        34
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "34",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-64x48",
+    "url": "http://127.0.0.1:8765/display.html?location=temp-democlub-1&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "after-display-aurelia-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA / (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 45,
+          "runW": 312,
+          "runH": 38,
+          "rect": {
+            "x": 52,
+            "y": 59,
+            "w": 312,
+            "h": 38
+          }
+        },
+        {
+          "text": "AURELIA",
+          "fontPx": 45,
+          "runW": 146,
+          "runH": 38,
+          "rect": {
+            "x": 135,
+            "y": 111,
+            "w": 146,
+            "h": 38
+          }
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "fontPx": 45,
+          "runW": 233,
+          "runH": 38,
+          "rect": {
+            "x": 91,
+            "y": 163,
+            "w": 233,
+            "h": 38
+          }
+        }
+      ],
+      "fontSizes": [
+        45
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "45",
+      "main": {
+        "w": 360,
+        "h": 191
+      },
+      "host": {
+        "w": 313,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-96x48",
+    "url": "http://127.0.0.1:8765/display.html?location=temp-democlub-1&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Aurelia (Demo Club)",
+    "file": "after-display-aurelia-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 53,
+          "runW": 367,
+          "runH": 45,
+          "rect": {
+            "x": 128,
+            "y": 69,
+            "w": 367,
+            "h": 45
+          }
+        },
+        {
+          "text": "AURELIA (DEMO CLUB)",
+          "fontPx": 53,
+          "runW": 457,
+          "runH": 45,
+          "rect": {
+            "x": 84,
+            "y": 147,
+            "w": 457,
+            "h": 45
+          }
+        }
+      ],
+      "fontSizes": [
+        53
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "53",
+      "main": {
+        "w": 520,
+        "h": 191
+      },
+      "host": {
+        "w": 460,
+        "h": 155
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-aurelia-xibo1080",
+    "url": "http://127.0.0.1:8765/display.html?location=temp-democlub-1&preview=1",
+    "size": "xibo1080",
+    "venue": "Aurelia (Demo Club)",
+    "file": "after-display-aurelia-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-96x48",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / AURELIA / (DEMO CLUB)",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 132,
+          "runW": 929,
+          "runH": 111,
+          "rect": {
+            "x": 495,
+            "y": 264,
+            "w": 929,
+            "h": 111
+          }
+        },
+        {
+          "text": "AURELIA",
+          "fontPx": 132,
+          "runW": 437,
+          "runH": 111,
+          "rect": {
+            "x": 741,
+            "y": 412,
+            "w": 437,
+            "h": 111
+          }
+        },
+        {
+          "text": "(DEMO CLUB)",
+          "fontPx": 132,
+          "runW": 695,
+          "runH": 111,
+          "rect": {
+            "x": 612,
+            "y": 560,
+            "w": 695,
+            "h": 111
+          }
+        }
+      ],
+      "fontSizes": [
+        132
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "132",
+      "main": {
+        "w": 1059,
+        "h": 536
+      },
+      "host": {
+        "w": 931,
+        "h": 444
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

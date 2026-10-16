@@ -1,0 +1,43 @@
+---
+description: OPEN WORK — VIP / Table Reservations translation is INCOMPLETE by design (beta, English only). Two-tier follow-up prompt; blocks taking vipReservations Live.
+alwaysApply: true
+---
+
+# VIP ReserV translation — INCOMPLETE (open work)
+
+Resume: `@vip-i18n$` / `$vip-translate$`. Design: `.cursor/rules/design-notes-vip-reservations.mdc`, proposal `reports/vip-reservations-proposal.md` §16. Owner brand (Oct 16 2026): **VIP ReserV**.
+
+## State (Oct 15–16 2026)
+
+| Piece | State |
+|---|---|
+| Feature | PROPOSAL — not built. When built, it ships as a **beta** (`vipReservations`, `IsTestFeature=1`) branded **VIP ReserV**, in **English only** |
+| Chrome keys | Must be created as `vip.*` / `legalDocs.*` keys from the first build (no hardcoded strings), English values only |
+| Help | English only until this rule is closed; every owner decision still needs FloqAi/help ids before that surface goes Live (see design-notes) |
+| Legal Terms text | English only; other languages need counsel-approved versions |
+
+## Why it is INCOMPLETE (owner principle 19: translation is LAST)
+
+1. **Beta copy is still changing** — translating it now means translating it twice.
+2. **Legal Terms / refund / no-show text must be lawyer-approved per language** — machine translation is not acceptable for patron-facing legal terms; each language is its own `legalDocuments` version approved by counsel.
+3. **Brand protections** — ShoutOut, FloqR, FloqAi, FloqMedia, BartR, Mingl, RydR, supRstar, SupRstR, DonPapi, Stripe, Google, Microsoft, Facebook, WhatsApp, SMS, OTP, and **VIP ReserV** stay untranslated (owner spelling; never localize the brand).
+4. **11 languages required** by `floqr-translation.mdc`: `en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar` (Arabic needs RTL checks on the floor map, list view and door screen).
+
+Until this rule is closed, `vipReservations` must **not** go Live (`IsTestFeature` stays 1). This is the only exception to the "no English-only help" rule, and it applies only while the feature is a beta behind the flag.
+
+## Follow-up prompt (run after the beta is stable and the owner says translate)
+
+```
+Translate VIP ReserV in two tiers, per floqr-translation.mdc.
+Tier A — patrons: Search VIP ReserV tile + Beta pill, vip.html (venue picker, nights, floor map + list view, section sheet, party size, hold countdown, consent checkboxes chrome, checkout hand-off, confirmation), My Profile Reservations tab, Inbox/email/SMS confirmation + reminder templates, QR pass page, patron help (help-vip-book-table, help-vip-floor-map, help-vip-terms-consent, help-vip-cancel-refund, help-vip-door-pass, help-vip-deposit-settings, help-vip-reserv-brand) + FloqAi intents.
+Tier B — club admins, venue/event admins, promoters, VIP Managers, counsel: Club Admin VIP ReserV tab (Subscription, Floor plans, Nights & pricing, Terms & policies, Team, Promoters, Reservations, Website & API, Activity), Master Admin F&S VIP ReserV management, vip-door.html, promoter-admin VIP tab, legal-docs.html, their help ids.
+Rules: every new English key filled in all 11 packs (CHROME key counts equal), every patron / venueAdmin / serviceMember help id in floqr-i18n-help.js for de fr es it pt ru el pl nl ar, brands untranslated (incl. VIP ReserV), cache-bust floqr-i18n.js + floqr-i18n-help.js, node scripts/i18n-coverage-report.js exits 0, functions/i18n-coverage.test.js green. Do NOT machine-translate venue Terms / refund / no-show policies — show the counsel-approved language version, or the English version with a "Terms available in English only" notice until counsel approves one. Check RTL (ar) on the floor map, list view and door screen. Then update this rule to Done (or delete it) and record it in design-notes-vip-reservations.mdc.
+```
+
+## Close-out checklist
+
+- [ ] Tier A complete in all 11 languages
+- [ ] Tier B complete in all 11 languages
+- [ ] Counsel-approved Terms available (or English-only notice) per language
+- [ ] i18n gate exits 0; RTL checked
+- [ ] Owner approves Live → this rule deleted or marked Done

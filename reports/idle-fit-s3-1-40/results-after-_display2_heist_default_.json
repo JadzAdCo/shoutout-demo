@@ -1,0 +1,474 @@
+[
+  {
+    "name": "display2-default-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Club",
+    "file": "after-display2-default-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 100
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 96,
+          "bottom": 128,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 28,
+          "scrollW": 340,
+          "clientW": 340,
+          "top": 136,
+          "bottom": 167,
+          "left": 38,
+          "right": 378
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 181,
+          "bottom": 197,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-64x48",
+    "url": "http://127.0.0.1:8765/display2.html?preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Club",
+    "file": "after-display2-default-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 100
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 158,
+          "bottom": 190,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 28,
+          "scrollW": 340,
+          "clientW": 340,
+          "top": 198,
+          "bottom": 229,
+          "left": 38,
+          "right": 378
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 243,
+          "bottom": 259,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-96x48",
+    "url": "http://127.0.0.1:8765/display2.html?preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Club",
+    "file": "after-display2-default-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 110
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 154,
+          "bottom": 190,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 32.448,
+          "scrollW": 394,
+          "clientW": 394,
+          "top": 198,
+          "bottom": 234,
+          "left": 115,
+          "right": 509
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 248,
+          "bottom": 264,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-default-xibo1080",
+    "url": "http://127.0.0.1:8765/display2.html?preview=1",
+    "size": "xibo1080",
+    "venue": "Club",
+    "file": "after-display2-default-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 213
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 603,
+          "bottom": 674,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Club",
+          "fontPx": 64,
+          "scrollW": 777,
+          "clientW": 777,
+          "top": 690,
+          "bottom": 762,
+          "left": 571,
+          "right": 1349
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 791,
+          "bottom": 816,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-64x32",
+    "url": "http://127.0.0.1:8765/display2.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "after-display2-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 132
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 96,
+          "bottom": 128,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 28,
+          "scrollW": 391,
+          "clientW": 391,
+          "top": 136,
+          "bottom": 198,
+          "left": 12,
+          "right": 404
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 212,
+          "bottom": 228,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-64x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=heist-washington-dc&preview=1&screen=led-64x48",
+    "size": "64x48",
+    "venue": "Heist Washington DC",
+    "file": "after-display2-heist-64x48.png",
+    "measure": {
+      "viewport": "416x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 391,
+        "h": 132
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 28,
+          "scrollW": 309,
+          "clientW": 309,
+          "top": 143,
+          "bottom": 174,
+          "left": 53,
+          "right": 363
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 28,
+          "scrollW": 391,
+          "clientW": 391,
+          "top": 182,
+          "bottom": 245,
+          "left": 12,
+          "right": 404
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 259,
+          "bottom": 275,
+          "left": 79,
+          "right": 337
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-96x48",
+    "url": "http://127.0.0.1:8765/display2.html?location=heist-washington-dc&preview=1&screen=led-96x48",
+    "size": "96x48",
+    "venue": "Heist Washington DC",
+    "file": "after-display2-heist-96x48.png",
+    "measure": {
+      "viewport": "624x312",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-96x48",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 587,
+        "h": 147
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 32.448,
+          "scrollW": 358,
+          "clientW": 358,
+          "top": 135,
+          "bottom": 172,
+          "left": 133,
+          "right": 491
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 32.448,
+          "scrollW": 587,
+          "clientW": 587,
+          "top": 180,
+          "bottom": 252,
+          "left": 19,
+          "right": 605
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 14,
+          "scrollW": 258,
+          "clientW": 258,
+          "top": 266,
+          "bottom": 282,
+          "left": 183,
+          "right": 441
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display2-heist-xibo1080",
+    "url": "http://127.0.0.1:8765/display2.html?location=heist-washington-dc&preview=1",
+    "size": "xibo1080",
+    "venue": "Heist Washington DC",
+    "file": "after-display2-heist-xibo1080.png",
+    "measure": {
+      "viewport": "1920x1080",
+      "canvasClass": "display-canvas display-board-secondary suprstar-idle-canvas",
+      "format": "led-64x32",
+      "idleClass": false,
+      "text": "",
+      "rows": [],
+      "fontSizes": [],
+      "uniform": false,
+      "insideSafe": true,
+      "idleFitPx": null,
+      "main": {
+        "w": 900,
+        "h": 285
+      },
+      "host": null,
+      "suprstar": [
+        {
+          "text": "Awaiting live Feed.",
+          "fontPx": 64,
+          "scrollW": 706,
+          "clientW": 706,
+          "top": 567,
+          "bottom": 639,
+          "left": 607,
+          "right": 1313
+        },
+        {
+          "text": "Be a SupRstar @ Heist Washington DC",
+          "fontPx": 64,
+          "scrollW": 900,
+          "clientW": 900,
+          "top": 655,
+          "bottom": 798,
+          "left": 510,
+          "right": 1410
+        },
+        {
+          "text": "Idle board · no guest is live right now",
+          "fontPx": 22,
+          "scrollW": 405,
+          "clientW": 405,
+          "top": 827,
+          "bottom": 851,
+          "left": 757,
+          "right": 1163
+        }
+      ],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

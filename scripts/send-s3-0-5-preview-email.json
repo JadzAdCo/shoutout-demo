@@ -1,0 +1,14 @@
+{
+  "to": "bans.don@gmail.com",
+  "package": "s3.0.5",
+  "v": "s3.0.5",
+  "note": "FLOQR s3.0.5 (stable) — test now.\n\nLanguage Settings report, satellite chrome, and the profile menu follow App language. From Club Admin / Master Admin, patron links open in a new tab and an in-app notice says: A new tab / new window is opening. The admin portal will stay open on this browser session. Please hold.\n\nHard-refresh patron-portal.html?v=s3.0.5&tab=language and admin.html?v=s3.0.5&location=temp-democlub-1\n\nPages SHA bda8e70. Functions CI green. No Functions deploy (Pages-only).\nXibo stays display.html?location=temp-democlub-1 (no ?v= or ?screen=).",
+  "links": [
+    {"label": "Patron Search s3.0.5", "url": "https://jadzadco.github.io/shoutout-demo/?v=s3.0.5&start=search"},
+    {"label": "Language Settings report", "url": "https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=s3.0.5&tab=language"},
+    {"label": "Club Admin Aurelia profile menu", "url": "https://jadzadco.github.io/shoutout-demo/admin.html?v=s3.0.5&location=temp-democlub-1"},
+    {"label": "Master Admin", "url": "https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.0.5"},
+    {"label": "BartR", "url": "https://jadzadco.github.io/shoutout-demo/commerce.html?v=s3.0.5&from=search"},
+    {"label": "Aurelia display.html (Xibo, no screen query)", "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1"}
+  ]
+}

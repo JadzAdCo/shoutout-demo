@@ -1,0 +1,1403 @@
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> floqr-ai-functions@3.1.36 test
+> node --test feature-services-core.test.js stripe-connect-core.test.js firestore-rules.test.js commerce-invariants.test.js recommendation-library.test.js auth-entry-ui.test.js payment-service.test.js app-logging.test.js discovery-crawl.test.js messaging-core.test.js scheduling-core.test.js venue-ingest-core.test.js receipt-delivery.test.js assignment-card.test.js sos2fa-core.test.js mail-log.test.js twilio-log.test.js suprstr-webrtc-reliability.test.js floqr-demo-accounts.test.js shoutout-compliance.test.js place-i18n.test.js ad-campaigns-business.test.js ad-core.test.js lang-save-preview.test.js privacy-compliance.test.js i18n-coverage.test.js floqr-venue-query.test.js floqr-geo-search.test.js venue-geocode-core.test.js whatsapp-otp-core.test.js welcome-signin-layout.test.js search-ad-house-card.test.js football-intro-venues.test.js temp-qa-showcase.test.js entity-link-output.test.js recommendation-help.test.js featured-staff-picker.test.js staff-marketing-consent.test.js search-shoutout-entry.test.js template-discovery-idle.test.js heist-template-availability.test.js heist-name-shoutout.test.js template-preview-tags.test.js employee-network.test.js club-public-feed.test.js floqai-page.test.js data-classification.test.js rules-tightening.test.js rules-tightening-stage-2-3.test.js seed-and-storage-lockdown.test.js display-text-fit.test.js board-fit.test.js security-phase0.test.js security-phase1-rules.test.js master-admin-claim-ui.test.js sos2fa-master-admin.test.js master-admin-audit-hero-help.test.js feature-links-reason-prompt.test.js demo-signin.test.js mail-log-redaction.test.js app-version-sync.test.js twilio-log-redaction.test.js scheduling-owner-picker.test.js scheduling-assignee-picker.test.js session-hint-hero-help.test.js
+
+✔ ad pricing packages match DOOH-informed Inline $45 and Mingl Gist $25 (28.5073ms)
+✔ patron portal and Club Admin mount the shared server-backed ad composer (41.4195ms)
+✔ master admin Ad Management tab group wires queue, live, stats, intake and settings (31.2639ms)
+✔ ad campaign form serializers build datapoints and required groups from plain fields (86.5764ms)
+✔ ad rules are server-only: no client can create, edit or activate an ad (7.6728ms)
+✔ search splash rotates a real campaign again and records measured impressions (55.108ms)
+✔ rotation serves only approved Firestore ads and honours age, gender and settings (18.8678ms)
+✔ pricing table covers both placements and every run length (10.0715ms)
+✔ client pricing mirror matches the server price table (13.946ms)
+✔ mp4 / mov duration parser reads mvhd v0 and v1, moov first or last (7.0977ms)
+✔ inspectAdMedia enforces the 30 second video cap (8.366ms)
+✔ validateCampaignInput requires headline, media and https links (20.1973ms)
+✔ approval requires payment unless waived (1.208ms)
+✔ flight starts today or later and lasts runDays (7.7778ms)
+✔ poster identities cover clubs, delegates, groups and service roles (40.8309ms)
+✔ intake commands and Twilio signatures (23.7123ms)
+✔ invoice lines include number, total and approval note (4.4065ms)
+✔ demographics become scorer match tags (1.9628ms)
+✔ client logger persists structured appLogs events (11.4944ms)
+✔ master admin logging tab can inspect logs and clear unpaid checkouts (18.4949ms)
+✔ paid shoutout submit checks club checkout readiness before media upload (22.6022ms)
+✔ commerce functions expose readiness and unpaid checkout cleanup (9.963ms)
+✔ firestore rules allow signed-in create and master read of appLogs (13.4959ms)
+✔ FLOQRNav.appVersion equals the package version (bump floqr-nav.js with functions/package.json) (31.474ms)
+✔ README CURRENT PACKAGE matches functions/package.json (11.4478ms)
+✖ generated links stamp the current package; Display boards stay location-only (14.9772ms)
+✔ link builders never hardcode a package: no ?v=<version> literal and no stale version fallback (16.6368ms)
+✖ FloqAi help links stamp FLOQRNav.appVersion, and carry no version at all when nav is missing (162.3827ms)
+✖ FloqAi links always open with ?v=<package> — never ?&, v=& or an empty v; Display boards get no v (235.8539ms)
+✔ an empty FLOQRNav.appVersion never mints ?&from=floqai or v= (559.9377ms)
+✔ app link stampers take v from FLOQRNav, never a hardcoded package (27.9613ms)
+✔ pages load floqr-nav.js before the FloqAi link builders (273.9765ms)
+✔ static hub links in HTML (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) use the current package (182.9843ms)
+✔ every page that loads floqr-nav.js cache-busts it with the current package (143.1211ms)
+✔ AssignmentCard uses one geometry and written status for every state (442.6201ms)
+✔ email sign-in matches the Facebook color and exposes a selected confirmation (64.1952ms)
+✔ email verification explicitly prompts for the eight-character code (4.7623ms)
+✔ satellite pages inherit FLOQR session via FLOQRSessionShell (58.3674ms)
+✔ main message typing preserves spaces instead of live-fitting on every keystroke (13.935ms)
+✖ venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29.09 or page ?v= (27.4046ms)
+✔ SOS2FA request UI is channel-neutral and puts status below the request button (11.7367ms)
+✔ Master Admin global back stays on NIC, not patron Search (30.4395ms)
+✔ Master Admin Entity Management defaults to Manage Entities and resumes deep links after auth (17.809ms)
+✔ App language chrome keys cover portal tabs and language settings radios (121.2884ms)
+✔ club approve keeps shoutout docs for Completed history (21.1438ms)
+✔ paid receipt deep links open My ShoutOuts in the patron portal (8.0315ms)
+✔ production pages load floqr-i18n and the profile status card is translated (34.1694ms)
+✔ A: Firestore board size wins over packaged shared-data values (29.5023ms)
+✔ A: packaged values only fill gaps (43.0116ms)
+✔ B: only approved/live ShoutOuts with copy or media render (7.9108ms)
+✔ B: expiry fallback chain (20.9808ms)
+✔ E: packWordsWithoutSplitting never splits or drops a word and fits maxRows (8.9568ms)
+✔ E: shrinkFactor keeps size when it fits inside the safe margin (2.5536ms)
+✔ preview: native board pixel sizes and centered scale (6.8716ms)
+✔ display-app wires board fit, live gate and Firestore-first venue merge (10.2452ms)
+✔ C stays untouched: classicFitStyle compact 64x32 sizing (38.1288ms)
+✔ display pages load board fit before display-app; Xibo URLs carry no ?v= (23.8142ms)
+✔ preview frames use the board frame helper (35.1454ms)
+✔ server photo signature matches the Club Admin consent signature (17.8017ms)
+✔ staff photos only publish when consent covers the current photos (12.242ms)
+✔ feed honours Public page controls and publish flag (15.9002ms)
+✔ profile reads the fields Club Admin actually saves (43.9304ms)
+✔ events: upcoming only, sorted, hidden statuses dropped, RSS escapes (13.4908ms)
+✔ gallery skips main/logo slots, non-https and duplicates (3.5152ms)
+✔ feed handler + Club Admin card + public iframe are wired (19.2084ms)
+✔ Checkout keeps dynamic payment methods and trusted Accounts v2 recipients (11.1462ms)
+✔ Commerce inventory is reserved before Checkout and released safely (2.1582ms)
+✔ refund and dispute webhook events create operational review state (2.3737ms)
+✔ browser code cannot supply connected-account IDs (1.9323ms)
+✔ Zebbies football intro is four-photo, 20-second, and server-priced at 30 dollars (18.4052ms)
+✔ Traditional Black and White keeps a global fixed identity rail (14.7745ms)
+✔ Soccer jersey mark accepts any 2 characters (8.8059ms)
+✔ Heist identity rail cycles optional handle then brand lines for 3s each (2.8906ms)
+✔ SMS and WhatsApp checkout fulfillment persist club subscription flags (2.5269ms)
+✔ all published templates have display-aware text contracts (242.7209ms)
+✔ screen datapoints are Firebase 0|1 flags and filter templates by venue overlap (258.4594ms)
+✔ Heist Washington DC defaults Display 1 to the 96x48 board; Display 2 stays 64x32 (122.3779ms)
+✔ birthday split-media loops on 64x48/64x32 and AssignmentCards spell status (8.4333ms)
+✔ every collection in firestore.rules is classified (including nested subcollections) (96.8257ms)
+✔ every catalog row carries the full datapoint set (6.7676ms)
+✔ served client module is byte-identical to the server core (2.7616ms)
+✔ System tier is server-only and cannot be switched off (4.9943ms)
+✔ System jobs are least-privilege: allowlisted collections only, each with a purpose (5.9168ms)
+✔ resolveViewerRole maps server facts to tiers (27.5013ms)
+✔ FloqAi filter matrix: each tier sees exactly its classified content (9.9209ms)
+✔ FloqAi fails closed on unclassified, malformed, or unknown ids (3.9695ms)
+✔ every FloqAi help entry and intent is classified, and the server manifest matches the source (235.223ms)
+✔ translated help inherits its source entry's classification (182.6575ms)
+✔ intent-search.js classifies every curated intent and has no default-audience fallback (34.5803ms)
+✔ getFloqAiAccess resolves the tier server-side, keeps the floqAi feature guard, and logs restricted denials (4.1308ms)
+✔ rules lock the register, throttles, and consent evidence to server writes (30.1579ms)
+✔ marketing media consent is restricted, own-record readable, and readable by the affiliated club's admins (1.9183ms)
+✔ rules parser and exposure report (5.3477ms)
+✔ Master Admin Security → Data classification panel is wired and SOS2FA-gated (15.6998ms)
+✔ Save all validates every row and needs a reason (7.57ms)
+✔ Save all plans: creates never-saved rows, writes only changed saved rows, fits one transaction (21.3514ms)
+✔ review guidance flags owner judgment and rules gaps; status follows save state (7.1947ms)
+✔ fix list groups the live exposure report by kind of gap (51.0374ms)
+✔ saveAllDataClassifications is SOS2FA-gated, chained in one transaction, and the panel has one Save all button (55.4494ms)
+✔ demo gate accepts only temp_<role>_<n>@floqr-demo.com with a reason of 8+ characters (30.0044ms)
+✔ challenge id is sha256(email) hex — the same id the Welcome card derives (6.2637ms)
+✔ admin-issued challenge has the requestEmailOtp shape plus audit-only extras (8.6183ms)
+✔ verifyEmailOtp's attempt logic accepts the issued code once and locks after 5 wrong tries (6.9479ms)
+✔ a live admin-issued code blocks a Welcome-card resend; used, locked, expired or normal codes do not (2.5087ms)
+✔ mail log row records the issue without a code or body (3.1418ms)
+✔ issueDemoSignInCode: Master Admin + SOS2FA first, demo-only gate, same challenge record, chained audit, code never logged (5.6633ms)
+✔ requestEmailOtp writes the shared record and will not overwrite a live admin-issued code (4.5856ms)
+✔ verifyEmailOtp is unchanged: attempt count commits before any throw (s3.1.26) (11.2312ms)
+✔ Welcome card: I already have a code verifies without sending email (27.7013ms)
+✔ Welcome-card code strings exist in all 11 chrome packs (58.9359ms)
+✔ Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help beside the heading (28.2948ms)
+✔ demo employee tab: SOS2FA before data, reason prompt before the callable, no code kept (4.0586ms)
+✔ demo employee roster: 80 packaged accounts, Firestore profiles merge in, search filters name/email/role/club (133.4746ms)
+✔ Demo Svc / Emp Mgmt tab label exists in all 11 chrome packs (45.6382ms)
+✖ old demo-signin.html redirects to the Master Admin tab (57.0885ms)
+✔ FloqAi help entry is Master Admin only and classified (203.4087ms)
+✔ mass onboard UI selects ready discovery cards only (26.2676ms)
+✔ runInstantDiscoveryCrawl export and contact lift helpers exist (43.7534ms)
+✔ runFloqrDiscoveryCrawl export exists in ai-discovery-functions (7.4715ms)
+✔ requiredDatapoints include artistsOrDjs or DJ in ai-discovery-service (2.867ms)
+✔ master-admin refined discovery search UI copy (28.9679ms)
+✔ runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud without placeholders (15.093ms)
+✔ discovery review UX is form-first with Needs research (7.4908ms)
+✔ social handle extraction reads footer hrefs (66.4629ms)
+✔ Gate Club Paris prefers venue Instagram over photographer credits (82.0637ms)
+✔ Buddha-Bar Monte-Carlo brand page supplies venue email (34.8054ms)
+✔ aggregator listing prefers official brand domain contacts (58.1173ms)
+✔ discovery crawl enriches website socials and stamps collectedAt (11.6208ms)
+✔ master admin discovery queue has country tabs and collected label (42.6202ms)
+✔ discovery Firestore rules require Master Admin writes (15.0915ms)
+✔ display packs all words and exposes fitDisplayMessageLines (37.681ms)
+✔ canonical display catalog is three P1.56 sizes (7.0964ms)
+✔ Master Admin onboarding no longer lists six pitch choices (9.735ms)
+✔ Christine soft caps remain 3×16 / 48 on 64×48 (4.7323ms)
+✔ roster keeps only people linked to the open club (23.9059ms)
+✔ CSR count ignores elected/approved rows that were never made CSR (9.4455ms)
+✔ elect candidates need 2+ letters, match name/username/email, and flag club links (40.6313ms)
+✔ each pending request is its own row; closed and duplicate rows are hidden (8.633ms)
+✔ hasMadeElectionRequest gates the electedRequestMadeTo duplicate check (8.0596ms)
+✔ both request forms block repeats and record the venue names (38.3471ms)
+✔ Approve survives the patron-only users rule and reports the result in the card (38.5472ms)
+✔ Club Admin panel uses the club roster and a select + confirm election (12.5476ms)
+✔ Entity Management venue links open a copyable output panel instead of navigating (14.3933ms)
+✔ Xibo Diag links use display-error.html per board with no cache-bust (9.0415ms)
+✔ Application access switch explains itself and the link panel is responsive (6.8422ms)
+✔ tel: and mailto: links stay links without underline on every styles.css page (6.6143ms)
+✔ club profile labels the FloqR handle as the Mingl handle (3.0813ms)
+✔ Papi's ClubTech 64x48 busboy and Maya VIP room photos are wired and shipped (65.4908ms)
+✔ club profile page has no mojibake punctuation (9.6935ms)
+✔ server derives enableFeatureLink / enableBetaFeatureLink from the two flags (49.8011ms)
+✔ linkFieldsDrifted flags missing or mismatched link fields only (2.2176ms)
+✔ link fields are written only by the server, in the same transaction as the flags (19.0772ms)
+✔ client derives link fields when a stored doc predates s3.1.30 (15.4317ms)
+✔ linkState matrix: off / test granted / test non-tester / test master / live (22.4057ms)
+✔ every feature link surface goes through linkState (38.5595ms)
+✔ Features & Services table: plain-language headers, Revision N, link inside the Feature cell (10.986ms)
+✔ reason is asked after Save in the shared prompt — no standing input, no window.prompt (17.0319ms)
+✔ reason prompt copy exists in every chrome language (41.8843ms)
+✔ help and rules document the s3.1.30 contract (10.5575ms)
+✔ only ShoutOut is live by default; every other feature is test-only (18.6145ms)
+✔ client catalog mirrors the server catalog (keys, routes, defaults) (16.3173ms)
+✔ feature state: IsFeatureEnabled=0 is off even when IsTestFeature=1 (1.1229ms)
+✔ page/server access: off for everyone; test for Master Admins + granted beta testers; live for all (22.477ms)
+✔ Search tile: Master Admins never see test tiles; only granted beta testers do (15.6482ms)
+✔ beta grants are per feature, only for active testers, never ShoutOut (28.9678ms)
+✔ beta feature choices are validated (9.6195ms)
+✔ beta tester status requires IsBetaTester=1 and status active (1.145ms)
+✔ flag changes are validated and need a reason (6.1989ms)
+✔ invite tokens are unguessable, hashed at rest, and bound to one account (9.8483ms)
+✔ audit records carry AU-3 content and privacy-safe source data (8.3803ms)
+✔ hash chain verifies and detects edits, deletions, and reordering (13.2023ms)
+✔ firestore rules: feature collections are server-write-only and superAdmin is protected (6.3981ms)
+✔ Search tiles: ShoutOut visible, every other feature hidden until Features & Services allows it (19.803ms)
+✔ test-feature satellite pages are guarded (17.0946ms)
+✖ signed-out visitors on a forwarded page go to the general sign-in, then back (23.6598ms)
+✔ server enforces feature access on checkout and robotaxi (15.3297ms)
+✔ Master Admins cannot become beta testers; feature grants and denials are logged (5.4823ms)
+✔ Master Admin Features & Services tab is SOS2FA gated (10.8665ms)
+✔ in-app ad splash: 5 second loading message, no countdown or Skip (15.8125ms)
+✔ photo options are the staff member's own https images only, de-duplicated, no videos (34.4774ms)
+✔ rows list featured people first (checked) then the rest of the roster (unchecked) (14.9816ms)
+✔ draft overrides tick, role and photo; uploads join the photo list (17.9259ms)
+✔ saving keeps the original entry shape and extra fields; unticking removes the person (12.4783ms)
+✔ Club Admin uses the checkbox picker, not a URL text box, for featured staff (14.4807ms)
+✔ photo consent is needed when published staff photos are new or changed (2.5529ms)
+✔ Club Admin shows the photo consent notice and blocks saving photos without it (34.6585ms)
+✔ club profile page still renders featuredStaff unchanged (2.6485ms)
+✔ Firestore rules have balanced braces (92.7942ms)
+✔ Stripe bindings and webhook claims are backend-only (3.1387ms)
+✔ service orders cannot be created or deleted by browser clients (4.9757ms)
+✔ browser-created ShoutOuts use the reviewed Black and White display limits (1.7997ms)
+✔ commerce products use seller-scoped creation and updates (1.6875ms)
+✔ identity and club updates preserve backend Stripe fields (4.5913ms)
+✔ platformSettings feature gates are Master Admin write / public read (1.4276ms)
+✔ recommendation moderation is Master Admin controlled (1.736ms)
+✔ shared template writes require Master Admin access (1.0606ms)
+✖ FloqAi has its own page and every entry point goes there (29.2661ms)
+✔ FloqAi page is a guarded satellite with audience-filtered search (40.0014ms)
+✔ FloqAi page chrome is localized (8.0463ms)
+▶ floqr-demo-accounts
+  ✔ accepts seeded temp QA emails (6.3268ms)
+  ✔ rejects literal N and other broken demo shapes (2.9013ms)
+  ✔ redirects demo OTP delivery to the operator inbox (1.3254ms)
+  ✔ does not redirect normal patron emails (1.0439ms)
+✔ floqr-demo-accounts (24.8304ms)
+✔ nearest first, same city ties go A→Z, unknown coordinates last (125.5288ms)
+✔ stored Google coordinates beat the city table, so new cities need no code (4.0434ms)
+✔ without a user location the list is alphabetical (7.535ms)
+✔ Clubs in Monaco: filtered list still orders closest to the user, then by name (2.5307ms)
+✔ sortNearest does not mutate the input (3.0398ms)
+✔ GPS wins when allowed (26.1424ms)
+✔ denied GPS falls back to IP estimate without storing the IP address (11.2979ms)
+✔ no GPS and no IP falls back to the profile city, then unknown (5.7967ms)
+✔ slow GPS permission resolves to IP now and reports the late fix (61.2477ms)
+✔ IP provider can be disabled (2.3127ms)
+✔ index loads floqr-geo-search before ai-location-service and patron-app (3.3803ms)
+✔ patron listings sort nearest first and re-sort when GPS arrives late (10.0149ms)
+✔ Hip Hop Clubs in DC parses type, genre, and place (21.1702ms)
+✔ EDM Events in New York parses events + EDM + New York (5.2568ms)
+✔ beach club spellings all resolve to beach-clubs (3.0278ms)
+✔ lounge-club spellings beat plain lounge / club (1.5729ms)
+✔ lounge and club alternates (7.5353ms)
+✔ event alternates and events win over a venue word (2.5351ms)
+✔ where the search is typed decides the type when the query has none (1.9416ms)
+✔ Miami Beach is a place, not a beach club (1.4755ms)
+✔ unknown city after 'in' becomes a free-text place (3.3763ms)
+✔ R&B and hip-hop genre spellings (2.6103ms)
+✔ compound genre+type words and localized placeholders parse (7.4942ms)
+✔ residual keeps venue names; day words go to when (9.5825ms)
+✔ matchesFilters checks genres and place on records (10.1033ms)
+✔ isVenueQuery separates venue searches from help questions (9.0798ms)
+✔ typeLabel uses translations when present (12.2248ms)
+✔ word list covers every Search-for category (3.4757ms)
+✔ index.html wires the stationary FloqAi category search (5.6275ms)
+✔ category page has no Search for heading and no venue-type tiles (7.2669ms)
+✔ near me in every language means the user's location, not a place (4.3756ms)
+✔ an explicit place wins over near me; Monaco is a known place (13.5601ms)
+✔ chrome pack carries the FloqAi category dialog copy (29.9463ms)
+✔ Football Intro is offered at Zebbies, Heist Washington DC and Aurelia only (157.1102ms)
+✔ Football Intro and Tengo muchos dólares play on 96x48 displays only (87.2498ms)
+✔ checkout accepts the three venues and keeps the requested club on the order (8.3472ms)
+✔ composer and board brand the Football Intro headline with the venue (11.1754ms)
+✔ Tengo muchos dólares takes only a name and types the heist line (170.7622ms)
+✔ name suggestions put the patron's own handles first and fold accents and @ (154.8241ms)
+✔ composer shows one name field with autocomplete for name-only templates (16.0209ms)
+✔ board shows the name, then types the heist line one letter at a time over novelty bills (13.0496ms)
+✔ Heist closing slide: HEIST logo over WASHINGTON DC, both centered, no HEIST DC wording (74.6235ms)
+✔ Search box: two leading words find a template; plain queries list events and clubs (100.537ms)
+✔ every Heist template is assigned to Heist and fits its boards (143.9894ms)
+✔ template names match despite accents, a missing plural s, or one typo (107.4077ms)
+✔ Club Admin repository lists one card per template, Heist exclusives first, with forgiving search (6.6171ms)
+✔ patron Search and FloqAi route a misspelled Tengo muchos dólares to the Heist template (14.8736ms)
+✔ chrome packs match en key count for every supported language (315.3618ms)
+✔ help packs cover the canonical help ids for every localized language (235.7395ms)
+✔ floqr-i18n and help VERSION are s3.0.88 (38.7319ms)
+✔ tIn translates in a chosen language without switching the page (221.1419ms)
+✔ every supported language has its own Save word and switch hint (172.9346ms)
+✔ App language Save button shows the picked word with English in parentheses (17.4138ms)
+✔ 8-character email OTP codes from the createOtpCode alphabet are masked (50.5976ms)
+✔ labelled codes are masked in any shape (code:, code is, OTP, recovery code, HTML) (1.7153ms)
+✔ six-digit SOS2FA / WhatsApp / SMS codes and bearer tokens stay masked (2.9627ms)
+✔ ordinary prose is not over-masked (2.2571ms)
+✔ plainPreview strips tags, collapses whitespace and masks (2.8449ms)
+✔ OTP mail (redactBody) stores no body: template id + masked preview only (30.3415ms)
+✔ SOS2FA mail stores no code even with an explicit template id (4.179ms)
+✔ non-OTP mail keeps its body but still masks any code in subject/body (6.7872ms)
+✔ system mail send path requests TLS 1.3 and logs Firestore (12.8965ms)
+✔ OTP-style bodies redact six-digit codes in stored logs (15.1123ms)
+✔ Master Admin Twilio exposes twilio_sendgridMailLogs search and content (8.5574ms)
+✔ Firestore rules: Master Admin read-only systemMailLogs (3.1005ms)
+✔ all SendGrid mail/send call sites go through sendSystemMail (16.1225ms)
+✔ preview-links mailer defaults to s3 package label not vs3 (4.2754ms)
+✔ applyMailEvents maps delivered onto an existing log (2.5711ms)
+✔ Feature & beta activity uses the responsive audit table, not inline table styles (22.5932ms)
+✔ audit rows carry labels, truncate long ids with a title, and fold before/after JSON (39.0109ms)
+✔ Master Admin hero has no orphan help; All Locations carries the help (6.5135ms)
+✔ help popouts reset heading typography in the shared help-attach module (6.9719ms)
+✔ All Locations help is Master Admin only in the repository and the server content classes (138.003ms)
+✔ Master Admin audit/hero assets are cache-busted (s3.1.29 help-attach, s3.1.30 F&S) (15.6634ms)
+✔ masterAdmin claim admits a Microsoft account whose IdP reports email_verified=false (23.8919ms)
+✔ superAdmin claim is also honored (7.2553ms)
+✔ listed email without a claim still requires a verified email (9.7467ms)
+✔ only a boolean true claim counts and the provider rule still applies (27.9109ms)
+✔ auth state handler reads token claims before the security check (9.9071ms)
+✔ normalizes E.164 phone numbers (9.4129ms)
+✔ channel preference maps to outbound channels (5.9909ms)
+✔ club day key is YYYY-MM-DD in club timezone (191.911ms)
+✔ daily auth codes are alphabet-safe and hash stably (51.7777ms)
+✔ parses APPROVE/REJECT ops replies (7.4909ms)
+✔ builds pending shoutout alert copy (2.0008ms)
+✔ selectOutboundTargets honors enabled channels and paid-but-paused SMS (4.3301ms)
+✔ describeOutboundSkip explains missing phone vs paused channels (1.8579ms)
+✔ selectedClubAlertChannels follows test checkboxes and saved settings (3.4821ms)
+✔ sanitizes Twilio secrets and explains invalid Account SID (16.6969ms)
+✔ payment callables use the compat App Functions client with the deployment region (31.3845ms)
+✔ FR localizes United States and District of Columbia (9.1634ms)
+✔ AR localizes United States (1.2998ms)
+✔ FR localizes genres and offerings; brand tokens preserved (14.3047ms)
+✔ AR offering keeps HEIST on branded night (3.6779ms)
+✔ placeLine localizes city and region; no locationName API (2.1524ms)
+✔ index loads floqr-place-i18n before patron-app (12.8364ms)
+✖ FLOQRCanonical prefers www.floqr.com production origin (23.5969ms)
+✔ FLOQRPrivacyPrefs blocks personalized ads for DNS / GPC / sharing false (10.7552ms)
+✔ FLOQRPrivacyPrefs GPC detection stamps Do Not Sell patch (27.3578ms)
+✔ FLOQRConsentMode denied defaults and updates from prefs (22.2316ms)
+✔ ad scoreCampaign demotes targeted ads when personalized ads blocked (40.1823ms)
+✔ privacy DSAR module exports callables and portal wires them (48.1246ms)
+✔ marketing broadcast honors marketingConsent and doNotSellOrShare (20.3519ms)
+✔ temp shoutout receipt mirrors unpaid confirmation fields (719.1529ms)
+✔ promote adds paid time and Stripe ids while keeping approval status (19.4645ms)
+✔ invoice PDF is a valid base64 PDF header (9.0221ms)
+✔ each recommendation card has exactly one declarative help and no legacy info-popout (13.6724ms)
+✔ recommendation status paragraphs opt out of helper-popout conversion (18.2937ms)
+✔ recommendation help is registered for FloqAi and localized (19.0853ms)
+✔ music-inspired recommendations are unique and await approval (22.2013ms)
+✔ recommendations fit every supported template's smallest shared ceiling (4.0345ms)
+✔ every published template allows patron background changes (2.399ms)
+✔ every template exposes IsModifiable as 0 or 1 datapoint (2.5391ms)
+✔ Stages 2-3: the exposure report is empty (89.834ms)
+✔ no Stage 2-3 collection keeps a bare signedIn() write, or a bare signedIn() read on non-public data (9.0785ms)
+✔ club data is scoped to that club's managers / staff (2.276ms)
+✔ owners: patrons see and edit only their own records (18.0747ms)
+✔ loaders query only rows the new rules allow (no whole-collection scans) (46.2265ms)
+✔ failed reads surface a visible notice instead of a silent empty list (74.0489ms)
+✔ FLOQRAccessNotice tells denied from failed, keeps callers working, and is translated (88.9003ms)
+✔ Mingl Gist stories never carry the submitter's email or phone (9.4924ms)
+✔ Stage 1: every Stage 1 collection is off the exposure report and the total dropped from 69 (71.9728ms)
+✔ users: only self and Master Admin read; other members come from getPeopleDirectory (2.9599ms)
+✔ messages: parties read; senders create as themselves; parties cannot be rewritten (1.7833ms)
+✔ inboxNotifications: recipient-only reads; creates are attributed, server kinds refused, links stay on FLOQR (4.6341ms)
+✔ every client Inbox writer that notifies someone else stamps createdByUid or requesterUid (38.0986ms)
+✔ clubDailyAuthCodes and club message logs: server writes only; club managers of that club read (3.0593ms)
+✔ SupRstR display2 may add ICE candidates only to a live session, shape-checked, without a Display URL change (2.5263ms)
+✔ people directory strips private fields and scopes club contacts (54.967ms)
+✔ people directory validates requests (10.9465ms)
+✔ getPeopleDirectory: auth required, club mode checks the club, reads only via its System job (4.8312ms)
+✔ peer readers use FLOQRPeople instead of reading the users collection (73.7933ms)
+✔ roster: club / company designations, rejected and other teams skipped (25.4867ms)
+✔ directory rows: team flag from the club-only phone field; placeholder name dropped (1.9197ms)
+✔ options: you first, then team, then everyone else; name + role; uid never in a label (144.108ms)
+✔ search matches name, role or email — never the uid (5.1941ms)
+✔ scheduling.html: Assign to picker replaces the Assignee uid box; scripts load in order (4.7212ms)
+✔ scheduling-portal.js: stores the picked uid, uses the people directory, no raw-uid prompt (5.5865ms)
+✔ every sched.* key used on the Scheduling page exists in all 11 chrome packs (217.083ms)
+✔ shared confirm list and cards fall back to English when FLOQRI18n is absent (90.9903ms)
+✔ published unassigned slots are open; assigned unpublished are pending (18.9641ms)
+✔ editing a confirmed card to draft keeps one card; same-slot confirmed stays confirmed (4.8054ms)
+✔ approved is an alias of confirmed; pending and confirmed can be deleted (1.7439ms)
+✔ worker and club channel gates default on unless explicitly off (4.0716ms)
+✔ website DTO is Confirmed-only and strips private employee fields (175.925ms)
+✔ sanitizeShiftIds de-dupes and caps at 80 (9.1495ms)
+✔ invite body includes a confirm link (6.0594ms)
+✔ club message templates fill placeholders without changing defaults (1.2439ms)
+✔ deep link owner=type:id parses; unknown types and empty ids are ignored (32.5583ms)
+✔ stored ownerId format is unchanged: DJ = uid, club = location id, company = company name (1.8523ms)
+✔ Master Admin hint: claim or verified listed email; unverified listed email is not enough (4.305ms)
+✔ managed clubs follow the server's canManageOwner club rules (7.1574ms)
+✔ promoting companies need an active promoter designation; names dedupe case-insensitively (10.9976ms)
+✔ club options show names (not raw ids), sorted, with city when it adds information (110.9103ms)
+✔ deep-linked owners stay selectable; search filters by name or id (2.922ms)
+✔ default owner type: deep link, then clubs, then company, then DJ (1.2942ms)
+✔ scheduling.html: satellite shell wiring, picker instead of free-text Owner id (6.712ms)
+✔ scheduling-portal.js starts Firebase itself before firebase.auth() and never writes club docs (27.4863ms)
+✔ Schedule for help is in the repository, every help locale, and the FloqAi content classes (87.7551ms)
+✔ Search splash ships the FloqMedia house card with corrected spelling and tappable contacts (13.6639ms)
+✔ only club-action buttons with a picked venue show the venue header; Search paths show the house card (20.833ms)
+✔ Zebbies demo campaign only rotates at Zebbies Garden (40.1531ms)
+✔ house card labels are localized in every supported language (50.9148ms)
+✔ Search page shows the FLOQR logo and a ShoutOut icon link with its title underneath (29.5491ms)
+✔ Throw a ShoutOut skips the ShoutOut landing page (10.7402ms)
+✔ ad splash FLOQR logo is unframed and FloqMedia contacts are not underlined (10.4474ms)
+✔ admin-trust: token claims grant admin (10.3229ms)
+✔ admin-trust: allowlisted emails grant admin only when the token email is verified (2.3015ms)
+✔ admin-trust: the unowned typo address is not an admin (1.1788ms)
+✔ admin-trust: env list merges with the defaults (7.9268ms)
+✔ admin-trust: patron profile fields never grant admin (14.6549ms)
+✔ admin-trust: missing auth or email is not admin (3.619ms)
+✔ admin-trust: module does not reach Firestore (6.259ms)
+✔ otp: correct code within the limit succeeds (8.1811ms)
+✔ otp: wrong code increments the count (27.8109ms)
+✔ otp: the attempt that reaches the max locks the challenge (19.2396ms)
+✔ otp: a locked challenge stays locked even with the right code (1.1601ms)
+✔ otp: five wrong guesses then the right code is refused (1.9081ms)
+✔ otp: expired and consumed challenges are refused (1.1112ms)
+✔ otp: different-length hashes are a wrong code, not a crash (0.8129ms)
+✔ assertSuperAdmin trusts claims / server email list only (5.2025ms)
+✔ Master Admin asserts in display-security and ai-discovery ignore user docs (7.2117ms)
+✔ feature-services privilege checks ignore patron-editable profile fields (2.4071ms)
+✔ assignVenueEmployee and removeVenueEmployee require an SOS2FA session (3.6631ms)
+✔ verifySos2faCode records failures and throws only after the transaction commits (3.258ms)
+✔ verifyEmailOtp records failures and throws only after the transaction commits (4.8112ms)
+✔ feature-gate Super Admin protection reads the Auth record, never users/{uid} fields (12.6728ms)
+✔ every Functions Master Admin check goes through admin-trust (72.5695ms)
+✔ rules admin email lists require a verified email and match each other (3.9751ms)
+✔ approvedRoles is not the only signal for member publishing or promoter scheduling (7.5409ms)
+✔ rules header carries the s3.1.26 marker (41.3044ms)
+✔ diffs use affectedKeys so added or removed keys cannot slip through (3.7623ms)
+✔ messages: no client-written system sender; parties and sender email are pinned (5.8808ms)
+✔ chatRooms / chatMessages: no non-Mingl escape branch, members only (7.28ms)
+✔ minglConnections: pending-only create, only requestedTo accepts, blocker owns a block (2.8851ms)
+✔ userBlocks: only the blocker changes an active block (1.5084ms)
+✔ aiIndex: writes are Master Admin (or Functions) only (5.2717ms)
+✔ suprstrSessions: board answer is write-once with a fixed shape (2.8879ms)
+✔ supRstar session docs no longer publish the broadcaster email (4.412ms)
+✔ storage: Mingl chat media is limited to the room's participants (6.0925ms)
+✔ client fixes: Mingl request message carries senderUid; aiIndex upsert tolerates denial (52.0142ms)
+✔ no public onRequest seed writer remains in Functions (169.8916ms)
+✔ no client page or script calls the removed HTTP seed URL (429.178ms)
+✔ seedLucyCobraBartrCatalog requires Master Admin + SOS2FA + reason and writes a chained audit (10.5948ms)
+✔ seed page sends the SOS2FA session and a reason through the callable (4.9089ms)
+✔ catalog seed is missing-only: existing profile values and products are kept (12.0021ms)
+✔ storage.rules: clubMedia writes and deletes need Master Admin or a Club Admin of that club (15.7806ms)
+✔ Club Admin uploads use clubMedia/{locationId}/... so the club id is the first path segment (6.968ms)
+✔ FLOQRHelpAttach.attachBesideHeading never puts a ? on a hero h1 (19.6884ms)
+✔ helper-popouts keeps hero-h1 paragraphs visible and never converts the session hint (17.2714ms)
+✖ embedded signed-out hint is a plain status line with a current-package My Profile link (26.4454ms)
+✔ session hint and status copy come from FLOQRI18n session.* keys (13.9099ms)
+✔ session.* keys exist in every chrome pack (36.7572ms)
+✔ no satellite ships the auth chrome hint as a hero p.sub.small (3.3618ms)
+✔ compliance retention constants match approved policy (5.1689ms)
+✔ buildComplianceRecord indexes venue content and media purge window (8.6179ms)
+✔ getFloqrClientIp and stampShoutoutActorContext are exported callables (2.7958ms)
+✔ patron Search loads floqr-client-ip and attaches session IP on submit (7.0591ms)
+✔ actorFieldsFromSources prefers email then phone (1.423ms)
+✔ shouldIndexShoutout covers submitted and rejected lifecycle (1.1405ms)
+✔ master admin html nests ShoutOuts completed log and retention (3.6138ms)
+✔ firestore rules harden shoutoutAudit and lock compliance logs (2.6217ms)
+✔ patron portal completed actions prefer Re-Use over Diagnose (6.2878ms)
+✔ master admin shoutouts loads venues from clubLocations and exports CSV (2.9758ms)
+✔ SOS2FA recovery code only inside the dated window (10.6352ms)
+✔ SOS2FA recovery code compares exactly and refuses short secrets (4.664ms)
+✔ SOS2FA recovery attempts: 5 per hour, then locked until the window resets (10.8274ms)
+✔ SOS2FA recovery callable: Super Admin email list, verified email, secret, audit, entityManagement session (36.2851ms)
+✔ SOS2FA masks phone last 5 and email local-part (2.0911ms)
+✔ SOS2FA channels follow universal notifyEmail / notifySms flags (2.3032ms)
+✔ SOS2FA delivery notes list email and/or SMS after Delivered / notes: (1.878ms)
+✔ SOS2FA delivery notes omit failed email and append email not sent (2.834ms)
+✔ client: masterAdmin / superAdmin claim holders count as Master Admin even with an unverified email (19.2634ms)
+✔ client: listed email needs email_verified; super-admin list alone is no longer the gate (14.2891ms)
+✔ client: requireUnlock reads the token claim and shows the Request SOS2FA Code button to a claim holder (39.3211ms)
+✔ client: a signed-in non-admin keeps the request button hidden (11.6514ms)
+✔ client: claim holder can request a code; recovery is offered only to verified listed emails (35.2549ms)
+✔ server: admin-trust accepts a masterAdmin claim with an unverified email, not a bare listed email (1.4963ms)
+✔ server: request / verify / session use admin-trust and mail the code to the signed-in token email (5.4252ms)
+✔ pages load the s3.1.28 SOS2FA client (7.8257ms)
+✔ consent verbiage covers the grant, channels, private data, and withdrawal (8.0143ms)
+✔ client and server share version, text, and hash (6.9139ms)
+✔ consent block renders unticked and keeps gated buttons disabled until ticked (30.7626ms)
+✔ records, stamps, and status priority (187.3281ms)
+✔ server validates input, refuses stale copy, and builds the evidence record (17.7517ms)
+✔ Firestore rules refuse opt-in without consent (8.2251ms)
+✔ every opt-in path requires the ticked box before writing (36.5033ms)
+✔ i18n: 20 staffConsent keys in all 11 packs, brands untranslated, help in every source (740.0809ms)
+✔ normalizes supported FLOQR Connect entity types (15.787ms)
+✔ creates stable opaque binding IDs (9.2628ms)
+✔ builds a recipient-only Accounts v2 marketplace request (3.3443ms)
+✔ reports transfer readiness from the v2 recipient capability (4.8722ms)
+✔ uses onboarding until transfers are active, then account update (10.1821ms)
+✔ phone broadcaster renegotiates when display2 reconnects with a new answer (12.4342ms)
+✔ display2 re-answers when the offer SDP changes after a board reconnect (3.856ms)
+✔ kiosk muted autoplay is forced on the live video element (3.5755ms)
+✔ display2 overlay reports Connecting, Linked, and errors (10.8181ms)
+✔ Go live stage button uses full-width stage-action CSS (5.1671ms)
+✔ supRstar functions default master-admin email list omits bands.don (3.593ms)
+✔ Aurelia is the New York demo club (31.1744ms)
+✔ other temp demo clubs stay in Washington DC (14.5427ms)
+✔ venue-only templates are searchable by name and alias (287.6007ms)
+✔ picker shows an Exclusive at {venue} section and Search routes template names (12.7189ms)
+✔ Tengo muchos dólares: words for 5s, then the money splash for 10s, every loop, then the brand slide (111.2924ms)
+✔ every club idles on Use ShoutOut @ {club} after a ShoutOut ends (30.1816ms)
+✔ approving after a 10-minute reset shows the new ShoutOut, not the idle board (22.3136ms)
+✔ preview picks made-up text and graphics by template type (148.8292ms)
+✔ preview URL uses the board renderer without a cache key and only offered sizes (134.3854ms)
+✔ template roles: Administrator reads, writes and deletes; Manager reads and writes (118.9644ms)
+✔ template tags cover every template offered at the venue (137.8597ms)
+✔ Firestore rules enforce the template roles (9.4735ms)
+✔ Preview button, tag search and role assignment are wired (18.375ms)
+✔ club daily code in an SMS test alert never reaches twilioSmsLogs or twilioComplianceLogs (278.2353ms)
+✔ club daily code in a WhatsApp alert never reaches twilioWhatsAppLogs (156.6491ms)
+✔ unlabelled mixed club codes and APPROVE / REJECT / YES replies are masked (27.4227ms)
+✔ labelled OTP / passcode / recovery / 8-char email codes and six-digit codes are masked (2.2129ms)
+✔ non-secret SMS / WhatsApp copy (club names, prices, phone-safe text) is not over-masked (2.3605ms)
+✔ redactDeep masks codes inside Twilio debugger payloads without touching keys (12.167ms)
+✔ stored request headers never carry the full Twilio Account SID (6.7338ms)
+✔ every Twilio body logger uses the shared secret-redaction module (6.3804ms)
+✔ Twilio logs request TLS 1.3 and use separate SMS/WhatsApp/feature collections (11.2711ms)
+✔ Twilio phone masking and hashing minimize PII (10.4535ms)
+✔ dry-run and auth failures are security-relevant for GRC compliance rows (2.8236ms)
+✔ marketing send allows retest and does not treat dry-run as delivered (2.2054ms)
+✔ Master Admin exposes Twilio tab with log-type subtabs including compliance and SendGrid mail (5.8805ms)
+✔ Club Admin Advertising exposes club-scoped SMS and WhatsApp logs (9.5826ms)
+✔ Firestore rules allow club managers to read their SMS/WhatsApp Twilio logs (6.679ms)
+✔ messaging and marketing send paths share twilio-log (2.7829ms)
+✔ geocode query prefers street address and appends missing city / country (22.1915ms)
+✔ new venues without coordinates need geocoding; geocoded ones do not (3.2788ms)
+✔ moving a venue re-geocodes; manual coordinates are respected (2.5146ms)
+✔ a Google miss is recorded once and not retried until the address changes (2.2902ms)
+✔ parses Places (New) and Geocoding API responses; rejects junk (11.9795ms)
+✔ functions wire the trigger + backfill on the existing Places secret, no key in source (5.2011ms)
+✔ ingest secrets hash and match without storing cleartext equality (20.0357ms)
+✔ feed URLs and RSS omit draft-looking payloads (8.2495ms)
+✔ SMS and WhatsApp region sits on its own second line in every language (249.0904ms)
+✔ Welcome buttons share one vertical gradient sliced per button (20.6828ms)
+✔ WhatsApp phone must be E.164 with a country code (8.5149ms)
+✔ codes are 6 digits, hashed with a pepper, and compared in constant time (11.8994ms)
+✔ rate window enforces a resend cooldown and an hourly cap without mutating input (9.1459ms)
+✔ approved WhatsApp Authentication template wins over a free-form body (4.847ms)
+✔ Twilio delivery statuses and WhatsApp error codes map to patron-facing hints (2.2405ms)
+✔ WhatsApp OTP callables log every auth event with a forced compliance row (4.5203ms)
+✔ Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divider, privacy links last in white (33.2409ms)
+✔ Welcome ? explains OTP in every supported language (26.0192ms)
+ℹ tests 509
+ℹ suites 1
+ℹ pass 500
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14921.2903
+
+✖ failing tests:
+
+test at app-version-sync.test.js:28:1
+✖ generated links stamp the current package; Display boards stay location-only (14.9772ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /[?&]v=s3\.1\.36(&|$)/. Input:
+  
+  './admin.html?location=zebbies&from=master'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\app-version-sync.test.js:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: './admin.html?location=zebbies&from=master',
+    expected: /[?&]v=s3\.1\.36(&|$)/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at app-version-sync.test.js:63:1
+✖ FloqAi help links stamp FLOQRNav.appVersion, and carry no version at all when nav is missing (162.3827ms)
+  AssertionError [ERR_ASSERTION]: found 0 stamped links
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\app-version-sync.test.js:73:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at app-version-sync.test.js:91:1
+✖ FloqAi links always open with ?v=<package> — never ?&, v=& or an empty v; Display boards get no v (235.8539ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   './floqai.html',
+  +   './suprstr-search.html?from=floqai',
+  +   './floqai.html',
+  +   './?start=search',
+  +   './suprstr-search.html?from=floqai',
+  +   './role-request.html?from=floqai&type=clubAdmin',
+  +   './role-request.html?from=floqai&type=dj',
+  +   './role-request.html?from=floqai&type=promoter',
+  +   './role-profiles.html?from=floqai',
+  +   './scheduling.html?from=floqai',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=notifications',
+  +   './admin.html?from=floqai&tab=notifications',
+  +   './admin.html?from=floqai&tab=notifications',
+  +   './admin.html?from=floqai&tab=notifications&notify=templates',
+  +   './admin.html?from=floqai&tab=notifications',
+  +   './patron-portal.html?from=floqai&tab=profile',
+  +   './patron-portal.html?from=floqai&tab=ad-campaigns',
+  +   './master-admin.html?from=floqai#adApprovalQueue',
+  +   './master-admin.html?from=floqai#adCampaignManagement',
+  +   './master-admin.html?from=floqai#adApprovalQueue',
+  +   './master-admin.html?from=floqai#adLiveCampaigns',
+  +   './master-admin.html?from=floqai#adStatsPanel',
+  +   './master-admin.html?from=floqai#adIntakePanel',
+  +   './master-admin.html?from=floqai#adSettingsPanel',
+  +   './master-admin.html?from=floqai#adCampaignManagement',
+  +   './patron-portal.html?from=floqai&tab=shoutouts',
+  +   './patron-portal.html?from=floqai&tab=shoutouts&sub=archive',
+  +   './patron-portal.html?from=floqai&tab=inbox',
+  +   './patron-portal.html?from=floqai&tab=shoutouts&sub=archive',
+  +   './patron-portal.html?from=floqai&tab=shoutouts&sub=completed',
+  +   './patron-portal.html?from=floqai&tab=work-calendar',
+  +   './admin.html?from=floqai&tab=notifications&notify=templates',
+  +   './admin.html?from=floqai&tab=reports',
+  +   './master-admin.html?from=floqai&tab=templateCatalogReport',
+  +   './admin.html?from=floqai&tab=public-profile',
+  +   './admin.html?from=floqai&tab=public-profile&location=heist-washington-dc',
+  +   './master-admin.html?from=floqai',
+  +   './floqai.html',
+  +   './master-admin.html#dataClassification',
+  +   './club-profile.html?from=floqai&location=temp-democlub-1',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './patron-portal.html?from=floqai&tab=work-calendar',
+  +   './staff-worksheet.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=service-members',
+  +   './patron-portal.html?from=floqai&tab=profile',
+  +   './admin.html?from=floqai&tab=employees',
+  +   './admin.html?from=floqai&tab=scheduling#schedWebsiteIngest',
+  +   './admin.html?from=floqai&tab=publicProfile',
+  +   './master-admin.html?from=floqai',
+  +   './master-admin.html?from=floqai',
+  +   './role-request.html?from=floqai&type=clubAdmin',
+  +   './admin.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './master-admin.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './privacy.html?from=floqai',
+  +   './?start=search&from=floqai',
+  +   './?start=mingl&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './privacy.html?from=floqai',
+  +   './patron-portal.html?tab=inbox&from=floqai',
+  +   './?start=search&from=floqai',
+  +   './master-admin.html?from=floqai#featuresServices',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './master-admin.html?from=floqai',
+  +   './master-admin.html?from=floqai',
+  +   './master-admin.html?from=floqai',
+  +   './master-admin.html?from=floqai#networkDashboard',
+  +   './master-admin.html?from=floqai#entityManagement',
+  +   './master-admin.html?from=floqai#clubAdminUrls',
+  +   './master-admin.html?from=floqai#demoEmployees',
+  +   './master-admin.html?from=floqai#shoutoutCompletedLog',
+  +   './master-admin.html?from=floqai#shoutoutRetention',
+  +   './master-admin.html?from=floqai#shoutoutRetention',
+  +   './master-admin.html?from=floqai#shoutoutCompletedLog',
+  +   './patron-portal.html?from=floqai&tab=public-profile',
+  +   './patron-portal.html?from=floqai&tab=language',
+  +   './master-admin.html?from=floqai#translationOverrides',
+  +   './patron-portal.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './onboard-dc-venues.html?from=floqai',
+  +   './master-admin.html?from=floqai',
+  +   './master-admin.html?from=floqai#translationOverrides',
+  +   './master-admin.html?from=floqai#twilio_sendgridMailLogs',
+  +   './master-admin.html?from=floqai#twilioSmsLogs',
+  +   './master-admin.html?from=floqai#twilioComplianceLogs',
+  +   './admin.html?tab=marketing&from=floqai',
+  +   './admin.html?from=floqai#panelMessagingCredit',
+  +   './admin.html?from=floqai#panelMarketingCampaigns',
+  +   './admin.html?from=floqai#panelInAppMarketing',
+  +   './onboard-dc-venues.html?from=floqai',
+  +   './?start=mingl',
+  +   './?start=search',
+  +   './?start=search',
+  +   './?start=search',
+  +   './?start=search',
+  +   './admin.html?from=floqai',
+  +   './admin.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=service-members',
+  +   './admin.html?from=floqai&tab=employees',
+  +   './admin.html?from=floqai',
+  +   './admin.html?from=floqai',
+  +   './admin.html?from=floqai',
+  +   './scheduling.html?from=floqai',
+  +   './?start=search',
+  +   './admin.html?from=floqai',
+  +   './?start=mingl',
+  +   './patron-portal.html?from=search&tab=ad-campaigns',
+  +   './?start=mingl',
+  +   './rydr.html?from=search',
+  +   './commerce.html?from=search',
+  +   './?start=search',
+  +   './?start=search',
+  +   './?start=search',
+  +   './suprstr-search.html?from=floqai',
+  +   './?start=search',
+  +   './patron-portal.html?from=floqai&tab=ad-campaigns',
+  +   './suprstr-search.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=service-members',
+  +   './patron-portal.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './admin.html?from=floqai',
+  +   './admin.html?from=floqai&tab=notifications',
+  +   './admin.html?from=floqai&tab=notifications&notify=templates',
+  +   './patron-portal.html?from=floqai&tab=work-calendar',
+  +   './club-profile.html?from=floqai&location=temp-democlub-1',
+  +   './role-profiles.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=language',
+  +   './master-admin.html?from=floqai#translationOverrides',
+  +   './master-admin.html?from=floqai#translationOverrides',
+  +   './admin.html?from=floqai&tab=reports',
+  +   './master-admin.html?from=floqai&tab=templateCatalogReport',
+  +   './admin.html?from=floqai&tab=public-profile',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './patron-portal.html?from=floqai&tab=work-calendar',
+  +   './staff-worksheet.html?from=floqai',
+  +   './patron-portal.html?from=floqai',
+  +   './admin.html?from=floqai&tab=scheduling#schedWebsiteIngest',
+  +   './admin.html?from=floqai&tab=publicProfile',
+  +   './master-admin.html?from=floqai',
+  +   './patron-portal.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './role-request.html?from=floqai&type=dj',
+  +   './scheduling.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './role-request.html?from=floqai&type=promoter',
+  +   './guest-list.html?from=floqai',
+  +   './scheduling.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './role-request.html?from=floqai&type=hospitality',
+  +   './role-request.html?from=floqai&type=bartender',
+  +   './role-profiles.html?from=floqai',
+  +   './role-request.html?from=floqai&type=mediaCreator',
+  +   './role-profiles.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=service-members',
+  +   './patron-portal.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './patron-portal.html?from=floqai&tab=privacy',
+  +   './privacy.html?from=floqai',
+  +   './guest-list.html?from=floqai',
+  +   './?start=search',
+  +   './scheduling.html?from=floqai',
+  +   './admin.html?from=floqai&tab=scheduling',
+  +   './admin.html?from=floqai&tab=notifications&notify=templates',
+  +   './role-profiles.html?from=floqai',
+  +   './?start=search',
+  +   './floqai.html',
+  +   './?start=search',
+  +   './jersey-preview-all.html?from=floqai',
+  +   './?start=search',
+  +   './floqai.html',
+  +   './patron-portal.html?from=floqai',
+  +   './commerce.html?from=floqai',
+  +   './?start=search',
+  +   './guest-list.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './patron-portal.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './onboard-dc-venues.html?from=floqai',
+  +   './master-admin.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './role-request.html?from=floqai',
+  +   './patron-portal.html?from=floqai',
+  +   './role-profiles.html?from=floqai',
+  +   './?start=search'
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\app-version-sync.test.js:99:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+      './floqai.html',                                                            './suprstr-search.html?from=floqai',
+      './floqai.html',                                                            './?start=search',
+      './suprstr-search.html?from=floqai',                                        './role-request.html?from=floqai&type=clubAdmin',
+      './role-request.html?from=floqai&type=dj',                                  './role-request.html?from=floqai&type=promoter',
+      './role-profiles.html?from=floqai',                                         './scheduling.html?from=floqai',
+      './admin.html?from=floqai&tab=scheduling',                                  './admin.html?from=floqai&tab=notifications',
+      './admin.html?from=floqai&tab=notifications',                               './admin.html?from=floqai&tab=notifications',
+      './admin.html?from=floqai&tab=notifications&notify=templates',              './admin.html?from=floqai&tab=notifications',
+      './patron-portal.html?from=floqai&tab=profile',                             './patron-portal.html?from=floqai&tab=ad-campaigns',
+      './master-admin.html?from=floqai#adApprovalQueue',                          './master-admin.html?from=floqai#adCampaignManagement',
+      './master-admin.html?from=floqai#adApprovalQueue',                          './master-admin.html?from=floqai#adLiveCampaigns',
+      './master-admin.html?from=floqai#adStatsPanel',                             './master-admin.html?from=floqai#adIntakePanel',
+      './master-admin.html?from=floqai#adSettingsPanel',                          './master-admin.html?from=floqai#adCampaignManagement',
+      './patron-portal.html?from=floqai&tab=shoutouts',                           './patron-portal.html?from=floqai&tab=shoutouts&sub=archive',
+      './patron-portal.html?from=floqai&tab=inbox',                               './patron-portal.html?from=floqai&tab=shoutouts&sub=archive',
+      './patron-portal.html?from=floqai&tab=shoutouts&sub=completed',             './patron-portal.html?from=floqai&tab=work-calendar',
+      './admin.html?from=floqai&tab=notifications&notify=templates',              './admin.html?from=floqai&tab=reports',
+      './master-admin.html?from=floqai&tab=templateCatalogReport',                './admin.html?from=floqai&tab=public-profile',
+      './admin.html?from=floqai&tab=public-profile&location=heist-washington-dc', './master-admin.html?from=floqai',
+      './floqai.html',                                                            './master-admin.html#dataClassification',
+      './club-profile.html?from=floqai&location=temp-democlub-1',                 './admin.html?from=floqai&tab=scheduling',
+      './admin.html?from=floqai&tab=scheduling',                                  './admin.html?from=floqai&tab=scheduling',
+      './admin.html?from=floqai&tab=scheduling',                                  './admin.html?from=floqai&tab=scheduling',
+      './patron-portal.html?from=floqai&tab=work-calendar',                       './staff-worksheet.html?from=floqai',
+      './patron-portal.html?from=floqai&tab=service-members',                     './patron-portal.html?from=floqai&tab=profile',
+      './admin.html?from=floqai&tab=employees',                                   './admin.html?from=floqai&tab=scheduling#schedWebsiteIngest',
+      './admin.html?from=floqai&tab=publicProfile',                               './master-admin.html?from=floqai',
+      './master-admin.html?from=floqai',                                          './role-request.html?from=floqai&type=clubAdmin',
+      './admin.html?from=floqai',                                                 './patron-portal.html?from=floqai&tab=privacy',
+      './master-admin.html?from=floqai',                                          './patron-portal.html?from=floqai&tab=privacy',
+      './patron-portal.html?from=floqai&tab=privacy',                             './privacy.html?from=floqai',
+      './?start=search&from=floqai',                                              './?start=mingl&from=floqai',
+      './?start=search&from=floqai',                                              './?start=search&from=floqai',
+      './?start=search&from=floqai',                                              './?start=search&from=floqai',
+      './?start=search&from=floqai',                                              './privacy.html?from=floqai',
+      './patron-portal.html?tab=inbox&from=floqai',                               './?start=search&from=floqai',
+      './master-admin.html?from=floqai#featuresServices',                         './patron-portal.html?from=floqai&tab=privacy',
+      './master-admin.html?from=floqai',                                          './master-admin.html?from=floqai',
+      './master-admin.html?from=floqai',                                          './master-admin.html?from=floqai#networkDashboard',
+      './master-admin.html?from=floqai#entityManagement',                         './master-admin.html?from=floqai#clubAdminUrls',
+      './master-admin.html?from=floqai#demoEmployees',                            './master-admin.html?from=floqai#shoutoutCompletedLog',
+      './master-admin.html?from=floqai#shoutoutRetention',                        './master-admin.html?from=floqai#shoutoutRetention',
+      './master-admin.html?from=floqai#shoutoutCompletedLog',                     './patron-portal.html?from=floqai&tab=public-profile',
+      './patron-portal.html?from=floqai&tab=language',                            './master-admin.html?from=floqai#translationOverrides',
+      './patron-portal.html?from=floqai',                                         './role-request.html?from=floqai',
+      './onboard-dc-venues.html?from=floqai',                                     './master-admin.html?from=floqai',
+      './master-admin.html?from=floqai#translationOverrides',                     './master-admin.html?from=floqai#twilio_sendgridMailLogs',
+      './master-admin.html?from=floqai#twilioSmsLogs',                            './master-admin.html?from=floqai#twilioComplianceLogs',
+      './admin.html?tab=marketing&from=floqai',                                   './admin.html?from=floqai#panelMessagingCredit',
+      './admin.html?from=floqai#panelMarketingCampaigns',                         './admin.html?from=floqai#panelInAppMarketing',
+      ... 100 more items
+    ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at auth-entry-ui.test.js:91:1
+✖ venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29.09 or page ?v= (27.4046ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Never copy the page's \?v=/. Input:
+  
+  '/* FLOQR contextual back navigation — keep users inside the current portal/area */\r\n' +
+    '(function (global) {\r\n' +
+    '  "use strict";\r\n' +
+    '\r\n' +
+    '  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.\r\n' +
+    '     Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */\r\n' +
+    '  const APP_V = "s3.1.36";\r\n' +
+    '\r\n' +
+    '  function navT(key, fallback) {\r\n' +
+    '    try {\r\n' +
+    '      const fn = global.FLOQRI18n?.t;\r\n' +
+    '      if (typeof fn === "function") {\r\n' +
+    '        const out = fn(key);\r\n' +
+    '        if (out && out !== key) return out;\r\n' +
+    '      }\r\n' +
+    '    } catch (_) {}\r\n' +
+    '    return fallback;\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function qs(name) {\r\n' +
+    '    try { return new URL(global.location.href).searchParams.get(name) || ""; }\r\n' +
+    '    catch (e) { return ""; }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function buildUrl(path, params = {}, drop = []) {\r\n' +
+    '    try {\r\n' +
+    '      const next = new URL(path, global.location.href);\r\n' +
+    '      ["v", ...drop].forEach(key => next.searchParams.delete(key));\r\n' +
+    '      Object.entries(params).forEach(([key, value]) => {\r\n' +
+    '        if (key !== "v" && value != null && value !== "") next.searchParams.set(key, String(value));\r\n' +
+    '      });\r\n' +
+    '      const file = next.pathname.split("/").pop() || path.replace(/^\\.\\//, "");\r\n' +
+    '      const search = next.searchParams.toString();\r\n' +
+    '      return `./${file}${search ? `?${search}` : ""}${next.hash || ""}`;\r\n' +
+    '    } catch (e) {\r\n' +
+    '      return path;\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function pageName() {\r\n' +
+    '    try {\r\n' +
+    '      return String(global.location.pathname.split("/").pop() || "").toLowerCase();\r\n' +
+    '    } catch (e) {\r\n' +
+    '      return "";\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function currentVersion() {\r\n' +
+    '    return APP_V;\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function isDisplayFile(path) {\r\n' +
+    '    const file = String(path || "").split("?")[0].split("/").pop() || "";\r\n' +
+    '    return file === "display.html" || file === "display2.html";\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  const FLOQRNav = {\r\n' +
+    '    appVersion: APP_V,\r\n' +
+    '    currentVersion,\r\n' +
+    '    portalHome(extra = {}) {\r\n' +
+    '      return buildUrl("./patron-portal.html", extra);\r\n' +
+    '    },\r\n' +
+    '    searchHome() {\r\n' +
+    '      return `./?start=search`;\r\n' +
+    '    },\r\n' +
+    '    adminHome(extra = {}) {\r\n' +
+    '      const extraLocation = extra.location;\r\n' +
+    '      const locationId = extraLocation != null && String(extraLocation).trim() !== ""\r\n' +
+    '        ? String(extraLocation).trim()\r\n' +
+    '        : (qs("location") || qs("club") || "");\r\n' +
+    '      const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");\r\n' +
+    '      const params = { ...extra, location: locationId };\r\n' +
+    '      if (from) params.from = from;\r\n' +
+    '      else delete params.from;\r\n' +
+    '      return buildUrl("./admin.html", params);\r\n' +
+    '    },\r\n' +
+    '    /** Club Admin URL for Venue Links / onboarding. */\r\n' +
+    '    adminPortalUrl(locationId = "", extra = {}) {\r\n' +
+    '      return this.adminHome({ location: locationId, from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Relative app link with any old ?v= removed. Display boards also drop screen params. */\r\n' +
+    '    stampCurrentVersion(href = "", extra = {}) {\r\n' +
+    '      if (!href) return href;\r\n' +
+    '      if (isDisplayFile(href)) return buildUrl(href, extra, ["screen", "screenFormatId"]);\r\n' +
+    '      return buildUrl(href, extra);\r\n' +
+    '    },\r\n' +
+    '    masterHome(extra = {}) {\r\n' +
+    '      const { hash, ...params } = extra || {};\r\n' +
+    '      const href = buildUrl("./master-admin.html", params);\r\n' +
+    '      const panel = String(hash || "").replace(/^#/, "").trim();\r\n' +
+    '      return panel ? `${href}#${panel}` : href;\r\n' +
+    '    },\r\n' +
+    '    suprstrHome(extra = {}) {\r\n' +
+    '      return buildUrl("./suprstr-search.html", { from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite page under My Profile and Settings */\r\n' +
+    '    portalLink(path, extra = {}) {\r\n' +
+    '      return buildUrl(path, { from: "portal", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite page under Club Admin — always stamp from=admin (+ location). */\r\n' +
+    '    adminLink(path, extra = {}) {\r\n' +
+    '      const locationId = qs("location") || qs("club") || extra.location || "";\r\n' +
+    '      return buildUrl(path, { from: "admin", location: locationId, ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */\r\n' +
+    '    masterLink(path, extra = {}) {\r\n' +
+    '      return buildUrl(path, { from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Stable venue board URL (for LED devices and external embeds). */\r\n' +
+    '    stableDisplayUrl(locationId = "", extra = {}) {\r\n' +
+    '      const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();\r\n' +
+    '      const params = {...extra};\r\n' +
+    '      delete params.location;\r\n' +
+    '      delete params.v;\r\n' +
+    '      const board = String(params.board || params.displayBoard || "").toLowerCase();\r\n' +
+    '      delete params.board;\r\n' +
+    '      delete params.displayBoard;\r\n' +
+    '      const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";\r\n' +
+    '      return buildUrl(page, id ? {location: id, ...params} : params);\r\n' +
+    '    },\r\n' +
+    '    /** Second LED/board per club — display2.html?location=… */\r\n' +
+    '    stableSecondaryDisplayUrl(locationId = "", extra = {}) {\r\n' +
+    '      return this.stableDisplayUrl(locationId, {...extra, board: "secondary"});\r\n' +
+    '    },\r\n' +
+    '    /** Resolve the correct back target for a satellite page. */\r\n' +
+    '    resolveBack(fromOverride = "") {\r\n' +
+    '      const from = String(fromOverride || qs("from") || "").toLowerCase();\r\n' +
+    '      const file = pageName();\r\n' +
+    '      let hash = "";\r\n' +
+    '      try { hash = String(global.location?.hash || "").replace(/^#/, "").trim(); } catch (_) {}\r\n' +
+    '\r\n' +
+    '      // Master Admin NIC: never dump operators onto the patron Search landing.\r\n' +
+    '      // Profile & Settings is an explicit profile-menu exit (new tab), not Back.\r\n' +
+    '      if (file === "master-admin.html") {\r\n' +
+    '        const onHome = !hash || hash === "networkDashboard";\r\n' +
+    '        return {\r\n' +
+    '          href: this.masterHome({ hash: "networkDashboard" }),\r\n' +
+    '          label: navT("nav.backToNic", "← Network Intelligence Center"),\r\n' +
+    '          stay: onHome\r\n' +
+    '        };\r\n' +
+    '      }\r\n' +
+    '\r\n' +
+    '      // Club Admin landing: never dump managers onto the patron Search site.\r\n' +
+    '      if (file === "admin.html") {\r\n' +
+    '        if (from === "master") {\r\n' +
+    '          return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n' +
+    '        }\r\n' +
+    '        return { href: this.adminHome({ from: "" }), label: navT("nav.backToVenueCommand", "← Venue Command Center"), stay: true };\r\n' +
+    '      }\r\n' +
+    '\r\n' +
+    '      if (from === "portal" || from === "profile") {\r\n' +
+    '        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "admin" || from === "club") {\r\n' +
+    '        return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "master") {\r\n' +
+    '        return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "mingl") {\r\n' +
+    '        return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "bartr" || from === "commerce") {\r\n' +
+    '        return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };\r\n' +
+    '      }\r\n' +
+    '      return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };\r\n' +
+    '    },\r\n' +
+    '    /**\r\n' +
+    '     * Prefer URL ?from= over hardcoded data-from so Club Admin deep links win.\r\n' +
+    '     * data-from is only a fallback when the query has no from.\r\n' +
+    '     */\r\n' +
+    '    applyGlobalBack(anchorOrId = "floqrGlobalBack") {\r\n' +
+    '      const anchor = typeof anchorOrId === "string" ? document.getElementById(anchorOrId) : anchorOrId;\r\n' +
+    '      if (!anchor) return null;\r\n' +
+    '      const queryFrom = qs("from");\r\n' +
+    '      const from = queryFrom || anchor.dataset.from || "";\r\n' +
+    '      if (queryFrom) anchor.dataset.from = queryFrom;\r\n' +
+    '      const target = this.resolveBack(from);\r\n' +
+    '      anchor.href = target.href;\r\n' +
+    '      anchor.textContent = target.label;\r\n' +
+    '      // On Club Admin / Master Admin NIC home, hide a no-op "home" back.\r\n' +
+    '      const hub = pageName();\r\n' +
+    '      if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {\r\n' +
+    '        anchor.classList.add("hidden");\r\n' +
+    '        anchor.setAttribute("aria-hidden", "true");\r\n' +
+    '      } else {\r\n' +
+    '        anchor.classList.remove("hidden");\r\n' +
+    '        anchor.removeAttribute("aria-hidden");\r\n' +
+    '      }\r\n' +
+    '      return target;\r\n' +
+    '    },\r\n' +
+    '    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */\r\n' +
+    '    applyStartPage(showPage) {\r\n' +
+    '      if (typeof showPage !== "function") return;\r\n' +
+    '      const start = String(qs("start") || "").toLowerCase();\r\n' +
+    '      if (start === "intent" || start === "ask" || start === "wish") {\r\n' +
+    '        const q = qs("q");\r\n' +
+    '        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));\r\n' +
+    '      }\r\n' +
+    '      else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");\r\n' +
+    '      else if (start === "mingl") showPage("minglLandingPage");\r\n' +
+    '    },\r\n' +
+    '    intentSearchHome() {\r\n' +
+    '      return buildUrl("./floqai.html");\r\n' +
+    '    }\r\n' +
+    '  };\r\n' +
+    '\r\n' +
+    '  global.FLOQRNav = FLOQRNav;\r\n' +
+    '\r\n' +
+    '  if (typeof global.addEventListener === "function") {\r\n' +
+    '    global.addEventListener("floqr:ui-language", () => {\r\n' +
+    '      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}\r\n' +
+    '    });\r\n' +
+    '  }\r\n' +
+    '})(typeof window !== "undefined" ? window : globalThis);\r\n'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\auth-entry-ui.test.js:96:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '/* FLOQR contextual back navigation — keep users inside the current portal/area */\r\n(function (global) {\r\n  "use strict";\r\n\r\n  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.\r\n     Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */\r\n  const APP_V = "s3.1.36";\r\n\r\n  function navT(key, fallback) {\r\n    try {\r\n      const fn = global.FLOQRI18n?.t;\r\n      if (typeof fn === "function") {\r\n        const out = fn(key);\r\n        if (out && out !== key) return out;\r\n      }\r\n    } catch (_) {}\r\n    return fallback;\r\n  }\r\n\r\n  function qs(name) {\r\n    try { return new URL(global.location.href).searchParams.get(name) || ""; }\r\n    catch (e) { return ""; }\r\n  }\r\n\r\n  function buildUrl(path, params = {}, drop = []) {\r\n    try {\r\n      const next = new URL(path, global.location.href);\r\n      ["v", ...drop].forEach(key => next.searchParams.delete(key));\r\n      Object.entries(params).forEach(([key, value]) => {\r\n        if (key !== "v" && value != null && value !== "") next.searchParams.set(key, String(value));\r\n      });\r\n      const file = next.pathname.split("/").pop() || path.replace(/^\\.\\//, "");\r\n      const search = next.searchParams.toString();\r\n      return `./${file}${search ? `?${search}` : ""}${next.hash || ""}`;\r\n    } catch (e) {\r\n      return path;\r\n    }\r\n  }\r\n\r\n  function pageName() {\r\n    try {\r\n      return String(global.location.pathname.split("/").pop() || "").toLowerCase();\r\n    } catch (e) {\r\n      return "";\r\n    }\r\n  }\r\n\r\n  function currentVersion() {\r\n    return APP_V;\r\n  }\r\n\r\n  function isDisplayFile(path) {\r\n    const file = String(path || "").split("?")[0].split("/").pop() || "";\r\n    return file === "display.html" || file === "display2.html";\r\n  }\r\n\r\n  const FLOQRNav = {\r\n    appVersion: APP_V,\r\n    currentVersion,\r\n    portalHome(extra = {}) {\r\n      return buildUrl("./patron-portal.html", extra);\r\n    },\r\n    searchHome() {\r\n      return `./?start=search`;\r\n    },\r\n    adminHome(extra = {}) {\r\n      const extraLocation = extra.location;\r\n      const locationId = extraLocation != null && String(extraLocation).trim() !== ""\r\n        ? String(extraLocation).trim()\r\n        : (qs("location") || qs("club") || "");\r\n      const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");\r\n      const params = { ...extra, location: locationId };\r\n      if (from) params.from = from;\r\n      else delete params.from;\r\n      return buildUrl("./admin.html", params);\r\n    },\r\n    /** Club Admin URL for Venue Links / onboarding. */\r\n    adminPortalUrl(locationId = "", extra = {}) {\r\n      return this.adminHome({ location: locationId, from: "master", ...extra });\r\n    },\r\n    /** Relative app link with any old ?v= removed. Display boards also drop screen params. */\r\n    stampCurrentVersion(href = "", extra = {}) {\r\n      if (!href) return href;\r\n      if (isDisplayFile(href)) return buildUrl(href, extra, ["screen", "screenFormatId"]);\r\n      return buildUrl(href, extra);\r\n    },\r\n    masterHome(extra = {}) {\r\n      const { hash, ...params } = extra || {};\r\n      const href = buildUrl("./master-admin.html", params);\r\n      const panel = String(hash || "").replace(/^#/, "").trim();\r\n      return panel ? `${href}#${panel}` : href;\r\n    },\r\n    suprstrHome(extra = {}) {\r\n      return buildUrl("./suprstr-search.html", { from: "master", ...extra });\r\n    },\r\n    /** Satellite page under My Profile and Settings */\r\n    portalLink(path, extra = {}) {\r\n      return buildUrl(path, { from: "portal", ...extra });\r\n    },\r\n    /** Satellite page under Club Admin — always stamp from=admin (+ location). */\r\n    adminLink(path, extra = {}) {\r\n      const locationId = qs("location") || qs("club") || extra.location || "";\r\n      return buildUrl(path, { from: "admin", location: locationId, ...extra });\r\n    },\r\n    /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */\r\n    masterLink(path, extra = {}) {\r\n      return buildUrl(path, { from: "master", ...extra });\r\n    },\r\n    /** Stable venue board URL (for LED devices and external embeds). */\r\n    stableDisplayUrl(locationId = "", extra = {}) {\r\n      const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();\r\n      const params = {...extra};\r\n      delete params.location;\r\n      delete params.v;\r\n      const board = String(params.board || params.displayBoard || "").toLowerCase();\r\n      delete params.board;\r\n      delete params.displayBoard;\r\n      const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";\r\n      return buildUrl(page, id ? {location: id, ...params} : params);\r\n    },\r\n    /** Second LED/board per club — display2.html?location=… */\r\n    stableSecondaryDisplayUrl(locationId = "", extra = {}) {\r\n      return this.stableDisplayUrl(locationId, {...extra, board: "secondary"});\r\n    },\r\n    /** Resolve the correct back target for a satellite page. */\r\n    resolveBack(fromOverride = "") {\r\n      const from = String(fromOverride || qs("from") || "").toLowerCase();\r\n      const file = pageName();\r\n      let hash = "";\r\n      try { hash = String(global.location?.hash || "").replace(/^#/, "").trim(); } catch (_) {}\r\n\r\n      // Master Admin NIC: never dump operators onto the patron Search landing.\r\n      // Profile & Settings is an explicit profile-menu exit (new tab), not Back.\r\n      if (file === "master-admin.html") {\r\n        const onHome = !hash || hash === "networkDashboard";\r\n        return {\r\n          href: this.masterHome({ hash: "networkDashboard" }),\r\n          label: navT("nav.backToNic", "← Network Intelligence Center"),\r\n          stay: onHome\r\n        };\r\n      }\r\n\r\n      // Club Admin landing: never dump managers onto the patron Search site.\r\n      if (file === "admin.html") {\r\n        if (from === "master") {\r\n          return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n        }\r\n        return { href: this.adminHome({ from: "" }), label: navT("nav.backToVenueCommand", "← Venue Command Center"), stay: true };\r\n      }\r\n\r\n      if (from === "portal" || from === "profile") {\r\n        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };\r\n      }\r\n      if (from === "admin" || from === "club") {\r\n        return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };\r\n      }\r\n      if (from === "master") {\r\n        return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n      }\r\n      if (from === "mingl") {\r\n        return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };\r\n      }\r\n      if (from === "bartr" || from === "commerce") {\r\n        return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };\r\n      }\r\n      return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };\r\n    },\r\n    /**\r\n     * Prefer URL ?from= over hardcoded data-from so Club Admin deep links win.\r\n     * data-from is only a fallback when the query has no from.\r\n     */\r\n    applyGlobalBack(anchorOrId = "floqrGlobalBack") {\r\n      const anchor = typeof anchorOrId === "string" ? document.getElementById(anchorOrId) : anchorOrId;\r\n      if (!anchor) return null;\r\n      const queryFrom = qs("from");\r\n      const from = queryFrom || anchor.dataset.from || "";\r\n      if (queryFrom) anchor.dataset.from = queryFrom;\r\n      const target = this.resolveBack(from);\r\n      anchor.href = target.href;\r\n      anchor.textContent = target.label;\r\n      // On Club Admin / Master Admin NIC home, hide a no-op "home" back.\r\n      const hub = pageName();\r\n      if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {\r\n        anchor.classList.add("hidden");\r\n        anchor.setAttribute("aria-hidden", "true");\r\n      } else {\r\n        anchor.classList.remove("hidden");\r\n        anchor.removeAttribute("aria-hidden");\r\n      }\r\n      return target;\r\n    },\r\n    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */\r\n    applyStartPage(showPage) {\r\n      if (typeof showPage !== "function") return;\r\n      const start = String(qs("start") || "").toLowerCase();\r\n      if (start === "intent" || start === "ask" || start === "wish") {\r\n        const q = qs("q");\r\n        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));\r\n      }\r\n      else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");\r\n      else if (start === "mingl") showPage("minglLandingPage");\r\n    },\r\n    intentSearchHome() {\r\n      return buildUrl("./floqai.html");\r\n    }\r\n  };\r\n\r\n  global.FLOQRNav = FLOQRNav;\r\n\r\n  if (typeof global.addEventListener === "function") {\r\n    global.addEventListener("floqr:ui-language", () => {\r\n      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}\r\n    });\r\n  }\r\n})(typeof window !== "undefined" ? window : globalThis);\r\n',
+    expected: /Never copy the page's \?v=/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at demo-signin.test.js:233:1
+✖ old demo-signin.html redirects to the Master Admin tab (57.0885ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /location\.replace\("\.\/master-admin\.html\?v=s\d+\.\d+\.\d+#demoEmployees"\)/. Input:
+  
+  '<!doctype html>\n' +
+    '<html lang="en">\n' +
+    '<head>\n' +
+    '  <meta charset="utf-8"/>\n' +
+    '  <meta name="viewport" content="width=device-width,initial-scale=1"/>\n' +
+    '  <meta name="referrer" content="no-referrer"/>\n' +
+    '  <title>Demo sign-in code | FLOQR Master Admin</title>\n' +
+    '  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>\n' +
+    '  <script>location.replace("./master-admin.html#demoEmployees");</script>\n' +
+    '</head>\n' +
+    '<body data-floqr-public>\n' +
+    '<main class="app">\n' +
+    '  <p class="sub">Demo sign-in codes are now in Master Admin → Entity Management → Demo Svc / Emp Mgmt.\n' +
+    '    <a href="./master-admin.html#demoEmployees">Open Demo Svc / Emp Mgmt</a></p>\n' +
+    '</main>\n' +
+    '</body>\n' +
+    '</html>\n'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\demo-signin.test.js:235:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8"/>\n  <meta name="viewport" content="width=device-width,initial-scale=1"/>\n  <meta name="referrer" content="no-referrer"/>\n  <title>Demo sign-in code | FLOQR Master Admin</title>\n  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>\n  <script>location.replace("./master-admin.html#demoEmployees");</script>\n</head>\n<body data-floqr-public>\n<main class="app">\n  <p class="sub">Demo sign-in codes are now in Master Admin → Entity Management → Demo Svc / Emp Mgmt.\n    <a href="./master-admin.html#demoEmployees">Open Demo Svc / Emp Mgmt</a></p>\n</main>\n</body>\n</html>\n',
+    expected: /location\.replace\("\.\/master-admin\.html\?v=s\d+\.\d+\.\d+#demoEmployees"\)/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at feature-services-core.test.js:248:1
+✖ signed-out visitors on a forwarded page go to the general sign-in, then back (23.6598ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 's3.0.110'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\feature-services-core.test.js:254:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 's3.0.110',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at floqai-page.test.js:11:1
+✖ FloqAi has its own page and every entry point goes there (29.2661ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /intentSearchHome\(\) \{\s*return buildUrl\("\.\/floqai\.html", \{ v: APP_V \}\);/. Input:
+  
+  '/* FLOQR contextual back navigation — keep users inside the current portal/area */\r\n' +
+    '(function (global) {\r\n' +
+    '  "use strict";\r\n' +
+    '\r\n' +
+    '  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.\r\n' +
+    '     Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */\r\n' +
+    '  const APP_V = "s3.1.36";\r\n' +
+    '\r\n' +
+    '  function navT(key, fallback) {\r\n' +
+    '    try {\r\n' +
+    '      const fn = global.FLOQRI18n?.t;\r\n' +
+    '      if (typeof fn === "function") {\r\n' +
+    '        const out = fn(key);\r\n' +
+    '        if (out && out !== key) return out;\r\n' +
+    '      }\r\n' +
+    '    } catch (_) {}\r\n' +
+    '    return fallback;\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function qs(name) {\r\n' +
+    '    try { return new URL(global.location.href).searchParams.get(name) || ""; }\r\n' +
+    '    catch (e) { return ""; }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function buildUrl(path, params = {}, drop = []) {\r\n' +
+    '    try {\r\n' +
+    '      const next = new URL(path, global.location.href);\r\n' +
+    '      ["v", ...drop].forEach(key => next.searchParams.delete(key));\r\n' +
+    '      Object.entries(params).forEach(([key, value]) => {\r\n' +
+    '        if (key !== "v" && value != null && value !== "") next.searchParams.set(key, String(value));\r\n' +
+    '      });\r\n' +
+    '      const file = next.pathname.split("/").pop() || path.replace(/^\\.\\//, "");\r\n' +
+    '      const search = next.searchParams.toString();\r\n' +
+    '      return `./${file}${search ? `?${search}` : ""}${next.hash || ""}`;\r\n' +
+    '    } catch (e) {\r\n' +
+    '      return path;\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function pageName() {\r\n' +
+    '    try {\r\n' +
+    '      return String(global.location.pathname.split("/").pop() || "").toLowerCase();\r\n' +
+    '    } catch (e) {\r\n' +
+    '      return "";\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function currentVersion() {\r\n' +
+    '    return APP_V;\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  function isDisplayFile(path) {\r\n' +
+    '    const file = String(path || "").split("?")[0].split("/").pop() || "";\r\n' +
+    '    return file === "display.html" || file === "display2.html";\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  const FLOQRNav = {\r\n' +
+    '    appVersion: APP_V,\r\n' +
+    '    currentVersion,\r\n' +
+    '    portalHome(extra = {}) {\r\n' +
+    '      return buildUrl("./patron-portal.html", extra);\r\n' +
+    '    },\r\n' +
+    '    searchHome() {\r\n' +
+    '      return `./?start=search`;\r\n' +
+    '    },\r\n' +
+    '    adminHome(extra = {}) {\r\n' +
+    '      const extraLocation = extra.location;\r\n' +
+    '      const locationId = extraLocation != null && String(extraLocation).trim() !== ""\r\n' +
+    '        ? String(extraLocation).trim()\r\n' +
+    '        : (qs("location") || qs("club") || "");\r\n' +
+    '      const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");\r\n' +
+    '      const params = { ...extra, location: locationId };\r\n' +
+    '      if (from) params.from = from;\r\n' +
+    '      else delete params.from;\r\n' +
+    '      return buildUrl("./admin.html", params);\r\n' +
+    '    },\r\n' +
+    '    /** Club Admin URL for Venue Links / onboarding. */\r\n' +
+    '    adminPortalUrl(locationId = "", extra = {}) {\r\n' +
+    '      return this.adminHome({ location: locationId, from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Relative app link with any old ?v= removed. Display boards also drop screen params. */\r\n' +
+    '    stampCurrentVersion(href = "", extra = {}) {\r\n' +
+    '      if (!href) return href;\r\n' +
+    '      if (isDisplayFile(href)) return buildUrl(href, extra, ["screen", "screenFormatId"]);\r\n' +
+    '      return buildUrl(href, extra);\r\n' +
+    '    },\r\n' +
+    '    masterHome(extra = {}) {\r\n' +
+    '      const { hash, ...params } = extra || {};\r\n' +
+    '      const href = buildUrl("./master-admin.html", params);\r\n' +
+    '      const panel = String(hash || "").replace(/^#/, "").trim();\r\n' +
+    '      return panel ? `${href}#${panel}` : href;\r\n' +
+    '    },\r\n' +
+    '    suprstrHome(extra = {}) {\r\n' +
+    '      return buildUrl("./suprstr-search.html", { from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite page under My Profile and Settings */\r\n' +
+    '    portalLink(path, extra = {}) {\r\n' +
+    '      return buildUrl(path, { from: "portal", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite page under Club Admin — always stamp from=admin (+ location). */\r\n' +
+    '    adminLink(path, extra = {}) {\r\n' +
+    '      const locationId = qs("location") || qs("club") || extra.location || "";\r\n' +
+    '      return buildUrl(path, { from: "admin", location: locationId, ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */\r\n' +
+    '    masterLink(path, extra = {}) {\r\n' +
+    '      return buildUrl(path, { from: "master", ...extra });\r\n' +
+    '    },\r\n' +
+    '    /** Stable venue board URL (for LED devices and external embeds). */\r\n' +
+    '    stableDisplayUrl(locationId = "", extra = {}) {\r\n' +
+    '      const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();\r\n' +
+    '      const params = {...extra};\r\n' +
+    '      delete params.location;\r\n' +
+    '      delete params.v;\r\n' +
+    '      const board = String(params.board || params.displayBoard || "").toLowerCase();\r\n' +
+    '      delete params.board;\r\n' +
+    '      delete params.displayBoard;\r\n' +
+    '      const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";\r\n' +
+    '      return buildUrl(page, id ? {location: id, ...params} : params);\r\n' +
+    '    },\r\n' +
+    '    /** Second LED/board per club — display2.html?location=… */\r\n' +
+    '    stableSecondaryDisplayUrl(locationId = "", extra = {}) {\r\n' +
+    '      return this.stableDisplayUrl(locationId, {...extra, board: "secondary"});\r\n' +
+    '    },\r\n' +
+    '    /** Resolve the correct back target for a satellite page. */\r\n' +
+    '    resolveBack(fromOverride = "") {\r\n' +
+    '      const from = String(fromOverride || qs("from") || "").toLowerCase();\r\n' +
+    '      const file = pageName();\r\n' +
+    '      let hash = "";\r\n' +
+    '      try { hash = String(global.location?.hash || "").replace(/^#/, "").trim(); } catch (_) {}\r\n' +
+    '\r\n' +
+    '      // Master Admin NIC: never dump operators onto the patron Search landing.\r\n' +
+    '      // Profile & Settings is an explicit profile-menu exit (new tab), not Back.\r\n' +
+    '      if (file === "master-admin.html") {\r\n' +
+    '        const onHome = !hash || hash === "networkDashboard";\r\n' +
+    '        return {\r\n' +
+    '          href: this.masterHome({ hash: "networkDashboard" }),\r\n' +
+    '          label: navT("nav.backToNic", "← Network Intelligence Center"),\r\n' +
+    '          stay: onHome\r\n' +
+    '        };\r\n' +
+    '      }\r\n' +
+    '\r\n' +
+    '      // Club Admin landing: never dump managers onto the patron Search site.\r\n' +
+    '      if (file === "admin.html") {\r\n' +
+    '        if (from === "master") {\r\n' +
+    '          return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n' +
+    '        }\r\n' +
+    '        return { href: this.adminHome({ from: "" }), label: navT("nav.backToVenueCommand", "← Venue Command Center"), stay: true };\r\n' +
+    '      }\r\n' +
+    '\r\n' +
+    '      if (from === "portal" || from === "profile") {\r\n' +
+    '        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "admin" || from === "club") {\r\n' +
+    '        return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "master") {\r\n' +
+    '        return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "mingl") {\r\n' +
+    '        return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };\r\n' +
+    '      }\r\n' +
+    '      if (from === "bartr" || from === "commerce") {\r\n' +
+    '        return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };\r\n' +
+    '      }\r\n' +
+    '      return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };\r\n' +
+    '    },\r\n' +
+    '    /**\r\n' +
+    '     * Prefer URL ?from= over hardcoded data-from so Club Admin deep links win.\r\n' +
+    '     * data-from is only a fallback when the query has no from.\r\n' +
+    '     */\r\n' +
+    '    applyGlobalBack(anchorOrId = "floqrGlobalBack") {\r\n' +
+    '      const anchor = typeof anchorOrId === "string" ? document.getElementById(anchorOrId) : anchorOrId;\r\n' +
+    '      if (!anchor) return null;\r\n' +
+    '      const queryFrom = qs("from");\r\n' +
+    '      const from = queryFrom || anchor.dataset.from || "";\r\n' +
+    '      if (queryFrom) anchor.dataset.from = queryFrom;\r\n' +
+    '      const target = this.resolveBack(from);\r\n' +
+    '      anchor.href = target.href;\r\n' +
+    '      anchor.textContent = target.label;\r\n' +
+    '      // On Club Admin / Master Admin NIC home, hide a no-op "home" back.\r\n' +
+    '      const hub = pageName();\r\n' +
+    '      if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {\r\n' +
+    '        anchor.classList.add("hidden");\r\n' +
+    '        anchor.setAttribute("aria-hidden", "true");\r\n' +
+    '      } else {\r\n' +
+    '        anchor.classList.remove("hidden");\r\n' +
+    '        anchor.removeAttribute("aria-hidden");\r\n' +
+    '      }\r\n' +
+    '      return target;\r\n' +
+    '    },\r\n' +
+    '    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */\r\n' +
+    '    applyStartPage(showPage) {\r\n' +
+    '      if (typeof showPage !== "function") return;\r\n' +
+    '      const start = String(qs("start") || "").toLowerCase();\r\n' +
+    '      if (start === "intent" || start === "ask" || start === "wish") {\r\n' +
+    '        const q = qs("q");\r\n' +
+    '        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));\r\n' +
+    '      }\r\n' +
+    '      else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");\r\n' +
+    '      else if (start === "mingl") showPage("minglLandingPage");\r\n' +
+    '    },\r\n' +
+    '    intentSearchHome() {\r\n' +
+    '      return buildUrl("./floqai.html");\r\n' +
+    '    }\r\n' +
+    '  };\r\n' +
+    '\r\n' +
+    '  global.FLOQRNav = FLOQRNav;\r\n' +
+    '\r\n' +
+    '  if (typeof global.addEventListener === "function") {\r\n' +
+    '    global.addEventListener("floqr:ui-language", () => {\r\n' +
+    '      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}\r\n' +
+    '    });\r\n' +
+    '  }\r\n' +
+    '})(typeof window !== "undefined" ? window : globalThis);\r\n'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\floqai-page.test.js:13:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '/* FLOQR contextual back navigation — keep users inside the current portal/area */\r\n(function (global) {\r\n  "use strict";\r\n\r\n  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.\r\n     Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */\r\n  const APP_V = "s3.1.36";\r\n\r\n  function navT(key, fallback) {\r\n    try {\r\n      const fn = global.FLOQRI18n?.t;\r\n      if (typeof fn === "function") {\r\n        const out = fn(key);\r\n        if (out && out !== key) return out;\r\n      }\r\n    } catch (_) {}\r\n    return fallback;\r\n  }\r\n\r\n  function qs(name) {\r\n    try { return new URL(global.location.href).searchParams.get(name) || ""; }\r\n    catch (e) { return ""; }\r\n  }\r\n\r\n  function buildUrl(path, params = {}, drop = []) {\r\n    try {\r\n      const next = new URL(path, global.location.href);\r\n      ["v", ...drop].forEach(key => next.searchParams.delete(key));\r\n      Object.entries(params).forEach(([key, value]) => {\r\n        if (key !== "v" && value != null && value !== "") next.searchParams.set(key, String(value));\r\n      });\r\n      const file = next.pathname.split("/").pop() || path.replace(/^\\.\\//, "");\r\n      const search = next.searchParams.toString();\r\n      return `./${file}${search ? `?${search}` : ""}${next.hash || ""}`;\r\n    } catch (e) {\r\n      return path;\r\n    }\r\n  }\r\n\r\n  function pageName() {\r\n    try {\r\n      return String(global.location.pathname.split("/").pop() || "").toLowerCase();\r\n    } catch (e) {\r\n      return "";\r\n    }\r\n  }\r\n\r\n  function currentVersion() {\r\n    return APP_V;\r\n  }\r\n\r\n  function isDisplayFile(path) {\r\n    const file = String(path || "").split("?")[0].split("/").pop() || "";\r\n    return file === "display.html" || file === "display2.html";\r\n  }\r\n\r\n  const FLOQRNav = {\r\n    appVersion: APP_V,\r\n    currentVersion,\r\n    portalHome(extra = {}) {\r\n      return buildUrl("./patron-portal.html", extra);\r\n    },\r\n    searchHome() {\r\n      return `./?start=search`;\r\n    },\r\n    adminHome(extra = {}) {\r\n      const extraLocation = extra.location;\r\n      const locationId = extraLocation != null && String(extraLocation).trim() !== ""\r\n        ? String(extraLocation).trim()\r\n        : (qs("location") || qs("club") || "");\r\n      const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");\r\n      const params = { ...extra, location: locationId };\r\n      if (from) params.from = from;\r\n      else delete params.from;\r\n      return buildUrl("./admin.html", params);\r\n    },\r\n    /** Club Admin URL for Venue Links / onboarding. */\r\n    adminPortalUrl(locationId = "", extra = {}) {\r\n      return this.adminHome({ location: locationId, from: "master", ...extra });\r\n    },\r\n    /** Relative app link with any old ?v= removed. Display boards also drop screen params. */\r\n    stampCurrentVersion(href = "", extra = {}) {\r\n      if (!href) return href;\r\n      if (isDisplayFile(href)) return buildUrl(href, extra, ["screen", "screenFormatId"]);\r\n      return buildUrl(href, extra);\r\n    },\r\n    masterHome(extra = {}) {\r\n      const { hash, ...params } = extra || {};\r\n      const href = buildUrl("./master-admin.html", params);\r\n      const panel = String(hash || "").replace(/^#/, "").trim();\r\n      return panel ? `${href}#${panel}` : href;\r\n    },\r\n    suprstrHome(extra = {}) {\r\n      return buildUrl("./suprstr-search.html", { from: "master", ...extra });\r\n    },\r\n    /** Satellite page under My Profile and Settings */\r\n    portalLink(path, extra = {}) {\r\n      return buildUrl(path, { from: "portal", ...extra });\r\n    },\r\n    /** Satellite page under Club Admin — always stamp from=admin (+ location). */\r\n    adminLink(path, extra = {}) {\r\n      const locationId = qs("location") || qs("club") || extra.location || "";\r\n      return buildUrl(path, { from: "admin", location: locationId, ...extra });\r\n    },\r\n    /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */\r\n    masterLink(path, extra = {}) {\r\n      return buildUrl(path, { from: "master", ...extra });\r\n    },\r\n    /** Stable venue board URL (for LED devices and external embeds). */\r\n    stableDisplayUrl(locationId = "", extra = {}) {\r\n      const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();\r\n      const params = {...extra};\r\n      delete params.location;\r\n      delete params.v;\r\n      const board = String(params.board || params.displayBoard || "").toLowerCase();\r\n      delete params.board;\r\n      delete params.displayBoard;\r\n      const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";\r\n      return buildUrl(page, id ? {location: id, ...params} : params);\r\n    },\r\n    /** Second LED/board per club — display2.html?location=… */\r\n    stableSecondaryDisplayUrl(locationId = "", extra = {}) {\r\n      return this.stableDisplayUrl(locationId, {...extra, board: "secondary"});\r\n    },\r\n    /** Resolve the correct back target for a satellite page. */\r\n    resolveBack(fromOverride = "") {\r\n      const from = String(fromOverride || qs("from") || "").toLowerCase();\r\n      const file = pageName();\r\n      let hash = "";\r\n      try { hash = String(global.location?.hash || "").replace(/^#/, "").trim(); } catch (_) {}\r\n\r\n      // Master Admin NIC: never dump operators onto the patron Search landing.\r\n      // Profile & Settings is an explicit profile-menu exit (new tab), not Back.\r\n      if (file === "master-admin.html") {\r\n        const onHome = !hash || hash === "networkDashboard";\r\n        return {\r\n          href: this.masterHome({ hash: "networkDashboard" }),\r\n          label: navT("nav.backToNic", "← Network Intelligence Center"),\r\n          stay: onHome\r\n        };\r\n      }\r\n\r\n      // Club Admin landing: never dump managers onto the patron Search site.\r\n      if (file === "admin.html") {\r\n        if (from === "master") {\r\n          return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n        }\r\n        return { href: this.adminHome({ from: "" }), label: navT("nav.backToVenueCommand", "← Venue Command Center"), stay: true };\r\n      }\r\n\r\n      if (from === "portal" || from === "profile") {\r\n        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };\r\n      }\r\n      if (from === "admin" || from === "club") {\r\n        return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };\r\n      }\r\n      if (from === "master") {\r\n        return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };\r\n      }\r\n      if (from === "mingl") {\r\n        return { href: `./?start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };\r\n      }\r\n      if (from === "bartr" || from === "commerce") {\r\n        return { href: `./commerce.html`, label: navT("nav.backToBartr", "← Back to BartR") };\r\n      }\r\n      return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };\r\n    },\r\n    /**\r\n     * Prefer URL ?from= over hardcoded data-from so Club Admin deep links win.\r\n     * data-from is only a fallback when the query has no from.\r\n     */\r\n    applyGlobalBack(anchorOrId = "floqrGlobalBack") {\r\n      const anchor = typeof anchorOrId === "string" ? document.getElementById(anchorOrId) : anchorOrId;\r\n      if (!anchor) return null;\r\n      const queryFrom = qs("from");\r\n      const from = queryFrom || anchor.dataset.from || "";\r\n      if (queryFrom) anchor.dataset.from = queryFrom;\r\n      const target = this.resolveBack(from);\r\n      anchor.href = target.href;\r\n      anchor.textContent = target.label;\r\n      // On Club Admin / Master Admin NIC home, hide a no-op "home" back.\r\n      const hub = pageName();\r\n      if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {\r\n        anchor.classList.add("hidden");\r\n        anchor.setAttribute("aria-hidden", "true");\r\n      } else {\r\n        anchor.classList.remove("hidden");\r\n        anchor.removeAttribute("aria-hidden");\r\n      }\r\n      return target;\r\n    },\r\n    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */\r\n    applyStartPage(showPage) {\r\n      if (typeof showPage !== "function") return;\r\n      const start = String(qs("start") || "").toLowerCase();\r\n      if (start === "intent" || start === "ask" || start === "wish") {\r\n        const q = qs("q");\r\n        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));\r\n      }\r\n      else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");\r\n      else if (start === "mingl") showPage("minglLandingPage");\r\n    },\r\n    intentSearchHome() {\r\n      return buildUrl("./floqai.html");\r\n    }\r\n  };\r\n\r\n  global.FLOQRNav = FLOQRNav;\r\n\r\n  if (typeof global.addEventListener === "function") {\r\n    global.addEventListener("floqr:ui-language", () => {\r\n      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}\r\n    });\r\n  }\r\n})(typeof window !== "undefined" ? window : globalThis);\r\n',
+    expected: /intentSearchHome\(\) \{\s*return buildUrl\("\.\/floqai\.html", \{ v: APP_V \}\);/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at privacy-compliance.test.js:37:1
+✖ FLOQRCanonical prefers www.floqr.com production origin (23.5969ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /privacy\.html\?v=s3\.0\.103/. Input:
+  
+  './privacy.html'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\privacy-compliance.test.js:44:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: './privacy.html',
+    expected: /privacy\.html\?v=s3\.0\.103/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at session-hint-hero-help.test.js:149:1
+✖ embedded signed-out hint is a plain status line with a current-package My Profile link (26.4454ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /[?&]v=s3\.1\.36(&|$)/. Input:
+  
+  '/patron-portal.html?from=session-shell'
+  
+      at TestContext.<anonymous> (C:\Users\Don\Documents\Codex\2026-06-22\so\work\v29-08\functions\session-hint-hero-help.test.js:158:10)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '/patron-portal.html?from=session-shell',
+    expected: /[?&]v=s3\.1\.36(&|$)/,
+    operator: 'match',
+    diff: 'simple'
+  }

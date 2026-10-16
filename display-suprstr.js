@@ -1,4 +1,4 @@
-/* Venue display / displays — receive SupRstR live video for this location + board. */
+/* Venue display2 — receive supRstar live video for this location + board. */
 (function () {
   "use strict";
 
@@ -22,6 +22,8 @@
       const file = String(location.pathname.split("/").pop() || "").toLowerCase();
       if (file === "display2.html" || file === "displays.html") return "secondary";
     } catch (_) {}
+    const meta = document.querySelector('meta[name="floqr-display-board"]');
+    if (meta && String(meta.content || "").toLowerCase() === "secondary") return "secondary";
     return "primary";
   }
 
@@ -38,40 +40,59 @@
     wrap.className = "suprstr-live-overlay hidden";
     wrap.setAttribute("aria-live", "polite");
     wrap.innerHTML = `
-      <video id="suprstrLiveVideo" class="suprstr-live-video" autoplay playsinline muted></video>
+      <video id="suprstrLiveVideo" class="suprstr-live-video" autoplay playsinline muted webkit-playsinline></video>
       <div class="suprstr-live-badge">LIVE · supRstar</div>
+      <div id="suprstrLiveStatus" class="suprstr-live-status">Connecting…</div>
     `;
     const canvas = byId("displayCanvas") || document.body;
     canvas.appendChild(wrap);
     return wrap;
   }
 
+  function setLiveStatus(msg) {
+    const el = byId("suprstrLiveStatus");
+    if (el) el.textContent = msg || "";
+  }
+
   function showOverlay(show) {
     const wrap = ensureOverlay();
     wrap.classList.toggle("hidden", !show);
+    document.body.classList.toggle("suprstr-live-active", !!show);
   }
 
   let activeJoin = null;
   let activeSessionId = "";
 
   async function attachSession(sessionId) {
-    if (!sessionId || sessionId === activeSessionId) return;
+    if (!sessionId) return;
+    if (sessionId === activeSessionId && activeJoin) return;
     if (activeJoin) {
       activeJoin.stop();
       activeJoin = null;
     }
     activeSessionId = sessionId;
-    const video = byId("suprstrLiveVideo") || ensureOverlay() && byId("suprstrLiveVideo");
+    ensureOverlay();
+    const video = byId("suprstrLiveVideo");
     showOverlay(true);
+    setLiveStatus("Connecting to patron…");
     if (!window.FLOQRSuprstrRtc?.joinAsDisplay) {
-      console.warn("SupRstR RTC helper missing");
+      setLiveStatus("Camera helper missing — refresh display2.");
+      console.warn("supRstar RTC helper missing");
       return;
     }
+    window.FLOQRSuprstrRtc.forceVideoPlay?.(video);
     activeJoin = await window.FLOQRSuprstrRtc.joinAsDisplay({
       sessionId,
       videoEl: video,
       onStatus(s) {
-        if (s === "ended") detach();
+        if (s === "ended") {
+          detach();
+          return;
+        }
+        if (s === "track" || s === "connected") setLiveStatus("");
+        else if (s === "answered") setLiveStatus("Linked — waiting for video…");
+        else if (String(s || "").includes("error")) setLiveStatus(String(s));
+        else setLiveStatus(`WebRTC: ${s}`);
       }
     });
   }
@@ -83,6 +104,7 @@
     }
     activeSessionId = "";
     showOverlay(false);
+    setLiveStatus("");
   }
 
   function boot() {
@@ -93,13 +115,26 @@
       firebase.initializeApp(window.firebaseConfig);
     }
     const liveId = suprstrLiveDocId(locationId);
+    console.info("[supRstar display] watching", liveId, "board=", displayBoard());
     firebase.firestore().collection("suprstrLive").doc(liveId).onSnapshot((snap) => {
       const data = snap.exists ? snap.data() || {} : {};
       const status = String(data.status || "").toLowerCase();
       const sessionId = String(data.sessionId || "").trim();
       if (status === "live" && sessionId) attachSession(sessionId);
       else detach();
-    }, (err) => console.warn("suprstrLive watch", err));
+    }, (err) => {
+      console.warn("suprstrLive watch", err);
+      setLiveStatus(err?.message || "Live watch failed");
+      showOverlay(true);
+    });
+
+    // Kiosk/WebView autoplay: unlock muted playback on first gesture if needed.
+    const unlock = () => {
+      const video = byId("suprstrLiveVideo");
+      window.FLOQRSuprstrRtc?.forceVideoPlay?.(video);
+    };
+    document.addEventListener("click", unlock, {passive: true});
+    document.addEventListener("touchstart", unlock, {passive: true});
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

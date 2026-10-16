@@ -1,0 +1,142 @@
+[
+  {
+    "name": "display-zebbies-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=zebbies-garden-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Zebbies Garden DC",
+    "file": "after-display-zebbies-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / ZEBBIES / GARDEN DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 41,
+          "runW": 285,
+          "runH": 33,
+          "rect": {
+            "x": 65,
+            "y": 36,
+            "w": 285,
+            "h": 33
+          }
+        },
+        {
+          "text": "ZEBBIES",
+          "fontPx": 41,
+          "runW": 132,
+          "runH": 33,
+          "rect": {
+            "x": 142,
+            "y": 69,
+            "w": 132,
+            "h": 33
+          }
+        },
+        {
+          "text": "GARDEN DC",
+          "fontPx": 41,
+          "runW": 184,
+          "runH": 33,
+          "rect": {
+            "x": 116,
+            "y": 102,
+            "w": 184,
+            "h": 33
+          }
+        }
+      ],
+      "fontSizes": [
+        41
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "41",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  },
+  {
+    "name": "display-heist-64x32",
+    "url": "http://127.0.0.1:8765/display.html?location=heist-washington-dc&preview=1&screen=led-64x32",
+    "size": "64x32",
+    "venue": "Heist Washington DC",
+    "file": "after-display-heist-64x32.png",
+    "measure": {
+      "viewport": "416x208",
+      "canvasClass": "display-canvas classic-bw classic-board-template classic-bw-idle",
+      "format": "led-64x32",
+      "idleClass": true,
+      "text": "USE SHOUTOUT @ / HEIST / WASHINGTON DC",
+      "rows": [
+        {
+          "text": "USE SHOUTOUT @",
+          "fontPx": 41,
+          "runW": 285,
+          "runH": 33,
+          "rect": {
+            "x": 65,
+            "y": 36,
+            "w": 285,
+            "h": 33
+          }
+        },
+        {
+          "text": "HEIST",
+          "fontPx": 41,
+          "runW": 94,
+          "runH": 33,
+          "rect": {
+            "x": 161,
+            "y": 69,
+            "w": 94,
+            "h": 33
+          }
+        },
+        {
+          "text": "WASHINGTON DC",
+          "fontPx": 41,
+          "runW": 277,
+          "runH": 33,
+          "rect": {
+            "x": 70,
+            "y": 102,
+            "w": 277,
+            "h": 33
+          }
+        }
+      ],
+      "fontSizes": [
+        41
+      ],
+      "uniform": true,
+      "insideSafe": true,
+      "idleFitPx": "41",
+      "main": {
+        "w": 339,
+        "h": 122
+      },
+      "host": {
+        "w": 298,
+        "h": 100
+      },
+      "suprstar": [],
+      "boardFitLoaded": true,
+      "idleFitApi": true
+    },
+    "errors": []
+  }
+]

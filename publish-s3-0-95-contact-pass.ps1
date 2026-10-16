@@ -39,7 +39,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "feat: discovery contact pass — brand domains + WhatsApp phone (s3.0.95)"
+    & $git commit -m "feat: discovery contact pass - brand domains + WhatsApp phone (s3.0.95)"
     if ($LASTEXITCODE -ne 0) { throw "Commit failed" }
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }

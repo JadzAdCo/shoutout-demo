@@ -28,7 +28,7 @@ foreach ($rel in $files) {
   Copy-Item $src $dst -Force
 }
 
-$msg = "s3.0.62: NFL shorter/wider jersey, FloqR FloqMedia↔FROM loop at bottom, force 6s jersey↔shout gif, emoji; Christine FloqR cycle"
+$msg = "s3.0.62: NFL shorter/wider jersey, FloqR FloqMedia-FROM loop at bottom, force 6s jersey-shout gif, emoji; Christine FloqR cycle"
 [IO.File]::WriteAllText((Join-Path $stage "commit-msg.txt"), $msg + "`n")
 
 Push-Location $stage
