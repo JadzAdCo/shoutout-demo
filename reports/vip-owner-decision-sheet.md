@@ -38,6 +38,23 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 | **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand` — Search tile, F&S row label, patron/admin chrome use **VIP ReserV** · protected never-translate |
 | **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | [ ] Master Admin / Club Admin onboarding help — beta venue list · [ ] floor-plan ingest topics for all three |
 
+### Batch 2 decided (Oct 16 2026) — remaining money
+
+**Consistency note:** VIP-B-06 B and VIP-B-11 C agree — always return / reverse the FloqMedia–FLOQR platform fee whenever the patron gets a deposit (or money) refund. **VIP-B-08 B:** Model B % fee base = **deposits + in-venue spend** (per B-03) **but not** extra-guest VIP entry fees.
+
+| ID | Owner answer (verbatim) | Help when built |
+|---|---|---|
+| **VIP-B-04** | Configurable % — FLOQR patron booking fee (if any) is a configurable percentage set at Master Admin / VIP ReserV management (shared with club as contractual), **NOT** a fixed beta-off or fixed dollar. Can be set to **0%** to mean no fee. | [ ] `help-vip-booking-fee-percent` — Master Admin sets patron booking-fee %; club can view; 0% = no fee |
+| **VIP-B-06** | B — Always return FloqMedia/FLOQR platform fee whenever the patron gets a deposit refund. | [ ] `help-vip-platform-fee-refund` — platform / application fee returned on every patron deposit refund |
+| **VIP-B-07** | A — Extra-guest VIP entry fee prepaid at booking as its own checkout line. | [ ] `help-vip-extra-guest-prepaid` — separate Checkout line “Extra guests — VIP entry” |
+| **VIP-B-08** | B — Extra-guest fees do **NOT** count toward Model B % fee base. | [ ] `help-vip-model-b-fee-base` — Model B base = deposits + in-venue spend; **exclude** extra-guest fees |
+| **VIP-B-09** | A — Extra-guest fee refunds follow same full-or-none club policy as deposit. | [ ] `help-vip-extra-guest-refund` — same full-or-none policy engine as deposit |
+| **VIP-B-11** | C — Always reverse FLOQR % whenever money is refunded to the patron (same/next billing period for invoiced Model B). | [ ] `help-vip-percent-fee-reverse` — reverse Model B / FLOQR % on every patron money refund; credit same or next invoice when Model B was invoiced |
+| **VIP-B-12** | A — Dunning day 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. | [ ] `help-vip-dunning` — dunning timeline; pause new bookings at day 21; MA extend |
+| **VIP-B-13** | D — No second Master Admin approver for credit notes in beta (any Master Admin alone). | [ ] `help-vip-credit-note-approval` — beta: any Master Admin may issue credit notes alone (no two-person rule) |
+| **VIP-B-14** | A — Counsel+accountant before Live; Stripe Tax off in beta. | [ ] `help-vip-sales-tax-beta` — Stripe Tax off in beta; counsel/accountant checklist before Live |
+
+
 ---
 
 ## A — Money & Stripe
@@ -48,17 +65,17 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 | VIP-B-02 | Proposal §20 Q3 | Must Model A ($20/mo) clubs still complete Stripe Connect to receive deposits? | **Yes — Connect required for any deposit-taking club** | Avoids FloqMedia holding club funds / money-transmission risk | **DECIDED Oct 16 2026** — Derived from B-01 (not blanket for $20/mo): Club Stripe → Connect required; FloqR Stripe → Connect not required; Club POS → POS connection required, Connect not required for collection. Model A vs B separate from collector. Help: [ ] `help-vip-payment-collector` |
 | VIP-B-03 | Proposal §20 Q4 | Model B “% of collected fees”: deposits/prepaid only, or also in-venue spend? Default %? | **Deposits + prepaid extras only · 10% (1000 bps)** | Measurable from FLOQR/POS webhooks; in-venue spend needs attestation and is Phase 2+ | **DECIDED Oct 16 2026** — C: Model B % includes **in-venue spend** (not only app deposit/prepaid). POS needed to measure in-venue spend. Help: [ ] `help-vip-model-b-in-venue-percent` |
 | VIP-B-03b | Follow-up to VIP-B-03 | What Model B percent number (bps)? | Configurable per deal (no platform default) | Contractual rate per club/promoter; Master Admin negotiates | **DECIDED Oct 16 2026** — NOT a fixed platform default. Configurable at Master Admin, shared with club admin, contractual obligation. Each deal has its contracted rate; UI shows contracted %; set in F&S / VIP ReserV management. Help: [ ] `help-vip-model-b-percent-contract` |
-| VIP-B-04 | Proposal §20 Q5 | Charge patrons a FLOQR booking fee on top of deposit? | **No patron booking fee in beta** | All-in price stays the club’s deposit; Stripe processing already on patron (Oct 15) | OPEN |
+| VIP-B-04 | Proposal §20 Q5 | Charge patrons a FLOQR booking fee on top of deposit? | **No patron booking fee in beta** | All-in price stays the club’s deposit; Stripe processing already on patron (Oct 15) | **DECIDED Oct 16 2026** — Configurable % at Master Admin / VIP ReserV management (shared with club as contractual); **NOT** fixed beta-off or fixed dollar; **0%** = no fee. Help: [ ] `help-vip-booking-fee-percent` |
 | VIP-B-05 | Proposal §20 Q6 | Default charge at booking: partial deposit % of minimum, or full minimum prepay? | **Full minimum prepay** | Strongest no-show protection; simplest refunds (full-or-none) | **DECIDED Oct 16 2026** — D: Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. |
-| VIP-B-06 | Proposal §20 Q7 | Refund FloqMedia’s application / Model B fee when a booking is cancelled? | **Refund fee only on club-caused cancellations** | Patron cancels → platform kept work; club cancels → make patron and club whole | OPEN |
-| VIP-B-07 | Proposal §20 Q23(a) | Is the extra-guest VIP entry fee prepaid at booking? | **Yes — separate Checkout line** | Matches demo; door does not chase unpaid entry | OPEN |
-| VIP-B-08 | Proposal §20 Q23(b) | Does extra-guest fee count toward Model B %? | **Yes** | It is money FLOQR collected / attested; same fee base as deposit | OPEN |
-| VIP-B-09 | Proposal §20 Q23(c) | Extra-guest fee refundability vs deposit policy? | **Same full-or-none club policy as deposit** | One policy engine; no special partial guest-fee rules in beta | OPEN |
+| VIP-B-06 | Proposal §20 Q7 | Refund FloqMedia’s application / Model B fee when a booking is cancelled? | **Refund fee only on club-caused cancellations** | Patron cancels → platform kept work; club cancels → make patron and club whole | **DECIDED Oct 16 2026** — B: Always return FloqMedia/FLOQR platform fee whenever the patron gets a deposit refund. Help: [ ] `help-vip-platform-fee-refund` |
+| VIP-B-07 | Proposal §20 Q23(a) | Is the extra-guest VIP entry fee prepaid at booking? | **Yes — separate Checkout line** | Matches demo; door does not chase unpaid entry | **DECIDED Oct 16 2026** — A: Extra-guest VIP entry fee prepaid at booking as its own checkout line. Help: [ ] `help-vip-extra-guest-prepaid` |
+| VIP-B-08 | Proposal §20 Q23(b) | Does extra-guest fee count toward Model B %? | **Yes** | It is money FLOQR collected / attested; same fee base as deposit | **DECIDED Oct 16 2026** — B: Extra-guest fees do **NOT** count toward Model B % fee base (base = deposits + in-venue spend only). Help: [ ] `help-vip-model-b-fee-base` |
+| VIP-B-09 | Proposal §20 Q23(c) | Extra-guest fee refundability vs deposit policy? | **Same full-or-none club policy as deposit** | One policy engine; no special partial guest-fee rules in beta | **DECIDED Oct 16 2026** — A: Extra-guest fee refunds follow same full-or-none club policy as deposit. Help: [ ] `help-vip-extra-guest-refund` |
 | VIP-B-10 | Billing §14 Q2 | Allow Model B for POS (b) and pay-at-venue (c) clubs (monthly invoice + attestation)? | **Yes — Model B on (b)/(c) with monthly invoice + attestation** | Clubs without Connect still pay %; ledger is source of truth | **DECIDED Oct 16 2026** — A: Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). Help: [ ] `help-vip-model-b-pos` |
-| VIP-B-11 | Billing §14 Q3 | When is FLOQR’s % fee returned on refunds / no-shows (club-caused, patron-caused, POS later)? Window? | **Return fee on club-caused only · within same or next billing period** | Aligns with VIP-B-06; POS late reports get a credit on next invoice | OPEN |
-| VIP-B-12 | Billing §14 Q9 | Confirm dunning days (§6.4) and pause new bookings at day 21? | **Use §6.4 timeline · pause new bookings at day 21** | Protects AR without killing same-night door ops on day 1 | OPEN |
-| VIP-B-13 | Billing §14 Q10 | Credit-note amount that needs a second Master Admin approver? | **$500** | Stops large goodwill credits without two-person rule on every $20 note | OPEN |
-| VIP-B-14 | Billing §14 Q14 | Sales tax: is FLOQR’s fee taxable in DC / launch states? Deposits taxable at booking or service? Stripe Tax on/off? | **Counsel + accountant confirm before Live · Stripe Tax off in beta** | Tax is jurisdiction-specific; beta can invoice pre-tax with counsel checklist | OPEN |
+| VIP-B-11 | Billing §14 Q3 | When is FLOQR’s % fee returned on refunds / no-shows (club-caused, patron-caused, POS later)? Window? | **Return fee on club-caused only · within same or next billing period** | Aligns with VIP-B-06; POS late reports get a credit on next invoice | **DECIDED Oct 16 2026** — C: Always reverse FLOQR % whenever money is refunded to the patron (same/next billing period for invoiced Model B). Consistent with VIP-B-06 B. Help: [ ] `help-vip-percent-fee-reverse` |
+| VIP-B-12 | Billing §14 Q9 | Confirm dunning days (§6.4) and pause new bookings at day 21? | **Use §6.4 timeline · pause new bookings at day 21** | Protects AR without killing same-night door ops on day 1 | **DECIDED Oct 16 2026** — A: Dunning day 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. Help: [ ] `help-vip-dunning` |
+| VIP-B-13 | Billing §14 Q10 | Credit-note amount that needs a second Master Admin approver? | **$500** | Stops large goodwill credits without two-person rule on every $20 note | **DECIDED Oct 16 2026** — D: No second Master Admin approver for credit notes in beta (any Master Admin alone). Help: [ ] `help-vip-credit-note-approval` |
+| VIP-B-14 | Billing §14 Q14 | Sales tax: is FLOQR’s fee taxable in DC / launch states? Deposits taxable at booking or service? Stripe Tax on/off? | **Counsel + accountant confirm before Live · Stripe Tax off in beta** | Tax is jurisdiction-specific; beta can invoice pre-tax with counsel checklist | **DECIDED Oct 16 2026** — A: Counsel+accountant before Live; Stripe Tax off in beta. Help: [ ] `help-vip-sales-tax-beta` |
 
 ---
 
@@ -235,34 +252,41 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 
 | Group | Open IDs |
 |---|---|
-| A Money & Stripe | VIP-B-04, 06…09, 11…14 (9) — B-01/02/03/03b/05/10 decided |
+| A Money & Stripe | **none** — all money IDs decided (Batch 1 + Batch 2) |
 | B Roles & legal | VIP-P-01…08 (8) |
 | C Booking UX & floor plans | VIP-P-09…12 (4) |
 | D Notifications & receipts | VIP-B-15…19 (5) |
 | E Promoters & ledger | VIP-B-20…22 (3) |
 | F Brand / origin / beta | VIP-P-15 only (1) — P-13/14/16 decided |
 | G Other | VIP-B-23…24 (2) |
-| **Total OPEN** | **32** |
+| **Total OPEN** | **23** |
 | Skipped (Oct 15) | Stripe fee payer · full-or-none refunds · promoter corporate check · Lima name · bars · area names · 360 timing |
 | Decided Batch 1 (Oct 16) | VIP-B-01 · VIP-B-02 · VIP-B-03 · VIP-B-03b · VIP-B-05 · VIP-B-10 · VIP-P-13 · VIP-P-14 · VIP-P-16 |
-| Presented Batch 2 (Oct 16) | VIP-B-04 · VIP-B-06 · VIP-B-07 · VIP-B-08 · VIP-B-09 · VIP-B-11 · VIP-B-12 · VIP-B-13 · VIP-B-14 |
+| Decided Batch 2 (Oct 16) | VIP-B-04 · VIP-B-06 · VIP-B-07 · VIP-B-08 · VIP-B-09 · VIP-B-11 · VIP-B-12 · VIP-B-13 · VIP-B-14 |
 
 ---
 
-## Batch 2 (presented Oct 16 2026)
+## Batch 2 (DECIDED Oct 16 2026) — remaining money
 
-Next owner batch after Batch 1 money/brand decisions. **Remaining money only** (9 IDs ≈ ~8). Roles/legal deferred to Batch 3.
+All 9 money IDs answered. See **Batch 2 decided** table above. Roles/legal deferred to Batch 3.
 
-| ID | Topic (short) |
-|---|---|
-| VIP-B-04 | Patron FLOQR booking fee on top of deposit? |
-| VIP-B-06 | Refund FloqMedia / Model B fee on cancellation? |
-| VIP-B-07 | Extra-guest VIP entry fee prepaid at booking? |
-| VIP-B-08 | Extra-guest fee in Model B % base? |
-| VIP-B-09 | Extra-guest fee refundability vs deposit |
-| VIP-B-11 | When FLOQR % fee is returned (refunds / no-shows) |
-| VIP-B-12 | Dunning days + pause new bookings at day 21? |
-| VIP-B-13 | Credit-note second-approver threshold |
-| VIP-B-14 | Sales tax / Stripe Tax for beta |
+| ID | Decision (short) | Help |
+|---|---|---|
+| VIP-B-04 | Configurable patron booking-fee % (0% = none) | [ ] `help-vip-booking-fee-percent` |
+| VIP-B-06 | B — Always return platform fee on patron deposit refund | [ ] `help-vip-platform-fee-refund` |
+| VIP-B-07 | A — Extra-guest fee prepaid as own Checkout line | [ ] `help-vip-extra-guest-prepaid` |
+| VIP-B-08 | B — Extra-guest fees **excluded** from Model B % base | [ ] `help-vip-model-b-fee-base` |
+| VIP-B-09 | A — Extra-guest refunds = same full-or-none as deposit | [ ] `help-vip-extra-guest-refund` |
+| VIP-B-11 | C — Always reverse FLOQR % on patron money refund | [ ] `help-vip-percent-fee-reverse` |
+| VIP-B-12 | A — Dunning 0/3/7/14; pause new bookings day 21; MA can extend | [ ] `help-vip-dunning` |
+| VIP-B-13 | D — No second MA approver for credit notes in beta | [ ] `help-vip-credit-note-approval` |
+| VIP-B-14 | A — Counsel+accountant before Live; Stripe Tax off in beta | [ ] `help-vip-sales-tax-beta` |
 
-Status stays **OPEN** until the owner answers. Full plain-language AskQuestion text lives in the chat that presented this batch (do not invent answers here).
+### Suggested Batch 3 groups (next)
+
+| Batch | Group | Open IDs | Why next |
+|---|---|---|---|
+| **3a** | B Roles & legal | VIP-P-01…08 (8) | Blocks certification, e-sign, break-glass, Finance role |
+| **3b** | D Notifications & receipts | VIP-B-15…19 (5) | SMS payer, mandatory list, quiet hours, receipt issuer |
+| **3c** | C Booking UX & floor plans | VIP-P-09…12 (4) | Map edge cases + capacity placeholders |
+| Later | E Promoters & ledger · F · G | VIP-B-20…24 · VIP-P-15 (6) | Promoter $20, QBO, club codes, retention, translation Live gate |

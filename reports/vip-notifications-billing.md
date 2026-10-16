@@ -26,6 +26,22 @@ Standing: every decision ships with FloqAi/help before that surface goes Live. F
 | **VIP-B-03b** | Model B percent is **NOT** a fixed platform default. Configurable at Master Admin, shared with club admin, contractual obligation. No single default % — each club/promoter deal has its contracted rate; UI shows contracted %; set/negotiated in Master Admin F&S / VIP ReserV management. | [ ] `help-vip-model-b-percent-contract` — Master Admin sets negotiated %; club admin can view; stored on subscription/legal agreement; changes need SOS2FA + reason + audit |
 | **VIP-B-10** | A — Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). | [ ] `help-vip-model-b-pos` |
 
+### Owner decisions (Oct 16 2026) — Batch 2 money (fees, refunds, dunning, tax)
+
+**Consistency:** VIP-B-06 B + VIP-B-11 C = always return / reverse platform fee when patron gets a money refund. **VIP-B-08 B:** Model B % base = deposits + in-venue spend (**not** extra-guest VIP entry fees).
+
+| ID | Decision | Help when built |
+|---|---|---|
+| **VIP-B-04** | Configurable % — FLOQR patron booking fee (if any) set at Master Admin / VIP ReserV management (shared with club as contractual); **NOT** fixed beta-off or fixed dollar; **0%** = no fee. | [ ] `help-vip-booking-fee-percent` |
+| **VIP-B-06** | B — Always return FloqMedia/FLOQR platform fee whenever the patron gets a deposit refund. | [ ] `help-vip-platform-fee-refund` |
+| **VIP-B-07** | A — Extra-guest VIP entry fee prepaid at booking as its own checkout line. | [ ] `help-vip-extra-guest-prepaid` |
+| **VIP-B-08** | B — Extra-guest fees do **NOT** count toward Model B % fee base. | [ ] `help-vip-model-b-fee-base` |
+| **VIP-B-09** | A — Extra-guest fee refunds follow same full-or-none club policy as deposit. | [ ] `help-vip-extra-guest-refund` |
+| **VIP-B-11** | C — Always reverse FLOQR % whenever money is refunded to the patron (same/next billing period for invoiced Model B). | [ ] `help-vip-percent-fee-reverse` |
+| **VIP-B-12** | A — Dunning day 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. | [ ] `help-vip-dunning` |
+| **VIP-B-13** | D — No second Master Admin approver for credit notes in beta (any Master Admin alone). | [ ] `help-vip-credit-note-approval` |
+| **VIP-B-14** | A — Counsel+accountant before Live; Stripe Tax off in beta. | [ ] `help-vip-sales-tax-beta` |
+
 ---
 
 ## 1. Executive summary
@@ -954,25 +970,45 @@ Cross-ref: `reports/vip-owner-decision-sheet.md` (IDs VIP-B-* / VIP-P-*). Standi
 | **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand`; protected never-translate |
 | **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | Club codes / onboarding / invoice prefixes for these three |
 
-Maps to payment paths in §1 / §4: Club POS ≈ path (b); Club Stripe / FloqR Stripe ≈ path (a) variants; pay-at-venue remains path (c). Model B on (b)/(c) is **DECIDED** (VIP-B-10). Model B % is per-contract (**VIP-B-03b**).
+Maps to payment paths in §1 / §4: Club POS ≈ path (b); Club Stripe / FloqR Stripe ≈ path (a) variants; pay-at-venue remains path (c). Model B on (b)/(c) is **DECIDED** (VIP-B-10). Model B % is per-contract (**VIP-B-03b**). Model B fee base = deposits + in-venue spend; **extra-guest fees excluded** (**VIP-B-08 B**). Platform fee always returned / reversed on patron refund (**VIP-B-06 B** · **VIP-B-11 C**).
+
+### Decided Batch 2 (Oct 16 2026) — remaining money
+
+| Sheet ID | Decision (verbatim) | Help when built |
+|---|---|---|
+| **VIP-B-04** | Configurable % — FLOQR patron booking fee (if any) is a configurable percentage set at Master Admin / VIP ReserV management (shared with club as contractual), **NOT** a fixed beta-off or fixed dollar. Can be set to **0%** to mean no fee. | [ ] `help-vip-booking-fee-percent` |
+| **VIP-B-06** | B — Always return FloqMedia/FLOQR platform fee whenever the patron gets a deposit refund. | [ ] `help-vip-platform-fee-refund` |
+| **VIP-B-07** | A — Extra-guest VIP entry fee prepaid at booking as its own checkout line. | [ ] `help-vip-extra-guest-prepaid` |
+| **VIP-B-08** | B — Extra-guest fees do **NOT** count toward Model B % fee base. | [ ] `help-vip-model-b-fee-base` |
+| **VIP-B-09** | A — Extra-guest fee refunds follow same full-or-none club policy as deposit. | [ ] `help-vip-extra-guest-refund` |
+| **VIP-B-11** | C — Always reverse FLOQR % whenever money is refunded to the patron (same/next billing period for invoiced Model B). | [ ] `help-vip-percent-fee-reverse` |
+| **VIP-B-12** | A — Dunning day 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. | [ ] `help-vip-dunning` |
+| **VIP-B-13** | D — No second Master Admin approver for credit notes in beta (any Master Admin alone). | [ ] `help-vip-credit-note-approval` |
+| **VIP-B-14** | A — Counsel+accountant before Live; Stripe Tax off in beta. | [ ] `help-vip-sales-tax-beta` |
 
 ### Still open (this document)
 
 1. ~~**Model B for POS and pay-at-venue clubs**~~ — **DECIDED VIP-B-10 A** (allow; monthly invoice + attestation or POS webhooks). Help: [ ] `help-vip-model-b-pos`.
 1b. ~~**VIP-B-03b — Model B percent number**~~ — **DECIDED** — not a fixed platform default; Master Admin negotiates per club/promoter deal; club admin can view; stored on subscription/legal agreement; SOS2FA + reason + audit on change. Help: [ ] `help-vip-model-b-percent-contract`.
-2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.)
-3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off.
-4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff?
-5. **Receipt issuer** — the club as merchant of record with "processed by FLOQR" (recommended), or FloqMedia as the issuer?
-6. **Receipts in path (c)** — should FLOQR always issue them, or may the club opt out because its own POS / terminal already issues one?
-7. **Dunning timeline** — the days in §6.4, and whether new bookings pause at day 21.
-8. **Credit-note threshold for a second approver** — suggested $500.
-9. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only?
-10. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now?
-11. **Sales tax** — is FLOQR's fee (SaaS / booking service) taxable in DC and other launch states? Are deposits taxable at booking or at service? Stripe Tax on or off?
-12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for Lima Twist Club, Aurelia TBD).
-13. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records.
-14. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them.
+1c. ~~**VIP-B-04 — Patron FLOQR booking fee**~~ — **DECIDED** — configurable % at Master Admin / VIP ReserV; 0% = no fee. Help: [ ] `help-vip-booking-fee-percent`.
+1d. ~~**VIP-B-06 / VIP-B-11 — Platform / % fee on refunds**~~ — **DECIDED** — always return platform fee (B-06 B) and always reverse FLOQR % (B-11 C) when patron gets a money refund (same/next billing period for invoiced Model B). Help: [ ] `help-vip-platform-fee-refund` · [ ] `help-vip-percent-fee-reverse`.
+1e. ~~**VIP-B-07 / 08 / 09 — Extra-guest fees**~~ — **DECIDED** — prepaid as own Checkout line (A); **excluded** from Model B % base (B); refunds same full-or-none as deposit (A). Help: [ ] `help-vip-extra-guest-prepaid` · [ ] `help-vip-model-b-fee-base` · [ ] `help-vip-extra-guest-refund`.
+1f. ~~**VIP-B-12 — Dunning**~~ — **DECIDED A** — days 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. Help: [ ] `help-vip-dunning`.
+1g. ~~**VIP-B-13 — Credit-note second approver**~~ — **DECIDED D** — no second MA approver in beta (any Master Admin alone). Help: [ ] `help-vip-credit-note-approval`.
+1h. ~~**VIP-B-14 — Sales tax / Stripe Tax**~~ — **DECIDED A** — counsel+accountant before Live; Stripe Tax off in beta. Help: [ ] `help-vip-sales-tax-beta`.
+2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.) — sheet **VIP-B-15**
+3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off. — sheet **VIP-B-16**
+4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff? — sheet **VIP-B-17**
+5. **Receipt issuer** — the club as merchant of record with "processed by FLOQR" (recommended), or FloqMedia as the issuer? — sheet **VIP-B-18**
+6. **Receipts in path (c)** — should FLOQR always issue them, or may the club opt out because its own POS / terminal already issues one? — sheet **VIP-B-19**
+7. ~~**Dunning timeline**~~ — **DECIDED VIP-B-12 A**.
+8. ~~**Credit-note threshold for a second approver**~~ — **DECIDED VIP-B-13 D** (none in beta).
+9. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only? — sheet **VIP-P-08**
+10. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now? — sheet **VIP-B-21**
+11. ~~**Sales tax**~~ — **DECIDED VIP-B-14 A** (counsel+accountant before Live; Stripe Tax off in beta).
+12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for Lima Twist Club, Aurelia TBD). — sheet **VIP-B-22**
+13. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records. — sheet **VIP-B-23**
+14. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them. — sheet **VIP-B-24**
 15. **Self-billing vs promoter-issued invoices** — which is the default for club → promoter and FloqMedia → promoter commissions? Counsel to confirm self-billing agreement language.
 16. **Stale-dated check window** — confirm 180 days (or the bank's policy) before an outstanding check is auto-flagged for void / reissue.
 17. **1099 / W-9** — counsel confirms the US promoter tax package (W-9 collection, 1099-NEC threshold, which entity files when the club vs FloqMedia pays).
