@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* One-off s3.1.25 → s3.1.26 stamp bump (Security Phase 0 + 1: privilege trust, OTP lockout, Mingl / supRstar / aiIndex rules).
+/* One-off s3.1.25 → s3.1.26 stamp bump (Security Phase 0 + 1: privilege trust, OTP lockout, Mingl / floqCast / aiIndex rules).
  * display.html / display2.html keep s3.1.25 on purpose (nothing they load changed). Xibo URLs never carry ?v=. */
 "use strict";
 
@@ -54,7 +54,7 @@ edit("ai-diagnostics-service.js", src => {
   const entry = [
     "    {",
     "      version: \"s3.1.26-security-phase-1\",",
-    "      title: \"Security: admin rights come only from the server, wrong codes now count toward the lockout, and Mingl chats, blocks, inbox messages and supRstar streams can only be changed by the people they belong to\",",
+    "      title: \"Security: admin rights come only from the server, wrong codes now count toward the lockout, and Mingl chats, blocks, inbox messages and floqCast streams can only be changed by the people they belong to\",",
     "      checks: [",
     "        {label:\"Rules version\", file:\"firestore.rules\", includes:[\"s3.1.26-security-phase-1\", \"function isValidNewMinglRoom(\", \"function minglStatusTransitionOk(\"]},",
     "        {label:\"Mingl request sender\", file:\"patron-app.js\", includes:[\"messageType:\\\"mingl_request\\\", senderUid:currentUser.uid\"]},",
@@ -79,7 +79,7 @@ edit("README.md", src => {
   const head = "# CURRENT PACKAGE: FLOQR ShoutOut s3.1.25 (stable)";
   if (!src.includes(head)) throw new Error("README head");
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = "- s3.1.26: Security. Admin rights are decided only by the server (never by fields a patron can edit on their own profile), wrong SOS2FA / email codes now count toward the lockout, and assigning venue employees needs an SOS2FA session. Mingl chats, Mingl requests, blocks, inbox messages, Mingl photos and supRstar streams can only be read or changed by the people they belong to; the search index is written by Master Admins only.";
+  const note = "- s3.1.26: Security. Admin rights are decided only by the server (never by fields a patron can edit on their own profile), wrong SOS2FA / email codes now count toward the lockout, and assigning venue employees needs an SOS2FA session. Mingl chats, Mingl requests, blocks, inbox messages, Mingl photos and floqCast streams can only be read or changed by the people they belong to; the search index is written by Master Admins only.";
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut s3.1.26 (stable)${eol}${eol}${note}`);
 });
 

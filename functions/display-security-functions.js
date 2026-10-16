@@ -320,7 +320,7 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
     return {notified: false, reason: "cooldown", cooldownRemainingMs: DISPLAY_DENIAL_NOTIFY_COOLDOWN_MS - (nowMs - lastMs)};
   }
 
-  const boardLabel = displayBoard === "secondary" ? "Display 2 (supRstar)" : "Display 1 (ShoutOut)";
+  const boardLabel = displayBoard === "secondary" ? "Display 2 (floqCast)" : "Display 1 (ShoutOut)";
   const locationName = text(entry.locationName, 200) || locationId;
   const title = "Display access denied";
   const body = [

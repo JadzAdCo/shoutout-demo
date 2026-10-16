@@ -12,7 +12,7 @@ $git = "C:\Program Files\Git\cmd\git.exe"
 # Whole-file copies from $Commit: new files, plus modified files whose main copy must equal $Base (drift check, v= values
 # ignored). Asset re-stamp, APP_V, functions/package.json version and README run on main's own copies via
 # scripts/bump-s3-1-42.js. Refuses to run unless main is still on s3.1.41 (another release took the number first).
-# patron-app.js / display-suprstr.js / suprstr-webrtc.js / mail-log.js / display-security-functions.js / admin-scheduling.js
+# patron-app.js / display-floqcast.js / floqcast-webrtc.js / mail-log.js / display-security-functions.js / admin-scheduling.js
 # are never copied.
 $new = @("scripts/bump-s3-1-42.js")
 $modified = @("display-app.js", "floqr-identity-card.js", "shared-data.js", "functions/identity-card.test.js")

@@ -20,7 +20,7 @@ Resume: `@vip-i18n$` / `$vip-translate$`. Design: `.cursor/rules/design-notes-vi
 
 1. **Beta copy is still changing** — translating it now means translating it twice.
 2. **Legal Terms / refund / no-show text must be lawyer-approved per language** — machine translation is not acceptable for patron-facing legal terms; each language is its own `legalDocuments` version approved by counsel.
-3. **Brand protections** — ShoutOut, FloqR, FloqAi, FloqMedia, BartR, Mingl, RydR, supRstar, SupRstR, DonPapi, Stripe, Google, Microsoft, Facebook, WhatsApp, SMS, OTP, and **VIP ReserV** stay untranslated (owner spelling; never localize the brand).
+3. **Brand protections** — ShoutOut, FloqR, FloqAi, FloqMedia, BartR, Mingl, RydR, floqCast, DonPapi, Stripe, Google, Microsoft, Facebook, WhatsApp, SMS, OTP, and **VIP ReserV** stay untranslated (owner spelling; never localize the brand).
 4. **11 languages required** by `floqr-translation.mdc`: `en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar` (Arabic needs RTL checks on the floor map, list view and door screen).
 
 Until this rule is closed, `vipReservations` must **not** go Live (`IsTestFeature` stays 1). This is the only exception to the "no English-only help" rule, and it applies only while the feature is a beta behind the flag.

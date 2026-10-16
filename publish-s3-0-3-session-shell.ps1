@@ -38,10 +38,10 @@ $files = @(
   "services.html",
   "staff-worksheet.html",
   "staff-worksheet.js",
-  "suprstar-preview.html",
-  "suprstar-preview.js",
-  "suprstr-search.html",
-  "suprstr-search.js",
+  "floqcast-preview.html",
+  "floqcast-preview.js",
+  "floqcast-search.html",
+  "floqcast-search.js",
   ".cursor/rules/satellite-session-auth.mdc",
   ".cursor/rules/notify-inbox-ctas.mdc"
 )

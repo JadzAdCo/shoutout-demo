@@ -18,7 +18,7 @@
     windowAds: true,
     bartrStores: true,
     shoutOut: true,
-    supRstar: true
+    floqCast: true
   });
 
   const PATRON_GATE_LABELS = Object.freeze({
@@ -34,7 +34,7 @@
     windowAds: "WindowAds",
     bartrStores: "BartR Stores",
     shoutOut: "ShoutOut Capability",
-    supRstar: "supRstar live video"
+    floqCast: "floqCast live video"
   });
 
   let cachedPatronGates = { ...DEFAULT_PATRON_GATES };
@@ -74,6 +74,11 @@
     Object.keys(DEFAULT_VENUE_GATES).forEach(key => {
       if (source && Object.prototype.hasOwnProperty.call(source, key)) out[key] = source[key] !== false;
     });
+    // Legacy clubLocations.featureGates.supRstar → floqCast for one release.
+    if (source && Object.prototype.hasOwnProperty.call(source, "supRstar")
+      && !Object.prototype.hasOwnProperty.call(source, "floqCast")) {
+      out.floqCast = source.supRstar !== false;
+    }
     return out;
   }
 

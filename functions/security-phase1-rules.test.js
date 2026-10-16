@@ -97,8 +97,8 @@ test("suprstrSessions: board answer is write-once with a fixed shape", () => {
   assert.match(block, /size\(\) <= 20000/);
 });
 
-test("supRstar session docs no longer publish the broadcaster email", () => {
-  const src = read("functions/suprstr-functions.js");
+test("floqCast session docs no longer publish the broadcaster email", () => {
+  const src = read("functions/floqcast-functions.js");
   const start = src.indexOf("tx.set(sessionRef, {");
   assert.ok(start > 0);
   const session = src.slice(start, src.indexOf("});", start));

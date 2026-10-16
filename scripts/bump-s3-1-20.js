@@ -24,7 +24,7 @@ for (const file of versioned) {
 
 const featureServicePages = [
   "index.html", "master-admin.html", "pickup.html", "mingl-gist.html", "beta-invite.html", "rydr.html",
-  "suprstr-search.html", "suprstar-preview.html", "mingl-chat.html", "commerce.html"
+  "floqcast-search.html", "floqcast-preview.html", "mingl-chat.html", "commerce.html"
 ];
 for (const file of featureServicePages) {
   edit(file, src => {

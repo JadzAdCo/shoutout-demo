@@ -131,13 +131,19 @@ function featureLabels(map) {
 }
 
 async function loadFeature(featureKey) {
-  const snap = await db.collection(C.features).doc(featureKey).get();
-  return core.normalizeFeature(featureKey, snap.exists ? snap.data() : null);
+  const key = core.canonicalizeFeatureKey(featureKey);
+  let snap = await db.collection(C.features).doc(key).get();
+  // One-release dual-read: prefer floqCast doc; fall back to legacy featureServices/supRstar.
+  if (!snap.exists && key === "floqCast") {
+    snap = await db.collection(C.features).doc("supRstar").get();
+  }
+  return core.normalizeFeature(key, snap.exists ? snap.data() : null);
 }
 
 /** Server-side enforcement for callables that belong to a feature (checkout, requests). */
 async function assertFeatureAccess(auth, featureKey, request = null) {
-  const feature = await loadFeature(featureKey);
+  const key = core.canonicalizeFeatureKey(featureKey);
+  const feature = await loadFeature(key);
   if (!feature) return true;
   const viewer = await viewerFor(auth);
   if (core.canAccessFeature(feature, viewer)) return true;
@@ -146,7 +152,7 @@ async function assertFeatureAccess(auth, featureKey, request = null) {
     eventType: "feature.access_denied",
     outcome: "denied",
     actor: {uid: auth?.uid || "", email: auth?.token?.email || "", role: viewerRole(viewer)},
-    target: {type: "feature", id: featureKey},
+    target: {type: "feature", id: key},
     detail: {IsFeatureEnabled: feature.IsFeatureEnabled, IsTestFeature: feature.IsTestFeature, state: core.featureState(feature), surface: "server"}
   }));
   throw new HttpsError("failed-precondition", UNAVAILABLE_MESSAGE);
@@ -216,13 +222,19 @@ exports.seedFeatureServices = onCall(CALL_OPTS, async request => {
   const result = await db.runTransaction(async tx => {
     const refs = core.FEATURE_KEYS.map(key => db.collection(C.features).doc(key));
     const snaps = await Promise.all(refs.map(ref => tx.get(ref)));
+    const legacySupRstar = await tx.get(db.collection(C.features).doc("supRstar"));
     const head = await tx.get(headRef());
     const missing = snaps.map((snap, i) => (snap.exists ? null : core.FEATURE_KEYS[i])).filter(Boolean);
     const drifted = snaps.map((snap, i) => (snap.exists && core.linkFieldsDrifted(snap.data()) ? core.FEATURE_KEYS[i] : null)).filter(Boolean);
     if (!missing.length && !drifted.length) return {created: [], backfilled: []};
     missing.forEach(key => {
-      const feature = {...core.normalizeFeature(key, null), revision: 1};
-      tx.set(db.collection(C.features).doc(key), featureDoc(feature, request, email, "Initial seed from packaged catalog", nowMs));
+      // Migrate flags from legacy featureServices/supRstar when seeding floqCast.
+      const legacy = key === "floqCast" && legacySupRstar.exists ? legacySupRstar.data() : null;
+      const feature = {...core.normalizeFeature(key, legacy), revision: legacy ? Number(legacy.revision || 0) || 1 : 1};
+      const reason = legacy
+        ? "Seeded floqCast from legacy featureServices/supRstar"
+        : "Initial seed from packaged catalog";
+      tx.set(db.collection(C.features).doc(key), featureDoc(feature, request, email, reason, nowMs));
     });
     const backfill = Object.fromEntries(drifted.map(key => {
       const raw = snaps[core.FEATURE_KEYS.indexOf(key)].data() || {};

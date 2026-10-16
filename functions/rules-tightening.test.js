@@ -91,7 +91,7 @@ test("clubDailyAuthCodes and club message logs: server writes only; club manager
   });
 });
 
-test("SupRstR display2 may add ICE candidates only to a live session, shape-checked, without a Display URL change", () => {
+test("floqCast display2 may add ICE candidates only to a live session, shape-checked, without a Display URL change", () => {
   const body = block("calleeCandidates");
   assert.match(body, /allow create: if suprstrSessionAcceptsCandidates\(sessionId\) && isIceCandidateShape\(\);/);
   assert.ok(!/allow create: if true;/.test(body));

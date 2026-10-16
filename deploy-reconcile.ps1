@@ -1,9 +1,9 @@
 # Functions deploy from the source of truth: a clean git archive of origin/main (never the workspace tree).
 # Refuses to run unless origin/workspace/v29-08 carries exactly main's functions/ + rules (scripts/check-functions-sync.js).
-# Default list = the exports s3.1.33 rolled back (startSuprstrLive, approveSuprstarRequest; deployed from workspace 51a730a,
-# which lacked main's supRstar resume / venue live duration) plus the delete-shift exports s3.1.37 missed (link v=).
+# Default list = the exports s3.1.33 rolled back (startFloqCastLive, approveFloqCastRequest; deployed from workspace 51a730a,
+# which lacked main's floqCast resume / venue live duration) plus the delete-shift exports s3.1.37 missed (link v=).
 param(
-  [string[]]$Functions = @("startSuprstrLive", "approveSuprstarRequest", "deleteScheduleShift", "deleteScheduleShifts"),
+  [string[]]$Functions = @("startFloqCastLive", "approveFloqCastRequest", "deleteScheduleShift", "deleteScheduleShifts"),
   [string]$WorkspaceRef = "origin/workspace/v29-08",
   [int]$BatchSize = 40
 )

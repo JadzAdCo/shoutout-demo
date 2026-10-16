@@ -112,7 +112,7 @@ test("every feature link surface goes through linkState", () => {
 
   const menu = read("global-profile-status.js");
   assert.match(menu, /data-floqr-feature-link="\$\{esc\(key\)\}"/);
-  ["mingl", "bartr", "rydr", "supRstar", "floqAi"].forEach(key => {
+  ["mingl", "bartr", "rydr", "floqCast", "floqAi"].forEach(key => {
     assert.match(menu, new RegExp(`featureLink\\("${key}"`), `profile menu link for ${key}`);
   });
   assert.match(menu, /fs\.applyFeatureLinks\(dropdown\)/);
@@ -133,7 +133,7 @@ test("every feature link surface goes through linkState", () => {
   const floqai = read("intent-search.js");
   assert.match(floqai, /fs\.linkState\(intent\.featureKey\)\.show/);
   assert.match(floqai, /linkState\?\.\(intent\.featureKey\)\.beta/);
-  ["mingl", "bartr", "rydr", "supRstar"].forEach(key => assert.match(floqai, new RegExp(`featureKey: "${key}"`), key));
+  ["mingl", "bartr", "rydr", "floqCast"].forEach(key => assert.match(floqai, new RegExp(`featureKey: "${key}"`), key));
 });
 
 test("Features & Services table: plain-language headers, Revision N, link inside the Feature cell", () => {

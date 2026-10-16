@@ -48,8 +48,8 @@ $files = @(
   "services.html",
   "staff-worksheet.html",
   "styles.css",
-  "suprstar-preview.html",
-  "suprstr-search.html"
+  "floqcast-preview.html",
+  "floqcast-search.html"
 )
 
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }

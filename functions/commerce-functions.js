@@ -860,8 +860,8 @@ exports.createFloqrConnectOnboardingLink = onCall({
       amountCents:unitCents * slots,
       unitAmountCents:unitCents,
       quantity:slots,
-      itemName:slots === 1 ? "SupRstR live-stream slot ($20)" : `SupRstR live-stream slots ×${slots} ($20 each)`,
-      description:"One SupRstR entitlement to live-stream device video to a FLOQR ShoutOut display. Consume one slot when Go Live succeeds. WebRTC go-live ships separately.",
+      itemName:slots === 1 ? "floqCast live-stream slot ($20)" : `floqCast live-stream slots ×${slots} ($20 each)`,
+      description:"One floqCast entitlement to live-stream device video to a FLOQR ShoutOut display. Consume one slot when Go Live succeeds. WebRTC go-live ships separately.",
       floqrShareCents:unitCents * slots,
       venueShareCents:0,
       paymentModel:"floqr-platform",
@@ -873,12 +873,12 @@ exports.createFloqrConnectOnboardingLink = onCall({
 
   if (type === "suprstarRequest") {
     const requestId = text(payload.requestId, 120);
-    if (!requestId) throw new HttpsError("invalid-argument", "A supRstar request id is required.");
+    if (!requestId) throw new HttpsError("invalid-argument", "A floqCast request id is required.");
     const reqSnap = await db.collection("suprstarRequests").doc(requestId).get();
-    if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar preview request not found.");
+    if (!reqSnap.exists) throw new HttpsError("not-found", "floqCast preview request not found.");
     const req = reqSnap.data() || {};
     if (!["preview", "awaiting_payment"].includes(text(req.status, 40))) {
-      throw new HttpsError("failed-precondition", "This supRstar request is already paid or closed.");
+      throw new HttpsError("failed-precondition", "This floqCast request is already paid or closed.");
     }
     const unitCents = 2000;
     const split = moneyParts(unitCents, SHOUTOUT_CLUB_SHARE_PERCENT);
@@ -886,8 +886,8 @@ exports.createFloqrConnectOnboardingLink = onCall({
       amountCents:unitCents,
       unitAmountCents:unitCents,
       quantity:1,
-      itemName:"supRstar live appearance ($20)",
-      description:"Payment is charged to FloqR. After payment, the venue approves before your camera goes to the SupRStar board.",
+      itemName:"floqCast live appearance ($20)",
+      description:"Payment is charged to FloqR. After payment, the venue approves before your camera goes to the floqCast board.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
       floqrShareCents:split.floqrShare,
@@ -980,8 +980,8 @@ const CHECKOUT_FEATURE_KEYS = Object.freeze({
   marketplace: "bartr",
   rydrTrip: "rydr",
   robotaxi: "rydr",
-  suprstarRequest: "supRstar",
-  suprstrSlot: "supRstar"
+  suprstarRequest: "floqCast",
+  suprstrSlot: "floqCast"
 });
 
 exports.createFloqrCheckoutSession = onCall({
@@ -1034,10 +1034,10 @@ exports.createFloqrCheckoutSession = onCall({
       const requestId = text(payload.requestId, 120);
       if (!requestId) throw new HttpsError("invalid-argument", "requestId is required.");
       const reqSnap = await db.collection("suprstarRequests").doc(requestId).get();
-      if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+      if (!reqSnap.exists) throw new HttpsError("not-found", "floqCast request not found.");
       const req = reqSnap.data() || {};
-      if (req.broadcasterUid !== request.auth.uid) throw new HttpsError("permission-denied", "Not your supRstar request.");
-      await featureGateHelpers.assertClubFeature(text(req.locationId, 120), "supRstar");
+      if (req.broadcasterUid !== request.auth.uid) throw new HttpsError("permission-denied", "Not your floqCast request.");
+      await featureGateHelpers.assertClubFeature(text(req.locationId, 120), "floqCast");
       await db.collection("suprstarRequests").doc(requestId).set({
         status:"awaiting_payment",
         updatedAt:admin.firestore.FieldValue.serverTimestamp()
@@ -1320,7 +1320,7 @@ exports.confirmFloqrCheckoutSession = onCall({
     throw new HttpsError("permission-denied", "Not your order.");
   }
 
-  async function ensureSuprstarQueue(orderRow = {}) {
+  async function ensureFloqCastQueue(orderRow = {}) {
     if (text(orderRow.orderType, 80) !== "suprstarRequest") return {requestId:"", status:""};
     const requestId = text(orderRow.payload?.requestId || orderRow.requestId, 120);
     if (!requestId) return {requestId:"", status:""};
@@ -1345,7 +1345,7 @@ exports.confirmFloqrCheckoutSession = onCall({
   }
 
   if (order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true) {
-    const repaired = await ensureSuprstarQueue(order);
+    const repaired = await ensureFloqCastQueue(order);
     return {
       ok: true,
       paymentStatus: "paid",
@@ -1377,7 +1377,7 @@ exports.confirmFloqrCheckoutSession = onCall({
   await finalizePaidOrder(orderId, session);
   const fresh = await ref.get();
   const updated = fresh.exists ? fresh.data() || {} : {};
-  const repaired = await ensureSuprstarQueue(updated);
+  const repaired = await ensureFloqCastQueue(updated);
   await writeAppLog({
     level: "info",
     category: "checkout",
@@ -1405,7 +1405,7 @@ exports.confirmFloqrCheckoutSession = onCall({
 });
 
 /** Master/club admin: push paid but stuck suprstar orders into the venue approval queue. */
-exports.repairSuprstarPaidOrders = onCall({
+exports.repairFloqCastPaidOrders = onCall({
   region:"us-central1",
   timeoutSeconds:60,
   memory:"256MiB"
@@ -2033,7 +2033,7 @@ async function finalizePaidOrder(orderId, session) {
 
   if (order.orderType === "suprstrSlot") {
     const uid = text(order.ownerUid, 160);
-    if (!uid) throw new Error("SupRstR fulfillment missing ownerUid.");
+    if (!uid) throw new Error("floqCast fulfillment missing ownerUid.");
     const slots = Math.max(1, Math.floor(Number(order.slotsGranted || order.quantity || 1)));
     const entitlementRef = db.collection("suprstrEntitlements").doc(uid);
     await db.runTransaction(async transaction => {
@@ -2068,10 +2068,10 @@ async function finalizePaidOrder(orderId, session) {
 
   if (order.orderType === "suprstarRequest") {
     const requestId = text(order.payload?.requestId || order.requestId, 120);
-    if (!requestId) throw new Error("supRstar fulfillment missing requestId.");
+    if (!requestId) throw new Error("floqCast fulfillment missing requestId.");
     const reqRef = db.collection("suprstarRequests").doc(requestId);
     const reqSnap = await reqRef.get();
-    if (!reqSnap.exists) throw new Error(`supRstar request ${requestId} not found for fulfillment.`);
+    if (!reqSnap.exists) throw new Error(`floqCast request ${requestId} not found for fulfillment.`);
     const req = reqSnap.data() || {};
     if (!(req.paymentStatus === "paid" && req.serviceOrderId === orderId)) {
       await reqRef.set({
@@ -2091,19 +2091,19 @@ async function finalizePaidOrder(orderId, session) {
         ]);
         const note = {
           type:"suprstarPending",
-          title:"supRstar awaiting approval",
-          body:`${text(req.broadcasterEmail, 200) || "A patron"} paid for a supRstar live appearance at ${text(req.locationName, 160) || req.locationId}. Approve in Club Admin.`,
+          title:"floqCast awaiting approval",
+          body:`${text(req.broadcasterEmail, 200) || "A patron"} paid for a floqCast live appearance at ${text(req.locationName, 160) || req.locationId}. Approve in Club Admin.`,
           clubLocationId:text(req.locationId, 120),
           locationName:text(req.locationName, 160) || text(req.locationId, 120),
           requestId,
           referenceNumber:text(req.referenceNumber, 80),
           read:false,
           createdAt:paidAt,
-          link:`./admin.html?location=${encodeURIComponent(text(req.locationId, 120))}&panel=suprstar`
+          link:`./admin.html?location=${encodeURIComponent(text(req.locationId, 120))}&panel=floqcast`
         };
         await Promise.all([...adminUids].filter(Boolean).map(uid => db.collection("inboxNotifications").add({...note, recipientUid:uid})));
       } catch (notifyErr) {
-        console.warn("supRstar admin notify failed", notifyErr?.message || notifyErr);
+        console.warn("floqCast admin notify failed", notifyErr?.message || notifyErr);
       }
     }
     await ref.set({

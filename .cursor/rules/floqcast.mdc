@@ -1,0 +1,100 @@
+---
+description: floqCast live video — pay/approve/display2 path, WebRTC reliability phases. Resume @floqCast$
+alwaysApply: true
+---
+
+# floqCast (always)
+
+Live video to the venue **floqCast board** (`display2.html?location=<id>` only — never `?v=` or `?screen=`). Like a ShoutOut, but phone camera. **Not** Display 1 unless Club Admin later picks a board.
+
+Resume / continue this work: **`@floqCast$`** (also `$floqcast$`).
+
+Brand: **floqCast** (camel f, capital C). Protected brand — never translate. Retired display names: supRstar, SupRstR, SupRStar, suprstr, suprstar.
+
+## Legacy storage ids (do not rename without dual-read)
+
+Firestore collection / commerce / inbox **storage ids stay** for kiosk + paid-order continuity:
+
+| Storage id | Role |
+|---|---|
+| `suprstarRequests` | Preview / pay / approve docs (token = doc id) |
+| `suprstrSessions` | WebRTC session SDP |
+| `suprstrLive` | Live pointer `{locationId}__secondary` |
+| `suprstrEntitlements` | Legacy prepaid slot wallet |
+| `orderType: "suprstarRequest"` / `"suprstrSlot"` | Stripe / serviceOrders |
+| Inbox `type`: `suprstarPending` / `Approved` / `Rejected` | Existing rows |
+
+UI, feature key, files, and callables say **floqCast**. Code may keep these collection string literals with a comment that they are legacy storage ids.
+
+## Feature key dual-read (one release)
+
+- Catalog key: `floqCast` (`featureServices/floqCast`).
+- Alias: `supRstar` → `floqCast` in `canonicalizeFeatureKey`, beta grants, venue `featureGates`, and `loadFeature` (falls back to legacy `featureServices/supRstar` until seed writes the new doc).
+- `seedFeatureServices` copies flags from `supRstar` when creating `floqCast`.
+
+## Product path (do not invent a second loop)
+
+1. Search `floqcast-search.html` — signed-in patron (`FLOQRSessionShell`; satellite), venue with feature gate `floqCast`, `displayBoard: "secondary"`. Legacy bookmark `suprstr-search.html` redirects here.
+2. `createFloqCastRequest` (alias `createSuprstarRequest`) → `suprstarRequests/{accessToken}` (`status: preview`). Preview URL is `floqcast-preview.html?t=<token>`.
+3. Private `getUserMedia` on the preview tab — **not** on the LED yet.
+4. Stripe `orderType: "suprstarRequest"` ~$20 → fulfillment → `pending_approval` + Club Admin inbox.
+5. Club Admin **floqCast Queue** → `approveFloqCastRequest` / reject. Patron inbox: return to preview tab. Hash `panel=floqcast` (legacy `panel=suprstar` still opens the queue).
+6. **Go live** → `startFloqCastLive` writes `suprstrSessions/{sessionId}` and `suprstrLive/{locationId}__secondary` `{status: live, sessionId}`. Phone `startBroadcast`; display2 `display-floqcast.js` → `joinAsDisplay`.
+7. **End live** → `endFloqCastLive` idles the live pointer.
+
+Key files: `floqcast-search.js`, `floqcast-preview.js`, `floqcast-webrtc.js`, `display-floqcast.js`, `display2.html`, `functions/floqcast-functions.js`, `functions/commerce-functions.js` (`suprstarRequest`), `admin-app.js` queue, `firestore.rules` (`suprstrLive` / `suprstrSessions` public read for kiosk).
+
+## Callable aliases (one deploy cycle)
+
+New exports are canonical; old names re-exported until the next Functions deploy cleans them up:
+
+`createFloqCastRequest` ← `createSuprstarRequest` · `approveFloqCastRequest` ← `approveSuprstarRequest` · `rejectFloqCastRequest` ← `rejectSuprstarRequest` · `startFloqCastLive` ← `startSuprstrLive` · `armFloqCastLiveDuration` ← `armSuprstrLiveDuration` · `endFloqCastLive` ← `endSuprstrLive` · `markFloqCastRequestPaid` ← `markSuprstarRequestPaid`.
+
+## FIX PROMPT — `@floqCast$` continuation (club-grade media)
+
+The pay → approve → Go live **business loop is complete**. Missing is **keeping the stream alive in a club**. Implement in this order. Do not add prepaid slots, recording, or a Display 1 patron path unless asked.
+
+### Phase 1 — survive the room (do first)
+
+- **Ship** the unpublished renegotiate pass when publishing is requested.
+- Phone: on `connectionState` / `iceConnectionState` `failed` | `disconnected`, close peer and `publishOffer` again.
+- display2: if the peer is dead, **do not** skip `attachSession` because `sessionId === activeSessionId`. `stop()` the dead join and `joinAsDisplay` again.
+- Phone writes `lastHeartbeatAt` on `suprstrLive` ~every 5s. display2 re-joins if heartbeat is stale (~15s).
+- Preview `pagehide` / `visibilitychange` → `endFloqCastLive` (keepalive).
+- Club Admin queue: **End live** using `endFloqCastLive`, gated like approve (`isClubManagerAuth`).
+
+### Phase 2 — TURN
+
+`createPeer()` is Google **STUN only**. Add callable `getFloqCastIceServers` with time-limited TURN. Secrets in Functions env, never in the Pages bundle.
+
+### Phase 3 — stored guards that are unused
+
+- Honor `expiresAt` in checkout, approve, and `startFloqCastLive`.
+- Max live duration: `liveUntil` on start; phone timer + auto `endFloqCastLive`.
+
+### Phase 4 — only if product asks
+
+- **LED audio:** keep display2 **muted** for kiosk autoplay.
+- **Display 1:** search always books `__secondary`.
+
+### Board auth (s3.1.26)
+
+Boards authenticate **only** by display token (`?k=` → `checkDisplayAccess`) and/or approved IP — never a person login; Xibo URL stays `display2.html?location=<id>`. Session `answer` write-once on `suprstrSessions`.
+
+### Do not “fix” first
+
+Public SDP (`suprstrLive` / sessions readable so Xibo can attach without login) is a kiosk tradeoff. Do not put `?v=` on Xibo Display URLs.
+
+## Checklist
+
+- [ ] Satellite shell on search + preview
+- [ ] Live pointer is `{locationId}__secondary` for display2
+- [ ] Rebuild offer/answer on board drop **and** hung peer without full reload
+- [ ] Heartbeat + tab-close end + admin End live
+- [ ] TURN before declaring “Go live does nothing” a UI bug
+- [ ] `expiresAt` + duration enforced
+- [ ] Reliability on `origin/main` only when asked; Functions deploy when backend changed
+- [ ] `functions/floqcast-webrtc-reliability.test.js` still green
+- [ ] Feature key dual-read / callable aliases retired after the alias release
+
+Resume: `@floqCast$` / `$floqcast$`.

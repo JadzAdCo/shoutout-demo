@@ -351,11 +351,11 @@
     {
       id: "floqai-ask-floqr",
       title: "Ask FloqR with FloqAi",
-      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
         {label: "Open FloqAi", href: pageUrl("./floqai.html")},
-        {label: "Open SupRstR", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "index.html#floqAiHelpPopout"
@@ -363,7 +363,7 @@
     {
       id: "help-floqai-page",
       title: "FloqAi",
-      body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, supRstar, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
+      body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
       links: [{label: "Open FloqAi", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -381,16 +381,17 @@
       source: "help-repository-seed"
     },
     {
-      id: "help-suprstar",
-      title: "Make me a supRstar / superstar",
-      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
+      id: "help-floqcast",
+      title: "Make me a floqCast / superstar",
+      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the floqCast Queue → Go live on the floqCast board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
+        "floqcast", "floq cast", "floqCast", "make me a floqcast", "make me a floq cast",
         "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
         "superstar", "super star", "super-star", "suprstr", "suprstar", "supr str", "supr star", "go live",
         "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
       ],
       links: [
-        {label: "Open supRstar", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron"]

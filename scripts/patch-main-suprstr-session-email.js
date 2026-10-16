@@ -2,7 +2,7 @@
 /* s3.1.26: patch main's own suprstr-functions.js in place (idempotent):
  * - drop broadcasterEmail from the public suprstrSessions doc
  * - Master Admin check goes through admin-trust (claim or verified server-list email)
- * main carries supRstar code the workspace does not, so the file is patched in place instead of overwritten. */
+ * main carries floqCast code the workspace does not, so the file is patched in place instead of overwritten. */
 "use strict";
 
 const fs = require("fs");

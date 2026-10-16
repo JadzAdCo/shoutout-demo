@@ -23,7 +23,7 @@ $modified = @(
   "floqr-nav.js", "floqr-session-shell.js", "guest-list-app.js", "intent-search.js", "master-ad-management.js",
   "master-admin-app.js", "master-admin.html", "master-services-extension.js", "mingl-gist-app.js", "mobile-test-checklist.js",
   "onboard-dc-venues.html", "patron-app.js", "patron-portal-app.js", "payment-return-app.js", "profile-access-guard.js",
-  "services-app.js", "suprstar-preview.js", "suprstr-search.js",
+  "services-app.js", "floqcast-preview.js", "floqcast-search.js",
   "functions/ad-functions.js", "functions/feature-services-functions.js", "functions/messaging-functions.js",
   "functions/receipt-delivery.js", "functions/scheduling-core.js", "functions/scheduling-functions.js",
   "functions/ad-campaigns-business.test.js", "functions/app-logging.test.js", "functions/app-version-sync.test.js",

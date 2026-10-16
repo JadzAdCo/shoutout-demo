@@ -16,7 +16,7 @@ const KEYS = [
   "dataClass.status.saved", "dataClass.status.default", "dataClass.status.edited", "dataClass.status.review",
   "dataClass.summary", "dataClass.onlyReview", "dataClass.recommendation",
   "dataClass.note.piiPublic", "dataClass.note.piiPatron", "dataClass.note.rulesRead", "dataClass.note.rulesWrite",
-  "dataClass.rec.shoutouts", "dataClass.rec.patronRanks", "dataClass.rec.displayDevices", "dataClass.rec.suprstrSessions", "dataClass.rec.minglGists",
+  "dataClass.rec.shoutouts", "dataClass.rec.patronRanks", "dataClass.rec.displayDevices", "dataClass.rec.floqcastSessions", "dataClass.rec.minglGists",
   "dataClass.rec.guestListRequests", "dataClass.rec.clubEmployeeDesignations", "dataClass.rec.featureServices", "dataClass.rec.aiIndex", "dataClass.rec.paymentLedger",
   "dataClass.fixTitle", "dataClass.fixIntro",
   "dataClass.fix.piiRead.title", "dataClass.fix.piiRead.fix", "dataClass.fix.restrictedWrite.title", "dataClass.fix.restrictedWrite.fix",

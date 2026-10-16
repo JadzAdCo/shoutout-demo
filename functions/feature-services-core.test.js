@@ -27,7 +27,21 @@ test("only ShoutOut is live by default; every other feature is test-only", () =>
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });
-  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "supRstar", "floqAi"]);
+  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "floqAi"]);
+});
+
+test("legacy supRstar feature key aliases to floqCast (beta grants + catalog)", () => {
+  assert.equal(core.canonicalizeFeatureKey("supRstar"), "floqCast");
+  assert.equal(core.catalogEntry("supRstar")?.key, "floqCast");
+  const grants = core.betaGrantsFrom({
+    IsBetaTester: 1,
+    status: "active",
+    features: {supRstar: 1}
+  });
+  assert.equal(grants.floqCast, 1);
+  const mapped = core.validateBetaFeatures(["supRstar"], {requireOne: true});
+  assert.equal(mapped.floqCast, 1);
+  assert.equal(mapped.supRstar, undefined);
 });
 
 test("client catalog mirrors the server catalog (keys, routes, defaults)", () => {
@@ -200,7 +214,7 @@ test("firestore rules: feature collections are server-write-only and superAdmin 
 test("Search tiles: ShoutOut visible, every other feature hidden until Features & Services allows it", () => {
   const html = read("index.html");
   assert.match(html, /id="shoutoutBtnCard" class="shoutout-icon-card"[^>]*data-feature-key="shoutOut"/);
-  ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "suprstrBtnCard", "intentSearchBtnCard"].forEach(id => {
+  ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "floqcastBtnCard", "intentSearchBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
   assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
@@ -213,7 +227,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
 test("test-feature satellite pages are guarded", () => {
   const pages = {
     "commerce.html": "bartr", "pickup.html": "rydr", "rydr.html": "rydr",
-    "suprstr-search.html": "supRstar", "suprstar-preview.html": "supRstar",
+    "floqcast-search.html": "floqCast", "floqcast-preview.html": "floqCast",
     "mingl-chat.html": "mingl", "mingl-gist.html": "mingl"
   };
   const guard = read("floqr-feature-services.js");

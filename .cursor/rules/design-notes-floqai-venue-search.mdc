@@ -11,7 +11,7 @@ This is **search**, not help. Help copy (`?`, FloqAi repository bodies) never ex
 
 ## Page contract (`index.html#categoryPage`)
 
-- **No** "Search for" heading and **no** Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs tiles (removed s3.0.106 — FloqAi search replaces them). Below the search: `Or` + product tiles (ShoutOut, Mingl, BartR, RydR, supRstar, FloqAi).
+- **No** "Search for" heading and **no** Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs tiles (removed s3.0.106 — FloqAi search replaces them). Below the search: `Or` + product tiles (ShoutOut, Mingl, BartR, RydR, floqCast, FloqAi).
 - FloqAi mark + dialog are **stationary above** the search input (`#categoryFloqAiSearch`). Mark is animated (bob + glow + halo; faster `is-listening` while typing). Dialog is **borderless, unframed** text beside the mark with a type-on reveal (`is-speaking`, clip-path; RTL mirrored). `prefers-reduced-motion` disables all of it.
 - Dialog loop (5s, only while input is empty and the page is active): `cat.floqaiWelcome` ("Welcome, type below to search for Events") → `cat.floqaiAlso` ("You may also search for: Clubs or Lounges").
 - While typing, the dialog shows the live interpretation: `cat.floqaiSearching` ("Searching {type}") · genres · `cat.floqaiIn` ("in {place}") or `cat.floqaiNearYou` ("near you"). `data-i18n` is removed while it shows a live interpretation so `applyText` does not overwrite it.

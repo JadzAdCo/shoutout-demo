@@ -14,11 +14,12 @@
     {key: "mingl", label: "Mingl", patronGate: "mingl", buttonIds: ["minglBtnCard", "confirmGoMinglBtn"], route: "./?start=mingl", sortOrder: 20, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "bartr", label: "Trade by BartR", patronGate: "bartr", buttonIds: ["bartrBtnCard", "confirmGoBartrBtn"], route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "supRstar", label: "supRstar", patronGate: "", buttonIds: ["suprstrBtnCard"], route: "./suprstr-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
+    {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));
+  const FEATURE_KEY_ALIASES = Object.freeze({supRstar: "floqCast"});
 
   let features = defaults();
   let viewer = {uid: "", isMasterAdmin: false, isBetaTester: false, betaFeatures: {}};
@@ -27,6 +28,11 @@
 
   function flag(value) {
     return value === 1 || value === true || value === "1" ? 1 : 0;
+  }
+
+  function canonicalizeFeatureKey(key) {
+    const k = String(key || "").trim();
+    return FEATURE_KEY_ALIASES[k] || k;
   }
 
   function defaults() {
@@ -103,21 +109,23 @@
   }
 
   function canAccess(key, who = viewer, rows = features) {
-    const state = stateOf(rows[key]);
+    const canon = canonicalizeFeatureKey(key);
+    const state = stateOf(rows[canon]);
     if (state === "off") return false;
     if (state === "live") return true;
-    return who.isMasterAdmin === true || hasBetaGrant(key, who);
+    return who.isMasterAdmin === true || hasBetaGrant(canon, who);
   }
 
   function searchVisible(key, who = viewer, rows = features) {
-    const state = stateOf(rows[key]);
+    const canon = canonicalizeFeatureKey(key);
+    const state = stateOf(rows[canon]);
     if (state === "off") return false;
     if (state === "live") return true;
-    return hasBetaGrant(key, who);
+    return hasBetaGrant(canon, who);
   }
 
   function isBetaOnly(key, rows = features) {
-    return stateOf(rows[key]) === "test";
+    return stateOf(rows[canonicalizeFeatureKey(key)]) === "test";
   }
 
   /**
@@ -127,21 +135,24 @@
    * Any other surface: Master Admins also see test features, because they can open them.
    */
   function linkState(key, {surface = "link", who = viewer, rows = features} = {}) {
-    const row = rows[key];
-    if (!row) return {key, show: false, beta: false, state: "off", enableFeatureLink: 0, enableBetaFeatureLink: 0};
+    const canon = canonicalizeFeatureKey(key);
+    const row = rows[canon];
+    if (!row) return {key: canon, show: false, beta: false, state: "off", enableFeatureLink: 0, enableBetaFeatureLink: 0};
     const fields = {
       enableFeatureLink: flag(row.enableFeatureLink ?? deriveLinkFields(row).enableFeatureLink),
       enableBetaFeatureLink: flag(row.enableBetaFeatureLink ?? deriveLinkFields(row).enableBetaFeatureLink)
     };
-    const allowed = surface === "search" ? searchVisible(key, who, rows) : canAccess(key, who, rows);
+    const allowed = surface === "search" ? searchVisible(canon, who, rows) : canAccess(canon, who, rows);
     const show = fields.enableFeatureLink === 1 && allowed;
-    return {key, show, beta: show && fields.enableBetaFeatureLink === 1, state: stateOf(row), ...fields};
+    return {key: canon, show, beta: show && fields.enableBetaFeatureLink === 1, state: stateOf(row), ...fields};
   }
 
   function betaGrantsFrom(row) {
     if (!row || flag(row.IsBetaTester) !== 1 || row.status !== "active") return {};
     const raw = row.features || {};
-    return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(raw[key]) === 1).map(key => [key, 1]));
+    const merged = {...raw};
+    if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+    return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
   }
 
   async function hasAdminClaim(user) {
@@ -170,8 +181,12 @@
         hasAdminClaim(user)
       ]);
       featureSnap?.forEach(doc => {
-        const row = normalize(doc.id, doc.data());
-        if (row) next[doc.id] = row;
+        const canon = canonicalizeFeatureKey(doc.id);
+        const row = normalize(canon, doc.data());
+        if (!row) return;
+        // Prefer a real floqCast doc over a legacy featureServices/supRstar row.
+        if (doc.id === "supRstar" && next.floqCast && next.floqCast.persisted) return;
+        next[canon] = row;
       });
       betaRow = betaSnap?.exists ? betaSnap.data() || {} : null;
       claimAdmin = claim;

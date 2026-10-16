@@ -1,4 +1,4 @@
-/* Venue display / displays — receive SupRstR live video for this location + board. */
+/* Venue display / displays — receive floqCast live video for this location + board. */
 (function () {
   "use strict";
 
@@ -25,21 +25,21 @@
     return "primary";
   }
 
-  function suprstrLiveDocId(locationId) {
+  function floqcastLiveDocId(locationId) {
     const id = String(locationId || "").trim();
     return displayBoard() === "secondary" ? `${id}__secondary` : id;
   }
 
   function ensureOverlay() {
-    let wrap = byId("suprstrLiveOverlay");
+    let wrap = byId("floqcastLiveOverlay");
     if (wrap) return wrap;
     wrap = document.createElement("div");
-    wrap.id = "suprstrLiveOverlay";
-    wrap.className = "suprstr-live-overlay hidden";
+    wrap.id = "floqcastLiveOverlay";
+    wrap.className = "floqcast-live-overlay hidden";
     wrap.setAttribute("aria-live", "polite");
     wrap.innerHTML = `
-      <video id="suprstrLiveVideo" class="suprstr-live-video" autoplay playsinline muted></video>
-      <div class="suprstr-live-badge">LIVE · supRstar</div>
+      <video id="floqcastLiveVideo" class="floqcast-live-video" autoplay playsinline muted></video>
+      <div class="floqcast-live-badge">LIVE · floqCast</div>
     `;
     const canvas = byId("displayCanvas") || document.body;
     canvas.appendChild(wrap);
@@ -61,13 +61,13 @@
       activeJoin = null;
     }
     activeSessionId = sessionId;
-    const video = byId("suprstrLiveVideo") || ensureOverlay() && byId("suprstrLiveVideo");
+    const video = byId("floqcastLiveVideo") || ensureOverlay() && byId("floqcastLiveVideo");
     showOverlay(true);
-    if (!window.FLOQRSuprstrRtc?.joinAsDisplay) {
-      console.warn("SupRstR RTC helper missing");
+    if (!window.FLOQRFloqCastRtc?.joinAsDisplay) {
+      console.warn("floqCast RTC helper missing");
       return;
     }
-    activeJoin = await window.FLOQRSuprstrRtc.joinAsDisplay({
+    activeJoin = await window.FLOQRFloqCastRtc.joinAsDisplay({
       sessionId,
       videoEl: video,
       onStatus(s) {
@@ -92,7 +92,7 @@
     if (!firebase.apps.length && window.firebaseConfig) {
       firebase.initializeApp(window.firebaseConfig);
     }
-    const liveId = suprstrLiveDocId(locationId);
+    const liveId = floqcastLiveDocId(locationId);
     firebase.firestore().collection("suprstrLive").doc(liveId).onSnapshot((snap) => {
       const data = snap.exists ? snap.data() || {} : {};
       const status = String(data.status || "").toLowerCase();

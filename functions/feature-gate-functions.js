@@ -14,7 +14,7 @@ const MASTER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 const SUPER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 
 const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, floqAi:true, shoutOut:true};
-const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true, supRstar:true};
+const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true, floqCast:true};
 
 const CLUB_PUBLIC_CLEAR_FIELDS = [
   "logoUrl", "logoStoragePath", "mainMediaUrl", "mainMediaType", "mainMediaStoragePath",
@@ -47,6 +47,11 @@ function normalizeVenueGates(raw = {}) {
   Object.keys(DEFAULT_VENUE_GATES).forEach(key => {
     if (Object.prototype.hasOwnProperty.call(raw || {}, key)) out[key] = raw[key] !== false;
   });
+  // Legacy clubLocations.featureGates.supRstar → floqCast for one release.
+  if (Object.prototype.hasOwnProperty.call(raw || {}, "supRstar")
+    && !Object.prototype.hasOwnProperty.call(raw || {}, "floqCast")) {
+    out.floqCast = raw.supRstar !== false;
+  }
   return out;
 }
 

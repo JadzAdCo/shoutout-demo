@@ -49,4 +49,4 @@ Language is **not** path-based (`/de/`, `/fr/`). It is `profile.uiLanguage` + `l
 
 ## Protected brands (never translate)
 
-ShoutOut, Mingl, BartR, RydR, FloqAi, FloqR, supRstar, SupRstR, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.
+ShoutOut, Mingl, BartR, RydR, FloqAi, FloqR, floqCast, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.

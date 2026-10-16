@@ -157,7 +157,7 @@
     const marketingCard = byId("marketingCampaignCard");
     const marketingSubtab = document.querySelector('.admin-subtab[data-panel="panelMarketingCampaigns"]');
     const shoutoutTab = document.querySelector('[data-panel="panelQueue"]');
-    const suprstarTab = document.querySelector('[data-panel="panelSuprstar"]');
+    const suprstarTab = document.querySelector('[data-panel="panelFloqCast"]');
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
@@ -168,7 +168,7 @@
     const uberOk = g.venueMayUse("uberAds", row);
     const windowOk = g.venueMayUse("windowAds", row);
     const shoutOk = g.venueMayUse("shoutOut", row);
-    const suprstarOk = g.venueMayUse("supRstar", row);
+    const suprstarOk = g.venueMayUse("floqCast", row);
     const bartrOk = g.venueMayUse("bartrStores", row);
     const marketingOk = uberOk || windowOk;
     if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
@@ -1138,8 +1138,8 @@
     const marketingPanel = MARKETING_ALIASES[wanted] || (MARKETING_PANELS.has(wantedRaw) ? wantedRaw : "");
     if (marketingPanel && byId(marketingPanel)) {
       activatePanel(marketingPanel);
-    } else if (wanted === "suprstar" || wanted === "panelsuprstar") {
-      activatePanel("panelSuprstar");
+    } else if (wanted === "floqcast" || wanted === "panelfloqcast" || wanted === "suprstar" || wanted === "panelsuprstar") {
+      activatePanel("panelFloqCast");
     } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "calendar" || wanted === "scheduler" || wanted === "scheduserguide" || wanted === "schedwebsiteingest" || wanted === "schedgridheading") {
       activatePanel("panelScheduling");
       const scrollId = wanted === "schedwebsiteingest" ? "schedWebsiteIngest"
@@ -1168,30 +1168,30 @@
 
   let suprstarQueueUnsub = null;
   let suprstarRepairBound = false;
-  async function repairSuprstarQueue() {
+  async function repairFloqCastQueue() {
     try {
-      setText("suprstarQueueStatus", "Repairing paid requests into the approval queue...");
+      setText("floqcastQueueStatus", "Repairing paid requests into the approval queue...");
       const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
-      const res = await callable("repairSuprstarPaidOrders")({locationId});
+      const res = await callable("repairFloqCastPaidOrders")({locationId});
       const repaired = Number(res?.data?.repaired || 0);
-      setText("suprstarQueueStatus", repaired
+      setText("floqcastQueueStatus", repaired
         ? ("Moved " + repaired + " paid request(s) into the queue.")
         : "No stuck paid requests found for this venue.");
     } catch (e) {
-      setText("suprstarQueueStatus", e.message || String(e));
+      setText("floqcastQueueStatus", e.message || String(e));
     }
   }
-  function renderSuprstarQueue() {
-    const list = byId("suprstarQueueList");
+  function renderFloqCastQueue() {
+    const list = byId("floqcastQueueList");
     if (!list) return;
-    list.innerHTML = "<p class='sub'>Loading pending supRstar requests...</p>";
+    list.innerHTML = "<p class='sub'>Loading pending floqCast requests...</p>";
     if (suprstarQueueUnsub) {
       suprstarQueueUnsub();
       suprstarQueueUnsub = null;
     }
     const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
     if (!suprstarRepairBound) {
-      byId("suprstarRepairBtn")?.addEventListener("click", () => repairSuprstarQueue());
+      byId("floqcastRepairBtn")?.addEventListener("click", () => repairFloqCastQueue());
       suprstarRepairBound = true;
     }
     suprstarQueueUnsub = db.collection("suprstarRequests")
@@ -1202,11 +1202,11 @@
           .sort((a, b) => (b.paidAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.paidAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
         const pending = rows.filter(r => r.status === "pending_approval" || (r.paymentStatus === "paid" && !["approved", "live", "ended", "rejected"].includes(String(r.status || ""))));
         const live = rows.filter(r => r.status === "live");
-        setText("metricSuprstarPending", String(pending.length));
-        setText("metricSuprstarLive", String(live.length));
-        setText("metricSuprstarDash", String(pending.length));
+        setText("metricFloqCastPending", String(pending.length));
+        setText("metricFloqCastLive", String(live.length));
+        setText("metricFloqCastDash", String(pending.length));
         if (!rows.length) {
-          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
+          list.innerHTML = "<p class='sub'>No paid floqCast requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
           return;
         }
         list.innerHTML = "";
@@ -1216,8 +1216,8 @@
           const status = String(item.status || "");
           const paid = item.paymentStatus === "paid";
           div.innerHTML = `
-            <strong>supRstar · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
-            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: ${esc(item.displayBoard === "secondary" ? "SupRStar (display2)" : "Display 1")}</p>
+            <strong>floqCast · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
+            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: ${esc(item.displayBoard === "secondary" ? "floqCast (display2)" : "Display 1")}</p>
             <small>
               Status: ${esc(status)}
               · Payment: ${esc(paid ? "paid $20" : "unpaid")}
@@ -1226,28 +1226,28 @@
             <div class="queue-actions">
               ${status === "pending_approval" || (paid && (status === "awaiting_payment" || status === "preview")) ? `<button class="approve" type="button">Approve — allow go live</button>
               <button class="reject" type="button">Reject</button>` : ""}
-              ${status === "live" ? `<span class="sub small">Live on venue SupRStar board</span>` : ""}
+              ${status === "live" ? `<span class="sub small">Live on venue floqCast board</span>` : ""}
               ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
             </div>`;
           div.querySelector(".approve")?.addEventListener("click", async () => {
             try {
-              setText("suprstarQueueStatus", "Approving…");
-              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
-              await callable("approveSuprstarRequest")({requestId: item.id});
-              setText("suprstarQueueStatus", "Approved. Patron can go live from their preview tab.");
+              setText("floqcastQueueStatus", "Approving…");
+              if (status !== "pending_approval") await callable("repairFloqCastPaidOrders")({locationId});
+              await callable("approveFloqCastRequest")({requestId: item.id});
+              setText("floqcastQueueStatus", "Approved. Patron can go live from their preview tab.");
             } catch (e) {
-              setText("suprstarQueueStatus", e.message || String(e));
+              setText("floqcastQueueStatus", e.message || String(e));
             }
           });
           div.querySelector(".reject")?.addEventListener("click", async () => {
-            if (!confirm("Reject this paid supRstar request?")) return;
+            if (!confirm("Reject this paid floqCast request?")) return;
             try {
-              setText("suprstarQueueStatus", "Rejecting…");
-              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
-              await callable("rejectSuprstarRequest")({requestId: item.id, reason: "Rejected by venue"});
-              setText("suprstarQueueStatus", "Rejected.");
+              setText("floqcastQueueStatus", "Rejecting…");
+              if (status !== "pending_approval") await callable("repairFloqCastPaidOrders")({locationId});
+              await callable("rejectFloqCastRequest")({requestId: item.id, reason: "Rejected by venue"});
+              setText("floqcastQueueStatus", "Rejected.");
             } catch (e) {
-              setText("suprstarQueueStatus", e.message || String(e));
+              setText("floqcastQueueStatus", e.message || String(e));
             }
           });
           list.appendChild(div);
@@ -3159,7 +3159,7 @@
       setText("adminStatus", isMasterAdmin ? "Master Admin verified for Club Admin." : "Club admin verified.");
       enforceVenueFeatureGates();
       renderQueue();
-      renderSuprstarQueue();
+      renderFloqCastQueue();
       loadClubPublicProfile().then(async () => {
         await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);
       });

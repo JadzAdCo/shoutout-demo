@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.1.43";
+  const APP_V = "s3.1.44";
 
   function navT(key, fallback) {
     try {
@@ -103,8 +103,8 @@
       const panel = String(hash || "").replace(/^#/, "").trim();
       return panel ? `${href}#${panel}` : href;
     },
-    suprstrHome(extra = {}) {
-      return buildUrl("./suprstr-search.html", { from: "master", ...extra });
+    floqcastHome(extra = {}) {
+      return buildUrl("./floqcast-search.html", { from: "master", ...extra });
     },
     /** Satellite page under My Profile and Settings */
     portalLink(path, extra = {}) {

@@ -1,4 +1,4 @@
-/* Shared WebRTC helpers for SupRstR (phone broadcaster ↔ venue display.html). */
+/* Shared WebRTC helpers for floqCast (phone broadcaster ↔ venue display.html). */
 (function (global) {
   "use strict";
 
@@ -141,7 +141,7 @@
     };
   }
 
-  global.FLOQRSuprstrRtc = {
+  global.FLOQRFloqCastRtc = {
     ICE_SERVERS,
     getCameraStream,
     startBroadcast,

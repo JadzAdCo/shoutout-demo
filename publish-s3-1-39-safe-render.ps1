@@ -11,7 +11,7 @@ $stage = Join-Path $root ".publish-s3-1-39-safe-render"
 $git = "C:\Program Files\Git\cmd\git.exe"
 # Whole-file copies from $Commit: new files, plus modified files whose main copy must equal $Base (drift check, v= values
 # ignored). Asset re-stamp, APP_V, functions/package.json (version + new test) and README run on main's own copies via
-# scripts/bump-s3-1-39.js. display-suprstr.js / suprstr-webrtc.js / mail-log.js / display-security-functions.js /
+# scripts/bump-s3-1-39.js. display-floqcast.js / floqcast-webrtc.js / mail-log.js / display-security-functions.js /
 # admin-scheduling.js are never copied.
 $new = @(
   "floqr-safe-render.js",

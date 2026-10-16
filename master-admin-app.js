@@ -689,7 +689,7 @@
         <p class="sub small">After you leave this onboarding result, Master Admin → Display Security only shows <em>obfuscated</em> tokens. You will need <strong>Rotate</strong> to get a new full URL.</p>
         <p><strong>Display 1 (ShoutOut) Xibo URL</strong></p>
         <p><code style="word-break:break-all">${esc(secrets.primaryUrl)}</code></p>
-        <p><strong>Display 2 (supRstar) Xibo URL</strong></p>
+        <p><strong>Display 2 (floqCast) Xibo URL</strong></p>
         <p><code style="word-break:break-all">${esc(secrets.secondaryUrl)}</code></p>
         <p class="sub small">${esc(secrets.warning || "")}</p>
       </div>` : (secrets.primaryTokenObfuscated || secrets.warning ? `
@@ -703,7 +703,7 @@
       <p><strong>Club Location ID:</strong> ${esc(payload.id)}</p>
       <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
       <p><strong>ShoutOut URL (no token — do not use in Xibo when token required):</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
-      <p><strong>SupRStar URL (no token):</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
+      <p><strong>floqCast URL (no token):</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
       ${tokenBlock}
     </div>`;
   }

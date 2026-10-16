@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* One-off s3.1.22 → s3.1.23 stamp bump (rules Stage 1: users, messages, Inbox, door codes, SupRstR candidates + people directory). */
+/* One-off s3.1.22 → s3.1.23 stamp bump (rules Stage 1: users, messages, Inbox, door codes, floqCast candidates + people directory). */
 "use strict";
 
 const fs = require("fs");
@@ -49,7 +49,7 @@ edit("ai-diagnostics-service.js", src => {
   const entry = [
     "    {",
     "      version: \"s3.1.23-rules-stage-1\",",
-    "      title: \"Security rules Stage 1: profiles, messages, Inbox, door codes and SupRstR board signaling are limited to the people involved; other members' profiles load through the people directory\",",
+    "      title: \"Security rules Stage 1: profiles, messages, Inbox, door codes and floqCast board signaling are limited to the people involved; other members' profiles load through the people directory\",",
     "      checks: [",
     "        {label:\"People directory helper\", file:\"floqr-people-directory.js\", includes:[\"getPeopleDirectory\"]},",
     "        {label:\"Mingl uses directory\", file:\"patron-app.js\", includes:[\"FLOQRPeople\"]},",
@@ -73,7 +73,7 @@ edit("README.md", src => {
   const head = "# CURRENT PACKAGE: FLOQR ShoutOut s3.1.22 (stable)";
   if (!src.includes(head)) throw new Error("README head");
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = "- s3.1.23: Security rules Stage 1. Patron profiles are readable only by their owner and Master Admins; Search, Mingl, Services, My Profile, Club Admin and promoter reports load other members through the people directory, which leaves out contact details, consents, payment and security fields (Club Admins still see contacts for their own staff). Messages and Inbox are limited to the people in them, door codes and club message logs are server-written, and the SupRstR board can only add connection data to a live session.";
+  const note = "- s3.1.23: Security rules Stage 1. Patron profiles are readable only by their owner and Master Admins; Search, Mingl, Services, My Profile, Club Admin and promoter reports load other members through the people directory, which leaves out contact details, consents, payment and security fields (Club Admins still see contacts for their own staff). Messages and Inbox are limited to the people in them, door codes and club message logs are server-written, and the floqCast board can only add connection data to a live session.";
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut s3.1.23 (stable)${eol}${eol}${note}`);
 });
 

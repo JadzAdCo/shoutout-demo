@@ -93,7 +93,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "fix: s3.1.23 rules Stage 1 - users, messages, Inbox, door codes, SupRstR candidates + people directory"
+    & $git commit -m "fix: s3.1.23 rules Stage 1 - users, messages, Inbox, door codes, floqCast candidates + people directory"
     if ($LASTEXITCODE -ne 0) { throw "Commit failed" }
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }

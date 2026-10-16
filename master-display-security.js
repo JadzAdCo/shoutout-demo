@@ -182,7 +182,7 @@
       ${revealHtml}
       <p><strong>Display 1 (ShoutOut) — obfuscated preview</strong></p>
       <p><code style="word-break:break-all">${esc(data.primaryUrlObfuscated || data.primaryBaseUrl || "—")}</code></p>
-      <p><strong>Display 2 (supRstar) — obfuscated preview</strong></p>
+      <p><strong>Display 2 (floqCast) — obfuscated preview</strong></p>
       <p><code style="word-break:break-all">${esc(data.secondaryUrlObfuscated || data.secondaryBaseUrl || "—")}</code></p>
       <p class="sub small" style="margin-top:10px">Obfuscated URLs are not usable in Xibo. Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
 
@@ -451,7 +451,7 @@
               <p><strong>Display 1 (ShoutOut)</strong></p>
               <p><code id="heistTestPrimaryUrl" style="word-break:break-all">${esc(data.primaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistPrimaryUrlBtn">Copy Display 1 URL</button></div>
-              <p style="margin-top:10px"><strong>Display 2 (supRstar)</strong></p>
+              <p style="margin-top:10px"><strong>Display 2 (floqCast)</strong></p>
               <p><code id="heistTestSecondaryUrl" style="word-break:break-all">${esc(data.secondaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistSecondaryUrlBtn">Copy Display 2 URL</button></div>
             </div>

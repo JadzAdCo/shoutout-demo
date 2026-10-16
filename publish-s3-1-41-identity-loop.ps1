@@ -12,7 +12,7 @@ $git = "C:\Program Files\Git\cmd\git.exe"
 # Whole-file copies from $Commit: new files, plus modified files whose main copy must equal $Base (drift check, v= values
 # ignored). patron-app.js gets only this release's hunks ($Base..$Commit diff), never a whole-file copy. Asset re-stamp,
 # APP_V, functions/package.json (version + new test) and README run on main's own copies via scripts/bump-s3-1-41.js.
-# display-suprstr.js / suprstr-webrtc.js / mail-log.js / display-security-functions.js / admin-scheduling.js are never copied.
+# display-floqcast.js / floqcast-webrtc.js / mail-log.js / display-security-functions.js / admin-scheduling.js are never copied.
 $new = @(
   "floqr-identity-card.js",
   "functions/identity-card.test.js",

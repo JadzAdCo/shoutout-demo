@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Спросите FloqR через FloqAi",
-    "body": "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
+    "body": "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
   },
   "help-soccer-jersey": {
     "title": "ShoutOut в футбольной майке",
     "body": "Ищите Soccer, Jersey или страну/клуб (Tanzania, Chelsea). Каждая карточка фото-кита — это спина LED, которую вы увидите в ShoutOut — Soccer · Jersey · Country или Club. Размеры 96×48, 64×48, 64×32. Имя и 2-символьная метка накладываются на кит; номера остаются по центру."
   },
-  "help-suprstar": {
-    "title": "Сделать меня supRstar / superstar",
-    "body": "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди supRstar → Go live на доске SupRStar. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
+  "help-floqcast": {
+    "title": "Сделать меня floqCast / superstar",
+    "body": "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
   },
   "help-become-club-admin": {
     "title": "Стать Club Admin",

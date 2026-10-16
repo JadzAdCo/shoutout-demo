@@ -14,7 +14,7 @@ $git = "C:\Program Files\Git\cmd\git.exe"
 # so patron-app.js on main keeps every hunk that is not part of this fix. New files are copied whole from $Commit.
 # floqr-i18n.js gets its one key via scripts/patch-direct-shoutout-i18n.js; asset re-stamp, APP_V,
 # functions/package.json (version + new test) and README via scripts/bump-s3-1-43.js on main's own copies.
-# mail-log.js / display-security-functions.js / display-suprstr.js / suprstr-webrtc.js / admin-scheduling.js are untouched.
+# mail-log.js / display-security-functions.js / display-floqcast.js / floqcast-webrtc.js / admin-scheduling.js are untouched.
 $patched = @("admin-app.js", "ai-assistant-ui.js", "club-embed.css", "club-embed.html", "club-embed.js", "club-profile-app.js",
   "entity-management.js", "floqr-nav.js", "patron-app.js")
 $new = @("functions/venue-shoutout-deeplink.test.js", "scripts/patch-direct-shoutout-i18n.js", "scripts/bump-s3-1-43.js")

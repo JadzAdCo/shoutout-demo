@@ -52,8 +52,8 @@ $files = @(
   "rydr.html",
   "scripts/add-feature-links-reason-prompt-test.js",
   "services.html",
-  "suprstar-preview.html",
-  "suprstr-search.html"
+  "floqcast-preview.html",
+  "floqcast-search.html"
 )
 $Only = @($Only | ForEach-Object { $_ -split "," } | Where-Object { $_ })
 $Bases = @($Bases | ForEach-Object { $_ -split "," } | Where-Object { $_ })

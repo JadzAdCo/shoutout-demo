@@ -41,8 +41,8 @@ $files = @(
   "scripts/_help-en.json",
   "sos2fa.js",
   "styles.css",
-  "suprstar-preview.html",
-  "suprstr-search.html"
+  "floqcast-preview.html",
+  "floqcast-search.html"
 )
 
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }

@@ -18,8 +18,8 @@ $files = @(
   "pickup.html",
   "mingl-chat.html",
   "mingl-gist.html",
-  "suprstr-search.html",
-  "suprstar-preview.html"
+  "floqcast-search.html",
+  "floqcast-preview.html"
 )
 
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }

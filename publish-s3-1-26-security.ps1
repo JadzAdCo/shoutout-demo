@@ -9,7 +9,7 @@ $env:GIT_PAGER = "cat"
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
 $stage = Join-Path $root ".publish-s3-1-26-security"
 $git = "C:\Program Files\Git\cmd\git.exe"
-# feature-gates.js, functions/suprstr-functions.js and functions/package.json differ on main: patched in place below, never overwritten.
+# feature-gates.js, functions/floqcast-functions.js and functions/package.json differ on main: patched in place below, never overwritten.
 $files = @(
   ".github/workflows/rules-emulator-tests.yml",
   "FLOQR-WORDLIST.md",
@@ -65,7 +65,7 @@ $files = @(
   "rules-tests/firestore-mingl-chat.test.js",
   "rules-tests/firestore-mingl-connections.test.js",
   "rules-tests/firestore-phase0-deny.test.js",
-  "rules-tests/firestore-suprstr-aiindex-display.test.js",
+  "rules-tests/firestore-floqcast-aiindex-display.test.js",
   "rules-tests/firestore-users.test.js",
   "rules-tests/helpers.js",
   "rules-tests/package-lock.json",
@@ -85,8 +85,8 @@ $files = @(
   "shared-data.js",
   "sos2fa.js",
   "storage.rules",
-  "suprstar-preview.html",
-  "suprstr-search.html",
+  "floqcast-preview.html",
+  "floqcast-search.html",
   "template-tags.html"
 )
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
@@ -139,7 +139,7 @@ $typo = Select-String -Path (Join-Path $stage "*.js"), (Join-Path $stage "*.html
 if ($typo) { throw "Typo admin address still on main: $(($typo | ForEach-Object { $_.Filename }) -join ', ')" }
 node (Join-Path $stage "scripts/patch-main-demo-seed-admin.js")
 if ($LASTEXITCODE -ne 0) { throw "Could not patch demo-seed-functions.js on main" }
-$files += "functions/package.json", "functions/suprstr-functions.js", "functions/demo-seed-functions.js", "feature-gates.js"
+$files += "functions/package.json", "functions/floqcast-functions.js", "functions/demo-seed-functions.js", "feature-gates.js"
 
 Push-Location $stage
 try {
@@ -175,7 +175,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "fix: s3.1.26 security phase 0 + 1 - server-only admin trust, verified-email admin lists, OTP lockout, Mingl/messages/aiIndex/supRstar rules, Mingl media members"
+    & $git commit -m "fix: s3.1.26 security phase 0 + 1 - server-only admin trust, verified-email admin lists, OTP lockout, Mingl/messages/aiIndex/floqCast rules, Mingl media members"
     if ($LASTEXITCODE -ne 0) { throw "Commit failed" }
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) {
