@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.54 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.55 (stable)
+
+- s3.1.55: Features Mgmt rename; Release Control / Beta & Testing / Audit Trail sub-tabs with lazy load.
 
 - s3.1.54: VIP Terms page (one checkbox + verbiage), venue-first search→map, mobile table info below map, post-pay confirmation receipt.
 

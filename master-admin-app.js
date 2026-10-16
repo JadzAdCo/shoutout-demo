@@ -89,6 +89,9 @@
     "recommendationModeration",
     "demoEmployees",
     "featuresServices",
+    "featuresReleaseControl",
+    "featuresBetaTesting",
+    "featuresAuditTrail",
     "dataClassification",
     "adApprovalQueue",
     "adLiveCampaigns",
@@ -97,8 +100,12 @@
     "adSettingsPanel"
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
+  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresAuditTrail"];
   const PANEL_LABELS = {
-    featuresServices: "Features / Svc Status Mgmt",
+    featuresServices: "Features Mgmt",
+    featuresReleaseControl: "Features Mgmt · Release Control",
+    featuresBetaTesting: "Features Mgmt · Beta & Testing",
+    featuresAuditTrail: "Features Mgmt · Audit Trail",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
     adLiveCampaigns: "Ad Management · Live & scheduled",
@@ -201,6 +208,8 @@
     };
 
     const activatePanel = (panelId, opts = {}) => {
+      /* Legacy #featuresServices → Release Control (first Features Mgmt page). */
+      if (panelId === "featuresServices") panelId = "featuresReleaseControl";
       if (!panelId || !byId(panelId)) return;
       rememberMasterDeepLink(panelId);
       document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
@@ -246,8 +255,8 @@
       if (panelId === "translationOverrides") {
         window.FLOQRMasterTranslationOverrides?.mount?.();
       }
-      if (panelId === "featuresServices") {
-        window.FLOQRMasterFeatureServices?.mount?.();
+      if (FEATURES_MGMT_PANEL_IDS.includes(panelId)) {
+        window.FLOQRMasterFeatureServices?.mount?.(panelId);
       }
       if (panelId === "demoEmployees") {
         window.FLOQRMasterDemoEmployees?.mount?.();

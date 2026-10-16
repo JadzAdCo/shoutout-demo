@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.54";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.55";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.55",
+      title: "Features Mgmt sub-tabs",
+      checks: [
+        {label:"Features Mgmt parent tab", file:"master-admin.html", includes:["data-group=\"featuresServices\"", "featuresReleaseControl", "featuresBetaTesting", "featuresAuditTrail"]},
+        {label:"Lazy Features mount", file:"master-feature-services.js", includes:["loadReleaseControl", "loadBetaTesting", "loadAuditTrail"]},
+        {label:"Legacy hash redirect", file:"master-admin-app.js", includes:["FEATURES_MGMT_PANEL_IDS", "featuresReleaseControl"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.55\""]}
+      ]
+    },
     {
       version: "s3.1.54",
       title: "VIP reserV Terms page + venue-first + confirmation",
@@ -1481,6 +1491,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-55-features-mgmt-subtabs",
+      area:"Master Admin / Features Mgmt",
+      feature:"Features Mgmt rename + Release Control / Beta / Audit sub-tabs",
+      changed:"Nav label Features Mgmt. Sub-tabs: Release Control (flags + Test → live), Beta & Testing, Audit Trail. Each sub-tab lazy-loads its own data. Legacy #featuresServices opens Release Control. Package s3.1.55.",
+      howToTest:"1) Hard-refresh Master Admin → Features Mgmt (not Features / Svc Status Mgmt). 2) Sub-tabs appear: Release Control, Beta & Testing, Audit Trail. 3) Release Control shows feature flags + Test → live only. 4) Beta & Testing loads invite UI without waiting on audit. 5) Audit Trail loads the hash-chained log alone. 6) Deep link #featuresServices lands on Release Control.",
+      expected:"Faster panel open; only the active sub-tab fetches Firestore; SOS2FA still gates all three pages.",
+      troubleshoot:"Old label → hard refresh master-admin.html / floqr-i18n.js ?v=s3.1.55. All sections still load together → master-feature-services.js mount(panelId) not wired. SOS2FA missing → sos2fa.js ENTITY_MGMT_PANELS must list featuresReleaseControl / featuresBetaTesting / featuresAuditTrail."
+    },
     {
       id:"s3-1-54-vip-terms-page-venue-first",
       area:"VIP reserV / Terms / Mobile / Confirmation",

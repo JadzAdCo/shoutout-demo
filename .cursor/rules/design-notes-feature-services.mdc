@@ -7,7 +7,7 @@ alwaysApply: true
 
 Resume: `@features$` / `$beta$`. Shipped in **s3.0.108**; access matrix + per-feature beta RBAC + sign-in redirect in **s3.0.110** (sections below marked s3.0.110 win over older text).
 
-Master Admin → **Features & Services** decides which Search link buttons exist for whom. Only **ShoutOut** is live by default. Everything else is a **test feature** until a Master Admin turns it Live.
+Master Admin → **Features Mgmt** (Release Control / Beta & Testing / Audit Trail) decides which Search link buttons exist for whom. Only **ShoutOut** is live by default. Everything else is a **test feature** until a Master Admin turns it Live.
 
 ## Data model (Firestore)
 
@@ -62,7 +62,7 @@ Two derived `0|1` fields on `featureServices/{featureKey}`:
 | `enableBetaFeatureLink` | `IsFeatureEnabled == 1 && IsTestFeature == 1 ? 1 : 0` |
 
 - Written **only by the server**, in the same transaction as the flags: `setFeatureServiceFlags` (`after = {...flags, ...featureLinkFields(flags), revision+1}`; audit before/after carry both), `seedFeatureServices` (new docs). Never independently editable (rules keep `featureServices` Functions-write-only). Helpers: `featureLinkFields` / `linkFieldsDrifted` in `functions/feature-services-core.js`; client mirror `deriveLinkFields`.
-- **Backfill:** `seedFeatureServices` also merges the two fields into existing docs that miss or disagree (`linkFieldsBackfilledAtMs`, flags + revision untouched) and writes **one** chained event per call (`feature.seeded` with `detail.linksBackfilled`, or `feature.links_backfilled`). Master Admin F&S tab calls seed automatically when any row is drifted (SOS2FA unlock required). Until then the client derives the fields from the flags.
+- **Backfill:** `seedFeatureServices` also merges the two fields into existing docs that miss or disagree (`linkFieldsBackfilledAtMs`, flags + revision untouched) and writes **one** chained event per call (`feature.seeded` with `detail.linksBackfilled`, or `feature.links_backfilled`). Master Admin Features Mgmt · Release Control calls seed automatically when any row is drifted (SOS2FA unlock required). Until then the client derives the fields from the flags.
 - **One client API:** `FLOQRFeatureServices.linkState(key, {surface}) → {show, beta, state, …}`. `show = enableFeatureLink == 1 && access`, where access = `searchVisible` for `surface: "search"` (Master Admins excluded from test tiles) and `canAccess` everywhere else. `beta = show && enableBetaFeatureLink == 1` → append `.feature-beta-pill` (`cat.betaPill`).
 - **Master Admin profile menu shows test features with a Beta pill** (canAccess), even though Search hides them — by design (s3.1.30).
 - Surfaces (all through `linkState` / `applyFeatureLinks` with `data-floqr-feature-link="key"`, hidden via `FLOQRTabGates.apply` / `hidden`, never one-off CSS): Search tiles (`applySearchUi`), profile avatar menu (`global-profile-status.js` on satellites; `patron-app.js` `#userDropdown` on Search: Mingl Chat), My Profile tabs/links (`patron-portal.html` BartR Store tab + Manage Mingl Friends tab with `data-floqr-feature-panel`, Mingl Chat / Open BartR links), FloqAi product cards (`intent-search.js` `featureKey` + `featureLinkShown`). ShoutOut is always live. Server `assertFeatureAccess` unchanged.
