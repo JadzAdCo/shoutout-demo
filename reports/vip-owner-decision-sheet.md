@@ -282,7 +282,7 @@ All 9 money IDs answered. See **Batch 2 decided** table above. Roles/legal defer
 | VIP-B-13 | D — No second MA approver for credit notes in beta | [ ] `help-vip-credit-note-approval` |
 | VIP-B-14 | A — Counsel+accountant before Live; Stripe Tax off in beta | [ ] `help-vip-sales-tax-beta` |
 
-### Suggested Batch 3 groups (next)
+### Suggested Batch 3 groups (presented Oct 16 2026)
 
 | Batch | Group | Open IDs | Why next |
 |---|---|---|---|
@@ -290,3 +290,222 @@ All 9 money IDs answered. See **Batch 2 decided** table above. Roles/legal defer
 | **3b** | D Notifications & receipts | VIP-B-15…19 (5) | SMS payer, mandatory list, quiet hours, receipt issuer |
 | **3c** | C Booking UX & floor plans | VIP-P-09…12 (4) | Map edge cases + capacity placeholders |
 | Later | E Promoters & ledger · F · G | VIP-B-20…24 · VIP-P-15 (6) | Promoter $20, QBO, club codes, retention, translation Live gate |
+
+---
+
+## Batch 3a (presented Oct 16 2026) — roles & legal
+
+Reply format: `P-01 A`, `P-02 B`, … (or full `VIP-P-01 = A`). ★ = recommended. Do **not** re-ask money / brand / host (Batches 1–2).
+
+Standing requirement: every DECIDED answer that creates a user-facing surface ships FloqAi/help before Live (`help-vip-*` ids below).
+
+### VIP-P-01 — What should club admins be able to do in VIP ReserV?
+
+**Clarify:** Finishes cut-off principle 14 (“Give club admins the capability to …”). Letters a–i are the capability list from the proposal.
+
+| Letter | Capability |
+|---|---|
+| a | Hold / block tables for house guests, comps, walk-ins |
+| b | Different minimums per night, event, or time slot |
+| c | Optional request-to-book (manual approve) instead of instant |
+| d | Override policy (waive fees, refund beyond policy, move parties) |
+| e | Assign tables to servers / bottle staff |
+| f | Message reserved guests (night-of updates) |
+| g | Export reservations CSV (door / accounting) |
+| h | Set promoter quotas / allocations |
+| i | Upload their own Terms PDF (instead of clause builder) |
+
+- **A ★** — Ops pack now: **a–h**; Terms PDF upload (**i**) later (Should)
+- **B** — All of **a–i** in beta (incl. Terms PDF upload)
+- **C** — Lean beta only: **a, b, d, f, g**
+- **D** — Custom — reply with the letters you want (e.g. `a b d f g h`)
+
+Help when decided: [ ] `help-vip-club-admin-capabilities`
+
+### VIP-P-02 — How may Master Admins see patron personal data (names, phones, etc.)?
+
+**Clarify:** “Break-glass” = temporary unlock (about 30 minutes), then access ends; club Owner is notified.
+
+- **A ★** — Break-glass only (30 min) + Owner notified
+- **B** — Standing read for Master Admins (no unlock step)
+- **C** — Break-glass only, **no** Owner notify
+- **D** — Never — only Club Owner / VIP Manager see patron PII
+
+Help when decided: [ ] `help-vip-break-glass-pii`
+
+### VIP-P-03 — How do clubs / counsel sign agreements in beta?
+
+**Clarify:** Passkey = device biometric / security key over the document hash. TSA = trusted timestamp so the signature time is hard to dispute. Paid e-sign = Dropbox Sign / DocuSign / Adobe.
+
+- **A ★** — Passkey + TSA in-app for beta; paid e-sign provider later if needed
+- **B** — Paid e-sign provider from day one (budget for Dropbox Sign / DocuSign / Adobe)
+- **C** — Wet-ink PDF upload only (scan + hash) for beta
+- **D** — Passkey only (no TSA) for beta
+
+Help when decided: [ ] `help-vip-esign-beta`
+
+### VIP-P-04 — Which trusted timestamp (TSA) service for those signatures?
+
+**Clarify:** A paid TSA is stronger evidence if a signature is challenged in court; free stamps are weaker.
+
+- **A ★** — Paid TSA (DigiCert or Sectigo — pick at build time)
+- **B** — Paid TSA (GlobalSign)
+- **C** — Free / public TSA (not recommended for evidence)
+- **D** — Defer TSA until post-beta (passkey only until then)
+
+Help when decided: [ ] `help-vip-tsa-provider`
+
+### VIP-P-05 — Capture the signer’s browser location (GPS) for counsel signatures?
+
+**Clarify:** Optional phone/browser geolocation. IP address + passkey + bar verification can still prove who signed without GPS.
+
+- **A ★** — No GPS — IP + passkey + bar verification only
+- **B** — Opt-in GPS when the signer agrees
+- **C** — Require GPS for counsel signatures
+- **D** — Opt-in GPS for FloqMedia counsel only; never for club counsel
+
+Help when decided: [ ] `help-vip-signer-geolocation`
+
+### VIP-P-06 — Are EU / non-US clubs in the VIP ReserV beta?
+
+**Clarify:** Non-US adds eIDAS signature rules, GDPR controller duties, and stronger card “SCA” challenges. US-only keeps beta simpler.
+
+- **A ★** — US-only for beta
+- **B** — US + Canada for beta
+- **C** — US + selected EU markets (name countries in chat)
+- **D** — Worldwide from beta (accept eIDAS / GDPR / SCA complexity)
+
+Help when decided: [ ] `help-vip-beta-geography`
+
+### VIP-P-07 — Who is the Club Owner (signs agreements) at each beta venue?
+
+**Clarify:** Club Owner is the person who signs the subscription / legal agreements — not every Club Admin. Beta venues already chosen: Decades, Lima Twist Club, Aurelia.
+
+- **A ★** — You name one email/uid per club at onboarding (blocks certification until named)
+- **B** — Any Club Admin may sign as Owner
+- **C** — Master Admin acts as temporary Owner until the club names one
+- **D** — Name Owners now in chat (one line per club)
+
+Help when decided: [ ] `help-vip-club-owner-onboarding`
+
+### VIP-P-08 — Who can open the VIP books / ledger?
+
+**Clarify:** “Finance role” = a FloqMedia bookkeeper claim (mostly read). Writes (adjustments, write-offs) stay with Master Admin + SOS2FA.
+
+- **A ★** — Finance role (read-mostly) + Master Admin for writes
+- **B** — Master-Admin-only (no separate Finance claim)
+- **C** — Finance role may propose adjustments; Master Admin must approve every write
+- **D** — Club Owner may export their own club memo book; platform books Master-Admin-only
+
+Help when decided: [ ] `help-vip-finance-role`
+
+---
+
+## Batch 3b (presented Oct 16 2026) — notifications & receipts
+
+Reply format: `B-15 A`, `B-16 B`, … ★ = recommended.
+
+### VIP-B-15 — Who pays for patron SMS / WhatsApp (confirm, remind, door pass)?
+
+**Clarify:** Club-ops staff alerts already use the club’s message packs. This is only **patron-facing** texts (booking confirm, reminder, QR pass).
+
+- **A ★** — Club message credits (patron opts in at booking)
+- **B** — FloqMedia / platform pays
+- **C** — Folded into the patron booking-fee % (when that % is > 0)
+- **D** — Email + Inbox only in beta (no patron SMS/WhatsApp)
+
+Help when decided: [ ] `help-vip-patron-sms-payer`
+
+### VIP-B-16 — Keep the mandatory notification list (Owner cannot turn them off)?
+
+**Clarify:** Proposal list covers disputes, invoices, statements, and Master Admin access alerts — always delivered to the Owner (and required roles). Optional marketing / night-of guest texts stay optional.
+
+- **A ★** — Confirm as written — Owner cannot disable the mandatory list
+- **B** — Mandatory list, but Owner may mute non-urgent items during quiet hours
+- **C** — Make the whole list optional (Owner chooses)
+- **D** — Shrink the mandatory list — say which events stay mandatory in chat
+
+Help when decided: [ ] `help-vip-mandatory-notifications`
+
+### VIP-B-17 — Default quiet hours for staff alerts?
+
+**Clarify:** Quiet hours pause non-urgent staff pings. Urgent items (disputes, break-glass, door emergencies) still break through.
+
+- **A ★** — 03:00–11:00 local preset (urgent still breaks through)
+- **B** — No quiet hours by default (club may set their own)
+- **C** — 02:00–10:00 local preset
+- **D** — Quiet hours off for Owner; on for other staff (03:00–11:00)
+
+Help when decided: [ ] `help-vip-quiet-hours`
+
+### VIP-B-18 — Whose name is on the receipt (issuer of record)?
+
+**Clarify:** “Merchant of record” is the business name the guest sees on the PDF / card trail. “Processed by FLOQR” is a footer line, not the issuer.
+
+- **A ★** — Club as merchant · footer “Processed by FLOQR”
+- **B** — FloqMedia / FLOQR as issuer (club named as venue only)
+- **C** — Depends on payment collector: Club Stripe / Club POS → club; FloqR Stripe → FLOQR
+- **D** — Dual PDF — club guest receipt + FLOQR ledger copy
+
+Help when decided: [ ] `help-vip-receipt-issuer`
+
+### VIP-B-19 — Pay-at-venue path: always issue a FLOQR receipt, or may the club opt out?
+
+**Clarify:** Pay-at-venue means the guest pays at the club (POS / cash), not in the app. A FLOQR receipt of record still helps disputes and the ledger even if the POS printed a slip.
+
+- **A ★** — Always issue FLOQR receipt of record
+- **B** — Club may opt out when its POS already prints a receipt
+- **C** — FLOQR receipt only when Model B % applies (needs attested totals)
+- **D** — Email/Inbox confirmation only (no PDF receipt) for pay-at-venue
+
+Help when decided: [ ] `help-vip-pay-at-venue-receipt`
+
+---
+
+## Batch 3c (presented Oct 16 2026) — floor-plan UX
+
+Reply format: `P-09 A`, `P-10 B`, … ★ = recommended. Already decided (do not re-ask): bars never bookable · area names club-editable · 360 tour later · Lima Twist Club spelling.
+
+### VIP-P-09 — On the Lima Twist map, is **106** the only DJ booth?
+
+**Clarify:** 106 is already marked blue / not bookable. Confirm nothing else on that plan is a DJ booth.
+
+- **A ★** — Yes — 106 only
+- **B** — No — also mark another label as DJ booth (name it in chat)
+- **C** — 106 is a table / something else (say what in chat)
+- **D** — Unsure — leave 106 as DJ booth for beta; club can correct in review
+
+Help when decided: [ ] `help-vip-lima-dj-booth`
+
+### VIP-P-10 — Decades: unlabeled enclosure west of south VIP TABLES — and can VIP areas sell as full buyouts?
+
+**Clarify:** Unlabeled shapes stay non-bookable until the club names them. “Buyout” = book a whole VIP area as one SKU instead of table-by-table.
+
+- **A ★** — Enclosure = non-bookable · VIP areas = per-table only (no buyout SKU in beta)
+- **B** — Enclosure = non-bookable · allow VIP-area buyout SKU in beta
+- **C** — Enclosure is bookable (name / capacity in chat) · per-table only
+- **D** — Ask Decades club in review before locking either answer
+
+Help when decided: [ ] `help-vip-decades-enclosure-buyout`
+
+### VIP-P-11 — Who shoots the later 360° “Explore the room” panoramas?
+
+**Clarify:** 360 is after beta core (already decided). Hotspots still book the same tables. Photos must blur faces / empty room.
+
+- **A ★** — Club staff with a FloqMedia capture guide (FloqMedia reviews privacy blur before publish)
+- **B** — FloqMedia photographer at FloqMedia cost
+- **C** — FloqMedia photographer billed to the club
+- **D** — Skip 360 entirely (2D map only forever)
+
+Help when decided: [ ] `help-vip-360-capture`
+
+### VIP-P-12 — Are the seat placeholders OK until each club reviews? Is “included guests” usually the full table?
+
+**Clarify:** Placeholders today: Decades VIP ~8 max / 6 included, tables ~6 / 4; Lima Twist ~2–6 per table. `includedGuests` = guests covered by the minimum; beyond that → optional extra-guest VIP entry fee (already decided: prepaid, own line).
+
+- **A ★** — Placeholders OK until club review · included often = max (extra-guest fee usually null)
+- **B** — Placeholders OK · included usually **less** than max (extra-guest fee common)
+- **C** — Freeze numbers now as platform defaults (clubs may only lower max)
+- **D** — Wipe placeholders — every section starts empty until the club fills capacity
+
+Help when decided: [ ] `help-vip-capacity-placeholders`
