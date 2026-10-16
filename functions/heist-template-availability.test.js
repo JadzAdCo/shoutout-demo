@@ -59,7 +59,7 @@ test("patron Search and FloqAi route a misspelled Tengo muchos dólares to the H
   assert.match(app, /matcher \? matcher\.phraseMatches\(q, phrase\) : q\.includes\(phrase\)/);
   assert.match(app, /\(t\.searchAliases \|\| \[\]\)\.join\(" "\)/);
   const intents = read("intent-search.js");
-  const block = intents.slice(intents.indexOf('id: "tengo-muchos-dolares"'), intents.indexOf('id: "suprstr"'));
+  const block = intents.slice(intents.indexOf('id: "tengo-muchos-dolares"'), intents.indexOf('id: "floqcast"'));
   const patternLine = block.slice(block.indexOf("patterns: ["));
   const patterns = Array.from(patternLine.slice(0, patternLine.indexOf("\n")).matchAll(/\/((?:[^/\\]|\\.)+)\//g)).map(m => new RegExp(m[1]));
   assert.ok(patterns.some(re => re.test("tendo mucho dolares")), "FloqAi intent tolerates 'tendo mucho dolares'");

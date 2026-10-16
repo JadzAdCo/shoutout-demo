@@ -978,7 +978,7 @@
         {label:"Work Sheet uses session shell", file:"staff-worksheet.html", includes:["floqr-session-shell.js", "data-floqr-auth-chrome", "embed=1"]},
         {label:"BartR satellite shell", file:"commerce.html", includes:["floqr-session-shell.js", "data-floqr-auth-chrome"]},
         {label:"Payment return no auto popup", file:"payment-return-app.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {})"]},
-        {label:"supRstar preview no auto popup", file:"suprstar-preview.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message))"]},
+        {label:"floqCast preview no auto popup", file:"floqcast-preview.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message))"]},
         {label:"Portal iframe embed=1", file:"patron-portal-app.js", includes:["embed: \"1\"", "from: \"portal\""]},
         {label:"Satellite session rule", file:".cursor/rules/satellite-session-auth.mdc", includes:["FLOQRSessionShell", "embed=1"]},
         {label:"Venue Links are version-free", file:"floqr-nav.js", includes:["adminPortalUrl", "currentVersion", "Page links never carry ?v="]},
@@ -1285,7 +1285,7 @@
     },
     {
       version: "s3.1.26-security-phase-1",
-      title: "Security: admin rights come only from the server, wrong codes now count toward the lockout, and Mingl chats, blocks, inbox messages and supRstar streams can only be changed by the people they belong to",
+      title: "Security: admin rights come only from the server, wrong codes now count toward the lockout, and Mingl chats, blocks, inbox messages and floqCast streams can only be changed by the people they belong to",
       checks: [
         {label:"Rules version", file:"firestore.rules", includes:["s3.1.26-security-phase-1", "function isValidNewMinglRoom(", "function minglStatusTransitionOk("]},
         {label:"Mingl request sender", file:"patron-app.js", includes:["messageType:\"mingl_request\", senderUid:currentUser.uid"]},
@@ -1312,7 +1312,7 @@
     },
     {
       version: "s3.1.23-rules-stage-1",
-      title: "Security rules Stage 1: profiles, messages, Inbox, door codes and SupRstR board signaling are limited to the people involved; other members' profiles load through the people directory",
+      title: "Security rules Stage 1: profiles, messages, Inbox, door codes and floqCast board signaling are limited to the people involved; other members' profiles load through the people directory",
       checks: [
         {label:"People directory helper", file:"floqr-people-directory.js", includes:["getPeopleDirectory"]},
         {label:"Mingl uses directory", file:"patron-app.js", includes:["FLOQRPeople"]}
@@ -1482,7 +1482,7 @@
       id:"s3-0-108-feature-services-beta",
       area:"Master Admin / Search",
       feature:"Features & Services (IsFeatureEnabled / IsTestFeature), beta testers, audit trail; in-app ad shows …loading your search for 5 seconds",
-      changed:"Search shows only the ShoutOut button by default. Master Admin → Features & Services turns each feature Live or Test with a reason, invites beta testers, records test → live promotions and shows a hash-chained audit trail. Test pages (BartR, RydR, Pickup, supRstar, Mingl chat/Gist) are blocked for regular patrons. The in-app ad no longer shows a countdown or Skip; it shows …loading your search for 5 seconds.",
+      changed:"Search shows only the ShoutOut button by default. Master Admin → Features & Services turns each feature Live or Test with a reason, invites beta testers, records test → live promotions and shows a hash-chained audit trail. Test pages (BartR, RydR, Pickup, floqCast, Mingl chat/Gist) are blocked for regular patrons. The in-app ad no longer shows a countdown or Skip; it shows …loading your search for 5 seconds.",
       howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/ → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Admin, open Features & Services, unlock SOS2FA, see all six features and the Beta-labelled test tiles on Search. Invite a test patron; as that patron open the Inbox → Review beta invite → Accept → Search shows the Beta tiles. Toggle a feature Live with a reason and confirm the audit row, then Verify integrity. Tap Mingl to see the ad: …loading your search, no Skip, continues after 5 seconds.",
       expected:"Patrons see only live features; beta testers and admins see test features marked Beta; every change is in the audit trail with who, when, reason and before/after; integrity check reports OK. Ad shows the loading message for 5 seconds with no Skip."
     },
@@ -1578,8 +1578,8 @@
       id:"s3-0-3-all-satellites-session-shell",
       area:"Satellite / iframe pages",
       feature:"Every satellite inherits FLOQR login; no auto Google popup",
-      changed:"role-request, BartR, guest list, Mingl, RydR, services, promoter admin, payment-return, and supRstar all load floqr-session-shell.js. Payment return and private preview no longer call signInWithPopup on signed-out. Embedded panels use popupBlocked and Open My Profile.",
-      howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from Search while still signed in. Confirm each restores the session and does not force a Google popup.",
+      changed:"role-request, BartR, guest list, Mingl, RydR, services, promoter admin, payment-return, and floqCast all load floqr-session-shell.js. Payment return and private preview no longer call signInWithPopup on signed-out. Embedded panels use popupBlocked and Open My Profile.",
+      howToTest:"Sign in on patron-portal.html as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, floqcast-search.html from Search while still signed in. Confirm each restores the session and does not force a Google popup.",
       expected:"Signed-in parent/session is reused. No Google-only gate. Iframe Work Calendar still has tick / Approve selected."
     },
     {
@@ -6495,7 +6495,7 @@
     return {
       package: v,
       note: note || `FLOQR s3.0.7 test notes:
-1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, supRstar. Each must restore the FLOQR session — no Google-only gate, no auto popup.
+1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, floqCast. Each must restore the FLOQR session — no Google-only gate, no auto popup.
 2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
 3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,
       links: [

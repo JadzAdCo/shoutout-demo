@@ -87,16 +87,17 @@
       patterns: [/shiloh/, /\bcat\s*(shout|template|background)/, /\bkitty\s*(shout|template)/, /aurelia\s*cat/]
     },
     {
-      id: "suprstr",
+      id: "floqcast",
       kind: "product",
-      featureKey: "supRstar",
-      label: "supRstar — go live / be a superstar",
-      blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.",
-      href: pageUrl("./suprstr-search.html", {from: "floqai"}),
+      featureKey: "floqCast",
+      label: "floqCast — go live / be a superstar",
+      blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the floqCast board.",
+      href: pageUrl("./floqcast-search.html", {from: "floqai"}),
       patterns: [
+        /floq\s*cast/, /floqcast/,
         /supr\s*str/, /suprstr/, /supr\s*star/, /suprstar/, /super\s*-?\s*star/, /superstar/,
-        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar|supr\s*str|supr\s*star)/,
-        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar|suprstar)/,
+        /make\s+me\s+(a\s+)?(floq\s*cast|floqcast|super\s*-?\s*star|superstar|suprstr|suprstar|supr\s*str|supr\s*star)/,
+        /be(come)?\s+(a\s+)?(floq\s*cast|floqcast|super\s*-?\s*star|superstar|suprstar)/,
         /go\s+live/, /live\s*stream/, /stream\s+(to\s+)?(the\s+)?display/,
         /camera\s+to\s+(the\s+)?(club|venue|display)/, /broadcast\s+(live|myself|to)/
       ]
@@ -141,29 +142,31 @@
       ]
     },
     {
-      id: "help-suprstr",
+      id: "help-floqcast",
       kind: "help",
-      label: "Make me a supRstar / superstar",
-      blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the supRstar Queue → Go live on the SupRStar board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
+      label: "Make me a floqCast / superstar",
+      blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the floqCast Queue → Go live on the floqCast board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
       steps: [
-        "Open supRstar from Search or FloqAi.",
-        "Choose a venue that has supRstar enabled.",
-        "Tap Go live, be a supRstar — a private preview page opens (camera only, not on the board yet).",
+        "Open floqCast from Search or FloqAi.",
+        "Choose a venue that has floqCast enabled.",
+        "Tap Go live, be a floqCast — a private preview page opens (camera only, not on the board yet).",
         "Pay $20 in the Stripe pop-out while the preview stays open.",
-        "Wait for Club Admin to Approve in Club Admin → supRstar Queue.",
+        "Wait for Club Admin to Approve in Club Admin → floqCast Queue.",
         "When approved, tap Go live on your preview page."
       ],
       links: [
-        {label: "Open supRstar", href: pageUrl("./suprstr-search.html", {from: "floqai"})}
+        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       searchPhrases: [
+        "floqcast", "floq cast", "floqCast", "make me a floqcast", "make me a floq cast",
         "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
         "superstar", "super star", "super-star", "suprstr", "suprstar", "supr str", "supr star",
         "go live", "live stream", "stream to display", "be a superstar", "become a superstar"
       ],
       patterns: [
-        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar)/,
-        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar|suprstar)/,
+        /floq\s*cast/, /floqcast/,
+        /make\s+me\s+(a\s+)?(floq\s*cast|floqcast|super\s*-?\s*star|superstar|suprstr|suprstar)/,
+        /be(come)?\s+(a\s+)?(floq\s*cast|floqcast|super\s*-?\s*star|superstar|suprstar)/,
         /supr\s*str/, /supr\s*star/, /super\s*-?\s*star/, /go\s+live/, /live\s*stream/
       ]
     },
@@ -879,8 +882,8 @@
   const INTENT_AUDIENCES = Object.freeze({
     "venue-search": ["public"],
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
-    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], suprstr: ["patron"], clubs: ["patron"],
-    "help-post-ad": ["patron"], "help-suprstr": ["patron"], "help-club-admin": ["patron"],
+    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], floqcast: ["patron"], clubs: ["patron"],
+    "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],

@@ -1775,8 +1775,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   height:12%!important;
 }
 
-/* SupRstR live overlay on venue display.html */
-.suprstr-live-overlay{
+/* floqCast live overlay on venue display.html */
+.floqcast-live-overlay{
   position:absolute;
   inset:0;
   z-index:80;
@@ -1784,14 +1784,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   place-items:center;
   background:#000;
 }
-.suprstr-live-overlay.hidden{display:none!important}
-.suprstr-live-video{
+.floqcast-live-overlay.hidden{display:none!important}
+.floqcast-live-video{
   width:100%;
   height:100%;
   object-fit:contain;
   background:#000;
 }
-.suprstr-live-badge{
+.floqcast-live-badge{
   position:absolute;
   top:3%;
   left:3%;
@@ -1803,7 +1803,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background:rgba(200,16,46,.92);
   box-shadow:0 0 0 2px rgba(255,255,255,.2);
 }
-.suprstr-live-status{
+.floqcast-live-status{
   position:absolute;
   bottom:4%;
   left:50%;
@@ -1814,26 +1814,26 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   color:#fff;
   background:rgba(0,0,0,.55);
 }
-.suprstr-live-status:empty{display:none}
-body.suprstr-live-active .display-text-overlay,
-body.suprstr-live-active .heist-brand-slide{
+.floqcast-live-status:empty{display:none}
+body.floqcast-live-active .display-text-overlay,
+body.floqcast-live-active .heist-brand-slide{
   opacity:0;
   pointer-events:none;
 }
 
-/* display2 idle — awaiting supRstar live feed */
-.display-canvas.suprstar-idle-canvas{
+/* display2 idle — awaiting floqCast live feed */
+.display-canvas.floqcast-idle-canvas{
   background:
     radial-gradient(circle at 28% 32%,rgba(223,255,90,.22),transparent 34%),
     radial-gradient(circle at 74% 28%,rgba(88,236,255,.28),transparent 36%),
     linear-gradient(145deg,#05070f 0%,#0a1630 55%,#02040a 100%)!important;
   animation:none;
 }
-.display-canvas.suprstar-idle-canvas .display-text-overlay{
+.display-canvas.floqcast-idle-canvas .display-text-overlay{
   display:grid;
   place-items:center;
 }
-.suprstar-idle-center{
+.floqcast-idle-center{
   width:min(920px,92vw)!important;
   height:auto!important;
   min-height:0!important;
@@ -1846,9 +1846,9 @@ body.suprstr-live-active .heist-brand-slide{
   background:transparent!important;
   box-shadow:none!important;
 }
-.suprstar-idle-center:before,
-.suprstar-idle-center:after{display:none!important}
-.media-slot.suprstar-idle-logo-slot{
+.floqcast-idle-center:before,
+.floqcast-idle-center:after{display:none!important}
+.media-slot.floqcast-idle-logo-slot{
   display:block!important;
   width:min(360px,46vw);
   max-height:28vh;
@@ -1857,14 +1857,14 @@ body.suprstr-live-active .heist-brand-slide{
   border:0!important;
   box-shadow:none!important;
 }
-.suprstar-idle-logo{
+.floqcast-idle-logo{
   width:100%;
   height:100%;
   max-height:28vh;
   object-fit:contain;
   filter:drop-shadow(0 12px 28px rgba(0,0,0,.45));
 }
-#displayMain.suprstar-idle-copy{
+#displayMain.floqcast-idle-copy{
   position:static!important;
   inset:auto!important;
   width:min(900px,94vw)!important;
@@ -1882,15 +1882,15 @@ body.suprstr-live-active .heist-brand-slide{
   color:#f4f7ff!important;
   text-shadow:0 2px 18px rgba(0,0,0,.45)!important;
 }
-#displayMain.suprstar-idle-copy .suprstar-idle-line{
+#displayMain.floqcast-idle-copy .floqcast-idle-line{
   display:block;
   text-align:center;
 }
-#displayMain.suprstar-idle-copy .suprstar-idle-line:last-child{
+#displayMain.floqcast-idle-copy .floqcast-idle-line:last-child{
   color:#dfff5a;
   font-size:.88em;
 }
-#displayMain.suprstar-idle-copy .suprstar-idle-note{
+#displayMain.floqcast-idle-copy .floqcast-idle-note{
   display:block;
   margin-top:clamp(6px,1.2vh,14px);
   font-size:clamp(14px,2.2vw,22px)!important;
@@ -1901,11 +1901,11 @@ body.suprstr-live-active .heist-brand-slide{
 }
 /* s3.1.40: 64×32 boards (208px tall) — keep the whole display2 idle screen on the board. */
 @media(max-height:260px){
-  .suprstar-idle-center{width:92vw!important;padding:3vh 0!important;gap:3vh!important;box-sizing:border-box!important}
-  .media-slot.suprstar-idle-logo-slot,.suprstar-idle-logo{max-height:24vh}
-  #displayMain.suprstar-idle-copy{width:100%!important;max-width:100%!important;gap:1.5vh!important;font-size:clamp(14px,4.6vw,26px)!important;line-height:1.05!important}
-  #displayMain.suprstar-idle-copy .suprstar-idle-line{max-width:100%;text-wrap:balance}
-  #displayMain.suprstar-idle-copy .suprstar-idle-note{margin-top:1vh;font-size:clamp(9px,2.5vw,12px)!important}
+  .floqcast-idle-center{width:92vw!important;padding:3vh 0!important;gap:3vh!important;box-sizing:border-box!important}
+  .media-slot.floqcast-idle-logo-slot,.floqcast-idle-logo{max-height:24vh}
+  #displayMain.floqcast-idle-copy{width:100%!important;max-width:100%!important;gap:1.5vh!important;font-size:clamp(14px,4.6vw,26px)!important;line-height:1.05!important}
+  #displayMain.floqcast-idle-copy .floqcast-idle-line{max-width:100%;text-wrap:balance}
+  #displayMain.floqcast-idle-copy .floqcast-idle-note{margin-top:1vh;font-size:clamp(9px,2.5vw,12px)!important}
 }
 .display-canvas.display-access-denied{
   background:linear-gradient(145deg,#1a0508,#2a0a10 55%,#0a0204)!important;

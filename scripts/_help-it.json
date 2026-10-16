@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Chiedi FloqR con FloqAi",
-    "body": "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
+    "body": "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
   },
   "help-soccer-jersey": {
     "title": "Maglia da calcio ShoutOut",
     "body": "Cerca calcio, maglia o un paese/club (Tanzania, Chelsea). Ogni scheda del kit fotografico è il retro LED che vedrai su ShoutOut — Calcio · Maglia · Nazione o Club. Formati 96×48, 64×48, 64×32. Nome e marchio di 2 caratteri sovrapposti al kit; i numeri rimangono giustificati al centro."
   },
-  "help-suprstar": {
-    "title": "Fammi un supRstar / superstar",
-    "body": "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda supRstar → Go live sulla bacheca SupRStar. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
+  "help-floqcast": {
+    "title": "Fammi un floqCast / superstar",
+    "body": "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
   },
   "help-become-club-admin": {
     "title": "Diventa un Club Admin",

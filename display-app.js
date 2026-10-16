@@ -61,7 +61,7 @@
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
   const HEIST_BRAND_SLIDE_LABEL = "WASHINGTON DC";
-  const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
+  const FLOQCAST_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
   let expiredLiveKey = "";
   let screenFormatOverride = "";
@@ -1124,8 +1124,8 @@
   function clubDefaultMainText(location = {}) {
     const clubName = clubVenueName(location);
     if (DISPLAY_BOARD === "secondary") {
-      // display2 / Xibo SupRStar board idle CTA
-      return `Awaiting live Feed. Be a SupRstar @ ${clubName}`;
+      // display2 / Xibo floqCast board idle CTA
+      return `Awaiting live Feed. Be a floqCast @ ${clubName}`;
     }
     return `Use ShoutOut @ ${clubName}`;
   }
@@ -1141,7 +1141,7 @@
     return !!data.idleCta || status === "default";
   }
 
-  function isSuprstarIdlePayload(data = {}) {
+  function isFloqCastIdlePayload(data = {}) {
     if (DISPLAY_BOARD !== "secondary") return false;
     if (isUrlPreviewMode() && (urlSearchParams().has("template") || urlSearchParams().has("main"))) return false;
     const status = String(data.status || "").toLowerCase();
@@ -1170,7 +1170,7 @@
         template: "blackwhite",
         status: "default",
         idleCta: true,
-        suprstarIdle: true
+        floqcastIdle: true
       };
     }
     const idleTemplate = "blackwhite";
@@ -1184,7 +1184,7 @@
     };
   }
 
-  function renderSuprstarIdleScreen(location = {}) {
+  function renderFloqCastIdleScreen(location = {}) {
     const clubName = clubVenueName(location);
     const canvas = byId("displayCanvas");
     const mediaSlot = byId("mediaSlot");
@@ -1196,7 +1196,7 @@
     hideHeistBrandSlide();
     hideJerseyMount();
     if (canvas) {
-      canvas.className = "display-canvas display-board-secondary suprstar-idle-canvas";
+      canvas.className = "display-canvas display-board-secondary floqcast-idle-canvas";
       canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
       canvas.style.backgroundImage = "";
       canvas.style.background = "";
@@ -1213,19 +1213,19 @@
       frame.setAttribute("aria-hidden", "true");
       frame.innerHTML = "";
     }
-    if (center) center.className = "display-center suprstar-idle-center";
+    if (center) center.className = "display-center floqcast-idle-center";
     byId("displayBrand").textContent = "";
     if (mediaSlot) {
-      mediaSlot.className = "media-slot suprstar-idle-logo-slot";
-      mediaSlot.innerHTML = `<img src="${esc(SUPRSTAR_LOGO)}" alt="supRstar" class="suprstar-idle-logo" decoding="async"/>`;
+      mediaSlot.className = "media-slot floqcast-idle-logo-slot";
+      mediaSlot.innerHTML = `<img src="${esc(FLOQCAST_LOGO)}" alt="floqCast" class="floqcast-idle-logo" decoding="async"/>`;
     }
-    byId("displayMain").className = "suprstar-idle-copy";
+    byId("displayMain").className = "floqcast-idle-copy";
     byId("displayMain").style.removeProperty("font-size");
     byId("displayMain").innerHTML = [
-      `<span class="suprstar-idle-line">Awaiting live Feed.</span>`,
-      `<span class="suprstar-idle-line">Be a SupRstar @ ${esc(clubName)}</span>`,
+      `<span class="floqcast-idle-line">Awaiting live Feed.</span>`,
+      `<span class="floqcast-idle-line">Be a floqCast @ ${esc(clubName)}</span>`,
       // Feature: make clear this is the idle/default board, not an IP/security block.
-      `<span class="suprstar-idle-note">Idle board · no guest is live right now</span>`
+      `<span class="floqcast-idle-note">Idle board · no guest is live right now</span>`
     ].join("");
     byId("displaySub").className = "hidden";
     byId("displaySub").removeAttribute("aria-label");
@@ -1588,9 +1588,9 @@
   function render(data) {
     // Frame loop stop is deferred until we know this paint is not a looping template.
     byId("displayNflShoutPanel")?.remove();
-    if (isSuprstarIdlePayload(data)) {
+    if (isFloqCastIdlePayload(data)) {
       stopSplitMediaLoop();
-      renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
+      renderFloqCastIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
     }
     const rawTemplateId = data.template || "neon";

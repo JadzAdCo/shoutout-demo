@@ -32,7 +32,8 @@ This failed in production as: parent `patron-portal.html` signed in, child ifram
 | `services.html` | Follow Services |
 | `payment-return.html` | Stripe return |
 | `promoter-admin.html` | Promoter tools |
-| `suprstr-search.html` / `suprstar-preview.html` | SupRstR |
+| `floqcast-search.html` / `floqcast-preview.html` | floqCast |
+| `template-tags.html` | Club Admin “Manage template tags” + Inbox `templateRole` |
 
 **Exceptions (no patron session UI):** `display.html` / `display2.html` (Xibo), seed/debug/onboarding tools.
 
@@ -67,11 +68,11 @@ FLOQRSessionShell.bind({
 });
 ```
 
-Standalone (not iframe): Google may remain as **one** option after the shell restores session and finds no user. Copy must say restore FLOQR session / open My Profile — not “Google only.”
+Standalone (not iframe), signed out (s3.0.110): the shell **redirects** to the general sign-in `./?profileRequired=sign-in&returnTo=<page>` (no `v`; any `v` on the page is dropped from `returnTo`) (Search Welcome card, every provider) and Search returns the patron to the page after sign-in. No Google button on the satellite. `requireSignIn()` auto-runs on every page that loads the shell; public pages opt out with `<body data-floqr-public>`. Details: `design-notes-feature-services.mdc` → “Sign-in redirect on every page”.
 
 ## Embed / iframe
 
-1. Portal/admin iframes: `embed=1` on `src` (keep `v=`).
+1. Portal/admin iframes: `embed=1` on `src`, no `v=` (page links never carry a version — owner decision Oct 10 2026).
 2. Embedded path **must not** call `signInWithPopup`. Shell hides login buttons and links **My Profile & Settings** (`target="_parent"`).
 3. Shell adds `floqr-embed-mode` and hides duplicate Back chrome.
 4. Prefer rendering inside the portal; if you iframe, the child still uses the shell.

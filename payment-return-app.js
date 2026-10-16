@@ -98,10 +98,10 @@
   function render(order = {}) {
     const paid = order.paymentStatus === "paid";
     const isShoutout = order.orderType === "shoutout";
-    const isSuprstar = order.orderType === "suprstarRequest" || order.orderType === "suprstrSlot";
+    const isFloqCast = order.orderType === "suprstarRequest" || order.orderType === "suprstrSlot";
     const receipt = order.receipt || {};
     byId("paymentReturnTitle").textContent = paid
-      ? (isShoutout ? "ShoutOut submitted" : isSuprstar ? "supRstar paid" : "Payment confirmed")
+      ? (isShoutout ? "ShoutOut submitted" : isFloqCast ? "floqCast paid" : "Payment confirmed")
       : cancelled || order.status === "checkout-cancelled"
         ? "Payment cancelled"
         : "Payment processing";
@@ -110,7 +110,7 @@
         ? "Your message has been sent to the location approval queue. A final receipt was also sent to FloqR Inbox and your email/SMS when available."
         : order.orderType === "suprstarRequest"
           ? "Payment received and sent to Club Admin for approval. Return to your private preview tab."
-          : isSuprstar
+          : isFloqCast
             ? "Your live-stream slot(s) are credited."
             : "Your order is recorded and the next service step is underway.")
       : cancelled || order.status === "checkout-cancelled"
@@ -123,14 +123,14 @@
       try { storedToken = sessionStorage.getItem("floqr_suprstar_token") || ""; } catch (_) {}
       const requestId = order.payload?.requestId || order.requestId || "";
       const previewToken = storedToken || requestId;
-      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}` : "";
+      const previewUrl = previewToken ? `./floqcast-preview.html?t=${encodeURIComponent(previewToken)}` : "";
       const backLink = isPopup
         ? `<p class="sub small">This window will close. Keep your preview tab open for Club Admin approval.</p>`
         : previewUrl
           ? `<p><a class="buttonlike" href="${esc(previewUrl)}">Return to your private preview →</a></p>`
           : `<p class="sub small">Return to your private preview tab and wait for Club Admin approval.</p>`;
       byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
-        <p><strong>Service:</strong> supRstar live appearance</p>
+        <p><strong>Service:</strong> floqCast live appearance</p>
         <p><strong>Ref:</strong> ${esc(order.referenceNumber || requestId || "—")}</p>
         <p><strong>Status:</strong> Pending Club Admin approval</p>
         <p><strong>Total:</strong> ${esc(money(order.amountCents))}</p>

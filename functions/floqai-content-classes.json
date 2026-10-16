@@ -108,6 +108,9 @@
     "help-floqai-template-search": [
       "patron"
     ],
+    "help-floqcast": [
+      "patron"
+    ],
     "help-football-intro": [
       "patron"
     ],
@@ -225,9 +228,6 @@
     "help-staff-worksheet": [
       "venueAdmin"
     ],
-    "help-suprstar": [
-      "patron"
-    ],
     "help-template-catalog-report": [
       "venueAdmin"
     ],
@@ -282,6 +282,9 @@
     "clubs": [
       "patron"
     ],
+    "floqcast": [
+      "patron"
+    ],
     "football-intro": [
       "patron"
     ],
@@ -307,6 +310,9 @@
       "patron"
     ],
     "help-donpapi-led-wall": [
+      "patron"
+    ],
+    "help-floqcast": [
       "patron"
     ],
     "help-general": [
@@ -378,9 +384,6 @@
     "help-staff-worksheet": [
       "serviceMember"
     ],
-    "help-suprstr": [
-      "patron"
-    ],
     "help-template-catalog-report": [
       "masterAdmin"
     ],
@@ -409,9 +412,6 @@
       "patron"
     ],
     "shoutout": [
-      "patron"
-    ],
-    "suprstr": [
       "patron"
     ],
     "tengo-muchos-dolares": [

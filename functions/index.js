@@ -16,7 +16,7 @@ module.exports = {
   ...require("./data-classification-functions"),
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
-  ...require("./suprstr-functions"),
+  ...require("./floqcast-functions"),
   ...require("./privacy-dsar-functions"),
   ...require("./venue-geocode-functions"),
   ...require("./whatsapp-otp-functions"),

@@ -31,7 +31,7 @@
     shoutouts: "Keep as is: the patron and the club's staff can read it. The display board gets the text from Content playing on display boards, not from here.",
     patronRanks: "Keep Public only if the leaderboard shows nicknames patrons chose. If it shows real names, untick Public.",
     displayDevices: "Keep Public: display boards read it without signing in. Board keys are kept separately and stay Secret.",
-    suprstrSessions: "Keep Public for now: the display board joins the live video without signing in. A join code will replace this later.",
+    floqcastSessions: "Keep Public for now: the display board joins the live video without signing in. A join code will replace this later.",
     minglGists: "Keep Public if Mingl posts are meant to be seen by people who are not signed in. Otherwise untick Public.",
     guestListRequests: "Keep as is, or untick Regular employee if only door staff and managers should see guest names and phone numbers.",
     clubEmployeeDesignations: "Keep as is. Staff email and phone are already stricter (Club Admin only) under Sensitive fields.",

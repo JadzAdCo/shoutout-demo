@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Pregunta FloqR con FloqAi",
-    "body": "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, SupRstR (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
+    "body": "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
   },
   "help-soccer-jersey": {
     "title": "Camiseta de fútbol ShoutOut",
     "body": "Busque fútbol, ​​camiseta o un país/club (Tanzania, Chelsea). Cada tarjeta del kit fotográfico es el LED posterior que verás en ShoutOut — Fútbol · Camiseta · País o Club. Medidas 96×48, 64×48, 64×32. El nombre y la marca de 2 caracteres se superponen en el kit; los números permanecen justificados en el centro."
   },
-  "help-suprstar": {
-    "title": "Hazme un supRstar / superestrella",
-    "body": "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola supRstar → Go live en el tablero SupRStar. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
+  "help-floqcast": {
+    "title": "Hazme un floqCast / superestrella",
+    "body": "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
   },
   "help-become-club-admin": {
     "title": "Conviértete en un Club Admin",

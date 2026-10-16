@@ -5,12 +5,9 @@
  *  - Per-board Xibo secrets (?k=) stored privately in displayBoardSecrets
  *  - Obfuscated token view after onboarding (full value only on provision/rotate reveal)
  *  - Per-venue display access log (IP, board, token ok/deny, UA)
- *  - Trigger-on-error fallback Webpage URLs (display-error.html) per board
  */
 (function (global) {
   "use strict";
-
-  const PUBLIC_DISPLAY_BASE = "https://jadzadco.github.io/shoutout-demo";
 
   /** Last fetched access-log rows — used by “Add IPs from access log”. */
   let lastAccessLogRows = [];
@@ -30,60 +27,8 @@
     }[c]));
   }
 
-  /** Feature: Display Security is not onboarding — link to Entity Onboarding (SOS2FA-gated). */
-  function showVenueNotOnboardedStatus(typed = "") {
-    const el = byId("displaySecurityStatus");
-    if (!el) return;
-    const hint = typed ? ` (“${esc(typed)}”)` : "";
-    el.innerHTML = `Venue not onboarded${hint}. Please onboard — <a href="#clubOnboarding" class="display-security-onboard-link">click here</a> to onboard venue or club.`;
-  }
-
-  function goEntityOnboarding(event) {
-    if (event) event.preventDefault();
-    const btn = document.querySelector('.admin-subtab[data-panel="clubOnboarding"]');
-    if (btn) {
-      btn.click();
-      return;
-    }
-    try { location.hash = "clubOnboarding"; } catch (_) {}
-  }
-
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
-  }
-
-  /** Feature: Xibo “trigger on page load error” fallback Webpage — stable, no ?v=, no ?k=. */
-  function buildTriggerOnErrorUrl(locationId = "", board = "1") {
-    const venue = String(locationId || "").trim().toLowerCase();
-    const boardKey = String(board || "1").trim() === "2" || String(board).toLowerCase() === "secondary" ? "2" : "1";
-    const url = new URL(`${PUBLIC_DISPLAY_BASE}/display-error.html`);
-    if (venue) url.searchParams.set("location", venue);
-    url.searchParams.set("board", boardKey);
-    url.searchParams.set("reason", "xibo_page_load_error");
-    return url.toString();
-  }
-
-  function refreshTriggerOnErrorUrls(locationId = "") {
-    const id = String(locationId || byId("displaySecurityLocationId")?.value || "").trim().toLowerCase();
-    const primary = byId("displaySecurityErrorUrlPrimary");
-    const secondary = byId("displaySecurityErrorUrlSecondary");
-    if (primary) primary.value = id ? buildTriggerOnErrorUrl(id, "1") : "";
-    if (secondary) secondary.value = id ? buildTriggerOnErrorUrl(id, "2") : "";
-  }
-
-  async function copyTriggerOnErrorUrl(board = "1") {
-    const id = String(byId("displaySecurityLocationId")?.value || resolveLocationId() || "").trim().toLowerCase();
-    if (!id) {
-      setText("displaySecurityErrorUrlStatus", "Load an onboarded venue first.");
-      return;
-    }
-    refreshTriggerOnErrorUrls(id);
-    const url = buildTriggerOnErrorUrl(id, board);
-    const label = board === "2" || board === "secondary" ? "Display 2" : "Display 1";
-    const ok = await copyText(url);
-    setText("displaySecurityErrorUrlStatus", ok
-      ? `${label} trigger-on-error URL copied — paste into the Xibo fallback Webpage.`
-      : `Copy failed — select the ${label} URL field and copy manually.`);
   }
 
   /**
@@ -184,74 +129,36 @@
     const hit = clubs.find((c) => {
       const id = String(c.id || "").toLowerCase();
       const name = String(c.locationName || c.brandName || "").toLowerCase();
-      return id === lower || name === lower || `${name} (${id})` === lower;
+      return id === lower || name === lower || `${name} (${id})` === lower || lower.includes(id);
     });
-    return hit ? String(hit.id) : "";
+    if (hit) return String(hit.id);
+    if (/^[a-z0-9][a-z0-9_-]+$/i.test(raw)) return raw.toLowerCase();
+    return "";
   }
 
-  /**
-   * Feature: Display Security venue picker — onboarded clubLocations only.
-   * Seeded catalog is not merged here; this panel does not onboard venues.
-   */
   async function populateClubList() {
     const list = byId("displaySecurityOptions");
     if (!list) return;
     try {
       const snap = await firebase.firestore().collection("clubLocations").limit(400).get();
-      const rows = snap.docs
-        .map((d) => ({...(d.data() || {}), id: d.id}))
-        .filter((row) => row.id)
-        .sort((a, b) => String(a.locationName || a.brandName || a.id).localeCompare(String(b.locationName || b.brandName || b.id)));
+      const rows = snap.docs.map((d) => ({id: d.id, ...(d.data() || {})}))
+        .sort((a, b) => String(a.locationName || a.id).localeCompare(String(b.locationName || b.id)));
       global.__floqrMasterClubs = rows;
       list.innerHTML = clubOptionsHtml(rows);
-    } catch (err) {
-      global.__floqrMasterClubs = [];
-      list.innerHTML = "";
-      setText("displaySecurityStatus", err?.message || "Could not load onboarded venues.");
-    }
+    } catch (_) {}
   }
 
   /**
    * Feature: Obfuscated token panel (normal Security portal view).
    * Full secrets are intentionally not shown — rotate for a one-time clear URL.
-   * Obfuscated last-4 keys sit behind "View Obfuscated Keys" (not help-popout nested text).
    */
-  function obfuscatedKeysTableHtml(data = {}) {
-    const d1 = data.primaryHasToken ? (data.primaryTokenObfuscated || "••••") : "none";
-    const d2 = data.secondaryHasToken ? (data.secondaryTokenObfuscated || "••••") : "none";
-    return `<details class="display-obfuscated-keys" data-keep-visible="true">
-      <summary class="display-obfuscated-keys-btn">View Obfuscated Keys</summary>
-      <div class="display-obfuscated-keys-panel" data-keep-visible="true">
-        <p class="display-obfuscated-keys-meta" data-keep-visible="true">Token required: <strong>${data.tokenRequired ? "ON" : "OFF"}</strong></p>
-        <table class="display-obfuscated-keys-table" data-keep-visible="true">
-          <thead>
-            <tr>
-              <th scope="col">Display</th>
-              <th scope="col">Obfuscated Keys showing last 4 digits</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Display 1 (ShoutOut)</td>
-              <td><code>${esc(d1)}</code></td>
-            </tr>
-            <tr>
-              <td>Display 2 (supRstar)</td>
-              <td><code>${esc(d2)}</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </details>`;
-  }
-
   function renderTokenReport(data = {}, oneTimeReveal = null) {
     const host = byId("displayTokenReport");
     if (!host) return;
     const revealHtml = oneTimeReveal?.url ? `
       <div class="display-token-onetime" style="margin:12px 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
         <p><strong>⚠️ ONE-TIME full ${esc(oneTimeReveal.label || "board")} URL</strong></p>
-        <p class="sub small" data-keep-visible="true">${esc(oneTimeReveal.warning || "Paste into Xibo now. This full value will not appear again until the next rotate.")}</p>
+        <p class="sub small">${esc(oneTimeReveal.warning || "Paste into Xibo now. This full value will not appear again until the next rotate.")}</p>
         <p><code id="displayOneTimeTokenUrl" style="word-break:break-all">${esc(oneTimeReveal.url)}</code></p>
         <div class="queue-actions">
           <button type="button" id="copyOneTimeDisplayTokenBtn">Copy full Xibo URL</button>
@@ -259,7 +166,7 @@
       </div>` : "";
 
     host.innerHTML = `
-      <div class="sub small" style="margin-bottom:10px;line-height:1.45" data-keep-visible="true">
+      <div class="sub small" style="margin-bottom:10px;line-height:1.45">
         <strong>How to rotate (directives)</strong>
         <ol style="margin:6px 0 0;padding-left:1.2rem">
           <li>Choose the venue above and confirm token requirement is ON if Xibo should reject open links.</li>
@@ -269,9 +176,15 @@
           <li>This portal then shows only an obfuscated token (last 4 characters) for confirmation.</li>
         </ol>
       </div>
-      ${obfuscatedKeysTableHtml(data)}
+      <p class="sub small">Token required: <strong>${data.tokenRequired ? "ON" : "OFF"}</strong>
+        · Display 1: ${data.primaryHasToken ? `set · <code>${esc(data.primaryTokenObfuscated || "••••")}</code>` : "none"}
+        · Display 2: ${data.secondaryHasToken ? `set · <code>${esc(data.secondaryTokenObfuscated || "••••")}</code>` : "none"}</p>
       ${revealHtml}
-      <p class="sub small" style="margin-top:10px" data-keep-visible="true">Obfuscated secrets are confirmation-only (last 4 digits). Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
+      <p><strong>Display 1 (ShoutOut) — obfuscated preview</strong></p>
+      <p><code style="word-break:break-all">${esc(data.primaryUrlObfuscated || data.primaryBaseUrl || "—")}</code></p>
+      <p><strong>Display 2 (floqCast) — obfuscated preview</strong></p>
+      <p><code style="word-break:break-all">${esc(data.secondaryUrlObfuscated || data.secondaryBaseUrl || "—")}</code></p>
+      <p class="sub small" style="margin-top:10px">Obfuscated URLs are not usable in Xibo. Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
 
     byId("copyOneTimeDisplayTokenBtn")?.addEventListener("click", async () => {
       const ok = await copyText(oneTimeReveal?.url || "");
@@ -285,7 +198,7 @@
       const result = await callable("getVenueDisplayTokens")({locationId});
       const data = result?.data || {};
       // Do not overwrite the Master Admin token checkbox from token portal status —
-      // IP restriction and token lock are independent unlocks (OR: either may open the board).
+      // IP restriction and token lock are independent controls.
       renderTokenReport(data, null);
       setText("displayTokenStatus", `Loaded obfuscated tokens for ${locationId}.`);
       return data;
@@ -308,28 +221,21 @@
         <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge">${ipCount} approved IP${ipCount === 1 ? "" : "s"}</span>
-        <span class="display-security-badge">Unlock: IP <strong>or</strong> token</span>
-      </div>`;
+      </div>
+      <p class="sub small">Updated by: ${esc(data.displayIpUpdatedBy || "—")}</p>`;
   }
 
   async function loadVenueDisplaySecurity() {
-    const typed = String(byId("displaySecuritySearch")?.value || "").trim();
     const locationId = resolveLocationId();
     if (!locationId) {
-      if (typed) showVenueNotOnboardedStatus(typed);
-      else setText("displaySecurityStatus", "Choose an onboarded venue first.");
+      setText("displaySecurityStatus", "Choose a venue first.");
       return;
     }
     if (byId("displaySecurityLocationId")) byId("displaySecurityLocationId").value = locationId;
     setText("displaySecurityStatus", `Loading display security for ${locationId}…`);
     try {
       const snap = await firebase.firestore().collection("clubLocations").doc(locationId).get();
-      if (!snap.exists) {
-        renderDisplaySecurityStatus({}, []);
-        showVenueNotOnboardedStatus(locationId);
-        return;
-      }
-      const data = snap.data() || {};
+      const data = snap.exists ? snap.data() || {} : {};
       const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
       if (byId("displaySecurityIps")) byId("displaySecurityIps").value = ips.join("\n");
       if (byId("displaySecurityRestrict")) byId("displaySecurityRestrict").checked = data.displayIpRestrictionEnabled === true;
@@ -339,9 +245,9 @@
       }
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
       renderDisplaySecurityStatus(data, ips);
-      refreshTriggerOnErrorUrls(locationId);
-      setText("displaySecurityStatus", `Loaded display security for ${locationId}.`);
-      setText("displaySecurityErrorUrlStatus", "Trigger-on-error URLs ready to copy.");
+      setText("displaySecurityStatus", snap.exists
+        ? `Loaded display security for ${locationId}.`
+        : `No clubLocations doc yet for ${locationId} — save will create settings.`);
       await loadVenueDisplayTokens(locationId);
       await loadDisplayAccessLogs(locationId);
     } catch (err) {
@@ -350,11 +256,9 @@
   }
 
   async function saveVenueDisplaySecurity() {
-    const typed = String(byId("displaySecuritySearch")?.value || "").trim();
     const locationId = resolveLocationId();
     if (!locationId) {
-      if (typed) showVenueNotOnboardedStatus(typed);
-      else setText("displaySecurityStatus", "Choose an onboarded venue first.");
+      setText("displaySecurityStatus", "Choose a venue first.");
       return;
     }
     setText("displaySecurityStatus", `Saving security settings for ${locationId}…`);
@@ -370,9 +274,7 @@
       setText("displaySecurityStatus", `Saved. IP ${data.displayIpRestrictionEnabled ? "ON" : "OFF"} · Token ${data.displayTokenRequired ? "ON" : "OFF"} · ${Number(data.approvedDisplayIps?.length || 0)} IP(s).`);
       await loadVenueDisplaySecurity();
     } catch (err) {
-      const msg = String(err?.message || err || "Save failed.");
-      if (/not onboarded/i.test(msg)) showVenueNotOnboardedStatus(locationId);
-      else setText("displaySecurityStatus", msg);
+      setText("displaySecurityStatus", err?.message || "Save failed.");
     }
   }
 
@@ -481,8 +383,6 @@
                 <th scope="col">Hostname</th>
                 <th scope="col">MAC Address</th>
                 <th scope="col">Token</th>
-                <th scope="col">k last5 got/expect</th>
-                <th scope="col">URL (redacted)</th>
                 <th scope="col">IP restrict</th>
                 <th scope="col">Allowed</th>
                 <th scope="col">Reason</th>
@@ -495,9 +395,6 @@
                   ? (row.tokenOk ? "ok" : (row.tokenProvided ? "bad" : "missing"))
                   : "off";
                 const allowedCell = row.allowed ? "yes" : "no";
-                const got = row.tokenProvidedLast5 || (row.tokenProvided ? "?" : "(none)");
-                const expect = row.tokenExpectedLast5 || "—";
-                const suffixNote = row.tokenSuffixMatch === true ? " · suffix✓" : "";
                 return `
                 <tr class="${row.allowed ? "is-allowed" : "is-denied"}">
                   <td>${esc(formatWhen(row.createdAtMs))}</td>
@@ -507,11 +404,9 @@
                   <td>${esc(row.hostname || "—")}</td>
                   <td>${esc(row.macAddress || "n/a")}</td>
                   <td>${esc(tokenCell)}</td>
-                  <td><code>${esc(got)}</code> / <code>${esc(expect)}</code>${esc(suffixNote)}</td>
-                  <td class="display-access-log-ua"><small>${esc((row.pageUrlRedacted || "").slice(0, 160) || "—")}</small></td>
                   <td>${row.restrictionEnabled ? "on" : "off"}</td>
                   <td><strong>${allowedCell}</strong></td>
-                  <td>${esc(row.reason || "—")}${row.actorEmail ? `<br/><small>${esc(row.actorEmail)}</small>` : ""}</td>
+                  <td>${esc(row.reason || "—")}</td>
                   <td class="display-access-log-ua"><small>${esc((row.userAgent || "").slice(0, 100))}${row.platform ? ` · ${esc(row.platform)}` : ""}</small></td>
                 </tr>`;
               }).join("")}
@@ -552,16 +447,15 @@
           host.innerHTML = `
             <div class="display-token-onetime" style="margin:12px 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
               <p><strong>⚠️ ONE-TIME — Heist / venue test URLs for BOTH boards</strong></p>
-              <p class="sub small" data-keep-visible="true">${esc(data.warning || "Paste into Xibo (or open in a browser) now. Full values will not be shown again until the next re-issue/rotate.")}</p>
+              <p class="sub small">${esc(data.warning || "Paste into Xibo (or open in a browser) now. Full values will not be shown again until the next re-issue/rotate.")}</p>
               <p><strong>Display 1 (ShoutOut)</strong></p>
               <p><code id="heistTestPrimaryUrl" style="word-break:break-all">${esc(data.primaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistPrimaryUrlBtn">Copy Display 1 URL</button></div>
-              <p style="margin-top:10px"><strong>Display 2 (supRstar)</strong></p>
+              <p style="margin-top:10px"><strong>Display 2 (floqCast)</strong></p>
               <p><code id="heistTestSecondaryUrl" style="word-break:break-all">${esc(data.secondaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistSecondaryUrlBtn">Copy Display 2 URL</button></div>
             </div>
-            <p class="sub small" data-keep-visible="true">After this, the portal returns to obfuscated tokens only. Use <em>View Obfuscated Keys</em> to confirm last-4 digits.</p>
-            ${obfuscatedKeysTableHtml(view)}`;
+            <p class="sub small">After this, the portal returns to obfuscated tokens only (${esc(view.primaryTokenObfuscated || "••••")} / ${esc(view.secondaryTokenObfuscated || "••••")}).</p>`;
           byId("copyHeistPrimaryUrlBtn")?.addEventListener("click", async () => {
             setText("displayTokenStatus", (await copyText(data.primaryUrl)) ? "Display 1 URL copied." : "Copy failed.");
           });
@@ -583,103 +477,14 @@
   let systemMessagesUnsub = null;
   let lastSecurityMessages = [];
 
-  function formatMessageDate(ms) {
+  function formatMessageWhen(ms) {
     const n = Number(ms || 0);
     if (!n) return "—";
     try {
-      return new Date(n).toLocaleDateString(undefined, {year: "numeric", month: "short", day: "numeric"});
+      return new Date(n).toLocaleString();
     } catch (_) {
-      return "—";
+      return String(n);
     }
-  }
-
-  function formatMessageTime(ms) {
-    const n = Number(ms || 0);
-    if (!n) return "—";
-    try {
-      return new Date(n).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit", second: "2-digit"});
-    } catch (_) {
-      return "—";
-    }
-  }
-
-  function boardLabelForMessage(board) {
-    const b = String(board || "").toLowerCase();
-    if (b === "2" || b === "secondary" || b === "display2" || b === "suprstar") return "Display 2 (supRstar)";
-    if (b === "1" || b === "primary" || b === "display" || b === "shoutout") return "Display 1 (ShoutOut)";
-    return board ? `Board ${board}` : "";
-  }
-
-  function parseSecurityMessageColumns(row = {}) {
-    const ms = Number(row.createdAtMs || row.createdAt?.toMillis?.() || 0);
-    const isTwilio = row.type === "twilioSecurityAlert" || row.provider === "twilio";
-    const venue = isTwilio
-      ? "Twilio"
-      : (String(row.locationName || row.clubLocationId || "—").trim() || "—");
-    const error = String(row.title || (isTwilio ? "Twilio security alert" : "Display access denied")).trim();
-    const board = boardLabelForMessage(row.displayBoard);
-    const body = String(row.body || "").trim();
-    let description = "";
-    let causation = "";
-
-    if (isTwilio) {
-      description = body || String(row.errorMessage || "Twilio Debugger security event.").trim();
-      causation = [
-        row.errorCode ? `Code ${row.errorCode}` : "",
-        row.denialReason || "",
-        row.moreInfo || "",
-        row.eventSid ? `Event ${row.eventSid}` : ""
-      ].filter(Boolean).join(". ") || "Review Twilio Monitor / Debugger logs.";
-      return {
-        date: formatMessageDate(ms),
-        time: formatMessageTime(ms),
-        venue,
-        error,
-        description: description || "—",
-        causation: causation || "—"
-      };
-    }
-
-    if (board || row.clientIp || row.locationName || row.clubLocationId) {
-      description = [
-        board ? `${board} blocked for ${row.locationName || row.clubLocationId || venue}.` : "",
-        row.clientIp ? `IP ${row.clientIp}.` : ""
-      ].filter(Boolean).join(" ");
-    }
-
-    if (row.denialReason) {
-      const got = row.tokenProvidedLast5 || "";
-      const expect = row.tokenExpectedLast5 || "";
-      const compare = (got || expect)
-        ? ` Token last5 provided=${got || "(none)"} expect=${expect || "(none)"}${row.tokenSuffixMatch === true ? " (suffix match)" : ""}.`
-        : "";
-      const urlBit = row.pageUrlRedacted ? ` URL ${String(row.pageUrlRedacted).trim()}.` : "";
-      causation = `${String(row.denialReason).trim()}.${compare}${urlBit} Device was shown the Floq Media / FloqR not-configured message.`;
-    }
-
-    if ((!description || !causation) && body) {
-      const reasonMatch = body.match(/Reason:\s*([^.]*)\.?/i);
-      const deviceMatch = body.match(/Device was shown[\s\S]*$/i);
-      if (!description) {
-        description = reasonMatch
-          ? body.slice(0, reasonMatch.index).replace(/\s+/g, " ").trim()
-          : body;
-      }
-      if (!causation) {
-        const reason = reasonMatch ? reasonMatch[1].trim() : "";
-        const device = deviceMatch ? deviceMatch[0].trim() : "Device was shown the Floq Media / FloqR not-configured message.";
-        causation = reason ? `${reason}. ${device}` : device;
-      }
-    }
-
-    return {
-      date: formatMessageDate(ms),
-      time: formatMessageTime(ms),
-      venue,
-      error,
-      description: description || "—",
-      causation: causation || "—"
-    };
   }
 
   function setSecurityMessagesBlink(hasUnread) {
@@ -693,69 +498,6 @@
     // Also pulse the parent Security tab so unread alerts are visible before expanding.
     const parent = document.querySelector('.admin-tab-parent[data-group="security"]');
     if (parent) parent.classList.toggle("is-blink", !!hasUnread);
-    syncSecurityMessagesAck(hasUnread);
-  }
-
-  function syncSecurityMessagesAck(hasUnread) {
-    const ack = byId("securityMessagesAckRead");
-    if (!ack) return;
-    // Checked only when there is nothing unread (including empty inbox).
-    ack.checked = !hasUnread;
-  }
-
-  async function acknowledgeAllSecurityMessagesRead() {
-    const ids = lastSecurityMessages.filter((row) => row.read !== true).map((row) => row.id).filter(Boolean);
-    if (!ids.length) {
-      setSecurityMessagesBlink(false);
-      setText("securitySystemMessagesStatus", lastSecurityMessages.length
-        ? `${lastSecurityMessages.length} security message(s)`
-        : "No security system messages.");
-      return;
-    }
-    try {
-      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
-        read: true,
-        readAt: firebase.firestore.FieldValue.serverTimestamp(),
-        acknowledgedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge: true})));
-      // Optimistic local update so blink clears immediately before snapshot returns.
-      lastSecurityMessages = lastSecurityMessages.map((row) => (
-        ids.includes(row.id) ? {...row, read: true} : row
-      ));
-      setSecurityMessagesBlink(false);
-      setText("securitySystemMessagesStatus", `${lastSecurityMessages.length} security message(s)`);
-    } catch (err) {
-      const ack = byId("securityMessagesAckRead");
-      if (ack) ack.checked = false;
-      setText("securitySystemMessagesStatus", err?.message || "Could not acknowledge messages as read.");
-    }
-  }
-
-  function selectedSecurityMessageIds() {
-    return Array.from(document.querySelectorAll("#masterSystemMessages .security-msg-check:checked"))
-      .map((el) => String(el.value || "").trim())
-      .filter(Boolean);
-  }
-
-  function bindSecurityMessageTableActions(host) {
-    const selectAll = host.querySelector("#securityMsgSelectAll");
-    const checks = () => Array.from(host.querySelectorAll(".security-msg-check"));
-    selectAll?.addEventListener("change", () => {
-      const on = !!selectAll.checked;
-      checks().forEach((box) => { box.checked = on; });
-    });
-    host.querySelector("#securityMsgSelectAllBtn")?.addEventListener("click", () => {
-      checks().forEach((box) => { box.checked = true; });
-      if (selectAll) selectAll.checked = true;
-    });
-    host.querySelector("#securityMsgDeleteSelectedBtn")?.addEventListener("click", () => {
-      deleteSelectedSecurityMessages();
-    });
-    checks().forEach((box) => {
-      box.addEventListener("change", () => {
-        if (selectAll) selectAll.checked = checks().length > 0 && checks().every((c) => c.checked);
-      });
-    });
   }
 
   function renderSystemMessages(rows = []) {
@@ -765,72 +507,30 @@
     const unreadCount = rows.filter((row) => row.read !== true).length;
     setSecurityMessagesBlink(unreadCount > 0);
     setText("securitySystemMessagesStatus", rows.length
-      ? `${rows.length} security message(s)`
+      ? `${rows.length} security message(s) · ${unreadCount} unread`
       : "No security system messages.");
     if (!rows.length) {
       host.textContent = "No security system messages yet.";
       return;
     }
-
-    const bodyRows = rows.map((row) => {
+    host.innerHTML = rows.map((row) => {
       const unread = row.read !== true;
-      const cols = parseSecurityMessageColumns(row);
-      return `<tr class="${unread ? "is-unread" : ""}" data-message-id="${esc(row.id)}">
-        <td class="security-msg-check-cell">
-          <input class="security-msg-check" type="checkbox" value="${esc(row.id)}" aria-label="Select message"/>
-        </td>
-        <td>${esc(cols.date)}</td>
-        <td>${esc(cols.time)}</td>
-        <td>${esc(cols.venue)}</td>
-        <td>${esc(cols.error)}${unread ? " · NEW" : ""}</td>
-        <td>${esc(cols.description)}</td>
-        <td>${esc(cols.causation)}</td>
-      </tr>`;
+      return `<article class="master-system-message-row${unread ? " is-unread" : ""}" data-message-id="${esc(row.id)}">
+        <strong>${esc(row.title || "Display access denied")}${unread ? " · NEW" : ""}</strong>
+        <p class="sub small">${esc(row.body || "")}</p>
+        <p class="sub small">${esc(formatMessageWhen(row.createdAtMs || row.createdAt?.toMillis?.()))}${row.clubLocationId ? ` · ${esc(row.clubLocationId)}` : ""}</p>
+        <div class="queue-actions">
+          ${unread ? `<button type="button" class="security-msg-read-btn" data-message-id="${esc(row.id)}">Mark read</button>` : ""}
+          <button type="button" class="ghost security-msg-delete-btn" data-message-id="${esc(row.id)}">Delete message</button>
+        </div>
+      </article>`;
     }).join("");
-
-    host.innerHTML = `<div class="security-messages-table-wrap" data-keep-visible="true">
-      <table class="security-messages-table" data-keep-visible="true">
-        <thead>
-          <tr>
-            <th scope="col" class="security-msg-check-cell">
-              <input id="securityMsgSelectAll" type="checkbox" aria-label="Select all messages"/>
-            </th>
-            <th scope="col">Date</th>
-            <th scope="col">Time</th>
-            <th scope="col">Venue</th>
-            <th scope="col">Error</th>
-            <th scope="col">Error Description</th>
-            <th scope="col">Causation</th>
-          </tr>
-        </thead>
-        <tbody>${bodyRows}</tbody>
-      </table>
-      <div class="security-messages-table-actions">
-        <button id="securityMsgSelectAllBtn" type="button">Select All</button>
-        <button id="securityMsgDeleteSelectedBtn" class="danger" type="button">Delete Selected</button>
-      </div>
-    </div>`;
-    bindSecurityMessageTableActions(host);
-  }
-
-  async function deleteSelectedSecurityMessages() {
-    const ids = selectedSecurityMessageIds();
-    if (!ids.length) {
-      setText("securitySystemMessagesStatus", "Select one or more messages first.");
-      return;
-    }
-    if (!window.confirm(`Delete ${ids.length} selected security message(s)? (Access logs are kept separately.)`)) return;
-    try {
-      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
-        deleted: true,
-        deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        deletedAtMs: Date.now(),
-        read: true
-      }, {merge: true})));
-      setText("securitySystemMessagesStatus", `Deleted ${ids.length} selected message(s).`);
-    } catch (err) {
-      setText("securitySystemMessagesStatus", err?.message || "Delete selected failed.");
-    }
+    host.querySelectorAll(".security-msg-delete-btn").forEach((btn) => {
+      btn.addEventListener("click", () => deleteSecurityMessage(btn.getAttribute("data-message-id")));
+    });
+    host.querySelectorAll(".security-msg-read-btn").forEach((btn) => {
+      btn.addEventListener("click", () => markSecurityMessageRead(btn.getAttribute("data-message-id")));
+    });
   }
 
   async function deleteSecurityMessage(messageId) {
@@ -922,8 +622,7 @@
             .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
             .filter((row) => {
               const isSecurity = row.messageCategory === "security"
-                || row.type === "displayAccessDenied"
-                || row.type === "twilioSecurityAlert";
+                || row.type === "displayAccessDenied";
               return isSecurity && row.deleted !== true;
             })
             .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))
@@ -1006,42 +705,23 @@
     byId("saveDisplaySecurityBtnBottom")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
-    byId("copyDisplaySecurityErrorUrlPrimaryBtn")?.addEventListener("click", () => copyTriggerOnErrorUrl("1"));
-    byId("copyDisplaySecurityErrorUrlSecondaryBtn")?.addEventListener("click", () => copyTriggerOnErrorUrl("2"));
-    refreshTriggerOnErrorUrls(String(byId("displaySecurityLocationId")?.value || "").trim());
-    byId("displaySecurityStatus")?.addEventListener("click", (event) => {
-      const link = event.target?.closest?.("a.display-security-onboard-link");
-      if (link) goEntityOnboarding(event);
-    });
     byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => {
       const filter = String(byId("securityLogVenueFilter")?.value || "").trim();
       const id = filter ? resolveLocationIdFromFilter(filter) : "";
       loadDisplayAccessLogs(id);
     });
     byId("exportSecurityLogsBtn")?.addEventListener("click", () => exportSecurityLogsCsv());
-    byId("securityMessagesAckRead")?.addEventListener("change", async (event) => {
-      const ack = event.currentTarget;
-      if (ack?.checked) {
-        await acknowledgeAllSecurityMessagesRead();
-        return;
-      }
-      // Blink is driven by unread messages only — unchecking does not re-open them.
-      const hasUnread = lastSecurityMessages.some((row) => row.read !== true);
-      if (!hasUnread) ack.checked = true;
-    });
+    byId("markSecurityMessagesReadBtn")?.addEventListener("click", () => markVisibleSecurityMessagesRead());
+    byId("deleteReadSecurityMessagesBtn")?.addEventListener("click", () => deleteReadSecurityMessages());
+    byId("refreshSecurityMessagesBtn")?.addEventListener("click", () => startMasterSystemMessageFeed());
     byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));
     byId("rotateSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary"));
     byId("clearPrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary", {clear: true}));
     byId("clearSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary", {clear: true}));
     byId("displaySecuritySearch")?.addEventListener("change", () => {
-      const typed = String(byId("displaySecuritySearch")?.value || "").trim();
       const id = resolveLocationId();
       if (id && byId("displaySecurityLocationId")) byId("displaySecurityLocationId").value = id;
-      else if (typed && byId("displaySecurityLocationId")) {
-        byId("displaySecurityLocationId").value = "";
-        showVenueNotOnboardedStatus(typed);
-      }
     });
     populateClubList();
     try {

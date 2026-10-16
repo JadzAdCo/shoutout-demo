@@ -48,7 +48,7 @@
     return {
       admin: {label: "Open Club Admin", hint: "Club Admin console for this venue (opens as Master Admin).", links: [{name: "Club Admin", url: absoluteUrl(masterAdminUrl(id))}]},
       display1: {label: "Display 1", hint: "Primary LED board. Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 1", url: absoluteUrl(displayUrl)}]},
-      display2: {label: "Display 2", hint: "Secondary LED board (supRstar). Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 2", url: absoluteUrl(display2Url)}]},
+      display2: {label: "Display 2", hint: "Secondary LED board (floqCast). Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 2", url: absoluteUrl(display2Url)}]},
       profile: {label: "Public profile", hint: "Patron-facing Club Public Profile.", links: [{name: "Public profile", url: absoluteUrl(profileUrl)}]},
       shoutout: {label: "ShoutOut link", hint: "Opens this venue's ad splash, then its Throw a ShoutOut page (sign-in first when needed). Share it on flyers, QR codes and social posts.", links: [{name: "Throw a ShoutOut", url: window.FLOQRNav?.shoutoutUrl?.({locationId: id}) || absoluteUrl(`./?start=shoutout&location=${encodeURIComponent(id)}`)}]},
       xibo: {label: "Xibo Diag", hint: "Paste into the Xibo Webpage widget on each board's error / fallback layout. Load failures appear under Diagnostics → Display / Xibo Load Errors.", links: [
@@ -332,7 +332,7 @@
           <span>Allow application access</span>
         </label>
         <p class="sub small entity-enable-help">${type === "club"
-          ? "Master switch for this venue. Unticked: Club Admin is locked, the venue is hidden from Search, and the server refuses its ShoutOut, supRstar, BartR and ad features. Reversible — the profile and data stay. Use Offboard to remove the venue permanently."
+          ? "Master switch for this venue. Unticked: Club Admin is locked, the venue is hidden from Search, and the server refuses its ShoutOut, floqCast, BartR and ad features. Reversible — the profile and data stay. Use Offboard to remove the venue permanently."
           : type === "event"
             ? "Unticked: the event is hidden and inactive. Reversible."
             : "Unticked: this account is blocked from FLOQR features. Reversible."}</p>
@@ -342,7 +342,7 @@
       ${type === "club" && !offboarded ? `
         <div class="card entity-gate-card">
           <h4>Per-venue feature gates</h4>
-          <p class="sub small">Disable venue ability to use UberAds, WindowAds, BartR Stores, ShoutOut, or supRstar.</p>
+          <p class="sub small">Disable venue ability to use UberAds, WindowAds, BartR Stores, ShoutOut, or floqCast.</p>
           <div class="privacy-datapoint-grid">${venueGateChecks(row)}</div>
           <button id="saveVenueGatesBtn" class="primary" type="button">Save Venue Feature Gates</button>
         </div>` : ""}

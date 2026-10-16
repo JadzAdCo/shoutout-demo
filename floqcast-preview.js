@@ -1,4 +1,4 @@
-/* Private supRstar preview — camera local until paid + Club Admin approved. */
+/* Private floqCast preview — camera local until paid + Club Admin approved. */
 (function (global) {
   "use strict";
 
@@ -22,12 +22,12 @@
   }
 
   function setGate(msg) {
-    const el = byId("suprstarPreviewGate");
+    const el = byId("floqcastPreviewGate");
     if (el) el.textContent = msg;
   }
 
   function setStatus(msg) {
-    const el = byId("suprstarStepStatus");
+    const el = byId("floqcastStepStatus");
     if (el) el.textContent = msg || "";
   }
 
@@ -45,7 +45,7 @@
 
   /** One CTA that advances: camera → pay → wait → go live → end. */
   function updateButtons() {
-    const btn = byId("suprstarStageBtn");
+    const btn = byId("floqcastStageBtn");
     if (!btn) return;
     const row = requestDoc || {};
     const status = String(row.status || "");
@@ -65,14 +65,14 @@
 
     if (status === "rejected") {
       btn.disabled = true;
-      btn.textContent = "Not approved — start a new supRstar";
+      btn.textContent = "Not approved — start a new floqCast";
       btn.dataset.stage = "done";
       return;
     }
 
     if (status === "ended" && !live) {
       btn.disabled = true;
-      btn.textContent = "Session ended — start a new supRstar";
+      btn.textContent = "Session ended — start a new floqCast";
       btn.dataset.stage = "done";
       return;
     }
@@ -88,7 +88,7 @@
 
     if (paid && status === "approved") {
       btn.disabled = false;
-      btn.textContent = "Go live, be a supRstar";
+      btn.textContent = "Go live, be a floqCast";
       btn.dataset.stage = "live";
       return;
     }
@@ -108,7 +108,7 @@
         return;
       }
       btn.disabled = false;
-      btn.textContent = "Go pay $20 — become a supRstar";
+      btn.textContent = "Go pay $20 — become a floqCast";
       btn.dataset.stage = "pay";
       return;
     }
@@ -119,7 +119,7 @@
   }
 
   function onStageClick() {
-    const stage = String(byId("suprstarStageBtn")?.dataset?.stage || "");
+    const stage = String(byId("floqcastStageBtn")?.dataset?.stage || "");
     if (stage === "camera") return startCamera();
     if (stage === "pay") return startPayment();
     if (stage === "live") return goLive();
@@ -134,7 +134,7 @@
       return;
     }
     const venue = requestDoc.locationName || requestDoc.locationId || "venue";
-    byId("suprstarVenueLabel").textContent = `Venue: ${venue} · Ref ${requestDoc.referenceNumber || requestDoc.requestId || ""}`;
+    byId("floqcastVenueLabel").textContent = `Venue: ${venue} · Ref ${requestDoc.referenceNumber || requestDoc.requestId || ""}`;
     const status = String(requestDoc.status || "");
     if (status === "preview") {
       setGate(cameraReady()
@@ -146,13 +146,13 @@
       setStatus("If you already paid, this page will update automatically.");
       maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
-      setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
+      setGate("Payment received. Waiting for Club Admin approval in the floqCast Queue.");
       setStatus("Do not close this tab. Go live unlocks when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! Tap Go live — your stream will reach the venue SupRStar board.");
+      setGate("Approved! Tap Go live — your stream will reach the venue floqCast board.");
       setStatus("Club Admin approved. Tap Go live when ready.");
     } else if (status === "live") {
-      setGate("You are live on the venue SupRStar board.");
+      setGate("You are live on the venue floqCast board.");
       setStatus("Keep this tab open while streaming.");
     } else if (status === "rejected") {
       setGate("This request was not approved by the venue.");
@@ -181,9 +181,9 @@
 
   async function startCamera() {
     try {
-      if (!global.FLOQRSuprstrRtc) throw new Error("Camera helper failed to load.");
-      localStream = await global.FLOQRSuprstrRtc.getCameraStream({audio: true});
-      const video = byId("suprstarPreviewVideo");
+      if (!global.FLOQRFloqCastRtc) throw new Error("Camera helper failed to load.");
+      localStream = await global.FLOQRFloqCastRtc.getCameraStream({audio: true});
+      const video = byId("floqcastPreviewVideo");
       if (video) {
         video.srcObject = localStream;
         video.classList.add("is-on");
@@ -202,7 +202,7 @@
     try {
       if (global.FLOQRPayments?.logPopupEvent) {
         await global.FLOQRPayments.logPopupEvent(action, message, {
-          flow: "suprstar_preview",
+          flow: "floqcast_preview",
           requestId: requestDoc?.requestId || "",
           accessToken: accessToken ? `${accessToken.slice(0, 6)}…` : "",
           ...details
@@ -213,8 +213,8 @@
           category: "checkout",
           action,
           message,
-          details: {flow: "suprstar_preview", ...details},
-          source: "suprstar-preview"
+          details: {flow: "floqcast_preview", ...details},
+          source: "floqcast-preview"
         });
       }
     } catch (_) {}
@@ -240,7 +240,7 @@
       try { checkoutPopup.opener = null; } catch (_) {}
     }
     try {
-      try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
+      try { sessionStorage.setItem("floqr_floqcast_token", accessToken); } catch (_) {}
       setStatus(popupBlocked ? "Preparing Stripe checkout…" : "Opening Stripe checkout in a pop-out… keep this preview open.");
       const result = await global.FLOQRPayments.startCheckout({
         orderType: "suprstarRequest",
@@ -258,14 +258,14 @@
       } catch (_) {}
       if (!popupBlocked && checkoutPopup && !checkoutPopup.closed) {
         checkoutPopup.location.href = url;
-        await logPopup("popup_opened", "supRstar Stripe checkout opened in pop-out", {
+        await logPopup("popup_opened", "floqCast Stripe checkout opened in pop-out", {
           orderId: result?.orderId || "",
           popupName: "floqr_suprstar_pay"
         });
         setStatus("Complete payment in the Stripe pop-out. This preview tab stays open — do not close it.");
         return;
       }
-      await logPopup("popup_blocked", "supRstar checkout pop-out unavailable; using same-tab fallback", {
+      await logPopup("popup_blocked", "floqCast checkout pop-out unavailable; using same-tab fallback", {
         orderId: result?.orderId || "",
         popupBlocked,
         popupClosed: popupBlocked ? true : !!checkoutPopup?.closed
@@ -289,17 +289,17 @@
     try {
       if (!localStream) await startCamera();
       setStatus("Starting live session…");
-      const start = await callable("startSuprstrLive")({requestId: requestDoc.requestId});
+      const start = await callable("startFloqCastLive")({requestId: requestDoc.requestId});
       const sessionId = start?.data?.sessionId;
       if (!sessionId) throw new Error("No sessionId returned.");
-      broadcastHandle = await global.FLOQRSuprstrRtc.startBroadcast({
+      broadcastHandle = await global.FLOQRFloqCastRtc.startBroadcast({
         sessionId,
         stream: localStream,
         onStatus(s) {
           setStatus(`WebRTC: ${s}`);
         }
       });
-      setStatus("Live on the venue SupRStar board. Keep this tab open.");
+      setStatus("Live on the venue floqCast board. Keep this tab open.");
       updateButtons();
     } catch (err) {
       setStatus(err?.message || "Go live failed.");
@@ -314,7 +314,7 @@
         broadcastHandle = null;
       }
       if (requestDoc?.requestId) {
-        await callable("endSuprstrLive")({
+        await callable("endFloqCastLive")({
           requestId: requestDoc.requestId,
           sessionId: requestDoc.sessionId || "",
           locationId: requestDoc.locationId,
@@ -351,13 +351,13 @@
   }
 
   function bindUi() {
-    byId("suprstarStageBtn")?.addEventListener("click", () => onStageClick());
-    byId("suprstarPreviewGoogleLoginBtn")?.addEventListener("click", () => {
-      if (window.FLOQRSessionShell?.popupBlocked?.("#suprstarPreviewGate")) return;
+    byId("floqcastStageBtn")?.addEventListener("click", () => onStageClick());
+    byId("floqcastPreviewGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#floqcastPreviewGate")) return;
       firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message));
     });
-    byId("suprstarPreviewMicrosoftLoginBtn")?.addEventListener("click", () => {
-      if (window.FLOQRSessionShell?.popupBlocked?.("#suprstarPreviewGate")) return;
+    byId("floqcastPreviewMicrosoftLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#floqcastPreviewGate")) return;
       firebase.auth().signInWithPopup(new firebase.auth.OAuthProvider("microsoft.com")).catch(e => setGate(e.message));
     });
     window.addEventListener("message", (ev) => {
@@ -373,7 +373,7 @@
     let token = qs("t");
     if (token && token.length >= 24) return token;
     try {
-      token = sessionStorage.getItem("floqr_suprstar_token") || "";
+      token = sessionStorage.getItem("floqr_floqcast_token") || "";
     } catch (_) {}
     if (token && token.length >= 24) {
       try {
@@ -393,18 +393,18 @@
     bindUi();
     accessToken = recoverAccessToken();
     if (!accessToken || accessToken.length < 24) {
-      setGate("Missing private preview token. Start again from Search → supRstar, or open the preview link from your payment receipt.");
-      byId("suprstarRecoverActions")?.classList.remove("hidden");
+      setGate("Missing private preview token. Start again from Search → floqCast, or open the preview link from your payment receipt.");
+      byId("floqcastRecoverActions")?.classList.remove("hidden");
       updateButtons();
       return;
     }
-    try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
+    try { sessionStorage.setItem("floqr_floqcast_token", accessToken); } catch (_) {}
     const auth = firebase.auth();
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",
       loginButtons: "[data-floqr-login-btn]",
-      statusEl: "#suprstarPreviewGate"
+      statusEl: "#floqcastPreviewGate"
     });
     auth.onAuthStateChanged(user => {
       if (!user) {

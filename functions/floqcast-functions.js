@@ -1,4 +1,4 @@
-/* supRstar live stream — preview, pay, approve, then WebRTC to venue SupRStar board (display2). */
+/* floqCast live stream — preview, pay, approve, then WebRTC to venue floqCast board (display2). */
 "use strict";
 
 const crypto = require("crypto");
@@ -53,12 +53,12 @@ function liveDocId(locationId, displayBoard) {
   return displayBoard === "secondary" ? `${locationId}__secondary` : locationId;
 }
 
-async function assertSuprstarVenue(locationId) {
+async function assertFloqCastVenue(locationId) {
   const gateHelpers = require("./feature-gate-functions").__featureGateHelpers;
-  await gateHelpers.assertClubFeature(locationId, "supRstar");
+  await gateHelpers.assertClubFeature(locationId, "floqCast");
 }
 
-async function notifyClubSuprstarRequest(request = {}) {
+async function notifyClubFloqCastRequest(request = {}) {
   const locationId = text(request.locationId, 120);
   if (!locationId) return;
   const snap = await db.collection("clubLocations").doc(locationId).get();
@@ -69,26 +69,26 @@ async function notifyClubSuprstarRequest(request = {}) {
   ]);
   const payload = {
     type: "suprstarPending",
-    title: "supRstar awaiting approval",
-    body: `${text(request.broadcasterEmail, 200) || "A patron"} paid for a supRstar live appearance at ${text(request.locationName, 160) || locationId}. Approve in Club Admin.`,
+    title: "floqCast awaiting approval",
+    body: `${text(request.broadcasterEmail, 200) || "A patron"} paid for a floqCast live appearance at ${text(request.locationName, 160) || locationId}. Approve in Club Admin.`,
     clubLocationId: locationId,
     locationName: text(request.locationName, 160) || locationId,
     requestId: text(request.requestId, 120),
     referenceNumber: text(request.referenceNumber, 80),
     read: false,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    link: `./admin.html?location=${encodeURIComponent(locationId)}&panel=suprstar`
+    link: `./admin.html?location=${encodeURIComponent(locationId)}&panel=floqcast`
   };
   const writes = [...adminUids].filter(Boolean).map(uid => db.collection("inboxNotifications").add({...payload, recipientUid: uid}));
   await Promise.all(writes);
 }
 
 /** Patron starts flow: pick venue → private preview page (camera only, not on venue board yet). */
-exports.createSuprstarRequest = onCall({region: "us-central1"}, async (request) => {
+exports.createFloqCastRequest = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const locationId = text(request.data?.locationId || request.data?.clubLocationId, 120);
   if (!locationId) throw new HttpsError("invalid-argument", "Choose a venue.");
-  await assertSuprstarVenue(locationId);
+  await assertFloqCastVenue(locationId);
   const locationName = text(request.data?.locationName, 160) || locationId;
   const displayBoard = boardFromRaw(request.data?.displayBoard || request.data?.board);
   const uid = request.auth.uid;
@@ -122,18 +122,18 @@ exports.createSuprstarRequest = onCall({region: "us-central1"}, async (request) 
     requestId: requestRef.id,
     accessToken,
     referenceNumber,
-    previewPath: `./suprstar-preview.html?t=${encodeURIComponent(accessToken)}`
+    previewPath: `./floqcast-preview.html?t=${encodeURIComponent(accessToken)}`
   };
 });
 
 /** Club admin approves paid request — patron preview page can then go live. */
-exports.approveSuprstarRequest = onCall({region: "us-central1"}, async (request) => {
+exports.approveFloqCastRequest = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const requestId = text(request.data?.requestId, 120);
   if (!requestId) throw new HttpsError("invalid-argument", "requestId required.");
   const ref = db.collection("suprstarRequests").doc(requestId);
   const snap = await ref.get();
-  if (!snap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+  if (!snap.exists) throw new HttpsError("not-found", "floqCast request not found.");
   const row = snap.data() || {};
   if (!(await isClubManagerAuth(request.auth, row.locationId))) {
     throw new HttpsError("permission-denied", "Club Admin access required.");
@@ -153,27 +153,27 @@ exports.approveSuprstarRequest = onCall({region: "us-central1"}, async (request)
       recipientUid: row.broadcasterUid,
       recipientEmail: row.broadcasterEmail || "",
       type: "suprstarApproved",
-      title: "supRstar approved",
-      body: `${row.locationName || row.locationId} approved your supRstar. Keep your preview tab open — live starts after a 10-second countdown.`,
+      title: "floqCast approved",
+      body: `${row.locationName || row.locationId} approved your floqCast. Keep your preview tab open — live starts after a 10-second countdown.`,
       clubLocationId: row.locationId,
       requestId,
       referenceNumber: row.referenceNumber || "",
       read: false,
       createdAt: now,
-      link: `./suprstar-preview.html?t=${encodeURIComponent(row.accessToken || "")}`
+      link: `./floqcast-preview.html?t=${encodeURIComponent(row.accessToken || "")}`
     });
   } catch (_) {}
   return {ok: true, requestId, status: "approved"};
 });
 
-exports.rejectSuprstarRequest = onCall({region: "us-central1"}, async (request) => {
+exports.rejectFloqCastRequest = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const requestId = text(request.data?.requestId, 120);
   const reason = text(request.data?.reason, 400);
   if (!requestId) throw new HttpsError("invalid-argument", "requestId required.");
   const ref = db.collection("suprstarRequests").doc(requestId);
   const snap = await ref.get();
-  if (!snap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+  if (!snap.exists) throw new HttpsError("not-found", "floqCast request not found.");
   const row = snap.data() || {};
   if (!(await isClubManagerAuth(request.auth, row.locationId))) {
     throw new HttpsError("permission-denied", "Club Admin access required.");
@@ -200,8 +200,8 @@ exports.rejectSuprstarRequest = onCall({region: "us-central1"}, async (request) 
       recipientUid: row.broadcasterUid,
       recipientEmail: row.broadcasterEmail || "",
       type: "suprstarRejected",
-      title: "supRstar not approved",
-      body: reason || `${row.locationName || row.locationId} did not approve this supRstar request.`,
+      title: "floqCast not approved",
+      body: reason || `${row.locationName || row.locationId} did not approve this floqCast request.`,
       clubLocationId: row.locationId,
       requestId,
       read: false,
@@ -212,19 +212,19 @@ exports.rejectSuprstarRequest = onCall({region: "us-central1"}, async (request) 
 });
 
 /**
- * After approval: start WebRTC session and point venue SupRStar board at it.
+ * After approval: start WebRTC session and point venue floqCast board at it.
  * Payment was collected at checkout — no prepaid slot wallet.
  */
-exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
+exports.startFloqCastLive = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const requestId = text(request.data?.requestId, 120);
   if (!requestId) throw new HttpsError("invalid-argument", "requestId required.");
   const reqRef = db.collection("suprstarRequests").doc(requestId);
   const reqSnap = await reqRef.get();
-  if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+  if (!reqSnap.exists) throw new HttpsError("not-found", "floqCast request not found.");
   const req = reqSnap.data() || {};
   if (req.broadcasterUid !== request.auth.uid && !isMasterAdminAuth(request.auth)) {
-    throw new HttpsError("permission-denied", "Only the patron who submitted this supRstar can go live.");
+    throw new HttpsError("permission-denied", "Only the patron who submitted this floqCast can go live.");
   }
   if (req.paymentStatus !== "paid") throw new HttpsError("failed-precondition", "Payment is required before going live.");
   const uid = request.auth.uid;
@@ -277,7 +277,7 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     const liveSnap = await tx.get(liveRef);
     const existing = liveSnap.exists ? liveSnap.data() || {} : {};
     if (existing.status === "live" && existing.sessionId && existing.broadcasterUid !== uid) {
-      throw new HttpsError("already-exists", "This venue board already has an active supRstar stream.");
+      throw new HttpsError("already-exists", "This venue board already has an active floqCast stream.");
     }
     tx.set(sessionRef, {
       sessionId: sessionRef.id,
@@ -340,14 +340,14 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
 /**
  * Arm the venue live duration clock once WebRTC is connected (not at approval / countdown).
  */
-exports.armSuprstrLiveDuration = onCall({region: "us-central1"}, async (request) => {
+exports.armFloqCastLiveDuration = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const requestId = text(request.data?.requestId, 120);
   const sessionId = text(request.data?.sessionId, 120);
   if (!requestId) throw new HttpsError("invalid-argument", "requestId required.");
   const reqRef = db.collection("suprstarRequests").doc(requestId);
   const reqSnap = await reqRef.get();
-  if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+  if (!reqSnap.exists) throw new HttpsError("not-found", "floqCast request not found.");
   const req = reqSnap.data() || {};
   if (req.broadcasterUid !== request.auth.uid && !isMasterAdminAuth(request.auth)) {
     throw new HttpsError("permission-denied", "Only the broadcaster can arm the live timer.");
@@ -395,7 +395,7 @@ exports.armSuprstrLiveDuration = onCall({region: "us-central1"}, async (request)
 });
 
 /** End live session and clear venue pointer. */
-exports.endSuprstrLive = onCall({region: "us-central1"}, async (request) => {
+exports.endFloqCastLive = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const sessionId = text(request.data?.sessionId, 120);
   const requestId = text(request.data?.requestId, 120);
@@ -452,10 +452,10 @@ exports.endSuprstrLive = onCall({region: "us-central1"}, async (request) => {
 });
 
 /** Called from commerce fulfillment after Stripe payment. */
-exports.markSuprstarRequestPaid = async function markSuprstarRequestPaid({requestId, orderId, paidAt, amountCents = 2000}) {
+exports.markFloqCastRequestPaid = async function markFloqCastRequestPaid({requestId, orderId, paidAt, amountCents = 2000}) {
   const ref = db.collection("suprstarRequests").doc(text(requestId, 120));
   const snap = await ref.get();
-  if (!snap.exists) throw new Error(`supRstar request ${requestId} not found for fulfillment.`);
+  if (!snap.exists) throw new Error(`floqCast request ${requestId} not found for fulfillment.`);
   const row = snap.data() || {};
   if (row.paymentStatus === "paid" && row.serviceOrderId === orderId) return row;
   const now = paidAt || admin.firestore.Timestamp.now();
@@ -468,6 +468,15 @@ exports.markSuprstarRequestPaid = async function markSuprstarRequestPaid({reques
     updatedAt: now
   };
   await ref.set(payload, {merge: true});
-  await notifyClubSuprstarRequest({...row, ...payload, requestId: ref.id});
+  await notifyClubFloqCastRequest({...row, ...payload, requestId: ref.id});
   return {...row, ...payload, requestId: ref.id};
 };
+
+/* Deprecated callable names — keep for one deploy cycle so older Pages clients still resolve. */
+exports.createSuprstarRequest = exports.createFloqCastRequest;
+exports.approveSuprstarRequest = exports.approveFloqCastRequest;
+exports.rejectSuprstarRequest = exports.rejectFloqCastRequest;
+exports.startSuprstrLive = exports.startFloqCastLive;
+exports.armSuprstrLiveDuration = exports.armFloqCastLiveDuration;
+exports.endSuprstrLive = exports.endFloqCastLive;
+exports.markSuprstarRequestPaid = exports.markFloqCastRequestPaid;

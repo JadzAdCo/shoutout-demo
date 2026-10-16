@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Fragen Sie FloqR mit FloqAi",
-    "body": "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, SupRstR (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
+    "body": "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
   },
   "help-soccer-jersey": {
     "title": "Fußballtrikot ShoutOut",
     "body": "Suchen Sie nach Fußball, Trikot oder einem Land/Verein (Tansania, Chelsea). Jede Foto-Kit-Karte ist die LED-Rückseite, die Sie auf ShoutOut sehen – Fußball · Trikot · Land oder Verein. Größen 96×48, 64×48, 64×32. Name und zweistellige Markierung liegen über dem Kit; Zahlen bleiben mittig ausgerichtet."
   },
-  "help-suprstar": {
-    "title": "Mach mich zu einem supRstar/Superstar",
-    "body": "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der supRstar-Warteschlange → Go live auf der SupRStar-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
+  "help-floqcast": {
+    "title": "Mach mich zu einem floqCast/Superstar",
+    "body": "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
   },
   "help-become-club-admin": {
     "title": "Werde ein Club Admin",

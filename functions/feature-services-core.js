@@ -9,11 +9,16 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "mingl", label: "Mingl", patronGate: "mingl", route: "./?start=mingl", sortOrder: 20, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "bartr", label: "Trade by BartR", patronGate: "bartr", route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "supRstar", label: "supRstar", patronGate: "", route: "./suprstr-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
+  {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));
 
 const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));
+
+/** One-release aliases: legacy featureServices / betaTesters.features keys → catalog key. */
+const FEATURE_KEY_ALIASES = Object.freeze({
+  supRstar: "floqCast"
+});
 
 const COLLECTIONS = Object.freeze({
   features: "featureServices",
@@ -44,8 +49,13 @@ function flag(value) {
   return value === 1 || value === true || value === "1" || String(value).toLowerCase() === "true" ? 1 : 0;
 }
 
+function canonicalizeFeatureKey(key) {
+  const k = text(key, 60);
+  return FEATURE_KEY_ALIASES[k] || k;
+}
+
 function catalogEntry(key) {
-  return FEATURE_CATALOG.find(row => row.key === key) || null;
+  return FEATURE_CATALOG.find(row => row.key === canonicalizeFeatureKey(key)) || null;
 }
 
 /** Derived link datapoints — written only by the server, in the same write as the flags they come from. */
@@ -122,14 +132,17 @@ function isActiveBetaTester(row) {
 function betaGrantsFrom(row) {
   if (!isActiveBetaTester(row)) return {};
   const raw = row.features && typeof row.features === "object" ? row.features : {};
-  return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(raw[key]) === 1).map(key => [key, 1]));
+  const merged = {...raw};
+  // Legacy betaTesters.features.supRstar → floqCast for one release.
+  if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+  return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
 }
 
 /** Accepts ["mingl"] or {mingl: 1}; returns a full 0|1 map over beta-eligible keys. */
 function validateBetaFeatures(input, {requireOne = true} = {}) {
   const picked = Array.isArray(input)
-    ? input.map(key => text(key, 60))
-    : Object.entries(input && typeof input === "object" ? input : {}).filter(([, value]) => flag(value) === 1).map(([key]) => text(key, 60));
+    ? input.map(key => canonicalizeFeatureKey(key))
+    : Object.entries(input && typeof input === "object" ? input : {}).filter(([, value]) => flag(value) === 1).map(([key]) => canonicalizeFeatureKey(key));
   const unknown = picked.filter(key => !BETA_ELIGIBLE_KEYS.includes(key));
   if (unknown.length) throw validationError("invalid-argument", `Not a beta feature: ${unknown.join(", ")}.`);
   const map = Object.fromEntries(BETA_ELIGIBLE_KEYS.map(key => [key, picked.includes(key) ? 1 : 0]));
@@ -154,7 +167,7 @@ function validateReason(reason) {
 }
 
 function validateFlagChange(input = {}) {
-  const featureKey = text(input.featureKey, 60);
+  const featureKey = canonicalizeFeatureKey(input.featureKey);
   if (!catalogEntry(featureKey)) throw validationError("invalid-argument", "Unknown feature.");
   const next = {};
   ["IsFeatureEnabled", "IsTestFeature"].forEach(field => {
@@ -275,12 +288,14 @@ function verifyChain(rowsAscending = []) {
 module.exports = {
   FEATURE_CATALOG,
   FEATURE_KEYS,
+  FEATURE_KEY_ALIASES,
   COLLECTIONS,
   INVITE_TTL_MS,
   REASON_MIN,
   GENESIS_HASH,
   CONTROL_SETS,
   flag,
+  canonicalizeFeatureKey,
   catalogEntry,
   featureLinkFields,
   linkFieldsDrifted,

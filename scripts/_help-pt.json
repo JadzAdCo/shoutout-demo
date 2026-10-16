@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Pergunte FloqR com FloqAi",
-    "body": "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+    "body": "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
   },
   "help-soccer-jersey": {
     "title": "Camisa de futebol ShoutOut",
     "body": "Pesquise Futebol, Jersey ou um país/clube (Tanzânia, Chelsea). Cada cartão de kit fotográfico é o LED traseiro que você verá em ShoutOut — Futebol · Camisa · País ou Clube. Tamanhos 96×48, 64×48, 64×32. O nome e a marca de 2 caracteres sobrepõem o kit; os números permanecem justificados ao centro."
   },
-  "help-suprstar": {
-    "title": "Faça de mim um supRstar / superstar",
-    "body": "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila supRstar → Go live no quadro SupRStar. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+  "help-floqcast": {
+    "title": "Faça de mim um floqCast / superstar",
+    "body": "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
   },
   "help-become-club-admin": {
     "title": "Torne-se um Club Admin",

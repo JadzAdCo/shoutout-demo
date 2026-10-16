@@ -13,15 +13,15 @@
   },
   "floqai-ask-floqr": {
     "title": "Demandez FloqR avec FloqAi",
-    "body": "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
+    "body": "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
   },
   "help-soccer-jersey": {
     "title": "Maillot de football ShoutOut",
     "body": "Recherchez Football, Jersey ou un pays/club (Tanzanie, Chelsea). Chaque carte du kit photo est le dos LED que vous verrez sur ShoutOut — Football · Maillot · Pays ou Club. Tailles 96×48, 64×48, 64×32. Le nom et la marque à 2 caractères superposent le kit ; les nombres restent justifiés au centre."
   },
-  "help-suprstar": {
-    "title": "Fais de moi une supRstar / superstar",
-    "body": "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente supRstar → Go live sur le tableau SupRStar. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
+  "help-floqcast": {
+    "title": "Fais de moi une floqCast / superstar",
+    "body": "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
   },
   "help-become-club-admin": {
     "title": "Devenez un Club Admin",

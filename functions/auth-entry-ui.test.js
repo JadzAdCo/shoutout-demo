@@ -39,8 +39,8 @@ test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
     "promoter-admin.html",
     "pickup.html",
     "payment-return.html",
-    "suprstr-search.html",
-    "suprstar-preview.html"
+    "floqcast-search.html",
+    "floqcast-preview.html"
   ];
   for (const file of pages) {
     const html = readReleaseFile(file);
@@ -59,8 +59,8 @@ test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
     "promoter-admin-app.js",
     "pickup-app.js",
     "payment-return-app.js",
-    "suprstr-search.js",
-    "suprstar-preview.js"
+    "floqcast-search.js",
+    "floqcast-preview.js"
   ];
   for (const file of apps) {
     const js = readReleaseFile(file);
@@ -69,7 +69,7 @@ test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
   }
   const payment = readReleaseFile("payment-return-app.js");
   assert.doesNotMatch(payment, /if \(!user\)[\s\S]{0,240}signInWithPopup/);
-  const preview = readReleaseFile("suprstar-preview.js");
+  const preview = readReleaseFile("floqcast-preview.js");
   assert.doesNotMatch(preview, /if \(!user\)[\s\S]{0,280}signInWithPopup/);
 });
 
@@ -286,8 +286,8 @@ test("production pages load floqr-i18n and the profile status card is translated
     "promoter-admin.html",
     "scheduling.html",
     "club-profile.html",
-    "suprstr-search.html",
-    "suprstar-preview.html",
+    "floqcast-search.html",
+    "floqcast-preview.html",
     "payment-return.html",
     "rydr.html",
     "role-profiles.html"
