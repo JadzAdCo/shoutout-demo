@@ -245,3 +245,24 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 | **Total OPEN** | **32** |
 | Skipped (Oct 15) | Stripe fee payer · full-or-none refunds · promoter corporate check · Lima name · bars · area names · 360 timing |
 | Decided Batch 1 (Oct 16) | VIP-B-01 · VIP-B-02 · VIP-B-03 · VIP-B-03b · VIP-B-05 · VIP-B-10 · VIP-P-13 · VIP-P-14 · VIP-P-16 |
+| Presented Batch 2 (Oct 16) | VIP-B-04 · VIP-B-06 · VIP-B-07 · VIP-B-08 · VIP-B-09 · VIP-B-11 · VIP-B-12 · VIP-B-13 · VIP-B-14 |
+
+---
+
+## Batch 2 (presented Oct 16 2026)
+
+Next owner batch after Batch 1 money/brand decisions. **Remaining money only** (9 IDs ≈ ~8). Roles/legal deferred to Batch 3.
+
+| ID | Topic (short) |
+|---|---|
+| VIP-B-04 | Patron FLOQR booking fee on top of deposit? |
+| VIP-B-06 | Refund FloqMedia / Model B fee on cancellation? |
+| VIP-B-07 | Extra-guest VIP entry fee prepaid at booking? |
+| VIP-B-08 | Extra-guest fee in Model B % base? |
+| VIP-B-09 | Extra-guest fee refundability vs deposit |
+| VIP-B-11 | When FLOQR % fee is returned (refunds / no-shows) |
+| VIP-B-12 | Dunning days + pause new bookings at day 21? |
+| VIP-B-13 | Credit-note second-approver threshold |
+| VIP-B-14 | Sales tax / Stripe Tax for beta |
+
+Status stays **OPEN** until the owner answers. Full plain-language AskQuestion text lives in the chat that presented this batch (do not invent answers here).
