@@ -1134,7 +1134,7 @@
     },
     {
       id: "help-features-services",
-      title: "Features & Services",
+      title: "Features / Svc Status Mgmt",
       body: "Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link under the feature name in this table. Each feature has two switches. Enable Feature (IsFeatureEnabled) = 0 turns the feature off for everyone, including beta testers, Master Admins, and every menu link. With Enable Feature = 1 and Enable Beta Feature (IsTestFeature) = 0, every patron sees its Search tile and menu links. With both = 1, the feature is in testing: only beta testers you granted that feature see its links, marked Beta; Master Admins see it in their profile menu marked Beta and open it from this table instead of Search. Master Admins cannot be beta testers. When you press Save, FLOQR asks for a reason of at least 8 characters; it needs an SOS2FA unlock and is written to the tamper-evident audit trail below. Revision counts the saved changes to a feature. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",
       searchPhrases: [
         "features and services", "feature flags", "enable feature", "enable beta feature", "disable feature", "test feature", "beta testers",
@@ -1142,7 +1142,7 @@
         "promote test to live", "feature audit trail"
       ],
       links: [
-        {label: "Features & Services (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
+        {label: "Features / Svc Status Mgmt (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
