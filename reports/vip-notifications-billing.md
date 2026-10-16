@@ -42,6 +42,17 @@ Standing: every decision ships with FloqAi/help before that surface goes Live. F
 | **VIP-B-13** | D — No second Master Admin approver for credit notes in beta (any Master Admin alone). | [ ] `help-vip-credit-note-approval` |
 | **VIP-B-14** | A — Counsel+accountant before Live; Stripe Tax off in beta. | [ ] `help-vip-sales-tax-beta` |
 
+### Owner decisions (Oct 16 2026) — Batch 3b notifications & receipts (+ P-08)
+
+| ID | Decision | Help when built |
+|---|---|---|
+| **VIP-B-15** | B — FloqMedia / platform pays for patron SMS / WhatsApp (confirm, remind, door pass). | [ ] `help-vip-patron-sms-payer` |
+| **VIP-B-16** | A — Mandatory notification list as written; Owner cannot turn them off. | [ ] `help-vip-mandatory-notifications` |
+| **VIP-B-17** | B — No quiet hours by default (club may set their own). | [ ] `help-vip-quiet-hours` |
+| **VIP-B-18** | C — Receipt issuer follows collector: Club Stripe / Club POS → club; FloqR Stripe → FLOQR. | [ ] `help-vip-receipt-issuer` |
+| **VIP-B-19** | A — Always issue FLOQR receipt of record for pay-at-venue. | [ ] `help-vip-pay-at-venue-receipt` |
+| **VIP-P-08** | A — Finance role (read-mostly) + Master Admin for writes. | [ ] `help-vip-finance-role` |
+
 ---
 
 ## 1. Executive summary
@@ -996,22 +1007,23 @@ Maps to payment paths in §1 / §4: Club POS ≈ path (b); Club Stripe / FloqR S
 1f. ~~**VIP-B-12 — Dunning**~~ — **DECIDED A** — days 0/3/7/14; pause new VIP bookings day 21; existing honored; Master Admin can extend. Help: [ ] `help-vip-dunning`.
 1g. ~~**VIP-B-13 — Credit-note second approver**~~ — **DECIDED D** — no second MA approver in beta (any Master Admin alone). Help: [ ] `help-vip-credit-note-approval`.
 1h. ~~**VIP-B-14 — Sales tax / Stripe Tax**~~ — **DECIDED A** — counsel+accountant before Live; Stripe Tax off in beta. Help: [ ] `help-vip-sales-tax-beta`.
-2. **Who pays for patron SMS / WhatsApp** (confirmations, reminders) — FloqMedia, the club's message credits, or folded into a patron booking fee? (Club-ops alerts already use the club's packs.) — sheet **VIP-B-15**
-3. **Mandatory notifications** — confirm the list in §2.3 (disputes, invoices, statements, Master Admin access) and that the Owner cannot turn them off. — sheet **VIP-B-16**
-4. **Quiet-hours default** — off, or a 03:00–11:00 preset for staff? — sheet **VIP-B-17**
-5. **Receipt issuer** — the club as merchant of record with "processed by FLOQR" (recommended), or FloqMedia as the issuer? — sheet **VIP-B-18**
-6. **Receipts in path (c)** — should FLOQR always issue them, or may the club opt out because its own POS / terminal already issues one? — sheet **VIP-B-19**
+2. ~~**Who pays for patron SMS / WhatsApp**~~ — **DECIDED VIP-B-15 B** — FloqMedia / platform pays. Help: [ ] `help-vip-patron-sms-payer`.
+3. ~~**Mandatory notifications**~~ — **DECIDED VIP-B-16 A** — confirm as written; Owner cannot turn them off. Help: [ ] `help-vip-mandatory-notifications`.
+4. ~~**Quiet-hours default**~~ — **DECIDED VIP-B-17 B** — no quiet hours by default (club may set). Help: [ ] `help-vip-quiet-hours`.
+5. ~~**Receipt issuer**~~ — **DECIDED VIP-B-18 C** — follows collector (Club Stripe/POS → club; FloqR Stripe → FLOQR). Help: [ ] `help-vip-receipt-issuer`.
+6. ~~**Receipts in path (c)**~~ — **DECIDED VIP-B-19 A** — always issue FLOQR receipt of record. Help: [ ] `help-vip-pay-at-venue-receipt`.
 7. ~~**Dunning timeline**~~ — **DECIDED VIP-B-12 A**.
 8. ~~**Credit-note threshold for a second approver**~~ — **DECIDED VIP-B-13 D** (none in beta).
-9. **FloqMedia Finance role** — create a read-mostly bookkeeper role (claim), or keep the books Master-Admin-only? — sheet **VIP-P-08**
+9. ~~**FloqMedia Finance role**~~ — **DECIDED VIP-P-08 A** — Finance role (read-mostly) + Master Admin for writes. Help: [ ] `help-vip-finance-role`.
 10. **Revenue recognition and accounting system** — QuickBooks Online or Xero? Daily or monthly subscription recognition? Does the accountant want the platform chart mapped now? — sheet **VIP-B-21**
 11. ~~**Sales tax**~~ — **DECIDED VIP-B-14 A** (counsel+accountant before Live; Stripe Tax off in beta).
 12. **Club code** — confirm the 3–5 letter code per club for numbering (for example `DEC` for Decades, `LIMA` for Lima Twist Club, Aurelia TBD). — sheet **VIP-B-22**
 13. **Retention** — confirm 7 years for receipts, invoices, ledger and statements, and 13 months for notification delivery records. — sheet **VIP-B-23**
 14. **Existing code findings** (§1) — schedule the separate fixes: route receipt SMS through `sendTwilioMessagesApi`, and change the existing `FLOQR-YYYYMMDD-XXXXXXXX` / `FLOQR-TEST-NNNNNN` invoice numbers so the log redactor stops masking them. — sheet **VIP-B-24**
-15. **Self-billing vs promoter-issued invoices** — which is the default for club → promoter and FloqMedia → promoter commissions? Counsel to confirm self-billing agreement language.
+15. **Self-billing vs promoter-issued invoices** — which is the default for club → promoter and FloqMedia → promoter commissions? Counsel to confirm self-billing agreement language. — sheet **VIP-B-20** adjacent / counsel
 16. **Stale-dated check window** — confirm 180 days (or the bank's policy) before an outstanding check is auto-flagged for void / reissue.
 17. **1099 / W-9** — counsel confirms the US promoter tax package (W-9 collection, 1099-NEC threshold, which entity files when the club vs FloqMedia pays).
+18. **Promoter platform subscription $20/mo?** — sheet **VIP-B-20** (still OPEN).
 
 ## 15. Files
 

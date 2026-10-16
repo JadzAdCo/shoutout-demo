@@ -83,14 +83,14 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-P-01 | Proposal §20 Q1 · design notes | Finish principle 14: what capabilities must club admins have? (multi-select) | **a–h all; i Terms PDF upload = Should later** | Covers house holds, pricing, overrides, door ops, messaging, export, promoter caps; clause builder first | OPEN |
-| VIP-P-02 | Proposal §20 Q9 | Master Admin access to patron PII: break-glass only or standing read? | **Break-glass only (30 min) + Owner notified** | Least privilege; matches design-notes Master Admin row | OPEN |
-| VIP-P-03 | Proposal §20 Q10 | E-sign: paid provider (Dropbox Sign / DocuSign / Adobe) or passkey + TSA in-app for beta? | **Passkey + TSA in-app for beta** | Ship without vendor contract; offer provider as Should post-beta | OPEN |
-| VIP-P-04 | Proposal §20 Q11 | TSA timestamp provider: paid (DigiCert / GlobalSign / Sectigo) or free? | **Paid TSA (DigiCert or Sectigo)** | Free stamps are weak evidence if a signature is challenged | OPEN |
-| VIP-P-05 | Proposal §20 Q12 | Capture opt-in browser geolocation for counsel signatures? | **No — IP + passkey + bar verification only** | Geolocation is optional noise and never proof | OPEN |
-| VIP-P-06 | Proposal §20 Q13 | EU / non-US clubs in beta scope (eIDAS, GDPR controller, SCA)? | **US-only for beta** | Avoids eIDAS/QES and SCA off-session complexity until counsel ready | OPEN |
-| VIP-P-07 | Proposal §20 Q20 | Who is Club Owner (signs agreements) at each beta venue? | **Owner names one uid/email per club at onboarding** | Blocks certification until a real signer exists | OPEN |
-| VIP-P-08 | Billing §14 Q11 | Create a FloqMedia Finance claim role, or Master-Admin-only books? | **Finance role (read-mostly) + Master Admin for writes** | Accountant can close books without full SOS2FA surface | OPEN |
+| VIP-P-01 | Proposal §20 Q1 · design notes | Finish principle 14: what capabilities must club admins have? (multi-select) | **a–h all; i Terms PDF upload = Should later** | Covers house holds, pricing, overrides, door ops, messaging, export, promoter caps; clause builder first | **DECIDED Oct 16 2026** — B: **All of a–i in beta** (holds/blocks, night minimums, request-to-book, policy override, assign servers, message guests, CSV export, promoter quotas, Terms PDF upload). Help: [ ] `help-vip-club-admin-capabilities` |
+| VIP-P-02 | Proposal §20 Q9 | Master Admin access to patron PII: break-glass only or standing read? | **Break-glass only (30 min) + Owner notified** | Least privilege; matches design-notes Master Admin row | **DECIDED Oct 16 2026** — A: Break-glass only (30 min) + Owner notified. Help: [ ] `help-vip-break-glass-pii` |
+| VIP-P-03 | Proposal §20 Q10 | E-sign: paid provider (Dropbox Sign / DocuSign / Adobe) or passkey + TSA in-app for beta? | **Passkey + TSA in-app for beta** | Ship without vendor contract; offer provider as Should post-beta | **DECIDED Oct 16 2026** — A: Passkey + TSA in-app for beta; paid e-sign later if needed. Help: [ ] `help-vip-esign-passkey` |
+| VIP-P-04 | Proposal §20 Q11 | TSA timestamp provider: paid (DigiCert / GlobalSign / Sectigo) or free? | **Paid TSA (DigiCert or Sectigo)** | Free stamps are weak evidence if a signature is challenged | **DECIDED Oct 16 2026** — A: Paid TSA (DigiCert or Sectigo — pick at build time). Help: [ ] `help-vip-tsa` |
+| VIP-P-05 | Proposal §20 Q12 | Capture opt-in browser geolocation for counsel signatures? | **No — IP + passkey + bar verification only** | Geolocation is optional noise and never proof | **DECIDED Oct 16 2026** — C: **Require GPS** for counsel signatures. Help: [ ] `help-vip-counsel-gps` |
+| VIP-P-06 | Proposal §20 Q13 | EU / non-US clubs in beta scope (eIDAS, GDPR controller, SCA)? | **US-only for beta** | Avoids eIDAS/QES and SCA off-session complexity until counsel ready | **DECIDED Oct 16 2026** — A: US-only for beta. Help: [ ] `help-vip-beta-geo` |
+| VIP-P-07 | Proposal §20 Q20 | Who is Club Owner (signs agreements) at each beta venue? | **Owner names one uid/email per club at onboarding** | Blocks certification until a real signer exists | **DECIDED Oct 16 2026** — C: Master Admin acts as temporary Owner until the club names one. Help: [ ] `help-vip-club-owner-temp` |
+| VIP-P-08 | Billing §14 Q11 | Create a FloqMedia Finance claim role, or Master-Admin-only books? | **Finance role (read-mostly) + Master Admin for writes** | Accountant can close books without full SOS2FA surface | **DECIDED Oct 16 2026** — A: Finance role (read-mostly) + Master Admin for writes. Help: [ ] `help-vip-finance-role` |
 
 ---
 
@@ -98,10 +98,10 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-P-09 | Proposal §20 Q15 remnant | Confirm Lima Twist **106 is the only DJ booth**? | **Yes — 106 only** | Matches owner Oct 15 map feedback; legend uses one blue DJ state | OPEN |
-| VIP-P-10 | Proposal §20 Q16 | Decades: what is the unlabeled enclosure west of south VIP TABLES? Are the two VIP TABLES areas bookable as full buyouts? | **Enclosure = non-bookable · VIP areas = per-table only (no buyout SKU in beta)** | Fail closed on unlabeled shapes; buyouts can be a later night-type | OPEN |
-| VIP-P-11 | Proposal §20 Q18 remnant | Who shoots the later 360 panoramas — club staff or FloqMedia photographer? | **Club staff with FloqMedia capture guide** | Cheaper; FloqMedia reviews privacy blur before publish | OPEN |
-| VIP-P-12 | Proposal §20 Q24 | Confirm capacity placeholders (Decades VIP 8/6, tables 6/4; Lima 2–6). Is `includedGuests` usually = `maxCapacity`? | **Placeholders OK until club review · included often = max (extra-guest fee null)** | Clubs confirm in ingest `review`; null extra fee is the simple default | OPEN |
+| VIP-P-09 | Proposal §20 Q15 remnant | Confirm Lima Twist **106 is the only DJ booth**? | **Yes — 106 only** | Matches owner Oct 15 map feedback; legend uses one blue DJ state | **DECIDED Oct 16 2026** — A: Yes — 106 only. Help: [ ] `help-vip-dj-booth-106` |
+| VIP-P-10 | Proposal §20 Q16 | Decades: what is the unlabeled enclosure west of south VIP TABLES? Are the two VIP TABLES areas bookable as full buyouts? | **Enclosure = non-bookable · VIP areas = per-table only (no buyout SKU in beta)** | Fail closed on unlabeled shapes; buyouts can be a later night-type | **DECIDED Oct 16 2026** — A: Enclosure = non-bookable · VIP areas = per-table only (no buyout in beta). Help: [ ] `help-vip-decades-enclosure` |
+| VIP-P-11 | Proposal §20 Q18 remnant | Who shoots the later 360 panoramas — club staff or FloqMedia photographer? | **Club staff with FloqMedia capture guide** | Cheaper; FloqMedia reviews privacy blur before publish | **DECIDED Oct 16 2026** — A: Club staff with FloqMedia capture guide (FloqMedia reviews privacy blur before publish). Help: [ ] `help-vip-360-capture` |
+| VIP-P-12 | Proposal §20 Q24 | Confirm capacity placeholders (Decades VIP 8/6, tables 6/4; Lima 2–6). Is `includedGuests` usually = `maxCapacity`? | **Placeholders OK until club review · included often = max (extra-guest fee null)** | Clubs confirm in ingest `review`; null extra fee is the simple default | **DECIDED Oct 16 2026** — A: Placeholders OK until club review · included often = max (extra-guest fee usually null). Help: [ ] `help-vip-capacity-placeholders` |
 
 ---
 
@@ -109,11 +109,11 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-B-15 | Billing §14 Q4 | Who pays for patron SMS / WhatsApp (confirm / remind / pass)? | **Club message credits** (opt-in at booking) | Club-ops already use club packs; FloqMedia does not subsidize venue SMS | OPEN |
-| VIP-B-16 | Billing §14 Q5 | Confirm mandatory notification list (§2.3) and that Owner cannot turn them off? | **Confirm as written** | Disputes / invoices / statements / MA access must always land | OPEN |
-| VIP-B-17 | Billing §14 Q6 | Quiet-hours default for staff alerts? | **03:00–11:00 local preset (urgent still breaks through)** | Nightclubs sleep late; urgent list already defined | OPEN |
-| VIP-B-18 | Billing §14 Q7 | Receipt issuer of record? | **Club as merchant · “Processed by FLOQR”** | Matches Connect settlement; club brand on the PDF | OPEN |
-| VIP-B-19 | Billing §14 Q8 | Path (c) pay-at-venue: always issue FLOQR receipts, or club may opt out? | **Always issue FLOQR receipt of record** | One immutable trail for ledger / disputes even if POS printed a slip | OPEN |
+| VIP-B-15 | Billing §14 Q4 | Who pays for patron SMS / WhatsApp (confirm / remind / pass)? | **Club message credits** (opt-in at booking) | Club-ops already use club packs; FloqMedia does not subsidize venue SMS | **DECIDED Oct 16 2026** — B: **FloqMedia / platform pays** for patron SMS/WhatsApp. Help: [ ] `help-vip-patron-sms-payer` |
+| VIP-B-16 | Billing §14 Q5 | Confirm mandatory notification list (§2.3) and that Owner cannot turn them off? | **Confirm as written** | Disputes / invoices / statements / MA access must always land | **DECIDED Oct 16 2026** — A: Confirm as written — Owner cannot disable the mandatory list. Help: [ ] `help-vip-mandatory-notifications` |
+| VIP-B-17 | Billing §14 Q6 | Quiet-hours default for staff alerts? | **03:00–11:00 local preset (urgent still breaks through)** | Nightclubs sleep late; urgent list already defined | **DECIDED Oct 16 2026** — B: **No quiet hours by default** (club may set their own). Help: [ ] `help-vip-quiet-hours` |
+| VIP-B-18 | Billing §14 Q7 | Receipt issuer of record? | **Club as merchant · “Processed by FLOQR”** | Matches Connect settlement; club brand on the PDF | **DECIDED Oct 16 2026** — C: **Depends on collector** — Club Stripe / Club POS → club; FloqR Stripe → FLOQR. Help: [ ] `help-vip-receipt-issuer` |
+| VIP-B-19 | Billing §14 Q8 | Path (c) pay-at-venue: always issue FLOQR receipts, or club may opt out? | **Always issue FLOQR receipt of record** | One immutable trail for ledger / disputes even if POS printed a slip | **DECIDED Oct 16 2026** — A: Always issue FLOQR receipt of record. Help: [ ] `help-vip-pay-at-venue-receipt` |
 
 ---
 
@@ -253,22 +253,47 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 | Group | Open IDs |
 |---|---|
 | A Money & Stripe | **none** — all money IDs decided (Batch 1 + Batch 2) |
-| B Roles & legal | VIP-P-01…08 (8) |
-| C Booking UX & floor plans | VIP-P-09…12 (4) |
-| D Notifications & receipts | VIP-B-15…19 (5) |
+| B Roles & legal | **none** — Batch 3a decided |
+| C Booking UX & floor plans | **none** — Batch 3c decided |
+| D Notifications & receipts | **none** — Batch 3b decided |
 | E Promoters & ledger | VIP-B-20…22 (3) |
 | F Brand / origin / beta | VIP-P-15 only (1) — P-13/14/16 decided |
 | G Other | VIP-B-23…24 (2) |
-| **Total OPEN** | **23** |
+| **Total OPEN** | **6** |
 | Skipped (Oct 15) | Stripe fee payer · full-or-none refunds · promoter corporate check · Lima name · bars · area names · 360 timing |
 | Decided Batch 1 (Oct 16) | VIP-B-01 · VIP-B-02 · VIP-B-03 · VIP-B-03b · VIP-B-05 · VIP-B-10 · VIP-P-13 · VIP-P-14 · VIP-P-16 |
 | Decided Batch 2 (Oct 16) | VIP-B-04 · VIP-B-06 · VIP-B-07 · VIP-B-08 · VIP-B-09 · VIP-B-11 · VIP-B-12 · VIP-B-13 · VIP-B-14 |
+| Decided Batch 3a–3c (Oct 16) | VIP-P-01…12 · VIP-B-15…19 |
 
 ---
 
+## Batch 3a–3c (DECIDED Oct 16 2026) — roles / notifications / floor UX
+
+| ID | Decision (short) | Help |
+|---|---|---|
+| VIP-P-01 | B — All club-admin capabilities **a–i** in beta | [ ] `help-vip-club-admin-capabilities` |
+| VIP-P-02 | A — Break-glass PII 30 min + Owner notified | [ ] `help-vip-break-glass-pii` |
+| VIP-P-03 | A — Passkey + TSA in-app for beta | [ ] `help-vip-esign-passkey` |
+| VIP-P-04 | A — Paid TSA DigiCert/Sectigo | [ ] `help-vip-tsa` |
+| VIP-P-05 | C — **Require GPS** for counsel signatures | [ ] `help-vip-counsel-gps` |
+| VIP-P-06 | A — US-only beta | [ ] `help-vip-beta-geo` |
+| VIP-P-07 | C — Master Admin temporary Club Owner until club names one | [ ] `help-vip-club-owner-temp` |
+| VIP-P-08 | A — Finance role (read) + Master Admin writes | [ ] `help-vip-finance-role` |
+| VIP-B-15 | B — FloqMedia/platform pays patron SMS/WhatsApp | [ ] `help-vip-patron-sms-payer` |
+| VIP-B-16 | A — Mandatory notification list as written | [ ] `help-vip-mandatory-notifications` |
+| VIP-B-17 | B — No quiet hours by default | [ ] `help-vip-quiet-hours` |
+| VIP-B-18 | C — Receipt issuer follows collector | [ ] `help-vip-receipt-issuer` |
+| VIP-B-19 | A — Always FLOQR receipt for pay-at-venue | [ ] `help-vip-pay-at-venue-receipt` |
+| VIP-P-09 | A — Lima Twist 106 only DJ booth | [ ] `help-vip-dj-booth-106` |
+| VIP-P-10 | A — Decades enclosure non-bookable; per-table only | [ ] `help-vip-decades-enclosure` |
+| VIP-P-11 | A — Club staff 360 + FloqMedia guide/review | [ ] `help-vip-360-capture` |
+| VIP-P-12 | A — Capacity placeholders OK; included often = max | [ ] `help-vip-capacity-placeholders` |
+
+Remaining OPEN: VIP-B-20…22 · VIP-P-15 · VIP-B-23…24 (Batch 4).
+
 ## Batch 2 (DECIDED Oct 16 2026) — remaining money
 
-All 9 money IDs answered. See **Batch 2 decided** table above. Roles/legal deferred to Batch 3.
+All 9 money IDs answered. See **Batch 2 decided** table above.
 
 | ID | Decision (short) | Help |
 |---|---|---|
