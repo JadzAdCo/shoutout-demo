@@ -899,6 +899,37 @@ exports.createFloqrConnectOnboardingLink = onCall({
       referenceNumber:text(req.referenceNumber, 80)
     };
   }
+
+  if (type === "vipReservation") {
+    const holdId = text(payload.holdId, 120);
+    const consentId = text(payload.consentId, 120);
+    if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP ReserV needs holdId and consentId.");
+    const holdSnap = await db.collection("vipHolds").doc(holdId).get();
+    if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
+    const hold = holdSnap.data() || {};
+    const charged = Math.max(50, Math.round(Number(hold.amounts?.chargedCents || 0)));
+    if (!charged) throw new HttpsError("failed-precondition", "VIP deposit amount is missing on this hold.");
+    const label = text(hold.sectionLabel || hold.sectionId, 40);
+    const club = text(hold.venueName || hold.clubLocationId, 80);
+    const night = text(hold.night, 20);
+    const included = Math.max(1, Math.floor(Number(hold.includedGuests || 1)));
+    return {
+      amountCents: charged,
+      unitAmountCents: charged,
+      quantity: 1,
+      itemName: `Table ${label} deposit — ${club}, ${night}`,
+      description: `VIP ReserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. FloqR Stripe collector (beta).`,
+      floqrShareCents: charged,
+      venueShareCents: 0,
+      paymentModel: "floqr-platform",
+      product: "vipReservation",
+      holdId,
+      consentId,
+      clubLocationId: text(hold.clubLocationId, 120),
+      night,
+      sectionId: text(hold.sectionId, 80)
+    };
+  }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
 }
 
@@ -981,7 +1012,8 @@ const CHECKOUT_FEATURE_KEYS = Object.freeze({
   rydrTrip: "rydr",
   robotaxi: "rydr",
   suprstarRequest: "floqCast",
-  suprstrSlot: "floqCast"
+  suprstrSlot: "floqCast",
+  vipReservation: "vipReservations"
 });
 
 exports.createFloqrCheckoutSession = onCall({
@@ -1043,6 +1075,27 @@ exports.createFloqrCheckoutSession = onCall({
         updatedAt:admin.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
     }
+    if (type === "vipReservation") {
+      const holdId = text(payload.holdId, 120);
+      const consentId = text(payload.consentId, 120);
+      if (!holdId || !consentId) throw new HttpsError("invalid-argument", "VIP ReserV checkout needs holdId and consentId.");
+      const holdSnap = await db.collection("vipHolds").doc(holdId).get();
+      if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
+      const hold = holdSnap.data() || {};
+      if (hold.uid !== request.auth.uid) throw new HttpsError("permission-denied", "Not your VIP hold.");
+      if (hold.status !== "active") throw new HttpsError("failed-precondition", "This VIP hold is no longer active.");
+      if (Number(hold.expiresAtMs || 0) <= Date.now()) throw new HttpsError("failed-precondition", "Your VIP hold expired. Pick the table again.");
+      if (text(hold.consentId, 120) !== consentId) throw new HttpsError("failed-precondition", "Record Terms consent before paying the deposit.");
+      const consentSnap = await db.collection("vipConsents").doc(consentId).get();
+      if (!consentSnap.exists || consentSnap.data()?.uid !== request.auth.uid) {
+        throw new HttpsError("failed-precondition", "VIP consent record missing.");
+      }
+      await holdSnap.ref.set({
+        status: "pendingPayment",
+        checkoutStartedAtMs: Date.now(),
+        updatedAtMs: Date.now()
+      }, {merge: true});
+    }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();
     const returnBase = safeReturnBase(request);
@@ -1099,12 +1152,16 @@ exports.createFloqrCheckoutSession = onCall({
         ? `${returnBase}pickup.html?rydrPaid=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}&session_id={CHECKOUT_SESSION_ID}`
         : type === "suprstarRequest"
           ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}&popup=1`
-          : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
+          : type === "vipReservation"
+            ? `${returnBase}vip.html?vipPaid=1&order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`
+            : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:type === "rydrFare"
         ? `${returnBase}pickup.html?rydrCancelled=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}`
         : type === "suprstarRequest"
           ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1&popup=1`
-          : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
+          : type === "vipReservation"
+            ? `${returnBase}vip.html?vipCancelled=1&order=${encodeURIComponent(orderRef.id)}`
+            : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
       client_reference_id:orderRef.id,
       metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId, ownerKey:text(summary.ownerKey, 220)},
       billing_address_collection:"auto",
@@ -2115,6 +2172,20 @@ async function finalizePaidOrder(orderId, session) {
   if (order.orderType === "adCampaign") {
     await require("./ad-functions").__adHelpers.fulfillAdOrder(orderId, order, session);
     await ref.set({fulfillmentStatus:"ad-pending-approval", fulfilledRecordId:text(order.campaignId, 160)}, {merge:true});
+  }
+
+  if (order.orderType === "vipReservation") {
+    const {fulfillVipReservationOrder} = require("./vip-functions").__vipHelpers;
+    const fulfilled = await fulfillVipReservationOrder(orderId, {
+      ...order,
+      stripeCheckoutSessionId: text(session?.id || order.stripeCheckoutSessionId, 160),
+      stripePaymentIntentId: text(session?.payment_intent || order.stripePaymentIntentId, 160)
+    });
+    await ref.set({
+      fulfillmentStatus: "vip-reservation-confirmed",
+      fulfilledRecordId: text(fulfilled.reservationId, 160),
+      vipReservationId: text(fulfilled.reservationId, 160)
+    }, {merge: true});
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});
 }

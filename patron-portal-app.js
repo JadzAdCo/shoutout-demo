@@ -382,6 +382,55 @@
       const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
       if (!activeSub) showShoutoutPane("shoutoutPendingPane");
     }
+    if (panelId === "portalVipReservations") loadVipReservationsPanel();
+  }
+
+  async function loadVipReservationsPanel() {
+    const status = byId("vipReservationsStatus");
+    const list = byId("vipReservationsList");
+    const book = byId("vipReservationsBookLink");
+    if (book && window.FLOQRNav?.withFrom) {
+      try { book.href = window.FLOQRNav.intentSearchHome ? "./vip.html?from=portal" : "./vip.html?from=portal"; } catch (_) { /* ignore */ }
+    }
+    if (!list) return;
+    if (status) status.textContent = "Loading reservations…";
+    try {
+      const call = firebase.app().functions("us-central1").httpsCallable("getMyVipReservations");
+      const res = await call({});
+      const rows = res.data?.reservations || [];
+      if (!rows.length) {
+        list.innerHTML = `<p class="sub">${esc(window.FLOQRI18n?.t?.("portal.vipReservations.empty") || "No VIP ReserV bookings yet.")}</p>`;
+        if (status) status.textContent = "";
+        return;
+      }
+      list.innerHTML = rows.map(r => {
+        const amt = Number(r.amounts?.chargedCents || 0);
+        const money = "$" + (amt / 100).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const canPass = r.status === "confirmed" || r.status === "checkedIn";
+        return `<div class="report-row" data-vip-res="${esc(r.reservationId)}">` +
+          `<strong>${esc(r.venueName || r.clubLocationId)}</strong> · ${esc(r.sectionLabel || r.sectionId)} · ${esc(r.night)} · ${esc(r.status)} · ${money}` +
+          (canPass ? ` <button type="button" class="buttonlike" data-vip-pass="${esc(r.reservationId)}">Show pass</button>` : "") +
+          `<pre class="hidden" id="vipPass-${esc(r.reservationId)}"></pre></div>`;
+      }).join("");
+      list.querySelectorAll("[data-vip-pass]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-vip-pass");
+          try {
+            const pass = await firebase.app().functions("us-central1").httpsCallable("getVipReservationPass")({reservationId: id});
+            const pre = byId(`vipPass-${id}`);
+            if (pre) {
+              pre.classList.remove("hidden");
+              pre.textContent = pass.data?.passToken || "";
+            }
+          } catch (err) {
+            if (status) status.textContent = err?.message || String(err);
+          }
+        });
+      });
+      if (status) status.textContent = "";
+    } catch (err) {
+      if (status) status.textContent = err?.message || String(err);
+    }
   }
 
   /** Mingl / BartR tabs and links follow Features & Services (FLOQRFeatureServices.linkState). */
@@ -412,6 +461,7 @@
       btn.addEventListener("click", () => {
         showPortalPanel(btn.dataset.panel, btn.dataset.panel);
         if (btn.dataset.panel === "portalShoutouts") showShoutoutPane("shoutoutPendingPane");
+        if (btn.dataset.panel === "portalVipReservations") loadVipReservationsPanel();
       });
     });
     document.getElementById("shoutoutSubtabs")?.addEventListener("click", event => {
@@ -464,7 +514,11 @@
         shoutouts:"portalShoutouts",
         myshoutouts:"portalShoutouts",
         "my-shoutouts":"portalShoutouts",
-        shoutout:"portalShoutouts"
+        shoutout:"portalShoutouts",
+        reservations:"portalVipReservations",
+        vip:"portalVipReservations",
+        "vip-reservations":"portalVipReservations",
+        vipreservations:"portalVipReservations"
       };
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();

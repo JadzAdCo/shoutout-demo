@@ -74,6 +74,15 @@ test("ordinary prose is not over-masked", () => {
   assert.equal(redactSecrets("ShoutOut @ Zebbies at 10:30 PM"), "ShoutOut @ Zebbies at 10:30 PM");
 });
 
+test("FLOQR invoice and VIP receipt numbers are not masked (VIP-B-24)", () => {
+  const invoice = "FLOQR receipt FLOQR-20261015-HJK2MN34";
+  assert.equal(redactSecrets(invoice), invoice);
+  assert.equal(redactSecrets("Invoice FLOQR-TEST-482913 attached"), "Invoice FLOQR-TEST-482913 attached");
+  assert.equal(redactSecrets("Receipt VR-DEC-2026-0000042 ready"), "Receipt VR-DEC-2026-0000042 ready");
+  // Bare OTP still masked when not part of an invoice id
+  assert.equal(redactSecrets("HJK2MN34"), MASK);
+});
+
 test("plainPreview strips tags, collapses whitespace and masks", () => {
   const out = plainPreview("<p>Your FLOQR sign-in code is <b>HJK2MN34</b>.</p>\n\n<p>Bye</p>");
   assert.match(out, /^Your FLOQR sign-in code is •••••• ?\. Bye$/);

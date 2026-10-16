@@ -399,10 +399,11 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP ReserV)",
-      body: "VIP ReserV lets you explore a club floor map and reserve a table. Phase 1 (beta): open VIP ReserV from Search (when granted), pick Decades or Lima Twist Club, tap a green available section, and review capacity and fees. Holding, deposits, and door check-in ship in Phase 2. Bars and the DJ booth are never bookable. Brand name VIP ReserV is never translated.",
+      body: "VIP ReserV lets you explore a club floor map and reserve a table. Open VIP ReserV from Search (when granted), pick Decades or Lima Twist Club and a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP ReserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
-        "table reservation", "vip booth", "floor map", "decades table", "lima twist table"
+        "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
+        "table deposit", "hold a table"
       ],
       links: [
         {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
@@ -420,6 +421,49 @@
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-terms-consent",
+      title: "VIP ReserV Terms & consent",
+      body: "Before deposit checkout you must accept the venue Terms, refund/cancellation, no-show/forfeit, age 21+ with ID, and minimum-spend disclosure. Consent is recorded server-side with the Terms version hash. Marketing opt-in is optional.",
+      searchPhrases: ["vip terms", "table terms", "vip consent", "accept terms vip", "minimum spend disclosure"],
+      links: [
+        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "venueAdmin"]
+    },
+    {
+      id: "help-vip-door-pass",
+      title: "VIP ReserV door pass",
+      body: "After your deposit confirms, open My Profile → Reservations and tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue cutoff. Door staff use VIP ReserV Door to check you in.",
+      searchPhrases: ["vip pass", "door pass", "qr table", "vip qr", "show pass", "table check in"],
+      links: [
+        {label: "My Reservations", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "reservations"})},
+        {label: "Open VIP ReserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "serviceMember", "venueAdmin"]
+    },
+    {
+      id: "help-vip-door-ops",
+      title: "VIP ReserV door check-in",
+      body: "VIP Managers open VIP ReserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status.",
+      searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door"],
+      links: [
+        {label: "VIP ReserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["serviceMember", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-receipt-sms-redaction-fixes",
+      title: "VIP receipt SMS & invoice redaction",
+      body: "Paid receipts send SMS only through the logged Twilio Messages API path. FLOQR-YYYYMMDD-… and VR-… invoice numbers stay readable in mail/SMS logs (they are not treated as OTP codes).",
+      searchPhrases: ["vip receipt sms", "invoice redaction", "FLOQR invoice", "VR receipt", "twilio receipt"],
+      links: [],
+      source: "help-repository-seed",
+      audiences: ["masterAdmin"]
     },
     {
       id: "help-become-club-admin",

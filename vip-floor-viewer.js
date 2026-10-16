@@ -325,9 +325,19 @@
       (canBook ? `<div class="party"><span id="partyLabel">Party size</span><div class="stepper" role="group" aria-labelledby="partyLabel">` +
         `<button type="button" data-step="-1" aria-label="Fewer guests">−</button><output id="partySize" aria-live="polite"></output>` +
         `<button type="button" data-step="1" aria-label="More guests">+</button></div></div><table class="fees" id="fees"></table>` : "") +
-      (item.bookable ? `<button type="button" class="book" ${canBook ? "" : "disabled"}>${canBook ? "Book this table (demo)" : esc(st.text) + " — pick another table"}</button>` : "");
+      (item.bookable ? `<button type="button" class="book" ${canBook ? "" : "disabled"}>${canBook ? "Hold this table" : esc(st.text) + " — pick another table"}</button>` : "");
     info.querySelector(".close").addEventListener("click", () => { selectedId = null; renderOverlay(); showInfo(null); });
     if (canBook) bindParty(item);
+    const bookBtn = info.querySelector("button.book");
+    if (bookBtn && canBook) {
+      bookBtn.addEventListener("click", () => {
+        const partyEl = info.querySelector("#partySize");
+        const partyText = partyEl ? partyEl.textContent : "";
+        const party = Math.max(1, parseInt(String(partyText).split(" ")[0], 10) || item.includedGuests || 1);
+        const handler = window.FLOQRVipFloorViewer?.onBookRequest;
+        if (typeof handler === "function") handler({sectionId: item.id, partySize: party, item});
+      });
+    }
   }
 
   // Demo amounts only — real minimums / fees come from the section's minimumAmount / extraGuestFee / deposit.
@@ -417,6 +427,8 @@
     load,
     select,
     setMode,
-    getPlan: () => plan
+    getPlan: () => plan,
+    setStates: next => { states = next && typeof next === "object" ? next : {}; renderOverlay(); renderList(); },
+    onBookRequest: null
   };
 })();

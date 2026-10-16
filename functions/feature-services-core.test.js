@@ -229,6 +229,7 @@ test("test-feature satellite pages are guarded", () => {
     "commerce.html": "bartr", "pickup.html": "rydr", "rydr.html": "rydr",
     "floqcast-search.html": "floqCast", "floqcast-preview.html": "floqCast",
     "vip.html": "vipReservations",
+    "vip-door.html": "vipReservations",
     "mingl-chat.html": "mingl", "mingl-gist.html": "mingl"
   };
   const guard = read("floqr-feature-services.js");

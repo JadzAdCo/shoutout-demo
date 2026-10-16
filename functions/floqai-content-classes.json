@@ -268,6 +268,33 @@
     "help-venue-website-ingest": [
       "venueAdmin"
     ],
+    "help-vip-book-table": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
+    "help-vip-door-ops": [
+      "masterAdmin",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-vip-door-pass": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-vip-floor-map": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
+    "help-vip-receipt-sms-redaction-fixes": [
+      "masterAdmin"
+    ],
+    "help-vip-terms-consent": [
+      "patron",
+      "venueAdmin"
+    ],
     "help-welcome": [
       "patron"
     ]
@@ -419,6 +446,9 @@
     ],
     "venue-search": [
       "public"
+    ],
+    "vip-reserv": [
+      "patron"
     ]
   }
 }

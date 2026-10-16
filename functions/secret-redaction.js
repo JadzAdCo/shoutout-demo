@@ -30,8 +30,23 @@ function looksLikeOpsCode(token) {
   return CODE_TOKEN.test(token) && (/\d/.test(token) || token === token.toUpperCase());
 }
 
+/** Invoice / receipt ids must survive logging (VIP-B-24). Protect before OTP/club-code masks. */
+const FLOQR_INVOICE_NUM = /\bFLOQR-(?:\d{8}|TEST)-[A-Z0-9]+\b/gi;
+const VIP_RECEIPT_NUM = /\bVR-[A-Z0-9]+-\d{4}-\d+\b/gi;
+
 function redactSecrets(value) {
-  return String(value == null ? "" : value)
+  const protectedSpans = [];
+  let s = String(value == null ? "" : value);
+  const protect = (re) => {
+    s = s.replace(re, (match) => {
+      const i = protectedSpans.length;
+      protectedSpans.push(match);
+      return `\u0001INV${i}\u0001`;
+    });
+  };
+  protect(FLOQR_INVOICE_NUM);
+  protect(VIP_RECEIPT_NUM);
+  s = s
     .replace(BEARER, "Bearer [redacted]")
     .replace(LABELLED_CODE, (match, label, sep, token) => (looksLikeCode(token) ? `${label}${sep}${MASK}` : match))
     .replace(OPS_REPLY, (match, verb, sep, token) => (looksLikeOpsCode(token) ? `${verb}${sep}${MASK}` : match))
@@ -39,6 +54,10 @@ function redactSecrets(value) {
     .replace(EMAIL_OTP_TOKEN, MASK)
     .replace(CLUB_CODE_TOKEN, MASK)
     .replace(SIX_DIGITS, MASK);
+  protectedSpans.forEach((orig, i) => {
+    s = s.split(`\u0001INV${i}\u0001`).join(orig);
+  });
+  return s;
 }
 
 /** Redact every string leaf of a plain object / array (keys untouched). */

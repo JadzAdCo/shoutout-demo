@@ -298,20 +298,24 @@ When adding a section, use this skeleton:
 
 ---
 
-## VIP ReserV (`vipReservations`) — Phase 1
+## VIP ReserV (`vipReservations`) — Phase 2
 
 | Piece | Where |
 |---|---|
 | **Brand** | VIP ReserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
-| **Patron page** | `vip.html` (`data-floqr-feature="vipReservations"`) + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` / `.css` |
-| **Floor plans** | Static publish `vip-plans/` (`decades.json`, `lima-twist.json`, `legend.json`, PNGs). Aurelia 2D pending; 3D demo remains `reports/vip-aurelia-demo/` |
-| **Session** | `floqr-session-shell.js` after `firebase-config.js` |
-| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, stub `createVipHold` (Phase 2). Exported from `functions/index.js` |
-| **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map` in `floqai-help-repository.js` + `floqr-i18n-help.js` / `scripts/_help-en.json`; product intent `vip-reserv` in `intent-search.js` |
-| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant. Open from F&S when Test. |
-| **Not in Phase 1** | Holds, Stripe deposits, Terms consent, door check-in, promoter billing, Firestore `vipFloorPlans` ingest pipeline |
+| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — night picker, 30‑min hold, Terms consent, FloqR Stripe deposit |
+| **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
+| **My Profile** | `patron-portal.html` `#portalVipReservations` (`?tab=reservations`) — list + Show pass |
+| **Floor plans** | Static `vip-plans/` + server `functions/vip-beta-catalog.js`. Aurelia 2D pending |
+| **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-door.html` |
+| **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent`, `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`. Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms `vipReservations` + books `vipInventory` |
+| **Data** | `vipInventory`, `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations` (Functions-write) |
+| **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
+| **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
+| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant |
+| **Not yet** | Club Admin VIP tab, promoter path, counsel Live Terms, Model B invoicing, Aurelia 2D |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
-| **Package** | s3.1.45 |
+| **Package** | s3.1.46 |

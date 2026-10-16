@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.45";
+  const VERSION = "s3.1.46";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -523,7 +523,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Table reservations",
-      "page.vip.sub": "Pick a night, explore the floor map, and reserve a table. Beta — deposits and live inventory arrive in Phase 2.",
+      "page.vip.sub": "Pick a night, hold a table for 30 minutes, accept the venue Terms, and pay the deposit.",
       "page.vip.restoring": "Restoring your FLOQR session…",
       "page.vip.signInHint": "Sign in on Search / My Profile to use VIP ReserV, or continue with Google if this tab has no session yet.",
       "page.vip.googleSignIn": "Google sign-in",
@@ -531,15 +531,15 @@
       "page.vip.chooseVenue": "Choose a venue",
       "page.vip.betaVenues": "Beta venues: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Floor map",
-      "page.vip.mapDemo": "Demo booking colors (green available · amber held · red booked). Pinch or scroll to zoom.",
-      "page.vip.signedIn": "Signed in — pick a venue to open its floor map.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Signed in — pick a venue and night, then tap a green table.",
       "page.vip.needSignIn": "Sign in to explore VIP ReserV floor maps.",
       "page.vip.mapLoaded": "Floor map loaded. Tap a green table for details.",
       "page.vip.mapLoading": "Loading floor map…",
       "page.vip.aureliaPending": "Aurelia’s interactive 3D demo is in reports; the 2D VIP ReserV map lands next.",
       "page.vip.shellMissing": "Session shell missing — hard refresh and try again.",
       "help.vip.book.title": "Book a VIP table",
-      "help.vip.book.body": "Choose a beta venue, open its floor map, tap a green (available) table, and review capacity and fees. Holding and paying ships in Phase 2. Bars and the DJ booth are never bookable.",
+      "help.vip.book.body": "Choose a beta venue and night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable.",
       "cat.floqaiAlso": "You may also search for: Clubs or Lounges",
       "cat.floqaiGo": "Search",
       "cat.floqaiIn": "in {place}",
@@ -739,7 +739,6 @@
       "page.clubProfile.share": "Copy Link",
       "page.clubProfile.shop": "Shop",
       "page.clubProfile.shoutout": "Throw a ShoutOut",
-
       "app.directShoutoutUnavailable": "That venue isn't available for ShoutOuts right now. Search for another venue below.",
       "page.clubProfile.title": "Club Profile | FLOQR",
       "page.clubProfile.website": "Official Website",
@@ -1012,53 +1011,29 @@
       "nameShoutout.placeholder": "Name, @instagram or @mingl handle",
       "nameShoutout.hint": "Type a name or start an @handle — pick from the suggestions. The board adds the rest of the line.",
       "nameShoutout.required": "Enter a name or pick an @handle first.",
-
       "templatePreview.button": "Preview",
-
       "templatePreview.title": "Preview: {name}",
-
       "templatePreview.close": "Close",
-
       "templatePreview.note": "Sample text and pictures. Your ShoutOut shows your own words and photos.",
-
       "templateTags.title": "Template tags",
-
       "templateTags.body": "Add search tags to the templates offered at this venue so patrons find them faster.",
-
       "templateTags.search": "Search templates",
-
       "templateTags.roleAdministrator": "You are a Template Administrator here: you can add and remove tags.",
-
       "templateTags.roleManager": "You are a Template Manager here: you can add tags. Ask a Template Administrator or Club Admin to remove one.",
-
       "templateTags.remove": "Remove tag {tag}",
-
       "templateTags.builtIn": "FLOQR tags:",
-
       "templateTags.none": "No venue tags yet.",
-
       "templateTags.placeholder": "Add a tag, e.g. game night",
-
       "templateTags.add": "Add tag",
-
       "templateTags.noMatch": "No templates match.",
-
       "templateTags.saving": "Saving…",
-
       "templateTags.saved": "Tags saved.",
-
       "templateTags.denied": "You can't change that tag. Ask your Club Admin for the Template Administrator role.",
-
       "templateTags.tooMany": "A template can have up to 30 venue tags.",
-
       "templateTags.noVenue": "Open this page from Club Admin or your Inbox link so FLOQR knows the venue.",
-
       "templateTags.loading": "Loading templates…",
-
       "templateTags.noRole": "You don't have a template role at this venue. Ask your Club Admin for Manage Templates or Administer Templates.",
-
       "templateTags.loadFailed": "Templates could not be loaded. Refresh and try again.",
-
       "templateTags.openFromAdmin": "Manage template tags",
       "employees.title": "Employee / Worker Network",
       "employees.search": "Search workers / affiliates",
@@ -1289,9 +1264,7 @@
       "floqai.checkingAccess": "Checking what your account can see…",
       "floqai.scopePublic": "Showing public answers. Sign in to see answers for your account.",
       "portal.serviceMembers.statusAlreadyRequested": "You already sent a request to {clubs}. Remove that club and try again.",
-
       "rep.administerTemplates": "Administer Templates — Template Administrator: read, add and remove template tags",
-
       "rep.manageTemplates": "Manage Templates — Template Manager: read and add template tags",
       "nameShoutout.kind.ownMingl": "Your Mingl handle",
       "nameShoutout.kind.ownInstagram": "Your Instagram",
@@ -1321,7 +1294,62 @@
       "template.variantScopeMine": " - Mine",
       "master.translationOverrides": "Translation Overrides",
       "master.translationOverridesTitle": "Translation Overrides",
-      "master.translationOverridesHint": "Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs."
+      "master.translationOverridesHint": "Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs.",
+      "page.vip.chooseNight": "Night",
+      "page.vip.holdActive": "Hold active",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Release hold",
+      "page.vip.continueTerms": "Accept Terms & pay",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Terms & consent",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Back",
+      "page.vip.consentPay": "Pay deposit",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Venue",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Reservations",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "No VIP ReserV bookings yet.",
+      "portal.vipReservations.book": "Book another table",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     fr: {
       "ad.splash.body": "Votre ShoutOut est presque en direct.",
@@ -1536,7 +1564,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Tischreservierungen",
-      "page.vip.sub": "Wähle einen Abend, erkunde den Saalplan und reserviere einen Tisch. Beta — Anzahlungen und Live-Bestand kommen in Phase 2.",
+      "page.vip.sub": "Choisissez une soirée, réservez une table 30 minutes, acceptez les Conditions et payez l’acompte.",
       "page.vip.restoring": "FLOQR-Sitzung wird wiederhergestellt…",
       "page.vip.signInHint": "Melde dich über Suche / Mein Profil an, um VIP ReserV zu nutzen, oder mit Google, wenn dieses Tab noch keine Sitzung hat.",
       "page.vip.googleSignIn": "Mit Google anmelden",
@@ -1544,15 +1572,15 @@
       "page.vip.chooseVenue": "Location wählen",
       "page.vip.betaVenues": "Beta-Locations: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Saalplan",
-      "page.vip.mapDemo": "Demo-Farben (grün frei · amber gehalten · rot gebucht). Zum Zoomen kneifen oder scrollen.",
-      "page.vip.signedIn": "Angemeldet — wähle eine Location für den Saalplan.",
+      "page.vip.mapDemo": "Couleurs d’inventaire (vert libre · ambre tenu · rouge réservé). Pincez ou faites défiler pour zoomer.",
+      "page.vip.signedIn": "Connecté — choisissez un lieu et une soirée, puis une table verte.",
       "page.vip.needSignIn": "Melde dich an, um VIP ReserV-Saalpläne zu sehen.",
       "page.vip.mapLoaded": "Saalplan geladen. Tippe auf einen grünen Tisch für Details.",
       "page.vip.mapLoading": "Saalplan wird geladen…",
       "page.vip.aureliaPending": "Aurelias interaktive 3D-Demo liegt unter reports; die 2D-VIP ReserV-Karte folgt als Nächstes.",
       "page.vip.shellMissing": "Sitzungsmodul fehlt — bitte hart neu laden.",
       "help.vip.book.title": "VIP-Tisch buchen",
-      "help.vip.book.body": "Wähle eine Beta-Location, öffne den Saalplan, tippe auf einen grünen (freien) Tisch und prüfe Kapazität und Gebühren. Halten und Zahlen kommen in Phase 2. Bars und DJ-Booth sind nie buchbar.",
+      "help.vip.book.body": "Choisissez un lieu bêta et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez avec FloqR Stripe. Bars et DJ non réservables.",
       "cat.floqaiAlso": "Vous pouvez aussi rechercher : Boîtes de nuit ou Salons",
       "cat.floqaiGo": "Rechercher",
       "cat.floqaiIn": "à {place}",
@@ -1752,7 +1780,6 @@
       "page.clubProfile.share": "Copier le lien",
       "page.clubProfile.shop": "Boutique",
       "page.clubProfile.shoutout": "Lancer un ShoutOut",
-
       "app.directShoutoutUnavailable": "Ce lieu n'accepte pas de ShoutOut pour le moment. Recherchez un autre lieu ci-dessous.",
       "page.clubProfile.title": "Profil du club | FLOQR",
       "page.clubProfile.website": "Site officiel",
@@ -2025,53 +2052,29 @@
       "nameShoutout.placeholder": "Nom, @instagram ou @pseudo Mingl",
       "nameShoutout.hint": "Tapez un nom ou commencez un @pseudo — choisissez dans les suggestions. L’écran ajoute le reste de la phrase.",
       "nameShoutout.required": "Saisissez d’abord un nom ou choisissez un @pseudo.",
-
       "templatePreview.button": "Aperçu",
-
       "templatePreview.title": "Aperçu : {name}",
-
       "templatePreview.close": "Fermer",
-
       "templatePreview.note": "Texte et images d’exemple. Votre ShoutOut affiche vos propres mots et photos.",
-
       "templateTags.title": "Tags des modèles",
-
       "templateTags.body": "Ajoutez des tags de recherche aux modèles proposés dans ce lieu pour que les clients les trouvent plus vite.",
-
       "templateTags.search": "Rechercher des modèles",
-
       "templateTags.roleAdministrator": "Vous êtes Administrateur des modèles ici : vous pouvez ajouter et retirer des tags.",
-
       "templateTags.roleManager": "Vous êtes Gestionnaire des modèles ici : vous pouvez ajouter des tags. Demandez à un Administrateur des modèles ou au Club Admin d’en retirer un.",
-
       "templateTags.remove": "Retirer le tag {tag}",
-
       "templateTags.builtIn": "Tags FLOQR :",
-
       "templateTags.none": "Pas encore de tags du lieu.",
-
       "templateTags.placeholder": "Ajoutez un tag, ex. soirée match",
-
       "templateTags.add": "Ajouter le tag",
-
       "templateTags.noMatch": "Aucun modèle ne correspond.",
-
       "templateTags.saving": "Enregistrement…",
-
       "templateTags.saved": "Tags enregistrés.",
-
       "templateTags.denied": "Vous ne pouvez pas modifier ce tag. Demandez le rôle Administrateur des modèles à votre Club Admin.",
-
       "templateTags.tooMany": "Un modèle peut avoir jusqu’à 30 tags du lieu.",
-
       "templateTags.noVenue": "Ouvrez cette page depuis Club Admin ou le lien de votre boîte de réception pour que FLOQR connaisse le lieu.",
-
       "templateTags.loading": "Chargement des modèles…",
-
       "templateTags.noRole": "Vous n’avez pas de rôle sur les modèles dans ce lieu. Demandez Gérer les modèles ou Administrer les modèles à votre Club Admin.",
-
       "templateTags.loadFailed": "Impossible de charger les modèles. Actualisez et réessayez.",
-
       "templateTags.openFromAdmin": "Gérer les tags des modèles",
       "employees.title": "Réseau des employés et du personnel",
       "employees.search": "Rechercher du personnel / des affiliés",
@@ -2302,9 +2305,7 @@
       "floqai.checkingAccess": "Vérification de ce que votre compte peut voir…",
       "floqai.scopePublic": "Réponses publiques affichées. Connectez-vous pour voir les réponses de votre compte.",
       "portal.serviceMembers.statusAlreadyRequested": "Vous avez déjà envoyé une demande à {clubs}. Retirez ce club et réessayez.",
-
       "rep.administerTemplates": "Administrer les modèles — Administrateur des modèles : lire, ajouter et retirer des tags",
-
       "rep.manageTemplates": "Gérer les modèles — Gestionnaire des modèles : lire et ajouter des tags",
       "nameShoutout.kind.ownMingl": "Votre pseudo Mingl",
       "nameShoutout.kind.ownInstagram": "Votre Instagram",
@@ -2334,7 +2335,62 @@
       "template.variantScopeMine": " - Moi",
       "master.translationOverrides": "Remplacements de traduction",
       "master.translationOverridesTitle": "Remplacements de traduction",
-      "master.translationOverridesHint": "Les locuteurs natifs peuvent corriger ici les textes trop « IA ». Les remplacements s'appliquent à l'exécution jusqu'à promotion dans les packs."
+      "master.translationOverridesHint": "Les locuteurs natifs peuvent corriger ici les textes trop « IA ». Les remplacements s'appliquent à l'exécution jusqu'à promotion dans les packs.",
+      "page.vip.chooseNight": "Soirée",
+      "page.vip.holdActive": "Réservation temporaire active",
+      "page.vip.payToday": "Payer aujourd’hui",
+      "page.vip.releaseHold": "Libérer",
+      "page.vip.continueTerms": "Accepter les Conditions et payer",
+      "page.vip.holdExpired": "Votre réservation temporaire a expiré. Choisissez une autre table.",
+      "page.vip.holdReleased": "Réservation temporaire libérée.",
+      "page.vip.holding": "Réservation de la table…",
+      "page.vip.holdReady": "Table réservée 30 minutes. Acceptez les Conditions, puis payez l’acompte.",
+      "page.vip.holdFailed": "Impossible de réserver cette table.",
+      "page.vip.termsTitle": "Conditions et consentement",
+      "page.vip.termsSub": "Conditions bêta provisoires — le conseil publie les Conditions Live. Cases obligatoires avant l’acompte.",
+      "page.vip.checkTerms": "J’accepte les Conditions VIP ReserV / du lieu",
+      "page.vip.checkRefund": "Je comprends la politique de remboursement / annulation",
+      "page.vip.checkNoShow": "Je comprends la politique de non-présentation / acompte",
+      "page.vip.checkAge": "J’ai 21 ans ou plus et j’apporterai une pièce d’identité valide",
+      "page.vip.checkMinimum": "Je comprends le minimum de consommation / pourboire",
+      "page.vip.checkMarketing": "Optionnel : messages marketing du lieu",
+      "page.vip.consentCancel": "Retour",
+      "page.vip.consentPay": "Payer l’acompte",
+      "page.vip.consentRequired": "Cochez toutes les cases obligatoires avant de payer.",
+      "page.vip.recordingConsent": "Enregistrement du consentement…",
+      "page.vip.openingCheckout": "Ouverture du paiement…",
+      "page.vip.checkoutFailed": "Le paiement n’a pas pu démarrer.",
+      "page.vip.paidOk": "Acompte payé — table confirmée. Mon profil → Réservations pour le pass.",
+      "page.vip.paidCancel": "Paiement annulé. La réservation temporaire peut encore être active.",
+      "help.vip.terms.title": "Pourquoi accepter les Conditions",
+      "help.vip.terms.body": "Vous acceptez les Conditions du lieu, remboursement, no-show, 21+ avec ID et minimum. Consentement avant FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Porte",
+      "page.vipDoor.sub": "Enregistrez les tables confirmées ce soir. Conçu pour téléphone (VIP Manager).",
+      "page.vipDoor.restoring": "Restauration de votre session FLOQR…",
+      "page.vipDoor.signInHint": "Connectez-vous via Recherche / Profil / Club Admin, ou avec Google.",
+      "page.vipDoor.venue": "Lieu",
+      "page.vipDoor.refresh": "Actualiser ce soir",
+      "page.vipDoor.checkIn": "Enregistrement",
+      "page.vipDoor.passToken": "Jeton de pass",
+      "page.vipDoor.id21": "ID 21+ vérifiée",
+      "page.vipDoor.doCheckIn": "Enregistrer",
+      "page.vipDoor.listTitle": "Réservations de ce soir",
+      "page.vipDoor.loading": "Chargement des réservations…",
+      "page.vipDoor.empty": "Pas encore de réservations pour cette soirée.",
+      "page.vipDoor.ready": "Prêt.",
+      "page.vipDoor.checkedIn": "Enregistré.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marqué no-show.",
+      "page.vipDoor.needSignIn": "Connectez-vous pour utiliser VIP ReserV Door.",
+      "help.vip.door.title": "Enregistrement à la porte",
+      "help.vip.door.body": "Scannez ou saisissez le jeton, confirmez ID 21+, enregistrez. No-show seulement après grâce. Un lien notify ne change pas le statut.",
+      "nav.vipReservations": "Réservations",
+      "portal.vipReservations.sub": "Vos réservations VIP ReserV et acomptes confirmés. Pass après paiement.",
+      "portal.vipReservations.empty": "Pas encore de réservations VIP ReserV.",
+      "portal.vipReservations.book": "Réserver une autre table",
+      "help.vip.pass.title": "Pass porte",
+      "help.vip.pass.body": "Après confirmation de l’acompte, affichez le pass pour un jeton QR unique. Apportez une ID 21+."
     },
     de: {
       "ad.splash.body": "Dein ShoutOut ist fast live.",
@@ -2549,7 +2605,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Réservations de table",
-      "page.vip.sub": "Choisissez une soirée, explorez le plan et réservez une table. Bêta — dépôts et inventaire en direct en phase 2.",
+      "page.vip.sub": "Wähle einen Abend, halte einen Tisch 30 Minuten, akzeptiere die AGB und zahle die Anzahlung.",
       "page.vip.restoring": "Restauration de votre session FLOQR…",
       "page.vip.signInHint": "Connectez-vous via Recherche / Mon profil pour utiliser VIP ReserV, ou avec Google si cet onglet n’a pas encore de session.",
       "page.vip.googleSignIn": "Connexion Google",
@@ -2557,15 +2613,15 @@
       "page.vip.chooseVenue": "Choisir un lieu",
       "page.vip.betaVenues": "Lieux bêta : Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Plan de salle",
-      "page.vip.mapDemo": "Couleurs démo (vert dispo · ambre tenu · rouge réservé). Pincez ou faites défiler pour zoomer.",
-      "page.vip.signedIn": "Connecté — choisissez un lieu pour ouvrir son plan.",
+      "page.vip.mapDemo": "Live-Bestand (grün frei · amber gehalten · rot gebucht). Zum Zoomen kneifen oder scrollen.",
+      "page.vip.signedIn": "Angemeldet — Location und Abend wählen, dann grünen Tisch tippen.",
       "page.vip.needSignIn": "Connectez-vous pour explorer les plans VIP ReserV.",
       "page.vip.mapLoaded": "Plan chargé. Touchez une table verte pour les détails.",
       "page.vip.mapLoading": "Chargement du plan…",
       "page.vip.aureliaPending": "La démo 3D Aurelia est dans reports ; le plan 2D VIP ReserV arrive ensuite.",
       "page.vip.shellMissing": "Module de session manquant — actualisez en dur.",
       "help.vip.book.title": "Réserver une table VIP",
-      "help.vip.book.body": "Choisissez un lieu bêta, ouvrez le plan, touchez une table verte (disponible) et vérifiez capacité et frais. La retenue et le paiement arrivent en phase 2. Les bars et la cabine DJ ne sont jamais réservables.",
+      "help.vip.book.body": "Beta-Location und Abend wählen, grünen Tisch tippen, 30 Min halten, AGB akzeptieren, Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar.",
       "cat.floqaiAlso": "Du kannst auch suchen nach: Clubs oder Lounges",
       "cat.floqaiGo": "Suchen",
       "cat.floqaiIn": "in {place}",
@@ -2765,7 +2821,6 @@
       "page.clubProfile.share": "Link kopieren",
       "page.clubProfile.shop": "Shop",
       "page.clubProfile.shoutout": "Einen ShoutOut senden",
-
       "app.directShoutoutUnavailable": "Diese Location ist für ShoutOuts gerade nicht verfügbar. Suche unten nach einer anderen Location.",
       "page.clubProfile.title": "Clubprofil | FLOQR",
       "page.clubProfile.website": "Offizielle Website",
@@ -3038,53 +3093,29 @@
       "nameShoutout.placeholder": "Name, @instagram oder @Mingl-Handle",
       "nameShoutout.hint": "Gib einen Namen ein oder beginne ein @Handle — wähle aus den Vorschlägen. Die Anzeige ergänzt den Rest der Zeile.",
       "nameShoutout.required": "Gib zuerst einen Namen ein oder wähle ein @Handle.",
-
       "templatePreview.button": "Vorschau",
-
       "templatePreview.title": "Vorschau: {name}",
-
       "templatePreview.close": "Schließen",
-
       "templatePreview.note": "Beispieltext und -bilder. Dein ShoutOut zeigt deine eigenen Worte und Fotos.",
-
       "templateTags.title": "Vorlagen-Tags",
-
       "templateTags.body": "Füge den Vorlagen dieser Location Such-Tags hinzu, damit Gäste sie schneller finden.",
-
       "templateTags.search": "Vorlagen suchen",
-
       "templateTags.roleAdministrator": "Du bist hier Vorlagen-Administrator: Du kannst Tags hinzufügen und entfernen.",
-
       "templateTags.roleManager": "Du bist hier Vorlagen-Manager: Du kannst Tags hinzufügen. Bitte einen Vorlagen-Administrator oder Club Admin, einen Tag zu entfernen.",
-
       "templateTags.remove": "Tag {tag} entfernen",
-
       "templateTags.builtIn": "FLOQR-Tags:",
-
       "templateTags.none": "Noch keine Location-Tags.",
-
       "templateTags.placeholder": "Tag hinzufügen, z. B. Spieleabend",
-
       "templateTags.add": "Tag hinzufügen",
-
       "templateTags.noMatch": "Keine passenden Vorlagen.",
-
       "templateTags.saving": "Wird gespeichert…",
-
       "templateTags.saved": "Tags gespeichert.",
-
       "templateTags.denied": "Du kannst diesen Tag nicht ändern. Bitte deinen Club Admin um die Rolle Vorlagen-Administrator.",
-
       "templateTags.tooMany": "Eine Vorlage kann bis zu 30 Location-Tags haben.",
-
       "templateTags.noVenue": "Öffne diese Seite aus Club Admin oder über deinen Inbox-Link, damit FLOQR die Location kennt.",
-
       "templateTags.loading": "Vorlagen werden geladen…",
-
       "templateTags.noRole": "Du hast an dieser Location keine Vorlagen-Rolle. Bitte deinen Club Admin um Vorlagen verwalten oder Vorlagen administrieren.",
-
       "templateTags.loadFailed": "Vorlagen konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-
       "templateTags.openFromAdmin": "Vorlagen-Tags verwalten",
       "employees.title": "Mitarbeiter- und Personalnetzwerk",
       "employees.search": "Personal / Partner suchen",
@@ -3315,9 +3346,7 @@
       "floqai.checkingAccess": "Prüfe, was dein Konto sehen darf…",
       "floqai.scopePublic": "Öffentliche Antworten werden angezeigt. Melde dich an, um Antworten für dein Konto zu sehen.",
       "portal.serviceMembers.statusAlreadyRequested": "Du hast bereits eine Anfrage an {clubs} gesendet. Entferne diesen Club und versuche es erneut.",
-
       "rep.administerTemplates": "Vorlagen administrieren — Vorlagen-Administrator: Tags lesen, hinzufügen und entfernen",
-
       "rep.manageTemplates": "Vorlagen verwalten — Vorlagen-Manager: Tags lesen und hinzufügen",
       "nameShoutout.kind.ownMingl": "Dein Mingl-Handle",
       "nameShoutout.kind.ownInstagram": "Dein Instagram",
@@ -3347,7 +3376,62 @@
       "template.variantScopeMine": " - Meine",
       "master.translationOverrides": "Übersetzungs-Anpassungen",
       "master.translationOverridesTitle": "Übersetzungs-Anpassungen",
-      "master.translationOverridesHint": "Muttersprachler können hier künstlich klingende Texte korrigieren. Anpassungen gelten zur Laufzeit, bis sie in Sprachpakete übernommen werden."
+      "master.translationOverridesHint": "Muttersprachler können hier künstlich klingende Texte korrigieren. Anpassungen gelten zur Laufzeit, bis sie in Sprachpakete übernommen werden.",
+      "page.vip.chooseNight": "Abend",
+      "page.vip.holdActive": "Halt aktiv",
+      "page.vip.payToday": "Heute zahlen",
+      "page.vip.releaseHold": "Halt freigeben",
+      "page.vip.continueTerms": "AGB akzeptieren & zahlen",
+      "page.vip.holdExpired": "Dein Halt ist abgelaufen. Wähle erneut einen Tisch.",
+      "page.vip.holdReleased": "Halt freigegeben.",
+      "page.vip.holding": "Tisch wird gehalten…",
+      "page.vip.holdReady": "Tisch 30 Minuten gehalten. AGB akzeptieren, dann Anzahlung zahlen.",
+      "page.vip.holdFailed": "Tisch konnte nicht gehalten werden.",
+      "page.vip.termsTitle": "AGB & Einwilligung",
+      "page.vip.termsSub": "Beta-AGB-Platzhalter — Live-AGB veröffentlicht die Kanzlei. Pflichtkästchen vor der Anzahlung.",
+      "page.vip.checkTerms": "Ich akzeptiere die VIP ReserV- / Location-AGB",
+      "page.vip.checkRefund": "Ich verstehe die Rückerstattungs- / Stornoregeln",
+      "page.vip.checkNoShow": "Ich verstehe die No-Show- / Anzahlungsregeln",
+      "page.vip.checkAge": "Ich bin 21+ und bringe gültigen Ausweis mit",
+      "page.vip.checkMinimum": "Ich verstehe Mindestumsatz / Trinkgeld-Hinweis",
+      "page.vip.checkMarketing": "Optional: Marketing der Location",
+      "page.vip.consentCancel": "Zurück",
+      "page.vip.consentPay": "Anzahlung zahlen",
+      "page.vip.consentRequired": "Bitte alle Pflichtkästchen setzen.",
+      "page.vip.recordingConsent": "Einwilligung wird gespeichert…",
+      "page.vip.openingCheckout": "Checkout wird geöffnet…",
+      "page.vip.checkoutFailed": "Checkout konnte nicht starten.",
+      "page.vip.paidOk": "Anzahlung bezahlt — Tisch bestätigt. Mein Profil → Reservierungen für den Pass.",
+      "page.vip.paidCancel": "Checkout abgebrochen. Halt kann noch aktiv sein.",
+      "help.vip.terms.title": "Warum AGB akzeptieren",
+      "help.vip.terms.body": "Du akzeptierst Location-AGB, Rückerstattung, No-Show, 21+ mit Ausweis und Mindestumsatz. Einwilligung vor FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Tür",
+      "page.vipDoor.sub": "Bestätigte Tische heute einchecken. Phone-first für VIP Manager.",
+      "page.vipDoor.restoring": "FLOQR-Sitzung wird wiederhergestellt…",
+      "page.vipDoor.signInHint": "Melde dich über Suche / Profil / Club Admin an, oder mit Google.",
+      "page.vipDoor.venue": "Location",
+      "page.vipDoor.refresh": "Heute aktualisieren",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass-Token",
+      "page.vipDoor.id21": "Ausweis 21+ geprüft",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Reservierungen heute",
+      "page.vipDoor.loading": "Reservierungen werden geladen…",
+      "page.vipDoor.empty": "Noch keine Reservierungen für diesen Abend.",
+      "page.vipDoor.ready": "Bereit.",
+      "page.vipDoor.checkedIn": "Eingecheckt.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Als No-Show markiert.",
+      "page.vipDoor.needSignIn": "Melde dich an, um VIP ReserV Door zu nutzen.",
+      "help.vip.door.title": "Tür-Check-in",
+      "help.vip.door.body": "Pass-Token scannen oder eingeben, ID 21+ prüfen, Party einchecken. No-Show erst nach Grace. Notify-Links ändern den Status nicht.",
+      "nav.vipReservations": "Reservierungen",
+      "portal.vipReservations.sub": "Deine VIP ReserV-Holds und bestätigten Anzahlungen. Pass nach Zahlung.",
+      "portal.vipReservations.empty": "Noch keine VIP ReserV-Buchungen.",
+      "portal.vipReservations.book": "Weiteren Tisch buchen",
+      "help.vip.pass.title": "Tür-Pass",
+      "help.vip.pass.body": "Nach bestätigter Anzahlung Pass anzeigen für einmaligen QR-Token. Ausweis 21+ mitbringen."
     },
     es: {
       "ad.splash.body": "Tu ShoutOut casi está en vivo.",
@@ -3562,7 +3646,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Reservas de mesa",
-      "page.vip.sub": "Elige una noche, explora el plano y reserva una mesa. Beta — depósitos e inventario en vivo en la fase 2.",
+      "page.vip.sub": "Elige una noche, reserva una mesa 30 minutos, acepta los Términos y paga el depósito.",
       "page.vip.restoring": "Restaurando tu sesión FLOQR…",
       "page.vip.signInHint": "Inicia sesión en Buscar / Mi perfil para usar VIP ReserV, o con Google si esta pestaña aún no tiene sesión.",
       "page.vip.googleSignIn": "Iniciar con Google",
@@ -3570,15 +3654,15 @@
       "page.vip.chooseVenue": "Elegir local",
       "page.vip.betaVenues": "Locales beta: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Plano",
-      "page.vip.mapDemo": "Colores demo (verde libre · ámbar retenido · rojo reservado). Pellizca o desplázate para zoom.",
-      "page.vip.signedIn": "Sesión iniciada — elige un local para abrir su plano.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Sesión iniciada — elige local y noche, luego una mesa verde.",
       "page.vip.needSignIn": "Inicia sesión para explorar planos VIP ReserV.",
       "page.vip.mapLoaded": "Plano cargado. Toca una mesa verde para ver detalles.",
       "page.vip.mapLoading": "Cargando plano…",
       "page.vip.aureliaPending": "La demo 3D de Aurelia está en reports; el plano 2D VIP ReserV llega después.",
       "page.vip.shellMissing": "Falta el módulo de sesión — recarga forzada.",
       "help.vip.book.title": "Reservar mesa VIP",
-      "help.vip.book.body": "Elige un local beta, abre el plano, toca una mesa verde (disponible) y revisa capacidad y tarifas. La retención y el pago llegan en la fase 2. Las barras y la cabina DJ nunca se reservan.",
+      "help.vip.book.body": "Elige local beta y noche, toca mesa verde, reserva 30 min, acepta Términos y paga con FloqR Stripe. Barras y DJ no reservables.",
       "cat.floqaiAlso": "También puedes buscar: Clubs o Lounges",
       "cat.floqaiGo": "Buscar",
       "cat.floqaiIn": "en {place}",
@@ -3778,7 +3862,6 @@
       "page.clubProfile.share": "Copiar enlace",
       "page.clubProfile.shop": "Tienda",
       "page.clubProfile.shoutout": "Enviar un ShoutOut",
-
       "app.directShoutoutUnavailable": "Ese local no está disponible para ShoutOuts en este momento. Busca otro local abajo.",
       "page.clubProfile.title": "Perfil del club | FLOQR",
       "page.clubProfile.website": "Sitio web oficial",
@@ -4051,53 +4134,29 @@
       "nameShoutout.placeholder": "Nombre, @instagram o @usuario de Mingl",
       "nameShoutout.hint": "Escribe un nombre o empieza un @usuario — elige de las sugerencias. La pantalla añade el resto de la frase.",
       "nameShoutout.required": "Primero escribe un nombre o elige un @usuario.",
-
       "templatePreview.button": "Vista previa",
-
       "templatePreview.title": "Vista previa: {name}",
-
       "templatePreview.close": "Cerrar",
-
       "templatePreview.note": "Texto e imágenes de ejemplo. Tu ShoutOut muestra tus propias palabras y fotos.",
-
       "templateTags.title": "Etiquetas de plantillas",
-
       "templateTags.body": "Añade etiquetas de búsqueda a las plantillas de este local para que los clientes las encuentren más rápido.",
-
       "templateTags.search": "Buscar plantillas",
-
       "templateTags.roleAdministrator": "Aquí eres Administrador de plantillas: puedes añadir y quitar etiquetas.",
-
       "templateTags.roleManager": "Aquí eres Gestor de plantillas: puedes añadir etiquetas. Pide a un Administrador de plantillas o al Club Admin que quite una.",
-
       "templateTags.remove": "Quitar la etiqueta {tag}",
-
       "templateTags.builtIn": "Etiquetas de FLOQR:",
-
       "templateTags.none": "Aún no hay etiquetas del local.",
-
       "templateTags.placeholder": "Añade una etiqueta, p. ej. noche de partido",
-
       "templateTags.add": "Añadir etiqueta",
-
       "templateTags.noMatch": "Ninguna plantilla coincide.",
-
       "templateTags.saving": "Guardando…",
-
       "templateTags.saved": "Etiquetas guardadas.",
-
       "templateTags.denied": "No puedes cambiar esa etiqueta. Pide a tu Club Admin el rol de Administrador de plantillas.",
-
       "templateTags.tooMany": "Una plantilla puede tener hasta 30 etiquetas del local.",
-
       "templateTags.noVenue": "Abre esta página desde Club Admin o el enlace de tu bandeja de entrada para que FLOQR sepa cuál es el local.",
-
       "templateTags.loading": "Cargando plantillas…",
-
       "templateTags.noRole": "No tienes un rol de plantillas en este local. Pide a tu Club Admin Gestionar plantillas o Administrar plantillas.",
-
       "templateTags.loadFailed": "No se pudieron cargar las plantillas. Actualiza e inténtalo de nuevo.",
-
       "templateTags.openFromAdmin": "Gestionar etiquetas de plantillas",
       "employees.title": "Red de empleados y personal",
       "employees.search": "Buscar personal / afiliados",
@@ -4328,9 +4387,7 @@
       "floqai.checkingAccess": "Comprobando lo que tu cuenta puede ver…",
       "floqai.scopePublic": "Mostrando respuestas públicas. Inicia sesión para ver las respuestas de tu cuenta.",
       "portal.serviceMembers.statusAlreadyRequested": "Ya enviaste una solicitud a {clubs}. Quita ese club e inténtalo de nuevo.",
-
       "rep.administerTemplates": "Administrar plantillas — Administrador de plantillas: leer, añadir y quitar etiquetas",
-
       "rep.manageTemplates": "Gestionar plantillas — Gestor de plantillas: leer y añadir etiquetas",
       "nameShoutout.kind.ownMingl": "Tu usuario de Mingl",
       "nameShoutout.kind.ownInstagram": "Tu Instagram",
@@ -4360,7 +4417,62 @@
       "template.variantScopeMine": " - Mío",
       "master.translationOverrides": "Anulaciones de traducción",
       "master.translationOverridesTitle": "Anulaciones de traducción",
-      "master.translationOverridesHint": "Los hablantes nativos pueden corregir aquí textos con sonido artificial. Las anulaciones se aplican en tiempo de ejecución hasta promoverlas a los paquetes."
+      "master.translationOverridesHint": "Los hablantes nativos pueden corregir aquí textos con sonido artificial. Las anulaciones se aplican en tiempo de ejecución hasta promoverlas a los paquetes.",
+      "page.vip.chooseNight": "Noche",
+      "page.vip.holdActive": "Reserva temporal activa",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Liberar",
+      "page.vip.continueTerms": "Aceptar términos y pagar",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Términos y consentimiento",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Volver",
+      "page.vip.consentPay": "Pagar depósito",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Local",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Reservas",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Aún no hay reservas VIP ReserV.",
+      "portal.vipReservations.book": "Reservar otra mesa",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     nl: {
       "ad.splash.body": "Je ShoutOut is bijna live.",
@@ -4575,7 +4687,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Prenotazioni tavolo",
-      "page.vip.sub": "Scegli una sera, esplora la mappa e prenota un tavolo. Beta — depositi e inventario live in fase 2.",
+      "page.vip.sub": "Kies een avond, houd een tafel 30 minuten, accepteer de voorwaarden en betaal de borg.",
       "page.vip.restoring": "Ripristino della sessione FLOQR…",
       "page.vip.signInHint": "Accedi da Cerca / Il mio profilo per usare VIP ReserV, o con Google se questa scheda non ha ancora una sessione.",
       "page.vip.googleSignIn": "Accedi con Google",
@@ -4583,15 +4695,15 @@
       "page.vip.chooseVenue": "Scegli un locale",
       "page.vip.betaVenues": "Locali beta: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Pianta",
-      "page.vip.mapDemo": "Colori demo (verde libero · ambra trattenuto · rosso prenotato). Pizzica o scorri per lo zoom.",
-      "page.vip.signedIn": "Accesso effettuato — scegli un locale per aprire la pianta.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Ingelogd — kies locatie en avond, tik daarna een groene tafel.",
       "page.vip.needSignIn": "Accedi per esplorare le piante VIP ReserV.",
       "page.vip.mapLoaded": "Pianta caricata. Tocca un tavolo verde per i dettagli.",
       "page.vip.mapLoading": "Caricamento pianta…",
       "page.vip.aureliaPending": "La demo 3D Aurelia è in reports; la mappa 2D VIP ReserV arriva dopo.",
       "page.vip.shellMissing": "Modulo sessione mancante — aggiorna con hard refresh.",
       "help.vip.book.title": "Prenota un tavolo VIP",
-      "help.vip.book.body": "Scegli un locale beta, apri la pianta, tocca un tavolo verde (disponibile) e controlla capienza e tariffe. Blocco e pagamento arrivano in fase 2. Bar e cabina DJ non sono mai prenotabili.",
+      "help.vip.book.body": "Kies beta-locatie en avond, tik groene tafel, houd 30 min, accepteer voorwaarden en betaal met FloqR Stripe. Bars en DJ niet boekbaar.",
       "cat.floqaiAlso": "Je kunt ook zoeken naar: Clubs of Lounges",
       "cat.floqaiGo": "Zoeken",
       "cat.floqaiIn": "in {place}",
@@ -4791,7 +4903,6 @@
       "page.clubProfile.share": "Link kopiëren",
       "page.clubProfile.shop": "Winkel",
       "page.clubProfile.shoutout": "Een ShoutOut sturen",
-
       "app.directShoutoutUnavailable": "Deze locatie is nu niet beschikbaar voor ShoutOuts. Zoek hieronder een andere locatie.",
       "page.clubProfile.title": "Clubprofiel | FLOQR",
       "page.clubProfile.website": "Officiële website",
@@ -5064,53 +5175,29 @@
       "nameShoutout.placeholder": "Naam, @instagram of @Mingl-handle",
       "nameShoutout.hint": "Typ een naam of begin een @handle — kies uit de suggesties. Het scherm vult de rest van de zin aan.",
       "nameShoutout.required": "Vul eerst een naam in of kies een @handle.",
-
       "templatePreview.button": "Voorbeeld",
-
       "templatePreview.title": "Voorbeeld: {name}",
-
       "templatePreview.close": "Sluiten",
-
       "templatePreview.note": "Voorbeeldtekst en -beelden. Je ShoutOut toont je eigen woorden en foto’s.",
-
       "templateTags.title": "Sjabloontags",
-
       "templateTags.body": "Voeg zoektags toe aan de sjablonen van deze locatie, zodat gasten ze sneller vinden.",
-
       "templateTags.search": "Sjablonen zoeken",
-
       "templateTags.roleAdministrator": "Je bent hier Sjabloonbeheerder: je kunt tags toevoegen en verwijderen.",
-
       "templateTags.roleManager": "Je bent hier Sjabloonmanager: je kunt tags toevoegen. Vraag een Sjabloonbeheerder of Club Admin om er een te verwijderen.",
-
       "templateTags.remove": "Tag {tag} verwijderen",
-
       "templateTags.builtIn": "FLOQR-tags:",
-
       "templateTags.none": "Nog geen locatietags.",
-
       "templateTags.placeholder": "Voeg een tag toe, bijv. wedstrijdavond",
-
       "templateTags.add": "Tag toevoegen",
-
       "templateTags.noMatch": "Geen sjablonen gevonden.",
-
       "templateTags.saving": "Opslaan…",
-
       "templateTags.saved": "Tags opgeslagen.",
-
       "templateTags.denied": "Je kunt die tag niet wijzigen. Vraag je Club Admin om de rol Sjabloonbeheerder.",
-
       "templateTags.tooMany": "Een sjabloon kan maximaal 30 locatietags hebben.",
-
       "templateTags.noVenue": "Open deze pagina vanuit Club Admin of via je Inbox-link, zodat FLOQR de locatie kent.",
-
       "templateTags.loading": "Sjablonen laden…",
-
       "templateTags.noRole": "Je hebt geen sjabloonrol op deze locatie. Vraag je Club Admin om Sjablonen beheren of Sjablonen administreren.",
-
       "templateTags.loadFailed": "Sjablonen konden niet worden geladen. Vernieuw en probeer opnieuw.",
-
       "templateTags.openFromAdmin": "Sjabloontags beheren",
       "employees.title": "Netwerk van medewerkers en personeel",
       "employees.search": "Personeel / partners zoeken",
@@ -5341,9 +5428,7 @@
       "floqai.checkingAccess": "Controleren wat je account mag zien…",
       "floqai.scopePublic": "Openbare antwoorden worden getoond. Log in om antwoorden voor je account te zien.",
       "portal.serviceMembers.statusAlreadyRequested": "Je hebt al een verzoek gestuurd naar {clubs}. Verwijder die club en probeer het opnieuw.",
-
       "rep.administerTemplates": "Sjablonen administreren — Sjabloonbeheerder: tags lezen, toevoegen en verwijderen",
-
       "rep.manageTemplates": "Sjablonen beheren — Sjabloonmanager: tags lezen en toevoegen",
       "nameShoutout.kind.ownMingl": "Jouw Mingl-handle",
       "nameShoutout.kind.ownInstagram": "Jouw Instagram",
@@ -5373,7 +5458,62 @@
       "template.variantScopeMine": " - Mijn",
       "master.translationOverrides": "Vertaling overrides",
       "master.translationOverridesTitle": "Vertaling overrides",
-      "master.translationOverridesHint": "Moedertaalsprekers kunnen hier AI-achtige teksten corrigeren. Overrides gelden tijdens runtime tot ze in taalpakketten staan."
+      "master.translationOverridesHint": "Moedertaalsprekers kunnen hier AI-achtige teksten corrigeren. Overrides gelden tijdens runtime tot ze in taalpakketten staan.",
+      "page.vip.chooseNight": "Avond",
+      "page.vip.holdActive": "Hold actief",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Vrijgeven",
+      "page.vip.continueTerms": "Voorwaarden accepteren en betalen",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Voorwaarden en toestemming",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Terug",
+      "page.vip.consentPay": "Borg betalen",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Locatie",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Reserveringen",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Nog geen VIP ReserV-boekingen.",
+      "portal.vipReservations.book": "Nog een tafel boeken",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     ru: {
       "ad.splash.body": "Ваш ShoutOut почти в эфире.",
@@ -5588,7 +5728,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Reservas de mesa",
-      "page.vip.sub": "Escolha uma noite, explore o mapa e reserve uma mesa. Beta — depósitos e inventário ao vivo na fase 2.",
+      "page.vip.sub": "Выберите вечер, удержите стол на 30 минут, примите условия и оплатите депозит.",
       "page.vip.restoring": "A restaurar a sua sessão FLOQR…",
       "page.vip.signInHint": "Inicie sessão em Pesquisa / O meu perfil para usar VIP ReserV, ou com Google se este separador ainda não tiver sessão.",
       "page.vip.googleSignIn": "Iniciar sessão com Google",
@@ -5596,15 +5736,15 @@
       "page.vip.chooseVenue": "Escolher local",
       "page.vip.betaVenues": "Locais beta: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Mapa do piso",
-      "page.vip.mapDemo": "Cores demo (verde disponível · âmbar retido · vermelho reservado). Pinça ou desliza para zoom.",
-      "page.vip.signedIn": "Sessão iniciada — escolha um local para abrir o mapa.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Вход выполнен — выберите площадку и вечер, затем зелёный стол.",
       "page.vip.needSignIn": "Inicie sessão para explorar mapas VIP ReserV.",
       "page.vip.mapLoaded": "Mapa carregado. Toque numa mesa verde para detalhes.",
       "page.vip.mapLoading": "A carregar mapa…",
       "page.vip.aureliaPending": "A demo 3D da Aurelia está em reports; o mapa 2D VIP ReserV vem a seguir.",
       "page.vip.shellMissing": "Módulo de sessão em falta — atualize com hard refresh.",
       "help.vip.book.title": "Reservar mesa VIP",
-      "help.vip.book.body": "Escolha um local beta, abra o mapa, toque numa mesa verde (disponível) e reveja capacidade e taxas. Retenção e pagamento chegam na fase 2. Barras e cabine DJ nunca são reserváveis.",
+      "help.vip.book.body": "Выберите бета-площадку и вечер, нажмите зелёный стол, удержите 30 мин, примите условия и оплатите через FloqR Stripe. Бар и DJ не бронируются.",
       "cat.floqaiAlso": "Также можно искать: Клубы или Лаунжи",
       "cat.floqaiGo": "Искать",
       "cat.floqaiIn": "в {place}",
@@ -5804,7 +5944,6 @@
       "page.clubProfile.share": "Копировать ссылку",
       "page.clubProfile.shop": "Магазин",
       "page.clubProfile.shoutout": "Отправить ShoutOut",
-
       "app.directShoutoutUnavailable": "Это заведение сейчас не принимает ShoutOut. Найдите другое заведение ниже.",
       "page.clubProfile.title": "Профиль клуба | FLOQR",
       "page.clubProfile.website": "Официальный сайт",
@@ -6077,53 +6216,29 @@
       "nameShoutout.placeholder": "Имя, @instagram или @ник в Mingl",
       "nameShoutout.hint": "Введите имя или начните @ник — выберите из подсказок. Экран допишет остальную часть фразы.",
       "nameShoutout.required": "Сначала введите имя или выберите @ник.",
-
       "templatePreview.button": "Предпросмотр",
-
       "templatePreview.title": "Предпросмотр: {name}",
-
       "templatePreview.close": "Закрыть",
-
       "templatePreview.note": "Пример текста и картинок. Ваш ShoutOut покажет ваши собственные слова и фото.",
-
       "templateTags.title": "Теги шаблонов",
-
       "templateTags.body": "Добавьте поисковые теги к шаблонам этой площадки, чтобы гости находили их быстрее.",
-
       "templateTags.search": "Поиск шаблонов",
-
       "templateTags.roleAdministrator": "Здесь вы администратор шаблонов: можете добавлять и удалять теги.",
-
       "templateTags.roleManager": "Здесь вы менеджер шаблонов: можете добавлять теги. Чтобы удалить тег, обратитесь к администратору шаблонов или Club Admin.",
-
       "templateTags.remove": "Удалить тег {tag}",
-
       "templateTags.builtIn": "Теги FLOQR:",
-
       "templateTags.none": "Тегов площадки пока нет.",
-
       "templateTags.placeholder": "Добавьте тег, например вечер матча",
-
       "templateTags.add": "Добавить тег",
-
       "templateTags.noMatch": "Подходящих шаблонов нет.",
-
       "templateTags.saving": "Сохранение…",
-
       "templateTags.saved": "Теги сохранены.",
-
       "templateTags.denied": "Вы не можете изменить этот тег. Попросите у Club Admin роль администратора шаблонов.",
-
       "templateTags.tooMany": "У шаблона может быть до 30 тегов площадки.",
-
       "templateTags.noVenue": "Откройте эту страницу из Club Admin или по ссылке во входящих, чтобы FLOQR знал площадку.",
-
       "templateTags.loading": "Загрузка шаблонов…",
-
       "templateTags.noRole": "У вас нет роли для шаблонов на этой площадке. Попросите у Club Admin «Управление шаблонами» или «Администрирование шаблонов».",
-
       "templateTags.loadFailed": "Не удалось загрузить шаблоны. Обновите страницу и попробуйте снова.",
-
       "templateTags.openFromAdmin": "Управлять тегами шаблонов",
       "employees.title": "Сеть сотрудников и персонала",
       "employees.search": "Поиск персонала / партнёров",
@@ -6354,9 +6469,7 @@
       "floqai.checkingAccess": "Проверяем, что доступно вашему аккаунту…",
       "floqai.scopePublic": "Показаны общедоступные ответы. Войдите, чтобы увидеть ответы для своего аккаунта.",
       "portal.serviceMembers.statusAlreadyRequested": "Вы уже отправили заявку в {clubs}. Уберите этот клуб и попробуйте снова.",
-
       "rep.administerTemplates": "Администрирование шаблонов — администратор шаблонов: читать, добавлять и удалять теги",
-
       "rep.manageTemplates": "Управление шаблонами — менеджер шаблонов: читать и добавлять теги",
       "nameShoutout.kind.ownMingl": "Ваш ник в Mingl",
       "nameShoutout.kind.ownInstagram": "Ваш Instagram",
@@ -6386,7 +6499,62 @@
       "template.variantScopeMine": " — Мои",
       "master.translationOverrides": "Переопределения перевода",
       "master.translationOverridesTitle": "Переопределения перевода",
-      "master.translationOverridesHint": "Носители языка могут исправить «нейросетевой» текст. Переопределения действуют до переноса в языковые пакеты."
+      "master.translationOverridesHint": "Носители языка могут исправить «нейросетевой» текст. Переопределения действуют до переноса в языковые пакеты.",
+      "page.vip.chooseNight": "Вечер",
+      "page.vip.holdActive": "Холд активен",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Освободить",
+      "page.vip.continueTerms": "Принять условия и оплатить",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Условия и согласие",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Назад",
+      "page.vip.consentPay": "Оплатить депозит",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Площадка",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Бронирования",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Пока нет бронирований VIP ReserV.",
+      "portal.vipReservations.book": "Забронировать ещё стол",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     it: {
       "ad.splash.body": "Il tuo ShoutOut è quasi live.",
@@ -6601,7 +6769,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Бронирование столов",
-      "page.vip.sub": "Выберите вечер, изучите план зала и забронируйте стол. Бета — депозиты и живой инвентарь в фазе 2.",
+      "page.vip.sub": "Scegli una serata, tieni un tavolo 30 minuti, accetta i Termini e paga il deposito.",
       "page.vip.restoring": "Восстановление сеанса FLOQR…",
       "page.vip.signInHint": "Войдите через Поиск / Мой профиль, чтобы использовать VIP ReserV, или через Google, если в этой вкладке ещё нет сеанса.",
       "page.vip.googleSignIn": "Вход через Google",
@@ -6609,15 +6777,15 @@
       "page.vip.chooseVenue": "Выберите заведение",
       "page.vip.betaVenues": "Бета-заведения: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "План зала",
-      "page.vip.mapDemo": "Демо-цвета (зелёный свободен · янтарный удержан · красный занят). Сведите пальцы или прокрутите для масштаба.",
-      "page.vip.signedIn": "Вы вошли — выберите заведение, чтобы открыть план.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Accesso effettuato — scegli locale e serata, poi un tavolo verde.",
       "page.vip.needSignIn": "Войдите, чтобы смотреть планы VIP ReserV.",
       "page.vip.mapLoaded": "План загружен. Нажмите зелёный стол для деталей.",
       "page.vip.mapLoading": "Загрузка плана…",
       "page.vip.aureliaPending": "Интерактивная 3D-демо Aurelia в reports; 2D-карта VIP ReserV будет следующей.",
       "page.vip.shellMissing": "Нет модуля сеанса — сделайте жёсткое обновление.",
       "help.vip.book.title": "Забронировать VIP-стол",
-      "help.vip.book.body": "Выберите бета-заведение, откройте план, нажмите зелёный (свободный) стол и проверьте вместимость и сборы. Удержание и оплата — в фазе 2. Бары и DJ-пульт никогда не бронируются.",
+      "help.vip.book.body": "Scegli locale beta e serata, tocca tavolo verde, tieni 30 min, accetta Termini e paga con FloqR Stripe. Bar e DJ non prenotabili.",
       "cat.floqaiAlso": "Puoi anche cercare: Club o Salotti",
       "cat.floqaiGo": "Cerca",
       "cat.floqaiIn": "a {place}",
@@ -6817,7 +6985,6 @@
       "page.clubProfile.share": "Copia collegamento",
       "page.clubProfile.shop": "Negozio",
       "page.clubProfile.shoutout": "Lancia un ShoutOut",
-
       "app.directShoutoutUnavailable": "Questo locale non è disponibile per gli ShoutOut in questo momento. Cerca un altro locale qui sotto.",
       "page.clubProfile.title": "Profilo del club | FLOQR",
       "page.clubProfile.website": "Sito ufficiale",
@@ -7090,53 +7257,29 @@
       "nameShoutout.placeholder": "Nome, @instagram o @handle Mingl",
       "nameShoutout.hint": "Scrivi un nome o inizia un @handle — scegli dai suggerimenti. Lo schermo aggiunge il resto della frase.",
       "nameShoutout.required": "Inserisci prima un nome o scegli un @handle.",
-
       "templatePreview.button": "Anteprima",
-
       "templatePreview.title": "Anteprima: {name}",
-
       "templatePreview.close": "Chiudi",
-
       "templatePreview.note": "Testo e immagini di esempio. Il tuo ShoutOut mostra le tue parole e le tue foto.",
-
       "templateTags.title": "Tag dei modelli",
-
       "templateTags.body": "Aggiungi tag di ricerca ai modelli offerti in questo locale, così i clienti li trovano più in fretta.",
-
       "templateTags.search": "Cerca modelli",
-
       "templateTags.roleAdministrator": "Qui sei Amministratore dei modelli: puoi aggiungere e rimuovere tag.",
-
       "templateTags.roleManager": "Qui sei Gestore dei modelli: puoi aggiungere tag. Chiedi a un Amministratore dei modelli o al Club Admin di rimuoverne uno.",
-
       "templateTags.remove": "Rimuovi il tag {tag}",
-
       "templateTags.builtIn": "Tag FLOQR:",
-
       "templateTags.none": "Ancora nessun tag del locale.",
-
       "templateTags.placeholder": "Aggiungi un tag, es. serata partita",
-
       "templateTags.add": "Aggiungi tag",
-
       "templateTags.noMatch": "Nessun modello corrisponde.",
-
       "templateTags.saving": "Salvataggio…",
-
       "templateTags.saved": "Tag salvati.",
-
       "templateTags.denied": "Non puoi modificare quel tag. Chiedi al tuo Club Admin il ruolo di Amministratore dei modelli.",
-
       "templateTags.tooMany": "Un modello può avere fino a 30 tag del locale.",
-
       "templateTags.noVenue": "Apri questa pagina da Club Admin o dal link nella tua Inbox, così FLOQR sa qual è il locale.",
-
       "templateTags.loading": "Caricamento modelli…",
-
       "templateTags.noRole": "Non hai un ruolo sui modelli in questo locale. Chiedi al tuo Club Admin Gestire i modelli o Amministrare i modelli.",
-
       "templateTags.loadFailed": "Impossibile caricare i modelli. Aggiorna e riprova.",
-
       "templateTags.openFromAdmin": "Gestisci i tag dei modelli",
       "employees.title": "Rete di dipendenti e personale",
       "employees.search": "Cerca personale / affiliati",
@@ -7367,9 +7510,7 @@
       "floqai.checkingAccess": "Verifica di ciò che il tuo account può vedere…",
       "floqai.scopePublic": "Mostro le risposte pubbliche. Accedi per vedere le risposte per il tuo account.",
       "portal.serviceMembers.statusAlreadyRequested": "Hai già inviato una richiesta a {clubs}. Rimuovi quel club e riprova.",
-
       "rep.administerTemplates": "Amministrare i modelli — Amministratore dei modelli: leggere, aggiungere e rimuovere tag",
-
       "rep.manageTemplates": "Gestire i modelli — Gestore dei modelli: leggere e aggiungere tag",
       "nameShoutout.kind.ownMingl": "Il tuo handle Mingl",
       "nameShoutout.kind.ownInstagram": "Il tuo Instagram",
@@ -7399,7 +7540,62 @@
       "template.variantScopeMine": " - Mio",
       "master.translationOverrides": "Override traduzione",
       "master.translationOverridesTitle": "Override traduzione",
-      "master.translationOverridesHint": "I madrelingua possono correggere qui testi dall'aspetto artificiale. Gli override valgono a runtime finché non finiscono nei pack."
+      "master.translationOverridesHint": "I madrelingua possono correggere qui testi dall'aspetto artificiale. Gli override valgono a runtime finché non finiscono nei pack.",
+      "page.vip.chooseNight": "Serata",
+      "page.vip.holdActive": "Hold attivo",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Rilascia",
+      "page.vip.continueTerms": "Accetta termini e paga",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Termini e consenso",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Indietro",
+      "page.vip.consentPay": "Paga deposito",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Locale",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Prenotazioni",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Nessuna prenotazione VIP ReserV.",
+      "portal.vipReservations.book": "Prenota un altro tavolo",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     pt: {
       "ad.splash.body": "O seu ShoutOut está quase ao vivo.",
@@ -7614,7 +7810,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Κρατήσεις τραπεζιού",
-      "page.vip.sub": "Επιλέξτε βράδυ, εξερευνήστε το σχέδιο και κλείστε τραπέζι. Beta — προκαταβολές και ζωντανό απόθεμα στη φάση 2.",
+      "page.vip.sub": "Escolha uma noite, segure uma mesa por 30 minutos, aceite os Termos e pague o depósito.",
       "page.vip.restoring": "Επαναφορά συνεδρίας FLOQR…",
       "page.vip.signInHint": "Συνδεθείτε από Αναζήτηση / Το προφίλ μου για VIP ReserV, ή με Google αν αυτή η καρτέλα δεν έχει ακόμη συνεδρία.",
       "page.vip.googleSignIn": "Σύνδεση με Google",
@@ -7622,15 +7818,15 @@
       "page.vip.chooseVenue": "Επιλογή χώρου",
       "page.vip.betaVenues": "Χώροι beta: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Κάτοψη",
-      "page.vip.mapDemo": "Χρώματα demo (πράσινο διαθέσιμο · κεχριμπαρί κράτηση · κόκκινο κλεισμένο). Τσιμπήστε ή κυλήστε για ζουμ.",
-      "page.vip.signedIn": "Συνδεθήκατε — επιλέξτε χώρο για την κάτοψη.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Sessão iniciada — escolha local e noite, depois uma mesa verde.",
       "page.vip.needSignIn": "Συνδεθείτε για να δείτε κατόψεις VIP ReserV.",
       "page.vip.mapLoaded": "Η κάτοψη φορτώθηκε. Πατήστε πράσινο τραπέζι για λεπτομέρειες.",
       "page.vip.mapLoading": "Φόρτωση κάτοψης…",
       "page.vip.aureliaPending": "Το 3D demo της Aurelia είναι στα reports· η κάτοψη 2D VIP ReserV έρχεται μετά.",
       "page.vip.shellMissing": "Λείπει το module συνεδρίας — κάντε hard refresh.",
       "help.vip.book.title": "Κράτηση VIP τραπεζιού",
-      "help.vip.book.body": "Επιλέξτε χώρο beta, ανοίξτε την κάτοψη, πατήστε πράσινο (διαθέσιμο) τραπέζι και δείτε χωρητικότητα και χρεώσεις. Κράτηση και πληρωμή στη φάση 2. Μπαρ και DJ booth δεν κλείνονται ποτέ.",
+      "help.vip.book.body": "Escolha local beta e noite, toque mesa verde, segure 30 min, aceite Termos e pague com FloqR Stripe. Barras e DJ não reserváveis.",
       "cat.floqaiAlso": "Você também pode pesquisar: Clubes ou Lounges",
       "cat.floqaiGo": "Pesquisar",
       "cat.floqaiIn": "em {place}",
@@ -7830,7 +8026,6 @@
       "page.clubProfile.share": "Copiar link",
       "page.clubProfile.shop": "Loja",
       "page.clubProfile.shoutout": "Jogar um ShoutOut",
-
       "app.directShoutoutUnavailable": "Este local não está disponível para ShoutOuts neste momento. Pesquise outro local abaixo.",
       "page.clubProfile.title": "Perfil do Clube | FLOQR",
       "page.clubProfile.website": "Website oficial",
@@ -8103,53 +8298,29 @@
       "nameShoutout.placeholder": "Nome, @instagram ou @usuário do Mingl",
       "nameShoutout.hint": "Digite um nome ou comece um @usuário — escolha nas sugestões. O painel completa o resto da frase.",
       "nameShoutout.required": "Digite um nome ou escolha um @usuário primeiro.",
-
       "templatePreview.button": "Pré-visualizar",
-
       "templatePreview.title": "Pré-visualização: {name}",
-
       "templatePreview.close": "Fechar",
-
       "templatePreview.note": "Texto e imagens de exemplo. Seu ShoutOut mostra suas próprias palavras e fotos.",
-
       "templateTags.title": "Tags de modelos",
-
       "templateTags.body": "Adicione tags de busca aos modelos oferecidos neste local para que os clientes os encontrem mais rápido.",
-
       "templateTags.search": "Buscar modelos",
-
       "templateTags.roleAdministrator": "Aqui você é Administrador de modelos: pode adicionar e remover tags.",
-
       "templateTags.roleManager": "Aqui você é Gestor de modelos: pode adicionar tags. Peça a um Administrador de modelos ou ao Club Admin para remover uma.",
-
       "templateTags.remove": "Remover a tag {tag}",
-
       "templateTags.builtIn": "Tags da FLOQR:",
-
       "templateTags.none": "Ainda não há tags do local.",
-
       "templateTags.placeholder": "Adicione uma tag, ex. noite de jogo",
-
       "templateTags.add": "Adicionar tag",
-
       "templateTags.noMatch": "Nenhum modelo corresponde.",
-
       "templateTags.saving": "Salvando…",
-
       "templateTags.saved": "Tags salvas.",
-
       "templateTags.denied": "Você não pode alterar essa tag. Peça ao seu Club Admin o papel de Administrador de modelos.",
-
       "templateTags.tooMany": "Um modelo pode ter até 30 tags do local.",
-
       "templateTags.noVenue": "Abra esta página pelo Club Admin ou pelo link da sua caixa de entrada para que a FLOQR saiba qual é o local.",
-
       "templateTags.loading": "Carregando modelos…",
-
       "templateTags.noRole": "Você não tem um papel de modelos neste local. Peça ao seu Club Admin Gerenciar modelos ou Administrar modelos.",
-
       "templateTags.loadFailed": "Não foi possível carregar os modelos. Atualize e tente de novo.",
-
       "templateTags.openFromAdmin": "Gerenciar tags de modelos",
       "employees.title": "Rede de funcionários e equipe",
       "employees.search": "Buscar equipe / afiliados",
@@ -8380,9 +8551,7 @@
       "floqai.checkingAccess": "Verificando o que sua conta pode ver…",
       "floqai.scopePublic": "Mostrando respostas públicas. Entre para ver as respostas da sua conta.",
       "portal.serviceMembers.statusAlreadyRequested": "Você já enviou um pedido para {clubs}. Remova esse clube e tente de novo.",
-
       "rep.administerTemplates": "Administrar modelos — Administrador de modelos: ler, adicionar e remover tags",
-
       "rep.manageTemplates": "Gerenciar modelos — Gestor de modelos: ler e adicionar tags",
       "nameShoutout.kind.ownMingl": "Seu usuário do Mingl",
       "nameShoutout.kind.ownInstagram": "Seu Instagram",
@@ -8412,7 +8581,62 @@
       "template.variantScopeMine": " - Meu",
       "master.translationOverrides": "Substituições de tradução",
       "master.translationOverridesTitle": "Substituições de tradução",
-      "master.translationOverridesHint": "Falantes nativos podem corrigir textos artificiais aqui. Substituições valem em runtime até irem para os packs."
+      "master.translationOverridesHint": "Falantes nativos podem corrigir textos artificiais aqui. Substituições valem em runtime até irem para os packs.",
+      "page.vip.chooseNight": "Noite",
+      "page.vip.holdActive": "Reserva temporária ativa",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Liberar",
+      "page.vip.continueTerms": "Aceitar termos e pagar",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Termos e consentimento",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Voltar",
+      "page.vip.consentPay": "Pagar depósito",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Local",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Reservas",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Ainda sem reservas VIP ReserV.",
+      "portal.vipReservations.book": "Reservar outra mesa",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     el: {
       "ad.splash.body": "Το ShoutOut σας είναι σχεδόν live.",
@@ -8627,7 +8851,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Rezerwacje stolików",
-      "page.vip.sub": "Wybierz wieczór, zobacz plan sali i zarezerwuj stolik. Beta — zaliczki i live inventory w fazie 2.",
+      "page.vip.sub": "Επιλέξτε βράδυ, κρατήστε τραπέζι 30 λεπτά, αποδεχτείτε τους Όρους και πληρώστε την προκαταβολή.",
       "page.vip.restoring": "Przywracanie sesji FLOQR…",
       "page.vip.signInHint": "Zaloguj się w Szukaj / Mój profil, aby użyć VIP ReserV, albo przez Google, jeśli ta karta nie ma jeszcze sesji.",
       "page.vip.googleSignIn": "Zaloguj przez Google",
@@ -8635,15 +8859,15 @@
       "page.vip.chooseVenue": "Wybierz lokal",
       "page.vip.betaVenues": "Lokale beta: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Plan sali",
-      "page.vip.mapDemo": "Kolory demo (zielony wolny · bursztyn wstrzymany · czerwony zarezerwowany). Uszczypnij lub przewiń, by zoomować.",
-      "page.vip.signedIn": "Zalogowano — wybierz lokal, aby otworzyć plan.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Συνδεθήκατε — επιλέξτε χώρο και βράδυ, μετά πράσινο τραπέζι.",
       "page.vip.needSignIn": "Zaloguj się, aby przeglądać plany VIP ReserV.",
       "page.vip.mapLoaded": "Plan załadowany. Dotknij zielonego stolika, by zobaczyć szczegóły.",
       "page.vip.mapLoading": "Ładowanie planu…",
       "page.vip.aureliaPending": "Interaktywne 3D Aurelii jest w reports; mapa 2D VIP ReserV będzie następna.",
       "page.vip.shellMissing": "Brak modułu sesji — twarde odświeżenie.",
       "help.vip.book.title": "Zarezerwuj stolik VIP",
-      "help.vip.book.body": "Wybierz lokal beta, otwórz plan, dotknij zielonego (wolnego) stolika i sprawdź pojemność oraz opłaty. Blokada i płatność w fazie 2. Bary i booth DJ nigdy nie są rezerwowalne.",
+      "help.vip.book.body": "Επιλέξτε beta χώρο και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα.",
       "cat.floqaiAlso": "Μπορείτε επίσης να αναζητήσετε: Νυχτερινά κλαμπ ή Lounge",
       "cat.floqaiGo": "Αναζήτηση",
       "cat.floqaiIn": "σε {place}",
@@ -8843,7 +9067,6 @@
       "page.clubProfile.share": "Αντιγραφή συνδέσμου",
       "page.clubProfile.shop": "Κατάστημα",
       "page.clubProfile.shoutout": "Ρίξε ένα ShoutOut",
-
       "app.directShoutoutUnavailable": "Αυτός ο χώρος δεν είναι διαθέσιμος για ShoutOut αυτή τη στιγμή. Αναζητήστε άλλο χώρο παρακάτω.",
       "page.clubProfile.title": "Προφίλ ομάδας | FLOQR",
       "page.clubProfile.website": "Επίσημος Ιστότοπος",
@@ -9116,53 +9339,29 @@
       "nameShoutout.placeholder": "Όνομα, @instagram ή @handle Mingl",
       "nameShoutout.hint": "Γράψτε ένα όνομα ή ξεκινήστε ένα @handle — διαλέξτε από τις προτάσεις. Η οθόνη συμπληρώνει την υπόλοιπη φράση.",
       "nameShoutout.required": "Γράψτε πρώτα ένα όνομα ή διαλέξτε ένα @handle.",
-
       "templatePreview.button": "Προεπισκόπηση",
-
       "templatePreview.title": "Προεπισκόπηση: {name}",
-
       "templatePreview.close": "Κλείσιμο",
-
       "templatePreview.note": "Δείγμα κειμένου και εικόνων. Το ShoutOut σας δείχνει τα δικά σας λόγια και φωτογραφίες.",
-
       "templateTags.title": "Ετικέτες προτύπων",
-
       "templateTags.body": "Προσθέστε ετικέτες αναζήτησης στα πρότυπα αυτού του χώρου, ώστε οι πελάτες να τα βρίσκουν πιο γρήγορα.",
-
       "templateTags.search": "Αναζήτηση προτύπων",
-
       "templateTags.roleAdministrator": "Εδώ είστε Διαχειριστής προτύπων: μπορείτε να προσθέτετε και να αφαιρείτε ετικέτες.",
-
       "templateTags.roleManager": "Εδώ είστε Υπεύθυνος προτύπων: μπορείτε να προσθέτετε ετικέτες. Ζητήστε από έναν Διαχειριστή προτύπων ή τον Club Admin να αφαιρέσει μία.",
-
       "templateTags.remove": "Αφαίρεση ετικέτας {tag}",
-
       "templateTags.builtIn": "Ετικέτες FLOQR:",
-
       "templateTags.none": "Δεν υπάρχουν ακόμη ετικέτες χώρου.",
-
       "templateTags.placeholder": "Προσθέστε ετικέτα, π.χ. βραδιά αγώνα",
-
       "templateTags.add": "Προσθήκη ετικέτας",
-
       "templateTags.noMatch": "Κανένα πρότυπο δεν ταιριάζει.",
-
       "templateTags.saving": "Αποθήκευση…",
-
       "templateTags.saved": "Οι ετικέτες αποθηκεύτηκαν.",
-
       "templateTags.denied": "Δεν μπορείτε να αλλάξετε αυτή την ετικέτα. Ζητήστε από τον Club Admin τον ρόλο Διαχειριστή προτύπων.",
-
       "templateTags.tooMany": "Ένα πρότυπο μπορεί να έχει έως 30 ετικέτες χώρου.",
-
       "templateTags.noVenue": "Ανοίξτε αυτή τη σελίδα από το Club Admin ή από τον σύνδεσμο στα εισερχόμενα, ώστε το FLOQR να ξέρει τον χώρο.",
-
       "templateTags.loading": "Φόρτωση προτύπων…",
-
       "templateTags.noRole": "Δεν έχετε ρόλο προτύπων σε αυτόν τον χώρο. Ζητήστε από τον Club Admin Διαχείριση ή Διοίκηση προτύπων.",
-
       "templateTags.loadFailed": "Δεν ήταν δυνατή η φόρτωση των προτύπων. Ανανεώστε και δοκιμάστε ξανά.",
-
       "templateTags.openFromAdmin": "Διαχείριση ετικετών προτύπων",
       "employees.title": "Δίκτυο υπαλλήλων και προσωπικού",
       "employees.search": "Αναζήτηση προσωπικού / συνεργατών",
@@ -9393,9 +9592,7 @@
       "floqai.checkingAccess": "Ελέγχουμε τι μπορεί να δει ο λογαριασμός σας…",
       "floqai.scopePublic": "Εμφανίζονται δημόσιες απαντήσεις. Συνδεθείτε για απαντήσεις για τον λογαριασμό σας.",
       "portal.serviceMembers.statusAlreadyRequested": "Έχετε ήδη στείλει αίτημα στο {clubs}. Αφαιρέστε αυτό το club και δοκιμάστε ξανά.",
-
       "rep.administerTemplates": "Διοίκηση προτύπων — Διαχειριστής προτύπων: ανάγνωση, προσθήκη και αφαίρεση ετικετών",
-
       "rep.manageTemplates": "Διαχείριση προτύπων — Υπεύθυνος προτύπων: ανάγνωση και προσθήκη ετικετών",
       "nameShoutout.kind.ownMingl": "Το Mingl handle σας",
       "nameShoutout.kind.ownInstagram": "Το Instagram σας",
@@ -9425,7 +9622,62 @@
       "template.variantScopeMine": " - Δικό μου",
       "master.translationOverrides": "Παράκαμψεις μετάφρασης",
       "master.translationOverridesTitle": "Παράκαμψεις μετάφρασης",
-      "master.translationOverridesHint": "Οι μητρόφωνοι διορθώνουν εδώ τεχνητό κείμενο. Οι παράκαμψεις ισχύουν μέχρι προώθηση στα packs."
+      "master.translationOverridesHint": "Οι μητρόφωνοι διορθώνουν εδώ τεχνητό κείμενο. Οι παράκαμψεις ισχύουν μέχρι προώθηση στα packs.",
+      "page.vip.chooseNight": "Βράδυ",
+      "page.vip.holdActive": "Κράτηση ενεργή",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Απελευθέρωση",
+      "page.vip.continueTerms": "Αποδοχή όρων και πληρωμή",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Όροι και συναίνεση",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Πίσω",
+      "page.vip.consentPay": "Πληρωμή προκαταβολής",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Χώρος",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Κρατήσεις",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Δεν υπάρχουν ακόμη κρατήσεις VIP ReserV.",
+      "portal.vipReservations.book": "Κράτηση άλλου τραπεζιού",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     pl: {
       "ad.splash.body": "Twój ShoutOut jest prawie na żywo.",
@@ -9640,7 +9892,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · Tafelreserveringen",
-      "page.vip.sub": "Kies een avond, bekijk de plattegrond en reserveer een tafel. Beta — stortingen en live inventaris in fase 2.",
+      "page.vip.sub": "Wybierz wieczór, zablokuj stolik na 30 minut, zaakceptuj warunki i zapłać depozyt.",
       "page.vip.restoring": "FLOQR-sessie herstellen…",
       "page.vip.signInHint": "Meld je aan via Zoeken / Mijn profiel om VIP ReserV te gebruiken, of met Google als dit tabblad nog geen sessie heeft.",
       "page.vip.googleSignIn": "Inloggen met Google",
@@ -9648,15 +9900,15 @@
       "page.vip.chooseVenue": "Kies een locatie",
       "page.vip.betaVenues": "Beta-locaties: Decades, Lima Twist Club, Aurelia.",
       "page.vip.floorMap": "Plattegrond",
-      "page.vip.mapDemo": "Demokleuren (groen beschikbaar · amber vastgehouden · rood geboekt). Knijp of scroll om te zoomen.",
-      "page.vip.signedIn": "Ingelogd — kies een locatie om de plattegrond te openen.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "Zalogowano — wybierz klub i wieczór, potem zielony stolik.",
       "page.vip.needSignIn": "Meld je aan om VIP ReserV-plattegronden te bekijken.",
       "page.vip.mapLoaded": "Plattegrond geladen. Tik op een groene tafel voor details.",
       "page.vip.mapLoading": "Plattegrond laden…",
       "page.vip.aureliaPending": "Aurelia’s interactieve 3D-demo staat in reports; de 2D VIP ReserV-kaart volgt.",
       "page.vip.shellMissing": "Sessiemodule ontbreekt — hard vernieuwen.",
       "help.vip.book.title": "VIP-tafel boeken",
-      "help.vip.book.body": "Kies een beta-locatie, open de plattegrond, tik op een groene (beschikbare) tafel en bekijk capaciteit en kosten. Vasthouden en betalen komen in fase 2. Bars en de DJ-booth zijn nooit boekbaar.",
+      "help.vip.book.body": "Wybierz klub beta i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać FloqR Stripe. Bary i DJ nie do rezerwacji.",
       "cat.floqaiAlso": "Możesz też wyszukać: Kluby lub Lounge",
       "cat.floqaiGo": "Szukaj",
       "cat.floqaiIn": "w {place}",
@@ -9856,7 +10108,6 @@
       "page.clubProfile.share": "Skopiuj łącze",
       "page.clubProfile.shop": "Sklep",
       "page.clubProfile.shoutout": "Rzuć ShoutOut",
-
       "app.directShoutoutUnavailable": "Ten lokal nie przyjmuje teraz ShoutOutów. Wyszukaj inny lokal poniżej.",
       "page.clubProfile.title": "Profil klubowy | FLOQR",
       "page.clubProfile.website": "Oficjalna strona internetowa",
@@ -10129,53 +10380,29 @@
       "nameShoutout.placeholder": "Imię, @instagram lub @nick Mingl",
       "nameShoutout.hint": "Wpisz imię albo zacznij @nick — wybierz z podpowiedzi. Ekran dopisze resztę zdania.",
       "nameShoutout.required": "Najpierw wpisz imię lub wybierz @nick.",
-
       "templatePreview.button": "Podgląd",
-
       "templatePreview.title": "Podgląd: {name}",
-
       "templatePreview.close": "Zamknij",
-
       "templatePreview.note": "Przykładowy tekst i obrazy. Twój ShoutOut pokaże Twoje własne słowa i zdjęcia.",
-
       "templateTags.title": "Tagi szablonów",
-
       "templateTags.body": "Dodaj tagi wyszukiwania do szablonów w tym lokalu, aby goście szybciej je znajdowali.",
-
       "templateTags.search": "Szukaj szablonów",
-
       "templateTags.roleAdministrator": "Jesteś tu Administratorem szablonów: możesz dodawać i usuwać tagi.",
-
       "templateTags.roleManager": "Jesteś tu Menedżerem szablonów: możesz dodawać tagi. Aby usunąć tag, poproś Administratora szablonów lub Club Admin.",
-
       "templateTags.remove": "Usuń tag {tag}",
-
       "templateTags.builtIn": "Tagi FLOQR:",
-
       "templateTags.none": "Brak tagów lokalu.",
-
       "templateTags.placeholder": "Dodaj tag, np. wieczór meczowy",
-
       "templateTags.add": "Dodaj tag",
-
       "templateTags.noMatch": "Brak pasujących szablonów.",
-
       "templateTags.saving": "Zapisywanie…",
-
       "templateTags.saved": "Tagi zapisane.",
-
       "templateTags.denied": "Nie możesz zmienić tego tagu. Poproś Club Admin o rolę Administratora szablonów.",
-
       "templateTags.tooMany": "Szablon może mieć do 30 tagów lokalu.",
-
       "templateTags.noVenue": "Otwórz tę stronę z Club Admin lub z linku w skrzynce odbiorczej, aby FLOQR znał lokal.",
-
       "templateTags.loading": "Ładowanie szablonów…",
-
       "templateTags.noRole": "Nie masz roli dla szablonów w tym lokalu. Poproś Club Admin o Zarządzanie szablonami lub Administrowanie szablonami.",
-
       "templateTags.loadFailed": "Nie udało się wczytać szablonów. Odśwież i spróbuj ponownie.",
-
       "templateTags.openFromAdmin": "Zarządzaj tagami szablonów",
       "employees.title": "Sieć pracowników i personelu",
       "employees.search": "Szukaj personelu / współpracowników",
@@ -10406,9 +10633,7 @@
       "floqai.checkingAccess": "Sprawdzamy, co może zobaczyć Twoje konto…",
       "floqai.scopePublic": "Pokazujemy publiczne odpowiedzi. Zaloguj się, aby zobaczyć odpowiedzi dla swojego konta.",
       "portal.serviceMembers.statusAlreadyRequested": "Już wysłano zgłoszenie do {clubs}. Usuń ten klub i spróbuj ponownie.",
-
       "rep.administerTemplates": "Administrowanie szablonami — Administrator szablonów: odczyt, dodawanie i usuwanie tagów",
-
       "rep.manageTemplates": "Zarządzanie szablonami — Menedżer szablonów: odczyt i dodawanie tagów",
       "nameShoutout.kind.ownMingl": "Twój nick Mingl",
       "nameShoutout.kind.ownInstagram": "Twój Instagram",
@@ -10438,7 +10663,62 @@
       "template.variantScopeMine": " - Moje",
       "master.translationOverrides": "Nadpisania tłumaczeń",
       "master.translationOverridesTitle": "Nadpisania tłumaczeń",
-      "master.translationOverridesHint": "Native speakerzy poprawiają tu sztucznie brzmiące teksty. Nadpisania działają w runtime do czasu promocji do packów."
+      "master.translationOverridesHint": "Native speakerzy poprawiają tu sztucznie brzmiące teksty. Nadpisania działają w runtime do czasu promocji do packów.",
+      "page.vip.chooseNight": "Wieczór",
+      "page.vip.holdActive": "Blokada aktywna",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "Zwolnij",
+      "page.vip.continueTerms": "Zaakceptuj warunki i zapłać",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "Warunki i zgoda",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "Wstecz",
+      "page.vip.consentPay": "Zapłać depozyt",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "Klub",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "Rezerwacje",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "Brak rezerwacji VIP ReserV.",
+      "portal.vipReservations.book": "Zarezerwuj kolejny stolik",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     },
     ar: {
       "ad.splash.body": "ShoutOut الخاص بك على وشك البث المباشر.",
@@ -10653,7 +10933,7 @@
       "cat.vipreserv": "VIP ReserV",
       "page.vip.title": "VIP ReserV",
       "page.vip.eyebrow": "FLOQR · حجوزات الطاولات",
-      "page.vip.sub": "اختر ليلة، استكشف خريطة القاعة، واحجز طاولة. تجريبي — العربون والمخزون المباشر في المرحلة 2.",
+      "page.vip.sub": "اختر ليلة، احجز طاولة لمدة 30 دقيقة، اقبل الشروط وادفع العربون.",
       "page.vip.restoring": "جارٍ استعادة جلسة FLOQR…",
       "page.vip.signInHint": "سجّل الدخول عبر البحث / ملفي لاستخدام VIP ReserV، أو عبر Google إذا لم تكن لهذه العلامة جلسة بعد.",
       "page.vip.googleSignIn": "تسجيل الدخول عبر Google",
@@ -10661,15 +10941,15 @@
       "page.vip.chooseVenue": "اختر مكانًا",
       "page.vip.betaVenues": "أماكن تجريبية: Decades وLima Twist Club وAurelia.",
       "page.vip.floorMap": "خريطة القاعة",
-      "page.vip.mapDemo": "ألوان تجريبية (أخضر متاح · كهرماني محجوز مؤقتًا · أحمر محجوز). قرّب أو مرّر للتكبير.",
-      "page.vip.signedIn": "تم تسجيل الدخول — اختر مكانًا لفتح الخريطة.",
+      "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
+      "page.vip.signedIn": "تم تسجيل الدخول — اختر المكان والليلة ثم طاولة خضراء.",
       "page.vip.needSignIn": "سجّل الدخول لاستكشاف خرائط VIP ReserV.",
       "page.vip.mapLoaded": "تم تحميل الخريطة. المس طاولة خضراء للتفاصيل.",
       "page.vip.mapLoading": "جارٍ تحميل الخريطة…",
       "page.vip.aureliaPending": "عرض Aurelia ثلاثي الأبعاد في reports؛ خريطة VIP ReserV ثنائية الأبعاد تلي ذلك.",
       "page.vip.shellMissing": "وحدة الجلسة مفقودة — حدّث الصفحة بقوة.",
       "help.vip.book.title": "احجز طاولة VIP",
-      "help.vip.book.body": "اختر مكانًا تجريبيًا، افتح الخريطة، المس طاولة خضراء (متاحة)، وراجع السعة والرسوم. الحجز والدفع في المرحلة 2. الحانات وكابينة الدي جي غير قابلة للحجز أبدًا.",
+      "help.vip.book.body": "اختر مكاناً تجريبياً وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع عبر FloqR Stripe. البارات وDJ غير قابلة للحجز.",
       "cat.floqaiAlso": "يمكنك أيضاً البحث عن: النوادي أو الصالات",
       "cat.floqaiGo": "بحث",
       "cat.floqaiIn": "في {place}",
@@ -10869,7 +11149,6 @@
       "page.clubProfile.share": "نسخ الرابط",
       "page.clubProfile.shop": "تسوق",
       "page.clubProfile.shoutout": "ارمِ ShoutOut",
-
       "app.directShoutoutUnavailable": "هذا المكان غير متاح لـ ShoutOut حاليًا. ابحث عن مكان آخر أدناه.",
       "page.clubProfile.title": "الملف الشخصي للنادي | FLOQR",
       "page.clubProfile.website": "موقع الويب الرسمي",
@@ -11142,53 +11421,29 @@
       "nameShoutout.placeholder": "الاسم أو @instagram أو معرّف Mingl",
       "nameShoutout.hint": "اكتب اسمًا أو ابدأ بـ @معرّف — اختر من الاقتراحات. تضيف الشاشة بقية العبارة.",
       "nameShoutout.required": "أدخل اسمًا أو اختر @معرّفًا أولًا.",
-
       "templatePreview.button": "معاينة",
-
       "templatePreview.title": "معاينة: {name}",
-
       "templatePreview.close": "إغلاق",
-
       "templatePreview.note": "نص وصور تجريبية. يعرض ShoutOut الخاص بك كلماتك وصورك أنت.",
-
       "templateTags.title": "وسوم القوالب",
-
       "templateTags.body": "أضف وسوم بحث إلى القوالب المتاحة في هذا المكان ليعثر عليها الزبائن أسرع.",
-
       "templateTags.search": "ابحث في القوالب",
-
       "templateTags.roleAdministrator": "أنت مسؤول القوالب هنا: يمكنك إضافة الوسوم وإزالتها.",
-
       "templateTags.roleManager": "أنت مدير القوالب هنا: يمكنك إضافة الوسوم. اطلب من مسؤول القوالب أو Club Admin إزالة أي وسم.",
-
       "templateTags.remove": "إزالة الوسم {tag}",
-
       "templateTags.builtIn": "وسوم FLOQR:",
-
       "templateTags.none": "لا توجد وسوم للمكان بعد.",
-
       "templateTags.placeholder": "أضف وسمًا، مثل ليلة المباراة",
-
       "templateTags.add": "إضافة وسم",
-
       "templateTags.noMatch": "لا توجد قوالب مطابقة.",
-
       "templateTags.saving": "جارٍ الحفظ…",
-
       "templateTags.saved": "تم حفظ الوسوم.",
-
       "templateTags.denied": "لا يمكنك تغيير هذا الوسم. اطلب من Club Admin دور مسؤول القوالب.",
-
       "templateTags.tooMany": "يمكن أن يحتوي القالب على 30 وسمًا للمكان كحد أقصى.",
-
       "templateTags.noVenue": "افتح هذه الصفحة من Club Admin أو من الرابط في صندوق الوارد ليعرف FLOQR المكان.",
-
       "templateTags.loading": "جارٍ تحميل القوالب…",
-
       "templateTags.noRole": "ليس لديك دور للقوالب في هذا المكان. اطلب من Club Admin دور إدارة القوالب أو الإشراف على القوالب.",
-
       "templateTags.loadFailed": "تعذّر تحميل القوالب. حدّث الصفحة وحاول مرة أخرى.",
-
       "templateTags.openFromAdmin": "إدارة وسوم القوالب",
       "employees.title": "شبكة الموظفين والعاملين",
       "employees.search": "البحث عن العاملين / الشركاء",
@@ -11419,9 +11674,7 @@
       "floqai.checkingAccess": "نتحقق مما يمكن لحسابك رؤيته…",
       "floqai.scopePublic": "نعرض الإجابات العامة. سجّل الدخول لرؤية إجابات حسابك.",
       "portal.serviceMembers.statusAlreadyRequested": "لقد أرسلت طلبًا بالفعل إلى {clubs}. أزل هذا النادي وحاول مرة أخرى.",
-
       "rep.administerTemplates": "الإشراف على القوالب — مسؤول القوالب: قراءة الوسوم وإضافتها وإزالتها",
-
       "rep.manageTemplates": "إدارة القوالب — مدير القوالب: قراءة الوسوم وإضافتها",
       "nameShoutout.kind.ownMingl": "معرّفك على Mingl",
       "nameShoutout.kind.ownInstagram": "حسابك على Instagram",
@@ -11451,7 +11704,62 @@
       "template.variantScopeMine": " - لي",
       "master.translationOverrides": "تعديلات الترجمة",
       "master.translationOverridesTitle": "تعديلات الترجمة",
-      "master.translationOverridesHint": "يمكن للناطقين الأصليين تصحيح النصوص التي تبدو آلية هنا. التعديلات سارية وقت التشغيل حتى تُدمج في حزم اللغة."
+      "master.translationOverridesHint": "يمكن للناطقين الأصليين تصحيح النصوص التي تبدو آلية هنا. التعديلات سارية وقت التشغيل حتى تُدمج في حزم اللغة.",
+      "page.vip.chooseNight": "الليلة",
+      "page.vip.holdActive": "الحجز المؤقت نشط",
+      "page.vip.payToday": "Pay today",
+      "page.vip.releaseHold": "إلغاء الحجز المؤقت",
+      "page.vip.continueTerms": "قبول الشروط والدفع",
+      "page.vip.holdExpired": "Your hold expired. Pick a table again.",
+      "page.vip.holdReleased": "Hold released.",
+      "page.vip.holding": "Holding your table…",
+      "page.vip.holdReady": "Table held for 30 minutes. Accept Terms, then pay the deposit.",
+      "page.vip.holdFailed": "Could not hold that table.",
+      "page.vip.termsTitle": "الشروط والموافقة",
+      "page.vip.termsSub": "Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.",
+      "page.vip.checkTerms": "I accept the VIP ReserV / venue Terms",
+      "page.vip.checkRefund": "I understand the refund / cancellation policy",
+      "page.vip.checkNoShow": "I understand the no-show / deposit forfeit policy",
+      "page.vip.checkAge": "I am 21+ and will bring valid ID",
+      "page.vip.checkMinimum": "I understand the minimum spend / gratuity disclosure",
+      "page.vip.checkMarketing": "Optional: venue marketing messages",
+      "page.vip.consentCancel": "رجوع",
+      "page.vip.consentPay": "دفع العربون",
+      "page.vip.consentRequired": "Check all required Terms boxes before paying.",
+      "page.vip.recordingConsent": "Recording consent…",
+      "page.vip.openingCheckout": "Opening deposit checkout…",
+      "page.vip.checkoutFailed": "Checkout could not start.",
+      "page.vip.paidOk": "Deposit paid — your VIP ReserV table is confirmed. Open My Profile → Reservations for your pass.",
+      "page.vip.paidCancel": "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it.",
+      "help.vip.terms.title": "Why accept Terms",
+      "help.vip.terms.body": "You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.",
+      "page.vipDoor.title": "VIP ReserV Door",
+      "page.vipDoor.eyebrow": "VIP ReserV · Door",
+      "page.vipDoor.sub": "Check in confirmed tables for tonight. Phone-first for VIP Managers.",
+      "page.vipDoor.restoring": "Restoring your FLOQR session…",
+      "page.vipDoor.signInHint": "Sign in on Search / My Profile / Club Admin, or continue with Google if this tab has no session yet.",
+      "page.vipDoor.venue": "المكان",
+      "page.vipDoor.refresh": "Refresh tonight",
+      "page.vipDoor.checkIn": "Check in",
+      "page.vipDoor.passToken": "Pass token",
+      "page.vipDoor.id21": "ID 21+ checked",
+      "page.vipDoor.doCheckIn": "Check in",
+      "page.vipDoor.listTitle": "Tonight’s reservations",
+      "page.vipDoor.loading": "Loading reservations…",
+      "page.vipDoor.empty": "No reservations for this night yet.",
+      "page.vipDoor.ready": "Ready.",
+      "page.vipDoor.checkedIn": "Checked in.",
+      "page.vipDoor.noShow": "No-show",
+      "page.vipDoor.markedNoShow": "Marked no-show.",
+      "page.vipDoor.needSignIn": "Sign in to use VIP ReserV door.",
+      "help.vip.door.title": "Door check-in",
+      "help.vip.door.body": "Scan or enter a pass token, confirm ID 21+, check in the party. Mark no-show only after grace. Opening a notify link never mutates status.",
+      "nav.vipReservations": "الحجوزات",
+      "portal.vipReservations.sub": "Your VIP ReserV table holds and confirmed deposits. Open a pass for the door after payment.",
+      "portal.vipReservations.empty": "لا حجوزات VIP ReserV بعد.",
+      "portal.vipReservations.book": "حجز طاولة أخرى",
+      "help.vip.pass.title": "Door pass",
+      "help.vip.pass.body": "After the deposit confirms, tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue’s cutoff."
     }
   };
 
