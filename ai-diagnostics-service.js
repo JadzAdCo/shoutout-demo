@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.49";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.50";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1471,13 +1471,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-50-vip-aurelia-hold-checkout",
+      area:"VIP reserV / Aurelia / Checkout",
+      feature:"Aurelia hold → Terms → FloqR Stripe deposit (Functions live)",
+      changed:"Aurelia featureGates.vipReservations=true in Firestore. Functions redeployed with aurelia.json catalog (25 tables). VIP UX: inventory summary status, Accept all required Terms, map scroll-into-view. Package s3.1.50.",
+      howToTest:"1) Sign in (beta VIP grant or Master Admin). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=temp-democlub-1&v=s3.1.50 — Aurelia map loads; status shows available/held/booked counts. 3) Tap a green table → Hold this table. 4) Accept all required Terms → Pay deposit (Stripe test). 5) Return vipPaid=1 → portal Guest List & reserV → Show pass. Optional: Explore 3D walk-through.",
+      expected:"Hold lasts 30 min; consent required; Stripe Checkout opens; confirmed reservation + pass after pay. No “not bookable yet” on Aurelia.",
+      troubleshoot:"not bookable yet → Functions still on old vip-core (pending Aurelia); confirm createVipHold after [firebase-deploy]. Inventory failed → feature grant vipReservations + signed-in session. Checkout missing → commerce-functions vipReservation branch. Gate missing → clubLocations/temp-democlub-1.featureGates.vipReservations must be true."
+    },
+    {
       id:"s3-1-49-vip-chrome-aurelia",
       area:"VIP reserV / Aurelia / Product chrome",
       feature:"VIP page matches ShoutOut pink/cyan chrome; Aurelia 2D map + 3D walk-through published",
-      changed:"vip-floor-viewer.css no longer overrides body/:root (flat #111 + purple accent). vip.css reinforces ShoutOut radial body + glass cards. Aurelia plan vip-plans/aurelia.json bookable; Explore 3D → reports/vip-aurelia-demo/. Package s3.1.49.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html — body must show pink/cyan washes like ShoutOut, not flat black. 2) Select Aurelia → floor map loads (not Soon). 3) Tap Explore 3D walk-through → 3D/Walk/2D demo opens; ← VIP reserV returns. 4) Decades/Lima maps still load.",
+      changed:"vip-floor-viewer.css no longer overrides body/:root (flat #111 + purple accent). vip.css reinforces ShoutOut radial body + glass cards. Aurelia plan vip-plans/aurelia.json bookable; Explore 3D → reports/vip-aurelia-demo/. Package s3.1.49+.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?v=s3.1.50 — body must show pink/cyan washes like ShoutOut, not flat black. 2) Select Aurelia → floor map loads (not Soon). 3) Tap Explore 3D walk-through → 3D/Walk/2D demo opens; ← VIP reserV returns. 4) Decades/Lima maps still load.",
       expected:"VIP landing chrome matches ShoutOut; Aurelia bookable 2D; 3D demo live under reports/vip-aurelia-demo/.",
-      troubleshoot:"Still flat black → hard refresh vip-floor-viewer.css?v=s3.1.49 (must not set body background). Aurelia Soon → Functions getVipBetaVenues still pending; redeploy vip-functions after vip-core planFile aurelia.json. Blank 3D → open from HTTP Pages URL not file://; check vendor/three.module.min.js."
+      troubleshoot:"Still flat black → hard refresh vip-floor-viewer.css?v=s3.1.50 (must not set body background). Aurelia Soon → Functions getVipBetaVenues still pending; redeploy vip-functions after vip-core planFile aurelia.json. Blank 3D → open from HTTP Pages URL not file://; check vendor/three.module.min.js."
     },
     {
       id:"s3-1-47-feature-orders-receipts",

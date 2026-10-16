@@ -161,6 +161,12 @@ body.vip-page {
   min-height: 18px;
 }
 
+.vip-accept-required {
+  width: fit-content;
+  min-height: 44px;
+  margin-bottom: 0.25rem;
+  border-color: rgba(38, 216, 255, 0.4);
+}
 .vip-consent-actions {
   display: flex;
   flex-wrap: wrap;

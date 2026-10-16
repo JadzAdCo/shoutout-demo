@@ -94,7 +94,7 @@
     return nightEl?.value || new Date().toISOString().slice(0, 10);
   }
 
-  async function refreshAvailability() {
+  async function refreshAvailability(opts) {
     if (!currentVenue || currentVenue.pending || !currentUser) return;
     try {
       const res = await callable("getVipAvailability")({
@@ -103,14 +103,41 @@
       });
       const sections = res.data?.sections || [];
       const states = {};
+      let available = 0;
+      let held = 0;
+      let booked = 0;
       sections.forEach(s => {
-        if (s.status === "booked") states[s.sectionId] = "booked";
-        else if (s.status === "held") states[s.sectionId] = "held";
-        else if (s.status === "closed") states[s.sectionId] = "notBookable";
+        if (s.status === "booked") {
+          states[s.sectionId] = "booked";
+          booked += 1;
+        } else if (s.status === "held") {
+          states[s.sectionId] = "held";
+          held += 1;
+        } else if (s.status === "closed") {
+          states[s.sectionId] = "notBookable";
+        } else {
+          available += 1;
+        }
       });
       window.FLOQRVipFloorViewer?.setStates?.(states);
+      if (opts?.announce !== false && !activeHold) {
+        const base = t("page.vip.inventorySummary", "{available} available · {held} held · {booked} booked — tap a green table to hold.")
+          .replace("{available}", String(available))
+          .replace("{held}", String(held))
+          .replace("{booked}", String(booked));
+        const extra = EXPLORE_3D_BY_ID[currentVenue.id]
+          ? ` ${t("page.vip.explore3dHint", "Open Explore 3D walk-through for the interactive room.")}`
+          : "";
+        setStatus(base + extra);
+      }
     } catch (err) {
       console.warn("VIP availability", err);
+      const msg = err?.message || err?.details || String(err);
+      setStatus(
+        t("page.vip.availabilityFailed", "Could not load live inventory.") +
+        " " +
+        String(msg).replace(/^FirebaseError:\s*/i, "").replace(/^.*?:\s*/, "")
+      );
     }
   }
 
@@ -380,15 +407,13 @@
     if (mapTitle) mapTitle.textContent = `${venue.label} — ${t("page.vip.floorMap", "Floor map")}`;
     window.FLOQR_VIP_BOOT = {plan: venue.plan};
     if (window.FLOQRVipFloorViewer?.load) {
-      window.FLOQRVipFloorViewer.load(venue.plan).then?.(() => refreshAvailability());
-      if (!opts?.silent) {
-        const base = t("page.vip.mapLoaded", "Floor map loaded. Tap a green table for details.");
-        const extra = EXPLORE_3D_BY_ID[venue.id]
-          ? ` ${t("page.vip.explore3dHint", "Open Explore 3D walk-through for the interactive room.")}`
-          : "";
-        setStatus(base + extra);
-      }
-      refreshAvailability();
+      if (!opts?.silent) setStatus(t("page.vip.mapLoading", "Loading floor map…"));
+      Promise.resolve(window.FLOQRVipFloorViewer.load(venue.plan))
+        .then(() => refreshAvailability({announce: true}))
+        .catch(err => {
+          console.warn(err);
+          setStatus(t("page.vip.mapFailed", "Floor map failed to load. Hard refresh and try again."));
+        });
     } else if (!opts?.silent) {
       setStatus(t("page.vip.mapLoading", "Loading floor map…"));
     }
@@ -397,6 +422,17 @@
       u.searchParams.set("location", venue.id);
       history.replaceState({}, "", u.pathname + u.search + u.hash);
     } catch (_) { /* ignore */ }
+    try {
+      mapSection?.scrollIntoView?.({block: "nearest", behavior: "smooth"});
+    } catch (_) { /* ignore */ }
+  }
+
+  function acceptRequiredTerms() {
+    ["vipCheckTerms", "vipCheckRefund", "vipCheckNoShow", "vipCheckAge", "vipCheckMinimum"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.checked = true;
+    });
+    setStatus(t("page.vip.requiredAccepted", "Required Terms checked — optional marketing left unchecked. Tap Pay deposit."));
   }
 
   async function showApp(user) {
@@ -444,6 +480,7 @@
       refreshAvailability();
     });
     document.getElementById("vipConsentPay")?.addEventListener("click", submitConsentAndPay);
+    document.getElementById("vipAcceptRequired")?.addEventListener("click", acceptRequiredTerms);
     document.getElementById("vipConsentCancel")?.addEventListener("click", () => {
       if (consentEl) consentEl.classList.add("hidden");
     });

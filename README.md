@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.49 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.50 (stable)
+
+- s3.1.50: VIP Aurelia hold/checkout live; Accept-all Terms; inventory summary status; featureGates.vipReservations on Aurelia.
 
 - s3.1.49: VIP reserV chrome matches ShoutOut (scoped floor-viewer CSS); Aurelia 2D map + Explore 3D walk-through published.
 
