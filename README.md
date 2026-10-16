@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.47 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.48 (stable)
+
+- s3.1.48: VCC floqCast tab (not supRstar); profile menu VIP reserV link; vip.html FloqR+VIP hero + subscribed-venue search.
 
 - s3.1.47: VIP reserV Phase 2 — inventory holds, Terms consent, FloqR Stripe deposit checkout, My Profile Reservations, vip-door.html check-in; VIP-B-24 receipt SMS + invoice redactor fixes.
 
