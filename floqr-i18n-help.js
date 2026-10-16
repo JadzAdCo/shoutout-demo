@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.53";
+  const VERSION = "s3.1.54";
 
   const packs = {
     "ru": {
@@ -263,8 +263,8 @@
         body: "Выберите несколько изображений или коротких видео сразу, затем задайте их порядок в публичном профиле. Профили поддерживают до 8 изображений и 2 коротких видео."
       },
       "help-vip-terms-consent": {
-        title: "Условия и согласие VIP reserV",
-        body: "Перед оплатой депозита нужно принять условия площадки, правила возврата, no-show, возраст 21+ с ID и раскрытие минимального расхода. Согласие пишется на сервере с хешем версии условий. Маркетинг — по желанию."
+        title: "Условия VIP reserV",
+        body: "После удержания стола откройте страницу условий, прочитайте текст и примите один раз (маркетинг отдельно). Согласие сохраняется до FloqR Stripe Checkout — как у платного ShoutOut, затем квитанция и пропуск."
       },
       "help-vip-door-pass": {
         title: "Пропуск VIP reserV",
@@ -537,8 +537,8 @@
         body: "Kies meerdere afbeeldingen of korte video's tegelijk en rangschik daarna hun volgorde op het openbare profiel. Profielen ondersteunen tot 8 afbeeldingen en 2 korte video's."
       },
       "help-vip-terms-consent": {
-        title: "VIP reserV voorwaarden & toestemming",
-        body: "Voor de borg accepteer je locatievoorwaarden, restitutie, no-show, 21+ met ID en minimum. Toestemming wordt server-side opgeslagen met de Terms-hash. Marketing optioneel."
+        title: "VIP reserV voorwaarden",
+        body: "Na een tafelhold open je de Voorwaardenpagina, lees de tekst en accepteer één keer (marketing optioneel apart). Toestemming wordt opgeslagen vóór FloqR Stripe Checkout — zoals een betaalde ShoutOut, daarna bon en pass."
       },
       "help-vip-door-pass": {
         title: "VIP reserV deurpass",
@@ -811,8 +811,8 @@
         body: "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
       },
       "help-vip-terms-consent": {
-        title: "Conditions et consentement VIP reserV",
-        body: "Avant l’acompte, acceptez les Conditions du lieu, remboursement, no-show, 21+ avec ID et minimum. Le consentement est enregistré côté serveur avec le hash des Conditions. Marketing optionnel."
+        title: "Conditions VIP reserV",
+        body: "Après avoir retenu une table, ouvrez la page Conditions, lisez le texte, et acceptez une seule fois (marketing optionnel à part). Le consentement est enregistré avant FloqR Stripe Checkout — même schéma qu’un ShoutOut payant, puis reçu et pass."
       },
       "help-vip-door-pass": {
         title: "Pass porte VIP reserV",
@@ -1085,8 +1085,8 @@
         body: "Wähle mehrere Bilder oder kurze Videos auf einmal aus und lege dann ihre Reihenfolge im öffentlichen Profil fest. Profile unterstützen bis zu 8 Bilder und 2 kurze Videos."
       },
       "help-vip-terms-consent": {
-        title: "VIP reserV AGB & Einwilligung",
-        body: "Vor der Anzahlung musst du Location-AGB, Rückerstattung, No-Show, 21+ mit Ausweis und Mindestumsatz akzeptieren. Einwilligung wird serverseitig mit Terms-Hash gespeichert. Marketing optional."
+        title: "VIP reserV AGB",
+        body: "Nach dem Tischhalt öffnen Sie die AGB-Seite, lesen den Text und akzeptieren einmal (Marketing optional). Einwilligung wird vor FloqR Stripe Checkout gespeichert — wie bei einem bezahlten ShoutOut, danach Beleg und Pass."
       },
       "help-vip-door-pass": {
         title: "VIP reserV Tür-Pass",
@@ -1359,8 +1359,8 @@
         body: "Elige varias imágenes o videos cortos a la vez y luego ordena su posición en el perfil público. Los perfiles admiten hasta 8 imágenes y 2 videos cortos."
       },
       "help-vip-terms-consent": {
-        title: "Términos y consentimiento VIP reserV",
-        body: "Antes del depósito acepta Términos del local, reembolso, no-show, 21+ con ID y mínimo. El consentimiento se guarda en servidor con el hash de Términos. Marketing opcional."
+        title: "Términos VIP reserV",
+        body: "Tras retener una mesa, abre la página de Términos, léelos y acepta una vez (marketing opcional aparte). El consentimiento se guarda antes de FloqR Stripe Checkout — como un ShoutOut de pago, luego recibo y pase."
       },
       "help-vip-door-pass": {
         title: "Pase de puerta VIP reserV",
@@ -1633,8 +1633,8 @@
         body: "Scegli più immagini o brevi video insieme, poi definisci l'ordine nel profilo pubblico. I profili supportano fino a 8 immagini e 2 brevi video."
       },
       "help-vip-terms-consent": {
-        title: "Termini e consenso VIP reserV",
-        body: "Prima del deposito accetta i Termini del locale, rimborso, no-show, 21+ con ID e minimo. Il consenso è registrato sul server con l’hash dei Termini. Marketing opzionale."
+        title: "Termini VIP reserV",
+        body: "Dopo aver bloccato un tavolo, apri la pagina Termini, leggili e accetta una volta (marketing opzionale a parte). Il consenso è salvato prima di FloqR Stripe Checkout — come uno ShoutOut a pagamento, poi ricevuta e pass."
       },
       "help-vip-door-pass": {
         title: "Pass porta VIP reserV",
@@ -1907,8 +1907,8 @@
         body: "Escolha várias imagens ou vídeos curtos de uma vez e organize a ordem no perfil público. Os perfis suportam até 8 imagens e 2 vídeos curtos."
       },
       "help-vip-terms-consent": {
-        title: "Termos e consentimento VIP reserV",
-        body: "Antes do depósito aceite os Termos do local, reembolso, no-show, 21+ com ID e mínimo. O consentimento é gravado no servidor com o hash dos Termos. Marketing opcional."
+        title: "Termos VIP reserV",
+        body: "Depois de reter uma mesa, abra a página de Termos, leia e aceite uma vez (marketing opcional à parte). O consentimento é guardado antes do FloqR Stripe Checkout — como um ShoutOut pago, depois recibo e passe."
       },
       "help-vip-door-pass": {
         title: "Passe de porta VIP reserV",
@@ -2181,8 +2181,8 @@
         body: "Επιλέξτε πολλές εικόνες ή σύντομα βίντεο μαζί και στη συνέχεια ρυθμίστε τη σειρά τους στο δημόσιο προφίλ. Τα προφίλ υποστηρίζουν έως 8 εικόνες και 2 σύντομα βίντεο."
       },
       "help-vip-terms-consent": {
-        title: "Όροι και συναίνεση VIP reserV",
-        body: "Πριν την προκαταβολή αποδεχτείτε Όρους χώρου, επιστροφή, no-show, 21+ με ID και ελάχιστο. Η συναίνεση αποθηκεύεται στον server με hash Όρων. Marketing προαιρετικό."
+        title: "Όροι VIP reserV",
+        body: "Μετά την κράτηση τραπεζιού, ανοίξτε τη σελίδα Όρων, διαβάστε και αποδεχτείτε μία φορά (προαιρετικό marketing χωριστά). Η συναίνεση αποθηκεύεται πριν το FloqR Stripe Checkout — όπως πληρωμένο ShoutOut, μετά απόδειξη και πάσο."
       },
       "help-vip-door-pass": {
         title: "Πάσο πόρτας VIP reserV",
@@ -2455,8 +2455,8 @@
         body: "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
       },
       "help-vip-terms-consent": {
-        title: "Warunki i zgoda VIP reserV",
-        body: "Przed depozytem zaakceptuj warunki klubu, zwrot, no-show, 21+ z ID i minimum. Zgoda jest zapisywana po stronie serwera z hashem warunków. Marketing opcjonalny."
+        title: "Warunki VIP reserV",
+        body: "Po zablokowaniu stolika otwórz stronę Warunków, przeczytaj i zaakceptuj raz (marketing opcjonalnie osobno). Zgoda jest zapisywana przed FloqR Stripe Checkout — jak płatny ShoutOut, potem paragon i pass."
       },
       "help-vip-door-pass": {
         title: "Pass drzwi VIP reserV",
@@ -2729,8 +2729,8 @@
         body: "اختر عدة صور أو مقاطع فيديو قصيرة دفعة واحدة، ثم رتّب ترتيبها في الملف العام. تدعم الملفات حتى 8 صور ومقطعي فيديو قصيرين."
       },
       "help-vip-terms-consent": {
-        title: "شروط وموافقة VIP reserV",
-        body: "قبل العربون اقبل شروط المكان والاسترداد وno-show و21+ مع الهوية والحد الأدنى. تُسجَّل الموافقة على الخادم مع هاش الشروط. التسويق اختياري."
+        title: "شروط VIP reserV",
+        body: "بعد حجز الطاولة افتح صفحة الشروط واقرأها واقبل مرة واحدة (التسويق اختياري ومنفصل). تُحفظ الموافقة قبل FloqR Stripe Checkout — مثل ShoutOut المدفوع ثم الإيصال وتصريح الباب."
       },
       "help-vip-door-pass": {
         title: "تصريح باب VIP reserV",

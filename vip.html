@@ -4,10 +4,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title data-i18n="page.vip.title">VIP reserV | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.53"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.53"/>
-  <link rel="stylesheet" href="./vip-floor-viewer.css?v=s3.1.53"/>
-  <link rel="stylesheet" href="./vip.css?v=s3.1.53"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.54"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.54"/>
+  <link rel="stylesheet" href="./vip-floor-viewer.css?v=s3.1.54"/>
+  <link rel="stylesheet" href="./vip.css?v=s3.1.54"/>
 </head>
 <body class="vip-page" data-floqr-feature="vipReservations">
 <main class="app admin-shell vip-shell">
@@ -17,16 +17,16 @@
       <div>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/vip-reserv-icon.svg?v=s3.1.53" alt="VIP reserV" class="product-logo vip-hero-logo"/>
+          <img src="./images/vip-reserv-icon.svg?v=s3.1.54" alt="VIP reserV" class="product-logo vip-hero-logo"/>
         </div>
         <h1 class="brand-mixed-case" data-i18n="page.vip.title">VIP reserV</h1>
-        <p class="sub" data-i18n="page.vip.sub">Pick a night, hold a table for 30 minutes, accept the venue Terms, and pay the deposit.</p>
+        <p class="sub" data-i18n="page.vip.sub">Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit.</p>
       </div>
       <details class="help-popout" data-floqr-help-id="help-vip-book-table">
         <summary aria-label="Help">?</summary>
         <div class="help-popout-body">
           <strong data-i18n="help.vip.book.title">Book a VIP table</strong>
-          <p data-i18n="help.vip.book.body">Search VIP reserV–subscribed clubs, pick a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable.</p>
+          <p data-i18n="help.vip.book.body">Search VIP reserV–subscribed clubs first, select a venue, pick a night on the floor map, hold a green table for 30 minutes, continue to Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable.</p>
         </div>
       </details>
     </header>
@@ -37,6 +37,23 @@
       <p data-i18n="page.vip.signInHint">Sign in on Search / My Profile to use VIP reserV, or continue with Google if this tab has no session yet.</p>
       <button type="button" class="primary" data-floqr-login-btn data-i18n="page.vip.googleSignIn">Google sign-in</button>
       <p class="sub small"><a id="vipOpenProfile" href="./patron-portal.html?tab=profile" data-i18n="page.vip.openProfile">Open My Profile &amp; Settings</a></p>
+    </div>
+
+    <div id="vipConfirmation" class="confirmation card vip-confirmation hidden">
+      <h1 data-i18n="page.vip.confirmTitle">VIP reserV confirmed</h1>
+      <p class="sub" data-i18n="page.vip.confirmSub">Your table deposit is paid. Show your door pass from My Profile when you arrive.</p>
+      <div class="receipt">
+        <p><strong data-i18n="page.vip.confirmRefLabel">Reference:</strong> <span id="vipConfirmRef">—</span></p>
+        <p><strong data-i18n="page.vip.confirmVenueLabel">Venue:</strong> <span id="vipConfirmVenue">—</span></p>
+        <p><strong data-i18n="page.vip.confirmNightLabel">Night:</strong> <span id="vipConfirmNight">—</span></p>
+        <p><strong data-i18n="page.vip.confirmTableLabel">Table:</strong> <span id="vipConfirmTable">—</span></p>
+        <p><strong data-i18n="page.vip.confirmStatusLabel">Status:</strong> <span id="vipConfirmStatus" data-i18n="page.vip.confirmStatusPaid">Deposit paid · confirmed</span></p>
+        <p><strong data-i18n="page.vip.confirmOrderLabel">Order:</strong> <span id="vipConfirmOrder">—</span></p>
+      </div>
+      <div class="button-row confirmation-actions">
+        <a id="vipConfirmPass" class="buttonlike primary" href="./patron-portal.html?tab=guest-list-reserv" data-i18n="page.vip.confirmOpenPass">Open door pass</a>
+        <button type="button" id="vipConfirmAgain" class="ghost" data-i18n="page.vip.confirmBookAgain">Book another table</button>
+      </div>
     </div>
 
     <div id="vipApp" class="vip-app hidden">
@@ -59,30 +76,6 @@
       </div>
 
       <div id="vipHoldBanner" class="vip-hold-banner hidden" aria-live="polite"></div>
-
-      <div id="vipConsent" class="card vip-consent hidden">
-        <h2 data-i18n="page.vip.termsTitle">Terms &amp; consent</h2>
-        <p class="sub small" data-i18n="page.vip.termsSub">Beta Terms placeholder — counsel publishes Live venue Terms. Required boxes must be checked before deposit checkout.</p>
-        <details class="help-popout" data-floqr-help-id="help-vip-terms-consent">
-          <summary aria-label="Help">?</summary>
-          <div class="help-popout-body">
-            <strong data-i18n="help.vip.terms.title">Why accept Terms</strong>
-            <p data-i18n="help.vip.terms.body">You accept the venue’s Terms, refund and no-show rules, age 21+ with ID, and minimum-spend disclosure. Consent is stored before FloqR Stripe Checkout.</p>
-          </div>
-        </details>
-        <button type="button" id="vipAcceptRequired" class="buttonlike vip-accept-required" data-i18n="page.vip.acceptRequired">Accept all required Terms</button>
-        <label class="vip-check"><input type="checkbox" id="vipCheckTerms"/> <span data-i18n="page.vip.checkTerms">I accept the VIP reserV / venue Terms</span></label>
-        <label class="vip-check"><input type="checkbox" id="vipCheckRefund"/> <span data-i18n="page.vip.checkRefund">I understand the refund / cancellation policy</span></label>
-        <label class="vip-check"><input type="checkbox" id="vipCheckNoShow"/> <span data-i18n="page.vip.checkNoShow">I understand the no-show / deposit forfeit policy</span></label>
-        <label class="vip-check"><input type="checkbox" id="vipCheckAge"/> <span data-i18n="page.vip.checkAge">I am 21+ and will bring valid ID</span></label>
-        <label class="vip-check"><input type="checkbox" id="vipCheckMinimum"/> <span data-i18n="page.vip.checkMinimum">I understand the minimum spend / gratuity disclosure</span></label>
-        <label class="vip-check"><input type="checkbox" id="vipCheckMarketing"/> <span data-i18n="page.vip.checkMarketing">Optional: venue marketing messages</span></label>
-        <div class="vip-consent-actions">
-          <button type="button" id="vipConsentCancel" class="buttonlike" data-i18n="page.vip.consentCancel">Back</button>
-          <button type="button" id="vipConsentPay" class="primary" data-i18n="page.vip.consentPay">Pay deposit</button>
-        </div>
-        <p class="sub small vip-stripe-hint" data-i18n="page.vip.stripeTestHint">Stripe test card: 4242 4242 4242 4242 · any future expiry · any CVC.</p>
-      </div>
 
       <div id="vipMapSection" class="vip-map-section hidden">
         <header class="vip-map-header">
@@ -118,18 +111,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.53"></script>
-<script src="./floqr-session-shell.js?v=s3.1.53"></script>
-<script src="./shared-data.js?v=s3.1.53"></script>
-<script src="./feature-gates.js?v=s3.1.53"></script>
-<script src="./floqr-i18n.js?v=s3.1.53"></script>
-<script src="./floqr-feature-services.js?v=s3.1.53"></script>
-<script src="./floqr-nav.js?v=s3.1.53"></script>
-<script src="./floqai-help-repository.js?v=s3.1.53"></script>
-<script src="./helper-popouts.js?v=s3.1.53"></script>
-<script src="./global-profile-status.js?v=s3.1.53"></script>
+<script src="./firebase-config.js?v=s3.1.54"></script>
+<script src="./floqr-session-shell.js?v=s3.1.54"></script>
+<script src="./shared-data.js?v=s3.1.54"></script>
+<script src="./feature-gates.js?v=s3.1.54"></script>
+<script src="./floqr-i18n.js?v=s3.1.54"></script>
+<script src="./floqr-feature-services.js?v=s3.1.54"></script>
+<script src="./floqr-nav.js?v=s3.1.54"></script>
+<script src="./floqai-help-repository.js?v=s3.1.54"></script>
+<script src="./helper-popouts.js?v=s3.1.54"></script>
+<script src="./global-profile-status.js?v=s3.1.54"></script>
 <script>window.FLOQR_VIP_BOOT = window.FLOQR_VIP_BOOT || {plan: "decades.json"};</script>
-<script src="./vip-app.js?v=s3.1.53"></script>
-<script src="./vip-floor-viewer.js?v=s3.1.53"></script>
+<script src="./vip-app.js?v=s3.1.54"></script>
+<script src="./vip-floor-viewer.js?v=s3.1.54"></script>
 </body>
 </html>

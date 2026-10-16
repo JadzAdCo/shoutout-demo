@@ -364,17 +364,26 @@
     position: static;
     width: 150px;
   }
+  /* Mobile: selected table details sit below the map (document flow), not a fixed overlay.
+     Desktop (≥601px) keeps the sticky side panel unchanged. */
+  .vip-map-section .layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .vip-map-section .map-col { order: 1; }
   .vip-map-section aside.info {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    order: 2;
+    position: static;
+    left: auto;
+    right: auto;
+    bottom: auto;
     top: auto;
-    max-height: 48vh;
-    overflow: auto;
-    border-radius: 14px 14px 0 0;
-    z-index: 10;
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+    max-height: none;
+    overflow: visible;
+    margin-top: 12px;
+    border-radius: 16px;
+    z-index: auto;
+    box-shadow: none;
   }
   .vip-map-section aside.info[hidden] { display: none; }
   .vip-map-section aside.info .close { display: inline-flex; margin-left: auto; }

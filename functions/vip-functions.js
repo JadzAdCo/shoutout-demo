@@ -14,7 +14,8 @@ const db = admin.firestore();
 
 const CALL_OPTS = {region: "us-central1", cors: true};
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
-  validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, holdExpiresAtMs, HOLD_MS} = core;
+  validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
+  holdExpiresAtMs, HOLD_MS} = core;
 
 function requireAuth(auth) {
   if (!auth?.uid) throw new HttpsError("unauthenticated", "Sign in required.");
@@ -297,7 +298,7 @@ exports.recordVipConsent = onCall(CALL_OPTS, async request => {
   const checks = request.data?.checks && typeof request.data.checks === "object" ? request.data.checks : {};
   if (!holdId) throw new HttpsError("invalid-argument", "holdId is required.");
   if (!consentChecksComplete(checks)) {
-    throw new HttpsError("invalid-argument", "Accept all required VIP reserV Terms checkboxes.");
+    throw new HttpsError("invalid-argument", "Accept the VIP reserV Terms before paying.");
   }
   const holdSnap = await db.collection("vipHolds").doc(holdId).get();
   if (!holdSnap.exists) throw new HttpsError("not-found", "Hold not found.");
@@ -320,14 +321,7 @@ exports.recordVipConsent = onCall(CALL_OPTS, async request => {
     termsDocId: BETA_TERMS.termsDocId,
     termsVersion: BETA_TERMS.termsVersion,
     termsSha256: BETA_TERMS.termsSha256,
-    checks: {
-      terms: true,
-      refund: true,
-      noShow: true,
-      age21: true,
-      minimumSpend: true,
-      marketing: checks.marketing === true
-    },
+    checks: expandConsentChecks(checks),
     ip: meta.ip,
     userAgent: meta.userAgent,
     createdAtMs: now
