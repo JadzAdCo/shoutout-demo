@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.44 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.46 (stable)
+
+- s3.1.46: VIP ReserV Phase 2 — inventory holds, Terms consent, FloqR Stripe deposit checkout, My Profile Reservations, vip-door.html check-in; VIP-B-24 receipt SMS + invoice redactor fixes.
 
 - s3.1.44: Rename product brand supRstar / SupRstR / suprstr to floqCast (feature key floqCast with legacy supRstar dual-read; pages floqcast-*.html; Firestore collection ids suprstrLive / suprstrSessions / suprstarRequests kept as storage ids).
 

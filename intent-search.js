@@ -103,6 +103,23 @@
       ]
     },
     {
+      id: "vip-reserv",
+      kind: "product",
+      featureKey: "vipReservations",
+      label: "VIP ReserV — book a VIP table",
+      blurb: "Explore a club floor map and reserve a VIP table. Beta: Decades, Lima Twist Club, Aurelia.",
+      href: pageUrl("./vip.html", {from: "floqai"}),
+      searchPhrases: [
+        "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
+        "table reservation", "vip booth", "bottle service reservation", "floor map booking"
+      ],
+      patterns: [
+        /vip\s*reserv/, /vipreserv/, /vip\s*table/, /book\s+(a\s+)?(vip\s+)?table/,
+        /reserve\s+(a\s+)?(vip\s+)?table/, /table\s+reservation/, /vip\s*booth/,
+        /bottle\s+service\s+(book|reserv)/, /floor\s*map\s+(book|reserv)/
+      ]
+    },
+    {
       id: "clubs",
       kind: "product",
       label: "Clubs & venues",
@@ -889,7 +906,7 @@
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],
     "help-nfl-jersey": ["patron"], "help-soccer-jersey": ["patron"], "help-sell-bartr": ["patron"],
-    "help-vip": ["patron"], "help-onboarding": ["patron"], "help-general": ["patron"],
+    "help-vip": ["patron"], "vip-reserv": ["patron"], "help-onboarding": ["patron"], "help-general": ["patron"],
     "help-schedule-confirm": ["serviceMember"], "help-staff-worksheet": ["serviceMember"],
     "help-scheduling": ["serviceMember"], "help-staff-schedule-user-guide": ["serviceMember"],
     "help-create-publish-schedule": ["privilegedEmployee"], "help-multi-delete-shifts": ["privilegedEmployee"],

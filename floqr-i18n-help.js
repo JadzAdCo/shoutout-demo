@@ -2,10 +2,10 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.88";
+  const VERSION = "s3.1.46";
 
   const packs = {
-    ru: {
+    "ru": {
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
         body: "Планируйте смены и букинги и уведомляйте каждого через Inbox, Email, SMS или WhatsApp. В разделе «Расписание для» выберите, с чьим календарём вы работаете: «Моё расписание DJ» — ваш собственный календарь, «Клуб» — клубы, которыми вы управляете, «Промо-компания» — компании, для которых вы промоутер. У каждого календаря своя подписка за 20 $ в месяц. Смены, назначенные вам, появляются в разделе «Мои назначения», где их можно подтвердить или отклонить."
@@ -42,9 +42,7 @@
         title: "Общие ShoutOuts",
         body: "Готовые идеи для обычных поводов — дней рождения и праздников. Нажмите, чтобы использовать, и измените под себя."
       },
-
       "help-beta-tester": {
-
         title: "Бета-тестирование",
         body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт, и нажмите «Принять». После этого в поиске с меткой «Бета» появятся только функции, которые FLOQR выбрал для вас. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
       },
@@ -79,6 +77,14 @@
       "help-floqcast": {
         title: "Сделать меня floqCast / superstar",
         body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
+      },
+      "help-vip-book-table": {
+        title: "Забронировать VIP-стол (VIP ReserV)",
+        body: "VIP ReserV позволяет изучить план зала и забронировать стол. Откройте VIP ReserV из Поиска, выберите Decades или Lima Twist Club и вечер, нажмите зелёный стол, удержите 30 минут, примите условия и оплатите депозит через FloqR Stripe. Бары и DJ не бронируются. Бренд VIP ReserV не переводится."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Стать Club Admin",
@@ -255,9 +261,25 @@
       "help-public-media-sharing": {
         title: "Публичные медиа и обмен данными",
         body: "Выберите несколько изображений или коротких видео сразу, затем задайте их порядок в публичном профиле. Профили поддерживают до 8 изображений и 2 коротких видео."
+      },
+      "help-vip-terms-consent": {
+        title: "Условия и согласие VIP ReserV",
+        body: "Перед оплатой депозита нужно принять условия площадки, правила возврата, no-show, возраст 21+ с ID и раскрытие минимального расхода. Согласие пишется на сервере с хешем версии условий. Маркетинг — по желанию."
+      },
+      "help-vip-door-pass": {
+        title: "Пропуск VIP ReserV",
+        body: "После подтверждения депозита откройте Мой профиль → Бронирования и нажмите Show pass для одноразового QR. Возьмите ID 21+. Персонал двери использует VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in у двери VIP ReserV",
+        body: "VIP Manager открывает VIP ReserV Door на сегодня. Сканируйте или вставьте токен, подтвердите ID 21+, затем check-in. No-show только после grace. Ссылка notify не меняет статус."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS чеков VIP и редакция счетов",
+        body: "SMS чеков идут только через залогированный Twilio Messages API. Номера FLOQR-YYYYMMDD-… и VR-… остаются читаемыми в логах (не маскируются как OTP)."
       }
     },
-    nl: {
+    "nl": {
       "help-scheduling-schedule-for": {
         title: "Personeelsplanning",
         body: "Plan diensten en boekingen en laat iedereen het weten via Inbox, Email, SMS of WhatsApp. Kies onder 'Planning voor' aan welke agenda je werkt: 'Mijn DJ-planning' is je eigen agenda, 'Club' toont de clubs die je beheert en 'Promotiebedrijf' de bedrijven waarvoor je promoot. Elke agenda heeft een eigen abonnement van $ 20 per maand. Diensten die aan jou zijn toegewezen verschijnen onder 'Mijn toewijzingen', waar je ze bevestigt of weigert."
@@ -294,9 +316,7 @@
         title: "Algemene ShoutOuts",
         body: "Kant-en-klare ideeën voor veelvoorkomende momenten zoals verjaardagen en feestjes. Tik op een idee om het te gebruiken en maak het daarna persoonlijk."
       },
-
       "help-beta-tester": {
-
         title: "Bètatesten",
         body: "FLOQR nodigt soms bezoekers uit om nieuwe functies vroeg te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account en kies Accepteren. Alleen de functies die FLOQR voor jou heeft gekozen verschijnen dan bij Zoeken met het label Bèta. Ze kunnen tijdens het testen veranderen of worden uitgezet. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
       },
@@ -331,6 +351,14 @@
       "help-floqcast": {
         title: "Maak me een floqCast / superstar",
         body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de floqCast Queue → Go live op het floqCast-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
+      },
+      "help-vip-book-table": {
+        title: "VIP-tafel boeken (VIP ReserV)",
+        body: "VIP ReserV toont de plattegrond en boekt tafels. Open VIP ReserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Word Club Admin",
@@ -507,9 +535,25 @@
       "help-public-media-sharing": {
         title: "Openbare media en gegevensdeling",
         body: "Kies meerdere afbeeldingen of korte video's tegelijk en rangschik daarna hun volgorde op het openbare profiel. Profielen ondersteunen tot 8 afbeeldingen en 2 korte video's."
+      },
+      "help-vip-terms-consent": {
+        title: "VIP ReserV voorwaarden & toestemming",
+        body: "Voor de borg accepteer je locatievoorwaarden, restitutie, no-show, 21+ met ID en minimum. Toestemming wordt server-side opgeslagen met de Terms-hash. Marketing optioneel."
+      },
+      "help-vip-door-pass": {
+        title: "VIP ReserV deurpass",
+        body: "Na bevestigde borg: Mijn profiel → Reserveringen → Toon pass voor een eenmalige QR. Neem ID 21+ mee. Deurstaf gebruikt VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "VIP ReserV deur check-in",
+        body: "VIP Managers openen VIP ReserV Door voor vanavond. Scan of plak de token, bevestig ID 21+, check in. No-show alleen na grace. Een notify-link wijzigt de status niet."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "VIP ontvangst-SMS & factuurredactie",
+        body: "Ontvangst-SMS alleen via de gelogde Twilio Messages API. FLOQR-YYYYMMDD-… en VR-… blijven leesbaar in logs."
       }
     },
-    fr: {
+    "fr": {
       "help-scheduling-schedule-for": {
         title: "Planification du personnel",
         body: "Planifiez des shifts et des bookings, puis prévenez chaque personne par Inbox, Email, SMS ou WhatsApp. Sous « Planning pour », choisissez le calendrier sur lequel vous travaillez : « Mon planning DJ » est votre propre calendrier, « Club » liste les clubs que vous gérez et « Société de promotion » les sociétés pour lesquelles vous faites la promotion. Chaque calendrier a son propre abonnement à 20 $/mois. Les shifts qui vous sont attribués apparaissent sous « Mes affectations », où vous les confirmez ou les refusez."
@@ -546,9 +590,7 @@
         title: "ShoutOuts génériques",
         body: "Des idées prêtes à l'emploi pour les moments courants comme les anniversaires et les fêtes. Touchez-en une pour l'utiliser, puis personnalisez-la."
       },
-
       "help-beta-tester": {
-
         title: "Tests bêta",
         body: "FLOQR invite parfois des clients à essayer de nouvelles fonctionnalités en avant-première. L'invitation arrive dans votre boîte de réception ; ouvrez-la en étant connecté au même compte et choisissez Accepter. Seules les fonctionnalités que FLOQR a choisies pour vous apparaissent alors dans la recherche avec l'étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
       },
@@ -583,6 +625,14 @@
       "help-floqcast": {
         title: "Fais de moi une floqCast / superstar",
         body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
+      },
+      "help-vip-book-table": {
+        title: "Réserver une table VIP (VIP ReserV)",
+        body: "VIP ReserV explore le plan et réserve une table. Ouvrez VIP ReserV depuis Recherche, choisissez Decades ou Lima Twist Club et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez l’acompte avec FloqR Stripe. Bars et DJ non réservables. La marque VIP ReserV n’est pas traduite."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Devenez un Club Admin",
@@ -759,9 +809,25 @@
       "help-public-media-sharing": {
         title: "Médias publics et partage",
         body: "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
+      },
+      "help-vip-terms-consent": {
+        title: "Conditions et consentement VIP ReserV",
+        body: "Avant l’acompte, acceptez les Conditions du lieu, remboursement, no-show, 21+ avec ID et minimum. Le consentement est enregistré côté serveur avec le hash des Conditions. Marketing optionnel."
+      },
+      "help-vip-door-pass": {
+        title: "Pass porte VIP ReserV",
+        body: "Après confirmation de l’acompte, Mon profil → Réservations → Afficher le pass pour un jeton QR unique. Apportez une ID 21+. Le personnel utilise VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Enregistrement porte VIP ReserV",
+        body: "Les VIP Managers ouvrent VIP ReserV Door pour ce soir. Scannez ou collez le jeton, confirmez ID 21+, enregistrez. No-show seulement après grâce. Un lien notify ne change pas le statut."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS de reçu VIP et rédaction des factures",
+        body: "Les SMS de reçu passent uniquement par l’API Twilio Messages journalisée. Les numéros FLOQR-YYYYMMDD-… et VR-… restent lisibles dans les logs."
       }
     },
-    de: {
+    "de": {
       "help-scheduling-schedule-for": {
         title: "Mitarbeiterplanung",
         body: "Plane Schichten und Bookings und benachrichtige jede Person per Inbox, Email, SMS oder WhatsApp. Unter „Planen für“ wählst du, wessen Kalender du bearbeitest: „Mein DJ-Plan“ ist dein eigener Kalender, „Club“ zeigt die Clubs, die du verwaltest, und „Promo-Firma“ die Firmen, für die du promotest. Jeder Kalender hat sein eigenes Abo für 20 $/Monat. Schichten für dich erscheinen unter „Meine Einsätze“, wo du sie bestätigst oder ablehnst."
@@ -798,9 +864,7 @@
         title: "Allgemeine ShoutOuts",
         body: "Fertige Ideen für typische Anlässe wie Geburtstage und Feiern. Tippe auf eine, um sie zu verwenden, und passe sie dann an."
       },
-
       "help-beta-tester": {
-
         title: "Beta-Tests",
         body: "FLOQR lädt Gäste manchmal ein, neue Funktionen vorab auszuprobieren. Die Einladung kommt in Ihren Posteingang; öffnen Sie sie, während Sie mit demselben Konto angemeldet sind, und wählen Sie Annehmen. Nur die Funktionen, die FLOQR für Sie ausgewählt hat, erscheinen dann in der Suche mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das Konto, an das sie gesendet wurden."
       },
@@ -835,6 +899,14 @@
       "help-floqcast": {
         title: "Mach mich zu einem floqCast/Superstar",
         body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
+      },
+      "help-vip-book-table": {
+        title: "VIP-Tisch buchen (VIP ReserV)",
+        body: "VIP ReserV zeigt den Saalplan und bucht Tische. Öffne VIP ReserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP ReserV wird nicht übersetzt."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Werde ein Club Admin",
@@ -1011,9 +1083,25 @@
       "help-public-media-sharing": {
         title: "Öffentliche Medien und Datenfreigabe",
         body: "Wähle mehrere Bilder oder kurze Videos auf einmal aus und lege dann ihre Reihenfolge im öffentlichen Profil fest. Profile unterstützen bis zu 8 Bilder und 2 kurze Videos."
+      },
+      "help-vip-terms-consent": {
+        title: "VIP ReserV AGB & Einwilligung",
+        body: "Vor der Anzahlung musst du Location-AGB, Rückerstattung, No-Show, 21+ mit Ausweis und Mindestumsatz akzeptieren. Einwilligung wird serverseitig mit Terms-Hash gespeichert. Marketing optional."
+      },
+      "help-vip-door-pass": {
+        title: "VIP ReserV Tür-Pass",
+        body: "Nach bestätigter Anzahlung: Mein Profil → Reservierungen → Pass anzeigen für einmaligen QR. Ausweis 21+ mitbringen. Türpersonal nutzt VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "VIP ReserV Tür-Check-in",
+        body: "VIP Manager öffnen VIP ReserV Door für heute. Token scannen/einfügen, ID 21+ prüfen, einchecken. No-Show erst nach Grace. Notify-Links ändern den Status nicht."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "VIP-Beleg-SMS & Rechnungsredaktion",
+        body: "Beleg-SMS nur über den geloggten Twilio Messages API-Pfad. FLOQR-YYYYMMDD-… und VR-… bleiben in Logs lesbar (keine OTP-Maskierung)."
       }
     },
-    es: {
+    "es": {
       "help-scheduling-schedule-for": {
         title: "Planificación del personal",
         body: "Planifica turnos y contrataciones y avisa a cada persona por Inbox, Email, SMS o WhatsApp. En «Horario de», elige el calendario con el que trabajas: «Mi horario de DJ» es tu propio calendario, «Club» muestra los clubs que administras y «Empresa de promoción» las empresas para las que promocionas. Cada calendario tiene su propia suscripción de 20 $/mes. Los turnos que te asignan aparecen en «Mis asignaciones», donde los confirmas o rechazas."
@@ -1050,9 +1138,7 @@
         title: "ShoutOuts genéricos",
         body: "Ideas listas para momentos comunes como cumpleaños y celebraciones. Toca una para usarla y luego hazla tuya."
       },
-
       "help-beta-tester": {
-
         title: "Pruebas beta",
         body: "FLOQR a veces invita a clientes a probar funciones nuevas antes que nadie. La invitación llega a tu bandeja de entrada; ábrela con la sesión iniciada en la misma cuenta y elige Aceptar. Solo las funciones que FLOQR eligió para ti aparecerán en la búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta a la que se enviaron."
       },
@@ -1087,6 +1173,14 @@
       "help-floqcast": {
         title: "Hazme un floqCast / superestrella",
         body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
+      },
+      "help-vip-book-table": {
+        title: "Reservar mesa VIP (VIP ReserV)",
+        body: "VIP ReserV muestra el mapa y reserva mesas. Abre VIP ReserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Conviértete en un Club Admin",
@@ -1263,9 +1357,25 @@
       "help-public-media-sharing": {
         title: "Medios públicos y uso compartido de datos",
         body: "Elige varias imágenes o videos cortos a la vez y luego ordena su posición en el perfil público. Los perfiles admiten hasta 8 imágenes y 2 videos cortos."
+      },
+      "help-vip-terms-consent": {
+        title: "Términos y consentimiento VIP ReserV",
+        body: "Antes del depósito acepta Términos del local, reembolso, no-show, 21+ con ID y mínimo. El consentimiento se guarda en servidor con el hash de Términos. Marketing opcional."
+      },
+      "help-vip-door-pass": {
+        title: "Pase de puerta VIP ReserV",
+        body: "Tras confirmar el depósito, Mi perfil → Reservas → Mostrar pase para un QR de un solo uso. Trae ID 21+. El personal usa VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in en puerta VIP ReserV",
+        body: "Los VIP Managers abren VIP ReserV Door para esta noche. Escanea o pega el token, confirma ID 21+, check-in. No-show solo tras gracia. Un enlace notify no cambia el estado."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS de recibo VIP y redacción de facturas",
+        body: "Los SMS de recibo solo usan la API Twilio Messages con registro. Los números FLOQR-YYYYMMDD-… y VR-… siguen legibles en los logs."
       }
     },
-    it: {
+    "it": {
       "help-scheduling-schedule-for": {
         title: "Pianificazione del personale",
         body: "Pianifica turni e ingaggi, poi avvisa ogni persona tramite Inbox, Email, SMS o WhatsApp. In «Turni per» scegli il calendario su cui lavori: «Il mio calendario DJ» è il tuo calendario, «Club» elenca i club che gestisci e «Società di promozione» le società per cui fai promozione. Ogni calendario ha il proprio abbonamento da 20 $/mese. I turni assegnati a te compaiono in «I miei incarichi», dove li confermi o li rifiuti."
@@ -1302,9 +1412,7 @@
         title: "ShoutOut generici",
         body: "Idee pronte per momenti comuni come compleanni e feste. Toccane una per usarla, poi personalizzala."
       },
-
       "help-beta-tester": {
-
         title: "Test beta",
         body: "FLOQR a volte invita i clienti a provare in anteprima nuove funzioni. L'invito arriva nella tua Posta in arrivo; aprilo mentre sei connesso allo stesso account e scegli Accetta. Solo le funzioni che FLOQR ha scelto per te compariranno nella ricerca con l'etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l'account a cui sono stati inviati."
       },
@@ -1339,6 +1447,14 @@
       "help-floqcast": {
         title: "Fammi un floqCast / superstar",
         body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
+      },
+      "help-vip-book-table": {
+        title: "Prenota un tavolo VIP (VIP ReserV)",
+        body: "VIP ReserV mostra la mappa e prenota tavoli. Apri VIP ReserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Diventa un Club Admin",
@@ -1515,9 +1631,25 @@
       "help-public-media-sharing": {
         title: "Public Media and Data Sharing",
         body: "Scegli più immagini o brevi video insieme, poi definisci l'ordine nel profilo pubblico. I profili supportano fino a 8 immagini e 2 brevi video."
+      },
+      "help-vip-terms-consent": {
+        title: "Termini e consenso VIP ReserV",
+        body: "Prima del deposito accetta i Termini del locale, rimborso, no-show, 21+ con ID e minimo. Il consenso è registrato sul server con l’hash dei Termini. Marketing opzionale."
+      },
+      "help-vip-door-pass": {
+        title: "Pass porta VIP ReserV",
+        body: "Dopo la conferma del deposito, Il mio profilo → Prenotazioni → Mostra pass per un QR monouso. Porta ID 21+. Lo staff usa VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in porta VIP ReserV",
+        body: "I VIP Manager aprono VIP ReserV Door per stasera. Scansiona o incolla il token, conferma ID 21+, check-in. No-show solo dopo grace. Un link notify non cambia lo stato."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS ricevuta VIP e redazione fatture",
+        body: "Gli SMS ricevuta usano solo l’API Twilio Messages con log. I numeri FLOQR-YYYYMMDD-… e VR-… restano leggibili nei log."
       }
     },
-    pt: {
+    "pt": {
       "help-scheduling-schedule-for": {
         title: "Agendamento de pessoal",
         body: "Planeje turnos e contratações e avise cada pessoa por Inbox, Email, SMS ou WhatsApp. Em «Escala de», escolha em qual agenda você está trabalhando: «Minha agenda de DJ» é a sua própria agenda, «Clube» lista os clubes que você administra e «Empresa de promoção» as empresas para as quais você promove. Cada agenda tem sua própria assinatura de US$ 20/mês. Os turnos enviados para você aparecem em «Minhas atribuições», onde você os confirma ou recusa."
@@ -1554,9 +1686,7 @@
         title: "ShoutOuts genéricos",
         body: "Ideias prontas para momentos comuns, como aniversários e comemorações. Toque em uma para usá-la e depois deixe-a do seu jeito."
       },
-
       "help-beta-tester": {
-
         title: "Testes beta",
         body: "A FLOQR convida por vezes clientes a experimentar novas funcionalidades mais cedo. O convite chega à sua Caixa de entrada; abra-o com sessão iniciada na mesma conta e escolha Aceitar. Só as funcionalidades que a FLOQR escolheu para si passam a aparecer na pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta a que foram enviados."
       },
@@ -1591,6 +1721,14 @@
       "help-floqcast": {
         title: "Faça de mim um floqCast / superstar",
         body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+      },
+      "help-vip-book-table": {
+        title: "Reservar mesa VIP (VIP ReserV)",
+        body: "VIP ReserV mostra o mapa e reserva mesas. Abra VIP ReserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Torne-se um Club Admin",
@@ -1767,9 +1905,25 @@
       "help-public-media-sharing": {
         title: "Mídia pública e compartilhamento de dados",
         body: "Escolha várias imagens ou vídeos curtos de uma vez e organize a ordem no perfil público. Os perfis suportam até 8 imagens e 2 vídeos curtos."
+      },
+      "help-vip-terms-consent": {
+        title: "Termos e consentimento VIP ReserV",
+        body: "Antes do depósito aceite os Termos do local, reembolso, no-show, 21+ com ID e mínimo. O consentimento é gravado no servidor com o hash dos Termos. Marketing opcional."
+      },
+      "help-vip-door-pass": {
+        title: "Passe de porta VIP ReserV",
+        body: "Após confirmar o depósito, Meu perfil → Reservas → Mostrar passe para um QR de uso único. Traga ID 21+. A equipa usa VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in na porta VIP ReserV",
+        body: "VIP Managers abrem VIP ReserV Door para esta noite. Digitalize ou cole o token, confirme ID 21+, faça check-in. No-show só após grace. Um link notify não altera o estado."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS de recibo VIP e redação de faturas",
+        body: "SMS de recibo só pela API Twilio Messages com log. Números FLOQR-YYYYMMDD-… e VR-… permanecem legíveis nos logs."
       }
     },
-    el: {
+    "el": {
       "help-scheduling-schedule-for": {
         title: "Προγραμματισμός προσωπικού",
         body: "Σχεδιάστε βάρδιες και κρατήσεις και ειδοποιήστε κάθε άτομο μέσω Inbox, Email, SMS ή WhatsApp. Στο «Πρόγραμμα για» επιλέξτε σε ποιο ημερολόγιο δουλεύετε: «Το πρόγραμμά μου ως DJ» είναι το δικό σας ημερολόγιο, το «Club» δείχνει τα clubs που διαχειρίζεστε και η «Εταιρεία προώθησης» τις εταιρείες για τις οποίες κάνετε προώθηση. Κάθε ημερολόγιο έχει τη δική του συνδρομή 20 $/μήνα. Οι βάρδιες που σας ανατίθενται εμφανίζονται στις «Οι αναθέσεις μου», όπου τις επιβεβαιώνετε ή τις απορρίπτετε."
@@ -1806,9 +1960,7 @@
         title: "Γενικά ShoutOuts",
         body: "Έτοιμες ιδέες για συνηθισμένες στιγμές, όπως γενέθλια και γιορτές. Πατήστε μία για να τη χρησιμοποιήσετε και μετά κάντε τη δική σας."
       },
-
       "help-beta-tester": {
-
         title: "Δοκιμές beta",
         body: "Το FLOQR προσκαλεί κάποιες φορές πελάτες να δοκιμάσουν νωρίτερα νέες λειτουργίες. Η πρόσκληση έρχεται στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό και επιλέξτε Αποδοχή. Μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς εμφανίζονται τότε στην αναζήτηση με την ετικέτα Beta. Μπορεί να αλλάξουν ή να απενεργοποιηθούν κατά τις δοκιμές. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό στον οποίο στάλθηκαν."
       },
@@ -1843,6 +1995,14 @@
       "help-floqcast": {
         title: "Κάνε με floqCast / σούπερ σταρ",
         body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά floqCast → Go live στον πίνακα floqCast. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
+      },
+      "help-vip-book-table": {
+        title: "Κράτηση VIP τραπεζιού (VIP ReserV)",
+        body: "Το VIP ReserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP ReserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Γίνε Club Admin",
@@ -2019,9 +2179,25 @@
       "help-public-media-sharing": {
         title: "Δημόσια Μέσα και Κοινοποίηση Δεδομένων",
         body: "Επιλέξτε πολλές εικόνες ή σύντομα βίντεο μαζί και στη συνέχεια ρυθμίστε τη σειρά τους στο δημόσιο προφίλ. Τα προφίλ υποστηρίζουν έως 8 εικόνες και 2 σύντομα βίντεο."
+      },
+      "help-vip-terms-consent": {
+        title: "Όροι και συναίνεση VIP ReserV",
+        body: "Πριν την προκαταβολή αποδεχτείτε Όρους χώρου, επιστροφή, no-show, 21+ με ID και ελάχιστο. Η συναίνεση αποθηκεύεται στον server με hash Όρων. Marketing προαιρετικό."
+      },
+      "help-vip-door-pass": {
+        title: "Πάσο πόρτας VIP ReserV",
+        body: "Μετά την επιβεβαίωση προκαταβολής, Το προφίλ μου → Κρατήσεις → Εμφάνιση πάσου για QR μίας χρήσης. Φέρτε ID 21+. Το προσωπικό χρησιμοποιεί VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in πόρτας VIP ReserV",
+        body: "Οι VIP Managers ανοίγουν VIP ReserV Door για απόψε. Σαρώστε ή επικολλήστε token, επιβεβαιώστε ID 21+, check-in. No-show μόνο μετά από grace. Σύνδεσμος notify δεν αλλάζει κατάσταση."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS απόδειξης VIP και σύνταξη τιμολογίων",
+        body: "Τα SMS απόδειξης περνούν μόνο από το καταγεγραμμένο Twilio Messages API. Οι αριθμοί FLOQR-YYYYMMDD-… και VR-… μένουν αναγνώσιμοι στα logs."
       }
     },
-    pl: {
+    "pl": {
       "help-scheduling-schedule-for": {
         title: "Planowanie personelu",
         body: "Planuj zmiany i bookingi, a potem powiadamiaj każdą osobę przez Inbox, Email, SMS lub WhatsApp. W sekcji „Grafik dla” wybierz, czyim kalendarzem się zajmujesz: „Mój grafik DJ” to twój własny kalendarz, „Klub” pokazuje kluby, którymi zarządzasz, a „Firma promocyjna” firmy, dla których promujesz. Każdy kalendarz ma własną subskrypcję za 20 $/miesiąc. Zmiany przypisane tobie pojawiają się w „Moje przydziały”, gdzie je potwierdzasz lub odrzucasz."
@@ -2058,9 +2234,7 @@
         title: "Ogólne ShoutOuts",
         body: "Gotowe pomysły na typowe okazje, takie jak urodziny i uroczystości. Dotknij jednego, aby go użyć, a potem dopasuj go do siebie."
       },
-
       "help-beta-tester": {
-
         title: "Testy beta",
         body: "FLOQR czasem zaprasza gości do wcześniejszego wypróbowania nowych funkcji. Zaproszenie trafia do skrzynki odbiorczej; otwórz je, będąc zalogowanym na to samo konto, i wybierz Akceptuj. W wyszukiwaniu z etykietą Beta pojawią się tylko funkcje, które FLOQR dla Ciebie wybrał. Mogą się zmieniać lub zostać wyłączone w trakcie testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta, na które je wysłano."
       },
@@ -2095,6 +2269,14 @@
       "help-floqcast": {
         title: "Zrób mi floqCast / supergwiazdę",
         body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce floqCast → Go live na tablicy floqCast. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
+      },
+      "help-vip-book-table": {
+        title: "Zarezerwuj stolik VIP (VIP ReserV)",
+        body: "VIP ReserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP ReserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "Zostań Club Admin",
@@ -2271,9 +2453,25 @@
       "help-public-media-sharing": {
         title: "Udostępnianie mediów publicznych i danych",
         body: "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
+      },
+      "help-vip-terms-consent": {
+        title: "Warunki i zgoda VIP ReserV",
+        body: "Przed depozytem zaakceptuj warunki klubu, zwrot, no-show, 21+ z ID i minimum. Zgoda jest zapisywana po stronie serwera z hashem warunków. Marketing opcjonalny."
+      },
+      "help-vip-door-pass": {
+        title: "Pass drzwi VIP ReserV",
+        body: "Po potwierdzeniu depozytu: Mój profil → Rezerwacje → Pokaż pass dla jednorazowego QR. Weź ID 21+. Personel używa VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "Check-in drzwi VIP ReserV",
+        body: "VIP Managerowie otwierają VIP ReserV Door na dziś. Zeskanuj lub wklej token, potwierdź ID 21+, check-in. No-show dopiero po grace. Link notify nie zmienia statusu."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS paragonu VIP i redakcja faktur",
+        body: "SMS paragonów tylko przez zalogowane Twilio Messages API. Numery FLOQR-YYYYMMDD-… i VR-… pozostają czytelne w logach."
       }
     },
-    ar: {
+    "ar": {
       "help-scheduling-schedule-for": {
         title: "جداول الموظفين",
         body: "خطّط المناوبات والحجوزات ثم أبلغ كل شخص عبر Inbox أو Email أو SMS أو WhatsApp. من «الجدول لـ» اختر التقويم الذي تعمل عليه: «جدولي كـ DJ» هو تقويمك الخاص، و«نادٍ» يعرض النوادي التي تديرها، و«شركة ترويج» يعرض الشركات التي تروّج لها. لكل تقويم اشتراكه الخاص بـ 20 دولارًا شهريًا. تظهر المناوبات المسندة إليك في «مهامي» حيث تؤكدها أو ترفضها."
@@ -2310,9 +2508,7 @@
         title: "ShoutOuts عامة",
         body: "أفكار جاهزة للمناسبات الشائعة مثل أعياد الميلاد والاحتفالات. اضغط على واحدة لاستخدامها، ثم اجعلها خاصة بك."
       },
-
       "help-beta-tester": {
-
         title: "الاختبار التجريبي",
         body: "تدعو FLOQR أحيانًا الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى صندوق الوارد؛ افتحها وأنت مسجّل الدخول بالحساب نفسه واختر قبول. ستظهر بعد ذلك في البحث مع شارة تجريبي الميزات التي اختارتها FLOQR لك فقط. قد تتغير أو تُوقَف أثناء الاختبار. تنتهي صلاحية الدعوات بعد 7 أيام ولا تعمل إلا للحساب الذي أُرسلت إليه."
       },
@@ -2347,6 +2543,14 @@
       "help-floqcast": {
         title: "اصنع لي floqCast / نجمة مشهورة",
         body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة floqCast → Go live على لوح floqCast. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
+      },
+      "help-vip-book-table": {
+        title: "حجز طاولة VIP (VIP ReserV)",
+        body: "VIP ReserV يعرض خريطة القاعة ويحجز الطاولات. افتح VIP ReserV من البحث، اختر Decades أو Lima Twist Club وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع العربون عبر FloqR Stripe. البارات وDJ غير قابلة للحجز."
+      },
+      "help-vip-floor-map": {
+        title: "VIP ReserV floor map",
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
       },
       "help-become-club-admin": {
         title: "كن Club Admin",
@@ -2523,6 +2727,22 @@
       "help-public-media-sharing": {
         title: "وسائل الإعلام العامة ومشاركة البيانات",
         body: "اختر عدة صور أو مقاطع فيديو قصيرة دفعة واحدة، ثم رتّب ترتيبها في الملف العام. تدعم الملفات حتى 8 صور ومقطعي فيديو قصيرين."
+      },
+      "help-vip-terms-consent": {
+        title: "شروط وموافقة VIP ReserV",
+        body: "قبل العربون اقبل شروط المكان والاسترداد وno-show و21+ مع الهوية والحد الأدنى. تُسجَّل الموافقة على الخادم مع هاش الشروط. التسويق اختياري."
+      },
+      "help-vip-door-pass": {
+        title: "تصريح باب VIP ReserV",
+        body: "بعد تأكيد العربون، ملفي → الحجوزات → عرض التصريح لرمز QR لمرة واحدة. أحضر هوية 21+. يستخدم طاقم الباب VIP ReserV Door."
+      },
+      "help-vip-door-ops": {
+        title: "تسجيل الدخول عند الباب VIP ReserV",
+        body: "يفتح VIP Managers صفحة VIP ReserV Door لهذه الليلة. امسح أو الصق الرمز، أكّد هوية 21+، ثم check-in. No-show فقط بعد المهلة. رابط notify لا يغيّر الحالة."
+      },
+      "help-vip-receipt-sms-redaction-fixes": {
+        title: "SMS إيصال VIP وتنقيح الفواتير",
+        body: "رسائل SMS للإيصالات تمر فقط عبر Twilio Messages API المسجّل. أرقام FLOQR-YYYYMMDD-… وVR-… تبقى مقروءة في السجلات."
       }
     }
   };

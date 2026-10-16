@@ -1,0 +1,42 @@
+---
+description: OPEN WORK — VIP ReserV translation is INCOMPLETE (English first). Owner VIP-P-15 C (Oct 16 2026) — English-only Live is allowed; translate after. Does NOT block Live.
+alwaysApply: true
+---
+
+# VIP ReserV translation — INCOMPLETE (open work)
+
+Resume: `@vip-i18n$` / `$vip-translate$`. Design: `.cursor/rules/design-notes-vip-reservations.mdc`, proposal `reports/vip-reservations-proposal.md` §16. Owner brand (Oct 16 2026): **VIP ReserV**.
+
+## State (Oct 16 2026)
+
+| Piece | State |
+|---|---|
+| Feature | PROPOSAL — not built. When built, ships as beta (`vipReservations`, `IsTestFeature=1`) branded **VIP ReserV**, in **English only** at first |
+| Live gate | **VIP-P-15 C DECIDED:** English-only **Live is allowed**; translate after. This rule tracks translation work — it does **not** block `IsTestFeature→0` / Live |
+| Chrome keys | Must be created as `vip.*` / `legalDocs.*` keys from the first build (no hardcoded strings), English values only until tiers run |
+| Help | English only until this rule is closed; every owner decision still needs FloqAi/help ids before that surface goes Live (see design-notes) |
+| Legal Terms text | English only until counsel-approved language versions exist |
+
+## Why it is INCOMPLETE (owner principle 19: translation is LAST)
+
+1. **Beta copy is still changing** — translating it now means translating it twice.
+2. **Legal Terms / refund / no-show text must be lawyer-approved per language** — machine translation is not acceptable for patron-facing legal terms; each language is its own `legalDocuments` version approved by counsel.
+3. **Brand protections** — ShoutOut, FloqR, FloqAi, FloqMedia, BartR, Mingl, RydR, floqCast, DonPapi, Stripe, Google, Microsoft, Facebook, WhatsApp, SMS, OTP, and **VIP ReserV** stay untranslated (owner spelling; never localize the brand).
+4. **11 languages required** by `floqr-translation.mdc`: `en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar` (Arabic needs RTL checks on the floor map, list view and door screen).
+
+## Follow-up prompt (run after the beta is stable and the owner says translate)
+
+```
+Translate VIP ReserV in two tiers, per floqr-translation.mdc.
+Tier A — patrons: Search VIP ReserV tile + Beta pill, vip.html (venue picker, nights, floor map + list view, section sheet, party size, hold countdown, consent checkboxes chrome, checkout hand-off, confirmation), My Profile Reservations tab, Inbox/email/SMS confirmation + reminder templates, QR pass page, patron help (help-vip-book-table, help-vip-floor-map, help-vip-terms-consent, help-vip-cancel-refund, help-vip-door-pass, help-vip-deposit-settings, help-vip-reserv-brand) + FloqAi intents.
+Tier B — club admins, venue/event admins, promoters, VIP Managers, counsel: Club Admin VIP ReserV tab (Subscription, Floor plans, Nights & pricing, Terms & policies, Team, Promoters, Reservations, Website & API, Activity), Master Admin F&S VIP ReserV management, vip-door.html, promoter-admin VIP tab, legal-docs.html, their help ids.
+Rules: every new English key filled in all 11 packs (CHROME key counts equal), every patron / venueAdmin / serviceMember help id in floqr-i18n-help.js for de fr es it pt ru el pl nl ar, brands untranslated (incl. VIP ReserV), cache-bust floqr-i18n.js + floqr-i18n-help.js, node scripts/i18n-coverage-report.js exits 0, functions/i18n-coverage.test.js green. Do NOT machine-translate venue Terms / refund / no-show policies — show the counsel-approved language version, or the English version with a "Terms available in English only" notice until counsel approves one. Check RTL (ar) on the floor map, list view and door screen. Then update this rule to Done (or delete it) and record it in design-notes-vip-reservations.mdc.
+```
+
+## Close-out checklist
+
+- [ ] Tier A complete in all 11 languages
+- [ ] Tier B complete in all 11 languages
+- [ ] Counsel Terms versions for languages the owner requests
+- [ ] i18n coverage gate green
+- [ ] This rule marked Done or removed; design-notes updated

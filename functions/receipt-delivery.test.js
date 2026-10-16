@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const {
   buildTempShoutoutReceipt,
   promoteShoutoutReceipt,
@@ -75,4 +77,11 @@ test("invoice PDF is a valid base64 PDF header", () => {
   const raw = Buffer.from(b64, "base64").toString("utf8");
   assert.ok(raw.startsWith("%PDF-1.4"));
   assert.ok(raw.includes("%%EOF"));
+});
+
+test("receipt SMS uses sendTwilioMessagesApi (VIP-B-24)", () => {
+  const src = fs.readFileSync(path.join(__dirname, "receipt-delivery.js"), "utf8");
+  assert.match(src, /sendTwilioMessagesApi/);
+  assert.match(src, /source:\s*"deliverPaidShoutoutReceipt"/);
+  assert.doesNotMatch(src, /api\.twilio\.com\/2010-04-01\/Accounts/);
 });

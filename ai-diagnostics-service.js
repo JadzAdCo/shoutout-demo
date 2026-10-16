@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.26";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.46";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1470,6 +1470,24 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-46-vip-reserv-phase2",
+      area:"Search / VIP ReserV / Portal / Door",
+      feature:"VIP ReserV Phase 2 — holds, Terms consent, FloqR Stripe deposit, Reservations tab, door check-in",
+      changed:"createVipHold / recordVipConsent / createFloqrCheckoutSession orderType vipReservation; vip.html night + hold countdown + consent; patron-portal Reservations; vip-door.html check-in/no-show; VIP-B-24 receipt SMS + FLOQR invoice redactor. Package s3.1.46.",
+      howToTest:"1) Master Admin F&S: seed/enable vipReservations Test=1, grant beta tester. 2) Hard-refresh Search → VIP ReserV. 3) vip.html → Decades → pick tonight → Hold this table → accept all required Terms → Pay deposit (Stripe test). 4) Return vipPaid=1 → portal ?tab=reservations → Show pass. 5) vip-door.html?location=decades-washington-dc → check in with token or list button. FloqAi: book a table / door pass.",
+      expected:"Hold lasts 30 min; consent required before Checkout; deposit confirms reservation; pass token works at door; no-show blocked after check-in. Aurelia still soon.",
+      troubleshoot:"Hold fails → Functions deploy vip-functions + feature grant. Checkout unsupported type → commerce-functions vipReservation branch deployed. Pass missing → reservation status must be confirmed. Tile missing → seedFeatureServices."
+    },
+    {
+      id:"s3-1-45-vip-reserv-phase1",
+      area:"Search / VIP ReserV",
+      feature:"VIP ReserV Phase 1 — beta feature key, Search tile, floor maps for Decades and Lima Twist Club",
+      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP ReserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia is marked soon. FloqAi finds book a table / VIP ReserV. Holds and deposits are Phase 2.",
+      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP ReserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP ReserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club. Signed out → home sign-in with returnTo. FloqAi: book a table.",
+      expected:"Map loads for Decades and Lima Twist; bars/DJ not bookable. Aurelia chip disabled with soon. Feature off → not-available gate.",
+      troubleshoot:"Tile missing → seedFeatureServices and beta grant for vipReservations. Blank map → check vip-plans/*.json and PNG paths, hard refresh ?v=."
+    },
     {
       id:"s3-0-110-beta-rbac-login-redirect",
       area:"Sign-in / Master Admin / Search",

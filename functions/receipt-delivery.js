@@ -195,38 +195,36 @@ async function sendgridMailWithAttachment({
   return result.status;
 }
 
-async function sendTwilioSms({accountSid, authToken, fromNumber, to, body}) {
+/** VIP-B-24: always use the logged Twilio path (never raw fetch). */
+async function sendTwilioSms({
+  accountSid,
+  authToken,
+  fromNumber,
+  to,
+  body,
+  clubLocationId = "",
+  shoutoutId = "",
+  actorUid = "",
+  actorEmail = ""
+} = {}) {
   const {sanitizeTwilioSecret, describeTwilioAccountSid, explainTwilioDeliveryError} = require("./messaging-core");
-  const sid = sanitizeTwilioSecret(accountSid);
-  const token = sanitizeTwilioSecret(authToken);
-  const toPhone = text(to, 40);
-  const from = text(fromNumber, 40);
-  if (!sid || !token || !from || !toPhone) {
-    return {ok: false, dryRun: true, status: "missing-config"};
-  }
-  const sidInfo = describeTwilioAccountSid(sid);
-  if (!sidInfo.looksLikeAccountSid) {
-    return {ok: false, status: "invalid-sid", error: explainTwilioDeliveryError("Authentication Error - invalid username", sidInfo)};
-  }
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(sid)}/Messages.json`;
-  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      authorization: `Basic ${auth}`,
-      "content-type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams({
-      To: toPhone,
-      From: from,
-      Body: String(body || "").slice(0, 1500)
-    })
+  const {sendTwilioMessagesApi} = require("./twilio-log");
+  return sendTwilioMessagesApi({
+    accountSid: sanitizeTwilioSecret(accountSid),
+    authToken: sanitizeTwilioSecret(authToken),
+    from: text(fromNumber, 40),
+    to: text(to, 40),
+    body: String(body || "").slice(0, 1500),
+    channel: "sms",
+    purpose: "receipt",
+    source: "deliverPaidShoutoutReceipt",
+    clubLocationId: text(clubLocationId, 120),
+    shoutoutId: text(shoutoutId, 120),
+    actorUid: text(actorUid, 120),
+    actorEmail: text(actorEmail, 200),
+    describeInvalidSid: describeTwilioAccountSid,
+    explainError: explainTwilioDeliveryError
   });
-  if (!response.ok) {
-    const errText = await response.text().catch(() => "");
-    return {ok: false, status: "twilio-error", error: errText.slice(0, 300)};
-  }
-  return {ok: true, status: "sent"};
 }
 
 async function deliverFinalPaidShoutoutReceipt({
