@@ -27,9 +27,12 @@ test("consentChecksComplete requires all mandatory boxes", () => {
   }), true);
 });
 
-test("beta catalog covers Decades and Lima Twist bookable sections", () => {
+test("beta catalog covers Decades, Lima Twist, and Aurelia bookable sections", () => {
   assert.ok(catalog["decades-washington-dc"].sections.length >= 10);
   assert.ok(catalog["lima-twist-washington-dc"].sections.length >= 20);
+  assert.ok(catalog["temp-democlub-1"].sections.length >= 20);
+  assert.equal(catalog["temp-democlub-1"].planFile, "aurelia.json");
+  assert.equal(core.BETA_VENUES.find(v => v.id === "temp-democlub-1")?.pending, false);
 });
 
 test("hold expiry is 30 minutes", () => {

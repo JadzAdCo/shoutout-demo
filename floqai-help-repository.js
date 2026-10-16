@@ -399,14 +399,15 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick), choose a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP reserV is never translated.",
+      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick), choose a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
-        "table deposit", "hold a table"
+        "table deposit", "hold a table", "aurelia vip", "aurelia 3d", "explore 3d", "3d walk-through"
       ],
       links: [
-        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
+        {label: "Aurelia 3D walk-through", href: pageUrl("./reports/vip-aurelia-demo/", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]
@@ -414,10 +415,11 @@
     {
       id: "help-vip-floor-map",
       title: "VIP reserV floor map",
-      body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn.",
-      searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green"],
+      body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club, and Aurelia each have a published 2D plan; Aurelia also offers Explore 3D walk-through.",
+      searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green", "aurelia floor map"],
       links: [
-        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
+        {label: "Aurelia 3D walk-through", href: pageUrl("./reports/vip-aurelia-demo/", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]

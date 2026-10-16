@@ -108,11 +108,44 @@
     return FORMAT_ORDER.filter(fid => list.includes(fid)).concat(list.filter(fid => !FORMAT_ORDER.includes(fid)));
   }
 
+  /** Real ShoutOut fields → display.html query (photoreal preview). */
+  function shoutoutPayload(row = {}, template = {}) {
+    const id = String(row.template || row.templateId || template.id || "neon");
+    const extra = {};
+    const media = String(row.mediaUrl || row.photoUrl || row.imageUrl || row.archivedMediaUrl || "").trim();
+    if (media) {
+      extra.media = media;
+      extra.mediaType = String(row.mediaType || "image").trim() || "image";
+      if (row.mediaFit) extra.mediaFit = row.mediaFit;
+    }
+    if (row.backgroundUrl) extra.backgroundUrl = row.backgroundUrl;
+    if (row.backgroundColor) extra.backgroundColor = row.backgroundColor;
+    if (row.backgroundGradient) extra.backgroundGradient = row.backgroundGradient;
+    if (row.jerseyTeamId) extra.jerseyTeamId = row.jerseyTeamId;
+    if (row.jerseyTeamLabel) extra.jerseyTeamLabel = row.jerseyTeamLabel;
+    if (row.jerseyPrimary) extra.jerseyPrimary = row.jerseyPrimary;
+    if (row.jerseySecondary) extra.jerseySecondary = row.jerseySecondary;
+    if (row.jerseyAccent) extra.jerseyAccent = row.jerseyAccent;
+    if (row.jerseyPatronName) extra.jerseyPatronName = row.jerseyPatronName;
+    if (row.jerseyCssBack != null) extra.jerseyCssBack = row.jerseyCssBack;
+    if (row.sport) extra.sport = row.sport;
+    if (row.nflDualLayout) extra.nflDualLayout = row.nflDualLayout;
+    if (row.attribution) extra.attribution = row.attribution;
+    if (row.includeAttribution) extra.includeAttribution = "1";
+    if (row.teamMembers) extra.teamMembers = typeof row.teamMembers === "string" ? row.teamMembers : JSON.stringify(row.teamMembers);
+    return {
+      template: id,
+      main: String(row.mainText || row.main || "").trim(),
+      sub: String(row.subText || row.sub || "").trim(),
+      extra
+    };
+  }
+
   /** display.html URL-preview link. Never carries ?v= (Display URLs stay cache-key free). */
-  function previewUrl(template = {}, {locationId = "", location = {}, formatId = "", base = global.location?.href} = {}) {
-    const sample = sampleFor(template, location);
+  function previewUrl(template = {}, {locationId = "", location = {}, formatId = "", shoutout = null, base = global.location?.href} = {}) {
+    const sample = shoutout ? shoutoutPayload(shoutout, template) : sampleFor(template, location);
     const url = new URL("./display.html", base);
-    url.searchParams.set("location", locationId || location.id || "");
+    url.searchParams.set("location", locationId || location.id || shoutout?.clubLocationId || shoutout?.location || "");
     url.searchParams.set("template", sample.template || template.id || "neon");
     url.searchParams.set("main", sample.main || "");
     if (sample.sub) url.searchParams.set("sub", sample.sub);
@@ -151,26 +184,49 @@
 
   function open(template = {}, options = {}) {
     const location = options.location || {};
+    const shoutout = options.shoutout || null;
     const root = ensureModal();
     const formats = formatsFor(template, location);
+    const preferred = String(options.formatId || shoutout?.screenFormatId || "").trim();
+    const startFormat = formats.includes(preferred) ? preferred : (formats[0] || "led-96x48");
     const frame = root.querySelector("[data-preview-frame]");
     const sizes = root.querySelector("[data-preview-sizes]");
-    root.querySelector("[data-preview-title]").textContent = tt("templatePreview.title", {name: template.name || template.id}, "Preview: {name}");
+    const titleName = shoutout
+      ? (shoutout.mainText || shoutout.templateName || template.name || template.id || "ShoutOut")
+      : (template.name || template.id);
+    root.querySelector("[data-preview-title]").textContent = tt("templatePreview.title", {name: titleName}, "Preview: {name}");
     root.querySelector("[data-preview-close]").textContent = tt("templatePreview.close", {}, "Close");
-    root.querySelector("[data-preview-note]").textContent = tt("templatePreview.note", {}, "Sample text and pictures. Your ShoutOut shows your own words and photos.");
+    root.querySelector("[data-preview-note]").textContent = shoutout
+      ? tt("templatePreview.realNote", {}, "Real board render — pick the LED size used for this ShoutOut. Text and layout match the live display.")
+      : tt("templatePreview.note", {}, "Sample text and pictures. Your ShoutOut shows your own words and photos.");
     const show = formatId => {
       const fmt = global.FLOQR_DISPLAY_FORMATS?.[formatId];
       if (global.FLOQRBoardFrame) global.FLOQRBoardFrame.mount(frame, formatId, {maxHeight: "min(70vh, 560px)"});
       else frame.style.aspectRatio = fmt ? `${fmt.pixelWidth} / ${fmt.pixelHeight}` : "2 / 1";
-      frame.src = previewUrl(template, {...options, formatId});
+      frame.src = previewUrl(template, {...options, formatId, shoutout});
       sizes.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.previewFormat === formatId));
     };
     sizes.innerHTML = formats.map(fid => `<button type="button" class="secondary" data-preview-format="${esc(fid)}">${esc(SIZE_LABELS[fid] || fid)}</button>`).join("");
     sizes.querySelectorAll("button").forEach(b => b.addEventListener("click", () => show(b.dataset.previewFormat)));
     root.classList.remove("hidden");
-    show(formats[0]);
+    show(startFormat);
     root.querySelector("[data-preview-close]").focus();
   }
 
-  global.FLOQRTemplatePreview = {sampleFor, formatsFor, previewUrl, open};
+  /** Photoreal preview of a saved/completed ShoutOut at its chosen board size. */
+  function openShoutout(row = {}, options = {}) {
+    const templateId = String(row.template || row.templateId || "neon");
+    const template = Object.assign({}, (global.SHOUTOUT_TEMPLATES || {})[templateId] || {}, {id: templateId, name: row.templateName || templateId});
+    const locationId = String(row.clubLocationId || row.location || options.locationId || "");
+    const location = options.location || (global.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {id: locationId};
+    return open(template, {
+      ...options,
+      locationId,
+      location,
+      formatId: options.formatId || row.screenFormatId || "",
+      shoutout: row
+    });
+  }
+
+  global.FLOQRTemplatePreview = {sampleFor, formatsFor, previewUrl, open, openShoutout, shoutoutPayload};
 })(typeof window !== "undefined" ? window : globalThis);

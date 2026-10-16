@@ -6,7 +6,12 @@
   const PLAN_BY_ID = Object.freeze({
     "decades-washington-dc": "decades.json",
     "lima-twist-washington-dc": "lima-twist.json",
-    "temp-democlub-1": null
+    "temp-democlub-1": "aurelia.json"
+  });
+
+  /** Optional 3D walk-through (Aurelia demo only — reports/vip-aurelia-demo). */
+  const EXPLORE_3D_BY_ID = Object.freeze({
+    "temp-democlub-1": "./reports/vip-aurelia-demo/"
   });
 
   const statusEl = document.getElementById("vipStatus");
@@ -17,11 +22,23 @@
   const countEl = document.getElementById("vipVenueCount");
   const selectedWrap = document.getElementById("vipVenueSelected");
   const selectedLabel = document.getElementById("vipSelectedLabel");
+  const explore3dEl = document.getElementById("vipExplore3d");
   const mapSection = document.getElementById("vipMapSection");
   const mapTitle = document.getElementById("vipMapTitle");
   const nightEl = document.getElementById("vipNight");
   const holdBanner = document.getElementById("vipHoldBanner");
   const consentEl = document.getElementById("vipConsent");
+
+  function setExplore3d(venue) {
+    if (!explore3dEl) return;
+    const href = venue && (EXPLORE_3D_BY_ID[venue.id] || venue.explore3dUrl);
+    if (href) {
+      explore3dEl.href = href;
+      explore3dEl.classList.remove("hidden");
+    } else {
+      explore3dEl.classList.add("hidden");
+    }
+  }
 
   let venueCatalog = [];
   let currentVenue = null;
@@ -230,6 +247,7 @@
     if (searchEl) searchEl.classList.remove("hidden");
     if (selectedWrap) selectedWrap.classList.add("hidden");
     if (mapSection) mapSection.classList.add("hidden");
+    setExplore3d(null);
     clearHoldUi();
     currentVenue = null;
     renderVenueGrid();
@@ -314,7 +332,8 @@
       if (!subscribed) continue;
       const beta = betaMeta[id] || {};
       const plan = PLAN_BY_ID[id] || beta.planFile || null;
-      const pending = plan == null || !!beta.pending;
+      /* Static plan in PLAN_BY_ID wins over a stale Functions pending flag. */
+      const pending = plan == null || (!PLAN_BY_ID[id] && !!beta.pending);
       rows.push({
         id,
         label: club.locationName || club.brandName || beta.name || id,
@@ -337,13 +356,14 @@
   function selectVenue(venue, opts) {
     if (!venue) return;
     if (venue.pending) {
-      setStatus(t("page.vip.aureliaPending", "Aurelia’s interactive 3D demo is in reports; the 2D VIP reserV map lands next."));
+      setStatus(t("page.vip.aureliaPending", "This club’s VIP reserV map is not published yet."));
       currentVenue = venue;
       if (gridEl) gridEl.classList.add("hidden");
       if (searchEl) searchEl.classList.add("hidden");
       if (countEl) countEl.textContent = "";
       if (selectedWrap) selectedWrap.classList.remove("hidden");
       if (selectedLabel) selectedLabel.textContent = `${venue.label} — ${t("page.vip.comingSoon", "Soon")}`;
+      setExplore3d(venue);
       if (mapSection) mapSection.classList.add("hidden");
       clearHoldUi();
       return;
@@ -355,12 +375,19 @@
     if (countEl) countEl.textContent = "";
     if (selectedWrap) selectedWrap.classList.remove("hidden");
     if (selectedLabel) selectedLabel.textContent = venue.label;
+    setExplore3d(venue);
     if (mapSection) mapSection.classList.remove("hidden");
     if (mapTitle) mapTitle.textContent = `${venue.label} — ${t("page.vip.floorMap", "Floor map")}`;
     window.FLOQR_VIP_BOOT = {plan: venue.plan};
     if (window.FLOQRVipFloorViewer?.load) {
       window.FLOQRVipFloorViewer.load(venue.plan).then?.(() => refreshAvailability());
-      if (!opts?.silent) setStatus(t("page.vip.mapLoaded", "Floor map loaded. Tap a green table for details."));
+      if (!opts?.silent) {
+        const base = t("page.vip.mapLoaded", "Floor map loaded. Tap a green table for details.");
+        const extra = EXPLORE_3D_BY_ID[venue.id]
+          ? ` ${t("page.vip.explore3dHint", "Open Explore 3D walk-through for the interactive room.")}`
+          : "";
+        setStatus(base + extra);
+      }
       refreshAvailability();
     } else if (!opts?.silent) {
       setStatus(t("page.vip.mapLoading", "Loading floor map…"));

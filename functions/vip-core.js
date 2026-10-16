@@ -38,11 +38,12 @@ const BETA_VENUES = Object.freeze([
   },
   {
     id: "temp-democlub-1",
-    name: "Aurelia",
-    planFile: null,
-    city: "Washington, DC",
-    pending: true,
-    clubCode: "AUR"
+    name: "Aurelia (Demo Club)",
+    planFile: "aurelia.json",
+    city: "New York",
+    pending: false,
+    clubCode: "AUR",
+    explore3dUrl: "./reports/vip-aurelia-demo/"
   }
 ]);
 

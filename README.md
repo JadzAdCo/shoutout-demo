@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.48 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.49 (stable)
+
+- s3.1.49: VIP reserV chrome matches ShoutOut (scoped floor-viewer CSS); Aurelia 2D map + Explore 3D walk-through published.
 
 - s3.1.48: VCC floqCast tab (not supRstar); profile menu VIP reserV link; vip.html FloqR+VIP hero + subscribed-venue search.
 

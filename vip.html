@@ -4,10 +4,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title data-i18n="page.vip.title">VIP reserV | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.48"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.48"/>
-  <link rel="stylesheet" href="./vip-floor-viewer.css?v=s3.1.48"/>
-  <link rel="stylesheet" href="./vip.css?v=s3.1.48"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.49"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.49"/>
+  <link rel="stylesheet" href="./vip-floor-viewer.css?v=s3.1.49"/>
+  <link rel="stylesheet" href="./vip.css?v=s3.1.49"/>
 </head>
 <body class="vip-page" data-floqr-feature="vipReservations">
 <main class="app admin-shell vip-shell">
@@ -17,7 +17,7 @@
       <div>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/vip-reserv-icon.svg?v=s3.1.48" alt="VIP reserV" class="product-logo vip-hero-logo"/>
+          <img src="./images/vip-reserv-icon.svg?v=s3.1.49" alt="VIP reserV" class="product-logo vip-hero-logo"/>
         </div>
         <h1 class="brand-mixed-case" data-i18n="page.vip.title">VIP reserV</h1>
         <p class="sub" data-i18n="page.vip.sub">Pick a night, hold a table for 30 minutes, accept the venue Terms, and pay the deposit.</p>
@@ -51,6 +51,8 @@
         <div id="vipVenueSelected" class="vip-venue-selected hidden">
           <p id="vipSelectedLabel" class="vip-selected-label"></p>
           <button type="button" id="vipChangeVenue" class="buttonlike" data-i18n="page.vip.changeVenue">Change venue</button>
+          <a id="vipExplore3d" class="vip-explore-3d hidden" href="./reports/vip-aurelia-demo/" target="_blank" rel="noopener"
+            data-i18n="page.vip.explore3d">Explore 3D walk-through</a>
           <label class="vip-night-label" for="vipNight" data-i18n="page.vip.chooseNight">Night</label>
           <select id="vipNight" class="vip-night" aria-label="Night"></select>
         </div>
@@ -114,18 +116,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.48"></script>
-<script src="./floqr-session-shell.js?v=s3.1.48"></script>
-<script src="./shared-data.js?v=s3.1.48"></script>
-<script src="./feature-gates.js?v=s3.1.48"></script>
-<script src="./floqr-i18n.js?v=s3.1.48"></script>
-<script src="./floqr-feature-services.js?v=s3.1.48"></script>
-<script src="./floqr-nav.js?v=s3.1.48"></script>
-<script src="./floqai-help-repository.js?v=s3.1.48"></script>
-<script src="./helper-popouts.js?v=s3.1.48"></script>
-<script src="./global-profile-status.js?v=s3.1.48"></script>
+<script src="./firebase-config.js?v=s3.1.49"></script>
+<script src="./floqr-session-shell.js?v=s3.1.49"></script>
+<script src="./shared-data.js?v=s3.1.49"></script>
+<script src="./feature-gates.js?v=s3.1.49"></script>
+<script src="./floqr-i18n.js?v=s3.1.49"></script>
+<script src="./floqr-feature-services.js?v=s3.1.49"></script>
+<script src="./floqr-nav.js?v=s3.1.49"></script>
+<script src="./floqai-help-repository.js?v=s3.1.49"></script>
+<script src="./helper-popouts.js?v=s3.1.49"></script>
+<script src="./global-profile-status.js?v=s3.1.49"></script>
 <script>window.FLOQR_VIP_BOOT = window.FLOQR_VIP_BOOT || {plan: "decades.json"};</script>
-<script src="./vip-app.js?v=s3.1.48"></script>
-<script src="./vip-floor-viewer.js?v=s3.1.48"></script>
+<script src="./vip-app.js?v=s3.1.49"></script>
+<script src="./vip-floor-viewer.js?v=s3.1.49"></script>
 </body>
 </html>

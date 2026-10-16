@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.47";
+  const VERSION = "s3.1.49";
 
   const packs = {
     "ru": {
@@ -80,11 +80,11 @@
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
-        body: "VIP reserV позволяет изучить план зала и забронировать стол. Откройте VIP reserV из Поиска, выберите Decades или Lima Twist Club и вечер, нажмите зелёный стол, удержите 30 минут, примите условия и оплатите депозит через FloqR Stripe. Бары и DJ не бронируются. Бренд VIP reserV не переводится."
+        body: "VIP reserV позволяет изучить план зала и забронировать стол. Откройте VIP reserV из Поиска, выберите Decades или Lima Twist Club и вечер, нажмите зелёный стол, удержите 30 минут, примите условия и оплатите депозит через FloqR Stripe. Бары и DJ не бронируются. Бренд VIP reserV не переводится. В Aurelia откройте Explore 3D walk-through для интерактивного зала (бронирование остаётся на 2D-карте)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. У Decades, Lima Twist Club и Aurelia есть опубликованный 2D-план; у Aurelia также есть Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Стать Club Admin",
@@ -354,11 +354,11 @@
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
-        body: "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar."
+        body: "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar. Bij Aurelia gebruikt u Explore 3D walk-through voor de interactieve ruimte (boeken blijft op de 2D-kaart)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club en Aurelia hebben elk een gepubliceerd 2D-plan; Aurelia biedt ook Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Word Club Admin",
@@ -628,11 +628,11 @@
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
-        body: "VIP reserV explore le plan et réserve une table. Ouvrez VIP reserV depuis Recherche, choisissez Decades ou Lima Twist Club et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez l’acompte avec FloqR Stripe. Bars et DJ non réservables. La marque VIP reserV n’est pas traduite."
+        body: "VIP reserV explore le plan et réserve une table. Ouvrez VIP reserV depuis Recherche, choisissez Decades ou Lima Twist Club et une soirée, touchez une table verte, réservez 30 minutes, acceptez les Conditions et payez l’acompte avec FloqR Stripe. Bars et DJ non réservables. La marque VIP reserV n’est pas traduite. À Aurelia, utilisez Explore 3D walk-through pour la salle interactive (la réservation reste sur le plan 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club et Aurelia ont chacun un plan 2D publié ; Aurelia propose aussi Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Devenez un Club Admin",
@@ -902,11 +902,11 @@
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
-        body: "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV wird nicht übersetzt."
+        body: "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV wird nicht übersetzt. Bei Aurelia öffnen Sie Explore 3D walk-through für den interaktiven Raum (Buchung bleibt auf dem 2D-Plan)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club und Aurelia haben je einen veröffentlichten 2D-Plan; Aurelia bietet auch Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Werde ein Club Admin",
@@ -1176,11 +1176,11 @@
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
-        body: "VIP reserV muestra el mapa y reserva mesas. Abre VIP reserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables."
+        body: "VIP reserV muestra el mapa y reserva mesas. Abre VIP reserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables. En Aurelia, use Explore 3D walk-through para la sala interactiva (la reserva sigue en el plano 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club y Aurelia tienen cada uno un plano 2D publicado; Aurelia también ofrece Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Conviértete en un Club Admin",
@@ -1450,11 +1450,11 @@
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
-        body: "VIP reserV mostra la mappa e prenota tavoli. Apri VIP reserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili."
+        body: "VIP reserV mostra la mappa e prenota tavoli. Apri VIP reserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili. Ad Aurelia usa Explore 3D walk-through per la sala interattiva (la prenotazione resta sulla mappa 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club e Aurelia hanno ciascuno una pianta 2D pubblicata; Aurelia offre anche Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Diventa un Club Admin",
@@ -1724,11 +1724,11 @@
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
-        body: "VIP reserV mostra o mapa e reserva mesas. Abra VIP reserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis."
+        body: "VIP reserV mostra o mapa e reserva mesas. Abra VIP reserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis. Em Aurelia, use Explore 3D walk-through para a sala interativa (a reserva continua no mapa 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club e Aurelia têm cada um um mapa 2D publicado; Aurelia também oferece Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Torne-se um Club Admin",
@@ -1998,11 +1998,11 @@
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
-        body: "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα."
+        body: "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα. Στην Aurelia χρησιμοποιήστε Explore 3D walk-through για την διαδραστική αίθουσα (η κράτηση μένει στο 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Τα Decades, Lima Twist Club και Aurelia έχουν δημοσιευμένο 2D σχέδιο· η Aurelia προσφέρει και Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Γίνε Club Admin",
@@ -2272,11 +2272,11 @@
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
-        body: "VIP reserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP reserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji."
+        body: "VIP reserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP reserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji. W Aurelii użyj Explore 3D walk-through dla interaktywnej sali (rezerwacja zostaje na mapie 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club i Aurelia mają opublikowany plan 2D; Aurelia oferuje też Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "Zostań Club Admin",
@@ -2546,11 +2546,11 @@
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",
-        body: "VIP reserV يعرض خريطة القاعة ويحجز الطاولات. افتح VIP reserV من البحث، اختر Decades أو Lima Twist Club وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع العربون عبر FloqR Stripe. البارات وDJ غير قابلة للحجز."
+        body: "VIP reserV يعرض خريطة القاعة ويحجز الطاولات. افتح VIP reserV من البحث، اختر Decades أو Lima Twist Club وليلة، اضغط طاولة خضراء، احجز 30 دقيقة، اقبل الشروط وادفع العربون عبر FloqR Stripe. البارات وDJ غير قابلة للحجز. في Aurelia استخدم Explore 3D walk-through للقاعة التفاعلية (الحجز يبقى على خريطة 2D)."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
-        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn."
+        body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. لدى Decades وLima Twist Club وAurelia خطة 2D منشورة؛ Aurelia توفر أيضاً Explore 3D walk-through."
       },
       "help-become-club-admin": {
         title: "كن Club Admin",

@@ -12,7 +12,8 @@
   const DEMO_STATES = {
     "decades.json": {"decades-c2": "booked", "decades-c4": "booked", "decades-c8": "held", "decades-c10": "booked"},
     "lima-twist.json": {"lima-twist-203": "booked", "lima-twist-207": "held", "lima-twist-102": "booked", "lima-twist-401": "booked",
-      "lima-twist-206": "held", "lima-twist-304": "booked", "lima-twist-502": "booked", "lima-twist-307": "held"}
+      "lima-twist-206": "held", "lima-twist-304": "booked", "lima-twist-502": "booked", "lima-twist-307": "held"},
+    "aurelia.json": {"aurelia-b3": "booked", "aurelia-r2": "held", "aurelia-t1": "booked", "aurelia-l2": "held", "aurelia-v2": "booked"}
   };
   const ICONS = {
     check: "M5 12.5l4.5 4.5L19 7.5",

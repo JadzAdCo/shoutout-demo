@@ -1,0 +1,33 @@
+# FLOQR product-page chrome (always)
+
+Patron product landings (ShoutOut, VIP reserV, BartR, RydR, Mingl, floqCast) share **one** visual system from `styles.css`:
+
+| Token / surface | Value |
+|---|---|
+| Body | Pink + cyan radial washes on navy (`radial-gradient` hot/accent + `#07101c` → `#071b63`) |
+| `--hot` / `--accent` / `--lime` | `#f43abf` / `#26d8ff` / `#dfff5a` |
+| Cards | Glass: `linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07))`, blur, `--line` border, ~30px radius |
+| Primary CTA | `linear-gradient(90deg, var(--hot), var(--accent))` |
+
+## Forbidden on product pages
+
+1. **Global** `:root` / `body { background: #111 }` (or any flat black) that overrides `styles.css` — this is what made VIP look like a separate admin dark theme.
+2. Remapping `--accent` to purple (`#7c4dff`) on the whole page.
+3. Unscoped `button { … }` / `*` resets in feature CSS that fight ShoutOut chrome.
+4. Admin-only flat panels as the **page** background. Admin shell layout (`admin-shell` max-width) is fine; the **body wash** must stay product chrome.
+
+## Floor / map / satellite CSS
+
+Scope viewer styles under a page root (e.g. `.vip-map-section`). Local vars (`--vip-map-*`) are OK. Pressed chips / primary actions should reuse `--hot` / `--accent`, not a one-off purple.
+
+Inventory **state** colors on the map (green available · amber held · red booked · blue DJ) stay as in `vip-floorplan-ingest.mdc` — those are legend states, not page chrome.
+
+## Checklist (new or edited product HTML)
+
+- [ ] `styles.css` loaded first
+- [ ] Feature CSS does not set bare `body` / `:root` background or global `--accent`
+- [ ] Hero uses `product-brand-stack` + FloqR parent logo when other products do
+- [ ] Cards / CTAs read as the same family as ShoutOut on Search
+- [ ] Hard-refresh QA against `index.html` ShoutOut landing side-by-side
+
+Resume: `@product-chrome$` / `$shoutout-colors$`.

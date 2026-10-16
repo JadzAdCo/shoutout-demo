@@ -1,62 +1,180 @@
-/* VIP reserV — ShoutOut-like landing + hold / consent chrome */
+/* VIP reserV — same FLOQR product chrome as ShoutOut (styles.css body gradient + tokens).
+   Never load a global flat body/#111 override on this page. See design-notes-product-chrome.mdc. */
+
+body.vip-page {
+  /* Reinforce ShoutOut body when a satellite CSS tries to flatten it */
+  background:
+    radial-gradient(circle at 18% 8%, rgba(244, 58, 191, 0.32), transparent 32%),
+    radial-gradient(circle at 82% 18%, rgba(38, 216, 255, 0.34), transparent 36%),
+    linear-gradient(135deg, #07101c, #071b63 68%, #090b12) !important;
+  color: var(--text, #f4f6ff);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
 .vip-shell { max-width: 1100px; }
+
 .vip-product-page .vip-hero {
-  display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
 }
+
 .vip-product-page .product-brand-stack { margin-bottom: 4px; }
+
 .vip-hero-logo {
-  width: min(160px, 42vw); max-height: 120px; margin: 4px 0 8px;
-  object-fit: contain; filter: drop-shadow(0 0 16px rgba(253, 224, 71, 0.28));
+  width: min(160px, 42vw);
+  max-height: 120px;
+  margin: 4px 0 8px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
+    drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
 }
+
 .vip-hero h1 {
-  font-size: clamp(2rem, 6vw, 3.2rem); margin: 0.15rem 0 0.35rem; letter-spacing: 0.02em;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  margin: 0.15rem 0 0.35rem;
+  letter-spacing: 0.02em;
 }
+
+.vip-page .card,
+.vip-venue-card,
+.vip-gate,
+.vip-consent {
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.18));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.07));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+  border-radius: 30px;
+  padding: 26px;
+  backdrop-filter: blur(14px);
+}
+
 .vip-venue-card .search { width: 100%; margin-top: 0.65rem; }
 .vip-venue-grid { margin-top: 0.85rem; }
+
 .vip-venue-option {
-  text-align: left; cursor: pointer; color: inherit;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px; padding: 1rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
+
 .vip-venue-option:hover,
 .vip-venue-option:focus-visible {
-  border-color: #fde047;
-  box-shadow: 0 0 0 2px rgba(253, 224, 71, 0.28);
+  border-color: var(--accent, #26d8ff);
+  box-shadow: 0 0 0 2px rgba(38, 216, 255, 0.28);
   outline: none;
+  transform: translateY(-1px);
 }
+
 .vip-venue-option .vip-pick-cta {
-  display: inline-flex; margin-top: 0.85rem; min-height: 44px; align-items: center;
-  padding: 0.45rem 0.9rem; border-radius: 10px;
+  display: inline-flex;
+  margin-top: 0.85rem;
+  min-height: 44px;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
 }
+
 .vip-venue-selected {
-  margin-top: 1rem; padding-top: 0.85rem;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  display: grid; gap: 0.45rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  gap: 0.45rem;
 }
+
 .vip-selected-label { font-weight: 800; font-size: 1.15rem; margin: 0; }
-.vip-night-label { display: block; margin-top: 0.4rem; font-size: 0.9rem; opacity: 0.85; }
+
+.vip-night-label {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
 .vip-night {
-  min-height: 44px; margin-top: 0.35rem; padding: 0.4rem 0.7rem;
-  border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(0,0,0,0.25); color: inherit; max-width: 100%;
+  min-height: 44px;
+  margin-top: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  max-width: 100%;
 }
+
+.vip-explore-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid rgba(38, 216, 255, 0.45);
+  background: linear-gradient(90deg, rgba(244, 58, 191, 0.22), rgba(38, 216, 255, 0.22));
+  color: var(--text, #f4f6ff);
+  font-weight: 900;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.vip-explore-3d:hover {
+  border-color: var(--accent, #26d8ff);
+  transform: translateY(-1px);
+}
+
 .vip-hold-banner {
-  margin: 0.85rem 0; padding: 0.75rem 1rem; border-radius: 12px;
-  border: 1px solid rgba(253, 224, 71, 0.45); background: rgba(253, 224, 71, 0.12);
-  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  margin: 0.85rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(253, 224, 71, 0.45);
+  background: rgba(253, 224, 71, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
 }
-.vip-consent { margin: 0.85rem 0 1.25rem; display: grid; gap: 0.55rem; }
-.vip-check { display: flex; gap: 0.55rem; align-items: flex-start; min-height: 44px; }
-.vip-check input { margin-top: 0.35rem; min-width: 18px; min-height: 18px; }
-.vip-consent-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+
+.vip-consent {
+  margin: 0.85rem 0 1.25rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.vip-check {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  min-height: 44px;
+}
+
+.vip-check input {
+  margin-top: 0.35rem;
+  min-width: 18px;
+  min-height: 18px;
+}
+
+.vip-consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .vip-map-header { margin: 1.25rem 0 0.5rem; }
 .vip-map-layout { margin-bottom: 2rem; }
 .vip-gate .primary { min-height: 44px; }
 .vip-page .info button.primary,
 .vip-page .info button.book { min-height: 44px; }
 .hidden { display: none !important; }
+
 @media (max-width: 600px) {
   .vip-hero { flex-direction: column; }
   .vip-hero-logo { width: min(132px, 40vw); max-height: 100px; }

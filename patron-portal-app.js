@@ -376,24 +376,45 @@
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
+  function hidePortalFoSubtabs() {
+    document.querySelectorAll('.admin-tab-group[data-tab-group="featureOrders"] .admin-subtabs').forEach(el => el.classList.add("hidden"));
+    document.querySelectorAll('.admin-tab-group[data-tab-group="featureOrders"] .admin-tab-parent').forEach(btn => {
+      btn.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function expandPortalFoSubtabs() {
+    const group = document.querySelector('.admin-tab-group[data-tab-group="featureOrders"]');
+    const subtabs = group?.querySelector(".admin-subtabs");
+    const parent = group?.querySelector(".admin-tab-parent");
+    subtabs?.classList.remove("hidden");
+    parent?.setAttribute("aria-expanded", "true");
+    parent?.classList.add("active");
+  }
+
   function showPortalPanel(panelId, tabPanelId = "") {
     let resolved = panelId;
     let foPane = "";
     if (panelId === "portalShoutouts") { resolved = "portalFeatureOrders"; foPane = "foShoutoutsPane"; }
     if (panelId === "portalVipReservations") { resolved = "portalFeatureOrders"; foPane = "foVipPane"; }
     if (panelId === "portalPaidServices") { resolved = "portalFeatureOrders"; foPane = "foInvoicesPane"; }
+    if (panelId === "portalFeatureOrders" && !foPane) {
+      foPane = document.querySelector("#featureOrdersSubtabs .admin-subtab.active")?.dataset?.foPane || "foStatusPane";
+    }
     const tabId = tabPanelId === "portalShoutouts" || tabPanelId === "portalVipReservations" || tabPanelId === "portalPaidServices"
       ? "portalFeatureOrders"
       : (tabPanelId || resolved);
-    document.querySelectorAll(".admin-tab").forEach(btn => btn.classList.toggle("active", !!tabId && btn.dataset.panel === tabId));
+    document.querySelectorAll(".admin-tab").forEach(btn => {
+      const isFoParent = btn.classList.contains("admin-tab-parent") && btn.dataset.group === "featureOrders";
+      btn.classList.toggle("active", (!!tabId && btn.dataset.panel === tabId) || (resolved === "portalFeatureOrders" && isFoParent));
+    });
     document.querySelectorAll(".admin-panel-section").forEach(section => section.classList.remove("active"));
     byId(resolved)?.classList.add("active");
     if (resolved === "portalFeatureOrders") {
-      if (foPane) showFeatureOrdersPane(foPane);
-      else {
-        const activeFo = document.querySelector("#featureOrdersSubtabs .admin-subtab.active");
-        showFeatureOrdersPane(activeFo?.dataset?.foPane || "foStatusPane");
-      }
+      expandPortalFoSubtabs();
+      showFeatureOrdersPane(foPane || "foStatusPane");
+    } else {
+      hidePortalFoSubtabs();
     }
   }
 
@@ -405,6 +426,13 @@
     document.querySelectorAll("#featureOrdersSubtabs .admin-subtab").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.foPane === target);
     });
+    expandPortalFoSubtabs();
+    document.querySelectorAll(".admin-tab").forEach(btn => {
+      const isFoParent = btn.classList.contains("admin-tab-parent") && btn.dataset.group === "featureOrders";
+      if (isFoParent) btn.classList.add("active");
+      else if (btn.dataset.panel && btn.dataset.panel !== "portalFeatureOrders") btn.classList.remove("active");
+    });
+    byId("portalFeatureOrders")?.classList.add("active");
     if (target === "foVipPane") loadVipReservationsPanel();
     if (target === "foStatusPane") renderFeatureOrdersStatus();
     if (target === "foShoutoutsPane") {
@@ -516,13 +544,20 @@
   function setupTabs() {
     document.querySelectorAll(".admin-tab[data-panel]").forEach(btn => {
       btn.addEventListener("click", () => {
+        if (btn.classList.contains("admin-tab-parent") && btn.dataset.group === "featureOrders") {
+          const group = btn.closest(".admin-tab-group");
+          const defaultFo = group?.dataset?.defaultFo || "foStatusPane";
+          showPortalPanel("portalFeatureOrders", "portalFeatureOrders");
+          showFeatureOrdersPane(defaultFo);
+          return;
+        }
         showPortalPanel(btn.dataset.panel, btn.dataset.panel);
-        if (btn.dataset.panel === "portalFeatureOrders") showFeatureOrdersPane("foStatusPane");
       });
     });
     document.getElementById("featureOrdersSubtabs")?.addEventListener("click", event => {
       const btn = event.target?.closest?.("[data-fo-pane]");
       if (!btn) return;
+      showPortalPanel("portalFeatureOrders", "portalFeatureOrders");
       showFeatureOrdersPane(btn.dataset.foPane);
     });
     document.getElementById("shoutoutSubtabs")?.addEventListener("click", event => {
@@ -827,14 +862,19 @@
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
+  function isCancelledShoutout(row) {
+    const status = shoutoutStatus(row);
+    return status === "cancelled" || status === "canceled" || status === "deleted" || row?.patronDeleted === true;
+  }
+
   function isSavedShoutout(row) {
-    if (row?.complianceArchived) return false;
+    if (row?.complianceArchived || isCancelledShoutout(row)) return false;
     return SHOUTOUT_SAVED_STATUSES.has(shoutoutStatus(row));
   }
 
   /** Pending = submitted / awaiting payment or club approval (not Saved drafts). */
   function isPendingShoutout(row) {
-    if (row?.complianceArchived) return false;
+    if (row?.complianceArchived || isCancelledShoutout(row)) return false;
     if (isSavedShoutout(row)) return false;
     if (shoutoutDisplayFinished(row)) return false;
     const status = shoutoutStatus(row);
@@ -844,8 +884,9 @@
 
   /** Completed = club-approved / live / finished / refunded / rejected. Archived rows leave Completed for the Archive tab. */
   function isCompletedShoutout(row) {
-    if (row?.complianceArchived || row?._fromArchive) return false;
+    if (row?.complianceArchived || row?._fromArchive || isCancelledShoutout(row)) return false;
     const status = shoutoutStatus(row);
+    if (status === "cancelled" || status === "canceled") return false;
     if (SHOUTOUT_APPROVED_OR_DONE.has(status)) return true;
     if (shoutoutDisplayFinished(row)) return true;
     return false;
@@ -963,16 +1004,34 @@
         setText("portalStatus", err.message || "Could not re-use this ShoutOut.");
       }));
     });
+    root?.querySelectorAll(".save-pending-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => savePendingShoutoutAsDraft(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not save this ShoutOut.");
+      }));
+    });
+    root?.querySelectorAll(".delete-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => deletePatronShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not delete this ShoutOut.");
+      }));
+    });
+    root?.querySelectorAll(".preview-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => previewPatronShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not open preview.");
+      }));
+    });
   }
 
   function renderShoutoutQueueItem(x, index, mode) {
     const status = shoutoutStatus(x);
-    const canModify = mode === "open" && x.editable !== false && (status === "pending" || status === "pending_approval" || status === "preview");
+    const canModify = mode === "open" && x.editable !== false && (status === "pending" || status === "pending_approval" || status === "preview" || status === "unpaid" || status === "pending_payment");
     const archived = !!x.complianceArchived || mode === "archive";
     const paid = shoutoutPaid(x) ? tt("portal.paid", {}, "Paid") : tt("portal.unpaid", {}, "Unpaid");
     const canSaveTemplate = (mode === "completed" || mode === "archive") && shoutoutTemplateIsModifiable(x);
     const canReuse = mode === "completed" || mode === "archive";
     const canContinueSaved = mode === "saved";
+    const canSavePending = mode === "open";
+    const canDelete = mode === "open" || mode === "saved";
+    const canPreview = mode === "completed" || mode === "archive" || mode === "saved" || mode === "open";
     const mediaThumb = String(x.mediaUrl || x.archivedMediaUrl || x.photoUrl || "").trim();
     const mediaBadge = shoutoutHasMedia(x) || mediaThumb
       ? ` - ${esc(tt("portal.hasMedia", {}, "Media"))}`
@@ -980,19 +1039,138 @@
     const continueHref = window.FLOQRNav?.portalLink?.("./", {start: "editor", savedId: x.id || ""})
       || `./?start=editor&savedId=${encodeURIComponent(x.id || "")}`;
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
-      ${mediaThumb && mode === "archive" ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
+      ${mediaThumb && (mode === "archive" || mode === "completed") ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
       <strong>${esc(x.mainText || "ShoutOut")}</strong>
       <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}${mediaBadge}</p>
-      <small>${esc(fmtDate(x.savedAt || x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
+      <small>${esc(fmtDate(x.savedAt || x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}${x.screenFormatId ? ` · ${esc(x.screenFormatLabel || x.screenFormatId)}` : ""}</small>
       <p class="queue-actions">
         ${canContinueSaved ? `<a class="buttonlike continue-saved-shoutout-btn" href="${esc(continueHref)}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</a>` : ""}
         ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
+        ${canPreview ? `<button class="buttonlike preview-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.previewShoutout", {}, "Preview"))}</button>` : ""}
         ${canReuse ? `<button class="buttonlike reuse-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.reuseShoutout", {}, "Re-Use ShoutOut"))}</button>` : ""}
+        ${canSavePending ? `<button class="buttonlike save-pending-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveShoutout", {}, "Save"))}</button>` : ""}
+        ${canDelete ? `<button class="buttonlike delete-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.deleteShoutout", {}, "Delete"))}</button>` : ""}
         ${canSaveTemplate ? `<button class="buttonlike save-shoutout-template-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveAsTemplate", {}, "Save as my template"))}</button>` : ""}
         ${mode === "completed" && !archived ? `<button class="buttonlike archive-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.archiveShoutout", {}, "Archive"))}</button>` : ""}
         ${mode === "open" ? `<button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">${esc(tt("portal.diagnose", {}, "Diagnose"))}</button>` : ""}
       </p>
     </div>`;
+  }
+
+  function findPortalShoutout(shoutoutId) {
+    return currentShoutouts.find(item => item.id === shoutoutId)
+      || currentArchivedShoutouts.find(item => item.id === shoutoutId)
+      || null;
+  }
+
+  async function previewPatronShoutout(shoutoutId) {
+    const row = findPortalShoutout(shoutoutId);
+    if (!row) throw new Error(tt("portal.shoutoutMissing", {}, "ShoutOut not found."));
+    if (!window.FLOQRTemplatePreview?.openShoutout) {
+      throw new Error(tt("portal.previewUnavailable", {}, "Preview module missing — hard refresh and try again."));
+    }
+    window.FLOQRTemplatePreview.openShoutout(row);
+  }
+
+  /**
+   * Save pending → reusable Saved draft.
+   * Unpaid: convert status to saved. Paid: copy a new saved draft (leave paid pending for club approval).
+   */
+  async function savePendingShoutoutAsDraft(shoutoutId) {
+    const user = auth.currentUser;
+    const row = findPortalShoutout(shoutoutId);
+    if (!user || !row?.id) throw new Error(tt("portal.shoutoutMissing", {}, "ShoutOut not found."));
+    if (!isPendingShoutout(row)) throw new Error(tt("portal.savePendingOnly", {}, "Only pending ShoutOuts can be saved as drafts here."));
+    setText("portalStatus", tt("portal.savingShoutout", {}, "Saving ShoutOut…"));
+    const paid = shoutoutPaid(row);
+    if (!paid) {
+      await db.collection("shoutouts").doc(row.id).set({
+        status: "saved",
+        draft: true,
+        editable: true,
+        savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    } else {
+      const snap = shoutoutAuditSnapshot(row);
+      const ref = await db.collection("shoutouts").add({
+        ...snap,
+        template: snap.template || "neon",
+        mainText: snap.mainText || "ShoutOut",
+        subText: snap.subText || "",
+        screenFormatId: snap.screenFormatId || "led-96x48",
+        maxMainCharacters: Number(row.maxMainCharacters || 45),
+        maxSubCharacters: Number(row.maxSubCharacters || 20),
+        lineCount: Number(row.lineCount || 3),
+        maxCharactersPerLine: Number(row.maxCharactersPerLine || 15),
+        clubLocationId: snap.clubLocationId || "",
+        locationName: snap.locationName || "",
+        clubName: snap.locationName || "",
+        location: snap.clubLocationId || "",
+        submittedByUid: user.uid,
+        submittedBy: user.email || user.uid,
+        status: "saved",
+        draft: true,
+        editable: true,
+        paymentRequired: false,
+        paymentStatus: "unpaid",
+        amountCents: 0,
+        sourceShoutoutId: row.id,
+        sourceReferenceNumber: row.referenceNumber || "",
+        savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      try {
+        await db.collection("shoutoutAudit").add({
+          shoutoutId: ref.id,
+          action: "saved_from_pending",
+          sourceShoutoutId: row.id,
+          referenceNumber: snap.referenceNumber || "",
+          ownerUid: user.uid,
+          actorUid: user.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (_e) { /* audit optional */ }
+    }
+    setText("portalStatus", tt("portal.savedToDrafts", {}, "Saved. Open the Saved tab to reuse or delete this draft."));
+    await loadPortal(user);
+    showFeatureOrdersPane("foShoutoutsPane");
+    showShoutoutPane("shoutoutSavedPane");
+  }
+
+  async function deletePatronShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = findPortalShoutout(shoutoutId);
+    if (!user || !row?.id) throw new Error(tt("portal.shoutoutMissing", {}, "ShoutOut not found."));
+    if (!(isPendingShoutout(row) || isSavedShoutout(row))) {
+      throw new Error(tt("portal.deletePendingOrSavedOnly", {}, "Only pending or saved ShoutOuts can be deleted here."));
+    }
+    const paid = shoutoutPaid(row) && isPendingShoutout(row);
+    const confirmMsg = paid
+      ? tt("portal.deletePaidPendingConfirm", {}, "This ShoutOut is paid and waiting for club approval. Cancel it anyway?")
+      : tt("portal.deleteShoutoutConfirm", {}, "Delete this ShoutOut? You can also Save a reusable draft first.");
+    if (!window.confirm(confirmMsg)) return;
+    setText("portalStatus", tt("portal.deletingShoutout", {}, "Deleting ShoutOut…"));
+    await db.collection("shoutouts").doc(row.id).set({
+      status: "cancelled",
+      patronDeleted: true,
+      editable: false,
+      cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    try {
+      await db.collection("shoutoutAudit").add({
+        shoutoutId: row.id,
+        action: "patron_deleted",
+        referenceNumber: row.referenceNumber || "",
+        ownerUid: user.uid,
+        actorUid: user.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (_e) { /* optional */ }
+    setText("portalStatus", tt("portal.shoutoutDeleted", {}, "ShoutOut deleted."));
+    await loadPortal(user);
   }
 
   // Design notes: .cursor/rules/design-notes-completed-shoutouts.mdc

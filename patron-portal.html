@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="portal.title">My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.48"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.48"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.49"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.49"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -34,7 +34,16 @@
         <button class="admin-tab" data-panel="portalLanguageSettings" type="button" data-i18n="nav.languageSettings">Language Settings</button>
         <button class="admin-tab" data-panel="portalAiNotifications" type="button" data-i18n="nav.aiNotifications">AI Notification Preferences</button>
         <button class="admin-tab" data-panel="portalPublicProfile" type="button" data-i18n="nav.publicMedia">Public Media and Data Sharing</button>
-        <button class="admin-tab" data-panel="portalFeatureOrders" type="button" data-i18n="nav.featureOrders">Feature &amp; Orders</button>
+        <div class="admin-tab-group" data-tab-group="featureOrders" data-default-fo="foStatusPane">
+          <button class="admin-tab admin-tab-parent" data-group="featureOrders" data-panel="portalFeatureOrders" type="button" aria-expanded="false" data-i18n="nav.featureOrders">Feature &amp; Orders</button>
+          <div class="admin-subtabs hidden" id="featureOrdersSubtabs" role="group" aria-label="Feature and Orders sections">
+            <button class="admin-subtab active" type="button" data-fo-pane="foStatusPane" data-i18n="portal.fo.status">Status</button>
+            <button class="admin-subtab hidden" hidden type="button" data-fo-pane="foVipPane" data-floqr-feature-link="vipReservations" data-i18n="nav.guestListReserv">Guest List &amp; reserV</button>
+            <button class="admin-subtab" type="button" data-fo-pane="foShoutoutsPane" data-i18n="nav.myShoutouts">My ShoutOuts</button>
+            <button class="admin-subtab hidden" hidden type="button" data-fo-pane="foFloqCastsPane" data-floqr-feature-link="floqCast" data-i18n="nav.myFloqCasts">My FloqCasts</button>
+            <button class="admin-subtab" type="button" data-fo-pane="foInvoicesPane" data-i18n="nav.myInvoices">My Invoices</button>
+          </div>
+        </div>
         <button class="admin-tab" data-panel="portalGuestLists" type="button" data-i18n="nav.guestLists">My Guest Lists</button>
         <button class="admin-tab hidden" hidden data-panel="portalBartrStore" data-floqr-feature-link="bartr" data-floqr-feature-panel="#portalBartrStore" type="button" data-i18n="nav.bartrStore">BartR Store</button>
         <button class="admin-tab hidden" id="portalAdCampaignsTab" data-panel="portalAdCampaigns" type="button" data-i18n="nav.adCampaigns">Ad Campaigns</button>
@@ -247,21 +256,12 @@
       </section>
 
       <section id="portalFeatureOrders" class="admin-panel-section">
-        <div class="card">
-          <h2 data-i18n="nav.featureOrders">Feature &amp; Orders</h2>
-          <p class="sub small" data-i18n="portal.featureOrders.sub">Status of your enabled FLOQR features, VIP reserV guest lists, ShoutOuts, floqCasts, and invoices. Completed paid receipts also appear in FloqR Inbox.</p>
-          <div class="admin-subtabs" id="featureOrdersSubtabs" role="tablist" aria-label="Feature and Orders sections">
-            <button class="admin-subtab active" type="button" data-fo-pane="foStatusPane" data-i18n="portal.fo.status">Status</button>
-            <button class="admin-subtab hidden" hidden type="button" data-fo-pane="foVipPane" data-floqr-feature-link="vipReservations" data-i18n="nav.guestListReserv">Guest List &amp; reserV</button>
-            <button class="admin-subtab" type="button" data-fo-pane="foShoutoutsPane" data-i18n="nav.myShoutouts">My ShoutOuts</button>
-            <button class="admin-subtab hidden" hidden type="button" data-fo-pane="foFloqCastsPane" data-floqr-feature-link="floqCast" data-i18n="nav.myFloqCasts">My FloqCasts</button>
-            <button class="admin-subtab" type="button" data-fo-pane="foInvoicesPane" data-i18n="nav.myInvoices">My Invoices</button>
-          </div>
-        </div>
         <div id="foStatusPane" class="fo-pane">
           <div class="card">
+            <h2 data-i18n="nav.featureOrders">Feature &amp; Orders</h2>
+            <p class="sub small" data-i18n="portal.featureOrders.sub">Status of your enabled FLOQR features, VIP reserV guest lists, ShoutOuts, floqCasts, and invoices. Completed paid receipts also appear in FloqR Inbox.</p>
             <h3 data-i18n="portal.fo.status">Status</h3>
-            <p class="sub small" data-i18n="portal.fo.statusNote">Enabled features for the current period. Open a row’s feature tab for full Saved / Pending / Completed lists.</p>
+            <p class="sub small" data-i18n="portal.fo.statusNote">Enabled features for the current period. Open a nested Feature &amp; Orders tab for full Saved / Pending / Completed lists.</p>
             <div id="featureOrdersStatusReport" class="report-block"></div>
           </div>
         </div>
@@ -796,46 +796,49 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.48"></script>
-<script src="./floqr-people-directory.js?v=s3.1.48"></script>
-<script src="./floqr-app-check.js?v=s3.1.48"></script>
-<script src="./floqr-nav.js?v=s3.1.48"></script>
-<script src="./global-profile-status.js?v=s3.1.48"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.48"></script>
-<script src="./shared-data.js?v=s3.1.48"></script>
-<script src="./url-media-field.js?v=s3.1.48"></script>
-<script src="./ai-service.js?v=s3.1.48"></script>
-<script src="./ai-index-service.js?v=s3.1.48"></script>
-<script src="./ai-search-service.js?v=s3.1.48"></script>
-<script src="./ai-notification-service.js?v=s3.1.48"></script>
-<script src="./ai-template-studio.js?v=s3.1.48"></script>
-<script src="./ai-grammar-service.js?v=s3.1.48"></script>
-  <script src="./floqr-action-feedback.js?v=s3.1.48"></script>
-<script src="./floqr-tab-gates.js?v=s3.1.48"></script>
-<script src="./floqr-feature-services.js?v=s3.1.48"></script>
-<script src="./floqr-i18n.js?v=s3.1.48"></script>
-<script src="./floqai-help-repository.js?v=s3.1.48"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.48"></script>
-<script src="./help-attach.js?v=s3.1.48"></script>
-<script src="./helper-popouts.js?v=s3.1.48"></script>
-<script src="./floqr-identity.js?v=s3.1.48"></script>
-<script src="./floqr-blocks.js?v=s3.1.48"></script>
-<script src="./payment-service.js?v=s3.1.48"></script>
-<script src="./dj-commerce-policy.js?v=s3.1.48"></script>
-<script src="./floqr-service-access.js?v=s3.1.48"></script>
-<script src="./floqr-venue-picker.js?v=s3.1.48"></script>
-<script src="./floqr-employee-network.js?v=s3.1.48"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.1.48"></script>
-<script src="./floqr-canonical.js?v=s3.1.48"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.1.48"></script>
-<script src="./floqr-consent-mode.js?v=s3.1.48"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.48"></script>
-<script src="./ad-campaigns.js?v=s3.1.48"></script>
-<script src="./floqr-ad-composer.js?v=s3.1.48"></script>
-<script src="./patron-ad-campaigns.js?v=s3.1.48"></script>
-<script src="./floqr-access-notice.js?v=s3.1.48"></script>
-<script src="./patron-portal-app.js?v=s3.1.48"></script>
-  <script src="./profile-access-guard.js?v=s3.1.48"></script>
+<script src="./firebase-config.js?v=s3.1.49"></script>
+<script src="./floqr-people-directory.js?v=s3.1.49"></script>
+<script src="./floqr-app-check.js?v=s3.1.49"></script>
+<script src="./floqr-nav.js?v=s3.1.49"></script>
+<script src="./global-profile-status.js?v=s3.1.49"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.49"></script>
+<script src="./shared-data.js?v=s3.1.49"></script>
+<script src="./url-media-field.js?v=s3.1.49"></script>
+<script src="./ai-service.js?v=s3.1.49"></script>
+<script src="./ai-index-service.js?v=s3.1.49"></script>
+<script src="./ai-search-service.js?v=s3.1.49"></script>
+<script src="./ai-notification-service.js?v=s3.1.49"></script>
+<script src="./ai-template-studio.js?v=s3.1.49"></script>
+<script src="./ai-grammar-service.js?v=s3.1.49"></script>
+  <script src="./floqr-action-feedback.js?v=s3.1.49"></script>
+<script src="./floqr-tab-gates.js?v=s3.1.49"></script>
+<script src="./floqr-feature-services.js?v=s3.1.49"></script>
+<script src="./floqr-i18n.js?v=s3.1.49"></script>
+<script src="./floqai-help-repository.js?v=s3.1.49"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.49"></script>
+<script src="./help-attach.js?v=s3.1.49"></script>
+<script src="./helper-popouts.js?v=s3.1.49"></script>
+<script src="./floqr-identity.js?v=s3.1.49"></script>
+<script src="./floqr-blocks.js?v=s3.1.49"></script>
+<script src="./payment-service.js?v=s3.1.49"></script>
+<script src="./dj-commerce-policy.js?v=s3.1.49"></script>
+<script src="./floqr-service-access.js?v=s3.1.49"></script>
+<script src="./floqr-venue-picker.js?v=s3.1.49"></script>
+<script src="./floqr-employee-network.js?v=s3.1.49"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.49"></script>
+<script src="./floqr-canonical.js?v=s3.1.49"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.1.49"></script>
+<script src="./floqr-consent-mode.js?v=s3.1.49"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.49"></script>
+<script src="./ad-campaigns.js?v=s3.1.49"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.49"></script>
+<script src="./patron-ad-campaigns.js?v=s3.1.49"></script>
+<script src="./floqr-access-notice.js?v=s3.1.49"></script>
+<script src="./floqr-safe-render.js?v=s3.1.49"></script>
+<script src="./floqr-board-frame.js?v=s3.1.49"></script>
+<script src="./floqr-template-preview.js?v=s3.1.49"></script>
+<script src="./patron-portal-app.js?v=s3.1.49"></script>
+  <script src="./profile-access-guard.js?v=s3.1.49"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

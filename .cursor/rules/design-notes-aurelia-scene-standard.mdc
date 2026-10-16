@@ -1,0 +1,80 @@
+---
+description: Aurelia VIP 3D scene STANDARD for repeated AI scenes and 15–30 min AI movies
+alwaysApply: true
+---
+
+# Aurelia VIP 3D scene STANDARD
+
+Resume: `@aurelia-scene$` / `$ai-movie$`.
+
+## Owner decision (Oct 15 2026)
+
+The **Aurelia VIP 3D demo** design is approved as a **STANDARD** base layout. Use this procedural room geometry to generate AI scenes repeatedly (still frames, clips, and full **15–30 minute AI movies** from a story bible). Process and prompt templates live in `reports/aurelia-scene-standard/`. Reference implementation: `reports/vip-aurelia-demo/` (`aurelia.json`, `scene3d.js`).
+
+**Status:** documentation standard only — **not** an app build, **not** published to GitHub Pages, **not** Functions deploy unless the owner asks. Billing / ledger work is out of scope (see commit `03988f0` and related VIP billing docs — do not touch).
+
+## Locked vs mutable
+
+| Locked (architecture) | Mutable (story / art direction) |
+|---|---|
+| Room **32 m × 22 m**, walls **6 m**, eye **1.65 m**, mezzanine **+1.2 m** | Wardrobe, era, palette accents within mood |
+| Four areas: **A West Booths**, **B Dance Floor**, **C VIP Mezzanine**, **D Bar Lounge** | Anonymous crowd silhouettes (no faces) |
+| **Non-bookable:** main bar, VIP bar, DJ booth, dance-floor zone, entrance, coat check, restrooms, stairs, exits | Bottle service, sparklers, confetti props |
+| Circulation paths and door positions | DJ silhouette (no real artist likeness) |
+| Camera preset *geometry* (overview, area focus, section focus, walk spawn) | Story beats, time-of-night, music mood |
+| Brand placement rules (below) | LED wall *content* (ShoutOut silhouettes only) |
+
+**Never** move walls, bars, DJ booth, stairs, or exits for a story beat. If AI output drifts architecture, regenerate with the architecture-drift repair prompt (`AI-MOVIE-PROCESS.md`).
+
+## Capture method
+
+**Modeled / AI-assisted procedural layout** inspired by club gallery photos — **not** photogrammetry, **not** a survey. **No identifiable patrons** in any render (still, video, or LED wall). Crowds = anonymous silhouettes only.
+
+## Camera presets (match `scene3d.js`)
+
+| Preset | Use |
+|---|---|
+| **Overview** | Position ~(0, 24, 22) world, target (0, 0, 1) — dollhouse read of all four areas |
+| **Area focus** | Center on area bounds; VIP mezz uses +1.2 m floor; distance scales with area size × aspect boost |
+| **Section focus** | Table/booth framing with sheet offset (mobile bottom sheet vs side panel) |
+| **Walk start** | Spawn **x=7 m, z=19.6 m**, eye height **1.65 m**, yaw **0** (facing north), pitch ~**-0.08** |
+
+## Lighting moods
+
+Base rig (club night): hemisphere **#ffe7c2** / ground **#1a1020**, ambient white, directional key, point **chandeliers #ffd28a**. Named moods for AI direction:
+
+- **club night** — default warm VIP interior
+- **arrival red-carpet** — brighter entry, accent on entrance path
+- **VIP mezzanine champagne** — cooler highlights on mezz, softer floor
+- **dance-floor peak** — stronger beams / haze on Area B (mutable VFX only)
+- **closing soft** — dimmer chandeliers, longer shadows, no layout change
+
+## Brand chrome
+
+**FloqR**, **FloqMedia**, **ShoutOut** are brand strings — **never translated**. LED wall may show **ShoutOut silhouette boards** (classic board shapes, no patron photos). Do not invent a second production origin; canonical product links follow `cutoffrequirement.mdc` when cutover applies — these docs are repo-local QA / production notes.
+
+## Film pipeline (summary)
+
+1. **Story bible** — logline, characters (silhouettes), beats, runtime target (15–30 min)
+2. **SCENE-LOCK keyframes** — stills that obey locked geometry (`SCENE-LOCK.md`)
+3. **Image-to-video** — short clips per beat from keyframes
+4. **Assembly** — edit to beat sheet; hold on architecture-locked wide shots between story inserts
+5. **Audio** — music mood + optional VO; no uncleared identifiable voice clones
+6. **QC / architecture-drift fix** — reject or repair any shot that moved bars, DJ, walls, or exits
+
+Full operator steps: `reports/aurelia-scene-standard/AI-MOVIE-PROCESS.md`.
+
+## Pointers
+
+| Doc | Role |
+|---|---|
+| `reports/aurelia-scene-standard/README.md` | Operator pack index |
+| `reports/aurelia-scene-standard/SCENE-LOCK.md` | Locked geometry + cameras + lights |
+| `reports/aurelia-scene-standard/AI-MOVIE-PROCESS.md` | Phases, beat sheet example, prompt templates |
+| `reports/vip-aurelia-demo/` | Live three.js demo + `aurelia.json` |
+
+## FIX PROMPT
+
+```
+Aurelia VIP 3D STANDARD (Oct 15 2026): locked 32×22 m room, areas A West Booths / B Dance Floor / C VIP Mezzanine / D Bar Lounge; bars + DJ non-bookable; circulation clear. Cameras: overview (0,24,22)→(0,0,1), area/section focus per scene3d.js, walk start (7,19.6) eye 1.65 m north. Lights: hemisphere #ffe7c2/#1a1020, chandeliers #ffd28a + named moods. Brand FloqR/FloqMedia/ShoutOut untranslated; LED = ShoutOut silhouettes only. Pipeline: bible → SCENE-LOCK keyframes → i2v → assembly → audio → QC/drift repair. 15–30 min movies; modeled not photogrammetry; no identifiable patrons. Docs: reports/aurelia-scene-standard/ + demo reports/vip-aurelia-demo/. Not app build / not publish unless asked. Resume: @aurelia-scene$ / $ai-movie$
+```

@@ -318,5 +318,212 @@ module.exports = {
         "extraGuestFee": true
       }
     ]
+  },
+  "temp-democlub-1": {
+    "clubLocationId": "temp-democlub-1",
+    "planFile": "aurelia.json",
+    "venueName": "Aurelia (Demo Club)",
+    "sections": [
+      {
+        "id": "aurelia-b1",
+        "label": "B1",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-b2",
+        "label": "B2",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-b3",
+        "label": "B3",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-b4",
+        "label": "B4",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-b5",
+        "label": "B5",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-b6",
+        "label": "B6",
+        "type": "booth",
+        "maxCapacity": 8,
+        "includedGuests": 6,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r1",
+        "label": "R1",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r2",
+        "label": "R2",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r3",
+        "label": "R3",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r4",
+        "label": "R4",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r5",
+        "label": "R5",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-r6",
+        "label": "R6",
+        "type": "round",
+        "maxCapacity": 6,
+        "includedGuests": 4,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-t1",
+        "label": "T1",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false
+      },
+      {
+        "id": "aurelia-t2",
+        "label": "T2",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false
+      },
+      {
+        "id": "aurelia-t3",
+        "label": "T3",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false
+      },
+      {
+        "id": "aurelia-t4",
+        "label": "T4",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false
+      },
+      {
+        "id": "aurelia-l1",
+        "label": "L1",
+        "type": "standing",
+        "maxCapacity": 4,
+        "includedGuests": 2,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-l2",
+        "label": "L2",
+        "type": "standing",
+        "maxCapacity": 4,
+        "includedGuests": 2,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-l3",
+        "label": "L3",
+        "type": "standing",
+        "maxCapacity": 4,
+        "includedGuests": 2,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-l4",
+        "label": "L4",
+        "type": "standing",
+        "maxCapacity": 4,
+        "includedGuests": 2,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-v1",
+        "label": "V1",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 8,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-v2",
+        "label": "V2",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 8,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-v3",
+        "label": "V3",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 8,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-v4",
+        "label": "V4",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 8,
+        "extraGuestFee": true
+      },
+      {
+        "id": "aurelia-aurelia-suite",
+        "label": "AURELIA SUITE",
+        "type": "vipArea",
+        "maxCapacity": 20,
+        "includedGuests": 15,
+        "extraGuestFee": true
+      }
+    ]
   }
 };
