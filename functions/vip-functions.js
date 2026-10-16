@@ -4,7 +4,8 @@
 
 const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {assertFeatureAccess} = require("./feature-services-functions");
+const {__featureServiceHelpers: featureAccess} = require("./feature-services-functions");
+const assertFeatureAccess = (auth, key, req = null) => featureAccess.assertFeatureAccess(auth, key, req);
 const core = require("./vip-core");
 const betaCatalog = require("./vip-beta-catalog");
 
@@ -75,7 +76,7 @@ function publicReservation(id, row, {includePassToken = false, passToken = ""} =
 
 /** Phase 1+2: beta venue list. */
 exports.getVipBetaVenues = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   return {
     phase: 2,
     brand: "VIP ReserV",
@@ -93,7 +94,7 @@ exports.getVipBetaVenues = onCall(CALL_OPTS, async request => {
 
 /** Sections + inventory status for a night. */
 exports.getVipAvailability = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const clubLocationId = text(request.data?.clubLocationId, 120);
   const night = validateNight(request.data?.night);
   if (!clubLocationId || !night) throw new HttpsError("invalid-argument", "clubLocationId and night (YYYY-MM-DD) are required.");
@@ -136,7 +137,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
 
 /** Transactional inventory hold (30 min). */
 exports.createVipHold = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const clubLocationId = text(request.data?.clubLocationId, 120);
   const night = validateNight(request.data?.night);
@@ -239,7 +240,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
 });
 
 exports.releaseVipHold = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
   if (!holdId) throw new HttpsError("invalid-argument", "holdId is required.");
@@ -272,7 +273,7 @@ exports.releaseVipHold = onCall(CALL_OPTS, async request => {
 });
 
 exports.recordVipConsent = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
   const checks = request.data?.checks && typeof request.data.checks === "object" ? request.data.checks : {};
@@ -323,7 +324,7 @@ exports.recordVipConsent = onCall(CALL_OPTS, async request => {
 });
 
 exports.getMyVipReservations = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const snap = await db.collection("vipReservations")
     .where("patronUid", "==", uid)
@@ -336,7 +337,7 @@ exports.getMyVipReservations = onCall(CALL_OPTS, async request => {
 });
 
 exports.getVipReservationPass = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const reservationId = text(request.data?.reservationId, 120);
   if (!reservationId) throw new HttpsError("invalid-argument", "reservationId is required.");
@@ -357,7 +358,7 @@ exports.getVipReservationPass = onCall(CALL_OPTS, async request => {
 });
 
 exports.checkInVipReservation = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const clubLocationId = text(request.data?.clubLocationId, 120);
   const token = text(request.data?.token, 200);
@@ -407,7 +408,7 @@ exports.checkInVipReservation = onCall(CALL_OPTS, async request => {
 });
 
 exports.markVipNoShow = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const reservationId = text(request.data?.reservationId, 120);
   if (!reservationId) throw new HttpsError("invalid-argument", "reservationId is required.");
@@ -430,7 +431,7 @@ exports.markVipNoShow = onCall(CALL_OPTS, async request => {
 });
 
 exports.listVipReservations = onCall(CALL_OPTS, async request => {
-  await assertFeatureAccess(request.auth, "vipReservations");
+  await assertFeatureAccess(request.auth, "vipReservations", request);
   requireAuth(request.auth);
   const clubLocationId = text(request.data?.clubLocationId, 120);
   const night = validateNight(request.data?.night);
