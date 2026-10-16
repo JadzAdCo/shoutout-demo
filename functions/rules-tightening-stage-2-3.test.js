@@ -67,7 +67,7 @@ test("owners: patrons see and edit only their own records", () => {
   assert.ok(owns.includes("data[uidField] == request.auth.uid"), "direct field access so owner queries can be proven");
   const edit = rules.slice(rules.indexOf("function isOwnerShoutoutEdit"), rules.indexOf("match /shoutouts/"));
   ["paymentStatus", "approvedByUid", "serviceOrderId"].forEach(field => assert.ok(edit.includes(`"${field}"`), field));
-  assert.ok(edit.includes('["pending", "cancelled"]'));
+  assert.ok(edit.includes('["pending", "cancelled", "canceled", "saved", "draft"]'));
   assert.ok(block("pickupRequests").includes("resource.data.ownerUid == request.auth.uid"));
   assert.ok(block("entityFollows").includes("resource.data.followerUid == request.auth.uid"));
   assert.ok(block("roleRequests").includes("request.resource.data.uid == request.auth.uid"));
