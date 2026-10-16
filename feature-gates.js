@@ -18,7 +18,9 @@
     windowAds: true,
     bartrStores: true,
     shoutOut: true,
-    floqCast: true
+    floqCast: true,
+    /* Opt-in: only clubs subscribed to VIP reserV appear in VIP venue search. */
+    vipReservations: false
   });
 
   const PATRON_GATE_LABELS = Object.freeze({
@@ -34,7 +36,8 @@
     windowAds: "WindowAds",
     bartrStores: "BartR Stores",
     shoutOut: "ShoutOut Capability",
-    floqCast: "floqCast live video"
+    floqCast: "floqCast live video",
+    vipReservations: "VIP reserV tables"
   });
 
   let cachedPatronGates = { ...DEFAULT_PATRON_GATES };

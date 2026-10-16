@@ -319,7 +319,9 @@ When adding a section, use this skeleton:
 | **Brand** | VIP reserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
-| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — night picker, 30‑min hold, Terms consent, FloqR Stripe deposit |
+| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero (ShoutOut-like), venue search of `venueMayUse("vipReservations")` clubs only, night picker, 30‑min hold, Terms consent, FloqR Stripe deposit |
+| **Profile menu** | `global-profile-status.js` `featureLink("vipReservations", …, "VIP reserV")` — same Features & Services gate as Search tile |
+| **VCC tab** | Club Admin `panelFloqCast` label forced to **floqCast** (never legacy `supRstar`) |
 | **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
 | **My Profile** | Feature & Orders → Guest List & reserV (`?tab=guest-list-reserv` / legacy `?tab=reservations`) — list + Show pass |
 | **Search icon** | `images/vip-reserv-icon.svg` + `shoutout-icon-card` (same 132/116px as ShoutOut) |
@@ -329,11 +331,11 @@ When adding a section, use this skeleton:
 | **Data** | `vipInventory`, `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
 | **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
-| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant |
+| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant. Venue opt-in: `clubLocations.featureGates.vipReservations` (default **false** in `feature-gates.js`). Beta seeds: Decades, Lima Twist, Aurelia (`temp-democlub-1`) |
 | **Not yet** | Club Admin VIP tab, promoter path, counsel Live Terms, Model B invoicing, Aurelia 2D |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
-| **Package** | s3.1.47 |
+| **Package** | s3.1.48 |
 
 ## Feature & Orders (patron portal)
 

@@ -132,6 +132,7 @@
       ${featureLink("bartr", hrefStamp("./commerce.html", { from: "search" }), t("nav.bartr", "BartR"), blank)}
       ${featureLink("rydr", hrefStamp("./rydr.html", { from: "search" }), t("cat.rydr", "RydR"), blank)}
       ${featureLink("floqCast", hrefStamp("./floqcast-search.html", { from: "search" }), t("cat.floqcast", "floqCast"), blank)}
+      ${featureLink("vipReservations", hrefStamp("./vip.html", { from: "search" }), t("cat.vipreserv", "VIP reserV"), blank)}
       ${featureLink("floqAi", hrefFloqAi(), t("cat.floqai", "FloqAi"), blank)}
       <button id="floqrGlobalSignOutBtn" type="button">${esc(t("app.signOut", "Sign out"))}</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());

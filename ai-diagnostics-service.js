@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.47";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.48";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1478,6 +1478,15 @@
       howToTest:"1) Hard-refresh portal → Feature & Orders → Status default. 2) Pay VIP deposit → FloqR Inbox shows descriptive Table … deposit — Venue, date (not a stub). My Invoices shows same title + card last4 when available. 3) Compose ShoutOut → Save ShoutOut → Feature & Orders → My ShoutOuts → Saved. 4) Submit/pay ShoutOut → Pending (not Inbox). 5) Club Admin approve → Inbox paidShoutoutReceipt with descriptive title. 6) Search VIP reserV icon same size as ShoutOut.",
       expected:"VIP receipt in Inbox; pending ShoutOut not in Inbox; Saved drafts listed; tab labels Feature & Orders / Guest List & reserV; icon 132/116px.",
       troubleshoot:"No VIP Inbox → redeploy commerce-functions + receipt-delivery; confirm webhook expanded session. Thin ShoutOut title → order.itemName/receipt.title from shoutoutReceiptTitle. Save missing → cache-bust patron-app.js / index.html. Tabs wrong → hard refresh patron-portal ?v=s3.1.47."
+    },
+    {
+      id:"s3-1-48-vip-landing-floqcast-profile",
+      area:"VCC / Profile / VIP reserV",
+      feature:"VCC floqCast tab, profile VIP reserV link, ShoutOut-like VIP venue search",
+      changed:"Club Admin floqCast tab never shows supRstar. Profile menu wires VIP reserV via featureLink. vip.html FloqR+VIP hero + search of clubs with featureGates.vipReservations only (Decades/Lima/Aurelia seeded). Package s3.1.48.",
+      howToTest:"1) Hard-refresh admin.html VCC → tab label is floqCast (not supRstar). 2) Open profile menu → VIP reserV link (beta grant / Master Admin). 3) vip.html → FloqR + VIP icon → search shows only VIP-subscribed clubs → pick Decades → night + floor map. 4) Non-subscribed clubs never appear.",
+      expected:"VCC tab floqCast; profile shows VIP reserV; VIP landing matches ShoutOut UX with subscribed-only venue search.",
+      troubleshoot:"Tab still supRstar → hard refresh admin-app.js / floqr-i18n.js ?v=s3.1.48. Profile missing VIP → Features & Services vipReservations + global-profile-status.js cache-bust. Empty VIP search → clubLocations.featureGates.vipReservations must be true (seed Decades/Lima)."
     },
     {
       id:"s3-1-46-vip-reserv-phase2",

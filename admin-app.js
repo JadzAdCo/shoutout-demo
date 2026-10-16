@@ -157,7 +157,7 @@
     const marketingCard = byId("marketingCampaignCard");
     const marketingSubtab = document.querySelector('.admin-subtab[data-panel="panelMarketingCampaigns"]');
     const shoutoutTab = document.querySelector('[data-panel="panelQueue"]');
-    const suprstarTab = document.querySelector('[data-panel="panelFloqCast"]');
+    const floqCastTab = document.querySelector('[data-panel="panelFloqCast"]');
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
@@ -168,7 +168,7 @@
     const uberOk = g.venueMayUse("uberAds", row);
     const windowOk = g.venueMayUse("windowAds", row);
     const shoutOk = g.venueMayUse("shoutOut", row);
-    const suprstarOk = g.venueMayUse("floqCast", row);
+    const floqCastOk = g.venueMayUse("floqCast", row);
     const bartrOk = g.venueMayUse("bartrStores", row);
     const marketingOk = uberOk || windowOk;
     if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
@@ -178,7 +178,11 @@
     if (marketingGroup) marketingGroup.classList.toggle("hidden", !marketingOk);
     if (marketingParent) marketingParent.classList.toggle("hidden", !marketingOk);
     if (shoutoutTab) shoutoutTab.classList.toggle("hidden", !shoutOk);
-    if (suprstarTab) suprstarTab.classList.toggle("hidden", !suprstarOk);
+    if (floqCastTab) {
+      floqCastTab.classList.toggle("hidden", !floqCastOk);
+      /* Never show legacy supRstar chrome — product brand is floqCast. */
+      floqCastTab.textContent = "floqCast";
+    }
     document.querySelectorAll("[data-bartr-store-gate]").forEach(el => el.classList.toggle("hidden", !bartrOk));
   }
 

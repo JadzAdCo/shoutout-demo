@@ -74,21 +74,39 @@ function publicReservation(id, row, {includePassToken = false, passToken = ""} =
   return out;
 }
 
-/** Phase 1+2: beta venue list. */
+/** Phase 1+2: beta venue list (VIP reserV–subscribed clubs only when gate is set). */
 exports.getVipBetaVenues = onCall(CALL_OPTS, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
-  return {
-    phase: 2,
-    brand: "VIP reserV",
-    terms: BETA_TERMS,
-    holdMinutes: Math.round(HOLD_MS / 60000),
-    venues: BETA_VENUES.map(v => ({
+  const venues = [];
+  for (const v of BETA_VENUES) {
+    let subscribed = true;
+    try {
+      const snap = await db.collection("clubLocations").doc(v.id).get();
+      if (snap.exists) {
+        const gates = (snap.data() || {}).featureGates || {};
+        if (Object.prototype.hasOwnProperty.call(gates, "vipReservations")) {
+          subscribed = gates.vipReservations !== false;
+        } else {
+          /* Beta catalog venues are subscribed until Club Admin turns the gate off. */
+          subscribed = true;
+        }
+      }
+    } catch (_) { /* keep beta row */ }
+    if (!subscribed) continue;
+    venues.push({
       id: v.id,
       name: v.name,
       planFile: v.planFile,
       city: v.city,
       pending: !!v.pending
-    }))
+    });
+  }
+  return {
+    phase: 2,
+    brand: "VIP reserV",
+    terms: BETA_TERMS,
+    holdMinutes: Math.round(HOLD_MS / 60000),
+    venues
   };
 });
 

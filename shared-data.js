@@ -222,6 +222,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     activityDates:["Thu Summer Beach Club (18+)","Fri Fridays at Decades (21+)","Sat Saturdays at Decades (21+)","Sun Sueño Sundays rooftop"],
     templates:["hiphop","edm","vip","bottle","neon","birthday"],
     onboardingSource:"website-extract-decadesdc.com",
+    featureGates:{shoutOut:true, floqCast:true, vipReservations:true},
     active:true
   },
   "mayflower-washington-dc": {
@@ -441,6 +442,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     reservationsUrl:"https://www.opentable.com/r/lima-twist-washington",
     eventsUrl:"https://www.limatwist.com/private-events",
     onboardingSource:"website-extract-limatwist.com",
+    featureGates:{shoutOut:true, floqCast:true, vipReservations:true},
     active:true
   },
   "casamara-rooftop-washington-dc": {
@@ -719,6 +721,11 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
       continue;
     }
     locations[id] = locations[id] || {};
+  }
+  /* Aurelia demo club is on the VIP reserV beta list (2D map pending). */
+  const aurelia = locations["temp-democlub-1"];
+  if (aurelia) {
+    aurelia.featureGates = Object.assign({}, aurelia.featureGates || {}, {vipReservations: true});
   }
 })(window.SHOUTOUT_CLUB_LOCATIONS);
 

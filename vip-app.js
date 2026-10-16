@@ -1,21 +1,29 @@
-/* VIP reserV Phase 2 — venue → night → hold → consent → Checkout deposit. */
+/* VIP reserV — ShoutOut-style venue search → night → hold → consent → Checkout. */
 (function () {
   "use strict";
 
-  const BETA_VENUES = [
-    {id: "decades-washington-dc", label: "Decades", plan: "decades.json", hint: "Washington, DC"},
-    {id: "lima-twist-washington-dc", label: "Lima Twist Club", plan: "lima-twist.json", hint: "Washington, DC"},
-    {id: "temp-democlub-1", label: "Aurelia", plan: null, hint: "Demo club — 3D demo; 2D map Phase 1.1", pending: true}
-  ];
+  /** Static floor plans for beta / subscribed clubs (under vip-plans/). */
+  const PLAN_BY_ID = Object.freeze({
+    "decades-washington-dc": "decades.json",
+    "lima-twist-washington-dc": "lima-twist.json",
+    "temp-democlub-1": null
+  });
 
   const statusEl = document.getElementById("vipStatus");
   const gateEl = document.getElementById("vipGate");
   const appEl = document.getElementById("vipApp");
-  const chipsEl = document.getElementById("vipVenueChips");
+  const searchEl = document.getElementById("vipVenueSearch");
+  const gridEl = document.getElementById("vipVenueGrid");
+  const countEl = document.getElementById("vipVenueCount");
+  const selectedWrap = document.getElementById("vipVenueSelected");
+  const selectedLabel = document.getElementById("vipSelectedLabel");
+  const mapSection = document.getElementById("vipMapSection");
   const mapTitle = document.getElementById("vipMapTitle");
   const nightEl = document.getElementById("vipNight");
   const holdBanner = document.getElementById("vipHoldBanner");
   const consentEl = document.getElementById("vipConsent");
+
+  let venueCatalog = [];
   let currentVenue = null;
   let currentUser = null;
   let activeHold = null;
@@ -28,6 +36,14 @@
       if (v && v !== key) return v;
     } catch (_) { /* ignore */ }
     return fallback;
+  }
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   function setStatus(msg) {
@@ -103,7 +119,7 @@
       const amounts = activeHold.amounts || {};
       holdBanner.innerHTML =
         `<strong data-i18n-skip>${t("page.vip.holdActive", "Hold active")}</strong> — ` +
-        `${activeHold.sectionLabel || activeHold.sectionId} · ${activeHold.night} · ` +
+        `${esc(activeHold.sectionLabel || activeHold.sectionId)} · ${esc(activeHold.night)} · ` +
         `${t("page.vip.payToday", "Pay today")} ${money(amounts.chargedCents)} · ` +
         `<span id="vipHoldClock">${mins}:${String(secs).padStart(2, "0")}</span>` +
         ` <button type="button" id="vipReleaseHold" class="buttonlike">${t("page.vip.releaseHold", "Release hold")}</button>` +
@@ -196,50 +212,150 @@
     }
   }
 
-  function showApp(user) {
-    currentUser = user;
-    if (gateEl) gateEl.classList.add("hidden");
-    if (appEl) appEl.classList.remove("hidden");
-    setStatus(t("page.vip.signedIn", "Signed in — pick a venue and night, then tap a green table."));
-    renderVenues();
-    fillNights();
-    const params = new URLSearchParams(location.search);
-    if (params.get("vipPaid") === "1") {
-      setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
-    } else if (params.get("vipCancelled") === "1") {
-      setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it."));
-    }
-    const loc = params.get("location");
-    const match = BETA_VENUES.find(v => v.id === loc) || BETA_VENUES[0];
-    selectVenue(match, {silent: true});
+  function venueSearchHaystack(v) {
+    return [
+      v.label, v.brandName, v.hint, v.city, v.region, v.country,
+      ...(v.genres || [])
+    ].join(" ").toLowerCase();
   }
 
-  function renderVenues() {
-    if (!chipsEl) return;
-    chipsEl.innerHTML = "";
-    BETA_VENUES.forEach(v => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.setAttribute("role", "tab");
-      b.dataset.venue = v.id;
-      b.textContent = v.pending ? `${v.label} (soon)` : v.label;
-      b.title = v.hint || "";
-      b.disabled = !!v.pending;
-      b.addEventListener("click", () => selectVenue(v));
-      chipsEl.appendChild(b);
+  function filteredVenues() {
+    const q = String(searchEl?.value || "").trim().toLowerCase();
+    if (!q) return venueCatalog.slice();
+    return venueCatalog.filter(v => venueSearchHaystack(v).includes(q));
+  }
+
+  function showSearchMode() {
+    if (gridEl) gridEl.classList.remove("hidden");
+    if (searchEl) searchEl.classList.remove("hidden");
+    if (selectedWrap) selectedWrap.classList.add("hidden");
+    if (mapSection) mapSection.classList.add("hidden");
+    clearHoldUi();
+    currentVenue = null;
+    renderVenueGrid();
+  }
+
+  function renderVenueGrid() {
+    if (!gridEl) return;
+    const rows = filteredVenues();
+    if (countEl) {
+      countEl.textContent = rows.length
+        ? t("page.vip.venueCount", "{n} VIP reserV venue(s)").replace("{n}", String(rows.length))
+        : t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV.");
+    }
+    if (!rows.length) {
+      gridEl.innerHTML = `<p class="sub">${esc(t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV."))}</p>`;
+      return;
+    }
+    gridEl.innerHTML = "";
+    rows.forEach(v => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "club-option vip-venue-option";
+      card.setAttribute("role", "listitem");
+      card.dataset.venue = v.id;
+      const badges = [];
+      if (v.pending) badges.push(t("page.vip.comingSoon", "Soon"));
+      else badges.push(t("page.vip.bookable", "Bookable"));
+      (v.genres || []).slice(0, 3).forEach(g => badges.push(g));
+      const place = v.hint || [v.city, v.region, v.country].filter(Boolean).join(", ") || "";
+      card.innerHTML =
+        `<div><div class="club-option-head"><div><h3>${esc(v.label)}</h3>` +
+        `<p>${esc(place)}</p></div><strong>VIP reserV</strong></div>` +
+        `<div class="badge-row">${badges.map(b => `<span>${esc(b)}</span>`).join("")}</div></div>` +
+        `<span class="primary vip-pick-cta">${esc(v.pending ? t("page.vip.comingSoon", "Soon") : t("page.vip.pickVenue", "Select venue"))}</span>`;
+      card.disabled = false;
+      card.addEventListener("click", () => selectVenue(v));
+      gridEl.appendChild(card);
     });
   }
 
+  /**
+   * Build catalog: clubs with venue gate vipReservations=true (subscribed),
+   * merged with beta plan metadata from getVipBetaVenues when available.
+   */
+  async function loadSubscribedVenues() {
+    const map = window.SHOUTOUT_CLUB_LOCATIONS || {};
+    const g = window.FLOQRFeatureGates;
+    const db = firebase.firestore();
+    const betaMeta = {};
+    try {
+      const res = await callable("getVipBetaVenues")({});
+      (res.data?.venues || []).forEach(v => {
+        if (v?.id) betaMeta[v.id] = v;
+      });
+    } catch (err) {
+      console.warn("getVipBetaVenues", err?.message || err);
+      Object.keys(PLAN_BY_ID).forEach(id => {
+        betaMeta[id] = {
+          id,
+          name: (map[id] && (map[id].locationName || map[id].brandName)) || id,
+          planFile: PLAN_BY_ID[id],
+          pending: PLAN_BY_ID[id] == null
+        };
+      });
+    }
+
+    const ids = new Set([...Object.keys(map), ...Object.keys(betaMeta)]);
+    const rows = [];
+    for (const id of ids) {
+      const staticRow = map[id] || {};
+      let club = {id, ...staticRow};
+      try {
+        if (g?.loadVenueRecord) club = (await g.loadVenueRecord(db, id)) || club;
+      } catch (_) { /* keep static */ }
+      /* Merge gates: Firestore can replace featureGates wholesale and drop static VIP seeds. */
+      const mergedGates = Object.assign({}, staticRow.featureGates || {}, club.featureGates || {});
+      if (!Object.prototype.hasOwnProperty.call(mergedGates, "vipReservations") && betaMeta[id]) {
+        mergedGates.vipReservations = true;
+      }
+      const gatedClub = Object.assign({}, club, {featureGates: mergedGates});
+      const subscribed = g ? g.venueMayUse("vipReservations", gatedClub) : !!mergedGates.vipReservations;
+      if (!subscribed) continue;
+      const beta = betaMeta[id] || {};
+      const plan = PLAN_BY_ID[id] || beta.planFile || null;
+      const pending = plan == null || !!beta.pending;
+      rows.push({
+        id,
+        label: club.locationName || club.brandName || beta.name || id,
+        brandName: club.brandName || "",
+        hint: club.locationLabel || [club.city, club.region || club.regionType, club.country].filter(Boolean).join(", ") || beta.city || "",
+        city: club.city || beta.city || "",
+        region: club.region || "",
+        country: club.country || "",
+        genres: Array.isArray(club.genres) ? club.genres : [],
+        logoUrl: club.logoUrl || club.coverImageUrl || "",
+        plan,
+        pending
+      });
+    }
+    rows.sort((a, b) => a.label.localeCompare(b.label));
+    venueCatalog = rows;
+    renderVenueGrid();
+  }
+
   function selectVenue(venue, opts) {
-    if (!venue || venue.pending) {
+    if (!venue) return;
+    if (venue.pending) {
       setStatus(t("page.vip.aureliaPending", "Aurelia’s interactive 3D demo is in reports; the 2D VIP reserV map lands next."));
+      currentVenue = venue;
+      if (gridEl) gridEl.classList.add("hidden");
+      if (searchEl) searchEl.classList.add("hidden");
+      if (countEl) countEl.textContent = "";
+      if (selectedWrap) selectedWrap.classList.remove("hidden");
+      if (selectedLabel) selectedLabel.textContent = `${venue.label} — ${t("page.vip.comingSoon", "Soon")}`;
+      if (mapSection) mapSection.classList.add("hidden");
+      clearHoldUi();
       return;
     }
     currentVenue = venue;
     clearHoldUi();
-    chipsEl?.querySelectorAll("button").forEach(b => {
-      b.setAttribute("aria-pressed", String(b.dataset.venue === venue.id));
-    });
+    if (gridEl) gridEl.classList.add("hidden");
+    if (searchEl) searchEl.classList.add("hidden");
+    if (countEl) countEl.textContent = "";
+    if (selectedWrap) selectedWrap.classList.remove("hidden");
+    if (selectedLabel) selectedLabel.textContent = venue.label;
+    if (mapSection) mapSection.classList.remove("hidden");
     if (mapTitle) mapTitle.textContent = `${venue.label} — ${t("page.vip.floorMap", "Floor map")}`;
     window.FLOQR_VIP_BOOT = {plan: venue.plan};
     if (window.FLOQRVipFloorViewer?.load) {
@@ -256,6 +372,25 @@
     } catch (_) { /* ignore */ }
   }
 
+  async function showApp(user) {
+    currentUser = user;
+    if (gateEl) gateEl.classList.add("hidden");
+    if (appEl) appEl.classList.remove("hidden");
+    setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+    fillNights();
+    await loadSubscribedVenues();
+    const params = new URLSearchParams(location.search);
+    if (params.get("vipPaid") === "1") {
+      setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
+    } else if (params.get("vipCancelled") === "1") {
+      setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — finish Terms & pay, or release it."));
+    }
+    const loc = params.get("location");
+    const match = venueCatalog.find(v => v.id === loc);
+    if (match) selectVenue(match, {silent: true});
+    else showSearchMode();
+  }
+
   function boot() {
     window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
     try { window.FLOQRI18n?.apply?.(document); } catch (_) { /* ignore */ }
@@ -263,10 +398,20 @@
     const profileLink = document.getElementById("vipOpenProfile");
     if (profileLink && window.FLOQRNav?.portalHome) {
       profileLink.href = window.FLOQRNav.portalLink
-        ? window.FLOQRNav.portalLink({tab: "reservations"})
-        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=reservations");
+        ? window.FLOQRNav.portalLink({tab: "guest-list-reserv"})
+        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=guest-list-reserv");
     }
 
+    searchEl?.addEventListener("input", () => renderVenueGrid());
+    document.getElementById("vipChangeVenue")?.addEventListener("click", () => {
+      try {
+        const u = new URL(location.href);
+        u.searchParams.delete("location");
+        history.replaceState({}, "", u.pathname + u.search + u.hash);
+      } catch (_) { /* ignore */ }
+      showSearchMode();
+      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+    });
     nightEl?.addEventListener("change", () => {
       clearHoldUi();
       refreshAvailability();

@@ -399,7 +399,7 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted), pick Decades or Lima Twist Club and a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP reserV is never translated.",
+      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick), choose a night, tap a green table, hold it for 30 minutes, accept Terms, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
