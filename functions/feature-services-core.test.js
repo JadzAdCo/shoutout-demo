@@ -307,14 +307,20 @@ test("Master Admins cannot become beta testers; feature grants and denials are l
   assert.match(rules, /match \/featureServiceAccessThrottle\/\{uid\}\s*\{\s*allow read, write: if false;/);
 });
 
-test("Master Admin Features / Svc Status Mgmt tab is SOS2FA gated", () => {
+test("Master Admin Features Mgmt tab is SOS2FA gated with lazy sub-tabs", () => {
   const html = read("master-admin.html");
-  assert.match(html, /data-panel="featuresServices"/);
-  assert.match(html, /<section id="featuresServices"/);
+  assert.match(html, /data-group="featuresServices"/);
+  assert.match(html, /data-panel="featuresReleaseControl"/);
+  assert.match(html, /data-panel="featuresBetaTesting"/);
+  assert.match(html, /data-panel="featuresAuditTrail"/);
+  assert.match(html, /<section id="featuresReleaseControl"/);
+  assert.match(html, /<section id="featuresBetaTesting"/);
+  assert.match(html, /<section id="featuresAuditTrail"/);
   assert.match(html, /master-feature-services\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /id="betaInviteFeatures"/);
   assert.match(html, /id="betaInviteSubmitBtn"/);
-  assert.match(html, /Features \/ Svc Status Mgmt/);
+  assert.match(html, /Features Mgmt/);
+  assert.match(html, /Test → live/);
   assert.match(html, /class="beta-invite-find"/);
   assert.match(html, /class="beta-invite-actions"/);
   const app = read("master-feature-services.js");
@@ -322,11 +328,15 @@ test("Master Admin Features / Svc Status Mgmt tab is SOS2FA gated", () => {
   assert.match(app, /featureKeys/);
   assert.match(app, /syncInviteSubmitState|selectedInviteUid/);
   assert.match(app, /is-ready/);
-  assert.match(app, /Promise\.allSettled/);
+  assert.match(app, /loadReleaseControl|loadBetaTesting|loadAuditTrail/);
   assert.match(app, /withTimeout/);
-  assert.match(read("sos2fa.js"), /"featuresServices"/);
-  assert.match(read("master-admin-app.js"), /"featuresServices"/);
-  assert.match(read("master-admin-app.js"), /Features \/ Svc Status Mgmt/);
+  assert.match(read("sos2fa.js"), /"featuresReleaseControl"/);
+  assert.match(read("sos2fa.js"), /"featuresBetaTesting"/);
+  assert.match(read("sos2fa.js"), /"featuresAuditTrail"/);
+  assert.match(read("master-admin-app.js"), /FEATURES_MGMT_PANEL_IDS/);
+  assert.match(read("master-admin-app.js"), /Features Mgmt/);
+  assert.match(read("master-admin-app.js"), /panelId === "featuresServices"/);
+  assert.match(read("master-admin-app.js"), /featuresReleaseControl/);
   assert.match(read("master-admin-app.js"), /loadLightLocations/);
   assert.match(read("master-admin-app.js"), /Do not pull 1000 users/);
 });

@@ -312,16 +312,19 @@ When adding a section, use this skeleton:
 
 ---
 
-## Features / Svc Status Mgmt (`featuresServices`)
+## Features Mgmt (`featuresServices` group)
 
 | | |
 |---|---|
-| **NIC tab** | Label **Features / Svc Status Mgmt** (`master.featuresServices`); panel id `featuresServices` |
-| **Beta invite** | Search beside Find patron; select radio; Note + Invite (disabled until patron + note ≥3); tablet/phone hide feature checklist until selection |
+| **NIC tab** | Parent **Features Mgmt** (`master.featuresServices`); sub-tabs: **Release Control** (`featuresReleaseControl`), **Beta & Testing** (`featuresBetaTesting`), **Audit Trail** (`featuresAuditTrail`) |
+| **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
+| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed) |
+| **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
+| **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
-| **Load perf** | Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand; Features beta/audit load in parallel with timeouts |
-| **Package** | s3.1.53 |
+| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand |
+| **Package** | s3.1.55 |
 
 ## VIP reserV (`vipReservations`) — Phase 2
 

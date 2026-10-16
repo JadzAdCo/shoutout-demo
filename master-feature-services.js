@@ -1,10 +1,14 @@
-/* Master Admin — Features & Services (flags, beta testers, promotion log, audit trail).
+/* Master Admin — Features Mgmt (Release Control, Beta & Testing, Audit Trail).
    Design notes: .cursor/rules/design-notes-feature-services.mdc */
 (function (root) {
   "use strict";
 
   const SCOPE = "entityManagement";
-  const PANEL_ID = "featuresServices";
+  const PANEL_IDS = Object.freeze([
+    "featuresReleaseControl",
+    "featuresBetaTesting",
+    "featuresAuditTrail"
+  ]);
   const AUDIT_LIMIT = 40;
   const USER_SCAN_LIMIT = 120;
   const RESULT_LIMIT = 20;
@@ -16,6 +20,8 @@
   let seededOnce = false;
   let userCache = null;
   let features = {};
+  /** Last Features Mgmt sub-tab mounted (for SOS2FA re-entry). */
+  let activePanelId = "featuresReleaseControl";
   /** Selected patron uid from search results (radio). */
   let selectedInviteUid = "";
 
@@ -231,7 +237,6 @@
       const result = await call("setFeatureServiceFlags", payload);
       setStatus("featureServicesStatus", `Saved ${featureLabel(key)}: ${result.eventType || "updated"} (audit ${String(result.eventId || "").slice(0, 8)}).`);
       await refreshFeatures();
-      await loadAudit();
     } catch (error) {
       setStatus("featureServicesStatus", errorText(error));
     }
@@ -566,7 +571,7 @@
   function bindOnce() {
     if (bound) return;
     bound = true;
-    byId(PANEL_ID)?.addEventListener("click", onPanelClick);
+    PANEL_IDS.forEach(id => byId(id)?.addEventListener("click", onPanelClick));
     byId("featureServicesReloadBtn")?.addEventListener("click", () => refreshFeatures());
     byId("betaPatronSearchBtn")?.addEventListener("click", () => searchPatrons());
     byId("betaPatronSearch")?.addEventListener("keydown", event => { if (event.key === "Enter") searchPatrons(); });
@@ -581,36 +586,88 @@
       else if (mq.addListener) mq.addListener(onMq);
     }
     document.addEventListener("floqr:sos2fa-unlocked", event => {
-      if (event.detail?.scope === SCOPE && byId(PANEL_ID)?.classList.contains("active")) loadAll();
+      if (event.detail?.scope !== SCOPE) return;
+      const active = PANEL_IDS.find(id => byId(id)?.classList.contains("active"));
+      if (active) mount(active);
     });
     syncInviteFeaturesVisibility();
     syncInviteSubmitState();
   }
 
-  async function loadAll() {
+  /** Ensure catalog flags are in memory (needed for beta feature checkboxes). */
+  async function ensureFeaturesLoaded() {
+    if (Object.keys(features).length) return;
+    await withTimeout(loadFeatures(), "Feature catalog");
+    renderInviteFeatures();
+  }
+
+  async function loadReleaseControl() {
     if (!isUnlocked()) {
       setStatus("featureServicesStatus", "Unlock with SOS2FA to manage features.");
       return;
     }
-    setStatus("featureServicesStatus", "Loading features, beta lists, and audit…");
-    /* Never block beta/audit on seed — a hung seed made the panel look empty. */
-    const results = await Promise.allSettled([
-      refreshFeatures(),
-      loadBeta(),
-      loadAudit()
-    ]);
-    const failed = results.filter(row => row.status === "rejected");
-    if (failed.length) {
-      setStatus("featureServicesStatus", failed.map(row => errorText(row.reason)).join(" · "));
-    } else if (!String(byId("featureServicesStatus")?.textContent || "").trim()) {
-      setStatus("featureServicesStatus", "");
+    setStatus("featureServicesStatus", "Loading feature flags…");
+    try {
+      await refreshFeatures();
+      if (!String(byId("featureServicesStatus")?.textContent || "").trim()) {
+        setStatus("featureServicesStatus", "");
+      }
+    } catch (error) {
+      setStatus("featureServicesStatus", errorText(error));
     }
   }
 
-  function mount() {
-    bindOnce();
-    loadAll();
+  async function loadBetaTesting() {
+    if (!isUnlocked()) {
+      setStatus("betaInviteStatus", "Unlock with SOS2FA to manage beta testers.");
+      return;
+    }
+    setStatus("betaInviteStatus", "Loading beta testers…");
+    try {
+      await ensureFeaturesLoaded();
+      await withTimeout(loadBeta(), "Beta testers");
+      if (!String(byId("betaInviteStatus")?.textContent || "").trim()) {
+        setStatus("betaInviteStatus", "");
+      }
+    } catch (error) {
+      setStatus("betaInviteStatus", errorText(error));
+    }
   }
 
-  root.FLOQRMasterFeatureServices = {mount, refreshFeatures, loadAudit, auditRowHtml, featureCell, flagChangeSummary};
+  async function loadAuditTrail() {
+    if (!isUnlocked()) {
+      setStatus("featureAuditStatus", "Unlock with SOS2FA to view the audit trail.");
+      return;
+    }
+    setStatus("featureAuditStatus", "Loading audit trail…");
+    try {
+      await withTimeout(loadAudit(), "Audit trail");
+      if (!String(byId("featureAuditStatus")?.textContent || "").trim()) {
+        setStatus("featureAuditStatus", "");
+      }
+    } catch (error) {
+      setStatus("featureAuditStatus", errorText(error));
+    }
+  }
+
+  /** Mount only the active Features Mgmt sub-tab (isolates load time). */
+  function mount(panelId) {
+    bindOnce();
+    const id = PANEL_IDS.includes(panelId) ? panelId : "featuresReleaseControl";
+    activePanelId = id;
+    if (id === "featuresReleaseControl") return loadReleaseControl();
+    if (id === "featuresBetaTesting") return loadBetaTesting();
+    if (id === "featuresAuditTrail") return loadAuditTrail();
+  }
+
+  root.FLOQRMasterFeatureServices = {
+    mount,
+    refreshFeatures,
+    loadAudit,
+    auditRowHtml,
+    featureCell,
+    flagChangeSummary,
+    PANEL_IDS,
+    activePanelId: () => activePanelId
+  };
 })(window);
