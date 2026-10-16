@@ -32,6 +32,38 @@ function requestContext(request) {
   };
 }
 
+/**
+ * Cursor / cloud agents and scripted probes must show as actorRole "agent" in the
+ * Features audit trail — not anonymous "patron". Client may pass clientKind:"agent";
+ * otherwise User-Agent / x-floqr-client is used.
+ */
+function isAgentClient(request) {
+  const data = request?.data || {};
+  const kind = text(data.clientKind || data.actorKind || "", 40).toLowerCase();
+  if (kind === "agent") return true;
+  const headers = request?.rawRequest?.headers || {};
+  if (text(headers["x-floqr-client"], 40).toLowerCase() === "agent") return true;
+  const ua = String(headers["user-agent"] || "");
+  if (/^(curl\/|wget\/|python-requests\/|Go-http-client\/|axios\/|node-fetch\/|undici)/i.test(ua)) return true;
+  if (/HeadlessChrome|Playwright|Puppeteer|Cursor|FLOQR-Agent|cloud.?agent/i.test(ua)) return true;
+  return false;
+}
+
+function auditActorFromRequest(request, roleFallback) {
+  if (isAgentClient(request)) {
+    return {
+      uid: request?.auth?.uid || "",
+      email: "agent",
+      role: "agent"
+    };
+  }
+  return {
+    uid: request?.auth?.uid || "",
+    email: request?.auth?.token?.email || "",
+    role: roleFallback || "patron"
+  };
+}
+
 function headRef() {
   return db.collection(C.auditHead).doc("current");
 }
@@ -62,10 +94,14 @@ async function writeUnchainedAudit(record) {
 }
 
 function auditRecord(request, fields) {
+  const roleFallback = fields.role || "masterAdmin";
+  const actor = auditActorFromRequest(request, roleFallback);
+  const rest = {...fields};
+  delete rest.role;
   return core.buildAuditRecord({
     ...requestContext(request),
-    actor: {uid: request.auth?.uid || "", email: request.auth?.token?.email || "", role: fields.role || "masterAdmin"},
-    ...fields
+    actor,
+    ...rest
   });
 }
 
@@ -147,13 +183,22 @@ async function assertFeatureAccess(auth, featureKey, request = null) {
   if (!feature) return true;
   const viewer = await viewerFor(auth);
   if (core.canAccessFeature(feature, viewer)) return true;
+  const actor = request
+    ? auditActorFromRequest(request, viewerRole(viewer))
+    : {uid: auth?.uid || "", email: auth?.token?.email || "", role: viewerRole(viewer)};
   await writeUnchainedAudit(core.buildAuditRecord({
     ...(request ? requestContext(request) : {}),
     eventType: "feature.access_denied",
     outcome: "denied",
-    actor: {uid: auth?.uid || "", email: auth?.token?.email || "", role: viewerRole(viewer)},
+    actor,
     target: {type: "feature", id: key},
-    detail: {IsFeatureEnabled: feature.IsFeatureEnabled, IsTestFeature: feature.IsTestFeature, state: core.featureState(feature), surface: "server"}
+    detail: {
+      IsFeatureEnabled: feature.IsFeatureEnabled,
+      IsTestFeature: feature.IsTestFeature,
+      state: core.featureState(feature),
+      surface: "server",
+      ...(actor.role === "agent" ? {clientKind: "agent"} : {})
+    }
   }));
   throw new HttpsError("failed-precondition", UNAVAILABLE_MESSAGE);
 }
@@ -277,6 +322,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
   const targetUid = text(request.data?.targetUid, 128);
   const note = text(request.data?.note, 300);
   if (!targetUid) throw new HttpsError("invalid-argument", "Choose a patron to invite.");
+  if (note.length < 3) throw new HttpsError("invalid-argument", "Enter a short note (why they were picked) before inviting.");
   let features;
   try { features = core.validateBetaFeatures(request.data?.featureKeys); } catch (error) { throw asHttps(error); }
   const [userSnap, betaSnap] = await Promise.all([

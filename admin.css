@@ -1038,3 +1038,27 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 .schedule-owner-types{flex-wrap:wrap}
 .schedule-owner-types label{min-width:9rem}
 .schedule-owner-types input:focus-visible+span{outline:2px solid #5eeaff;outline-offset:2px}
+
+/* Features / Svc Status Mgmt — beta invite layout */
+.beta-invite-find{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:8px}
+.beta-invite-find-label{flex:1 1 220px;margin:0;min-width:0}
+.beta-invite-find-label input{width:100%}
+.beta-invite-find #betaPatronSearchBtn{flex:0 0 auto;min-height:44px;align-self:flex-end}
+.beta-invite-features{margin-top:12px}
+.beta-invite-actions{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:12px}
+.beta-invite-note-label{flex:1 1 220px;margin:0;min-width:0}
+.beta-invite-note-label input{width:100%}
+#betaInviteSubmitBtn{flex:0 0 auto;min-height:44px}
+#betaInviteSubmitBtn:disabled,
+#betaInviteSubmitBtn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;filter:grayscale(.35)}
+.beta-patron-pick{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.beta-patron-pick input{flex:0 0 auto;width:20px;height:20px;margin-top:4px}
+.beta-patron-pick span{min-width:0}
+@media (max-width:1024px){
+  /* Tablet + phone: hide feature checklist until a patron is selected. */
+  .beta-invite-features:not(.is-ready){display:none !important}
+  .beta-invite-find{flex-direction:column;align-items:stretch}
+  .beta-invite-find #betaPatronSearchBtn{width:100%}
+  .beta-invite-actions{flex-direction:column;align-items:stretch}
+  #betaInviteSubmitBtn{width:100%}
+}

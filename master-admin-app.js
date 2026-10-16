@@ -98,7 +98,7 @@
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
   const PANEL_LABELS = {
-    featuresServices: "Features & Services",
+    featuresServices: "Features / Svc Status Mgmt",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
     adLiveCampaigns: "Ad Management · Live & scheduled",

@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.51 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.52 (stable)
+
+- s3.1.52: Features / Svc Status Mgmt rename; beta invite UX; agent audit attribution; classification+security always-apply.
 
 - s3.1.51: VIP Aurelia Functions live; Stripe test-card tip on Pay deposit; Accept-all Terms; inventory summary.
 

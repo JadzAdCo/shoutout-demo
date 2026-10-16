@@ -312,6 +312,16 @@ When adding a section, use this skeleton:
 
 ---
 
+## Features / Svc Status Mgmt (`featuresServices`)
+
+| | |
+|---|---|
+| **NIC tab** | Label **Features / Svc Status Mgmt** (`master.featuresServices`); panel id `featuresServices` |
+| **Beta invite** | Search beside Find patron; select radio; Note + Invite (disabled until patron + note ≥3); tablet/phone hide feature checklist until selection |
+| **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
+| **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
+| **Package** | s3.1.52 |
+
 ## VIP reserV (`vipReservations`) — Phase 2
 
 | Piece | Where |

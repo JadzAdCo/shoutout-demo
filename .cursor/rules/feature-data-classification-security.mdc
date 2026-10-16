@@ -1,0 +1,30 @@
+---
+description: End of every new/changed feature — apply data classification + security rules without waiting for an explicit ask (same standing as translation)
+alwaysApply: true
+---
+
+# Data classification + security on every feature (always)
+
+Resume: `@dataclass$` / `$security-gates$`. Same standing as `floqr-translation.mdc`: **do not wait for the owner to ask.**
+
+When you **add, change, or fix** a FLOQR product feature (UI, callables, Firestore collections/fields, Storage paths, public feeds, VIP, payments, beta, diagnostics, etc.):
+
+## Required before calling the work done
+
+1. **Data classification** — every new or changed collection / field / export surface has a register row (Master Admin Data Classification / `data-classification-*` / FEATURE-WIRING data section). Mark sensitivity, retention, who may read/write, and whether the current Firestore rules are looser than the register (call that out as a fix in the same iteration when possible).
+2. **Security rules** — update `firestore.rules` / `storage.rules` (and indexes if needed) so the feature cannot be abused by signed-in patrons writing or reading beyond the design. Prefer Functions-write for money, holds, invites, audit, tokens, and PII.
+3. **Server enforcement** — page/client guards are UX only. Callables that mutate or reveal gated data must re-check auth, feature flags (`assertFeatureAccess` / equivalent), and role.
+4. **Audit / observability** — privileged or denial paths that matter for abuse get audit or Security System Message coverage when the feature already has that pattern (Features & Services, SOS2FA, display tokens, etc.).
+5. **Agent traffic** — automated / Cursor / curl / headless probes against gated callables must attribute audit `actorRole` / `actorEmail` as **`agent`** (not blank “patron”). See `design-notes-feature-services.mdc` § Agent audit attribution.
+
+## Same gate as translation
+
+Incomplete classification or “rules later” is a **product bug**, not a follow-up nice-to-have. If rules/deploy need owner credentials, still land the rule + register diffs on the branch and say what deploy is pending — do not ship the feature as complete while leaving collections wide open by design omission.
+
+## Checklist (mental, every feature iteration)
+
+- [ ] New/changed collections or sensitive fields classified
+- [ ] Firestore/Storage rules match the intended readers/writers
+- [ ] Callables enforce access (not only HTML/CSS hide)
+- [ ] Denial/privilege paths attributable (incl. **agent** for automation)
+- [ ] `docs/FEATURE-WIRING.md` notes data + security contracts

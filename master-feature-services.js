@@ -14,6 +14,8 @@
   let seededOnce = false;
   let userCache = null;
   let features = {};
+  /** Selected patron uid from search results (radio). */
+  let selectedInviteUid = "";
 
   function byId(id) {
     return document.getElementById(id);
@@ -148,6 +150,32 @@
     if (!box) return;
     const previous = Object.fromEntries([...box.querySelectorAll("input[data-invite-feature]")].map(input => [input.dataset.featureKey, input.checked ? 1 : 0]));
     box.innerHTML = `<legend>Features this tester may use</legend>${featureCheckboxes("data-invite-feature=\"1\"", previous)}`;
+    syncInviteFeaturesVisibility();
+  }
+
+  /** PC: features always visible. Tablet/mobile (≤1024px): only after a patron is selected (.is-ready). */
+  function syncInviteFeaturesVisibility() {
+    const box = byId("betaInviteFeatures");
+    if (!box) return;
+    box.classList.toggle("is-ready", !!selectedInviteUid);
+  }
+
+  function syncInviteSubmitState() {
+    const btn = byId("betaInviteSubmitBtn");
+    if (!btn) return;
+    const note = String(byId("betaInviteNote")?.value || "").trim();
+    const ready = !!selectedInviteUid && note.length >= 3;
+    btn.disabled = !ready;
+    btn.setAttribute("aria-disabled", ready ? "false" : "true");
+  }
+
+  function selectInvitePatron(uid) {
+    selectedInviteUid = String(uid || "");
+    document.querySelectorAll("#betaPatronResults input[name=\"betaInvitePick\"]").forEach(input => {
+      input.checked = input.value === selectedInviteUid;
+    });
+    syncInviteFeaturesVisibility();
+    syncInviteSubmitState();
   }
 
   function checkedKeys(selector) {
@@ -237,6 +265,9 @@
     const query = String(byId("betaPatronSearch")?.value || "").trim().toLowerCase();
     const out = byId("betaPatronResults");
     if (!out) return;
+    selectedInviteUid = "";
+    syncInviteFeaturesVisibility();
+    syncInviteSubmitState();
     if (query.length < 2) {
       out.innerHTML = "<p class=\"sub small\">Type at least 2 characters.</p>";
       return;
@@ -247,8 +278,7 @@
       const hits = users.filter(user => [user.displayName, user.fullName, user.floqrHandle, user.email, user.phone, user.phoneNumber, user.uid]
         .some(value => String(value || "").toLowerCase().includes(query))).slice(0, RESULT_LIMIT);
       out.innerHTML = hits.length
-        ? hits.map(user => `<div class="queue-item"><strong>${esc(userLabel(user))}</strong> <small>${esc(user.email || "")}</small>
-            <button type="button" data-beta-invite="${esc(user.uid)}">Invite as beta tester</button></div>`).join("")
+        ? hits.map(user => `<label class="queue-item beta-patron-pick"><input type="radio" name="betaInvitePick" value="${esc(user.uid)}"/> <span><strong>${esc(userLabel(user))}</strong> <small>${esc(user.email || "")}</small></span></label>`).join("")
         : "<p class=\"sub small\">No patrons match.</p>";
     } catch (error) {
       out.innerHTML = `<p class="sub small">${esc(errorText(error))}</p>`;
@@ -265,18 +295,33 @@
   }
 
   async function invite(uid) {
+    const targetUid = String(uid || selectedInviteUid || "").trim();
+    if (!targetUid) {
+      setStatus("betaInviteStatus", "Search for a patron and select them first.");
+      return;
+    }
+    const note = String(byId("betaInviteNote")?.value || "").trim();
+    if (note.length < 3) {
+      setStatus("betaInviteStatus", "Enter a short note (why they were picked) before inviting.");
+      return;
+    }
     const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]");
     if (!featureKeys.length) {
       setStatus("betaInviteStatus", "Tick at least one feature this tester may use, then click Invite again.");
+      syncInviteFeaturesVisibility();
       return;
     }
     setStatus("betaInviteStatus", "Sending invitation…");
     try {
-      const result = await call("createBetaInvite", {targetUid: uid, featureKeys, note: String(byId("betaInviteNote")?.value || "").trim()});
+      const result = await call("createBetaInvite", {targetUid, featureKeys, note});
       const url = new URL(result.invitePath, location.href).href;
       const copied = await copyText(url);
       const granted = featureKeys.map(featureLabel).join(", ");
       setStatus("betaInviteStatus", `Invitation for ${granted} sent to ${result.targetEmailMasked || "the patron"}'s Inbox. ${copied ? "Link copied to clipboard." : `Link: ${url}`} Expires ${formatWhen(result.expiresAtMs)} UTC.`);
+      selectedInviteUid = "";
+      if (byId("betaInviteNote")) byId("betaInviteNote").value = "";
+      syncInviteFeaturesVisibility();
+      syncInviteSubmitState();
       await loadBeta();
       await loadAudit();
     } catch (error) {
@@ -443,10 +488,24 @@
   }
 
   function onPanelClick(event) {
+    const pick = event.target.closest("input[name=\"betaInvitePick\"]");
+    if (pick) {
+      selectInvitePatron(pick.value);
+      return;
+    }
+    const pickLabel = event.target.closest("label.beta-patron-pick");
+    if (pickLabel && !event.target.closest("input")) {
+      const radio = pickLabel.querySelector("input[name=\"betaInvitePick\"]");
+      if (radio) {
+        radio.checked = true;
+        selectInvitePatron(radio.value);
+      }
+      return;
+    }
     const target = event.target.closest("button");
     if (!target) return;
-    if (target.dataset.featureSave) saveFeature(target.dataset.featureSave);
-    else if (target.dataset.betaInvite) invite(target.dataset.betaInvite);
+    if (target.id === "betaInviteSubmitBtn") invite(selectedInviteUid);
+    else if (target.dataset.featureSave) saveFeature(target.dataset.featureSave);
     else if (target.dataset.betaFeaturesSave) saveTesterFeatures(target.dataset.betaFeaturesSave);
     else if (target.dataset.betaRevoke) revokeTester(target.dataset.betaRevoke);
     else if (target.dataset.inviteRevoke) revokeInvite(target.dataset.inviteRevoke);
@@ -459,12 +518,21 @@
     byId("featureServicesReloadBtn")?.addEventListener("click", () => refreshFeatures());
     byId("betaPatronSearchBtn")?.addEventListener("click", () => searchPatrons());
     byId("betaPatronSearch")?.addEventListener("keydown", event => { if (event.key === "Enter") searchPatrons(); });
+    byId("betaInviteNote")?.addEventListener("input", () => syncInviteSubmitState());
     byId("featurePromotionBtn")?.addEventListener("click", () => recordPromotion());
     byId("featureAuditReloadBtn")?.addEventListener("click", () => loadAudit());
     byId("featureAuditVerifyBtn")?.addEventListener("click", () => verifyAudit());
+    if (typeof window.matchMedia === "function") {
+      const mq = window.matchMedia("(max-width: 1024px)");
+      const onMq = () => syncInviteFeaturesVisibility();
+      if (mq.addEventListener) mq.addEventListener("change", onMq);
+      else if (mq.addListener) mq.addListener(onMq);
+    }
     document.addEventListener("floqr:sos2fa-unlocked", event => {
       if (event.detail?.scope === SCOPE && byId(PANEL_ID)?.classList.contains("active")) loadAll();
     });
+    syncInviteFeaturesVisibility();
+    syncInviteSubmitState();
   }
 
   async function loadAll() {

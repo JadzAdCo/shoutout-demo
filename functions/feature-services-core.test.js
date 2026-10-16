@@ -307,17 +307,37 @@ test("Master Admins cannot become beta testers; feature grants and denials are l
   assert.match(rules, /match \/featureServiceAccessThrottle\/\{uid\}\s*\{\s*allow read, write: if false;/);
 });
 
-test("Master Admin Features & Services tab is SOS2FA gated", () => {
+test("Master Admin Features / Svc Status Mgmt tab is SOS2FA gated", () => {
   const html = read("master-admin.html");
   assert.match(html, /data-panel="featuresServices"/);
   assert.match(html, /<section id="featuresServices"/);
   assert.match(html, /master-feature-services\.js\?v=s3\.\d+\.\d+/);
   assert.match(html, /id="betaInviteFeatures"/);
+  assert.match(html, /id="betaInviteSubmitBtn"/);
+  assert.match(html, /Features \/ Svc Status Mgmt/);
+  assert.match(html, /class="beta-invite-find"/);
+  assert.match(html, /class="beta-invite-actions"/);
   const app = read("master-feature-services.js");
   assert.match(app, /httpsCallable\("setBetaTesterFeatures"\)|call\("setBetaTesterFeatures"/);
   assert.match(app, /featureKeys/);
+  assert.match(app, /syncInviteSubmitState|selectedInviteUid/);
+  assert.match(app, /is-ready/);
   assert.match(read("sos2fa.js"), /"featuresServices"/);
   assert.match(read("master-admin-app.js"), /"featuresServices"/);
+  assert.match(read("master-admin-app.js"), /Features \/ Svc Status Mgmt/);
+});
+
+test("agent clients are attributed as agent on feature access denials", () => {
+  const fns = read("functions/feature-services-functions.js");
+  assert.match(fns, /function isAgentClient\(/);
+  assert.match(fns, /function auditActorFromRequest\(/);
+  assert.match(fns, /email: "agent"/);
+  assert.match(fns, /role: "agent"/);
+  assert.match(fns, /x-floqr-client/);
+  assert.match(fns, /note\.length < 3/);
+  const guard = read("floqr-feature-services.js");
+  assert.match(guard, /clientKind:\s*"agent"|clientKind = "agent"/);
+  assert.match(guard, /isAgentBrowser|FLOQR_AGENT_CLIENT/);
 });
 
 test("in-app ad splash: 5 second loading message, no countdown or Skip", () => {

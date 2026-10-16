@@ -369,11 +369,24 @@
     return String(root.location?.pathname || "").split("/").pop() || "index.html";
   }
 
+  function isAgentBrowser() {
+    try {
+      if (root.FLOQR_AGENT_CLIENT === true) return true;
+      if (root.localStorage?.getItem?.("floqrAgentClient") === "1") return true;
+      if (root.navigator?.webdriver) return true;
+      const ua = String(root.navigator?.userAgent || "");
+      if (/HeadlessChrome|Playwright|Puppeteer|Cursor|FLOQR-Agent/i.test(ua)) return true;
+    } catch (_) { /* ignore */ }
+    return false;
+  }
+
   function logDenied(key) {
     try {
       const fns = root.firebase?.app?.().functions?.("us-central1");
       if (!fns) return;
-      fns.httpsCallable("logFeatureAccessAttempt")({featureKey: key, page: pageName()})
+      const payload = {featureKey: key, page: pageName()};
+      if (isAgentBrowser()) payload.clientKind = "agent";
+      fns.httpsCallable("logFeatureAccessAttempt")(payload)
         .catch(error => console.warn("Feature access log failed", error?.message || error));
     } catch (error) {
       console.warn("Feature access log unavailable", error?.message || error);

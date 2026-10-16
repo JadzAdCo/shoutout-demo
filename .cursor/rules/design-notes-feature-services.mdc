@@ -96,13 +96,28 @@ All admin callables require an **SOS2FA** session (`assertSos2faSession`, scope 
 
 Patron-side logging callable **`logFeatureAccessAttempt({featureKey, page})`** (s3.0.110): signed-in only; transactional throttle 20 / 10 min per uid in `featureServiceAccessThrottle`; the **server re-evaluates** access and writes an unchained `feature.page_denied` row only when access really is denied (client cannot forge an “allowed” row or flood the chain).
 
+## NIC tab label
+
+Master Admin nav + panel title: **Features / Svc Status Mgmt** (`data-i18n="master.featuresServices"`, panel `featuresServices`). Hash `#featuresServices` unchanged.
+
 ## Beta testers
 
-- Master Admin searches patrons (client scan of `users`, 500), ticks **Features this tester may use** (`#betaInviteFeatures`) → **Invite** → Inbox message + link copied to clipboard (share by any channel).
+- **Find patron** input sits beside **Search** (`.beta-invite-find`). Results are radio picks (`.beta-patron-pick`); one patron must be selected.
+- **Note** (required, ≥ 3 chars) sits immediately left of **Invite as beta tester** (`.beta-invite-actions`). Invite stays disabled until a patron is selected **and** a note is entered (server `createBetaInvite` also rejects empty/short notes).
+- Ticks **Features this tester may use** (`#betaInviteFeatures`) → Invite → Inbox message + link copied to clipboard.
+- **PC (>1024px):** feature checklist always visible. **Tablet + phone (≤1024px):** checklist hidden until a patron is selected (`.beta-invite-features.is-ready`).
 - Tester list shows per-feature checkboxes + **Save feature access** (reason prompt → `setBetaTesterFeatures`).
 - `beta-invite.html` shows the granted features after Accept, or “Master Admins cannot be beta testers” (`beta.masterAdmin`).
 - Token: 32 random bytes (base64url); only its SHA-256 is stored. Link is useless on another account (`wrong-account`), after 7 days, or once used. `beta-invite.html` strips `t` from the address bar after responding and sets `no-referrer`.
 - Inbox button label: **Review beta invite** (`patron-portal-app.js` `inboxLinkLabel`).
+
+## Agent audit attribution
+
+Cursor cloud agents, curl/scripted probes, and headless browsers must **not** show as blank **— patron** on the Features audit trail.
+
+- Server: `isAgentClient(request)` in `feature-services-functions.js` — `data.clientKind` / `actorKind` === `agent`, header `x-floqr-client: agent`, or User-Agent matching curl/wget/python-requests/HeadlessChrome/Playwright/Puppeteer/Cursor/FLOQR-Agent.
+- Denials (`feature.access_denied`, `feature.page_denied`, and other `auditRecord` paths) set `actorEmail: "agent"`, `actorRole: "agent"`.
+- Browser page-guard: `floqr-feature-services.js` passes `clientKind: "agent"` when `FLOQR_AGENT_CLIENT`, `localStorage.floqrAgentClient=1`, `navigator.webdriver`, or a headless UA is detected.
 
 ## Test branch and promotion
 
