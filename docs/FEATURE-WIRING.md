@@ -324,7 +324,19 @@ When adding a section, use this skeleton:
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
 | **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand |
-| **Package** | s3.1.55 |
+| **Beta invite consent (s3.1.56)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR.app Beta Test & Prerelease Agreement + Booking Transaction Disclaimer; required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` on `betaTesters`/`betaInvites` (`BETA_AGREEMENT` in `feature-services-core.js`). Help: `help-beta-tester` |
+| **Package** | s3.1.56 |
+
+## Beta invite landing (`beta-invite.html`)
+
+| Layer | Wiring |
+|---|---|
+| Surface | Inbox `type: betaInvite` → `./beta-invite.html?t=…` (account-bound, 7-day expiry) |
+| UX | Session shell; Agreement scroll; two mandatory unchecked checkboxes; **I Agree and join beta** disabled until both; Decline; success acknowledgement card |
+| Client | `beta-invite-app.js` passes `{token, checks}` to `acceptBetaInvite` |
+| Server | `functions/feature-services-functions.js` `respondToInvite` — refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` |
+| Data | `betaInvites/{hash}` + `betaTesters/{uid}.consent` |
+| Help / FloqAi | `help-beta-tester`; phrases: beta agreement, booking disclaimer |
 
 ## VIP reserV (`vipReservations`) — Phase 2
 

@@ -398,6 +398,21 @@ async function respondToInvite(request, accept) {
   const token = text(request.data?.token, 64);
   const invalid = new HttpsError("failed-precondition", "This invitation link is invalid, expired, or was sent to a different account.");
   if (!core.isValidInviteToken(token)) throw invalid;
+  const checks = request.data?.checks && typeof request.data.checks === "object" ? request.data.checks : {};
+  if (accept && !core.betaConsentChecksComplete(checks)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Accept the FloqR.app Beta Test Agreement and Booking Transaction Disclaimer to join."
+    );
+  }
+  const consent = accept
+    ? {
+      agreementDocId: core.BETA_AGREEMENT.agreementDocId,
+      agreementVersion: core.BETA_AGREEMENT.agreementVersion,
+      agreementSha256: core.BETA_AGREEMENT.agreementSha256,
+      checks: core.expandBetaConsentChecks(checks)
+    }
+    : null;
   const inviteId = core.inviteIdFor(token);
   const uid = request.auth.uid;
   const nowMs = Date.now();
@@ -415,12 +430,16 @@ async function respondToInvite(request, accept) {
       return;
     }
     granted = core.validateBetaFeatures(invite.features || {}, {requireOne: false});
-    tx.update(inviteRef, {
+    const inviteUpdate = {
       status: accept ? "accepted" : "declined",
       respondedAt: FieldValue.serverTimestamp(),
       respondedAtMs: nowMs,
       respondedUid: uid
-    });
+    };
+    if (accept && consent) {
+      inviteUpdate.consent = {...consent, acceptedAtMs: nowMs};
+    }
+    tx.update(inviteRef, inviteUpdate);
     if (accept) {
       tx.set(betaRef, {
         uid,
@@ -433,6 +452,7 @@ async function respondToInvite(request, accept) {
         invitedByEmail: invite.createdByEmail || "",
         acceptedAt: FieldValue.serverTimestamp(),
         acceptedAtMs: nowMs,
+        consent: {...consent, acceptedAtMs: nowMs},
         revokedAt: null,
         revokedByEmail: null
       }, {merge: true});
@@ -442,8 +462,17 @@ async function respondToInvite(request, accept) {
       eventType: accept ? "beta.accepted" : "beta.declined",
       target: {type: "patron", id: uid},
       before: {status: "pending"},
-      after: {status: accept ? "accepted" : "declined", IsBetaTester: accept ? 1 : 0, features: accept ? granted : {}},
-      detail: {inviteIdPrefix: inviteId.slice(0, 12), invitedByEmail: invite.createdByEmail || ""},
+      after: {
+        status: accept ? "accepted" : "declined",
+        IsBetaTester: accept ? 1 : 0,
+        features: accept ? granted : {},
+        agreementVersion: accept ? core.BETA_AGREEMENT.agreementVersion : null
+      },
+      detail: {
+        inviteIdPrefix: inviteId.slice(0, 12),
+        invitedByEmail: invite.createdByEmail || "",
+        agreementDocId: accept ? core.BETA_AGREEMENT.agreementDocId : ""
+      },
       nowMs
     }));
   });
@@ -458,9 +487,17 @@ async function respondToInvite(request, accept) {
     if (denial === "master-admin") {
       throw new HttpsError("failed-precondition", "Master Admins cannot be beta testers. Open test features from Features & Services.");
     }
+    if (denial === "used") {
+      throw new HttpsError("failed-precondition", "You already joined this beta invitation.");
+    }
     throw invalid;
   }
-  return {ok: true, status: accept ? "accepted" : "declined", features: accept ? grantedKeys(granted) : []};
+  return {
+    ok: true,
+    status: accept ? "accepted" : "declined",
+    features: accept ? grantedKeys(granted) : [],
+    agreementVersion: accept ? core.BETA_AGREEMENT.agreementVersion : null
+  };
 }
 
 exports.acceptBetaInvite = onCall(CALL_OPTS, request => respondToInvite(request, true));

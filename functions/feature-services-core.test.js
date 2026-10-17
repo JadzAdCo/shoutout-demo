@@ -160,6 +160,38 @@ test("invite tokens are unguessable, hashed at rest, and bound to one account", 
   assert.equal(core.evaluateInvite(null, {uid: "u1", nowMs: now}).reason, "not-found");
 });
 
+test("beta invite accept requires Agreement + Booking Disclaimer consent", () => {
+  assert.equal(core.BETA_AGREEMENT.agreementDocId, "floqr-beta-test-agreement-v1");
+  assert.equal(core.BETA_AGREEMENT.agreementVersion, "1");
+  assert.match(core.BETA_AGREEMENT.agreementSha256, /^[0-9a-f]{64}$/);
+  assert.match(core.BETA_AGREEMENT_CANONICAL, /BETA TEST & PRERELEASE AGREEMENT/);
+  assert.match(core.BETA_AGREEMENT_CANONICAL, /has not completed User Acceptance Testing/);
+  assert.match(core.BETA_AGREEMENT_CANONICAL, /final and non-refundable/);
+  assert.deepEqual([...core.REQUIRED_BETA_CONSENT_CHECKS], ["betaAgreement", "bookingDisclaimer"]);
+  assert.equal(core.betaConsentChecksComplete({}), false);
+  assert.equal(core.betaConsentChecksComplete({betaAgreement: true}), false);
+  assert.equal(core.betaConsentChecksComplete({betaAgreement: true, bookingDisclaimer: true}), true);
+  assert.deepEqual(
+    core.expandBetaConsentChecks({betaAgreement: true, bookingDisclaimer: true, extra: true}),
+    {betaAgreement: true, bookingDisclaimer: true}
+  );
+  const html = read("beta-invite.html");
+  assert.match(html, /id="betaCheckAgreement"/);
+  assert.match(html, /id="betaCheckBooking"/);
+  assert.match(html, /id="betaSuccess"/);
+  assert.match(html, /FloqR\.app Beta Test/);
+  assert.match(html, /Booking Transaction Disclaimer/);
+  const app = read("beta-invite-app.js");
+  assert.match(app, /checks:\s*consentChecks\(\)/);
+  assert.match(app, /betaAgreement/);
+  assert.match(app, /bookingDisclaimer/);
+  assert.match(app, /renderSuccess/);
+  const fns = read("functions/feature-services-functions.js");
+  assert.match(fns, /betaConsentChecksComplete/);
+  assert.match(fns, /agreementSha256/);
+  assert.match(fns, /You already joined this beta invitation/);
+});
+
 function chain(records) {
   let prevHash = core.GENESIS_HASH;
   return records.map((record, i) => {

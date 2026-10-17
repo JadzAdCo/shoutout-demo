@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="referrer" content="no-referrer"/>
   <title data-i18n="beta.title">Become a FLOQR beta tester</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.55"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.55"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.56"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.56"/>
 </head>
-<body>
+<body class="beta-invite-page">
 <main class="app admin-shell">
   <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html">&larr; Back to My Profile and Settings</a>
   <section class="page active">
@@ -17,17 +17,94 @@
         <p class="eyebrow">FLOQR Beta</p>
         <h1 data-i18n="beta.title">Become a FLOQR beta tester</h1>
         <p class="sub" data-i18n="beta.body">FLOQR invited you to try new features before everyone else. Beta features may change or be switched off while we test them. You can stop at any time by asking FLOQR support.</p>
-        <p id="betaStatus" class="status" role="status" aria-live="polite"></p>
+        <p id="betaStatus" class="status" role="status" aria-live="polite" data-i18n="beta.restoring">Restoring your FLOQR session…</p>
       </div>
+      <details class="help-popout" data-floqr-help-id="help-beta-tester">
+        <summary aria-label="Help">?</summary>
+        <div class="help-popout-body">
+          <strong data-i18n="help.beta.title">Beta testing</strong>
+          <p data-i18n="help.beta.body">Open this invite while signed in to the same account. Read the FloqR.app Beta Test Agreement, accept both required checkboxes, then I Agree and join beta. Search then shows your granted features with a Beta label.</p>
+        </div>
+      </details>
     </header>
+
     <div id="betaLogin" class="card hidden" data-floqr-auth-chrome>
       <p class="sub" data-i18n="beta.signIn">Sign in with the account this invitation was sent to.</p>
       <a class="buttonlike" id="betaPortalLink" href="./patron-portal.html?from=beta-invite" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
     </div>
-    <div id="betaActions" class="card hidden">
-      <div class="queue-actions">
-        <button id="betaAcceptBtn" class="primary" type="button" data-i18n="beta.accept">Accept and join beta</button>
+
+    <div id="betaActions" class="card beta-consent-card hidden">
+      <h2 data-i18n="beta.agreementTitle">FloqR.app Beta Test &amp; Prerelease Agreement</h2>
+      <p class="sub small" data-i18n="beta.agreementSub">Read the full Agreement below. Both checkboxes are required before you can join. Agreement text is in English.</p>
+
+      <article id="betaAgreementBody" class="beta-agreement-body" aria-label="FloqR.app Beta Test and Prerelease Agreement">
+        <h3>FLOQR.APP BETA TEST &amp; PRERELEASE AGREEMENT</h3>
+        <p class="sub small"><strong>Last Updated:</strong> October 17, 2026</p>
+        <p class="sub small">This Beta Test Agreement (the &ldquo;Agreement&rdquo;) is a legally binding contract between you (the &ldquo;Beta Tester&rdquo; or &ldquo;Patron&rdquo;) and FloqMedia, the owner and operator of FloqR.app (collectively, the &ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;).</p>
+        <p class="sub small">By clicking &ldquo;I Agree,&rdquo; checking an acceptance box, or accessing and using the prerelease version of the FloqR.app web application (the &ldquo;Beta Product&rdquo;), you agree to be bound by the terms of this Agreement. If you do not agree, you are not authorized to participate in the Beta Program.</p>
+
+        <h4>1. Purpose &amp; &ldquo;As-Is&rdquo; Nature of Beta Product</h4>
+        <p class="sub small"><strong>Pre-Release Software:</strong> You acknowledge that FloqR.app is currently a startup social operating system built for searching and booking global nightlife events (including clubs, lounges, rooftops, concerts, and DJ events).</p>
+        <p class="sub small"><strong>Testing Status:</strong> The Beta Product contains features under active development. It has not completed User Acceptance Testing (UAT) and is currently undergoing Quality Assurance (QA) testing.</p>
+        <p class="sub small"><strong>Disclaimer of Warranties:</strong> Because the software is incomplete, it may contain technical bugs, errors, glitches, or data inaccuracies. The Beta Product is provided strictly on an &ldquo;AS IS&rdquo; and &ldquo;AS AVAILABLE&rdquo; basis, without warranties of any kind.</p>
+
+        <h4>2. Eligibility &amp; Access License</h4>
+        <p class="sub small"><strong>Age Requirement:</strong> Because FloqR.app services the nightlife and entertainment industry, you must be at least 18 years of age (or the legal age of majority in your jurisdiction, e.g., 21 where required by local law) to participate.</p>
+        <p class="sub small"><strong>Limited License:</strong> The Company grants you a personal, non-exclusive, non-transferable, revocable, and limited license to access and test the Beta Product solely for evaluation purposes.</p>
+
+        <h4>3. Absolute Confidentiality</h4>
+        <p class="sub small"><strong>Confidential Information:</strong> The Beta Product, its underlying features, design interface (including sub-features like Mingl, RydR, BartR, ShoutOut, floqCast, and FloqAi), performance metrics, screenshots, videos of usage, and any documented bugs are the strictest proprietary secrets of FloqMedia.</p>
+        <p class="sub small"><strong>Non-Disclosure:</strong> You agree not to disclose, share, publish, tweet, or blog about your experiences or any aspect of the Beta Product to any third party, public forum, or competitor.</p>
+        <p class="sub small"><strong>Media &amp; Streaming:</strong> You are strictly prohibited from sharing screenshots or live-streaming the Beta Product unless explicitly authorized in writing by FloqMedia.</p>
+
+        <h4>4. Feedback &amp; Intellectual Property Assignment</h4>
+        <p class="sub small"><strong>Feedback Obligation:</strong> As a condition of your invite, you agree to report system bugs, crashes, or user-experience gaps back to the Company.</p>
+        <p class="sub small"><strong>Ownership of Feedback:</strong> You agree that all comments, suggestions, ideas, or feedback you provide become the sole and exclusive property of FloqMedia. You assign all rights, titles, and interests in such feedback to the Company without any expectation of compensation or royalties.</p>
+
+        <h4>5. Data Collection, AI, &amp; Transaction Terms</h4>
+        <p class="sub small"><strong>Analytics Usage:</strong> You agree that FloqMedia may monitor and collect data regarding your activity within the Beta Product. This data will be used in aggregate analytics to optimize venue insights, AI processing via FloqAi, and advertising performance.</p>
+        <p class="sub small"><strong>Media Uploads:</strong> If you test customized marketing display features (such as &ldquo;ShoutOut&rdquo; media or promotional cards), you represent that you possess all legal permissions and intellectual property rights for any photos, names, or @handles you upload to the application.</p>
+        <p class="sub small"><strong>Prerelease Transactions &amp; Booking Disclaimer:</strong> The Beta Product features live integration modules allowing users to reserve tables, join guest lists, and pay for VIP, Event, or Standard venue entries. You acknowledge that because the application is in a QA testing phase, technical glitches may cause transaction failures, double-bookings, incorrect pricing, or communication failures with local venues. FloqMedia is not responsible or liable for any financial discrepancies, canceled bookings, or denied entries at participating nightlife venues.</p>
+        <p class="sub small"><strong>Refund Policy:</strong> All ticket sales, table reservations, and entry fees processed through the Beta Product are final and non-refundable by FloqMedia. Any disputes regarding venue bookings, entry denial, or payment errors must be resolved directly with the physical venue or the third-party merchant processor (e.g., Stripe, Papi, or Social OS).</p>
+        <p class="sub small"><strong>Mock vs. Real Processing:</strong> FloqMedia will clearly notify you whether a specific testing phase utilizes &ldquo;Test/Sandbox&rdquo; payment credentials or real financial transactions. If real payment methods are required, you are fully responsible for the charges incurred.</p>
+
+        <h4>6. Limitation of Liability</h4>
+        <p class="sub small"><strong>No Damages:</strong> To the maximum extent permitted by applicable law, FloqMedia shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your participation in the Beta Program. This includes, but is not limited to, system crashes, loss of booking data, phone/device damage, or data loss.</p>
+
+        <h4>7. Termination &amp; Modification</h4>
+        <p class="sub small"><strong>Program Changes:</strong> FloqMedia reserves the right to modify, suspend, or completely terminate the Beta Program, or your specific access to it, at any time with or without prior notice.</p>
+        <p class="sub small"><strong>Survival:</strong> Your obligations regarding Confidentiality (Section 3) and Intellectual Property (Section 4) will survive the termination of this Agreement or the release of the final Minimum Viable Product (MVP).</p>
+      </article>
+
+      <aside class="beta-booking-callout" aria-label="Booking Transaction Disclaimer">
+        <h3 data-i18n="beta.bookingTitle">Booking Transaction Disclaimer</h3>
+        <p class="sub small" data-i18n="beta.bookingBody">Because FloqR.app is in a QA testing phase and has not completed UAT, ticket sales, table reservations, VIP entry, and other payments made through the Beta Product are final and non-refundable by FloqMedia. You participate at your own risk. Disputes about venue entry or payment must be resolved with the venue or the payment processor (e.g., Stripe, Papi, or Social OS).</p>
+      </aside>
+
+      <label class="consent-line beta-check" for="betaCheckAgreement">
+        <input type="checkbox" id="betaCheckAgreement"/>
+        <span data-i18n="beta.checkAgreement">I have read and accept the FloqR.app Beta Test Agreement (including that FloqR.app has not completed UAT and is in QA testing, provided AS IS)</span>
+      </label>
+      <label class="consent-line beta-check" for="betaCheckBooking">
+        <input type="checkbox" id="betaCheckBooking"/>
+        <span data-i18n="beta.checkBooking">I accept the Booking Transaction Disclaimer: all beta reservations, tickets, and payments are final and non-refundable; I participate at my own risk</span>
+      </label>
+
+      <div class="queue-actions beta-consent-actions">
+        <button id="betaAcceptBtn" class="primary" type="button" disabled data-i18n="beta.accept">I Agree and join beta</button>
         <button id="betaDeclineBtn" class="ghost" type="button" data-i18n="beta.decline">No thanks</button>
+      </div>
+    </div>
+
+    <div id="betaSuccess" class="card beta-success-card hidden" role="status" aria-live="polite">
+      <p class="eyebrow" data-i18n="beta.successEyebrow">Beta program</p>
+      <h2 data-i18n="beta.successTitle">You&rsquo;re a FLOQR beta tester</h2>
+      <p id="betaSuccessBody" class="sub" data-i18n="beta.accepted">You&rsquo;re a FLOQR beta tester. Beta features now appear on Search with a Beta label.</p>
+      <p id="betaSuccessFeatures" class="sub small"></p>
+      <p class="sub small" data-i18n="beta.successAck">Your acceptance of the FloqR.app Beta Test Agreement and Booking Transaction Disclaimer was recorded for this account.</p>
+      <div class="queue-actions">
+        <a id="betaSuccessSearch" class="buttonlike primary" href="./?start=search" data-i18n="beta.goSearch">Open Search to try Beta features</a>
+        <a id="betaSuccessPortal" class="buttonlike" href="./patron-portal.html" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
       </div>
     </div>
   </section>
@@ -36,11 +113,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.55"></script>
-<script src="./floqr-i18n.js?v=s3.1.55"></script>
-<script src="./floqr-session-shell.js?v=s3.1.55"></script>
-<script src="./floqr-nav.js?v=s3.1.55"></script>
-<script src="./floqr-feature-services.js?v=s3.1.55"></script>
-<script src="./beta-invite-app.js?v=s3.1.55"></script>
+<script src="./firebase-config.js?v=s3.1.56"></script>
+<script src="./floqr-i18n.js?v=s3.1.56"></script>
+<script src="./floqr-session-shell.js?v=s3.1.56"></script>
+<script src="./floqr-nav.js?v=s3.1.56"></script>
+<script src="./floqr-feature-services.js?v=s3.1.56"></script>
+<script src="./floqai-help-repository.js?v=s3.1.56"></script>
+<script src="./helper-popouts.js?v=s3.1.56"></script>
+<script src="./beta-invite-app.js?v=s3.1.56"></script>
 </body>
 </html>

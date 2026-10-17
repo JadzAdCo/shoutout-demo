@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.55 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.56 (stable)
+
+- s3.1.56: Beta invite FloqR.app Agreement + Booking Disclaimer dual consent + join acknowledgement.
 
 - s3.1.55: Features Mgmt rename; Release Control / Beta & Testing / Audit Trail sub-tabs with lazy load.
 
