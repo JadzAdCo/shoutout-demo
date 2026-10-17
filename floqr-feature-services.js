@@ -246,11 +246,28 @@
   }
 
   function ensureLinkStyles(doc) {
-    if (doc.getElementById("floqrFeatureLinkStyles")) return;
-    const style = doc.createElement("style");
-    style.id = "floqrFeatureLinkStyles";
-    style.textContent = ".feature-beta-pill{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:999px;background:#dfff5a;color:#10132a;font-size:10px;font-weight:900;letter-spacing:.04em;line-height:1.5;text-transform:uppercase;vertical-align:middle}";
-    doc.head?.appendChild(style);
+    let style = doc.getElementById("floqrFeatureLinkStyles");
+    if (!style) {
+      style = doc.createElement("style");
+      style.id = "floqrFeatureLinkStyles";
+      doc.head?.appendChild(style);
+    }
+    // Injected so gated menu links stay hidden for every patron even if styles.css
+    // still has .user-dropdown .profile-menu-link{display:block!important} only.
+    style.textContent = [
+      ".feature-beta-pill{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:999px;background:#dfff5a;color:#10132a;font-size:10px;font-weight:900;letter-spacing:.04em;line-height:1.5;text-transform:uppercase;vertical-align:middle}",
+      ".user-dropdown .profile-menu-link.hidden,",
+      ".user-dropdown .profile-menu-line.hidden,",
+      ".user-dropdown [data-patron-menu].hidden,",
+      ".user-dropdown [data-floqr-feature-link].hidden,",
+      ".user-dropdown a.profile-menu-link[hidden],",
+      ".user-dropdown [data-patron-menu][hidden],",
+      ".user-dropdown [data-floqr-feature-link][hidden],",
+      ".floqr-global-profile-status .user-dropdown .profile-menu-link.hidden,",
+      ".floqr-global-profile-status .user-dropdown .profile-menu-link[hidden],",
+      ".floqr-global-profile-status .user-dropdown [data-floqr-feature-link].hidden,",
+      ".floqr-global-profile-status .user-dropdown [data-floqr-feature-link][hidden]{display:none!important}"
+    ].join("");
   }
 
   function setBetaPill(el, beta, doc) {

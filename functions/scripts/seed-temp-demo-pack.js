@@ -139,7 +139,30 @@ function emailFor(role, n) {
   return `temp_${role}_${n}@${DEMO_DOMAIN}`;
 }
 
+const SHOWCASE_ROLE = {
+  dj: "dj",
+  waitress: "waitress",
+  bottlegirl: "bottle",
+  busboy: "busboy",
+  barman: "bartender",
+  clubadmin: "clubadmin",
+  promoter: "promoter"
+};
+
+function showcaseDisplayName(role, n) {
+  try {
+    const showcase = require("../../floqr-temp-qa-showcase.js");
+    const key = SHOWCASE_ROLE[role];
+    if (!showcase?.personRecord || !key) return null;
+    return showcase.personRecord(key, n, false)?.displayName || null;
+  } catch (_) {
+    return null;
+  }
+}
+
 function displayName(role, n) {
+  const named = showcaseDisplayName(role, n);
+  if (named) return named;
   const genre = role === "dj" ? ` · ${GENRES[n - 1].label}` : "";
   return `Temp ${ROLE_LABELS[role] || role} ${n}${genre}`;
 }

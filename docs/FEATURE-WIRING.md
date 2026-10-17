@@ -324,8 +324,10 @@ When adding a section, use this skeleton:
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
 | **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand |
-| **Beta invite consent (s3.1.56)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR.app Beta Test & Prerelease Agreement + Booking Transaction Disclaimer; required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` on `betaTesters`/`betaInvites` (`BETA_AGREEMENT` in `feature-services-core.js`). Help: `help-beta-tester` |
-| **Package** | s3.1.56 |
+| **Beta invite consent (s3.1.56)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR.app Beta Test & Prerelease Agreement + Booking Transaction Disclaimer; required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` on `betaTesters`/`betaInvites` (`BETA_AGREEMENT` in `feature-services-core.js`). Help: `help-beta-tester`. Profile card via `global-profile-status.js`. |
+| **Profile menu fail-closed** | Search `#userDropdown` + `global-profile-status` mint feature links hidden; `FLOQRFeatureServices.applyFeatureLinks` reveals only granted Live/Beta. CSS: `.user-dropdown … .hidden` / `[hidden]` must beat `display:block!important` (also injected in `ensureLinkStyles`). |
+| **Inbox Recipient autocomplete** | Compose uses `#composeRecipientSearch` only — results appear after 2+ typed characters; empty query never dumps the directory. One Club Admin row (not one per support mailbox). |
+| **Package** | s3.1.57 |
 
 ## Beta invite landing (`beta-invite.html`)
 

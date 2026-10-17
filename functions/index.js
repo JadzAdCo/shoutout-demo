@@ -22,6 +22,7 @@ module.exports = {
   ...require("./venue-geocode-functions"),
   ...require("./whatsapp-otp-functions"),
   ...require("./staff-marketing-consent-functions"),
+  seedTempDemoPack: require("./demo-seed-functions").seedTempDemoPack,
   onShoutoutComplianceWrite: require("./shoutout-compliance-functions").onShoutoutComplianceWrite,
   purgeExpiredShoutoutMedia: require("./shoutout-compliance-functions").purgeExpiredShoutoutMedia,
   anonymizeExpiredComplianceLogs: require("./shoutout-compliance-functions").anonymizeExpiredComplianceLogs,

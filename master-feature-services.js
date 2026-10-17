@@ -157,9 +157,11 @@
 
   function featureCheckboxes(attrs, granted = {}) {
     return betaKeys().map(key => {
-      const checked = Number(granted[key]) === 1 ? " checked" : "";
-      const hint = STATE_TEXT[stateOf(features[key])] ? ` <small>(${esc(stateOf(features[key]))})</small>` : "";
-      return `<label class="toggle-inline"><input type="checkbox" ${attrs} data-feature-key="${esc(key)}"${checked}/> ${esc(featureLabel(key))}${hint}</label>`;
+      const state = stateOf(features[key]);
+      const checked = Number(granted[key]) === 1 && state !== "off" ? " checked" : "";
+      const disabled = state === "off" ? " disabled" : "";
+      const hint = STATE_TEXT[state] ? ` <small>(${esc(state)})</small>` : "";
+      return `<label class="toggle-inline"><input type="checkbox" ${attrs} data-feature-key="${esc(key)}"${checked}${disabled}/> ${esc(featureLabel(key))}${hint}</label>`;
     }).join(" ");
   }
 
@@ -347,9 +349,10 @@
       setStatus("betaInviteStatus", "Enter a short note (why they were picked) before inviting.");
       return;
     }
-    const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]");
+    const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]")
+      .filter(key => stateOf(features[key]) !== "off");
     if (!featureKeys.length) {
-      setStatus("betaInviteStatus", "Tick at least one feature this tester may use, then click Invite again.");
+      setStatus("betaInviteStatus", "Tick at least one Live or Beta feature (Off features cannot be granted).");
       syncInviteFeaturesVisibility();
       return;
     }
@@ -472,10 +475,6 @@
     }
   }
 
-  function auditTarget(row) {
-    return [row.targetType, row.targetId].filter(Boolean).join(": ");
-  }
-
   function auditWhen(row) {
     const iso = String(row.createdAtIso || "");
     return iso ? iso.replace("T", " ").replace(/\.\d+Z$/, "Z") : formatWhen(row.createdAtMs);
@@ -498,15 +497,68 @@
     return ["success", "denied", "failure"].includes(value) ? value : "other";
   }
 
-  function auditRowHtml(row) {
+  /** Integrity chain hash (SHA-256) — not a person/record lookup id. */
+  function auditChainHashHtml(row) {
+    if (!row.chained || !row.hash) return "";
+    const full = String(row.hash);
+    const short = full.length > 16 ? `${full.slice(0, 12)}…` : full;
+    return `<small class="audit-sub audit-mono" title="Integrity chain hash (SHA-256). Used by Verify integrity — not a patron id.&#10;${esc(full)}">chain ${esc(short)}</small>`;
+  }
+
+  function patronLabelFromDoc(data = {}, uid = "") {
+    const name = String(data.displayName || data.fullName || data.floqrHandle || "").trim();
+    const email = String(data.email || "").trim();
+    if (name && email) return `${name} · ${email}`;
+    if (name) return name;
+    if (email) return email;
+    return uid ? `uid ${uid.slice(0, 10)}…` : "";
+  }
+
+  async function resolveAuditTargetLabels(rows) {
+    const labels = Object.create(null);
+    const patronUids = [...new Set(
+      rows
+        .filter(row => String(row.targetType || "") === "patron" && row.targetId)
+        .map(row => String(row.targetId))
+    )].slice(0, AUDIT_LIMIT);
+    await Promise.all(patronUids.map(async uid => {
+      try {
+        const snap = await db().collection("users").doc(uid).get();
+        labels[uid] = patronLabelFromDoc(snap.exists ? snap.data() : {}, uid);
+      } catch (_) {
+        labels[uid] = `uid ${uid.slice(0, 10)}…`;
+      }
+    }));
+    return labels;
+  }
+
+  function auditTargetHtml(row, labels = {}) {
+    const type = String(row.targetType || "").trim();
+    const id = String(row.targetId || "").trim();
+    if (!type && !id) return "—";
+    if (type === "patron" && id) {
+      const label = labels[id] || row.detail?.targetEmailMasked || `uid ${id.slice(0, 10)}…`;
+      return `<span class="audit-trunc" title="Patron Firebase uid: ${esc(id)}">${esc(`patron · ${label}`)}</span>`;
+    }
+    if (type === "demoAccount" && id) {
+      return `<span class="audit-trunc" title="${esc(id)}">${esc(`demo · ${id}`)}</span>`;
+    }
+    if (type === "feature" && id) {
+      return `<span class="audit-trunc" title="${esc(id)}">${esc(`feature · ${featureLabel(id)}`)}</span>`;
+    }
+    const raw = [type, id].filter(Boolean).join(": ");
+    return truncated(raw) || "—";
+  }
+
+  function auditRowHtml(row, labels = {}) {
     const seq = row.chained ? `<span class="audit-seq">#${esc(row.seq)}</span>` : "";
-    const hash = row.chained && row.hash ? truncated(row.hash, "audit-mono") : "";
+    const hash = auditChainHashHtml(row);
     const role = row.actorRole ? `<small class="audit-sub">${esc(row.actorRole)}</small>` : "";
     return `<tr class="audit-row">
       <td data-label="When (UTC)"><time datetime="${esc(row.createdAtIso || "")}">${esc(auditWhen(row))}</time>${seq}${hash}</td>
       <td data-label="Event"><code class="audit-event">${esc(row.eventType || "—")}</code>${auditChange(row)}</td>
       <td data-label="Who">${truncated(row.actorEmail || row.actorUid || "—")}${role}${truncated(row.sourceIpTruncated, "audit-mono")}</td>
-      <td data-label="Target">${truncated(auditTarget(row)) || "—"}</td>
+      <td data-label="Target">${auditTargetHtml(row, labels)}</td>
       <td data-label="Outcome"><span class="audit-outcome is-${outcomeKey(row.outcome)}">${esc(row.outcome || "—")}</span></td>
       <td data-label="Reason">${esc(row.reason || "—")}</td>
     </tr>`;
@@ -522,9 +574,13 @@
         db().collection("featureServiceAuditLogs").orderBy("createdAtMs", "desc").limit(AUDIT_LIMIT).get(),
         "Audit trail"
       );
-      tbody.innerHTML = snap.empty
-        ? "<tr class=\"audit-empty\"><td colspan=\"6\">No activity yet.</td></tr>"
-        : snap.docs.map(doc => auditRowHtml(doc.data())).join("");
+      if (snap.empty) {
+        tbody.innerHTML = "<tr class=\"audit-empty\"><td colspan=\"6\">No activity yet.</td></tr>";
+        return;
+      }
+      const rows = snap.docs.map(doc => doc.data() || {});
+      const labels = await resolveAuditTargetLabels(rows);
+      tbody.innerHTML = rows.map(row => auditRowHtml(row, labels)).join("");
     } catch (error) {
       tbody.innerHTML = `<tr class="audit-empty"><td colspan="6">${esc(errorText(error))}</td></tr>`;
       setStatus("featureAuditStatus", `Could not load audit trail: ${errorText(error)}`);

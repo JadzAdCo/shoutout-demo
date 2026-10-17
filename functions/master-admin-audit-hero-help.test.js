@@ -78,11 +78,33 @@ test("audit rows carry labels, truncate long ids with a title, and fold before/a
   }
   assert.match(html, />2026-10-09 08:12:40Z</);
   assert.match(html, /class="audit-seq">#3</);
-  assert.match(html, new RegExp(`class="audit-trunc audit-mono" title="${hash}"`));
+  assert.match(html, /chain aaaaaaaaaaaa…/);
+  assert.match(html, /Integrity chain hash \(SHA-256\)/);
+  assert.match(html, new RegExp(hash.slice(0, 12)));
   assert.match(html, /title="2601:4d:8700::\/48"/);
   assert.match(html, /<details class="audit-change"><summary>Before → after<\/summary><pre class="audit-json">/);
   assert.match(html, /audit-outcome is-denied/);
   assert.doesNotMatch(html, /<br\/><small>\{/);
+});
+
+test("audit patron targets show a resolved label; uid stays in the title", () => {
+  const render = loadAuditRenderer();
+  const uid = "YdkLkft64hNeahg3d8VgvWEZn9t1";
+  const html = render({
+    createdAtIso: "2026-10-17T13:48:15.000Z",
+    chained: true,
+    seq: 12,
+    hash: "0798426bb89071a5f2a8f49",
+    eventType: "beta.invite_created",
+    actorEmail: "bans.don@gmail.com",
+    targetType: "patron",
+    targetId: uid,
+    outcome: "success",
+    reason: "testing"
+  }, {[uid]: "Priya Shah · temp_waitress_1@floqr-demo.com"});
+  assert.match(html, /patron · Priya Shah · temp_waitress_1@floqr-demo\.com/);
+  assert.match(html, new RegExp(`Patron Firebase uid: ${uid}`));
+  assert.doesNotMatch(html, new RegExp(`patron: ${uid.slice(0, 12)}`));
 });
 
 test("Master Admin hero has no orphan help; All Locations carries the help", () => {

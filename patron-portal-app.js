@@ -1684,16 +1684,20 @@
       byKey.set(key, item);
     };
 
-    (window.SHOUTOUT_ADMIN_EMAILS || []).forEach((email, index) => add({
-      uid: "",
-      email,
-      label: "Club Admin",
-      displayName: "Club Admin",
-      roleLabel: "Club Admin",
-      recipientType: "club_admin",
-      // Keep email for routing only; never surface in patron UI.
-      supportIndex: index + 1
-    }));
+    // One Club Admin row in the UI (not one card per support mailbox).
+    const adminEmails = (window.SHOUTOUT_ADMIN_EMAILS || []).map(email => String(email || "").trim().toLowerCase()).filter(Boolean);
+    if (adminEmails.length) {
+      add({
+        uid: "",
+        email: adminEmails[0],
+        label: "Club Admin",
+        displayName: "Club Admin",
+        roleLabel: "Club Admin",
+        recipientType: "club_admin",
+        // Keep emails for routing only; never surface in patron UI.
+        supportEmails: adminEmails
+      });
+    }
 
     designations.filter(x => x.isCSR !== false).forEach(item => add({
       uid: item.workerUid || "",
@@ -1727,26 +1731,54 @@
     byId("composeRecipientEmail").value = recipient.email || "";
     byId("composeRecipientLabel").value = supportRecipientLabel(recipient);
     byId("composeRecipientSearch").value = supportRecipientLabel(recipient);
-    renderRecipientSearchResults();
+    renderRecipientSearchResults({selected: true});
   }
 
-  function renderRecipientSearchResults() {
+  function renderRecipientSearchResults(opts = {}) {
     const wrap = byId("recipientSearchResults");
     if (!wrap) return;
-    const query = byId("composeRecipientSearch")?.value || "";
+    const query = String(byId("composeRecipientSearch")?.value || "").trim();
     const selectedUid = byId("composeRecipientUid")?.value || "";
     const selectedEmail = byId("composeRecipientEmail")?.value || "";
+    const selectedLabel = String(byId("composeRecipientLabel")?.value || "").trim();
+    const hasSelection = !!(selectedUid || selectedEmail);
+    const hint = window.FLOQRI18n?.t?.("inbox.recipientHint");
+    const hintText = hint && hint !== "inbox.recipientHint"
+      ? hint
+      : "Start typing a name or @username to find a recipient.";
+    const noMatch = window.FLOQRI18n?.t?.("inbox.recipientNoMatch");
+    const noMatchText = noMatch && noMatch !== "inbox.recipientNoMatch"
+      ? noMatch
+      : "No allowed recipients matched this search.";
+
+    // Autocomplete only — never dump the full eligible directory when the field is empty.
+    if (opts.selected || (hasSelection && query === selectedLabel)) {
+      wrap.innerHTML = "";
+      wrap.classList.remove("is-open");
+      wrap.hidden = true;
+      return;
+    }
+    if (normalizeSearchText(query).length < 2) {
+      wrap.innerHTML = hasSelection ? "" : `<p class="sub small recipient-search-hint">${esc(hintText)}</p>`;
+      wrap.classList.toggle("is-open", !hasSelection);
+      wrap.hidden = !!hasSelection;
+      return;
+    }
+
     const rows = messageRecipients
       .filter(x => contextualTextMatch(query, recipientText(x)))
-      .slice(0, 12);
+      .slice(0, 8);
+    wrap.hidden = false;
+    wrap.classList.add("is-open");
     wrap.innerHTML = rows.length ? rows.map((item, index) => {
       const subtitle = recipientPublicSubtitle(item);
-      return `<button type="button" class="${(item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail) ? "selected" : ""}" data-recipient-index="${index}">
+      const selected = (item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail);
+      return `<button type="button" class="${selected ? "selected" : ""}" data-recipient-index="${index}">
       <strong>${esc(item.label || item.displayName || "Recipient")}</strong>
       ${subtitle ? `<span>${esc(subtitle)}</span>` : ""}
       <small>${esc(item.roleLabel || "Internal Recipient")}${item.locationName ? ` - ${esc(item.locationName)}` : ""}</small>
     </button>`;
-    }).join("") : "<p class='sub small'>No allowed internal recipients matched this search.</p>";
+    }).join("") : `<p class="sub small recipient-search-hint">${esc(noMatchText)}</p>`;
     wrap.querySelectorAll("button[data-recipient-index]").forEach(btn => {
       btn.addEventListener("click", () => selectMessageRecipient(rows[Number(btn.dataset.recipientIndex)]));
     });
@@ -4042,14 +4074,18 @@
   function renderPolicies(profile) {
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
-    const tt = (key, vars) => window.FLOQRI18n?.t?.(key, vars) || key;
+    const tt = (key, vars, fallback) => {
+      const value = window.FLOQRI18n?.t?.(key, vars);
+      return value && value !== key ? value : (fallback || key);
+    };
     const roleText = esc(roles.join(", ") || "Patron");
-    byId("messagePolicySummary").innerHTML = `<ul>
-      <li>${tt("inbox.policySystem")}</li>
-      <li>${tt("inbox.policyClubOps")}</li>
-      <li>${tt("inbox.policyPatronBlocked")}</li>
-      <li>${tt("inbox.policyStaffRoles")}</li>
-      <li>${tt("inbox.policyRoles", {roles: roleText})}</li>
+    const summary = byId("messagePolicySummary");
+    if (summary) summary.innerHTML = `<ul>
+      <li>${tt("inbox.policySystem", null, "System notifications are internal FloqR Inbox messages and use System Message as the sender.")}</li>
+      <li>${tt("inbox.policyClubOps", null, "Club ops alerts (scheduling, guest list, VIP, door) land in FloqR Inbox as System Messages — they are not ShoutOuts.")}</li>
+      <li>${tt("inbox.policyPatronBlocked", null, "Patron-to-patron direct FloqR Inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.")}</li>
+      <li>${tt("inbox.policyStaffRoles", null, "Approved staff roles may message patrons only in a patron-originated context (payment, guest list, ShoutOut, reservation, or support).")}</li>
+      <li>${tt("inbox.policyRoles", null, "Your current approved role set:")} ${roleText}</li>
     </ul>`;
     if (byId("chatPolicySummary")) {
       byId("chatPolicySummary").innerHTML = `<ul>
@@ -4788,6 +4824,7 @@
     byId("composeRecipientUid").value = "";
     byId("composeRecipientEmail").value = "";
     byId("composeRecipientLabel").value = "";
+    renderRecipientSearchResults();
     await loadPortal(user);
     });
   }

@@ -35,9 +35,10 @@
     promo: "promo-collective-logo.png",
     dj: n => ["dj-jordan.png", "dj-maya.png", "dj-rico.png"][(n - 1) % 3],
     djBooth: n => ["dj-jordan-booth.png", "dj-maya-booth.png", "dj-rico-booth.png"][(n - 1) % 3],
-    waitress: n => ["staff-priya.png", "staff-imani.png", "staff-sofia.png"][(n - 1) % 3],
-    waitressFloor: n => ["staff-priya-floor.png", "staff-imani-floor.png", "staff-sofia-floor.png"][(n - 1) % 3],
-    waitressVip: n => ["staff-priya-vip.png", "staff-imani-vip.png", "staff-sofia-vip.png"][(n - 1) % 3],
+    /* Waitress 4 (May Shah) reuses Sofia stills until a dedicated May pack ships. */
+    waitress: n => ["staff-priya.png", "staff-imani.png", "staff-sofia.png", "staff-sofia.png"][(n - 1) % 4],
+    waitressFloor: n => ["staff-priya-floor.png", "staff-imani-floor.png", "staff-sofia-floor.png", "staff-sofia-floor.png"][(n - 1) % 4],
+    waitressVip: n => ["staff-priya-vip.png", "staff-imani-vip.png", "staff-sofia-vip.png", "staff-sofia-vip.png"][(n - 1) % 4],
     waiter: n => ["staff-luis.png", "staff-malik.png", "staff-andre.png"][(n - 1) % 3],
     waiterTable: n => ["staff-luis-table.png", "staff-malik-table.png", "staff-andre.png"][(n - 1) % 3],
     busboy: n => ((n - 1) % 3 === 2 ? "staff-jamal.png" : ["staff-andre.png", "staff-jamal.png"][(n - 1) % 2]),
@@ -64,8 +65,9 @@
     waitress: n => ([
       {first: "Priya", last: "Shah", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Fast floor, warm table, never miss a hail.", music: ["R&B", "Open Format"], lookingToMeet: "Regulars who tip and DJs who keep the energy up."},
       {first: "Imani", last: "Cole", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Black-girl magic on the floor — tray up, eyes on the hail.", music: ["Afrobeats", "R&B"], lookingToMeet: "Tables that celebrate and hosts who share the section."},
-      {first: "Sofia", last: "Alvarez", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Spanish-first greetings, champagne before the second song.", music: ["Latin", "Open Format"], lookingToMeet: "VIP hosts who call the bottle early."}
-    ][(n - 1) % 3]),
+      {first: "Sofia", last: "Alvarez", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Spanish-first greetings, champagne before the second song.", music: ["Latin", "Open Format"], lookingToMeet: "VIP hosts who call the bottle early."},
+      {first: "May", last: "Shah", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Calm section lead — water, smile, and the next round before you ask.", music: ["Open Format", "R&B"], lookingToMeet: "Hosts who share the floor and guests who stay for the encore."}
+    ][(n - 1) % 4]),
     waiter: n => ([
       {first: "Luis", last: "Ortega", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "VIP tables, water before the third round.", music: ["Latin", "House"], lookingToMeet: "Bottle teams who move as one."},
       {first: "Malik", last: "Brooks", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "Quiet luxury service — glasses full, never hovering.", music: ["Hip Hop", "R&B"], lookingToMeet: "Busboys who time the LED walk with the toast."},

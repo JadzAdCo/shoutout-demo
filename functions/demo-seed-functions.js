@@ -91,7 +91,39 @@ function emailFor(role, n) {
   return `temp_${role}_${n}@${DEMO_DOMAIN}`;
 }
 
+/** Map seed role keys → floqr-temp-qa-showcase personRecord keys. */
+const SHOWCASE_ROLE = {
+  dj: "dj",
+  waitress: "waitress",
+  bottlegirl: "bottle",
+  busboy: "busboy",
+  barman: "bartender",
+  clubadmin: "clubadmin",
+  promoter: "promoter"
+};
+
+function loadShowcase() {
+  try {
+    return require("../floqr-temp-qa-showcase.js");
+  } catch (_) {
+    return null;
+  }
+}
+
+function showcasePatch(role, n, uid) {
+  const showcase = loadShowcase();
+  const key = SHOWCASE_ROLE[role];
+  if (!showcase?.userProfilePatch || !key) return null;
+  try {
+    return showcase.userProfilePatch(key, n, uid || "");
+  } catch (_) {
+    return null;
+  }
+}
+
 function displayName(role, n) {
+  const patch = showcasePatch(role, n);
+  if (patch?.displayName) return patch.displayName;
   const genre = role === "dj" ? ` · ${GENRES[n - 1].label}` : "";
   return `Temp ${ROLE_LABELS[role] || role} ${n}${genre}`;
 }
@@ -383,21 +415,26 @@ async function runSeed() {
   const accounts = buildAccounts();
   for (const account of accounts) {
     account.uid = await ensureAuthUser(account);
+    const enrich = showcasePatch(account.role, account.index, account.uid) || {};
+    const display = enrich.displayName || account.displayName;
+    account.displayName = display;
     const profile = {
       uid: account.uid,
       email: account.email,
-      displayName: account.displayName,
-      publicName: account.displayName,
+      displayName: display,
+      publicName: display,
+      firstName: enrich.firstName || null,
+      lastName: enrich.lastName || null,
       role: account.role,
       roles: [account.role],
-      approvedRoles: [ROLE_LABELS[account.role] || account.role],
+      approvedRoles: enrich.approvedRoles || [ROLE_LABELS[account.role] || account.role],
       phone: SINK_SMS,
       profileCompleted: true,
       demoTemp: true,
       demoPack: "temp-v1",
       loginCode: account.loginCode,
       deliveryRedirect: {emailTo: SINK_EMAIL, smsTo: SINK_SMS, intendedEmail: account.email},
-      avatarUrl: `${ORIGIN}/${account.avatarPath}`,
+      avatarUrl: enrich.avatarUrl || `${ORIGIN}/${account.avatarPath}`,
       iconUrl: `${ORIGIN}/${account.iconPath}`,
       genre: account.genre || null,
       locationId: account.locationId || (account.clubIndex ? `temp-democlub-${account.clubIndex}` : null),
@@ -410,12 +447,39 @@ async function runSeed() {
     await db.collection("users").doc(account.uid).set({
       uid: account.uid,
       email: account.email,
-      displayName: account.displayName,
+      displayName: display,
+      fullName: enrich.fullName || display,
+      firstName: enrich.firstName || null,
+      lastName: enrich.lastName || null,
       approvedRoles: profile.approvedRoles,
       phone: SINK_SMS,
       profileCompleted: true,
       demoTemp: true,
       demoPack: "temp-v1",
+      qaTemp: true,
+      bio: enrich.bio || null,
+      nightlifeStyle: enrich.nightlifeStyle || null,
+      lookingToMeet: enrich.lookingToMeet || null,
+      musicInterests: enrich.musicInterests || null,
+      favoriteGenres: enrich.favoriteGenres || null,
+      photoURL: enrich.photoURL || null,
+      photoUrl: enrich.photoUrl || null,
+      imageUrl: enrich.imageUrl || null,
+      avatarUrl: enrich.avatarUrl || null,
+      publicPhotoUrl: enrich.publicPhotoUrl || null,
+      profilePhotoUrl: enrich.profilePhotoUrl || null,
+      publicProfileType: enrich.publicProfileType || null,
+      publicProfileVisibility: enrich.publicProfileVisibility || null,
+      publicProfilePublished: enrich.publicProfilePublished === true,
+      publicProfileBioEnglish: enrich.publicProfileBioEnglish || null,
+      publicProfileBioOriginal: enrich.publicProfileBioOriginal || null,
+      profileMediaSlots: enrich.profileMediaSlots || null,
+      affiliatedClubId: enrich.affiliatedClubId || profile.clubLocationId || null,
+      affiliatedClubName: enrich.affiliatedClubName || null,
+      floqrHandle: enrich.floqrHandle || null,
+      instagramHandle: enrich.instagramHandle || null,
+      city: enrich.city || null,
+      country: enrich.country || null,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
   }

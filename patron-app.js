@@ -4786,9 +4786,31 @@
     const chats = upsert("chats", "a", "profile-menu-link");
     chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal";
     if (!chats.dataset.count) chats.dataset.count = "0/0";
-    chats.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chats.dataset.count})`;
+    chats.textContent = `${tt("nav.minglChat", {}, "Mingl Chat")} (${chats.dataset.count})`;
+    chats.dataset.floqrFeatureLink = "mingl";
+    chats.classList.add("hidden");
+    chats.hidden = true;
+    chats.setAttribute("aria-hidden", "true");
+
+    const featureItems = [
+      ["bartr", window.FLOQRNav?.stampCurrentVersion?.("./commerce.html", {from: "search"}) || "./commerce.html?from=search", tt("nav.bartr", {}, "BartR")],
+      ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
+      ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "floqCast")],
+      ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
+      ["floqAi", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.floqai", {}, "FloqAi")]
+    ];
+    featureItems.forEach(([key, href, label]) => {
+      const el = upsert(`feature-${key}`, "a", "profile-menu-link");
+      el.href = href;
+      el.textContent = label;
+      el.dataset.floqrFeatureLink = key;
+      el.classList.add("hidden");
+      el.hidden = true;
+      el.setAttribute("aria-hidden", "true");
+    });
 
     updateProfileMenuCounts(user.uid);
+    applyMenuFeatureLinks(user);
   }
 
   async function updateProfileMenuCounts(uid) {
@@ -4813,27 +4835,12 @@
         const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(1000).get();
         totalMessages += noteSnap.size;
         noteSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
-    if (!chats.dataset.floqrFeatureLink) {
-      chats.dataset.floqrFeatureLink = "mingl";
-      chats.classList.add("hidden");
-      chats.hidden = true;
-    }
       } catch(e) {}
 
       try {
-    applyMenuFeatureLinks(user);
         const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(1000).get();
         totalChats = chatSnap.size;
         chatSnap.forEach(d => {
-  function applyMenuFeatureLinks(user) {
-    const fs = window.FLOQRFeatureServices;
-    const host = byId("userDropdown");
-    if (!fs?.ensureLoaded || !host || !user) return;
-    fs.ensureLoaded({db, user, profile: cachedUserProfile})
-      .then(() => fs.applyFeatureLinks(host))
-      .catch(error => console.warn("Profile menu feature links", error?.message || error));
-  }
-
           const unread = d.data().unreadCounts && d.data().unreadCounts[uid] ? Number(d.data().unreadCounts[uid]) : 0;
           unreadChats += unread;
         });
@@ -4848,11 +4855,28 @@
       const chatEl = document.querySelector("#userDropdown [data-patron-menu='chats']");
       if (chatEl) {
         chatEl.dataset.count = `${unreadChats}/${totalChats}`;
-        chatEl.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chatEl.dataset.count})`;
+        chatEl.textContent = `${tt("nav.minglChat", {}, "Mingl Chat")} (${chatEl.dataset.count})`;
       }
+      applyMenuFeatureLinks({uid});
     } catch(e) {
       console.warn("Could not update profile menu counts", e);
     }
+  }
+
+  function applyMenuFeatureLinks(user) {
+    const fs = window.FLOQRFeatureServices;
+    const host = byId("userDropdown");
+    const authUser = user?.uid ? user : (auth.currentUser || user);
+    if (!fs?.ensureLoaded || !host || !authUser?.uid) return;
+    // Fail-closed for every patron: mint links hidden, then reveal only what Features & Services allows.
+    host.querySelectorAll("[data-floqr-feature-link]").forEach(el => {
+      el.classList.add("hidden");
+      el.hidden = true;
+      el.setAttribute("aria-hidden", "true");
+    });
+    fs.ensureLoaded({db, user: authUser, profile: cachedUserProfile})
+      .then(() => fs.applyFeatureLinks(host))
+      .catch(error => console.warn("Profile menu feature links", error?.message || error));
   }
 
 
