@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="portal.title">My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.56"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.56"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.57"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.57"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -463,21 +463,24 @@
       </section>
 
       <section id="portalMessages" class="admin-panel-section">
-        <div class="card">
-          <h2 data-i18n="inbox.rulesTitle">FloqR Inbox Rules</h2>
-          <div id="messagePolicySummary" class="policy-list"></div>
-        </div>
         <div class="card" id="portalCompose">
-          <h2 data-i18n="inbox.composeTitle">Send FloqR Inbox Message</h2>
-          <p id="composePolicyNote" class="sub small"></p>
-          <div class="profile-grid">
-            <label><span data-i18n="inbox.recipientSearch">Recipient Search</span><input id="composeRecipientSearch" data-i18n-placeholder="inbox.recipientPlaceholder" placeholder="Search club admin, CSR, display name, or username"/></label>
-            <label><span data-i18n="inbox.subject">Subject</span><input id="composeSubject" data-i18n-placeholder="inbox.subjectPlaceholder" placeholder="Subject"/></label>
+          <div class="inbox-compose-heading">
+            <h2 data-i18n="inbox.composeTitle">Send FloqR Inbox Message</h2>
+            <details class="help-popout" data-floqr-help-id="help-floqr-inbox-rules">
+              <summary aria-label="Help">?</summary>
+              <div class="help-popout-body">
+                <strong data-i18n="inbox.rulesTitle">FloqR Inbox Rules</strong>
+                <div id="messagePolicySummary" class="policy-list"></div>
+              </div>
+            </details>
           </div>
+          <p id="composePolicyNote" class="sub small"></p>
+          <label class="inbox-recipient-field"><span data-i18n="inbox.recipientSearch">Recipient</span><input id="composeRecipientSearch" data-i18n-placeholder="inbox.recipientPlaceholder" placeholder="Start typing a name or @username" autocomplete="off" autocapitalize="off" spellcheck="false"/></label>
           <input id="composeRecipientUid" type="hidden"/>
           <input id="composeRecipientEmail" type="hidden"/>
           <input id="composeRecipientLabel" type="hidden"/>
-          <div id="recipientSearchResults" class="recipient-search-results"></div>
+          <div id="recipientSearchResults" class="recipient-search-results" hidden></div>
+          <label><span data-i18n="inbox.subject">Subject</span><input id="composeSubject" data-i18n-placeholder="inbox.subjectPlaceholder" placeholder="Subject"/></label>
           <label><span data-i18n="inbox.message">Message</span><input id="composeBody" data-i18n-placeholder="inbox.messagePlaceholder" placeholder="Write your message..."/></label>
           <button id="sendMessageBtn" class="primary" type="button" data-i18n="inbox.send">Send Message</button>
         </div>
@@ -796,49 +799,49 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.56"></script>
-<script src="./floqr-people-directory.js?v=s3.1.56"></script>
-<script src="./floqr-app-check.js?v=s3.1.56"></script>
-<script src="./floqr-nav.js?v=s3.1.56"></script>
-<script src="./global-profile-status.js?v=s3.1.56"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.56"></script>
-<script src="./shared-data.js?v=s3.1.56"></script>
-<script src="./url-media-field.js?v=s3.1.56"></script>
-<script src="./ai-service.js?v=s3.1.56"></script>
-<script src="./ai-index-service.js?v=s3.1.56"></script>
-<script src="./ai-search-service.js?v=s3.1.56"></script>
-<script src="./ai-notification-service.js?v=s3.1.56"></script>
-<script src="./ai-template-studio.js?v=s3.1.56"></script>
-<script src="./ai-grammar-service.js?v=s3.1.56"></script>
-  <script src="./floqr-action-feedback.js?v=s3.1.56"></script>
-<script src="./floqr-tab-gates.js?v=s3.1.56"></script>
-<script src="./floqr-feature-services.js?v=s3.1.56"></script>
-<script src="./floqr-i18n.js?v=s3.1.56"></script>
-<script src="./floqai-help-repository.js?v=s3.1.56"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.56"></script>
-<script src="./help-attach.js?v=s3.1.56"></script>
-<script src="./helper-popouts.js?v=s3.1.56"></script>
-<script src="./floqr-identity.js?v=s3.1.56"></script>
-<script src="./floqr-blocks.js?v=s3.1.56"></script>
-<script src="./payment-service.js?v=s3.1.56"></script>
-<script src="./dj-commerce-policy.js?v=s3.1.56"></script>
-<script src="./floqr-service-access.js?v=s3.1.56"></script>
-<script src="./floqr-venue-picker.js?v=s3.1.56"></script>
-<script src="./floqr-employee-network.js?v=s3.1.56"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.1.56"></script>
-<script src="./floqr-canonical.js?v=s3.1.56"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.1.56"></script>
-<script src="./floqr-consent-mode.js?v=s3.1.56"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.56"></script>
-<script src="./ad-campaigns.js?v=s3.1.56"></script>
-<script src="./floqr-ad-composer.js?v=s3.1.56"></script>
-<script src="./patron-ad-campaigns.js?v=s3.1.56"></script>
-<script src="./floqr-access-notice.js?v=s3.1.56"></script>
-<script src="./floqr-safe-render.js?v=s3.1.56"></script>
-<script src="./floqr-board-frame.js?v=s3.1.56"></script>
-<script src="./floqr-template-preview.js?v=s3.1.56"></script>
-<script src="./patron-portal-app.js?v=s3.1.56"></script>
-  <script src="./profile-access-guard.js?v=s3.1.56"></script>
+<script src="./firebase-config.js?v=s3.1.57"></script>
+<script src="./floqr-people-directory.js?v=s3.1.57"></script>
+<script src="./floqr-app-check.js?v=s3.1.57"></script>
+<script src="./floqr-nav.js?v=s3.1.57"></script>
+<script src="./global-profile-status.js?v=s3.1.57"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.57"></script>
+<script src="./shared-data.js?v=s3.1.57"></script>
+<script src="./url-media-field.js?v=s3.1.57"></script>
+<script src="./ai-service.js?v=s3.1.57"></script>
+<script src="./ai-index-service.js?v=s3.1.57"></script>
+<script src="./ai-search-service.js?v=s3.1.57"></script>
+<script src="./ai-notification-service.js?v=s3.1.57"></script>
+<script src="./ai-template-studio.js?v=s3.1.57"></script>
+<script src="./ai-grammar-service.js?v=s3.1.57"></script>
+  <script src="./floqr-action-feedback.js?v=s3.1.57"></script>
+<script src="./floqr-tab-gates.js?v=s3.1.57"></script>
+<script src="./floqr-feature-services.js?v=s3.1.57"></script>
+<script src="./floqr-i18n.js?v=s3.1.57"></script>
+<script src="./floqai-help-repository.js?v=s3.1.57"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.57"></script>
+<script src="./help-attach.js?v=s3.1.57"></script>
+<script src="./helper-popouts.js?v=s3.1.57"></script>
+<script src="./floqr-identity.js?v=s3.1.57"></script>
+<script src="./floqr-blocks.js?v=s3.1.57"></script>
+<script src="./payment-service.js?v=s3.1.57"></script>
+<script src="./dj-commerce-policy.js?v=s3.1.57"></script>
+<script src="./floqr-service-access.js?v=s3.1.57"></script>
+<script src="./floqr-venue-picker.js?v=s3.1.57"></script>
+<script src="./floqr-employee-network.js?v=s3.1.57"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.57"></script>
+<script src="./floqr-canonical.js?v=s3.1.57"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.1.57"></script>
+<script src="./floqr-consent-mode.js?v=s3.1.57"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.57"></script>
+<script src="./ad-campaigns.js?v=s3.1.57"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.57"></script>
+<script src="./patron-ad-campaigns.js?v=s3.1.57"></script>
+<script src="./floqr-access-notice.js?v=s3.1.57"></script>
+<script src="./floqr-safe-render.js?v=s3.1.57"></script>
+<script src="./floqr-board-frame.js?v=s3.1.57"></script>
+<script src="./floqr-template-preview.js?v=s3.1.57"></script>
+<script src="./patron-portal-app.js?v=s3.1.57"></script>
+  <script src="./profile-access-guard.js?v=s3.1.57"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

@@ -157,9 +157,11 @@
 
   function featureCheckboxes(attrs, granted = {}) {
     return betaKeys().map(key => {
-      const checked = Number(granted[key]) === 1 ? " checked" : "";
-      const hint = STATE_TEXT[stateOf(features[key])] ? ` <small>(${esc(stateOf(features[key]))})</small>` : "";
-      return `<label class="toggle-inline"><input type="checkbox" ${attrs} data-feature-key="${esc(key)}"${checked}/> ${esc(featureLabel(key))}${hint}</label>`;
+      const state = stateOf(features[key]);
+      const checked = Number(granted[key]) === 1 && state !== "off" ? " checked" : "";
+      const disabled = state === "off" ? " disabled" : "";
+      const hint = STATE_TEXT[state] ? ` <small>(${esc(state)})</small>` : "";
+      return `<label class="toggle-inline"><input type="checkbox" ${attrs} data-feature-key="${esc(key)}"${checked}${disabled}/> ${esc(featureLabel(key))}${hint}</label>`;
     }).join(" ");
   }
 
@@ -347,9 +349,10 @@
       setStatus("betaInviteStatus", "Enter a short note (why they were picked) before inviting.");
       return;
     }
-    const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]");
+    const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]")
+      .filter(key => stateOf(features[key]) !== "off");
     if (!featureKeys.length) {
-      setStatus("betaInviteStatus", "Tick at least one feature this tester may use, then click Invite again.");
+      setStatus("betaInviteStatus", "Tick at least one Live or Beta feature (Off features cannot be granted).");
       syncInviteFeaturesVisibility();
       return;
     }

@@ -59,6 +59,19 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .user-menu a,.user-menu a:link,.user-menu a:visited,.user-menu a:hover,.user-menu a:active,.user-menu a:focus,.user-dropdown a,.user-dropdown a:link,.user-dropdown a:visited,.user-dropdown a:hover,.user-dropdown a:active,.user-dropdown a:focus{color:#fff!important;text-decoration:none!important}
 .user-dropdown .profile-menu-link{display:block!important;padding:8px 0!important;font-weight:600!important;transition:opacity .2s ease!important}
 .user-dropdown .profile-menu-link:hover{opacity:.8!important}
+/* Features & Services fail-closed (every patron): .hidden / [hidden] must beat display:block!important above.
+   Covers Search #userDropdown and global-profile-status on every other page. */
+.user-dropdown .profile-menu-link.hidden,
+.user-dropdown .profile-menu-line.hidden,
+.user-dropdown [data-patron-menu].hidden,
+.user-dropdown [data-floqr-feature-link].hidden,
+.user-dropdown a.profile-menu-link[hidden],
+.user-dropdown [data-patron-menu][hidden],
+.user-dropdown [data-floqr-feature-link][hidden],
+.floqr-global-profile-status .user-dropdown .profile-menu-link.hidden,
+.floqr-global-profile-status .user-dropdown .profile-menu-link[hidden],
+.floqr-global-profile-status .user-dropdown [data-floqr-feature-link].hidden,
+.floqr-global-profile-status .user-dropdown [data-floqr-feature-link][hidden]{display:none!important}
 .global-back-btn{position:sticky;top:12px;z-index:9990;margin:0 0 16px 0;width:auto;min-width:92px;background:rgba(31,22,69,.78);border:1px solid rgba(255,255,255,.24);box-shadow:0 12px 34px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
 .topbar > button[id^="logout"], #logoutBtnClubActions{display:none!important}
 .category-grid,.compact-category-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:10px!important;margin-top:16px!important}
@@ -249,7 +262,11 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 .highlight-item{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(98,234,255,.22)}
 .message-envelope-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.message-envelope-head span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--lime);font-weight:1000}
 .message-body{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;white-space:pre-wrap;color:#fff}
-.recipient-search-results{display:grid;gap:10px;margin:10px 0 14px}
+.inbox-recipient-field{display:block;margin:14px 0 6px}
+.recipient-search-results{display:none;gap:8px;margin:0 0 12px;max-height:min(42vh,280px);overflow:auto}
+.recipient-search-results.is-open{display:grid}
+.recipient-search-results[hidden]{display:none!important}
+.recipient-search-results .recipient-search-hint{margin:0;padding:8px 2px}
 .recipient-search-results button{display:grid;text-align:left;gap:3px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18);padding:11px 13px;color:#fff}
 .recipient-search-results button.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(98,234,255,.22)}
 .recipient-search-results span,.recipient-search-results small{color:var(--muted);font-weight:800}

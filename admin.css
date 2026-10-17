@@ -1066,12 +1066,23 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 .schedule-owner-types label{min-width:9rem}
 .schedule-owner-types input:focus-visible+span{outline:2px solid #5eeaff;outline-offset:2px}
 
+/* FloqR Inbox — rules nested in ? next to compose title */
+.inbox-compose-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+.inbox-compose-heading h2{margin:0;flex:1 1 auto}
+.inbox-compose-heading .help-popout{margin:0}
+.inbox-compose-heading .help-popout .help-popout-body{min-width:min(320px,78vw);max-width:420px}
+.inbox-compose-heading .policy-list{margin:8px 0 0;padding:0}
+.inbox-compose-heading .policy-list ul{margin:0;padding-left:1.1em}
+
 /* Features / Svc Status Mgmt — beta invite layout */
 .beta-invite-find{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:8px}
 .beta-invite-find-label{flex:1 1 220px;margin:0;min-width:0}
 .beta-invite-find-label input{width:100%}
 .beta-invite-find #betaPatronSearchBtn{flex:0 0 auto;min-height:44px;align-self:flex-end}
+.beta-patron-results{margin-top:10px}
+.beta-patron-results:empty{display:none}
 .beta-invite-features{margin-top:12px}
+.beta-invite-features .help-inline{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:6px;border-radius:999px;border:1px solid rgba(255,255,255,.35);font-size:11px;font-weight:900;vertical-align:middle;opacity:.85}
 .beta-invite-actions{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:12px}
 .beta-invite-note-label{flex:1 1 220px;margin:0;min-width:0}
 .beta-invite-note-label input{width:100%}

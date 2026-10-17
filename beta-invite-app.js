@@ -156,7 +156,7 @@
     const portal = byId("betaPortalLink");
     if (portal) portal.href = window.FLOQRNav?.portalHome?.({from: "beta-invite"}) || portal.href;
 
-    window.FLOQRSessionShell?.bind?.({
+    const shell = window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",
       statusEl: "#betaStatus",
@@ -178,5 +178,20 @@
         setStatus(t("beta.signIn", "Sign in with the account this invitation was sent to."));
       }
     });
+
+    // If auth already resolved before bind listeners, still unlock the Agreement UI.
+    shell?.ready?.then?.(user => {
+      if (!user) return;
+      if (byId("betaActions")?.classList.contains("hidden")) {
+        byId("betaLogin")?.classList.add("hidden");
+        showSuccess(false);
+        showActions(true);
+        setStatus(t(
+          "beta.ready",
+          "Signed in. Read the Agreement, accept both checkboxes, then I Agree and join beta."
+        ));
+        syncAcceptEnabled();
+      }
+    }).catch?.(() => {});
   });
 })();

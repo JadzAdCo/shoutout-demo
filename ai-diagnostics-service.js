@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.56";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.57";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1170,7 +1170,7 @@
         {label:"Master Admin tab", file:"master-admin.html", includes:["data-panel=\"featuresServices\"", "master-feature-services.js?v=s3.0.108"]},
         {label:"Callables + audit chain", file:"functions/feature-services-functions.js", includes:["exports.setFeatureServiceFlags", "exports.createBetaInvite", "exports.verifyFeatureServiceAuditChain", "appendChainedAudit"]},
         {label:"Rules server-write-only", file:"firestore.rules", includes:["match /featureServices/", "match /featureServiceAuditLogs/", "\"superAdmin\""]},
-        {label:"Beta invite landing", file:"beta-invite.html", includes:["beta-invite-app.js", "betaCheckAgreement", "betaCheckBooking", "betaSuccess", "data-floqr-auth-chrome"]},
+        {label:"Beta invite landing", file:"beta-invite.html", includes:["beta-invite-app.js", "global-profile-status.js", "betaCheckAgreement", "betaCheckBooking", "betaSuccess", "data-floqr-auth-chrome"]},
         {label:"Ad splash 5s loading", file:"patron-app.js", includes:["const AD_SPLASH_MS = 5000;"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.108\""]}
       ]
@@ -1492,13 +1492,31 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-57-inbox-recipient-autocomplete",
+      area:"My Profile / FloqR Inbox",
+      feature:"Recipient type-to-search (no full directory dump)",
+      changed:"Compose Recipient field is autocomplete-only: results appear after 2+ typed characters; empty query never lists all eligible members. Label Recipient. One Club Admin row. Package s3.1.57.",
+      howToTest:"1) Hard-refresh My Profile → FloqR Inbox compose. 2) Confirm Recipient input is visible; no full list of Ale/Andre/Anna/… under Subject. 3) Type two letters of a name → matching cards appear. 4) Pick one → list closes; Subject/Message remain. 5) Clear/retype to change recipient.",
+      expected:"No full eligible-recipient dump on open; typeahead matches only; selected recipient sticks until edited.",
+      troubleshoot:"Still see full list → hard refresh patron-portal-app.js / styles.css ?v=s3.1.57. Recipient field missing → #composeRecipientSearch must be above Subject. Club Admin duplicated → SHOUTOUT_ADMIN_EMAILS must collapse to one UI row."
+    },
+    {
+      id:"s3-1-57-profile-menu-feature-gate",
+      area:"Search / Profile menu / Features & Services",
+      feature:"Gated profile-menu links stay hidden for every patron",
+      changed:"CSS .user-dropdown … .hidden / [hidden] beats display:block!important; same rule injected via FLOQRFeatureServices.ensureLinkStyles. Search + global profile mint feature links hidden until applyFeatureLinks. Package s3.1.57.",
+      howToTest:"1) Sign in as a patron with no beta grants (e.g. temp_waitress_4 / May Shah). 2) Open Search profile menu → Mingl/BartR/RydR/VIP/floqCast/FloqAi must stay hidden when Off/ungranted. 3) Open My Profile or Club Admin profile card → same fail-closed. 4) Master Admin / granted beta tester still sees allowed links (+ Beta pill when beta).",
+      expected:"Off/ungranted features never appear in any profile menu for any patron.",
+      troubleshoot:"Links still show → hard refresh styles.css + floqr-feature-services.js ?v=s3.1.57. Search-only leak → patron-app.js must mint data-floqr-feature-link hidden then applyFeatureLinks."
+    },
+    {
       id:"s3-1-56-beta-invite-agreement-consent",
       area:"Beta invite / Consent / Inbox",
       feature:"Beta invite Agreement + Booking Disclaimer + join acknowledgement",
-      changed:"beta-invite.html shows scrollable FloqR.app Beta Test & Prerelease Agreement, Booking Transaction Disclaimer callout, two required checkboxes, I Agree and join beta (disabled until both checked). acceptBetaInvite stores consent version/hash on betaTesters + betaInvites. Success card confirms join + recorded consent. Package s3.1.56.",
-      howToTest:"1) As Master Admin invite temp_waitress_1 (or any patron) from Features Mgmt → Beta & Testing. 2) Sign in as that patron → Inbox → open beta invite link. 3) Confirm Agreement scroll + two unchecked boxes; I Agree stays disabled until both checked. 4) Check both → I Agree and join beta → success card says You're a FLOQR beta tester + consent recorded + Open Search. 5) Search shows granted Beta tiles. 6) FloqAi: beta agreement / booking disclaimer.",
-      expected:"No silent join; both checkboxes required; clear success acknowledgement; Features audit shows beta.accepted with agreementVersion.",
-      troubleshoot:"Old page without checkboxes → hard refresh beta-invite.html ?v=s3.1.56. Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Already joined → success card / already-joined status. Wrong account → sign in as invite target."
+      changed:"beta-invite.html shows scrollable FloqR.app Beta Test & Prerelease Agreement, Booking Transaction Disclaimer callout, two required checkboxes, I Agree and join beta (disabled until both checked). acceptBetaInvite stores consent version/hash on betaTesters + betaInvites. Success card confirms join + recorded consent. Profile card via global-profile-status.js. Package s3.1.57.",
+      howToTest:"1) As Master Admin invite temp_waitress_1 (or any patron) from Features Mgmt → Beta & Testing. 2) Sign in as that patron → Inbox → open beta invite link. 3) Confirm top-right profile card appears and status leaves Restoring… . 4) Confirm Agreement scroll + two unchecked boxes; I Agree stays disabled until both checked. 5) Check both → I Agree and join beta → success card. 6) Search shows granted Beta tiles.",
+      expected:"Profile card present; Agreement + dual checks + success acknowledgement; Features audit shows beta.accepted with agreementVersion.",
+      troubleshoot:"Stuck Restoring / no Agreement → hard refresh beta-invite.html ?v=s3.1.57 + global-profile-status.js. Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Wrong account → sign in as invite target."
     },
     {
       id:"s3-1-55-features-mgmt-subtabs",
