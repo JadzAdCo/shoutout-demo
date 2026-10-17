@@ -42,6 +42,72 @@ const CONTROL_SETS = Object.freeze([
   "NIST-800-53r5-AC-6(9)"
 ]);
 
+/** Canonical FloqR.app Beta Test & Prerelease Agreement (plain text for hash / audit). */
+const BETA_AGREEMENT_CANONICAL = [
+  "FLOQR.APP BETA TEST & PRERELEASE AGREEMENT",
+  "",
+  "Last Updated: October 17, 2026",
+  "",
+  "This Beta Test Agreement (the \"Agreement\") is a legally binding contract between you (the \"Beta Tester\" or \"Patron\") and FloqMedia, the owner and operator of FloqR.app (collectively, the \"Company\", \"we\", \"us\", or \"our\").",
+  "",
+  "By clicking \"I Agree,\" checking an acceptance box, or accessing and using the prerelease version of the FloqR.app web application (the \"Beta Product\"), you agree to be bound by the terms of this Agreement. If you do not agree, you are not authorized to participate in the Beta Program.",
+  "",
+  "1. Purpose & \"As-Is\" Nature of Beta Product",
+  "Pre-Release Software: You acknowledge that FloqR.app is currently a startup social operating system built for searching and booking global nightlife events (including clubs, lounges, rooftops, concerts, and DJ events).",
+  "Testing Status: The Beta Product contains features under active development. It has not completed User Acceptance Testing (UAT) and is currently undergoing Quality Assurance (QA) testing.",
+  "Disclaimer of Warranties: Because the software is incomplete, it may contain technical bugs, errors, glitches, or data inaccuracies. The Beta Product is provided strictly on an \"AS IS\" and \"AS AVAILABLE\" basis, without warranties of any kind.",
+  "",
+  "2. Eligibility & Access License",
+  "Age Requirement: Because FloqR.app services the nightlife and entertainment industry, you must be at least 18 years of age (or the legal age of majority in your jurisdiction, e.g., 21 where required by local law) to participate.",
+  "Limited License: The Company grants you a personal, non-exclusive, non-transferable, revocable, and limited license to access and test the Beta Product solely for evaluation purposes.",
+  "",
+  "3. Absolute Confidentiality",
+  "Confidential Information: The Beta Product, its underlying features, design interface (including sub-features like Mingl, RydR, BartR, ShoutOut, floqCast, and FloqAi), performance metrics, screenshots, videos of usage, and any documented bugs are the strictest proprietary secrets of FloqMedia.",
+  "Non-Disclosure: You agree not to disclose, share, publish, tweet, or blog about your experiences or any aspect of the Beta Product to any third party, public forum, or competitor.",
+  "Media & Streaming: You are strictly prohibited from sharing screenshots or live-streaming the Beta Product unless explicitly authorized in writing by FloqMedia.",
+  "",
+  "4. Feedback & Intellectual Property Assignment",
+  "Feedback Obligation: As a condition of your invite, you agree to report system bugs, crashes, or user-experience gaps back to the Company.",
+  "Ownership of Feedback: You agree that all comments, suggestions, ideas, or feedback you provide become the sole and exclusive property of FloqMedia. You assign all rights, titles, and interests in such feedback to the Company without any expectation of compensation or royalties.",
+  "",
+  "5. Data Collection, AI, & Transaction Terms",
+  "Analytics Usage: You agree that FloqMedia may monitor and collect data regarding your activity within the Beta Product. This data will be used in aggregate analytics to optimize venue insights, AI processing via FloqAi, and advertising performance.",
+  "Media Uploads: If you test customized marketing display features (such as \"ShoutOut\" media or promotional cards), you represent that you possess all legal permissions and intellectual property rights for any photos, names, or @handles you upload to the application.",
+  "Prerelease Transactions & Booking Disclaimer: The Beta Product features live integration modules allowing users to reserve tables, join guest lists, and pay for VIP, Event, or Standard venue entries. You acknowledge that because the application is in a QA testing phase, technical glitches may cause transaction failures, double-bookings, incorrect pricing, or communication failures with local venues. FloqMedia is not responsible or liable for any financial discrepancies, canceled bookings, or denied entries at participating nightlife venues.",
+  "Refund Policy: All ticket sales, table reservations, and entry fees processed through the Beta Product are final and non-refundable by FloqMedia. Any disputes regarding venue bookings, entry denial, or payment errors must be resolved directly with the physical venue or the third-party merchant processor (e.g., Stripe, Papi, or Social OS).",
+  "Mock vs. Real Processing: FloqMedia will clearly notify you whether a specific testing phase utilizes \"Test/Sandbox\" payment credentials or real financial transactions. If real payment methods are required, you are fully responsible for the charges incurred.",
+  "",
+  "6. Limitation of Liability",
+  "No Damages: To the maximum extent permitted by applicable law, FloqMedia shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your participation in the Beta Program. This includes, but is not limited to, system crashes, loss of booking data, phone/device damage, or data loss.",
+  "",
+  "7. Termination & Modification",
+  "Program Changes: FloqMedia reserves the right to modify, suspend, or completely terminate the Beta Program, or your specific access to it, at any time with or without prior notice.",
+  "Survival: Your obligations regarding Confidentiality (Section 3) and Intellectual Property (Section 4) will survive the termination of this Agreement or the release of the final Minimum Viable Product (MVP)."
+].join("\n");
+
+const BETA_AGREEMENT = Object.freeze({
+  agreementDocId: "floqr-beta-test-agreement-v1",
+  agreementVersion: "1",
+  agreementSha256: crypto.createHash("sha256").update(BETA_AGREEMENT_CANONICAL).digest("hex"),
+  title: "FloqR.app Beta Test & Prerelease Agreement",
+  lastUpdated: "2026-10-17"
+});
+
+/** Two mandatory checkboxes on beta-invite.html before Accept. */
+const REQUIRED_BETA_CONSENT_CHECKS = Object.freeze(["betaAgreement", "bookingDisclaimer"]);
+
+function betaConsentChecksComplete(checks = {}) {
+  return REQUIRED_BETA_CONSENT_CHECKS.every(key => checks[key] === true);
+}
+
+function expandBetaConsentChecks(checks = {}) {
+  const out = {};
+  REQUIRED_BETA_CONSENT_CHECKS.forEach(key => {
+    out[key] = checks[key] === true;
+  });
+  return out;
+}
+
 function text(value, max = 200) {
   return String(value == null ? "" : value).trim().slice(0, max);
 }
@@ -295,6 +361,11 @@ module.exports = {
   REASON_MIN,
   GENESIS_HASH,
   CONTROL_SETS,
+  BETA_AGREEMENT_CANONICAL,
+  BETA_AGREEMENT,
+  REQUIRED_BETA_CONSENT_CHECKS,
+  betaConsentChecksComplete,
+  expandBetaConsentChecks,
   flag,
   canonicalizeFeatureKey,
   catalogEntry,
