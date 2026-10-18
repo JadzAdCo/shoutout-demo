@@ -33,6 +33,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Layer | Wiring |
 |---|---|
 | Seed | `functions/scripts/seed-temp-demo-pack.js` + callable `seedTempDemoPack` (`functions/demo-seed-functions.js`) |
+| Showcase names | `floqr-temp-qa-showcase.js` — **one** Priya Shah (`temp_waitress_1` / club 1). Waitress 2–4: Imani Cole, Sofia Alvarez, May Tran. Clubs 5–10: Keisha / Aaliyah / Noor / Camille / Elena / Zara (never re-cycle Priya). Seed re-syncs Auth `displayName` after showcase enrich. |
+| Search profile menu | `patron-app.js` prefers Firestore `displayName`/photo over Auth; `syncAuthDisplayNameFromProfile` heals stale `Temp Waitress N`; inbox counts = non-deleted `inboxNotifications` + `messages` by `recipientUid` (same as `global-profile-status.js`) |
 | Rule | `.cursor/rules/temp-demo-accounts.mdc` |
 | Auth / profiles | Firebase Auth + `userProfiles` / `users`; codes in `system/demoAccounts` |
 | Clubs | `clubLocations/temp-democlub-{1..4}` full public profile + structured hours |

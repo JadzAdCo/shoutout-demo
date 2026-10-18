@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.68";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.69";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.69",
+      title: "Priya Search profile + inbox soft-delete counts",
+      checks: [
+        {label:"Auth displayName sync", file:"patron-app.js", includes:["syncAuthDisplayNameFromProfile"]},
+        {label:"Inbox skip deleted", file:"patron-app.js", includes:["if (data.deleted) return;"]},
+        {label:"One Priya showcase", file:"floqr-temp-qa-showcase.js", includes:["One Priya Shah only"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.69\""]}
+      ]
+    },
     {
       version: "s3.1.68",
       title: "Search Beta pill on shoutout-icon-card tiles",
@@ -1595,6 +1605,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-65-priya-profile-inbox-reconcile",
+      area:"Search / Profile menu / Demo accounts",
+      feature:"temp_waitress_1 shows PS + matching inbox counts; only one Priya Shah",
+      changed:"Search profile menu prefers Firestore displayName/photo over stale Auth Temp Waitress 1 (TW→PS) and syncs Auth once. Inbox menu counts exclude soft-deleted rows and match portal (recipientUid). Showcase waitress roster: Priya Shah only on waitress_1; May Tran (was May Shah); clubs 5–10 get unique names. Package s3.1.69.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as temp_waitress_1@floqr-demo.com (package s3.1.69). 2) Open profile menu → name Priya Shah, initials PS (not TW), FloqR Inbox unread/total matches My Profile Overview and Inbox tab (deleted excluded — expect ~0/1 after soft-deletes, not 0/10). 3) Open My Profile → same PS + same inbox fraction. 4) Confirm no second Priya Shah among demo waitresses (waitress_4 is May Tran).",
+      expected:"Search and portal show Priya Shah / PS; inbox counts agree; only one Priya Shah.",
+      troubleshoot:"Still TW → hard refresh patron-app.js cache-bust s3.1.69 (getUserProfile calls updateUserMenu + syncAuthDisplayNameFromProfile); sign out/in once to refresh Auth token. Still 0/10 → menu must skip data.deleted. Duplicate Priya on club 5/9 → re-seed or check floqr-temp-qa-showcase.js waitress roster."
+    },
+    {
       id:"s3-1-68-search-beta-pill",
       area:"Search / Product tiles",
       feature:"Beta pill on FloqAi / floqCast / VIP tiles",
@@ -1625,7 +1644,7 @@
       id:"s3-1-65-search-icon-tiles-standard",
       area:"Search / Product tiles",
       feature:"Standardized ShoutOut / floqCast / VIP / FloqAi icon tiles",
-      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.65.",
+      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.69.",
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with FloqAi/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) FloqAi / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; FloqAi → floqai.html.",
       expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
       troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."

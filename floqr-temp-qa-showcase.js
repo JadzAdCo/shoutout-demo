@@ -35,7 +35,7 @@
     promo: "promo-collective-logo.png",
     dj: n => ["dj-jordan.png", "dj-maya.png", "dj-rico.png"][(n - 1) % 3],
     djBooth: n => ["dj-jordan-booth.png", "dj-maya-booth.png", "dj-rico-booth.png"][(n - 1) % 3],
-    /* Waitress 4 (May Shah) reuses Sofia stills until a dedicated May pack ships. */
+    /* Waitress photos cycle 4 stills; names are unique per club index (Priya only on n=1). */
     waitress: n => ["staff-priya.png", "staff-imani.png", "staff-sofia.png", "staff-sofia.png"][(n - 1) % 4],
     waitressFloor: n => ["staff-priya-floor.png", "staff-imani-floor.png", "staff-sofia-floor.png", "staff-sofia-floor.png"][(n - 1) % 4],
     waitressVip: n => ["staff-priya-vip.png", "staff-imani-vip.png", "staff-sofia-vip.png", "staff-sofia-vip.png"][(n - 1) % 4],
@@ -62,12 +62,19 @@
       music: ["House", "Hip Hop", "Afrobeats"],
       lookingToMeet: "Promoters who actually pack rooms."
     }),
+    /* One Priya Shah only (temp_waitress_1 / club 1). Clubs 5–10 get distinct names — never re-cycle Priya. */
     waitress: n => ([
       {first: "Priya", last: "Shah", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Fast floor, warm table, never miss a hail.", music: ["R&B", "Open Format"], lookingToMeet: "Regulars who tip and DJs who keep the energy up."},
       {first: "Imani", last: "Cole", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Black-girl magic on the floor — tray up, eyes on the hail.", music: ["Afrobeats", "R&B"], lookingToMeet: "Tables that celebrate and hosts who share the section."},
       {first: "Sofia", last: "Alvarez", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Spanish-first greetings, champagne before the second song.", music: ["Latin", "Open Format"], lookingToMeet: "VIP hosts who call the bottle early."},
-      {first: "May", last: "Shah", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Calm section lead — water, smile, and the next round before you ask.", music: ["Open Format", "R&B"], lookingToMeet: "Hosts who share the floor and guests who stay for the encore."}
-    ][(n - 1) % 4]),
+      {first: "May", last: "Tran", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Calm section lead — water, smile, and the next round before you ask.", music: ["Open Format", "R&B"], lookingToMeet: "Hosts who share the floor and guests who stay for the encore."},
+      {first: "Keisha", last: "Brooks", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Rooftop pace — trays up, Latin nights locked in.", music: ["Latin", "Open Format"], lookingToMeet: "Hosts who share the section on merengue nights."},
+      {first: "Aaliyah", last: "Reed", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Disco-luxe floor — every angle catches the toast.", music: ["Disco", "House"], lookingToMeet: "Regulars who tip and DJs who stretch the encore."},
+      {first: "Noor", last: "Hassan", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Afterhours calm — water before the second encore.", music: ["House", "International"], lookingToMeet: "VIP hosts who call bottle service early."},
+      {first: "Camille", last: "Dubois", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Match-lit lounge energy — smile, hail, next round.", music: ["Hip Hop", "Open Format"], lookingToMeet: "Tables that celebrate and stay for last call."},
+      {first: "Elena", last: "Vargas", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Listening-room soft touch — never miss a quiet hail.", music: ["R&B", "Soul"], lookingToMeet: "Hosts who protect the listening floor."},
+      {first: "Zara", last: "Okoye", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "International late lounge — tray up, eyes on the room.", music: ["Afro House", "International"], lookingToMeet: "Promoters who book the right nights."}
+    ][(Math.max(1, Math.min(10, Number(n) || 1)) - 1)]),
     waiter: n => ([
       {first: "Luis", last: "Ortega", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "VIP tables, water before the third round.", music: ["Latin", "House"], lookingToMeet: "Bottle teams who move as one."},
       {first: "Malik", last: "Brooks", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "Quiet luxury service — glasses full, never hovering.", music: ["Hip Hop", "R&B"], lookingToMeet: "Busboys who time the LED walk with the toast."},

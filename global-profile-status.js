@@ -1,5 +1,6 @@
-/* global-profile-status.js s3.1.30 — translated profile pill; admin hubs open patron apps in a new tab;
-   feature links follow Features & Services (FLOQRFeatureServices.linkState). */
+/* global-profile-status.js s3.1.65 — translated profile pill; admin hubs open patron apps in a new tab;
+   feature links follow Features & Services (FLOQRFeatureServices.linkState).
+   Inbox counts = non-deleted inboxNotifications + messages by recipientUid (match Search menu). */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
@@ -83,16 +84,22 @@
     const out = {messages:"0/0", chats:"0/0"};
     if (!db || !uid) return out;
     try {
-      // Match portal inbox: count inboxNotifications that are not soft-deleted.
-      const messages = await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(80).get();
+      // Match Search + portal inbox: recipientUid rows that are not soft-deleted (dedupe by id).
+      const seen = new Set();
       let unread = 0;
       let total = 0;
-      messages.forEach(doc => {
-        const data = doc.data() || {};
-        if (data.deleted) return;
-        total += 1;
-        if (!data.read) unread += 1;
-      });
+      const tally = (snap) => {
+        snap.forEach(doc => {
+          if (!doc?.id || seen.has(doc.id)) return;
+          const data = doc.data() || {};
+          if (data.deleted) return;
+          seen.add(doc.id);
+          total += 1;
+          if (!data.read) unread += 1;
+        });
+      };
+      tally(await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(80).get());
+      try { tally(await db.collection("messages").where("recipientUid","==",uid).limit(80).get()); } catch (_) {}
       out.messages = `${unread}/${total}`;
     } catch(e) {}
     try {

@@ -418,6 +418,12 @@ async function runSeed() {
     const enrich = showcasePatch(account.role, account.index, account.uid) || {};
     const display = enrich.displayName || account.displayName;
     account.displayName = display;
+    // Re-sync Auth after showcase enrich so Temp Waitress N never sticks when profile is Priya Shah.
+    try {
+      await admin.auth().updateUser(account.uid, { displayName: display, emailVerified: true });
+    } catch (authErr) {
+      console.warn("Auth displayName re-sync skipped", account.email, authErr?.message || authErr);
+    }
     const profile = {
       uid: account.uid,
       email: account.email,
