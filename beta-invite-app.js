@@ -246,10 +246,8 @@
     showLogin(false);
     showSuccess(false);
     showActions(true);
-    setStatus(t(
-      "beta.ready",
-      "Signed in. Read the Agreement, accept both checkboxes, then I Agree and join beta."
-    ));
+    /* Keep the page clean — no “Signed in…” status line when the Agreement card is visible. */
+    setStatus("");
     byId("betaActions")?.scrollIntoView?.({behavior: "smooth", block: "nearest"});
     syncAcceptEnabled();
   }

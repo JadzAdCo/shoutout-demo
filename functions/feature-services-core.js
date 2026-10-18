@@ -42,23 +42,23 @@ const CONTROL_SETS = Object.freeze([
   "NIST-800-53r5-AC-6(9)"
 ]);
 
-/** Canonical FloqR.app Beta Test & Prerelease Agreement (plain text for hash / audit). */
+/** Canonical FloqR Beta Test & Prerelease Agreement (plain text for hash / audit). */
 const BETA_AGREEMENT_CANONICAL = [
-  "FLOQR.APP BETA TEST & PRERELEASE AGREEMENT",
+  "FLOQR BETA TEST & PRERELEASE AGREEMENT",
   "",
-  "Last Updated: October 17, 2026",
+  "Last Updated: October 18, 2026",
   "",
-  "This Beta Test Agreement (the \"Agreement\") is a legally binding contract between you (the \"Beta Tester\" or \"Patron\") and FloqMedia, the owner and operator of FloqR.app (collectively, the \"Company\", \"we\", \"us\", or \"our\").",
+  "This Beta Test Agreement (the \"Agreement\") is a legally binding contract between you (the \"Beta Tester\" or \"Patron\") and FloqMedia, the owner and operator of FloqR (collectively, the \"Company\", \"we\", \"us\", or \"our\").",
   "",
-  "By clicking \"I Agree,\" checking an acceptance box, or accessing and using the prerelease version of the FloqR.app web application (the \"Beta Product\"), you agree to be bound by the terms of this Agreement. If you do not agree, you are not authorized to participate in the Beta Program.",
+  "By clicking \"I Agree,\" checking an acceptance box, or accessing and using the prerelease version of the FloqR web application (the \"Beta Product\"), you agree to be bound by the terms of this Agreement. If you do not agree, you are not authorized to participate in the Beta Program.",
   "",
   "1. Purpose & \"As-Is\" Nature of Beta Product",
-  "Pre-Release Software: You acknowledge that FloqR.app is currently a startup social operating system built for searching and booking global nightlife events (including clubs, lounges, rooftops, concerts, and DJ events).",
+  "Pre-Release Software: You acknowledge that FloqR is currently a startup social operating system built for searching and booking global nightlife events (including clubs, lounges, rooftops, concerts, and DJ events).",
   "Testing Status: The Beta Product contains features under active development. It has not completed User Acceptance Testing (UAT) and is currently undergoing Quality Assurance (QA) testing.",
   "Disclaimer of Warranties: Because the software is incomplete, it may contain technical bugs, errors, glitches, or data inaccuracies. The Beta Product is provided strictly on an \"AS IS\" and \"AS AVAILABLE\" basis, without warranties of any kind.",
   "",
   "2. Eligibility & Access License",
-  "Age Requirement: Because FloqR.app services the nightlife and entertainment industry, you must be at least 18 years of age (or the legal age of majority in your jurisdiction, e.g., 21 where required by local law) to participate.",
+  "Age Requirement: Because FloqR serves the nightlife and entertainment industry, you must be at least 18 years of age (or the legal age of majority in your jurisdiction, e.g., 21 where required by local law) to participate.",
   "Limited License: The Company grants you a personal, non-exclusive, non-transferable, revocable, and limited license to access and test the Beta Product solely for evaluation purposes.",
   "",
   "3. Absolute Confidentiality",
@@ -74,7 +74,7 @@ const BETA_AGREEMENT_CANONICAL = [
   "Analytics Usage: You agree that FloqMedia may monitor and collect data regarding your activity within the Beta Product. This data will be used in aggregate analytics to optimize venue insights, AI processing via FloqAi, and advertising performance.",
   "Media Uploads: If you test customized marketing display features (such as \"ShoutOut\" media or promotional cards), you represent that you possess all legal permissions and intellectual property rights for any photos, names, or @handles you upload to the application.",
   "Prerelease Transactions & Booking Disclaimer: The Beta Product features live integration modules allowing users to reserve tables, join guest lists, and pay for VIP, Event, or Standard venue entries. You acknowledge that because the application is in a QA testing phase, technical glitches may cause transaction failures, double-bookings, incorrect pricing, or communication failures with local venues. FloqMedia is not responsible or liable for any financial discrepancies, canceled bookings, or denied entries at participating nightlife venues.",
-  "Refund Policy: All ticket sales, table reservations, and entry fees processed through the Beta Product are final and non-refundable by FloqMedia. Any disputes regarding venue bookings, entry denial, or payment errors must be resolved directly with the physical venue or the third-party merchant processor (e.g., Stripe, Papi, or Social OS).",
+  "Refund Policy: As a beta tester, you accept that reversing payments is difficult during a beta testing phase. Ticket sales, table reservations, VIP entry, and other payments performed on beta features are final and non-refundable by FloqMedia. Any disputes regarding venue bookings, entry denial, or payment errors must be resolved directly with the physical venue or the third-party merchant processor (e.g., Stripe, Papi, or Social OS).",
   "Mock vs. Real Processing: FloqMedia will clearly notify you whether a specific testing phase utilizes \"Test/Sandbox\" payment credentials or real financial transactions. If real payment methods are required, you are fully responsible for the charges incurred.",
   "",
   "6. Limitation of Liability",
@@ -87,10 +87,10 @@ const BETA_AGREEMENT_CANONICAL = [
 
 const BETA_AGREEMENT = Object.freeze({
   agreementDocId: "floqr-beta-test-agreement-v1",
-  agreementVersion: "1",
+  agreementVersion: "2",
   agreementSha256: crypto.createHash("sha256").update(BETA_AGREEMENT_CANONICAL).digest("hex"),
-  title: "FloqR.app Beta Test & Prerelease Agreement",
-  lastUpdated: "2026-10-17"
+  title: "FloqR Beta Test & Prerelease Agreement",
+  lastUpdated: "2026-10-18"
 });
 
 /** Two mandatory checkboxes on beta-invite.html before Accept. */

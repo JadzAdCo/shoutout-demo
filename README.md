@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.69 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.70 (stable)
+
+- s3.1.70: Beta invite clean UI (no green eyebrow/Signed-in; FloqR branding; booking disclaimer in ?; agreement v2 reverse-payments). VIP hero ? beside intro; no green Signed-in status.
 
 - s3.1.69: Ship Priya Shah Search profile/inbox reconcile (TW→PS, soft-delete inbox counts) onto live Pages.
 

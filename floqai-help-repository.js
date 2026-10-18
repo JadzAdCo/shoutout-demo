@@ -1120,15 +1120,32 @@
     {
       id: "help-beta-tester",
       title: "Beta testing",
-      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox (and may be emailed). Open the link — if email opened a private browser without your FLOQR login, tap Sign in to accept this invite; after OTP/Google you return with the invite token. Read the FloqR.app Beta Test Agreement (QA / not yet UAT, AS IS), accept both required checkboxes (Beta Test Agreement and Booking Transaction Disclaimer), then tap I Agree and join beta. You see a clear confirmation that you joined and that consent was recorded. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
+      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox (and may be emailed). Open the link — if email opened a private browser without your FLOQR login, tap Sign in to accept this invite; after OTP/Google you return with the invite token. Tap ? next to the title for what beta means. Read the FloqR Beta Test Agreement (QA / not yet UAT, AS IS), accept both required checkboxes (Beta Test Agreement and Booking Transaction Disclaimer — details under the Booking ?), then tap I Agree and join beta. You see a clear confirmation that you joined and that consent was recorded. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
       searchPhrases: [
         "beta", "beta tester", "beta testing", "become a beta tester", "test new features", "early access",
         "beta invite", "beta invitation", "try new features", "beta label", "why can't i see mingl", "feature not available",
         "beta agreement", "booking disclaimer", "I Agree and join beta", "beta terms",
-        "sign in to accept this invite", "restoring your floqr session", "beta invite email"
+        "sign in to accept this invite", "restoring your floqr session", "beta invite email",
+        "FLOQR invited you", "try new features before everyone else"
       ],
       links: [
         {label: "My Profile Inbox", href: pageUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})},
+        {label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "beta-invite.html"
+    },
+    {
+      id: "help-beta-booking-disclaimer",
+      title: "Booking Transaction Disclaimer",
+      body: "As a FloqR beta tester, you accept that reversing payments is difficult during beta. Ticket sales, table reservations, VIP entry, and other payments on beta features are final and non-refundable by FloqMedia. You participate at your own risk. Disputes about venue entry or payment must be resolved with the venue or the payment processor (e.g., Stripe, Papi, or Social OS).",
+      searchPhrases: [
+        "booking disclaimer", "booking transaction disclaimer", "beta refund", "non-refundable",
+        "reverse payments", "beta payments", "ticket sales beta", "VIP entry beta", "hard to reverse"
+      ],
+      links: [
+        {label: "Beta invite", href: pageUrl("./beta-invite.html", {from: "floqai"})},
         {label: "Search", href: pageUrl("./", {start: "search", from: "floqai"})}
       ],
       audiences: ["patron"],

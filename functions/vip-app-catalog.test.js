@@ -23,8 +23,21 @@ test("VIP showApp clears Restoring status before awaiting venue catalog", () => 
   const show = vipApp.match(/async function showApp\(user\) \{[\s\S]*?\n  \}/);
   assert.ok(show, "showApp present");
   const body = show[0];
-  const signedInAt = body.indexOf('page.vip.signedIn');
+  const clearAt = body.indexOf('setStatus("")');
   const awaitAt = body.indexOf("await loadSubscribedVenues");
-  assert.ok(signedInAt > 0 && awaitAt > signedInAt, "signed-in status must precede loadSubscribedVenues");
+  assert.ok(clearAt > 0 && awaitAt > clearAt, "status clear must precede loadSubscribedVenues");
+  assert.doesNotMatch(body, /page\.vip\.signedIn/);
   assert.match(body, /appEl\.classList\.remove\("hidden"\)/);
+});
+
+test("VIP hero puts help ? beside intro subcopy — no green Signed-in chrome", () => {
+  const html = fs.readFileSync(path.join(root, "vip.html"), "utf8");
+  assert.match(html, /vip-sub-row/);
+  assert.match(html, /data-i18n="page\.vip\.sub"/);
+  assert.match(html, /help-vip-book-table/);
+  assert.doesNotMatch(html, /data-i18n="page\.vip\.restoring"/);
+  assert.doesNotMatch(html, /data-i18n="page\.vip\.signedIn"/);
+  const css = fs.readFileSync(path.join(root, "vip.css"), "utf8");
+  assert.match(css, /\.vip-sub-row/);
+  assert.match(css, /\.vip-page \.status:empty/);
 });

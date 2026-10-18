@@ -162,11 +162,13 @@ test("invite tokens are unguessable, hashed at rest, and bound to one account", 
 
 test("beta invite accept requires Agreement + Booking Disclaimer consent", () => {
   assert.equal(core.BETA_AGREEMENT.agreementDocId, "floqr-beta-test-agreement-v1");
-  assert.equal(core.BETA_AGREEMENT.agreementVersion, "1");
+  assert.equal(core.BETA_AGREEMENT.agreementVersion, "2");
   assert.match(core.BETA_AGREEMENT.agreementSha256, /^[0-9a-f]{64}$/);
   assert.match(core.BETA_AGREEMENT_CANONICAL, /BETA TEST & PRERELEASE AGREEMENT/);
   assert.match(core.BETA_AGREEMENT_CANONICAL, /has not completed User Acceptance Testing/);
   assert.match(core.BETA_AGREEMENT_CANONICAL, /final and non-refundable/);
+  assert.match(core.BETA_AGREEMENT_CANONICAL, /reversing payments is difficult/);
+  assert.doesNotMatch(core.BETA_AGREEMENT_CANONICAL, /FloqR\.app/);
   assert.deepEqual([...core.REQUIRED_BETA_CONSENT_CHECKS], ["betaAgreement", "bookingDisclaimer"]);
   assert.equal(core.betaConsentChecksComplete({}), false);
   assert.equal(core.betaConsentChecksComplete({betaAgreement: true}), false);
@@ -180,7 +182,12 @@ test("beta invite accept requires Agreement + Booking Disclaimer consent", () =>
   assert.match(html, /id="betaCheckBooking"/);
   assert.match(html, /id="betaSuccess"/);
   assert.match(html, /id="betaSignInLink"/);
-  assert.match(html, /FloqR\.app Beta Test/);
+  assert.match(html, /FloqR Beta Test/);
+  assert.doesNotMatch(html, /FloqR\.app/);
+  assert.doesNotMatch(html, />FLOQR Beta</);
+  assert.match(html, /help-beta-booking-disclaimer/);
+  assert.match(html, /data-i18n="beta\.body"/);
+  assert.doesNotMatch(html, /<p class="sub" data-i18n="beta\.body">/);
   assert.match(html, /Booking Transaction Disclaimer/);
   const app = read("beta-invite-app.js");
   assert.match(app, /checks:\s*consentChecks\(\)/);
@@ -191,6 +198,7 @@ test("beta invite accept requires Agreement + Booking Disclaimer consent", () =>
   assert.match(app, /loginHref/);
   assert.match(app, /autoRedirect:\s*false/);
   assert.match(app, /paintSignedOut|sessionHandoff/);
+  assert.match(app, /setStatus\(""\)/);
   const fns = read("functions/feature-services-functions.js");
   assert.match(fns, /betaConsentChecksComplete/);
   assert.match(fns, /agreementSha256/);

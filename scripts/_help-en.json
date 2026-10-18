@@ -179,6 +179,10 @@
     "title": "Beta testing",
     "body": "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to."
   },
+  "help-beta-booking-disclaimer": {
+    "title": "Booking Transaction Disclaimer",
+    "body": "As a FloqR beta tester, you accept that reversing payments is difficult during beta. Ticket sales, table reservations, VIP entry, and other payments on beta features are final and non-refundable by FloqMedia. You participate at your own risk. Disputes about venue entry or payment must be resolved with the venue or the payment processor (e.g., Stripe, Papi, or Social OS)."
+  },
   "help-football-intro": {
     "title": "Football Intro",
     "body": "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only."

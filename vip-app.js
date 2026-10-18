@@ -503,8 +503,8 @@
     if (gateEl) gateEl.classList.add("hidden");
     if (appEl) appEl.classList.remove("hidden");
     if (confirmEl) confirmEl.classList.add("hidden");
-    /* Leave "Restoring…" immediately — venue load must not block the shell status. */
-    setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+    /* Leave "Restoring…" immediately — keep chrome clean (no green Signed-in line). */
+    setStatus("");
     const params = new URLSearchParams(location.search);
     fillNights(params.get("night") || "");
     try {
@@ -530,7 +530,7 @@
         }
       } catch (_) { /* ignore */ }
     } else {
-      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+      setStatus("");
     }
 
     const loc = params.get("location");
@@ -558,7 +558,7 @@
         history.replaceState({}, "", u.pathname + u.search + u.hash);
       } catch (_) { /* ignore */ }
       showSearchMode();
-      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+      setStatus("");
     });
     nightEl?.addEventListener("change", () => {
       clearHoldUi();
@@ -568,7 +568,7 @@
     document.getElementById("vipConfirmAgain")?.addEventListener("click", () => {
       hideConfirmation();
       showSearchMode();
-      setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
+      setStatus("");
     });
 
     const auth = firebase.auth();

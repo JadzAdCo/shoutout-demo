@@ -14,11 +14,29 @@ body.vip-page {
 .vip-shell { max-width: 1100px; }
 
 .vip-product-page .vip-hero {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: block;
 }
+
+.vip-hero-copy { max-width: 42rem; }
+
+.vip-sub-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vip-sub-row > .sub {
+  flex: 1 1 12rem;
+  margin: 0;
+}
+
+.vip-sub-row > .help-popout {
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+}
+
+.vip-page .status:empty { display: none; }
 
 .vip-product-page .product-brand-stack { margin-bottom: 4px; }
 

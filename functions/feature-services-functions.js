@@ -404,7 +404,7 @@ async function respondToInvite(request, accept) {
   if (accept && !core.betaConsentChecksComplete(checks)) {
     throw new HttpsError(
       "invalid-argument",
-      "Accept the FloqR.app Beta Test Agreement and Booking Transaction Disclaimer to join."
+      "Accept the FloqR Beta Test Agreement and Booking Transaction Disclaimer to join."
     );
   }
   const consent = accept

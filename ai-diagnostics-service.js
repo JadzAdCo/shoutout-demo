@@ -191,6 +191,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.70",
+      title: "Beta invite clean UI + VIP hero ? / no Signed-in green",
+      checks: [
+        {label:"Beta booking ? + no FLOQR Beta eyebrow", file:"beta-invite.html", includes:["help-beta-booking-disclaimer", "help-beta-tester", "FloqR Beta Test"], notIncludes:["FloqR.app", ">FLOQR Beta<"]},
+        {label:"Agreement v2 reverse payments", file:"functions/feature-services-core.js", includes:["agreementVersion: \"2\"", "reversing payments is difficult"], notIncludes:["FloqR.app"]},
+        {label:"VIP ? beside intro", file:"vip.html", includes:["vip-sub-row", "help-vip-book-table"], notIncludes:["page.vip.signedIn"]},
+        {label:"VIP clear signed-in status", file:"vip-app.js", includes:["setStatus(\"\")"], notIncludes:["page.vip.signedIn"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.70\""]}
+      ]
+    },
+    {
       version: "s3.1.69",
       title: "Priya Search profile + inbox soft-delete counts",
       checks: [
@@ -1632,13 +1643,31 @@
       troubleshoot:"Still side-by-side tiny marks → styles.css must use flex-direction:column and width:80% on tile marks; hard refresh styles.css cache-bust s3.1.67."
     },
     {
+      id:"s3-1-70-beta-invite-clean-ui",
+      area:"Beta invite / Consent",
+      feature:"Clean beta invite — ? help, FloqR branding, reverse-payments disclaimer",
+      changed:"Removed green FLOQR Beta eyebrow and Signed-in status. Invite intro lives in title ?. Booking Transaction Disclaimer body lives in ? next to that section. FloqR.app → FloqR. Agreement v2: reversing payments is difficult / beta payments non-refundable. Package s3.1.70.",
+      howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html?v=s3.1.70). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
+      expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
+      troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-70-vip-hero-help-no-signed-in",
+      area:"VIP reserV / Chrome",
+      feature:"VIP ? beside intro; no green Signed-in status",
+      changed:"vip.html moves help-vip-book-table ? into vip-sub-row next to page.vip.sub. showApp clears status (no page.vip.signedIn green line). Empty #vipStatus hidden via CSS. Package s3.1.70.",
+      howToTest:"1) Sign in as VIP beta tester. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html. 3) Confirm white intro line has ? beside it. 4) Confirm no green Signed in — search… line under the hero. 5) Venue search still appears.",
+      expected:"? inline with intro; no green Signed-in chrome; venue grid loads.",
+      troubleshoot:"? still alone under hero → vip.html must use vip-sub-row. Green line remains → vip-app.js must setStatus(\"\") not page.vip.signedIn."
+    },
+    {
       id:"s3-1-66-vip-restoring-catalog",
       area:"VIP reserV / Session",
       feature:"VIP page leaves Restoring and loads venue catalog",
-      changed:"vip-app.js no longer scans every SHOUTOUT_CLUB_LOCATIONS id (~590 Firestore gets) before clearing Restoring. vipCandidateIds limits to beta/static VIP clubs; showApp unhides the app and sets signed-in status first. Package s3.1.66.",
-      howToTest:"1) Sign in as a VIP beta tester on Search. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html (package s3.1.66). 3) Status must leave Restoring within a few seconds and show the venue search (Decades / Lima / Aurelia). 4) Confirm Search tiles still use in-face wordmarks (s3.1.65+).",
-      expected:"No stuck Restoring…; VIP venue grid appears while signed in (profile pill visible).",
-      troubleshoot:"Still Restoring → confirm vip-app.js cache-bust s3.1.66 has vipCandidateIds (not Object.keys(map) for all clubs). Feature gate deny → Master Admin grant vipReservations. Callable fail → fallback PLAN_BY_ID still shows three beta clubs."
+      changed:"vip-app.js no longer scans every SHOUTOUT_CLUB_LOCATIONS id (~590 Firestore gets) before clearing Restoring. vipCandidateIds limits to beta/static VIP clubs; showApp unhides the app and clears status first (s3.1.70: no green Signed-in line). Package s3.1.66+.",
+      howToTest:"1) Sign in as a VIP beta tester on Search. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html. 3) Status must leave Restoring within a few seconds and show the venue search (Decades / Lima / Aurelia) without a green Signed-in line. 4) Confirm Search tiles still use in-face wordmarks (s3.1.65+).",
+      expected:"No stuck Restoring…; VIP venue grid appears while signed in (profile pill visible); no green Signed-in status.",
+      troubleshoot:"Still Restoring → confirm vip-app.js has vipCandidateIds (not Object.keys(map) for all clubs). Feature gate deny → Master Admin grant vipReservations. Callable fail → fallback PLAN_BY_ID still shows three beta clubs."
     },
     {
       id:"s3-1-65-search-icon-tiles-standard",
