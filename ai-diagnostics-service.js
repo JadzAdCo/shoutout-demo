@@ -1582,9 +1582,9 @@
       area:"VIP reserV / Session",
       feature:"VIP page leaves Restoring and loads venue catalog",
       changed:"vip-app.js no longer scans every SHOUTOUT_CLUB_LOCATIONS id (~590 Firestore gets) before clearing Restoring. vipCandidateIds limits to beta/static VIP clubs; showApp unhides the app and sets signed-in status first. Package s3.1.66.",
-      howToTest:"1) Sign in as a VIP beta tester on Search. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?v=s3.1.66. 3) Status must leave Restoring within a few seconds and show the venue search (Decades / Lima / Aurelia). 4) Confirm Search tiles still use in-face wordmarks (s3.1.65+).",
+      howToTest:"1) Sign in as a VIP beta tester on Search. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html (package s3.1.66). 3) Status must leave Restoring within a few seconds and show the venue search (Decades / Lima / Aurelia). 4) Confirm Search tiles still use in-face wordmarks (s3.1.65+).",
       expected:"No stuck Restoring…; VIP venue grid appears while signed in (profile pill visible).",
-      troubleshoot:"Still Restoring → confirm vip-app.js?v=s3.1.66 has vipCandidateIds (not Object.keys(map) for all clubs). Feature gate deny → Master Admin grant vipReservations. Callable fail → fallback PLAN_BY_ID still shows three beta clubs."
+      troubleshoot:"Still Restoring → confirm vip-app.js cache-bust s3.1.66 has vipCandidateIds (not Object.keys(map) for all clubs). Feature gate deny → Master Admin grant vipReservations. Callable fail → fallback PLAN_BY_ID still shows three beta clubs."
     },
     {
       id:"s3-1-65-search-icon-tiles-standard",
