@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.59";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.60";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,14 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.60",
+      title: "Inbox Read badge nowrap",
+      checks: [
+        {label:"Read badge nowrap CSS", file:"styles.css", includes:["message-envelope-head span","white-space:nowrap","flex-shrink:0"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.60\""]}
+      ]
+    },
     {
       version: "s3.1.59",
       title: "Inbox paints before template/BartR chrome",
@@ -1512,13 +1520,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-59-inbox-not-stuck-loading",
+      area:"My Profile / FloqR Inbox",
+      feature:"Inbox no longer stuck on Loading while menu shows 5/10",
+      changed:"loadAndRenderInbox runs immediately after profile bootstrap — before template studio / BartR / AI prefs. Uses recipientUid fast path + 12s timeout. Package s3.1.59.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Within ~3s the list count must leave (0/0) and match profile-menu FloqR Inbox (e.g. 5/10). 3) Message envelopes appear (not stuck on Loading your FloqR Inbox…). 4) FAB still opens compose.",
+      expected:"Inbox list paints quickly; count matches menu; never stuck Loading forever.",
+      troubleshoot:"Still Loading → hard refresh ?v=s3.1.59; confirm patron-portal-app.js contains loadAndRenderInbox. Menu 5/10 but list empty after load → check deleted filter / recipientUid rules."
+    },
+    {
       id:"s3-1-58-inbox-fab-inbox-first",
       area:"My Profile / FloqR Inbox",
       feature:"Floating New Message FAB + inbox-first load",
-      changed:"Send FloqR Inbox Message compose is hidden until FAB. Inbox list loads before shoutout history so messages appear in seconds (not minutes). Package s3.1.58.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
+      changed:"Send FloqR Inbox Message compose is hidden until FAB. Inbox list loads before shoutout history so messages appear in seconds (not minutes). Package s3.1.58 (further fixed in s3.1.59).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
       expected:"Inbox rows visible quickly; FAB opens compose; close hides compose; menu count matches list.",
-      troubleshoot:"Empty inbox while menu shows N/M → hard refresh patron-portal-app.js ?v=s3.1.58 (inbox-first). FAB missing → #inboxNewMessageFab + styles.css inbox-new-message-fab. Compose always open → portalCompose must start hidden."
+      troubleshoot:"Empty inbox while menu shows N/M → hard refresh patron-portal-app.js ?v=s3.1.59 (loadAndRenderInbox). FAB missing → #inboxNewMessageFab + styles.css inbox-new-message-fab. Compose always open → portalCompose must start hidden."
     },
     {
       id:"s3-1-58-inbox-recipient-search",

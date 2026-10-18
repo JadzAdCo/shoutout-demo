@@ -260,7 +260,9 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 .role-template-card h3{margin:4px 0 8px}.role-template-card ul,.policy-list ul{margin:10px 0 0;padding-left:20px;color:var(--muted);line-height:1.45}.role-template-card li,.policy-list li{margin:6px 0}
 .message-envelope{cursor:pointer}.message-envelope.unread{border-color:var(--accent);box-shadow:0 0 0 1px rgba(98,234,255,.28)}.message-envelope.read{opacity:.82}
 .highlight-item{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(98,234,255,.22)}
-.message-envelope-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.message-envelope-head span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--lime);font-weight:1000}
+.message-envelope-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.message-envelope-head strong{min-width:0;overflow-wrap:anywhere}
+.message-envelope-head span{flex-shrink:0;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;line-height:1.2;color:var(--lime);font-weight:1000}
 .message-body{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;white-space:pre-wrap;color:#fff}
 .inbox-recipient-field{display:block;margin:14px 0 6px}
 .inbox-compose-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}

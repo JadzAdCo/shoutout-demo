@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.59 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.60 (stable)
+
+- s3.1.60: FloqR Inbox Read/Unread badge nowrap (no Rea/d wrap on mobile).
 
 - s3.1.59: FloqR Inbox paints before template/BartR chrome (fixes stuck Loading vs menu 5/10).
 
