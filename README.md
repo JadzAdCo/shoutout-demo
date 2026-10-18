@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.67 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.68 (stable)
+
+- s3.1.68: Restore Beta pill on Search shoutout-icon-card tiles (FloqAi / floqCast / VIP) — CSS had only covered category-card.
 
 - s3.1.67: Search FloqAi/floqCast/VIP tiles — marks ~80% of black face, wordmarks stacked at bottom inside the button (ShoutOut visual weight).
 

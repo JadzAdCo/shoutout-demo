@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.67";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.68";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,14 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.68",
+      title: "Search Beta pill on shoutout-icon-card tiles",
+      checks: [
+        {label:"Beta pill CSS for shoutout tiles", file:"styles.css", includes:[".shoutout-icon-card.feature-beta::after", "data-beta-label"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.68\""]}
+      ]
+    },
     {
       version: "s3.1.67",
       title: "Search tile marks 80% + bottom wordmarks",
@@ -1586,6 +1594,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-68-search-beta-pill",
+      area:"Search / Product tiles",
+      feature:"Beta pill on FloqAi / floqCast / VIP tiles",
+      changed:"styles.css Beta ::after covers .shoutout-icon-card.feature-beta (not only .category-card). Package s3.1.68.",
+      howToTest:"1) As a beta tester with FloqAi/floqCast/VIP grants, hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.68). 2) Yellow Beta pills sit on the top-right of those three tiles.",
+      expected:"Beta pill visible on each test-feature Search tile that uses shoutout-icon-card.",
+      troubleshoot:"No pill → styles.css must include .shoutout-icon-card.feature-beta::after; feature services must set feature-beta + data-beta-label. Hard refresh styles.css."
+    },
     {
       id:"s3-1-67-search-tile-icon-scale",
       area:"Search / Product tiles",

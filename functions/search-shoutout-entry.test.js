@@ -30,6 +30,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.floqai-icon-face \.floqai-tile-mark,\.floqcast-icon-face \.floqcast-tile-mark,\.vip-icon-face \.vip-tile-mark\{[^}]*width:80%/);
   assert.match(css, /\.vip-icon-word\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
+  assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
 });
 
 test("Throw a ShoutOut skips the ShoutOut landing page", () => {
