@@ -131,17 +131,22 @@
       let available = 0;
       let held = 0;
       let booked = 0;
+      // Full map for every section — setStates replaces (does not merge). Omitting
+      // "available" left demo/baked map status fighting the list (B3 Booked vs Available).
       sections.forEach(s => {
-        const reserved = Number(s.isReserved) === 1 || s.status === "booked";
+        const id = s.sectionId;
+        if (!id) return;
+        const reserved = Number(s.isReserved) === 1 || s.status === "booked" || s.status === "confirmed";
         if (reserved) {
-          states[s.sectionId] = "booked";
+          states[id] = "booked";
           booked += 1;
         } else if (s.status === "held") {
-          states[s.sectionId] = "held";
+          states[id] = "held";
           held += 1;
         } else if (s.status === "closed") {
-          states[s.sectionId] = "notBookable";
+          states[id] = "notBookable";
         } else {
+          states[id] = "available";
           available += 1;
         }
       });

@@ -73,3 +73,18 @@ test("VIP inventory uses isReserved 0|1 datapoint", () => {
   assert.match(fns, /isReserved:\s*0/);
   assert.match(fns, /Number\(inv\.isReserved\) === 1/);
 });
+
+test("VIP setStates includes available — single source of truth with list/map", () => {
+  assert.match(vipApp, /states\[id\] = "available"/);
+  assert.match(vipApp, /states\[id\] = "booked"/);
+  assert.match(vipApp, /states\[id\] = "held"/);
+  const viewer = fs.readFileSync(path.join(root, "vip-floor-viewer.js"), "utf8");
+  assert.match(viewer, /data-live-state/);
+  assert.match(viewer, /seat-status/);
+  assert.match(viewer, /Opaque underlay/);
+  const svg = fs.readFileSync(path.join(root, "vip-plans/aurelia-floor-map.svg"), "utf8");
+  assert.match(svg, /data-state="neutral"/);
+  assert.equal((svg.match(/data-state="booked"/g) || []).length, 0);
+  assert.equal((svg.match(/>Booked</g) || []).length, 0);
+  assert.equal((svg.match(/>Available</g) || []).length, 0);
+});

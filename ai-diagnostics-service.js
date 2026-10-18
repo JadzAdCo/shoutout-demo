@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.71";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.72";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.72",
+      title: "VIP map/list booked vs available sync",
+      checks: [
+        {label:"VIP app available states", file:"vip-app.js", includes:["states[id] = \"available\""]},
+        {label:"Aurelia neutral SVG", file:"vip-plans/aurelia-floor-map.svg", includes:["data-state=\"neutral\""], notIncludes:[">Booked<"]},
+        {label:"Floor viewer live status", file:"vip-floor-viewer.js", includes:["data-live-state", "seat-status"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.72\""]}
+      ]
+    },
     {
       version: "s3.1.70",
       title: "Beta invite clean UI + VIP hero ? / no Signed-in green",
@@ -1650,6 +1660,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-72-vip-map-list-state-sync",
+      area:"VIP reserV / Floor map / Inventory",
+      feature:"Map and list share one booked/available state",
+      changed:"Aurelia floor SVG bookable seats are status-neutral (no baked Booked/Available). vip-app setStates sends every section including available. Overlay draws underlay + seat label + status text from isReserved/status. Package s3.1.72.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html (package s3.1.72). 2) Open Aurelia → Area A · West Booths. 3) For each booth B1–B6, corner badge, on-seat status text, and list Status column must match (no red X with green Available). 4) Hold a table → that seat flips to Held on map and list together. 5) After paid reservation, isReserved=1 → Booked on map and list.",
+      expected:"One status per table across map art, corner badge, and list — driven by vipInventory isReserved/status.",
+      troubleshoot:"Still dual Booked+Available on B3 → confirm aurelia-floor-map.svg has data-state=neutral and no >Booked< text; vip-app.js must set states[id]=\"available\" for free seats; hard-refresh vip-floor-viewer.js + vip-app.js s3.1.72."
     },
     {
       id:"s3-1-71-vip-clean-help-popout-isreserved",

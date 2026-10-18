@@ -70,7 +70,16 @@ function iconMarkup(icon, x, y, color, scale = 1.25) {
   return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${scale})" aria-hidden="true"><circle r="10" fill="#111" fill-opacity=".85" stroke="${color}" stroke-width="1.5"/><path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>`;
 }
 
-function elementMarkup(plan, el, {stateOverrides, selectedId, interactive, areaName}) {
+function elementMarkup(plan, el, {stateOverrides, selectedId, interactive, areaName, neutralBookable}) {
+  const bookable = el.bookable !== false && el.type !== "djBooth";
+  // Background art for vip-plans/: seat outline + id only. Live FLOQRVipFloorViewer owns Available/Held/Booked.
+  if (neutralBookable && bookable) {
+    const [cx, cy] = centerOf(plan, el);
+    const label = escapeXml(el.label || el.name || "");
+    const base = shapeMarkup(plan, el, `fill="#4b5563" fill-opacity="0.28" stroke="#9ca3af" stroke-width="3"`);
+    const text = `<text x="${cx.toFixed(1)}" y="${(cy + 5).toFixed(1)}" text-anchor="middle" font-size="20" font-weight="700" fill="#fff" stroke="#000" stroke-width="3" paint-order="stroke">${label}</text>`;
+    return `<g class="el el-${escapeXml(el.type)}" data-state="neutral">${base}${text}</g>`;
+  }
   const state = elementState(el, stateOverrides);
   const st = LEGEND[state];
   const dash = st.dash ? ` stroke-dasharray="${st.dash}"` : "";
@@ -93,7 +102,7 @@ function elementMarkup(plan, el, {stateOverrides, selectedId, interactive, areaN
 }
 
 export function renderPlanSvg(plan, opts = {}) {
-  const {stateOverrides = {}, selectedId = null, interactive = false, viewBox = null, title = true} = opts;
+  const {stateOverrides = {}, selectedId = null, interactive = false, viewBox = null, title = true, neutralBookable = false} = opts;
   const W = plan.image.widthPx, H = plan.image.heightPx;
   const vb = viewBox ? `${viewBox.x * W} ${viewBox.y * H} ${viewBox.w * W} ${viewBox.h * H}` : `0 0 ${W} ${H}`;
   const areaById = Object.fromEntries(plan.areas.map(a => [a.id, a]));
@@ -119,8 +128,8 @@ export function renderPlanSvg(plan, opts = {}) {
     parts.push(`<rect x="${b.x * W}" y="${b.y * H}" width="${b.w * W}" height="${b.h * H}" fill="none" stroke="${AREA_OUTLINE.stroke}" stroke-dasharray="${AREA_OUTLINE.dash}" stroke-width="2" rx="10"/>`);
     parts.push(`<text x="${b.x * W + 10}" y="${b.y * H + 20}" font-size="15" font-weight="600" fill="${AREA_OUTLINE.labelColor}" stroke="#000" stroke-width="3" paint-order="stroke">${escapeXml(area.name)}</text>`);
   }
-  for (const el of plan.nonBookable) parts.push(elementMarkup(plan, el, {stateOverrides, selectedId, interactive}));
-  for (const el of plan.sections) parts.push(elementMarkup(plan, el, {stateOverrides, selectedId, interactive, areaName: areaById[el.areaId]?.name}));
+  for (const el of plan.nonBookable) parts.push(elementMarkup(plan, el, {stateOverrides, selectedId, interactive, neutralBookable}));
+  for (const el of plan.sections) parts.push(elementMarkup(plan, el, {stateOverrides, selectedId, interactive, areaName: areaById[el.areaId]?.name, neutralBookable}));
   parts.push(`<text x="${W - 14}" y="${H - 16}" text-anchor="end" font-size="13" fill="#9ca3af">DEMO · modeled layout, not a survey · N ↑</text>`);
   parts.push(`</svg>`);
   return parts.join("\n");

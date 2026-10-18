@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.71 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.72 (stable)
+
+- s3.1.72: VIP map/list booked vs available sync — Aurelia floor SVG status-neutral; setStates includes available; overlay owns live status.
 
 - s3.1.71: VIP ? nests intro/venue hints next to headings; table details as centered pop-out; vipInventory.isReserved 0|1; betaInvites.isBetaLinkused blocks invite reuse.
 

@@ -21,7 +21,7 @@
     document.body.classList.toggle("vip-table-popout-active", !!open);
   }
 
-  // Simulated booking states so the colors can be reviewed. Not real data.
+  // Offline demo only — live vip-app refreshAvailability replaces this via setStates (full map).
   const DEMO_STATES = {
     "decades.json": {"decades-c2": "booked", "decades-c4": "booked", "decades-c8": "held", "decades-c10": "booked"},
     "lima-twist.json": {"lima-twist-203": "booked", "lima-twist-207": "held", "lima-twist-102": "booked", "lima-twist-401": "booked",
@@ -140,14 +140,20 @@
   }
 
   function drawItem(item, u, interactive, dimmed) {
-    const st = stDef(itemState(item));
-    const g = el("g", {class: dimmed ? "dimmed" : ""}, map);
+    const state = itemState(item);
+    const st = stDef(state);
+    const g = el("g", {class: dimmed ? "dimmed" : "", "data-section-id": item.id, "data-live-state": state}, map);
     const deco = el("g", {class: "deco"}, g);
     const shp = shapeEl(item, deco, "shape");
-    shp.setAttribute("fill", st.color);
-    shp.setAttribute("fill-opacity", st.fillOpacity);
+    // Opaque underlay so any residual floor-art status never shows through the live tint.
+    shp.setAttribute("fill", "#111");
+    shp.setAttribute("fill-opacity", item.bookable ? 0.72 : 0.45);
     shp.setAttribute("stroke", st.stroke);
     shp.setAttribute("stroke-width", 2);
+    const tint = shapeEl(item, deco, "shape");
+    tint.setAttribute("fill", st.color);
+    tint.setAttribute("fill-opacity", Math.max(Number(st.fillOpacity) || 0.35, item.bookable ? 0.55 : 0.22));
+    tint.setAttribute("stroke", "none");
     if (st.strokeDash) shp.setAttribute("stroke-dasharray", st.strokeDash);
     if (st.pattern !== "none") {
       const p = shapeEl(item, deco, "shape");
@@ -155,9 +161,24 @@
     }
     const [x0, y0, x1, y1] = item.pixelBox;
     const w = x1 - x0 + 1, h = y1 - y0 + 1;
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
     badge(deco, st, x1, y0, Math.min(u(isPhone() ? 10 : 8), 0.34 * Math.min(w, h)));
-    if (item.name && item.type === "djBooth" && interactive) {
-      el("text", {class: "caption", x: (x0 + x1) / 2, y: y1 + u(15), "text-anchor": "middle", fill: st.stroke, "font-size": u(12), "stroke-width": u(3)}, deco).textContent = item.name;
+    if (item.bookable && interactive && !dimmed) {
+      const label = item.label || "";
+      const statusText = st.text || st.label || state;
+      const fs = Math.min(u(16), Math.max(u(11), 0.22 * Math.min(w, h)));
+      el("text", {
+        class: "seat-label", x: cx, y: cy - fs * 0.15, "text-anchor": "middle",
+        fill: "#fff", "font-size": fs, "font-weight": 700, "stroke-width": u(3), "paint-order": "stroke", stroke: "#000"
+      }, deco).textContent = label;
+      el("text", {
+        class: "seat-status", x: cx, y: cy + fs * 1.05, "text-anchor": "middle",
+        fill: st.stroke, "font-size": Math.max(u(10), fs * 0.72), "font-weight": 600,
+        "stroke-width": u(2.5), "paint-order": "stroke", stroke: "#000"
+      }, deco).textContent = statusText;
+    } else if (item.name && item.type === "djBooth" && interactive) {
+      el("text", {class: "caption", x: cx, y: y1 + u(15), "text-anchor": "middle", fill: st.stroke, "font-size": u(12), "stroke-width": u(3)}, deco).textContent = item.name;
     }
     if (item.id === selectedId) shapeEl(item, deco, "selected-ring", u(4));
     if (!interactive) return;
@@ -449,7 +470,15 @@
     select,
     setMode,
     getPlan: () => plan,
-    setStates: next => { states = next && typeof next === "object" ? next : {}; renderOverlay(); renderList(); },
+    setStates: next => {
+      states = next && typeof next === "object" ? next : {};
+      if (plan) {
+        buildChips();
+        chips.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.area === mode)));
+        renderOverlay();
+        renderList();
+      }
+    },
     onBookRequest: null
   };
 })();
