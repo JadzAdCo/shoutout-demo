@@ -1647,7 +1647,7 @@
       area:"Beta invite / Consent",
       feature:"Clean beta invite — ? help, FloqR branding, reverse-payments disclaimer",
       changed:"Removed green FLOQR Beta eyebrow and Signed-in status. Invite intro lives in title ?. Booking Transaction Disclaimer body lives in ? next to that section. FloqR.app → FloqR. Agreement v2: reversing payments is difficult / beta payments non-refundable. Package s3.1.70.",
-      howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html?v=s3.1.70). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
+      howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
