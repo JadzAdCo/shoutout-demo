@@ -1543,7 +1543,7 @@
       area:"My Profile / FloqR Inbox",
       feature:"Read / Unread badge stays on one line",
       changed:"message-envelope-head status pill uses white-space:nowrap + flex-shrink:0 so Read never wraps to Rea/d on narrow phones. Package s3.1.60.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.60 on a phone-width viewport. 2) Open a long-subject Read message (e.g. beta invite). 3) Confirm the lime Read pill shows the full word on one line.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox on a phone-width viewport. 2) Open a long-subject Read message (e.g. beta invite). 3) Confirm the lime Read pill shows the full word on one line.",
       expected:"Read and Unread badges never wrap mid-word.",
       troubleshoot:"Still wraps → hard refresh styles.css ?v=s3.1.60; .message-envelope-head span must include white-space:nowrap and flex-shrink:0."
     },
@@ -1552,7 +1552,7 @@
       area:"My Profile / FloqR Inbox",
       feature:"Inbox no longer stuck on Loading while menu shows 5/10",
       changed:"loadAndRenderInbox runs immediately after profile bootstrap — before template studio / BartR / AI prefs. Uses recipientUid fast path + 12s timeout. Package s3.1.59.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Within ~3s the list count must leave (0/0) and match profile-menu FloqR Inbox (e.g. 5/10). 3) Message envelopes appear (not stuck on Loading your FloqR Inbox…). 4) FAB still opens compose.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Within ~3s the list count must leave (0/0) and match profile-menu FloqR Inbox (e.g. 5/10). 3) Message envelopes appear (not stuck on Loading your FloqR Inbox…). 4) FAB still opens compose.",
       expected:"Inbox list paints quickly; count matches menu; never stuck Loading forever.",
       troubleshoot:"Still Loading → hard refresh ?v=s3.1.59; confirm patron-portal-app.js contains loadAndRenderInbox. Menu 5/10 but list empty after load → check deleted filter / recipientUid rules."
     },
@@ -1561,7 +1561,7 @@
       area:"My Profile / FloqR Inbox",
       feature:"Floating New Message FAB + inbox-first load",
       changed:"Send FloqR Inbox Message compose is hidden until FAB. Inbox list loads before shoutout history so messages appear in seconds (not minutes). Package s3.1.58 (further fixed in s3.1.59).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
       expected:"Inbox rows visible quickly; FAB opens compose; close hides compose; menu count matches list.",
       troubleshoot:"Empty inbox while menu shows N/M → hard refresh patron-portal-app.js ?v=s3.1.59 (loadAndRenderInbox). FAB missing → #inboxNewMessageFab + styles.css inbox-new-message-fab. Compose always open → portalCompose must start hidden."
     },
