@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.63";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.64";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.64",
+      title: "FloqAi Search tile matches ShoutOut",
+      checks: [
+        {label:"FloqAi icon card", file:"index.html", includes:["floqai-icon-card", "category-floqai-mark", "floqai-icon-word"]},
+        {label:"Black FloqAi face", file:"styles.css", includes:["floqai-icon-face", "background:#000"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.64\""]}
+      ]
+    },
     {
       version: "s3.1.63",
       title: "Beta profile card + compact testers table",
@@ -1547,6 +1556,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-64-floqai-search-tile",
+      area:"Search / FloqAi",
+      feature:"FloqAi tile matches ShoutOut card",
+      changed:"Search FloqAi control uses shoutout-icon-card size with black face, reuses the Search FloqAi tiles mark (floqr-tiles-transparent), white FloqAi word beside the icon. Package s3.1.64.",
+      howToTest:"1) As beta tester with FloqAi grant, hard-refresh Search. 2) FloqAi tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white FloqAi text beside it. 4) Tap opens floqai.html.",
+      expected:"FloqAi and ShoutOut tiles match box size; FloqAi uses existing Search mark asset.",
+      troubleshoot:"Wide beige tile → hard refresh index.html + styles.css. Wrong icon → must use category-floqai-mark + floqr-tiles-transparent.png."
+    },
     {
       id:"s3-1-63-beta-profile-card-testers-table",
       area:"Beta invite / Master Admin Features Mgmt",

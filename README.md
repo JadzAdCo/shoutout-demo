@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.63 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.64 (stable)
+
+- s3.1.64: FloqAi Search tile matches ShoutOut box — black face, same FloqAi tiles mark, white FloqAi label.
 
 - s3.1.63: Beta-invite profile card uses signed-in session; Active beta testers compact table (≤3 lines).
 
