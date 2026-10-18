@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.66";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.67";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.67",
+      title: "Search tile marks 80% + bottom wordmarks",
+      checks: [
+        {label:"Column faces 80% marks", file:"styles.css", includes:["flex-direction:column", "width:80%"]},
+        {label:"Search icon row", file:"index.html", includes:["floqcast-icon-face", "vip-icon-face", "floqai-icon-face"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.67\""]}
+      ]
+    },
     {
       version: "s3.1.66",
       title: "VIP reserV catalog no Restoring hang + Search tiles",
@@ -1577,6 +1586,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-67-search-tile-icon-scale",
+      area:"Search / Product tiles",
+      feature:"Large in-face icons for FloqAi / floqCast / VIP",
+      changed:"FloqAi, floqCast, and VIP faces stack a ~80% mark above an in-face wordmark (ShoutOut visual weight). Package s3.1.67.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.67) with FloqAi/floqCast/VIP grants. 2) Each of those three black tiles shows a large icon filling most of the square and the product name at the bottom inside the tile. 3) ShoutOut remains the full-bleed logo tile.",
+      expected:"Icons dominate each tile (~80%); labels sit at the bottom inside the black face, not beside a tiny mark.",
+      troubleshoot:"Still side-by-side tiny marks → styles.css must use flex-direction:column and width:80% on tile marks; hard refresh styles.css cache-bust s3.1.67."
+    },
     {
       id:"s3-1-66-vip-restoring-catalog",
       area:"VIP reserV / Session",

@@ -26,7 +26,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const css = read("styles.css");
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
   assert.match(css, /\.search-icon-row\{/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.vip-icon-face\{/);
+  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.vip-icon-face\{[^}]*flex-direction:column/);
+  assert.match(css, /\.floqai-icon-face \.floqai-tile-mark,\.floqcast-icon-face \.floqcast-tile-mark,\.vip-icon-face \.vip-tile-mark\{[^}]*width:80%/);
   assert.match(css, /\.vip-icon-word\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
 });
