@@ -111,6 +111,11 @@
     "help-floqcast": [
       "patron"
     ],
+    "help-floqr-inbox-rules": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-football-intro": [
       "patron"
     ],
