@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.64";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.65";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.65",
+      title: "Search icon tiles FloqAi/floqCast/VIP faces + 3-across",
+      checks: [
+        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "floqai-icon-face"]},
+        {label:"No caption under ShoutOut/VIP", file:"index.html", notIncludes:["shoutout-icon-title"]},
+        {label:"3-across mobile CSS", file:"styles.css", includes:["search-icon-row", "vip-icon-face", "floqcast-icon-face", "calc((100% - 20px) / 3)"]},
+        {label:"floqCast cast icon asset", file:"images/floqcast-icon.svg", includes:["floqCast", "FloqMedia LED"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.65\""]}
+      ]
+    },
     {
       version: "s3.1.64",
       title: "FloqAi Search tile matches ShoutOut",
