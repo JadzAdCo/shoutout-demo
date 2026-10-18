@@ -330,19 +330,23 @@ When adding a section, use this skeleton:
 | **Inbox-first + New Message FAB (s3.1.58)** | `loadPortal` renders `messages` + `inboxNotifications` before shoutout history / directory scans. Compose sheet `#portalCompose` stays hidden until floating `#inboxNewMessageFab`. Recipient directory: CSR + Club Admin seed first, then `FLOQRPeople.listSafe("contacts")`; Club Admin email local-parts searchable (not displayed). Profile-menu counts skip soft-deleted inbox rows. Follow Service: `listSafe("services")` + token haystack (handle/club/genre) + loading status. Help: `help-floqr-inbox-rules`. |
 | **Inbox paint gate (s3.1.59)** | `loadAndRenderInbox(user)` starts immediately after profile bootstrap — **before** `renderTemplateVariantSettings` / BartR / AI prefs (those awaits left Inbox on Loading while menu already showed 5/10). Fast path = `recipientUid` queries (same as profile menu) + 12s timeout; email-scoped rows enrich without blocking first paint. |
 | **Read badge nowrap (s3.1.60)** | `.message-envelope-head span` — `white-space:nowrap; flex-shrink:0` so Read/Unread pills do not wrap mid-word next to long subjects on mobile. |
-| **Search icon tiles (s3.1.61)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP use black faces with in-tile wordmarks; `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` + `VIP reserV`. Mobile/tablet: 3 across; PC: one line. |
-| **Package** | s3.1.61 |
+| **Beta invite email handoff (s3.1.61–62)** | Email/private browsers have no Firebase session — landing no longer sticks on Restoring/Checking. `ensureAuth()` initializes Firebase before `auth()`; stashes invite `t` in `FLOQR_BETA_INVITE_TOKEN`; **Sign in to accept this invite** → home OTP with `returnTo` keeping `t`. `createBetaInvite` Inbox `link` is absolute Pages URL. |
+| **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
+| **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
+| **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
+| **Search icon tiles (s3.1.65)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP use black faces with in-tile wordmarks; `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` + `VIP reserV`. Mobile/tablet: 3 across; PC: one line. |
+| **Package** | s3.1.65 |
 
 ## Beta invite landing (`beta-invite.html`)
 
 | Layer | Wiring |
 |---|---|
-| Surface | Inbox `type: betaInvite` → `./beta-invite.html?t=…` (account-bound, 7-day expiry) |
-| UX | Session shell; Agreement scroll; two mandatory unchecked checkboxes; **I Agree and join beta** disabled until both; Decline; success acknowledgement card |
-| Client | `beta-invite-app.js` passes `{token, checks}` to `acceptBetaInvite` |
-| Server | `functions/feature-services-functions.js` `respondToInvite` — refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` |
+| Surface | Inbox `type: betaInvite` → absolute `https://…/beta-invite.html?t=…` (account-bound, 7-day expiry); body also includes the URL for email clients |
+| UX | Session shell; signed-out → Sign in CTA (not stuck Restoring); Agreement scroll; two mandatory unchecked checkboxes; **I Agree and join beta** disabled until both; Decline; success acknowledgement card |
+| Client | `beta-invite-app.js` stashes/restores `t`, wires `FLOQRSessionShell.loginHref()` returnTo, passes `{token, checks}` to `acceptBetaInvite` |
+| Server | `functions/feature-services-functions.js` `createBetaInvite` / `respondToInvite` — absolute invite URL; refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` |
 | Data | `betaInvites/{hash}` + `betaTesters/{uid}.consent` |
-| Help / FloqAi | `help-beta-tester`; phrases: beta agreement, booking disclaimer |
+| Help / FloqAi | `help-beta-tester`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
 
 ## VIP reserV (`vipReservations`) — Phase 2
 

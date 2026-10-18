@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.61";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.64";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,14 +191,40 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.1.61",
-      title: "Search icon tiles FloqAi/floqCast/VIP faces + 3-across",
+      version: "s3.1.64",
+      title: "FloqAi Search tile matches ShoutOut",
       checks: [
-        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "floqai-icon-face"]},
-        {label:"No caption under ShoutOut/VIP", file:"index.html", notIncludes:["shoutout-icon-title"]},
-        {label:"3-across mobile CSS", file:"styles.css", includes:["search-icon-row", "vip-icon-face", "floqcast-icon-face", "calc((100% - 20px) / 3)"]},
-        {label:"floqCast cast icon asset", file:"images/floqcast-icon.svg", includes:["floqCast", "FloqMedia LED"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.61\""]}
+        {label:"FloqAi icon card", file:"index.html", includes:["floqai-icon-card", "category-floqai-mark", "floqai-icon-word"]},
+        {label:"Black FloqAi face", file:"styles.css", includes:["floqai-icon-face", "background:#000"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.64\""]}
+      ]
+    },
+    {
+      version: "s3.1.63",
+      title: "Beta profile card + compact testers table",
+      checks: [
+        {label:"Profile ensureAuth", file:"global-profile-status.js", includes:["ensureAuth", "initializeApp"]},
+        {label:"Beta testers table", file:"master-feature-services.js", includes:["beta-testers-table", "featureTableCells"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.63\""]}
+      ]
+    },
+    {
+      version: "s3.1.62",
+      title: "Beta invite Firebase init fail-open",
+      checks: [
+        {label:"Ensure Firebase before auth", file:"beta-invite-app.js", includes:["ensureAuth", "initializeApp", "paintSignedOut"]},
+        {label:"Beta invite cache-bust", file:"beta-invite.html", includes:["beta-invite-app.js?v=s3.1.62"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.62\""]}
+      ]
+    },
+    {
+      version: "s3.1.61",
+      title: "Beta invite email/session handoff",
+      checks: [
+        {label:"Sign-in CTA + token stash", file:"beta-invite-app.js", includes:["FLOQR_BETA_INVITE_TOKEN", "loginHref", "autoRedirect: false", "beta.signInCta"]},
+        {label:"Beta invite landing CTA", file:"beta-invite.html", includes:["betaSignInLink", "beta.signInCta", "beta.sessionHandoff"]},
+        {label:"Absolute invite URL", file:"functions/feature-services-functions.js", includes:["FLOQR_PUBLIC_ORIGIN", "beta-invite.html?t="]},
+        {label:"Invite token stash", file:"beta-invite-app.js", includes:["FLOQR_BETA_INVITE_TOKEN"]}
       ]
     },
     {
@@ -1531,13 +1557,49 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
-      id:"s3-1-61-search-icon-tiles-standard",
+      id:"s3-1-65-search-icon-tiles-standard",
       area:"Search / Product tiles",
       feature:"Standardized ShoutOut / floqCast / VIP / FloqAi icon tiles",
-      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.61.",
+      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.65.",
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with FloqAi/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) FloqAi / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; FloqAi → floqai.html.",
       expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
       troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."
+    },
+    {
+      id:"s3-1-64-floqai-search-tile",
+      area:"Search / FloqAi",
+      feature:"FloqAi tile matches ShoutOut card",
+      changed:"Search FloqAi control uses shoutout-icon-card size with black face, reuses the Search FloqAi tiles mark (floqr-tiles-transparent), white FloqAi word beside the icon. Package s3.1.64.",
+      howToTest:"1) As beta tester with FloqAi grant, hard-refresh Search. 2) FloqAi tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white FloqAi text beside it. 4) Tap opens floqai.html.",
+      expected:"FloqAi and ShoutOut tiles match box size; FloqAi uses existing Search mark asset.",
+      troubleshoot:"Wide beige tile → hard refresh index.html + styles.css. Wrong icon → must use category-floqai-mark + floqr-tiles-transparent.png."
+    },
+    {
+      id:"s3-1-63-beta-profile-card-testers-table",
+      area:"Beta invite / Master Admin Features Mgmt",
+      feature:"Signed-in profile card on beta-invite + compact Active beta testers table",
+      changed:"global-profile-status ensureAuth initializes Firebase so the profile pill shows photo/initials after join. Active beta testers render as a table (tester + feature checkboxes + Save/Revoke) ≤3 lines per user. Package s3.1.63.",
+      howToTest:"1) As invited patron complete beta join → top-right profile pill shows your photo or initials (not ?). 2) As Master Admin open Features Mgmt → Beta & Testing → Active beta testers is a compact table. 3) Toggle FloqAi → Save still works.",
+      expected:"Profile card authenticated on beta-invite; one tester uses ≤3 visual lines in a table.",
+      troubleshoot:"Still ? on pill → hard refresh global-profile-status.js + beta-invite.html. Tall list → master-feature-services.js must build beta-testers-table."
+    },
+    {
+      id:"s3-1-61-beta-invite-email-session-handoff",
+      area:"Beta invite / Email / Auth",
+      feature:"Email invite link signs in with returnTo (keeps invite token)",
+      changed:"Opening beta-invite.html from email (no Firebase session) no longer sticks on Restoring/Checking…. Invite t= is stashed; Sign in to accept this invite uses loginHref returnTo. ensureAuth() initializes Firebase before auth (s3.1.62). createBetaInvite Inbox link is absolute Pages URL. Package s3.1.62.",
+      howToTest:"1) As Master Admin invite a patron (Features Mgmt → Beta & Testing). 2) On a phone, open the invite URL in a fresh/private browser (or Mail in-app browser) so you are signed out. 3) Confirm status leaves Checking within ~3s and shows Sign in to accept this invite (or redirects to Search sign-in with returnTo). 4) Sign in as the invited account. 5) Confirm return lands on beta-invite with Agreement UI (t preserved). 6) Check both boxes → I Agree and join beta.",
+      expected:"No stuck Checking/Restoring; invite token survives sign-in; Agreement unlocks for the invited account.",
+      troubleshoot:"Stuck Checking → hard refresh beta-invite.html + beta-invite-app.js (ensureAuth/initializeApp). Lost invite after OTP → returnTo must include t=; storage key FLOQR_BETA_INVITE_TOKEN. Wrong account → sign in as invite target. Old relative Inbox link → re-invite so link is absolute github.io URL."
+    },
+    {
+      id:"s3-1-60-inbox-read-badge-nowrap",
+      area:"My Profile / FloqR Inbox",
+      feature:"Read / Unread badge stays on one line",
+      changed:"message-envelope-head status pill uses white-space:nowrap + flex-shrink:0 so Read never wraps to Rea/d on narrow phones. Package s3.1.60.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox on a phone-width viewport. 2) Open a long-subject Read message (e.g. beta invite). 3) Confirm the lime Read pill shows the full word on one line.",
+      expected:"Read and Unread badges never wrap mid-word.",
+      troubleshoot:"Still wraps → hard refresh styles.css ?v=s3.1.60; .message-envelope-head span must include white-space:nowrap and flex-shrink:0."
     },
     {
       id:"s3-1-59-inbox-not-stuck-loading",
@@ -1597,10 +1659,10 @@
       id:"s3-1-56-beta-invite-agreement-consent",
       area:"Beta invite / Consent / Inbox",
       feature:"Beta invite Agreement + Booking Disclaimer + join acknowledgement",
-      changed:"beta-invite.html shows scrollable FloqR.app Beta Test & Prerelease Agreement, Booking Transaction Disclaimer callout, two required checkboxes, I Agree and join beta (disabled until both checked). acceptBetaInvite stores consent version/hash on betaTesters + betaInvites. Success card confirms join + recorded consent. Profile card via global-profile-status.js. Package s3.1.57.",
+      changed:"beta-invite.html shows scrollable FloqR.app Beta Test & Prerelease Agreement, Booking Transaction Disclaimer callout, two required checkboxes, I Agree and join beta (disabled until both checked). acceptBetaInvite stores consent version/hash on betaTesters + betaInvites. Success card confirms join + recorded consent. Profile card via global-profile-status.js. Package s3.1.57 (session handoff refined in s3.1.61).",
       howToTest:"1) As Master Admin invite temp_waitress_1 (or any patron) from Features Mgmt → Beta & Testing. 2) Sign in as that patron → Inbox → open beta invite link. 3) Confirm top-right profile card appears and status leaves Restoring… . 4) Confirm Agreement scroll + two unchecked boxes; I Agree stays disabled until both checked. 5) Check both → I Agree and join beta → success card. 6) Search shows granted Beta tiles.",
       expected:"Profile card present; Agreement + dual checks + success acknowledgement; Features audit shows beta.accepted with agreementVersion.",
-      troubleshoot:"Stuck Restoring / no Agreement → hard refresh beta-invite.html ?v=s3.1.57 + global-profile-status.js. Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Wrong account → sign in as invite target."
+      troubleshoot:"Stuck Restoring / no Agreement → hard refresh beta-invite.html ?v=s3.1.62 + beta-invite-app.js + floqr-session-shell.js (see s3-1-61-beta-invite-email-session-handoff). Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Wrong account → sign in as invite target."
     },
     {
       id:"s3-1-55-features-mgmt-subtabs",

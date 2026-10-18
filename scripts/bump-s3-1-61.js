@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* s3.1.60 → s3.1.61 bump. Search icon tiles: FloqAi/floqCast/VIP faces + 3-across mobile. */
+/* s3.1.60 → s3.1.61 bump. Beta invite email/session handoff. */
 const fs = require("fs");
 const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
@@ -10,7 +10,7 @@ const NEW_TESTS = [];
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 const NOTE = process.env.FLOQR_BUMP_NOTE
-  || `- ${NEXT}: Search tiles standardized — FloqAi/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.`;
+  || `- ${NEXT}: Beta invite email/session handoff — persist invite t=, Sign in CTA with returnTo, absolute Inbox invite URL.`;
 
 function transformHtml(src) {
   return stripPageLinkVersions(src).replace(ASSET_REF, `$1${NEXT}`);

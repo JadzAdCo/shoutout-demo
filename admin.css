@@ -1092,6 +1092,25 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 .beta-patron-pick{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
 .beta-patron-pick input{flex:0 0 auto;width:20px;height:20px;margin-top:4px}
 .beta-patron-pick span{min-width:0}
+
+/* Active beta testers — compact table (≤3 visual lines per user) */
+.beta-testers-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+.beta-testers-table{width:100%;min-width:640px;border-collapse:collapse;font-size:0.92rem}
+.beta-testers-table th,
+.beta-testers-table td{padding:8px 10px;vertical-align:middle;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+.beta-testers-table thead th{font-size:0.78rem;letter-spacing:0.02em;text-transform:uppercase;opacity:.85;white-space:nowrap;background:rgba(0,0,0,.22)}
+.beta-testers-table tbody tr:last-child td{border-bottom:0}
+.beta-tester-who{min-width:160px;max-width:220px}
+.beta-tester-who strong{display:block;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.beta-tester-who small{display:block;line-height:1.25;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.beta-feat-col,
+.beta-feat-cell{text-align:center!important;width:3.25rem;padding-left:4px;padding-right:4px}
+.beta-feat-check{display:inline-flex;align-items:center;justify-content:center;margin:0;min-height:44px;min-width:44px;cursor:pointer}
+.beta-feat-check input{width:18px;height:18px;margin:0}
+.beta-tester-actions{white-space:nowrap}
+.beta-tester-actions .primary,
+.beta-tester-actions .ghost{min-height:36px;padding:6px 12px;margin:0 4px 0 0}
+.beta-testers-table .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media (max-width:1024px){
   /* Tablet + phone: hide feature checklist until a patron is selected. */
   .beta-invite-features:not(.is-ready){display:none !important}

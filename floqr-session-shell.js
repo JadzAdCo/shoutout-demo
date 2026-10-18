@@ -178,10 +178,14 @@
    * @param {function} [options.onUser]
    * @param {function} [options.onSignedOut]
    * @param {string} [options.restoringMessage]
+   * @param {number} [options.timeoutMs] — how long to wait for IndexedDB session restore before signed-out handoff (default 4000)
+   * @param {boolean} [options.autoRedirect=true] — standalone pages navigate to general sign-in with returnTo
    */
   function bind(options = {}) {
     const auth = options.auth;
     if (!auth) return {embedded: isEmbedded(), ready: Promise.resolve(null)};
+    const timeoutMs = Number.isFinite(options.timeoutMs) ? Math.max(500, options.timeoutMs) : 4000;
+    const autoRedirect = options.autoRedirect !== false;
     applyEmbedChrome();
     setStatus(options.statusEl, options.restoringMessage || t("session.restoring"));
     if (auth.currentUser) {
@@ -190,8 +194,8 @@
       setHidden(options.loginButtons, true);
     }
 
-    const ready = waitForUser(auth, {timeoutMs: 15000}).then(user => {
-      if (!user && redirectToLogin()) return null;
+    const ready = waitForUser(auth, {timeoutMs}).then(user => {
+      if (!user && autoRedirect && redirectToLogin()) return null;
       paintAuthChrome({
         chrome: options.chrome,
         loginButtons: options.loginButtons,
@@ -212,7 +216,7 @@
       else options.onSignedOut?.();
     });
 
-    return {embedded: isEmbedded(), ready, isEmbedded, waitForUser: () => waitForUser(auth)};
+    return {embedded: isEmbedded(), ready, isEmbedded, waitForUser: () => waitForUser(auth, {timeoutMs}), loginHref};
   }
 
   const APP_WAIT_MS = 4000;
@@ -234,7 +238,7 @@
     if (isEmbedded() || isLoginOrPublicPage()) return;
     const auth = await waitForFirebaseApp();
     if (!auth) return;
-    const user = await waitForUser(auth, {timeoutMs: 15000});
+    const user = await waitForUser(auth, {timeoutMs: 4000});
     if (!user) redirectToLogin();
   }
 

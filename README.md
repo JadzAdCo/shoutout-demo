@@ -1,6 +1,12 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.61 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.64 (stable)
 
-- s3.1.61: Search tiles standardized — FloqAi/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.
+- s3.1.64: FloqAi Search tile matches ShoutOut box — black face, same FloqAi tiles mark, white FloqAi label.
+
+- s3.1.63: Beta-invite profile card uses signed-in session; Active beta testers compact table (≤3 lines).
+
+- s3.1.62: Beta invite initializes Firebase before auth (no stuck Checking… when App missing); Sign in CTA fail-open.
+
+- s3.1.61: Beta invite email/session handoff — persist invite `t`, Sign in CTA with returnTo (no stuck Restoring), absolute Inbox invite URL.
 
 - s3.1.60: FloqR Inbox Read/Unread badge nowrap (no Rea/d wrap on mobile).
 
