@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.58";
+  const VERSION = "s3.1.61";
 
   const packs = {
     "ru": {
@@ -44,7 +44,7 @@
       },
       "help-beta-tester": {
         title: "Бета-тестирование",
-        body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт. Прочитайте Соглашение о бета-тесте FloqR.app (QA / UAT ещё не завершён, «как есть»), отметьте оба обязательных флажка (Соглашение и отказ от ответственности по транзакциям) и нажмите «Я соглашаюсь и присоединяюсь к бете». Вы увидите подтверждение вступления и записи согласия. В поиске с меткой «Бета» появятся только выбранные для вас функции. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
+        body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Если вы открыли ссылку из письма, войдите один раз в FLOQR — вы вернётесь сюда с приглашением. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт. Прочитайте Соглашение о бета-тесте FloqR.app (QA / UAT ещё не завершён, «как есть»), отметьте оба обязательных флажка (Соглашение и отказ от ответственности по транзакциям) и нажмите «Я соглашаюсь и присоединяюсь к бете». Вы увидите подтверждение вступления и записи согласия. В поиске с меткой «Бета» появятся только выбранные для вас функции. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -322,7 +322,7 @@
       },
       "help-beta-tester": {
         title: "Bètatesten",
-        body: "Soms nodigt FLOQR bezoekers uit om nieuwe functies eerder te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account. Lees de FloqR.app-bètatestovereenkomst (QA / UAT nog niet afgerond, AS IS), vink beide verplichte vakjes aan (bètatestovereenkomst en disclaimer boekingstransacties) en tik Ik ga akkoord en doe mee aan de bèta. Je ziet een duidelijke bevestiging dat je bent toegetreden en dat toestemming is vastgelegd. Bij Zoeken verschijnen alleen de functies die FLOQR voor jou koos met het label Bèta. Ze kunnen tijdens het testen wijzigen of uitgaan. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
+        body: "Soms nodigt FLOQR bezoekers uit om nieuwe functies eerder te proberen. Als je de link vanuit e-mail opende, log één keer in bij FLOQR — je keert hier terug met de uitnodiging. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account. Lees de FloqR.app-bètatestovereenkomst (QA / UAT nog niet afgerond, AS IS), vink beide verplichte vakjes aan (bètatestovereenkomst en disclaimer boekingstransacties) en tik Ik ga akkoord en doe mee aan de bèta. Je ziet een duidelijke bevestiging dat je bent toegetreden en dat toestemming is vastgelegd. Bij Zoeken verschijnen alleen de functies die FLOQR voor jou koos met het label Bèta. Ze kunnen tijdens het testen wijzigen of uitgaan. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -600,7 +600,7 @@
       },
       "help-beta-tester": {
         title: "Tests bêta",
-        body: "Parfois FLOQR invite des clients à essayer de nouvelles fonctionnalités plus tôt. L’invitation arrive dans la Boîte de réception ; ouvrez-la en étant connecté au même compte. Lisez l’Accord de test bêta FloqR.app (QA / UAT non terminée, TEL QUEL), cochez les deux cases obligatoires (Accord et avertissement sur les transactions), puis J’accepte et je rejoins la bêta. Vous voyez une confirmation claire d’inscription et d’enregistrement du consentement. Seules les fonctionnalités choisies pour vous apparaissent ensuite dans la recherche avec l’étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
+        body: "Parfois FLOQR invite des clients à essayer de nouvelles fonctionnalités plus tôt. Si vous avez ouvert le lien depuis un e-mail, connectez-vous une fois sur FLOQR — vous revenez ici avec l’invitation. L’invitation arrive dans la Boîte de réception ; ouvrez-la en étant connecté au même compte. Lisez l’Accord de test bêta FloqR.app (QA / UAT non terminée, TEL QUEL), cochez les deux cases obligatoires (Accord et avertissement sur les transactions), puis J’accepte et je rejoins la bêta. Vous voyez une confirmation claire d’inscription et d’enregistrement du consentement. Seules les fonctionnalités choisies pour vous apparaissent ensuite dans la recherche avec l’étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -878,7 +878,7 @@
       },
       "help-beta-tester": {
         title: "Beta-Tests",
-        body: "Manchmal lädt FLOQR Gäste ein, neue Funktionen früher zu testen. Die Einladung kommt in den Posteingang; öffne sie, während du mit demselben Konto angemeldet bist. Lies die FloqR.app-Beta-Testvereinbarung (QA / UAT noch nicht abgeschlossen, WIE BESEHEN), aktiviere beide Pflichtkästchen (Beta-Testvereinbarung und Hinweis zu Buchungstransaktionen) und tippe Ich stimme zu und trete der Beta bei. Du siehst eine klare Bestätigung, dass du beigetreten bist und die Zustimmung gespeichert wurde. In der Suche erscheinen nur die für dich gewählten Funktionen mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das empfangende Konto."
+        body: "Manchmal lädt FLOQR Gäste ein, neue Funktionen früher zu testen. Wenn du den Link aus einer E-Mail geöffnet hast, melde dich einmal bei FLOQR an — du kehrst mit der Einladung hierher zurück. Die Einladung kommt in den Posteingang; öffne sie, während du mit demselben Konto angemeldet bist. Lies die FloqR.app-Beta-Testvereinbarung (QA / UAT noch nicht abgeschlossen, WIE BESEHEN), aktiviere beide Pflichtkästchen (Beta-Testvereinbarung und Hinweis zu Buchungstransaktionen) und tippe Ich stimme zu und trete der Beta bei. Du siehst eine klare Bestätigung, dass du beigetreten bist und die Zustimmung gespeichert wurde. In der Suche erscheinen nur die für dich gewählten Funktionen mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das empfangende Konto."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -1156,7 +1156,7 @@
       },
       "help-beta-tester": {
         title: "Pruebas beta",
-        body: "A veces FLOQR invita a los clientes a probar funciones nuevas antes. La invitación llega a la Bandeja de entrada; ábrela con la misma cuenta. Lee el Acuerdo de prueba beta de FloqR.app (QA / UAT aún no completada, TAL CUAL), marca ambas casillas obligatorias (Acuerdo y Aviso de transacciones) y pulsa Acepto y me uno a la beta. Verás una confirmación clara de que te uniste y de que el consentimiento quedó registrado. Solo las funciones que FLOQR eligió para ti aparecen luego en Búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta destinataria."
+        body: "A veces FLOQR invita a los clientes a probar funciones nuevas antes. Si abriste el enlace desde el correo, inicia sesión una vez en FLOQR: vuelves aquí con la invitación. La invitación llega a la Bandeja de entrada; ábrela con la misma cuenta. Lee el Acuerdo de prueba beta de FloqR.app (QA / UAT aún no completada, TAL CUAL), marca ambas casillas obligatorias (Acuerdo y Aviso de transacciones) y pulsa Acepto y me uno a la beta. Verás una confirmación clara de que te uniste y de que el consentimiento quedó registrado. Solo las funciones que FLOQR eligió para ti aparecen luego en Búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta destinataria."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -1434,7 +1434,7 @@
       },
       "help-beta-tester": {
         title: "Test beta",
-        body: "A volte FLOQR invita i clienti a provare nuove funzioni in anticipo. L’invito arriva in Posta in arrivo; aprilo restando connesso allo stesso account. Leggi l’Accordo di beta test FloqR.app (QA / UAT non ancora completata, COSÌ COM’È), spunta entrambe le caselle obbligatorie (Accordo e disclaimer sulle transazioni), poi Accetto e partecipo alla beta. Vedrai una conferma chiara dell’iscrizione e della registrazione del consenso. Solo le funzioni scelte per te compaiono poi in Cerca con l’etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l’account destinatario."
+        body: "A volte FLOQR invita i clienti a provare nuove funzioni in anticipo. Se hai aperto il link dall’email, accedi una volta a FLOQR: torni qui con l’invito. L’invito arriva in Posta in arrivo; aprilo restando connesso allo stesso account. Leggi l’Accordo di beta test FloqR.app (QA / UAT non ancora completata, COSÌ COM’È), spunta entrambe le caselle obbligatorie (Accordo e disclaimer sulle transazioni), poi Accetto e partecipo alla beta. Vedrai una conferma chiara dell’iscrizione e della registrazione del consenso. Solo le funzioni scelte per te compaiono poi in Cerca con l’etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l’account destinatario."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -1712,7 +1712,7 @@
       },
       "help-beta-tester": {
         title: "Testes beta",
-        body: "Por vezes a FLOQR convida clientes a experimentar novas funcionalidades mais cedo. O convite chega à Caixa de entrada; abra-o com a mesma conta. Leia o Acordo de teste beta do FloqR.app (QA / UAT ainda não concluída, TAL COMO ESTÁ), marque as duas caixas obrigatórias (Acordo e Aviso de transações) e toque Concordo e entro na beta. Verá uma confirmação clara de que entrou e de que o consentimento foi registado. Só as funcionalidades escolhidas para si aparecem depois na Pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta destinatária."
+        body: "Por vezes a FLOQR convida clientes a experimentar novas funcionalidades mais cedo. Se abriu o link a partir do e-mail, inicie sessão uma vez no FLOQR — volta aqui com o convite. O convite chega à Caixa de entrada; abra-o com a mesma conta. Leia o Acordo de teste beta do FloqR.app (QA / UAT ainda não concluída, TAL COMO ESTÁ), marque as duas caixas obrigatórias (Acordo e Aviso de transações) e toque Concordo e entro na beta. Verá uma confirmação clara de que entrou e de que o consentimento foi registado. Só as funcionalidades escolhidas para si aparecem depois na Pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta destinatária."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -1990,7 +1990,7 @@
       },
       "help-beta-tester": {
         title: "Δοκιμές beta",
-        body: "Μερικές φορές το FLOQR προσκαλεί επισκέπτες να δοκιμάσουν νέες λειτουργίες νωρίτερα. Η πρόσκληση φτάνει στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό. Διαβάστε τη Συμφωνία δοκιμής beta FloqR.app (QA / UAT δεν έχει ολοκληρωθεί, ΩΣ ΕΧΕΙ), επιλέξτε και τα δύο υποχρεωτικά πλαίσια (Συμφωνία και αποποίηση συναλλαγών) και πατήστε Συμφωνώ και συμμετέχω στη beta. Θα δείτε σαφή επιβεβαίωση εγγραφής και καταγραφής συγκατάθεσης. Στην Αναζήτηση εμφανίζονται μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς με ετικέτα Beta. Μπορούν να αλλάξουν ή να απενεργοποιηθούν κατά τη δοκιμή. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό παραλήπτη."
+        body: "Μερικές φορές το FLOQR προσκαλεί επισκέπτες να δοκιμάσουν νέες λειτουργίες νωρίτερα. Αν ανοίξατε τον σύνδεσμο από email, συνδεθείτε μία φορά στο FLOQR — επιστρέφετε εδώ με την πρόσκληση. Η πρόσκληση φτάνει στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό. Διαβάστε τη Συμφωνία δοκιμής beta FloqR.app (QA / UAT δεν έχει ολοκληρωθεί, ΩΣ ΕΧΕΙ), επιλέξτε και τα δύο υποχρεωτικά πλαίσια (Συμφωνία και αποποίηση συναλλαγών) και πατήστε Συμφωνώ και συμμετέχω στη beta. Θα δείτε σαφή επιβεβαίωση εγγραφής και καταγραφής συγκατάθεσης. Στην Αναζήτηση εμφανίζονται μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς με ετικέτα Beta. Μπορούν να αλλάξουν ή να απενεργοποιηθούν κατά τη δοκιμή. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό παραλήπτη."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -2268,7 +2268,7 @@
       },
       "help-beta-tester": {
         title: "Testy beta",
-        body: "Czasem FLOQR zaprasza gości do wcześniejszego testowania nowych funkcji. Zaproszenie trafia do Skrzynki; otwórz je będąc zalogowanym na to samo konto. Przeczytaj Umowę testów beta FloqR.app (QA / UAT jeszcze nieukończone, W STANIE JAKIM JEST), zaznacz oba wymagane pola (Umowa i zastrzeżenie transakcji), a potem Zgadzam się i dołączam do bety. Zobaczysz jasne potwierdzenie dołączenia i zapisania zgody. W Wyszukiwaniu pojawią się tylko funkcje wybrane dla Ciebie z etykietą Beta. Mogą się zmieniać lub być wyłączane podczas testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta odbiorcy."
+        body: "Czasem FLOQR zaprasza gości do wcześniejszego testowania nowych funkcji. Jeśli otworzyłeś link z e-maila, zaloguj się raz w FLOQR — wrócisz tutaj z zaproszeniem. Zaproszenie trafia do Skrzynki; otwórz je będąc zalogowanym na to samo konto. Przeczytaj Umowę testów beta FloqR.app (QA / UAT jeszcze nieukończone, W STANIE JAKIM JEST), zaznacz oba wymagane pola (Umowa i zastrzeżenie transakcji), a potem Zgadzam się i dołączam do bety. Zobaczysz jasne potwierdzenie dołączenia i zapisania zgody. W Wyszukiwaniu pojawią się tylko funkcje wybrane dla Ciebie z etykietą Beta. Mogą się zmieniać lub być wyłączane podczas testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta odbiorcy."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",
@@ -2546,7 +2546,7 @@
       },
       "help-beta-tester": {
         title: "الاختبار التجريبي",
-        body: "أحيانًا تدعو FLOQR الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى الوارد؛ افتحها وأنت مسجّل الدخول بنفس الحساب. اقرأ اتفاقية اختبار بيتا لـ FloqR.app (ضمان الجودة / لم يُكمل اختبار قبول المستخدم، كما هو)، وفعّل المربعين الإلزاميين (الاتفاقية وإخلاء مسؤولية معاملات الحجز)، ثم اضغط أوافق وأنضم إلى النسخة التجريبية. سترى تأكيدًا واضحًا للانضمام وتسجيل الموافقة. يظهر في البحث فقط الميزات التي اختارتها FLOQR لك بتصنيف بيتا. قد تتغير أو تُوقف أثناء الاختبار. تنتهي الدعوات بعد 7 أيام وتعمل فقط لحساب المستلم."
+        body: "أحيانًا تدعو FLOQR الزوار لتجربة ميزات جديدة مبكرًا. إذا فتحت الرابط من البريد، سجّل الدخول مرة واحدة في FLOQR — ستعود هنا مع الدعوة. تصل الدعوة إلى الوارد؛ افتحها وأنت مسجّل الدخول بنفس الحساب. اقرأ اتفاقية اختبار بيتا لـ FloqR.app (ضمان الجودة / لم يُكمل اختبار قبول المستخدم، كما هو)، وفعّل المربعين الإلزاميين (الاتفاقية وإخلاء مسؤولية معاملات الحجز)، ثم اضغط أوافق وأنضم إلى النسخة التجريبية. سترى تأكيدًا واضحًا للانضمام وتسجيل الموافقة. يظهر في البحث فقط الميزات التي اختارتها FLOQR لك بتصنيف بيتا. قد تتغير أو تُوقف أثناء الاختبار. تنتهي الدعوات بعد 7 أيام وتعمل فقط لحساب المستلم."
       },
       "help-floqr-inbox-rules": {
         title: "FloqR Inbox",

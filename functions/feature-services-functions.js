@@ -350,7 +350,9 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
   const inviteId = core.inviteIdFor(token);
   const nowMs = Date.now();
   const expiresAtMs = nowMs + core.INVITE_TTL_MS;
-  const invitePath = `./beta-invite.html?t=${token}&from=beta-invite`;
+  // Absolute URL so email / copy-paste / in-app browsers keep `t=` (relative ./ breaks outside the portal).
+  const publicOrigin = String(process.env.FLOQR_PUBLIC_ORIGIN || "https://jadzadco.github.io/shoutout-demo").replace(/\/$/, "");
+  const invitePath = `${publicOrigin}/beta-invite.html?t=${encodeURIComponent(token)}&from=beta-invite`;
 
   await db.runTransaction(async tx => {
     const head = await tx.get(headRef());
@@ -384,7 +386,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
     recipientUid: targetUid,
     type: "betaInvite",
     title: "You're invited to test new FLOQR features",
-    body: `FLOQR invited you to become a beta tester and try ${featureLabels(features)} before everyone else. Open the invitation to accept or decline. It expires in 7 days.`,
+    body: `FLOQR invited you to become a beta tester and try ${featureLabels(features)} before everyone else. Open the invitation to accept or decline. It expires in 7 days.\n\n${invitePath}`,
     link: invitePath,
     read: false,
     createdAt: FieldValue.serverTimestamp()

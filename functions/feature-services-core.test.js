@@ -179,6 +179,7 @@ test("beta invite accept requires Agreement + Booking Disclaimer consent", () =>
   assert.match(html, /id="betaCheckAgreement"/);
   assert.match(html, /id="betaCheckBooking"/);
   assert.match(html, /id="betaSuccess"/);
+  assert.match(html, /id="betaSignInLink"/);
   assert.match(html, /FloqR\.app Beta Test/);
   assert.match(html, /Booking Transaction Disclaimer/);
   const app = read("beta-invite-app.js");
@@ -186,10 +187,17 @@ test("beta invite accept requires Agreement + Booking Disclaimer consent", () =>
   assert.match(app, /betaAgreement/);
   assert.match(app, /bookingDisclaimer/);
   assert.match(app, /renderSuccess/);
+  assert.match(app, /FLOQR_BETA_INVITE_TOKEN/);
+  assert.match(app, /loginHref/);
+  assert.match(app, /autoRedirect:\s*false/);
+  assert.match(app, /paintSignedOut|sessionHandoff/);
   const fns = read("functions/feature-services-functions.js");
   assert.match(fns, /betaConsentChecksComplete/);
   assert.match(fns, /agreementSha256/);
   assert.match(fns, /You already joined this beta invitation/);
+  assert.match(fns, /FLOQR_PUBLIC_ORIGIN/);
+  assert.match(fns, /jadzadco\.github\.io\/shoutout-demo/);
+  assert.match(fns, /\$\{publicOrigin\}\/beta-invite\.html\?t=/);
 });
 
 function chain(records) {
@@ -301,6 +309,16 @@ test("signed-out visitors on a forwarded page go to the general sign-in, then ba
   assert.equal(next.searchParams.get("profileRequired"), "sign-in");
   assert.equal(next.searchParams.get("v"), null, "page links never carry a version");
   assert.equal(next.searchParams.get("returnTo"), "commerce.html?club=abc#store");
+
+  const inviteTok = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-abcde"; // 43 chars
+  const beta = loadShell(`https://example.test/shoutout-demo/beta-invite.html?t=${inviteTok}&from=beta-invite`);
+  const betaReturn = new URL(beta.shell.loginHref(), "https://example.test/shoutout-demo/beta-invite.html");
+  assert.equal(betaReturn.searchParams.get("profileRequired"), "sign-in");
+  assert.equal(
+    betaReturn.searchParams.get("returnTo"),
+    `beta-invite.html?t=${inviteTok}&from=beta-invite`,
+    "invite token t must survive sign-in returnTo"
+  );
 
   const embedded = loadShell("https://example.test/staff-worksheet.html?embed=1");
   assert.equal(embedded.shell.redirectToLogin(), false, "iframes never navigate to sign-in");

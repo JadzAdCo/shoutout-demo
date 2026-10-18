@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.60 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.61 (stable)
+
+- s3.1.61: Beta invite email/session handoff — persist invite `t`, Sign in CTA with returnTo (no stuck Restoring), absolute Inbox invite URL.
 
 - s3.1.60: FloqR Inbox Read/Unread badge nowrap (no Rea/d wrap on mobile).
 
