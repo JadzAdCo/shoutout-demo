@@ -769,9 +769,11 @@
         }
         return row;
       }).filter(x => !x.deleted));
-      const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
-      setText("metricMessages", `${unreadMessages}/${messages.length}`);
-      setText("messageCountLabel", `(${unreadMessages}/${messages.length})`);
+      // Inbox metric = received only (exclude sent copies pulled via senderUid for thread context).
+      const received = messages.filter(x => x.recipientUid === user.uid || (user.email && x.recipientEmail === user.email));
+      const unreadMessages = received.filter(x => !x.read).length;
+      setText("metricMessages", `${unreadMessages}/${received.length}`);
+      setText("messageCountLabel", `(${unreadMessages}/${received.length})`);
       renderMessages(messages, user);
       setText("portalStatus", "");
       syncInboxComposeChrome();
@@ -3001,9 +3003,10 @@
       }, {merge: true});
       currentMessages = currentMessages.filter((_, i) => i !== index);
       const visible = currentMessages.filter(x => !x.deleted);
-      const unread = visible.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
-      setText("metricMessages", `${unread}/${visible.length}`);
-      setText("messageCountLabel", `(${unread}/${visible.length})`);
+      const received = visible.filter(x => x.recipientUid === user.uid || (user.email && x.recipientEmail === user.email));
+      const unread = received.filter(x => !x.read).length;
+      setText("metricMessages", `${unread}/${received.length}`);
+      setText("messageCountLabel", `(${unread}/${received.length})`);
       renderMessages(visible, user);
       setText("portalStatus", "Message deleted from FloqR Inbox.");
     });

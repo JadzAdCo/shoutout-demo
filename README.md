@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.68 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.69 (stable)
+
+- s3.1.69: Ship Priya Shah Search profile/inbox reconcile (TW→PS, soft-delete inbox counts) onto live Pages.
 
 - s3.1.68: Restore Beta pill on Search shoutout-icon-card tiles (FloqAi / floqCast / VIP) — CSS had only covered category-card.
 

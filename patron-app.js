@@ -695,14 +695,19 @@
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
-  function getInitials(user) {
-    const name = user?.displayName || user?.email || user?.phoneNumber || "Guest";
+  function getInitials(user, profile = {}) {
+    // Prefer Firestore profile name (e.g. Priya Shah) over stale Auth displayName (e.g. Temp Waitress 1).
+    const name = profile.displayName || profile.fullName || user?.displayName || user?.email || user?.phoneNumber || "Guest";
     return name.split(/[ @._-]+/).filter(Boolean).slice(0,2).map(x => x[0].toUpperCase()).join("") || "?";
   }
 
-  function updateUserMenu(user) {
-    const photoURL = user?.photoURL || "";
-    const displayName = user?.displayName || user?.email || user?.phoneNumber || "Please Sign-In or Sign-Up:";
+  function profilePhotoUrl(user, profile = {}) {
+    return profile.photoURL || profile.photoUrl || profile.avatarUrl || profile.publicPhotoUrl || profile.profilePhotoUrl || user?.photoURL || "";
+  }
+
+  function updateUserMenu(user, profile = cachedUserProfile || {}) {
+    const photoURL = profilePhotoUrl(user, profile);
+    const displayName = profile.displayName || profile.fullName || user?.displayName || user?.email || user?.phoneNumber || "Please Sign-In or Sign-Up:";
     const email = user?.email || user?.phoneNumber || "Guest";
     const userPhoto = byId("userPhoto");
     const dropdownPhoto = byId("dropdownUserPhoto");
@@ -717,12 +722,27 @@
       dropdownPhoto.classList.toggle("hidden", !photoURL);
     }
     if (initials) {
-      initials.textContent = user ? getInitials(user) : "?";
+      initials.textContent = user ? getInitials(user, profile) : "?";
       initials.classList.toggle("hidden", !!photoURL);
     }
     setText("dropdownUserName", displayName);
     setText("dropdownUserEmail", email);
-    window.FLOQRIntentSearch?.syncPatronCard(user, cachedUserProfile || {});
+    window.FLOQRIntentSearch?.syncPatronCard(user, profile || {});
+  }
+
+  /** When Firestore profile name beats a stale Auth displayName (demo Temp Waitress N), sync Auth once. */
+  async function syncAuthDisplayNameFromProfile(user, profile = {}) {
+    if (!user?.updateProfile || !profile) return;
+    const wanted = String(profile.displayName || profile.fullName || "").trim();
+    if (!wanted || wanted === String(user.displayName || "").trim()) return;
+    try {
+      const patch = { displayName: wanted };
+      const photo = profilePhotoUrl(user, profile);
+      if (photo && photo !== user.photoURL) patch.photoURL = photo;
+      await user.updateProfile(patch);
+    } catch (error) {
+      console.warn("Auth displayName sync skipped", error?.message || error);
+    }
   }
 
   function toggleUserDropdown(event) {
@@ -1086,6 +1106,10 @@
       const doc = await db.collection("users").doc(currentUser.uid).get();
       cachedUserProfile = doc.exists ? doc.data() : null;
       resetUserLocationContext();
+      if (cachedUserProfile) {
+        updateUserMenu(currentUser, cachedUserProfile);
+        syncAuthDisplayNameFromProfile(currentUser, cachedUserProfile).catch(() => {});
+      }
       return cachedUserProfile;
     } catch (e) {
       lastProfileReadError = e;
@@ -4817,6 +4841,8 @@
     try {
       const profileDoc = await db.collection("users").doc(uid).get();
       const profile = profileDoc.exists ? profileDoc.data() : {};
+      cachedUserProfile = profile;
+      updateUserMenu(currentUser || {uid, email: profile.email}, profile);
       const levelEl = document.querySelector("#userDropdown [data-patron-menu='level']");
       if (levelEl) {
         const level = profile.memberType || profile.memberLevel || "Patron";
@@ -4824,21 +4850,28 @@
         levelEl.textContent = tt("profile.menu.memberLevel", { level }, `Member Type: ${level}`);
       }
 
+      // Match portal / global-profile-status: recipientUid only, exclude soft-deleted, dedupe by id.
       let totalMessages = 0, unreadMessages = 0, totalChats = 0, unreadChats = 0;
-
+      const seen = new Set();
+      const tallyInboxDoc = (doc) => {
+        if (!doc?.id || seen.has(doc.id)) return;
+        const data = doc.data() || {};
+        if (data.deleted) return;
+        seen.add(doc.id);
+        totalMessages += 1;
+        if (!data.read) unreadMessages += 1;
+      };
       try {
-        const msgSnap = await db.collection("messages").where("recipientUid", "==", uid).limit(1000).get();
-        totalMessages = msgSnap.size;
-        msgSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
+        const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(80).get();
+        noteSnap.forEach(tallyInboxDoc);
       } catch(e) {}
       try {
-        const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(1000).get();
-        totalMessages += noteSnap.size;
-        noteSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
+        const msgSnap = await db.collection("messages").where("recipientUid", "==", uid).limit(80).get();
+        msgSnap.forEach(tallyInboxDoc);
       } catch(e) {}
 
       try {
-        const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(1000).get();
+        const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(80).get();
         totalChats = chatSnap.size;
         chatSnap.forEach(d => {
           const unread = d.data().unreadCounts && d.data().unreadCounts[uid] ? Number(d.data().unreadCounts[uid]) : 0;
@@ -5089,19 +5122,28 @@
 
   async function counts(uid){
     const out = {tm:0, um:0, tc:0, uc:0};
+    const seen = new Set();
+    const tally = (doc) => {
+      if (!doc?.id || seen.has(doc.id)) return;
+      const data = doc.data() || {};
+      if (data.deleted) return;
+      seen.add(doc.id);
+      out.tm += 1;
+      if (!data.read) out.um += 1;
+    };
     try{
       const db = firebase.firestore();
-      const ms = await db.collection("messages").where("recipientUid","==",uid).limit(1000).get();
-      out.tm = ms.size; ms.forEach(d => { if(!d.data().read) out.um++; });
+      const ns = await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(80).get();
+      ns.forEach(tally);
     }catch(e){}
     try{
       const db = firebase.firestore();
-      const ns = await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(1000).get();
-      out.tm += ns.size; ns.forEach(d => { if(!d.data().read) out.um++; });
+      const ms = await db.collection("messages").where("recipientUid","==",uid).limit(80).get();
+      ms.forEach(tally);
     }catch(e){}
     try{
       const db = firebase.firestore();
-      const cs = await db.collection("chatRooms").where("participants","array-contains",uid).limit(1000).get();
+      const cs = await db.collection("chatRooms").where("participants","array-contains",uid).limit(80).get();
       out.tc = cs.size; cs.forEach(d => { out.uc += Number((d.data().unreadCounts || {})[uid] || 0); });
     }catch(e){}
     return out;
