@@ -270,5 +270,9 @@
   "help-vip-receipt-sms-redaction-fixes": {
     "title": "VIP receipt SMS & invoice redaction",
     "body": "Paid receipts send SMS only through the logged Twilio Messages API path. FLOQR-YYYYMMDD-… and VR-… invoice numbers stay readable in mail/SMS logs (they are not treated as OTP codes)."
+  },
+  "help-floqr-inbox-rules": {
+    "title": "FloqR Inbox",
+    "body": "FloqR Inbox holds System Messages and internal support messages. The list loads first so your messages appear quickly. Tap the floating New Message button to compose — type a name or @username to find an allowed recipient (Club Admin, CSR, or approved staff). Patron-to-patron chat stays in Mingl after both patrons Mingl back. Opening a schedule invite does not confirm a shift — review and Approve selected on Work Calendar."
   }
 }

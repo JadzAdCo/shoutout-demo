@@ -83,10 +83,17 @@
     const out = {messages:"0/0", chats:"0/0"};
     if (!db || !uid) return out;
     try {
+      // Match portal inbox: count inboxNotifications that are not soft-deleted.
       const messages = await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(80).get();
       let unread = 0;
-      messages.forEach(doc => { if (!doc.data().read) unread += 1; });
-      out.messages = `${unread}/${messages.size}`;
+      let total = 0;
+      messages.forEach(doc => {
+        const data = doc.data() || {};
+        if (data.deleted) return;
+        total += 1;
+        if (!data.read) unread += 1;
+      });
+      out.messages = `${unread}/${total}`;
     } catch(e) {}
     try {
       const chats = await db.collection("chatRooms").where("participants","array-contains",uid).limit(80).get();

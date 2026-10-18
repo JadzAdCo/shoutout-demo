@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.57";
+  const VERSION = "s3.1.58";
 
   const packs = {
     "ru": {
@@ -45,6 +45,10 @@
       "help-beta-tester": {
         title: "Бета-тестирование",
         body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт. Прочитайте Соглашение о бета-тесте FloqR.app (QA / UAT ещё не завершён, «как есть»), отметьте оба обязательных флажка (Соглашение и отказ от ответственности по транзакциям) и нажмите «Я соглашаюсь и присоединяюсь к бете». Вы увидите подтверждение вступления и записи согласия. В поиске с меткой «Бета» появятся только выбранные для вас функции. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
+      },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox хранит System Messages и внутренние сообщения поддержки. Список загружается первым, чтобы письма появлялись быстро. Нажмите плавающую кнопку New Message, чтобы написать — введите имя или @username, чтобы найти разрешённого получателя (Club Admin, CSR или одобренный персонал). Переписка patron–patron остаётся в Mingl после взаимного Mingl. Открытие приглашения на смену не подтверждает её — просмотрите и нажмите Approve selected в Work Calendar."
       },
       "help-location-search": {
         title: "Поиск с учётом местоположения",
@@ -320,6 +324,10 @@
         title: "Bètatesten",
         body: "Soms nodigt FLOQR bezoekers uit om nieuwe functies eerder te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account. Lees de FloqR.app-bètatestovereenkomst (QA / UAT nog niet afgerond, AS IS), vink beide verplichte vakjes aan (bètatestovereenkomst en disclaimer boekingstransacties) en tik Ik ga akkoord en doe mee aan de bèta. Je ziet een duidelijke bevestiging dat je bent toegetreden en dat toestemming is vastgelegd. Bij Zoeken verschijnen alleen de functies die FLOQR voor jou koos met het label Bèta. Ze kunnen tijdens het testen wijzigen of uitgaan. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
       },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox bevat System Messages en interne supportberichten. De lijst laadt eerst zodat berichten snel verschijnen. Tik op de zwevende knop New Message om te schrijven — typ een naam of @username om een toegestane ontvanger te vinden (Club Admin, CSR of goedgekeurd personeel). Patron-naar-patron chat blijft in Mingl na wederzijds Mingl. Een shift-uitnodiging openen bevestigt niet — bekijk en tik Approve selected op Work Calendar."
+      },
       "help-location-search": {
         title: "Zoeken op locatie",
         body: "FLOQR toont evenementen en clubs die het dichtst bij je zijn eerst, daarna op naam. Als je het toestaat, gebruikt FLOQR de locatie van je telefoon of browser (gps); anders wordt je stad geschat op basis van je internetverbinding (IP). Typ een plaats, zoals Clubs in Monaco, om ergens anders te zoeken — ook daar staan de dichtstbijzijnde eerst. Je kunt locatietoegang uitzetten in de instellingen van je browser of telefoon."
@@ -593,6 +601,10 @@
       "help-beta-tester": {
         title: "Tests bêta",
         body: "Parfois FLOQR invite des clients à essayer de nouvelles fonctionnalités plus tôt. L’invitation arrive dans la Boîte de réception ; ouvrez-la en étant connecté au même compte. Lisez l’Accord de test bêta FloqR.app (QA / UAT non terminée, TEL QUEL), cochez les deux cases obligatoires (Accord et avertissement sur les transactions), puis J’accepte et je rejoins la bêta. Vous voyez une confirmation claire d’inscription et d’enregistrement du consentement. Seules les fonctionnalités choisies pour vous apparaissent ensuite dans la recherche avec l’étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
+      },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox contient les System Messages et les messages de support internes. La liste se charge d’abord pour afficher vos messages rapidement. Appuyez sur le bouton flottant New Message pour composer — saisissez un nom ou @username pour trouver un destinataire autorisé (Club Admin, CSR ou personnel approuvé). Le chat patron-à-patron reste dans Mingl après un Mingl mutuel. Ouvrir une invitation de shift ne confirme pas — examinez et Approve selected sur Work Calendar."
       },
       "help-location-search": {
         title: "Recherche selon votre position",
@@ -868,6 +880,10 @@
         title: "Beta-Tests",
         body: "Manchmal lädt FLOQR Gäste ein, neue Funktionen früher zu testen. Die Einladung kommt in den Posteingang; öffne sie, während du mit demselben Konto angemeldet bist. Lies die FloqR.app-Beta-Testvereinbarung (QA / UAT noch nicht abgeschlossen, WIE BESEHEN), aktiviere beide Pflichtkästchen (Beta-Testvereinbarung und Hinweis zu Buchungstransaktionen) und tippe Ich stimme zu und trete der Beta bei. Du siehst eine klare Bestätigung, dass du beigetreten bist und die Zustimmung gespeichert wurde. In der Suche erscheinen nur die für dich gewählten Funktionen mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das empfangende Konto."
       },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox enthält System Messages und interne Support-Nachrichten. Die Liste lädt zuerst, damit Nachrichten schnell erscheinen. Tippe auf den schwebenden New Message-Button zum Verfassen — gib einen Namen oder @username ein, um einen erlaubten Empfänger zu finden (Club Admin, CSR oder genehmigtes Personal). Patron-zu-Patron-Chat bleibt in Mingl nach gegenseitigem Mingl. Eine Schicht-Einladung zu öffnen bestätigt nicht — prüfe und tippe Approve selected im Work Calendar."
+      },
       "help-location-search": {
         title: "Standortbezogene Suche",
         body: "FLOQR zeigt zuerst die Events und Clubs, die Ihnen am nächsten sind, danach nach Name. Wenn Sie es erlauben, nutzt FLOQR den Standort Ihres Telefons oder Browsers (GPS); sonst wird Ihre Stadt anhand Ihrer Internetverbindung (IP) geschätzt. Geben Sie einen Ort ein, z. B. Clubs in Monaco, um woanders zu suchen — auch dort stehen die nächstgelegenen zuerst. Den Standortzugriff können Sie in den Browser- oder Telefoneinstellungen deaktivieren."
@@ -1141,6 +1157,10 @@
       "help-beta-tester": {
         title: "Pruebas beta",
         body: "A veces FLOQR invita a los clientes a probar funciones nuevas antes. La invitación llega a la Bandeja de entrada; ábrela con la misma cuenta. Lee el Acuerdo de prueba beta de FloqR.app (QA / UAT aún no completada, TAL CUAL), marca ambas casillas obligatorias (Acuerdo y Aviso de transacciones) y pulsa Acepto y me uno a la beta. Verás una confirmación clara de que te uniste y de que el consentimiento quedó registrado. Solo las funciones que FLOQR eligió para ti aparecen luego en Búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta destinataria."
+      },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox guarda System Messages y mensajes internos de soporte. La lista carga primero para que tus mensajes aparezcan rápido. Pulsa el botón flotante New Message para redactar — escribe un nombre o @username para encontrar un destinatario permitido (Club Admin, CSR o personal aprobado). El chat patron-a-patron sigue en Mingl tras Mingl mutuo. Abrir una invitación de turno no confirma — revisa y Approve selected en Work Calendar."
       },
       "help-location-search": {
         title: "Búsqueda según tu ubicación",
@@ -1416,6 +1436,10 @@
         title: "Test beta",
         body: "A volte FLOQR invita i clienti a provare nuove funzioni in anticipo. L’invito arriva in Posta in arrivo; aprilo restando connesso allo stesso account. Leggi l’Accordo di beta test FloqR.app (QA / UAT non ancora completata, COSÌ COM’È), spunta entrambe le caselle obbligatorie (Accordo e disclaimer sulle transazioni), poi Accetto e partecipo alla beta. Vedrai una conferma chiara dell’iscrizione e della registrazione del consenso. Solo le funzioni scelte per te compaiono poi in Cerca con l’etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l’account destinatario."
       },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox contiene System Messages e messaggi di supporto interni. L’elenco si carica per primo così i messaggi appaiono subito. Tocca il pulsante fluttuante New Message per scrivere — digita un nome o @username per trovare un destinatario consentito (Club Admin, CSR o staff approvato). La chat patron-a-patron resta in Mingl dopo il Mingl reciproco. Aprire un invito di turno non conferma — rivedi e Approve selected su Work Calendar."
+      },
       "help-location-search": {
         title: "Ricerca in base alla posizione",
         body: "FLOQR mostra prima gli eventi e i club più vicini a te, poi per nome. Se lo consenti, usa la posizione del telefono o del browser (GPS); altrimenti stima la tua città dalla connessione internet (IP). Scrivi un luogo, ad esempio Club a Monaco, per cercare altrove: anche lì i risultati partono dai più vicini a te. Puoi disattivare l'accesso alla posizione nelle impostazioni del browser o del telefono."
@@ -1689,6 +1713,10 @@
       "help-beta-tester": {
         title: "Testes beta",
         body: "Por vezes a FLOQR convida clientes a experimentar novas funcionalidades mais cedo. O convite chega à Caixa de entrada; abra-o com a mesma conta. Leia o Acordo de teste beta do FloqR.app (QA / UAT ainda não concluída, TAL COMO ESTÁ), marque as duas caixas obrigatórias (Acordo e Aviso de transações) e toque Concordo e entro na beta. Verá uma confirmação clara de que entrou e de que o consentimento foi registado. Só as funcionalidades escolhidas para si aparecem depois na Pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta destinatária."
+      },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "O FloqR Inbox guarda System Messages e mensagens internas de suporte. A lista carrega primeiro para as mensagens aparecerem depressa. Toque no botão flutuante New Message para escrever — digite um nome ou @username para encontrar um destinatário permitido (Club Admin, CSR ou staff aprovado). O chat patron-a-patron fica no Mingl após Mingl mútuo. Abrir um convite de turno não confirma — reveja e Approve selected no Work Calendar."
       },
       "help-location-search": {
         title: "Pesquisa por localização",
@@ -1964,6 +1992,10 @@
         title: "Δοκιμές beta",
         body: "Μερικές φορές το FLOQR προσκαλεί επισκέπτες να δοκιμάσουν νέες λειτουργίες νωρίτερα. Η πρόσκληση φτάνει στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό. Διαβάστε τη Συμφωνία δοκιμής beta FloqR.app (QA / UAT δεν έχει ολοκληρωθεί, ΩΣ ΕΧΕΙ), επιλέξτε και τα δύο υποχρεωτικά πλαίσια (Συμφωνία και αποποίηση συναλλαγών) και πατήστε Συμφωνώ και συμμετέχω στη beta. Θα δείτε σαφή επιβεβαίωση εγγραφής και καταγραφής συγκατάθεσης. Στην Αναζήτηση εμφανίζονται μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς με ετικέτα Beta. Μπορούν να αλλάξουν ή να απενεργοποιηθούν κατά τη δοκιμή. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό παραλήπτη."
       },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "Το FloqR Inbox κρατά System Messages και εσωτερικά μηνύματα υποστήριξης. Η λίστα φορτώνει πρώτη ώστε τα μηνύματα να εμφανίζονται γρήγορα. Πατήστε το αιωρούμενο κουμπί New Message για σύνταξη — πληκτρολογήστε όνομα ή @username για επιτρεπόμενο παραλήπτη (Club Admin, CSR ή εγκεκριμένο προσωπικό). Η συνομιλία patron-προς-patron μένει στο Mingl μετά από αμοιβαίο Mingl. Το άνοιγμα πρόσκλησης βάρδιας δεν επιβεβαιώνει — ελέγξτε και Approve selected στο Work Calendar."
+      },
       "help-location-search": {
         title: "Αναζήτηση με βάση την τοποθεσία",
         body: "Το FLOQR δείχνει πρώτα τις εκδηλώσεις και τα κλαμπ που είναι πιο κοντά σας και μετά κατά όνομα. Αν το επιτρέψετε, χρησιμοποιεί την τοποθεσία του τηλεφώνου ή του browser (GPS)· αλλιώς εκτιμά την πόλη σας από τη σύνδεσή σας στο διαδίκτυο (IP). Πληκτρολογήστε ένα μέρος, π.χ. Κλαμπ στο Μονακό, για να ψάξετε αλλού — και εκεί τα αποτελέσματα ξεκινούν από τα πιο κοντινά σας. Μπορείτε να απενεργοποιήσετε την πρόσβαση στην τοποθεσία από τις ρυθμίσεις του browser ή του τηλεφώνου."
@@ -2238,6 +2270,10 @@
         title: "Testy beta",
         body: "Czasem FLOQR zaprasza gości do wcześniejszego testowania nowych funkcji. Zaproszenie trafia do Skrzynki; otwórz je będąc zalogowanym na to samo konto. Przeczytaj Umowę testów beta FloqR.app (QA / UAT jeszcze nieukończone, W STANIE JAKIM JEST), zaznacz oba wymagane pola (Umowa i zastrzeżenie transakcji), a potem Zgadzam się i dołączam do bety. Zobaczysz jasne potwierdzenie dołączenia i zapisania zgody. W Wyszukiwaniu pojawią się tylko funkcje wybrane dla Ciebie z etykietą Beta. Mogą się zmieniać lub być wyłączane podczas testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta odbiorcy."
       },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "FloqR Inbox przechowuje System Messages i wewnętrzne wiadomości wsparcia. Lista ładuje się najpierw, aby wiadomości pojawiały się szybko. Dotknij pływającego przycisku New Message, aby napisać — wpisz imię lub @username, by znaleźć dozwolonego odbiorcę (Club Admin, CSR lub zatwierdzony personel). Czat patron-do-patron zostaje w Mingl po wzajemnym Mingl. Otwarcie zaproszenia na zmianę nie potwierdza — przejrzyj i Approve selected w Work Calendar."
+      },
       "help-location-search": {
         title: "Wyszukiwanie według lokalizacji",
         body: "FLOQR najpierw pokazuje wydarzenia i kluby najbliżej Ciebie, a potem według nazwy. Jeśli na to pozwolisz, używa lokalizacji telefonu lub przeglądarki (GPS); w przeciwnym razie szacuje Twoje miasto na podstawie połączenia internetowego (IP). Wpisz miejsce, np. Kluby w Monako, aby szukać gdzie indziej — tam również wyniki zaczynają się od najbliższych Tobie. Dostęp do lokalizacji możesz wyłączyć w ustawieniach przeglądarki lub telefonu."
@@ -2511,6 +2547,10 @@
       "help-beta-tester": {
         title: "الاختبار التجريبي",
         body: "أحيانًا تدعو FLOQR الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى الوارد؛ افتحها وأنت مسجّل الدخول بنفس الحساب. اقرأ اتفاقية اختبار بيتا لـ FloqR.app (ضمان الجودة / لم يُكمل اختبار قبول المستخدم، كما هو)، وفعّل المربعين الإلزاميين (الاتفاقية وإخلاء مسؤولية معاملات الحجز)، ثم اضغط أوافق وأنضم إلى النسخة التجريبية. سترى تأكيدًا واضحًا للانضمام وتسجيل الموافقة. يظهر في البحث فقط الميزات التي اختارتها FLOQR لك بتصنيف بيتا. قد تتغير أو تُوقف أثناء الاختبار. تنتهي الدعوات بعد 7 أيام وتعمل فقط لحساب المستلم."
+      },
+      "help-floqr-inbox-rules": {
+        title: "FloqR Inbox",
+        body: "يحفظ FloqR Inbox رسائل System Messages ورسائل الدعم الداخلية. تُحمَّل القائمة أولاً لتظهر رسائلك بسرعة. اضغط زر New Message العائم للكتابة — اكتب اسمًا أو @username للعثور على مستلم مسموح (Club Admin أو CSR أو طاقم معتمد). محادثة patron-إلى-patron تبقى في Mingl بعد Mingl متبادل. فتح دعوة وردية لا يؤكدها — راجع ثم Approve selected في Work Calendar."
       },
       "help-location-search": {
         title: "البحث حسب الموقع",

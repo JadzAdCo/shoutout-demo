@@ -220,6 +220,10 @@
   let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
+  let messageRecipientsLoading = false;
+  let messageRecipientsReady = false;
+  let messageRecipientsPromise = null;
+  let inboxComposeOpen = false;
   let currentShoutouts = [];
   let currentArchivedShoutouts = [];
   let activeShoutoutEditId = "";
@@ -416,6 +420,7 @@
     } else {
       hidePortalFoSubtabs();
     }
+    syncInboxComposeChrome();
   }
 
   function showFeatureOrdersPane(paneId) {
@@ -1640,23 +1645,35 @@
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
+      .replace(/^@+/, "")
       .replace(/&/g, " and ")
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
   }
 
   function contextualTextMatch(query, value) {
-    const tokens = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    const tokens = normalizeSearchText(String(query || "").replace(/^@+/, ""))
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(token => token.replace(/^@+/, ""));
     const haystack = normalizeSearchText(value);
     return !tokens.length || tokens.every(token => haystack.includes(token));
   }
 
   function recipientText(recipient = {}) {
-    return [
+    const parts = [
       recipient.label, recipient.displayName, recipient.username, recipient.floqrHandle,
       recipient.roleLabel, recipient.locationName, recipient.clubLocationId
-      // Email intentionally omitted from search/display text so patrons never see staff emails.
-    ].join(" ");
+      // Full emails stay out of display; Club Admin local-parts are searchable aliases only.
+    ];
+    if (recipient.recipientType === "club_admin") {
+      (recipient.supportEmails || []).forEach(email => {
+        const local = String(email || "").split("@")[0].trim();
+        if (local) parts.push(local.replace(/[._+-]+/g, " "));
+      });
+      parts.push("club admin", "support", "admin");
+    }
+    return parts.join(" ");
   }
 
   function recipientPublicSubtitle(recipient = {}) {
@@ -1726,6 +1743,85 @@
     return Array.from(byKey.values()).sort((a,b) => supportRecipientLabel(a).localeCompare(supportRecipientLabel(b)));
   }
 
+  function isInboxPanelActive() {
+    return !!byId("portalMessages")?.classList.contains("active");
+  }
+
+  function syncInboxComposeChrome() {
+    const onInbox = isInboxPanelActive();
+    const compose = byId("portalCompose");
+    const fab = byId("inboxNewMessageFab");
+    if (compose) {
+      compose.classList.toggle("hidden", !inboxComposeOpen);
+      compose.hidden = !inboxComposeOpen;
+      compose.setAttribute("aria-hidden", inboxComposeOpen ? "false" : "true");
+    }
+    if (fab) {
+      const showFab = onInbox && !inboxComposeOpen;
+      fab.classList.toggle("hidden", !showFab);
+      fab.hidden = !showFab;
+      fab.setAttribute("aria-hidden", showFab ? "false" : "true");
+    }
+  }
+
+  function openInboxCompose() {
+    inboxComposeOpen = true;
+    syncInboxComposeChrome();
+    const user = auth.currentUser;
+    if (user) ensureMessageRecipients(user).catch(() => {});
+    renderRecipientSearchResults();
+    byId("composeRecipientSearch")?.focus();
+    byId("portalCompose")?.scrollIntoView?.({behavior: "smooth", block: "nearest"});
+  }
+
+  function closeInboxCompose({clear = false} = {}) {
+    inboxComposeOpen = false;
+    if (clear) {
+      ["composeRecipientUid", "composeRecipientEmail", "composeRecipientLabel", "composeRecipientSearch", "composeSubject", "composeBody"]
+        .forEach(id => { if (byId(id)) byId(id).value = ""; });
+      renderRecipientSearchResults({selected: true});
+    }
+    syncInboxComposeChrome();
+  }
+
+  async function loadCsrDesignations(user) {
+    const groups = await Promise.all([
+      queryCollectionSafe("clubEmployeeDesignations", "workerUid", user.uid, 100),
+      queryCollectionSafe("clubEmployeeDesignations", "uid", user.uid, 100),
+      queryCollectionSafe("clubEmployeeDesignations", "isCSR", true, 300)
+    ]);
+    return [...new Map(groups.flat().map(row => [row.id, row])).values()];
+  }
+
+  function ensureMessageRecipients(user) {
+    if (!user) return Promise.resolve([]);
+    if (messageRecipientsReady && messageRecipients.length) return Promise.resolve(messageRecipients);
+    if (messageRecipientsPromise) return messageRecipientsPromise;
+    messageRecipientsLoading = true;
+    renderRecipientSearchResults();
+    messageRecipientsPromise = (async () => {
+      // Seed Club Admin + CSR immediately so typeahead works before the full contacts scan.
+      const employeeDesignations = await loadCsrDesignations(user);
+      currentPortalDesignations = employeeDesignations;
+      messageRecipients = buildMessageRecipients(user, currentPortalUsers, employeeDesignations.filter(x => x.isCSR !== false));
+      renderRecipientSearchResults();
+      const allUsers = await (window.FLOQRPeople?.listSafe("contacts") || Promise.resolve([]));
+      currentPortalUsers = allUsers;
+      messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations.filter(x => x.isCSR !== false));
+      messageRecipientsReady = true;
+      messageRecipientsLoading = false;
+      renderRecipientSearchResults();
+      return messageRecipients;
+    })().catch(error => {
+      messageRecipientsLoading = false;
+      messageRecipientsPromise = null;
+      console.warn("Recipient directory", error?.message || error);
+      renderRecipientSearchResults();
+      return messageRecipients;
+    });
+    return messageRecipientsPromise;
+  }
+
   function selectMessageRecipient(recipient) {
     byId("composeRecipientUid").value = recipient.uid || "";
     byId("composeRecipientEmail").value = recipient.email || "";
@@ -1750,6 +1846,10 @@
     const noMatchText = noMatch && noMatch !== "inbox.recipientNoMatch"
       ? noMatch
       : "No allowed recipients matched this search.";
+    const loading = window.FLOQRI18n?.t?.("inbox.recipientLoading");
+    const loadingText = loading && loading !== "inbox.recipientLoading"
+      ? loading
+      : "Looking up recipients…";
 
     // Autocomplete only — never dump the full eligible directory when the field is empty.
     if (opts.selected || (hasSelection && query === selectedLabel)) {
@@ -1770,6 +1870,10 @@
       .slice(0, 8);
     wrap.hidden = false;
     wrap.classList.add("is-open");
+    if (!rows.length && messageRecipientsLoading) {
+      wrap.innerHTML = `<p class="sub small recipient-search-hint">${esc(loadingText)}</p>`;
+      return;
+    }
     wrap.innerHTML = rows.length ? rows.map((item, index) => {
       const subtitle = recipientPublicSubtitle(item);
       const selected = (item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail);
@@ -4558,6 +4662,11 @@
     }
     profile = await applyGpcOnLoad(user, profile);
     currentProfile = {uid:user.uid, email:user.email || "", ...profile};
+    messageRecipients = [];
+    messageRecipientsReady = false;
+    messageRecipientsLoading = false;
+    messageRecipientsPromise = null;
+    inboxComposeOpen = false;
 
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
@@ -4581,35 +4690,44 @@
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
     setText("portalStatus", "Loading your FloqR Inbox…");
+    if (byId("myMessages") && !currentMessages.length) {
+      byId("myMessages").innerHTML = `<p class="sub">${esc(tt("inbox.loadingList", {}, "Loading your FloqR Inbox…"))}</p>`;
+    }
     await refreshBlocks(user);
-    const [guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
-      getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
+
+    // Inbox-first: render notifications/messages before shoutout history / directory scans.
+    const [directMessages, inboxNotifications] = await Promise.all([
       getUserScopedRows("messages", user, [["recipientUid","uid"],["senderUid","uid"],["recipientEmail","email"],["senderEmail","email"]]),
-      getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]]),
+      getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]])
+    ]);
+    const messages = [
+      ...directMessages.filter(x => !x.deleted),
+      ...inboxNotifications.filter(x => !x.deleted).map(x => ({...x, senderUid:"system", senderName:"System Message", messageType:"system", subject:x.subject || x.title || "System Message", body:x.body || x.preview || "", type:x.type || "notification"}))
+    ];
+    const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
+    setText("metricMessages", `${unreadMessages}/${messages.length}`);
+    setText("messageCountLabel", `(${unreadMessages}/${messages.length})`);
+    renderMessages(messages, user);
+    setText("portalStatus", "");
+    syncInboxComposeChrome();
+    // Warm recipient directory in the background (CSR first, then contacts).
+    ensureMessageRecipients(user).catch(() => {});
+
+    const [guestLists, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
+      getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
       getParticipantCollectionSafe("chatRooms", user.uid),
       getParticipantCollectionSafe("minglConnections", user.uid),
       queryCollectionSafe("serviceOrders", "ownerUid", user.uid, 300)
     ]);
     const shoutouts = await loadPatronShoutoutHistory(user, serviceOrders);
     currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
-    currentPortalUsers = [];
     const chats = (await getPortalMinglRooms(user, [], queriedChats)).filter(room => {
       const other = (room.participants || []).find(uid => uid !== user.uid);
       return !other || !currentBlockedUids.has(other);
     });
-    renderMinglFriendSettings([]);
-    messageRecipients = [];
-
-    const messages = [
-      ...directMessages.filter(x => !x.deleted),
-      ...inboxNotifications.filter(x => !x.deleted).map(x => ({...x, senderUid:"system", senderName:"System Message", messageType:"system", subject:x.subject || x.title || "System Message", body:x.body || x.preview || "", type:x.type || "notification"}))
-    ];
-    const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
+    renderMinglFriendSettings(currentPortalUsers);
     const unreadChats = chats.reduce((sum,x) => sum + Number(x.unreadCounts?.[user.uid] || 0), 0);
-
-    setText("metricMessages", `${unreadMessages}/${messages.length}`);
     setText("metricChats", `${unreadChats}/${chats.length}`);
-    setText("messageCountLabel", `(${unreadMessages}/${messages.length})`);
     setText("chatCountLabel", `(${unreadChats}/${chats.length})`);
 
     byId("profileSummary").innerHTML = simpleRows([
@@ -4740,20 +4858,13 @@
       runShoutoutDiagnostic();
     }
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
-    renderMessages(messages, user);
     renderPortalMinglRequests(currentMinglConnections, user);
     renderPortalMinglChats(chats, user);
     setText("portalStatus", "");
-    Promise.all([
-      window.FLOQRPeople?.listSafe("contacts") || [],
-      Promise.all([
-        queryCollectionSafe("clubEmployeeDesignations", "workerUid", user.uid, 100),
-        queryCollectionSafe("clubEmployeeDesignations", "uid", user.uid, 100),
-        queryCollectionSafe("clubEmployeeDesignations", "isCSR", true, 300)
-      ]).then(groups => [...new Map(groups.flat().map(row => [row.id, row])).values()])
-    ]).then(async ([allUsers, employeeDesignations]) => {
-      currentPortalUsers = allUsers;
-      currentPortalDesignations = employeeDesignations;
+    // Directory / calendar enrichment continues after inbox is already visible.
+    Promise.resolve(messageRecipientsPromise || ensureMessageRecipients(user)).then(async () => {
+      const allUsers = currentPortalUsers;
+      const employeeDesignations = currentPortalDesignations;
       await renderStaffCalendarLinks(user, employeeDesignations);
       if (!currentMinglConnections.length) currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
       renderMinglFriendSettings(allUsers);
@@ -4762,8 +4873,6 @@
         const legacyChats = await getPortalMinglRooms(user, allUsers, queriedChats);
         renderPortalMinglChats(legacyChats, user);
       }
-      messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations.filter(x => x.isCSR !== false));
-      renderRecipientSearchResults();
       setText("portalStatus", "");
     }).catch(() => setText("portalStatus", "Some directory tools may still be loading."));
     const requestedRoom = params.get("room");
@@ -4779,6 +4888,7 @@
       ["Do Not Sell or Share", profile.doNotSellOrShare ? "Yes" : "No"],
       ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]
     ]);
+    syncInboxComposeChrome();
   }
 
   async function sendPortalMessage() {
@@ -4818,13 +4928,7 @@
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     setText("portalStatus", "Message sent.");
-    byId("composeBody").value = "";
-    byId("composeSubject").value = "";
-    byId("composeRecipientSearch").value = "";
-    byId("composeRecipientUid").value = "";
-    byId("composeRecipientEmail").value = "";
-    byId("composeRecipientLabel").value = "";
-    renderRecipientSearchResults();
+    closeInboxCompose({clear: true});
     await loadPortal(user);
     });
   }
@@ -4906,6 +5010,8 @@
       if (type === "videoLicense") { byId("commerceProductCategory").value = "Video"; byId("commerceProductPreviewType").value = "video"; }
     });
     bind("sendMessageBtn", sendPortalMessage);
+    bind("inboxNewMessageFab", openInboxCompose);
+    bind("closeComposeBtn", () => closeInboxCompose({clear: false}));
     bind("portalSendMinglMessageBtn", sendPortalMinglMessage);
     bind("portalImproveMinglMessageBtn", improvePortalMinglDraft);
     bind("backToMinglDashboardBtn", backToMinglDashboard);

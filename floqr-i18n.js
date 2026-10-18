@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.57";
+  const VERSION = "s3.1.58";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -615,6 +615,10 @@
       "inbox.composeNotePatron": "Patrons can message Club Admins and designated Customer Service Representatives here. Patron-to-patron conversations use Mingl Chat after both patrons Mingl back.",
       "inbox.composeNoteStaff": "Internal messaging is enabled for your approved role. Use patron-originated context before contacting a patron.",
       "inbox.composeTitle": "Send FloqR Inbox Message",
+      "inbox.closeCompose": "Close",
+      "inbox.loadingList": "Loading your FloqR Inbox…",
+      "inbox.newMessageFab": "New Message",
+      "inbox.recipientLoading": "Looking up recipients…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Message",
       "inbox.messagePlaceholder": "Write your message...",
@@ -1751,6 +1755,10 @@
       "inbox.composeNotePatron": "Les patrons peuvent écrire ici aux Club Admins et aux Customer Service Representatives désignés. Les conversations patron-à-patron utilisent Mingl Chat après un Mingl mutuel.",
       "inbox.composeNoteStaff": "La messagerie interne est activée pour votre rôle approuvé. Utilisez un contexte initié par un patron avant de contacter un patron.",
       "inbox.composeTitle": "Envoyer un message FloqR Inbox",
+      "inbox.closeCompose": "Fermer",
+      "inbox.loadingList": "Chargement de votre FloqR Inbox…",
+      "inbox.newMessageFab": "Nouveau message",
+      "inbox.recipientLoading": "Recherche des destinataires…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Message",
       "inbox.messagePlaceholder": "Écrivez votre message...",
@@ -2887,6 +2895,10 @@
       "inbox.composeNotePatron": "Patrons können hier Club Admins und benannte Customer Service Representatives schreiben. Patron-zu-Patron-Gespräche laufen über Mingl Chat, nachdem beide zurück-Mingln.",
       "inbox.composeNoteStaff": "Interne Nachrichten sind für deine genehmigte Rolle aktiviert. Nutze einen patron-initiierten Kontext, bevor du einen Patron kontaktierst.",
       "inbox.composeTitle": "FloqR Inbox-Nachricht senden",
+      "inbox.closeCompose": "Schließen",
+      "inbox.loadingList": "FloqR Inbox wird geladen…",
+      "inbox.newMessageFab": "Neue Nachricht",
+      "inbox.recipientLoading": "Empfänger werden gesucht…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Nachricht",
       "inbox.messagePlaceholder": "Schreibe deine Nachricht...",
@@ -4023,6 +4035,10 @@
       "inbox.composeNotePatron": "Los patrons pueden escribir aquí a Club Admins y Customer Service Representatives designados. Las conversaciones patron-a-patron usan Mingl Chat tras Mingl mutuo.",
       "inbox.composeNoteStaff": "La mensajería interna está habilitada para tu rol aprobado. Usa un contexto iniciado por un patron antes de contactar a un patron.",
       "inbox.composeTitle": "Enviar mensaje de FloqR Inbox",
+      "inbox.closeCompose": "Cerrar",
+      "inbox.loadingList": "Cargando tu FloqR Inbox…",
+      "inbox.newMessageFab": "Mensaje nuevo",
+      "inbox.recipientLoading": "Buscando destinatarios…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Mensaje",
       "inbox.messagePlaceholder": "Escribe tu mensaje...",
@@ -5159,6 +5175,10 @@
       "inbox.composeNotePatron": "Patrons kunnen hier Club Admins en aangewezen Customer Service Representatives berichten. Patron-naar-patron gesprekken gebruiken Mingl Chat na wederzijds Mingl.",
       "inbox.composeNoteStaff": "Interne berichten zijn ingeschakeld voor je goedgekeurde rol. Gebruik een door een patron gestarte context voordat je een patron contacteert.",
       "inbox.composeTitle": "FloqR Inbox-bericht versturen",
+      "inbox.closeCompose": "Sluiten",
+      "inbox.loadingList": "Je FloqR Inbox wordt geladen…",
+      "inbox.newMessageFab": "Nieuw bericht",
+      "inbox.recipientLoading": "Ontvangers zoeken…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Bericht",
       "inbox.messagePlaceholder": "Schrijf je bericht...",
@@ -6295,6 +6315,10 @@
       "inbox.composeNotePatron": "Patrons могут писать здесь Club Admins и назначенным Customer Service Representatives. Переписки patron–patron идут через Mingl Chat после взаимного Mingl.",
       "inbox.composeNoteStaff": "Внутренние сообщения включены для вашей одобренной роли. Используйте контекст, инициированный patron, прежде чем писать patron.",
       "inbox.composeTitle": "Отправить сообщение FloqR Inbox",
+      "inbox.closeCompose": "Закрыть",
+      "inbox.loadingList": "Загрузка FloqR Inbox…",
+      "inbox.newMessageFab": "Новое сообщение",
+      "inbox.recipientLoading": "Поиск получателей…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Сообщение",
       "inbox.messagePlaceholder": "Напишите сообщение...",
@@ -7431,6 +7455,10 @@
       "inbox.composeNotePatron": "I patron possono scrivere qui a Club Admin e Customer Service Representative designati. Le conversazioni patron-a-patron usano Mingl Chat dopo il Mingl reciproco.",
       "inbox.composeNoteStaff": "La messaggistica interna è attiva per il tuo ruolo approvato. Usa un contesto avviato dal patron prima di contattare un patron.",
       "inbox.composeTitle": "Invia messaggio FloqR Inbox",
+      "inbox.closeCompose": "Chiudi",
+      "inbox.loadingList": "Caricamento FloqR Inbox…",
+      "inbox.newMessageFab": "Nuovo messaggio",
+      "inbox.recipientLoading": "Ricerca destinatari…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Messaggio",
       "inbox.messagePlaceholder": "Scrivi il tuo messaggio...",
@@ -8567,6 +8595,10 @@
       "inbox.composeNotePatron": "Patrons podem escrever aqui para Club Admins e Customer Service Representatives designados. Conversas patron-a-patron usam Mingl Chat após Mingl mútuo.",
       "inbox.composeNoteStaff": "Mensagens internas estão ativadas para sua função aprovada. Use um contexto iniciado pelo patron antes de contactar um patron.",
       "inbox.composeTitle": "Enviar mensagem FloqR Inbox",
+      "inbox.closeCompose": "Fechar",
+      "inbox.loadingList": "A carregar o FloqR Inbox…",
+      "inbox.newMessageFab": "Nova mensagem",
+      "inbox.recipientLoading": "A procurar destinatários…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Mensagem",
       "inbox.messagePlaceholder": "Escreva sua mensagem...",
@@ -9703,6 +9735,10 @@
       "inbox.composeNotePatron": "Οι patrons μπορούν να γράφουν εδώ σε Club Admins και ορισμένους Customer Service Representatives. Οι συνομιλίες patron-προς-patron χρησιμοποιούν Mingl Chat μετά από αμοιβαίο Mingl.",
       "inbox.composeNoteStaff": "Η εσωτερική ανταλλαγή μηνυμάτων είναι ενεργή για τον εγκεκριμένο ρόλο σας. Χρησιμοποιήστε πλαίσιο που ξεκίνησε από patron πριν επικοινωνήσετε με patron.",
       "inbox.composeTitle": "Αποστολή μηνύματος FloqR Inbox",
+      "inbox.closeCompose": "Κλείσιμο",
+      "inbox.loadingList": "Φόρτωση FloqR Inbox…",
+      "inbox.newMessageFab": "Νέο μήνυμα",
+      "inbox.recipientLoading": "Αναζήτηση παραληπτών…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Μήνυμα",
       "inbox.messagePlaceholder": "Γράψτε το μήνυμά σας...",
@@ -10839,6 +10875,10 @@
       "inbox.composeNotePatron": "Patrons mogą pisać tutaj do Club Admins i wyznaczonych Customer Service Representatives. Rozmowy patron-do-patron używają Mingl Chat po wzajemnym Mingl.",
       "inbox.composeNoteStaff": "Wiadomości wewnętrzne są włączone dla Twojej zatwierdzonej roli. Użyj kontekstu zainicjowanego przez patrona przed kontaktem z patronem.",
       "inbox.composeTitle": "Wyślij wiadomość FloqR Inbox",
+      "inbox.closeCompose": "Zamknij",
+      "inbox.loadingList": "Ładowanie FloqR Inbox…",
+      "inbox.newMessageFab": "Nowa wiadomość",
+      "inbox.recipientLoading": "Szukanie odbiorców…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "Wiadomość",
       "inbox.messagePlaceholder": "Napisz wiadomość...",
@@ -11975,6 +12015,10 @@
       "inbox.composeNotePatron": "يمكن للـ patrons مراسلة Club Admins وممثلي خدمة العملاء المعيّنين هنا. محادثات patron-إلى-patron تستخدم Mingl Chat بعد Mingl متبادل.",
       "inbox.composeNoteStaff": "الرسائل الداخلية مفعّلة لدورك المعتمد. استخدم سياقًا بدأه patron قبل التواصل مع patron.",
       "inbox.composeTitle": "إرسال رسالة FloqR Inbox",
+      "inbox.closeCompose": "إغلاق",
+      "inbox.loadingList": "جارٍ تحميل FloqR Inbox…",
+      "inbox.newMessageFab": "رسالة جديدة",
+      "inbox.recipientLoading": "جارٍ البحث عن المستلمين…",
       "inbox.listTitle": "FloqR Inbox",
       "inbox.message": "الرسالة",
       "inbox.messagePlaceholder": "اكتب رسالتك...",
@@ -12914,6 +12958,10 @@
     root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
       const key = el.getAttribute("data-i18n-placeholder");
       if (key) el.setAttribute("placeholder", t(key));
+    });
+    root.querySelectorAll("[data-i18n-aria]").forEach(el => {
+      const key = el.getAttribute("data-i18n-aria");
+      if (key) el.setAttribute("aria-label", t(key));
     });
     const titleKey = document.documentElement.getAttribute("data-i18n-title")
       || document.querySelector("title[data-i18n]")?.getAttribute("data-i18n");

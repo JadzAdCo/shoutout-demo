@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.57";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.58";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.58",
+      title: "Inbox FAB + inbox-first + Follow Service search",
+      checks: [
+        {label:"Inbox New Message FAB", file:"patron-portal.html", includes:["inboxNewMessageFab", "portalCompose", "closeComposeBtn"]},
+        {label:"Inbox-first portal load", file:"patron-portal-app.js", includes:["ensureMessageRecipients", "openInboxCompose", "Loading your FloqR Inbox"]},
+        {label:"FAB styles", file:"styles.css", includes:["inbox-new-message-fab", "inbox-compose-sheet"]},
+        {label:"Follow Service search haystack", file:"services-app.js", includes:["serviceSearchHaystack", "listSafe", "Loading service directory"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.58\""]}
+      ]
+    },
     {
       version: "s3.1.55",
       title: "Features Mgmt sub-tabs",
@@ -1492,13 +1503,40 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-58-inbox-fab-inbox-first",
+      area:"My Profile / FloqR Inbox",
+      feature:"Floating New Message FAB + inbox-first load",
+      changed:"Send FloqR Inbox Message compose is hidden until FAB. Inbox list loads before shoutout history so messages appear in seconds (not minutes). Package s3.1.58.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
+      expected:"Inbox rows visible quickly; FAB opens compose; close hides compose; menu count matches list.",
+      troubleshoot:"Empty inbox while menu shows N/M → hard refresh patron-portal-app.js ?v=s3.1.58 (inbox-first). FAB missing → #inboxNewMessageFab + styles.css inbox-new-message-fab. Compose always open → portalCompose must start hidden."
+    },
+    {
+      id:"s3-1-58-inbox-recipient-search",
+      area:"My Profile / FloqR Inbox",
+      feature:"Recipient name / @username typeahead (CSR-first)",
+      changed:"Opening compose warms CSR + Club Admin immediately; contacts directory fills in behind. @don matches Club Admin via support email local-part when applicable. Looking up recipients… while directory loads. Package s3.1.58.",
+      howToTest:"1) Inbox tab → New Message. 2) Type @don or two letters of a known allowed name within a second or two. 3) Matching cards appear (or Looking up… then results). 4) Empty field never dumps full directory.",
+      expected:"Typeahead returns allowed recipients quickly; no full dump; Club Admin searchable without showing email.",
+      troubleshoot:"Always No allowed recipients → ensureMessageRecipients / FLOQRPeople.listSafe contacts; CSR designations query. Still slow → check getPeopleDirectory callable latency."
+    },
+    {
+      id:"s3-1-58-follow-service-search",
+      area:"Follow Service / Search",
+      feature:"Service directory search haystack + loading UX",
+      changed:"services-app uses listSafe, shows Loading service directory…, token-matches name/@handle/club/city/genre/role. Package s3.1.58.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/services.html. 2) Status moves Loading… → Service directory ready. 3) Type a DJ name or city → results filter locally without hanging. 4) Clear search → full list returns.",
+      expected:"Directory loads with status; local filter is snappy after load; empty match shows No approved services matched this search.",
+      troubleshoot:"Stuck Loading → getPeopleDirectory services mode / Functions. No filter → services-app.js ?v=s3.1.58 haystack."
+    },
+    {
       id:"s3-1-57-inbox-recipient-autocomplete",
       area:"My Profile / FloqR Inbox",
       feature:"Recipient type-to-search (no full directory dump)",
-      changed:"Compose Recipient field is autocomplete-only: results appear after 2+ typed characters; empty query never lists all eligible members. Label Recipient. One Club Admin row. Package s3.1.57.",
-      howToTest:"1) Hard-refresh My Profile → FloqR Inbox compose. 2) Confirm Recipient input is visible; no full list of Ale/Andre/Anna/… under Subject. 3) Type two letters of a name → matching cards appear. 4) Pick one → list closes; Subject/Message remain. 5) Clear/retype to change recipient.",
+      changed:"Compose Recipient field is autocomplete-only: results appear after 2+ typed characters; empty query never lists all eligible members. Label Recipient. One Club Admin row. Package s3.1.57 (superseded compose UX by s3.1.58 FAB).",
+      howToTest:"1) Hard-refresh My Profile → FloqR Inbox → New Message FAB. 2) Confirm Recipient input is visible; no full list of Ale/Andre/Anna/… under Subject. 3) Type two letters of a name → matching cards appear. 4) Pick one → list closes; Subject/Message remain. 5) Clear/retype to change recipient.",
       expected:"No full eligible-recipient dump on open; typeahead matches only; selected recipient sticks until edited.",
-      troubleshoot:"Still see full list → hard refresh patron-portal-app.js / styles.css ?v=s3.1.57. Recipient field missing → #composeRecipientSearch must be above Subject. Club Admin duplicated → SHOUTOUT_ADMIN_EMAILS must collapse to one UI row."
+      troubleshoot:"Still see full list → hard refresh patron-portal-app.js / styles.css ?v=s3.1.58. Recipient field missing → #composeRecipientSearch must be above Subject. Club Admin duplicated → SHOUTOUT_ADMIN_EMAILS must collapse to one UI row."
     },
     {
       id:"s3-1-57-profile-menu-feature-gate",

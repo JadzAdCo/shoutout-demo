@@ -1135,6 +1135,21 @@
       page: "beta-invite.html"
     },
     {
+      id: "help-floqr-inbox-rules",
+      title: "FloqR Inbox",
+      body: "FloqR Inbox holds System Messages and internal support messages. The list loads first so your messages appear quickly. Tap the floating New Message button to compose — type a name or @username to find an allowed recipient (Club Admin, CSR, or approved staff). Patron-to-patron chat stays in Mingl after both patrons Mingl back. Opening a schedule invite does not confirm a shift — review and Approve selected on Work Calendar.",
+      searchPhrases: [
+        "floqr inbox", "inbox", "new message", "send message", "recipient", "@username", "compose message",
+        "inbox empty", "floating new message", "system message", "club admin message"
+      ],
+      links: [
+        {label: "FloqR Inbox", href: pageUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalMessages"
+    },
+    {
       id: "help-features-services",
       title: "Features Mgmt",
       body: "Features Mgmt has three pages: Release Control (flags + Test → live), Beta & Testing (invites), and Audit Trail. Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link under the feature name in this table. Each feature has two switches. Enable Feature (IsFeatureEnabled) = 0 turns the feature off for everyone, including beta testers, Master Admins, and every menu link. With Enable Feature = 1 and Enable Beta Feature (IsTestFeature) = 0, every patron sees its Search tile and menu links. With both = 1, the feature is in testing: only beta testers you granted that feature see its links, marked Beta; Master Admins see it in their profile menu marked Beta and open it from this table instead of Search. Master Admins cannot be beta testers. When you press Save, FLOQR asks for a reason of at least 8 characters; it needs an SOS2FA unlock and is written to the tamper-evident audit trail below. Revision counts the saved changes to a feature. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",

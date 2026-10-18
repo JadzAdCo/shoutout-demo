@@ -327,7 +327,8 @@ When adding a section, use this skeleton:
 | **Beta invite consent (s3.1.56)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR.app Beta Test & Prerelease Agreement + Booking Transaction Disclaimer; required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` on `betaTesters`/`betaInvites` (`BETA_AGREEMENT` in `feature-services-core.js`). Help: `help-beta-tester`. Profile card via `global-profile-status.js`. |
 | **Profile menu fail-closed** | Search `#userDropdown` + `global-profile-status` mint feature links hidden; `FLOQRFeatureServices.applyFeatureLinks` reveals only granted Live/Beta. CSS: `.user-dropdown … .hidden` / `[hidden]` must beat `display:block!important` (also injected in `ensureLinkStyles`). |
 | **Inbox Recipient autocomplete** | Compose uses `#composeRecipientSearch` only — results appear after 2+ typed characters; empty query never dumps the directory. One Club Admin row (not one per support mailbox). |
-| **Package** | s3.1.57 |
+| **Inbox-first + New Message FAB (s3.1.58)** | `loadPortal` renders `messages` + `inboxNotifications` before shoutout history / directory scans. Compose sheet `#portalCompose` stays hidden until floating `#inboxNewMessageFab`. Recipient directory: CSR + Club Admin seed first, then `FLOQRPeople.listSafe("contacts")`; Club Admin email local-parts searchable (not displayed). Profile-menu counts skip soft-deleted inbox rows. Follow Service: `listSafe("services")` + token haystack (handle/club/genre) + loading status. Help: `help-floqr-inbox-rules`. |
+| **Package** | s3.1.58 |
 
 ## Beta invite landing (`beta-invite.html`)
 

@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.57 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.58 (stable)
 
+- s3.1.58: Inbox-first FloqR Inbox load + floating New Message FAB; faster Recipient/@username lookup; Follow Service search haystack + loading UX.
 - s3.1.57: Inbox Recipient type-to-search (no full directory dump); profile-menu .hidden fail-closed for every patron; beta-invite profile card + Agreement unlock.
 
 - s3.1.56: Beta invite FloqR.app Agreement + Booking Disclaimer dual consent + join acknowledgement.

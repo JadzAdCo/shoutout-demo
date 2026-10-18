@@ -1,4 +1,4 @@
-/* FLOQR role-capacity following and campaigns v29.07. */
+/* FLOQR role-capacity following and campaigns — optimized local filter after directory load. */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -11,6 +11,8 @@
   let profile = {};
   let services = [];
   let following = new Set();
+  let searchTimer = null;
+  let directoryReady = false;
 
   function normalizedRole(value = "") {
     const raw = String(value || "").toLowerCase();
@@ -30,10 +32,46 @@
   function roleLabel(role) { return role === "dj" ? "DJ" : role === "promoter" ? "Promoter" : role === "mediaCreator" ? "Videographer / Camera Operator" : "Hospitality Service"; }
   function followId(entityId, uid) { return `${entityId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_"); }
 
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/^@+/, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function serviceSearchHaystack(row = {}) {
+    const clubs = []
+      .concat(row.clubLocationId || "", row.locationName || "", row.clubName || "")
+      .concat(Array.isArray(row.clubLocationIds) ? row.clubLocationIds : [])
+      .concat(Array.isArray(row.affiliatedClubIds) ? row.affiliatedClubIds : []);
+    return normalizeSearchText([
+      row.displayName, row.fullName, row.username, row.floqrHandle,
+      row.city, row.country, row.state, row.region,
+      roleLabel(roleOf(row)), roleOf(row),
+      ...(row.musicInterests || []),
+      ...(row.favoriteGenres || []),
+      ...(row.genres || []),
+      ...clubs
+    ].filter(Boolean).join(" "));
+  }
+
+  function matchesQuery(row, query) {
+    const tokens = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    if (!tokens.length) return true;
+    const haystack = serviceSearchHaystack(row);
+    return tokens.every(token => haystack.includes(token));
+  }
+
   async function loadDirectory(user) {
+    directoryReady = false;
+    setStatus("Loading service directory…");
+    byId("serviceDirectory").innerHTML = `<div class="card"><p class="sub">Loading service directory…</p></div>`;
     const [mine, users, follows] = await Promise.all([
       db.collection("users").doc(user.uid).get(),
-      window.FLOQRPeople.list("services"),
+      window.FLOQRPeople?.listSafe ? window.FLOQRPeople.listSafe("services") : Promise.resolve([]),
       db.collection("entityFollows").where("followerUid", "==", user.uid).limit(500).get()
     ]);
     profile = mine.exists ? mine.data() || {} : {};
@@ -42,25 +80,37 @@
       const blocks = await window.FLOQRBlocks.loadActiveBlocks(db, user.uid);
       blocked = window.FLOQRBlocks.blockedUidSet(blocks, user.uid);
     }
-    services = users.flatMap(row => rolesOf(row).map(serviceRole => ({...row, id:`${row.uid}:${serviceRole}`, memberUid:row.uid, serviceRole:row.serviceRole || serviceRole}))).filter(row => row.memberUid !== user.uid && !blocked.has(row.memberUid));
+    services = users
+      .flatMap(row => rolesOf(row).map(serviceRole => ({...row, id:`${row.uid}:${serviceRole}`, memberUid:row.uid, serviceRole:row.serviceRole || serviceRole})))
+      .filter(row => row.memberUid !== user.uid && !blocked.has(row.memberUid));
     following = new Set(follows.docs.filter(doc => doc.data()?.active !== false).map(doc => doc.data()?.entityId));
     const ownRoles = rolesOf(profile);
     byId("serviceCampaignPanel").classList.toggle("hidden", !ownRoles.length);
     byId("serviceCampaignRole").innerHTML = ownRoles.map(role => `<option value="${esc(role)}">${esc(roleLabel(role))}</option>`).join("");
+    directoryReady = true;
     render();
   }
 
   function render() {
-    const query = String(byId("serviceSearch")?.value || "").trim().toLowerCase();
+    if (!directoryReady) {
+      byId("serviceDirectory").innerHTML = `<div class="card"><p class="sub">Loading service directory…</p></div>`;
+      return;
+    }
+    const query = String(byId("serviceSearch")?.value || "").trim();
     const filter = byId("serviceRoleFilter")?.value || "";
     const rows = services
       .filter(row => !filter || roleOf(row) === filter)
-      .filter(row => !query || `${row.displayName || ""} ${row.username || ""} ${row.city || ""} ${row.country || ""} ${(row.musicInterests || row.favoriteGenres || []).join(" ")} ${roleLabel(roleOf(row))}`.toLowerCase().includes(query));
+      .filter(row => matchesQuery(row, query));
     byId("serviceDirectory").innerHTML = rows.length ? rows.map(row => `<article class="card service-member-card">
       <div><p class="eyebrow">${esc(roleLabel(roleOf(row)))}</p><h2>${esc(row.displayName || row.username || "FLOQR Service Member")}</h2><p class="sub">${esc([row.city, row.country].filter(Boolean).join(", "))}</p><div class="badge-row">${(row.musicInterests || row.favoriteGenres || []).slice(0,5).map(value => `<span>${esc(value)}</span>`).join("")}</div></div>
       <div class="queue-actions"><button type="button" data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow service"}</button>${row.commerceEnabled ? `<a class="buttonlike" href="./commerce.html?seller=${encodeURIComponent(row.memberUid)}">Shop</a>` : ""}</div>
-    </article>`).join("") : `<div class="card"><p class="sub">No approved services matched.</p></div>`;
+    </article>`).join("") : `<div class="card"><p class="sub">${query || filter ? "No approved services matched this search." : "No approved services matched."}</p></div>`;
     document.querySelectorAll("[data-follow]").forEach(button => button.addEventListener("click", () => toggleFollow(button.dataset.follow)));
+  }
+
+  function scheduleRender() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(render, 60);
   }
 
   async function toggleFollow(entityId) {
@@ -108,7 +158,7 @@
       if (window.FLOQRSessionShell?.popupBlocked?.("#serviceStatus")) return;
       auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
     });
-    byId("serviceSearch")?.addEventListener("input", render);
+    byId("serviceSearch")?.addEventListener("input", scheduleRender);
     byId("serviceRoleFilter")?.addEventListener("change", render);
     byId("serviceCampaignAudience")?.addEventListener("change", event => byId("serviceTargetCountLabel").classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));
     byId("servicePublishCampaignBtn")?.addEventListener("click", publishCampaign);

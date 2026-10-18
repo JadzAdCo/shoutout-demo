@@ -263,6 +263,18 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 .message-envelope-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.message-envelope-head span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--lime);font-weight:1000}
 .message-body{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;white-space:pre-wrap;color:#fff}
 .inbox-recipient-field{display:block;margin:14px 0 6px}
+.inbox-compose-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.inbox-compose-heading h2{margin:0}
+.inbox-compose-heading-actions{display:flex;align-items:center;gap:8px}
+.inbox-compose-close{width:40px;height:40px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.28);color:#fff;font-size:22px;line-height:1;font-weight:900;padding:0}
+.inbox-compose-sheet{position:relative;z-index:3}
+.inbox-compose-sheet.hidden,[hidden].inbox-compose-sheet{display:none!important}
+#portalMessages{position:relative;padding-bottom:88px}
+.inbox-new-message-fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:40;display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 18px 0 14px;border:0;border-radius:999px;background:linear-gradient(135deg,#62eaff 0%,#3de7ff 45%,#ff4fc9 130%);color:#06101c;font-weight:1000;box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(98,234,255,.35);cursor:pointer}
+.inbox-new-message-fab.hidden,[hidden].inbox-new-message-fab{display:none!important}
+.inbox-new-message-fab-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:rgba(6,16,28,.16);font-size:24px;line-height:1;font-weight:900}
+.inbox-new-message-fab-label{font-size:14px;letter-spacing:.02em}
+@media(max-width:760px){.inbox-new-message-fab-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.inbox-new-message-fab{width:56px;height:56px;padding:0;justify-content:center}.inbox-new-message-fab-icon{background:transparent}}
 .recipient-search-results{display:none;gap:8px;margin:0 0 12px;max-height:min(42vh,280px);overflow:auto}
 .recipient-search-results.is-open{display:grid}
 .recipient-search-results[hidden]{display:none!important}
