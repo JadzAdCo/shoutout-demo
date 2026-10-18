@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.60";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.61";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.61",
+      title: "Search icon tiles FloqAi/floqCast/VIP faces + 3-across",
+      checks: [
+        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "floqai-icon-face"]},
+        {label:"No caption under ShoutOut/VIP", file:"index.html", notIncludes:["shoutout-icon-title"]},
+        {label:"3-across mobile CSS", file:"styles.css", includes:["search-icon-row", "vip-icon-face", "floqcast-icon-face", "calc((100% - 20px) / 3)"]},
+        {label:"floqCast cast icon asset", file:"images/floqcast-icon.svg", includes:["floqCast", "FloqMedia LED"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.61\""]}
+      ]
+    },
     {
       version: "s3.1.60",
       title: "Inbox Read badge nowrap",
@@ -1520,11 +1531,20 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-61-search-icon-tiles-standard",
+      area:"Search / Product tiles",
+      feature:"Standardized ShoutOut / floqCast / VIP / FloqAi icon tiles",
+      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.61.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with FloqAi/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) FloqAi / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; FloqAi → floqai.html.",
+      expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
+      troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."
+    },
+    {
       id:"s3-1-59-inbox-not-stuck-loading",
       area:"My Profile / FloqR Inbox",
       feature:"Inbox no longer stuck on Loading while menu shows 5/10",
       changed:"loadAndRenderInbox runs immediately after profile bootstrap — before template studio / BartR / AI prefs. Uses recipientUid fast path + 12s timeout. Package s3.1.59.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Within ~3s the list count must leave (0/0) and match profile-menu FloqR Inbox (e.g. 5/10). 3) Message envelopes appear (not stuck on Loading your FloqR Inbox…). 4) FAB still opens compose.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Within ~3s the list count must leave (0/0) and match profile-menu FloqR Inbox (e.g. 5/10). 3) Message envelopes appear (not stuck on Loading your FloqR Inbox…). 4) FAB still opens compose.",
       expected:"Inbox list paints quickly; count matches menu; never stuck Loading forever.",
       troubleshoot:"Still Loading → hard refresh ?v=s3.1.59; confirm patron-portal-app.js contains loadAndRenderInbox. Menu 5/10 but list empty after load → check deleted filter / recipientUid rules."
     },
@@ -1533,7 +1553,7 @@
       area:"My Profile / FloqR Inbox",
       feature:"Floating New Message FAB + inbox-first load",
       changed:"Send FloqR Inbox Message compose is hidden until FAB. Inbox list loads before shoutout history so messages appear in seconds (not minutes). Package s3.1.58 (further fixed in s3.1.59).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox&v=s3.1.59 as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=inbox as temp_waitress_1. 2) Confirm FloqR Inbox list shows messages within a few seconds (count matches profile-menu FloqR Inbox unread/total, excluding deleted). 3) Confirm compose card is NOT always visible. 4) Tap floating + / New Message (bottom-right) → compose sheet opens. 5) Close × returns to list + FAB.",
       expected:"Inbox rows visible quickly; FAB opens compose; close hides compose; menu count matches list.",
       troubleshoot:"Empty inbox while menu shows N/M → hard refresh patron-portal-app.js ?v=s3.1.59 (loadAndRenderInbox). FAB missing → #inboxNewMessageFab + styles.css inbox-new-message-fab. Compose always open → portalCompose must start hidden."
     },

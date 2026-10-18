@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.60 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.61 (stable)
+
+- s3.1.61: Search tiles standardized — FloqAi/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.
 
 - s3.1.60: FloqR Inbox Read/Unread badge nowrap (no Rea/d wrap on mobile).
 
