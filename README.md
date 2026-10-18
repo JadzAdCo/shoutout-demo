@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.65 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.66 (stable)
+
+- s3.1.66: VIP reserV no longer stuck on Restoring — catalog loads only VIP candidates (not ~590 club docs); Search tiles from s3.1.65 stay live.
 
 - s3.1.65: Search tiles standardized — FloqAi/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.
 
