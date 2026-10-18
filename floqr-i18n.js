@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.70";
+  const VERSION = "s3.1.71";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -593,6 +593,7 @@
       "beta.successAck": "Your acceptance of the FloqR Beta Test Agreement and Booking Transaction Disclaimer was recorded for this account.",
       "beta.successStatus": "Joined — Agreement accepted and recorded.",
       "beta.alreadyJoined": "You already joined this beta invitation.",
+      "beta.linkAlreadyUsed": "This beta invite link was already used. You accepted the Agreement and joined beta with this invitation — open Search to try your Beta features, or ask FLOQR for a new invite.",
       "beta.goSearch": "Open Search to try Beta features",
       "help.beta.title": "Beta testing",
       "help.beta.body": "Open this invite while signed in to the same account. If you opened the link from email, sign in once on FLOQR — you return here with the invite. Read the FloqR Beta Test Agreement, accept both required checkboxes, then I Agree and join beta. Search then shows your granted features with a Beta label.",
@@ -1736,6 +1737,7 @@
       "beta.successAck": "Votre acceptation de l’Accord de test bêta FloqR et de l’avertissement sur les transactions a été enregistrée pour ce compte.",
       "beta.successStatus": "Inscription réussie — Accord accepté et enregistré.",
       "beta.alreadyJoined": "Vous avez déjà rejoint cette invitation bêta.",
+      "beta.linkAlreadyUsed": "Ce lien d’invitation bêta a déjà été utilisé. Vous avez accepté l’Accord et rejoint la bêta avec cette invitation — ouvrez la Recherche pour essayer vos fonctions Bêta, ou demandez une nouvelle invitation à FLOQR.",
       "beta.goSearch": "Ouvrir la recherche pour essayer les fonctions Bêta",
       "help.beta.title": "Test bêta",
       "help.beta.body": "Ouvrez cette invitation en étant connecté au même compte. Lisez l’Accord de test bêta FloqR, cochez les deux cases obligatoires, puis J’accepte et je rejoins la bêta. La recherche affiche ensuite vos fonctions avec l’étiquette Bêta.",
@@ -2879,6 +2881,7 @@
       "beta.successAck": "Deine Annahme der FloqR-Beta-Testvereinbarung und des Hinweises zu Buchungstransaktionen wurde für dieses Konto gespeichert.",
       "beta.successStatus": "Beigetreten — Vereinbarung akzeptiert und gespeichert.",
       "beta.alreadyJoined": "Du bist dieser Beta-Einladung bereits beigetreten.",
+      "beta.linkAlreadyUsed": "Dieser Beta-Einladungslink wurde bereits verwendet. Du hast die Vereinbarung akzeptiert und bist mit dieser Einladung der Beta beigetreten — öffne die Suche, um deine Beta-Funktionen zu testen, oder bitte FLOQR um eine neue Einladung.",
       "beta.goSearch": "Suche öffnen, um Beta-Funktionen zu testen",
       "help.beta.title": "Beta-Tests",
       "help.beta.body": "Öffne diese Einladung, während du mit demselben Konto angemeldet bist. Lies die FloqR-Beta-Testvereinbarung, aktiviere beide Pflichtkästchen und tippe Ich stimme zu und trete der Beta bei. In der Suche erscheinen deine freigeschalteten Funktionen mit dem Label Beta.",
@@ -4022,6 +4025,7 @@
       "beta.successAck": "Tu aceptación del Acuerdo de prueba beta de FloqR y del Aviso de transacciones de reserva quedó registrada en esta cuenta.",
       "beta.successStatus": "Unido — Acuerdo aceptado y registrado.",
       "beta.alreadyJoined": "Ya te uniste a esta invitación beta.",
+      "beta.linkAlreadyUsed": "Este enlace de invitación beta ya se usó. Aceptaste el Acuerdo y te uniste a la beta con esta invitación: abre Búsqueda para probar tus funciones Beta, o pide a FLOQR una nueva invitación.",
       "beta.goSearch": "Abrir Búsqueda para probar funciones Beta",
       "help.beta.title": "Pruebas beta",
       "help.beta.body": "Abre esta invitación iniciando sesión con la misma cuenta. Lee el Acuerdo de prueba beta de FloqR, marca ambas casillas obligatorias y luego Acepto y me uno a la beta. En Búsqueda verás tus funciones con la etiqueta Beta.",
@@ -5165,6 +5169,7 @@
       "beta.successAck": "Je acceptatie van de FloqR-bètatestovereenkomst en de disclaimer boekingstransacties is voor dit account vastgelegd.",
       "beta.successStatus": "Meegedaan — Overeenkomst geaccepteerd en vastgelegd.",
       "beta.alreadyJoined": "Je bent deze bèta-uitnodiging al geaccepteerd.",
+      "beta.linkAlreadyUsed": "Deze bèta-uitnodigingslink is al gebruikt. Je hebt de Overeenkomst geaccepteerd en bent met deze uitnodiging toegetreden tot de bèta — open Zoeken om je Bètafuncties te proberen, of vraag FLOQR om een nieuwe uitnodiging.",
       "beta.goSearch": "Open Zoeken om bètafuncties te proberen",
       "help.beta.title": "Bètatesten",
       "help.beta.body": "Open deze uitnodiging terwijl je bent ingelogd op hetzelfde account. Lees de FloqR-bètatestovereenkomst, vink beide verplichte vakjes aan en tik Ik ga akkoord en doe mee aan de bèta. Bij Zoeken verschijnen je functies met het label Bèta.",
@@ -6308,6 +6313,7 @@
       "beta.successAck": "Ваше принятие Соглашения о бета-тесте FloqR и отказа от ответственности по транзакциям записано для этого аккаунта.",
       "beta.successStatus": "Присоединились — Соглашение принято и записано.",
       "beta.alreadyJoined": "Вы уже приняли это бета-приглашение.",
+      "beta.linkAlreadyUsed": "Эта ссылка на бета-приглашение уже использована. Вы приняли Соглашение и присоединились к бете по этому приглашению — откройте Поиск, чтобы попробовать функции «Бета», или попросите у FLOQR новое приглашение.",
       "beta.goSearch": "Открыть поиск, чтобы попробовать бета-функции",
       "help.beta.title": "Бета-тестирование",
       "help.beta.body": "Откройте это приглашение, войдя в тот же аккаунт. Прочитайте Соглашение о бета-тесте FloqR, отметьте оба обязательных флажка и нажмите «Я соглашаюсь и присоединяюсь к бете». В поиске появятся ваши функции с меткой «Бета».",
@@ -7451,6 +7457,7 @@
       "beta.successAck": "La tua accettazione dell’Accordo di beta test FloqR e del disclaimer sulle transazioni è stata registrata per questo account.",
       "beta.successStatus": "Iscritto — Accordo accettato e registrato.",
       "beta.alreadyJoined": "Hai già accettato questo invito beta.",
+      "beta.linkAlreadyUsed": "Questo link di invito beta è già stato usato. Hai accettato l’Accordo e sei entrato nella beta con questo invito — apri Cerca per provare le funzioni Beta, oppure chiedi a FLOQR un nuovo invito.",
       "beta.goSearch": "Apri Cerca per provare le funzioni Beta",
       "help.beta.title": "Beta testing",
       "help.beta.body": "Apri questo invito restando connesso allo stesso account. Leggi l’Accordo di beta test FloqR, spunta entrambe le caselle obbligatorie, poi Accetto e partecipo alla beta. In Cerca compaiono le tue funzioni con l’etichetta Beta.",
@@ -8594,6 +8601,7 @@
       "beta.successAck": "A sua aceitação do Acordo de teste beta do FloqR e do Aviso de transações de reserva foi registada nesta conta.",
       "beta.successStatus": "Entrou — Acordo aceite e registado.",
       "beta.alreadyJoined": "Já aceitou este convite beta.",
+      "beta.linkAlreadyUsed": "Este link de convite beta já foi usado. Aceitou o Acordo e entrou na beta com este convite — abra a Pesquisa para experimentar as funções Beta, ou peça um novo convite à FLOQR.",
       "beta.goSearch": "Abrir Pesquisa para experimentar funções Beta",
       "help.beta.title": "Testes beta",
       "help.beta.body": "Abra este convite com sessão iniciada na mesma conta. Leia o Acordo de teste beta do FloqR, marque as duas caixas obrigatórias e depois Concordo e entro na beta. Na Pesquisa aparecem as suas funções com a etiqueta Beta.",
@@ -9737,6 +9745,7 @@
       "beta.successAck": "Η αποδοχή της Συμφωνίας δοκιμής beta FloqR και της αποποίησης ευθύνης συναλλαγών καταγράφηκε για αυτόν τον λογαριασμό.",
       "beta.successStatus": "Εγγραφή — Συμφωνία αποδεκτή και καταγεγραμμένη.",
       "beta.alreadyJoined": "Έχετε ήδη αποδεχτεί αυτήν την πρόσκληση beta.",
+      "beta.linkAlreadyUsed": "Αυτός ο σύνδεσμος πρόσκλησης beta έχει ήδη χρησιμοποιηθεί. Αποδεχθήκατε τη Συμφωνία και συμμετείχατε στη beta με αυτήν την πρόσκληση — ανοίξτε την Αναζήτηση για να δοκιμάσετε τις λειτουργίες Beta, ή ζητήστε νέα πρόσκληση από το FLOQR.",
       "beta.goSearch": "Άνοιγμα Αναζήτησης για δοκιμή λειτουργιών Beta",
       "help.beta.title": "Δοκιμές beta",
       "help.beta.body": "Ανοίξτε αυτήν την πρόσκληση ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό. Διαβάστε τη Συμφωνία δοκιμής beta FloqR, επιλέξτε και τα δύο υποχρεωτικά πλαίσια και μετά Συμφωνώ και συμμετέχω στη beta. Στην Αναζήτηση εμφανίζονται οι λειτουργίες σας με ετικέτα Beta.",
@@ -10880,6 +10889,7 @@
       "beta.successAck": "Twoja akceptacja Umowy testów beta FloqR i zastrzeżenia dotyczącego transakcji została zapisana dla tego konta.",
       "beta.successStatus": "Dołączono — Umowa zaakceptowana i zapisana.",
       "beta.alreadyJoined": "Już dołączyłeś/aś do tego zaproszenia beta.",
+      "beta.linkAlreadyUsed": "Ten link zaproszenia beta został już użyty. Zaakceptowałeś Umowę i dołączyłeś do bety tym zaproszeniem — otwórz Wyszukiwanie, aby wypróbować funkcje Beta, albo poproś FLOQR o nowe zaproszenie.",
       "beta.goSearch": "Otwórz Wyszukiwanie, aby wypróbować funkcje Beta",
       "help.beta.title": "Testy beta",
       "help.beta.body": "Otwórz to zaproszenie będąc zalogowanym na to samo konto. Przeczytaj Umowę testów beta FloqR, zaznacz oba wymagane pola, a potem Zgadzam się i dołączam do bety. W Wyszukiwaniu pojawią się Twoje funkcje z etykietą Beta.",
@@ -12023,6 +12033,7 @@
       "beta.successAck": "تم تسجيل قبولك لاتفاقية اختبار بيتا لـ FloqR وإخلاء مسؤولية معاملات الحجز لهذا الحساب.",
       "beta.successStatus": "انضممت — تم قبول الاتفاقية وتسجيلها.",
       "beta.alreadyJoined": "لقد انضممت بالفعل إلى دعوة البيتا هذه.",
+      "beta.linkAlreadyUsed": "تم استخدام رابط دعوة البيتا هذا من قبل. قبلت الاتفاقية وانضممت إلى البيتا بهذه الدعوة — افتح البحث لتجربة ميزات البيتا، أو اطلب من FLOQR دعوة جديدة.",
       "beta.goSearch": "افتح البحث لتجربة ميزات البيتا",
       "help.beta.title": "اختبار البيتا",
       "help.beta.body": "افتح هذه الدعوة وأنت مسجّل الدخول بنفس الحساب. اقرأ اتفاقية اختبار بيتا لـ FloqR، وفعّل المربعين الإلزاميين، ثم أوافق وأنضم إلى النسخة التجريبية. يظهر البحث بعد ذلك ميزاتك بتصنيف بيتا.",

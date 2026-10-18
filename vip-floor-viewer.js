@@ -4,9 +4,22 @@
   const NS = "http://www.w3.org/2000/svg";
   const $ = id => document.getElementById(id);
   const stage = $("stage"), map = $("map"), mini = $("minimap"), info = $("info"), list = $("list"), chips = $("chips"), legendBar = $("legend");
+  const popoutBackdrop = $("vipTablePopoutBackdrop");
   const params = new URLSearchParams(location.search);
   const phoneMq = matchMedia("(max-width: 600px)");
   const isPhone = () => phoneMq.matches;
+
+  function setTablePopoutOpen(open) {
+    if (!info) return;
+    info.hidden = !open;
+    info.classList.toggle("vip-table-popout-open", !!open);
+    if (popoutBackdrop) {
+      popoutBackdrop.hidden = !open;
+      popoutBackdrop.classList.toggle("hidden", !open);
+      popoutBackdrop.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+    document.body.classList.toggle("vip-table-popout-active", !!open);
+  }
 
   // Simulated booking states so the colors can be reviewed. Not real data.
   const DEMO_STATES = {
@@ -310,24 +323,25 @@
 
   function showInfo(item) {
     if (!item) {
-      info.hidden = isPhone();
-      const c = plan.counts;
-      info.innerHTML = `<h2>${esc(plan.venue.name)}</h2><p>${c.bookableSections} bookable · ${c.areas} areas · ${c.nonBookable} not bookable</p>` +
-        `<p>${mode === "all" ? "Pick an area or tap a table." : esc(currentArea().description || "")}</p>`;
+      selectedId = null;
+      info.innerHTML = "";
+      setTablePopoutOpen(false);
       return;
     }
     const state = itemState(item), st = stDef(state), area = areaOf(item.id);
     const canBook = item.bookable && state === "available";
-    info.hidden = false;
+    const reserved = state === "booked" || Number(item.isReserved) === 1;
     info.innerHTML = `<h2>${iconSvg(st)} ${esc(item.label ?? "Unlabeled")}${item.name ? " · " + esc(item.name) : ""}<button type="button" class="close" aria-label="Close">×</button></h2><dl>` +
-      `<dt>Status</dt><dd>${esc(st.text)}</dd><dt>Area</dt><dd>${esc(area ? area.name : "—")}</dd><dt>Type</dt><dd>${esc(item.type)}</dd>` +
+      `<dt>Status</dt><dd>${esc(reserved ? "Reserved" : st.text)}</dd>` +
+      `<dt>Area</dt><dd>${esc(area ? area.name : "—")}</dd><dt>Type</dt><dd>${esc(item.type)}</dd>` +
       (item.bookable ? `<dt>Guests</dt><dd>Up to ${item.maxCapacity} · minimum covers ${item.includedGuests}</dd>` : "") +
       (item.reason ? `<dt>Why not bookable</dt><dd>${esc(item.reason)}</dd>` : "") + `</dl>` +
       (canBook ? `<div class="party"><span id="partyLabel">Party size</span><div class="stepper" role="group" aria-labelledby="partyLabel">` +
         `<button type="button" data-step="-1" aria-label="Fewer guests">−</button><output id="partySize" aria-live="polite"></output>` +
         `<button type="button" data-step="1" aria-label="More guests">+</button></div></div><table class="fees" id="fees"></table>` : "") +
       (item.bookable ? `<button type="button" class="book" ${canBook ? "" : "disabled"}>${canBook ? "Hold this table" : esc(st.text) + " — pick another table"}</button>` : "");
-    info.querySelector(".close").addEventListener("click", () => { selectedId = null; renderOverlay(); showInfo(null); });
+    setTablePopoutOpen(true);
+    info.querySelector(".close")?.addEventListener("click", () => { selectedId = null; renderOverlay(); showInfo(null); });
     if (canBook) bindParty(item);
     const bookBtn = info.querySelector("button.book");
     if (bookBtn && canBook) {
@@ -382,8 +396,6 @@
     }
     applyView(true);
     showInfo(item);
-    // The phone bottom sheet covers the lower half of the screen; keep the map above it.
-    if (isPhone()) legendBar.scrollIntoView({block: "start"});
   }
 
   function setMode(next) {
@@ -411,6 +423,14 @@
   }
 
   document.querySelectorAll("[data-plan]").forEach(b => b.addEventListener("click", () => load(b.dataset.plan)));
+  popoutBackdrop?.addEventListener("click", () => { selectedId = null; renderOverlay(); showInfo(null); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && info && !info.hidden) {
+      selectedId = null;
+      renderOverlay();
+      showInfo(null);
+    }
+  });
   let resizeTimer = 0;
   window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => plan && fit(), 120); });
   // A page scrollbar appearing after the list renders narrows the stage; refit so phone targets stay ≥ 44px.

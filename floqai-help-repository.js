@@ -399,15 +399,30 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "VIP reserV lets you explore a club floor map and reserve a table. Open VIP reserV from Search (when granted) or the profile menu. Search only shows clubs subscribed to VIP reserV (same idea as ShoutOut venue pick). Choose a venue first, then the floor map and night, tap a green table, hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
+      body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Reserved tables use isReserved=1 in inventory. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
-        "table deposit", "hold a table", "aurelia vip", "aurelia 3d", "explore 3d", "3d walk-through"
+        "table deposit", "hold a table", "aurelia vip", "aurelia 3d", "explore 3d", "3d walk-through",
+        "search a vip reserv club", "isReserved"
       ],
       links: [
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
         {label: "Aurelia 3D walk-through", href: pageUrl("./reports/vip-aurelia-demo/", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-choose-venue",
+      title: "Choose a VIP reserV venue",
+      body: "Only clubs subscribed to VIP reserV appear here — same idea as picking a ShoutOut venue. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker.",
+      searchPhrases: [
+        "choose a venue", "vip venue", "subscribed clubs", "vip reserv clubs",
+        "only clubs subscribed", "select venue vip"
+      ],
+      links: [
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "venueAdmin", "masterAdmin"]

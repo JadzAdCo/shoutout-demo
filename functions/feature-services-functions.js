@@ -365,6 +365,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
       note,
       features,
       status: "pending",
+      isBetaLinkused: 0,
       createdAt: FieldValue.serverTimestamp(),
       createdAtMs: nowMs,
       expiresAtMs,
@@ -434,6 +435,8 @@ async function respondToInvite(request, accept) {
     granted = core.validateBetaFeatures(invite.features || {}, {requireOne: false});
     const inviteUpdate = {
       status: accept ? "accepted" : "declined",
+      // Successful accept (terms + subscribe) marks the invite link as used — reuse is denied.
+      isBetaLinkused: accept ? 1 : 0,
       respondedAt: FieldValue.serverTimestamp(),
       respondedAtMs: nowMs,
       respondedUid: uid
@@ -490,7 +493,10 @@ async function respondToInvite(request, accept) {
       throw new HttpsError("failed-precondition", "Master Admins cannot be beta testers. Open test features from Features & Services.");
     }
     if (denial === "used") {
-      throw new HttpsError("failed-precondition", "You already joined this beta invitation.");
+      throw new HttpsError(
+        "failed-precondition",
+        "This beta invite link was already used. You accepted the Agreement and joined beta with this invitation — open Search to try your Beta features, or ask FLOQR for a new invite."
+      );
     }
     throw invalid;
   }

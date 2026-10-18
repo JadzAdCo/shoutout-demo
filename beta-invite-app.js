@@ -221,10 +221,14 @@
       if (/Master Admins/.test(message)) {
         setStatus(t("beta.masterAdmin", "Master Admins open test features from Features & Services, not as beta testers."));
         showActions(false);
-      } else if (/already joined/i.test(message)) {
+      } else if (/already used|already joined|isBetaLinkused/i.test(message)) {
         clearStoredToken();
-        renderSuccess([]);
-        setStatus(t("beta.alreadyJoined", "You already joined this beta invitation."));
+        showActions(false);
+        showSuccess(false);
+        setStatus(t(
+          "beta.linkAlreadyUsed",
+          "This beta invite link was already used. You accepted the Agreement and joined beta with this invitation — open Search to try your Beta features, or ask FLOQR for a new invite."
+        ));
       } else if (/Beta Test Agreement|Booking Transaction/i.test(message)) {
         setStatus(t(
           "beta.consentRequired",

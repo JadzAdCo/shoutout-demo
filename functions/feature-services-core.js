@@ -270,7 +270,10 @@ function inviteIdFor(token) {
 /** Invites are bound to one account (targetUid): a forwarded link is useless to anyone else. */
 function evaluateInvite(invite, {uid = "", nowMs = Date.now()} = {}) {
   if (!invite) return {ok: false, reason: "not-found"};
-  if (invite.status === "accepted") return {ok: false, reason: "used"};
+  // isBetaLinkused=1 means the invite was successfully accepted (terms + subscribe completed).
+  if (Number(invite.isBetaLinkused) === 1 || invite.status === "accepted") {
+    return {ok: false, reason: "used"};
+  }
   if (invite.status === "declined") return {ok: false, reason: "declined"};
   if (invite.status === "revoked") return {ok: false, reason: "revoked"};
   if (invite.status !== "pending") return {ok: false, reason: "not-pending"};

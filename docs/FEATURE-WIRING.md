@@ -339,7 +339,7 @@ When adding a section, use this skeleton:
 | **Search icon tiles (s3.1.65+ / s3.1.67)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP black faces stack a ~80% mark above an in-face wordmark (`flex-direction:column`). `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` (+ VIP lettering). Mobile/tablet: 3 across; PC: one line. |
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
 | **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — FloqAi/floqCast/VIP tiles are shoutout-icon-card, not category-card.
-| **Package** | s3.1.70 |
+| **Package** | s3.1.71 |
 
 ## Beta invite landing (`beta-invite.html`)
 
@@ -351,6 +351,7 @@ When adding a section, use this skeleton:
 | Server | `functions/feature-services-functions.js` `createBetaInvite` / `respondToInvite` — absolute invite URL; refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` (canonical v2 FloqR, reverse-payments refund) |
 | Data | `betaInvites/{hash}` + `betaTesters/{uid}.consent` |
 | Help / FloqAi | `help-beta-tester`, `help-beta-booking-disclaimer`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
+| Link reuse | `betaInvites.isBetaLinkused` `0|1` — set `1` on successful accept (terms + subscribe); `evaluateInvite` denies reuse with clear “link already used” error |
 
 ## VIP reserV (`vipReservations`) — Phase 2
 
@@ -359,7 +360,7 @@ When adding a section, use this skeleton:
 | **Brand** | VIP reserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
-| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero (ShoutOut-like). Intro `page.vip.sub` + inline `?` (`help-vip-book-table`); no green “Signed in…” status (`setStatus("")` on showApp). **Workflow:** venue search first → select club → floor map + night → 30‑min hold → `vip-terms.html` (full Terms verbiage + one accept checkbox) → FloqR Stripe deposit → confirmation receipt on `vip.html?vipPaid=1` |
+| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero. Title `?` (`help-vip-book-table` holds intro); Choose a venue `?` (`help-vip-choose-venue`); no green Signed-in status. Table tap opens centered pop-out (`#info` + `#vipTablePopoutBackdrop`), not a bottom sheet. Inventory `isReserved` `0|1` on `vipInventory`. **Workflow:** venue search → floor map + night → hold → `vip-terms.html` → Stripe deposit → `vip.html?vipPaid=1` |
 | **Terms page** | `vip-terms.html` + `vip-terms-app.js` — satellite session shell; hold via `sessionStorage` `FLOQR_VIP_HOLD` + `?holdId=`; single required `checks.terms` (server `expandConsentChecks` fills refund/noShow/age21/minimumSpend; marketing optional) |
 | **Mobile map** | `vip-floor-viewer.css` ≤600px — selected table `#info` in document flow **below** the map (not fixed bottom sheet). Desktop sticky side panel unchanged |
 | **Profile menu** | `global-profile-status.js` `featureLink("vipReservations", …, "VIP reserV")` — same Features & Services gate as Search tile |

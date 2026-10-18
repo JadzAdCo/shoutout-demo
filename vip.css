@@ -19,21 +19,22 @@ body.vip-page {
 
 .vip-hero-copy { max-width: 42rem; }
 
-.vip-sub-row {
+.vip-title-row,
+.vip-section-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.vip-sub-row > .sub {
-  flex: 1 1 12rem;
+.vip-title-row h1,
+.vip-section-head h2 {
   margin: 0;
 }
 
-.vip-sub-row > .help-popout {
+.vip-title-row > .help-popout,
+.vip-section-head > .help-popout {
   flex: 0 0 auto;
-  margin-top: 0.1rem;
 }
 
 .vip-page .status:empty { display: none; }

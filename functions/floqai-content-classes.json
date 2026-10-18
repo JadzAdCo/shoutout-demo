@@ -281,6 +281,11 @@
       "patron",
       "venueAdmin"
     ],
+    "help-vip-choose-venue": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
     "help-vip-door-ops": [
       "masterAdmin",
       "serviceMember",

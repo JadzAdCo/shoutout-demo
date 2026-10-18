@@ -156,8 +156,14 @@ test("invite tokens are unguessable, hashed at rest, and bound to one account", 
   assert.equal(core.evaluateInvite(invite, {uid: "u2", nowMs: now}).reason, "wrong-account");
   assert.equal(core.evaluateInvite(invite, {uid: "u1", nowMs: now + 5000}).reason, "expired");
   assert.equal(core.evaluateInvite({...invite, status: "accepted"}, {uid: "u1", nowMs: now}).reason, "used");
+  assert.equal(core.evaluateInvite({...invite, isBetaLinkused: 1, status: "pending"}, {uid: "u1", nowMs: now}).reason, "used");
+  assert.equal(core.evaluateInvite({...invite, isBetaLinkused: 0}, {uid: "u1", nowMs: now}).ok, true);
   assert.equal(core.evaluateInvite({...invite, status: "revoked"}, {uid: "u1", nowMs: now}).reason, "revoked");
   assert.equal(core.evaluateInvite(null, {uid: "u1", nowMs: now}).reason, "not-found");
+  const fns = read("functions/feature-services-functions.js");
+  assert.match(fns, /isBetaLinkused:\s*0/);
+  assert.match(fns, /isBetaLinkused:\s*accept \? 1 : 0/);
+  assert.match(fns, /This beta invite link was already used/);
 });
 
 test("beta invite accept requires Agreement + Booking Disclaimer consent", () => {
@@ -202,7 +208,7 @@ test("beta invite accept requires Agreement + Booking Disclaimer consent", () =>
   const fns = read("functions/feature-services-functions.js");
   assert.match(fns, /betaConsentChecksComplete/);
   assert.match(fns, /agreementSha256/);
-  assert.match(fns, /You already joined this beta invitation/);
+  assert.match(fns, /This beta invite link was already used/);
   assert.match(fns, /FLOQR_PUBLIC_ORIGIN/);
   assert.match(fns, /jadzadco\.github\.io\/shoutout-demo/);
   assert.match(fns, /\$\{publicOrigin\}\/beta-invite\.html\?t=/);

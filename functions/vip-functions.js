@@ -128,8 +128,9 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     const key = inventoryKey(clubLocationId, night, section.id);
     const invSnap = await db.collection("vipInventory").doc(key).get();
     const inv = invSnap.exists ? invSnap.data() || {} : {};
+    const isReserved = Number(inv.isReserved) === 1 ? 1 : 0;
     let status = "available";
-    if (inv.status === "booked" || inv.status === "confirmed") status = "booked";
+    if (isReserved === 1 || inv.status === "booked" || inv.status === "confirmed") status = "booked";
     else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) status = "held";
     else if (inv.status === "blocked") status = "closed";
     const amounts = computePartyAmounts(section, section.includedGuests);
@@ -140,6 +141,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       maxCapacity: amounts.maxCapacity,
       includedGuests: amounts.includedGuests,
       status,
+      isReserved: status === "booked" ? 1 : 0,
       depositCents: amounts.depositCents,
       minimumAmountCents: amounts.minimumAmountCents,
       extraGuestFeeCents: amounts.extraGuestFeeCents
@@ -196,7 +198,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
             const priorInv = db.collection("vipInventory").doc(text(prior.inventoryKey, 200));
             const priorInvSnap = await tx.get(priorInv);
             if (priorInvSnap.exists && priorInvSnap.data()?.holdId === priorId) {
-              tx.set(priorInv, {status: "available", holdId: "", holdUid: "", expiresAtMs: 0, updatedAtMs: now}, {merge: true});
+              tx.set(priorInv, {status: "available", isReserved: 0, holdId: "", holdUid: "", expiresAtMs: 0, updatedAtMs: now}, {merge: true});
             }
           }
         }
@@ -205,8 +207,8 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
 
     const invSnap = await tx.get(invRef);
     const inv = invSnap.exists ? invSnap.data() || {} : {};
-    if (inv.status === "booked" || inv.status === "confirmed") {
-      throw new HttpsError("failed-precondition", "That table is already booked for this night.");
+    if (Number(inv.isReserved) === 1 || inv.status === "booked" || inv.status === "confirmed") {
+      throw new HttpsError("failed-precondition", "That table is already reserved for this night.");
     }
     if (inv.status === "blocked") {
       throw new HttpsError("failed-precondition", "That table is blocked for this night.");
@@ -221,6 +223,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
       night,
       sectionId,
       status: "held",
+      isReserved: 0,
       holdId: holdRef.id,
       holdUid: uid,
       expiresAtMs,
@@ -277,7 +280,7 @@ exports.releaseVipHold = onCall(CALL_OPTS, async request => {
     if (invSnap.exists) {
       const inv = invSnap.data() || {};
       if (inv.holdId === holdId && inv.status === "held") {
-        tx.set(invRef, {status: "available", holdId: "", holdUid: "", expiresAtMs: 0, updatedAtMs: now}, {merge: true});
+        tx.set(invRef, {status: "available", isReserved: 0, holdId: "", holdUid: "", expiresAtMs: 0, updatedAtMs: now}, {merge: true});
       }
     }
     const pointerRef = db.collection("vipActiveHolds").doc(`${uid}_${text(hold.night, 20)}`);
@@ -512,6 +515,7 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
     tx.set(holdRef, {status: "converted", reservationId: reservationRef.id, updatedAtMs: now}, {merge: true});
     tx.set(invRef, {
       status: "booked",
+      isReserved: 1,
       reservationId: reservationRef.id,
       holdId: "",
       holdUid: "",

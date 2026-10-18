@@ -132,7 +132,8 @@
       let held = 0;
       let booked = 0;
       sections.forEach(s => {
-        if (s.status === "booked") {
+        const reserved = Number(s.isReserved) === 1 || s.status === "booked";
+        if (reserved) {
           states[s.sectionId] = "booked";
           booked += 1;
         } else if (s.status === "held") {

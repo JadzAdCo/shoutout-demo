@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.70";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.71";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1652,13 +1652,31 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
+      id:"s3-1-71-vip-clean-help-popout-isreserved",
+      area:"VIP reserV / Chrome / Inventory",
+      feature:"VIP ? nested copy; table pop-out; isReserved 0|1",
+      changed:"Intro and Choose-a-venue hints live only in ? next to VIP reserV / Choose a venue headings. Table tap opens centered pop-out (not bottom sheet). vipInventory.isReserved 0|1 tracks reserved tables. Package s3.1.71.",
+      howToTest:"1) Hard-refresh vip.html. 2) Confirm no intro paragraph under VIP reserV — only title + ?. 3) Confirm no subscribed-clubs paragraph under Choose a venue — only heading + ?. 4) Select Aurelia → tap a green table → details open as centered pop-out with backdrop; close with × / backdrop / Escape. 5) After a paid reservation, inventory isReserved=1 and table shows booked.",
+      expected:"Clean headings with ?; table details as pop-out; reserved tables blocked via isReserved.",
+      troubleshoot:"Bottom sheet still → vip-floor-viewer.css must use fixed centered aside.info. Visible intro under title → vip-title-row must hide page.vip.sub outside help."
+    },
+    {
+      id:"s3-1-71-beta-link-used-once",
+      area:"Beta invite / Consent",
+      feature:"isBetaLinkused blocks invite link reuse",
+      changed:"betaInvites.isBetaLinkused set 0 on create, 1 on successful accept. Reuse returns clear already-used error. Package s3.1.71.",
+      howToTest:"1) Accept a beta invite successfully. 2) Re-open the same invite URL. 3) Try I Agree again (or open while already accepted) → status shows This beta invite link was already used…",
+      expected:"Second use denied with link-already-used message; Search still shows Beta tiles for the tester.",
+      troubleshoot:"Still allows re-accept → Functions need isBetaLinkused stamp + evaluateInvite gate deployed."
+    },
+    {
       id:"s3-1-70-vip-hero-help-no-signed-in",
       area:"VIP reserV / Chrome",
       feature:"VIP ? beside intro; no green Signed-in status",
-      changed:"vip.html moves help-vip-book-table ? into vip-sub-row next to page.vip.sub. showApp clears status (no page.vip.signedIn green line). Empty #vipStatus hidden via CSS. Package s3.1.70.",
-      howToTest:"1) Sign in as VIP beta tester. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html. 3) Confirm white intro line has ? beside it. 4) Confirm no green Signed in — search… line under the hero. 5) Venue search still appears.",
-      expected:"? inline with intro; no green Signed-in chrome; venue grid loads.",
-      troubleshoot:"? still alone under hero → vip.html must use vip-sub-row. Green line remains → vip-app.js must setStatus(\"\") not page.vip.signedIn."
+      changed:"vip.html nests help beside headings (s3.1.71). showApp clears status (no page.vip.signedIn green line). Empty #vipStatus hidden via CSS. Package s3.1.70+.",
+      howToTest:"1) Sign in as VIP beta tester. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html. 3) Confirm ? next to VIP reserV and Choose a venue. 4) Confirm no green Signed in line. 5) Venue search still appears.",
+      expected:"? beside headings; no green Signed-in chrome; venue grid loads.",
+      troubleshoot:"Green line remains → vip-app.js must setStatus(\"\") not page.vip.signedIn."
     },
     {
       id:"s3-1-66-vip-restoring-catalog",

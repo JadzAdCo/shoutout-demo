@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.70 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.71 (stable)
+
+- s3.1.71: VIP ? nests intro/venue hints next to headings; table details as centered pop-out; vipInventory.isReserved 0|1; betaInvites.isBetaLinkused blocks invite reuse.
 
 - s3.1.70: Beta invite clean UI (no green eyebrow/Signed-in; FloqR branding; booking disclaimer in ?; agreement v2 reverse-payments). VIP hero ? beside intro; no green Signed-in status.
 
