@@ -714,6 +714,78 @@
     return uniqueRows(await Promise.all(queries));
   }
 
+  function withTimeout(promise, ms, fallback) {
+    let timer;
+    return Promise.race([
+      Promise.resolve(promise).finally(() => clearTimeout(timer)),
+      new Promise(resolve => { timer = setTimeout(() => resolve(fallback), ms); })
+    ]);
+  }
+
+  /** Fast path matching profile-menu counts: recipientUid only, short timeout. */
+  async function loadAndRenderInbox(user) {
+    const list = byId("myMessages");
+    const loadingText = tt("inbox.loadingList", {}, "Loading your FloqR Inbox…");
+    if (list && !currentMessages.length) {
+      list.innerHTML = `<p class="sub">${esc(loadingText)}</p>`;
+    }
+    setText("portalStatus", loadingText);
+    const uid = String(user?.uid || "").trim();
+    const email = scopedQueryValue(user, "email");
+    if (!uid) {
+      if (list) list.innerHTML = "<p class='sub'>Sign in to view FloqR Inbox.</p>";
+      return [];
+    }
+    try {
+      const [inboxNotifications, directMessages] = await withTimeout(Promise.all([
+        queryCollectionSafe("inboxNotifications", "recipientUid", uid, 80),
+        queryCollectionSafe("messages", "recipientUid", uid, 80)
+      ]), 12000, [[], []]);
+      // Best-effort email-scoped rows (legacy) — never block the first paint.
+      const emailExtra = email
+        ? await withTimeout(Promise.all([
+          queryCollectionSafe("inboxNotifications", "recipientEmail", email, 40),
+          queryCollectionSafe("messages", "recipientEmail", email, 40),
+          queryCollectionSafe("messages", "senderUid", uid, 40)
+        ]), 4000, [[], [], []])
+        : [[], [], []];
+      const messages = uniqueRows([
+        ...directMessages,
+        ...emailExtra[1],
+        ...emailExtra[2],
+        ...inboxNotifications,
+        ...emailExtra[0]
+      ].map(row => {
+        if (row._collection === "inboxNotifications" || (!row.messageType && (row.type || row.title))) {
+          return {
+            ...row,
+            senderUid: row.senderUid || "system",
+            senderName: row.senderName || "System Message",
+            messageType: row.messageType || "system",
+            subject: row.subject || row.title || "System Message",
+            body: row.body || row.preview || "",
+            type: row.type || "notification"
+          };
+        }
+        return row;
+      }).filter(x => !x.deleted));
+      const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
+      setText("metricMessages", `${unreadMessages}/${messages.length}`);
+      setText("messageCountLabel", `(${unreadMessages}/${messages.length})`);
+      renderMessages(messages, user);
+      setText("portalStatus", "");
+      syncInboxComposeChrome();
+      return messages;
+    } catch (error) {
+      console.warn("FloqR Inbox load failed", error?.message || error);
+      if (list) {
+        list.innerHTML = `<p class="sub">Could not load FloqR Inbox. Pull to refresh or reopen this tab.</p>`;
+      }
+      setText("portalStatus", "FloqR Inbox failed to load.");
+      return [];
+    }
+  }
+
   function sortBySubmittedAtDesc(rows = []) {
     return rows.slice().sort((a, b) => {
       const aMs = Number(a?.submittedAt?.toMillis?.() || a?.submittedAt?.seconds * 1000 || a?.paidAt?.toMillis?.() || a?.createdAt?.toMillis?.() || a?.createdAt?.seconds * 1000 || 0);
@@ -4668,6 +4740,11 @@
     messageRecipientsPromise = null;
     inboxComposeOpen = false;
 
+    // Inbox MUST paint before template studio / BartR / AI prefs — those can hang and left Inbox on Loading forever.
+    const inboxReady = loadAndRenderInbox(user);
+    ensureMessageRecipients(user).catch(() => {});
+    refreshBlocks(user).catch(() => {});
+
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
       window.FLOQRI18n?.applyDom?.();
@@ -4682,36 +4759,17 @@
     } catch (_) { /* ignore */ }
     renderMediaSlots(profile);
     renderProfilePreview(profile, user);
-    await renderTemplateVariantSettings(user, profile);
     renderRoleGuide();
     renderPolicies(profile);
-    await renderBartrSellerBackend(user, profile);
     setText("metricMemberLevel", memberTypeLabel(profile));
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    setText("portalStatus", "Loading your FloqR Inbox…");
-    if (byId("myMessages") && !currentMessages.length) {
-      byId("myMessages").innerHTML = `<p class="sub">${esc(tt("inbox.loadingList", {}, "Loading your FloqR Inbox…"))}</p>`;
-    }
-    await refreshBlocks(user);
-
-    // Inbox-first: render notifications/messages before shoutout history / directory scans.
-    const [directMessages, inboxNotifications] = await Promise.all([
-      getUserScopedRows("messages", user, [["recipientUid","uid"],["senderUid","uid"],["recipientEmail","email"],["senderEmail","email"]]),
-      getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]])
-    ]);
-    const messages = [
-      ...directMessages.filter(x => !x.deleted),
-      ...inboxNotifications.filter(x => !x.deleted).map(x => ({...x, senderUid:"system", senderName:"System Message", messageType:"system", subject:x.subject || x.title || "System Message", body:x.body || x.preview || "", type:x.type || "notification"}))
-    ];
-    const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
-    setText("metricMessages", `${unreadMessages}/${messages.length}`);
-    setText("messageCountLabel", `(${unreadMessages}/${messages.length})`);
-    renderMessages(messages, user);
-    setText("portalStatus", "");
-    syncInboxComposeChrome();
-    // Warm recipient directory in the background (CSR first, then contacts).
-    ensureMessageRecipients(user).catch(() => {});
+    // Wait for inbox paint (already started); never block it on templates/BartR.
+    const messages = await inboxReady;
+    Promise.all([
+      renderTemplateVariantSettings(user, profile).catch(error => console.warn("template variants", error?.message || error)),
+      renderBartrSellerBackend(user, profile).catch(error => console.warn("BartR seller", error?.message || error))
+    ]).catch(() => {});
 
     const [guestLists, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
       getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
