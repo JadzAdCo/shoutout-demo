@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.64";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.66";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,27 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.66",
+      title: "VIP reserV catalog no Restoring hang + Search tiles",
+      checks: [
+        {label:"VIP candidate catalog", file:"vip-app.js", includes:["vipCandidateIds", "gates.vipReservations === true"]},
+        {label:"VIP showApp clears Restoring first", file:"vip-app.js", includes:["page.vip.signedIn", "await loadSubscribedVenues"]},
+        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.66\""]}
+      ]
+    },
+    {
+      version: "s3.1.65",
+      title: "Search icon tiles FloqAi/floqCast/VIP faces + 3-across",
+      checks: [
+        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "floqai-icon-face"]},
+        {label:"No caption under ShoutOut/VIP", file:"index.html", notIncludes:["shoutout-icon-title"]},
+        {label:"3-across mobile CSS", file:"styles.css", includes:["search-icon-row", "vip-icon-face", "floqcast-icon-face", "calc((100% - 20px) / 3)"]},
+        {label:"floqCast cast icon asset", file:"images/floqcast-icon.svg", includes:["floqCast", "FloqMedia LED"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.65\""]}
+      ]
+    },
     {
       version: "s3.1.64",
       title: "FloqAi Search tile matches ShoutOut",
@@ -1556,6 +1577,24 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-66-vip-restoring-catalog",
+      area:"VIP reserV / Session",
+      feature:"VIP page leaves Restoring and loads venue catalog",
+      changed:"vip-app.js no longer scans every SHOUTOUT_CLUB_LOCATIONS id (~590 Firestore gets) before clearing Restoring. vipCandidateIds limits to beta/static VIP clubs; showApp unhides the app and sets signed-in status first. Package s3.1.66.",
+      howToTest:"1) Sign in as a VIP beta tester on Search. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?v=s3.1.66. 3) Status must leave Restoring within a few seconds and show the venue search (Decades / Lima / Aurelia). 4) Confirm Search tiles still use in-face wordmarks (s3.1.65+).",
+      expected:"No stuck Restoring…; VIP venue grid appears while signed in (profile pill visible).",
+      troubleshoot:"Still Restoring → confirm vip-app.js?v=s3.1.66 has vipCandidateIds (not Object.keys(map) for all clubs). Feature gate deny → Master Admin grant vipReservations. Callable fail → fallback PLAN_BY_ID still shows three beta clubs."
+    },
+    {
+      id:"s3-1-65-search-icon-tiles-standard",
+      area:"Search / Product tiles",
+      feature:"Standardized ShoutOut / floqCast / VIP / FloqAi icon tiles",
+      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.65.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with FloqAi/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) FloqAi / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; FloqAi → floqai.html.",
+      expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
+      troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."
+    },
     {
       id:"s3-1-64-floqai-search-tile",
       area:"Search / FloqAi",

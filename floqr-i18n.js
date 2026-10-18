@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.64";
+  const VERSION = "s3.1.66";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -543,6 +543,7 @@
       "page.vip.floorMap": "Floor map",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Signed in — search a VIP reserV club, pick a night, then tap a green table.",
+      "page.vip.venuesFailed": "Could not load VIP reserV clubs. Hard refresh and try again.",
       "page.vip.needSignIn": "Sign in to explore VIP reserV floor maps.",
       "page.vip.mapLoaded": "Floor map loaded. Tap a green table for details.",
       "page.vip.mapLoading": "Loading floor map…",
@@ -1685,6 +1686,7 @@
       "page.vip.floorMap": "Saalplan",
       "page.vip.mapDemo": "Couleurs d’inventaire (vert libre · ambre tenu · rouge réservé). Pincez ou faites défiler pour zoomer.",
       "page.vip.signedIn": "Connecté — choisissez un lieu et une soirée, puis une table verte.",
+      "page.vip.venuesFailed": "Impossible de charger les clubs VIP reserV. Actualisez et réessayez.",
       "page.vip.needSignIn": "Melde dich an, um VIP reserV-Saalpläne zu sehen.",
       "page.vip.mapLoaded": "Saalplan geladen. Tippe auf einen grünen Tisch für Details.",
       "page.vip.mapLoading": "Saalplan wird geladen…",
@@ -2827,6 +2829,7 @@
       "page.vip.floorMap": "Plan de salle",
       "page.vip.mapDemo": "Live-Bestand (grün frei · amber gehalten · rot gebucht). Zum Zoomen kneifen oder scrollen.",
       "page.vip.signedIn": "Angemeldet — Location und Abend wählen, dann grünen Tisch tippen.",
+      "page.vip.venuesFailed": "VIP reserV Clubs konnten nicht geladen werden. Hard-Refresh und erneut versuchen.",
       "page.vip.needSignIn": "Connectez-vous pour explorer les plans VIP reserV.",
       "page.vip.mapLoaded": "Plan chargé. Touchez une table verte pour les détails.",
       "page.vip.mapLoading": "Chargement du plan…",
@@ -3969,6 +3972,7 @@
       "page.vip.floorMap": "Plano",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Sesión iniciada — elige local y noche, luego una mesa verde.",
+      "page.vip.venuesFailed": "No se pudieron cargar los clubes VIP reserV. Actualiza e inténtalo de nuevo.",
       "page.vip.needSignIn": "Inicia sesión para explorar planos VIP reserV.",
       "page.vip.mapLoaded": "Plano cargado. Toca una mesa verde para ver detalles.",
       "page.vip.mapLoading": "Cargando plano…",
@@ -5111,6 +5115,7 @@
       "page.vip.floorMap": "Pianta",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Ingelogd — kies locatie en avond, tik daarna een groene tafel.",
+      "page.vip.venuesFailed": "VIP reserV-clubs laden mislukt. Vernieuw hard en probeer opnieuw.",
       "page.vip.needSignIn": "Accedi per esplorare le piante VIP reserV.",
       "page.vip.mapLoaded": "Pianta caricata. Tocca un tavolo verde per i dettagli.",
       "page.vip.mapLoading": "Caricamento pianta…",
@@ -6253,6 +6258,7 @@
       "page.vip.floorMap": "Mapa do piso",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Вход выполнен — выберите площадку и вечер, затем зелёный стол.",
+      "page.vip.venuesFailed": "Не удалось загрузить клубы VIP reserV. Обновите страницу и попробуйте снова.",
       "page.vip.needSignIn": "Inicie sessão para explorar mapas VIP reserV.",
       "page.vip.mapLoaded": "Mapa carregado. Toque numa mesa verde para detalhes.",
       "page.vip.mapLoading": "A carregar mapa…",
@@ -7395,6 +7401,7 @@
       "page.vip.floorMap": "План зала",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Accesso effettuato — scegli locale e serata, poi un tavolo verde.",
+      "page.vip.venuesFailed": "Impossibile caricare i club VIP reserV. Aggiorna e riprova.",
       "page.vip.needSignIn": "Войдите, чтобы смотреть планы VIP reserV.",
       "page.vip.mapLoaded": "План загружен. Нажмите зелёный стол для деталей.",
       "page.vip.mapLoading": "Загрузка плана…",
@@ -8537,6 +8544,7 @@
       "page.vip.floorMap": "Κάτοψη",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Sessão iniciada — escolha local e noite, depois uma mesa verde.",
+      "page.vip.venuesFailed": "Não foi possível carregar os clubes VIP reserV. Atualize e tente de novo.",
       "page.vip.needSignIn": "Συνδεθείτε για να δείτε κατόψεις VIP reserV.",
       "page.vip.mapLoaded": "Η κάτοψη φορτώθηκε. Πατήστε πράσινο τραπέζι για λεπτομέρειες.",
       "page.vip.mapLoading": "Φόρτωση κάτοψης…",
@@ -9679,6 +9687,7 @@
       "page.vip.floorMap": "Plan sali",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Συνδεθήκατε — επιλέξτε χώρο και βράδυ, μετά πράσινο τραπέζι.",
+      "page.vip.venuesFailed": "Αδυναμία φόρτωσης λεσχών VIP reserV. Ανανεώστε και δοκιμάστε ξανά.",
       "page.vip.needSignIn": "Zaloguj się, aby przeglądać plany VIP reserV.",
       "page.vip.mapLoaded": "Plan załadowany. Dotknij zielonego stolika, by zobaczyć szczegóły.",
       "page.vip.mapLoading": "Ładowanie planu…",
@@ -10821,6 +10830,7 @@
       "page.vip.floorMap": "Plattegrond",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "Zalogowano — wybierz klub i wieczór, potem zielony stolik.",
+      "page.vip.venuesFailed": "Nie udało się wczytać klubów VIP reserV. Odśwież i spróbuj ponownie.",
       "page.vip.needSignIn": "Meld je aan om VIP reserV-plattegronden te bekijken.",
       "page.vip.mapLoaded": "Plattegrond geladen. Tik op een groene tafel voor details.",
       "page.vip.mapLoading": "Plattegrond laden…",
@@ -11963,6 +11973,7 @@
       "page.vip.floorMap": "خريطة القاعة",
       "page.vip.mapDemo": "Live inventory colors (green available · amber held · red booked). Pinch or scroll to zoom.",
       "page.vip.signedIn": "تم تسجيل الدخول — اختر المكان والليلة ثم طاولة خضراء.",
+      "page.vip.venuesFailed": "تعذّر تحميل نوادي VIP reserV. حدّث الصفحة بقوة وحاول مرة أخرى.",
       "page.vip.needSignIn": "سجّل الدخول لاستكشاف خرائط VIP reserV.",
       "page.vip.mapLoaded": "تم تحميل الخريطة. المس طاولة خضراء للتفاصيل.",
       "page.vip.mapLoading": "جارٍ تحميل الخريطة…",

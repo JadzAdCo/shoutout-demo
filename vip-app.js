@@ -308,6 +308,22 @@
   }
 
   /**
+   * Candidate VIP venue ids only — never every club in SHOUTOUT_CLUB_LOCATIONS
+   * (~590 sequential Firestore reads left the page stuck on "Restoring…").
+   */
+  function vipCandidateIds(map, betaMeta) {
+    const staticVip = Object.keys(map).filter(id => {
+      const gates = (map[id] && map[id].featureGates) || {};
+      return gates.vipReservations === true;
+    });
+    return [...new Set([
+      ...Object.keys(PLAN_BY_ID),
+      ...Object.keys(betaMeta || {}),
+      ...staticVip
+    ])];
+  }
+
+  /**
    * Build catalog: clubs with venue gate vipReservations=true (subscribed),
    * merged with beta plan metadata from getVipBetaVenues when available.
    */
@@ -333,9 +349,8 @@
       });
     }
 
-    const ids = new Set([...Object.keys(map), ...Object.keys(betaMeta)]);
-    const rows = [];
-    for (const id of ids) {
+    const ids = vipCandidateIds(map, betaMeta);
+    const rows = (await Promise.all(ids.map(async id => {
       const staticRow = map[id] || {};
       let club = {id, ...staticRow};
       try {
@@ -348,12 +363,12 @@
       }
       const gatedClub = Object.assign({}, club, {featureGates: mergedGates});
       const subscribed = g ? g.venueMayUse("vipReservations", gatedClub) : !!mergedGates.vipReservations;
-      if (!subscribed) continue;
+      if (!subscribed) return null;
       const beta = betaMeta[id] || {};
       const plan = PLAN_BY_ID[id] || beta.planFile || null;
       /* Static plan in PLAN_BY_ID wins over a stale Functions pending flag. */
       const pending = plan == null || (!PLAN_BY_ID[id] && !!beta.pending);
-      rows.push({
+      return {
         id,
         label: club.locationName || club.brandName || beta.name || id,
         brandName: club.brandName || "",
@@ -365,8 +380,8 @@
         logoUrl: club.logoUrl || club.coverImageUrl || "",
         plan,
         pending
-      });
-    }
+      };
+    }))).filter(Boolean);
     rows.sort((a, b) => a.label.localeCompare(b.label));
     venueCatalog = rows;
     renderVenueGrid();
@@ -486,17 +501,24 @@
   async function showApp(user) {
     currentUser = user;
     if (gateEl) gateEl.classList.add("hidden");
+    if (appEl) appEl.classList.remove("hidden");
+    if (confirmEl) confirmEl.classList.add("hidden");
+    /* Leave "Restoring…" immediately — venue load must not block the shell status. */
+    setStatus(t("page.vip.signedIn", "Signed in — search a VIP reserV club, pick a night, then tap a green table."));
     const params = new URLSearchParams(location.search);
     fillNights(params.get("night") || "");
-    await loadSubscribedVenues();
+    try {
+      await loadSubscribedVenues();
+    } catch (err) {
+      console.warn("VIP venue catalog", err);
+      setStatus(t("page.vip.venuesFailed", "Could not load VIP reserV clubs. Hard refresh and try again."));
+      return;
+    }
 
     if (params.get("vipPaid") === "1") {
       await showPaidConfirmation(params);
       return;
     }
-
-    if (appEl) appEl.classList.remove("hidden");
-    if (confirmEl) confirmEl.classList.add("hidden");
 
     if (params.get("vipCancelled") === "1") {
       setStatus(t("page.vip.paidCancel", "Checkout cancelled. Your hold may still be active — continue to Terms & pay, or release it."));
@@ -578,7 +600,10 @@
           setStatus(t("page.vip.needSignIn", "Sign in to explore VIP reserV floor maps."));
           return;
         }
-        showApp(user);
+        Promise.resolve(showApp(user)).catch(err => {
+          console.warn("VIP showApp", err);
+          setStatus(t("page.vip.venuesFailed", "Could not load VIP reserV clubs. Hard refresh and try again."));
+        });
       }
     });
   }
