@@ -167,10 +167,23 @@
     }
     note.textContent = `${title}. ${body}`;
   }
+  function ensureAuth() {
+    try {
+      const fb = window.firebase;
+      if (!fb || typeof fb.auth !== "function") return null;
+      // Satellite pages (e.g. beta-invite) load firebase-config without initializeApp — do it here.
+      if (!fb.apps?.length && window.firebaseConfig) fb.initializeApp(window.firebaseConfig);
+      return fb.auth();
+    } catch (error) {
+      console.warn("Global profile status: Firebase Auth unavailable", error?.message || error);
+      return null;
+    }
+  }
   function init(){
-    if (!window.firebase?.auth) return;
     // The patron landing page owns its richer profile menu; avoid stacking a second global button on top of it.
     if (document.getElementById("userMenu")) return;
+    const auth = ensureAuth();
+    if (!auth) return;
     const shell = ensureShell();
     shell.querySelector("#floqrGlobalProfileBtn")?.addEventListener("click", event => {
       event.stopPropagation();
@@ -187,7 +200,7 @@
     window.addEventListener("floqr:ui-language", () => {
       if (lastUser !== undefined) render(lastUser);
     });
-    firebase.auth().onAuthStateChanged(user => {
+    auth.onAuthStateChanged(user => {
       lastUser = user || null;
       render(user);
     });

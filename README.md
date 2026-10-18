@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.62 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.63 (stable)
+
+- s3.1.63: Beta-invite profile card uses signed-in session; Active beta testers compact table (≤3 lines).
 
 - s3.1.62: Beta invite initializes Firebase before auth (no stuck Checking… when App missing); Sign in CTA fail-open.
 

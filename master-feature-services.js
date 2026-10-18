@@ -165,6 +165,36 @@
     }).join(" ");
   }
 
+  function shortFeatureLabel(key) {
+    const map = {
+      mingl: "Mingl",
+      bartr: "BartR",
+      rydr: "RydR",
+      floqCast: "floqCast",
+      floqAi: "FloqAi",
+      vipReservations: "VIP"
+    };
+    return map[key] || featureLabel(key);
+  }
+
+  function featureTableHeaders() {
+    return betaKeys().map(key => {
+      const state = stateOf(features[key]);
+      const hint = STATE_TEXT[state] ? ` (${state})` : "";
+      return `<th scope="col" class="beta-feat-col" title="${esc(featureLabel(key))}${esc(hint)}">${esc(shortFeatureLabel(key))}</th>`;
+    }).join("");
+  }
+
+  function featureTableCells(uid, granted = {}) {
+    return betaKeys().map(key => {
+      const state = stateOf(features[key]);
+      const checked = Number(granted[key]) === 1 && state !== "off" ? " checked" : "";
+      const disabled = state === "off" ? " disabled" : "";
+      const title = `${featureLabel(key)}${STATE_TEXT[state] ? ` (${state})` : ""}`;
+      return `<td class="beta-feat-cell"><label class="beta-feat-check" title="${esc(title)}"><input type="checkbox" data-tester-feature="${esc(uid)}" data-feature-key="${esc(key)}"${checked}${disabled}/><span class="visually-hidden">${esc(title)}</span></label></td>`;
+    }).join("");
+  }
+
   function renderInviteFeatures() {
     const box = byId("betaInviteFeatures");
     if (!box) return;
@@ -388,14 +418,30 @@
         testersEl.innerHTML = `<p class="sub small">${esc(errorText(testersResult.reason))}</p>`;
       } else {
         const testers = testersResult.value;
-        testersEl.innerHTML = testers.empty ? "<p class=\"sub small\">No active beta testers.</p>" : testers.docs.map(doc => {
-          const row = doc.data();
-          const uid = esc(doc.id);
-          return `<div class="queue-item"><strong>${esc(row.emailMasked || doc.id)}</strong> <small>since ${esc(formatWhen(row.acceptedAtMs))} · invited by ${esc(row.invitedByEmail || "—")}</small>
-            <div>${featureCheckboxes(`data-tester-feature="${uid}"`, row.features || {})}</div>
-            <button type="button" data-beta-features-save="${uid}">Save feature access</button>
-            <button type="button" class="ghost" data-beta-revoke="${uid}">Revoke</button></div>`;
-        }).join("");
+        if (testers.empty) {
+          testersEl.innerHTML = "<p class=\"sub small\">No active beta testers.</p>";
+        } else {
+          const body = testers.docs.map(doc => {
+            const row = doc.data();
+            const uid = esc(doc.id);
+            const who = esc(row.emailMasked || doc.id);
+            const meta = `since ${esc(formatWhen(row.acceptedAtMs))} · by ${esc(row.invitedByEmail || "—")}`;
+            return `<tr data-tester-uid="${uid}">
+              <td class="beta-tester-who"><strong>${who}</strong><small>${meta}</small></td>
+              ${featureTableCells(uid, row.features || {})}
+              <td class="beta-tester-actions">
+                <button type="button" class="primary" data-beta-features-save="${uid}">Save</button>
+                <button type="button" class="ghost" data-beta-revoke="${uid}">Revoke</button>
+              </td>
+            </tr>`;
+          }).join("");
+          testersEl.innerHTML = `<div class="beta-testers-scroll" role="region" aria-label="Active beta testers">
+            <table class="beta-testers-table">
+              <thead><tr><th scope="col">Tester</th>${featureTableHeaders()}<th scope="col">Actions</th></tr></thead>
+              <tbody>${body}</tbody>
+            </table>
+          </div>`;
+        }
       }
     }
     if (invitesEl) {
@@ -414,7 +460,8 @@
 
   function testerLabel(uid) {
     const button = document.querySelector(`#betaTesterList [data-beta-revoke="${CSS.escape(uid)}"]`);
-    return button?.closest(".queue-item")?.querySelector("strong")?.textContent || "this beta tester";
+    const row = button?.closest("tr[data-tester-uid], .queue-item");
+    return row?.querySelector(".beta-tester-who strong, strong")?.textContent || "this beta tester";
   }
 
   async function revokeTester(uid) {

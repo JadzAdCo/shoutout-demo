@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.62";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.63";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.63",
+      title: "Beta profile card + compact testers table",
+      checks: [
+        {label:"Profile ensureAuth", file:"global-profile-status.js", includes:["ensureAuth", "initializeApp"]},
+        {label:"Beta testers table", file:"master-feature-services.js", includes:["beta-testers-table", "featureTableCells"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.63\""]}
+      ]
+    },
     {
       version: "s3.1.62",
       title: "Beta invite Firebase init fail-open",
@@ -1538,6 +1547,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-63-beta-profile-card-testers-table",
+      area:"Beta invite / Master Admin Features Mgmt",
+      feature:"Signed-in profile card on beta-invite + compact Active beta testers table",
+      changed:"global-profile-status ensureAuth initializes Firebase so the profile pill shows photo/initials after join. Active beta testers render as a table (tester + feature checkboxes + Save/Revoke) ≤3 lines per user. Package s3.1.63.",
+      howToTest:"1) As invited patron complete beta join → top-right profile pill shows your photo or initials (not ?). 2) As Master Admin open Features Mgmt → Beta & Testing → Active beta testers is a compact table. 3) Toggle FloqAi → Save still works.",
+      expected:"Profile card authenticated on beta-invite; one tester uses ≤3 visual lines in a table.",
+      troubleshoot:"Still ? on pill → hard refresh global-profile-status.js + beta-invite.html. Tall list → master-feature-services.js must build beta-testers-table."
+    },
     {
       id:"s3-1-61-beta-invite-email-session-handoff",
       area:"Beta invite / Email / Auth",

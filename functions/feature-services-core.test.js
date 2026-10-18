@@ -380,6 +380,10 @@ test("Master Admin Features Mgmt tab is SOS2FA gated with lazy sub-tabs", () => 
   assert.match(app, /is-ready/);
   assert.match(app, /loadReleaseControl|loadBetaTesting|loadAuditTrail/);
   assert.match(app, /withTimeout/);
+  assert.match(app, /beta-testers-table/);
+  assert.match(app, /featureTableCells|featureTableHeaders/);
+  assert.match(read("admin.css"), /beta-testers-table/);
+  assert.match(read("global-profile-status.js"), /ensureAuth|initializeApp/);
   assert.match(read("sos2fa.js"), /"featuresReleaseControl"/);
   assert.match(read("sos2fa.js"), /"featuresBetaTesting"/);
   assert.match(read("sos2fa.js"), /"featuresAuditTrail"/);
