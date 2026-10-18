@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.61 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.62 (stable)
+
+- s3.1.62: Beta invite initializes Firebase before auth (no stuck Checking… when App missing); Sign in CTA fail-open.
 
 - s3.1.61: Beta invite email/session handoff — persist invite `t`, Sign in CTA with returnTo (no stuck Restoring), absolute Inbox invite URL.
 

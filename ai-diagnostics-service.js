@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.61";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.62";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,13 +191,22 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.62",
+      title: "Beta invite Firebase init fail-open",
+      checks: [
+        {label:"Ensure Firebase before auth", file:"beta-invite-app.js", includes:["ensureAuth", "initializeApp", "paintSignedOut"]},
+        {label:"Beta invite cache-bust", file:"beta-invite.html", includes:["beta-invite-app.js?v=s3.1.62"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.62\""]}
+      ]
+    },
+    {
       version: "s3.1.61",
       title: "Beta invite email/session handoff",
       checks: [
         {label:"Sign-in CTA + token stash", file:"beta-invite-app.js", includes:["FLOQR_BETA_INVITE_TOKEN", "loginHref", "autoRedirect: false", "beta.signInCta"]},
-        {label:"Beta invite landing CTA", file:"beta-invite.html", includes:["betaSignInLink", "beta-invite-app.js?v=s3.1.61", "floqr-session-shell.js?v=s3.1.61"]},
+        {label:"Beta invite landing CTA", file:"beta-invite.html", includes:["betaSignInLink", "beta.signInCta", "beta.sessionHandoff"]},
         {label:"Absolute invite URL", file:"functions/feature-services-functions.js", includes:["FLOQR_PUBLIC_ORIGIN", "beta-invite.html?t="]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.61\""]}
+        {label:"Invite token stash", file:"beta-invite-app.js", includes:["FLOQR_BETA_INVITE_TOKEN"]}
       ]
     },
     {
@@ -1533,10 +1542,10 @@
       id:"s3-1-61-beta-invite-email-session-handoff",
       area:"Beta invite / Email / Auth",
       feature:"Email invite link signs in with returnTo (keeps invite token)",
-      changed:"Opening beta-invite.html from email (no Firebase session) no longer sticks on Restoring…. Invite t= is stashed in session/localStorage; Sign in to accept this invite uses FLOQRSessionShell.loginHref returnTo so OTP/Google returns with t=. createBetaInvite Inbox link is absolute Pages URL. Package s3.1.61.",
-      howToTest:"1) As Master Admin invite a patron (Features Mgmt → Beta & Testing). 2) On a phone, open the invite URL in a fresh/private browser (or Mail in-app browser) so you are signed out. 3) Confirm status leaves Restoring within ~3s and shows Sign in to accept this invite. 4) Sign in as the invited account on Search. 5) Confirm return lands on beta-invite with Agreement UI (t preserved). 6) Check both boxes → I Agree and join beta.",
-      expected:"No stuck Restoring; invite token survives sign-in; Agreement unlocks for the invited account.",
-      troubleshoot:"Stuck Restoring → hard refresh beta-invite.html / beta-invite-app.js / floqr-session-shell.js ?v=s3.1.61. Lost invite after OTP → returnTo must include t=; storage key FLOQR_BETA_INVITE_TOKEN. Wrong account → sign in as invite target. Old relative Inbox link → re-invite so link is absolute github.io URL."
+      changed:"Opening beta-invite.html from email (no Firebase session) no longer sticks on Restoring/Checking…. Invite t= is stashed; Sign in to accept this invite uses loginHref returnTo. ensureAuth() initializes Firebase before auth (s3.1.62). createBetaInvite Inbox link is absolute Pages URL. Package s3.1.62.",
+      howToTest:"1) As Master Admin invite a patron (Features Mgmt → Beta & Testing). 2) On a phone, open the invite URL in a fresh/private browser (or Mail in-app browser) so you are signed out. 3) Confirm status leaves Checking within ~3s and shows Sign in to accept this invite (or redirects to Search sign-in with returnTo). 4) Sign in as the invited account. 5) Confirm return lands on beta-invite with Agreement UI (t preserved). 6) Check both boxes → I Agree and join beta.",
+      expected:"No stuck Checking/Restoring; invite token survives sign-in; Agreement unlocks for the invited account.",
+      troubleshoot:"Stuck Checking → hard refresh beta-invite.html + beta-invite-app.js (ensureAuth/initializeApp). Lost invite after OTP → returnTo must include t=; storage key FLOQR_BETA_INVITE_TOKEN. Wrong account → sign in as invite target. Old relative Inbox link → re-invite so link is absolute github.io URL."
     },
     {
       id:"s3-1-60-inbox-read-badge-nowrap",
@@ -1608,7 +1617,7 @@
       changed:"beta-invite.html shows scrollable FloqR.app Beta Test & Prerelease Agreement, Booking Transaction Disclaimer callout, two required checkboxes, I Agree and join beta (disabled until both checked). acceptBetaInvite stores consent version/hash on betaTesters + betaInvites. Success card confirms join + recorded consent. Profile card via global-profile-status.js. Package s3.1.57 (session handoff refined in s3.1.61).",
       howToTest:"1) As Master Admin invite temp_waitress_1 (or any patron) from Features Mgmt → Beta & Testing. 2) Sign in as that patron → Inbox → open beta invite link. 3) Confirm top-right profile card appears and status leaves Restoring… . 4) Confirm Agreement scroll + two unchecked boxes; I Agree stays disabled until both checked. 5) Check both → I Agree and join beta → success card. 6) Search shows granted Beta tiles.",
       expected:"Profile card present; Agreement + dual checks + success acknowledgement; Features audit shows beta.accepted with agreementVersion.",
-      troubleshoot:"Stuck Restoring / no Agreement → hard refresh beta-invite.html ?v=s3.1.61 + beta-invite-app.js + floqr-session-shell.js (see s3-1-61-beta-invite-email-session-handoff). Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Wrong account → sign in as invite target."
+      troubleshoot:"Stuck Restoring / no Agreement → hard refresh beta-invite.html ?v=s3.1.62 + beta-invite-app.js + floqr-session-shell.js (see s3-1-61-beta-invite-email-session-handoff). Accept fails without checks → Functions need acceptBetaInvite consent gate deploy. Wrong account → sign in as invite target."
     },
     {
       id:"s3-1-55-features-mgmt-subtabs",

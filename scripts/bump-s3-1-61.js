@@ -4,11 +4,13 @@ const fs = require("fs");
 const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 
-const NEXT = "s3.1.61";
+const NEXT = process.env.FLOQR_BUMP_TO || "s3.1.61";
 const NEXT_NUM = NEXT.slice(1);
 const NEW_TESTS = [];
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
+const NOTE = process.env.FLOQR_BUMP_NOTE
+  || `- ${NEXT}: Beta invite email/session handoff — persist invite t=, Sign in CTA with returnTo, absolute Inbox invite URL.`;
 
 function transformHtml(src) {
   return stripPageLinkVersions(src).replace(ASSET_REF, `$1${NEXT}`);
@@ -65,12 +67,11 @@ function run(root) {
     if (!head.test(src)) throw new Error("README head");
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`) && src.includes(`- ${NEXT}:`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
-    const note = `- ${NEXT}: Beta invite email/session handoff — persist invite t=, Sign in CTA with returnTo, absolute Inbox invite URL.`;
     let out = src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`);
     if (!out.includes(`- ${NEXT}:`)) {
       out = out.replace(
         `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`,
-        `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`
+        `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${NOTE}`
       );
     }
     return out;

@@ -3,9 +3,9 @@
   "use strict";
 
   const TOKEN_KEY = "FLOQR_BETA_INVITE_TOKEN";
-  const auth = firebase.auth();
   let token = "";
   let busy = false;
+  let auth = null;
 
   function byId(id) {
     return document.getElementById(id);
@@ -61,6 +61,18 @@
       return stored;
     }
     return "";
+  }
+
+  function ensureAuth() {
+    try {
+      const fb = window.firebase;
+      if (!fb || typeof fb.auth !== "function") return null;
+      if (!fb.apps?.length && window.firebaseConfig) fb.initializeApp(window.firebaseConfig);
+      return fb.auth();
+    } catch (error) {
+      console.warn("Beta invite could not start Firebase Auth", error?.message || error);
+      return null;
+    }
   }
 
   function setStatus(message) {
@@ -172,6 +184,10 @@
       setStatus(t("beta.invalid", "This invitation link is invalid, expired, or was sent to a different account."));
       return;
     }
+    if (!auth?.currentUser) {
+      paintSignedOut();
+      return;
+    }
     if (accept) {
       const checks = consentChecks();
       if (!checks.betaAgreement || !checks.bookingDisclaimer) {
@@ -215,13 +231,7 @@
           "Accept both the Beta Test Agreement and the Booking Transaction Disclaimer to join."
         ));
       } else if (/unauthenticated|sign in/i.test(message) || error?.code === "unauthenticated") {
-        showLogin(true);
-        showActions(false);
-        wireSignInLink();
-        setStatus(t(
-          "beta.sessionHandoff",
-          "Email and private browsers do not keep your FLOQR login. Sign in with the invited account — you return here with this invite."
-        ));
+        paintSignedOut();
       } else {
         setStatus(t("beta.invalid", "This invitation link is invalid, expired, or was sent to a different account."));
         showActions(false);
@@ -272,7 +282,13 @@
       return;
     }
 
+    // Always wire the CTA first so a Firebase failure never leaves "Checking…" forever.
     wireSignInLink();
+    auth = ensureAuth();
+    if (!auth) {
+      paintSignedOut();
+      return;
+    }
 
     const shell = window.FLOQRSessionShell?.bind?.({
       auth,
@@ -286,7 +302,12 @@
       onSignedOut: () => paintSignedOut()
     });
 
-    shell?.ready?.then?.(user => {
+    if (!shell) {
+      paintSignedOut();
+      return;
+    }
+
+    shell.ready?.then?.(user => {
       if (user) {
         if (byId("betaActions")?.classList.contains("hidden")) unlockAgreementUi();
         return;
@@ -294,7 +315,7 @@
       paintSignedOut();
       // Soft redirect after a beat so the CTA is readable; returnTo keeps `t`.
       setTimeout(() => {
-        if (auth.currentUser) return;
+        if (auth?.currentUser) return;
         const href = signInHref();
         try { location.replace(href); } catch (_) { location.href = href; }
       }, 1200);
