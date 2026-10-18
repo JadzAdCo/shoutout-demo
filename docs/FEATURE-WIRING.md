@@ -334,9 +334,9 @@ When adding a section, use this skeleton:
 | **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
 | **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
-| **Search icon tiles (s3.1.65+)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP use black faces with in-tile wordmarks; `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` + `VIP reserV`. Mobile/tablet: 3 across; PC: one line. |
+| **Search icon tiles (s3.1.65+ / s3.1.67)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP black faces stack a ~80% mark above an in-face wordmark (`flex-direction:column`). `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` (+ VIP lettering). Mobile/tablet: 3 across; PC: one line. |
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
-| **Package** | s3.1.66 |
+| **Package** | s3.1.67 |
 
 ## Beta invite landing (`beta-invite.html`)
 
