@@ -336,7 +336,8 @@ When adding a section, use this skeleton:
 | **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
 | **Search icon tiles (s3.1.65+ / s3.1.67)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP black faces stack a ~80% mark above an in-face wordmark (`flex-direction:column`). `images/floqcast-icon.svg` (phone→beam→LED); `images/vip-reserv-mark.svg` (+ VIP lettering). Mobile/tablet: 3 across; PC: one line. |
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
-| **Package** | s3.1.67 |
+| **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — FloqAi/floqCast/VIP tiles are shoutout-icon-card, not category-card.
+| **Package** | s3.1.68 |
 
 ## Beta invite landing (`beta-invite.html`)
 
