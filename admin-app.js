@@ -1442,6 +1442,15 @@
       } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
     });
     byId("vipAdminBillingRefresh")?.addEventListener("click", () => refreshVipBilling());
+    byId("vipAdminEnsureTables")?.addEventListener("click", async () => {
+      try {
+        const res = await vipCallable("ensureVipTables")({
+          clubLocationId: locationId,
+          nights: 14
+        });
+        setText("vipAdminStatus", `Ensured ${res?.data?.tablesPerNight || 0} tables × ${res?.data?.nightsEnsured || 0} nights (isBooked starts at 0).`);
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
     byId("vipAdminBook")?.addEventListener("click", async () => {
       try {
         await vipCallable("adminConfirmVipReservation")({
