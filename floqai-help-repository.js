@@ -399,7 +399,7 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Reserved tables use isReserved=1 in inventory. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
+      body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
@@ -430,7 +430,7 @@
     {
       id: "help-vip-floor-map",
       title: "VIP reserV floor map",
-      body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club, and Aurelia each have a published 2D plan; Aurelia also offers Explore 3D walk-through.",
+      body: "Green = available, amber = held (30 min), red = booked (only after deposit paid when required — or after confirm when the club does not require a deposit), grey = not bookable / blocked, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club, and Aurelia each have a published 2D plan; Aurelia also offers Explore 3D walk-through.",
       searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green", "aurelia floor map"],
       links: [
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
@@ -473,6 +473,36 @@
       ],
       source: "help-repository-seed",
       audiences: ["serviceMember", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-club-admin",
+      title: "Club Admin VIP reserV management",
+      body: "Club Admin → VIP reserV manages tonight’s reservations: check in, no-show, cancel (frees the table), block/unblock sections, and walk-in book. When Require deposit is on, a table stays green/amber until the deposit is paid (Stripe) or an admin records payment — only then does it show booked/unavailable (red). Holds never set isReserved=1. Door staff can also use VIP reserV Door.",
+      searchPhrases: [
+        "vip club admin", "manage vip reservations", "vip deposit required", "paid before booked",
+        "block vip table", "walk-in vip", "vip admin book", "require deposit before booked"
+      ],
+      links: [
+        {label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
+        {label: "VIP reserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-deposit-settings",
+      title: "VIP reserV deposit before booked",
+      body: "Clubs set Require deposit before table is marked booked in Club Admin → VIP reserV. When required, holding a table only shows amber; the floor map turns red (booked/unavailable) after FloqR Stripe deposit payment — or after Club Admin records payment on a walk-in. If deposit is not required, confirming Terms marks the table booked without checkout.",
+      searchPhrases: [
+        "vip deposit settings", "deposit before booked", "table booked after pay",
+        "require deposit vip", "isReserved after payment"
+      ],
+      links: [
+        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
+        {label: "Book VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "patron", "masterAdmin"]
     },
     {
       id: "help-vip-receipt-sms-redaction-fixes",

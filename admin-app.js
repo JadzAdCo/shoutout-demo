@@ -1185,6 +1185,178 @@
       setText("floqcastQueueStatus", e.message || String(e));
     }
   }
+  function vipCallable(name) {
+    return firebase.app().functions("us-central1").httpsCallable(name);
+  }
+
+  function fillVipAdminNights() {
+    const nightEl = byId("vipAdminNight");
+    if (!nightEl || nightEl.options.length) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 14; i += 1) {
+      const d = new Date(today.getTime() + i * 86400000);
+      const opt = document.createElement("option");
+      opt.value = d.toISOString().slice(0, 10);
+      opt.textContent = d.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"});
+      nightEl.appendChild(opt);
+    }
+  }
+
+  function moneyVip(cents) {
+    return "$" + (Number(cents || 0) / 100).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+
+  async function loadVipAdminSettings() {
+    if (!locationId) return;
+    try {
+      const res = await vipCallable("getVipClubSettings")({clubLocationId: locationId});
+      const required = Number(res?.data?.settings?.depositRequired) !== 0;
+      if (byId("vipAdminDepositRequired")) byId("vipAdminDepositRequired").checked = required;
+    } catch (e) {
+      setText("vipAdminStatus", e.message || String(e));
+    }
+  }
+
+  async function refreshVipAdminList() {
+    const list = byId("vipAdminList");
+    const nightEl = byId("vipAdminNight");
+    if (!list || !nightEl || !locationId) return;
+    setText("vipAdminStatus", "Loading reservations…");
+    try {
+      const res = await vipCallable("listVipReservations")({
+        clubLocationId: locationId,
+        night: nightEl.value
+      });
+      const rows = res?.data?.reservations || [];
+      if (!rows.length) {
+        list.innerHTML = "<p class='sub'>No reservations for this night yet.</p>";
+        setText("vipAdminStatus", "Ready.");
+        return;
+      }
+      list.innerHTML = "";
+      rows.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "queue-item";
+        const st = r.IsCheckedIn ? "checked in" : (r.IsNoShow ? "no-show" : (r.status || ""));
+        div.innerHTML = `
+          <strong>${esc(r.sectionLabel || r.sectionId)}</strong>
+          <p>${esc(r.leadGuestName || "Guest")} · ${esc(String(r.partySize || "?"))} guests · ${esc(st)}
+            · ${esc(moneyVip(r.amounts?.chargedCents))}
+            · ${Number(r.depositRequired) === 0 ? "no deposit" : (Number(r.paymentConfirmed) === 1 ? "deposit paid" : "deposit pending")}</p>
+          <div class="queue-actions">
+            ${r.status === "confirmed" && !r.IsCheckedIn
+              ? `<button type="button" class="approve" data-vip-check="${esc(r.reservationId)}">Check in</button>
+                 <button type="button" class="reject" data-vip-noshow="${esc(r.reservationId)}">No-show</button>
+                 <button type="button" data-vip-cancel="${esc(r.reservationId)}">Cancel</button>`
+              : ""}
+          </div>`;
+        div.querySelector("[data-vip-check]")?.addEventListener("click", async () => {
+          try {
+            await vipCallable("checkInVipReservation")({
+              clubLocationId: locationId,
+              reservationId: r.reservationId,
+              id21Checked: true
+            });
+            setText("vipAdminStatus", "Checked in.");
+            refreshVipAdminList();
+          } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+        });
+        div.querySelector("[data-vip-noshow]")?.addEventListener("click", async () => {
+          if (!confirm("Mark no-show?")) return;
+          try {
+            await vipCallable("markVipNoShow")({reservationId: r.reservationId});
+            setText("vipAdminStatus", "Marked no-show.");
+            refreshVipAdminList();
+          } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+        });
+        div.querySelector("[data-vip-cancel]")?.addEventListener("click", async () => {
+          if (!confirm("Cancel this reservation and free the table?")) return;
+          try {
+            await vipCallable("cancelVipReservation")({
+              reservationId: r.reservationId,
+              reason: "Cancelled by Club Admin"
+            });
+            setText("vipAdminStatus", "Reservation cancelled — table available.");
+            refreshVipAdminList();
+          } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+        });
+        list.appendChild(div);
+      });
+      setText("vipAdminStatus", "Ready.");
+    } catch (e) {
+      list.innerHTML = `<p class='sub'>${esc(e.message || String(e))}</p>`;
+      setText("vipAdminStatus", e.message || String(e));
+    }
+  }
+
+  function bindVipAdminPanel() {
+    if (bindVipAdminPanel._bound) return;
+    bindVipAdminPanel._bound = true;
+    fillVipAdminNights();
+    const door = byId("vipAdminDoorLink");
+    if (door && locationId) {
+      const base = window.FLOQRNav?.withQuery?.("./vip-door.html", {location: locationId})
+        || `./vip-door.html?location=${encodeURIComponent(locationId)}`;
+      door.href = base;
+    }
+    byId("vipAdminRefresh")?.addEventListener("click", () => refreshVipAdminList());
+    byId("vipAdminNight")?.addEventListener("change", () => refreshVipAdminList());
+    byId("vipAdminSaveSettings")?.addEventListener("click", async () => {
+      try {
+        const depositRequired = byId("vipAdminDepositRequired")?.checked ? 1 : 0;
+        await vipCallable("saveVipClubSettings")({clubLocationId: locationId, depositRequired});
+        setText("vipAdminStatus", depositRequired
+          ? "Saved: deposit required before tables show booked."
+          : "Saved: deposit not required — confirm without payment marks booked.");
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminBook")?.addEventListener("click", async () => {
+      try {
+        await vipCallable("adminConfirmVipReservation")({
+          clubLocationId: locationId,
+          night: byId("vipAdminNight")?.value,
+          sectionId: byId("vipAdminSectionId")?.value?.trim(),
+          partySize: Number(byId("vipAdminPartySize")?.value || 0),
+          leadGuestName: byId("vipAdminLeadGuest")?.value?.trim() || "",
+          note: byId("vipAdminNote")?.value?.trim() || "",
+          paymentRecorded: !!byId("vipAdminPaymentRecorded")?.checked
+        });
+        setText("vipAdminStatus", "Table booked.");
+        refreshVipAdminList();
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminBlock")?.addEventListener("click", async () => {
+      try {
+        await vipCallable("setVipSectionBlocked")({
+          clubLocationId: locationId,
+          night: byId("vipAdminNight")?.value,
+          sectionId: byId("vipAdminBlockSection")?.value?.trim(),
+          blocked: true
+        });
+        setText("vipAdminStatus", "Table blocked for this night.");
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminUnblock")?.addEventListener("click", async () => {
+      try {
+        await vipCallable("setVipSectionBlocked")({
+          clubLocationId: locationId,
+          night: byId("vipAdminNight")?.value,
+          sectionId: byId("vipAdminBlockSection")?.value?.trim(),
+          blocked: false
+        });
+        setText("vipAdminStatus", "Table unblocked.");
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+  }
+
+  function renderVipAdmin() {
+    if (!byId("panelVipReserv")) return;
+    bindVipAdminPanel();
+    loadVipAdminSettings();
+    refreshVipAdminList();
+  }
+
   function renderFloqCastQueue() {
     const list = byId("floqcastQueueList");
     if (!list) return;
@@ -3184,6 +3356,7 @@
       enforceVenueFeatureGates();
       renderQueue();
       renderFloqCastQueue();
+      renderVipAdmin();
       loadClubPublicProfile().then(async () => {
         await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);
       });

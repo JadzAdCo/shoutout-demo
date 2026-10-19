@@ -106,6 +106,12 @@
     holdTimer = setInterval(tick, 1000);
   }
 
+  function depositRequiredForHold(hold) {
+    if (Number(hold?.depositRequired) === 0) return false;
+    if (Number(hold?.depositRequired) === 1) return true;
+    return Number(hold?.amounts?.depositCents || hold?.amounts?.chargedCents || 0) > 0;
+  }
+
   async function submitConsentAndPay() {
     if (!activeHold?.holdId) {
       setStatus(t("page.vipTerms.missingHold", "No active hold. Return to the floor map and hold a table first."));
@@ -128,6 +134,17 @@
         checks
       });
       const consentId = consentRes.data?.consentId;
+      const needsDeposit = depositRequiredForHold(activeHold);
+      if (!needsDeposit) {
+        setStatus(t("page.vip.confirmingNoDeposit", "Confirming your table (no deposit required)…"));
+        await callable("confirmVipReservationWithoutDeposit")({
+          holdId: activeHold.holdId,
+          consentId
+        });
+        try { sessionStorage.removeItem("FLOQR_VIP_HOLD"); } catch (_) { /* ignore */ }
+        location.href = "./vip.html?vipPaid=1";
+        return;
+      }
       setStatus(t("page.vip.openingCheckout", "Opening deposit checkout…"));
       const pay = await callable("createFloqrCheckoutSession")({
         orderType: "vipReservation",
@@ -156,7 +173,15 @@
     if (backEl) backEl.href = mapReturnUrl(activeHold);
     window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack", {href: mapReturnUrl(activeHold)});
     renderSummary();
-    setStatus(t("page.vipTerms.ready", "Read the Terms, accept once, then pay the deposit."));
+    const needsDeposit = depositRequiredForHold(activeHold);
+    if (payBtn) {
+      payBtn.textContent = needsDeposit
+        ? t("page.vip.consentPay", "Pay deposit")
+        : t("page.vip.consentConfirm", "Confirm reservation");
+    }
+    setStatus(needsDeposit
+      ? t("page.vipTerms.ready", "Read the Terms, accept once, then pay the deposit.")
+      : t("page.vipTerms.readyNoDeposit", "Read the Terms, accept once, then confirm — this venue does not require a deposit before the table is booked."));
   }
 
   function boot() {

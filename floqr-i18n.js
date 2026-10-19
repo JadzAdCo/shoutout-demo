@@ -497,6 +497,8 @@
       "admin.smsWhatsappLogs": "SMS & WhatsApp Logs",
       "admin.subtitle": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Template Backgrounds",
       "admin.venueCommand": "Venue Command Center",
       "app.emailContinue": "Continue with your own Email",
@@ -1641,6 +1643,8 @@
       "admin.smsWhatsappLogs": "Journaux SMS et WhatsApp",
       "admin.subtitle": "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Arrière-plans de modèles",
       "admin.venueCommand": "Centre de commande du lieu",
       "app.emailContinue": "Continuer avec votre e-mail",
@@ -2785,6 +2789,8 @@
       "admin.smsWhatsappLogs": "SMS- & WhatsApp-Protokolle",
       "admin.subtitle": "ShoutOuts freigeben, Venue-Leistung prüfen und Kontoaktivität für diesen Standort abstimmen.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Vorlagen-Hintergründe",
       "admin.venueCommand": "Venue Command Center",
       "app.emailContinue": "Weiter mit deiner E-Mail",
@@ -3929,6 +3935,8 @@
       "admin.smsWhatsappLogs": "Registros SMS y WhatsApp",
       "admin.subtitle": "Aprueba ShoutOuts, revisa el rendimiento del local y concilia la actividad de la cuenta de esta ubicación.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Fondos de plantillas",
       "admin.venueCommand": "Venue Command Center",
       "app.emailContinue": "Continuar con tu propio Email",
@@ -5073,6 +5081,8 @@
       "admin.smsWhatsappLogs": "SMS- en WhatsApp-logboeken",
       "admin.subtitle": "Keur ShoutOuts goed, bekijk venue-prestaties en stem accountactiviteit af voor deze locatie.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Sjabloonachtergronden",
       "admin.venueCommand": "Venue Command Center",
       "app.emailContinue": "Doorgaan met je eigen e-mail",
@@ -6217,6 +6227,8 @@
       "admin.smsWhatsappLogs": "Журналы SMS и WhatsApp",
       "admin.subtitle": "Одобряйте ShoutOuts, смотрите показатели площадки и сверяйте активность аккаунта для этой локации.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Фоны шаблонов",
       "admin.venueCommand": "Центр управления площадкой",
       "app.emailContinue": "Продолжить со своим Email",
@@ -7361,6 +7373,8 @@
       "admin.smsWhatsappLogs": "Log SMS e WhatsApp",
       "admin.subtitle": "Approva ShoutOuts, esamina il rendimento della sede e riconcilia l'attività dell'account per questa sede.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Sfondi modello",
       "admin.venueCommand": "Venue Command Center",
       "app.emailContinue": "Continua con la tua email",
@@ -8505,6 +8519,8 @@
       "admin.smsWhatsappLogs": "Registos SMS e WhatsApp",
       "admin.subtitle": "Aprovar ShoutOuts, avaliar o desempenho do local e reconciliar a atividade da conta para este local.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Template Backgrounds",
       "admin.venueCommand": "Centro de Comando do Local",
       "app.emailContinue": "Continuar com seu email",
@@ -9649,6 +9665,8 @@
       "admin.smsWhatsappLogs": "Αρχεία SMS & WhatsApp",
       "admin.subtitle": "Έγκριση ShoutOuts, έλεγχος απόδοσης χώρου και αντιστοίχιση δραστηριότητας λογαριασμού για αυτήν την τοποθεσία.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Υπόβαθρα προτύπου",
       "admin.venueCommand": "Κέντρο εντολών του χώρου διεξαγωγής",
       "app.emailContinue": "Συνεχίστε με το δικό σας email",
@@ -10793,6 +10811,8 @@
       "admin.smsWhatsappLogs": "Dzienniki SMS i WhatsApp",
       "admin.subtitle": "Zatwierdź ShoutOuts, sprawdź wydajność atrakcji i uzgodnij aktywność na koncie dla tej lokalizacji.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "Tła szablonów",
       "admin.venueCommand": "Centrum dowodzenia obiektem",
       "app.emailContinue": "Kontynuuj przy użyciu własnego adresu e-mail",
@@ -11937,6 +11957,8 @@
       "admin.smsWhatsappLogs": "سجلات SMS وWhatsApp",
       "admin.subtitle": "الموافقة على ShoutOuts، ومراجعة أداء المكان، وتسوية نشاط الحساب لهذا الموقع.",
       "admin.floqcastQueue": "floqCast",
+
+      "admin.vipReserv": "VIP reserV",
       "admin.templateBackgrounds": "خلفيات القالب",
       "admin.venueCommand": "مركز قيادة المنشأة",
       "app.emailContinue": "التسجيل عن طريق بريدك الإلكتروني",

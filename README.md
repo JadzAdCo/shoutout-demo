@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.78 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.79 (stable)
+
+- s3.1.79: VIP reserV paid-before-booked + Club Admin VIP panel; mark inverted banquette + legible VIP reserV letter V.
 
 - s3.1.78: floqCast locked to display2.html only (server + client); Display 1 no longer loads display-floqcast.
 

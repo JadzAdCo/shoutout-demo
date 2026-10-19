@@ -96,6 +96,42 @@ function computePartyAmounts(section, partySize) {
   };
 }
 
+/**
+ * Club deposit policy (VIP-B-05). When deposit is required, inventory
+ * `isReserved=1` / status `booked` is allowed only after payment (or an
+ * explicit admin-recorded payment). Holds stay amber (`held`, isReserved=0).
+ */
+function normalizeVipSettings(raw = {}) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const hasExplicit = Object.prototype.hasOwnProperty.call(row, "depositRequired");
+  let depositRequired = 1;
+  if (hasExplicit) {
+    depositRequired = row.depositRequired === 0 || row.depositRequired === false || row.depositRequired === "0"
+      ? 0
+      : 1;
+  }
+  return {
+    depositRequired,
+    depositRequiredExplicit: hasExplicit ? 1 : 0
+  };
+}
+
+/** Resolve whether this booking needs a paid deposit before the table shows booked. */
+function resolveDepositRequired(vipSettings = {}, amounts = {}) {
+  const settings = normalizeVipSettings(vipSettings);
+  if (settings.depositRequiredExplicit) return settings.depositRequired === 1;
+  return Number(amounts.depositCents || amounts.chargedCents || 0) > 0;
+}
+
+/**
+ * Hard gate for marking a table booked/unavailable on the floor map.
+ * paymentConfirmed = Stripe fulfillment or admin-recorded payment.
+ */
+function canMarkTableBooked({depositRequired, paymentConfirmed} = {}) {
+  if (!depositRequired) return true;
+  return paymentConfirmed === true || paymentConfirmed === 1 || paymentConfirmed === "1";
+}
+
 function upcomingNights(count = 14, fromMs = Date.now()) {
   const nights = [];
   const start = new Date(fromMs);
@@ -157,6 +193,9 @@ module.exports = {
   inventoryKey,
   demoPricesForSection,
   computePartyAmounts,
+  normalizeVipSettings,
+  resolveDepositRequired,
+  canMarkTableBooked,
   upcomingNights,
   validateNight,
   betaVenue,

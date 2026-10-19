@@ -19,31 +19,55 @@
     <linearGradient id="seatShade" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#fff" stop-opacity="0.22"/>
       <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.32"/>
     </linearGradient>
   </defs>
   <rect width="132" height="132" rx="28" fill="#0b1020"/>
   <circle cx="66" cy="66" r="56" fill="none" stroke="url(#g)" stroke-width="4.5"/>
-  <text x="66" y="40" text-anchor="middle" fill="#fff"
+
+  <text x="66" y="38" text-anchor="middle" fill="#fff"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="16" font-weight="900" letter-spacing="0.14em">VIP</text>
-  <text x="60" y="56" text-anchor="middle" fill="#fff"
+        font-size="17.5" font-weight="900" letter-spacing="0.12em">VIP</text>
+  <text x="66" y="56" text-anchor="middle"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="14.5" font-weight="900">reser</text>
-  <path d="M82 46 L88 55 L98 42" fill="none" stroke="#dfff5a" stroke-width="4"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M34 74 C38 60, 50 52, 66 52 C82 52, 94 60, 98 74 C90 68, 79 64, 66 64 C53 64, 42 68, 34 74 Z"
+        font-size="16" font-weight="900" letter-spacing="0.04em">
+    <tspan fill="#fff">reser</tspan><tspan fill="#dfff5a">V</tspan>
+  </text>
+
+  <!-- Table: straight outer, curved inner toward seat -->
+  <path d="M32 60
+           L100 60
+           L100 63
+           C91 76, 79 81, 66 81
+           C53 81, 41 76, 32 63
+           Z"
         fill="url(#table)"/>
-  <circle cx="48" cy="64" r="2.2" fill="#fff" opacity="0.9"/>
-  <circle cx="57" cy="60.5" r="2.2" fill="#fff" opacity="0.9"/>
-  <circle cx="66" cy="59" r="2.2" fill="#fff" opacity="0.9"/>
-  <circle cx="75" cy="60.5" r="2.2" fill="#fff" opacity="0.9"/>
-  <circle cx="84" cy="64" r="2.2" fill="#fff" opacity="0.9"/>
-  <path d="M26 102 L106 102 L106 90 C96 78, 82 72, 66 72 C50 72, 36 78, 26 90 Z" fill="url(#seat)"/>
-  <path d="M26 102 L106 102 L106 90 C96 78, 82 72, 66 72 C50 72, 36 78, 26 90 Z" fill="url(#seatShade)"/>
-  <path d="M42 90 C43 94, 43.5 97, 44 102" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M54 84 C54.5 90, 55 96, 55.5 102" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M66 82 C66 88, 66 95, 66 102" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M78 84 C77.5 90, 77 96, 76.5 102" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M90 90 C89 94, 88.5 97, 88 102" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <circle cx="43" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+  <circle cx="54.5" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+  <circle cx="66" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+  <circle cx="77.5" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+  <circle cx="89" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+
+  <!-- Banquette: rear against ring; interior mirrors toward table -->
+  <path d="M24 92
+           C35 78, 49 71, 66 71
+           C83 71, 97 78, 108 92
+           C98 103, 83 110, 66 110
+           C49 110, 34 103, 24 92
+           Z"
+        fill="url(#seat)"/>
+  <path d="M24 92
+           C35 78, 49 71, 66 71
+           C83 71, 97 78, 108 92
+           C98 103, 83 110, 66 110
+           C49 110, 34 103, 24 92
+           Z"
+        fill="url(#seatShade)"/>
+  <path d="M40 85 C41 92, 42 98, 43 105" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <path d="M53 78 C54 88, 54.5 97, 55 108" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <path d="M66 74 C66 86, 66 98, 66 109" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <path d="M79 78 C78 88, 77.5 97, 77 108" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <path d="M92 85 C91 92, 90 98, 89 105" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+  <path d="M28 90 C38 77, 51 72.5, 66 72.5 C81 72.5, 94 77, 104 90"
+        fill="none" stroke="#fff" stroke-width="2" opacity="0.32" stroke-linecap="round"/>
 </svg>

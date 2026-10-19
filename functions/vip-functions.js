@@ -15,11 +15,43 @@ const db = admin.firestore();
 const CALL_OPTS = {region: "us-central1", cors: true};
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
   validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
-  holdExpiresAtMs, HOLD_MS} = core;
+  holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked} = core;
 
 function requireAuth(auth) {
   if (!auth?.uid) throw new HttpsError("unauthenticated", "Sign in required.");
   return auth.uid;
+}
+
+function isMasterAdminAuth(authContext) {
+  const claims = authContext?.token || {};
+  return !!(claims.masterAdmin || claims.floqrMasterAdmin || claims.admin === true);
+}
+
+async function isClubManagerAuth(authContext, clubId) {
+  if (!authContext?.uid || !clubId) return false;
+  if (isMasterAdminAuth(authContext)) return true;
+  const snap = await db.collection("clubLocations").doc(clubId).get();
+  if (!snap.exists) return false;
+  const row = snap.data() || {};
+  const uid = authContext.uid;
+  const email = text(authContext.token?.email, 200).toLowerCase();
+  if (Array.isArray(row.adminUids) && row.adminUids.includes(uid)) return true;
+  if (Array.isArray(row.masterAdminUids) && row.masterAdminUids.includes(uid)) return true;
+  if (email && Array.isArray(row.adminEmails) && row.adminEmails.map(e => String(e).toLowerCase()).includes(email)) return true;
+  const assign = await db.collection("clubAdminAssignments").doc(`${clubId}_${uid}`).get();
+  return assign.exists && text(assign.data()?.status, 40) === "active";
+}
+
+async function requireClubManager(authContext, clubId) {
+  requireAuth(authContext);
+  const ok = await isClubManagerAuth(authContext, clubId);
+  if (!ok) throw new HttpsError("permission-denied", "Club Admin access required for this venue.");
+}
+
+async function loadVipSettings(clubLocationId) {
+  const snap = await db.collection("clubLocations").doc(text(clubLocationId, 120)).get();
+  const row = snap.exists ? snap.data() || {} : {};
+  return normalizeVipSettings(row.vipSettings || {});
 }
 
 function clientMeta(request) {
@@ -68,6 +100,8 @@ function publicReservation(id, row, {includePassToken = false, passToken = ""} =
     venueName: row.venueName || "",
     IsCheckedIn: row.IsCheckedIn === 1 ? 1 : 0,
     IsNoShow: row.IsNoShow === 1 ? 1 : 0,
+    paymentConfirmed: Number(row.paymentConfirmed) === 1 ? 1 : 0,
+    depositRequired: Number(row.depositRequired) === 0 ? 0 : 1,
     confirmedAtMs: row.confirmedAtMs || 0,
     leadGuestName: row.leadGuestName || ""
   };
@@ -123,6 +157,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
   if (!catalog) throw new HttpsError("failed-precondition", "Floor plan catalog missing for this venue.");
 
   const now = Date.now();
+  const vipSettings = await loadVipSettings(clubLocationId);
   const sections = [];
   for (const section of catalog.sections) {
     const key = inventoryKey(clubLocationId, night, section.id);
@@ -130,10 +165,12 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     const inv = invSnap.exists ? invSnap.data() || {} : {};
     const isReserved = Number(inv.isReserved) === 1 ? 1 : 0;
     let status = "available";
+    // Booked/unavailable only when inventory was marked after payment (or no-deposit confirm).
     if (isReserved === 1 || inv.status === "booked" || inv.status === "confirmed") status = "booked";
     else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) status = "held";
     else if (inv.status === "blocked") status = "closed";
     const amounts = computePartyAmounts(section, section.includedGuests);
+    const depositRequired = resolveDepositRequired(vipSettings, amounts) ? 1 : 0;
     sections.push({
       sectionId: section.id,
       label: section.label,
@@ -143,6 +180,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       status,
       isReserved: status === "booked" ? 1 : 0,
       depositCents: amounts.depositCents,
+      depositRequired,
       minimumAmountCents: amounts.minimumAmountCents,
       extraGuestFeeCents: amounts.extraGuestFeeCents
     });
@@ -152,6 +190,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     night,
     venueName: catalog.venueName,
     nights: upcomingNights(14),
+    depositRequired: vipSettings.depositRequired,
     sections
   };
 });
@@ -174,6 +213,8 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
     throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
   }
   const amounts = computePartyAmounts(section, partySize);
+  const vipSettings = await loadVipSettings(clubLocationId);
+  const depositRequired = resolveDepositRequired(vipSettings, amounts);
   const key = inventoryKey(clubLocationId, night, sectionId);
   const now = Date.now();
   const expiresAtMs = holdExpiresAtMs(now);
@@ -217,6 +258,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
       throw new HttpsError("failed-precondition", "Someone else is holding that table. Try another section.");
     }
 
+    // Hold never marks booked — isReserved stays 0 until payment (when required).
     tx.set(invRef, {
       inventoryKey: key,
       clubLocationId,
@@ -241,6 +283,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
       partySize: amounts.partySize,
       includedGuests: amounts.includedGuests,
       extraGuests: amounts.extraGuests,
+      depositRequired: depositRequired ? 1 : 0,
       amounts: {
         minimumAmountCents: amounts.minimumAmountCents,
         depositCents: amounts.depositCents,
@@ -258,7 +301,9 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
   });
 
   const snap = await holdRef.get();
-  return publicHold(holdRef.id, snap.data() || {});
+  return Object.assign(publicHold(holdRef.id, snap.data() || {}), {
+    depositRequired: depositRequired ? 1 : 0
+  });
 });
 
 exports.releaseVipHold = onCall(CALL_OPTS, async request => {
@@ -463,6 +508,20 @@ exports.listVipReservations = onCall(CALL_OPTS, async request => {
   };
 });
 
+/** Inventory patch after a confirmed booking (callers must pass canMarkTableBooked first). */
+function inventoryBookedPatch({reservationId, now, paymentConfirmed}) {
+  return {
+    status: "booked",
+    isReserved: 1,
+    reservationId: reservationId || "",
+    holdId: "",
+    holdUid: "",
+    expiresAtMs: 0,
+    paymentConfirmed: paymentConfirmed ? 1 : 0,
+    updatedAtMs: now
+  };
+}
+
 /** Fulfillment helper used by commerce webhook when orderType === vipReservation. */
 async function fulfillVipReservationOrder(orderId, order = {}) {
   const holdId = text(order.payload?.holdId || order.holdId, 120);
@@ -477,6 +536,10 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
   const reservationRef = db.collection("vipReservations").doc();
   const invKey = text(hold.inventoryKey, 200);
   const invRef = db.collection("vipInventory").doc(invKey);
+  // Stripe paid → always allowed to mark booked, even when depositRequired.
+  if (!canMarkTableBooked({depositRequired: true, paymentConfirmed: 1})) {
+    throw new Error("VIP paid-before-booked gate rejected fulfillment.");
+  }
 
   await db.runTransaction(async tx => {
     tx.set(reservationRef, {
@@ -493,6 +556,8 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
       contactEmail: text(order.ownerEmail || "", 200),
       bookedByType: "patron",
       status: "confirmed",
+      paymentConfirmed: 1,
+      depositRequired: Number(hold.depositRequired) === 0 ? 0 : 1,
       termsDocId: BETA_TERMS.termsDocId,
       termsVersion: BETA_TERMS.termsVersion,
       termsSha256: BETA_TERMS.termsSha256,
@@ -513,15 +578,7 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
       updatedAtMs: now
     });
     tx.set(holdRef, {status: "converted", reservationId: reservationRef.id, updatedAtMs: now}, {merge: true});
-    tx.set(invRef, {
-      status: "booked",
-      isReserved: 1,
-      reservationId: reservationRef.id,
-      holdId: "",
-      holdUid: "",
-      expiresAtMs: 0,
-      updatedAtMs: now
-    }, {merge: true});
+    tx.set(invRef, inventoryBookedPatch({reservationId: reservationRef.id, now, paymentConfirmed: 1}), {merge: true});
     const patronUid = text(hold.uid || order.ownerUid, 120);
     const night = text(hold.night, 20);
     if (patronUid && night) {
@@ -533,11 +590,314 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
   return {reservationId: reservationRef.id, passToken};
 }
 
+/** Club Admin: read VIP deposit / booking settings for this venue. */
+exports.getVipClubSettings = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  if (!clubLocationId) throw new HttpsError("invalid-argument", "clubLocationId is required.");
+  await requireClubManager(request.auth, clubLocationId);
+  const settings = await loadVipSettings(clubLocationId);
+  return {clubLocationId, settings, brand: "VIP reserV"};
+});
+
+/** Club Admin: save depositRequired (1 = table booked only after paid deposit). */
+exports.saveVipClubSettings = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  if (!clubLocationId) throw new HttpsError("invalid-argument", "clubLocationId is required.");
+  await requireClubManager(request.auth, clubLocationId);
+  const depositRequired = request.data?.depositRequired === 0 || request.data?.depositRequired === false || request.data?.depositRequired === "0"
+    ? 0
+    : 1;
+  const now = Date.now();
+  await db.collection("clubLocations").doc(clubLocationId).set({
+    vipSettings: {
+      depositRequired,
+      updatedAtMs: now,
+      updatedByUid: request.auth.uid
+    },
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, clubLocationId, settings: {depositRequired}};
+});
+
+/** Club Admin: block or reopen a section for a night (shows closed on the map). */
+exports.setVipSectionBlocked = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  const night = validateNight(request.data?.night);
+  const sectionId = text(request.data?.sectionId, 80);
+  const blocked = request.data?.blocked === true || request.data?.blocked === 1;
+  if (!clubLocationId || !night || !sectionId) {
+    throw new HttpsError("invalid-argument", "clubLocationId, night, and sectionId are required.");
+  }
+  await requireClubManager(request.auth, clubLocationId);
+  resolveSection(clubLocationId, sectionId);
+  const key = inventoryKey(clubLocationId, night, sectionId);
+  const invRef = db.collection("vipInventory").doc(key);
+  const now = Date.now();
+  const snap = await invRef.get();
+  const inv = snap.exists ? snap.data() || {} : {};
+  if (blocked && (Number(inv.isReserved) === 1 || inv.status === "booked")) {
+    throw new HttpsError("failed-precondition", "Cannot block a paid/booked table. Cancel the reservation first.");
+  }
+  if (blocked && inv.status === "held" && Number(inv.expiresAtMs || 0) > now) {
+    throw new HttpsError("failed-precondition", "Release the active hold before blocking this table.");
+  }
+  await invRef.set({
+    inventoryKey: key,
+    clubLocationId,
+    night,
+    sectionId,
+    status: blocked ? "blocked" : "available",
+    isReserved: 0,
+    holdId: "",
+    holdUid: "",
+    expiresAtMs: 0,
+    blockedByUid: blocked ? request.auth.uid : "",
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, inventoryKey: key, status: blocked ? "blocked" : "available"};
+});
+
+/**
+ * Confirm a hold without Stripe when the club does not require a deposit
+ * (or chargedCents is 0). Never marks booked when deposit is required.
+ */
+exports.confirmVipReservationWithoutDeposit = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const uid = requireAuth(request.auth);
+  const holdId = text(request.data?.holdId, 120);
+  const consentId = text(request.data?.consentId, 120);
+  if (!holdId || !consentId) throw new HttpsError("invalid-argument", "holdId and consentId are required.");
+  const holdRef = db.collection("vipHolds").doc(holdId);
+  const holdSnap = await holdRef.get();
+  if (!holdSnap.exists) throw new HttpsError("not-found", "Hold not found.");
+  const hold = holdSnap.data() || {};
+  if (hold.uid !== uid) throw new HttpsError("permission-denied", "Not your hold.");
+  if (!["active", "pendingPayment"].includes(text(hold.status, 40))) {
+    throw new HttpsError("failed-precondition", "Hold is not active.");
+  }
+  if (Number(hold.expiresAtMs || 0) <= Date.now()) {
+    throw new HttpsError("failed-precondition", "Hold expired. Hold the table again.");
+  }
+  const vipSettings = await loadVipSettings(hold.clubLocationId);
+  const depositRequired = resolveDepositRequired(vipSettings, hold.amounts || {});
+  if (depositRequired) {
+    throw new HttpsError(
+      "failed-precondition",
+      "This venue requires a deposit before the table is marked booked. Pay the deposit to confirm."
+    );
+  }
+  if (!canMarkTableBooked({depositRequired: false, paymentConfirmed: 0})) {
+    throw new HttpsError("failed-precondition", "Cannot mark table booked without payment.");
+  }
+
+  const now = Date.now();
+  const passToken = newQrToken();
+  const reservationRef = db.collection("vipReservations").doc();
+  const invRef = db.collection("vipInventory").doc(text(hold.inventoryKey, 200));
+
+  await db.runTransaction(async tx => {
+    tx.set(reservationRef, {
+      clubLocationId: hold.clubLocationId || "",
+      night: hold.night || "",
+      sectionId: hold.sectionId || "",
+      sectionLabel: hold.sectionLabel || "",
+      venueName: hold.venueName || "",
+      partySize: hold.partySize || 0,
+      includedGuests: hold.includedGuests || 0,
+      extraGuests: hold.extraGuests || 0,
+      patronUid: hold.uid || "",
+      leadGuestName: "",
+      contactEmail: text(request.auth.token?.email, 200),
+      bookedByType: "patron",
+      status: "confirmed",
+      paymentConfirmed: 0,
+      depositRequired: 0,
+      termsDocId: BETA_TERMS.termsDocId,
+      termsVersion: BETA_TERMS.termsVersion,
+      termsSha256: BETA_TERMS.termsSha256,
+      consentId,
+      holdId,
+      amounts: hold.amounts || {},
+      qrTokenHash: hashToken(passToken),
+      IsCheckedIn: 0,
+      IsNoShow: 0,
+      IsRefunded: 0,
+      confirmedAtMs: now,
+      createdAtMs: now,
+      updatedAtMs: now
+    });
+    tx.set(holdRef, {status: "converted", reservationId: reservationRef.id, updatedAtMs: now}, {merge: true});
+    tx.set(invRef, inventoryBookedPatch({reservationId: reservationRef.id, now, paymentConfirmed: 0}), {merge: true});
+    const pointerRef = db.collection("vipActiveHolds").doc(`${uid}_${text(hold.night, 20)}`);
+    tx.delete(pointerRef);
+  });
+
+  return {
+    ok: true,
+    reservation: publicReservation(reservationRef.id, (await reservationRef.get()).data() || {}, {
+      includePassToken: true,
+      passToken
+    })
+  };
+});
+
+/**
+ * Club Admin walk-in / manage: confirm a table as booked.
+ * If depositRequired, must pass paymentRecorded=true (cash/POS/card at door).
+ */
+exports.adminConfirmVipReservation = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const uid = requireAuth(request.auth);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  const night = validateNight(request.data?.night);
+  const sectionId = text(request.data?.sectionId, 80);
+  const partySize = Math.floor(Number(request.data?.partySize || 0));
+  const leadGuestName = text(request.data?.leadGuestName, 120);
+  const paymentRecorded = request.data?.paymentRecorded === true || request.data?.paymentRecorded === 1;
+  const note = text(request.data?.note, 300);
+  if (!clubLocationId || !night || !sectionId) {
+    throw new HttpsError("invalid-argument", "clubLocationId, night, and sectionId are required.");
+  }
+  await requireClubManager(request.auth, clubLocationId);
+  const {catalog, section} = resolveSection(clubLocationId, sectionId);
+  if (partySize < 1 || partySize > Number(section.maxCapacity || 0)) {
+    throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
+  }
+  const amounts = computePartyAmounts(section, partySize);
+  const vipSettings = await loadVipSettings(clubLocationId);
+  const depositRequired = resolveDepositRequired(vipSettings, amounts);
+  if (depositRequired && !paymentRecorded) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Deposit required: record payment (paymentRecorded) before marking this table booked."
+    );
+  }
+  if (!canMarkTableBooked({depositRequired, paymentConfirmed: paymentRecorded || !depositRequired})) {
+    throw new HttpsError("failed-precondition", "Cannot mark table booked until deposit is paid.");
+  }
+
+  const key = inventoryKey(clubLocationId, night, sectionId);
+  const invRef = db.collection("vipInventory").doc(key);
+  const reservationRef = db.collection("vipReservations").doc();
+  const passToken = newQrToken();
+  const now = Date.now();
+
+  await db.runTransaction(async tx => {
+    const invSnap = await tx.get(invRef);
+    const inv = invSnap.exists ? invSnap.data() || {} : {};
+    if (Number(inv.isReserved) === 1 || inv.status === "booked") {
+      throw new HttpsError("failed-precondition", "That table is already booked for this night.");
+    }
+    if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) {
+      throw new HttpsError("failed-precondition", "A patron hold is active. Release it first or wait for expiry.");
+    }
+    if (inv.status === "blocked") {
+      throw new HttpsError("failed-precondition", "Table is blocked. Unblock it first.");
+    }
+    tx.set(reservationRef, {
+      clubLocationId,
+      night,
+      sectionId,
+      sectionLabel: section.label || sectionId,
+      venueName: catalog.venueName,
+      partySize: amounts.partySize,
+      includedGuests: amounts.includedGuests,
+      extraGuests: amounts.extraGuests,
+      patronUid: "",
+      leadGuestName,
+      contactEmail: "",
+      bookedByType: "clubAdmin",
+      bookedByUid: uid,
+      adminNote: note,
+      status: "confirmed",
+      paymentConfirmed: paymentRecorded || !depositRequired ? 1 : 0,
+      depositRequired: depositRequired ? 1 : 0,
+      amounts: {
+        minimumAmountCents: amounts.minimumAmountCents,
+        depositCents: amounts.depositCents,
+        extraGuestFeeCents: amounts.extraGuestFeeCents,
+        extraGuestFeeTotalCents: amounts.extraGuestFeeTotalCents,
+        chargedCents: amounts.chargedCents,
+        currency: amounts.currency
+      },
+      qrTokenHash: hashToken(passToken),
+      IsCheckedIn: 0,
+      IsNoShow: 0,
+      IsRefunded: 0,
+      confirmedAtMs: now,
+      createdAtMs: now,
+      updatedAtMs: now
+    });
+    tx.set(invRef, inventoryBookedPatch({
+      reservationId: reservationRef.id,
+      now,
+      paymentConfirmed: paymentRecorded || !depositRequired ? 1 : 0
+    }), {merge: true});
+  });
+
+  return {
+    ok: true,
+    reservation: publicReservation(reservationRef.id, (await reservationRef.get()).data() || {}, {
+      includePassToken: true,
+      passToken
+    })
+  };
+});
+
+/** Club Admin: cancel a confirmed reservation and free the table (not a Stripe refund). */
+exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const uid = requireAuth(request.auth);
+  const reservationId = text(request.data?.reservationId, 120);
+  const reason = text(request.data?.reason, 300);
+  if (!reservationId) throw new HttpsError("invalid-argument", "reservationId is required.");
+  const ref = db.collection("vipReservations").doc(reservationId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Reservation not found.");
+  const row = snap.data() || {};
+  const clubLocationId = text(row.clubLocationId, 120);
+  await requireClubManager(request.auth, clubLocationId);
+  if (row.IsCheckedIn === 1 || text(row.status, 40) === "checkedIn") {
+    throw new HttpsError("failed-precondition", "Already checked in — cannot cancel.");
+  }
+  const now = Date.now();
+  const key = inventoryKey(clubLocationId, row.night, row.sectionId);
+  await db.runTransaction(async tx => {
+    tx.set(ref, {
+      status: "cancelled",
+      cancelledAtMs: now,
+      cancelledByUid: uid,
+      cancelReason: reason,
+      updatedAtMs: now
+    }, {merge: true});
+    const invRef = db.collection("vipInventory").doc(key);
+    const invSnap = await tx.get(invRef);
+    if (invSnap.exists && text(invSnap.data()?.reservationId, 120) === reservationId) {
+      tx.set(invRef, {
+        status: "available",
+        isReserved: 0,
+        reservationId: "",
+        paymentConfirmed: 0,
+        holdId: "",
+        holdUid: "",
+        expiresAtMs: 0,
+        updatedAtMs: now
+      }, {merge: true});
+    }
+  });
+  return {ok: true, reservationId, status: "cancelled"};
+});
+
 exports.__vipHelpers = {
   fulfillVipReservationOrder,
   resolveSection,
   publicHold,
   publicReservation,
+  loadVipSettings,
+  inventoryBookedPatch,
   BETA_TERMS,
   core
 };

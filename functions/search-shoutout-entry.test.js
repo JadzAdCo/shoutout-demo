@@ -35,8 +35,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const vipMark = read("images/vip-reserv-mark.svg");
   assert.match(vipMark, /aria-label="VIP reserV"/);
   assert.match(vipMark, />VIP</);
-  assert.match(vipMark, />reser</);
-  assert.match(vipMark, /vipSeat|Natural banquette/);
+  assert.match(vipMark, /<tspan[^>]*>reser<\/tspan>\s*<tspan[^>]*>V<\/tspan>/);
+  assert.match(vipMark, /vipSeat|Banquette|rear curve against the ring/);
   const floqMark = read("images/floqcast-icon.svg");
   assert.doesNotMatch(floqMark, /<use[\s>]/, "floqCast Search mark must be Safari img-safe (no use)");
 });

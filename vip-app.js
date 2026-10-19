@@ -246,7 +246,11 @@
       });
       storeHold(activeHold);
       renderHoldBanner();
-      setStatus(t("page.vip.holdReady", "Table held for 30 minutes. Continue to Terms, then pay the deposit."));
+      const needsDeposit = Number(activeHold.depositRequired) !== 0
+        && Number(activeHold.amounts?.depositCents || activeHold.amounts?.chargedCents || 0) > 0;
+      setStatus(needsDeposit
+        ? t("page.vip.holdReady", "Table held for 30 minutes. Continue to Terms, then pay the deposit.")
+        : t("page.vip.holdReadyNoDeposit", "Table held for 30 minutes. Continue to Terms to confirm — no deposit required at this venue."));
       refreshAvailability();
     } catch (err) {
       const msg = err?.message || err?.details || String(err);
