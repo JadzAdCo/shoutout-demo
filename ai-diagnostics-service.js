@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.75";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.76";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,12 +191,12 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.1.75",
-      title: "floqCast icon LED emphasis + display2 idle copy",
+      version: "s3.1.76",
+      title: "VIP reserV curved banquette mark + floqCast silhouette",
       checks: [
-        {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["fcWoman", "fcLedClip", "fcPhoneClip", "ff2d55"]},
-        {label:"Display2 idle stream copy", file:"display-app.js", includes:["Awaiting a floqCast stream", "Go live @"], notIncludes:["Awaiting live feed", "Be a FloqCast @"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.75\""]}
+        {label:"VIP curved banquette mark", file:"images/vip-reserv-mark.svg", includes:["VIP reserV", "vipSeat", "banquette"]},
+        {label:"VIP mark-only Search face", file:"index.html", includes:["vip-icon-face--mark-only", "vip-reserv-mark.svg?v=s3.1.76"], notIncludes:["vip-icon-word"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.76\""]}
       ]
     },
     {
@@ -1671,13 +1671,22 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
+      id:"s3-1-76-vip-curved-banquette-mark",
+      area:"VIP reserV / Search tile",
+      feature:"Curved banquette VIP mark with in-ring VIP reserV",
+      changed:"vip-reserv-mark.svg: one curved seat (table-facing curve, straight outer edge), VIP reserV above table, enlarged ring. Search face drops under-mark word (mark-only). Package s3.1.76.",
+      howToTest:"1) Hard-refresh Search → VIP tile: large gradient ring, VIP reserV above oval table, single curved banquette seat (not 4 boxes), no VIP reserV text under the mark. 2) Confirm BETA pill still on card.",
+      expected:"Banquette seat + in-ring VIP reserV; mark fills the black face.",
+      troubleshoot:"Old 4 seats → hard-refresh vip-reserv-mark.svg?v=s3.1.76 + styles.css. Word still under mark → index must use vip-icon-face--mark-only without vip-icon-word."
+    },
+    {
       id:"s3-1-73-floqcast-icon-idle-copy",
       area:"floqCast / Search tile / Display 2",
       feature:"LED-first floqCast icon + Display2 stream idle copy",
-      changed:"floqcast-icon.svg: small phone + large FloqMedia LED wall, matching woman portrait silhouette on both; Image1 arcs/red arrow. Package s3.1.75.",
+      changed:"floqcast-icon.svg: small phone + large FloqMedia LED wall, matching woman portrait silhouette on both; Image1 arcs/red arrow. Package s3.1.76.",
       howToTest:"1) Hard-refresh Search → floqCast tile: small phone + large LED wall, same woman silhouette on both; cyan arcs + red arrow. 2) display2 idle → Awaiting a floqCast stream. / Go live @ …",
       expected:"Phone clearly smaller than LED; matching silhouettes; Display2 stream idle copy.",
-      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.75. Old idle copy → hard-refresh display-app.js on display2.html."
+      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.76. Old idle copy → hard-refresh display-app.js on display2.html."
     },
     {
       id:"s3-1-72-vip-map-list-state-sync",

@@ -130,6 +130,9 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 .floqai-icon-word,.floqcast-icon-word,.vip-icon-word{flex:0 0 auto;color:#fff;font-size:clamp(11px,2.8vw,14px);font-weight:1000;letter-spacing:.02em;line-height:1.05;white-space:nowrap;text-align:center;max-width:100%;text-shadow:0 0 12px rgba(38,216,255,.55),0 0 18px rgba(244,58,191,.35)}
 .floqcast-icon-word{font-size:clamp(10px,2.6vw,13px)}
 .vip-icon-word{font-size:clamp(9px,2.3vw,12px);letter-spacing:.01em}
+/* VIP mark carries “VIP reserV” inside the ring — fill the black face */
+.vip-icon-face.vip-icon-face--mark-only{justify-content:center;padding:8px;gap:0}
+.vip-icon-face.vip-icon-face--mark-only .vip-tile-mark{width:92%!important;max-height:92%!important}
 @media(max-width:900px){
   .search-icon-row{flex-wrap:wrap;gap:10px}
   .search-icon-row > .shoutout-icon-card,
