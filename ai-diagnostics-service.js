@@ -191,6 +191,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.83",
+      title: "VIP isBooked control + cancel Stripe refund-by-policy",
+      checks: [
+        {label:"Refund policy helpers", file:"functions/vip-payments-core.js", includes:["computeVipRefundCents", "normalizeRefundPolicy", "floqrStripe"]},
+        {label:"Cancel refunds + clear isBooked", file:"functions/vip-functions.js", includes:["cancelVipReservation", "applyTableAvailable", "stripe.refunds.create", "isBooked is the booking-status control"]},
+        {label:"Club Admin cancel/refund UI", file:"admin.html", includes:["panelVipReserv", "vipAdminRefundOnCancel", "vipAdminCancelRefundMode"]},
+        {label:"VIP mark cache-bust", file:"index.html", includes:["vip-reserv-mark.svg?v=s3.1.83"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.83\""]}
+      ]
+    },
+    {
       version: "s3.1.80",
       title: "VIP Club POS payment collectors",
       checks: [
