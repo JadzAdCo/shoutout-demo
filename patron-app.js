@@ -1475,78 +1475,75 @@
     await continueToMainCategories();
   }
 
+  const AUTH_REDIRECT_PENDING_KEY = "floqr.authRedirectPending";
+
+  function oauthAuthErrorMessage(e, label = "Sign-in") {
+    const code = e?.code || "error";
+    const message = e?.message || String(e || "Unknown error");
+    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+      return `${label} was cancelled. Tap Continue with ${label} again.`;
+    }
+    if (code === "auth/popup-blocked") {
+      return `Your browser blocked the ${label} popup. Allow popups for jadzadco.github.io, then try again.`;
+    }
+    if (code === "auth/unauthorized-domain") {
+      return "This site is not authorized for sign-in. Add jadzadco.github.io under Firebase Authentication → Settings → Authorized domains.";
+    }
+    if (code === "auth/operation-not-allowed") {
+      return `${label} is not enabled in Firebase Authentication.`;
+    }
+    if (code === "auth/account-exists-with-different-credential") {
+      return "This email already exists with another sign-in method. Sign in with the original provider first.";
+    }
+    if (code === "auth/invalid-credential" || code === "auth/invalid-oauth-client-id") {
+      return `${label} OAuth configuration appears invalid. Check Firebase provider settings.`;
+    }
+    return `${code}: ${message}`;
+  }
+
+  /**
+   * Prefer popup. Do NOT redirect on popup-closed-by-user — full-page redirect between
+   * jadzadco.github.io and *.firebaseapp.com often returns no session (third-party storage),
+   * leaving Welcome stuck on "Redirecting to secure sign-in…".
+   * Redirect only when the browser truly blocked the popup.
+   */
   async function signInProvider(provider, label) {
     try {
       setStatus(`Opening ${label} sign-in...`);
       await auth.signInWithPopup(provider);
-    } catch(e) {
+    } catch (e) {
       const code = e?.code || "";
-      // Popup closed / blocked is common on mobile + strict browsers; fall back to redirect.
-      if (
-        code === "auth/popup-blocked"
-        || code === "auth/cancelled-popup-request"
-        || code === "auth/popup-closed-by-user"
-      ) {
-        setStatus(`${label} popup closed or blocked. Redirecting to secure sign-in…`);
+      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        setStatus(oauthAuthErrorMessage(e, label));
+        return;
+      }
+      if (code === "auth/popup-blocked") {
         try {
+          sessionStorage.setItem(AUTH_REDIRECT_PENDING_KEY, label);
+          setStatus(`${label} popup was blocked. Trying full-page sign-in…`);
           await auth.signInWithRedirect(provider);
           return;
         } catch (redirectErr) {
-          setStatus(`${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}
+          setStatus(oauthAuthErrorMessage(redirectErr, label));
           return;
         }
       }
-      if (code === "auth/unauthorized-domain") {
-        setStatus("This site is not authorized for Google sign-in. Add jadzadco.github.io under Firebase Authentication → Settings → Authorized domains.");
-        return;
-      }
-      if (code === "auth/operation-not-allowed") {
-        setStatus("Google sign-in is not enabled in Firebase Authentication.");
-        return;
-      }
-      setStatus(`${e.code || "error"}: ${e.message}`);
+      setStatus(oauthAuthErrorMessage(e, label));
     }
   }
   async function loginGoogle() { await signInProvider(new firebase.auth.GoogleAuthProvider(), "Google"); }
   async function loginFacebook() { await signInProvider(new firebase.auth.FacebookAuthProvider(), "Facebook"); }
   function microsoftAuthErrorMessage(e) {
-    const code = e?.code || "error";
-    const message = e?.message || String(e || "Unknown error");
-    if (code === "auth/popup-closed-by-user") return "Microsoft sign-in popup closed before completion. Try again, or allow popups for this site.";
-    if (code === "auth/popup-blocked") return "Your browser blocked Microsoft sign-in. Allow popups for jadzadco.github.io and try again.";
-    if (code === "auth/operation-not-allowed") return "Microsoft sign-in is not enabled in Firebase Authentication.";
-    if (code === "auth/unauthorized-domain") return "This site is not authorized in Firebase Authentication. Add jadzadco.github.io under Authentication > Settings > Authorized domains.";
-    if (code === "auth/account-exists-with-different-credential") return "This email already exists with another sign-in method. Sign in with the original provider first.";
-    if (code === "auth/invalid-credential" || code === "auth/invalid-oauth-client-id") return "Microsoft OAuth configuration appears invalid. Verify Microsoft Client ID, Client Secret, and Firebase redirect URI.";
-    return `${code}: ${message}`;
+    return oauthAuthErrorMessage(e, "Microsoft");
   }
   function buildMicrosoftProvider() {
     const p = new firebase.auth.OAuthProvider("microsoft.com");
     p.setCustomParameters({prompt:"select_account"});
     return p;
   }
-  function isMicrosoftPopupIssue(e) {
-    const code = e?.code || "";
-    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
-  }
   async function loginMicrosoft() {
-    const p = buildMicrosoftProvider();
-    try {
-      setStatus("Opening Microsoft sign-in...");
-      await auth.signInWithPopup(p);
-    } catch(e) {
-      if (isMicrosoftPopupIssue(e)) {
-        try {
-          setStatus("Microsoft popup was blocked or closed. Redirecting instead...");
-          await auth.signInWithRedirect(p);
-          return;
-        } catch(redirectError) {
-          setStatus(microsoftAuthErrorMessage(redirectError));
-          return;
-        }
-      }
-      setStatus(microsoftAuthErrorMessage(e));
-    }
+    await signInProvider(buildMicrosoftProvider(), "Microsoft");
   }
   function showEmailOtpPanel() {
     const panel = byId("emailOtpPanel");
@@ -4921,8 +4918,23 @@
     window.addEventListener("orientationchange", detectRenderContext);
     setStatus("");
     auth.getRedirectResult().then(result => {
-      if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
-    }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
+      let pending = "";
+      try {
+        pending = sessionStorage.getItem(AUTH_REDIRECT_PENDING_KEY) || "";
+        sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY);
+      } catch (_) {}
+      if (result?.user) {
+        setStatus(`Signed in as ${result.user.email || result.user.displayName || result.user.uid}`);
+        return;
+      }
+      // Redirect between github.io and firebaseapp.com often yields null — clear stuck "Redirecting…" copy.
+      if (pending) {
+        setStatus(`${pending} full-page sign-in did not finish. Allow popups for jadzadco.github.io, then tap Continue with ${pending} again.`);
+      }
+    }).catch(e => {
+      try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}
+      setStatus(oauthAuthErrorMessage(e, "Sign-in"));
+    });
     setTimeout(() => document.documentElement.classList.remove("floqr-auth-resolving"), 8000);
     auth.onAuthStateChanged(async user => {
       currentUser = user;
