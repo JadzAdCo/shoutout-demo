@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.82 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.83 (stable)
+
+- s3.1.83: VIP isBooked booking control + Club Admin cancel with FloqMedia/Club Stripe refund-by-policy; Aurelia VIP tab + mark cache-bust.
 
 - s3.1.82: VIP per-table Firestore status (tableNumber key, isBooked "1"/"yes" after booking).
 

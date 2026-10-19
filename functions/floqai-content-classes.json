@@ -286,6 +286,15 @@
       "patron",
       "venueAdmin"
     ],
+    "help-vip-club-admin": [
+      "masterAdmin",
+      "venueAdmin"
+    ],
+    "help-vip-deposit-settings": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
     "help-vip-door-ops": [
       "masterAdmin",
       "serviceMember",
@@ -301,8 +310,23 @@
       "patron",
       "venueAdmin"
     ],
+    "help-vip-floqr-stripe-aurelia": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
+    "help-vip-payment-collector": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
+    ],
     "help-vip-receipt-sms-redaction-fixes": [
       "masterAdmin"
+    ],
+    "help-vip-table-isbooked": [
+      "masterAdmin",
+      "patron",
+      "venueAdmin"
     ],
     "help-vip-terms-consent": [
       "patron",

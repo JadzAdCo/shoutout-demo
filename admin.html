@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.82"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.82"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.83"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.83"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&larr; Venue Command Center</a>
@@ -407,8 +407,31 @@
               <input type="checkbox" id="vipAdminDepositRequired" checked/>
               <span>Require deposit before table is marked booked (Stripe collectors)</span>
             </label>
+            <label class="vip-check" style="display:flex;align-items:center;gap:8px;margin-top:10px">
+              <input type="checkbox" id="vipAdminRefundOnCancel" checked/>
+              <span>On cancel: refund FloqMedia / Club Stripe deposit (per refund policy) and clear isBooked</span>
+            </label>
+            <label style="margin-top:10px">Club cancel refund mode
+              <select id="vipAdminCancelRefundMode">
+                <option value="full">Full refund (default)</option>
+                <option value="policy">Hours policy (full / partial / none)</option>
+                <option value="none">Never auto-refund (free table only)</option>
+              </select>
+            </label>
+            <div class="admin-grid" style="margin-top:8px">
+              <label>Full refund if ≥ hours before night
+                <input id="vipAdminFullRefundHours" type="number" min="0" max="720" value="24"/>
+              </label>
+              <label>Partial refund if ≥ hours before night
+                <input id="vipAdminPartialRefundHours" type="number" min="0" max="720" value="4"/>
+              </label>
+              <label>Partial refund %
+                <input id="vipAdminPartialRefundPercent" type="number" min="0" max="100" value="50"/>
+              </label>
+            </div>
+            <p class="sub small" style="margin-top:8px">Firestore <code>isBooked</code> controls map booked status. Cancel always sets isBooked to 0. Club POS voids stay on Toast/SpotOn — FLOQR only frees the table.</p>
             <p style="margin:8px 0 0">
-              <button type="button" id="vipAdminSaveSettings" class="buttonlike">Save deposit policy</button>
+              <button type="button" id="vipAdminSaveSettings" class="buttonlike">Save deposit &amp; refund policy</button>
               <button type="button" id="vipAdminRefresh" class="buttonlike">Refresh night</button>
               <a id="vipAdminDoorLink" class="buttonlike" href="./vip-door.html" target="_blank" rel="noopener">Open Door</a>
             </p>
@@ -1055,54 +1078,54 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.82"></script>
-<script src="./floqr-people-directory.js?v=s3.1.82"></script>
-<script src="./floqr-app-check.js?v=s3.1.82"></script>
-<script src="./floqr-nav.js?v=s3.1.82"></script>
-<script src="./global-profile-status.js?v=s3.1.82"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.82"></script>
-<script src="./shared-data.js?v=s3.1.82"></script>
-<script src="./feature-gates.js?v=s3.1.82"></script>
-<script src="./url-media-field.js?v=s3.1.82"></script>
-<script src="./media-source-picker.js?v=s3.1.82"></script>
-<script src="./ai-service.js?v=s3.1.82"></script>
-<script src="./ai-index-service.js?v=s3.1.82"></script>
-<script src="./ai-template-studio.js?v=s3.1.82"></script>
-<script src="./floqr-action-feedback.js?v=s3.1.82"></script>
-<script src="./floqr-i18n.js?v=s3.1.82"></script>
-<script src="./floqai-help-repository.js?v=s3.1.82"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.82"></script>
-<script src="./help-attach.js?v=s3.1.82"></script>
-<script src="./helper-popouts.js?v=s3.1.82"></script>
-<script src="./floqr-identity.js?v=s3.1.82"></script>
-<script src="./floqr-logger.js?v=s3.1.82"></script>
-<script src="./payment-service.js?v=s3.1.82"></script>
-<script src="./messaging-credits.js?v=s3.1.82"></script>
-<script src="./marketing-templates.js?v=s3.1.82"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.1.82"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.82"></script>
-<script src="./ad-campaigns.js?v=s3.1.82"></script>
-<script src="./floqr-ad-composer.js?v=s3.1.82"></script>
-<script src="./floqr-tab-gates.js?v=s3.1.82"></script>
-<script src="./floqr-venue-calendar.js?v=s3.1.82"></script>
-<script src="./floqr-employee-network.js?v=s3.1.82"></script>
-<script src="./floqr-featured-staff.js?v=s3.1.82"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.1.82"></script>
-<script src="./floqr-access-notice.js?v=s3.1.82"></script>
-<script src="./floqr-board-frame.js?v=s3.1.82"></script>
-<script src="./floqr-safe-render.js?v=s3.1.82"></script>
-<script src="./admin-app.js?v=s3.1.82"></script>
-<script src="./admin-venue-hours.js?v=s3.1.82"></script>
-<script src="./floqr-template-tags.js?v=s3.1.82"></script>
-<script src="./admin-rep-extension.js?v=s3.1.82"></script>
-<script src="./admin-notifications.js?v=s3.1.82"></script>
-<script src="./admin-marketing.js?v=s3.1.82"></script>
-<script src="./master-twilio-logging.js?v=s3.1.82"></script>
-<script src="./admin-spot-ads.js?v=s3.1.82"></script>
-<script src="./assignment-card.js?v=s3.1.82"></script>
-<script src="./admin-scheduling.js?v=s3.1.82"></script>
-<script src="./notification-center.js?v=s3.1.82"></script>
-<script src="./profile-access-guard.js?v=s3.1.82"></script>
+<script src="./firebase-config.js?v=s3.1.83"></script>
+<script src="./floqr-people-directory.js?v=s3.1.83"></script>
+<script src="./floqr-app-check.js?v=s3.1.83"></script>
+<script src="./floqr-nav.js?v=s3.1.83"></script>
+<script src="./global-profile-status.js?v=s3.1.83"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.83"></script>
+<script src="./shared-data.js?v=s3.1.83"></script>
+<script src="./feature-gates.js?v=s3.1.83"></script>
+<script src="./url-media-field.js?v=s3.1.83"></script>
+<script src="./media-source-picker.js?v=s3.1.83"></script>
+<script src="./ai-service.js?v=s3.1.83"></script>
+<script src="./ai-index-service.js?v=s3.1.83"></script>
+<script src="./ai-template-studio.js?v=s3.1.83"></script>
+<script src="./floqr-action-feedback.js?v=s3.1.83"></script>
+<script src="./floqr-i18n.js?v=s3.1.83"></script>
+<script src="./floqai-help-repository.js?v=s3.1.83"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.83"></script>
+<script src="./help-attach.js?v=s3.1.83"></script>
+<script src="./helper-popouts.js?v=s3.1.83"></script>
+<script src="./floqr-identity.js?v=s3.1.83"></script>
+<script src="./floqr-logger.js?v=s3.1.83"></script>
+<script src="./payment-service.js?v=s3.1.83"></script>
+<script src="./messaging-credits.js?v=s3.1.83"></script>
+<script src="./marketing-templates.js?v=s3.1.83"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.83"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.83"></script>
+<script src="./ad-campaigns.js?v=s3.1.83"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.83"></script>
+<script src="./floqr-tab-gates.js?v=s3.1.83"></script>
+<script src="./floqr-venue-calendar.js?v=s3.1.83"></script>
+<script src="./floqr-employee-network.js?v=s3.1.83"></script>
+<script src="./floqr-featured-staff.js?v=s3.1.83"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.83"></script>
+<script src="./floqr-access-notice.js?v=s3.1.83"></script>
+<script src="./floqr-board-frame.js?v=s3.1.83"></script>
+<script src="./floqr-safe-render.js?v=s3.1.83"></script>
+<script src="./admin-app.js?v=s3.1.83"></script>
+<script src="./admin-venue-hours.js?v=s3.1.83"></script>
+<script src="./floqr-template-tags.js?v=s3.1.83"></script>
+<script src="./admin-rep-extension.js?v=s3.1.83"></script>
+<script src="./admin-notifications.js?v=s3.1.83"></script>
+<script src="./admin-marketing.js?v=s3.1.83"></script>
+<script src="./master-twilio-logging.js?v=s3.1.83"></script>
+<script src="./admin-spot-ads.js?v=s3.1.83"></script>
+<script src="./assignment-card.js?v=s3.1.83"></script>
+<script src="./admin-scheduling.js?v=s3.1.83"></script>
+<script src="./notification-center.js?v=s3.1.83"></script>
+<script src="./profile-access-guard.js?v=s3.1.83"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

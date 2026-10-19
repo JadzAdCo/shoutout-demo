@@ -3,17 +3,23 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const Stripe = require("stripe");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {defineSecret} = require("firebase-functions/params");
 const {__featureServiceHelpers: featureAccess} = require("./feature-services-functions");
 const assertFeatureAccess = (auth, key, req = null) => featureAccess.assertFeatureAccess(auth, key, req);
 const core = require("./vip-core");
 const betaCatalog = require("./vip-beta-catalog");
 const tableStatus = require("./vip-table-status");
+const vipPayments = require("./vip-payments-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
+const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
+const STRIPE_API_VERSION = "2026-06-24.dahlia";
 const CALL_OPTS = {region: "us-central1", cors: true};
+const CALL_OPTS_STRIPE = {region: "us-central1", cors: true, secrets: [STRIPE_SECRET_KEY]};
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
   validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
   holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked,
@@ -181,6 +187,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
   }
   const vipSettings = await loadVipSettings(clubLocationId);
   const tableRows = await tableStatus.listTablesForNight(db, clubLocationId, night);
+  // Firestore isBooked is the booking-status control (set only after payment / admin confirm).
   const bookedByTable = new Map(tableRows.filter(t => t.isBooked === "1").map(t => [t.tableNumber, t]));
   const sections = [];
   for (const section of catalog.sections) {
@@ -189,12 +196,15 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     const inv = invSnap.exists ? invSnap.data() || {} : {};
     const tableNumber = tableNumberFromSection(section);
     const tableBooked = bookedByTable.has(tableNumber);
-    const isReserved = (Number(inv.isReserved) === 1 || tableBooked) ? 1 : 0;
     let status = "available";
-    // Booked/unavailable only when inventory was marked after payment (or no-deposit confirm).
-    if (isReserved === 1 || inv.status === "booked" || inv.status === "confirmed" || tableBooked) status = "booked";
-    else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) status = "held";
-    else if (inv.status === "blocked") status = "closed";
+    if (tableBooked) {
+      status = "booked";
+    } else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) {
+      status = "held";
+    } else if (inv.status === "blocked") {
+      status = "closed";
+    }
+    // Do not treat legacy vipInventory.isReserved alone as booked — isBooked wins.
     const amounts = computePartyAmounts(section, section.includedGuests);
     const depositRequired = resolveDepositRequired(vipSettings, amounts) ? 1 : 0;
     sections.push({
@@ -650,7 +660,7 @@ exports.getVipClubSettings = onCall(CALL_OPTS, async request => {
   return {clubLocationId, settings, brand: "VIP reserV"};
 });
 
-/** Club Admin: save depositRequired (1 = table booked only after paid deposit). */
+/** Club Admin: save depositRequired + refund policy (cancel → clear isBooked; Stripe refund by policy). */
 exports.saveVipClubSettings = onCall(CALL_OPTS, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const clubLocationId = text(request.data?.clubLocationId, 120);
@@ -659,16 +669,27 @@ exports.saveVipClubSettings = onCall(CALL_OPTS, async request => {
   const depositRequired = request.data?.depositRequired === 0 || request.data?.depositRequired === false || request.data?.depositRequired === "0"
     ? 0
     : 1;
+  const existing = await loadVipSettings(clubLocationId);
+  const refundPolicy = vipPayments.normalizeRefundPolicy({
+    ...existing.refundPolicy,
+    ...(request.data?.refundPolicy && typeof request.data.refundPolicy === "object" ? request.data.refundPolicy : {}),
+    clubCancelRefundMode: request.data?.clubCancelRefundMode ?? request.data?.refundPolicy?.clubCancelRefundMode,
+    allowStripeRefund: request.data?.allowStripeRefund ?? request.data?.refundPolicy?.allowStripeRefund,
+    fullRefundHoursBeforeNight: request.data?.fullRefundHoursBeforeNight ?? request.data?.refundPolicy?.fullRefundHoursBeforeNight,
+    partialRefundHoursBeforeNight: request.data?.partialRefundHoursBeforeNight ?? request.data?.refundPolicy?.partialRefundHoursBeforeNight,
+    partialRefundPercent: request.data?.partialRefundPercent ?? request.data?.refundPolicy?.partialRefundPercent
+  });
   const now = Date.now();
   await db.collection("clubLocations").doc(clubLocationId).set({
     vipSettings: {
       depositRequired,
+      refundPolicy,
       updatedAtMs: now,
       updatedByUid: request.auth.uid
     },
     updatedAtMs: now
   }, {merge: true});
-  return {ok: true, clubLocationId, settings: {depositRequired}};
+  return {ok: true, clubLocationId, settings: {depositRequired, refundPolicy}};
 });
 
 /** Club Admin: block or reopen a section for a night (shows closed on the map). */
@@ -915,8 +936,12 @@ exports.adminConfirmVipReservation = onCall(CALL_OPTS, async request => {
   };
 });
 
-/** Club Admin: cancel a confirmed reservation and free the table (not a Stripe refund). */
-exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
+/**
+ * Club Admin: cancel a confirmed reservation, clear Firestore isBooked, and
+ * optionally reverse FloqMedia / Club Stripe deposits per refund policy.
+ * Club POS / CSV collectors never auto-refund cards here — club handles POS void.
+ */
+exports.cancelVipReservation = onCall(CALL_OPTS_STRIPE, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const reservationId = text(request.data?.reservationId, 120);
@@ -931,16 +956,145 @@ exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
   if (row.IsCheckedIn === 1 || text(row.status, 40) === "checkedIn") {
     throw new HttpsError("failed-precondition", "Already checked in — cannot cancel.");
   }
+  if (text(row.status, 40) === "cancelled") {
+    return {ok: true, reservationId, status: "cancelled", alreadyCancelled: 1};
+  }
+
+  const vipSettings = await loadVipSettings(clubLocationId);
+  let paySettings = {paymentCollector: text(row.paymentCollector, 40) || "floqrStripe"};
+  try {
+    const {loadClubPaymentSettings} = require("./vip-pos-functions").__vipPosHelpers;
+    paySettings = await loadClubPaymentSettings(clubLocationId);
+  } catch (_) { /* keep reservation collector */ }
+
+  const processRefundRequested = !(
+    request.data?.processRefund === false
+    || request.data?.processRefund === 0
+    || request.data?.processRefund === "0"
+  );
+  const forceMode = text(request.data?.refundMode, 20);
+  const chargedCents = Math.max(
+    0,
+    Math.round(Number(row.amounts?.chargedCents || row.amounts?.depositCents || 0))
+  );
+  const refundPlan = vipPayments.computeVipRefundCents({
+    chargedCents,
+    night: row.night,
+    policy: vipSettings.refundPolicy,
+    actor: "club",
+    forceMode,
+    nowMs: Date.now()
+  });
+  const stripeCollector = vipPayments.collectorSupportsStripeRefund(
+    paySettings.paymentCollector || row.paymentCollector
+  );
+  const wantsStripeRefund = processRefundRequested
+    && stripeCollector
+    && Number(row.paymentConfirmed) === 1
+    && Number(row.IsRefunded) !== 1
+    && refundPlan.refundCents > 0;
+
+  let refundResult = {
+    attempted: 0,
+    refunded: 0,
+    refundCents: 0,
+    refundId: "",
+    reason: refundPlan.reason,
+    collector: paySettings.paymentCollector || row.paymentCollector || "",
+    note: ""
+  };
+
+  if (processRefundRequested && !stripeCollector) {
+    refundResult.note = paySettings.paymentCollector === "clubPos"
+      ? "Club POS deposits are not reversed in FLOQR — void/refund on Toast/SpotOn if needed."
+      : "No Stripe deposit on this collector — table freed without a card refund.";
+  }
+
+  if (wantsStripeRefund) {
+    let paymentIntentId = text(row.stripe?.paymentIntentId || row.stripePaymentIntentId, 160);
+    let orderId = text(row.serviceOrderId, 160);
+    if (!paymentIntentId && orderId) {
+      const orderSnap = await db.collection("serviceOrders").doc(orderId).get();
+      if (orderSnap.exists) {
+        paymentIntentId = text(orderSnap.data()?.stripePaymentIntentId, 160);
+      }
+    }
+    if (!paymentIntentId) {
+      refundResult.attempted = 1;
+      refundResult.note = "Paid reservation has no Stripe payment intent; table freed without card refund.";
+    } else {
+      const key = STRIPE_SECRET_KEY.value();
+      if (!key) {
+        throw new HttpsError("failed-precondition", "Stripe is not configured for VIP refunds.");
+      }
+      const stripe = new Stripe(key, {apiVersion: STRIPE_API_VERSION, maxNetworkRetries: 2, timeout: 20000});
+      try {
+        const refund = await stripe.refunds.create({
+          payment_intent: paymentIntentId,
+          amount: refundPlan.refundCents,
+          reason: "requested_by_customer",
+          metadata: {
+            floqrAction: "vip_cancel_reservation",
+            reservationId,
+            clubLocationId,
+            night: text(row.night, 20),
+            refundReason: refundPlan.reason,
+            actorUid: uid
+          }
+        }, {idempotencyKey: `vip-cancel-refund-${reservationId}`.slice(0, 255)});
+        refundResult = {
+          attempted: 1,
+          refunded: 1,
+          refundCents: Math.max(0, Math.round(Number(refund.amount || refundPlan.refundCents))),
+          refundId: text(refund.id, 160),
+          reason: refundPlan.reason,
+          collector: paySettings.paymentCollector || "",
+          note: refundPlan.percent < 100
+            ? `Partial refund (${refundPlan.percent}%) per venue policy.`
+            : "Full deposit refunded via Stripe."
+        };
+        if (orderId) {
+          await db.collection("serviceOrders").doc(orderId).set({
+            paymentStatus: "refunded",
+            status: "refunded",
+            stripeRefundId: refundResult.refundId,
+            refundAmountCents: refundResult.refundCents,
+            refundStatus: refundPlan.percent >= 100 ? "full" : "partial",
+            updatedAtMs: Date.now()
+          }, {merge: true});
+        }
+      } catch (err) {
+        console.error("VIP cancel Stripe refund failed", reservationId, err?.message || err);
+        throw new HttpsError(
+          "failed-precondition",
+          `Could not refund Stripe deposit (${err?.message || "stripe_error"}). Table was not cancelled — fix payment then retry, or cancel with processRefund=false.`
+        );
+      }
+    }
+  } else if (processRefundRequested && stripeCollector && refundPlan.refundCents <= 0) {
+    refundResult.note = `No refund under policy (${refundPlan.reason}). Table will be freed.`;
+  }
+
   const now = Date.now();
   const key = inventoryKey(clubLocationId, row.night, row.sectionId);
   await db.runTransaction(async tx => {
-    tx.set(ref, {
+    const patch = {
       status: "cancelled",
       cancelledAtMs: now,
       cancelledByUid: uid,
       cancelReason: reason,
-      updatedAtMs: now
-    }, {merge: true});
+      updatedAtMs: now,
+      refundPolicyReason: refundPlan.reason,
+      refundRequested: processRefundRequested ? 1 : 0
+    };
+    if (refundResult.refunded) {
+      patch.IsRefunded = 1;
+      patch.stripeRefundId = refundResult.refundId;
+      patch.refundAmountCents = refundResult.refundCents;
+      patch.refundedAtMs = now;
+      patch.paymentStatus = "refunded";
+    }
+    tx.set(ref, patch, {merge: true});
     const invRef = db.collection("vipInventory").doc(key);
     const invSnap = await tx.get(invRef);
     if (invSnap.exists && text(invSnap.data()?.reservationId, 120) === reservationId) {
@@ -955,6 +1109,7 @@ exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
         updatedAtMs: now
       }, {merge: true});
     }
+    // Always clear Firestore isBooked on cancel (booking-status control).
     tableStatus.applyTableAvailable(tx, db, {
       clubLocationId,
       night: row.night,
@@ -964,7 +1119,14 @@ exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
       now
     });
   });
-  return {ok: true, reservationId, status: "cancelled"};
+  return {
+    ok: true,
+    reservationId,
+    status: "cancelled",
+    isBooked: "0",
+    refund: refundResult,
+    refundPolicy: refundPlan.policy
+  };
 });
 
 /**

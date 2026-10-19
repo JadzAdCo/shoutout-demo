@@ -61,3 +61,12 @@ test("VIP booking paths write table status under clubLocations/.../tables/{table
   assert.match(rules, /vipNights\/\{night\}\/tables\/\{tableNumber\}/);
   assert.match(rules, /isBooked/);
 });
+
+test("getVipAvailability uses Firestore isBooked as booking-status control", () => {
+  const read = f => fs.readFileSync(path.resolve(__dirname, "..", f), "utf8");
+  const fn = read("functions/vip-functions.js");
+  const avail = fn.slice(fn.indexOf("exports.getVipAvailability"), fn.indexOf("exports.createVipHold"));
+  assert.match(avail, /tableBooked/);
+  assert.match(avail, /isBooked is the booking-status control/);
+  assert.match(avail, /Do not treat legacy vipInventory\.isReserved alone as booked/);
+});

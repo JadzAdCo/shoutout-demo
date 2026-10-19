@@ -477,10 +477,11 @@
     {
       id: "help-vip-club-admin",
       title: "Club Admin VIP reserV management",
-      body: "Club Admin → VIP reserV manages tonight’s reservations: check in, no-show, cancel (frees the table), block/unblock sections, and walk-in book. When Require deposit is on, a table stays green/amber until the deposit is paid (Stripe) or an admin records payment — only then does it show booked/unavailable (red). Holds never set isReserved=1. Door staff can also use VIP reserV Door.",
+      body: "Club Admin → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
       searchPhrases: [
         "vip club admin", "manage vip reservations", "vip deposit required", "paid before booked",
-        "block vip table", "walk-in vip", "vip admin book", "require deposit before booked"
+        "block vip table", "walk-in vip", "vip admin book", "require deposit before booked",
+        "cancel vip refund", "vip refund policy", "clear isBooked", "negate vip payment"
       ],
       links: [
         {label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
@@ -523,10 +524,11 @@
     {
       id: "help-vip-table-isbooked",
       title: "VIP table isBooked status in Firestore",
-      body: "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). After the booking flow completes (deposit paid on FloqMedia Stripe / Club Stripe, Club POS confirm, or admin recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel sets isBooked back to \"0\". Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs.",
+      body: "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). getVipAvailability treats isBooked as the booking-status control for the floor map (booked only when isBooked is \"1\"). After payment completes (FloqMedia Stripe / Club Stripe deposit, Club POS confirm, or admin-recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel always clears isBooked to \"0\" and, for FloqMedia/Club Stripe, can refund the deposit per Club Admin refund policy. Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs.",
       searchPhrases: [
         "isBooked", "table is booked firestore", "vip table status", "table number key",
-        "vipNights tables", "isBooked yes", "firestore vip tables"
+        "vipNights tables", "isBooked yes", "firestore vip tables", "cancel clears isBooked",
+        "vip stripe refund", "refund policy vip"
       ],
       links: [
         {label: "Aurelia Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},

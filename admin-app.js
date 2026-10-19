@@ -1246,6 +1246,11 @@
       ]);
       const required = Number(club?.data?.settings?.depositRequired) !== 0;
       if (byId("vipAdminDepositRequired")) byId("vipAdminDepositRequired").checked = required;
+      const rp = club?.data?.settings?.refundPolicy || {};
+      if (byId("vipAdminCancelRefundMode")) byId("vipAdminCancelRefundMode").value = rp.clubCancelRefundMode || "full";
+      if (byId("vipAdminFullRefundHours")) byId("vipAdminFullRefundHours").value = String(rp.fullRefundHoursBeforeNight ?? 24);
+      if (byId("vipAdminPartialRefundHours")) byId("vipAdminPartialRefundHours").value = String(rp.partialRefundHoursBeforeNight ?? 4);
+      if (byId("vipAdminPartialRefundPercent")) byId("vipAdminPartialRefundPercent").value = String(rp.partialRefundPercent ?? 50);
       vipPayState = pay?.data || {};
       vipPayCatalog = {
         collectors: vipPayState.collectors || [],
@@ -1343,13 +1348,22 @@
           } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
         });
         div.querySelector("[data-vip-cancel]")?.addEventListener("click", async () => {
-          if (!confirm("Cancel this reservation and free the table?")) return;
+          const processRefund = !!byId("vipAdminRefundOnCancel")?.checked;
+          const msg = processRefund
+            ? "Cancel this reservation, clear isBooked, and refund the FloqMedia/Club Stripe deposit per refund policy?"
+            : "Cancel this reservation and clear isBooked without a Stripe refund?";
+          if (!confirm(msg)) return;
           try {
-            await vipCallable("cancelVipReservation")({
+            const res = await vipCallable("cancelVipReservation")({
               reservationId: r.reservationId,
-              reason: "Cancelled by Club Admin"
+              reason: "Cancelled by Club Admin",
+              processRefund
             });
-            setText("vipAdminStatus", "Reservation cancelled — table available.");
+            const rf = res?.data?.refund || {};
+            const refundNote = rf.refunded
+              ? ` Refunded $${((rf.refundCents || 0) / 100).toFixed(2)} (${rf.reason || "ok"}).`
+              : (rf.note ? ` ${rf.note}` : "");
+            setText("vipAdminStatus", `Reservation cancelled — isBooked cleared.${refundNote}`);
             refreshVipAdminList();
           } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
         });
@@ -1377,10 +1391,20 @@
     byId("vipAdminSaveSettings")?.addEventListener("click", async () => {
       try {
         const depositRequired = byId("vipAdminDepositRequired")?.checked ? 1 : 0;
-        await vipCallable("saveVipClubSettings")({clubLocationId: locationId, depositRequired});
+        await vipCallable("saveVipClubSettings")({
+          clubLocationId: locationId,
+          depositRequired,
+          refundPolicy: {
+            clubCancelRefundMode: byId("vipAdminCancelRefundMode")?.value || "full",
+            fullRefundHoursBeforeNight: Number(byId("vipAdminFullRefundHours")?.value || 24),
+            partialRefundHoursBeforeNight: Number(byId("vipAdminPartialRefundHours")?.value || 4),
+            partialRefundPercent: Number(byId("vipAdminPartialRefundPercent")?.value || 50),
+            allowStripeRefund: 1
+          }
+        });
         setText("vipAdminStatus", depositRequired
-          ? "Saved: deposit required before tables show booked."
-          : "Saved: deposit not required — confirm without payment marks booked.");
+          ? "Saved: deposit + refund policy (isBooked after pay; cancel clears isBooked)."
+          : "Saved: no deposit required; refund policy stored for Stripe collectors.");
       } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
     });
     byId("vipAdminCollector")?.addEventListener("change", syncVipCollectorUi);

@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.71";
+  const VERSION = "s3.1.83";
 
   const packs = {
     "ru": {
@@ -296,7 +296,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Статус isBooked VIP-столов в Firestore",
-        body: "У каждого VIP-клуба есть документ Firestore на номер стола и вечер: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = печатный номер (напр. T1, B3). После завершения бронирования: isBooked \"1\", isBookedYes \"yes\". Свободные: \"0\" / \"no\". Hold не меняет isBooked. Отмена → \"0\"."
+        body: "У каждого VIP-клуба есть документ Firestore на номер стола и вечер: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = печатный номер (напр. T1, B3). После завершения бронирования: isBooked \"1\", isBookedYes \"yes\". Свободные: \"0\" / \"no\". Hold не меняет isBooked. Отмена → \"0\". getVipAvailability берёт isBooked как статус брони. Отмена всегда → isBooked \"0\"; FloqMedia/Club Stripe может вернуть депозит по политике клуба."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Настроить FloqMedia Stripe для Aurelia (Demo Club)",
@@ -594,7 +594,7 @@
       },
       "help-vip-table-isbooked": {
         title: "VIP-tafel isBooked-status in Firestore",
-        body: "Elke VIP-onboarded club heeft een Firestore-doc per tafelnummer en nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-id = gedrukt nummer (bijv. T1, B3). Na voltooide boeking: isBooked \"1\", isBookedYes \"yes\". Vrij: \"0\" / \"no\". Holds zetten isBooked niet. Annuleren → \"0\"."
+        body: "Elke VIP-onboarded club heeft een Firestore-doc per tafelnummer en nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-id = gedrukt nummer (bijv. T1, B3). Na voltooide boeking: isBooked \"1\", isBookedYes \"yes\". Vrij: \"0\" / \"no\". Holds zetten isBooked niet. Annuleren → \"0\". getVipAvailability gebruikt isBooked als boekingsstatus. Annuleren zet isBooked altijd op \"0\"; FloqMedia/Club Stripe kan de storting terugbetalen per clubbeleid."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "FloqMedia Stripe instellen voor Aurelia (Demo Club)",
@@ -892,7 +892,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Statut isBooked des tables VIP dans Firestore",
-        body: "Chaque club VIP onboardé a un doc Firestore par numéro de table et par soirée : clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. L’id du doc est le numéro imprimé (ex. T1, B3). Après réservation complète, isBooked = \"1\" et isBookedYes = \"yes\". Tables libres : \"0\" / \"no\". Les holds ne changent pas isBooked. Annulation → \"0\"."
+        body: "Chaque club VIP onboardé a un doc Firestore par numéro de table et par soirée : clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. L’id du doc est le numéro imprimé (ex. T1, B3). Après réservation complète, isBooked = \"1\" et isBookedYes = \"yes\". Tables libres : \"0\" / \"no\". Les holds ne changent pas isBooked. Annulation → \"0\". getVipAvailability utilise isBooked comme statut de réservation. L’annulation remet toujours isBooked à \"0\" ; FloqMedia/Club Stripe peut rembourser le dépôt selon la politique du club."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurer FloqMedia Stripe pour Aurelia (Demo Club)",
@@ -1190,7 +1190,7 @@
       },
       "help-vip-table-isbooked": {
         title: "VIP-Tisch isBooked-Status in Firestore",
-        body: "Jeder VIP-onboardete Club hat ein Firestore-Dokument pro Tischnummer und Nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-ID = gedruckte Nummer (z. B. T1, B3). Nach abgeschlossener Buchung: isBooked \"1\", isBookedYes \"yes\". Frei: \"0\" / \"no\". Holds setzen isBooked nicht. Storno → \"0\"."
+        body: "Jeder VIP-onboardete Club hat ein Firestore-Dokument pro Tischnummer und Nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-ID = gedruckte Nummer (z. B. T1, B3). Nach abgeschlossener Buchung: isBooked \"1\", isBookedYes \"yes\". Frei: \"0\" / \"no\". Holds setzen isBooked nicht. Storno → \"0\". getVipAvailability nutzt isBooked als Buchungsstatus. Storno setzt isBooked immer auf \"0\"; FloqMedia/Club Stripe kann die Anzahlung laut Club-Policy erstatten."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "FloqMedia Stripe für Aurelia (Demo Club) einrichten",
@@ -1488,7 +1488,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked de mesas VIP en Firestore",
-        body: "Cada club VIP onboarded tiene un doc Firestore por número de mesa y noche: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. El id es el número impreso (p. ej. T1, B3). Tras completar la reserva: isBooked \"1\", isBookedYes \"yes\". Libres: \"0\" / \"no\". Los holds no cambian isBooked. Cancelar → \"0\"."
+        body: "Cada club VIP onboarded tiene un doc Firestore por número de mesa y noche: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. El id es el número impreso (p. ej. T1, B3). Tras completar la reserva: isBooked \"1\", isBookedYes \"yes\". Libres: \"0\" / \"no\". Los holds no cambian isBooked. Cancelar → \"0\". getVipAvailability usa isBooked como estado de reserva. Cancelar siempre pone isBooked en \"0\"; FloqMedia/Club Stripe puede reembolsar el depósito según la política del club."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurar FloqMedia Stripe para Aurelia (Demo Club)",
@@ -1786,7 +1786,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Stato isBooked tavoli VIP in Firestore",
-        body: "Ogni club VIP onboarded ha un doc Firestore per numero tavolo e notte: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = numero stampato (es. T1, B3). Dopo prenotazione completa: isBooked \"1\", isBookedYes \"yes\". Liberi: \"0\" / \"no\". Gli hold non impostano isBooked. Annulla → \"0\"."
+        body: "Ogni club VIP onboarded ha un doc Firestore per numero tavolo e notte: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = numero stampato (es. T1, B3). Dopo prenotazione completa: isBooked \"1\", isBookedYes \"yes\". Liberi: \"0\" / \"no\". Gli hold non impostano isBooked. Annulla → \"0\". getVipAvailability usa isBooked come stato prenotazione. Annullare azzera sempre isBooked a \"0\"; FloqMedia/Club Stripe può rimborsare il deposito secondo la policy del club."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurare FloqMedia Stripe per Aurelia (Demo Club)",
@@ -2084,7 +2084,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked das mesas VIP no Firestore",
-        body: "Cada clube VIP onboarded tem um doc Firestore por número de mesa e noite: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = número impresso (ex. T1, B3). Após reserva completa: isBooked \"1\", isBookedYes \"yes\". Livres: \"0\" / \"no\". Holds não alteram isBooked. Cancelar → \"0\"."
+        body: "Cada clube VIP onboarded tem um doc Firestore por número de mesa e noite: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = número impresso (ex. T1, B3). Após reserva completa: isBooked \"1\", isBookedYes \"yes\". Livres: \"0\" / \"no\". Holds não alteram isBooked. Cancelar → \"0\". getVipAvailability usa isBooked como estado da reserva. Cancelar sempre define isBooked como \"0\"; FloqMedia/Club Stripe pode reembolsar o depósito conforme a política do clube."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurar FloqMedia Stripe para Aurelia (Demo Club)",
@@ -2382,7 +2382,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Κατάσταση isBooked τραπεζιών VIP στο Firestore",
-        body: "Κάθε VIP club έχει ένα doc Firestore ανά αριθμό τραπεζιού και βραδιά: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = εκτυπωμένος αριθμός (π.χ. T1, B3). Μετά την ολοκλήρωση κράτησης: isBooked \"1\", isBookedYes \"yes\". Ελεύθερα: \"0\" / \"no\". Τα holds δεν αλλάζουν isBooked. Ακύρωση → \"0\"."
+        body: "Κάθε VIP club έχει ένα doc Firestore ανά αριθμό τραπεζιού και βραδιά: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = εκτυπωμένος αριθμός (π.χ. T1, B3). Μετά την ολοκλήρωση κράτησης: isBooked \"1\", isBookedYes \"yes\". Ελεύθερα: \"0\" / \"no\". Τα holds δεν αλλάζουν isBooked. Ακύρωση → \"0\". Το getVipAvailability χρησιμοποιεί το isBooked ως κατάσταση κράτησης. Η ακύρωση μηδενίζει πάντα το isBooked σε \"0\"· FloqMedia/Club Stripe μπορεί να επιστρέψει την προκαταβολή ανά πολιτική του club."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Ρύθμιση FloqMedia Stripe για Aurelia (Demo Club)",
@@ -2680,7 +2680,7 @@
       },
       "help-vip-table-isbooked": {
         title: "Status isBooked stolików VIP w Firestore",
-        body: "Każdy klub VIP ma dokument Firestore na numer stolika i noc: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = drukowany numer (np. T1, B3). Po zakończeniu rezerwacji: isBooked \"1\", isBookedYes \"yes\". Wolne: \"0\" / \"no\". Hold nie ustawia isBooked. Anulowanie → \"0\"."
+        body: "Każdy klub VIP ma dokument Firestore na numer stolika i noc: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = drukowany numer (np. T1, B3). Po zakończeniu rezerwacji: isBooked \"1\", isBookedYes \"yes\". Wolne: \"0\" / \"no\". Hold nie ustawia isBooked. Anulowanie → \"0\". getVipAvailability używa isBooked jako statusu rezerwacji. Anulowanie zawsze ustawia isBooked na \"0\"; FloqMedia/Club Stripe może zwrócić depozyt wg polityki klubu."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Skonfiguruj FloqMedia Stripe dla Aurelia (Demo Club)",
@@ -2978,7 +2978,7 @@
       },
       "help-vip-table-isbooked": {
         title: "حالة isBooked لطاولات VIP في Firestore",
-        body: "لكل نادٍ VIP مستند Firestore لكل رقم طاولة وليلة: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. المعرّف = الرقم المطبوع (مثل T1، B3). بعد اكتمال الحجز: isBooked \"1\" وisBookedYes \"yes\". الفارغة: \"0\" / \"no\". الـhold لا يغيّر isBooked. الإلغاء → \"0\"."
+        body: "لكل نادٍ VIP مستند Firestore لكل رقم طاولة وليلة: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. المعرّف = الرقم المطبوع (مثل T1، B3). بعد اكتمال الحجز: isBooked \"1\" وisBookedYes \"yes\". الفارغة: \"0\" / \"no\". الـhold لا يغيّر isBooked. الإلغاء → \"0\". getVipAvailability يعتمد isBooked لحالة الحجز. الإلغاء يصفّر isBooked دائماً إلى \"0\"؛ ويمكن لـ FloqMedia/Club Stripe استرداد العربون وفق سياسة النادي."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "إعداد FloqMedia Stripe لنادي Aurelia (Demo Club)",

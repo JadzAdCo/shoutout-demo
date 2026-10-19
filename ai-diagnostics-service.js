@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.82";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.83";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1715,7 +1715,16 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-82-vip-table-isbooked",
+      id:"s3-1-83-vip-isbooked-cancel-refund",
+      area:"VIP reserV / Booking + refunds",
+      feature:"isBooked booking control + cancel clears + FloqMedia Stripe refund-by-policy",
+      changed:"Map booked only when Firestore isBooked=1 after pay. Cancel clears isBooked. FloqMedia/Club Stripe cancel can refund per vipSettings.refundPolicy. Club Admin VIP tab + mark s3.1.83. Package s3.1.83.",
+      howToTest:"1) Deploy Functions + publish Pages. 2) Hard-refresh admin.html?location=temp-democlub-1 — VIP reserV tab visible. 3) Search VIP tile shows brownish-red banquette mark (not rainbow). 4) Pay Aurelia deposit → tables/{n} isBooked=1. 5) Club Admin Cancel with Refund checked → isBooked=0 + Stripe refund (test mode). 6) Uncheck refund → cancel frees table without refund.",
+      expected:"VIP tab on Aurelia admin; new mark; booked only after pay via isBooked; cancel clears isBooked; Stripe refund when opted.",
+      troubleshoot:"No VIP tab / old icons → Pages still on main pre-s3.1.83; hard-refresh ?v=s3.1.83. Refund fails → deploy Functions with STRIPE_SECRET_KEY + cancelVipReservation secrets. Still booked after cancel → applyTableAvailable not deployed."
+    },
+    {
+      id:"s3-1-82-vip-table-isbooked",
       area:"VIP reserV / Firestore",
       feature:"Per-table isBooked docs keyed by table number",
       changed:"clubLocations/{id}/vipNights/{night}/tables/{tableNumber}; isBooked 1/yes after booking. Package s3.1.82.",

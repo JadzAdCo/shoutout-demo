@@ -141,9 +141,23 @@ function normalizeVipSettings(raw = {}) {
       ? 0
       : 1;
   }
+  let refundPolicy = {};
+  try {
+    const payments = require("./vip-payments-core");
+    refundPolicy = payments.normalizeRefundPolicy(row.refundPolicy || row);
+  } catch (_) {
+    refundPolicy = {
+      allowStripeRefund: 1,
+      clubCancelRefundMode: "full",
+      fullRefundHoursBeforeNight: 24,
+      partialRefundHoursBeforeNight: 4,
+      partialRefundPercent: 50
+    };
+  }
   return {
     depositRequired,
-    depositRequiredExplicit: hasExplicit ? 1 : 0
+    depositRequiredExplicit: hasExplicit ? 1 : 0,
+    refundPolicy
   };
 }
 

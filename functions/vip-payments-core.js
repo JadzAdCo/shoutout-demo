@@ -239,11 +239,104 @@ function publicBillingStatement(id, row = {}) {
   };
 }
 
+/** Collectors where FLOQR can reverse a card deposit via Stripe.refunds.create. */
+const STRIPE_REFUND_COLLECTORS = Object.freeze(new Set(["floqrStripe", "clubStripe"]));
+
+/**
+ * Club VIP cancel / refund policy (hours before night UTC midnight).
+ * Club Admin cancel defaults to full refund for Stripe collectors (product lock).
+ * Patron / policy mode uses the hours windows.
+ */
+function normalizeRefundPolicy(raw = {}) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const mode = text(row.clubCancelRefundMode || row.cancelRefundMode, 20);
+  const clubCancelRefundMode = ["full", "policy", "none"].includes(mode) ? mode : "full";
+  const fullH = Number(row.fullRefundHoursBeforeNight ?? row.fullRefundHoursBefore);
+  const partialH = Number(row.partialRefundHoursBeforeNight ?? row.partialRefundHoursBefore);
+  const partialPct = Number(row.partialRefundPercent);
+  return {
+    allowStripeRefund: row.allowStripeRefund === 0 || row.allowStripeRefund === false || row.allowStripeRefund === "0"
+      ? 0
+      : 1,
+    clubCancelRefundMode,
+    fullRefundHoursBeforeNight: Number.isFinite(fullH) ? Math.max(0, Math.round(fullH)) : 24,
+    partialRefundHoursBeforeNight: Number.isFinite(partialH) ? Math.max(0, Math.round(partialH)) : 4,
+    partialRefundPercent: Number.isFinite(partialPct)
+      ? Math.max(0, Math.min(100, Math.round(partialPct)))
+      : 50
+  };
+}
+
+function collectorSupportsStripeRefund(collectorId) {
+  return STRIPE_REFUND_COLLECTORS.has(text(collectorId, 40));
+}
+
+/**
+ * Compute refund cents for a VIP cancel.
+ * @param {object} opts
+ * @param {number} opts.chargedCents
+ * @param {string} opts.night YYYY-MM-DD
+ * @param {object} [opts.policy]
+ * @param {"club"|"patron"} [opts.actor]
+ * @param {"full"|"policy"|"none"} [opts.forceMode] request override
+ * @param {number} [opts.nowMs]
+ */
+function computeVipRefundCents({
+  chargedCents = 0,
+  night = "",
+  policy = {},
+  actor = "club",
+  forceMode = "",
+  nowMs = Date.now()
+} = {}) {
+  const charged = Math.max(0, Math.round(Number(chargedCents) || 0));
+  const pol = normalizeRefundPolicy(policy);
+  if (!charged) {
+    return {refundCents: 0, percent: 0, reason: "no_charge", policy: pol};
+  }
+  if (!pol.allowStripeRefund) {
+    return {refundCents: 0, percent: 0, reason: "refunds_disabled", policy: pol};
+  }
+  const modeRaw = text(forceMode, 20);
+  const mode = ["full", "policy", "none"].includes(modeRaw)
+    ? modeRaw
+    : (actor === "club" ? pol.clubCancelRefundMode : "policy");
+  if (mode === "none") {
+    return {refundCents: 0, percent: 0, reason: "mode_none", policy: pol};
+  }
+  if (mode === "full") {
+    return {refundCents: charged, percent: 100, reason: "full_refund", policy: pol};
+  }
+  const nightKey = text(night, 20);
+  const nightStart = /^\d{4}-\d{2}-\d{2}$/.test(nightKey)
+    ? Date.parse(`${nightKey}T00:00:00.000Z`)
+    : NaN;
+  const hoursBefore = Number.isFinite(nightStart) ? (nightStart - nowMs) / 3600000 : 0;
+  if (hoursBefore >= pol.fullRefundHoursBeforeNight) {
+    return {refundCents: charged, percent: 100, reason: "full_window", policy: pol, hoursBefore};
+  }
+  if (hoursBefore >= pol.partialRefundHoursBeforeNight) {
+    const pct = pol.partialRefundPercent;
+    return {
+      refundCents: Math.round(charged * pct / 100),
+      percent: pct,
+      reason: "partial_window",
+      policy: pol,
+      hoursBefore
+    };
+  }
+  return {refundCents: 0, percent: 0, reason: "inside_cutoff", policy: pol, hoursBefore};
+}
+
 module.exports = {
   PAYMENT_COLLECTORS,
   POS_PROVIDERS,
+  STRIPE_REFUND_COLLECTORS,
   text,
   normalizePaymentSettings,
+  normalizeRefundPolicy,
+  collectorSupportsStripeRefund,
+  computeVipRefundCents,
   listCollectorsPublic,
   listProvidersPublic,
   buildVipReservationsCsv,
