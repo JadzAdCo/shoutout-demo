@@ -1,132 +1,177 @@
-/* floqCast — Master-only search module (mirrors FloqAi intent layout) */
-.floqcast-page{
-  min-height:100vh;
-}
-.floqcast-shell{
-  max-width:920px;
-  margin:0 auto;
-}
-.floqcast-hero-logo,
-.floqcast-mark-inline{
-  width:min(160px,42vw);
-  max-height:120px;
-  object-fit:contain;
-  filter:drop-shadow(0 10px 24px rgba(0,0,0,.4));
-}
-.floqcast-brand-row{
-  max-width:min(520px,96vw);
-  gap:10px;
-}
-.floqcast-brand-row .floqai-hero-logo{
-  width:min(200px,48vw);
-  max-height:72px;
-}
-.floqcast-action-cards{
-  width:100%;
-  max-width:520px;
-  margin-top:8px;
-  display:grid;
-  gap:10px;
-  justify-items:stretch;
-}
-.floqcast-live-card[disabled]{
-  opacity:.72;
-  cursor:not-allowed;
-}
-.floqcast-tech-note{
-  text-align:left;
-  line-height:1.45;
-  padding:0 4px 24px;
-  color:var(--muted,#9aa3af);
-}
-.floqcast-tech-note code{
-  font-size:.9em;
-}
-.intent-search-results .intent-result{
-  display:block;
-  text-align:left;
-  width:100%;
-  margin:0 0 8px;
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(26,30,38,.92);
-  color:inherit;
-  cursor:pointer;
-}
-.intent-search-results .intent-result:hover,
-.intent-search-results .intent-result:focus-visible{
-  border-color:rgba(200,16,46,.55);
-  outline:none;
-}
-.intent-search-results .intent-result strong{
-  display:block;
-  margin-bottom:4px;
-}
-.intent-search-results .intent-result .sub{
-  margin:0;
-}
-.intent-search-results .intent-result[disabled],
-.intent-search-results .intent-result.is-soon{
-  opacity:.78;
-  cursor:default;
-}
-.floqcast-preview{
-  width:100%;
-  max-width:420px;
-  aspect-ratio:16/10;
-  object-fit:cover;
-  border-radius:14px;
-  background:#0a0c10;
-  border:1px solid rgba(255,255,255,.14);
-  display:none;
-}
-.floqcast-preview.is-on{
-  display:block;
-}
-.floqcast-steps{
-  margin:0;
-  padding-left:1.2rem;
-  line-height:1.5;
-  text-align:left;
-}
-.floqcast-steps li{
-  margin:0.25rem 0;
-}
-#floqcastVenueSelect,
-#floqcastBoardSelect{
-  width:100%;
-  max-width:420px;
-  margin-top:6px;
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.16);
-  background:#141820;
-  color:inherit;
-  font:inherit;
-}
-#floqcastDisplayLinkWrap{
-  text-align:left;
-  max-width:420px;
-}
-.category-card.ghost{
-  background:transparent;
-  border:1px dashed rgba(255,255,255,.25);
+/* floqCast — same FLOQR product chrome as VIP reserV / ShoutOut.
+   See design-notes-feature-landing-pages.mdc + design-notes-product-chrome.mdc. */
+
+body.floqcast-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(244, 58, 191, 0.32), transparent 32%),
+    radial-gradient(circle at 82% 18%, rgba(38, 216, 255, 0.34), transparent 36%),
+    linear-gradient(135deg, #07101c, #071b63 68%, #090b12) !important;
+  color: var(--text, #f4f6ff);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  min-height: 100vh;
 }
 
-.floqcast-stage-actions{
-  width:100%;
-  max-width:420px;
-  display:grid;
-  gap:8px;
+.floqcast-shell { max-width: 1100px; }
+
+.floqcast-product-page .floqcast-hero { display: block; }
+.floqcast-hero-copy { max-width: 42rem; }
+
+.floqcast-title-row,
+.floqcast-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.floqcast-stage-actions .category-card{
-  width:100%;
-  justify-content:center;
-  text-align:center;
+
+.floqcast-title-row h1,
+.floqcast-section-head h2 {
+  margin: 0;
 }
-.floqcast-stage-actions .category-card:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  filter:grayscale(.25);
+
+.floqcast-title-row > .help-popout,
+.floqcast-section-head > .help-popout {
+  flex: 0 0 auto;
+}
+
+.floqcast-page .status:empty { display: none; }
+
+.floqcast-product-page .product-brand-stack { margin-bottom: 4px; }
+
+.floqcast-hero-logo {
+  width: min(160px, 42vw);
+  max-height: 120px;
+  margin: 4px 0 8px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
+    drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
+}
+
+.floqcast-hero h1 {
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  margin: 0.15rem 0 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+.floqcast-page .card,
+.floqcast-venue-card,
+.floqcast-gate {
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.18));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.07));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+  border-radius: 30px;
+  padding: 26px;
+  backdrop-filter: blur(14px);
+}
+
+.floqcast-venue-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.floqcast-venue-card .search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 24, 0.72);
+  color: inherit;
+  font: inherit;
+}
+
+.floqcast-venue-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.floqcast-venue-item {
+  padding: 16px !important;
+  border-radius: 18px !important;
+}
+
+.floqcast-venue-item.is-selected {
+  border-color: rgba(38, 216, 255, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(38, 216, 255, 0.35), 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.floqcast-venue-item .buttonlike {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+}
+
+.floqcast-venue-item .buttonlike.primary {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(90deg, var(--hot, #f43abf), var(--accent, #26d8ff));
+}
+
+.floqcast-venue-card .primary {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  border: 0;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font: inherit;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--hot, #f43abf), var(--accent, #26d8ff));
+}
+
+.floqcast-venue-card .primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.25);
+}
+
+.floqcast-tech-note {
+  text-align: left;
+  line-height: 1.45;
+  padding: 0 4px 8px;
+  color: var(--muted, #9aa3af);
+  margin: 0;
+}
+
+.floqcast-preview {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #0a0c10;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: none;
+}
+.floqcast-preview.is-on { display: block; }
+
+.floqcast-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  line-height: 1.5;
+  text-align: left;
+}
+.floqcast-steps li { margin: 0.25rem 0; }
+
+.floqcast-stage-actions {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .floqcast-hero-logo { width: min(132px, 40vw); max-height: 100px; }
 }

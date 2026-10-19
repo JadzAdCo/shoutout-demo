@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.76";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.77";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,10 +191,21 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.77",
+      title: "floqCast landing header parity + hero icon",
+      checks: [
+        {label:"floqCast Search mark img-safe", file:"images/floqcast-icon.svg", includes:["fcSil", "fcLedClip"], notIncludes:["<use "]},
+        {label:"floqCast landing VIP-style header", file:"floqcast-search.html", includes:["floqcast-hero-icon.svg", "floqcast-title-row", "help-popout", "floqcastVenueSearch"], notIncludes:["suprstr-logo.png", "floqcast-brand-row"]},
+        {label:"Display idle uses floqcast-icon", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/floqcast-icon.svg\""], notIncludes:["suprstr-logo.png"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.77\""]}
+      ]
+    },
+
+    {
       version: "s3.1.76",
       title: "VIP reserV curved banquette mark + floqCast silhouette",
       checks: [
-        {label:"VIP curved banquette mark", file:"images/vip-reserv-mark.svg", includes:["VIP reserV", "vipSeat", "banquette"]},
+        {label:"VIP curved banquette mark", file:"images/vip-reserv-mark.svg", includes:["reser", "vipSeat", "Natural banquette"]},
         {label:"VIP mark-only Search face", file:"index.html", includes:["vip-icon-face--mark-only", "vip-reserv-mark.svg?v=s3.1.76"], notIncludes:["vip-icon-word"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.76\""]}
       ]
@@ -1669,6 +1680,24 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+            id:"s3-1-77-vip-sketch-banquette",
+      area:"VIP reserV / Search tile",
+      feature:"Sketch-faithful VIP mark + natural banquette",
+      changed:"vip-reserv-mark: VIP / reser + check-V, crescent table with dots, natural curved banquette (curved to table, straight outside). floqcast-icon: remove &lt;use&gt; so Safari Search tile renders. Package s3.1.77.",
+      howToTest:"1) Hard-refresh Search on iPhone — floqCast tile shows phone→LED silhouette (not blue ?). 2) VIP tile shows VIP/reser✓, crescent table, soft banquette. 3) Compare to vip.html hero icon.",
+      expected:"Both Search tiles render; VIP matches sketch intent.",
+      troubleshoot:"floqCast still ? → SVG must not use &lt;use href&gt; when loaded as img. VIP old 4 boxes → hard-refresh vip-reserv-mark.svg?v=s3.1.77."
+    },
+    {
+      id:"s3-1-77-floqcast-landing-header",
+      area:"floqCast / Feature landings",
+      feature:"VIP-parity header + new floqCast hero icon",
+      changed:"floqcast-search/preview: FloqR → floqcast-hero-icon under logo → title+?; venue search cards; no suprstr-logo. display-app idle logo = floqcast-icon.svg. Architecture rule design-notes-feature-landing-pages.mdc. Package s3.1.77.",
+      howToTest:"1) Hard-refresh floqcast-search.html — FLOQR alone, floqCast black-face icon below, floqCast title + ? (not side-by-side). 2) Compare to vip.html header stack. 3) Venue search filters cards. 4) display2 idle shows new cast icon not suprstr-logo.",
+      expected:"Header matches VIP pattern; icon is phone→LED silhouette everywhere.",
+      troubleshoot:"Old side-by-side mark → hard-refresh floqcast-search.html + floqcast-hero-icon.svg?v=s3.1.77. Still suprstr → grep for suprstr-logo.png."
     },
     {
       id:"s3-1-76-vip-curved-banquette-mark",

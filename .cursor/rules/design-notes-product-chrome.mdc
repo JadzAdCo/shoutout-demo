@@ -27,7 +27,9 @@ Inventory **state** colors on the map (green available · amber held · red book
 - [ ] `styles.css` loaded first
 - [ ] Feature CSS does not set bare `body` / `:root` background or global `--accent`
 - [ ] Hero uses `product-brand-stack` + FloqR parent logo when other products do
+- [ ] Feature icon stacked **under** FLOQR (never beside it) — see `design-notes-feature-landing-pages.mdc`
+- [ ] Title row uses `details.help-popout` `?` like VIP reserV
 - [ ] Cards / CTAs read as the same family as ShoutOut on Search
-- [ ] Hard-refresh QA against `index.html` ShoutOut landing side-by-side
+- [ ] Hard-refresh QA against `vip.html` / Search side-by-side
 
-Resume: `@product-chrome$` / `$shoutout-colors$`.
+Resume: `@product-chrome$` / `$shoutout-colors$` / `@feature-landing$`.

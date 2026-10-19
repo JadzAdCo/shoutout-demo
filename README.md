@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.76 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.77 (stable)
+
+- s3.1.77: floqCast landing standardized to VIP header (FloqR → hero icon → title+?); floqcast-hero-icon; retire suprstr-logo on landings/display idle.
 
 - s3.1.76: VIP reserV curved banquette Search mark (in-ring VIP reserV, enlarged ring); floqCast small-phone + LED woman silhouette + Display2 stream idle copy.
 

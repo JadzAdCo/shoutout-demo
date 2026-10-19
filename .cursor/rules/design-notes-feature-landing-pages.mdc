@@ -1,0 +1,67 @@
+---
+description: Site architecture — standardize patron feature landing headers, icons, ?, search. Resume @feature-landing$
+alwaysApply: true
+---
+
+# Feature landing pages (site architecture — always)
+
+Patron feature landings (VIP reserV, floqCast, ShoutOut, BartR, RydR, Mingl, FloqAi when it is a product page) share **one** header + chrome pattern. Same color scheme, same hierarchy, **different feature icon only**.
+
+Resume: `@feature-landing$` / `$feature-landing$`.
+
+## Canonical header stack (top → bottom)
+
+Match **VIP reserV** (`vip.html`) as the reference:
+
+1. **Back** — `floqrGlobalBack` / `FLOQRNav.applyGlobalBack` (← Back to Search). No hardcoded `?v=` in the href.
+2. **FLOQR parent logo** — `images/floqr-color.png` via `.product-parent-logo` inside `.product-brand-stack` (**centered, alone on its row**).
+3. **Feature icon** — stacked **under** FLOQR (not beside it). Use a black-face hero tile when the Search mark is mark-only:
+   - VIP → `images/vip-reserv-icon.svg`
+   - floqCast → `images/floqcast-hero-icon.svg` (mark: `floqcast-icon.svg`)
+   - Classes: `product-logo {feature}-hero-logo` (~160×120 max, pink/cyan drop-shadow).
+4. **Feature title + `?`** — one flex row (`.{feature}-title-row`): `<h1>` + `details.help-popout` summary `?`. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title (VIP pattern).
+5. **Body card** — glass card from `styles.css` / product chrome. Section heads that need help use the same `?` row pattern (`.{feature}-section-head`).
+
+### Forbidden header layouts
+
+- Feature icon **on the same line** as the FLOQR logo (old floqCast `floqcast-brand-row` / FloqAi-inline pattern on product landings).
+- Legacy `suprstr-logo.png` / SupRstR art as the floqCast mark — use `floqcast-icon.svg` / `floqcast-hero-icon.svg` everywhere.
+- Flat admin `#111` body on product landings — see `design-notes-product-chrome.mdc`.
+
+## Color / chrome
+
+Same tokens as Search / ShoutOut (`--hot` `#f43abf`, `--accent` `#26d8ff`, pink+cyan radial washes). Primary CTA = hot→accent gradient. Do not invent a second theme per feature.
+
+## Venue / contextual search
+
+When the landing needs venue pick:
+
+- Prefer the **VIP-style** contextual search: search input + result cards (“Select venue”), not a bare orphan `<select>` as the only UI.
+- Copy: only clubs with that feature enabled appear (parity with ShoutOut / VIP / floqCast gates).
+- Hidden `<select>` may remain as a sync target for existing JS if needed.
+
+## Icons — one mark, two surfaces
+
+| Surface | Asset shape |
+|---|---|
+| Search tile face | Mark SVG (no outer black square if the HTML face supplies black) |
+| Feature landing hero | Hero SVG with black rounded face **or** same mark sized as VIP hero |
+| Display / idle (floqCast board) | Mark SVG (`display-app.js` `FLOQCAST_LOGO` → `floqcast-icon.svg`) |
+
+Replace retired logos site-wide when a mark ships — do not leave `suprstr-logo.png` on landings.
+
+## Checklist (new or edited feature landing)
+
+- [ ] Header order: Back → FLOQR → feature icon (below) → title + `?`
+- [ ] Feature icon is the current mark (not a side-by-side FloqAi row)
+- [ ] `?` uses `details.help-popout` / FloqAi help repository id
+- [ ] Body wash = product chrome; card = glass
+- [ ] Venue pick uses search+cards when venue list exists
+- [ ] No hardcoded `?v=` in nav links; asset tags re-stamped by bump script
+- [ ] Update `docs/FEATURE-WIRING.md` if the landing contract changed
+
+## Related
+
+- `design-notes-product-chrome.mdc` — colors / forbidden flat black
+- `floqcast.mdc` — floqCast pay → approve → display2 path
+- `design-notes-vip-reservations.mdc` — VIP map / hold / deposit

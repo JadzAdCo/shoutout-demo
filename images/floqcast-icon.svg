@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="floqCast">
+  <!-- Safari/iOS-safe: no &lt;use&gt; (breaks when SVG is loaded as &lt;img&gt;) -->
   <defs>
     <linearGradient id="fcStroke" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#26d8ff"/>
@@ -29,57 +30,47 @@
     <clipPath id="fcLedClip">
       <rect x="21.5" y="10.5" width="40" height="33" rx="1.5"/>
     </clipPath>
-    <!-- Icon-ready woman portrait silhouette -->
-    <g id="fcWoman">
-      <path d="M5 12 C4 5.5 8 1.5 12.5 1.5 C17 1.5 21 5.5 20 12
-               C21.2 13.2 22.2 16.5 21.8 20.5 C21.2 26 18.8 30.5 16.8 33.5
-               L16.8 40 L8.2 40 L8.2 33.5 C6.2 30.5 3.8 26 3.2 20.5
-               C2.8 16.5 3.8 13.2 5 12 Z"/>
-      <ellipse cx="12.5" cy="12.2" rx="4.6" ry="5.6" fill="#0a0e18" opacity="0.32"/>
-      <path d="M10.6 17.8 C10.8 16.6 14.2 16.6 14.4 17.8 L14.8 23.2 L10.2 23.2 Z"/>
-      <path d="M3.5 40 C4.2 31.5 8 27.2 12.5 27.2 C17 27.2 20.8 31.5 21.5 40 Z"/>
-    </g>
   </defs>
 
-  <!-- Small origin phone (clearly smaller than LED wall) -->
+  <!-- Small origin phone -->
   <g transform="translate(9.5 44) rotate(-34)">
     <rect x="-4.0" y="-8.6" width="8.0" height="17.2" rx="1.8" fill="#0b1020" stroke="#f2f6ff" stroke-width="1.25"/>
     <rect x="-2.6" y="-6.6" width="5.2" height="10.2" rx="0.7" fill="#0a1020"/>
     <g clip-path="url(#fcPhoneClip)">
       <rect x="-2.6" y="-6.6" width="5.2" height="10.2" fill="#12192c"/>
+      <!-- Tiny woman silhouette on phone (inlined) -->
       <g transform="translate(-1.75,-6.1) scale(0.175)" fill="url(#fcSilPhone)">
-        <use href="#fcWoman"/>
+        <path d="M5 12 C4 5.5 8 1.5 12.5 1.5 C17 1.5 21 5.5 20 12 C21.2 13.2 22.2 16.5 21.8 20.5 C21.2 26 18.8 30.5 16.8 33.5 L16.8 40 L8.2 40 L8.2 33.5 C6.2 30.5 3.8 26 3.2 20.5 C2.8 16.5 3.8 13.2 5 12 Z"/>
+        <path d="M10.6 17.8 C10.8 16.6 14.2 16.6 14.4 17.8 L14.8 23.2 L10.2 23.2 Z"/>
+        <path d="M3.5 40 C4.2 31.5 8 27.2 12.5 27.2 C17 27.2 20.8 31.5 21.5 40 Z"/>
       </g>
     </g>
     <circle cx="0" cy="6.7" r="0.75" fill="#f2f6ff"/>
   </g>
 
-  <!-- Framing rays -->
   <path d="M13.8 32.5 L22.5 18.5" fill="none" stroke="#ff2d55" stroke-width="1.0" stroke-linecap="round" opacity="0.7"/>
   <path d="M14.2 48.0 L23.5 52.5" fill="none" stroke="#26d8ff" stroke-width="1.0" stroke-linecap="round" opacity="0.65"/>
-
-  <!-- Wireless arcs (from small phone toward large LED) -->
   <path d="M12.8 33.5 C17.5 26.8, 24.0 24.2, 29.5 26.8" fill="none" stroke="#26d8ff" stroke-width="1.7" stroke-linecap="round"/>
   <path d="M13.2 36.8 C18.8 29.8, 25.8 27.2, 31.8 30.2" fill="none" stroke="#26d8ff" stroke-width="1.35" stroke-linecap="round" opacity="0.8"/>
   <path d="M13.6 39.8 C19.8 32.6, 27.0 30.0, 33.5 33.4" fill="none" stroke="#26d8ff" stroke-width="1.1" stroke-linecap="round" opacity="0.55"/>
-
-  <!-- Red cast arrow into the LED -->
   <path d="M14.5 37.8 L24.8 32.6 L24.8 35.2 L30.2 35.2 L30.2 38.8 L24.8 38.8 L24.8 41.4 Z" fill="#ff2d55"/>
 
-  <!-- Large FloqMedia LED wall (hero — much bigger than phone) -->
+  <!-- Large FloqMedia LED wall -->
   <rect x="19.5" y="8.0" width="43.5" height="38" rx="3.0" fill="url(#fcCabinet)" stroke="url(#fcStroke)" stroke-width="1.9"/>
   <rect x="21.5" y="10.5" width="40" height="33" rx="1.5" fill="url(#fcFace)"/>
   <rect x="21.5" y="10.5" width="40" height="1.5" rx="0.7" fill="#26d8ff" opacity="0.28"/>
 
   <g clip-path="url(#fcLedClip)">
-    <!-- Corner LED module accents -->
     <rect x="22.4" y="11.6" width="3.6" height="3.6" rx="0.6" fill="#26d8ff" opacity="0.32"/>
     <rect x="56.6" y="11.6" width="3.6" height="3.6" rx="0.6" fill="#f43abf" opacity="0.38"/>
     <rect x="22.4" y="38.6" width="3.6" height="3.6" rx="0.6" fill="#7a5cff" opacity="0.32"/>
     <rect x="56.6" y="38.6" width="3.6" height="3.6" rx="0.6" fill="#dfff5a" opacity="0.32"/>
-    <!-- Large portrait silhouette (cast content on LED) -->
+    <!-- Woman silhouette on LED (inlined — img-safe) -->
     <g transform="translate(27.2,11.2) scale(0.95)" fill="url(#fcSil)">
-      <use href="#fcWoman"/>
+      <path d="M5 12 C4 5.5 8 1.5 12.5 1.5 C17 1.5 21 5.5 20 12 C21.2 13.2 22.2 16.5 21.8 20.5 C21.2 26 18.8 30.5 16.8 33.5 L16.8 40 L8.2 40 L8.2 33.5 C6.2 30.5 3.8 26 3.2 20.5 C2.8 16.5 3.8 13.2 5 12 Z"/>
+      <ellipse cx="12.5" cy="12.2" rx="4.6" ry="5.6" fill="#0a0e18" opacity="0.32"/>
+      <path d="M10.6 17.8 C10.8 16.6 14.2 16.6 14.4 17.8 L14.8 23.2 L10.2 23.2 Z"/>
+      <path d="M3.5 40 C4.2 31.5 8 27.2 12.5 27.2 C17 27.2 20.8 31.5 21.5 40 Z"/>
     </g>
   </g>
 

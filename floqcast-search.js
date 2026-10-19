@@ -3,6 +3,7 @@
   "use strict";
 
   let venueRows = [];
+  let selectedVenueId = "";
 
   function byId(id) {
     return document.getElementById(id);
@@ -10,7 +11,7 @@
 
   function setStatus(msg) {
     const el = byId("floqcastGateStatus");
-    if (el) el.textContent = msg;
+    if (el) el.textContent = msg || "";
   }
 
   function setLiveStatus(msg) {
@@ -36,9 +37,59 @@
 
   function showGate(show) {
     byId("floqcastGate")?.classList.toggle("hidden", !show);
-    byId("floqcastGate")?.classList.toggle("active", show);
-    byId("floqcastSearchPage")?.classList.toggle("hidden", show);
-    byId("floqcastSearchPage")?.classList.toggle("active", !show);
+    byId("floqcastApp")?.classList.toggle("hidden", show);
+  }
+
+  function esc(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function filteredVenues() {
+    const q = String(byId("floqcastVenueSearch")?.value || "").trim().toLowerCase();
+    if (!q) return venueRows.slice();
+    return venueRows.filter((r) => `${r.name} ${r.id}`.toLowerCase().includes(q));
+  }
+
+  function syncSelect() {
+    const sel = byId("floqcastVenueSelect");
+    if (!sel) return;
+    sel.innerHTML = venueRows.map((r) => `<option value="${esc(r.id)}">${esc(r.name)}</option>`).join("");
+    if (selectedVenueId && venueRows.some((r) => r.id === selectedVenueId)) sel.value = selectedVenueId;
+    else if (venueRows[0]) {
+      selectedVenueId = venueRows[0].id;
+      sel.value = selectedVenueId;
+    }
+  }
+
+  function renderVenueGrid() {
+    const grid = byId("floqcastVenueGrid");
+    if (!grid) return;
+    const rows = filteredVenues();
+    if (!rows.length) {
+      grid.innerHTML = `<p class="sub small">No floqCast venues match that search.</p>`;
+      return;
+    }
+    grid.innerHTML = rows.map((r) => {
+      const selected = r.id === selectedVenueId;
+      return `<article class="card club-card floqcast-venue-item${selected ? " is-selected" : ""}" role="listitem" data-venue-id="${esc(r.id)}">
+        <strong>${esc(r.name)}</strong>
+        <p class="sub small" style="color:var(--lime,#dfff5a);margin:4px 0 10px">floqCast</p>
+        <button type="button" class="buttonlike ${selected ? "primary" : ""}" data-select-venue="${esc(r.id)}">${selected ? "Selected" : "Select venue"}</button>
+      </article>`;
+    }).join("");
+  }
+
+  function selectVenue(id) {
+    if (!venueRows.some((r) => r.id === id)) return;
+    selectedVenueId = id;
+    const sel = byId("floqcastVenueSelect");
+    if (sel) sel.value = id;
+    renderVenueGrid();
+    setLiveStatus("");
   }
 
   async function loadVenues() {
@@ -60,24 +111,27 @@
     }
     rows.sort((a, b) => a.name.localeCompare(b.name));
     venueRows = rows;
-    const sel = byId("floqcastVenueSelect");
-    if (!sel) return;
     if (!rows.length) {
-      sel.innerHTML = `<option value="">No venues with floqCast enabled</option>`;
+      selectedVenueId = "";
+      syncSelect();
+      renderVenueGrid();
       setVenueStatus("No venues currently allow floqCast.");
       byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = true);
       return;
     }
-    sel.innerHTML = rows.map(r => `<option value="${r.id}">${r.name}</option>`).join("");
-    const preferred = rows.find(r => r.id === "heist-washington-dc") || rows[0];
-    if (preferred) sel.value = preferred.id;
-    setVenueStatus(`${rows.length} venue${rows.length === 1 ? "" : "s"} with floqCast enabled.`);
+    const preferred = rows.find((r) => r.id === selectedVenueId)
+      || rows.find((r) => r.id === "heist-washington-dc")
+      || rows[0];
+    selectedVenueId = preferred.id;
+    syncSelect();
+    renderVenueGrid();
+    setVenueStatus(`${rows.length} floqCast venue${rows.length === 1 ? "" : "s"}`);
     byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = false);
   }
 
   function selectedVenue() {
-    const id = byId("floqcastVenueSelect")?.value || "";
-    const row = venueRows.find(r => r.id === id) || {};
+    const id = selectedVenueId || byId("floqcastVenueSelect")?.value || "";
+    const row = venueRows.find((r) => r.id === id) || {};
     return {id, name: row.name || id};
   }
 
@@ -106,7 +160,6 @@
     }
     const btn = byId("floqcastGoLiveBtn");
     if (btn) btn.disabled = true;
-    // Open placeholder tab synchronously on click — before any await.
     let previewTab = window.open("about:blank", "floqr_floqcast_preview");
     const tabBlocked = !previewTab;
     if (!tabBlocked) {
@@ -149,21 +202,14 @@
     }
   }
 
-  function bindHelp() {
-    const btn = byId("floqcastHelpBtn");
-    const pop = byId("floqcastHelpPopout");
-    const close = byId("floqcastHelpClose");
-    function setOpen(open) {
-      pop?.classList.toggle("hidden", !open);
-      pop?.setAttribute("aria-hidden", open ? "false" : "true");
-      btn?.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-    btn?.addEventListener("click", () => setOpen(pop?.classList.contains("hidden")));
-    close?.addEventListener("click", () => setOpen(false));
-  }
-
   function bindUi() {
     byId("floqcastGoLiveBtn")?.addEventListener("click", () => beginFloqCast());
+    byId("floqcastVenueSearch")?.addEventListener("input", () => renderVenueGrid());
+    byId("floqcastVenueGrid")?.addEventListener("click", (ev) => {
+      const btn = ev.target?.closest?.("[data-select-venue]");
+      if (!btn) return;
+      selectVenue(btn.getAttribute("data-select-venue"));
+    });
   }
 
   function bindAuth(auth) {
@@ -193,14 +239,14 @@
     });
     byId("floqcastLogoutBtn")?.addEventListener("click", () => auth.signOut());
 
-    auth.onAuthStateChanged(async user => {
+    auth.onAuthStateChanged(async (user) => {
       const check = accessCheck(user);
       if (!check.ok) {
         showGate(true);
         setStatus(user ? `Access issue: ${check.reason}` : "Sign in to open floqCast.");
         return;
       }
-      setStatus(`Signed in as ${check.email}`);
+      setStatus("");
       showGate(false);
       await loadVenues();
     });
@@ -213,7 +259,6 @@
       setStatus("Firebase Auth failed to load.");
       return;
     }
-    bindHelp();
     bindUi();
     bindAuth(firebase.auth());
   }
