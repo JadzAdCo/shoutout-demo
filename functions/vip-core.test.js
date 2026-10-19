@@ -45,3 +45,13 @@ test("hold expiry is 30 minutes", () => {
   assert.equal(core.holdExpiresAtMs(now) - now, core.HOLD_MS);
   assert.equal(core.HOLD_MS, 30 * 60 * 1000);
 });
+
+test("paid-before-booked: deposit policy gates isReserved", () => {
+  assert.equal(core.resolveDepositRequired({depositRequired: 1}, {depositCents: 0}), true);
+  assert.equal(core.resolveDepositRequired({depositRequired: 0}, {depositCents: 5000}), false);
+  assert.equal(core.resolveDepositRequired({}, {depositCents: 5000}), true);
+  assert.equal(core.resolveDepositRequired({}, {depositCents: 0, chargedCents: 0}), false);
+  assert.equal(core.canMarkTableBooked({depositRequired: true, paymentConfirmed: 0}), false);
+  assert.equal(core.canMarkTableBooked({depositRequired: true, paymentConfirmed: 1}), true);
+  assert.equal(core.canMarkTableBooked({depositRequired: false, paymentConfirmed: 0}), true);
+});

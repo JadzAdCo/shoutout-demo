@@ -18,6 +18,7 @@ module.exports = {
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),
   ...require("./vip-functions"),
+  ...require("./vip-pos-functions"),
   ...require("./privacy-dsar-functions"),
   ...require("./venue-geocode-functions"),
   ...require("./whatsapp-otp-functions"),

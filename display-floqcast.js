@@ -14,20 +14,21 @@
     }
   }
 
-  function displayBoard() {
-    if (window.FLOQR_DISPLAY_BOARD === "secondary" || window.FLOQR_DISPLAY_BOARD === "primary") {
-      return window.FLOQR_DISPLAY_BOARD;
-    }
+  /** floqCast answers only on display2.html (secondary). Display 1 never joins. */
+  function isFloqCastBoard() {
+    if (window.FLOQR_DISPLAY_BOARD === "secondary") return true;
     try {
       const file = String(location.pathname.split("/").pop() || "").toLowerCase();
-      if (file === "display2.html" || file === "displays.html") return "secondary";
+      if (file === "display2.html" || file === "displays.html") return true;
+      const meta = document.querySelector('meta[name="floqr-display-board"]');
+      if (String(meta?.getAttribute("content") || "").toLowerCase() === "secondary") return true;
     } catch (_) {}
-    return "primary";
+    return false;
   }
 
   function floqcastLiveDocId(locationId) {
     const id = String(locationId || "").trim();
-    return displayBoard() === "secondary" ? `${id}__secondary` : id;
+    return id ? `${id}__secondary` : "";
   }
 
   function ensureOverlay() {
@@ -86,6 +87,8 @@
   }
 
   function boot() {
+    // Product rule: floqCast ↔ display2.html only. Ignore Display 1 even if the script is linked.
+    if (!isFloqCastBoard()) return;
     if (!window.firebase?.firestore) return;
     const locationId = locationFromUrl();
     if (!locationId) return;

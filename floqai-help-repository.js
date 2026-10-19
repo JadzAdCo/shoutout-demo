@@ -399,7 +399,7 @@
     {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
-      body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe. Bars and the DJ booth are never bookable. Reserved tables use isReserved=1 in inventory. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
+      body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
@@ -430,7 +430,7 @@
     {
       id: "help-vip-floor-map",
       title: "VIP reserV floor map",
-      body: "Green = available, amber = held, red = booked, grey = not bookable, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club, and Aurelia each have a published 2D plan; Aurelia also offers Explore 3D walk-through.",
+      body: "Green = available, amber = held (30 min), red = booked (only after deposit paid when required — or after confirm when the club does not require a deposit), grey = not bookable / blocked, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targets are at least 44px. Area names are club-editable; printed table labels stay as drawn. Decades, Lima Twist Club, and Aurelia each have a published 2D plan; Aurelia also offers Explore 3D walk-through.",
       searchPhrases: ["vip floor map", "floor plan", "table map", "dj booth blue", "available green", "aurelia floor map"],
       links: [
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})},
@@ -473,6 +473,86 @@
       ],
       source: "help-repository-seed",
       audiences: ["serviceMember", "venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-club-admin",
+      title: "Club Admin VIP reserV management",
+      body: "Club Admin → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
+      searchPhrases: [
+        "vip club admin", "manage vip reservations", "vip deposit required", "paid before booked",
+        "block vip table", "walk-in vip", "vip admin book", "require deposit before booked",
+        "cancel vip refund", "vip refund policy", "clear isBooked", "negate vip payment"
+      ],
+      links: [
+        {label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
+        {label: "VIP reserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-vip-deposit-settings",
+      title: "VIP reserV deposit before booked",
+      body: "Clubs set Require deposit before table is marked booked in Club Admin → VIP reserV. When required, holding a table only shows amber; the floor map turns red (booked/unavailable) after FloqR Stripe deposit payment — or after Club Admin records payment on a walk-in. If deposit is not required, confirming Terms marks the table booked without checkout.",
+      searchPhrases: [
+        "vip deposit settings", "deposit before booked", "table booked after pay",
+        "require deposit vip", "isReserved after payment"
+      ],
+      links: [
+        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
+        {label: "Book VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "patron", "masterAdmin"]
+    },
+    {
+      id: "help-vip-payment-collector",
+      title: "VIP reserV payment collector & Club POS",
+      body: "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps.",
+      searchPhrases: [
+        "club pos vip", "toast vip", "spoton vip", "vip payment collector", "floqr stripe vip",
+        "club stripe vip", "vip csv export", "vip sandbox", "pos owns payment"
+      ],
+      links: [
+        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})},
+        {label: "Set FloqMedia Stripe for Aurelia", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
+    },
+    {
+      id: "help-vip-table-isbooked",
+      title: "VIP table isBooked status in Firestore",
+      body: "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). getVipAvailability treats isBooked as the booking-status control for the floor map (booked only when isBooked is \"1\"). After payment completes (FloqMedia Stripe / Club Stripe deposit, Club POS confirm, or admin-recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel always clears isBooked to \"0\" and, for FloqMedia/Club Stripe, can refund the deposit per Club Admin refund policy. Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs.",
+      searchPhrases: [
+        "isBooked", "table is booked firestore", "vip table status", "table number key",
+        "vipNights tables", "isBooked yes", "firestore vip tables", "cancel clears isBooked",
+        "vip stripe refund", "refund policy vip"
+      ],
+      links: [
+        {label: "Aurelia Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Book Aurelia VIP", href: pageUrl("./vip.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
+    },
+    {
+      id: "help-vip-floqr-stripe-aurelia",
+      title: "Set FloqMedia Stripe for Aurelia (Demo Club)",
+      body: "Aurelia (temp-democlub-1) uses FloqMedia Stripe (FloqR Checkout) as the default VIP deposit collector — patrons pay on FloqR’s platform Stripe, then the table marks booked.\n\nMaster Admin steps:\n1) Open Master Admin → Features Mgmt → VIP reserV Payments.\n2) Confirm VIP Reservations is enabled for the network (Features & Services / Release Control if needed).\n3) Seed / refresh POS providers only if you also enable Club POS later — not required for FloqMedia Stripe.\n4) Leave Aurelia on FloqMedia Stripe unless a live club needs Club POS or Club Stripe.\n5) After deposits, open VIP reserV Payments → Network VIP billing to review FloqR settlements / invoices.\n\nClub Admin steps (Aurelia):\n1) Sign in as temp_clubadmin_1@floqr-demo.com (Email OTP on home) or your Club Admin account assigned to Aurelia.\n2) Open Club Admin → VIP reserV (location=temp-democlub-1).\n3) Under Payment collector, choose FloqMedia Stripe (FloqR).\n4) Keep Require deposit before table is marked booked checked for demos.\n5) Tap Save payment collector — status should confirm FloqMedia Stripe.\n6) Smoke test: vip.html?location=temp-democlub-1 → hold a table → Terms → Pay deposit (Stripe test card 4242…).\n7) Door / billing: Open Door for check-in; Refresh billing for statements.\n\nDo not choose Club POS for Aurelia demos unless you intentionally connect Toast/SpotOn sandbox. FloqMedia, Stripe, ShoutOut, and VIP reserV stay untranslated brand names.",
+      searchPhrases: [
+        "aurelia stripe", "floqmedia stripe", "floqr stripe aurelia", "set stripe for aurelia",
+        "demo club vip payment", "temp-democlub-1 stripe", "how to configure vip stripe",
+        "master admin vip stripe", "club admin vip stripe", "default vip payment aurelia"
+      ],
+      links: [
+        {label: "Aurelia Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})},
+        {label: "Book Aurelia VIP", href: pageUrl("./vip.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
     },
     {
       id: "help-vip-receipt-sms-redaction-fixes",

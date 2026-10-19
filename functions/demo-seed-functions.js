@@ -295,6 +295,17 @@ function clubDoc(i, adminAccount, hoursWeek) {
     onboardingSource: "temp-demo-seed",
     logoUrl: `${ORIGIN}/assets/demo-temp/icons/temp_democlub_${i}.svg`,
     mainImageUrl: `${ORIGIN}/assets/demo-temp/avatars/temp_democlub_${i}.svg`,
+    // Aurelia (temp-democlub-1): FloqMedia Stripe is the VIP deposit default for demos.
+    ...(i === 1 ? {
+      vipSettings: {
+        paymentCollector: "floqrStripe",
+        stripeAccountMode: "floqr",
+        depositRequired: 1,
+        posProvider: "",
+        posMode: "",
+        note: "Aurelia demo default: FloqMedia Stripe (FloqR Checkout)."
+      }
+    } : {}),
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };

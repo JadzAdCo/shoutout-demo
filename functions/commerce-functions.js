@@ -957,25 +957,58 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const holdSnap = await db.collection("vipHolds").doc(holdId).get();
     if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
     const hold = holdSnap.data() || {};
+    const clubLocationId = text(hold.clubLocationId, 120);
+    const {loadClubPaymentSettings, loadClubStripeReady} = require("./vip-pos-functions").__vipPosHelpers;
+    const paySettings = await loadClubPaymentSettings(clubLocationId);
+    if (paySettings.paymentCollector === "clubPos") {
+      throw new HttpsError(
+        "failed-precondition",
+        "This venue uses Club POS for VIP deposits. Confirm on Terms — payment opens on the POS tab at the door (Toast/SpotOn), not FloqR Stripe."
+      );
+    }
+    if (paySettings.paymentCollector === "manualCsv" && Number(hold.amounts?.chargedCents || 0) <= 0) {
+      throw new HttpsError(
+        "failed-precondition",
+        "No deposit to charge. Confirm the reservation in VIP reserV, then export CSV for your POS/accounting."
+      );
+    }
     const charged = Math.max(50, Math.round(Number(hold.amounts?.chargedCents || 0)));
     if (!charged) throw new HttpsError("failed-precondition", "VIP deposit amount is missing on this hold.");
     const label = text(hold.sectionLabel || hold.sectionId, 40);
     const club = text(hold.venueName || hold.clubLocationId, 80);
     const night = text(hold.night, 20);
     const included = Math.max(1, Math.floor(Number(hold.includedGuests || 1)));
+    let paymentModel = "floqr-platform";
+    let connectedAccountId = "";
+    let floqrShareCents = charged;
+    let venueShareCents = 0;
+    let collectorLabel = "FloqMedia Stripe";
+    if (paySettings.paymentCollector === "clubStripe") {
+      const stripe = await loadClubStripeReady(clubLocationId);
+      if (!stripe.transfersReady || !stripe.connectedAccountId) {
+        throw new HttpsError("failed-precondition", "Club Stripe Connect is not ready for VIP deposits.");
+      }
+      paymentModel = "club-stripe-connect";
+      connectedAccountId = stripe.connectedAccountId;
+      floqrShareCents = 0;
+      venueShareCents = charged;
+      collectorLabel = "Club Stripe";
+    }
     return {
       amountCents: charged,
       unitAmountCents: charged,
       quantity: 1,
       itemName: `Table ${label} deposit — ${club}, ${night}`,
-      description: `VIP reserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. FloqR Stripe collector (beta).`,
-      floqrShareCents: charged,
-      venueShareCents: 0,
-      paymentModel: "floqr-platform",
+      description: `VIP reserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. Collector: ${collectorLabel}.`,
+      floqrShareCents,
+      venueShareCents,
+      paymentModel,
+      connectedAccountId,
+      paymentCollector: paySettings.paymentCollector,
       product: "vipReservation",
       holdId,
       consentId,
-      clubLocationId: text(hold.clubLocationId, 120),
+      clubLocationId,
       venueName: club,
       night,
       sectionId: text(hold.sectionId, 80),
@@ -1142,10 +1175,19 @@ exports.createFloqrCheckoutSession = onCall({
       if (!consentSnap.exists || consentSnap.data()?.uid !== request.auth.uid) {
         throw new HttpsError("failed-precondition", "VIP consent record missing.");
       }
+      const {loadClubPaymentSettings} = require("./vip-pos-functions").__vipPosHelpers;
+      const paySettings = await loadClubPaymentSettings(text(hold.clubLocationId, 120));
+      if (paySettings.paymentCollector === "clubPos") {
+        throw new HttpsError(
+          "failed-precondition",
+          "Club POS collector: use Confirm for POS — deposit and tab stay on Toast/SpotOn, not FloqR Checkout."
+        );
+      }
       await holdSnap.ref.set({
         status: "pendingPayment",
         checkoutStartedAtMs: Date.now(),
-        updatedAtMs: Date.now()
+        updatedAtMs: Date.now(),
+        paymentCollector: paySettings.paymentCollector
       }, {merge: true});
     }
     const summary = await describeOrder(type, payload);

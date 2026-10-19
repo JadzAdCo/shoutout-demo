@@ -1,4 +1,16 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.77 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.83 (stable)
+
+- s3.1.83: VIP isBooked booking control + Club Admin cancel with FloqMedia/Club Stripe refund-by-policy; Aurelia VIP tab + mark cache-bust.
+
+- s3.1.82: VIP per-table Firestore status (tableNumber key, isBooked "1"/"yes" after booking).
+
+- s3.1.82: Aurelia demo VIP default = FloqMedia Stripe; FloqAi + i18n setup guide (Master/Club Admin).
+
+- s3.1.82: VIP Club POS–first payment collectors (Toast/SpotOn preferred); Club/Master Admin connect + CSV + billing.
+
+- s3.1.79: VIP reserV paid-before-booked + Club Admin VIP panel; mark inverted banquette + legible VIP reserV letter V.
+
+- s3.1.78: floqCast locked to display2.html only (server + client); Display 1 no longer loads display-floqcast.
 
 - s3.1.77: floqCast landing standardized to VIP header (FloqR → hero icon → title+?); floqcast-hero-icon; retire suprstr-logo on landings/display idle.
 

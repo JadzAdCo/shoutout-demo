@@ -318,7 +318,7 @@
           requestId: requestDoc.requestId,
           sessionId: requestDoc.sessionId || "",
           locationId: requestDoc.locationId,
-          displayBoard: requestDoc.displayBoard
+          displayBoard: "secondary"
         });
       }
     } catch (err) {

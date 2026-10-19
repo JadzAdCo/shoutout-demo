@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.77";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.83";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,50 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.83",
+      title: "VIP isBooked control + cancel Stripe refund-by-policy",
+      checks: [
+        {label:"Refund policy helpers", file:"functions/vip-payments-core.js", includes:["computeVipRefundCents", "normalizeRefundPolicy", "floqrStripe"]},
+        {label:"Cancel refunds + clear isBooked", file:"functions/vip-functions.js", includes:["cancelVipReservation", "applyTableAvailable", "stripe.refunds.create", "isBooked is the booking-status control"]},
+        {label:"Club Admin cancel/refund UI", file:"admin.html", includes:["panelVipReserv", "vipAdminRefundOnCancel", "vipAdminCancelRefundMode"]},
+        {label:"VIP mark cache-bust", file:"index.html", includes:["vip-reserv-mark.svg?v=s3.1.83"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.83\""]}
+      ]
+    },
+    {
+      version: "s3.1.80",
+      title: "VIP Club POS payment collectors",
+      checks: [
+        {label:"Club POS preferred", file:"functions/vip-payments-core.js", includes:["clubPos", "preferred: true", "openTabOnTable"]},
+        {label:"POS connect callables", file:"functions/vip-pos-functions.js", includes:["beginVipPosConnect", "confirmVipReservationForClubPos", "exportVipReservationsCsv"]},
+        {label:"Club Admin collector UI", file:"admin.html", includes:["vipAdminCollector", "vipAdminPosConnect"]},
+        {label:"Master VIP Payments", file:"master-admin.html", includes:["featuresVipPayments"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.81\""]}
+      ]
+    },
+    {
+      version: "s3.1.79",
+      title: "VIP reserV paid-before-booked + Club Admin + mark",
+      checks: [
+        {label:"Deposit gate helper", file:"functions/vip-core.js", includes:["canMarkTableBooked", "resolveDepositRequired"]},
+        {label:"Hold never books", file:"functions/vip-functions.js", includes:["isReserved: 0", "confirmVipReservationWithoutDeposit", "adminConfirmVipReservation"]},
+        {label:"Club Admin VIP panel", file:"admin.html", includes:["panelVipReserv", "vipAdminDepositRequired"]},
+        {label:"VIP mark letter V", file:"images/vip-reserv-mark.svg", includes:["<tspan", "reser", ">V</tspan>"]},
+        {label:"Paid-before-booked core", file:"functions/vip-core.js", includes:["canMarkTableBooked"]}
+      ]
+    },
+    {
+      version: "s3.1.78",
+      title: "floqCast display2-only lock",
+      checks: [
+        {label:"Server forces secondary", file:"functions/floqcast-functions.js", includes:["return \"secondary\"", "display2.html", "__secondary"]},
+        {label:"Display1 omits floqcast receiver", file:"display.html", notIncludes:["display-floqcast.js"]},
+        {label:"Display2 loads floqcast receiver", file:"display2.html", includes:["display-floqcast.js"]},
+        {label:"Preview links package marker", file:"ai-diagnostics-service.js", includes:["floqCast display2-only lock"]}
+      ]
+    },
+
     {
       version: "s3.1.77",
       title: "floqCast landing header parity + hero icon",
@@ -1682,7 +1726,61 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-77-vip-sketch-banquette",
+      id:"s3-1-83-vip-isbooked-cancel-refund",
+      area:"VIP reserV / Booking + refunds",
+      feature:"isBooked booking control + cancel clears + FloqMedia Stripe refund-by-policy",
+      changed:"Map booked only when Firestore isBooked=1 after pay. Cancel clears isBooked. FloqMedia/Club Stripe cancel can refund per vipSettings.refundPolicy. Club Admin VIP tab + mark s3.1.83. Package s3.1.83.",
+      howToTest:"1) Deploy Functions + publish Pages. 2) Hard-refresh admin.html?location=temp-democlub-1 — VIP reserV tab visible. 3) Search VIP tile shows brownish-red banquette mark (not rainbow). 4) Pay Aurelia deposit → tables/{n} isBooked=1. 5) Club Admin Cancel with Refund checked → isBooked=0 + Stripe refund (test mode). 6) Uncheck refund → cancel frees table without refund.",
+      expected:"VIP tab on Aurelia admin; new mark; booked only after pay via isBooked; cancel clears isBooked; Stripe refund when opted.",
+      troubleshoot:"No VIP tab / old icons → Pages still on main pre-s3.1.83; hard-refresh ?v=s3.1.83. Refund fails → deploy Functions with STRIPE_SECRET_KEY + cancelVipReservation secrets. Still booked after cancel → applyTableAvailable not deployed."
+    },
+    {
+      id:"s3-1-82-vip-table-isbooked",
+      area:"VIP reserV / Firestore",
+      feature:"Per-table isBooked docs keyed by table number",
+      changed:"clubLocations/{id}/vipNights/{night}/tables/{tableNumber}; isBooked 1/yes after booking. Package s3.1.82.",
+      howToTest:"1) Deploy Functions. 2) Open vip.html Aurelia night — ensures table docs. 3) Complete Pay deposit. 4) In Firestore Console open tables/{tableNumber} — isBooked=\"1\", isBookedYes=\"yes\". 5) Cancel in Club Admin — back to 0.",
+      expected:"Booked tables show isBooked 1/yes; free tables 0/no; holds do not flip isBooked.",
+      troubleshoot:"No docs → ensureVipTables or open availability once. Still 0 after pay → Functions not deployed with applyTableBooked."
+    },
+    {
+      id:"s3-1-81-aurelia-floqr-stripe",
+      area:"VIP reserV / Aurelia demo",
+      feature:"FloqMedia Stripe default for Aurelia + FloqAi setup guide",
+      changed:"Aurelia temp-democlub-1 vipSettings.paymentCollector=floqrStripe. FloqAi help-vip-floqr-stripe-aurelia + chrome/help i18n. Package s3.1.81.",
+      howToTest:"Ask FloqAi: set FloqMedia Stripe for Aurelia. Follow Master Admin then Club Admin steps. Confirm collector FloqMedia Stripe on admin.html?location=temp-democlub-1 tab VIP reserV.",
+      expected:"Help returns Master+Club steps; Club Admin shows FloqMedia Stripe selected after save.",
+      troubleshoot:"Help missing → hard-refresh floqai-help-repository + floqr-i18n-help s3.1.81. Collector wrong → Save payment collector on VIP reserV."
+    },
+    {
+      id:"s3-1-80-vip-club-pos",
+      area:"VIP reserV / Club POS",
+      feature:"Club POS–first payment collector + connect workflow",
+      changed:"Collectors: clubPos (preferred Toast/SpotOn), clubStripe, floqrStripe, manualCsv. Sandbox connect, CSV export, Master+Club billing lists. Package s3.1.80.",
+      howToTest:"1) Master Admin → Features Mgmt → VIP reserV Payments → Seed providers. 2) Club Admin → VIP reserV → choose Club POS + Toast sandbox → Connect → Mark connected. 3) Patron hold+Terms shows Confirm — pay on venue POS. 4) Export night CSV. 5) Club Stripe requires Connect ready.",
+      expected:"FLOQR books/holds/maps; POS owns money path when Club POS selected.",
+      troubleshoot:"Connect disabled → Master must Enable provider. Patron still Stripe → hold.paymentCollector not clubPos / Functions not deployed."
+    },
+    {
+      id:"s3-1-79-vip-paid-before-booked",
+      area:"VIP reserV / Club Admin",
+      feature:"Deposit required before table shows booked + Club Admin VIP panel",
+      changed:"vipSettings.depositRequired; hold keeps isReserved=0; booked only after Stripe pay, no-deposit confirm, or admin paymentRecorded. admin.html VIP reserV tab manages nights/check-in/cancel/block/walk-in. Mark: inverted banquette + legible VIP reserV. Package s3.1.79.",
+      howToTest:"1) Club Admin → VIP reserV → leave Require deposit on → Save. 2) Patron hold a table → map stays amber (not red). 3) Pay deposit → table red booked. 4) Walk-in without Payment recorded fails when deposit required; with Payment recorded succeeds. 5) Search VIP tile shows VIP reserV letter V (not check-only).",
+      expected:"Unpaid holds never show booked; admin can fully manage reservations.",
+      troubleshoot:"Table red on hold → check createVipHold still writes isReserved:0; Functions deploy required for new callables."
+    },
+    {
+      id:"s3-1-78-floqcast-display2-only",
+      area:"floqCast / Display 2",
+      feature:"floqCast always targets display2.html",
+      changed:"Server boardFromRaw/liveDocId force secondary + display2.html. display.html no longer loads display-floqcast.js. display-floqcast boots only on secondary. Package s3.1.78.",
+      howToTest:"1) Xibo floqCast board URL = display2.html?location=<id> (not display.html). 2) createFloqCastRequest / startFloqCastLive write suprstrLive/{id}__secondary. 3) display.html source has no display-floqcast.js.",
+      expected:"Cast answers only when display2 is online for that venue.",
+      troubleshoot:"Still answer:null → confirm display2.html is the URL on the LED and heartbeating; not Display 1."
+    },
+    {
+      id:"s3-1-77-vip-sketch-banquette",
       area:"VIP reserV / Search tile",
       feature:"Sketch-faithful VIP mark + natural banquette",
       changed:"vip-reserv-mark: VIP / reser + check-V, crescent table with dots, natural curved banquette (curved to table, straight outside). floqcast-icon: remove &lt;use&gt; so Safari Search tile renders. Package s3.1.77.",

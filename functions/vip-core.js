@@ -60,6 +60,37 @@ function inventoryKey(clubLocationId, night, sectionId) {
   return `${text(clubLocationId, 120)}_${text(night, 20)}_${text(sectionId, 80)}`;
 }
 
+/**
+ * Printed table number / label used as Firestore doc id under
+ * clubLocations/{club}/vipNights/{night}/tables/{tableNumber}.
+ * Prefer plan `label` (e.g. "12", "C1"); fall back to section id tail.
+ */
+function tableNumberFromSection(section = {}, sectionId = "") {
+  const label = text(section.label || section.tableNumber || section.number, 40);
+  if (label) return sanitizeTableNumberKey(label);
+  const id = text(section.id || sectionId, 80);
+  const tail = id.includes("-") ? id.split("-").pop() : id;
+  return sanitizeTableNumberKey(tail || id || "unknown");
+}
+
+function sanitizeTableNumberKey(raw) {
+  return String(raw || "")
+    .trim()
+    .replace(/[\/\\#?[\]*]/g, "-")
+    .replace(/\s+/g, "-")
+    .slice(0, 40) || "unknown";
+}
+
+/** Canonical string datapoint: "1" booked, "0" free. Also accepts yes/no when reading. */
+function normalizeIsBooked(value) {
+  if (value === true || value === 1 || value === "1" || String(value).toLowerCase() === "yes") return "1";
+  return "0";
+}
+
+function isTableBookedValue(value) {
+  return normalizeIsBooked(value) === "1";
+}
+
 /** Demo pricing until Club Admin publishes real minimums/deposits (plan JSON placeholders). */
 function demoPricesForSection(section = {}) {
   const type = text(section.type, 40);
@@ -94,6 +125,56 @@ function computePartyAmounts(section, partySize) {
     chargedCents,
     currency: "USD"
   };
+}
+
+/**
+ * Club deposit policy (VIP-B-05). When deposit is required, inventory
+ * `isReserved=1` / status `booked` is allowed only after payment (or an
+ * explicit admin-recorded payment). Holds stay amber (`held`, isReserved=0).
+ */
+function normalizeVipSettings(raw = {}) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const hasExplicit = Object.prototype.hasOwnProperty.call(row, "depositRequired");
+  let depositRequired = 1;
+  if (hasExplicit) {
+    depositRequired = row.depositRequired === 0 || row.depositRequired === false || row.depositRequired === "0"
+      ? 0
+      : 1;
+  }
+  let refundPolicy = {};
+  try {
+    const payments = require("./vip-payments-core");
+    refundPolicy = payments.normalizeRefundPolicy(row.refundPolicy || row);
+  } catch (_) {
+    refundPolicy = {
+      allowStripeRefund: 1,
+      clubCancelRefundMode: "full",
+      fullRefundHoursBeforeNight: 24,
+      partialRefundHoursBeforeNight: 4,
+      partialRefundPercent: 50
+    };
+  }
+  return {
+    depositRequired,
+    depositRequiredExplicit: hasExplicit ? 1 : 0,
+    refundPolicy
+  };
+}
+
+/** Resolve whether this booking needs a paid deposit before the table shows booked. */
+function resolveDepositRequired(vipSettings = {}, amounts = {}) {
+  const settings = normalizeVipSettings(vipSettings);
+  if (settings.depositRequiredExplicit) return settings.depositRequired === 1;
+  return Number(amounts.depositCents || amounts.chargedCents || 0) > 0;
+}
+
+/**
+ * Hard gate for marking a table booked/unavailable on the floor map.
+ * paymentConfirmed = Stripe fulfillment or admin-recorded payment.
+ */
+function canMarkTableBooked({depositRequired, paymentConfirmed} = {}) {
+  if (!depositRequired) return true;
+  return paymentConfirmed === true || paymentConfirmed === 1 || paymentConfirmed === "1";
 }
 
 function upcomingNights(count = 14, fromMs = Date.now()) {
@@ -155,8 +236,15 @@ module.exports = {
   BETA_VENUES,
   text,
   inventoryKey,
+  tableNumberFromSection,
+  sanitizeTableNumberKey,
+  normalizeIsBooked,
+  isTableBookedValue,
   demoPricesForSection,
   computePartyAmounts,
+  normalizeVipSettings,
+  resolveDepositRequired,
+  canMarkTableBooked,
   upcomingNights,
   validateNight,
   betaVenue,

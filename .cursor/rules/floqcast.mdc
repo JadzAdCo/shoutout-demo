@@ -5,7 +5,9 @@ alwaysApply: true
 
 # floqCast (always)
 
-Live video to the venue **floqCast board** (`display2.html?location=<id>` only — never `?v=` or `?screen=`). Like a ShoutOut, but phone camera. **Not** Display 1 unless Club Admin later picks a board.
+Live video to the venue **floqCast board** (`display2.html?location=<id>` only — never `?v=` or `?screen=`). Like a ShoutOut, but phone camera.
+
+**Hard rule:** floqCast is **display2-only at every site**. Live pointer is always `{locationId}__secondary`. Create/start/end callables force `displayBoard: "secondary"`. `display.html` (Display 1) must not load `display-floqcast.js`. Do not “fix” a dead cast by retargeting Display 1 — put `display2.html?location=<id>` on the floqCast LED in Xibo.
 
 Resume / continue this work: **`@floqCast$`** (also `$floqcast$`).
 

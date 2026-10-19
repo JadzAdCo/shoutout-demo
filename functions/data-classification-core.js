@@ -77,6 +77,7 @@
     ["clubEmployeeDesignations", "ownClubPrivileged", 1, "Club staff roster and roles"],
     ["clubLocationAliases", "public", 0, "Merged venue aliases"],
     ["clubLocations", "public", 0, "Published venue profiles"],
+    ["clubLocations/vipNights", "public", 0, "VIP reserV per-table isBooked status by night (tables/{tableNumber})"],
     ["clubMarketingCampaigns", "clubAdmin", 0, "Club marketing campaigns"],
     ["clubMedia", "public", 0, "Published venue photos and videos"],
     ["clubMessageDeliveries", "clubAdmin", 1, "Messages a club sent to patrons"],
