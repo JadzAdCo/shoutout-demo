@@ -7,6 +7,9 @@ const read = f => fs.readFileSync(path.resolve(__dirname, "..", f), "utf8");
 
 test("Club Admin Feature Mgmt nests ShoutOut / floqCast / VIP reserV", () => {
   const html = read("admin.html");
+  // Package stamp must match functions/package.json (app-version-sync gate).
+  const pkg = `s${JSON.parse(read("functions/package.json")).version}`;
+  assert.match(html, new RegExp(`admin-app\\.js\\?v=${pkg.replace(/\./g, "\\.")}`));
   assert.match(html, /data-tab-group="featureMgmt"/);
   assert.match(html, /data-i18n="admin\.featureMgmt"/);
   assert.match(html, /data-tab-group="featureShoutOut"/);
