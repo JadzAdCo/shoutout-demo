@@ -507,14 +507,32 @@
     {
       id: "help-vip-payment-collector",
       title: "VIP reserV payment collector & Club POS",
-      body: "Preferred: Club POS — FLOQR books, holds, and maps the table; Toast or SpotOn owns the deposit, open tab, and spend (sandbox available for testing). Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV export for any POS/accounting. Master Admin → Features Mgmt → VIP reserV Payments enables providers; Club Admin → VIP reserV connects and exports CSV. Billing statements appear on both Master Admin and Club Admin.",
+      body: "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps.",
       searchPhrases: [
         "club pos vip", "toast vip", "spoton vip", "vip payment collector", "floqr stripe vip",
         "club stripe vip", "vip csv export", "vip sandbox", "pos owns payment"
       ],
       links: [
-        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
-        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})}
+        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})},
+        {label: "Set FloqMedia Stripe for Aurelia", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
+    },
+    {
+      id: "help-vip-floqr-stripe-aurelia",
+      title: "Set FloqMedia Stripe for Aurelia (Demo Club)",
+      body: "Aurelia (temp-democlub-1) uses FloqMedia Stripe (FloqR Checkout) as the default VIP deposit collector — patrons pay on FloqR’s platform Stripe, then the table marks booked.\n\nMaster Admin steps:\n1) Open Master Admin → Features Mgmt → VIP reserV Payments.\n2) Confirm VIP Reservations is enabled for the network (Features & Services / Release Control if needed).\n3) Seed / refresh POS providers only if you also enable Club POS later — not required for FloqMedia Stripe.\n4) Leave Aurelia on FloqMedia Stripe unless a live club needs Club POS or Club Stripe.\n5) After deposits, open VIP reserV Payments → Network VIP billing to review FloqR settlements / invoices.\n\nClub Admin steps (Aurelia):\n1) Sign in as temp_clubadmin_1@floqr-demo.com (Email OTP on home) or your Club Admin account assigned to Aurelia.\n2) Open Club Admin → VIP reserV (location=temp-democlub-1).\n3) Under Payment collector, choose FloqMedia Stripe (FloqR).\n4) Keep Require deposit before table is marked booked checked for demos.\n5) Tap Save payment collector — status should confirm FloqMedia Stripe.\n6) Smoke test: vip.html?location=temp-democlub-1 → hold a table → Terms → Pay deposit (Stripe test card 4242…).\n7) Door / billing: Open Door for check-in; Refresh billing for statements.\n\nDo not choose Club POS for Aurelia demos unless you intentionally connect Toast/SpotOn sandbox. FloqMedia, Stripe, ShoutOut, and VIP reserV stay untranslated brand names.",
+      searchPhrases: [
+        "aurelia stripe", "floqmedia stripe", "floqr stripe aurelia", "set stripe for aurelia",
+        "demo club vip payment", "temp-democlub-1 stripe", "how to configure vip stripe",
+        "master admin vip stripe", "club admin vip stripe", "default vip payment aurelia"
+      ],
+      links: [
+        {label: "Aurelia Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})},
+        {label: "Book Aurelia VIP", href: pageUrl("./vip.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
       source: "help-repository-seed",
       audiences: ["venueAdmin", "masterAdmin", "patron"]

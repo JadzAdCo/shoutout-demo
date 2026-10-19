@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.80"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.80"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.81"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.81"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&larr; Venue Command Center</a>
@@ -415,17 +415,17 @@
           </div>
         </div>
         <div class="card">
-          <h2 data-floqr-help-id="help-vip-payment-collector">Payment collector</h2>
-          <p class="sub small">Choose how VIP deposits are collected. <strong>Club POS</strong> is the clean real-time path for Toast/SpotOn.</p>
-          <label>Collector
+          <h2 data-floqr-help-id="help-vip-floqr-stripe-aurelia" data-i18n="admin.vipPaymentCollector">Payment collector</h2>
+          <p class="sub small" data-i18n="admin.vipPaymentCollectorSub">Choose how VIP deposits are collected. Aurelia (Demo Club) defaults to FloqMedia Stripe (FloqR).</p>
+          <label data-i18n-label="admin.vipPaymentCollector">Collector
             <select id="vipAdminCollector"></select>
           </label>
           <p id="vipAdminCollectorHint" class="sub small"></p>
           <div id="vipAdminPosBlock" class="hidden">
-            <label>POS system
+            <label data-i18n-label="admin.vipPosSystem">POS system
               <select id="vipAdminPosProvider"></select>
             </label>
-            <label>Environment
+            <label data-i18n-label="admin.vipPosEnvironment">Environment
               <select id="vipAdminPosMode">
                 <option value="sandbox">Sandbox (test)</option>
                 <option value="live">Live</option>
@@ -434,26 +434,26 @@
             <p id="vipAdminPosSandboxNote" class="sub small"></p>
             <p id="vipAdminPosConnState" class="sub small"></p>
             <p class="button-row">
-              <button type="button" id="vipAdminPosConnect" class="primary">Connect POS</button>
-              <button type="button" id="vipAdminPosConfirm" class="buttonlike">Mark connected</button>
-              <button type="button" id="vipAdminPosDisconnect" class="buttonlike">Disconnect</button>
+              <button type="button" id="vipAdminPosConnect" class="primary" data-i18n="admin.vipPosConnect">Connect POS</button>
+              <button type="button" id="vipAdminPosConfirm" class="buttonlike" data-i18n="admin.vipPosMarkConnected">Mark connected</button>
+              <button type="button" id="vipAdminPosDisconnect" class="buttonlike" data-i18n="admin.vipPosDisconnect">Disconnect</button>
             </p>
             <p id="vipAdminPosCode" class="sub small"></p>
           </div>
           <div id="vipAdminStripeBlock" class="hidden">
             <p id="vipAdminStripeStatus" class="sub small"></p>
-            <p class="sub small">Club Stripe uses this venue’s Connect account. FloqMedia Stripe charges FloqR’s platform account.</p>
+            <p class="sub small" data-i18n="admin.vipCollectorFloqrHint">Deposits charge FloqMedia (FloqR) Stripe. Billing statements track club share / Model B fees.</p>
           </div>
           <p style="margin-top:10px">
-            <button type="button" id="vipAdminSaveCollector" class="primary">Save payment collector</button>
-            <button type="button" id="vipAdminExportCsv" class="buttonlike">Export night CSV</button>
+            <button type="button" id="vipAdminSaveCollector" class="primary" data-i18n="admin.vipSaveCollector">Save payment collector</button>
+            <button type="button" id="vipAdminExportCsv" class="buttonlike" data-i18n="admin.vipExportCsv">Export night CSV</button>
           </p>
         </div>
         <div class="card">
-          <h2>VIP billing &amp; invoices</h2>
-          <p class="sub small">Model B fees and FloqR settlements appear here. POS in-venue spend fees bill as Stripe Invoices to the club when statements issue.</p>
+          <h2 data-i18n="admin.vipBilling">VIP billing &amp; invoices</h2>
+          <p class="sub small" data-i18n="admin.vipBillingSub">Model B fees and FloqR settlements appear here.</p>
           <div id="vipAdminBillingList"><p class="sub">No statements yet.</p></div>
-          <p><button type="button" id="vipAdminBillingRefresh" class="buttonlike">Refresh billing</button></p>
+          <p><button type="button" id="vipAdminBillingRefresh" class="buttonlike" data-i18n="admin.vipRefreshBilling">Refresh billing</button></p>
         </div>
         <div class="card">
           <h2>Tonight’s reservations</h2>
@@ -1054,54 +1054,54 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.1.80"></script>
-<script src="./floqr-people-directory.js?v=s3.1.80"></script>
-<script src="./floqr-app-check.js?v=s3.1.80"></script>
-<script src="./floqr-nav.js?v=s3.1.80"></script>
-<script src="./global-profile-status.js?v=s3.1.80"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.80"></script>
-<script src="./shared-data.js?v=s3.1.80"></script>
-<script src="./feature-gates.js?v=s3.1.80"></script>
-<script src="./url-media-field.js?v=s3.1.80"></script>
-<script src="./media-source-picker.js?v=s3.1.80"></script>
-<script src="./ai-service.js?v=s3.1.80"></script>
-<script src="./ai-index-service.js?v=s3.1.80"></script>
-<script src="./ai-template-studio.js?v=s3.1.80"></script>
-<script src="./floqr-action-feedback.js?v=s3.1.80"></script>
-<script src="./floqr-i18n.js?v=s3.1.80"></script>
-<script src="./floqai-help-repository.js?v=s3.1.80"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.80"></script>
-<script src="./help-attach.js?v=s3.1.80"></script>
-<script src="./helper-popouts.js?v=s3.1.80"></script>
-<script src="./floqr-identity.js?v=s3.1.80"></script>
-<script src="./floqr-logger.js?v=s3.1.80"></script>
-<script src="./payment-service.js?v=s3.1.80"></script>
-<script src="./messaging-credits.js?v=s3.1.80"></script>
-<script src="./marketing-templates.js?v=s3.1.80"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.1.80"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.80"></script>
-<script src="./ad-campaigns.js?v=s3.1.80"></script>
-<script src="./floqr-ad-composer.js?v=s3.1.80"></script>
-<script src="./floqr-tab-gates.js?v=s3.1.80"></script>
-<script src="./floqr-venue-calendar.js?v=s3.1.80"></script>
-<script src="./floqr-employee-network.js?v=s3.1.80"></script>
-<script src="./floqr-featured-staff.js?v=s3.1.80"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.1.80"></script>
-<script src="./floqr-access-notice.js?v=s3.1.80"></script>
-<script src="./floqr-board-frame.js?v=s3.1.80"></script>
-<script src="./floqr-safe-render.js?v=s3.1.80"></script>
-<script src="./admin-app.js?v=s3.1.80"></script>
-<script src="./admin-venue-hours.js?v=s3.1.80"></script>
-<script src="./floqr-template-tags.js?v=s3.1.80"></script>
-<script src="./admin-rep-extension.js?v=s3.1.80"></script>
-<script src="./admin-notifications.js?v=s3.1.80"></script>
-<script src="./admin-marketing.js?v=s3.1.80"></script>
-<script src="./master-twilio-logging.js?v=s3.1.80"></script>
-<script src="./admin-spot-ads.js?v=s3.1.80"></script>
-<script src="./assignment-card.js?v=s3.1.80"></script>
-<script src="./admin-scheduling.js?v=s3.1.80"></script>
-<script src="./notification-center.js?v=s3.1.80"></script>
-<script src="./profile-access-guard.js?v=s3.1.80"></script>
+<script src="./firebase-config.js?v=s3.1.81"></script>
+<script src="./floqr-people-directory.js?v=s3.1.81"></script>
+<script src="./floqr-app-check.js?v=s3.1.81"></script>
+<script src="./floqr-nav.js?v=s3.1.81"></script>
+<script src="./global-profile-status.js?v=s3.1.81"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.81"></script>
+<script src="./shared-data.js?v=s3.1.81"></script>
+<script src="./feature-gates.js?v=s3.1.81"></script>
+<script src="./url-media-field.js?v=s3.1.81"></script>
+<script src="./media-source-picker.js?v=s3.1.81"></script>
+<script src="./ai-service.js?v=s3.1.81"></script>
+<script src="./ai-index-service.js?v=s3.1.81"></script>
+<script src="./ai-template-studio.js?v=s3.1.81"></script>
+<script src="./floqr-action-feedback.js?v=s3.1.81"></script>
+<script src="./floqr-i18n.js?v=s3.1.81"></script>
+<script src="./floqai-help-repository.js?v=s3.1.81"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.81"></script>
+<script src="./help-attach.js?v=s3.1.81"></script>
+<script src="./helper-popouts.js?v=s3.1.81"></script>
+<script src="./floqr-identity.js?v=s3.1.81"></script>
+<script src="./floqr-logger.js?v=s3.1.81"></script>
+<script src="./payment-service.js?v=s3.1.81"></script>
+<script src="./messaging-credits.js?v=s3.1.81"></script>
+<script src="./marketing-templates.js?v=s3.1.81"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.81"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.81"></script>
+<script src="./ad-campaigns.js?v=s3.1.81"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.81"></script>
+<script src="./floqr-tab-gates.js?v=s3.1.81"></script>
+<script src="./floqr-venue-calendar.js?v=s3.1.81"></script>
+<script src="./floqr-employee-network.js?v=s3.1.81"></script>
+<script src="./floqr-featured-staff.js?v=s3.1.81"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.81"></script>
+<script src="./floqr-access-notice.js?v=s3.1.81"></script>
+<script src="./floqr-board-frame.js?v=s3.1.81"></script>
+<script src="./floqr-safe-render.js?v=s3.1.81"></script>
+<script src="./admin-app.js?v=s3.1.81"></script>
+<script src="./admin-venue-hours.js?v=s3.1.81"></script>
+<script src="./floqr-template-tags.js?v=s3.1.81"></script>
+<script src="./admin-rep-extension.js?v=s3.1.81"></script>
+<script src="./admin-notifications.js?v=s3.1.81"></script>
+<script src="./admin-marketing.js?v=s3.1.81"></script>
+<script src="./master-twilio-logging.js?v=s3.1.81"></script>
+<script src="./admin-spot-ads.js?v=s3.1.81"></script>
+<script src="./assignment-card.js?v=s3.1.81"></script>
+<script src="./admin-scheduling.js?v=s3.1.81"></script>
+<script src="./notification-center.js?v=s3.1.81"></script>
+<script src="./profile-access-guard.js?v=s3.1.81"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.1.80";
+  const APP_V = "s3.1.81";
 
   function navT(key, fallback) {
     try {

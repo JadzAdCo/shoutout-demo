@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.80";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.81";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -198,7 +198,7 @@
         {label:"POS connect callables", file:"functions/vip-pos-functions.js", includes:["beginVipPosConnect", "confirmVipReservationForClubPos", "exportVipReservationsCsv"]},
         {label:"Club Admin collector UI", file:"admin.html", includes:["vipAdminCollector", "vipAdminPosConnect"]},
         {label:"Master VIP Payments", file:"master-admin.html", includes:["featuresVipPayments"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.80\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.81\""]}
       ]
     },
     {
@@ -1715,7 +1715,16 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-80-vip-club-pos",
+            id:"s3-1-81-aurelia-floqr-stripe",
+      area:"VIP reserV / Aurelia demo",
+      feature:"FloqMedia Stripe default for Aurelia + FloqAi setup guide",
+      changed:"Aurelia temp-democlub-1 vipSettings.paymentCollector=floqrStripe. FloqAi help-vip-floqr-stripe-aurelia + chrome/help i18n. Package s3.1.81.",
+      howToTest:"Ask FloqAi: set FloqMedia Stripe for Aurelia. Follow Master Admin then Club Admin steps. Confirm collector FloqMedia Stripe on admin.html?location=temp-democlub-1 tab VIP reserV.",
+      expected:"Help returns Master+Club steps; Club Admin shows FloqMedia Stripe selected after save.",
+      troubleshoot:"Help missing → hard-refresh floqai-help-repository + floqr-i18n-help s3.1.81. Collector wrong → Save payment collector on VIP reserV."
+    },
+    {
+      id:"s3-1-80-vip-club-pos",
       area:"VIP reserV / Club POS",
       feature:"Club POS–first payment collector + connect workflow",
       changed:"Collectors: clubPos (preferred Toast/SpotOn), clubStripe, floqrStripe, manualCsv. Sandbox connect, CSV export, Master+Club billing lists. Package s3.1.80.",
