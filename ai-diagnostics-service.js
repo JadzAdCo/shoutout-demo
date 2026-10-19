@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.81";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.82";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1715,7 +1715,16 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-81-aurelia-floqr-stripe",
+            id:"s3-1-82-vip-table-isbooked",
+      area:"VIP reserV / Firestore",
+      feature:"Per-table isBooked docs keyed by table number",
+      changed:"clubLocations/{id}/vipNights/{night}/tables/{tableNumber}; isBooked 1/yes after booking. Package s3.1.82.",
+      howToTest:"1) Deploy Functions. 2) Open vip.html Aurelia night — ensures table docs. 3) Complete Pay deposit. 4) In Firestore Console open tables/{tableNumber} — isBooked=\"1\", isBookedYes=\"yes\". 5) Cancel in Club Admin — back to 0.",
+      expected:"Booked tables show isBooked 1/yes; free tables 0/no; holds do not flip isBooked.",
+      troubleshoot:"No docs → ensureVipTables or open availability once. Still 0 after pay → Functions not deployed with applyTableBooked."
+    },
+    {
+      id:"s3-1-81-aurelia-floqr-stripe",
       area:"VIP reserV / Aurelia demo",
       feature:"FloqMedia Stripe default for Aurelia + FloqAi setup guide",
       changed:"Aurelia temp-democlub-1 vipSettings.paymentCollector=floqrStripe. FloqAi help-vip-floqr-stripe-aurelia + chrome/help i18n. Package s3.1.81.",

@@ -290,5 +290,9 @@
   "help-vip-payment-collector": {
     "title": "VIP reserV payment collector & Club POS",
     "body": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps."
+  },
+  "help-vip-table-isbooked": {
+    "title": "VIP table isBooked status in Firestore",
+    "body": "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). After the booking flow completes (deposit paid on FloqMedia Stripe / Club Stripe, Club POS confirm, or admin recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel sets isBooked back to \"0\". Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs."
   }
 }

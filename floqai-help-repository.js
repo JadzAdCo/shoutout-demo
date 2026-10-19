@@ -521,6 +521,21 @@
       audiences: ["venueAdmin", "masterAdmin", "patron"]
     },
     {
+      id: "help-vip-table-isbooked",
+      title: "VIP table isBooked status in Firestore",
+      body: "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). After the booking flow completes (deposit paid on FloqMedia Stripe / Club Stripe, Club POS confirm, or admin recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel sets isBooked back to \"0\". Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs.",
+      searchPhrases: [
+        "isBooked", "table is booked firestore", "vip table status", "table number key",
+        "vipNights tables", "isBooked yes", "firestore vip tables"
+      ],
+      links: [
+        {label: "Aurelia Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", location: "temp-democlub-1", tab: "panelVipReserv"})},
+        {label: "Book Aurelia VIP", href: pageUrl("./vip.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
+    },
+    {
       id: "help-vip-floqr-stripe-aurelia",
       title: "Set FloqMedia Stripe for Aurelia (Demo Club)",
       body: "Aurelia (temp-democlub-1) uses FloqMedia Stripe (FloqR Checkout) as the default VIP deposit collector — patrons pay on FloqR’s platform Stripe, then the table marks booked.\n\nMaster Admin steps:\n1) Open Master Admin → Features Mgmt → VIP reserV Payments.\n2) Confirm VIP Reservations is enabled for the network (Features & Services / Release Control if needed).\n3) Seed / refresh POS providers only if you also enable Club POS later — not required for FloqMedia Stripe.\n4) Leave Aurelia on FloqMedia Stripe unless a live club needs Club POS or Club Stripe.\n5) After deposits, open VIP reserV Payments → Network VIP billing to review FloqR settlements / invoices.\n\nClub Admin steps (Aurelia):\n1) Sign in as temp_clubadmin_1@floqr-demo.com (Email OTP on home) or your Club Admin account assigned to Aurelia.\n2) Open Club Admin → VIP reserV (location=temp-democlub-1).\n3) Under Payment collector, choose FloqMedia Stripe (FloqR).\n4) Keep Require deposit before table is marked booked checked for demos.\n5) Tap Save payment collector — status should confirm FloqMedia Stripe.\n6) Smoke test: vip.html?location=temp-democlub-1 → hold a table → Terms → Pay deposit (Stripe test card 4242…).\n7) Door / billing: Open Door for check-in; Refresh billing for statements.\n\nDo not choose Club POS for Aurelia demos unless you intentionally connect Toast/SpotOn sandbox. FloqMedia, Stripe, ShoutOut, and VIP reserV stay untranslated brand names.",

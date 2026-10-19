@@ -1,8 +1,10 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.81 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.82 (stable)
 
-- s3.1.81: Aurelia demo VIP default = FloqMedia Stripe; FloqAi + i18n setup guide (Master/Club Admin).
+- s3.1.82: VIP per-table Firestore status (tableNumber key, isBooked "1"/"yes" after booking).
 
-- s3.1.81: VIP Club POS–first payment collectors (Toast/SpotOn preferred); Club/Master Admin connect + CSV + billing.
+- s3.1.82: Aurelia demo VIP default = FloqMedia Stripe; FloqAi + i18n setup guide (Master/Club Admin).
+
+- s3.1.82: VIP Club POS–first payment collectors (Toast/SpotOn preferred); Club/Master Admin connect + CSV + billing.
 
 - s3.1.79: VIP reserV paid-before-booked + Club Admin VIP panel; mark inverted banquette + legible VIP reserV letter V.
 

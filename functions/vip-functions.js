@@ -8,6 +8,7 @@ const {__featureServiceHelpers: featureAccess} = require("./feature-services-fun
 const assertFeatureAccess = (auth, key, req = null) => featureAccess.assertFeatureAccess(auth, key, req);
 const core = require("./vip-core");
 const betaCatalog = require("./vip-beta-catalog");
+const tableStatus = require("./vip-table-status");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -15,7 +16,14 @@ const db = admin.firestore();
 const CALL_OPTS = {region: "us-central1", cors: true};
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
   validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
-  holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked} = core;
+  holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked,
+  tableNumberFromSection} = core;
+
+function resolveTableNumber(holdOrRow = {}, section = null) {
+  if (section) return tableNumberFromSection(section, holdOrRow.sectionId);
+  const fromLabel = tableNumberFromSection({label: holdOrRow.sectionLabel}, holdOrRow.sectionId);
+  return fromLabel;
+}
 
 function requireAuth(auth) {
   if (!auth?.uid) throw new HttpsError("unauthenticated", "Sign in required.");
@@ -160,16 +168,31 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
   if (!catalog) throw new HttpsError("failed-precondition", "Floor plan catalog missing for this venue.");
 
   const now = Date.now();
+  // Ensure every onboarded club night has table docs keyed by table number (isBooked "0" until booked).
+  try {
+    await tableStatus.ensureVipTablesForNightSafe(db, {
+      clubLocationId,
+      night,
+      sections: catalog.sections || [],
+      now
+    });
+  } catch (e) {
+    console.warn("ensureVipTablesForNightSafe", clubLocationId, night, e?.message || e);
+  }
   const vipSettings = await loadVipSettings(clubLocationId);
+  const tableRows = await tableStatus.listTablesForNight(db, clubLocationId, night);
+  const bookedByTable = new Map(tableRows.filter(t => t.isBooked === "1").map(t => [t.tableNumber, t]));
   const sections = [];
   for (const section of catalog.sections) {
     const key = inventoryKey(clubLocationId, night, section.id);
     const invSnap = await db.collection("vipInventory").doc(key).get();
     const inv = invSnap.exists ? invSnap.data() || {} : {};
-    const isReserved = Number(inv.isReserved) === 1 ? 1 : 0;
+    const tableNumber = tableNumberFromSection(section);
+    const tableBooked = bookedByTable.has(tableNumber);
+    const isReserved = (Number(inv.isReserved) === 1 || tableBooked) ? 1 : 0;
     let status = "available";
     // Booked/unavailable only when inventory was marked after payment (or no-deposit confirm).
-    if (isReserved === 1 || inv.status === "booked" || inv.status === "confirmed") status = "booked";
+    if (isReserved === 1 || inv.status === "booked" || inv.status === "confirmed" || tableBooked) status = "booked";
     else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) status = "held";
     else if (inv.status === "blocked") status = "closed";
     const amounts = computePartyAmounts(section, section.includedGuests);
@@ -177,11 +200,13 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     sections.push({
       sectionId: section.id,
       label: section.label,
+      tableNumber,
       type: section.type,
       maxCapacity: amounts.maxCapacity,
       includedGuests: amounts.includedGuests,
       status,
       isReserved: status === "booked" ? 1 : 0,
+      isBooked: status === "booked" ? "1" : "0",
       depositCents: amounts.depositCents,
       depositRequired,
       minimumAmountCents: amounts.minimumAmountCents,
@@ -194,7 +219,8 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     venueName: catalog.venueName,
     nights: upcomingNights(14),
     depositRequired: vipSettings.depositRequired,
-    sections
+    sections,
+    tables: tableRows
   };
 });
 
@@ -594,6 +620,15 @@ async function fulfillVipReservationOrder(orderId, order = {}) {
     });
     tx.set(holdRef, {status: "converted", reservationId: reservationRef.id, updatedAtMs: now}, {merge: true});
     tx.set(invRef, inventoryBookedPatch({reservationId: reservationRef.id, now, paymentConfirmed: 1}), {merge: true});
+    tableStatus.applyTableBooked(tx, db, {
+      clubLocationId: hold.clubLocationId,
+      night: hold.night,
+      tableNumber: resolveTableNumber(hold),
+      sectionId: hold.sectionId,
+      sectionLabel: hold.sectionLabel,
+      reservationId: reservationRef.id,
+      now
+    });
     const patronUid = text(hold.uid || order.ownerUid, 120);
     const night = text(hold.night, 20);
     if (patronUid && night) {
@@ -746,6 +781,15 @@ exports.confirmVipReservationWithoutDeposit = onCall(CALL_OPTS, async request =>
     });
     tx.set(holdRef, {status: "converted", reservationId: reservationRef.id, updatedAtMs: now}, {merge: true});
     tx.set(invRef, inventoryBookedPatch({reservationId: reservationRef.id, now, paymentConfirmed: 0}), {merge: true});
+    tableStatus.applyTableBooked(tx, db, {
+      clubLocationId: hold.clubLocationId,
+      night: hold.night,
+      tableNumber: resolveTableNumber(hold),
+      sectionId: hold.sectionId,
+      sectionLabel: hold.sectionLabel,
+      reservationId: reservationRef.id,
+      now
+    });
     const pointerRef = db.collection("vipActiveHolds").doc(`${uid}_${text(hold.night, 20)}`);
     tx.delete(pointerRef);
   });
@@ -851,6 +895,15 @@ exports.adminConfirmVipReservation = onCall(CALL_OPTS, async request => {
       now,
       paymentConfirmed: paymentRecorded || !depositRequired ? 1 : 0
     }), {merge: true});
+    tableStatus.applyTableBooked(tx, db, {
+      clubLocationId,
+      night,
+      tableNumber: tableNumberFromSection(section, sectionId),
+      sectionId,
+      sectionLabel: section.label || sectionId,
+      reservationId: reservationRef.id,
+      now
+    });
   });
 
   return {
@@ -902,8 +955,64 @@ exports.cancelVipReservation = onCall(CALL_OPTS, async request => {
         updatedAtMs: now
       }, {merge: true});
     }
+    tableStatus.applyTableAvailable(tx, db, {
+      clubLocationId,
+      night: row.night,
+      tableNumber: resolveTableNumber(row),
+      sectionId: row.sectionId,
+      sectionLabel: row.sectionLabel,
+      now
+    });
   });
   return {ok: true, reservationId, status: "cancelled"};
+});
+
+/**
+ * List per-table Firestore status for a night (doc id = table number, isBooked "1"|"0").
+ * Club Admin / Master Admin.
+ */
+exports.listVipTables = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  const night = validateNight(request.data?.night);
+  if (!clubLocationId || !night) {
+    throw new HttpsError("invalid-argument", "clubLocationId and night are required.");
+  }
+  await requireClubManager(request.auth, clubLocationId);
+  const tables = await tableStatus.listTablesForNight(db, clubLocationId, night);
+  return {clubLocationId, night, tables};
+});
+
+/**
+ * Seed / refresh table docs for an onboarded VIP club (upcoming nights).
+ * Doc path: clubLocations/{id}/vipNights/{night}/tables/{tableNumber}
+ */
+exports.ensureVipTables = onCall(CALL_OPTS, async request => {
+  await assertFeatureAccess(request.auth, "vipReservations", request);
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  if (!clubLocationId) throw new HttpsError("invalid-argument", "clubLocationId is required.");
+  await requireClubManager(request.auth, clubLocationId);
+  const venue = betaVenue(clubLocationId);
+  if (!venue || venue.pending) {
+    throw new HttpsError("failed-precondition", "Club is not VIP-onboarded / bookable yet.");
+  }
+  const catalog = betaCatalog[clubLocationId];
+  if (!catalog?.sections?.length) {
+    throw new HttpsError("failed-precondition", "No floor-plan sections for this club.");
+  }
+  const nightCount = Math.min(30, Math.max(1, Math.floor(Number(request.data?.nights || 14))));
+  const results = await tableStatus.ensureUpcomingNights(db, {
+    clubLocationId,
+    sections: catalog.sections,
+    nights: nightCount
+  });
+  return {
+    ok: true,
+    clubLocationId,
+    nightsEnsured: results.length,
+    tablesPerNight: catalog.sections.length,
+    path: `clubLocations/${clubLocationId}/vipNights/{night}/tables/{tableNumber}`
+  };
 });
 
 exports.__vipHelpers = {
@@ -913,6 +1022,8 @@ exports.__vipHelpers = {
   publicReservation,
   loadVipSettings,
   inventoryBookedPatch,
+  resolveTableNumber,
   BETA_TERMS,
-  core
+  core,
+  tableStatus
 };

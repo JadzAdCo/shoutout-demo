@@ -649,6 +649,13 @@ service cloud.firestore {
  allow update: if (isMasterAdmin() || isClubManager(id))
  && preservesStripeBindingFields();
  allow delete: if isMasterAdmin();
+
+ // VIP reserV per-table status (doc id = table number). Writes via Cloud Functions only.
+ // isBooked: "1" | "yes" after booking completes; "0" | "no" when free.
+ match /vipNights/{night}/tables/{tableNumber} {
+  allow read: if true;
+  allow write: if false;
+ }
  }
 
  // Platform-wide Master Admin settings (patron feature gates, etc.)

@@ -60,6 +60,37 @@ function inventoryKey(clubLocationId, night, sectionId) {
   return `${text(clubLocationId, 120)}_${text(night, 20)}_${text(sectionId, 80)}`;
 }
 
+/**
+ * Printed table number / label used as Firestore doc id under
+ * clubLocations/{club}/vipNights/{night}/tables/{tableNumber}.
+ * Prefer plan `label` (e.g. "12", "C1"); fall back to section id tail.
+ */
+function tableNumberFromSection(section = {}, sectionId = "") {
+  const label = text(section.label || section.tableNumber || section.number, 40);
+  if (label) return sanitizeTableNumberKey(label);
+  const id = text(section.id || sectionId, 80);
+  const tail = id.includes("-") ? id.split("-").pop() : id;
+  return sanitizeTableNumberKey(tail || id || "unknown");
+}
+
+function sanitizeTableNumberKey(raw) {
+  return String(raw || "")
+    .trim()
+    .replace(/[\/\\#?[\]*]/g, "-")
+    .replace(/\s+/g, "-")
+    .slice(0, 40) || "unknown";
+}
+
+/** Canonical string datapoint: "1" booked, "0" free. Also accepts yes/no when reading. */
+function normalizeIsBooked(value) {
+  if (value === true || value === 1 || value === "1" || String(value).toLowerCase() === "yes") return "1";
+  return "0";
+}
+
+function isTableBookedValue(value) {
+  return normalizeIsBooked(value) === "1";
+}
+
 /** Demo pricing until Club Admin publishes real minimums/deposits (plan JSON placeholders). */
 function demoPricesForSection(section = {}) {
   const type = text(section.type, 40);
@@ -191,6 +222,10 @@ module.exports = {
   BETA_VENUES,
   text,
   inventoryKey,
+  tableNumberFromSection,
+  sanitizeTableNumberKey,
+  normalizeIsBooked,
+  isTableBookedValue,
   demoPricesForSection,
   computePartyAmounts,
   normalizeVipSettings,

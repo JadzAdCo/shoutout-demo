@@ -6,6 +6,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {__featureServiceHelpers: featureAccess} = require("./feature-services-functions");
 const payments = require("./vip-payments-core");
 const vipCore = require("./vip-core");
+const tableStatus = require("./vip-table-status");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -504,6 +505,19 @@ exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, async request => {
       expiresAtMs: 0,
       updatedAtMs: now
     }, {merge: true});
+    const tableNumber = vipCore.tableNumberFromSection(
+      {label: hold.sectionLabel},
+      hold.sectionId
+    );
+    tableStatus.applyTableBooked(tx, db, {
+      clubLocationId,
+      night: hold.night,
+      tableNumber,
+      sectionId: hold.sectionId,
+      sectionLabel: hold.sectionLabel,
+      reservationId: reservationRef.id,
+      now
+    });
     tx.delete(db.collection("vipActiveHolds").doc(`${uid}_${text(hold.night, 20)}`));
   });
 

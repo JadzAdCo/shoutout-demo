@@ -294,6 +294,10 @@
         title: "Сборщик оплаты VIP reserV и Club POS",
         body: "Предпочтительно для живых клубов с Toast/SpotOn: Club POS — FLOQR бронирует/держит/карту; POS владеет депозитом, счётом и тратами. Альтернативы: Club Stripe, FloqMedia Stripe (FloqR) или движок VIP + CSV. Aurelia (Demo Club) по умолчанию FloqMedia Stripe — спросите FloqAi шаги Master и Club Admin."
       },
+      "help-vip-table-isbooked": {
+        title: "Статус isBooked VIP-столов в Firestore",
+        body: "У каждого VIP-клуба есть документ Firestore на номер стола и вечер: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = печатный номер (напр. T1, B3). После завершения бронирования: isBooked \"1\", isBookedYes \"yes\". Свободные: \"0\" / \"no\". Hold не меняет isBooked. Отмена → \"0\"."
+      },
       "help-vip-floqr-stripe-aurelia": {
         title: "Настроить FloqMedia Stripe для Aurelia (Demo Club)",
         body: "Aurelia (temp-democlub-1) по умолчанию использует FloqMedia Stripe (FloqR Checkout) для VIP-депозита — гости платят на платформенном Stripe FloqR, затем стол считается забронированным.\n\nШаги Master Admin:\n1) Откройте Master Admin → Features Mgmt → VIP reserV Payments.\n2) Убедитесь, что VIP Reservations включён в сети.\n3) Seed / refresh POS-провайдеров только если позже нужен Club POS — для FloqMedia Stripe не требуется.\n4) Оставьте Aurelia на FloqMedia Stripe, если не нужны Club POS или Club Stripe.\n5) После депозитов откройте Network VIP billing.\n\nШаги Club Admin (Aurelia):\n1) Войдите как temp_clubadmin_1@floqr-demo.com (Email OTP на главной) или Club Admin Aurelia.\n2) Club Admin → VIP reserV (location=temp-democlub-1).\n3) В Payment collector выберите FloqMedia Stripe (FloqR).\n4) Оставьте Require deposit before table is marked booked.\n5) Сохраните Save payment collector.\n6) Тест: vip.html?location=temp-democlub-1 → удержать стол → Условия → Оплатить депозит (тест-карта 4242…).\n7) Door / биллинг: Open Door; Refresh billing.\n\nНе выбирайте Club POS для демо Aurelia без sandbox Toast/SpotOn. FloqMedia, Stripe, ShoutOut и VIP reserV — непереводимые бренды."
@@ -587,6 +591,10 @@
       "help-vip-payment-collector": {
         title: "VIP reserV-betalingscollector & Club POS",
         body: "Voorkeur voor live clubs met Toast/SpotOn: Club POS — FLOQR boekt/houdt/kaart; POS beheert borg, tab en besteding. Alternatieven: Club Stripe, FloqMedia Stripe (FloqR) of VIP-engine + CSV. Aurelia (Demo Club) standaard FloqMedia Stripe — vraag FloqAi om Master- en Club Admin-stappen."
+      },
+      "help-vip-table-isbooked": {
+        title: "VIP-tafel isBooked-status in Firestore",
+        body: "Elke VIP-onboarded club heeft een Firestore-doc per tafelnummer en nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-id = gedrukt nummer (bijv. T1, B3). Na voltooide boeking: isBooked \"1\", isBookedYes \"yes\". Vrij: \"0\" / \"no\". Holds zetten isBooked niet. Annuleren → \"0\"."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "FloqMedia Stripe instellen voor Aurelia (Demo Club)",
@@ -882,6 +890,10 @@
         title: "Collecteur de paiement VIP reserV et Club POS",
         body: "Préféré pour les clubs live avec Toast/SpotOn : Club POS — FLOQR réserve/maintient/carte ; le POS gère acompte, addition et dépenses. Alternatives : Club Stripe, FloqMedia Stripe (FloqR), ou moteur VIP + CSV. Aurelia (Demo Club) utilise FloqMedia Stripe par défaut — demandez à FloqAi les étapes Master Admin et Club Admin."
       },
+      "help-vip-table-isbooked": {
+        title: "Statut isBooked des tables VIP dans Firestore",
+        body: "Chaque club VIP onboardé a un doc Firestore par numéro de table et par soirée : clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. L’id du doc est le numéro imprimé (ex. T1, B3). Après réservation complète, isBooked = \"1\" et isBookedYes = \"yes\". Tables libres : \"0\" / \"no\". Les holds ne changent pas isBooked. Annulation → \"0\"."
+      },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurer FloqMedia Stripe pour Aurelia (Demo Club)",
         body: "Aurelia (temp-democlub-1) utilise FloqMedia Stripe (FloqR Checkout) comme collecteur d’acompte VIP par défaut — les patrons paient sur le Stripe plateforme FloqR, puis la table passe en réservée.\n\nÉtapes Master Admin :\n1) Ouvrir Master Admin → Features Mgmt → VIP reserV Payments.\n2) Vérifier que VIP Reservations est activé pour le réseau (Features & Services / Release Control si besoin).\n3) Seed / refresh des fournisseurs POS seulement si vous activez Club POS plus tard — inutile pour FloqMedia Stripe.\n4) Laisser Aurelia sur FloqMedia Stripe sauf besoin Club POS ou Club Stripe.\n5) Après les acomptes, ouvrir VIP reserV Payments → Network VIP billing pour les règlements / factures FloqR.\n\nÉtapes Club Admin (Aurelia) :\n1) Se connecter en temp_clubadmin_1@floqr-demo.com (OTP e-mail sur l’accueil) ou compte Club Admin Aurelia.\n2) Ouvrir Club Admin → VIP reserV (location=temp-democlub-1).\n3) Sous Payment collector, choisir FloqMedia Stripe (FloqR).\n4) Garder Require deposit before table is marked booked coché pour les démos.\n5) Enregistrer Save payment collector.\n6) Test : vip.html?location=temp-democlub-1 → retenir une table → Conditions → Payer l’acompte (carte test Stripe 4242…).\n7) Door / facturation : Open Door pour le check-in ; Refresh billing pour les relevés.\n\nNe choisissez pas Club POS pour les démos Aurelia sauf connexion sandbox Toast/SpotOn volontaire. FloqMedia, Stripe, ShoutOut et VIP reserV restent des marques non traduites."
@@ -1175,6 +1187,10 @@
       "help-vip-payment-collector": {
         title: "VIP reserV Zahlungskollektor & Club POS",
         body: "Bevorzugt für Live-Clubs mit Toast/SpotOn: Club POS — FLOQR bucht/hält/karte; POS übernimmt Anzahlung, Tab und Umsatz. Alternativen: Club Stripe, FloqMedia Stripe (FloqR) oder VIP-Engine + CSV. Aurelia (Demo Club) standardmäßig FloqMedia Stripe — FloqAi für Master-/Club-Admin-Schritte fragen."
+      },
+      "help-vip-table-isbooked": {
+        title: "VIP-Tisch isBooked-Status in Firestore",
+        body: "Jeder VIP-onboardete Club hat ein Firestore-Dokument pro Tischnummer und Nacht: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc-ID = gedruckte Nummer (z. B. T1, B3). Nach abgeschlossener Buchung: isBooked \"1\", isBookedYes \"yes\". Frei: \"0\" / \"no\". Holds setzen isBooked nicht. Storno → \"0\"."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "FloqMedia Stripe für Aurelia (Demo Club) einrichten",
@@ -1470,6 +1486,10 @@
         title: "Cobrador de pago VIP reserV y Club POS",
         body: "Preferido para clubs en vivo con Toast/SpotOn: Club POS — FLOQR reserva/retiene/mapa; el POS cobra depósito, cuenta y gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) o motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por defecto — pregunte a FloqAi los pasos Master y Club Admin."
       },
+      "help-vip-table-isbooked": {
+        title: "Estado isBooked de mesas VIP en Firestore",
+        body: "Cada club VIP onboarded tiene un doc Firestore por número de mesa y noche: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. El id es el número impreso (p. ej. T1, B3). Tras completar la reserva: isBooked \"1\", isBookedYes \"yes\". Libres: \"0\" / \"no\". Los holds no cambian isBooked. Cancelar → \"0\"."
+      },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurar FloqMedia Stripe para Aurelia (Demo Club)",
         body: "Aurelia (temp-democlub-1) usa FloqMedia Stripe (FloqR Checkout) como cobrador de depósito VIP por defecto — los patronos pagan en el Stripe de plataforma FloqR y luego la mesa queda reservada.\n\nPasos Master Admin:\n1) Abrir Master Admin → Features Mgmt → VIP reserV Payments.\n2) Confirmar que VIP Reservations está habilitado en la red.\n3) Seed / refresh de proveedores POS solo si más adelante usa Club POS — no hace falta para FloqMedia Stripe.\n4) Dejar Aurelia en FloqMedia Stripe salvo Club POS o Club Stripe.\n5) Tras depósitos, revisar Network VIP billing.\n\nPasos Club Admin (Aurelia):\n1) Entrar como temp_clubadmin_1@floqr-demo.com (OTP por email en el inicio) o Club Admin de Aurelia.\n2) Club Admin → VIP reserV (location=temp-democlub-1).\n3) En Payment collector, elegir FloqMedia Stripe (FloqR).\n4) Mantener Require deposit before table is marked booked.\n5) Guardar Save payment collector.\n6) Prueba: vip.html?location=temp-democlub-1 → retener mesa → Términos → Pagar depósito (tarjeta test 4242…).\n7) Door / facturación: Open Door y Refresh billing.\n\nNo elija Club POS en demos Aurelia salvo sandbox Toast/SpotOn. FloqMedia, Stripe, ShoutOut y VIP reserV no se traducen."
@@ -1763,6 +1783,10 @@
       "help-vip-payment-collector": {
         title: "Collettore pagamento VIP reserV e Club POS",
         body: "Preferito per club live con Toast/SpotOn: Club POS — FLOQR prenota/mantiene/mappa; il POS gestisce deposito, conto e spesa. Alternative: Club Stripe, FloqMedia Stripe (FloqR) o motore VIP + CSV. Aurelia (Demo Club) di default FloqMedia Stripe — chiedi a FloqAi i passi Master e Club Admin."
+      },
+      "help-vip-table-isbooked": {
+        title: "Stato isBooked tavoli VIP in Firestore",
+        body: "Ogni club VIP onboarded ha un doc Firestore per numero tavolo e notte: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = numero stampato (es. T1, B3). Dopo prenotazione completa: isBooked \"1\", isBookedYes \"yes\". Liberi: \"0\" / \"no\". Gli hold non impostano isBooked. Annulla → \"0\"."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurare FloqMedia Stripe per Aurelia (Demo Club)",
@@ -2058,6 +2082,10 @@
         title: "Cobrador de pagamento VIP reserV e Club POS",
         body: "Preferido para clubs ao vivo com Toast/SpotOn: Club POS — FLOQR reserva/segura/mapa; o POS trata depósito, conta e gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) ou motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por omissão — pergunte ao FloqAi os passos Master e Club Admin."
       },
+      "help-vip-table-isbooked": {
+        title: "Estado isBooked das mesas VIP no Firestore",
+        body: "Cada clube VIP onboarded tem um doc Firestore por número de mesa e noite: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = número impresso (ex. T1, B3). Após reserva completa: isBooked \"1\", isBookedYes \"yes\". Livres: \"0\" / \"no\". Holds não alteram isBooked. Cancelar → \"0\"."
+      },
       "help-vip-floqr-stripe-aurelia": {
         title: "Configurar FloqMedia Stripe para Aurelia (Demo Club)",
         body: "Aurelia (temp-democlub-1) usa FloqMedia Stripe (FloqR Checkout) como cobrador padrão de depósito VIP — os patronos pagam no Stripe da plataforma FloqR e a mesa fica reservada.\n\nPassos Master Admin:\n1) Abrir Master Admin → Features Mgmt → VIP reserV Payments.\n2) Confirmar VIP Reservations ativo na rede.\n3) Seed / refresh de POS só se for usar Club POS depois — não é preciso para FloqMedia Stripe.\n4) Manter Aurelia em FloqMedia Stripe salvo Club POS ou Club Stripe.\n5) Após depósitos, ver Network VIP billing.\n\nPassos Club Admin (Aurelia):\n1) Entrar como temp_clubadmin_1@floqr-demo.com (OTP de e-mail na home) ou Club Admin da Aurelia.\n2) Club Admin → VIP reserV (location=temp-democlub-1).\n3) Em Payment collector, escolher FloqMedia Stripe (FloqR).\n4) Manter Require deposit before table is marked booked.\n5) Guardar Save payment collector.\n6) Teste: vip.html?location=temp-democlub-1 → reter mesa → Termos → Pagar depósito (cartão teste 4242…).\n7) Door / faturação: Open Door; Refresh billing.\n\nNão escolha Club POS nas demos Aurelia salvo sandbox Toast/SpotOn. FloqMedia, Stripe, ShoutOut e VIP reserV não se traduzem."
@@ -2351,6 +2379,10 @@
       "help-vip-payment-collector": {
         title: "Συλλέκτης πληρωμής VIP reserV και Club POS",
         body: "Προτιμώμενο για ζωντανά clubs με Toast/SpotOn: Club POS — το FLOQR κρατάει/χαρτογραφεί· το POS διαχειρίζεται προκαταβολή, λογαριασμό και δαπάνη. Εναλλακτικές: Club Stripe, FloqMedia Stripe (FloqR) ή VIP engine + CSV. Η Aurelia (Demo Club) προεπιλέγει FloqMedia Stripe — ρωτήστε το FloqAi τα βήματα Master και Club Admin."
+      },
+      "help-vip-table-isbooked": {
+        title: "Κατάσταση isBooked τραπεζιών VIP στο Firestore",
+        body: "Κάθε VIP club έχει ένα doc Firestore ανά αριθμό τραπεζιού και βραδιά: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = εκτυπωμένος αριθμός (π.χ. T1, B3). Μετά την ολοκλήρωση κράτησης: isBooked \"1\", isBookedYes \"yes\". Ελεύθερα: \"0\" / \"no\". Τα holds δεν αλλάζουν isBooked. Ακύρωση → \"0\"."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "Ρύθμιση FloqMedia Stripe για Aurelia (Demo Club)",
@@ -2646,6 +2678,10 @@
         title: "Kolektor płatności VIP reserV i Club POS",
         body: "Preferowane dla klubów live z Toast/SpotOn: Club POS — FLOQR rezerwuje/trzyma/mapę; POS obsługuje depozyt, rachunek i wydatki. Alternatywy: Club Stripe, FloqMedia Stripe (FloqR) lub silnik VIP + CSV. Aurelia (Demo Club) domyślnie FloqMedia Stripe — zapytaj FloqAi o kroki Master i Club Admin."
       },
+      "help-vip-table-isbooked": {
+        title: "Status isBooked stolików VIP w Firestore",
+        body: "Każdy klub VIP ma dokument Firestore na numer stolika i noc: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Id = drukowany numer (np. T1, B3). Po zakończeniu rezerwacji: isBooked \"1\", isBookedYes \"yes\". Wolne: \"0\" / \"no\". Hold nie ustawia isBooked. Anulowanie → \"0\"."
+      },
       "help-vip-floqr-stripe-aurelia": {
         title: "Skonfiguruj FloqMedia Stripe dla Aurelia (Demo Club)",
         body: "Aurelia (temp-democlub-1) domyślnie używa FloqMedia Stripe (FloqR Checkout) jako kolektora depozytu VIP — patroni płacą na platformowym Stripe FloqR, potem stolik jest zarezerwowany.\n\nKroki Master Admin:\n1) Otwórz Master Admin → Features Mgmt → VIP reserV Payments.\n2) Potwierdź, że VIP Reservations jest włączone w sieci.\n3) Seed / refresh dostawców POS tylko gdy później użyjesz Club POS — niepotrzebne dla FloqMedia Stripe.\n4) Zostaw Aurelię na FloqMedia Stripe, chyba że Club POS lub Club Stripe.\n5) Po depozytach otwórz Network VIP billing.\n\nKroki Club Admin (Aurelia):\n1) Zaloguj się jako temp_clubadmin_1@floqr-demo.com (OTP e-mail na stronie głównej) lub Club Admin Aurelii.\n2) Club Admin → VIP reserV (location=temp-democlub-1).\n3) W Payment collector wybierz FloqMedia Stripe (FloqR).\n4) Zostaw Require deposit before table is marked booked.\n5) Zapisz Save payment collector.\n6) Test: vip.html?location=temp-democlub-1 → hold stolika → Warunki → Zapłać depozyt (karta testowa 4242…).\n7) Door / rozliczenia: Open Door; Refresh billing.\n\nNie wybieraj Club POS w demo Aurelii bez sandbox Toast/SpotOn. FloqMedia, Stripe, ShoutOut i VIP reserV pozostają markami."
@@ -2939,6 +2975,10 @@
       "help-vip-payment-collector": {
         title: "جامع دفع VIP reserV وClub POS",
         body: "المفضّل للأندية الحية مع Toast/SpotOn: Club POS — FLOQR يحجز/يمسك/خريطة؛ الـ POS يملك العربون والحساب والإنفاق. بدائل: Club Stripe أو FloqMedia Stripe (FloqR) أو محرك VIP + CSV. Aurelia (Demo Club) افتراضياً FloqMedia Stripe — اسأل FloqAi عن خطوات Master وClub Admin."
+      },
+      "help-vip-table-isbooked": {
+        title: "حالة isBooked لطاولات VIP في Firestore",
+        body: "لكل نادٍ VIP مستند Firestore لكل رقم طاولة وليلة: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. المعرّف = الرقم المطبوع (مثل T1، B3). بعد اكتمال الحجز: isBooked \"1\" وisBookedYes \"yes\". الفارغة: \"0\" / \"no\". الـhold لا يغيّر isBooked. الإلغاء → \"0\"."
       },
       "help-vip-floqr-stripe-aurelia": {
         title: "إعداد FloqMedia Stripe لنادي Aurelia (Demo Club)",
