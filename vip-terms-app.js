@@ -106,10 +106,16 @@
     holdTimer = setInterval(tick, 1000);
   }
 
+  let venueCollector = "floqrStripe";
+
   function depositRequiredForHold(hold) {
     if (Number(hold?.depositRequired) === 0) return false;
     if (Number(hold?.depositRequired) === 1) return true;
     return Number(hold?.amounts?.depositCents || hold?.amounts?.chargedCents || 0) > 0;
+  }
+
+  async function refreshCollector() {
+    venueCollector = String(activeHold?.paymentCollector || "floqrStripe");
   }
 
   async function submitConsentAndPay() {
@@ -129,21 +135,34 @@
     setStatus(t("page.vip.recordingConsent", "Recording consent…"));
     if (payBtn) payBtn.disabled = true;
     try {
+      await refreshCollector();
       const consentRes = await callable("recordVipConsent")({
         holdId: activeHold.holdId,
         checks
       });
       const consentId = consentRes.data?.consentId;
-      const needsDeposit = depositRequiredForHold(activeHold);
-      if (!needsDeposit) {
-        setStatus(t("page.vip.confirmingNoDeposit", "Confirming your table (no deposit required)…"));
-        await callable("confirmVipReservationWithoutDeposit")({
+      if (venueCollector === "clubPos") {
+        setStatus(t("page.vip.confirmingPos", "Reserving your table — deposit opens on the venue POS…"));
+        await callable("confirmVipReservationForClubPos")({
           holdId: activeHold.holdId,
           consentId
         });
         try { sessionStorage.removeItem("FLOQR_VIP_HOLD"); } catch (_) { /* ignore */ }
-        location.href = "./vip.html?vipPaid=1";
+        location.href = "./vip.html?vipPaid=1&collector=clubPos";
         return;
+      }
+      const needsDeposit = depositRequiredForHold(activeHold);
+      if (!needsDeposit || venueCollector === "manualCsv") {
+        if (!needsDeposit) {
+          setStatus(t("page.vip.confirmingNoDeposit", "Confirming your table (no deposit required)…"));
+          await callable("confirmVipReservationWithoutDeposit")({
+            holdId: activeHold.holdId,
+            consentId
+          });
+          try { sessionStorage.removeItem("FLOQR_VIP_HOLD"); } catch (_) { /* ignore */ }
+          location.href = "./vip.html?vipPaid=1";
+          return;
+        }
       }
       setStatus(t("page.vip.openingCheckout", "Opening deposit checkout…"));
       const pay = await callable("createFloqrCheckoutSession")({
@@ -173,15 +192,25 @@
     if (backEl) backEl.href = mapReturnUrl(activeHold);
     window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack", {href: mapReturnUrl(activeHold)});
     renderSummary();
-    const needsDeposit = depositRequiredForHold(activeHold);
-    if (payBtn) {
-      payBtn.textContent = needsDeposit
-        ? t("page.vip.consentPay", "Pay deposit")
-        : t("page.vip.consentConfirm", "Confirm reservation");
-    }
-    setStatus(needsDeposit
-      ? t("page.vipTerms.ready", "Read the Terms, accept once, then pay the deposit.")
-      : t("page.vipTerms.readyNoDeposit", "Read the Terms, accept once, then confirm — this venue does not require a deposit before the table is booked."));
+    refreshCollector().then(() => {
+      const needsDeposit = depositRequiredForHold(activeHold);
+      if (payBtn) {
+        if (venueCollector === "clubPos") {
+          payBtn.textContent = t("page.vip.consentPos", "Confirm — pay on venue POS");
+        } else {
+          payBtn.textContent = needsDeposit
+            ? t("page.vip.consentPay", "Pay deposit")
+            : t("page.vip.consentConfirm", "Confirm reservation");
+        }
+      }
+      if (venueCollector === "clubPos") {
+        setStatus(t("page.vipTerms.readyPos", "Read the Terms, then confirm. FLOQR holds your table; deposit and tab open on the club POS when you arrive."));
+      } else {
+        setStatus(needsDeposit
+          ? t("page.vipTerms.ready", "Read the Terms, accept once, then pay the deposit.")
+          : t("page.vipTerms.readyNoDeposit", "Read the Terms, accept once, then confirm — this venue does not require a deposit before the table is booked."));
+      }
+    });
   }
 
   function boot() {

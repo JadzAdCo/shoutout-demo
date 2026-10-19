@@ -5,73 +5,70 @@
       <stop offset="55%" stop-color="#7a5cff"/>
       <stop offset="100%" stop-color="#ff4fc9"/>
     </linearGradient>
+    <!-- Slight brownish red — table + seat (not rainbow) -->
     <linearGradient id="vipTable" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#7a5cff"/>
-      <stop offset="100%" stop-color="#26d8ff"/>
+      <stop offset="0%" stop-color="#c9785c"/>
+      <stop offset="55%" stop-color="#a85242"/>
+      <stop offset="100%" stop-color="#8a3f36"/>
     </linearGradient>
-    <linearGradient id="vipSeat" x1="0" y1="0.5" x2="1" y2="0.5">
-      <stop offset="0%" stop-color="#26d8ff"/>
-      <stop offset="28%" stop-color="#5b7cff"/>
-      <stop offset="55%" stop-color="#a855f7"/>
-      <stop offset="78%" stop-color="#ff4fc9"/>
-      <stop offset="100%" stop-color="#dfff5a"/>
+    <linearGradient id="vipSeat" x1="0" y1="0.2" x2="1" y2="0.85">
+      <stop offset="0%" stop-color="#b86852"/>
+      <stop offset="45%" stop-color="#9a4a3c"/>
+      <stop offset="100%" stop-color="#7a3830"/>
     </linearGradient>
     <linearGradient id="vipSeatShade" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.22"/>
-      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000" stop-opacity="0.32"/>
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.16"/>
+      <stop offset="50%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.28"/>
     </linearGradient>
   </defs>
 
-  <!-- Large ring (fills most of the mark) -->
   <circle cx="32" cy="32" r="30.2" fill="none" stroke="url(#vipRing)" stroke-width="2.7"/>
 
-  <!-- VIP reserV — letter V (not a check) so the word reads clearly -->
-  <text x="32" y="15.6" text-anchor="middle" fill="#fff"
+  <!-- VIP reserV — larger, lowered; letter V (not a check) -->
+  <text x="32" y="20.5" text-anchor="middle" fill="#fff"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="9" font-weight="900" letter-spacing="0.12em">VIP</text>
-  <text x="32" y="24.2" text-anchor="middle"
+        font-size="11.5" font-weight="900" letter-spacing="0.1em">VIP</text>
+  <text x="32" y="31.2" text-anchor="middle"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="8.2" font-weight="900" letter-spacing="0.04em">
+        font-size="10.5" font-weight="900" letter-spacing="0.02em">
     <tspan fill="#fff">reser</tspan><tspan fill="#dfff5a">V</tspan>
   </text>
 
-  <!-- Table: straight outer (toward VIP), curved inner (toward seat) -->
-  <path d="M15.5 28.2
-           L48.5 28.2
-           L48.5 29.6
-           C44.2 35.8, 38.4 38.4, 32 38.4
-           C25.6 38.4, 19.8 35.8, 15.5 29.6
+  <!-- Table: straight outer (toward text), curved inner (toward seat); 2 glass spots -->
+  <path d="M17.5 34.0
+           L46.5 34.0
+           L46.5 35.2
+           C42.8 40.2, 37.6 42.6, 32 42.6
+           C26.4 42.6, 21.2 40.2, 17.5 35.2
            Z"
         fill="url(#vipTable)"/>
-  <circle cx="20.8" cy="28.2" r="1.15" fill="#fff" opacity="0.92"/>
-  <circle cx="26.4" cy="28.2" r="1.15" fill="#fff" opacity="0.92"/>
-  <circle cx="32.0" cy="28.2" r="1.15" fill="#fff" opacity="0.92"/>
-  <circle cx="37.6" cy="28.2" r="1.15" fill="#fff" opacity="0.92"/>
-  <circle cx="43.2" cy="28.2" r="1.15" fill="#fff" opacity="0.92"/>
+  <!-- Two glass-holder spots -->
+  <circle cx="25.2" cy="36.6" r="1.55" fill="#f4e8e0" opacity="0.95"/>
+  <circle cx="25.2" cy="36.6" r="0.7" fill="#8a3f36" opacity="0.55"/>
+  <circle cx="38.8" cy="36.6" r="1.55" fill="#f4e8e0" opacity="0.95"/>
+  <circle cx="38.8" cy="36.6" r="0.7" fill="#8a3f36" opacity="0.55"/>
 
-  <!-- Banquette: rear curve against the ring; interior curve mirrors toward the table -->
-  <path d="M11.2 44.2
-           C16.4 38.0, 23.6 34.6, 32 34.6
-           C40.4 34.6, 47.6 38.0, 52.8 44.2
-           C47.8 49.6, 40.4 53.2, 32 53.2
-           C23.6 53.2, 16.2 49.6, 11.2 44.2
+  <!-- Banquette: rear against ring; interior curve mirrors toward table -->
+  <path d="M10.8 46.6
+           C16.2 41.0, 23.4 38.0, 32 38.0
+           C40.6 38.0, 47.8 41.0, 53.2 46.6
+           C48.0 51.8, 40.4 55.0, 32 55.0
+           C23.6 55.0, 16.0 51.8, 10.8 46.6
            Z"
         fill="url(#vipSeat)"/>
-  <path d="M11.2 44.2
-           C16.4 38.0, 23.6 34.6, 32 34.6
-           C40.4 34.6, 47.6 38.0, 52.8 44.2
-           C47.8 49.6, 40.4 53.2, 32 53.2
-           C23.6 53.2, 16.2 49.6, 11.2 44.2
+  <path d="M10.8 46.6
+           C16.2 41.0, 23.4 38.0, 32 38.0
+           C40.6 38.0, 47.8 41.0, 53.2 46.6
+           C48.0 51.8, 40.4 55.0, 32 55.0
+           C23.6 55.0, 16.0 51.8, 10.8 46.6
            Z"
         fill="url(#vipSeatShade)"/>
-  <!-- Soft seat divisions -->
-  <path d="M19.2 41.2 C19.8 44.4, 20.2 47.2, 20.6 50.4" fill="none" stroke="#0a0e18" stroke-width="0.85" opacity="0.28" stroke-linecap="round"/>
-  <path d="M25.6 38.4 C26.0 42.0, 26.4 46.0, 26.8 51.2" fill="none" stroke="#0a0e18" stroke-width="0.85" opacity="0.28" stroke-linecap="round"/>
-  <path d="M32.0 36.6 C32.0 41.0, 32.0 46.4, 32.0 51.8" fill="none" stroke="#0a0e18" stroke-width="0.85" opacity="0.28" stroke-linecap="round"/>
-  <path d="M38.4 38.4 C38.0 42.0, 37.6 46.0, 37.2 51.2" fill="none" stroke="#0a0e18" stroke-width="0.85" opacity="0.28" stroke-linecap="round"/>
-  <path d="M44.8 41.2 C44.2 44.4, 43.8 47.2, 43.4 50.4" fill="none" stroke="#0a0e18" stroke-width="0.85" opacity="0.28" stroke-linecap="round"/>
-  <!-- Table-facing cushion lip (interior curve) -->
-  <path d="M13.0 43.4 C17.8 38.0, 24.4 35.4, 32 35.4 C39.6 35.4, 46.2 38.0, 51.0 43.4"
-        fill="none" stroke="#fff" stroke-width="1.05" opacity="0.32" stroke-linecap="round"/>
+  <path d="M19.4 44.0 C19.9 47.0, 20.3 49.6, 20.7 52.4" fill="none" stroke="#3a1814" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M26.0 41.2 C26.3 44.8, 26.6 48.4, 26.9 53.2" fill="none" stroke="#3a1814" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M32.0 39.6 C32.0 44.0, 32.0 48.8, 32.0 53.8" fill="none" stroke="#3a1814" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M38.0 41.2 C37.7 44.8, 37.4 48.4, 37.1 53.2" fill="none" stroke="#3a1814" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M44.6 44.0 C44.1 47.0, 43.7 49.6, 43.3 52.4" fill="none" stroke="#3a1814" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M12.6 45.8 C17.6 40.8, 24.2 38.8, 32 38.8 C39.8 38.8, 46.4 40.8, 51.4 45.8"
+        fill="none" stroke="#f4e8e0" stroke-width="0.95" opacity="0.28" stroke-linecap="round"/>
 </svg>

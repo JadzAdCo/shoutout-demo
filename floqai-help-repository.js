@@ -505,6 +505,21 @@
       audiences: ["venueAdmin", "patron", "masterAdmin"]
     },
     {
+      id: "help-vip-payment-collector",
+      title: "VIP reserV payment collector & Club POS",
+      body: "Preferred: Club POS — FLOQR books, holds, and maps the table; Toast or SpotOn owns the deposit, open tab, and spend (sandbox available for testing). Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV export for any POS/accounting. Master Admin → Features Mgmt → VIP reserV Payments enables providers; Club Admin → VIP reserV connects and exports CSV. Billing statements appear on both Master Admin and Club Admin.",
+      searchPhrases: [
+        "club pos vip", "toast vip", "spoton vip", "vip payment collector", "floqr stripe vip",
+        "club stripe vip", "vip csv export", "vip sandbox", "pos owns payment"
+      ],
+      links: [
+        {label: "Club Admin VIP reserV", href: pageUrl("./admin.html", {from: "floqai", tab: "panelVipReserv"})},
+        {label: "Master Admin VIP Payments", href: pageUrl("./master-admin.html", {from: "floqai", tab: "featuresVipPayments"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["venueAdmin", "masterAdmin", "patron"]
+    },
+    {
       id: "help-vip-receipt-sms-redaction-fixes",
       title: "VIP receipt SMS & invoice redaction",
       body: "Paid receipts send SMS only through the logged Twilio Messages API path. FLOQR-YYYYMMDD-… and VR-… invoice numbers stay readable in mail/SMS logs (they are not treated as OTP codes).",

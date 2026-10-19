@@ -49,5 +49,5 @@ test("VIP mark shows legible VIP reserV letter V (not check-only)", () => {
   assert.match(mark, /aria-label="VIP reserV"/);
   assert.match(mark, />VIP</);
   assert.match(mark, /<tspan[^>]*>reser<\/tspan>\s*<tspan[^>]*>V<\/tspan>/);
-  assert.match(mark, /rear curve against the ring/i);
+  assert.match(mark, /vipSeat|brownish red|glass/i);
 });

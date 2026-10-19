@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.79 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.80 (stable)
+
+- s3.1.80: VIP Club POS–first payment collectors (Toast/SpotOn preferred); Club/Master Admin connect + CSV + billing.
 
 - s3.1.79: VIP reserV paid-before-booked + Club Admin VIP panel; mark inverted banquette + legible VIP reserV letter V.
 

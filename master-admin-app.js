@@ -45,6 +45,88 @@
     byId(id)?.addEventListener("click", fn);
   }
 
+  function vipMasterCallable(name) {
+    return firebase.app().functions("us-central1").httpsCallable(name);
+  }
+
+  async function refreshVipMasterProviders() {
+    const list = byId("vipMasterProviderList");
+    if (!list) return;
+    try {
+      const res = await vipMasterCallable("getVipPaymentCatalog")({});
+      const providers = res?.data?.providers || [];
+      const preferred = res?.data?.preferredBlurb || "";
+      list.innerHTML = `<p class="sub small">${esc(preferred)}</p>` + providers.map(p => `
+        <div class="queue-item">
+          <strong>${esc(p.label)}${p.preferredForClubPos ? " ★ Club POS" : ""}</strong>
+          <p>${esc(p.connectHint || "")}</p>
+          <small>Sandbox: ${p.sandbox ? esc(p.sandboxLabel || "yes") : "none"}
+            · open tab on table: ${p.openTabOnTable ? "yes" : "no"}
+            · realtime sales: ${p.realtimeSales ? "yes" : "no"}
+            · enabled: ${Number(p.IsProviderEnabled) === 0 ? "OFF" : "ON"}</small>
+          <div class="queue-actions">
+            <button type="button" data-vip-prov="${esc(p.id)}" data-on="1">Enable</button>
+            <button type="button" data-vip-prov="${esc(p.id)}" data-on="0">Disable</button>
+          </div>
+        </div>`).join("");
+      list.querySelectorAll("[data-vip-prov]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try {
+            await vipMasterCallable("setVipPosProviderEnabled")({
+              provider: btn.getAttribute("data-vip-prov"),
+              enabled: Number(btn.getAttribute("data-on"))
+            });
+            setText("vipMasterPayStatus", "Provider updated.");
+            refreshVipMasterProviders();
+          } catch (e) {
+            setText("vipMasterPayStatus", e.message || String(e));
+          }
+        });
+      });
+    } catch (e) {
+      list.innerHTML = `<p class="sub">${esc(e.message || String(e))}</p>`;
+    }
+  }
+
+  async function refreshVipMasterBilling() {
+    const list = byId("vipMasterBillingList");
+    if (!list) return;
+    try {
+      const res = await vipMasterCallable("listVipBillingStatements")({network: true});
+      const rows = res?.data?.statements || [];
+      if (!rows.length) {
+        list.innerHTML = "<p class='sub'>No network VIP statements yet.</p>";
+        return;
+      }
+      list.innerHTML = rows.map(s => `
+        <div class="queue-item">
+          <strong>${esc(s.clubLocationId)} · ${esc(s.period || s.statementId)}</strong>
+          <p>${esc(s.state)} · ${esc(s.collector || "—")} · fee ${esc(money(Number(s.feeCents || 0) / 100))}
+            ${s.stripeInvoiceId ? ` · ${esc(s.stripeInvoiceId)}` : ""}</p>
+        </div>`).join("");
+    } catch (e) {
+      list.innerHTML = `<p class="sub">${esc(e.message || String(e))}</p>`;
+    }
+  }
+
+  function mountVipPaymentsMasterPanel() {
+    if (!byId("featuresVipPayments")) return;
+    if (!mountVipPaymentsMasterPanel._bound) {
+      mountVipPaymentsMasterPanel._bound = true;
+      byId("vipMasterSeedProviders")?.addEventListener("click", async () => {
+        try {
+          await vipMasterCallable("seedVipPosProviders")({});
+          setText("vipMasterPayStatus", "POS providers seeded (Toast/SpotOn preferred for Club POS).");
+          refreshVipMasterProviders();
+        } catch (e) { setText("vipMasterPayStatus", e.message || String(e)); }
+      });
+      byId("vipMasterRefreshProviders")?.addEventListener("click", () => refreshVipMasterProviders());
+      byId("vipMasterBillingRefresh")?.addEventListener("click", () => refreshVipMasterBilling());
+    }
+    refreshVipMasterProviders();
+    refreshVipMasterBilling();
+  }
+
   function masterAuthErrorMessage(e) {
     const code = e?.code || "error";
     const message = e?.message || String(e || "Unknown error");
@@ -91,6 +173,7 @@
     "featuresServices",
     "featuresReleaseControl",
     "featuresBetaTesting",
+    "featuresVipPayments",
     "featuresAuditTrail",
     "dataClassification",
     "adApprovalQueue",
@@ -100,11 +183,12 @@
     "adSettingsPanel"
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
-  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresAuditTrail"];
+  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresAuditTrail"];
   const PANEL_LABELS = {
     featuresServices: "Features Mgmt",
     featuresReleaseControl: "Features Mgmt · Release Control",
     featuresBetaTesting: "Features Mgmt · Beta & Testing",
+    featuresVipPayments: "Features Mgmt · VIP reserV Payments",
     featuresAuditTrail: "Features Mgmt · Audit Trail",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
@@ -257,6 +341,9 @@
       }
       if (FEATURES_MGMT_PANEL_IDS.includes(panelId)) {
         window.FLOQRMasterFeatureServices?.mount?.(panelId);
+      }
+      if (panelId === "featuresVipPayments") {
+        mountVipPaymentsMasterPanel();
       }
       if (panelId === "demoEmployees") {
         window.FLOQRMasterDemoEmployees?.mount?.();

@@ -6,68 +6,66 @@
       <stop offset="100%" stop-color="#ff4fc9"/>
     </linearGradient>
     <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#7a5cff"/>
-      <stop offset="100%" stop-color="#26d8ff"/>
+      <stop offset="0%" stop-color="#c9785c"/>
+      <stop offset="55%" stop-color="#a85242"/>
+      <stop offset="100%" stop-color="#8a3f36"/>
     </linearGradient>
-    <linearGradient id="seat" x1="0" y1="0.5" x2="1" y2="0.5">
-      <stop offset="0%" stop-color="#26d8ff"/>
-      <stop offset="28%" stop-color="#5b7cff"/>
-      <stop offset="55%" stop-color="#a855f7"/>
-      <stop offset="78%" stop-color="#ff4fc9"/>
-      <stop offset="100%" stop-color="#dfff5a"/>
+    <linearGradient id="seat" x1="0" y1="0.2" x2="1" y2="0.85">
+      <stop offset="0%" stop-color="#b86852"/>
+      <stop offset="45%" stop-color="#9a4a3c"/>
+      <stop offset="100%" stop-color="#7a3830"/>
     </linearGradient>
     <linearGradient id="seatShade" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.22"/>
-      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000" stop-opacity="0.32"/>
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.16"/>
+      <stop offset="50%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.28"/>
     </linearGradient>
   </defs>
   <rect width="132" height="132" rx="28" fill="#0b1020"/>
   <circle cx="66" cy="66" r="56" fill="none" stroke="url(#g)" stroke-width="4.5"/>
 
-  <text x="66" y="38" text-anchor="middle" fill="#fff"
+  <text x="66" y="46" text-anchor="middle" fill="#fff"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="17.5" font-weight="900" letter-spacing="0.12em">VIP</text>
-  <text x="66" y="56" text-anchor="middle"
+        font-size="22" font-weight="900" letter-spacing="0.1em">VIP</text>
+  <text x="66" y="68" text-anchor="middle"
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
-        font-size="16" font-weight="900" letter-spacing="0.04em">
+        font-size="20" font-weight="900" letter-spacing="0.02em">
     <tspan fill="#fff">reser</tspan><tspan fill="#dfff5a">V</tspan>
   </text>
 
-  <!-- Table: straight outer, curved inner toward seat -->
-  <path d="M32 60
-           L100 60
-           L100 63
-           C91 76, 79 81, 66 81
-           C53 81, 41 76, 32 63
+  <!-- Table: straight outer, curved inner; 2 glass holders -->
+  <path d="M36 74
+           L96 74
+           L96 76.5
+           C88 87, 78 92, 66 92
+           C54 92, 44 87, 36 76.5
            Z"
         fill="url(#table)"/>
-  <circle cx="43" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
-  <circle cx="54.5" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
-  <circle cx="66" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
-  <circle cx="77.5" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
-  <circle cx="89" cy="60" r="2.2" fill="#fff" opacity="0.92"/>
+  <circle cx="52" cy="79.5" r="3.1" fill="#f4e8e0" opacity="0.95"/>
+  <circle cx="52" cy="79.5" r="1.35" fill="#8a3f36" opacity="0.55"/>
+  <circle cx="80" cy="79.5" r="3.1" fill="#f4e8e0" opacity="0.95"/>
+  <circle cx="80" cy="79.5" r="1.35" fill="#8a3f36" opacity="0.55"/>
 
-  <!-- Banquette: rear against ring; interior mirrors toward table -->
-  <path d="M24 92
-           C35 78, 49 71, 66 71
-           C83 71, 97 78, 108 92
-           C98 103, 83 110, 66 110
-           C49 110, 34 103, 24 92
+  <!-- Banquette: rear on ring; interior mirrors toward table -->
+  <path d="M23 98
+           C34 86, 48 80, 66 80
+           C84 80, 98 86, 109 98
+           C99 109, 84 116, 66 116
+           C48 116, 33 109, 23 98
            Z"
         fill="url(#seat)"/>
-  <path d="M24 92
-           C35 78, 49 71, 66 71
-           C83 71, 97 78, 108 92
-           C98 103, 83 110, 66 110
-           C49 110, 34 103, 24 92
+  <path d="M23 98
+           C34 86, 48 80, 66 80
+           C84 80, 98 86, 109 98
+           C99 109, 84 116, 66 116
+           C48 116, 33 109, 23 98
            Z"
         fill="url(#seatShade)"/>
-  <path d="M40 85 C41 92, 42 98, 43 105" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M53 78 C54 88, 54.5 97, 55 108" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M66 74 C66 86, 66 98, 66 109" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M79 78 C78 88, 77.5 97, 77 108" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M92 85 C91 92, 90 98, 89 105" fill="none" stroke="#0a0e18" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
-  <path d="M28 90 C38 77, 51 72.5, 66 72.5 C81 72.5, 94 77, 104 90"
-        fill="none" stroke="#fff" stroke-width="2" opacity="0.32" stroke-linecap="round"/>
+  <path d="M40 93 C41 99, 42 105, 43 111" fill="none" stroke="#3a1814" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M53 87 C54 96, 54.5 104, 55 113" fill="none" stroke="#3a1814" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M66 84 C66 94, 66 104, 66 114" fill="none" stroke="#3a1814" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M79 87 C78 96, 77.5 104, 77 113" fill="none" stroke="#3a1814" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M92 93 C91 99, 90 105, 89 111" fill="none" stroke="#3a1814" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  <path d="M27 96 C38 85, 50 81.5, 66 81.5 C82 81.5, 94 85, 105 96"
+        fill="none" stroke="#f4e8e0" stroke-width="1.8" opacity="0.28" stroke-linecap="round"/>
 </svg>

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.79";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.80";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,6 +191,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.80",
+      title: "VIP Club POS payment collectors",
+      checks: [
+        {label:"Club POS preferred", file:"functions/vip-payments-core.js", includes:["clubPos", "preferred: true", "openTabOnTable"]},
+        {label:"POS connect callables", file:"functions/vip-pos-functions.js", includes:["beginVipPosConnect", "confirmVipReservationForClubPos", "exportVipReservationsCsv"]},
+        {label:"Club Admin collector UI", file:"admin.html", includes:["vipAdminCollector", "vipAdminPosConnect"]},
+        {label:"Master VIP Payments", file:"master-admin.html", includes:["featuresVipPayments"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.80\""]}
+      ]
+    },
+    {
       version: "s3.1.79",
       title: "VIP reserV paid-before-booked + Club Admin + mark",
       checks: [
@@ -198,7 +209,7 @@
         {label:"Hold never books", file:"functions/vip-functions.js", includes:["isReserved: 0", "confirmVipReservationWithoutDeposit", "adminConfirmVipReservation"]},
         {label:"Club Admin VIP panel", file:"admin.html", includes:["panelVipReserv", "vipAdminDepositRequired"]},
         {label:"VIP mark letter V", file:"images/vip-reserv-mark.svg", includes:["<tspan", "reser", ">V</tspan>"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.79\""]}
+        {label:"Paid-before-booked core", file:"functions/vip-core.js", includes:["canMarkTableBooked"]}
       ]
     },
     {
@@ -1704,7 +1715,16 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-79-vip-paid-before-booked",
+            id:"s3-1-80-vip-club-pos",
+      area:"VIP reserV / Club POS",
+      feature:"Club POS–first payment collector + connect workflow",
+      changed:"Collectors: clubPos (preferred Toast/SpotOn), clubStripe, floqrStripe, manualCsv. Sandbox connect, CSV export, Master+Club billing lists. Package s3.1.80.",
+      howToTest:"1) Master Admin → Features Mgmt → VIP reserV Payments → Seed providers. 2) Club Admin → VIP reserV → choose Club POS + Toast sandbox → Connect → Mark connected. 3) Patron hold+Terms shows Confirm — pay on venue POS. 4) Export night CSV. 5) Club Stripe requires Connect ready.",
+      expected:"FLOQR books/holds/maps; POS owns money path when Club POS selected.",
+      troubleshoot:"Connect disabled → Master must Enable provider. Patron still Stripe → hold.paymentCollector not clubPos / Functions not deployed."
+    },
+    {
+      id:"s3-1-79-vip-paid-before-booked",
       area:"VIP reserV / Club Admin",
       feature:"Deposit required before table shows booked + Club Admin VIP panel",
       changed:"vipSettings.depositRequired; hold keeps isReserved=0; booked only after Stripe pay, no-deposit confirm, or admin paymentRecorded. admin.html VIP reserV tab manages nights/check-in/cancel/block/walk-in. Mark: inverted banquette + legible VIP reserV. Package s3.1.79.",

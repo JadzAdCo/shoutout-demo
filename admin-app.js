@@ -1207,14 +1207,86 @@
     return "$" + (Number(cents || 0) / 100).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
 
+  let vipPayCatalog = null;
+  let vipPayState = null;
+
+  function fillSelect(el, options, value) {
+    if (!el) return;
+    el.innerHTML = options.map(o => `<option value="${esc(o.id)}">${esc(o.label)}${o.preferred ? " ★" : ""}</option>`).join("");
+    if (value) el.value = value;
+  }
+
+  function syncVipCollectorUi() {
+    const collector = byId("vipAdminCollector")?.value || "floqrStripe";
+    const meta = (vipPayCatalog?.collectors || []).find(c => c.id === collector);
+    setText("vipAdminCollectorHint", meta?.summary || "");
+    byId("vipAdminPosBlock")?.classList.toggle("hidden", collector !== "clubPos");
+    byId("vipAdminStripeBlock")?.classList.toggle("hidden", collector !== "clubStripe" && collector !== "floqrStripe");
+    if (collector === "clubStripe") {
+      const st = vipPayState?.stripe;
+      setText("vipAdminStripeStatus", st?.transfersReady
+        ? `Club Stripe ready (${st.livemode ? "live" : "test"}).`
+        : "Club Stripe Connect not ready — finish onboarding under Account / Stripe before saving Club Stripe.");
+    } else if (collector === "floqrStripe") {
+      setText("vipAdminStripeStatus", "Deposits charge FloqMedia (FloqR) Stripe. Billing statements track club share / Model B fees.");
+    }
+    const prov = byId("vipAdminPosProvider")?.value;
+    const pmeta = (vipPayCatalog?.providers || []).find(p => p.id === prov);
+    setText("vipAdminPosSandboxNote", pmeta?.sandbox
+      ? `Sandbox available: ${pmeta.sandboxLabel || "yes"}. ${pmeta.connectHint || ""}`
+      : (pmeta?.connectHint || ""));
+  }
+
   async function loadVipAdminSettings() {
     if (!locationId) return;
     try {
-      const res = await vipCallable("getVipClubSettings")({clubLocationId: locationId});
-      const required = Number(res?.data?.settings?.depositRequired) !== 0;
+      const [club, pay] = await Promise.all([
+        vipCallable("getVipClubSettings")({clubLocationId: locationId}),
+        vipCallable("getVipPaymentSettings")({clubLocationId: locationId})
+      ]);
+      const required = Number(club?.data?.settings?.depositRequired) !== 0;
       if (byId("vipAdminDepositRequired")) byId("vipAdminDepositRequired").checked = required;
+      vipPayState = pay?.data || {};
+      vipPayCatalog = {
+        collectors: vipPayState.collectors || [],
+        providers: vipPayState.providers || []
+      };
+      fillSelect(byId("vipAdminCollector"), vipPayCatalog.collectors, vipPayState.settings?.paymentCollector || "floqrStripe");
+      fillSelect(
+        byId("vipAdminPosProvider"),
+        (vipPayCatalog.providers || []).filter(p => Number(p.IsProviderEnabled) !== 0),
+        vipPayState.settings?.posProvider || "toast"
+      );
+      if (byId("vipAdminPosMode")) byId("vipAdminPosMode").value = vipPayState.settings?.posMode || "sandbox";
+      const conn = vipPayState.connection || {};
+      setText("vipAdminPosConnState", `POS connection: ${conn.state || "disconnected"}${conn.provider ? ` · ${conn.provider}` : ""}${conn.mode ? ` · ${conn.mode}` : ""}`);
+      setText("vipAdminPosCode", conn.connectionCode ? `Toast connection code: ${conn.connectionCode}` : "");
+      syncVipCollectorUi();
     } catch (e) {
       setText("vipAdminStatus", e.message || String(e));
+    }
+  }
+
+  async function refreshVipBilling() {
+    const list = byId("vipAdminBillingList");
+    if (!list || !locationId) return;
+    try {
+      const res = await vipCallable("listVipBillingStatements")({clubLocationId: locationId});
+      const rows = res?.data?.statements || [];
+      if (!rows.length) {
+        list.innerHTML = "<p class='sub'>No VIP billing statements yet. They appear when Model B / FloqR settlements issue.</p>";
+        return;
+      }
+      list.innerHTML = rows.map(s => `
+        <div class="queue-item">
+          <strong>${esc(s.period || s.statementId)}</strong>
+          <p>${esc(s.state)} · collector ${esc(s.collector || "—")}
+            · fee ${esc(moneyVip(s.feeCents))}
+            · basis ${esc(moneyVip(s.feeBasisCents))}
+            ${s.stripeInvoiceId ? ` · invoice ${esc(s.stripeInvoiceId)}` : ""}</p>
+        </div>`).join("");
+    } catch (e) {
+      list.innerHTML = `<p class='sub'>${esc(e.message || String(e))}</p>`;
     }
   }
 
@@ -1311,6 +1383,65 @@
           : "Saved: deposit not required — confirm without payment marks booked.");
       } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
     });
+    byId("vipAdminCollector")?.addEventListener("change", syncVipCollectorUi);
+    byId("vipAdminPosProvider")?.addEventListener("change", syncVipCollectorUi);
+    byId("vipAdminSaveCollector")?.addEventListener("click", async () => {
+      try {
+        await vipCallable("saveVipPaymentSettings")({
+          clubLocationId: locationId,
+          paymentCollector: byId("vipAdminCollector")?.value,
+          posProvider: byId("vipAdminPosProvider")?.value,
+          posMode: byId("vipAdminPosMode")?.value,
+          depositRequired: byId("vipAdminDepositRequired")?.checked ? 1 : 0
+        });
+        setText("vipAdminStatus", "Payment collector saved.");
+        loadVipAdminSettings();
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminPosConnect")?.addEventListener("click", async () => {
+      try {
+        const res = await vipCallable("beginVipPosConnect")({
+          clubLocationId: locationId,
+          posProvider: byId("vipAdminPosProvider")?.value,
+          posMode: byId("vipAdminPosMode")?.value
+        });
+        const d = res?.data || {};
+        setText("vipAdminStatus", d.statusMessage || "Connect started.");
+        setText("vipAdminPosCode", d.connectionCode
+          ? `Paste this code in Toast Integrations: ${d.connectionCode}`
+          : (d.nextSteps || ""));
+        loadVipAdminSettings();
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminPosConfirm")?.addEventListener("click", async () => {
+      try {
+        const res = await vipCallable("confirmVipPosConnected")({clubLocationId: locationId});
+        setText("vipAdminStatus", res?.data?.blurb || "POS marked connected.");
+        loadVipAdminSettings();
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminPosDisconnect")?.addEventListener("click", async () => {
+      try {
+        await vipCallable("disconnectVipPos")({clubLocationId: locationId});
+        setText("vipAdminStatus", "POS disconnected.");
+        loadVipAdminSettings();
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminExportCsv")?.addEventListener("click", async () => {
+      try {
+        const night = byId("vipAdminNight")?.value;
+        const res = await vipCallable("exportVipReservationsCsv")({clubLocationId: locationId, night});
+        const csv = res?.data?.csv || "";
+        const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = res?.data?.filename || `vip-${night}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        setText("vipAdminStatus", `Exported ${res?.data?.rowCount || 0} row(s).`);
+      } catch (e) { setText("vipAdminStatus", e.message || String(e)); }
+    });
+    byId("vipAdminBillingRefresh")?.addEventListener("click", () => refreshVipBilling());
     byId("vipAdminBook")?.addEventListener("click", async () => {
       try {
         await vipCallable("adminConfirmVipReservation")({
@@ -1355,6 +1486,7 @@
     bindVipAdminPanel();
     loadVipAdminSettings();
     refreshVipAdminList();
+    refreshVipBilling();
   }
 
   function renderFloqCastQueue() {

@@ -1449,6 +1449,8 @@
       "page.vipTerms.ready": "Read the Terms, accept once, then pay the deposit.",
           "master.featuresReleaseControl": "Release Control",
       "master.featuresBetaTesting": "Beta & Testing",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Audit Trail",
       "master.featuresReleaseControlEyebrow": "Release Control",
       "master.featuresBetaTestingEyebrow": "Beta & Testing",
@@ -2595,6 +2597,8 @@
       "page.vipTerms.ready": "Lisez les Conditions, acceptez une fois, puis payez l’acompte.",
           "master.featuresReleaseControl": "Contrôle des versions",
       "master.featuresBetaTesting": "Bêta et tests",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Journal d’audit",
       "master.featuresReleaseControlEyebrow": "Contrôle des versions",
       "master.featuresBetaTestingEyebrow": "Bêta et tests",
@@ -3741,6 +3745,8 @@
       "page.vipTerms.ready": "AGB lesen, einmal akzeptieren, dann Anzahlung zahlen.",
           "master.featuresReleaseControl": "Release-Steuerung",
       "master.featuresBetaTesting": "Beta & Tests",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Audit-Protokoll",
       "master.featuresReleaseControlEyebrow": "Release-Steuerung",
       "master.featuresBetaTestingEyebrow": "Beta & Tests",
@@ -4887,6 +4893,8 @@
       "page.vipTerms.ready": "Lea los Términos, acepte una vez y pague el depósito.",
           "master.featuresReleaseControl": "Control de versiones",
       "master.featuresBetaTesting": "Beta y pruebas",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Registro de auditoría",
       "master.featuresReleaseControlEyebrow": "Control de versiones",
       "master.featuresBetaTestingEyebrow": "Beta y pruebas",
@@ -6033,6 +6041,8 @@
       "page.vipTerms.ready": "Lees de Voorwaarden, accepteer één keer, betaal dan de borg.",
           "master.featuresReleaseControl": "Releasebeheer",
       "master.featuresBetaTesting": "Beta & testen",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Audittrail",
       "master.featuresReleaseControlEyebrow": "Releasebeheer",
       "master.featuresBetaTestingEyebrow": "Beta & testen",
@@ -7179,6 +7189,8 @@
       "page.vipTerms.ready": "Прочитайте условия, примите один раз и оплатите депозит.",
           "master.featuresReleaseControl": "Контроль релизов",
       "master.featuresBetaTesting": "Бета и тесты",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Журнал аудита",
       "master.featuresReleaseControlEyebrow": "Контроль релизов",
       "master.featuresBetaTestingEyebrow": "Бета и тесты",
@@ -8325,6 +8337,8 @@
       "page.vipTerms.ready": "Leggi i Termini, accetta una volta, poi paga il deposito.",
           "master.featuresReleaseControl": "Controllo release",
       "master.featuresBetaTesting": "Beta e test",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Registro di audit",
       "master.featuresReleaseControlEyebrow": "Controllo release",
       "master.featuresBetaTestingEyebrow": "Beta e test",
@@ -9471,6 +9485,8 @@
       "page.vipTerms.ready": "Leia os Termos, aceite uma vez e pague o depósito.",
           "master.featuresReleaseControl": "Controlo de releases",
       "master.featuresBetaTesting": "Beta e testes",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Registo de auditoria",
       "master.featuresReleaseControlEyebrow": "Controlo de releases",
       "master.featuresBetaTestingEyebrow": "Beta e testes",
@@ -10617,6 +10633,8 @@
       "page.vipTerms.ready": "Διαβάστε τους Όρους, αποδεχτείτε μία φορά, μετά πληρώστε.",
           "master.featuresReleaseControl": "Έλεγχος εκδόσεων",
       "master.featuresBetaTesting": "Beta και δοκιμές",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Ίχνος ελέγχου",
       "master.featuresReleaseControlEyebrow": "Έλεγχος εκδόσεων",
       "master.featuresBetaTestingEyebrow": "Beta και δοκιμές",
@@ -11763,6 +11781,8 @@
       "page.vipTerms.ready": "Przeczytaj Warunki, zaakceptuj raz, potem zapłać depozyt.",
           "master.featuresReleaseControl": "Kontrola wydań",
       "master.featuresBetaTesting": "Beta i testy",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "Ślad audytu",
       "master.featuresReleaseControlEyebrow": "Kontrola wydań",
       "master.featuresBetaTestingEyebrow": "Beta i testy",
@@ -12909,6 +12929,8 @@
       "page.vipTerms.ready": "اقرأ الشروط، واقبل مرة واحدة، ثم ادفع العربون.",
           "master.featuresReleaseControl": "التحكم بالإصدارات",
       "master.featuresBetaTesting": "بيتا والاختبار",
+
+      "master.featuresVipPayments": "VIP reserV Payments",
       "master.featuresAuditTrail": "سجل التدقيق",
       "master.featuresReleaseControlEyebrow": "التحكم بالإصدارات",
       "master.featuresBetaTestingEyebrow": "بيتا والاختبار",

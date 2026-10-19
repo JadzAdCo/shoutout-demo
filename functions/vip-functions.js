@@ -83,7 +83,10 @@ function publicHold(holdId, row) {
     amounts: row.amounts || {},
     expiresAtMs: row.expiresAtMs || 0,
     status: row.status || "",
-    venueName: row.venueName || ""
+    venueName: row.venueName || "",
+    depositRequired: Number(row.depositRequired) === 0 ? 0 : 1,
+    paymentCollector: row.paymentCollector || "floqrStripe",
+    posProvider: row.posProvider || ""
   };
 }
 
@@ -215,6 +218,14 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
   const amounts = computePartyAmounts(section, partySize);
   const vipSettings = await loadVipSettings(clubLocationId);
   const depositRequired = resolveDepositRequired(vipSettings, amounts);
+  let paymentCollector = "floqrStripe";
+  let posProvider = "";
+  try {
+    const {loadClubPaymentSettings} = require("./vip-pos-functions").__vipPosHelpers;
+    const pay = await loadClubPaymentSettings(clubLocationId);
+    paymentCollector = pay.paymentCollector || paymentCollector;
+    posProvider = pay.posProvider || "";
+  } catch (_) { /* default FloqR Stripe */ }
   const key = inventoryKey(clubLocationId, night, sectionId);
   const now = Date.now();
   const expiresAtMs = holdExpiresAtMs(now);
@@ -284,6 +295,8 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
       includedGuests: amounts.includedGuests,
       extraGuests: amounts.extraGuests,
       depositRequired: depositRequired ? 1 : 0,
+      paymentCollector,
+      posProvider,
       amounts: {
         minimumAmountCents: amounts.minimumAmountCents,
         depositCents: amounts.depositCents,
@@ -302,7 +315,9 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
 
   const snap = await holdRef.get();
   return Object.assign(publicHold(holdRef.id, snap.data() || {}), {
-    depositRequired: depositRequired ? 1 : 0
+    depositRequired: depositRequired ? 1 : 0,
+    paymentCollector,
+    posProvider
   });
 });
 
