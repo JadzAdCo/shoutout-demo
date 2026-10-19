@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.72 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.76 (stable)
+
+- s3.1.76: VIP reserV curved banquette Search mark (in-ring VIP reserV, enlarged ring); floqCast small-phone + LED woman silhouette + Display2 stream idle copy.
 
 - s3.1.72: VIP map/list booked vs available sync — Aurelia floor SVG status-neutral; setStates includes available; overlay owns live status.
 

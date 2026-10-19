@@ -21,16 +21,20 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /<button id="shoutoutBtnCard" class="shoutout-icon-card"[^>]*>\s*<img src="\.\/shoutout-logo\.png[^"]*" alt="" class="shoutout-icon-img"[^>]*>\s*<\/button>/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[^>]*>[\s\S]*floqcast-icon-face[\s\S]*floqcast-icon\.svg[\s\S]*floqcast-icon-word/);
-  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face[\s\S]*vip-reserv-mark\.svg[\s\S]*vip-icon-word[^>]*>VIP reserV/);
+  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-reserv-mark\.svg/);
+  assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
   assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*floqai-icon-face[\s\S]*floqai-icon-word/);
   const css = read("styles.css");
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.vip-icon-face\{[^}]*flex-direction:column/);
   assert.match(css, /\.floqai-icon-face \.floqai-tile-mark,\.floqcast-icon-face \.floqcast-tile-mark,\.vip-icon-face \.vip-tile-mark\{[^}]*width:80%/);
-  assert.match(css, /\.vip-icon-word\{/);
+  assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
+  const vipMark = read("images/vip-reserv-mark.svg");
+  assert.match(vipMark, /VIP reserV/);
+  assert.match(vipMark, /vipSeat|banquette/);
 });
 
 test("Throw a ShoutOut skips the ShoutOut landing page", () => {
