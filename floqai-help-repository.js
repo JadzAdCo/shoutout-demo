@@ -477,7 +477,7 @@
     {
       id: "help-vip-club-admin",
       title: "Club Admin VIP reserV management",
-      body: "Club Admin → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
+      body: "Club Admin → Feature Mgmt → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Feature Mgmt also holds ShoutOut (Queue / Display / Template Mgmt) and floqCast. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
       searchPhrases: [
         "vip club admin", "manage vip reservations", "vip deposit required", "paid before booked",
         "block vip table", "walk-in vip", "vip admin book", "require deposit before booked",
