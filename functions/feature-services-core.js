@@ -177,7 +177,7 @@ function hasBetaGrant(viewer = {}, featureKey = "") {
   return flag(grants[featureKey]) === 1;
 }
 
-/** Page + server access. Search tile visibility is searchTileVisible (Master Admins use Features & Services). */
+/** Page + server access. */
 function canAccessFeature(feature, viewer = {}) {
   const state = featureState(feature);
   if (state === "off") return false;
@@ -185,11 +185,16 @@ function canAccessFeature(feature, viewer = {}) {
   return viewer.isMasterAdmin === true || hasBetaGrant(viewer, feature.key);
 }
 
+/**
+ * Search tile visibility.
+ * Live → everyone. Test → Master Admin (QA / Beta pill) OR granted beta tester.
+ * Master Admins must see enabled test tiles on Search so floqCast / VIP / FloqAi marks are QA-able.
+ */
 function searchTileVisible(feature, viewer = {}) {
   const state = featureState(feature);
   if (state === "off") return false;
   if (state === "live") return true;
-  return hasBetaGrant(viewer, feature.key);
+  return viewer.isMasterAdmin === true || hasBetaGrant(viewer, feature.key);
 }
 
 function isActiveBetaTester(row) {

@@ -125,8 +125,9 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 .floqai-icon-face,.floqcast-icon-face,.vip-icon-face{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;width:132px;height:132px;border-radius:22px;background:#000;box-shadow:0 0 18px rgba(38,216,255,.42),0 0 28px rgba(244,58,191,.28);overflow:hidden;padding:6px 6px 9px;box-sizing:border-box}
 .floqai-icon-face .floqai-tile-mark,.floqai-icon-face .category-floqai-mark.floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.vip-icon-face .vip-tile-mark{width:80%!important;height:auto!important;aspect-ratio:1;max-height:80%!important;flex:0 0 auto;margin:0 auto;animation:none!important;position:relative}
 .floqai-icon-face .floqai-tile-mark .category-floqai-mark-halo{display:none!important}
-.floqai-icon-face .floqai-tile-mark img,.floqcast-icon-face .floqcast-tile-mark,.vip-icon-face .vip-tile-mark{width:100%!important;height:100%!important;display:block;object-fit:contain}
-.floqcast-icon-face .floqcast-tile-mark,.vip-icon-face .vip-tile-mark{filter:drop-shadow(0 0 12px rgba(38,216,255,.5))}
+/* FloqAi nests an <img> inside .floqai-tile-mark; floqCast/VIP marks ARE the <img> — do not force height:100% on them (collapses when face height is auto). */
+.floqai-icon-face .floqai-tile-mark img{width:100%!important;height:100%!important;display:block;object-fit:contain}
+.floqcast-icon-face .floqcast-tile-mark,.vip-icon-face .vip-tile-mark{display:block;object-fit:contain;filter:drop-shadow(0 0 12px rgba(38,216,255,.5))}
 .floqai-icon-word,.floqcast-icon-word,.vip-icon-word{flex:0 0 auto;color:#fff;font-size:clamp(11px,2.8vw,14px);font-weight:1000;letter-spacing:.02em;line-height:1.05;white-space:nowrap;text-align:center;max-width:100%;text-shadow:0 0 12px rgba(38,216,255,.55),0 0 18px rgba(244,58,191,.35)}
 .floqcast-icon-word{font-size:clamp(10px,2.6vw,13px)}
 .vip-icon-word{font-size:clamp(9px,2.3vw,12px);letter-spacing:.01em}

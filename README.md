@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.85 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.86 (stable)
+
+- s3.1.86: Master Admin Search shows test/Beta tiles (floqCast / VIP / FloqAi); mark CSS no longer collapses icons.
 
 - s3.1.85: Google/Facebook/Microsoft Welcome sign-in — no redirect on popup-closed (fixes stuck Redirecting… on GitHub Pages).
 

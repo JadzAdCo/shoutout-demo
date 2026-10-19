@@ -29,14 +29,14 @@ The two switches sit side by side on each Features & Services row. `IsFeatureEna
 | IsFeatureEnabled | IsTestFeature | state | Regular patron | Beta tester granted this feature | Master Admin |
 |---|---|---|---|---|---|
 | 0 | 0 or 1 | `off` | nothing | nothing | nothing (page + server denied); F&S row shows “Off” instead of the Open link |
-| 1 | 1 | `test` | hidden / denied | **Search tile** (Beta pill) + page + server | **no Search tile**; opens it from the F&S **Master Admin link**; page + server allowed |
+| 1 | 1 | `test` | hidden / denied | **Search tile** (Beta pill) + page + server | **Search tile** (Beta pill) for QA + page + server; also F&S Open link |
 | 1 | 0 | `live` | yes | yes | yes |
 
 ```
 state        = IsFeatureEnabled != 1 ? "off" : (IsTestFeature == 1 ? "test" : "live")
 hasBetaGrant = !isMasterAdmin && betaTesters/{uid}.IsBetaTester==1 && status=="active" && features[key]==1
 canAccess    = off → false · live → true · test → isMasterAdmin || hasBetaGrant      (pages + server)
-searchVisible= off → false · live → true · test → hasBetaGrant                       (Search tiles; Master Admins excluded)
+searchVisible= off → false · live → true · test → isMasterAdmin || hasBetaGrant      (Search tiles; Master Admins see Beta tiles for QA)
 Search tile shown = searchVisible && legacy patronFeatureGates.patronMayUse
 ```
 
@@ -63,8 +63,8 @@ Two derived `0|1` fields on `featureServices/{featureKey}`:
 
 - Written **only by the server**, in the same transaction as the flags: `setFeatureServiceFlags` (`after = {...flags, ...featureLinkFields(flags), revision+1}`; audit before/after carry both), `seedFeatureServices` (new docs). Never independently editable (rules keep `featureServices` Functions-write-only). Helpers: `featureLinkFields` / `linkFieldsDrifted` in `functions/feature-services-core.js`; client mirror `deriveLinkFields`.
 - **Backfill:** `seedFeatureServices` also merges the two fields into existing docs that miss or disagree (`linkFieldsBackfilledAtMs`, flags + revision untouched) and writes **one** chained event per call (`feature.seeded` with `detail.linksBackfilled`, or `feature.links_backfilled`). Master Admin Features Mgmt · Release Control calls seed automatically when any row is drifted (SOS2FA unlock required). Until then the client derives the fields from the flags.
-- **One client API:** `FLOQRFeatureServices.linkState(key, {surface}) → {show, beta, state, …}`. `show = enableFeatureLink == 1 && access`, where access = `searchVisible` for `surface: "search"` (Master Admins excluded from test tiles) and `canAccess` everywhere else. `beta = show && enableBetaFeatureLink == 1` → append `.feature-beta-pill` (`cat.betaPill`).
-- **Master Admin profile menu shows test features with a Beta pill** (canAccess), even though Search hides them — by design (s3.1.30).
+- **One client API:** `FLOQRFeatureServices.linkState(key, {surface}) → {show, beta, state, …}`. `show = enableFeatureLink == 1 && access`, where access = `searchVisible` for `surface: "search"` (Master Admins + granted beta testers for test tiles) and `canAccess` everywhere else. `beta = show && enableBetaFeatureLink == 1` → append `.feature-beta-pill` (`cat.betaPill`).
+- **Master Admin Search + profile menu show test features with a Beta pill** (s3.1.86 Search QA; profile since s3.1.30).
 - Surfaces (all through `linkState` / `applyFeatureLinks` with `data-floqr-feature-link="key"`, hidden via `FLOQRTabGates.apply` / `hidden`, never one-off CSS): Search tiles (`applySearchUi`), profile avatar menu (`global-profile-status.js` on satellites; `patron-app.js` `#userDropdown` on Search: Mingl Chat), My Profile tabs/links (`patron-portal.html` BartR Store tab + Manage Mingl Friends tab with `data-floqr-feature-panel`, Mingl Chat / Open BartR links), FloqAi product cards (`intent-search.js` `featureKey` + `featureLinkShown`). ShoutOut is always live. Server `assertFeatureAccess` unchanged.
 - Master Admin detection on the client also reads token claims (`masterAdmin` / `superAdmin`) so claim-only admins get the Beta menu entries.
 

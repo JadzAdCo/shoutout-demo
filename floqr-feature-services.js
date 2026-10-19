@@ -117,12 +117,13 @@
     return who.isMasterAdmin === true || hasBetaGrant(canon, who);
   }
 
+  /** Search tiles: live → all; test → Master Admin (QA) or granted beta tester. */
   function searchVisible(key, who = viewer, rows = features) {
     const canon = canonicalizeFeatureKey(key);
     const state = stateOf(rows[canon]);
     if (state === "off") return false;
     if (state === "live") return true;
-    return hasBetaGrant(canon, who);
+    return who.isMasterAdmin === true || hasBetaGrant(canon, who);
   }
 
   function isBetaOnly(key, rows = features) {
@@ -132,8 +133,8 @@
   /**
    * The one rule every feature link uses (Search tiles, profile menus, My Profile tabs, FloqAi results).
    * show = enableFeatureLink==1 AND the access rule. beta = shown AND enableBetaFeatureLink==1 (render the Beta pill).
-   * surface "search": test features only for granted beta testers (Master Admins open them from Features & Services).
-   * Any other surface: Master Admins also see test features, because they can open them.
+   * surface "search": test features for Master Admins (QA) and granted beta testers.
+   * Any other surface: Master Admins also see test features via canAccess.
    */
   function linkState(key, {surface = "link", who = viewer, rows = features} = {}) {
     const canon = canonicalizeFeatureKey(key);

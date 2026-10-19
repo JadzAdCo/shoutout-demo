@@ -94,7 +94,7 @@ test("linkState matrix: off / test granted / test non-tester / test master / liv
     assert.deepEqual(link("test", "patron", surface), {show: false, beta: false}, `patron ${surface}`);
   }
   assert.deepEqual(link("test", "master", "link"), {show: true, beta: true}, "Master Admin profile menu shows test features as Beta");
-  assert.deepEqual(link("test", "master", "search"), {show: false, beta: false}, "Search keeps Master Admins off test tiles");
+  assert.deepEqual(link("test", "master", "search"), {show: true, beta: true}, "Master Admin Search shows test features as Beta for QA");
 
   const stale = {mingl: {...rows.off.mingl, enableFeatureLink: 1, enableBetaFeatureLink: 1}};
   assert.equal(client.linkState("mingl", {who: who.granted, rows: stale}).show, false, "a stale link field never opens an off feature");

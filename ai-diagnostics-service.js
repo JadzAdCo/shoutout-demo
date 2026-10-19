@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.85";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.86";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,14 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.86",
+      title: "Master Admin sees Search beta tiles",
+      checks: [
+        {label:"searchVisible Master Admin", file:"floqr-feature-services.js", includes:["Master Admin (QA) or granted beta tester"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.86\""]}
+      ]
+    },
     {
       version: "s3.1.85",
       title: "Welcome Google sign-in no stuck redirect",
@@ -1742,6 +1750,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-86-search-beta-tiles-master",
+      area:"Search / Beta tiles",
+      feature:"Master Admin sees floqCast / VIP / FloqAi Search tiles",
+      changed:"searchVisible / searchTileVisible allow Master Admin for test features (Beta pill). CSS: floqCast/VIP marks no longer height:100% (icon collapse). Package s3.1.86.",
+      howToTest:"1) Sign in as Master Admin (Google). 2) Hard-refresh Search. 3) Confirm floqCast, VIP reserV, FloqAi tiles with Beta pills and visible marks (not empty black). 4) Beta tester with grants still sees granted tiles only.",
+      expected:"Master Admin Search shows enabled test tiles with artwork + Beta pill.",
+      troubleshoot:"Still only ShoutOut → hard-refresh floqr-feature-services.js ?v=s3.1.86. Tile hidden → Features Mgmt Enable Feature=1 + Enable Beta=1 for that key."
     },
     {
       id:"s3-1-85-google-signin-no-stuck-redirect",

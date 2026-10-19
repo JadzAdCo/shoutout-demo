@@ -88,10 +88,10 @@ test("page/server access: off for everyone; test for Master Admins + granted bet
   });
 });
 
-test("Search tile: Master Admins never see test tiles; only granted beta testers do", () => {
+test("Search tile: Master Admins and granted beta testers see test tiles", () => {
   const expected = {
     live: {patron: true, granted: true, otherGrant: true, master: true, masterClaimingBeta: true},
-    test: {patron: false, granted: true, otherGrant: false, master: false, masterClaimingBeta: false},
+    test: {patron: false, granted: true, otherGrant: false, master: true, masterClaimingBeta: true},
     offTest: {patron: false, granted: false, otherGrant: false, master: false, masterClaimingBeta: false}
   };
   const client = loadClientModule();
