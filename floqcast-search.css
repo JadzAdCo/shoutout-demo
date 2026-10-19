@@ -171,6 +171,16 @@ body.floqcast-page {
   display: grid;
   gap: 8px;
 }
+.floqcast-stage-actions .category-card {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+.floqcast-stage-actions .category-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.25);
+}
 
 @media (max-width: 720px) {
   .floqcast-hero-logo { width: min(132px, 40vw); max-height: 100px; }

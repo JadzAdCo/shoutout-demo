@@ -1221,7 +1221,7 @@
           const paid = item.paymentStatus === "paid";
           div.innerHTML = `
             <strong>floqCast · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
-            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: ${esc(item.displayBoard === "secondary" ? "floqCast (display2)" : "Display 1")}</p>
+            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: floqCast (display2)</p>
             <small>
               Status: ${esc(status)}
               · Payment: ${esc(paid ? "paid $20" : "unpaid")}

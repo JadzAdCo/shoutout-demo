@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.77 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.78 (stable)
+
+- s3.1.78: floqCast locked to display2.html only (server + client); Display 1 no longer loads display-floqcast.
 
 - s3.1.77: floqCast landing standardized to VIP header (FloqR → hero icon → title+?); floqcast-hero-icon; retire suprstr-logo on landings/display idle.
 

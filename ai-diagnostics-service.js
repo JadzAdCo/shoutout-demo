@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.77";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.78";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.78",
+      title: "floqCast display2-only lock",
+      checks: [
+        {label:"Server forces secondary", file:"functions/floqcast-functions.js", includes:["return \"secondary\"", "display2.html", "__secondary"]},
+        {label:"Display1 omits floqcast receiver", file:"display.html", notIncludes:["display-floqcast.js"]},
+        {label:"Display2 loads floqcast receiver", file:"display2.html", includes:["display-floqcast.js"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.78\""]}
+      ]
+    },
+
     {
       version: "s3.1.77",
       title: "floqCast landing header parity + hero icon",
@@ -1682,7 +1693,16 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
-            id:"s3-1-77-vip-sketch-banquette",
+            id:"s3-1-78-floqcast-display2-only",
+      area:"floqCast / Display 2",
+      feature:"floqCast always targets display2.html",
+      changed:"Server boardFromRaw/liveDocId force secondary + display2.html. display.html no longer loads display-floqcast.js. display-floqcast boots only on secondary. Package s3.1.78.",
+      howToTest:"1) Xibo floqCast board URL = display2.html?location=<id> (not display.html). 2) createFloqCastRequest / startFloqCastLive write suprstrLive/{id}__secondary. 3) display.html source has no display-floqcast.js.",
+      expected:"Cast answers only when display2 is online for that venue.",
+      troubleshoot:"Still answer:null → confirm display2.html is the URL on the LED and heartbeating; not Display 1."
+    },
+    {
+      id:"s3-1-77-vip-sketch-banquette",
       area:"VIP reserV / Search tile",
       feature:"Sketch-faithful VIP mark + natural banquette",
       changed:"vip-reserv-mark: VIP / reser + check-V, crescent table with dots, natural curved banquette (curved to table, straight outside). floqcast-icon: remove &lt;use&gt; so Safari Search tile renders. Package s3.1.77.",

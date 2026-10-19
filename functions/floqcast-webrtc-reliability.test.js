@@ -25,7 +25,29 @@ test("display2 loads floqcast webrtc + display modules (location-only URL)", () 
   assert.match(html, /Xibo URL: display2\.html\?location=/);
   assert.match(html, /floqcast-webrtc\.js\?v=/);
   assert.match(html, /display-floqcast\.js\?v=/);
+  assert.match(html, /floqr-display-board" content="secondary"/);
   assert.doesNotMatch(html, /href=["'][^"']*display2\.html\?[^"']*v=/);
+});
+
+test("Display 1 never loads floqCast answer path (display2-only)", () => {
+  const primary = read("display.html");
+  assert.doesNotMatch(primary, /display-floqcast\.js/);
+  assert.doesNotMatch(primary, /floqcast-webrtc\.js/);
+  assert.match(primary, /display2-only/);
+});
+
+test("server + client force secondary live pointer for every site", () => {
+  const fn = read("functions/floqcast-functions.js");
+  const display = read("display-floqcast.js");
+  const search = read("floqcast-search.js");
+  const preview = read("floqcast-preview.js");
+  assert.match(fn, /function boardFromRaw[\s\S]*?return "secondary"/);
+  assert.match(fn, /function liveDocId[\s\S]*?__secondary/);
+  assert.match(fn, /function displayPageForBoard[\s\S]*?return "display2\.html"/);
+  assert.match(display, /\$\{id\}__secondary/);
+  assert.match(display, /isFloqCastBoard/);
+  assert.match(search, /displayBoard:\s*"secondary"/);
+  assert.match(preview, /displayBoard:\s*"secondary"/);
 });
 
 test("display module watches legacy suprstrLive pointer and joins via FLOQRFloqCastRtc", () => {
@@ -40,10 +62,10 @@ test("display module watches legacy suprstrLive pointer and joins via FLOQRFloqC
 test("Go live stage button uses full-width stage-action CSS", () => {
   const css = read("floqcast-search.css");
   const preview = read("floqcast-preview.html");
-  assert.match(css, /\.floqcast-stage-actions\{/);
-  assert.match(css, /\.floqcast-stage-actions \.category-card\{/);
-  assert.match(css, /max-width:420px/);
-  assert.match(css, /\.floqcast-stage-actions \.category-card:disabled\{/);
+  assert.match(css, /\.floqcast-stage-actions\s*\{/);
+  assert.match(css, /\.floqcast-stage-actions\s+\.category-card\s*\{/);
+  assert.match(css, /max-width:\s*420px/);
+  assert.match(css, /\.floqcast-stage-actions\s+\.category-card:disabled\s*\{/);
   assert.match(preview, /class="queue-actions floqcast-stage-actions"/);
   assert.match(preview, /id="floqcastStageBtn"/);
 });

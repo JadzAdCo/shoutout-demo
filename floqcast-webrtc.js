@@ -1,4 +1,4 @@
-/* Shared WebRTC helpers for floqCast (phone broadcaster ↔ venue display.html). */
+/* Shared WebRTC helpers for floqCast (phone broadcaster ↔ venue display2.html). */
 (function (global) {
   "use strict";
 
@@ -77,7 +77,7 @@
   }
 
   /**
-   * Display (venue display.html): watch session, set remote offer, send answer + ICE.
+   * Display (venue display2.html): watch session, set remote offer, send answer + ICE.
    */
   async function joinAsDisplay({sessionId, videoEl, onStatus}) {
     const pc = createPeer();

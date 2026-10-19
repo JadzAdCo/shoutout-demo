@@ -33,8 +33,12 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
   const vipMark = read("images/vip-reserv-mark.svg");
-  assert.match(vipMark, /VIP reserV/);
-  assert.match(vipMark, /vipSeat|banquette/);
+  assert.match(vipMark, /aria-label="VIP reserV"/);
+  assert.match(vipMark, />VIP</);
+  assert.match(vipMark, />reser</);
+  assert.match(vipMark, /vipSeat|Natural banquette/);
+  const floqMark = read("images/floqcast-icon.svg");
+  assert.doesNotMatch(floqMark, /<use[\s>]/, "floqCast Search mark must be Safari img-safe (no use)");
 });
 
 test("Throw a ShoutOut skips the ShoutOut landing page", () => {

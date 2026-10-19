@@ -174,7 +174,7 @@
       const res = await callable("createFloqCastRequest")({
         locationId: venue.id,
         locationName: venue.name,
-        displayBoard: "secondary"
+        displayBoard: "secondary" // floqCast → display2.html only (never Display 1)
       });
       const path = res?.data?.previewPath || `./floqcast-preview.html?t=${encodeURIComponent(res?.data?.accessToken || "")}`;
       const fullUrl = path.includes("?") ? `${path}&from=search` : `${path}?from=search`;

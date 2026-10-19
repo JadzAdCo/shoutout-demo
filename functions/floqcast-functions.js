@@ -44,13 +44,21 @@ async function isClubManagerAuth(authContext, clubId) {
   return assign.exists && text(assign.data()?.status, 40) === "active";
 }
 
-function boardFromRaw(boardRaw = "") {
-  const board = text(boardRaw, 40).toLowerCase();
-  return (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "secondary" : "primary";
+/**
+ * floqCast is display2-only at every venue. Ignore client board hints that
+ * would land on Display 1 (`display.html`) — live pointer is always
+ * `{locationId}__secondary` and the answering player is display2.html.
+ */
+function boardFromRaw(_boardRaw = "") {
+  return "secondary";
 }
 
-function liveDocId(locationId, displayBoard) {
-  return displayBoard === "secondary" ? `${locationId}__secondary` : locationId;
+function liveDocId(locationId, _displayBoard) {
+  return `${text(locationId, 120)}__secondary`;
+}
+
+function displayPageForBoard(_displayBoard) {
+  return "display2.html";
 }
 
 async function assertFloqCastVenue(locationId) {
@@ -235,11 +243,11 @@ exports.startFloqCastLive = onCall({region: "us-central1"}, async (request) => {
       sessionId: text(req.sessionId, 120),
       requestId,
       locationId: text(req.locationId, 120),
-      displayBoard: boardFromRaw(req.displayBoard),
+      displayBoard: "secondary",
       liveDurationSeconds: duration,
       liveEndsAtMs: Number(req.liveEndsAtMs) || 0,
       resumed: true,
-      displayPage: boardFromRaw(req.displayBoard) === "secondary" ? "display2.html" : "display.html"
+      displayPage: displayPageForBoard()
     };
   }
   if (req.status !== "approved") throw new HttpsError("failed-precondition", "Venue approval is required before going live.");
@@ -330,10 +338,10 @@ exports.startFloqCastLive = onCall({region: "us-central1"}, async (request) => {
     sessionId: sid,
     requestId,
     locationId,
-    displayBoard,
+    displayBoard: "secondary",
     liveDurationSeconds: durationOut,
     liveEndsAtMs: Number(afterRow.liveEndsAtMs) || 0,
-    displayPage: displayBoard === "secondary" ? "display2.html" : "display.html"
+    displayPage: displayPageForBoard()
   };
 });
 
