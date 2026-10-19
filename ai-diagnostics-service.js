@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.84";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.85";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,13 +191,21 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.85",
+      title: "Welcome Google sign-in no stuck redirect",
+      checks: [
+        {label:"No stuck Redirecting copy", file:"patron-app.js", includes:["Do NOT redirect on popup-closed-by-user", "AUTH_REDIRECT_PENDING_KEY"], notIncludes:["Redirecting to secure sign-in"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.85\""]}
+      ]
+    },
+    {
       version: "s3.1.84",
       title: "Club Admin Feature Mgmt nested tabs",
       checks: [
         {label:"Feature Mgmt group", file:"admin.html", includes:["featureMgmt", "admin.featureMgmt", "featureShoutOut", "admin.queueMgmt", "admin.displayMgmt", "admin.templateMgmt"]},
         {label:"Nested activate logic", file:"admin-app.js", includes:["revealAncestorsFor", "admin-subtab-parent", "FEATURE_ALIASES"]},
         {label:"Nested CSS", file:"admin.css", includes:["admin-nested-group", "admin-nested-subtabs"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.84\""]}
+        {label:"Feature Mgmt markers remain", file:"admin.html", includes:["featureMgmt", "admin.featureMgmt"]}
       ]
     },
     {
@@ -1734,6 +1742,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-85-google-signin-no-stuck-redirect",
+      area:"Auth / Welcome",
+      feature:"Google sign-in no longer stuck on Redirecting…",
+      changed:"Welcome OAuth: popup-closed/cancelled no longer calls signInWithRedirect (GitHub Pages ↔ firebaseapp.com often returns null). Only popup-blocked tries full-page redirect; getRedirectResult clears stuck status. Package s3.1.85.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (v=s3.1.85). 2) Tap Continue with Google — complete the popup. 3) If you close the popup, status should say cancelled and Google should still be tappable (not stuck on Redirecting…). 4) Allow popups if the browser blocks them.",
+      expected:"Successful Google popup signs in to Search. Cancelled popup returns to Welcome with retryable buttons — never stuck on Redirecting to secure sign-in.",
+      troubleshoot:"Still stuck Redirecting → hard-refresh patron-app.js ?v=s3.1.85. Popup blocked → allow popups for jadzadco.github.io. unauthorized-domain → Firebase Auth authorized domains must include jadzadco.github.io."
     },
     {
       id:"s3-1-84-admin-feature-mgmt-tabs",

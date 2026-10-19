@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.84 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.85 (stable)
+
+- s3.1.85: Google/Facebook/Microsoft Welcome sign-in — no redirect on popup-closed (fixes stuck Redirecting… on GitHub Pages).
 
 - s3.1.84: Club Admin Feature Mgmt tab — ShoutOut (Queue/Display/Template Mgmt), floqCast, VIP reserV as nested subtabs.
 
