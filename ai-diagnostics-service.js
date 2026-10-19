@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.73";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.74";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,12 +191,12 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.1.73",
+      version: "s3.1.74",
       title: "floqCast icon LED emphasis + display2 idle copy",
       checks: [
         {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["FloqMedia LED", "fcArrow", "fcLedClip", "landscape"]},
         {label:"Display2 idle stream copy", file:"display-app.js", includes:["Awaiting a floqCast stream", "Go live @"], notIncludes:["Awaiting live feed", "Be a FloqCast @"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.73\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.74\""]}
       ]
     },
     {
@@ -1674,10 +1674,10 @@
       id:"s3-1-73-floqcast-icon-idle-copy",
       area:"floqCast / Search tile / Display 2",
       feature:"LED-first floqCast icon + Display2 stream idle copy",
-      changed:"floqcast-icon.svg merges Image1 wireless arcs + red cast arrow with a larger landscape FloqMedia LED board (not a TV). display2 idle: Awaiting a floqCast stream. Go live @ {club}. Package s3.1.73.",
+      changed:"floqcast-icon.svg merges Image1 wireless arcs + red cast arrow with a larger landscape FloqMedia LED board (not a TV). display2 idle: Awaiting a floqCast stream. Go live @ {club}. Package s3.1.74.",
       howToTest:"1) Hard-refresh Search → floqCast tile mark shows phone → cyan arcs/red arrow → large landscape LED board with red arrow pixels. 2) Open display2.html?location=temp-democlub-1 (no live guest) → copy reads Awaiting a floqCast stream. / Go live @ Aurelia… (not Awaiting live feed / Be a FloqCast).",
       expected:"Search tile emphasizes landscape LED board; Display2 idle uses new stream wording.",
-      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.73. Old idle copy → hard-refresh display-app.js on display2.html."
+      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.74. Old idle copy → hard-refresh display-app.js on display2.html."
     },
     {
       id:"s3-1-72-vip-map-list-state-sync",
