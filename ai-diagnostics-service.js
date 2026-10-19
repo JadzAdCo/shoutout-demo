@@ -1740,7 +1740,7 @@
       area:"Club Admin / Navigation",
       feature:"Feature Mgmt nests ShoutOut / floqCast / VIP reserV",
       changed:"New Feature Mgmt parent. ShoutOut renamed from ShoutOut Queue with Queue Mgmt / Display Mgmt / Template Mgmt nested. floqCast + VIP reserV are Feature Mgmt subtabs. Package s3.1.84.",
-      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1&v=s3.1.84. 2) Confirm Feature Mgmt top tab (no standalone ShoutOut Queue / floqCast / VIP / Display Security / Template Backgrounds). 3) Open Feature Mgmt → ShoutOut → Queue Mgmt / Display Mgmt / Template Mgmt. 4) Open floqCast and VIP reserV under Feature Mgmt. 5) Deep link #panelVipReserv still opens VIP with parents expanded.",
+      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1. 2) Confirm Feature Mgmt top tab (no standalone ShoutOut Queue / floqCast / VIP / Display Security / Template Backgrounds). 3) Open Feature Mgmt → ShoutOut → Queue Mgmt / Display Mgmt / Template Mgmt. 4) Open floqCast and VIP reserV under Feature Mgmt. 5) Deep link #panelVipReserv still opens VIP with parents expanded.",
       expected:"Nested Feature Mgmt chrome; all three ShoutOut panels reachable; VIP + floqCast under Feature Mgmt.",
       troubleshoot:"Old flat tabs → hard-refresh admin.html/admin-app.js/admin.css ?v=s3.1.84. Nested row missing → click ShoutOut (not only Feature Mgmt)."
     },
