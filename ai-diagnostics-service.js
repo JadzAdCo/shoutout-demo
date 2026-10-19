@@ -194,7 +194,7 @@
       version: "s3.1.74",
       title: "floqCast icon LED emphasis + display2 idle copy",
       checks: [
-        {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["FloqMedia LED", "fcArrow", "fcLedClip", "landscape"]},
+        {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["FloqMedia LED", "fcLedClip", "landscape", "ff2d55"]},
         {label:"Display2 idle stream copy", file:"display-app.js", includes:["Awaiting a floqCast stream", "Go live @"], notIncludes:["Awaiting live feed", "Be a FloqCast @"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.74\""]}
       ]
@@ -1674,9 +1674,9 @@
       id:"s3-1-73-floqcast-icon-idle-copy",
       area:"floqCast / Search tile / Display 2",
       feature:"LED-first floqCast icon + Display2 stream idle copy",
-      changed:"floqcast-icon.svg merges Image1 wireless arcs + red cast arrow with a larger landscape FloqMedia LED board (not a TV). display2 idle: Awaiting a floqCast stream. Go live @ {club}. Package s3.1.74.",
-      howToTest:"1) Hard-refresh Search → floqCast tile mark shows phone → cyan arcs/red arrow → large landscape LED board with red arrow pixels. 2) Open display2.html?location=temp-democlub-1 (no live guest) → copy reads Awaiting a floqCast stream. / Go live @ Aurelia… (not Awaiting live feed / Be a FloqCast).",
-      expected:"Search tile emphasizes landscape LED board; Display2 idle uses new stream wording.",
+      changed:"floqcast-icon.svg: Image1 phone + 3 cyan arcs + solid red arrow + framing rays into a landscape FloqMedia LED module wall (rounded brand tiles, no TV feet). display2 idle: Awaiting a floqCast stream. Go live @ {club}. Package s3.1.74.",
+      howToTest:"1) Hard-refresh Search → floqCast tile: tilted phone, cyan arcs, red arrow into a wide LED with colored modules + red arrow shape. 2) display2.html?location=temp-democlub-1 idle → Awaiting a floqCast stream. / Go live @ …",
+      expected:"Icon reads as cast-to-FloqMedia-LED (not TV); Display2 uses stream idle copy.",
       troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.74. Old idle copy → hard-refresh display-app.js on display2.html."
     },
     {
