@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.74";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.75";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -191,12 +191,12 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.1.74",
+      version: "s3.1.75",
       title: "floqCast icon LED emphasis + display2 idle copy",
       checks: [
-        {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["FloqMedia LED", "fcLedClip", "landscape", "ff2d55"]},
+        {label:"floqCast icon LED hero", file:"images/floqcast-icon.svg", includes:["fcWoman", "fcLedClip", "fcPhoneClip", "ff2d55"]},
         {label:"Display2 idle stream copy", file:"display-app.js", includes:["Awaiting a floqCast stream", "Go live @"], notIncludes:["Awaiting live feed", "Be a FloqCast @"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.74\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.75\""]}
       ]
     },
     {
@@ -1674,10 +1674,10 @@
       id:"s3-1-73-floqcast-icon-idle-copy",
       area:"floqCast / Search tile / Display 2",
       feature:"LED-first floqCast icon + Display2 stream idle copy",
-      changed:"floqcast-icon.svg: Image1 phone + 3 cyan arcs + solid red arrow + framing rays into a landscape FloqMedia LED module wall (rounded brand tiles, no TV feet). display2 idle: Awaiting a floqCast stream. Go live @ {club}. Package s3.1.74.",
-      howToTest:"1) Hard-refresh Search → floqCast tile: tilted phone, cyan arcs, red arrow into a wide LED with colored modules + red arrow shape. 2) display2.html?location=temp-democlub-1 idle → Awaiting a floqCast stream. / Go live @ …",
-      expected:"Icon reads as cast-to-FloqMedia-LED (not TV); Display2 uses stream idle copy.",
-      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.74. Old idle copy → hard-refresh display-app.js on display2.html."
+      changed:"floqcast-icon.svg: small phone + large FloqMedia LED wall, matching woman portrait silhouette on both; Image1 arcs/red arrow. Package s3.1.75.",
+      howToTest:"1) Hard-refresh Search → floqCast tile: small phone + large LED wall, same woman silhouette on both; cyan arcs + red arrow. 2) display2 idle → Awaiting a floqCast stream. / Go live @ …",
+      expected:"Phone clearly smaller than LED; matching silhouettes; Display2 stream idle copy.",
+      troubleshoot:"Old TV icon → hard-refresh floqcast-icon.svg?v=s3.1.75. Old idle copy → hard-refresh display-app.js on display2.html."
     },
     {
       id:"s3-1-72-vip-map-list-state-sync",
