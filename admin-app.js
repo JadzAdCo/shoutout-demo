@@ -152,12 +152,19 @@
     const row = await g.loadVenueRecord(db, locationId);
     const marketingGroup = document.querySelector('.admin-tab-group[data-tab-group="marketing"]');
     const marketingParent = marketingGroup?.querySelector(".admin-tab-parent");
+    const featureMgmtGroup = document.querySelector('.admin-tab-group[data-tab-group="featureMgmt"]');
+    const featureMgmtParent = featureMgmtGroup?.querySelector(".admin-tab-parent");
+    const shoutOutGroup = document.querySelector('.admin-tab-group[data-tab-group="featureShoutOut"]');
+    const shoutOutParent = shoutOutGroup?.querySelector(".admin-subtab-parent");
     const spotCard = byId("spotAdCampaignCard");
     const spotSubtab = document.querySelector('.admin-subtab[data-panel="panelInAppMarketing"]');
     const marketingCard = byId("marketingCampaignCard");
     const marketingSubtab = document.querySelector('.admin-subtab[data-panel="panelMarketingCampaigns"]');
-    const shoutoutTab = document.querySelector('[data-panel="panelQueue"]');
-    const floqCastTab = document.querySelector('[data-panel="panelFloqCast"]');
+    const shoutoutTabs = document.querySelectorAll(
+      '.admin-tab-group[data-tab-group="featureShoutOut"] .admin-subtab[data-panel], .admin-subtab-parent[data-group="featureShoutOut"]'
+    );
+    const floqCastTab = document.querySelector('.admin-subtab[data-panel="panelFloqCast"]');
+    const vipTab = document.querySelector('.admin-subtab[data-panel="panelVipReserv"]');
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
@@ -169,20 +176,27 @@
     const windowOk = g.venueMayUse("windowAds", row);
     const shoutOk = g.venueMayUse("shoutOut", row);
     const floqCastOk = g.venueMayUse("floqCast", row);
+    const vipOk = g.venueMayUse("vipReservations", row);
     const bartrOk = g.venueMayUse("bartrStores", row);
     const marketingOk = uberOk || windowOk;
+    const featureOk = shoutOk || floqCastOk || vipOk;
     if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
     if (spotSubtab) spotSubtab.classList.toggle("hidden", !uberOk);
     if (marketingCard) marketingCard.classList.toggle("hidden", !marketingOk);
     if (marketingSubtab) marketingSubtab.classList.toggle("hidden", !marketingOk);
     if (marketingGroup) marketingGroup.classList.toggle("hidden", !marketingOk);
     if (marketingParent) marketingParent.classList.toggle("hidden", !marketingOk);
-    if (shoutoutTab) shoutoutTab.classList.toggle("hidden", !shoutOk);
+    shoutoutTabs.forEach(el => el.classList.toggle("hidden", !shoutOk));
+    if (shoutOutGroup) shoutOutGroup.classList.toggle("hidden", !shoutOk);
+    if (shoutOutParent) shoutOutParent.classList.toggle("hidden", !shoutOk);
     if (floqCastTab) {
       floqCastTab.classList.toggle("hidden", !floqCastOk);
       /* Never show legacy supRstar chrome — product brand is floqCast. */
       floqCastTab.textContent = "floqCast";
     }
+    if (vipTab) vipTab.classList.toggle("hidden", !vipOk);
+    if (featureMgmtGroup) featureMgmtGroup.classList.toggle("hidden", !featureOk);
+    if (featureMgmtParent) featureMgmtParent.classList.toggle("hidden", !featureOk);
     document.querySelectorAll("[data-bartr-store-gate]").forEach(el => el.classList.toggle("hidden", !bartrOk));
   }
 
@@ -1068,13 +1082,31 @@
 
     const hideAllSubtabs = () => {
       document.querySelectorAll(".admin-subtabs").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".admin-tab-parent").forEach(el => el.setAttribute("aria-expanded", "false"));
+      document.querySelectorAll(".admin-tab-parent, .admin-subtab-parent").forEach(el => {
+        el.setAttribute("aria-expanded", "false");
+      });
     };
 
     const groupDefaultPanel = group => {
       const configured = String(group?.dataset?.defaultPanel || "").trim();
       if (configured && byId(configured)) return configured;
-      return group?.querySelector(".admin-subtab:not(.hidden)")?.dataset.panel || "";
+      const nestedDefault = group?.querySelector(".admin-nested-group")?.dataset?.defaultPanel;
+      if (nestedDefault && byId(nestedDefault)) return nestedDefault;
+      return group?.querySelector(".admin-subtab[data-panel]:not(.hidden)")?.dataset.panel || "";
+    };
+
+    const revealAncestorsFor = (el) => {
+      let node = el;
+      while (node && node !== document.body) {
+        if (node.classList?.contains("admin-tab-group")) {
+          const parentBtn = node.querySelector(":scope > .admin-tab-parent, :scope > .admin-subtab-parent");
+          const subtabs = node.querySelector(":scope > .admin-subtabs");
+          parentBtn?.classList.add("active");
+          parentBtn?.setAttribute("aria-expanded", "true");
+          subtabs?.classList.remove("hidden");
+        }
+        node = node.parentElement;
+      }
     };
 
     const activatePanel = (panelId, opts = {}) => {
@@ -1082,19 +1114,14 @@
       document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
       document.querySelectorAll(".admin-tab:not(.admin-tab-parent)").forEach(x => x.classList.remove("active"));
       document.querySelectorAll(".admin-subtab").forEach(x => x.classList.remove("active"));
-      document.querySelectorAll(".admin-tab-parent").forEach(x => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-parent, .admin-subtab-parent").forEach(x => x.classList.remove("active"));
       byId(panelId).classList.add("active");
 
       const sub = document.querySelector(`.admin-subtab[data-panel="${panelId}"]`);
       if (sub) {
+        if (!opts.keepSubtabs) hideAllSubtabs();
         sub.classList.add("active");
-        const group = sub.closest(".admin-tab-group");
-        const parent = group?.querySelector(".admin-tab-parent");
-        const subtabs = group?.querySelector(".admin-subtabs");
-        parent?.classList.add("active");
-        parent?.setAttribute("aria-expanded", "true");
-        hideAllSubtabs();
-        subtabs?.classList.remove("hidden");
+        revealAncestorsFor(sub);
       } else if (!opts.keepSubtabs) {
         hideAllSubtabs();
         document.querySelector(`.admin-tab[data-panel="${panelId}"]`)?.classList.add("active");
@@ -1113,12 +1140,35 @@
     document.querySelectorAll(".admin-tab-parent[data-group]").forEach(btn => {
       btn.addEventListener("click", () => {
         const group = btn.closest(".admin-tab-group");
-        const subtabs = group?.querySelector(".admin-subtabs");
+        const subtabs = group?.querySelector(":scope > .admin-subtabs");
         const target = groupDefaultPanel(group);
         hideAllSubtabs();
         subtabs?.classList.remove("hidden");
         btn.classList.add("active");
         btn.setAttribute("aria-expanded", "true");
+        if (target) activatePanel(target, {keepSubtabs: true});
+      });
+    });
+
+    document.querySelectorAll(".admin-subtab-parent[data-group]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const group = btn.closest(".admin-tab-group");
+        const nested = group?.querySelector(":scope > .admin-subtabs");
+        const target = groupDefaultPanel(group);
+        /* Keep Feature Mgmt open; only collapse sibling nested rows. */
+        document.querySelectorAll(".admin-nested-subtabs").forEach(el => {
+          if (el !== nested) el.classList.add("hidden");
+        });
+        document.querySelectorAll(".admin-subtab-parent").forEach(el => {
+          if (el !== btn) {
+            el.classList.remove("active");
+            el.setAttribute("aria-expanded", "false");
+          }
+        });
+        nested?.classList.remove("hidden");
+        btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
+        revealAncestorsFor(btn);
         if (target) activatePanel(target, {keepSubtabs: true});
       });
     });
@@ -1140,8 +1190,29 @@
     const wantedRaw = String(new URL(location.href).searchParams.get("panel") || new URL(location.href).searchParams.get("tab") || "").trim();
     const wanted = wantedRaw.toLowerCase();
     const marketingPanel = MARKETING_ALIASES[wanted] || (MARKETING_PANELS.has(wantedRaw) ? wantedRaw : "");
+    const FEATURE_ALIASES = {
+      featuremgmt: "panelQueue",
+      features: "panelQueue",
+      shoutout: "panelQueue",
+      shoutouts: "panelQueue",
+      queuemgmt: "panelQueue",
+      queue: "panelQueue",
+      panelqueue: "panelQueue",
+      displaymgmt: "panelDisplaySecurity",
+      displaysecurity: "panelDisplaySecurity",
+      paneldisplaysecurity: "panelDisplaySecurity",
+      templatemgmt: "panelTemplateBackgrounds",
+      templatebackgrounds: "panelTemplateBackgrounds",
+      paneltemplatebackgrounds: "panelTemplateBackgrounds",
+      vipreserv: "panelVipReserv",
+      vip: "panelVipReserv",
+      panelvipreserv: "panelVipReserv"
+    };
+    const featurePanel = FEATURE_ALIASES[wanted] || "";
     if (marketingPanel && byId(marketingPanel)) {
       activatePanel(marketingPanel);
+    } else if (featurePanel && byId(featurePanel)) {
+      activatePanel(featurePanel);
     } else if (wanted === "floqcast" || wanted === "panelfloqcast" || wanted === "suprstar" || wanted === "panelsuprstar") {
       activatePanel("panelFloqCast");
     } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "calendar" || wanted === "scheduler" || wanted === "scheduserguide" || wanted === "schedwebsiteingest" || wanted === "schedgridheading") {

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.83";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.84";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.84",
+      title: "Club Admin Feature Mgmt nested tabs",
+      checks: [
+        {label:"Feature Mgmt group", file:"admin.html", includes:["featureMgmt", "admin.featureMgmt", "featureShoutOut", "admin.queueMgmt", "admin.displayMgmt", "admin.templateMgmt"]},
+        {label:"Nested activate logic", file:"admin-app.js", includes:["revealAncestorsFor", "admin-subtab-parent", "FEATURE_ALIASES"]},
+        {label:"Nested CSS", file:"admin.css", includes:["admin-nested-group", "admin-nested-subtabs"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.84\""]}
+      ]
+    },
     {
       version: "s3.1.83",
       title: "VIP isBooked control + cancel Stripe refund-by-policy",
@@ -1726,13 +1736,22 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
+      id:"s3-1-84-admin-feature-mgmt-tabs",
+      area:"Club Admin / Navigation",
+      feature:"Feature Mgmt nests ShoutOut / floqCast / VIP reserV",
+      changed:"New Feature Mgmt parent. ShoutOut renamed from ShoutOut Queue with Queue Mgmt / Display Mgmt / Template Mgmt nested. floqCast + VIP reserV are Feature Mgmt subtabs. Package s3.1.84.",
+      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1&v=s3.1.84. 2) Confirm Feature Mgmt top tab (no standalone ShoutOut Queue / floqCast / VIP / Display Security / Template Backgrounds). 3) Open Feature Mgmt → ShoutOut → Queue Mgmt / Display Mgmt / Template Mgmt. 4) Open floqCast and VIP reserV under Feature Mgmt. 5) Deep link #panelVipReserv still opens VIP with parents expanded.",
+      expected:"Nested Feature Mgmt chrome; all three ShoutOut panels reachable; VIP + floqCast under Feature Mgmt.",
+      troubleshoot:"Old flat tabs → hard-refresh admin.html/admin-app.js/admin.css ?v=s3.1.84. Nested row missing → click ShoutOut (not only Feature Mgmt)."
+    },
+    {
       id:"s3-1-83-vip-isbooked-cancel-refund",
       area:"VIP reserV / Booking + refunds",
       feature:"isBooked booking control + cancel clears + FloqMedia Stripe refund-by-policy",
       changed:"Map booked only when Firestore isBooked=1 after pay. Cancel clears isBooked. FloqMedia/Club Stripe cancel can refund per vipSettings.refundPolicy. Club Admin VIP tab + mark s3.1.83. Package s3.1.83.",
-      howToTest:"1) Deploy Functions + publish Pages. 2) Hard-refresh admin.html?location=temp-democlub-1 — VIP reserV tab visible. 3) Search VIP tile shows brownish-red banquette mark (not rainbow). 4) Pay Aurelia deposit → tables/{n} isBooked=1. 5) Club Admin Cancel with Refund checked → isBooked=0 + Stripe refund (test mode). 6) Uncheck refund → cancel frees table without refund.",
-      expected:"VIP tab on Aurelia admin; new mark; booked only after pay via isBooked; cancel clears isBooked; Stripe refund when opted.",
-      troubleshoot:"No VIP tab / old icons → Pages still on main pre-s3.1.83; hard-refresh ?v=s3.1.83. Refund fails → deploy Functions with STRIPE_SECRET_KEY + cancelVipReservation secrets. Still booked after cancel → applyTableAvailable not deployed."
+      howToTest:"1) Deploy Functions + publish Pages. 2) Hard-refresh admin.html?location=temp-democlub-1 — VIP reserV under Feature Mgmt. 3) Search VIP tile shows brownish-red banquette mark (not rainbow). 4) Pay Aurelia deposit → tables/{n} isBooked=1. 5) Club Admin Cancel with Refund checked → isBooked=0 + Stripe refund (test mode). 6) Uncheck refund → cancel frees table without refund.",
+      expected:"VIP under Feature Mgmt; new mark; booked only after pay via isBooked; cancel clears isBooked; Stripe refund when opted.",
+      troubleshoot:"No VIP tab / old icons → Pages still on main pre-s3.1.83; hard-refresh ?v=s3.1.84. Refund fails → deploy Functions with STRIPE_SECRET_KEY + cancelVipReservation secrets. Still booked after cancel → applyTableAvailable not deployed."
     },
     {
       id:"s3-1-82-vip-table-isbooked",

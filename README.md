@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.83 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.84 (stable)
+
+- s3.1.84: Club Admin Feature Mgmt tab — ShoutOut (Queue/Display/Template Mgmt), floqCast, VIP reserV as nested subtabs.
 
 - s3.1.83: VIP isBooked booking control + Club Admin cancel with FloqMedia/Club Stripe refund-by-policy; Aurelia VIP tab + mark cache-bust.
 

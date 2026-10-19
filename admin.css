@@ -61,6 +61,18 @@
 }
 .admin-subtabs.hidden{display:none!important}
 .admin-subpanel.hidden{display:none!important}
+.admin-nested-group{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:4px;
+  width:100%;
+}
+.admin-nested-subtabs{
+  margin:0 0 2px 8px;
+  width:calc(100% - 8px);
+  box-sizing:border-box;
+}
 .admin-subtab{
   appearance:none;
   border:1px solid rgba(255,255,255,.16);
@@ -71,6 +83,9 @@
   font-size:12px;
   font-weight:800;
   cursor:pointer;
+}
+.admin-subtab-parent[aria-expanded="true"]{
+  border-color:rgba(38,216,255,.45);
 }
 .admin-subtab.active{
   background:linear-gradient(90deg,var(--hot),var(--accent));
