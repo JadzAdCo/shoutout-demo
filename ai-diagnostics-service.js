@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.91";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.92";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.92",
+      title: "floqCast no top-strip crop + Switch camera Front/Back",
+      checks: [
+        {label:"No landscape 1280x720 force", file:"floqcast-webrtc.js", includes:["Do NOT force 1280", "switchCameraPool", "facingMode toggle", "preferInteropVideoCodecs"], notIncludes:["width: {ideal: 1280}"]},
+        {label:"Switch camera reports no-op", file:"floqcast-preview.js", includes:["Only one usable camera", "result.switched"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.92\""]}
+      ]
+    },
     {
       version: "s3.1.91",
       title: "floqCast LIVE board reconnect (no black LIVE)",
@@ -1800,6 +1809,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-92-floqcast-top-strip-and-switch",
+      area:"floqCast / camera",
+      feature:"LED shows full face (not top strip) + Switch camera Front/Back",
+      changed:"Removed forced 1280×720 landscape (iPhone was cropping the top of the portrait selfie into WebRTC). Switch camera cycles Front↔Back + facingMode toggle (was a silent no-op). H264 baseline/VP8 preferred. Package s3.1.92.",
+      howToTest:"1) Hard-refresh floqCast preview (s3.1.92) on iPhone + open display2. 2) Go live — LED shows the same full face as the phone preview (not ceiling/forehead-only top strip). 3) Tap Switch camera — preview label changes Front↔Back (or status explains if only one camera). 4) While live, Switch camera updates the board via replaceTrack.",
+      expected:"Board framing matches phone selfie; Switch camera actually changes lenses.",
+      troubleshoot:"Still top-strip on LED → hard-refresh floqcast-webrtc.js s3.1.92 (must not request width 1280/height 720). Switch does nothing → confirm switchCameraPool includes Back; watch status line for switch-failed."
     },
     {
       id:"s3-1-91-floqcast-live-black-board",

@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.91 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.92 (stable)
+
+- s3.1.92: floqCast drop landscape 1280x720 (iPhone top-strip crop on LED); Switch camera Front↔Back + facingMode toggle; H264 baseline/VP8 prefer.
 
 - s3.1.91: floqCast LIVE black-board fix — keep session.status connected (not answered) so ICE continues; display rejoin + phone renegotiate; keep phone tab foreground.
 

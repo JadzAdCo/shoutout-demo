@@ -13,10 +13,14 @@
     {urls: "stun:stun1.l.google.com:19302"}
   ];
 
+  /**
+   * Do NOT force 1280×720 landscape. On iPhone Safari that crops a 16:9 strip
+   * (often the TOP of the portrait selfie sensor) into the WebRTC bitstream —
+   * local <video> can still look upright via orientation metadata while
+   * display2 shows forehead/ceiling only.
+   */
   const VIDEO_BASE = Object.freeze({
-    width: {ideal: 1280},
-    height: {ideal: 720},
-    frameRate: {ideal: 30, max: 30}
+    frameRate: {ideal: 24, max: 30}
   });
 
   const RECONNECT_DEBOUNCE_MS = 1800;
@@ -28,6 +32,49 @@
 
   function createPeer() {
     return new RTCPeerConnection({iceServers: ICE_SERVERS});
+  }
+
+  /** Prefer VP8 / H264 Constrained Baseline for iPhone → Chrome LED decode. */
+  function preferInteropVideoCodecs(pc) {
+    try {
+      if (!pc?.getTransceivers || typeof RTCRtpSender?.getCapabilities !== "function") return;
+      const caps = RTCRtpSender.getCapabilities("video");
+      if (!caps?.codecs?.length) return;
+      const rank = (c) => {
+        const mime = String(c.mimeType || "").toLowerCase();
+        const fmtp = String(c.sdpFmtpLine || "").toLowerCase();
+        if (mime === "video/vp8") return 10;
+        if (mime === "video/h264" && /profile-level-id=42e0/.test(fmtp)) return 20;
+        if (mime === "video/h264") return 30;
+        if (mime === "video/vp9") return 40;
+        return 100;
+      };
+      const ordered = caps.codecs.slice().sort((a, b) => rank(a) - rank(b));
+      pc.getTransceivers().forEach((t) => {
+        const kind = t.receiver?.track?.kind || t.sender?.track?.kind || "";
+        if (kind && kind !== "video") return;
+        try { t.setCodecPreferences?.(ordered); } catch (_) {}
+      });
+    } catch (_) {}
+  }
+
+  async function prepareVideoTrack(track) {
+    if (!track) return;
+    try { track.contentHint = "motion"; } catch (_) {}
+    await resetTrackZoom(track);
+    // If Safari still handed us a wide landscape crop, nudge toward portrait.
+    try {
+      const settings = track.getSettings?.() || {};
+      const w = Number(settings.width) || 0;
+      const h = Number(settings.height) || 0;
+      if (w > 0 && h > 0 && w > h * 1.15) {
+        await track.applyConstraints({
+          width: {ideal: 720},
+          height: {ideal: 1280},
+          advanced: [{zoom: 1}]
+        });
+      }
+    } catch (_) {}
   }
 
   function forceVideoPlay(videoEl) {
@@ -161,7 +208,7 @@
     }
 
     const track = stream.getVideoTracks()[0];
-    await resetTrackZoom(track);
+    await prepareVideoTrack(track);
     return stream;
   }
 
@@ -178,20 +225,90 @@
       .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
   }
 
-  /** Cycle to the next usable videoinput (skips Continuity / telephoto when alternatives exist). */
-  async function switchCameraStream(currentStream, {audio = true} = {}) {
-    const devices = await listVideoDevices();
-    const usable = devices.filter((d) => d.score >= 0);
-    const pool = usable.length ? usable : devices;
-    if (pool.length < 2) {
-      return {stream: currentStream, switched: false, label: currentStream?.getVideoTracks?.()[0]?.label || ""};
+  /**
+   * Cameras Switch may cycle: Front + Back are both allowed.
+   * Continuity / Telephoto / Ultra Wide (score <= -50) stay excluded.
+   * Previously only score>=0 was cycled, so Front↔Back was a silent no-op while
+   * the button still showed (list.length > 1).
+   */
+  function switchCameraPool(devices) {
+    const list = Array.isArray(devices) ? devices : [];
+    const nonExotic = list.filter((d) => Number(d?.score) > -50 && d?.deviceId);
+    if (nonExotic.length >= 2) return nonExotic;
+    const fronts = list.filter((d) => Number(d?.score) >= 100 && d?.deviceId);
+    return fronts.length >= 2 ? fronts : nonExotic;
+  }
+
+  async function openFacingStream(facing, audio) {
+    try {
+      return await openWithConstraints({...VIDEO_BASE, facingMode: {exact: facing}}, audio);
+    } catch (_) {
+      return openWithConstraints({...VIDEO_BASE, facingMode: {ideal: facing}}, audio);
     }
-    const currentId = currentStream?.getVideoTracks?.()[0]?.getSettings?.()?.deviceId || "";
-    const idx = Math.max(0, pool.findIndex((d) => d.deviceId === currentId));
-    const next = pool[(idx + 1) % pool.length];
-    const stream = await getCameraStream({audio, deviceId: next.deviceId});
-    stopStream(currentStream);
-    return {stream, switched: true, label: next.label || stream.getVideoTracks()[0]?.label || "Camera"};
+  }
+
+  /** Cycle Front ↔ Back (and facingMode fallback when iOS exposes a single deviceId). */
+  async function switchCameraStream(currentStream, {audio = true} = {}) {
+    const wantAudio = !!audio;
+    const devices = await listVideoDevices();
+    const pool = switchCameraPool(devices);
+    const currentTrack = currentStream?.getVideoTracks?.()[0] || null;
+    const currentId = currentTrack?.getSettings?.()?.deviceId || "";
+    const currentFacing = String(currentTrack?.getSettings?.()?.facingMode || "user").toLowerCase();
+    const nextFacing = currentFacing === "environment" ? "user" : "environment";
+
+    async function openNextByDevice(deviceId) {
+      // iOS often needs the previous camera released before another opens.
+      stopStream(currentStream);
+      const stream = await getCameraStream({audio: wantAudio, deviceId});
+      return stream;
+    }
+
+    if (pool.length >= 2) {
+      const idx = Math.max(0, pool.findIndex((d) => d.deviceId === currentId));
+      const next = pool[(idx + 1) % pool.length];
+      if (next?.deviceId && next.deviceId !== currentId) {
+        try {
+          const stream = await openNextByDevice(next.deviceId);
+          return {
+            stream,
+            switched: true,
+            label: next.label || stream.getVideoTracks()[0]?.label || "Camera"
+          };
+        } catch (_) {
+          /* fall through to facingMode toggle */
+        }
+      }
+    }
+
+    // facingMode toggle — works when Front/Back share one deviceId or device switch failed.
+    try {
+      stopStream(currentStream);
+      const stream = await openFacingStream(nextFacing, wantAudio);
+      await prepareVideoTrack(stream.getVideoTracks()[0]);
+      return {
+        stream,
+        switched: true,
+        label: stream.getVideoTracks()[0]?.label || nextFacing
+      };
+    } catch (err) {
+      try {
+        const stream = await getCameraStream({audio: wantAudio});
+        return {
+          stream,
+          switched: false,
+          label: stream.getVideoTracks()[0]?.label || "",
+          reason: err?.message || "switch-failed"
+        };
+      } catch (_) {
+        return {
+          stream: currentStream,
+          switched: false,
+          label: currentTrack?.label || "",
+          reason: err?.message || "switch-failed"
+        };
+      }
+    }
   }
 
   function wireIce(pc, sessionRef, collectionName) {
@@ -218,6 +335,7 @@
 
     function attachLocalTracks(peer, media) {
       (media || activeStream).getTracks().forEach(track => peer.addTrack(track, media || activeStream));
+      preferInteropVideoCodecs(peer);
     }
 
     function listenCalleeIce(peer) {
@@ -414,6 +532,7 @@
     let answering = false;
     let joinRequestedForOffer = "";
 
+    preferInteropVideoCodecs(pc);
     forceVideoPlay(videoEl);
 
     pc.ontrack = (ev) => {
@@ -546,9 +665,12 @@
     getCameraStream,
     listVideoDevices,
     switchCameraStream,
+    switchCameraPool,
     scoreVideoDevice,
     pickPreferredVideoDevice,
     resetTrackZoom,
+    prepareVideoTrack,
+    preferInteropVideoCodecs,
     forceVideoPlay,
     startBroadcast,
     joinAsDisplay

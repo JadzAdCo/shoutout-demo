@@ -405,8 +405,9 @@
     if (!btn) return;
     try {
       const list = await global.FLOQRFloqCastRtc?.listVideoDevices?.() || [];
-      const usable = list.filter((d) => d.score >= 0);
-      const show = cameraReady() && (usable.length > 1 || list.length > 1);
+      const pool = global.FLOQRFloqCastRtc?.switchCameraPool?.(list) || list.filter((d) => d.score > -50);
+      // Always show once camera is on — facingMode toggle can still flip Front↔Back on iPhone.
+      const show = cameraReady() && (pool.length > 1 || list.length >= 1);
       btn.classList.toggle("hidden", !show);
       btn.disabled = !show;
     } catch (_) {
@@ -451,6 +452,12 @@
       if (!result?.stream) throw new Error("Could not switch camera.");
       localStream = result.stream;
       attachLocalPreview(localStream);
+      if (!result.switched) {
+        setStatus(result.reason
+          ? `Could not switch camera (${result.reason}). Still using ${result.label || "Camera"}.`
+          : `Only one usable camera on this phone (${result.label || "Camera"}).`);
+        return;
+      }
       if (broadcastHandle?.replaceStream) {
         await broadcastHandle.replaceStream(localStream);
         setStatus(`Switched camera while live → ${result.label || "Camera"}`);
