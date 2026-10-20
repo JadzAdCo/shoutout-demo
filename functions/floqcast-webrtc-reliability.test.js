@@ -18,6 +18,28 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /async function joinAsDisplay/);
   assert.match(rtc, /global\.FLOQRFloqCastRtc\s*=/);
   assert.match(rtc, /collection\("suprstrSessions"\)/);
+  assert.match(rtc, /Do NOT report "connected" here/);
+  assert.match(rtc, /onStatus\?\.\("answered"/);
+  assert.match(rtc, /renegotiate-error/);
+});
+
+test("floqCast preview arms duration only after stable ICE", () => {
+  const preview = read("floqcast-preview.js");
+  assert.match(preview, /armFloqCastLiveDuration/);
+  assert.match(preview, /live_timer_arm_request/);
+  assert.match(preview, /stable-ice-connected/);
+  assert.match(preview, /CONNECT_ARM_DEBOUNCE_MS\s*=\s*2500/);
+  assert.doesNotMatch(preview, /await endLive\(\{silent: true\}\)/);
+});
+
+test("floqCast Search mark SVG is well-formed UTF-8 (img-safe)", () => {
+  const fs = require("node:fs");
+  const bytes = fs.readFileSync(path.resolve(__dirname, "..", "images/floqcast-icon.svg"));
+  assert.equal(bytes.includes(0x97), false, "must not contain Windows-1252 0x97 (breaks SVG-as-img)");
+  assert.doesNotThrow(() => bytes.toString("utf8"));
+  const svg = bytes.toString("utf8");
+  assert.match(svg, /inlined, img-safe/);
+  assert.match(svg, /viewBox="0 0 64 64"/);
 });
 
 test("display2 loads floqcast webrtc + display modules (location-only URL)", () => {

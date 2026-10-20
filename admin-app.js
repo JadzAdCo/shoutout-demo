@@ -1610,7 +1610,11 @@
       .where("locationId", "==", locationId)
       .onSnapshot(snapshot => {
         const rows = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-          .filter(r => r.paymentStatus === "paid" || ["pending_approval", "approved", "live"].includes(String(r.status || "")))
+          .filter(r => {
+            const status = String(r.status || "");
+            if (["ended", "rejected"].includes(status)) return false;
+            return r.paymentStatus === "paid" || ["pending_approval", "approved", "live"].includes(status);
+          })
           .sort((a, b) => (b.paidAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.paidAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
         const pending = rows.filter(r => r.status === "pending_approval" || (r.paymentStatus === "paid" && !["approved", "live", "ended", "rejected"].includes(String(r.status || ""))));
         const live = rows.filter(r => r.status === "live");

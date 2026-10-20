@@ -22,56 +22,139 @@
     });
   }
 
-  /**
-   * Broadcaster (phone): publish local stream to session; write offer; wait for answer + ICE.
-   */
-  async function startBroadcast({sessionId, stream, onStatus}) {
-    const pc = createPeer();
-    const sessionRef = db().collection("suprstrSessions").doc(sessionId);
-    stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
+  function wireIce(pc, sessionRef, collectionName) {
     pc.onicecandidate = (ev) => {
       if (!ev.candidate) return;
-      sessionRef.collection("callerCandidates").add(ev.candidate.toJSON()).catch(() => {});
+      sessionRef.collection(collectionName).add(ev.candidate.toJSON()).catch(() => {});
     };
-    pc.onconnectionstatechange = () => onStatus?.(pc.connectionState);
+  }
 
-    const offer = await pc.createOffer({offerToReceiveAudio: false, offerToReceiveVideo: false});
-    await pc.setLocalDescription(offer);
-    await sessionRef.set({
-      offer: {type: offer.type, sdp: offer.sdp},
-      status: "offering",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
+  /**
+   * Broadcaster (phone): publish local stream; renegotiate when display reconnects with a new answer.
+   * Duration clock must arm on real ICE/peer connected — never on SDP answer alone.
+   */
+  async function startBroadcast({sessionId, stream, onStatus}) {
+    let pc = createPeer();
+    const sessionRef = db().collection("suprstrSessions").doc(sessionId);
+    let lastAnswerSdp = "";
+    let unsubCallee = null;
+    let rebuilding = false;
+    let activeStream = stream;
+
+    function attachLocalTracks(peer, media) {
+      (media || activeStream).getTracks().forEach(track => peer.addTrack(track, media || activeStream));
+    }
+
+    function listenCalleeIce(peer) {
+      if (unsubCallee) unsubCallee();
+      unsubCallee = sessionRef.collection("calleeCandidates").onSnapshot((qs) => {
+        qs.docChanges().forEach((change) => {
+          if (change.type !== "added") return;
+          peer.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
+        });
+      });
+    }
+
+    function emitPeerState(peer, label) {
+      const connectionState = String(peer?.connectionState || "");
+      const ice = String(peer?.iceConnectionState || "");
+      const signaling = String(peer?.signalingState || "");
+      onStatus?.(label || connectionState || "unknown", {
+        connectionState,
+        iceConnectionState: ice,
+        signalingState: signaling
+      });
+    }
+
+    function wirePeerState(peer) {
+      peer.onconnectionstatechange = () => emitPeerState(peer, peer.connectionState);
+      peer.oniceconnectionstatechange = () => {
+        const ice = String(peer.iceConnectionState || "");
+        if (ice === "connected" || ice === "completed") {
+          if (peer.connectionState === "connected") emitPeerState(peer, "connected");
+          else emitPeerState(peer, `ice-${ice}`);
+        } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
+          emitPeerState(peer, ice === "failed" ? "failed" : ice);
+        } else {
+          emitPeerState(peer, peer.connectionState || ice);
+        }
+      };
+    }
+
+    async function publishOffer(peer) {
+      wireIce(peer, sessionRef, "callerCandidates");
+      listenCalleeIce(peer);
+      wirePeerState(peer);
+      const offer = await peer.createOffer({offerToReceiveAudio: false, offerToReceiveVideo: false});
+      await peer.setLocalDescription(offer);
+      await sessionRef.set({
+        offer: {type: offer.type, sdp: offer.sdp},
+        answer: null,
+        status: "offering",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+      lastAnswerSdp = "";
+      onStatus?.("offering", {
+        connectionState: peer.connectionState,
+        iceConnectionState: peer.iceConnectionState,
+        signalingState: peer.signalingState
+      });
+    }
+
+    attachLocalTracks(pc, activeStream);
+    await publishOffer(pc);
 
     const unsubSession = sessionRef.onSnapshot(async (snap) => {
       const data = snap.data() || {};
-      if (!data.answer || pc.currentRemoteDescription) return;
+      if (!data.answer?.sdp) return;
+      if (data.answer.sdp === lastAnswerSdp) return;
+      if (rebuilding) return;
+
+      // Display re-joined after an old answer was already applied — rebuild peer + offer.
+      if (pc.currentRemoteDescription) {
+        rebuilding = true;
+        try {
+          try { pc.close(); } catch (_) {}
+          pc = createPeer();
+          attachLocalTracks(pc, activeStream);
+          await publishOffer(pc);
+        } catch (e) {
+          onStatus?.(`renegotiate-error:${e.message}`);
+        } finally {
+          rebuilding = false;
+        }
+        return;
+      }
+
       try {
+        lastAnswerSdp = data.answer.sdp;
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
         await sessionRef.set({
-          status: "connected",
+          status: "answered",
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
-        onStatus?.("connected");
+        // Signaling answer applied — ICE may still be connecting. Do NOT report "connected" here.
+        onStatus?.("answered", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState,
+          signalingState: pc.signalingState
+        });
       } catch (e) {
+        lastAnswerSdp = "";
         onStatus?.(`answer-error:${e.message}`);
       }
     });
 
-    const unsubCallee = sessionRef.collection("calleeCandidates").onSnapshot((qs) => {
-      qs.docChanges().forEach((change) => {
-        if (change.type !== "added") return;
-        pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
-      });
-    });
-
     return {
-      pc,
-      stop() {
+      get pc() { return pc; },
+      get stream() { return activeStream; },
+      stop({stopTracks = false} = {}) {
         unsubSession();
-        unsubCallee();
+        if (unsubCallee) unsubCallee();
         try { pc.close(); } catch (_) {}
+        if (stopTracks && activeStream) {
+          try { activeStream.getTracks().forEach(t => t.stop()); } catch (_) {}
+        }
       }
     };
   }
@@ -87,15 +170,20 @@
       const [remote] = ev.streams;
       if (videoEl && remote) {
         videoEl.srcObject = remote;
+        videoEl.muted = true;
         videoEl.play?.().catch(() => {});
       }
-      onStatus?.("track");
+      onStatus?.("track", {
+        connectionState: pc.connectionState,
+        iceConnectionState: pc.iceConnectionState
+      });
     };
-    pc.onicecandidate = (ev) => {
-      if (!ev.candidate) return;
-      sessionRef.collection("calleeCandidates").add(ev.candidate.toJSON()).catch(() => {});
-    };
-    pc.onconnectionstatechange = () => onStatus?.(pc.connectionState);
+    wireIce(pc, sessionRef, "calleeCandidates");
+    pc.onconnectionstatechange = () => onStatus?.(pc.connectionState, {
+      connectionState: pc.connectionState,
+      iceConnectionState: pc.iceConnectionState,
+      signalingState: pc.signalingState
+    });
 
     let answered = false;
     const unsubSession = sessionRef.onSnapshot(async (snap) => {
@@ -116,7 +204,11 @@
           answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
-        onStatus?.("answered");
+        // Signaling only — peer connected comes from connectionState.
+        onStatus?.("answered", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState
+        });
       } catch (e) {
         answered = false;
         onStatus?.(`offer-error:${e.message}`);
@@ -131,7 +223,7 @@
     });
 
     return {
-      pc,
+      get pc() { return pc; },
       stop() {
         unsubSession();
         unsubCaller();

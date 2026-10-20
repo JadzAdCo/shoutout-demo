@@ -1594,10 +1594,13 @@ exports.repairFloqCastPaidOrders = onCall({
     scanned += 1;
     if (locationId && text(req.locationId, 120) !== locationId) continue;
     const status = text(req.status, 40);
+    // Already finished or already in the approval/live path — do not count as repaired.
+    if (["ended", "rejected"].includes(status)) continue;
     if (req.paymentStatus === "paid" && ["pending_approval", "approved", "live"].includes(status)) continue;
+    const nextStatus = ["approved", "live"].includes(status) ? status : "pending_approval";
     await reqRef.set({
       paymentStatus:"paid",
-      status: ["approved", "live", "ended", "rejected"].includes(status) ? status : "pending_approval",
+      status: nextStatus,
       serviceOrderId:doc.id,
       paidAt:req.paidAt || order.paidAt || now,
       amountCents:Math.max(0, Math.round(Number(order.amountCents || 2000))),
@@ -1612,7 +1615,7 @@ exports.repairFloqCastPaidOrders = onCall({
       }, {merge:true});
     }
     repaired += 1;
-    refs.push({orderId:doc.id, requestId, locationId:text(req.locationId, 120), referenceNumber:text(req.referenceNumber, 80)});
+    refs.push({orderId:doc.id, requestId, locationId:text(req.locationId, 120), referenceNumber:text(req.referenceNumber, 80), status: nextStatus});
   }
   return {ok:true, scanned, repaired, refs};
 });

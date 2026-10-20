@@ -54,14 +54,30 @@
 
   let activeJoin = null;
   let activeSessionId = "";
+  let peerDead = false;
 
-  async function attachSession(sessionId) {
-    if (!sessionId || sessionId === activeSessionId) return;
+  function peerLooksDead(pc) {
+    try {
+      const state = String(pc?.connectionState || "");
+      const ice = String(pc?.iceConnectionState || "");
+      return ["failed", "closed", "disconnected"].includes(state) || ["failed", "closed"].includes(ice);
+    } catch (_) {
+      return true;
+    }
+  }
+
+  async function attachSession(sessionId, {force = false} = {}) {
+    if (!sessionId) return;
+    // Same sessionId with a dead peer must re-join — do not skip.
+    if (!force && sessionId === activeSessionId && activeJoin && !peerDead && !peerLooksDead(activeJoin.pc)) {
+      return;
+    }
     if (activeJoin) {
       activeJoin.stop();
       activeJoin = null;
     }
     activeSessionId = sessionId;
+    peerDead = false;
     const video = byId("floqcastLiveVideo") || ensureOverlay() && byId("floqcastLiveVideo");
     showOverlay(true);
     if (!window.FLOQRFloqCastRtc?.joinAsDisplay) {
@@ -72,7 +88,13 @@
       sessionId,
       videoEl: video,
       onStatus(s) {
-        if (s === "ended") detach();
+        if (s === "ended") {
+          detach();
+          return;
+        }
+        if (["failed", "disconnected", "closed"].includes(String(s || ""))) {
+          peerDead = true;
+        }
       }
     });
   }

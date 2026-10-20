@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.86";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.87";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.87",
+      title: "floqCast icon encoding + live duration arm",
+      checks: [
+        {label:"floqCast SVG UTF-8 comment", file:"images/floqcast-icon.svg", includes:["inlined, img-safe"]},
+        {label:"Preview arms after ICE", file:"floqcast-preview.js", includes:["armFloqCastLiveDuration"]},
+        {label:"WebRTC answered != connected", file:"floqcast-webrtc.js", includes:["Do NOT report \"connected\" here"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.87\""]}
+      ]
+    },
     {
       version: "s3.1.86",
       title: "Master Admin sees Search beta tiles",
@@ -1752,13 +1762,22 @@
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
     },
     {
+      id:"s3-1-87-floqcast-icon-and-live-arm",
+      area:"Search / floqCast",
+      feature:"floqCast Search mark visible + paid live duration arms after ICE",
+      changed:"images/floqcast-icon.svg invalid 0x97 byte fixed (SVG-as-img encoding error). Preview restores armFloqCastLiveDuration after stable ICE. Repair skips ended sessions. Package s3.1.87.",
+      howToTest:"1) Hard-refresh Search as Master Admin — floqCast tile shows phone+LED mark (not blank black). 2) Open images/floqcast-icon.svg?v=s3.1.87 — no encoding error. 3) Pay → approve → Go live with display2.html?location=temp-democlub-1 open — status waits for board, then arms timer. 4) Repair paid requests on ended history → 'No stuck paid requests'.",
+      expected:"floqCast mark artwork visible on Search; live duration starts only after WebRTC connected; Repair does not revive ended rows.",
+      troubleshoot:"Blank mark → confirm SVG has no 0x97 and ?v=s3.1.87. Tile hidden → Master Admin + Enable Feature/Beta=1. Live ends early with liveEndsAtMs=0 → display2 must answer; check appLogs webrtc_status / live_timer_arm_ok."
+    },
+    {
       id:"s3-1-86-search-beta-tiles-master",
       area:"Search / Beta tiles",
       feature:"Master Admin sees floqCast / VIP / FloqAi Search tiles",
       changed:"searchVisible / searchTileVisible allow Master Admin for test features (Beta pill). CSS: floqCast/VIP marks no longer height:100% (icon collapse). Package s3.1.86.",
       howToTest:"1) Sign in as Master Admin (Google). 2) Hard-refresh Search. 3) Confirm floqCast, VIP reserV, FloqAi tiles with Beta pills and visible marks (not empty black). 4) Beta tester with grants still sees granted tiles only.",
       expected:"Master Admin Search shows enabled test tiles with artwork + Beta pill.",
-      troubleshoot:"Still only ShoutOut → hard-refresh floqr-feature-services.js ?v=s3.1.86. Tile hidden → Features Mgmt Enable Feature=1 + Enable Beta=1 for that key."
+      troubleshoot:"Still only ShoutOut → hard-refresh floqr-feature-services.js ?v=s3.1.87. Tile hidden → Features Mgmt Enable Feature=1 + Enable Beta=1 for that key."
     },
     {
       id:"s3-1-85-google-signin-no-stuck-redirect",

@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.86 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.87 (stable)
+
+- s3.1.87: floqCast Search mark SVG encoding fix (invalid 0x97 broke <img>); restore live duration arm after ICE; repair no longer counts ended sessions.
 
 - s3.1.86: Master Admin Search shows test/Beta tiles (floqCast / VIP / FloqAi); mark CSS no longer collapses icons.
 

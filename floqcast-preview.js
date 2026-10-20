@@ -2,12 +2,32 @@
 (function (global) {
   "use strict";
 
+  const ALLOWED_DURATIONS = [15, 30, 45, 60, 90];
+  const DEFAULT_LIVE_SECONDS = 90;
+  const CONNECT_ARM_DEBOUNCE_MS = 2500;
+  const CONNECT_WAIT_DIAG_MS = 30000;
+  const LIVE_HEARTBEAT_MS = 10000;
+
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
   let broadcastHandle = null;
   let checkoutPopup = null;
   let accessToken = "";
+  let liveTimerArmed = false;
+  let liveTimerArmInFlight = false;
+  let liveExpireTimer = null;
+  let liveEndsAtMs = 0;
+  let venueLiveSeconds = DEFAULT_LIVE_SECONDS;
+  let activeSessionId = "";
+  let connectArmTimer = null;
+  let connectWaitDiagTimer = null;
+  let liveHeartbeatTimer = null;
+  let lastWebrtcStatus = "";
+  let lastWebrtcMeta = {};
+  let liveDiagCorrelationId = "";
+  let liveConnectedAtMs = 0;
+  let liveArmedAtMs = 0;
 
   function byId(id) {
     return document.getElementById(id);
@@ -41,6 +61,202 @@
     } catch (_) {
       return !!localStream;
     }
+  }
+
+  function liveDiag(action, message, details = {}, level = "info") {
+    const payload = {
+      level,
+      category: "suprstar",
+      action: String(action || "live_diag"),
+      message: String(message || action || "floqCast live diagnostic"),
+      details: {
+        requestId: requestDoc?.requestId || "",
+        sessionId: activeSessionId || requestDoc?.sessionId || "",
+        locationId: requestDoc?.locationId || "",
+        status: requestDoc?.status || "",
+        webrtc: lastWebrtcStatus || "",
+        webrtcMeta: lastWebrtcMeta || {},
+        liveTimerArmed,
+        liveEndsAtMs,
+        liveConnectedAtMs,
+        liveArmedAtMs,
+        venueLiveSeconds,
+        remainMs: liveEndsAtMs ? Math.max(0, liveEndsAtMs - Date.now()) : null,
+        correlationId: liveDiagCorrelationId || "",
+        ...details
+      },
+      correlationId: liveDiagCorrelationId || "",
+      source: "floqcast-preview"
+    };
+    try {
+      if (global.FLOQRLog?.write) global.FLOQRLog.write(payload);
+    } catch (_) {}
+  }
+
+  function clearLiveHeartbeat() {
+    if (liveHeartbeatTimer) {
+      clearInterval(liveHeartbeatTimer);
+      liveHeartbeatTimer = null;
+    }
+  }
+
+  function startLiveHeartbeat(sessionId) {
+    clearLiveHeartbeat();
+    liveHeartbeatTimer = setInterval(() => {
+      if (!broadcastHandle) {
+        clearLiveHeartbeat();
+        return;
+      }
+      liveDiag("live_heartbeat", "Live session still open", {
+        sessionId: sessionId || activeSessionId || "",
+        elapsedSinceConnectMs: liveConnectedAtMs ? Date.now() - liveConnectedAtMs : null,
+        elapsedSinceArmMs: liveArmedAtMs ? Date.now() - liveArmedAtMs : null,
+        pcState: (() => {
+          try {
+            const pc = broadcastHandle?.pc;
+            return {
+              connectionState: pc?.connectionState || "",
+              iceConnectionState: pc?.iceConnectionState || "",
+              signalingState: pc?.signalingState || ""
+            };
+          } catch (_) {
+            return {};
+          }
+        })()
+      });
+    }, LIVE_HEARTBEAT_MS);
+  }
+
+  function clearConnectArmTimers() {
+    if (connectArmTimer) {
+      clearTimeout(connectArmTimer);
+      connectArmTimer = null;
+    }
+    if (connectWaitDiagTimer) {
+      clearTimeout(connectWaitDiagTimer);
+      connectWaitDiagTimer = null;
+    }
+  }
+
+  function clearLiveExpireTimer() {
+    if (liveExpireTimer) {
+      clearTimeout(liveExpireTimer);
+      liveExpireTimer = null;
+    }
+    liveEndsAtMs = 0;
+    liveTimerArmed = false;
+    liveArmedAtMs = 0;
+    clearConnectArmTimers();
+    clearLiveHeartbeat();
+  }
+
+  function scheduleLiveExpire(endsAtMs) {
+    if (liveExpireTimer) {
+      clearTimeout(liveExpireTimer);
+      liveExpireTimer = null;
+    }
+    liveEndsAtMs = Number(endsAtMs) || 0;
+    if (!liveEndsAtMs) return;
+    liveTimerArmed = true;
+    liveArmedAtMs = Date.now();
+    const remainMs = Math.max(1000, liveEndsAtMs - Date.now());
+    liveDiag("live_timer_scheduled", "Duration clock armed", {
+      endsAtMs: liveEndsAtMs,
+      remainMs,
+      durationSeconds: venueLiveSeconds
+    });
+    liveExpireTimer = setTimeout(() => {
+      liveDiag("live_timer_fire", "Duration elapsed — ending live", {
+        endsAtMs: liveEndsAtMs,
+        durationSeconds: venueLiveSeconds
+      }, "warn");
+      endLive({silent: false, reason: "duration"});
+    }, remainMs);
+  }
+
+  async function armLiveDurationClock(sessionId, {source = "connected"} = {}) {
+    if (liveTimerArmed && liveEndsAtMs > Date.now()) {
+      liveDiag("live_timer_skip_already_armed", "Clock already running", {source, endsAtMs: liveEndsAtMs});
+      return liveEndsAtMs;
+    }
+    if (liveTimerArmInFlight) return liveEndsAtMs;
+    liveTimerArmInFlight = true;
+    const durationSeconds = ALLOWED_DURATIONS.includes(venueLiveSeconds) ? venueLiveSeconds : DEFAULT_LIVE_SECONDS;
+    try {
+      liveDiag("live_timer_arm_request", "Requesting server arm", {source, durationSeconds, sessionId: sessionId || ""});
+      const armed = await callable("armFloqCastLiveDuration")({
+        requestId: requestDoc?.requestId || "",
+        sessionId: sessionId || activeSessionId || requestDoc?.sessionId || "",
+        armSource: source
+      });
+      const ends = Number(armed?.data?.liveEndsAtMs) || (Date.now() + durationSeconds * 1000);
+      venueLiveSeconds = ALLOWED_DURATIONS.includes(Number(armed?.data?.liveDurationSeconds))
+        ? Number(armed.data.liveDurationSeconds)
+        : durationSeconds;
+      scheduleLiveExpire(ends);
+      setStatus(`LIVE on the venue floqCast board for ${venueLiveSeconds}s. Keep this tab open.`);
+      liveDiag("live_timer_arm_ok", "Server armed live duration", {
+        source,
+        alreadyArmed: !!armed?.data?.alreadyArmed,
+        endsAtMs: ends,
+        durationSeconds: venueLiveSeconds
+      });
+      return ends;
+    } catch (err) {
+      scheduleLiveExpire(Date.now() + durationSeconds * 1000);
+      setStatus(`LIVE on the venue floqCast board for ${durationSeconds}s. Keep this tab open.`);
+      liveDiag("live_timer_arm_fallback", err?.message || "armFloqCastLiveDuration failed; local fallback", {
+        source,
+        durationSeconds,
+        error: err?.message || String(err || "")
+      }, "warn");
+      return liveEndsAtMs;
+    } finally {
+      liveTimerArmInFlight = false;
+    }
+  }
+
+  function peerLooksConnected(meta = {}) {
+    const connectionState = String(meta.connectionState || lastWebrtcMeta.connectionState || lastWebrtcStatus || "");
+    const ice = String(meta.iceConnectionState || lastWebrtcMeta.iceConnectionState || "");
+    if (connectionState === "connected") return true;
+    if (ice === "connected" || ice === "completed") return true;
+    return false;
+  }
+
+  function queueArmAfterStableConnect(sessionId, meta = {}) {
+    if (liveTimerArmed && liveEndsAtMs > Date.now()) return;
+    if (!peerLooksConnected(meta)) {
+      liveDiag("live_timer_arm_ignored", "Ignored non-stable WebRTC status for timer arm", {
+        webrtc: lastWebrtcStatus,
+        meta
+      }, "warn");
+      return;
+    }
+    if (!liveConnectedAtMs) liveConnectedAtMs = Date.now();
+    if (connectArmTimer) clearTimeout(connectArmTimer);
+    connectArmTimer = setTimeout(() => {
+      connectArmTimer = null;
+      if (!peerLooksConnected(lastWebrtcMeta) && lastWebrtcStatus !== "connected") {
+        liveDiag("live_timer_arm_deferred", "Skipped arm — WebRTC no longer connected", {
+          webrtc: lastWebrtcStatus,
+          meta: lastWebrtcMeta
+        }, "warn");
+        return;
+      }
+      armLiveDurationClock(sessionId, {source: "stable-ice-connected"});
+    }, CONNECT_ARM_DEBOUNCE_MS);
+  }
+
+  async function loadVenueDuration(locationId) {
+    venueLiveSeconds = DEFAULT_LIVE_SECONDS;
+    if (!locationId) return venueLiveSeconds;
+    try {
+      const snap = await firebase.firestore().collection("clubLocations").doc(locationId).get();
+      const raw = Number(snap.exists ? snap.data()?.suprstarLiveDurationSeconds : DEFAULT_LIVE_SECONDS);
+      venueLiveSeconds = ALLOWED_DURATIONS.includes(raw) ? raw : DEFAULT_LIVE_SECONDS;
+    } catch (_) {}
+    return venueLiveSeconds;
   }
 
   /** One CTA that advances: camera → pay → wait → go live → end. */
@@ -282,50 +498,128 @@
 
   async function goLive() {
     if (!requestDoc?.requestId) return;
-    if (String(requestDoc.status) !== "approved" || requestDoc.paymentStatus !== "paid") {
+    if (broadcastHandle) return;
+    const status = String(requestDoc.status || "");
+    if (requestDoc.paymentStatus !== "paid") {
       setStatus("Payment and Club Admin approval are required first.");
       return;
     }
+    if (!["approved", "live"].includes(status)) {
+      setStatus("Payment and Club Admin approval are required first.");
+      return;
+    }
+    let startedSessionId = "";
     try {
       if (!localStream) await startCamera();
+      await loadVenueDuration(requestDoc.locationId);
       setStatus("Starting live session…");
-      const start = await callable("startFloqCastLive")({requestId: requestDoc.requestId});
+      const start = await callable("startFloqCastLive")({
+        requestId: requestDoc.requestId,
+        liveDurationSeconds: venueLiveSeconds
+      });
       const sessionId = start?.data?.sessionId;
       if (!sessionId) throw new Error("No sessionId returned.");
+      startedSessionId = sessionId;
+      activeSessionId = sessionId;
+      if (requestDoc) requestDoc.sessionId = sessionId;
+      venueLiveSeconds = ALLOWED_DURATIONS.includes(Number(start?.data?.liveDurationSeconds))
+        ? Number(start.data.liveDurationSeconds)
+        : venueLiveSeconds;
+      // Do not arm the duration clock yet — wait until WebRTC ICE is stably connected.
+      liveEndsAtMs = 0;
+      liveTimerArmed = false;
+      liveConnectedAtMs = 0;
+      liveArmedAtMs = 0;
+      liveDiagCorrelationId = global.FLOQRLog?.correlationId?.("fclive") || `fclive_${Date.now().toString(36)}`;
+      liveDiag("live_start_ok", "startFloqCastLive returned", {
+        sessionId,
+        durationSeconds: venueLiveSeconds,
+        serverEndsAtMs: Number(start?.data?.liveEndsAtMs) || 0,
+        resumed: !!start?.data?.resumed
+      });
+
       broadcastHandle = await global.FLOQRFloqCastRtc.startBroadcast({
         sessionId,
         stream: localStream,
-        onStatus(s) {
-          setStatus(`WebRTC: ${s}`);
+        onStatus(s, meta = {}) {
+          lastWebrtcStatus = String(s || "");
+          lastWebrtcMeta = meta && typeof meta === "object" ? meta : {};
+          setStatus(`LIVE · WebRTC: ${s}`);
+          liveDiag("webrtc_status", `WebRTC status → ${s}`, {sessionId, meta: lastWebrtcMeta});
+          if (s === "connected" || s === "ice-connected" || s === "ice-completed") {
+            queueArmAfterStableConnect(sessionId, lastWebrtcMeta);
+            if (!liveHeartbeatTimer) startLiveHeartbeat(sessionId);
+          } else if (s === "failed" || s === "disconnected" || s === "closed") {
+            liveDiag("webrtc_unstable", `WebRTC ${s} while live`, {
+              sessionId,
+              meta: lastWebrtcMeta,
+              liveTimerArmed,
+              remainMs: liveEndsAtMs ? Math.max(0, liveEndsAtMs - Date.now()) : null
+            }, "warn");
+          }
         }
       });
-      setStatus("Live on the venue floqCast board. Keep this tab open.");
+      setStatus("LIVE — waiting for the venue floqCast board to connect (timer starts then)…");
       updateButtons();
+      if (connectWaitDiagTimer) clearTimeout(connectWaitDiagTimer);
+      connectWaitDiagTimer = setTimeout(() => {
+        connectWaitDiagTimer = null;
+        if (broadcastHandle && !liveTimerArmed) {
+          liveDiag("webrtc_connect_wait_timeout", "Board has not ICE-connected yet; duration clock still waiting", {
+            sessionId,
+            waitMs: CONNECT_WAIT_DIAG_MS,
+            webrtc: lastWebrtcStatus,
+            meta: lastWebrtcMeta
+          }, "warn");
+          setStatus("LIVE — still waiting for the venue board link. Timer has not started yet. Confirm display2.html?location= is open on the floqCast LED.");
+        }
+      }, CONNECT_WAIT_DIAG_MS);
     } catch (err) {
+      // Never tear down a session that already started — overlapping go-live used to endLive() here.
+      if (broadcastHandle || (startedSessionId && String(requestDoc?.status || "") === "live")) {
+        setStatus(err?.message || "Live already starting — keep this tab open.");
+        return;
+      }
       setStatus(err?.message || "Go live failed.");
-      await endLive({silent: true});
     }
   }
 
-  async function endLive({silent = false} = {}) {
+  async function endLive({silent = false, reason = ""} = {}) {
+    clearConnectArmTimers();
+    clearLiveHeartbeat();
+    liveDiag("live_end", `Ending live (${reason || "manual"})`, {
+      reason: reason || "manual",
+      remainMs: liveEndsAtMs ? Math.max(0, liveEndsAtMs - Date.now()) : null,
+      livedMs: liveConnectedAtMs ? Date.now() - liveConnectedAtMs : null
+    }, reason === "duration" ? "info" : "warn");
+    clearLiveExpireTimer();
+    liveConnectedAtMs = 0;
+    const endingSessionId = activeSessionId || requestDoc?.sessionId || "";
     try {
       if (broadcastHandle) {
-        broadcastHandle.stop();
+        broadcastHandle.stop({stopTracks: false});
         broadcastHandle = null;
       }
       if (requestDoc?.requestId) {
         await callable("endFloqCastLive")({
           requestId: requestDoc.requestId,
-          sessionId: requestDoc.sessionId || "",
+          sessionId: endingSessionId,
           locationId: requestDoc.locationId,
           displayBoard: "secondary"
         });
       }
     } catch (err) {
       if (!silent) setStatus(err?.message || "End live failed.");
+      liveDiag("live_end_error", err?.message || "endFloqCastLive failed", {
+        reason: reason || "manual",
+        error: err?.message || String(err || "")
+      }, "error");
     }
+    activeSessionId = "";
     updateButtons();
-    if (!silent) setStatus("Live ended.");
+    if (!silent) {
+      setStatus(reason === "duration" ? "Live ended — time limit reached." : "Live ended.");
+    }
   }
 
   function watchRequest(uid) {
