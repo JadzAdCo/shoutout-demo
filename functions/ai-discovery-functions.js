@@ -67,8 +67,26 @@ const DEFAULT_ALLOWED_CATEGORIES = [
   "comedyShow",
   "ticketResaleEvent",
   "latinMusic",
-  "arabicMusic"
+  "arabicMusic",
+  "daytimeEvent",
+  "fleaMarket",
+  "farmersMarket",
+  "communityMarket",
+  "daytimeFestival",
+  "fallFestival"
 ];
+
+function isDaytimeEventType(value = "") {
+  return /daytime|flea|farmers?\s*market|community\s*market|fall\s*festival|day\s*festival|street\s*fair|outdoor\s*market|harvest/i.test(String(value || ""));
+}
+
+function proposedTypeFromJobEventType(eventType = "") {
+  const text = String(eventType || "");
+  if (isDaytimeEventType(text)) return "daytimeEvent";
+  if (/comedy/i.test(text)) return "comedyShow";
+  if (/concert|event|festival|market|dj|promoter|party/i.test(text)) return "event";
+  return "club";
+}
 
 const DEFAULT_DISCOVERY_MARKETS = [
   {country:"Portugal", languages:["Portuguese"], cities:["Lisbon", "Porto"]},
@@ -347,19 +365,26 @@ function cityCountryFromText(sourceUrl = "", text = "", location = {}) {
 
 function missingDatapoints(record = {}) {
   const missing = [];
+  const daytime = isDaytimeEventType(record.proposedType || "")
+    || isDaytimeEventType((record.categories || []).join(" "))
+    || isDaytimeEventType(record.proposedTitle || "");
   if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
   if (!(record.genres || []).length) missing.push("Genre");
-  const artists = record.artistsOrDjs || record.artists || record.djs;
-  if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
+  if (!daytime) {
+    const artists = record.artistsOrDjs || record.artists || record.djs;
+    if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
+  }
   const promoters = record.promoters || record.promotionGroup;
-  if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) missing.push("Promoter(s)");
+  if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) {
+    missing.push(daytime ? "Organizer(s) / Promoter(s)" : "Promoter(s)");
+  }
   if (!record.proposedAddress) missing.push("Address");
   if (!record.city) missing.push("City");
   if (!record.country) missing.push("Country");
   if (!(record.telephone || record.phone)) missing.push("Phone");
   if (!record.email) missing.push("Email");
   if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
-  if (/comedy/i.test(record.proposedType || "")) {
+  if (/comedy/i.test(record.proposedType || "") || daytime) {
     if (!record.proposedDate) missing.push("Date");
     if (!record.proposedTime) missing.push("Time");
   }
@@ -436,7 +461,13 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
   const address = addressFromJsonLd(location) || extractAddress(visibleText);
   const phone = location.telephone || event?.organizer?.telephone || extractPhone(visibleText);
   const dateText = event?.startDate || visibleText;
-  const proposedType = /comedy|stand.?up/i.test(`${title} ${description} ${visibleText}`) ? "comedyShow" : "event";
+  const hay = `${title} ${description} ${visibleText}`;
+  const proposedType = /comedy|stand.?up/i.test(hay)
+    ? "comedyShow"
+    : isDaytimeEventType(hay)
+      ? "daytimeEvent"
+      : "event";
+  const daytime = proposedType === "daytimeEvent";
   const record = {
     proposedType,
     proposedTitle:title,
@@ -458,9 +489,17 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
     sourceUrl,
     sourceName:sourceNameForUrl(sourceUrl),
     extractedImages:[...(Array.isArray(event?.image) ? event.image : event?.image ? [event.image] : [])],
-    extractedTags:[proposedType, "public-source-extracted", "ticketing"],
-    categories:[proposedType === "comedyShow" ? "comedy show" : "event", "public-source-extracted", "ticketing"],
-    genres:proposedType === "comedyShow" ? ["Comedy", "Live Entertainment"] : ["Live Entertainment"],
+    extractedTags:[proposedType, "public-source-extracted", daytime ? "daytime" : "ticketing"],
+    categories:[
+      proposedType === "comedyShow" ? "comedy show" : (daytime ? "daytime event" : "event"),
+      "public-source-extracted",
+      daytime ? "daytime" : "ticketing"
+    ],
+    genres: proposedType === "comedyShow"
+      ? ["Comedy", "Live Entertainment"]
+      : (daytime
+        ? (/flea|market/i.test(hay) ? ["Market", "Community"] : ["Festival", "Community"])
+        : ["Live Entertainment"]),
     searchQuery:title,
     aiSummary:"Extracted from public source page metadata/JSON-LD. Master Admin must verify before approval.",
     aiConfidenceScore:event ? 0.9 : 0.76,
@@ -721,10 +760,13 @@ async function searchGooglePlaces(job, apiKey) {
   for (const place of places) {
     const hoursStructured = venueDatapoints.hoursStructuredFromPlaces(place.regularOpeningHours || {});
     const editorial = place.editorialSummary?.text || "";
+    const jobType = String(job.eventType || "");
+    const daytimeJob = isDaytimeEventType(jobType);
+    const proposedType = proposedTypeFromJobEventType(jobType);
     let baseRecord = {
-      proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
-      proposedTitle:place.displayName?.text || "Discovered nightlife venue",
-      proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+      proposedType,
+      proposedTitle:place.displayName?.text || (daytimeJob ? "Discovered daytime event" : "Discovered nightlife venue"),
+      proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || (daytimeJob ? "daytime community event" : "nightlife")} in ${job.city || job.country || "the target market"}.`,
       proposedLocationName:place.displayName?.text || "",
       proposedAddress:place.formattedAddress || "",
       city:job.city || "",
@@ -748,11 +790,13 @@ async function searchGooglePlaces(job, apiKey) {
       placesUserRatingCount: place.userRatingCount || null,
       businessStatus: place.businessStatus || "",
       sourceConfirmations:{googlePlaces:true, ticketmaster:"later", publicPage:false, eventbrite:false},
-      categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
-      genres:job.genre ? [job.genre] : [],
+      categories:[job.eventType || place.primaryType || (daytimeJob ? "daytime event" : "nightclub"), ...(place.types || []).slice(0, 8)],
+      genres:job.genre ? [job.genre] : (daytimeJob ? ["Community"] : []),
       searchQuery:job.query || "",
       searchLanguage:job.language || "",
-      aiSummary:"Localized venue discovery candidate with Places hours/summary when available. Complete DJ/artist, promoter, email, and Instagram before approval.",
+      aiSummary: daytimeJob
+        ? "Localized daytime event / market candidate from Places. Complete organizer, date/time, email, and Instagram before approval."
+        : "Localized venue discovery candidate with Places hours/summary when available. Complete DJ/artist, promoter, email, and Instagram before approval.",
       aiConfidenceScore:0.86,
       aiStarRating:4,
       aiRatingReasons:["Google Places structured record", "Localized market-language query", hoursStructured ? "Opening hours captured" : "Master Admin review required"],

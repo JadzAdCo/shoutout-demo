@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.97";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.98";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -52,12 +52,34 @@
     "DJ event",
     "promoter event",
     "comedy show",
-    "ticket resale event"
+    "ticket resale event",
+    // Daytime / community (flea markets, fall festivals, farmers markets, etc.)
+    "daytime event",
+    "flea market",
+    "farmers market",
+    "community market",
+    "daytime festival",
+    "fall festival"
+  ];
+
+  const DAYTIME_EVENT_TYPES = [
+    "daytime event",
+    "flea market",
+    "farmers market",
+    "community market",
+    "daytime festival",
+    "fall festival",
+    "day festival",
+    "street fair",
+    "outdoor market"
   ];
 
   const DEFAULT_GENRES = [
     "Nightlife",
     "Live Entertainment",
+    "Community",
+    "Festival",
+    "Market",
     "Hip Hop",
     "Afro Beats",
     "Amapiano",
@@ -116,7 +138,13 @@
     {city:"Amsterdam", country:"Netherlands", region:"North Holland", language:"Dutch, English"},
     {city:"Berlin", country:"Germany", region:"Berlin", language:"German"},
     {city:"Milan", aliases:["Milano"], country:"Italy", region:"Lombardy", language:"Italian"},
-    {city:"Rome", country:"Italy", region:"Lazio", language:"Italian"}
+    {city:"Rome", country:"Italy", region:"Lazio", language:"Italian"},
+    {city:"Washington", aliases:["Washington DC", "Washington, DC", "DC", "District of Columbia"], country:"United States", region:"District of Columbia", language:"English"},
+    {city:"New York", aliases:["NYC", "New York City"], country:"United States", region:"New York", language:"English"},
+    {city:"Los Angeles", aliases:["LA", "L.A."], country:"United States", region:"California", language:"English"},
+    {city:"Miami", country:"United States", region:"Florida", language:"English"},
+    {city:"Atlanta", country:"United States", region:"Georgia", language:"English"},
+    {city:"Chicago", country:"United States", region:"Illinois", language:"English"}
   ];
 
   const COUNTRY_LANGUAGES = {
@@ -129,6 +157,7 @@
     thailand:"Thai, English",
     china:"Chinese, English",
     "united kingdom":"English",
+    "united states":"English",
     netherlands:"Dutch, English",
     germany:"German",
     italy:"Italian",
@@ -190,6 +219,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.98",
+      title: "AI crawl daytime events (flea / festival / market)",
+      checks: [
+        {label:"Daytime event types in diagnostics crawler", file:"ai-diagnostics-service.js", includes:["DAYTIME_EVENT_TYPES", "flea market", "fall festival", "isDaytimeEventType", "daytimeEvent"]},
+        {label:"Master Admin daytime multi-select", file:"master-admin.html", includes:["flea market", "fall festival", "daytime event", "farmers market"]},
+        {label:"Functions daytime proposedType", file:"functions/ai-discovery-functions.js", includes:["daytimeEvent", "isDaytimeEventType", "proposedTypeFromJobEventType"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.98\""]}
+      ]
+    },
     {
       version: "s3.1.97",
       title: "floqCast absolute preview URL + freeze reconnect hold",
@@ -1812,6 +1851,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-98-ai-crawl-daytime-events",
+      area:"Master Admin / AI Crawling",
+      feature:"Daytime events (flea / fall festival / farmers market) in crawl scope",
+      changed:"Added daytime event types + Community/Festival/Market genres; Washington DC market; daytime approval checklist (organizer + date/time, no DJ). Package s3.1.98. Save schedule so aiCrawlerSchedules/default includes the new types.",
+      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.98). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected (or select them). 3) Add Washington to cities / United States. 4) Preview Search Plan — jobs should include flea market / fall festival queries. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Review Discovery Queue for daytime candidates (e.g. Parks DC flea/fall).",
+      expected:"Search plan lists daytime jobs; crawl can surface daytime market/festival candidates; review cards do not require DJ for daytime.",
+      troubleshoot:"Still nightlife-only → Save schedule again (live doc may still be old hip-hop-France plan). No Places hits → confirm GOOGLE_PLACES_API_KEY; broaden query. Flea page never appears → paste theparksdc.com/event/fall_festival/ into Source Detail Extraction as a one-off."
+    },
+    {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",
       area:"floqCast / Search + Display 2",
       feature:"Aurelia select opens preview (not blank); freeze does not thrash reconnect",
@@ -3041,7 +3089,10 @@
       ["Latin", ["latin", "latin music"]],
       ["Arabic Music", ["arabic music", "arabic", "arab"]],
       ["R&B", ["r and b", "r&b", "rnb"]],
-      ["Reggaeton", ["reggaeton"]]
+      ["Reggaeton", ["reggaeton"]],
+      ["Community", ["community", "family", "neighborhood"]],
+      ["Festival", ["festival", "festivals", "fair", "street fair"]],
+      ["Market", ["market", "markets", "flea", "farmers market", "vintage market"]]
     ];
     const found = aliases.filter(([, terms]) => terms.some(term => includesWord(text, term))).map(([genre]) => genre);
     return uniqueByNormalized(found.length ? found : DEFAULT_GENRES.filter(genre => includesWord(text, genre)));
@@ -3061,7 +3112,13 @@
       ["DJ event", ["dj", "djs", "dj event", "dj events"]],
       ["promoter event", ["promoter", "promoter event", "promoter events"]],
       ["comedy show", ["comedy", "comedy show", "comedy shows"]],
-      ["ticket resale event", ["ticket", "tickets", "resale", "ticket resale"]]
+      ["ticket resale event", ["ticket", "tickets", "resale", "ticket resale"]],
+      ["flea market", ["flea market", "flea markets", "flea + fall", "flea and fall", "flea fall"]],
+      ["farmers market", ["farmers market", "farmer's market", "farmers markets"]],
+      ["community market", ["community market", "community markets", "street market"]],
+      ["fall festival", ["fall festival", "autumn festival", "harvest festival"]],
+      ["daytime festival", ["daytime festival", "day festival", "outdoor festival", "street fair"]],
+      ["daytime event", ["daytime event", "daytime events", "daytime", "day time event", "family festival"]]
     ];
     const found = aliases.filter(([, terms]) => terms.some(term => includesWord(text, term))).map(([type]) => type);
     const cleaned = found.filter(type => !(type === "ticket resale event" && found.some(other => other !== "ticket resale event")));
@@ -3076,8 +3133,20 @@
     ]);
   }
 
+  function isDaytimeEventType(eventType = "") {
+    const type = normalized(eventType);
+    if (!type) return false;
+    if (DAYTIME_EVENT_TYPES.some(day => normalized(day) === type || type.includes(normalized(day)))) return true;
+    return /flea|farmers?\s*market|community\s*market|daytime|fall\s*festival|day\s*festival|street\s*fair|outdoor\s*market|harvest/.test(type);
+  }
+
   function defaultGenreForEventType(eventType = "") {
     const type = normalized(eventType);
+    if (isDaytimeEventType(type)) {
+      if (/flea|farmers|market/.test(type)) return "Market";
+      if (/festival|fair/.test(type)) return "Festival";
+      return "Community";
+    }
     if (type.includes("comedy")) return "Live Entertainment";
     if (type.includes("ticket")) return "Live Entertainment";
     if (type.includes("dj")) return "DJ";
@@ -3105,6 +3174,16 @@
   }
 
   function crawlQueryForJob({eventType = "", genre = "", city = "", country = ""} = {}) {
+    if (isDaytimeEventType(eventType)) {
+      // Daytime community events: search for the market/festival itself, not nightlife tickets.
+      return searchPhraseFromParts([
+        eventType === "daytime event" ? "daytime festival flea market" : eventType,
+        genreShouldAppearInQuery(genre) ? genre : "",
+        city,
+        country && normalized(country) !== normalized(city) ? country : "",
+        "this weekend"
+      ]);
+    }
     const needsTickets = /comedy|ticket|event|dj|promoter|party/i.test(eventType);
     return searchPhraseFromParts([
       eventType,
@@ -3202,6 +3281,10 @@
   }
 
   function requiredDatapointLabels(type = "") {
+    // Daytime flea/festival: organizers matter; DJs usually do not. Date/time required.
+    if (isDaytimeEventType(type)) {
+      return ["name", "genres", "promoters", "address", "city", "country", "telephone", "email", "instagram", "date", "time"];
+    }
     const base = ["name", "genres", "artistsOrDjs", "promoters", "address", "city", "country", "telephone", "email", "instagram"];
     if (isComedyEventType(type)) return [...base, "date", "time"];
     return base;
@@ -3401,11 +3484,14 @@
       date: !!record.proposedDate,
       time: !!record.proposedTime
     };
+    const daytime = isDaytimeEventType(record.proposedType || "")
+      || isDaytimeEventType((record.categories || []).join(" "))
+      || isDaytimeEventType(record.proposedTitle || "");
     return required.filter(key => !has[key]).map(key => ({
       name:"Name",
       genres:"Genre",
       artistsOrDjs:"DJ(s)/Artist(s)",
-      promoters:"Promoter(s)",
+      promoters: daytime ? "Organizer(s) / Promoter(s)" : "Promoter(s)",
       address:"Address",
       city:"City",
       country:"Country",
@@ -5399,10 +5485,10 @@
 
   function hydrateDefaultControls() {
     if (byId("crawlNaturalLanguageInput") && !byId("crawlNaturalLanguageInput").value) {
-      byId("crawlNaturalLanguageInput").value = "Search for all clubs playing hip hop and EDM in Paris, Marseille, Monaco, St. Tropez, France. Include official website, address, phone, email, social handles, and ticket links.";
+      byId("crawlNaturalLanguageInput").value = "Search for nightlife clubs (hip hop, EDM) and daytime events (flea markets, fall festivals, farmers markets, community markets) in Washington DC, Paris, Marseille, Monaco, and Saint-Tropez. Include official website, address, phone, email, social handles, and ticket or event links.";
     }
     if (byId("crawlSearchCriteria") && !byId("crawlSearchCriteria").value) {
-      byId("crawlSearchCriteria").value = "nightlife tickets, comedy shows, rooftop lounges, rooftop bars, DJ events, beach clubs, brunch parties, pool parties, summer parties";
+      byId("crawlSearchCriteria").value = "nightlife tickets, comedy shows, rooftop lounges, daytime flea markets, fall festivals, farmers markets, community markets, DJ events, beach clubs, brunch parties, pool parties";
     }
     if (byId("crawlGenreCriteria") && !byId("crawlGenreCriteria").value) {
       byId("crawlGenreCriteria").value = DEFAULT_GENRES.join(", ");
@@ -5411,13 +5497,13 @@
       byId("crawlLanguageCriteria").value = "local language, English, Spanish, French, German, Italian, Dutch, Portuguese, Arabic, Turkish, Chinese, Thai";
     }
     if (byId("crawlCityCriteria") && !byId("crawlCityCriteria").value) {
-      byId("crawlCityCriteria").value = "Dubai, Istanbul, Singapore, Bangkok, Phuket, Shanghai, Barcelona, Paris, London, Amsterdam, Berlin, Milan";
+      byId("crawlCityCriteria").value = "Washington, Dubai, Istanbul, Singapore, Bangkok, Phuket, Shanghai, Barcelona, Paris, London, Amsterdam, Berlin, Milan";
     }
     if (byId("crawlRegionCriteria") && !byId("crawlRegionCriteria").value) {
       byId("crawlRegionCriteria").value = "Western Europe, Middle East, Southeast Asia, East Asia";
     }
     if (byId("crawlCountryCriteria") && !byId("crawlCountryCriteria").value) {
-      byId("crawlCountryCriteria").value = "Portugal, Spain, France, Belgium, Netherlands, Luxembourg, Germany, Switzerland, Austria, Italy, Ireland, United Kingdom, Denmark, Norway, Sweden, Finland, Iceland, United Arab Emirates, Turkey, Singapore, Thailand, China";
+      byId("crawlCountryCriteria").value = "United States, Portugal, Spain, France, Belgium, Netherlands, Luxembourg, Germany, Switzerland, Austria, Italy, Ireland, United Kingdom, Denmark, Norway, Sweden, Finland, Iceland, United Arab Emirates, Turkey, Singapore, Thailand, China";
     }
     if (byId("crawlEventTypeCriteria") && !byId("crawlEventTypeCriteria").value) {
       byId("crawlEventTypeCriteria").value = DEFAULT_EVENT_TYPES.join(", ");
@@ -5548,7 +5634,7 @@
       ["Record types", joinList(plan.eventTypes)],
       ["Languages", joinList(plan.languages) || "Market default"],
       ["Language strategy", plan.languageStrategy === "nativePlusEnglish" ? "Native market language + English" : plan.languageStrategy === "nativeOnly" ? "Native market language only" : "Selected languages only"],
-      ["Required result fields", "Name/title, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, physical address"]
+      ["Required result fields", "Name/title, genre, DJ(s)/artist(s) or Organizer(s) for daytime, promoter(s), phone, email, Instagram, physical address (+ date/time for comedy & daytime)"]
     ];
     const jobsHtml = plan.jobs.length ? plan.jobs.slice(0, 24).map((job, index) => `<div class="queue-item">
       <div class="message-envelope-head">
@@ -5731,6 +5817,7 @@
 
   function eventTypeToProposedType(eventType = "") {
     const text = normalized(eventType);
+    if (isDaytimeEventType(text)) return "daytimeEvent";
     if (text.includes("comedy")) return "comedyShow";
     if (text.includes("pool party")) return "poolParty";
     if (text.includes("day club") || text.includes("day party")) return "dayClub";
@@ -5768,16 +5855,18 @@
     const query = override.query || crawlQueryForJob({eventType, genre, city, country});
     const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, country, genre, eventType});
     const requiredDatapoints = requiredDatapointLabels(eventType);
-    const defaultMissing = [
-      "Genre",
-      "DJ(s)/Artist(s)",
-      "Promoter(s)",
-      "Phone",
-      "Email",
-      "Instagram",
-      "Address",
-      ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
-    ];
+    const defaultMissing = isDaytimeEventType(eventType)
+      ? ["Genre", "Organizer(s) / Promoter(s)", "Phone", "Email", "Instagram", "Address", "Date", "Time"]
+      : [
+        "Genre",
+        "DJ(s)/Artist(s)",
+        "Promoter(s)",
+        "Phone",
+        "Email",
+        "Instagram",
+        "Address",
+        ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
+      ];
     const record = {
       proposedType,
       proposedTitle: title,

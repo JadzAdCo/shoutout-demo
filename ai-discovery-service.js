@@ -4,10 +4,10 @@
   "use strict";
 
   const DEFAULT_SOURCES = [
-    {sourceName:"Ticketmaster Discovery API", sourceType:"api", sourceUrl:"https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/", enabled:true, crawlFrequency:"every4Hours", allowedCategories:["event","concert","comedyShow","nightclub"]},
-    {sourceName:"Eventbrite API", sourceType:"api", sourceUrl:"https://www.eventbrite.com/platform/api", enabled:true, crawlFrequency:"every4Hours", allowedCategories:["event","brunchParty","poolParty","comedyShow"]},
+    {sourceName:"Ticketmaster Discovery API", sourceType:"api", sourceUrl:"https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/", enabled:true, crawlFrequency:"every4Hours", allowedCategories:["event","concert","comedyShow","nightclub","daytimeEvent","fleaMarket","festival"]},
+    {sourceName:"Eventbrite API", sourceType:"api", sourceUrl:"https://www.eventbrite.com/platform/api", enabled:true, crawlFrequency:"every4Hours", allowedCategories:["event","brunchParty","poolParty","comedyShow","daytimeEvent","fleaMarket","farmersMarket","festival"]},
     {sourceName:"Ticket resale partners", sourceType:"api", sourceUrl:"partner-config-required", enabled:false, crawlFrequency:"every4Hours", allowedCategories:["event","ticketResaleEvent"]},
-    {sourceName:"Official venue websites and feeds", sourceType:"website", sourceUrl:"manual-source-list", enabled:true, crawlFrequency:"every6Hours", allowedCategories:["nightclub","beachClub","lounge","event","summerParty","comedyShow"]}
+    {sourceName:"Official venue websites and feeds", sourceType:"website", sourceUrl:"manual-source-list", enabled:true, crawlFrequency:"every6Hours", allowedCategories:["nightclub","beachClub","lounge","event","summerParty","comedyShow","daytimeEvent","fleaMarket","festival","communityMarket"]}
   ];
 
   const DEFAULT_CRITERIA = {
@@ -107,6 +107,11 @@
     return /comedy/i.test(`${item.proposedType || ""} ${item.proposedTitle || ""} ${item.categories || ""}`);
   }
 
+  function isDaytimeRecord(item = {}) {
+    const hay = `${item.proposedType || ""} ${item.proposedTitle || ""} ${(item.categories || []).join(" ")} ${(item.genres || []).join(" ")}`;
+    return /daytime|flea|farmers?\s*market|community\s*market|fall\s*festival|day\s*festival|street\s*fair|outdoor\s*market|harvest/i.test(hay);
+  }
+
   function recordKind(item = {}) {
     const text = String(item.proposedType || "").replace(/([a-z])([A-Z])/g, "$1 $2").trim();
     if (/rooftop/i.test(text) && /bar/i.test(text)) return "Rooftop Bar";
@@ -115,6 +120,12 @@
     if (/lounge/i.test(text)) return "Lounge";
     if (/club/i.test(text)) return "Club";
     if (isComedyRecord(item)) return "Comedy Show";
+    if (isDaytimeRecord(item)) {
+      if (/flea/i.test(text + (item.proposedTitle || ""))) return "Flea Market";
+      if (/farmers/i.test(text + (item.proposedTitle || ""))) return "Farmers Market";
+      if (/festival/i.test(text + (item.proposedTitle || ""))) return "Daytime Festival";
+      return "Daytime Event";
+    }
     return "Event";
   }
 
@@ -155,6 +166,22 @@
 
   function requiredDatapoints(item = {}) {
     const genres = Array.isArray(item.genres) ? item.genres : splitCSV(item.genres);
+    if (isDaytimeRecord(item)) {
+      // Daytime flea/festival: organizers + schedule; DJs usually N/A.
+      return [
+        ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
+        ["genres", "Genre", hasAny(genres)],
+        ["promoters", "Organizer(s) / Promoter(s)", hasPromoters(item)],
+        ["address", "Address", hasAny(item.proposedAddress || item.address)],
+        ["city", "City", hasAny(item.city)],
+        ["country", "Country", hasAny(item.country)],
+        ["phone", "Phone", hasAny(item.telephone || item.phone)],
+        ["email", "Email", hasAny(item.email)],
+        ["instagram", "Instagram", hasInstagram(item)],
+        ["date", "Date", hasAny(item.proposedDate)],
+        ["time", "Time", hasAny(item.proposedTime)]
+      ];
+    }
     const base = [
       ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
       ["genres", "Genre", hasAny(genres)],

@@ -26,7 +26,7 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 | Runs / day | 6 (live `aiCrawlerSchedules/default`) |
 | Slots | `00:00`, `04:00`, `08:00`, `12:00`, `16:00`, `20:00` |
 | Time zone | `UTC` on live schedule doc (design default was `America/New_York`) |
-| Focus | Spain + Germany · Hip Hop · concert / nightclub / club / lounge |
+| Focus | Nightlife (clubs / lounges / DJ) **and daytime** (flea markets, fall festivals, farmers / community markets) · Hip Hop + Community / Festival / Market · cities include Washington DC when selected |
 | Language | Native market + English |
 
 Backend: `scheduledAiDiscoveryCrawl` every **15 minutes UTC**; runs when local time is within 15 minutes of a saved slot; claims `aiCrawlRuns/{scheduleId}_{slot}`. Saved in `aiCrawlerSchedules/default`.
@@ -59,7 +59,11 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 
 ## Approval datapoints (impactful)
 
-Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy). Incomplete → cannot Approve; use **Needs research** (`status: needsResearch`).
+**Nightlife / ticketed:** Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy).
+
+**Daytime** (`daytimeEvent` / flea / farmers / community market / fall or daytime festival): Name, Genre, Organizer(s)/Promoter(s), Address, City, Country, Phone, Email, Instagram, **Date**, **Time**. DJ(s) not required.
+
+Incomplete → cannot Approve; use **Needs research** (`status: needsResearch`).
 
 ## Security
 
@@ -99,9 +103,9 @@ Review Discovery Queue shows dynamic **country tabs** (All + each country presen
 
 ## Onboard readiness blockers (engine gaps)
 
-Approve / mass onboard require: Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy).
+Approve / mass onboard require nightlife checklist above, or the daytime checklist (no DJ; Date/Time required).
 
-Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages.
+Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages. Daytime markets need **organizer** + schedule from the event page.
 
 **Next crawl improvements (priority):**
 

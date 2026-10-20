@@ -60,6 +60,28 @@ test("master-admin refined discovery search UI copy", () => {
   assert.match(html, /pool party/);
   assert.match(html, /day club/);
   assert.match(html, /rooftop lounge/);
+  assert.match(html, /flea market/);
+  assert.match(html, /fall festival/);
+  assert.match(html, /daytime event/);
+  assert.match(html, /farmers market/);
+});
+
+test("crawler includes daytime event types and relaxes DJ requirement", () => {
+  const diagnostics = read("ai-diagnostics-service.js");
+  const discovery = read("ai-discovery-service.js");
+  const fn = read("functions/ai-discovery-functions.js");
+  assert.match(diagnostics, /DAYTIME_EVENT_TYPES/);
+  assert.match(diagnostics, /flea market/);
+  assert.match(diagnostics, /fall festival/);
+  assert.match(diagnostics, /isDaytimeEventType/);
+  assert.match(diagnostics, /daytimeEvent/);
+  assert.match(diagnostics, /Washington/);
+  assert.match(discovery, /isDaytimeRecord/);
+  assert.match(discovery, /Organizer\(s\) \/ Promoter\(s\)/);
+  assert.match(fn, /daytimeEvent/);
+  assert.match(fn, /isDaytimeEventType/);
+  assert.match(fn, /proposedTypeFromJobEventType/);
+  assert.match(fn, /Organizer\(s\) \/ Promoter\(s\)/);
 });
 
 test("runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud without placeholders", () => {
