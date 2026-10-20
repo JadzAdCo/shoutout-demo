@@ -5,10 +5,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.99"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.99"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.99"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.1.99"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.100"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.100"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.100"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.1.100"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
@@ -632,7 +632,7 @@
           <div class="profile-grid">
             <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
             <label>Street address<input id="clubOnboardStreetAddress" autocomplete="address-line1" placeholder="1411 K St NW" required/></label>
-            <label>City<input id="clubOnboardCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>City<input id="clubOnboardCity" autocomplete="address-level2" placeholder="Washington, DC" required/></label>
             <label>State / region<input id="clubOnboardRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
             <label>Postal code<input id="clubOnboardPostalCode" autocomplete="postal-code" placeholder="20005"/></label>
             <label>Country<input id="clubOnboardCountry" autocomplete="country-name" value="United States" required/></label>
@@ -1418,7 +1418,7 @@
                 <option value="notReady">Not ready (show missing)</option>
               </select>
             </label>
-            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington, Miami"/></label>
+            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington DC, Seattle, Miami"/></label>
           </div>
           <div class="queue-actions">
             <button id="aiDiscoveryRefreshBtn" type="button">Refresh Discovery Queue</button>
@@ -1451,9 +1451,10 @@
             <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option selected>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
             <label>Music / activity genres<select id="crawlGenreCriteria" multiple size="8"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option><option selected>Community</option><option selected>Festival</option><option selected>Market</option></select></label>
             <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="12"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="pool party">Pool Parties</option><option value="day club">Day Parties / Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option><option value="daytime event" selected>Daytime Events</option><option value="flea market" selected>Flea Markets</option><option value="farmers market" selected>Farmers Markets</option><option value="community market" selected>Community Markets</option><option value="daytime festival" selected>Daytime Festivals</option><option value="fall festival" selected>Fall Festivals</option></select></label>
-            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington"/></label>
+            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington, DC, Seattle, Washington State"/></label>
           </div>
-          <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs, flea markets, and fall festivals in Washington DC and Spain, using native-language sources plus English sources."></textarea></label>
+          <p class="sub small">US places: use <strong>Washington, DC</strong> for the capital (District of Columbia). Use <strong>Washington State</strong> or <strong>Seattle</strong> for the Pacific Northwest — bare “Washington” is treated as Washington, DC.</p>
+          <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs, flea markets, and fall festivals in Washington, DC and Spain, using native-language sources plus English sources."></textarea></label>
           <input id="crawlSearchCriteria" type="hidden" value="nightlife venues, concerts, daytime flea markets, fall festivals, farmers markets, community markets, events and official ticket sources"/>
           <input id="crawlRegionCriteria" type="hidden"/>
           <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
@@ -1795,53 +1796,53 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.1.99"></script>
-<script src="./firebase-config.js?v=s3.1.99"></script>
-<script src="./floqr-app-check.js?v=s3.1.99"></script>
-<script src="./floqr-nav.js?v=s3.1.99"></script>
-<script src="./global-profile-status.js?v=s3.1.99"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.99"></script>
-<script src="./shared-data.js?v=s3.1.99"></script>
-<script src="./feature-gates.js?v=s3.1.99"></script>
-<script src="./sos2fa.js?v=s3.1.99"></script>
-<script src="./entity-management.js?v=s3.1.99"></script>
-<script src="./ai-service.js?v=s3.1.99"></script>
-<script src="./ai-index-service.js?v=s3.1.99"></script>
-<script src="./ai-search-service.js?v=s3.1.99"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.1.99"></script>
-<script src="./ai-discovery-service.js?v=s3.1.99"></script>
-<script src="./floqr-action-feedback.js?v=s3.1.99"></script>
-<script src="./floqai-help-repository.js?v=s3.1.99"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.99"></script>
-<script src="./help-attach.js?v=s3.1.99"></script>
-<script src="./helper-popouts.js?v=s3.1.99"></script>
-<script src="./floqr-ad-pricing.js?v=s3.1.99"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.1.99"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.1.99"></script>
-<script src="./ad-campaigns.js?v=s3.1.99"></script>
-<script src="./ai-diagnostics-service.js?v=s3.1.99"></script>
-<script src="./duplicate-record-service.js?v=s3.1.99"></script>
-<script src="./floqr-logger.js?v=s3.1.99"></script>
-<script src="./payment-service.js?v=s3.1.99"></script>
-<script src="./floqr-access-notice.js?v=s3.1.99"></script>
-<script src="./master-admin-app.js?v=s3.1.99"></script>
-<script src="./master-ad-management.js?v=s3.1.99"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.1.99"></script>
-<script src="./floqr-feature-services.js?v=s3.1.99"></script>
-<script src="./floqr-reason-prompt.js?v=s3.1.99"></script>
-<script src="./master-feature-services.js?v=s3.1.99"></script>
-<script src="./master-demo-employees.js?v=s3.1.99"></script>
-<script src="./floqr-data-classification.js?v=s3.1.99"></script>
-<script src="./master-data-classification.js?v=s3.1.99"></script>
-<script src="./master-admin-shoutouts.js?v=s3.1.99"></script>
-<script src="./master-display-security.js?v=s3.1.99"></script>
-<script src="./master-diagnostics-panels.js?v=s3.1.99"></script>
-<script src="./master-services-extension.js?v=s3.1.99"></script>
-<script src="./master-logging-extension.js?v=s3.1.99"></script>
-<script src="./master-mail-logging.js?v=s3.1.99"></script>
-<script src="./master-twilio-logging.js?v=s3.1.99"></script>
-<script src="./notification-center.js?v=s3.1.99"></script>
-<script src="./profile-access-guard.js?v=s3.1.99"></script>
+<script src="./floqr-i18n.js?v=s3.1.100"></script>
+<script src="./firebase-config.js?v=s3.1.100"></script>
+<script src="./floqr-app-check.js?v=s3.1.100"></script>
+<script src="./floqr-nav.js?v=s3.1.100"></script>
+<script src="./global-profile-status.js?v=s3.1.100"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.100"></script>
+<script src="./shared-data.js?v=s3.1.100"></script>
+<script src="./feature-gates.js?v=s3.1.100"></script>
+<script src="./sos2fa.js?v=s3.1.100"></script>
+<script src="./entity-management.js?v=s3.1.100"></script>
+<script src="./ai-service.js?v=s3.1.100"></script>
+<script src="./ai-index-service.js?v=s3.1.100"></script>
+<script src="./ai-search-service.js?v=s3.1.100"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.1.100"></script>
+<script src="./ai-discovery-service.js?v=s3.1.100"></script>
+<script src="./floqr-action-feedback.js?v=s3.1.100"></script>
+<script src="./floqai-help-repository.js?v=s3.1.100"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.100"></script>
+<script src="./help-attach.js?v=s3.1.100"></script>
+<script src="./helper-popouts.js?v=s3.1.100"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.100"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.100"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.1.100"></script>
+<script src="./ad-campaigns.js?v=s3.1.100"></script>
+<script src="./ai-diagnostics-service.js?v=s3.1.100"></script>
+<script src="./duplicate-record-service.js?v=s3.1.100"></script>
+<script src="./floqr-logger.js?v=s3.1.100"></script>
+<script src="./payment-service.js?v=s3.1.100"></script>
+<script src="./floqr-access-notice.js?v=s3.1.100"></script>
+<script src="./master-admin-app.js?v=s3.1.100"></script>
+<script src="./master-ad-management.js?v=s3.1.100"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.1.100"></script>
+<script src="./floqr-feature-services.js?v=s3.1.100"></script>
+<script src="./floqr-reason-prompt.js?v=s3.1.100"></script>
+<script src="./master-feature-services.js?v=s3.1.100"></script>
+<script src="./master-demo-employees.js?v=s3.1.100"></script>
+<script src="./floqr-data-classification.js?v=s3.1.100"></script>
+<script src="./master-data-classification.js?v=s3.1.100"></script>
+<script src="./master-admin-shoutouts.js?v=s3.1.100"></script>
+<script src="./master-display-security.js?v=s3.1.100"></script>
+<script src="./master-diagnostics-panels.js?v=s3.1.100"></script>
+<script src="./master-services-extension.js?v=s3.1.100"></script>
+<script src="./master-logging-extension.js?v=s3.1.100"></script>
+<script src="./master-mail-logging.js?v=s3.1.100"></script>
+<script src="./master-twilio-logging.js?v=s3.1.100"></script>
+<script src="./notification-center.js?v=s3.1.100"></script>
+<script src="./profile-access-guard.js?v=s3.1.100"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

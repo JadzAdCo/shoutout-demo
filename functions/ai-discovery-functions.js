@@ -743,20 +743,50 @@ async function applyOnboardedUpdatePolicy(record = {}) {
   };
 }
 
-function placesLocationBiasForJob(job = {}) {
+function isWashingtonDcJob(job = {}) {
   const city = String(job.city || "");
   const region = String(job.stateRegion || "");
   const query = String(job.query || "");
-  // Bare "Washington" hits WA state — bias Instant Crawl / Places to District of Columbia.
-  if (
-    /washington/i.test(city) ||
-    /district of columbia|\bdc\b/i.test(region) ||
-    /washington\s*dc|district of columbia/i.test(query)
-  ) {
+  const marketId = String(job.marketId || "");
+  if (marketId === "washington-dc") return true;
+  if (/district of columbia/i.test(region)) return true;
+  if (/washington\s*,?\s*d\.?c\.?|wash\.?\s*d\.?c\.?|district of columbia/i.test(city)) return true;
+  if (/washington\s*,?\s*d\.?c\.?|district of columbia/i.test(query)) return true;
+  // Bare city "Washington" on crawl jobs is the capital market (never WA state).
+  // Region "Washington" alone means the U.S. state — that is NOT DC.
+  if (/^washington$/i.test(city.trim())) {
+    if (/^washington$/i.test(region.trim()) || /washington state/i.test(region)) return false;
+    return true;
+  }
+  return false;
+}
+
+function isWashingtonStateJob(job = {}) {
+  const city = String(job.city || "");
+  const region = String(job.stateRegion || "");
+  const query = String(job.query || "");
+  const marketId = String(job.marketId || "");
+  if (marketId === "washington-state" || marketId === "seattle-wa") return true;
+  if (/^washington$/i.test(region.trim()) && !/district of columbia/i.test(region)) return true;
+  if (/washington state|wa state|state of washington|seattle/i.test(city)) return true;
+  if (/washington state|seattle washington|seattle\b/i.test(query) && !/washington\s*,?\s*d\.?c\.?/i.test(query)) return true;
+  return false;
+}
+
+function placesLocationBiasForJob(job = {}) {
+  if (isWashingtonDcJob(job) && !isWashingtonStateJob(job)) {
     return {
       circle: {
         center: { latitude: 38.9072, longitude: -77.0369 },
         radius: 45000.0
+      }
+    };
+  }
+  if (isWashingtonStateJob(job)) {
+    return {
+      circle: {
+        center: { latitude: 47.6062, longitude: -122.3321 },
+        radius: 120000.0
       }
     };
   }
@@ -765,8 +795,19 @@ function placesLocationBiasForJob(job = {}) {
 
 function normalizePlacesTextQuery(job = {}) {
   let text = String(job.query || "").slice(0, 500);
-  if (/washington/i.test(String(job.city || "")) && !/washington\s*dc|district of columbia/i.test(text)) {
-    text = text.replace(/\bWashington\b(?!\s*DC)/i, "Washington DC District of Columbia");
+  if (isWashingtonStateJob(job)) {
+    if (!/washington state|seattle/i.test(text)) {
+      text = `${text} Washington State`.trim();
+    }
+    // Avoid leaving a bare "Washington" token that Places can read as DC or the state.
+    text = text.replace(/\bWashington\b(?!\s*(?:State|,?\s*D\.?C\.?))/i, "Washington State");
+    return text.slice(0, 500);
+  }
+  if (isWashingtonDcJob(job)) {
+    if (!/washington\s*,?\s*d\.?c\.?|district of columbia/i.test(text)) {
+      text = text.replace(/\bWashington\b(?!\s*(?:State|,?\s*D\.?C\.?))/i, "Washington, DC District of Columbia");
+    }
+    return text.slice(0, 500);
   }
   return text;
 }

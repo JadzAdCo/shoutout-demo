@@ -26,7 +26,8 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 | Runs / day | 6 (live `aiCrawlerSchedules/default`) |
 | Slots | `00:00`, `04:00`, `08:00`, `12:00`, `16:00`, `20:00` |
 | Time zone | `UTC` on live schedule doc (design default was `America/New_York`) |
-| Focus | Nightlife (clubs / lounges / DJ) **and daytime** (flea markets, fall festivals, farmers / community markets) · Hip Hop + Community / Festival / Market · cities include Washington DC when selected |
+| Focus | Nightlife (clubs / lounges / DJ) **and daytime** (flea markets, fall festivals, farmers / community markets) · Hip Hop + Community / Festival / Market · cities include **Washington, DC** when selected |
+| US places | **Washington, DC** (District of Columbia) ≠ **Washington State** / Seattle. Bare “Washington” → capital. Use “Washington State” or “Seattle” for WA. Places queries never emit bare “Washington”. |
 | Language | Native market + English |
 
 Backend: `scheduledAiDiscoveryCrawl` every **15 minutes UTC**; runs when local time is within 15 minutes of a saved slot; claims `aiCrawlRuns/{scheduleId}_{slot}`. Saved in `aiCrawlerSchedules/default`.

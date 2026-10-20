@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.99 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.100 (stable)
 
+- s3.1.100: Clear Washington, DC vs Washington State distinction in crawler markets/Places.
 - s3.1.99: Washington daytime Places queries forced to DC (not WA state).
 - s3.1.98: AI crawler adds daytime events (flea / fall festival / farmers & community markets) + Washington DC markets.
 

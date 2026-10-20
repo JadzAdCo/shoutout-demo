@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.99";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.100";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -139,7 +139,10 @@
     {city:"Berlin", country:"Germany", region:"Berlin", language:"German"},
     {city:"Milan", aliases:["Milano"], country:"Italy", region:"Lombardy", language:"Italian"},
     {city:"Rome", country:"Italy", region:"Lazio", language:"Italian"},
-    {city:"Washington", aliases:["Washington DC", "Washington, DC", "DC", "District of Columbia"], country:"United States", region:"District of Columbia", language:"English"},
+    // US: keep Washington, DC and Washington State distinct — bare "Washington" is ambiguous in Places.
+    {city:"Washington, DC", aliases:["Washington DC", "Wash DC", "Wash. DC", "District of Columbia", "D.C."], country:"United States", region:"District of Columbia", language:"English", marketId:"washington-dc"},
+    {city:"Seattle", aliases:["Seattle WA", "Seattle, WA", "Seattle Washington"], country:"United States", region:"Washington", language:"English", marketId:"seattle-wa"},
+    {city:"Washington State", aliases:["WA State", "State of Washington", "Wash. State", "Washington (state)"], country:"United States", region:"Washington", language:"English", marketId:"washington-state"},
     {city:"New York", aliases:["NYC", "New York City"], country:"United States", region:"New York", language:"English"},
     {city:"Los Angeles", aliases:["LA", "L.A."], country:"United States", region:"California", language:"English"},
     {city:"Miami", country:"United States", region:"Florida", language:"English"},
@@ -220,9 +223,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.100",
+      title: "Washington, DC vs Washington State crawl distinction",
+      checks: [
+        {label:"Washington DC vs Washington State markets", file:"ai-diagnostics-service.js", includes:["marketId:\"washington-dc\"", "marketId:\"washington-state\"", "resolveUsWashingtonPlace", "canonicalizeCrawlCity"]},
+        {label:"Functions DC vs WA Places bias", file:"functions/ai-discovery-functions.js", includes:["isWashingtonDcJob", "isWashingtonStateJob", "Seattle Washington State"]},
+        {label:"Master Admin US place note", file:"master-admin.html", includes:["Washington, DC", "Washington State", "bare"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.100\""]}
+      ]
+    },
+    {
       version: "s3.1.99",
       checks: [
-        {label:"Washington DC Places bias", file:"ai-diagnostics-service.js", includes:["placePhraseForJob", "Washington DC District of Columbia"]},
+        {label:"Washington DC Places bias", file:"ai-diagnostics-service.js", includes:["placePhraseForJob", "Washington, DC District of Columbia"]},
         {label:"Functions DC locationBias", file:"functions/ai-discovery-functions.js", includes:["placesLocationBiasForJob", "normalizePlacesTextQuery"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.99\""]}
       ]
@@ -1863,7 +1876,7 @@
       area:"Master Admin / AI Crawling",
       feature:"Daytime events (flea / fall festival / farmers market) in crawl scope",
       changed:"Added daytime event types + Community/Festival/Market genres; Washington DC market; daytime approval checklist (organizer + date/time, no DJ). Package s3.1.98. Save schedule so aiCrawlerSchedules/default includes the new types.",
-      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.98). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected (or select them). 3) Add Washington to cities / United States. 4) Preview Search Plan — jobs should include flea market / fall festival queries. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Review Discovery Queue for daytime candidates (e.g. Parks DC flea/fall).",
+      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.100). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected. 3) Cities show Washington, DC (not bare Washington); optionally add Seattle / Washington State. 4) Preview Search Plan — DC jobs say Washington, DC District of Columbia; WA jobs say Washington State / Seattle. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Discovery Queue daytime candidates should be DC-addressed for Washington, DC jobs.",
       expected:"Search plan lists daytime jobs; crawl can surface daytime market/festival candidates; review cards do not require DJ for daytime.",
       troubleshoot:"Still nightlife-only → Save schedule again (live doc may still be old hip-hop-France plan). No Places hits → confirm GOOGLE_PLACES_API_KEY; broaden query. Flea page never appears → paste theparksdc.com/event/fall_festival/ into Source Detail Extraction as a one-off."
     },
@@ -3063,17 +3076,109 @@
     return out;
   }
 
+  function isWashingtonDcMarket(marketOrCity = "") {
+    if (marketOrCity && typeof marketOrCity === "object") {
+      return marketOrCity.marketId === "washington-dc" ||
+        normalized(marketOrCity.region) === "district of columbia" ||
+        /^washington\s*dc$/i.test(normalized(marketOrCity.city).replace(/\s+/g, " "));
+    }
+    const key = normalized(marketOrCity);
+    return key === "washington dc" ||
+      key === "wash dc" ||
+      key === "district of columbia" ||
+      key === "d c" ||
+      key === "dc";
+  }
+
+  function isWashingtonStateMarket(marketOrCity = "") {
+    if (marketOrCity && typeof marketOrCity === "object") {
+      return marketOrCity.marketId === "washington-state" ||
+        marketOrCity.marketId === "seattle-wa" ||
+        (normalized(marketOrCity.region) === "washington" && !isWashingtonDcMarket(marketOrCity));
+    }
+    const key = normalized(marketOrCity);
+    return key === "washington state" ||
+      key === "wa state" ||
+      key === "state of washington" ||
+      key === "wash state" ||
+      key === "washington state of" ||
+      key === "seattle" ||
+      key === "seattle wa" ||
+      key === "seattle washington";
+  }
+
+  function resolveUsWashingtonPlace(value = "") {
+    const raw = String(value || "").trim();
+    const key = normalized(raw);
+    if (!key) return null;
+    // State / Pacific Northwest first (more specific phrases beat bare "Washington").
+    if (
+      /\bwashington state\b|\bwa state\b|\bstate of washington\b|\bwash\.?\s*state\b|\bwashington\s*\(state\)\b/i.test(raw) ||
+      key === "washington state" ||
+      key === "wa state" ||
+      key === "state of washington"
+    ) {
+      return KNOWN_MARKETS.find(m => m.marketId === "washington-state") || null;
+    }
+    if (/\bseattle\b/i.test(raw) || key.startsWith("seattle")) {
+      return KNOWN_MARKETS.find(m => m.marketId === "seattle-wa") || null;
+    }
+    // Explicit District of Columbia forms.
+    if (
+      /\bwashington\s*,?\s*d\.?c\.?\b|\bwash\.?\s*d\.?c\.?\b|\bdistrict of columbia\b|\bwashington dc\b/i.test(raw) ||
+      key === "washington dc" ||
+      key === "wash dc" ||
+      key === "district of columbia" ||
+      key === "d c" ||
+      key === "dc"
+    ) {
+      return KNOWN_MARKETS.find(m => m.marketId === "washington-dc") || null;
+    }
+    // Bare "Washington" is ambiguous in Places (WA state vs DC). FLOQR nightlife/daytime
+    // product default is the capital — always label it Washington, DC.
+    if (key === "washington") {
+      return KNOWN_MARKETS.find(m => m.marketId === "washington-dc") || null;
+    }
+    return null;
+  }
+
   function marketForCityName(city) {
+    const washington = resolveUsWashingtonPlace(city);
+    if (washington) return washington;
     const key = normalized(city);
     return KNOWN_MARKETS.find(market => {
+      if (market.marketId === "washington-dc" || market.marketId === "washington-state" || market.marketId === "seattle-wa") {
+        // Handled only via resolveUsWashingtonPlace so bare "Washington" never
+        // falsely matches Washington State aliases or the other way around.
+        return false;
+      }
       if (normalized(market.city) === key || includesWord(city, market.city)) return true;
       return (market.aliases || []).some(alias => normalized(alias) === key || includesWord(city, alias));
     }) || null;
   }
 
+  function canonicalizeCrawlCity(city = "") {
+    const market = marketForCityName(city);
+    return market?.city || String(city || "").trim();
+  }
+
   function detectMarketsFromText(text = "") {
     const matches = [];
+    const source = String(text || "");
+    const washington = resolveUsWashingtonPlace(source) || (
+      // Natural language: "Washington State" / "Seattle" / "Washington DC" / bare Washington.
+      (/\bwashington state\b|\bwa state\b|\bstate of washington\b/i.test(source)
+        ? KNOWN_MARKETS.find(m => m.marketId === "washington-state")
+        : /\bseattle\b/i.test(source)
+          ? KNOWN_MARKETS.find(m => m.marketId === "seattle-wa")
+          : (/\bwashington\s*,?\s*d\.?c\.?\b|\bdistrict of columbia\b|\bwashington dc\b|\bwash\.?\s*d\.?c\.?\b/i.test(source) ||
+            (/\bwashington\b/i.test(source) && !/\bwashington state\b|\bwa state\b|\bstate of washington\b/i.test(source)))
+            ? KNOWN_MARKETS.find(m => m.marketId === "washington-dc")
+            : null)
+    );
+    if (washington) matches.push(washington);
     KNOWN_MARKETS.forEach(market => {
+      if (market.marketId === "washington-dc" || market.marketId === "washington-state" || market.marketId === "seattle-wa") return;
       const names = [market.city, ...(market.aliases || [])];
       if (names.some(name => includesWord(text, name))) matches.push(market);
     });
@@ -3182,22 +3287,28 @@
   }
 
   function placePhraseForJob({city = "", country = "", stateRegion = ""} = {}) {
-    // "Washington" alone resolves to WA state in Places — force District of Columbia.
-    if (normalized(city) === "washington" && (
-      /district of columbia|^dc$/i.test(stateRegion) ||
-      /united states|usa|u\.s\.?/i.test(country) ||
-      !country
+    const market = marketForCityName(city) || marketForCityName(stateRegion);
+    if (isWashingtonDcMarket(market) || isWashingtonDcMarket(city) || /district of columbia/i.test(stateRegion)) {
+      // Never emit bare "Washington" — Places treats that as Washington State.
+      return "Washington, DC District of Columbia";
+    }
+    if (isWashingtonStateMarket(market) || isWashingtonStateMarket(city) || (
+      normalized(stateRegion) === "washington" && !/district of columbia/i.test(stateRegion)
     )) {
-      return "Washington DC District of Columbia";
+      if (/seattle/i.test(city)) return "Seattle Washington State";
+      return "Washington State USA";
     }
     return searchPhraseFromParts([
-      city,
+      canonicalizeCrawlCity(city) || city,
       country && normalized(country) !== normalized(city) ? country : ""
     ]);
   }
 
   function crawlQueryForJob({eventType = "", genre = "", city = "", country = "", stateRegion = ""} = {}) {
-    const place = placePhraseForJob({city, country, stateRegion});
+    const market = marketForCityName(city);
+    const canonicalCity = market?.city || city;
+    const region = stateRegion || market?.region || "";
+    const place = placePhraseForJob({city: canonicalCity, country: country || market?.country || "", stateRegion: region});
     if (isDaytimeEventType(eventType)) {
       // Daytime community events: search for the market/festival itself, not nightlife tickets.
       return searchPhraseFromParts([
@@ -3230,7 +3341,7 @@
     );
     const cities = uniqueByNormalized([
       ...markets.map(market => market.city),
-      ...(criteria.cities || [])
+      ...(criteria.cities || []).map(canonicalizeCrawlCity)
     ]);
     const countries = uniqueByNormalized([
       ...detectedCountries,
@@ -3248,17 +3359,20 @@
     const fallbackMarkets = cities.length ? cities.map(city => marketForCityName(city)).filter(Boolean) : markets;
     const languages = inferLanguages(fallbackMarkets, countries, criteria.languages || []);
     const countryCities = countries.flatMap(country => KNOWN_MARKETS.filter(market => normalized(market.country) === normalized(country)).map(market => market.city));
-    const finalCities = uniqueByNormalized(cities.length ? cities : (countryCities.length ? countryCities : ["Dubai", "Istanbul", "Singapore", "Shanghai"]));
+    const finalCities = uniqueByNormalized(cities.length ? cities : (countryCities.length ? countryCities : ["Dubai", "Istanbul", "Singapore", "Shanghai"]))
+      .map(canonicalizeCrawlCity);
     const finalEventTypes = eventTypes.length ? eventTypes : ["nightclub"];
     const explicitGenres = genres.length ? genres : [""];
     const languageStrategy = criteria.languageStrategy || "nativePlusEnglish";
     const jobs = [];
-    finalCities.forEach(city => {
-      const market = marketForCityName(city);
+    finalCities.forEach(cityInput => {
+      const market = marketForCityName(cityInput);
+      const city = market?.city || cityInput;
       explicitGenres.forEach(genreInput => {
         finalEventTypes.forEach(eventType => {
           const genre = genreInput || defaultGenreForEventType(eventType);
           const country = market?.country || (countries.length === 1 ? countries[0] : "");
+          const stateRegion = market?.region || "";
           const nativeLanguages = splitList(market?.language || COUNTRY_LANGUAGES[normalized(country)] || "");
           const jobLanguages = languageStrategy === "selectedOnly"
             ? (criteria.languages || [])
@@ -3268,12 +3382,13 @@
           (jobLanguages.length ? jobLanguages : ["local language"]).forEach(language => jobs.push({
               city,
               country,
-              stateRegion: market?.region || "",
+              stateRegion,
+              marketId: market?.marketId || "",
               language,
               genre,
               eventType,
               query: searchPhraseFromParts([
-                crawlQueryForJob({eventType, genre, city, country, stateRegion: market?.region || ""}),
+                crawlQueryForJob({eventType, genre, city, country, stateRegion}),
                 language && language !== "local language" ? `in ${language}` : ""
               ]),
               requiredDatapoints: requiredDatapointLabels(eventType)
@@ -5522,7 +5637,7 @@
       byId("crawlLanguageCriteria").value = "local language, English, Spanish, French, German, Italian, Dutch, Portuguese, Arabic, Turkish, Chinese, Thai";
     }
     if (byId("crawlCityCriteria") && !byId("crawlCityCriteria").value) {
-      byId("crawlCityCriteria").value = "Washington, Dubai, Istanbul, Singapore, Bangkok, Phuket, Shanghai, Barcelona, Paris, London, Amsterdam, Berlin, Milan";
+      byId("crawlCityCriteria").value = "Washington, DC, Dubai, Istanbul, Singapore, Bangkok, Phuket, Shanghai, Barcelona, Paris, London, Amsterdam, Berlin, Milan";
     }
     if (byId("crawlRegionCriteria") && !byId("crawlRegionCriteria").value) {
       byId("crawlRegionCriteria").value = "Western Europe, Middle East, Southeast Asia, East Asia";
@@ -5586,7 +5701,9 @@
     if (criteria.search && byId("crawlSearchCriteria")) byId("crawlSearchCriteria").value = criteria.search;
     if (criteria.genres) applyValuesToControl("crawlGenreCriteria", criteria.genres);
     if (criteria.languages) applyValuesToControl("crawlLanguageCriteria", criteria.languages);
-    if (criteria.cities && byId("crawlCityCriteria")) byId("crawlCityCriteria").value = joinList(criteria.cities);
+    if (criteria.cities && byId("crawlCityCriteria")) {
+      byId("crawlCityCriteria").value = joinList((criteria.cities || []).map(canonicalizeCrawlCity));
+    }
     if (criteria.regions && byId("crawlRegionCriteria")) byId("crawlRegionCriteria").value = joinList(criteria.regions);
     if (criteria.countries) applyValuesToControl("crawlCountryCriteria", criteria.countries);
     if (criteria.eventTypes) applyValuesToControl("crawlEventTypeCriteria", criteria.eventTypes);
@@ -5604,7 +5721,7 @@
       search: byId("crawlSearchCriteria")?.value.trim() || "",
       genres: selectedControlValues("crawlGenreCriteria"),
       languages: selectedControlValues("crawlLanguageCriteria"),
-      cities: splitList(byId("crawlCityCriteria")?.value),
+      cities: splitList(byId("crawlCityCriteria")?.value).map(canonicalizeCrawlCity),
       regions: splitList(byId("crawlRegionCriteria")?.value),
       countries: selectedControlValues("crawlCountryCriteria"),
       eventTypes: selectedControlValues("crawlEventTypeCriteria"),
@@ -5659,6 +5776,7 @@
       ["Record types", joinList(plan.eventTypes)],
       ["Languages", joinList(plan.languages) || "Market default"],
       ["Language strategy", plan.languageStrategy === "nativePlusEnglish" ? "Native market language + English" : plan.languageStrategy === "nativeOnly" ? "Native market language only" : "Selected languages only"],
+      ["US place note", "Washington, DC ≠ Washington State. Bare “Washington” is treated as Washington, DC. Use “Washington State” or “Seattle” for WA."],
       ["Required result fields", "Name/title, genre, DJ(s)/artist(s) or Organizer(s) for daytime, promoter(s), phone, email, Instagram, physical address (+ date/time for comedy & daytime)"]
     ];
     const jobsHtml = plan.jobs.length ? plan.jobs.slice(0, 24).map((job, index) => `<div class="queue-item">
@@ -5666,7 +5784,7 @@
         <strong>${esc(index + 1)}. ${esc(job.query)}</strong>
         ${statusBadge("Pass")}
       </div>
-      <p>${esc(job.eventType)} | ${esc(job.genre)} | ${esc(job.city)}${job.country ? `, ${esc(job.country)}` : ""} | ${esc(job.language || "local language")}</p>
+      <p>${esc(job.eventType)} | ${esc(job.genre)} | ${esc(job.city)}${job.stateRegion ? ` · ${esc(job.stateRegion)}` : ""}${job.country ? `, ${esc(job.country)}` : ""} | ${esc(job.language || "local language")}</p>
       <small>Required datapoints: ${esc(job.requiredDatapoints.join(", "))}</small>
     </div>`).join("") : "<p class='sub'>No search jobs were generated. Add a city, genre, or event type.</p>";
     wrap.innerHTML = `${simpleRows(rows)}${jobsHtml}`;

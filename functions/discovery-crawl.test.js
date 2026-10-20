@@ -75,9 +75,13 @@ test("crawler includes daytime event types and relaxes DJ requirement", () => {
   assert.match(diagnostics, /fall festival/);
   assert.match(diagnostics, /isDaytimeEventType/);
   assert.match(diagnostics, /daytimeEvent/);
-  assert.match(diagnostics, /Washington/);
-  assert.match(diagnostics, /Washington DC District of Columbia/);
+  assert.match(diagnostics, /Washington, DC/);
+  assert.match(diagnostics, /Washington State/);
+  assert.match(diagnostics, /Washington, DC District of Columbia/);
   assert.match(diagnostics, /placePhraseForJob/);
+  assert.match(diagnostics, /resolveUsWashingtonPlace/);
+  assert.match(diagnostics, /marketId:"washington-dc"/);
+  assert.match(diagnostics, /marketId:"washington-state"/);
   assert.match(discovery, /isDaytimeRecord/);
   assert.match(discovery, /Organizer\(s\) \/ Promoter\(s\)/);
   assert.match(fn, /daytimeEvent/);
@@ -86,6 +90,22 @@ test("crawler includes daytime event types and relaxes DJ requirement", () => {
   assert.match(fn, /Organizer\(s\) \/ Promoter\(s\)/);
   assert.match(fn, /placesLocationBiasForJob/);
   assert.match(fn, /normalizePlacesTextQuery/);
+  assert.match(fn, /isWashingtonDcJob/);
+  assert.match(fn, /isWashingtonStateJob/);
+});
+
+test("Washington DC and Washington State stay distinct in crawl helpers", () => {
+  const diagnostics = read("ai-diagnostics-service.js");
+  const fn = read("functions/ai-discovery-functions.js");
+  const html = read("master-admin.html");
+  assert.match(diagnostics, /Bare "Washington" is ambiguous/);
+  assert.match(diagnostics, /Washington, DC ≠ Washington State/);
+  assert.match(diagnostics, /Seattle Washington State/);
+  assert.match(fn, /38\.9072/);
+  assert.match(fn, /47\.6062/);
+  assert.match(html, /Washington, DC/);
+  assert.match(html, /Washington State/);
+  assert.doesNotMatch(html, /placeholder="Berlin, Madrid, Barcelona, Washington"/);
 });
 
 test("runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud without placeholders", () => {
