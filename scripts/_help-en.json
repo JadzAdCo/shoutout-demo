@@ -23,6 +23,10 @@
     "title": "Make me a floqCast / superstar",
     "body": "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the floqCast Queue → Go live on the floqCast board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL."
   },
+  "help-floqcast-choose-venue": {
+    "title": "Choose a floqCast venue",
+    "body": "The first four clubs are the nearest floqCast venues (browser location, like ShoutOut). Type a club or event name to bring up matches. Only clubs with floqCast enabled appear here."
+  },
   "help-become-club-admin": {
     "title": "Become a Club Admin",
     "body": "Request Club Admin access, then get venue approval."

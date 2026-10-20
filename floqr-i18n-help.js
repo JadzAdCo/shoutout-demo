@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.87";
+  const VERSION = "s3.1.88";
 
   const packs = {
     "ru": {
@@ -85,6 +85,10 @@
       "help-floqcast": {
         title: "Сделать меня floqCast / superstar",
         body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
+      },
+      "help-floqcast-choose-venue": {
+        title: "Выберите площадку floqCast",
+        body: "Первые четыре клуба — ближайшие площадки floqCast (геолокация браузера, как в ShoutOut). Введите название клуба или события, чтобы найти совпадения."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -384,6 +388,10 @@
         title: "Maak me een floqCast / superstar",
         body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de floqCast Queue → Go live op het floqCast-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
       },
+      "help-floqcast-choose-venue": {
+        title: "Kies een floqCast-venue",
+        body: "De eerste vier clubs zijn de dichtstbijzijnde floqCast-venues (browserlocatie, zoals bij ShoutOut). Typ een club- of eventnaam om matches te zien."
+      },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
         body: "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar. Bij Aurelia gebruikt u Explore 3D walk-through voor de interactieve ruimte (boeken blijft op de 2D-kaart)."
@@ -681,6 +689,10 @@
       "help-floqcast": {
         title: "Fais de moi une floqCast / superstar",
         body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
+      },
+      "help-floqcast-choose-venue": {
+        title: "Choisir un lieu floqCast",
+        body: "Les quatre premiers clubs sont les lieux floqCast les plus proches (géolocalisation du navigateur, comme ShoutOut). Tapez un nom de club ou d'événement pour afficher les correspondances."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -980,6 +992,10 @@
         title: "Mach mich zu einem floqCast/Superstar",
         body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
       },
+      "help-floqcast-choose-venue": {
+        title: "floqCast-Venue wählen",
+        body: "Die ersten vier Clubs sind die nächsten floqCast-Venues (Browser-Standort, wie bei ShoutOut). Tippe einen Club- oder Eventnamen, um Treffer zu sehen."
+      },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
         body: "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV wird nicht übersetzt. Bei Aurelia öffnen Sie Explore 3D walk-through für den interaktiven Raum (Buchung bleibt auf dem 2D-Plan)."
@@ -1277,6 +1293,10 @@
       "help-floqcast": {
         title: "Hazme un floqCast / superestrella",
         body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
+      },
+      "help-floqcast-choose-venue": {
+        title: "Elige un local floqCast",
+        body: "Los cuatro primeros clubs son los locales floqCast más cercanos (geolocalización del navegador, como ShoutOut). Escribe un club o evento para ver coincidencias."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -1576,6 +1596,10 @@
         title: "Fammi un floqCast / superstar",
         body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
       },
+      "help-floqcast-choose-venue": {
+        title: "Scegli un locale floqCast",
+        body: "I primi quattro club sono i locali floqCast più vicini (geolocalizzazione del browser, come ShoutOut). Digita un club o un evento per vedere le corrispondenze."
+      },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
         body: "VIP reserV mostra la mappa e prenota tavoli. Apri VIP reserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili. Ad Aurelia usa Explore 3D walk-through per la sala interattiva (la prenotazione resta sulla mappa 2D)."
@@ -1873,6 +1897,10 @@
       "help-floqcast": {
         title: "Faça de mim um floqCast / superstar",
         body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+      },
+      "help-floqcast-choose-venue": {
+        title: "Escolher um local floqCast",
+        body: "Os primeiros quatro clubes são os locais floqCast mais próximos (geolocalização do navegador, como ShoutOut). Escreva um clube ou evento para ver correspondências."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -2172,6 +2200,10 @@
         title: "Κάνε με floqCast / σούπερ σταρ",
         body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά floqCast → Go live στον πίνακα floqCast. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
       },
+      "help-floqcast-choose-venue": {
+        title: "Επιλέξτε χώρο floqCast",
+        body: "Τα πρώτα τέσσερα κλαμπ είναι οι πλησιέστεροι χώροι floqCast (γεωτοποθεσία προγράμματος περιήγησης, όπως στο ShoutOut). Πληκτρολογήστε όνομα κλαμπ ή εκδήλωσης για αντιστοιχίες."
+      },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
         body: "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα. Στην Aurelia χρησιμοποιήστε Explore 3D walk-through για την διαδραστική αίθουσα (η κράτηση μένει στο 2D)."
@@ -2470,6 +2502,10 @@
         title: "Zrób mi floqCast / supergwiazdę",
         body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce floqCast → Go live na tablicy floqCast. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
       },
+      "help-floqcast-choose-venue": {
+        title: "Wybierz lokal floqCast",
+        body: "Pierwsze cztery kluby to najbliższe lokale floqCast (geolokalizacja przeglądarki, jak w ShoutOut). Wpisz nazwę klubu lub wydarzenia, aby zobaczyć dopasowania."
+      },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
         body: "VIP reserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP reserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji. W Aurelii użyj Explore 3D walk-through dla interaktywnej sali (rezerwacja zostaje na mapie 2D)."
@@ -2767,6 +2803,10 @@
       "help-floqcast": {
         title: "اصنع لي floqCast / نجمة مشهورة",
         body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة floqCast → Go live على لوح floqCast. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
+      },
+      "help-floqcast-choose-venue": {
+        title: "اختر مكان floqCast",
+        body: "أول أربعة أندية هي أقرب أماكن floqCast (موقع المتصفح، مثل ShoutOut). اكتب اسم نادٍ أو حدث لإظهار التطابقات."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",

@@ -191,6 +191,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.88",
+      title: "floqCast venue geo top-4 + name/event search",
+      checks: [
+        {label:"floqCast loads geo search", file:"floqcast-search.html", includes:["floqr-geo-search.js"]},
+        {label:"Nearest top-4 constant", file:"floqcast-search.js", includes:["NEARBY_TOP = 4", "resolveUserLocation", "eventNames"]},
+        {label:"Choose-venue help id", file:"floqai-help-repository.js", includes:["help-floqcast-choose-venue"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.88\""]}
+      ]
+    },
+    {
       version: "s3.1.87",
       title: "floqCast icon encoding + live duration arm",
       checks: [
@@ -1760,6 +1770,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-88-floqcast-venue-geo-top4",
+      area:"Search / floqCast",
+      feature:"floqCast Choose a venue — nearest 4 + name/event search",
+      changed:"floqcast-search loads floqr-geo-search.js. Empty list shows top 4 nearest floqCast venues (GPS→IP→profile). Typing matches club or event name. Package s3.1.88.",
+      howToTest:"1) Hard-refresh floqcast-search.html?v=s3.1.88 while signed in. 2) Allow (or deny) browser location. 3) Confirm at most 4 venue cards when search is empty and status mentions nearest / place. 4) Type a known club name (e.g. Heist) — matching card appears. 5) Type a known event name from that club — same venue appears.",
+      expected:"Empty = ≤4 nearest floqCast venues; typing filters by club/event name; not a full A–Z dump of all venues.",
+      troubleshoot:"Still shows 40+ cards empty → hard-refresh floqcast-search.js + floqr-geo-search.js ?v=s3.1.88. All A–Z with no geo status → geo script missing from floqcast-search.html. No matches on type → check shared-data club/event names and floqCast feature gate."
     },
     {
       id:"s3-1-87-floqcast-icon-and-live-arm",

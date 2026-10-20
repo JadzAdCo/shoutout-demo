@@ -397,6 +397,20 @@
       audiences: ["patron"]
     },
     {
+      id: "help-floqcast-choose-venue",
+      title: "Choose a floqCast venue",
+      body: "The first four clubs are the nearest floqCast venues (browser location, like ShoutOut). Type a club or event name to bring up matches. Only clubs with floqCast enabled appear here.",
+      searchPhrases: [
+        "choose a floqcast venue", "floqcast venue", "nearest floqcast", "floqcast near me",
+        "search floqcast club", "floqcast event venue", "closest floqcast"
+      ],
+      links: [
+        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron"]
+    },
+    {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
       body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",

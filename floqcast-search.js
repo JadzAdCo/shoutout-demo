@@ -1,12 +1,26 @@
-/* floqCast entry — venue pick → private preview (pay → approve → go live). */
+/* floqCast entry — venue pick → private preview (pay → approve → go live).
+ * Empty list shows the 4 nearest floqCast venues (GPS → IP → profile), like ShoutOut.
+ * Typing matches club / brand / city / event name. */
 (function (global) {
   "use strict";
 
+  const NEARBY_TOP = 4;
+
   let venueRows = [];
   let selectedVenueId = "";
+  let locationContext = null;
 
   function byId(id) {
     return document.getElementById(id);
+  }
+
+  function t(key, fallback, vars) {
+    try {
+      const out = global.FLOQRI18n?.t?.(key, vars);
+      if (out && out !== key) return out;
+    } catch (_) {}
+    if (!vars) return fallback || key;
+    return String(fallback || key).replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : ""));
   }
 
   function setStatus(msg) {
@@ -48,10 +62,86 @@
       .replace(/"/g, "&quot;");
   }
 
+  function eventNamesByLocation() {
+    const map = Object.create(null);
+    const events = global.SHOUTOUT_EVENTS || {};
+    for (const ev of Object.values(events)) {
+      const locId = String(ev?.locationId || ev?.clubLocationId || "").trim();
+      const name = String(ev?.eventName || "").trim();
+      if (!locId || !name) continue;
+      if (!map[locId]) map[locId] = [];
+      if (!map[locId].includes(name)) map[locId].push(name);
+    }
+    return map;
+  }
+
+  function locationSourceLabel(source) {
+    if (source === "gps") return t("listing.sourceGps", "GPS");
+    if (source === "ip") return t("listing.sourceIp", "IP estimate");
+    if (source === "profile") return t("listing.sourceProfile", "profile city");
+    return "";
+  }
+
+  function venueHaystack(r) {
+    return [
+      r.name, r.brandName, r.id, r.city, r.region, r.country, r.locationLabel,
+      ...(r.eventNames || [])
+    ].join(" ").toLowerCase();
+  }
+
+  function sortVenuesNearest(rows) {
+    const Geo = global.FLOQRGeoSearch;
+    const origin = locationContext && locationContext.latitude != null && locationContext.longitude != null
+      ? locationContext
+      : null;
+    if (!Geo || !origin) {
+      return rows.slice().sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: "base", numeric: true}));
+    }
+    return Geo.sortNearest(rows, origin, {
+      coordsOf: (r) => r.coords || Geo.recordCoordinates(r) || null,
+      nameOf: (r) => r.name
+    }).map((entry) => entry.item);
+  }
+
   function filteredVenues() {
     const q = String(byId("floqcastVenueSearch")?.value || "").trim().toLowerCase();
-    if (!q) return venueRows.slice();
-    return venueRows.filter((r) => `${r.name} ${r.id}`.toLowerCase().includes(q));
+    let rows = venueRows;
+    if (q) rows = rows.filter((r) => venueHaystack(r).includes(q));
+    rows = sortVenuesNearest(rows);
+    if (!q) return rows.slice(0, NEARBY_TOP);
+    return rows;
+  }
+
+  function updateVenueStatusLine(visibleCount) {
+    const q = String(byId("floqcastVenueSearch")?.value || "").trim();
+    const total = venueRows.length;
+    if (!total) {
+      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow floqCast."));
+      return;
+    }
+    if (q) {
+      setVenueStatus(t("page.floqcast.venueCountSearch", "{n} match(es)", {n: visibleCount}));
+      return;
+    }
+    const origin = locationContext && locationContext.latitude != null && locationContext.longitude != null
+      ? locationContext
+      : null;
+    if (origin) {
+      const place = locationContext.city
+        || t("listing.yourLocation", "your location");
+      const source = locationSourceLabel(locationContext.source) || "GPS";
+      setVenueStatus(t(
+        "page.floqcast.venueCountNear",
+        "{shown} nearest of {n} · {place} ({source})",
+        {shown: visibleCount, n: total, place, source}
+      ));
+      return;
+    }
+    setVenueStatus(t(
+      "page.floqcast.venueCountName",
+      "{n} floqCast venue(s) · allow location for nearest first",
+      {n: total}
+    ));
   }
 
   function syncSelect() {
@@ -69,16 +159,22 @@
     const grid = byId("floqcastVenueGrid");
     if (!grid) return;
     const rows = filteredVenues();
+    updateVenueStatusLine(rows.length);
     if (!rows.length) {
-      grid.innerHTML = `<p class="sub small">No floqCast venues match that search.</p>`;
+      grid.innerHTML = `<p class="sub small">${esc(t("page.floqcast.noMatch", "No floqCast venues match that search."))}</p>`;
       return;
     }
     grid.innerHTML = rows.map((r) => {
       const selected = r.id === selectedVenueId;
+      const place = r.locationLabel || [r.city, r.region, r.country].filter(Boolean).join(", ");
+      const selectLabel = selected
+        ? t("page.floqcast.selected", "Selected")
+        : t("page.floqcast.selectVenue", "Select venue");
       return `<article class="card club-card floqcast-venue-item${selected ? " is-selected" : ""}" role="listitem" data-venue-id="${esc(r.id)}">
         <strong>${esc(r.name)}</strong>
+        ${place ? `<p class="sub small" style="margin:4px 0 0">${esc(place)}</p>` : ""}
         <p class="sub small" style="color:var(--lime,#dfff5a);margin:4px 0 10px">floqCast</p>
-        <button type="button" class="buttonlike ${selected ? "primary" : ""}" data-select-venue="${esc(r.id)}">${selected ? "Selected" : "Select venue"}</button>
+        <button type="button" class="buttonlike ${selected ? "primary" : ""}" data-select-venue="${esc(r.id)}">${esc(selectLabel)}</button>
       </article>`;
     }).join("");
   }
@@ -92,10 +188,46 @@
     setLiveStatus("");
   }
 
+  async function resolvePatronLocation() {
+    const Geo = global.FLOQRGeoSearch;
+    if (!Geo?.resolveUserLocation) {
+      locationContext = null;
+      return;
+    }
+    let profile = null;
+    try {
+      const user = firebase.auth()?.currentUser;
+      if (user) {
+        const snap = await firebase.firestore().collection("users").doc(user.uid).get();
+        profile = snap.exists ? snap.data() : null;
+      }
+    } catch (_) {}
+    locationContext = await Geo.resolveUserLocation({
+      profile,
+      onLateGps: (coords) => {
+        if (!coords || coords.latitude == null || coords.longitude == null) return;
+        locationContext = Object.assign({}, locationContext || {}, {
+          source: "gps",
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          accuracy: coords.accuracy
+        });
+        venueRows = sortVenuesNearest(venueRows);
+        if (venueRows[0] && !String(byId("floqcastVenueSearch")?.value || "").trim()) {
+          selectedVenueId = venueRows[0].id;
+          syncSelect();
+        }
+        renderVenueGrid();
+      }
+    });
+  }
+
   async function loadVenues() {
     const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
     const g = global.FLOQRFeatureGates;
     const db = firebase.firestore();
+    const eventsByLoc = eventNamesByLocation();
+    const Geo = global.FLOQRGeoSearch;
     const rows = [];
     for (const [id, row] of Object.entries(map)) {
       let club = {id, ...row};
@@ -104,28 +236,39 @@
       } catch (_) {}
       const enabled = g ? g.venueMayUse("floqCast", club) : true;
       if (!enabled) continue;
+      const name = club.locationName || club.brandName || row.locationName || row.brandName || id;
       rows.push({
         id,
-        name: club.locationName || club.brandName || row.locationName || row.brandName || id
+        name,
+        brandName: club.brandName || row.brandName || "",
+        city: club.city || row.city || "",
+        region: club.region || row.region || "",
+        country: club.country || row.country || "",
+        locationLabel: club.locationLabel || row.locationLabel || "",
+        latitude: club.latitude ?? club.lat ?? row.latitude ?? row.lat,
+        longitude: club.longitude ?? club.lng ?? row.longitude ?? row.lng,
+        eventNames: eventsByLoc[id] || [],
+        coords: Geo?.recordCoordinates?.(club) || Geo?.recordCoordinates?.(row) || null
       });
     }
-    rows.sort((a, b) => a.name.localeCompare(b.name));
-    venueRows = rows;
+
+    setVenueStatus(t("page.floqcast.locating", "Finding venues near you…"));
+    await resolvePatronLocation();
+
+    venueRows = sortVenuesNearest(rows);
     if (!rows.length) {
       selectedVenueId = "";
       syncSelect();
       renderVenueGrid();
-      setVenueStatus("No venues currently allow floqCast.");
+      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow floqCast."));
       byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = true);
       return;
     }
-    const preferred = rows.find((r) => r.id === selectedVenueId)
-      || rows.find((r) => r.id === "heist-washington-dc")
-      || rows[0];
+    const preferred = venueRows.find((r) => r.id === selectedVenueId)
+      || venueRows[0];
     selectedVenueId = preferred.id;
     syncSelect();
     renderVenueGrid();
-    setVenueStatus(`${rows.length} floqCast venue${rows.length === 1 ? "" : "s"}`);
     byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = false);
   }
 
@@ -155,7 +298,7 @@
   async function beginFloqCast() {
     const venue = selectedVenue();
     if (!venue.id) {
-      setLiveStatus("Choose a venue first.");
+      setLiveStatus(t("page.floqcast.chooseFirst", "Choose a venue first."));
       return;
     }
     const btn = byId("floqcastGoLiveBtn");

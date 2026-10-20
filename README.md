@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.87 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.88 (stable)
+
+- s3.1.88: floqCast Choose a venue uses browser geo for top 4 nearest clubs; type club/event name for matches.
 
 - s3.1.87: floqCast Search mark SVG encoding fix (invalid 0x97 broke <img>); restore live duration arm after ICE; repair no longer counts ended sessions.
 
