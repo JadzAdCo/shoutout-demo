@@ -395,22 +395,72 @@
     } catch (_) {}
   }
 
+  function setCameraLabel(text) {
+    const el = byId("floqcastCameraLabel");
+    if (el) el.textContent = text || "";
+  }
+
+  async function refreshSwitchCameraBtn() {
+    const btn = byId("floqcastSwitchCameraBtn");
+    if (!btn) return;
+    try {
+      const list = await global.FLOQRFloqCastRtc?.listVideoDevices?.() || [];
+      const usable = list.filter((d) => d.score >= 0);
+      const show = cameraReady() && (usable.length > 1 || list.length > 1);
+      btn.classList.toggle("hidden", !show);
+      btn.disabled = !show;
+    } catch (_) {
+      btn.classList.add("hidden");
+    }
+  }
+
+  function attachLocalPreview(stream) {
+    const video = byId("floqcastPreviewVideo");
+    if (video) {
+      video.srcObject = stream;
+      video.classList.add("is-on");
+      video.muted = true;
+      video.setAttribute("playsinline", "");
+      video.play?.().catch(() => {});
+    }
+    const label = stream?.getVideoTracks?.()[0]?.label || "Camera";
+    setCameraLabel(`Using: ${label}`);
+  }
+
   async function startCamera() {
     try {
       if (!global.FLOQRFloqCastRtc) throw new Error("Camera helper failed to load.");
       localStream = await global.FLOQRFloqCastRtc.getCameraStream({audio: true});
-      const video = byId("floqcastPreviewVideo");
-      if (video) {
-        video.srcObject = localStream;
-        video.classList.add("is-on");
-        video.muted = true;
-      }
-      setGate("Preview on. Tap Go pay $20 when ready.");
-      setStatus("Local preview only — not on the club board yet.");
+      attachLocalPreview(localStream);
+      setGate("Preview on. Tap Go pay $20 when ready. Use Switch camera if the framing looks wrong.");
+      setStatus("Local preview only — not on the club board yet. Prefer Front / FaceTime on iPhone.");
       updateButtons();
+      await refreshSwitchCameraBtn();
     } catch (err) {
       setStatus(err?.message || "Camera failed.");
       updateButtons();
+    }
+  }
+
+  async function switchCamera() {
+    if (!localStream || !global.FLOQRFloqCastRtc?.switchCameraStream) return;
+    const btn = byId("floqcastSwitchCameraBtn");
+    if (btn) btn.disabled = true;
+    try {
+      const result = await global.FLOQRFloqCastRtc.switchCameraStream(localStream, {audio: true});
+      if (!result?.stream) throw new Error("Could not switch camera.");
+      localStream = result.stream;
+      attachLocalPreview(localStream);
+      if (broadcastHandle?.replaceStream) {
+        await broadcastHandle.replaceStream(localStream);
+        setStatus(`Switched camera while live → ${result.label || "Camera"}`);
+      } else {
+        setStatus(`Using ${result.label || "Camera"}. Framing matches the venue board (contain, not crop).`);
+      }
+    } catch (err) {
+      setStatus(err?.message || "Could not switch camera.");
+    } finally {
+      await refreshSwitchCameraBtn();
     }
   }
 
@@ -646,6 +696,7 @@
 
   function bindUi() {
     byId("floqcastStageBtn")?.addEventListener("click", () => onStageClick());
+    byId("floqcastSwitchCameraBtn")?.addEventListener("click", () => switchCamera());
     byId("floqcastPreviewGoogleLoginBtn")?.addEventListener("click", () => {
       if (window.FLOQRSessionShell?.popupBlocked?.("#floqcastPreviewGate")) return;
       firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message));

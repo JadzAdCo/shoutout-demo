@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.89";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.90";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.90",
+      title: "floqCast Front camera + contain framing",
+      checks: [
+        {label:"Prefer Front/FaceTime camera", file:"floqcast-webrtc.js", includes:["pickPreferredVideoDevice", "facingMode", "resetTrackZoom", "Continuity"]},
+        {label:"Switch camera + replaceTrack", file:"floqcast-preview.js", includes:["switchCamera", "replaceStream"]},
+        {label:"Preview contain not cover", file:"floqcast-search.css", includes:["object-fit: contain"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.90\""]}
+      ]
+    },
     {
       version: "s3.1.89",
       title: "Search Select follows floqCast/VIP intent",
@@ -1780,6 +1790,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-90-floqcast-front-camera-framing",
+      area:"floqCast / camera",
+      feature:"Front camera prefer + contain framing (no telephoto forehead crop)",
+      changed:"getCameraStream prefers Front/FaceTime, skips Continuity/Telephoto, resets zoom. Preview+board object-fit contain. Switch camera with replaceTrack. Package s3.1.90.",
+      howToTest:"1) Hard-refresh private floqCast preview (s3.1.90) on iPhone. 2) Start camera — label should say Front/FaceTime (not Continuity/Telephoto). 3) Preview should letterbox like the LED (not zoom-crop). 4) Go live on display2 — board shows full face, not forehead-only. 5) If wrong lens, tap Switch camera.",
+      expected:"Selfie camera, matched contain framing on phone and LED; Switch camera available when multiple devices.",
+      troubleshoot:"Still zoomed forehead → hard-refresh floqcast-webrtc.js + display.css; confirm Switch camera; avoid Continuity Camera (Mac nearby). Preview mirrored locally is expected; board stays unmirrored."
     },
     {
       id:"s3-1-89-search-select-feature-intent",

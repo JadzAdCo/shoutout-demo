@@ -148,14 +148,29 @@ body.floqcast-page {
 .floqcast-preview {
   width: 100%;
   max-width: 420px;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  /* Match venue board: contain (not cover) so preview framing = LED framing */
+  object-fit: contain;
+  object-position: center center;
   border-radius: 14px;
   background: #0a0c10;
   border: 1px solid rgba(255, 255, 255, 0.14);
   display: none;
+  /* Local selfie mirror only — WebRTC still sends the unmirrored track */
+  transform: scaleX(-1);
 }
 .floqcast-preview.is-on { display: block; }
+
+.floqcast-camera-label {
+  margin: 4px 0 0;
+  max-width: 420px;
+  text-align: center;
+  color: var(--muted, #9aa3af);
+}
+.floqcast-switch-camera {
+  width: 100%;
+  max-width: 420px;
+}
 
 .floqcast-steps {
   margin: 0;

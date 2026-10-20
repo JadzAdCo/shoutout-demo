@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.89 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.90 (stable)
+
+- s3.1.90: floqCast prefers Front/FaceTime camera, contain framing on preview+LED, Switch camera; Safari has no Apple fused multi-lens stream.
 
 - s3.1.89: Search listing Select follows product intent (floqCast / VIP / ShoutOut) via floqr-venue-actions registry — no more Floqcast query → ShoutOut templates.
 

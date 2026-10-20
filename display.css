@@ -1788,7 +1788,9 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .floqcast-live-video{
   width:100%;
   height:100%;
+  /* Never cover-crop live floqCast — phone selfie + wide LED must letterbox, not zoom to forehead */
   object-fit:contain;
+  object-position:center center;
   background:#000;
 }
 .floqcast-live-badge{
