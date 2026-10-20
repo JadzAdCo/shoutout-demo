@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.100 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.101 (stable)
+
+- s3.1.101: Discovery crawl upsert + auto-approve (≥92%) + past-event lifecycle (mark/retire/remove).
 
 - s3.1.100: Clear Washington, DC vs Washington State distinction in crawler markets/Places.
 - s3.1.99: Washington daytime Places queries forced to DC (not WA state).
