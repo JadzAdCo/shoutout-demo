@@ -62,19 +62,94 @@
     if (!track) return;
     try { track.contentHint = "motion"; } catch (_) {}
     await resetTrackZoom(track);
-    // If Safari still handed us a wide landscape crop, nudge toward portrait.
-    try {
-      const settings = track.getSettings?.() || {};
-      const w = Number(settings.width) || 0;
-      const h = Number(settings.height) || 0;
-      if (w > 0 && h > 0 && w > h * 1.15) {
-        await track.applyConstraints({
-          width: {ideal: 720},
-          height: {ideal: 1280},
-          advanced: [{zoom: 1}]
-        });
+  }
+
+  /**
+   * iPhone Safari: local <video> applies orientation (full upright selfie) but the
+   * raw WebRTC track is often a landscape buffer — Chrome on display2 then shows
+   * only a horizontal strip (forehead / ceiling). Drawing through a <video>→canvas
+   * bakes orientation into pixels before captureStream, so the LED matches preview.
+   */
+  function createUprightSendStream(sourceStream, {fps = 24} = {}) {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.setAttribute("muted", "");
+    video.style.cssText = "position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none";
+    try { document.body.appendChild(video); } catch (_) {}
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", {alpha: false, desynchronized: true});
+    let raf = 0;
+    let stopped = false;
+    let outStream = null;
+    let source = sourceStream;
+
+    function paint() {
+      if (stopped) return;
+      const vw = video.videoWidth | 0;
+      const vh = video.videoHeight | 0;
+      if (vw > 0 && vh > 0 && ctx) {
+        if (canvas.width !== vw || canvas.height !== vh) {
+          canvas.width = vw;
+          canvas.height = vh;
+        }
+        try { ctx.drawImage(video, 0, 0, vw, vh); } catch (_) {}
       }
-    } catch (_) {}
+      raf = requestAnimationFrame(paint);
+    }
+
+    function syncAudioTracks(fromStream) {
+      if (!outStream || !fromStream) return;
+      outStream.getAudioTracks().forEach((t) => {
+        try { outStream.removeTrack(t); } catch (_) {}
+      });
+      fromStream.getAudioTracks().forEach((t) => {
+        try { outStream.addTrack(t); } catch (_) {}
+      });
+    }
+
+    return {
+      async start() {
+        video.srcObject = source;
+        forceVideoPlay(video);
+        try { await video.play(); } catch (_) {}
+        for (let i = 0; i < 80 && !(video.videoWidth && video.videoHeight); i++) {
+          await new Promise((r) => setTimeout(r, 50));
+        }
+        paint();
+        const rate = Number(fps) > 0 ? Number(fps) : 24;
+        outStream = canvas.captureStream(rate);
+        syncAudioTracks(source);
+        const vTrack = outStream.getVideoTracks()[0];
+        try { if (vTrack) vTrack.contentHint = "motion"; } catch (_) {}
+        return outStream;
+      },
+      get stream() { return outStream; },
+      async replaceSource(nextStream) {
+        if (!nextStream) return false;
+        source = nextStream;
+        video.srcObject = nextStream;
+        forceVideoPlay(video);
+        try { await video.play(); } catch (_) {}
+        syncAudioTracks(nextStream);
+        return true;
+      },
+      stop() {
+        stopped = true;
+        try { cancelAnimationFrame(raf); } catch (_) {}
+        try { video.pause(); } catch (_) {}
+        try { video.srcObject = null; } catch (_) {}
+        try { video.remove(); } catch (_) {}
+        try {
+          (outStream?.getVideoTracks?.() || []).forEach((t) => t.stop());
+        } catch (_) {}
+        outStream = null;
+      }
+    };
   }
 
   function forceVideoPlay(videoEl) {
@@ -330,11 +405,32 @@
     let unsubJoins = null;
     let rebuilding = false;
     let stopped = false;
-    let activeStream = stream;
+    let activeStream = stream; // raw camera (preview / switch)
+    let sendStream = stream; // upright canvas stream for WebRTC (may equal activeStream)
+    let upright = null;
     let reconnectTimer = null;
 
+    // Bake iOS orientation into pixels before encode — preview keeps the raw stream.
+    if (typeof document !== "undefined" && typeof HTMLCanvasElement !== "undefined"
+        && typeof HTMLCanvasElement.prototype.captureStream === "function") {
+      try {
+        upright = createUprightSendStream(stream, {fps: 24});
+        sendStream = await upright.start();
+        if (!sendStream?.getVideoTracks?.().length) {
+          upright.stop();
+          upright = null;
+          sendStream = stream;
+        }
+      } catch (_) {
+        try { upright?.stop(); } catch (_) {}
+        upright = null;
+        sendStream = stream;
+      }
+    }
+
     function attachLocalTracks(peer, media) {
-      (media || activeStream).getTracks().forEach(track => peer.addTrack(track, media || activeStream));
+      const use = media || sendStream || activeStream;
+      use.getTracks().forEach(track => peer.addTrack(track, use));
       preferInteropVideoCodecs(peer);
     }
 
@@ -375,7 +471,7 @@
       try {
         try { pc.close(); } catch (_) {}
         pc = createPeer();
-        attachLocalTracks(pc, activeStream);
+        attachLocalTracks(pc, sendStream || activeStream);
         await publishOffer(pc);
         onStatus?.("renegotiating", {
           connectionState: pc.connectionState,
@@ -451,7 +547,7 @@
       });
     }
 
-    attachLocalTracks(pc, activeStream);
+    attachLocalTracks(pc, sendStream || activeStream);
     await publishOffer(pc);
     listenDisplayJoins();
 
@@ -492,6 +588,18 @@
       get stream() { return activeStream; },
       async replaceStream(nextStream) {
         if (!nextStream || !pc) return false;
+        activeStream = nextStream;
+        if (upright) {
+          // Keep the same canvas video track on the peer; only retarget the source.
+          await upright.replaceSource(nextStream);
+          sendStream = upright.stream || sendStream;
+          const nextAudio = nextStream.getAudioTracks()[0] || null;
+          const senders = pc.getSenders?.() || [];
+          for (const sender of senders) {
+            if (sender.track?.kind === "audio" && nextAudio) await sender.replaceTrack(nextAudio);
+          }
+          return true;
+        }
         const nextVideo = nextStream.getVideoTracks()[0] || null;
         const nextAudio = nextStream.getAudioTracks()[0] || null;
         const senders = pc.getSenders?.() || [];
@@ -500,7 +608,7 @@
           if (kind === "video" && nextVideo) await sender.replaceTrack(nextVideo);
           if (kind === "audio" && nextAudio) await sender.replaceTrack(nextAudio);
         }
-        activeStream = nextStream;
+        sendStream = nextStream;
         return true;
       },
       async renegotiate(reason) {
@@ -513,6 +621,8 @@
         if (unsubCallee) unsubCallee();
         if (unsubJoins) unsubJoins();
         try { pc.close(); } catch (_) {}
+        try { upright?.stop(); } catch (_) {}
+        upright = null;
         if (stopTracks && activeStream) {
           try { activeStream.getTracks().forEach(t => t.stop()); } catch (_) {}
         }
@@ -671,6 +781,7 @@
     resetTrackZoom,
     prepareVideoTrack,
     preferInteropVideoCodecs,
+    createUprightSendStream,
     forceVideoPlay,
     startBroadcast,
     joinAsDisplay

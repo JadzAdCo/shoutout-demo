@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.92";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.93";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,14 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.93",
+      title: "floqCast canvas upright send (LED matches preview)",
+      checks: [
+        {label:"Upright canvas captureStream", file:"floqcast-webrtc.js", includes:["createUprightSendStream", "canvas.captureStream", "drawImage(video", "attachLocalTracks(pc, sendStream"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.93\""]}
+      ]
+    },
     {
       version: "s3.1.92",
       title: "floqCast no top-strip crop + Switch camera Front/Back",
@@ -1809,6 +1817,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-93-floqcast-upright-canvas",
+      area:"floqCast / camera",
+      feature:"LED matches iPhone preview (canvas upright send)",
+      changed:"WebRTC now sends canvas.captureStream frames after drawing the local video (bakes iOS orientation). Fixes forehead-only zoom crop on display2 while phone showed full face. Package s3.1.93.",
+      howToTest:"1) Hard-refresh floqCast preview (s3.1.93) on iPhone 16 + open display2. 2) Go live — board must show the same full face/shoulders as the phone preview (not forehead-only). 3) Keep phone tab foreground.",
+      expected:"Phone preview and display2 framing match (full upright selfie).",
+      troubleshoot:"Still forehead zoom → confirm floqcast-webrtc.js?v=s3.1.93 includes createUprightSendStream; hard-refresh phone + display2; do not background the preview tab."
     },
     {
       id:"s3-1-92-floqcast-top-strip-and-switch",

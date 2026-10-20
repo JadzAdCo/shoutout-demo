@@ -64,6 +64,16 @@ test("camera constraints do not force landscape 1280x720 (iPhone top-strip crop)
   assert.match(src, /facingMode toggle/);
 });
 
+test("broadcast bakes iOS orientation via canvas captureStream before addTrack", () => {
+  const src = fs.readFileSync(path.join(__dirname, "..", "floqcast-webrtc.js"), "utf8");
+  assert.match(src, /function createUprightSendStream/);
+  assert.match(src, /canvas\.captureStream/);
+  assert.match(src, /drawImage\(video/);
+  assert.match(src, /upright\.start/);
+  assert.match(src, /attachLocalTracks\(pc, sendStream/);
+  assert.equal(typeof Rtc.createUprightSendStream, "function");
+});
+
 test("preview HTML has no mojibake arrows", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "floqcast-preview.html"), "utf8");
   assert.doesNotMatch(html, /â†’|â€”|â€/);

@@ -27,6 +27,8 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /displayJoins/);
   assert.match(rtc, /scheduleRebuild/);
   assert.match(rtc, /forceVideoPlay/);
+  assert.match(rtc, /createUprightSendStream/);
+  assert.match(rtc, /captureStream/);
 });
 
 test("display2 reattaches when peer dies and shows connecting status", () => {
