@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.98 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.99 (stable)
 
+- s3.1.99: Washington daytime Places queries forced to DC (not WA state).
 - s3.1.98: AI crawler adds daytime events (flea / fall festival / farmers & community markets) + Washington DC markets.
 
 - s3.1.97: floqCast absolute preview URL (no blank Aurelia tab) + freeze/reconnect hold after stable ICE.
