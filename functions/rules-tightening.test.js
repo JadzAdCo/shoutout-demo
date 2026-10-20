@@ -96,7 +96,7 @@ test("floqCast display2 may add ICE candidates only to a live session, shape-che
   assert.match(body, /allow create: if suprstrSessionAcceptsCandidates\(sessionId\) && isIceCandidateShape\(\);/);
   assert.ok(!/allow create: if true;/.test(body));
   const fn = rules.slice(rules.indexOf("function suprstrSessionAcceptsCandidates"), rules.indexOf("function isDiagnosticResource"));
-  assert.ok(fn.includes('["waiting", "offering", "connected"]') && fn.includes('duration.value(4, "h")'));
+  assert.ok(fn.includes('["waiting", "offering", "connected", "answered"]') && fn.includes('duration.value(4, "h")'));
   assert.ok(fn.includes('hasOnly(["candidate", "sdpMid", "sdpMLineIndex", "usernameFragment"])'));
 });
 
