@@ -26,8 +26,10 @@
   });
 
   const RECONNECT_DEBOUNCE_MS = 1800;
-  /** Brief ICE "disconnected" blips are common; do not tear down the answering peer quickly. */
+  /** Brief ICE "disconnected" blips are common; do not tear down a stable peer quickly. */
   const DISCONNECT_REBUILD_MS = 12000;
+  /** After a successful ICE connect, wait longer before rebuild — avoids freeze→storm. */
+  const DISCONNECT_REBUILD_AFTER_STABLE_MS = 28000;
 
   function db() {
     return firebase.firestore();
@@ -173,6 +175,10 @@
         try {
           // drawImage from a visible playing <video> applies iOS orientation.
           ctx.drawImage(video, 0, 0, vw, vh);
+        } catch (_) {}
+        // iOS can pause the element while WebRTC stays "connected" → frozen LED frames.
+        try {
+          if (video.paused || video.ended) forceVideoPlay(video);
         } catch (_) {}
       }
       raf = requestAnimationFrame(paint);
@@ -534,6 +540,7 @@
     let sendStream = stream; // upright canvas stream for WebRTC (may equal activeStream)
     let upright = null;
     let reconnectTimer = null;
+    let everIceConnected = false;
 
     // Bake what the visible preview shows into WebRTC pixels (iOS orientation).
     if (typeof document !== "undefined" && typeof HTMLCanvasElement !== "undefined"
@@ -586,18 +593,36 @@
       onStatus?.(label || connectionState || "unknown", {
         connectionState,
         iceConnectionState: ice,
-        signalingState: signaling
+        signalingState: signaling,
+        everIceConnected
       });
+    }
+
+    function clearReconnectTimer() {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
     }
 
     function scheduleRebuild(reason, waitMs) {
       if (stopped || rebuilding) return;
-      if (reconnectTimer) clearTimeout(reconnectTimer);
+      clearReconnectTimer();
       const delay = Number.isFinite(waitMs) ? waitMs : RECONNECT_DEBOUNCE_MS;
       reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
+        // Skip if ICE recovered during the wait (common after a freeze blip).
+        try {
+          const ice = String(pc?.iceConnectionState || "");
+          const conn = String(pc?.connectionState || "");
+          if (ice === "connected" || ice === "completed" || conn === "connected") return;
+        } catch (_) {}
         rebuildOffer(reason).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
       }, delay);
+    }
+
+    function disconnectRebuildDelay() {
+      return everIceConnected ? DISCONNECT_REBUILD_AFTER_STABLE_MS : DISCONNECT_REBUILD_MS;
     }
 
     async function rebuildOffer(reason) {
@@ -622,28 +647,23 @@
       peer.onconnectionstatechange = () => {
         const state = String(peer.connectionState || "");
         emitPeerState(peer, state);
-        // Brief ICE "disconnected" blips are common — only auto-rebuild on failed quickly;
-        // disconnected waits longer so a stable link is not torn down.
+        // failed → rebuild soon. disconnected → long hold, especially after a prior stable link
+        // (freeze→disconnect→immediate rebuild was causing reconnect errors).
         if (state === "failed") scheduleRebuild(state, RECONNECT_DEBOUNCE_MS);
-        else if (state === "disconnected") scheduleRebuild(state, DISCONNECT_REBUILD_MS);
-        else if (state === "connected" && reconnectTimer) {
-          clearTimeout(reconnectTimer);
-          reconnectTimer = null;
-        }
+        else if (state === "disconnected") scheduleRebuild(state, disconnectRebuildDelay());
+        else if (state === "connected") clearReconnectTimer();
       };
       peer.oniceconnectionstatechange = () => {
         const ice = String(peer.iceConnectionState || "");
         if (ice === "connected" || ice === "completed") {
-          if (reconnectTimer) {
-            clearTimeout(reconnectTimer);
-            reconnectTimer = null;
-          }
+          everIceConnected = true;
+          clearReconnectTimer();
           if (peer.connectionState === "connected") emitPeerState(peer, "connected");
           else emitPeerState(peer, `ice-${ice}`);
         } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
           emitPeerState(peer, ice === "failed" ? "failed" : ice);
           if (ice === "failed") scheduleRebuild(ice, RECONNECT_DEBOUNCE_MS);
-          else if (ice === "disconnected") scheduleRebuild(ice, DISCONNECT_REBUILD_MS);
+          else if (ice === "disconnected") scheduleRebuild(ice, disconnectRebuildDelay());
         } else {
           emitPeerState(peer, peer.connectionState || ice);
         }

@@ -35,6 +35,16 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /deferUntilEnabled/);
   assert.match(rtc, /enableAndFlush/);
   assert.match(rtc, /DISCONNECT_REBUILD_MS\s*=\s*12000/);
+  assert.match(rtc, /DISCONNECT_REBUILD_AFTER_STABLE_MS\s*=\s*28000/);
+  assert.match(rtc, /everIceConnected/);
+});
+
+test("floqCast search opens absolute preview URL (no blank about:blank tab)", () => {
+  const search = read("floqcast-search.js");
+  assert.match(search, /absoluteAppUrl/);
+  assert.match(search, /preferSameTabPreview/);
+  assert.match(search, /location\.assign\(absUrl\)/);
+  assert.match(search, /about:blank \+ "\.\/floqcast-preview/);
 });
 
 test("display2 reattaches when peer dies and shows connecting status", () => {
@@ -52,6 +62,8 @@ test("display2 reattaches when peer dies and shows connecting status", () => {
   assert.match(display, /answeredSticky/);
   assert.match(display, /Link blip/);
   assert.match(display, /function peerLooksDead\(pc\)[\s\S]*?return \["failed", "closed"\]\.includes\(state\) \|\| \["failed", "closed"\]\.includes\(ice\)/);
+  assert.match(display, /hadVideoTrack/);
+  assert.match(display, /Waiting for phone to restore/);
 });
 
 test("firestore rules let phone wipe ICE + require displayJoins timestamp", () => {

@@ -73,7 +73,9 @@
 
   const MAX_REATTACH = 8;
   const ICE_STUCK_MS = 25000;
-  const DISCONNECT_HOLD_MS = 10000;
+  /** After video was playing, hold through long NAT/Wi‑Fi blips before reattach. */
+  const DISCONNECT_HOLD_MS = 18000;
+  let hadVideoTrack = false;
 
   function clearIceWatchdog() {
     if (iceWatchdogTimer) {
@@ -162,6 +164,7 @@
     peerDead = false;
     waitingForPhoneRebuild = false;
     answeredSticky = false;
+    hadVideoTrack = false;
     clearIceWatchdog();
     clearDisconnectHold();
     ensureOverlay();
@@ -187,6 +190,7 @@
           reattachAttempts = 0;
           waitingForPhoneRebuild = false;
           answeredSticky = true;
+          hadVideoTrack = true;
           clearIceWatchdog();
           clearDisconnectHold();
           setLiveStatus("");
@@ -218,9 +222,12 @@
           return;
         }
         if (status === "disconnected") {
-          // Hold through NAT blips after answer — do not reattach (kills saJX peer).
-          if (answeredSticky) {
-            setLiveStatus("Link blip — holding…");
+          // Hold through NAT/Wi‑Fi blips after answer — do not reattach (kills answering peer).
+          // After video was playing, only reattach on failed/closed — not on disconnected alone.
+          if (answeredSticky || hadVideoTrack) {
+            setLiveStatus(hadVideoTrack
+              ? "Video paused — holding link (keep phone tab open)…"
+              : "Link blip — holding…");
             clearDisconnectHold();
             disconnectHoldTimer = setTimeout(() => {
               disconnectHoldTimer = null;
@@ -228,13 +235,24 @@
               const conn = String(activeJoin?.pc?.connectionState || "");
               if (ice === "connected" || ice === "completed" || conn === "connected") {
                 setLiveStatus("");
+                window.FLOQRFloqCastRtc.forceVideoPlay?.(video);
                 return;
               }
               if (ice === "failed" || conn === "failed" || conn === "closed" || ice === "closed") {
                 peerDead = true;
                 answeredSticky = false;
                 scheduleReattach(sessionId, "WebRTC failed after blip — retrying…");
+                return;
               }
+              // Still only "disconnected" after a prior video track — keep holding; phone rebuilds.
+              if (hadVideoTrack) {
+                setLiveStatus("Waiting for phone to restore the link… keep preview open.");
+                waitingForPhoneRebuild = true;
+                return;
+              }
+              peerDead = true;
+              answeredSticky = false;
+              scheduleReattach(sessionId, "WebRTC disconnected — retrying…");
             }, DISCONNECT_HOLD_MS);
             return;
           }
@@ -283,6 +301,7 @@
     peerDead = false;
     waitingForPhoneRebuild = false;
     answeredSticky = false;
+    hadVideoTrack = false;
     reattachAttempts = 0;
     showOverlay(false);
     setLiveStatus("");

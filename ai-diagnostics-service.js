@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.96";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.97";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.97",
+      title: "floqCast absolute preview URL + freeze reconnect hold",
+      checks: [
+        {label:"Absolute preview URL / same-tab mobile", file:"floqcast-search.js", includes:["absoluteAppUrl", "preferSameTabPreview", "location.assign(absUrl)"]},
+        {label:"Stable-link disconnect rebuild delay", file:"floqcast-webrtc.js", includes:["DISCONNECT_REBUILD_AFTER_STABLE_MS", "everIceConnected"]},
+        {label:"Display holds after video track", file:"display-floqcast.js", includes:["hadVideoTrack", "Waiting for phone to restore"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.97\""]}
+      ]
+    },
     {
       version: "s3.1.96",
       title: "floqCast stick-with-answer ICE (no Connecting hang)",
@@ -1801,6 +1811,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-97-floqcast-aurelia-blank-and-freeze",
+      area:"floqCast / Search + Display 2",
+      feature:"Aurelia select opens preview (not blank); freeze does not thrash reconnect",
+      changed:"Mobile/same-tab + absolute preview URL after venue select. After ICE was stable, phone waits ~28s before rebuild on disconnect; board holds after hadVideoTrack. Package s3.1.97.",
+      howToTest:"1) Hard-refresh floqcast-search.html (s3.1.97) on iPhone. 2) Select Aurelia → Go live, be a floqCast — private preview must load (camera steps), not a blank tab. 3) Pay/approve/Go live with display2 open. 4) After video plays, briefly background then foreground the preview — board may blip but should restore without endless reconnect errors.",
+      expected:"Preview page with Start camera; live video recovers after a blip without stuck Connecting/reconnect spam.",
+      troubleshoot:"Still blank → confirm floqcast-search.js has absoluteAppUrl and you are on s3.1.97 (hard refresh). Still reconnect storm → confirm DISCONNECT_REBUILD_AFTER_STABLE_MS in floqcast-webrtc.js; keep phone tab foreground; TURN still Phase 2 for hard NAT."
+    },
     {
       id:"s3-1-96-floqcast-connecting-hang",
       area:"floqCast / Display 2",

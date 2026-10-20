@@ -603,11 +603,25 @@
         onStatus(s, meta = {}) {
           lastWebrtcStatus = String(s || "");
           lastWebrtcMeta = meta && typeof meta === "object" ? meta : {};
-          if (s !== "upright-canvas") setStatus(`LIVE · WebRTC: ${s}`);
+          if (s === "upright-canvas") {
+            /* quiet */
+          } else if (s === "renegotiating") {
+            setStatus("LIVE — restoring venue link after a drop (keep this tab open)…");
+          } else if (s === "disconnected") {
+            setStatus("LIVE — link blip (Wi‑Fi/NAT). Holding… keep this tab open; do not spam End live.");
+          } else if (s === "failed") {
+            setStatus("LIVE — link failed; auto-rebuilding offer for the board…");
+          } else if (String(s).startsWith("renegotiate-error")) {
+            setStatus(`LIVE — reconnect hiccup (${String(s).slice(0, 80)}). Keep tab open.`);
+          } else {
+            setStatus(`LIVE · WebRTC: ${s}`);
+          }
           liveDiag("webrtc_status", `WebRTC status → ${s}`, {sessionId, meta: lastWebrtcMeta});
           if (s === "connected" || s === "ice-connected" || s === "ice-completed") {
             queueArmAfterStableConnect(sessionId, lastWebrtcMeta);
             if (!liveHeartbeatTimer) startLiveHeartbeat(sessionId);
+            // Unstick local preview if iOS paused the element during a blip.
+            try { global.FLOQRFloqCastRtc?.forceVideoPlay?.(byId("floqcastPreviewVideo")); } catch (_) {}
           } else if (s === "failed" || s === "disconnected" || s === "closed") {
             liveDiag("webrtc_unstable", `WebRTC ${s} while live`, {
               sessionId,
@@ -615,6 +629,7 @@
               liveTimerArmed,
               remainMs: liveEndsAtMs ? Math.max(0, liveEndsAtMs - Date.now()) : null
             }, "warn");
+            try { global.FLOQRFloqCastRtc?.forceVideoPlay?.(byId("floqcastPreviewVideo")); } catch (_) {}
           }
         }
       });

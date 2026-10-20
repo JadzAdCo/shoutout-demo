@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.96 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.97 (stable)
+
+- s3.1.97: floqCast absolute preview URL (no blank Aurelia tab) + freeze/reconnect hold after stable ICE.
 
 - s3.1.96: floqCast stick-with-answer ICE — stop Connecting-to-patron hang (ufrag hygiene + deferred callee ICE).
 

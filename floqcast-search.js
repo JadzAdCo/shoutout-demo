@@ -309,6 +309,26 @@
     } catch (_) {}
   }
 
+  /** Relative paths on about:blank resolve to nowhere → blank screen after Select venue. */
+  function absoluteAppUrl(path) {
+    try {
+      return new URL(String(path || "").replace(/^\.\//, ""), location.href).href;
+    } catch (_) {
+      return String(path || "");
+    }
+  }
+
+  function preferSameTabPreview() {
+    try {
+      const ua = String(navigator.userAgent || "");
+      // iPhone/iPad Safari + in-app browsers often leave about:blank tabs blank after
+      // relative navigations; same-tab is the reliable floqCast path on mobile.
+      return /iPhone|iPad|iPod|Android/i.test(ua) || window.matchMedia?.("(max-width: 900px)")?.matches;
+    } catch (_) {
+      return true;
+    }
+  }
+
   async function beginFloqCast() {
     const venue = selectedVenue();
     if (!venue.id) {
@@ -317,14 +337,17 @@
     }
     const btn = byId("floqcastGoLiveBtn");
     if (btn) btn.disabled = true;
-    let previewTab = window.open("about:blank", "floqr_floqcast_preview");
-    const tabBlocked = !previewTab;
-    if (!tabBlocked) {
-      try {
-        previewTab.document.title = "floqCast Preview";
-        previewTab.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening your private floqCast preview…</p>";
-        previewTab.opener = null;
-      } catch (_) {}
+    const sameTab = preferSameTabPreview();
+    let previewTab = null;
+    if (!sameTab) {
+      previewTab = window.open("about:blank", "floqr_floqcast_preview");
+      if (previewTab) {
+        try {
+          previewTab.document.title = "floqCast Preview";
+          previewTab.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening your private floqCast preview…</p>";
+          previewTab.opener = null;
+        } catch (_) {}
+      }
     }
     try {
       setLiveStatus(`Opening private preview for ${venue.name}…`);
@@ -334,22 +357,26 @@
         displayBoard: "secondary" // floqCast → display2.html only (never Display 1)
       });
       const path = res?.data?.previewPath || `./floqcast-preview.html?t=${encodeURIComponent(res?.data?.accessToken || "")}`;
-      const fullUrl = path.includes("?") ? `${path}&from=search` : `${path}?from=search`;
+      const withFrom = path.includes("?") ? `${path}&from=search` : `${path}?from=search`;
+      // Must be absolute — about:blank + "./floqcast-preview.html" = blank page.
+      const absUrl = absoluteAppUrl(withFrom);
       try { sessionStorage.setItem("floqr_floqcast_token", res?.data?.accessToken || ""); } catch (_) {}
-      if (!tabBlocked && previewTab && !previewTab.closed) {
-        previewTab.location.href = fullUrl;
+      if (previewTab && !previewTab.closed) {
+        previewTab.location.href = absUrl;
         await logPopup("popup_opened", "floqCast preview opened in new tab", {
           locationId: venue.id,
-          popupName: "floqr_floqcast_preview"
+          popupName: "floqr_floqcast_preview",
+          absUrl: true
         });
         setLiveStatus("Private preview opened in a new tab. Follow the steps there.");
       } else {
-        await logPopup("popup_blocked", "floqCast preview tab blocked; using same-tab fallback", {
+        await logPopup(sameTab ? "same_tab_preview" : "popup_blocked", "floqCast preview continuing in this tab", {
           locationId: venue.id,
-          tabBlocked
+          sameTab,
+          tabBlocked: !previewTab
         });
         try { previewTab?.close(); } catch (_) {}
-        location.href = fullUrl;
+        location.assign(absUrl);
       }
     } catch (err) {
       try { previewTab?.close(); } catch (_) {}
