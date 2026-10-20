@@ -29,6 +29,12 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /forceVideoPlay/);
   assert.match(rtc, /createUprightSendStream/);
   assert.match(rtc, /captureStream/);
+  // s3.1.96: ufrag hygiene — do not poison ICE with killed-peer trickle
+  assert.match(rtc, /candidateMatchesUfrag/);
+  assert.match(rtc, /clearIceCollections/);
+  assert.match(rtc, /deferUntilEnabled/);
+  assert.match(rtc, /enableAndFlush/);
+  assert.match(rtc, /DISCONNECT_REBUILD_MS\s*=\s*12000/);
 });
 
 test("display2 reattaches when peer dies and shows connecting status", () => {
@@ -42,6 +48,17 @@ test("display2 reattaches when peer dies and shows connecting status", () => {
   assert.match(display, /waitingForPhoneRebuild/);
   assert.match(display, /MAX_REATTACH/);
   assert.match(display, /waiting for phone/);
+  // s3.1.96: stick with answering peer — disconnected ≠ dead
+  assert.match(display, /answeredSticky/);
+  assert.match(display, /Link blip/);
+  assert.match(display, /function peerLooksDead\(pc\)[\s\S]*?return \["failed", "closed"\]\.includes\(state\) \|\| \["failed", "closed"\]\.includes\(ice\)/);
+});
+
+test("firestore rules let phone wipe ICE + require displayJoins timestamp", () => {
+  const rules = read("firestore.rules");
+  assert.match(rules, /match \/callerCandidates\/\{candidateId\}[\s\S]*?allow delete: if signedIn\(\)/);
+  assert.match(rules, /match \/calleeCandidates\/\{candidateId\}[\s\S]*?allow delete: if signedIn\(\)/);
+  assert.match(rules, /displayJoins[\s\S]*?at is timestamp/);
 });
 
 test("preview warns when tab is hidden while live", () => {

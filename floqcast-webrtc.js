@@ -26,7 +26,8 @@
   });
 
   const RECONNECT_DEBOUNCE_MS = 1800;
-  const DISCONNECT_REBUILD_MS = 5000;
+  /** Brief ICE "disconnected" blips are common; do not tear down the answering peer quickly. */
+  const DISCONNECT_REBUILD_MS = 12000;
 
   function db() {
     return firebase.firestore();
@@ -34,6 +35,57 @@
 
   function createPeer() {
     return new RTCPeerConnection({iceServers: ICE_SERVERS});
+  }
+
+  /** Extract a=ice-ufrag from SDP (first match). */
+  function sdpIceUfrag(sdp) {
+    const m = String(sdp || "").match(/a=ice-ufrag:([^\s\r\n]+)/i);
+    return m ? String(m[1] || "").trim() : "";
+  }
+
+  /** Trickle ICE from a killed peer must not poison the live answer/offer ufrag. */
+  function candidateMatchesUfrag(data, expectedUfrag) {
+    const want = String(expectedUfrag || "").trim();
+    if (!want) return true;
+    const frag = String(
+      data?.usernameFragment
+      || (String(data?.candidate || "").match(/\bufrag\s+(\S+)/i) || [])[1]
+      || ""
+    ).trim();
+    if (!frag) return true;
+    return frag === want;
+  }
+
+  function iceCandidatePayload(candidate) {
+    try {
+      const raw = candidate?.toJSON?.() || {};
+      const out = {};
+      if (typeof raw.candidate === "string") out.candidate = raw.candidate;
+      if (raw.sdpMid != null) out.sdpMid = raw.sdpMid;
+      if (raw.sdpMLineIndex != null) out.sdpMLineIndex = raw.sdpMLineIndex;
+      if (raw.usernameFragment != null) out.usernameFragment = raw.usernameFragment;
+      return out.candidate ? out : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /** Phone (signed-in broadcaster) wipes stale trickle docs before a new offer. */
+  async function clearIceCollections(sessionRef) {
+    if (!sessionRef) return;
+    try {
+      for (const col of ["callerCandidates", "calleeCandidates"]) {
+        // eslint-disable-next-line no-await-in-loop
+        const snap = await sessionRef.collection(col).limit(400).get();
+        if (snap.empty) continue;
+        const batch = db().batch();
+        snap.docs.forEach((d) => batch.delete(d.ref));
+        // eslint-disable-next-line no-await-in-loop
+        await batch.commit();
+      }
+    } catch (_) {
+      // Rules may block until deployed; filtering by ufrag still protects the peer.
+    }
   }
 
   /** Prefer VP8 / H264 Constrained Baseline for iPhone → Chrome LED decode. */
@@ -423,10 +475,46 @@
     }
   }
 
-  function wireIce(pc, sessionRef, collectionName) {
+  /**
+   * Publish local ICE. When deferUntilEnabled is true, candidates are buffered until
+   * the answer write succeeds — a failed write-once must not flood calleeCandidates
+   * with a dead peer's ufrag (that leaves the board on "Connecting to patron…").
+   * Returns { flush, stop } so the caller can release the buffer or abort.
+   */
+  function wireIce(pc, sessionRef, collectionName, opts = {}) {
+    const deferUntilEnabled = !!opts.deferUntilEnabled;
+    let enabled = !deferUntilEnabled;
+    let stopped = false;
+    const pending = [];
+
+    function publish(payload) {
+      if (!payload || stopped) return;
+      sessionRef.collection(collectionName).add(payload).catch(() => {});
+    }
+
     pc.onicecandidate = (ev) => {
-      if (!ev.candidate) return;
-      sessionRef.collection(collectionName).add(ev.candidate.toJSON()).catch(() => {});
+      if (!ev.candidate || stopped) return;
+      const payload = iceCandidatePayload(ev.candidate);
+      if (!payload) return;
+      if (!enabled) {
+        pending.push(payload);
+        return;
+      }
+      publish(payload);
+    };
+
+    return {
+      enableAndFlush() {
+        if (stopped) return;
+        enabled = true;
+        while (pending.length) publish(pending.shift());
+      },
+      stop() {
+        stopped = true;
+        enabled = false;
+        pending.length = 0;
+        try { pc.onicecandidate = null; } catch (_) {}
+      }
     };
   }
 
@@ -482,7 +570,11 @@
       unsubCallee = sessionRef.collection("calleeCandidates").onSnapshot((qs) => {
         qs.docChanges().forEach((change) => {
           if (change.type !== "added") return;
-          peer.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
+          const data = change.doc.data() || {};
+          // Ignore trickle from killed display peers (wrong answer ufrag).
+          const answerUfrag = sdpIceUfrag(lastAnswerSdp || peer?.remoteDescription?.sdp || "");
+          if (!candidateMatchesUfrag(data, answerUfrag)) return;
+          peer.addIceCandidate(new RTCIceCandidate(data)).catch(() => {});
         });
       });
     }
@@ -559,6 +651,9 @@
     }
 
     async function publishOffer(peer) {
+      lastAnswerSdp = "";
+      // Drop stale trickle from prior peers before minting a new offer/ufrag.
+      await clearIceCollections(sessionRef);
       wireIce(peer, sessionRef, "callerCandidates");
       listenCalleeIce(peer);
       wirePeerState(peer);
@@ -572,7 +667,6 @@
         status: "offering",
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge: true});
-      lastAnswerSdp = "";
       onStatus?.("offering", {
         connectionState: peer.connectionState,
         iceConnectionState: peer.iceConnectionState,
@@ -677,6 +771,10 @@
    * Display (venue display2.html): watch session, set remote offer, send answer + ICE.
    * Re-answers whenever the broadcaster publishes a new offer (answer cleared).
    * If an answer already exists for the current offer, requests a displayJoins renegotiate.
+   *
+   * Critical: do NOT publish callee ICE until the answer write succeeds. A reattach race
+   * that setLocalDescription then fails write-once still gathers ICE and poisons the
+   * session with foreign ufrags — phone never completes ICE → "Connecting to patron…".
    */
   async function joinAsDisplay({sessionId, videoEl, onStatus}) {
     const pc = createPeer();
@@ -684,6 +782,8 @@
     let answeredOfferSdp = "";
     let answering = false;
     let joinRequestedForOffer = "";
+    let offerUfrag = "";
+    const icePub = wireIce(pc, sessionRef, "calleeCandidates", {deferUntilEnabled: true});
 
     preferInteropVideoCodecs(pc);
     forceVideoPlay(videoEl);
@@ -699,7 +799,6 @@
         iceConnectionState: pc.iceConnectionState
       });
     };
-    wireIce(pc, sessionRef, "calleeCandidates");
     pc.onconnectionstatechange = () => onStatus?.(pc.connectionState, {
       connectionState: pc.connectionState,
       iceConnectionState: pc.iceConnectionState,
@@ -724,9 +823,13 @@
       if (offerSdp && joinRequestedForOffer === offerSdp) return;
       joinRequestedForOffer = offerSdp || joinRequestedForOffer;
       try {
+        // Prefer client Timestamp — some kiosk WebViews mishandle serverTimestamp sentinels
+        // against keys().hasOnly(["reason","at"]) rules.
+        const at = firebase.firestore.Timestamp?.now?.()
+          || firebase.firestore.FieldValue.serverTimestamp();
         await sessionRef.collection("displayJoins").add({
           reason: String(reason || "rejoin").slice(0, 64),
-          at: firebase.firestore.FieldValue.serverTimestamp()
+          at
         });
         onStatus?.("rejoin-requested", {
           connectionState: pc.connectionState,
@@ -748,22 +851,41 @@
           onStatus?.("need-new-peer", {connectionState: pc.connectionState});
           return;
         }
+        // Fresh read avoids double-answer race: two attaches both see answer=null.
+        const fresh = await sessionRef.get();
+        const freshData = fresh.data() || {};
+        if (freshData.answer?.sdp) {
+          await requestDisplayJoin("stale-answer", offerSdp);
+          return;
+        }
+        offerUfrag = sdpIceUfrag(offerSdp);
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        await sessionRef.set({
-          answer: {type: answer.type, sdp: answer.sdp},
-          status: "connected",
-          answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, {merge: true});
+        try {
+          await sessionRef.set({
+            answer: {type: answer.type, sdp: answer.sdp},
+            status: "connected",
+            answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, {merge: true});
+        } catch (writeErr) {
+          // Write-once lost the race — drop buffered ICE; never publish this ufrag.
+          icePub.stop();
+          answeredOfferSdp = "";
+          onStatus?.(`offer-error:${writeErr.message}`);
+          await requestDisplayJoin("answer-blocked", offerSdp);
+          return;
+        }
         answeredOfferSdp = offerSdp;
+        icePub.enableAndFlush();
         // Signaling only — peer connected comes from connectionState.
         onStatus?.("answered", {
           connectionState: pc.connectionState,
           iceConnectionState: pc.iceConnectionState
         });
       } catch (e) {
+        icePub.stop();
         answeredOfferSdp = "";
         onStatus?.(`offer-error:${e.message}`);
         // Answer write-once: existing answer blocks us — ask phone to clear + republish.
@@ -785,6 +907,7 @@
       const existingAnswer = data.answer?.sdp ? String(data.answer.sdp) : "";
 
       // Stale answer from a previous display instance — request renegotiate instead of failing rules.
+      // Do not setLocalDescription (would gather foreign ICE ufrags).
       if (existingAnswer && answeredOfferSdp !== offerSdp && !pc.currentRemoteDescription) {
         await requestDisplayJoin("stale-answer", offerSdp);
         return;
@@ -798,13 +921,17 @@
     const unsubCaller = sessionRef.collection("callerCandidates").onSnapshot((qs) => {
       qs.docChanges().forEach((change) => {
         if (change.type !== "added") return;
-        pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(() => {});
+        const data = change.doc.data() || {};
+        const want = offerUfrag || sdpIceUfrag(pc?.remoteDescription?.sdp || "");
+        if (!candidateMatchesUfrag(data, want)) return;
+        pc.addIceCandidate(new RTCIceCandidate(data)).catch(() => {});
       });
     });
 
     return {
       get pc() { return pc; },
       stop() {
+        icePub.stop();
         unsubSession();
         unsubCaller();
         try { pc.close(); } catch (_) {}
@@ -826,6 +953,9 @@
     preferInteropVideoCodecs,
     createUprightSendStream,
     forceVideoPlay,
+    sdpIceUfrag,
+    candidateMatchesUfrag,
+    clearIceCollections,
     startBroadcast,
     joinAsDisplay
   };

@@ -97,6 +97,10 @@ test("suprstrSessions: board answer is write-once with a fixed shape", () => {
   assert.match(block, /size\(\) <= 20000/);
   assert.match(block, /displayJoins/);
   assert.match(block, /"answered"/);
+  // s3.1.96: phone may wipe stale ICE; displayJoins requires timestamp `at`
+  assert.match(block, /callerCandidates[\s\S]*?allow delete: if signedIn\(\)/);
+  assert.match(block, /calleeCandidates[\s\S]*?allow delete: if signedIn\(\)/);
+  assert.match(block, /displayJoins[\s\S]*?at is timestamp/);
 });
 
 test("floqCast session docs no longer publish the broadcaster email", () => {

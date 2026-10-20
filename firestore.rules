@@ -1363,13 +1363,19 @@ service cloud.firestore {
  allow read: if true;
  allow create: if signedIn()
  && get(/databases/$(database)/documents/suprstrSessions/$(sessionId)).data.broadcasterUid == request.auth.uid;
- allow update, delete: if false;
+ // Phone clears stale trickle before each new offer (ufrag hygiene).
+ allow delete: if signedIn()
+ && get(/databases/$(database)/documents/suprstrSessions/$(sessionId)).data.broadcasterUid == request.auth.uid;
+ allow update: if false;
  }
  // Xibo display2 is not signed in: it may only add ICE candidates to a live session, for 4 hours.
  match /calleeCandidates/{candidateId} {
  allow read: if true;
  allow create: if suprstrSessionAcceptsCandidates(sessionId) && isIceCandidateShape();
- allow update, delete: if false;
+ // Phone wipes foreign-ufrag pollution when republishing offer.
+ allow delete: if signedIn()
+ && get(/databases/$(database)/documents/suprstrSessions/$(sessionId)).data.broadcasterUid == request.auth.uid;
+ allow update: if false;
  }
  // display2 refresh / late join: anonymous may ping so the phone clears answer + republishes offer.
  match /displayJoins/{joinId} {
@@ -1377,7 +1383,8 @@ service cloud.firestore {
  allow create: if suprstrSessionAcceptsCandidates(sessionId)
  && request.resource.data.keys().hasOnly(["reason", "at"])
  && request.resource.data.reason is string
- && request.resource.data.reason.size() <= 64;
+ && request.resource.data.reason.size() <= 64
+ && request.resource.data.at is timestamp;
  allow update, delete: if false;
  }
  }

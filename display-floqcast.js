@@ -66,21 +66,64 @@
   let watchedSessionId = "";
   let reattachAttempts = 0;
   let waitingForPhoneRebuild = false;
+  /** After SDP answer is written, stick with that peer — do not reattach on ICE blips. */
+  let answeredSticky = false;
+  let iceWatchdogTimer = null;
+  let disconnectHoldTimer = null;
 
   const MAX_REATTACH = 8;
+  const ICE_STUCK_MS = 25000;
+  const DISCONNECT_HOLD_MS = 10000;
 
+  function clearIceWatchdog() {
+    if (iceWatchdogTimer) {
+      clearTimeout(iceWatchdogTimer);
+      iceWatchdogTimer = null;
+    }
+  }
+
+  function clearDisconnectHold() {
+    if (disconnectHoldTimer) {
+      clearTimeout(disconnectHoldTimer);
+      disconnectHoldTimer = null;
+    }
+  }
+
+  function armIceWatchdog(sessionId) {
+    clearIceWatchdog();
+    iceWatchdogTimer = setTimeout(() => {
+      iceWatchdogTimer = null;
+      if (!answeredSticky || sessionId !== watchedSessionId) return;
+      const ice = String(activeJoin?.pc?.iceConnectionState || "");
+      if (ice === "connected" || ice === "completed") return;
+      // Answer landed but ICE never finished — ask phone for a clean offer once.
+      setLiveStatus("Linked but no video yet — asking phone to rebuild…");
+      waitingForPhoneRebuild = true;
+      peerDead = true;
+      scheduleReattach(sessionId, "ICE stuck after answer — refreshing…");
+    }, ICE_STUCK_MS);
+  }
+
+  /**
+   * "disconnected" is often a brief NAT blip. Treating it as dead caused the
+   * "Connecting to patron…" storm: kill answering peer → foreign ICE ufrags → never connect.
+   */
   function peerLooksDead(pc) {
     try {
       const state = String(pc?.connectionState || "");
       const ice = String(pc?.iceConnectionState || "");
-      return ["failed", "closed", "disconnected"].includes(state) || ["failed", "closed", "disconnected"].includes(ice);
+      return ["failed", "closed"].includes(state) || ["failed", "closed"].includes(ice);
     } catch (_) {
       return true;
     }
   }
 
   function reattachDelayMs() {
-    // 1.5s → 3s → 5s → 8s (cap). Avoid fighting phone renegotiate.
+    // Longer first wait after an answered peer so phone displayJoins can republish.
+    if (answeredSticky || waitingForPhoneRebuild) {
+      const steps = [4000, 6000, 8000, 10000];
+      return steps[Math.min(reattachAttempts, steps.length - 1)];
+    }
     const steps = [1500, 3000, 5000, 8000];
     return steps[Math.min(reattachAttempts, steps.length - 1)];
   }
@@ -103,8 +146,12 @@
 
   async function attachSession(sessionId, {force = false} = {}) {
     if (!sessionId) return;
-    // Same sessionId with a dead peer must re-join — do not skip.
+    // Same sessionId with a live (or briefly disconnected) peer must not re-join.
     if (!force && sessionId === activeSessionId && activeJoin && !peerDead && !peerLooksDead(activeJoin.pc)) {
+      return;
+    }
+    // Never kill an answering peer unless forced (ICE failed / watchdog / need-new-peer).
+    if (!force && answeredSticky && activeJoin && sessionId === activeSessionId) {
       return;
     }
     if (activeJoin) {
@@ -114,6 +161,9 @@
     activeSessionId = sessionId;
     peerDead = false;
     waitingForPhoneRebuild = false;
+    answeredSticky = false;
+    clearIceWatchdog();
+    clearDisconnectHold();
     ensureOverlay();
     const video = byId("floqcastLiveVideo");
     showOverlay(true);
@@ -136,12 +186,17 @@
         if (status === "track" || status === "connected" || status === "ice-connected" || status === "ice-completed") {
           reattachAttempts = 0;
           waitingForPhoneRebuild = false;
+          answeredSticky = true;
+          clearIceWatchdog();
+          clearDisconnectHold();
           setLiveStatus("");
           window.FLOQRFloqCastRtc.forceVideoPlay?.(video);
           return;
         }
         if (status === "answered") {
+          answeredSticky = true;
           setLiveStatus("Linked — waiting for video…");
+          armIceWatchdog(sessionId);
           return;
         }
         if (status === "rejoin-requested") {
@@ -154,15 +209,43 @@
         }
         if (status === "need-new-peer") {
           peerDead = true;
+          answeredSticky = false;
           scheduleReattach(sessionId, "Refreshing board link…");
           return;
         }
         if (status === "connecting" || status === "checking" || status === "new" || status === "offering") {
-          setLiveStatus(`WebRTC: ${status}`);
+          if (!answeredSticky) setLiveStatus(`WebRTC: ${status}`);
           return;
         }
-        if (["failed", "disconnected", "closed"].includes(status)) {
+        if (status === "disconnected") {
+          // Hold through NAT blips after answer — do not reattach (kills saJX peer).
+          if (answeredSticky) {
+            setLiveStatus("Link blip — holding…");
+            clearDisconnectHold();
+            disconnectHoldTimer = setTimeout(() => {
+              disconnectHoldTimer = null;
+              const ice = String(activeJoin?.pc?.iceConnectionState || "");
+              const conn = String(activeJoin?.pc?.connectionState || "");
+              if (ice === "connected" || ice === "completed" || conn === "connected") {
+                setLiveStatus("");
+                return;
+              }
+              if (ice === "failed" || conn === "failed" || conn === "closed" || ice === "closed") {
+                peerDead = true;
+                answeredSticky = false;
+                scheduleReattach(sessionId, "WebRTC failed after blip — retrying…");
+              }
+            }, DISCONNECT_HOLD_MS);
+            return;
+          }
           peerDead = true;
+          scheduleReattach(sessionId, "WebRTC disconnected — retrying…");
+          return;
+        }
+        if (["failed", "closed"].includes(status)) {
+          peerDead = true;
+          answeredSticky = false;
+          clearDisconnectHold();
           scheduleReattach(sessionId, `WebRTC ${status} — retrying…`);
           return;
         }
@@ -180,7 +263,7 @@
           scheduleReattach(sessionId, "Retrying after error…");
           return;
         }
-        setLiveStatus(`WebRTC: ${status}`);
+        if (!answeredSticky) setLiveStatus(`WebRTC: ${status}`);
       }
     });
   }
@@ -190,6 +273,8 @@
       clearTimeout(reattachTimer);
       reattachTimer = null;
     }
+    clearIceWatchdog();
+    clearDisconnectHold();
     if (activeJoin) {
       activeJoin.stop();
       activeJoin = null;
@@ -197,6 +282,7 @@
     activeSessionId = "";
     peerDead = false;
     waitingForPhoneRebuild = false;
+    answeredSticky = false;
     reattachAttempts = 0;
     showOverlay(false);
     setLiveStatus("");

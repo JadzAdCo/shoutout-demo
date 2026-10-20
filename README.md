@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.95 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.96 (stable)
+
+- s3.1.96: floqCast stick-with-answer ICE — stop Connecting-to-patron hang (ufrag hygiene + deferred callee ICE).
 
 - s3.1.95: floqCast display2 stop Retrying-after-error storm — wait for phone rebuild on offer-error; backoff reattach.
 

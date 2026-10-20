@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.95";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.96";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.96",
+      title: "floqCast stick-with-answer ICE (no Connecting hang)",
+      checks: [
+        {label:"Defer callee ICE until answer write", file:"floqcast-webrtc.js", includes:["deferUntilEnabled", "enableAndFlush", "candidateMatchesUfrag", "clearIceCollections"]},
+        {label:"Display sticks after answer", file:"display-floqcast.js", includes:["answeredSticky", "Link blip", "[\"failed\", \"closed\"]"]},
+        {label:"Rules allow ICE wipe + displayJoins timestamp", file:"firestore.rules", includes:["allow delete: if signedIn()", "at is timestamp"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.96\""]}
+      ]
+    },
     {
       version: "s3.1.94",
       title: "floqCast canvas paints from visible preview",
@@ -1791,6 +1801,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-1-96-floqcast-connecting-hang",
+      area:"floqCast / Display 2",
+      feature:"Board leaves Connecting to patron… and shows video",
+      changed:"Stick with answering peer after SDP (disconnected ≠ dead). Buffer callee ICE until answer write succeeds. Phone filters trickle by ufrag and clears candidate collections on new offer. displayJoins uses client Timestamp. Package s3.1.96. Rules deploy required.",
+      howToTest:"1) End any live cast. 2) Hard-refresh display2.html?location=temp-democlub-1 (scripts ?v=s3.1.96). 3) Hard-refresh floqcast-preview on phone (s3.1.96). 4) Go live — status should move Connecting → Linked — waiting for video… → clear (video). Must not stay on Connecting to patron… for more than ~15s. 5) Keep phone tab foreground.",
+      expected:"Video on display2 within ~15s; LIVE timer arms; no endless Connecting to patron….",
+      troubleshoot:"Still Connecting → confirm Pages s3.1.96 + Firestore rules deployed (candidate delete + displayJoins at timestamp). Check calleeCandidates for a single answer ufrag (not yyVO/RaMQ mix). End live + hard-refresh both sides before retry. STUN-only can still fail on hard NAT (TURN Phase 2)."
+    },
     {
       id:"s3-1-65-priya-profile-inbox-reconcile",
       area:"Search / Profile menu / Demo accounts",
