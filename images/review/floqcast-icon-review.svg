@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="floqCast review — smoke silhouette">
-  <!-- LOCAL REVIEW ONLY — site palette locked to live floqcast-icon.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="floqCast review — smoke silhouette + wordmark">
+  <!-- LOCAL REVIEW — preferred smoke cast + in-mark floqCast text -->
   <defs>
     <linearGradient id="fcStrokeR" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#26d8ff"/>
@@ -91,4 +91,9 @@
   </g>
 
   <rect x="19.5" y="8.0" width="43.5" height="38" rx="3.0" fill="none" stroke="#26d8ff" stroke-width="0.55" opacity="0.35"/>
+
+  <!-- In-mark word (preferred): floqCast -->
+  <text x="32" y="60.2" text-anchor="middle" fill="#fff"
+        font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
+        font-size="7.4" font-weight="900" letter-spacing="0.02em">floqCast</text>
 </svg>

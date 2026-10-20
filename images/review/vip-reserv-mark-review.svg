@@ -1,25 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="VIP reserV review — top-down C booth + table">
-  <!-- LOCAL REVIEW ONLY — site palette locked to live vip-reserv-mark.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="VIP reserV review — redder seat, black table">
+  <!-- LOCAL REVIEW — preferred layout; seat toward red; table black -->
   <defs>
     <linearGradient id="vipRingR" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#26d8ff"/>
       <stop offset="55%" stop-color="#7a5cff"/>
       <stop offset="100%" stop-color="#ff4fc9"/>
     </linearGradient>
+    <!-- Black table (requested) -->
     <linearGradient id="vipTableR" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#c9785c"/>
-      <stop offset="55%" stop-color="#a85242"/>
-      <stop offset="100%" stop-color="#8a3f36"/>
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="55%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#000000"/>
     </linearGradient>
+    <!-- Seat more toward red (site family, redder than brown) -->
     <linearGradient id="vipSeatR" x1="0" y1="0.2" x2="1" y2="0.85">
-      <stop offset="0%" stop-color="#b86852"/>
-      <stop offset="45%" stop-color="#9a4a3c"/>
-      <stop offset="100%" stop-color="#7a3830"/>
+      <stop offset="0%" stop-color="#d04848"/>
+      <stop offset="45%" stop-color="#b03030"/>
+      <stop offset="100%" stop-color="#8a2222"/>
     </linearGradient>
     <linearGradient id="vipSeatShadeR" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.16"/>
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.14"/>
       <stop offset="50%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.32"/>
     </linearGradient>
   </defs>
 
@@ -29,7 +31,6 @@
         font-family="Arial Black, Helvetica Neue, Arial, sans-serif"
         font-size="10" font-weight="900" letter-spacing="0.12em">VIP</text>
 
-  <!-- Top-down C booth hugging nested round table (site brown-red seat/table) -->
   <g transform="translate(0,1)">
     <path d="M13.5 46.5
              C11.2 39.0, 13.0 30.5, 19.0 25.2
@@ -58,31 +59,27 @@
              Z"
           fill="url(#vipSeatShadeR)"/>
 
-    <!-- Flute ribs — same dark seat ink as live mark -->
-    <path d="M18.6 27.0 C16.6 32.2, 16.8 38.4, 19.4 43.2" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-    <path d="M23.2 23.4 C20.8 29.6, 20.6 37.0, 23.4 43.8" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-    <path d="M27.8 21.4 C26.4 28.4, 26.2 36.6, 27.8 44.4" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-    <path d="M32.0 20.6 C32.0 28.2, 32.0 36.8, 32.0 44.8" fill="none" stroke="#3a1814" stroke-width="0.75" opacity="0.38" stroke-linecap="round"/>
-    <path d="M36.2 21.4 C37.6 28.4, 37.8 36.6, 36.2 44.4" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-    <path d="M40.8 23.4 C43.2 29.6, 43.4 37.0, 40.6 43.8" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-    <path d="M45.4 27.0 C47.4 32.2, 47.2 38.4, 44.6 43.2" fill="none" stroke="#3a1814" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
+    <path d="M18.6 27.0 C16.6 32.2, 16.8 38.4, 19.4 43.2" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.4" stroke-linecap="round"/>
+    <path d="M23.2 23.4 C20.8 29.6, 20.6 37.0, 23.4 43.8" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.4" stroke-linecap="round"/>
+    <path d="M27.8 21.4 C26.4 28.4, 26.2 36.6, 27.8 44.4" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.38" stroke-linecap="round"/>
+    <path d="M32.0 20.6 C32.0 28.2, 32.0 36.8, 32.0 44.8" fill="none" stroke="#3a1010" stroke-width="0.75" opacity="0.42" stroke-linecap="round"/>
+    <path d="M36.2 21.4 C37.6 28.4, 37.8 36.6, 36.2 44.4" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.38" stroke-linecap="round"/>
+    <path d="M40.8 23.4 C43.2 29.6, 43.4 37.0, 40.6 43.8" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.4" stroke-linecap="round"/>
+    <path d="M45.4 27.0 C47.4 32.2, 47.2 38.4, 44.6 43.2" fill="none" stroke="#3a1010" stroke-width="0.7" opacity="0.4" stroke-linecap="round"/>
     <path d="M15.2 44.8 C20.6 38.8, 26.4 36.6, 32 36.6 C37.6 36.6, 43.4 38.8, 48.8 44.8"
-          fill="none" stroke="#f4e8e0" stroke-width="0.9" opacity="0.28" stroke-linecap="round"/>
+          fill="none" stroke="#f4e8e0" stroke-width="0.9" opacity="0.22" stroke-linecap="round"/>
 
-    <!-- Nested round table -->
+    <!-- Black nested table -->
     <circle cx="32" cy="33.8" r="7.0" fill="url(#vipTableR)"/>
-    <circle cx="32" cy="33.8" r="7.0" fill="none" stroke="#f4e8e0" stroke-width="0.55" opacity="0.28"/>
-    <circle cx="32" cy="33.8" r="2.2" fill="#8a3f36" opacity="0.55"/>
+    <circle cx="32" cy="33.8" r="7.0" fill="none" stroke="#26d8ff" stroke-width="0.45" opacity="0.35"/>
+    <circle cx="32" cy="33.8" r="2.0" fill="#000000" opacity="0.85"/>
     <circle cx="29.0" cy="31.8" r="1.1" fill="#f4e8e0" opacity="0.95"/>
-    <circle cx="29.0" cy="31.8" r="0.45" fill="#8a3f36" opacity="0.55"/>
+    <circle cx="29.0" cy="31.8" r="0.45" fill="#111" opacity="0.7"/>
     <circle cx="35.0" cy="31.8" r="1.1" fill="#f4e8e0" opacity="0.95"/>
-    <circle cx="35.0" cy="31.8" r="0.45" fill="#8a3f36" opacity="0.55"/>
+    <circle cx="35.0" cy="31.8" r="0.45" fill="#111" opacity="0.7"/>
 
-    <!-- Accent chairs at C opening — same seat family (no teal off-palette) -->
-    <rect x="17.6" y="46.6" width="5.4" height="4.2" rx="0.9" fill="#9a4a3c" opacity="0.95" transform="rotate(-16 20.3 48.7)"/>
-    <rect x="41.0" y="46.6" width="5.4" height="4.2" rx="0.9" fill="#9a4a3c" opacity="0.95" transform="rotate(16 43.7 48.7)"/>
-    <rect x="18.2" y="47.0" width="4.2" height="1.2" rx="0.4" fill="#26d8ff" opacity="0.35" transform="rotate(-16 20.3 47.6)"/>
-    <rect x="41.6" y="47.0" width="4.2" height="1.2" rx="0.4" fill="#ff4fc9" opacity="0.35" transform="rotate(16 43.7 47.6)"/>
+    <rect x="17.6" y="46.6" width="5.4" height="4.2" rx="0.9" fill="#b03030" opacity="0.98" transform="rotate(-16 20.3 48.7)"/>
+    <rect x="41.0" y="46.6" width="5.4" height="4.2" rx="0.9" fill="#b03030" opacity="0.98" transform="rotate(16 43.7 48.7)"/>
   </g>
 
   <text x="32" y="57.6" text-anchor="middle"
