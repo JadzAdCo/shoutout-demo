@@ -191,6 +191,15 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.1.94",
+      title: "floqCast canvas paints from visible preview",
+      checks: [
+        {label:"Paint from preview videoEl", file:"floqcast-webrtc.js", includes:["videoEl", "resizeMode: \"none\"", "fromPreview"]},
+        {label:"Preview passes floqcastPreviewVideo", file:"floqcast-preview.js", includes:["videoEl: byId(\"floqcastPreviewVideo\")"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.94\""]}
+      ]
+    },
+    {
       version: "s3.1.93",
       title: "floqCast canvas upright send (LED matches preview)",
       checks: [

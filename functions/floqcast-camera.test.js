@@ -71,7 +71,14 @@ test("broadcast bakes iOS orientation via canvas captureStream before addTrack",
   assert.match(src, /drawImage\(video/);
   assert.match(src, /upright\.start/);
   assert.match(src, /attachLocalTracks\(pc, sendStream/);
+  assert.match(src, /videoEl/);
+  assert.match(src, /resizeMode:\s*"none"/);
   assert.equal(typeof Rtc.createUprightSendStream, "function");
+});
+
+test("preview goes live painting from the visible preview video element", () => {
+  const previewJs = fs.readFileSync(path.join(__dirname, "..", "floqcast-preview.js"), "utf8");
+  assert.match(previewJs, /videoEl:\s*byId\("floqcastPreviewVideo"\)/);
 });
 
 test("preview HTML has no mojibake arrows", () => {

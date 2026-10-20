@@ -598,10 +598,12 @@
       broadcastHandle = await global.FLOQRFloqCastRtc.startBroadcast({
         sessionId,
         stream: localStream,
+        // Paint WebRTC from the visible preview so iOS orientation matches what you see.
+        videoEl: byId("floqcastPreviewVideo"),
         onStatus(s, meta = {}) {
           lastWebrtcStatus = String(s || "");
           lastWebrtcMeta = meta && typeof meta === "object" ? meta : {};
-          setStatus(`LIVE · WebRTC: ${s}`);
+          if (s !== "upright-canvas") setStatus(`LIVE · WebRTC: ${s}`);
           liveDiag("webrtc_status", `WebRTC status → ${s}`, {sessionId, meta: lastWebrtcMeta});
           if (s === "connected" || s === "ice-connected" || s === "ice-completed") {
             queueArmAfterStableConnect(sessionId, lastWebrtcMeta);

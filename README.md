@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.93 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.94 (stable)
+
+- s3.1.94: floqCast canvas paints from visible preview video (iOS orientation); resizeMode none; Safari cannot fuse multi-lens.
 
 - s3.1.93: floqCast canvas upright send — bake iOS orientation into WebRTC pixels so display2 matches phone preview (no forehead zoom crop).
 

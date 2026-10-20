@@ -18,9 +18,11 @@
    * (often the TOP of the portrait selfie sensor) into the WebRTC bitstream —
    * local <video> can still look upright via orientation metadata while
    * display2 shows forehead/ceiling only.
+   * resizeMode:"none" asks the UA not to crop-and-scale the track (when supported).
    */
   const VIDEO_BASE = Object.freeze({
-    frameRate: {ideal: 24, max: 30}
+    frameRate: {ideal: 24, max: 30},
+    resizeMode: "none"
   });
 
   const RECONNECT_DEBOUNCE_MS = 1800;
@@ -62,24 +64,41 @@
     if (!track) return;
     try { track.contentHint = "motion"; } catch (_) {}
     await resetTrackZoom(track);
+    // Re-assert no digital zoom / no UA crop when the browser exposes them.
+    try {
+      const caps = typeof track.getCapabilities === "function" ? (track.getCapabilities() || {}) : {};
+      const advanced = [];
+      if (caps.zoom != null) {
+        const minZoom = typeof caps.zoom === "object" ? Number(caps.zoom.min) : 1;
+        advanced.push({zoom: Number.isFinite(minZoom) ? minZoom : 1});
+      }
+      const constr = {resizeMode: "none"};
+      if (advanced.length) constr.advanced = advanced;
+      await track.applyConstraints(constr);
+    } catch (_) {}
   }
 
   /**
-   * iPhone Safari: local <video> applies orientation (full upright selfie) but the
-   * raw WebRTC track is often a landscape buffer — Chrome on display2 then shows
-   * only a horizontal strip (forehead / ceiling). Drawing through a <video>→canvas
-   * bakes orientation into pixels before captureStream, so the LED matches preview.
+   * Bake what the patron *sees* into WebRTC pixels.
+   * Prefer the visible preview <video> (videoEl) — a hidden 2×2 clone often skips
+   * iOS orientation, so canvas still encoded the landscape forehead strip.
+   * Safari cannot fuse multi-lens (no Apple Continuity / dual-camera API on web).
    */
-  function createUprightSendStream(sourceStream, {fps = 24} = {}) {
-    const video = document.createElement("video");
-    video.muted = true;
-    video.defaultMuted = true;
-    video.playsInline = true;
-    video.setAttribute("playsinline", "");
-    video.setAttribute("webkit-playsinline", "");
-    video.setAttribute("muted", "");
-    video.style.cssText = "position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none";
-    try { document.body.appendChild(video); } catch (_) {}
+  function createUprightSendStream(sourceStream, {fps = 24, videoEl = null} = {}) {
+    const ownsVideo = !videoEl;
+    let video = videoEl;
+    if (!video) {
+      video = document.createElement("video");
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+      video.setAttribute("muted", "");
+      // Keep the fallback element large enough that Safari still applies orientation.
+      video.style.cssText = "position:fixed;left:0;top:0;width:64px;height:64px;opacity:0.01;pointer-events:none;z-index:-1";
+      try { document.body.appendChild(video); } catch (_) {}
+    }
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d", {alpha: false, desynchronized: true});
@@ -93,11 +112,16 @@
       const vw = video.videoWidth | 0;
       const vh = video.videoHeight | 0;
       if (vw > 0 && vh > 0 && ctx) {
+        // Prefer portrait canvas when the element reports landscape metadata but
+        // the visible box is portrait (common iOS mismatch). Still draw full frame.
         if (canvas.width !== vw || canvas.height !== vh) {
           canvas.width = vw;
           canvas.height = vh;
         }
-        try { ctx.drawImage(video, 0, 0, vw, vh); } catch (_) {}
+        try {
+          // drawImage from a visible playing <video> applies iOS orientation.
+          ctx.drawImage(video, 0, 0, vw, vh);
+        } catch (_) {}
       }
       raf = requestAnimationFrame(paint);
     }
@@ -114,9 +138,15 @@
 
     return {
       async start() {
-        video.srcObject = source;
-        forceVideoPlay(video);
-        try { await video.play(); } catch (_) {}
+        if (ownsVideo) {
+          video.srcObject = source;
+          forceVideoPlay(video);
+          try { await video.play(); } catch (_) {}
+        } else {
+          // Preview already owns srcObject — just ensure it is playing.
+          forceVideoPlay(video);
+          try { await video.play(); } catch (_) {}
+        }
         for (let i = 0; i < 80 && !(video.videoWidth && video.videoHeight); i++) {
           await new Promise((r) => setTimeout(r, 50));
         }
@@ -132,18 +162,25 @@
       async replaceSource(nextStream) {
         if (!nextStream) return false;
         source = nextStream;
-        video.srcObject = nextStream;
-        forceVideoPlay(video);
-        try { await video.play(); } catch (_) {}
+        if (ownsVideo) {
+          video.srcObject = nextStream;
+          forceVideoPlay(video);
+          try { await video.play(); } catch (_) {}
+        } else {
+          // Caller updates preview video srcObject first; we only refresh audio.
+          forceVideoPlay(video);
+        }
         syncAudioTracks(nextStream);
         return true;
       },
       stop() {
         stopped = true;
         try { cancelAnimationFrame(raf); } catch (_) {}
-        try { video.pause(); } catch (_) {}
-        try { video.srcObject = null; } catch (_) {}
-        try { video.remove(); } catch (_) {}
+        if (ownsVideo) {
+          try { video.pause(); } catch (_) {}
+          try { video.srcObject = null; } catch (_) {}
+          try { video.remove(); } catch (_) {}
+        }
         try {
           (outStream?.getVideoTracks?.() || []).forEach((t) => t.stop());
         } catch (_) {}
@@ -397,7 +434,7 @@
    * Broadcaster (phone): publish local stream; renegotiate when display reconnects with a new answer.
    * Duration clock must arm on real ICE/peer connected — never on SDP answer alone.
    */
-  async function startBroadcast({sessionId, stream, onStatus}) {
+  async function startBroadcast({sessionId, stream, onStatus, videoEl = null}) {
     let pc = createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let lastAnswerSdp = "";
@@ -410,16 +447,22 @@
     let upright = null;
     let reconnectTimer = null;
 
-    // Bake iOS orientation into pixels before encode — preview keeps the raw stream.
+    // Bake what the visible preview shows into WebRTC pixels (iOS orientation).
     if (typeof document !== "undefined" && typeof HTMLCanvasElement !== "undefined"
         && typeof HTMLCanvasElement.prototype.captureStream === "function") {
       try {
-        upright = createUprightSendStream(stream, {fps: 24});
+        upright = createUprightSendStream(stream, {fps: 24, videoEl: videoEl || null});
         sendStream = await upright.start();
         if (!sendStream?.getVideoTracks?.().length) {
           upright.stop();
           upright = null;
           sendStream = stream;
+        } else {
+          onStatus?.("upright-canvas", {
+            connectionState: "new",
+            iceConnectionState: "new",
+            fromPreview: !!videoEl
+          });
         }
       } catch (_) {
         try { upright?.stop(); } catch (_) {}
