@@ -64,6 +64,10 @@
   let peerDead = false;
   let reattachTimer = null;
   let watchedSessionId = "";
+  let reattachAttempts = 0;
+  let waitingForPhoneRebuild = false;
+
+  const MAX_REATTACH = 8;
 
   function peerLooksDead(pc) {
     try {
@@ -75,14 +79,26 @@
     }
   }
 
+  function reattachDelayMs() {
+    // 1.5s → 3s → 5s → 8s (cap). Avoid fighting phone renegotiate.
+    const steps = [1500, 3000, 5000, 8000];
+    return steps[Math.min(reattachAttempts, steps.length - 1)];
+  }
+
   function scheduleReattach(sessionId, reason) {
     if (!sessionId || sessionId !== watchedSessionId) return;
+    if (reattachAttempts >= MAX_REATTACH) {
+      setLiveStatus("Board link failed — refresh display2, or End live on the phone and Go live again.");
+      return;
+    }
     if (reattachTimer) clearTimeout(reattachTimer);
-    setLiveStatus(reason || "Reconnecting to patron…");
+    const delay = reattachDelayMs();
+    reattachAttempts += 1;
+    setLiveStatus(`${reason || "Reconnecting…"} (${reattachAttempts}/${MAX_REATTACH})`);
     reattachTimer = setTimeout(() => {
       reattachTimer = null;
       attachSession(sessionId, {force: true});
-    }, 1200);
+    }, delay);
   }
 
   async function attachSession(sessionId, {force = false} = {}) {
@@ -97,10 +113,11 @@
     }
     activeSessionId = sessionId;
     peerDead = false;
+    waitingForPhoneRebuild = false;
     ensureOverlay();
     const video = byId("floqcastLiveVideo");
     showOverlay(true);
-    setLiveStatus("Connecting to patron…");
+    setLiveStatus(reattachAttempts ? `Connecting to patron… (try ${reattachAttempts + 1})` : "Connecting to patron…");
     if (!window.FLOQRFloqCastRtc?.joinAsDisplay) {
       setLiveStatus("Camera helper missing — refresh display2.");
       console.warn("floqCast RTC helper missing");
@@ -111,40 +128,59 @@
       sessionId,
       videoEl: video,
       onStatus(s) {
-        if (s === "ended") {
+        const status = String(s || "");
+        if (status === "ended") {
           detach();
           return;
         }
-        if (s === "track" || s === "connected" || s === "ice-connected" || s === "ice-completed") {
+        if (status === "track" || status === "connected" || status === "ice-connected" || status === "ice-completed") {
+          reattachAttempts = 0;
+          waitingForPhoneRebuild = false;
           setLiveStatus("");
           window.FLOQRFloqCastRtc.forceVideoPlay?.(video);
           return;
         }
-        if (s === "answered") {
+        if (status === "answered") {
           setLiveStatus("Linked — waiting for video…");
           return;
         }
-        if (s === "rejoin-requested") {
-          setLiveStatus("Asking phone to reconnect…");
+        if (status === "rejoin-requested") {
+          // Phone was asked to clear answer + republish. Do NOT kill this peer yet —
+          // need-new-peer / new offer will refresh. Hard reattach here caused the
+          // "Retrying after error…" storm.
+          waitingForPhoneRebuild = true;
+          setLiveStatus("Asking phone to reconnect… keep phone preview open.");
           return;
         }
-        if (s === "need-new-peer") {
+        if (status === "need-new-peer") {
           peerDead = true;
           scheduleReattach(sessionId, "Refreshing board link…");
           return;
         }
-        if (["failed", "disconnected", "closed"].includes(String(s || ""))) {
-          peerDead = true;
-          scheduleReattach(sessionId, `WebRTC ${s} — retrying…`);
+        if (status === "connecting" || status === "checking" || status === "new" || status === "offering") {
+          setLiveStatus(`WebRTC: ${status}`);
           return;
         }
-        if (String(s || "").includes("error")) {
-          setLiveStatus(String(s));
+        if (["failed", "disconnected", "closed"].includes(status)) {
           peerDead = true;
+          scheduleReattach(sessionId, `WebRTC ${status} — retrying…`);
+          return;
+        }
+        // offer-error / rejoin-error / answer-error: show text; only reattach if
+        // we are not already waiting on a phone rebuild (displayJoins).
+        if (status.includes("error")) {
+          console.warn("[floqCast display]", status);
+          setLiveStatus(status.slice(0, 120));
+          peerDead = true;
+          if (waitingForPhoneRebuild || /offer-error|rejoin-error|answer-blocked/i.test(status)) {
+            // Wait for phone republish / need-new-peer instead of thrashing.
+            setLiveStatus(`${status.slice(0, 80)} — waiting for phone…`);
+            return;
+          }
           scheduleReattach(sessionId, "Retrying after error…");
           return;
         }
-        setLiveStatus(`WebRTC: ${s}`);
+        setLiveStatus(`WebRTC: ${status}`);
       }
     });
   }
@@ -160,6 +196,8 @@
     }
     activeSessionId = "";
     peerDead = false;
+    waitingForPhoneRebuild = false;
+    reattachAttempts = 0;
     showOverlay(false);
     setLiveStatus("");
   }
@@ -179,6 +217,7 @@
       const status = String(data.status || "").toLowerCase();
       const sessionId = String(data.sessionId || "").trim();
       if (status === "live" && sessionId) {
+        if (sessionId !== watchedSessionId) reattachAttempts = 0;
         watchedSessionId = sessionId;
         attachSession(sessionId);
       } else {

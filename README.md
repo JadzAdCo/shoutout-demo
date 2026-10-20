@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.94 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.95 (stable)
+
+- s3.1.95: floqCast display2 stop Retrying-after-error storm — wait for phone rebuild on offer-error; backoff reattach.
 
 - s3.1.94: floqCast canvas paints from visible preview video (iOS orientation); resizeMode none; Safari cannot fuse multi-lens.
 

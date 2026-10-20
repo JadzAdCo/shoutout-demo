@@ -38,6 +38,10 @@ test("display2 reattaches when peer dies and shows connecting status", () => {
   assert.match(display, /Connecting to patron/);
   assert.match(display, /forceVideoPlay/);
   assert.match(display, /need-new-peer/);
+  // offer-error must not hard-reattach while waiting for phone displayJoins rebuild
+  assert.match(display, /waitingForPhoneRebuild/);
+  assert.match(display, /MAX_REATTACH/);
+  assert.match(display, /waiting for phone/);
 });
 
 test("preview warns when tab is hidden while live", () => {

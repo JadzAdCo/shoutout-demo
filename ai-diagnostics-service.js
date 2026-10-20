@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.93";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.95";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1826,6 +1826,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-94-floqcast-preview-paint",
+      area:"floqCast / camera",
+      feature:"LED paints from visible iPhone preview (not hidden clone)",
+      changed:"Canvas upright send now draws from #floqcastPreviewVideo. Hidden clones skipped iOS orientation → zoom crop on LED. resizeMode none. Safari cannot fuse multi-lens. Package s3.1.94.",
+      howToTest:"1) Hard-refresh preview (s3.1.94) + display2. 2) Go live — board framing must match the phone preview exactly. 3) Switch camera — board follows after preview updates.",
+      expected:"WYSIWYG: what the preview shows is what the LED shows. No multi-lens fuse in Safari.",
+      troubleshoot:"Still cropped → confirm s3.1.94 floqcast-preview.js passes videoEl; hard-refresh both devices. Want fused cameras → not possible in Safari (native only)."
     },
     {
       id:"s3-1-93-floqcast-upright-canvas",
