@@ -76,12 +76,16 @@ test("crawler includes daytime event types and relaxes DJ requirement", () => {
   assert.match(diagnostics, /isDaytimeEventType/);
   assert.match(diagnostics, /daytimeEvent/);
   assert.match(diagnostics, /Washington/);
+  assert.match(diagnostics, /Washington DC District of Columbia/);
+  assert.match(diagnostics, /placePhraseForJob/);
   assert.match(discovery, /isDaytimeRecord/);
   assert.match(discovery, /Organizer\(s\) \/ Promoter\(s\)/);
   assert.match(fn, /daytimeEvent/);
   assert.match(fn, /isDaytimeEventType/);
   assert.match(fn, /proposedTypeFromJobEventType/);
   assert.match(fn, /Organizer\(s\) \/ Promoter\(s\)/);
+  assert.match(fn, /placesLocationBiasForJob/);
+  assert.match(fn, /normalizePlacesTextQuery/);
 });
 
 test("runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud without placeholders", () => {

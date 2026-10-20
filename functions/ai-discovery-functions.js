@@ -743,7 +743,42 @@ async function applyOnboardedUpdatePolicy(record = {}) {
   };
 }
 
+function placesLocationBiasForJob(job = {}) {
+  const city = String(job.city || "");
+  const region = String(job.stateRegion || "");
+  const query = String(job.query || "");
+  // Bare "Washington" hits WA state — bias Instant Crawl / Places to District of Columbia.
+  if (
+    /washington/i.test(city) ||
+    /district of columbia|\bdc\b/i.test(region) ||
+    /washington\s*dc|district of columbia/i.test(query)
+  ) {
+    return {
+      circle: {
+        center: { latitude: 38.9072, longitude: -77.0369 },
+        radius: 45000.0
+      }
+    };
+  }
+  return null;
+}
+
+function normalizePlacesTextQuery(job = {}) {
+  let text = String(job.query || "").slice(0, 500);
+  if (/washington/i.test(String(job.city || "")) && !/washington\s*dc|district of columbia/i.test(text)) {
+    text = text.replace(/\bWashington\b(?!\s*DC)/i, "Washington DC District of Columbia");
+  }
+  return text;
+}
+
 async function searchGooglePlaces(job, apiKey) {
+  const body = {
+    textQuery: normalizePlacesTextQuery(job),
+    languageCode: languageCode(job.language),
+    maxResultCount: 20
+  };
+  const bias = placesLocationBiasForJob(job);
+  if (bias) body.locationBias = bias;
   const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method:"POST",
     headers:{
@@ -751,7 +786,7 @@ async function searchGooglePlaces(job, apiKey) {
       "x-goog-api-key":apiKey,
       "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types,places.regularOpeningHours,places.editorialSummary,places.rating,places.userRatingCount,places.businessStatus"
     },
-    body:JSON.stringify({textQuery:String(job.query || "").slice(0, 500), languageCode:languageCode(job.language), maxResultCount:20})
+    body:JSON.stringify(body)
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();

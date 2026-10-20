@@ -3173,14 +3173,29 @@
     return !!key && !["nightlife", "live entertainment"].includes(key);
   }
 
-  function crawlQueryForJob({eventType = "", genre = "", city = "", country = ""} = {}) {
+  function placePhraseForJob({city = "", country = "", stateRegion = ""} = {}) {
+    // "Washington" alone resolves to WA state in Places — force District of Columbia.
+    if (normalized(city) === "washington" && (
+      /district of columbia|^dc$/i.test(stateRegion) ||
+      /united states|usa|u\.s\.?/i.test(country) ||
+      !country
+    )) {
+      return "Washington DC District of Columbia";
+    }
+    return searchPhraseFromParts([
+      city,
+      country && normalized(country) !== normalized(city) ? country : ""
+    ]);
+  }
+
+  function crawlQueryForJob({eventType = "", genre = "", city = "", country = "", stateRegion = ""} = {}) {
+    const place = placePhraseForJob({city, country, stateRegion});
     if (isDaytimeEventType(eventType)) {
       // Daytime community events: search for the market/festival itself, not nightlife tickets.
       return searchPhraseFromParts([
         eventType === "daytime event" ? "daytime festival flea market" : eventType,
         genreShouldAppearInQuery(genre) ? genre : "",
-        city,
-        country && normalized(country) !== normalized(city) ? country : "",
+        place,
         "this weekend"
       ]);
     }
@@ -3188,8 +3203,7 @@
     return searchPhraseFromParts([
       eventType,
       genreShouldAppearInQuery(genre) ? genre : "",
-      city,
-      country && normalized(country) !== normalized(city) ? country : "",
+      place,
       needsTickets && !includesWord(eventType, "ticket") ? "tickets" : ""
     ]);
   }
@@ -3250,7 +3264,10 @@
               language,
               genre,
               eventType,
-              query: searchPhraseFromParts([crawlQueryForJob({eventType, genre, city, country}), language && language !== "local language" ? `in ${language}` : ""]),
+              query: searchPhraseFromParts([
+                crawlQueryForJob({eventType, genre, city, country, stateRegion: market?.region || ""}),
+                language && language !== "local language" ? `in ${language}` : ""
+              ]),
               requiredDatapoints: requiredDatapointLabels(eventType)
             }));
         });
