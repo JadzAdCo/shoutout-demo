@@ -3303,7 +3303,9 @@
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const parsed = parsedListingQuery(s, "events");
-    const textQuery = parsed ? [parsed.residual, ...parsed.when].filter(Boolean).join(" ") : s;
+    const residual = parsed ? [parsed.residual, ...parsed.when].filter(Boolean).join(" ") : s;
+    const textQuery = listingSearchText(residual, null) || residual;
+    const venueAction = listingVenueAction(s, byId("listingType")?.value || "events");
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.eventsToRecords(events) : Object.entries(events).map(([id,e]) => ({id, data:e, title:e.eventName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
     const context = await userLocationContext();
@@ -3322,8 +3324,15 @@
       const publicLocationRaw = window.FLOQRAddress?.publicLocation?.(e) || [e.city, e.region || e.stateRegion || e.country].filter(Boolean).join(", ");
       const publicLocation = Place?.placeLine?.({ city: e.city, region: e.region || e.stateRegion, country: e.country, locationLabel: publicLocationRaw }) || publicLocationRaw;
       const genreLine = (Place?.genres?.(e.genres) || e.genres || []).join(" • ");
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} • ${esc(publicLocation)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button">Buy Ticket / ShoutOut</button>`;
+      const eventCta = venueAction.mode === "navigate"
+        ? (window.FLOQRVenueActions?.ctaLabel?.(venueAction, (key, _vars, fallback) => tt(key, {}, fallback)) || venueAction.ctaFallback)
+        : tt("listing.buyTicketShoutout", {}, "Buy Ticket / ShoutOut");
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} • ${esc(publicLocation)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button" data-venue-action="${esc(venueAction.id || "")}">${esc(eventCta)}</button>`;
       card.querySelector("button").addEventListener("click", () => {
+        if (venueAction.mode === "navigate") {
+          activateListingVenue(e.locationId, {event: {id, ...e}});
+          return;
+        }
         const msg = "Ticket checkout will be connected in the next payment integration. For now, you can throw a ShoutOut at this event location.";
         alert(msg);
         selectLocationForShoutOut(e.locationId, {event: {id, ...e}});
@@ -3332,12 +3341,43 @@
     });
   }
 
+  /** Product intent for listing Select CTAs (floqCast / VIP / ShoutOut) — never hardcode ShoutOut for every Select. */
+  function listingVenueAction(query, listingType) {
+    const VA = window.FLOQRVenueActions;
+    if (!VA?.resolve) {
+      return {
+        id: listingType === "shoutout" ? "shoutout" : "shoutout",
+        mode: listingType?.startsWith?.("club-action:") ? "club-action" : "shoutout",
+        ctaKey: listingType === "shoutout" ? "listing.throwShoutoutHere" : (listingType?.startsWith?.("club-action:") ? "listing.continue" : "listing.select"),
+        ctaFallback: listingType === "shoutout" ? "Throw ShoutOut Here" : (listingType?.startsWith?.("club-action:") ? "Continue" : "Select")
+      };
+    }
+    return VA.resolve({query, listingType});
+  }
+
+  function listingSearchText(query, parsed) {
+    const raw = parsed ? parsed.residual : query;
+    const stripped = window.FLOQRVenueActions?.stripFeatureTokens?.(raw);
+    return (stripped != null && stripped !== "" ? stripped : raw) || "";
+  }
+
+  function activateListingVenue(id, {event = null} = {}) {
+    const type = byId("listingType")?.value || "clubs";
+    const query = byId("locationSearch")?.value || "";
+    const action = listingVenueAction(query, type);
+    if (action.mode === "navigate" && window.FLOQRVenueActions?.navigateToVenue?.(action, id, {from: "search"})) {
+      return;
+    }
+    selectLocationForShoutOut(id, {event});
+  }
+
   async function renderLocationGrid(grid = byId("locationGrid")) {
     const type = byId("listingType").value || "clubs";
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const parsed = parsedListingQuery(s, type);
-    const textQuery = parsed ? parsed.residual : s;
+    const textQuery = listingSearchText(s, parsed);
+    const venueAction = listingVenueAction(s, type);
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.locationsToRecords(locations) : Object.entries(locations).map(([id,l]) => ({id, data:l, title:l.locationName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
     const context = await userLocationContext();
@@ -3362,19 +3402,20 @@
       card.className = "club-option";
       const viewClubLabel = esc(tt("listing.viewClub", {}, "View Club"));
       const actionLabel = esc(
-        type === "shoutout"
+        window.FLOQRVenueActions?.ctaLabel?.(venueAction, (key, _vars, fallback) => tt(key, {}, fallback))
+        || (type === "shoutout"
           ? tt("listing.throwShoutoutHere", {}, "Throw ShoutOut Here")
           : type.startsWith("club-action:")
             ? tt("listing.continue", {}, "Continue")
-            : tt("listing.select", {}, "Select")
+            : tt("listing.select", {}, "Select"))
       );
       const Place = window.FLOQRPlaceI18n;
       const placeLine = Place?.placeLine?.(l) || l.locationLabel || [l.city, l.region].filter(Boolean).join(", ");
       const countryLabel = Place?.country?.(l.country) || l.country;
       const genreLine = (Place?.genres?.(l.genres) || l.genres || []).join(" • ");
       const badges = (l.activityDates || []).slice(0, 4).map((x) => Place?.offering?.(x) || x);
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
-      card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a><button class="primary" type="button" data-venue-action="${esc(venueAction.id || "")}">${actionLabel}</button></div>`;
+      card.querySelector("button").addEventListener("click", () => activateListingVenue(id));
       grid.appendChild(card);
     });
   }

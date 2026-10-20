@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.88";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.89";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.89",
+      title: "Search Select follows floqCast/VIP intent",
+      checks: [
+        {label:"Venue actions registry", file:"floqr-venue-actions.js", includes:["FLOQRVenueActions", "Go floqCast", "buildUrl"]},
+        {label:"index loads venue-actions", file:"index.html", includes:["floqr-venue-actions.js"]},
+        {label:"Listing activateListingVenue", file:"patron-app.js", includes:["activateListingVenue", "listingVenueAction"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.89\""]}
+      ]
+    },
     {
       version: "s3.1.88",
       title: "floqCast venue geo top-4 + name/event search",
@@ -1770,6 +1780,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-89-search-select-feature-intent",
+      area:"Search / routing",
+      feature:"Listing Select follows product intent (floqCast / VIP / ShoutOut)",
+      changed:"floqr-venue-actions.js registry. Query “Floqcast to Aurelia” → CTA Go floqCast → floqcast-search.html?location=. VIP phrases → vip.html?location=. Plain club name still Select → ShoutOut. Package s3.1.89.",
+      howToTest:"1) Hard-refresh Search (package s3.1.89) signed in with floqCast access. 2) Search Floqcast to Aurelia. 3) Aurelia card CTA must say Go floqCast (not Select). 4) Tap it → floqcast-search with Aurelia selected. 5) Search only Aurelia → Select still opens ShoutOut templates.",
+      expected:"Feature words in the query change the venue CTA and destination; no silent ShoutOut when the patron asked for floqCast.",
+      troubleshoot:"Still Select→ShoutOut on Floqcast query → hard-refresh floqr-venue-actions.js + patron-app.js. CTA Go floqCast but lands on templates → activateListingVenue navigate branch. Gate deny → CTA falls back to Select until Features & Services grants floqCast."
     },
     {
       id:"s3-1-88-floqcast-venue-geo-top4",

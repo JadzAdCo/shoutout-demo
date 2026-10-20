@@ -188,6 +188,14 @@
     setLiveStatus("");
   }
 
+  function requestedLocationId() {
+    try {
+      return String(new URLSearchParams(location.search).get("location") || "").trim();
+    } catch (_) {
+      return "";
+    }
+  }
+
   async function resolvePatronLocation() {
     const Geo = global.FLOQRGeoSearch;
     if (!Geo?.resolveUserLocation) {
@@ -264,9 +272,15 @@
       byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = true);
       return;
     }
-    const preferred = venueRows.find((r) => r.id === selectedVenueId)
+    const deepLink = requestedLocationId();
+    const preferred = venueRows.find((r) => r.id === deepLink)
+      || venueRows.find((r) => r.id === selectedVenueId)
       || venueRows[0];
     selectedVenueId = preferred.id;
+    if (deepLink && preferred.id === deepLink) {
+      const search = byId("floqcastVenueSearch");
+      if (search && !String(search.value || "").trim()) search.value = preferred.name || deepLink;
+    }
     syncSelect();
     renderVenueGrid();
     byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = false);

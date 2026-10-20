@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.88 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.89 (stable)
+
+- s3.1.89: Search listing Select follows product intent (floqCast / VIP / ShoutOut) via floqr-venue-actions registry — no more Floqcast query → ShoutOut templates.
 
 - s3.1.88: floqCast Choose a venue uses browser geo for top 4 nearest clubs; type club/event name for matches.
 

@@ -47,6 +47,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Search beta tiles (s3.1.86) | `searchVisible` / `searchTileVisible`: test features show for **Master Admin** (Beta pill, QA) and granted beta testers. floqCast / VIP / FloqAi stay `hidden` for regular patrons until Live or a beta grant. CSS: floqCast/VIP `<img>` marks no longer `height:100%` (was collapsing when face height is auto). |
 | floqCast mark + live arm (s3.1.87) | `images/floqcast-icon.svg` must be valid UTF-8 (Windows-1252 `0x97` in a comment broke SVG-as-`<img>` → blank Search mark). Preview: `armFloqCastLiveDuration` only after stable ICE (`floqcast-webrtc.js` reports `answered` ≠ `connected`). `repairFloqCastPaidOrders` skips `ended`/`rejected` (no false “Moved N into queue”). Queue UI hides ended rows. |
 | floqCast venue geo pick (s3.1.88) | `floqcast-search.html` loads `floqr-geo-search.js`. Empty search shows **top 4 nearest** floqCast venues (GPS → IP → profile city via `FLOQRGeoSearch.resolveUserLocation` / `sortNearest`). Typing matches club, brand, city, or `SHOUTOUT_EVENTS` event name. Status line shows nearest-of-N + place/source. Help: `help-floqcast-choose-venue`. |
+| Search venue Select routing (s3.1.89) | Listing **Select** follows product intent from the query via `floqr-venue-actions.js` (`FLOQRVenueActions.resolve`). “Floqcast to Aurelia” → CTA **Go floqCast** → `floqcast-search.html?location=`. VIP phrases → `vip.html?location=`. Plain club browse still defaults to ShoutOut. Client routing is UX only; feature gates + satellite Auth + callables still enforce access (Bible §8.3 / §11). |
 | UI | Master Admin → **Demo Accounts** (`master-admin-demo-accounts.js`) — removable |
 | Callable bugfix | `demo-seed-functions.js` must init `const db = admin.firestore()` (missing `db` left Seed hanging on “Waiting…”); client uses 300s callable timeout + writes result to `masterActionFeedback` |
 | Firestore rules | `system/{docId}` — Master Admin read for `system/demoAccounts` manifest (Admin SDK writes only); without this, Seed can succeed but Refresh shows misleading “Master Admin only” |
@@ -343,7 +344,24 @@ When adding a section, use this skeleton:
 | **Search icon tiles (s3.1.65+ / s3.1.67 / s3.1.76)** | `#categoryPage .search-icon-row` — ShoutOut logo only (no caption); FloqAi / floqCast / VIP black faces stack a ~80% mark above an in-face wordmark (`flex-direction:column`). `images/floqcast-icon.svg` (small phone + matching woman silhouette → cyan arcs/red arrow → large FloqMedia LED wall with same silhouette); `images/vip-reserv-mark.svg` (enlarged ring, in-ring VIP reserV, curved banquette seat; Search face `vip-icon-face--mark-only`). Mobile/tablet: 3 across; PC: one line. Display2 idle: `Awaiting a floqCast stream. Go live @ {club}`. |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
-| **floqCast venue picker (s3.1.88)** | `floqcast-search.js` + `floqr-geo-search.js` — empty = nearest 4; typeahead = club/event name match (same geo stack as Search ShoutOut listings). |
+| **floqCast venue picker (s3.1.88)** | `floqcast-search.js` + `floqr-geo-search.js` — empty = nearest 4; typeahead = club/event name match (same geo stack as Search ShoutOut listings). Deep link `?location=` preselects (Search Select → floqCast). |
+| **Search venue Select (s3.1.89)** | `floqr-venue-actions.js` registry + `patron-app.js` `activateListingVenue`. Intent from query → CTA label + route. See “Venue Select routing” below. |
+
+## Venue Select routing (scalable feature CTAs)
+
+**Bug fixed (s3.1.89):** Natural Search “Floqcast to Aurelia” showed **Select** and always called `selectLocationForShoutOut` → template composer. Wrong when the query names another product.
+
+**Pattern (add features without new if/else in the grid):**
+
+1. Register one row in `floqr-venue-actions.js` `ACTIONS`: `id`, `featureKey`, `patterns` / `strip`, `ctaKey`, `buildUrl(locationId)` or `mode: "shoutout"`.
+2. Listing reads `FLOQRVenueActions.resolve({query, listingType})` for label + click.
+3. Satellite accepts `?location=` (floqCast / VIP already) and still runs `FLOQRFeatureServices` / session shell / callables.
+4. Mirror patterns in `intent-search.js` `PRODUCT_INTENTS` for FloqAi carpets (keep in sync when adding a product).
+5. Tests: `functions/floqr-venue-actions.test.js` — intent → URL, gate deny → fallback, index script order.
+
+**Security (Bible §8.3 / §11):** Query string and CTA are **UX only**. Authorization stays on: feature flags (`searchVisible` / `guardPage`), Firebase Auth + satellite session shell, Firestore rules, money/live callables. Never grant floqCast/VIP from a crafted `?location=` alone.
+
+**Default:** No product cue → Select still starts ShoutOut (historical primary LED product). Explicit `listingType=shoutout` → “Throw ShoutOut Here”.
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
 | **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — FloqAi/floqCast/VIP tiles are shoutout-icon-card, not category-card.
 | **Package** | s3.1.80 |
