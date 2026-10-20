@@ -712,6 +712,27 @@
         maybeConfirmAwaitingPayment();
       }
     });
+    // iPhone Safari suspends the camera when this tab is backgrounded — board goes black
+    // while Firestore still shows LIVE. Keep the preview tab foreground while casting.
+    document.addEventListener("visibilitychange", () => {
+      if (!broadcastHandle) return;
+      if (document.visibilityState === "hidden") {
+        setStatus("LIVE — keep this phone tab open in the foreground or the venue board goes black.");
+        liveDiag("preview_hidden_while_live", "Preview tab hidden while broadcasting", {
+          sessionId: activeSessionId || requestDoc?.sessionId || "",
+          liveTimerArmed
+        }, "warn");
+        return;
+      }
+      liveDiag("preview_visible_while_live", "Preview tab visible again — requesting renegotiate if needed", {
+        sessionId: activeSessionId || requestDoc?.sessionId || "",
+        webrtc: lastWebrtcStatus
+      });
+      if (["failed", "disconnected", "closed"].includes(lastWebrtcStatus) || !peerLooksConnected(lastWebrtcMeta)) {
+        broadcastHandle.renegotiate?.("preview-visible").catch(() => {});
+        setStatus("LIVE — reconnecting to the venue board…");
+      }
+    });
   }
 
   function recoverAccessToken() {

@@ -394,7 +394,9 @@ service cloud.firestore {
 
  function suprstrSessionAcceptsCandidates(sessionId) {
  let session = get(/databases/$(database)/documents/suprstrSessions/$(sessionId)).data;
- return session.get("status", "") in ["waiting", "offering", "connected"]
+ // Include legacy "answered" so trickle ICE still lands after older phone clients
+ // wrote that status (s3.1.91+ keeps status on connected/offering instead).
+ return session.get("status", "") in ["waiting", "offering", "connected", "answered"]
  && request.time < session.createdAt + duration.value(4, "h");
  }
 
@@ -1331,7 +1333,7 @@ service cloud.firestore {
  || (
  signedIn()
  && resource.data.broadcasterUid == request.auth.uid
- && resource.data.status in ["waiting", "offering", "connected"]
+ && resource.data.status in ["waiting", "offering", "connected", "answered"]
  && request.resource.data.diff(resource.data).affectedKeys()
  .hasOnly(["offer", "answer", "status", "updatedAt"])
  && request.resource.data.status in ["waiting", "offering", "connected"]
@@ -1342,9 +1344,9 @@ service cloud.firestore {
  )
  )
  // Xibo display board (no patron login): answer is write-once per offer.
- // Design notes: .cursor/rules/suprstr.mdc → "Board auth"
+ // Design notes: .cursor/rules/floqcast.mdc → "Board auth"
  || (
- resource.data.status in ["waiting", "offering", "connected"]
+ resource.data.status in ["waiting", "offering", "connected", "answered"]
  && resource.data.get("answer", null) == null
  && request.resource.data.diff(resource.data).affectedKeys()
  .hasOnly(["answer", "status", "answeredAt", "updatedAt"])
@@ -1367,6 +1369,15 @@ service cloud.firestore {
  match /calleeCandidates/{candidateId} {
  allow read: if true;
  allow create: if suprstrSessionAcceptsCandidates(sessionId) && isIceCandidateShape();
+ allow update, delete: if false;
+ }
+ // display2 refresh / late join: anonymous may ping so the phone clears answer + republishes offer.
+ match /displayJoins/{joinId} {
+ allow read: if true;
+ allow create: if suprstrSessionAcceptsCandidates(sessionId)
+ && request.resource.data.keys().hasOnly(["reason", "at"])
+ && request.resource.data.reason is string
+ && request.resource.data.reason.size() <= 64;
  allow update, delete: if false;
  }
  }

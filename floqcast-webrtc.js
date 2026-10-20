@@ -1,6 +1,10 @@
 /* Shared WebRTC helpers for floqCast (phone broadcaster ↔ venue display2.html).
  * iPhone multi-lens: Safari does NOT expose Apple’s fused camera to the web.
- * Prefer Front / FaceTime; skip Continuity / Telephoto / Ultra Wide; reset zoom. */
+ * Prefer Front / FaceTime; skip Continuity / Telephoto / Ultra Wide; reset zoom.
+ *
+ * Signaling note: never leave session.status as "answered" — Firestore rules and
+ * callee ICE only accept waiting|offering|connected (plus answered after s3.1.91
+ * for in-flight sessions). Use "connected" after SDP answer is applied. */
 (function (global) {
   "use strict";
 
@@ -15,12 +19,27 @@
     frameRate: {ideal: 30, max: 30}
   });
 
+  const RECONNECT_DEBOUNCE_MS = 1800;
+  const DISCONNECT_REBUILD_MS = 5000;
+
   function db() {
     return firebase.firestore();
   }
 
   function createPeer() {
     return new RTCPeerConnection({iceServers: ICE_SERVERS});
+  }
+
+  function forceVideoPlay(videoEl) {
+    if (!videoEl) return;
+    try {
+      videoEl.muted = true;
+      videoEl.setAttribute("muted", "");
+      videoEl.setAttribute("playsinline", "");
+      videoEl.setAttribute("webkit-playsinline", "");
+      const p = videoEl.play?.();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch (_) {}
   }
 
   function labelOf(device) {
@@ -191,8 +210,11 @@
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let lastAnswerSdp = "";
     let unsubCallee = null;
+    let unsubJoins = null;
     let rebuilding = false;
+    let stopped = false;
     let activeStream = stream;
+    let reconnectTimer = null;
 
     function attachLocalTracks(peer, media) {
       (media || activeStream).getTracks().forEach(track => peer.addTrack(track, media || activeStream));
@@ -219,15 +241,60 @@
       });
     }
 
+    function scheduleRebuild(reason, waitMs) {
+      if (stopped || rebuilding) return;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      const delay = Number.isFinite(waitMs) ? waitMs : RECONNECT_DEBOUNCE_MS;
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        rebuildOffer(reason).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
+      }, delay);
+    }
+
+    async function rebuildOffer(reason) {
+      if (stopped || rebuilding) return;
+      rebuilding = true;
+      try {
+        try { pc.close(); } catch (_) {}
+        pc = createPeer();
+        attachLocalTracks(pc, activeStream);
+        await publishOffer(pc);
+        onStatus?.("renegotiating", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState,
+          reason: String(reason || "rebuild")
+        });
+      } finally {
+        rebuilding = false;
+      }
+    }
+
     function wirePeerState(peer) {
-      peer.onconnectionstatechange = () => emitPeerState(peer, peer.connectionState);
+      peer.onconnectionstatechange = () => {
+        const state = String(peer.connectionState || "");
+        emitPeerState(peer, state);
+        // Brief ICE "disconnected" blips are common — only auto-rebuild on failed quickly;
+        // disconnected waits longer so a stable link is not torn down.
+        if (state === "failed") scheduleRebuild(state, RECONNECT_DEBOUNCE_MS);
+        else if (state === "disconnected") scheduleRebuild(state, DISCONNECT_REBUILD_MS);
+        else if (state === "connected" && reconnectTimer) {
+          clearTimeout(reconnectTimer);
+          reconnectTimer = null;
+        }
+      };
       peer.oniceconnectionstatechange = () => {
         const ice = String(peer.iceConnectionState || "");
         if (ice === "connected" || ice === "completed") {
+          if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+            reconnectTimer = null;
+          }
           if (peer.connectionState === "connected") emitPeerState(peer, "connected");
           else emitPeerState(peer, `ice-${ice}`);
         } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
           emitPeerState(peer, ice === "failed" ? "failed" : ice);
+          if (ice === "failed") scheduleRebuild(ice, RECONNECT_DEBOUNCE_MS);
+          else if (ice === "disconnected") scheduleRebuild(ice, DISCONNECT_REBUILD_MS);
         } else {
           emitPeerState(peer, peer.connectionState || ice);
         }
@@ -240,6 +307,8 @@
       wirePeerState(peer);
       const offer = await peer.createOffer({offerToReceiveAudio: false, offerToReceiveVideo: false});
       await peer.setLocalDescription(offer);
+      // Clear answer so display2 can write a fresh answer (rules: answer write-once).
+      // Keep status in {waiting,offering,connected} — never "answered" (blocks callee ICE).
       await sessionRef.set({
         offer: {type: offer.type, sdp: offer.sdp},
         answer: null,
@@ -254,36 +323,38 @@
       });
     }
 
+    function listenDisplayJoins() {
+      if (unsubJoins) unsubJoins();
+      unsubJoins = sessionRef.collection("displayJoins").onSnapshot((qs) => {
+        qs.docChanges().forEach((change) => {
+          if (change.type !== "added") return;
+          scheduleRebuild(change.doc.data()?.reason || "display-join");
+        });
+      });
+    }
+
     attachLocalTracks(pc, activeStream);
     await publishOffer(pc);
+    listenDisplayJoins();
 
     const unsubSession = sessionRef.onSnapshot(async (snap) => {
       const data = snap.data() || {};
       if (!data.answer?.sdp) return;
       if (data.answer.sdp === lastAnswerSdp) return;
-      if (rebuilding) return;
+      if (rebuilding || stopped) return;
 
       // Display re-joined after an old answer was already applied — rebuild peer + offer.
       if (pc.currentRemoteDescription) {
-        rebuilding = true;
-        try {
-          try { pc.close(); } catch (_) {}
-          pc = createPeer();
-          attachLocalTracks(pc, activeStream);
-          await publishOffer(pc);
-        } catch (e) {
-          onStatus?.(`renegotiate-error:${e.message}`);
-        } finally {
-          rebuilding = false;
-        }
+        scheduleRebuild("new-answer-while-set");
         return;
       }
 
       try {
         lastAnswerSdp = data.answer.sdp;
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        // Stay on "connected" so trickle ICE + renegotiate stay allowed by rules.
         await sessionRef.set({
-          status: "answered",
+          status: "connected",
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
         // Signaling answer applied — ICE may still be connecting. Do NOT report "connected" here.
@@ -314,9 +385,15 @@
         activeStream = nextStream;
         return true;
       },
+      async renegotiate(reason) {
+        await rebuildOffer(reason || "manual");
+      },
       stop({stopTracks = false} = {}) {
+        stopped = true;
+        if (reconnectTimer) clearTimeout(reconnectTimer);
         unsubSession();
         if (unsubCallee) unsubCallee();
+        if (unsubJoins) unsubJoins();
         try { pc.close(); } catch (_) {}
         if (stopTracks && activeStream) {
           try { activeStream.getTracks().forEach(t => t.stop()); } catch (_) {}
@@ -327,17 +404,23 @@
 
   /**
    * Display (venue display2.html): watch session, set remote offer, send answer + ICE.
+   * Re-answers whenever the broadcaster publishes a new offer (answer cleared).
+   * If an answer already exists for the current offer, requests a displayJoins renegotiate.
    */
   async function joinAsDisplay({sessionId, videoEl, onStatus}) {
     const pc = createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
+    let answeredOfferSdp = "";
+    let answering = false;
+    let joinRequestedForOffer = "";
+
+    forceVideoPlay(videoEl);
 
     pc.ontrack = (ev) => {
       const [remote] = ev.streams;
       if (videoEl && remote) {
         videoEl.srcObject = remote;
-        videoEl.muted = true;
-        videoEl.play?.().catch(() => {});
+        forceVideoPlay(videoEl);
       }
       onStatus?.("track", {
         connectionState: pc.connectionState,
@@ -350,18 +433,50 @@
       iceConnectionState: pc.iceConnectionState,
       signalingState: pc.signalingState
     });
-
-    let answered = false;
-    const unsubSession = sessionRef.onSnapshot(async (snap) => {
-      const data = snap.data() || {};
-      if (data.status === "ended") {
-        onStatus?.("ended");
-        return;
+    pc.oniceconnectionstatechange = () => {
+      const ice = String(pc.iceConnectionState || "");
+      if (ice === "connected" || ice === "completed") {
+        onStatus?.(pc.connectionState === "connected" ? "connected" : `ice-${ice}`, {
+          connectionState: pc.connectionState,
+          iceConnectionState: ice
+        });
+      } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
+        onStatus?.(ice, {
+          connectionState: pc.connectionState,
+          iceConnectionState: ice
+        });
       }
-      if (!data.offer || answered) return;
-      answered = true;
+    };
+
+    async function requestDisplayJoin(reason, offerSdp) {
+      if (offerSdp && joinRequestedForOffer === offerSdp) return;
+      joinRequestedForOffer = offerSdp || joinRequestedForOffer;
       try {
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        await sessionRef.collection("displayJoins").add({
+          reason: String(reason || "rejoin").slice(0, 64),
+          at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        onStatus?.("rejoin-requested", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState
+        });
+      } catch (e) {
+        onStatus?.(`rejoin-error:${e.message}`);
+      }
+    }
+
+    async function answerOffer(offer) {
+      const offerSdp = String(offer?.sdp || "");
+      if (!offerSdp || answering) return;
+      if (answeredOfferSdp === offerSdp && pc.currentRemoteDescription) return;
+      answering = true;
+      try {
+        if (pc.signalingState !== "stable" && pc.currentRemoteDescription) {
+          // Need a fresh peer for a second offer — parent will stop + rejoin.
+          onStatus?.("need-new-peer", {connectionState: pc.connectionState});
+          return;
+        }
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         await sessionRef.set({
@@ -370,14 +485,41 @@
           answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
+        answeredOfferSdp = offerSdp;
         // Signaling only — peer connected comes from connectionState.
         onStatus?.("answered", {
           connectionState: pc.connectionState,
           iceConnectionState: pc.iceConnectionState
         });
       } catch (e) {
-        answered = false;
+        answeredOfferSdp = "";
         onStatus?.(`offer-error:${e.message}`);
+        // Answer write-once: existing answer blocks us — ask phone to clear + republish.
+        await requestDisplayJoin("answer-blocked", offerSdp);
+      } finally {
+        answering = false;
+      }
+    }
+
+    const unsubSession = sessionRef.onSnapshot(async (snap) => {
+      const data = snap.data() || {};
+      if (data.status === "ended") {
+        onStatus?.("ended");
+        return;
+      }
+      const offer = data.offer;
+      if (!offer?.sdp) return;
+      const offerSdp = String(offer.sdp);
+      const existingAnswer = data.answer?.sdp ? String(data.answer.sdp) : "";
+
+      // Stale answer from a previous display instance — request renegotiate instead of failing rules.
+      if (existingAnswer && answeredOfferSdp !== offerSdp && !pc.currentRemoteDescription) {
+        await requestDisplayJoin("stale-answer", offerSdp);
+        return;
+      }
+
+      if (!existingAnswer || answeredOfferSdp === offerSdp) {
+        await answerOffer(offer);
       }
     });
 
@@ -407,6 +549,7 @@
     scoreVideoDevice,
     pickPreferredVideoDevice,
     resetTrackZoom,
+    forceVideoPlay,
     startBroadcast,
     joinAsDisplay
   };

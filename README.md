@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.90 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.91 (stable)
+
+- s3.1.91: floqCast LIVE black-board fix — keep session.status connected (not answered) so ICE continues; display rejoin + phone renegotiate; keep phone tab foreground.
 
 - s3.1.90: floqCast prefers Front/FaceTime camera, contain framing on preview+LED, Switch camera; Safari has no Apple fused multi-lens stream.
 

@@ -21,6 +21,28 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /Do NOT report "connected" here/);
   assert.match(rtc, /onStatus\?\.\("answered"/);
   assert.match(rtc, /renegotiate-error/);
+  // After SDP answer, session.status must stay "connected" (not "answered") so callee ICE is allowed.
+  assert.match(rtc, /status:\s*"connected"/);
+  assert.doesNotMatch(rtc, /status:\s*"answered"/);
+  assert.match(rtc, /displayJoins/);
+  assert.match(rtc, /scheduleRebuild/);
+  assert.match(rtc, /forceVideoPlay/);
+});
+
+test("display2 reattaches when peer dies and shows connecting status", () => {
+  const display = read("display-floqcast.js");
+  assert.match(display, /scheduleReattach/);
+  assert.match(display, /floqcastLiveStatus/);
+  assert.match(display, /Connecting to patron/);
+  assert.match(display, /forceVideoPlay/);
+  assert.match(display, /need-new-peer/);
+});
+
+test("preview warns when tab is hidden while live", () => {
+  const preview = read("floqcast-preview.js");
+  assert.match(preview, /visibilitychange/);
+  assert.match(preview, /keep this phone tab open/);
+  assert.match(preview, /renegotiate/);
 });
 
 test("floqCast preview arms duration only after stable ICE", () => {

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.90";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.91";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -190,6 +190,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.91",
+      title: "floqCast LIVE board reconnect (no black LIVE)",
+      checks: [
+        {label:"Session status stays connected", file:"floqcast-webrtc.js", includes:["status: \"connected\"", "displayJoins", "scheduleRebuild"], notIncludes:["status: \"answered\""]},
+        {label:"Display reattach + Connecting status", file:"display-floqcast.js", includes:["scheduleReattach", "floqcastLiveStatus", "forceVideoPlay"]},
+        {label:"Rules allow answered ICE + displayJoins", file:"firestore.rules", includes:["displayJoins", "\"answered\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.91\""]}
+      ]
+    },
     {
       version: "s3.1.90",
       title: "floqCast Front camera + contain framing",
@@ -1790,6 +1800,15 @@
       howToTest:"1) Open a pending beta invite as the invited patron (hard-refresh beta-invite.html). 2) Confirm no green FLOQR Beta eyebrow and no green Signed-in line. 3) Tap ? next to the title — invite intro appears. 4) Scroll Agreement — wording says FloqR (not FloqR.app) and Refund Policy mentions reversing payments. 5) Booking section shows title + ? only; open ? for disclaimer. 6) Check both boxes → I Agree and join beta.",
       expected:"Clean chrome; FloqR branding; booking copy only in ?; join still records consent v2.",
       troubleshoot:"Green Signed-in still shows → beta-invite-app unlockAgreementUi must setStatus(\"\"). FloqR.app still visible → hard refresh + confirm feature-services-core agreementVersion 2 deployed if accept fails hash mismatch."
+    },
+    {
+      id:"s3-1-91-floqcast-live-black-board",
+      area:"floqCast / Display 2",
+      feature:"floqCast LIVE badge with video (no black board)",
+      changed:"Session status stays connected after SDP (not answered) so callee ICE is not blocked. displayJoins renegotiate on board refresh. Phone rebuilds on ICE failed. Display shows Connecting… and reattaches. Preview warns if tab is backgrounded. Package s3.1.91. Rules deploy required.",
+      howToTest:"1) Open display2.html?location=temp-democlub-1. 2) Hard-refresh floqCast preview (package s3.1.91) on phone. 3) Pay/approve/Go live — board shows Connecting… then video (not only red LIVE on black). 4) Refresh display2 mid-cast — video returns within a few seconds. 5) Keep phone tab foreground while watching the board.",
+      expected:"Video frames on display2 while LIVE; timer arms after ICE; refresh recovers; backgrounding phone shows a keep-tab-open warning.",
+      troubleshoot:"Still black LIVE → confirm Pages s3.1.91 + Firestore rules deployed (displayJoins + answered in ICE allow-list). Phone tab must stay open. Check preview status for WebRTC failed/disconnected. STUN-only can still fail across hard NATs (TURN is Phase 2)."
     },
     {
       id:"s3-1-90-floqcast-front-camera-framing",

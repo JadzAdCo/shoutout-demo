@@ -95,6 +95,8 @@ test("suprstrSessions: board answer is write-once with a fixed shape", () => {
   assert.match(block, /hasOnly\(\["answer", "status", "answeredAt", "updatedAt"\]\)/);
   assert.match(block, /answer\.type == "answer"/);
   assert.match(block, /size\(\) <= 20000/);
+  assert.match(block, /displayJoins/);
+  assert.match(block, /"answered"/);
 });
 
 test("floqCast session docs no longer publish the broadcaster email", () => {
