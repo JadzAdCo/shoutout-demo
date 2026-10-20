@@ -114,6 +114,9 @@
     "help-floqcast": [
       "patron"
     ],
+    "help-floqcast-choose-venue": [
+      "patron"
+    ],
     "help-floqr-inbox-rules": [
       "patron",
       "serviceMember",
