@@ -1,0 +1,18 @@
+---
+description: Local HTML previews — always open in Cursor browser
+alwaysApply: true
+---
+
+# Local HTML previews (always)
+
+When you create or update a **local-only** HTML preview (icon review, logo steps, QA mock, etc.):
+
+1. Keep assets under the workspace (e.g. `images/review/`, `*-preview.html`).
+2. Push a throwaway `cursor/*-bbee` branch if the user’s machine needs the files (do **not** wire Search / Pages / `main` unless they say go-ahead).
+3. **Always open the preview yourself** in the agent environment:
+   - Serve the repo root with a local static server (e.g. `python3 -m http.server <port> --bind 127.0.0.1`).
+   - Open `http://127.0.0.1:<port>/<page>.html` in the **Cursor / computer-use browser** (not “tell the user to open file://…” as the only step).
+4. Confirm the page loaded (marks/images visible) before handing off for feedback.
+5. Do not treat GitHub Pages as the preview channel for unapproved icon/logo work.
+
+Do **not** stop at “here’s the path — open it locally” unless the browser cannot run in this environment (then say so and give the one-line `open`/`start` fallback).
