@@ -26,6 +26,10 @@ test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
   assert.match(source, /exports\.runInstantDiscoveryCrawl\s*=\s*onCall/);
   assert.match(source, /summarizeContactLift/);
   assert.match(source, /instant-discovery-crawl/);
+  assert.match(source, /discovery-crawl-core/);
+  assert.match(source, /discovery-auto-approve/);
+  assert.match(source, /maybeAutoPublishRecord/);
+  assert.match(source, /exports\.retirePastCrawledEvents/);
   const html = read("master-admin.html");
   assert.match(html, /runInstantCrawlBtn/);
   assert.match(html, /Instant Crawl Now/);

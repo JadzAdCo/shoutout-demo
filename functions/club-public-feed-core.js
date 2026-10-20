@@ -3,7 +3,8 @@
 "use strict";
 
 const STAFF_PHOTO_FIELDS = ["photoUrl", "photoURL", "imageUrl"];
-const HIDDEN_EVENT_STATUSES = new Set(["deleted", "cancelled", "canceled", "rejected", "draft"]);
+const HIDDEN_EVENT_STATUSES = new Set(["deleted", "cancelled", "canceled", "rejected", "draft", "removed"]);
+const HIDDEN_LIFECYCLE = new Set(["retired", "removed"]);
 
 function text(value = "", max = 500) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -80,7 +81,7 @@ function djsView(club = {}) {
 }
 
 function eventStartMs(event = {}) {
-  const raw = event.startsAt || event.eventDate || event.date || event.startDate;
+  const raw = event.eventStartIso || event.startsAt || event.eventDate || event.date || event.startDate;
   if (!raw) return 0;
   if (typeof raw.toMillis === "function") return raw.toMillis();
   if (typeof raw === "object" && Number.isFinite(raw._seconds)) return raw._seconds * 1000;
@@ -89,28 +90,59 @@ function eventStartMs(event = {}) {
   return Number.isFinite(ms) ? ms : 0;
 }
 
+function eventLifecycle(event = {}, nowMs = Date.now()) {
+  const life = text(event.lifecycleStatus, 40).toLowerCase();
+  if (HIDDEN_LIFECYCLE.has(life)) return life;
+  const startMs = eventStartMs(event);
+  if (startMs && startMs < nowMs - 12 * 60 * 60 * 1000) return "past";
+  if (life === "past") return "past";
+  return "upcoming";
+}
+
+function mapPublicEvent(event, startMs) {
+  return {
+    id: text(event.id, 160),
+    name: text(event.eventName || event.title, 160) || "Club event",
+    startsAt: startMs ? new Date(startMs).toISOString() : "",
+    date: text(typeof event.eventDate === "string" ? event.eventDate : event.date, 40),
+    time: text(event.eventTime, 40),
+    lifecycleStatus: text(event.lifecycleStatus, 40) || (startMs && startMs < Date.now() ? "past" : "upcoming"),
+    crawlerDateSource: text(event.crawlerDateSource, 120),
+    artists: (event.artists || event.artistsOrDjs || event.featuredDjs || event.djs || []).map(v => text(typeof v === "string" ? v : v?.name, 80)).filter(Boolean).slice(0, 8),
+    genres: (Array.isArray(event.genres) ? event.genres : []).map(v => text(v, 40)).filter(Boolean).slice(0, 6),
+    imageUrl: httpsUrl(event.imageUrl || event.flyerUrl),
+    ticketUrl: httpsUrl(event.ticketUrl || event.officialUrl || event.sourceUrl)
+  };
+}
+
 function eventsView(events = [], nowMs = Date.now(), club = {}) {
   if (!sectionOn(club, "upcomingEvents")) return [];
   const cutoff = nowMs - 12 * 60 * 60 * 1000;
   const seen = new Set();
   return (Array.isArray(events) ? events : [])
     .filter(event => event && !HIDDEN_EVENT_STATUSES.has(text(event.status, 30).toLowerCase()) && event.active !== false)
+    .filter(event => !HIDDEN_LIFECYCLE.has(text(event.lifecycleStatus, 40).toLowerCase()))
     .filter(event => !seen.has(event.id) && seen.add(event.id))
-    .map(event => ({event, startMs: eventStartMs(event)}))
-    .filter(row => !row.startMs || row.startMs >= cutoff)
+    .map(event => ({event, startMs: eventStartMs(event), life: eventLifecycle(event, nowMs)}))
+    .filter(row => row.life === "upcoming" && (!row.startMs || row.startMs >= cutoff))
     .sort((a, b) => (a.startMs || Infinity) - (b.startMs || Infinity))
     .slice(0, 30)
-    .map(({event, startMs}) => ({
-      id: text(event.id, 160),
-      name: text(event.eventName || event.title, 160) || "Club event",
-      startsAt: startMs ? new Date(startMs).toISOString() : "",
-      date: text(typeof event.eventDate === "string" ? event.eventDate : event.date, 40),
-      time: text(event.eventTime, 40),
-      artists: (event.artists || event.featuredDjs || event.djs || []).map(v => text(typeof v === "string" ? v : v?.name, 80)).filter(Boolean).slice(0, 8),
-      genres: (Array.isArray(event.genres) ? event.genres : []).map(v => text(v, 40)).filter(Boolean).slice(0, 6),
-      imageUrl: httpsUrl(event.imageUrl || event.flyerUrl),
-      ticketUrl: httpsUrl(event.ticketUrl || event.officialUrl || event.sourceUrl)
-    }));
+    .map(({event, startMs}) => mapPublicEvent(event, startMs));
+}
+
+/** Past events rail on venue / club / DJ / promoter public pages (when section enabled). */
+function pastEventsView(events = [], nowMs = Date.now(), club = {}) {
+  if (!sectionOn(club, "pastEvents")) return [];
+  const seen = new Set();
+  return (Array.isArray(events) ? events : [])
+    .filter(event => event && !HIDDEN_EVENT_STATUSES.has(text(event.status, 30).toLowerCase()))
+    .filter(event => !HIDDEN_LIFECYCLE.has(text(event.lifecycleStatus, 40).toLowerCase()))
+    .filter(event => !seen.has(event.id) && seen.add(event.id))
+    .map(event => ({event, startMs: eventStartMs(event), life: eventLifecycle(event, nowMs)}))
+    .filter(row => row.life === "past")
+    .sort((a, b) => (b.startMs || 0) - (a.startMs || 0))
+    .slice(0, 30)
+    .map(({event, startMs}) => mapPublicEvent(event, startMs));
 }
 
 function galleryView(media = [], club = {}) {
@@ -183,7 +215,9 @@ module.exports = {
   staffView,
   djsView,
   eventStartMs,
+  eventLifecycle,
   eventsView,
+  pastEventsView,
   galleryView,
   profileView,
   isProfilePublished,

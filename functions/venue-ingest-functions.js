@@ -98,6 +98,7 @@ async function clubDatasets(club, locationId, dataset) {
     staff: want("staff") ? clubFeed.staffView(club) : undefined,
     djs: want("djs") ? clubFeed.djsView(club) : undefined,
     events: want("events") ? clubFeed.eventsView(events, Date.now(), club) : undefined,
+    pastEvents: want("events") || want("pastEvents") ? clubFeed.pastEventsView(events, Date.now(), club) : undefined,
     gallery: want("gallery") ? clubFeed.galleryView(media, club) : undefined
   };
 }

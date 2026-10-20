@@ -75,6 +75,20 @@ test("events: upcoming only, sorted, hidden statuses dropped, RSS escapes", () =
   assert.match(rss, /<link>https:\/\/t\.example<\/link>/);
 });
 
+test("pastEventsView keeps past, hides retired/removed, respects section flag", () => {
+  const now = Date.parse("2026-10-10T12:00:00Z");
+  const club = {publicProfileSections: {pastEvents: true}};
+  const past = feed.pastEventsView([
+    {id: "past", eventName: "Past Show", eventDate: "2026-09-01", crawlerDateSource: "schema.org JSON-LD Event.startDate"},
+    {id: "soon", eventName: "Soon", eventDate: "2026-10-12"},
+    {id: "retired", eventName: "Old", eventDate: "2026-08-01", lifecycleStatus: "retired"},
+    {id: "removed", eventName: "Gone", eventDate: "2026-07-01", lifecycleStatus: "removed"}
+  ], now, club);
+  assert.deepEqual(past.map(e => e.id), ["past"]);
+  assert.equal(past[0].crawlerDateSource, "schema.org JSON-LD Event.startDate");
+  assert.deepEqual(feed.pastEventsView([{id: "past", eventName: "Past", eventDate: "2026-09-01"}], now, {publicProfileSections: {pastEvents: false}}), []);
+});
+
 test("gallery skips main/logo slots, non-https and duplicates", () => {
   const gallery = feed.galleryView([
     {mediaUrl: "https://cdn.example/2.jpg", galleryOrder: 2},

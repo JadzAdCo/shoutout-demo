@@ -28,6 +28,9 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 | Time zone | `UTC` on live schedule doc (design default was `America/New_York`) |
 | Focus | Nightlife (clubs / lounges / DJ) **and daytime** (flea markets, fall festivals, farmers / community markets) · Hip Hop + Community / Festival / Market · cities include **Washington, DC** when selected |
 | US places | **Washington, DC** (District of Columbia) ≠ **Washington State** / Seattle. Bare “Washington” → capital. Use “Washington State” or “Seattle” for WA. Places queries never emit bare “Washington”. |
+| Upsert keys | Venues: `place_{placesId}`. Dated events: `evt_{sha1(placesId\|startIso\|title)}`. Never append-only random ids. |
+| Auto-approve | `processCrawledItem` — all gates + confidence ≥ 0.92 → live publish; else pending review. Past startISO never auto-publishes. |
+| Past events | Stamp `eventStartIso` + `crawlerDateSource`. Public page: upcoming rail vs `pastEvents` rail. Retire/remove via `retirePastCrawledEvents` (soft retire keeps archive; remove sets deleted). |
 | Language | Native market + English |
 
 Backend: `scheduledAiDiscoveryCrawl` every **15 minutes UTC**; runs when local time is within 15 minutes of a saved slot; claims `aiCrawlRuns/{scheduleId}_{slot}`. Saved in `aiCrawlerSchedules/default`.
@@ -52,9 +55,11 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 
 ## Previous data / retention
 
-- New crawls **append** queue docs; they do not overwrite pending rows.
-- Approve → queue `approved` + separate live listing.
+- New crawls **upsert** by deterministic id (`place_*` / `evt_*`); `mergeQueuePolicy` refreshes crawl fields but does **not** overwrite human-approved live fields.
+- Auto-approve (≥92% + schema) → live `clubLocations` / `events` with `autoApproved: true`; else stays `pendingReview`.
+- Manual Approve → queue `approved` + separate live listing.
 - Reject / Delete → status only.
+- Past dated events: stamp `lifecycleStatus=past` (still on public `pastEvents` rail) → after 14 days `retired` (hidden, audit kept) or Master Admin `remove` (`status: deleted`).
 - **Stale Record Cleanup**: soft-clear ~**4 days** (`stale-cache-cleared`). Approved listings, profiles, ShoutOuts, guest lists, audit history **untouched**.
 - Profile import: `missingOnly` / never overwrite existing public-profile fields.
 

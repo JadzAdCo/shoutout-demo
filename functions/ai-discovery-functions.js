@@ -23,6 +23,9 @@ const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-func
 const {isServerAdminAuth} = require("./admin-trust");
 const {evaluateOtpAttempt} = require("./otp-attempts");
 const venueDatapoints = require("./venue-datapoint-extract");
+const crawlCore = require("./discovery-crawl-core");
+const autoApprove = require("./discovery-auto-approve");
+const pastEvents = require("./discovery-past-events");
 const {sendSystemMail} = require("./mail-log");
 const {
   looksLikeBrokenDemoEmail,
@@ -429,6 +432,7 @@ function summarizeContactLift(rows = []) {
 
 async function fetchPublicSource(sourceUrl) {
   const url = safeUrl(sourceUrl);
+  await crawlCore.waitForHostBudget(url.href);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   try {
@@ -436,7 +440,7 @@ async function fetchPublicSource(sourceUrl) {
       method: "GET",
       redirect: "follow",
       headers: {
-        "user-agent": "FLOQR public discovery bot/1.0 (+https://floqr.com)",
+        "user-agent": crawlCore.CRAWL_USER_AGENT,
         "accept": "text/html,application/xhtml+xml"
       },
       signal: controller.signal
@@ -541,9 +545,13 @@ async function crawlPublicEventSources(criteria = {}) {
         markets:source.markets || DEFAULT_DISCOVERY_MARKETS,
         crawlCriteria:criteria
       };
-      record = await enrichRecordFromPublicWebsite(record);
-      record = await applyOnboardedUpdatePolicy(record);
-      discovered.push(record);
+      const enriched = await enrichRecordFromPublicWebsite(record);
+      let venue = await applyOnboardedUpdatePolicy(enriched.venue || record);
+      venue.entityKind = crawlCore.isTimedEventRecord(venue) ? "event" : "venue";
+      discovered.push(venue);
+      for (const child of enriched.childEvents || []) {
+        discovered.push(await applyOnboardedUpdatePolicy(child));
+      }
     } catch (error) {
       console.warn(`Skipping source ${sourceUrl}:`, error.message);
     }
@@ -551,7 +559,7 @@ async function crawlPublicEventSources(criteria = {}) {
   const places = await discoverPlacesForCriteria(criteria);
   const seen = new Set();
   return [...discovered, ...places].filter(record => {
-    const key = normalized(`${record.proposedTitle}|${record.proposedAddress}|${record.telephone}`);
+    const key = record.queueDocId || record.placesId || normalized(`${record.proposedTitle}|${record.proposedAddress}|${record.telephone}|${record.eventStartIso || ""}`);
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -591,9 +599,12 @@ function needsSecondaryContactCrawl(record = {}) {
 
 async function enrichRecordFromPublicWebsite(record = {}) {
   const site = String(record.officialWebsite || record.website || record.sourceUrl || "").trim();
-  if (!/^https?:\/\//i.test(site) || /google\.(com|maps)|maps\.app\.goo\.gl/i.test(site)) return record;
+  if (!/^https?:\/\//i.test(site) || /google\.(com|maps)|maps\.app\.goo\.gl/i.test(site)) {
+    return {venue: record, childEvents: [], combinedHtml: ""};
+  }
   let next = {...record};
   const pagesFetched = [];
+  let combinedHtml = "";
   const venueContext = {
     venueName: next.proposedTitle || next.proposedLocationName || "",
     website: site
@@ -601,6 +612,7 @@ async function enrichRecordFromPublicWebsite(record = {}) {
   try {
     const html = await fetchPublicSource(site);
     pagesFetched.push(site);
+    combinedHtml += `\n${html}`;
     next = venueDatapoints.enrichVenueRecord(next, {html, text: stripTags(html)});
     next.sourceConfirmations = {
       ...(next.sourceConfirmations || {}),
@@ -609,7 +621,8 @@ async function enrichRecordFromPublicWebsite(record = {}) {
     };
 
     const brandUrls = venueDatapoints.listOfficialBrandUrls?.(html, site, venueContext) || [];
-    const secondaries = (venueDatapoints.listSocialSecondaryUrls?.(html, site, venueContext) || []).slice(0, 6);
+    const secondaries = (venueDatapoints.listSocialSecondaryUrls?.(html, site, venueContext) || [])
+      .slice(0, crawlCore.SECONDARY_FOLLOW_LIMIT);
     // Always chase official brand domains when Places/website is an aggregator.
     // Otherwise follow contact/about pages when socials or contact are incomplete.
     const followList = [...brandUrls];
@@ -619,11 +632,12 @@ async function enrichRecordFromPublicWebsite(record = {}) {
       });
     }
 
-    for (const url of followList.slice(0, 6)) {
+    for (const url of followList.slice(0, crawlCore.SECONDARY_FOLLOW_LIMIT)) {
       if (pagesFetched.includes(url)) continue;
       try {
         const html2 = await fetchPublicSource(url);
         pagesFetched.push(url);
+        combinedHtml += `\n${html2}`;
         next = venueDatapoints.enrichVenueRecord(next, {html: html2, text: stripTags(html2)});
         if (!venueDatapoints.isAggregatorWebsite?.(url) && /^https?:\/\//i.test(url)) {
           // Promote the official brand site when we found one from an aggregator listing.
@@ -640,7 +654,7 @@ async function enrichRecordFromPublicWebsite(record = {}) {
     }
   } catch (error) {
     console.warn(`Website enrich skipped (${site}):`, error.message);
-    return record;
+    return {venue: record, childEvents: [], combinedHtml: ""};
   }
   next.socialPagesFetched = pagesFetched;
   next.extractionMethod = `${record.extractionMethod || "public-page"}+website-social-pass`;
@@ -650,7 +664,9 @@ async function enrichRecordFromPublicWebsite(record = {}) {
   if (venueDatapoints.isAggregatorWebsite?.(site) && !venueDatapoints.isAggregatorWebsite?.(next.officialWebsite || "")) {
     next.aiRatingReasons = uniqueListLocal([...(next.aiRatingReasons || []), "Official brand domain preferred over aggregator listing"]);
   }
-  return next;
+  // Venue stays identity-stable; dated Schema.org Events become child queue docs.
+  const attached = crawlCore.attachEventsFromHtml(next, combinedHtml);
+  return {venue: attached.venue, childEvents: attached.childEvents, combinedHtml};
 }
 
 function uniqueListLocal(values = []) {
@@ -825,7 +841,7 @@ async function searchGooglePlaces(job, apiKey) {
     headers:{
       "content-type":"application/json",
       "x-goog-api-key":apiKey,
-      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types,places.regularOpeningHours,places.editorialSummary,places.rating,places.userRatingCount,places.businessStatus"
+      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.location,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types,places.regularOpeningHours,places.editorialSummary,places.rating,places.userRatingCount,places.businessStatus"
     },
     body:JSON.stringify(body)
   });
@@ -839,8 +855,14 @@ async function searchGooglePlaces(job, apiKey) {
     const jobType = String(job.eventType || "");
     const daytimeJob = isDaytimeEventType(jobType);
     const proposedType = proposedTypeFromJobEventType(jobType);
+    const placesId = String(place.id || "").replace(/^places\//i, "");
+    const latitude = Number(place.location?.latitude);
+    const longitude = Number(place.location?.longitude);
     let baseRecord = {
       proposedType,
+      entityKind: daytimeJob ? "event" : "venue",
+      placesId,
+      queueDocId: crawlCore.placesDocId(placesId),
       proposedTitle:place.displayName?.text || (daytimeJob ? "Discovered daytime event" : "Discovered nightlife venue"),
       proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || (daytimeJob ? "daytime community event" : "nightlife")} in ${job.city || job.country || "the target market"}.`,
       proposedLocationName:place.displayName?.text || "",
@@ -848,6 +870,8 @@ async function searchGooglePlaces(job, apiKey) {
       city:job.city || "",
       stateRegion:job.stateRegion || "",
       country:job.country || "",
+      latitude: Number.isFinite(latitude) ? latitude : null,
+      longitude: Number.isFinite(longitude) ? longitude : null,
       telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
       phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
       officialWebsite:place.websiteUri || place.googleMapsUri || "",
@@ -878,20 +902,38 @@ async function searchGooglePlaces(job, apiKey) {
       aiRatingReasons:["Google Places structured record", "Localized market-language query", hoursStructured ? "Opening hours captured" : "Master Admin review required"],
       status:"pendingReview",
       discoveryMode:"master-admin-refined-discovery-crawl",
-      extractionMethod:"google-places-text-search"
+      extractionMethod:"google-places-text-search",
+      legalCompliance: crawlCore.buildLegalCompliance({country: job.country || ""}, "google_places")
     };
     Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
     const contactBefore = contactFieldSnapshot(baseRecord);
-    baseRecord = await enrichRecordFromPublicWebsite(baseRecord);
-    baseRecord = await applyOnboardedUpdatePolicy(baseRecord);
-    baseRecord.missingDatapoints = missingDatapoints(baseRecord);
-    baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
-    baseRecord.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
-    baseRecord.contactLift = {
+    const enriched = await enrichRecordFromPublicWebsite(baseRecord);
+    let venue = await applyOnboardedUpdatePolicy(enriched.venue || baseRecord);
+    venue.entityKind = "venue";
+    venue.missingDatapoints = missingDatapoints(venue);
+    venue.crawlResultStatus = venue.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    venue.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
+    venue.contactLift = {
       before: contactBefore,
-      after: contactFieldSnapshot(baseRecord)
+      after: contactFieldSnapshot(venue)
     };
-    out.push(baseRecord);
+    venue.queueDocId = crawlCore.resolveQueueDocId(venue);
+    venue.legalCompliance = crawlCore.buildLegalCompliance(
+      venue,
+      (enriched.childEvents || []).length ? "google_places+html+jsonld_event" : (venue.sourceConfirmations?.publicPage ? "google_places+html" : "google_places")
+    );
+    out.push(venue);
+    for (const child of enriched.childEvents || []) {
+      const childNext = await applyOnboardedUpdatePolicy({
+        ...child,
+        latitude: child.latitude ?? venue.latitude,
+        longitude: child.longitude ?? venue.longitude
+      });
+      childNext.missingDatapoints = missingDatapoints(childNext);
+      childNext.crawlResultStatus = childNext.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+      childNext.lifecycleStatus = pastEvents.classifyLifecycle(childNext);
+      out.push(childNext);
+    }
   }
   return out;
 }
@@ -900,12 +942,16 @@ async function discoverPlacesForCriteria(criteria = {}) {
   const apiKey = optionalPlacesKey();
   const jobs = Array.isArray(criteria.structuredPlan?.jobs) ? criteria.structuredPlan.jobs.slice(0, 25) : [];
   if (!apiKey || !jobs.length) return [];
-  const records = [];
-  for (const job of jobs) {
-    try { records.push(...await searchGooglePlaces(job, apiKey)); }
-    catch (error) { console.warn(`Places job skipped (${job.query || "query"}):`, error.message); }
-  }
-  return records;
+  // Bounded concurrency (3): Places jobs in parallel; HTML stays host-polite via waitForHostBudget.
+  const batches = await crawlCore.mapPool(jobs, crawlCore.PLACES_JOB_CONCURRENCY, async job => {
+    try {
+      return await searchGooglePlaces(job, apiKey);
+    } catch (error) {
+      console.warn(`Places job skipped (${job.query || "query"}):`, error.message);
+      return [];
+    }
+  });
+  return batches.flat();
 }
 
 function emailOtpSecret() {
@@ -1022,19 +1068,97 @@ async function classifyDiscoveryRecord(record) {
   return classified;
 }
 
+async function maybeAutoPublishRecord(record = {}, queueDocId = "") {
+  const decision = autoApprove.processCrawledItem(record);
+  const patch = {
+    autoApproveDecision: {
+      route: decision.route,
+      confidence: decision.confidence,
+      completenessSum: decision.completenessSum,
+      sourceMultiplier: decision.sourceMultiplier,
+      failures: decision.failures,
+      reason: decision.reason,
+      threshold: decision.threshold,
+      decidedAtIso: new Date().toISOString()
+    },
+    publishConfidence: decision.confidence,
+    aiConfidenceScore: decision.confidence
+  };
+  if (decision.route !== "AUTO_PUBLISH") {
+    await db.collection("aiDiscoveryQueue").doc(queueDocId).set(patch, {merge: true});
+    return {autoPublished: false, decision};
+  }
+  // Past dated events never auto-publish to LIVE upcoming rails.
+  if (pastEvents.classifyLifecycle(decision.sanitized) === "past") {
+    await db.collection("aiDiscoveryQueue").doc(queueDocId).set({
+      ...patch,
+      status: "pendingReview",
+      lifecycleStatus: "past",
+      autoApproveDecision: {
+        ...patch.autoApproveDecision,
+        route: "ADMIN_QUEUE",
+        reason: "Future-dated gate failed: event is already past"
+      }
+    }, {merge: true});
+    return {autoPublished: false, decision: {...decision, route: "ADMIN_QUEUE"}};
+  }
+  const live = autoApprove.livePayloadFromDecision(decision);
+  await db.collection(live.collection).doc(live.id).set({
+    ...live.payload,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
+  await db.collection("aiDiscoveryQueue").doc(queueDocId).set({
+    ...decision.sanitized,
+    ...patch,
+    status: "approved",
+    crawlResultStatus: "auto-approved",
+    approvedCollection: live.collection,
+    approvedRecordId: live.id,
+    autoApproved: true,
+    reviewedByUid: "system:auto-approve",
+    reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
+  return {autoPublished: true, decision, live};
+}
+
 async function writeDiscoveryQueueItem(record) {
-  const ref = db.collection("aiDiscoveryQueue").doc();
   const collectedAtIso = record.collectedAtIso || new Date().toISOString();
-  await ref.set({
+  const stamped = pastEvents.stampCrawlerDateSource({
     ...record,
-    status:"pendingReview",
     collectedAtIso,
-    collectedAtLabel: record.collectedAtLabel || collectedAtIso,
-    collectedAt:admin.firestore.FieldValue.serverTimestamp(),
-    createdAt:admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt:admin.firestore.FieldValue.serverTimestamp()
-  });
-  return ref.id;
+    collectedAtLabel: record.collectedAtLabel || collectedAtIso
+  }, record.crawlerDateSource || (record.eventStartIso ? "schema.org/crawl" : "places-or-undated"));
+  const docId = crawlCore.resolveQueueDocId(stamped);
+  const ref = db.collection("aiDiscoveryQueue").doc(docId);
+  const existingSnap = await ref.get();
+  const incoming = {
+    ...stamped,
+    queueDocId: docId,
+    placesId: String(stamped.placesId || "").replace(/^places\//i, ""),
+    status: stamped.status || "pendingReview",
+    collectedAtIso,
+    collectedAtLabel: stamped.collectedAtLabel || collectedAtIso,
+    collectedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    lastCrawledAtIso: new Date().toISOString()
+  };
+  if (!existingSnap.exists) {
+    incoming.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    await ref.set(incoming);
+  } else {
+    const merged = crawlCore.mergeQueuePolicy(existingSnap.data() || {}, incoming);
+    // Never recreate createdAt; keep first-seen identity.
+    delete merged.createdAt;
+    await ref.set(merged, {merge: true});
+  }
+  try {
+    await maybeAutoPublishRecord(incoming, docId);
+  } catch (error) {
+    console.warn(`Auto-approve skipped for ${docId}:`, error.message || error);
+  }
+  return docId;
 }
 
 function optionalGeminiSecretValue() {
@@ -1343,6 +1467,43 @@ exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", tim
   const schedules = await db.collection("aiCrawlerSchedules").where("enabled", "==", true).get();
   for (const schedule of schedules.docs) await runScheduledCrawl(schedule);
   return null;
+});
+
+/** Daily: mark past dated events, then soft-retire ones older than 14 days from public rails. */
+exports.scheduledRetirePastCrawledEvents = onSchedule({
+  schedule: "every 24 hours",
+  timeZone: "UTC",
+  region: "us-central1"
+}, async () => {
+  // Keep recent past on public pastEvents rails; only retire after 14 days.
+  await pastEvents.markPastInCollection(db, "events", {limit: 400});
+  await pastEvents.markPastInCollection(db, "aiDiscoveryQueue", {limit: 400});
+  await pastEvents.retirePastCrawledEvents(db, {mode: "retire", olderThanHours: 14 * 24, limit: 400});
+  return null;
+});
+
+/**
+ * Master Admin callable:
+ *  data.mode = "retire" | "remove"
+ *  data.olderThanHours = number (0 = anything already past)
+ */
+exports.retirePastCrawledEvents = onCall({region: "us-central1"}, async request => {
+  await assertMasterAdmin(request);
+  const mode = String(request.data?.mode || "retire") === "remove" ? "remove" : "retire";
+  const olderThanHours = Math.max(0, Number(request.data?.olderThanHours || 0));
+  const summary = await pastEvents.retirePastCrawledEvents(db, {
+    mode,
+    olderThanHours,
+    limit: Math.max(1, Math.min(500, Number(request.data?.limit || 300)))
+  });
+  return {ok: true, ...summary};
+});
+
+/** Preview auto-approve decision without writing (Master Admin debug). */
+exports.previewDiscoveryAutoApprove = onCall({region: "us-central1"}, async request => {
+  await assertMasterAdmin(request);
+  const record = request.data?.record || {};
+  return autoApprove.processCrawledItem(record);
 });
 
 exports.runFloqrDiscoveryCrawl = onCall({
@@ -1739,19 +1900,26 @@ exports.aiExtractPublicSourceUrl = functions.https.onCall(async (data, context) 
   }
   const html = await fetchPublicSource(sourceUrl);
   let record = extractDiscoveryRecordFromHtml(sourceUrl, html, sourceText);
-  record = await enrichRecordFromPublicWebsite({
+  const enriched = await enrichRecordFromPublicWebsite({
     ...record,
     officialWebsite: record.officialWebsite || sourceUrl,
     website: record.website || sourceUrl,
     sourceUrl
   });
-  record = await applyOnboardedUpdatePolicy(record);
+  record = await applyOnboardedUpdatePolicy(enriched.venue || record);
   record.missingDatapoints = missingDatapoints(record);
   record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  record.relatedEvents = (enriched.childEvents || []).map(e => ({
+    proposedTitle: e.proposedTitle,
+    eventStartIso: e.eventStartIso,
+    ticketUrl: e.ticketUrl || "",
+    queueDocId: e.queueDocId
+  }));
   return {
     status:"extracted",
     sourceUrl,
     record,
+    childEvents: enriched.childEvents || [],
     missingDatapoints:record.missingDatapoints || []
   };
 });

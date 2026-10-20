@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.100";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.101";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.101",
+      title: "Discovery crawl upsert + auto-approve + past-event lifecycle",
+      checks: [
+        {label:"Crawl core concurrency + deterministic ids", file:"functions/discovery-crawl-core.js", includes:["mapPool", "placesDocId", "eventDocId", "attachEventsFromHtml", "waitForHostBudget"]},
+        {label:"Auto-approve processCrawledItem", file:"functions/discovery-auto-approve.js", includes:["processCrawledItem", "AUTO_APPROVE_THRESHOLD", "AUTO_PUBLISH", "ADMIN_QUEUE"]},
+        {label:"Past-event lifecycle", file:"functions/discovery-past-events.js", includes:["stampCrawlerDateSource", "retirePastCrawledEvents", "classifyLifecycle", "crawlerDateSource"]},
+        {label:"Functions wired to auto-publish + retire", file:"functions/ai-discovery-functions.js", includes:["maybeAutoPublishRecord", "scheduledRetirePastCrawledEvents", "previewDiscoveryAutoApprove"]},
+        {label:"Public pastEvents rail", file:"functions/club-public-feed-core.js", includes:["pastEventsView", "lifecycleStatus", "crawlerDateSource"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.101\""]}
+      ]
+    },
     {
       version: "s3.1.100",
       title: "Washington, DC vs Washington State crawl distinction",
@@ -1872,11 +1884,20 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-1-101-discovery-auto-approve-past",
+      area:"Master Admin / AI Crawling",
+      feature:"Deterministic crawl upsert + auto-approve (≥92%) + past-event mark/retire",
+      changed:"Queue upserts by place_/evt_ ids; JSON-LD child events; processCrawledItem auto-publishes high-confidence rows to live clubLocations/events; past events stay on public pastEvents until retire (14d) or Master Admin remove. Package s3.1.101. Functions deploy required.",
+      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.101). 2) Instant Crawl Now for Washington, DC daytime. 3) Open Discovery Queue — re-crawl of same Place should refresh the same place_* doc (not a new random id). 4) Cards with full contact + Places id + future date may show crawlResultStatus auto-approved / status approved. 5) Incomplete cards stay pendingReview with autoApproveDecision.failures. 6) For a past-dated event doc, confirm lifecycleStatus becomes past (still on club public pastEvents) then use retirePastCrawledEvents callable (mode retire|remove) or wait for daily schedule.",
+      expected:"Same venue/event upserts; only ≥92% complete trusted rows go LIVE; past shows on pastEvents rail until retired/removed.",
+      troubleshoot:"Still append-only ids → Functions not on s3.1.101 (redeploy runInstantDiscoveryCrawl + ai-discovery-functions). Never auto-approved → expected when email/phone/IG/latlng missing (bar is intentionally high). Past missing from public page → club.publicProfileSections.pastEvents must be true; retired/removed are hidden."
+    },
+    {
       id:"s3-1-98-ai-crawl-daytime-events",
       area:"Master Admin / AI Crawling",
       feature:"Daytime events (flea / fall festival / farmers market) in crawl scope",
       changed:"Added daytime event types + Community/Festival/Market genres; Washington DC market; daytime approval checklist (organizer + date/time, no DJ). Package s3.1.98. Save schedule so aiCrawlerSchedules/default includes the new types.",
-      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.100). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected. 3) Cities show Washington, DC (not bare Washington); optionally add Seattle / Washington State. 4) Preview Search Plan — DC jobs say Washington, DC District of Columbia; WA jobs say Washington State / Seattle. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Discovery Queue daytime candidates should be DC-addressed for Washington, DC jobs.",
+      howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.101). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected. 3) Cities show Washington, DC (not bare Washington); optionally add Seattle / Washington State. 4) Preview Search Plan — DC jobs say Washington, DC District of Columbia; WA jobs say Washington State / Seattle. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Discovery Queue daytime candidates should be DC-addressed for Washington, DC jobs.",
       expected:"Search plan lists daytime jobs; crawl can surface daytime market/festival candidates; review cards do not require DJ for daytime.",
       troubleshoot:"Still nightlife-only → Save schedule again (live doc may still be old hip-hop-France plan). No Places hits → confirm GOOGLE_PLACES_API_KEY; broaden query. Flea page never appears → paste theparksdc.com/event/fall_festival/ into Source Detail Extraction as a one-off."
     },
