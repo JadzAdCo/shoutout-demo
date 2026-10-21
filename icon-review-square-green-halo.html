@@ -3,27 +3,42 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Actual icons — rounded square + dark green LED halo (local review)</title>
+  <title>floqCast icon review — crisp circular mark (local)</title>
   <style>
     :root{
       --bg0:#050806; --bg1:#0c1410; --ink:#f4fff6; --muted:rgba(220,255,230,.68);
-      --green:#1f8a3e; --green-hot:#3dd46a; --accent:#9dffb0; --warn:#ffc98a;
+      --accent:#9dffb0; --line:rgba(90,180,110,.35); --cyan:#3de7ff;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; padding:28px 20px 72px;
+      margin:0; padding:24px 18px 72px;
       font-family:"Avenir Next","Segoe UI",sans-serif; color:var(--ink);
       background:
-        radial-gradient(900px 480px at 15% -8%, rgba(30,110,55,.35), transparent 55%),
-        radial-gradient(700px 420px at 90% 10%, rgba(20,70,40,.28), transparent 50%),
+        radial-gradient(900px 480px at 15% -8%, rgba(30,110,55,.28), transparent 55%),
         linear-gradient(165deg, var(--bg0), var(--bg1) 55%, #08110c);
     }
-    h1{margin:0 0 8px; font-size:clamp(22px,4vw,34px); letter-spacing:.02em}
-    .banner{color:var(--accent); font-weight:900; margin:0 0 10px}
-    .sub{color:var(--muted); max-width:920px; line-height:1.45; margin:0 0 22px}
+    h1{margin:0 0 8px; font-size:clamp(22px,4vw,32px)}
+    .banner{color:var(--accent); font-weight:900; margin:0 0 8px}
+    .sub{color:var(--muted); max-width:960px; line-height:1.45; margin:0 0 18px}
     .sub code{color:#c8e8b8}
+    .tabs{
+      display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px;
+      border-bottom:1px solid var(--line); padding-bottom:10px;
+    }
+    .tab{
+      appearance:none; border:1px solid rgba(90,180,110,.4); background:rgba(0,0,0,.35);
+      color:var(--ink); font:inherit; font-weight:800; font-size:13px;
+      padding:10px 14px; border-radius:12px; cursor:pointer;
+    }
+    .tab[aria-selected="true"]{
+      background:rgba(40,120,60,.35); border-color:rgba(61,212,106,.75);
+      box-shadow:0 0 0 1px rgba(61,212,106,.25) inset, 0 0 18px rgba(20,100,45,.35);
+      color:#d8ffe4;
+    }
+    .panel{display:none}
+    .panel.active{display:block}
     .block{
-      margin:20px 0; padding:18px; border-radius:18px;
+      margin:0 0 18px; padding:18px; border-radius:18px;
       border:1px dashed rgba(90,180,110,.28); background:rgba(0,0,0,.28);
     }
     .block.pick{border-color:rgba(61,212,106,.55); box-shadow:0 0 0 1px rgba(61,212,106,.2) inset}
@@ -32,148 +47,190 @@
     .row{display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start}
     figure{
       margin:0; padding:14px; border-radius:14px; background:rgba(255,255,255,.04);
-      min-width:150px; max-width:280px;
+      min-width:150px; max-width:360px;
     }
-    figure.hero{outline:2px solid rgba(61,212,106,.65); background:rgba(40,120,60,.12)}
+    figure.hero{outline:2px solid rgba(61,231,255,.65); background:rgba(40,100,120,.12)}
     figcaption{color:#c8e8b8; font-size:12px; font-weight:800; margin-bottom:10px; line-height:1.35}
-    .raw img{
-      display:block; width:132px; height:132px; object-fit:contain;
-      background:#000; border-radius:8px;
+    .checker{
+      background:
+        linear-gradient(45deg,#2a2a2a 25%,transparent 25%),
+        linear-gradient(-45deg,#2a2a2a 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#2a2a2a 75%),
+        linear-gradient(-45deg,transparent 75%,#2a2a2a 75%);
+      background-size:20px 20px;
+      background-position:0 0,0 10px,10px -10px,-10px 0;
+      background-color:#1a1a1a;
+      border-radius:16px; padding:16px; display:grid; place-items:center;
     }
-    /* CSS treatment: rounded square + dark green backlit LED halo */
+    .checker img{display:block; width:min(280px,70vw); height:auto}
+    .stage{
+      --s:240px; width:var(--s); height:var(--s);
+      border-radius:22px; background:#000; display:grid; place-items:center; overflow:hidden;
+    }
+    .stage img{width:92%; height:92%; object-fit:contain; display:block}
+    .crisp{image-rendering:auto}
+    .tag{display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; margin-left:4px}
+    .tag.now{background:rgba(255,255,255,.1); color:#ccc}
+    .tag.next{background:rgba(61,231,255,.2); color:var(--cyan)}
     .led-tile{
-      --s:168px; width:var(--s); height:var(--s); border-radius:28px;
+      --s:160px; width:var(--s); height:var(--s); border-radius:28px;
       background:#030605; padding:10px; display:grid; place-items:center;
       box-shadow:
-        0 0 0 2px #0d4020,
-        0 0 0 3px rgba(45,160,80,.55),
-        0 0 16px rgba(20,120,50,.9),
-        0 0 34px rgba(12,80,35,.65),
-        0 0 56px rgba(8,50,22,.4),
-        inset 0 0 22px rgba(20,80,40,.22);
+        0 0 0 2px #0d4020, 0 0 16px rgba(20,120,50,.9), 0 0 34px rgba(12,80,35,.55);
     }
-    .led-tile img{
-      width:100%; height:100%; object-fit:contain; display:block;
-      border-radius:18px; background:#000;
-    }
-    .led-tile.lg{--s:220px; border-radius:34px}
-    .baked img{
-      display:block; width:min(240px,72vw); height:auto;
-      background:#000; border-radius:18px;
-    }
-    .tag{
-      display:inline-block; padding:2px 8px; border-radius:999px;
-      font-size:11px; font-weight:800; margin-left:4px;
-    }
-    .tag.now{background:rgba(255,255,255,.1); color:#ccc}
-    .tag.next{background:rgba(61,212,106,.2); color:var(--accent)}
+    .led-tile img{width:100%; height:100%; object-fit:contain; border-radius:18px; background:#000}
     ul{margin:8px 0 0 18px; color:var(--muted); font-size:14px; line-height:1.45}
   </style>
 </head>
 <body>
   <p class="banner">LOCAL REVIEW ONLY — Search / production icons not changed</p>
-  <h1>Actual icons — rounded square + dark green LED halo</h1>
+  <h1>floqCast mark review</h1>
   <p class="sub">
-    Your four source marks (floqCast, VIP reserV, FloqAi diamonds, SHOUT OUT), shown as-is, then in a
-    <strong>rounded square</strong> with a <strong>dark green backlit LED halo</strong>.
-    floqCast also has a <strong>larger in-mark “FloqCast”</strong> proposal.
-    Branch <code>cursor/icon-square-green-halo-bbee</code>.
+    <strong>Tab “V4 silhouette draft”</strong> uses your persisted silhouette photo inside a nightlife circle
+    (transparent outside, like V3), with phone, wireless arcs, red cast arrow, large LED display, and large FloqCast (no text plate).<br/>
+    Silhouette kept at <code>images/review/floqcast-silhouette-source.jpg</code> and
+    <code>/cursor/stores/self/floqcast/</code>. Branch <code>cursor/icon-square-green-halo-bbee</code>.
   </p>
 
-  <div class="block">
-    <h2>0) Your source marks (as uploaded)</h2>
-    <p>Unframed — exact PNGs you sent for this review.</p>
-    <div class="row">
-      <figure class="raw">
-        <figcaption>floqCast</figcaption>
-        <img src="./images/review/actual-icons/floqcast-actual.png" alt="floqCast actual"/>
-      </figure>
-      <figure class="raw">
-        <figcaption>VIP reserV</figcaption>
-        <img src="./images/review/actual-icons/vip-reserv-actual.png" alt="VIP reserV actual"/>
-      </figure>
-      <figure class="raw">
-        <figcaption>FloqAi</figcaption>
-        <img src="./images/review/actual-icons/floqai-actual.png" alt="FloqAi actual"/>
-      </figure>
-      <figure class="raw">
-        <figcaption>SHOUT OUT</figcaption>
-        <img src="./images/review/actual-icons/shoutout-actual.png" alt="SHOUT OUT actual"/>
-      </figure>
-    </div>
+  <div class="tabs" role="tablist" aria-label="floqCast review versions">
+    <button class="tab" role="tab" id="tab-v4" data-panel="v4" aria-controls="panel-v4" aria-selected="true" type="button">V4 silhouette draft ★</button>
+    <button class="tab" role="tab" id="tab-v3" data-panel="v3" aria-controls="panel-v3" aria-selected="false" type="button">V3 vector circle</button>
+    <button class="tab" role="tab" id="tab-v1" data-panel="v1" aria-controls="panel-v1" aria-selected="false" type="button">Version 1 — original, no halo</button>
+    <button class="tab" role="tab" id="tab-v2" data-panel="v2" aria-controls="panel-v2" aria-selected="false" type="button">Version 2 — earlier word experiments</button>
+    <button class="tab" role="tab" id="tab-set" data-panel="set" aria-controls="panel-set" aria-selected="false" type="button">Full set + green halo</button>
   </div>
 
-  <div class="block pick">
-    <h2>1) CSS frame — rounded square + dark green LED halo</h2>
-    <p>Same artworks, live CSS halo (what Search tiles could use without re-baking PNGs).</p>
-    <div class="row">
-      <figure>
-        <figcaption>floqCast <span class="tag next">halo</span></figcaption>
-        <div class="led-tile"><img src="./images/review/actual-icons/floqcast-actual.png" alt=""/></div>
-      </figure>
-      <figure>
-        <figcaption>VIP reserV <span class="tag next">halo</span></figcaption>
-        <div class="led-tile"><img src="./images/review/actual-icons/vip-reserv-actual.png" alt=""/></div>
-      </figure>
-      <figure>
-        <figcaption>FloqAi <span class="tag next">halo</span></figcaption>
-        <div class="led-tile"><img src="./images/review/actual-icons/floqai-actual.png" alt=""/></div>
-      </figure>
-      <figure>
-        <figcaption>SHOUT OUT <span class="tag next">halo</span></figcaption>
-        <div class="led-tile"><img src="./images/review/actual-icons/shoutout-actual.png" alt=""/></div>
-      </figure>
+  <section class="panel active" id="panel-v4" role="tabpanel" aria-labelledby="tab-v4">
+    <div class="block pick">
+      <h2>V4 — silhouette photo + cast chrome</h2>
+      <p>
+        Your silhouette (Image 1) cut out and neon-tinted into the LED + phone screens.
+        Transparent outside the nightlife ring. Phone, wireless, arrow, large LED, FloqCast — all present.
+      </p>
+      <div class="row">
+        <figure class="hero">
+          <figcaption>V4 final draft <span class="tag next">silhouette source</span></figcaption>
+          <div class="checker">
+            <img src="./images/review/actual-icons/floqcast-v4-circle-silhouette.png" alt="FloqCast V4 silhouette circle"/>
+          </div>
+        </figure>
+        <figure>
+          <figcaption>Silhouette source (persistent)</figcaption>
+          <div class="stage" style="--s:280px;background:#eee">
+            <img src="./images/review/actual-icons/floqcast-silhouette-source.jpg" alt="silhouette source"/>
+          </div>
+        </figure>
+        <figure>
+          <figcaption>Neon cutout</figcaption>
+          <div class="checker">
+            <img style="width:150px" src="./images/review/actual-icons/floqcast-silhouette-neon-cutout.png" alt="neon cutout"/>
+          </div>
+        </figure>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="block pick">
-    <h2>2) floqCast — larger “FloqCast” wordmark</h2>
-    <p>
-      Left: source text size. Right: enlarged in-mark <strong>FloqCast</strong> (proposed), still in the green LED square.
-      Inner cyan→magenta cast ring kept from your art.
-    </p>
-    <div class="row">
-      <figure>
-        <figcaption>Source word size <span class="tag now">as uploaded</span></figcaption>
-        <div class="led-tile lg"><img src="./images/review/actual-icons/floqcast-actual.png" alt="floqCast source"/></div>
-      </figure>
-      <figure class="hero">
-        <figcaption>PROPOSED larger FloqCast <span class="tag next">+15–25% word</span></figcaption>
-        <div class="led-tile lg"><img src="./images/review/actual-icons/floqcast-actual-large-word.png" alt="floqCast larger word"/></div>
-      </figure>
+  <section class="panel" id="panel-v3" role="tabpanel" aria-labelledby="tab-v3" hidden>
+    <div class="block">
+      <h2>V3 — vector circular mark (prior)</h2>
+      <p>SVG path approximation — kept for compare. Prefer V4 for the real silhouette photo.</p>
+      <div class="row">
+        <figure>
+          <figcaption>V3 SVG → PNG</figcaption>
+          <div class="checker">
+            <img src="./images/review/actual-icons/floqcast-v3-circle-crisp.png" alt="FloqCast V3"/>
+          </div>
+        </figure>
+        <figure>
+          <figcaption>V3 live SVG</figcaption>
+          <div class="checker">
+            <img src="./images/review/actual-icons/floqcast-v3-circle-crisp.svg" alt="FloqCast V3 SVG"/>
+          </div>
+        </figure>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="block">
-    <h2>3) Baked PNG frames (shareable stills)</h2>
-    <p>Same treatment flattened into PNGs under <code>images/review/actual-icons/*-framed-green*.png</code>.</p>
-    <div class="row baked">
-      <figure class="hero">
-        <figcaption>floqCast + large word + green frame</figcaption>
-        <img src="./images/review/actual-icons/floqcast-framed-green-large-word.png" alt="floqCast framed large word"/>
-      </figure>
-      <figure>
-        <figcaption>VIP reserV framed</figcaption>
-        <img src="./images/review/actual-icons/vip-reserv-framed-green.png" alt="VIP framed"/>
-      </figure>
-      <figure>
-        <figcaption>FloqAi framed</figcaption>
-        <img src="./images/review/actual-icons/floqai-framed-green.png" alt="FloqAi framed"/>
-      </figure>
-      <figure>
-        <figcaption>SHOUT OUT framed</figcaption>
-        <img src="./images/review/actual-icons/shoutout-framed-green.png" alt="SHOUT OUT framed"/>
-      </figure>
+  <section class="panel" id="panel-v1" role="tabpanel" aria-labelledby="tab-v1" hidden>
+    <div class="block pick">
+      <h2>Version 1 — logo as uploaded (no halo)</h2>
+      <p>Crisp source art only. No green LED halo, no new overlay.</p>
+      <div class="row">
+        <figure class="hero">
+          <figcaption>V1 floqCast <span class="tag now">source · no halo</span></figcaption>
+          <div class="stage"><img src="./images/review/actual-icons/floqcast-actual.png" alt="floqCast version 1"/></div>
+        </figure>
+        <figure>
+          <figcaption>V1 NEAREST enlarge (still no halo)</figcaption>
+          <div class="stage"><img src="./images/review/actual-icons/floqcast-v1-no-halo.png" alt="floqCast v1 nearest"/></div>
+        </figure>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="block">
-    <h2>Review checklist</h2>
-    <ul>
-      <li>Keep the cyan→magenta <em>inner</em> product ring, or replace that too with green?</li>
-      <li>Approve larger FloqCast word (section 2 hero) for the Search mark?</li>
-      <li>Apply the green LED square to all Search tiles, or only nightlife chrome?</li>
-    </ul>
-  </div>
+  <section class="panel" id="panel-v2" role="tabpanel" aria-labelledby="tab-v2" hidden>
+    <div class="block">
+      <h2>Version 2 — earlier large-word experiments (superseded by V3)</h2>
+      <p>Kept for history. Prefer V3 tab for the clean circle recreate.</p>
+      <div class="row">
+        <figure>
+          <figcaption>Baked large-word (had plate issues)</figcaption>
+          <div class="stage"><img src="./images/review/actual-icons/floqcast-v2-large-word-crisp.png" alt="v2"/></div>
+        </figure>
+        <figure>
+          <figcaption>Green framed bake</figcaption>
+          <div class="checker" style="padding:8px">
+            <img style="width:220px" src="./images/review/actual-icons/floqcast-framed-green-large-word.png" alt="framed"/>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-set" role="tabpanel" aria-labelledby="tab-set" hidden>
+    <div class="block">
+      <h2>Full set — source marks</h2>
+      <div class="row">
+        <figure><figcaption>floqCast</figcaption><div class="stage" style="--s:140px"><img src="./images/review/actual-icons/floqcast-actual.png" alt=""/></div></figure>
+        <figure><figcaption>VIP reserV</figcaption><div class="stage" style="--s:140px"><img src="./images/review/actual-icons/vip-reserv-actual.png" alt=""/></div></figure>
+        <figure><figcaption>FloqAi</figcaption><div class="stage" style="--s:140px"><img src="./images/review/actual-icons/floqai-actual.png" alt=""/></div></figure>
+        <figure><figcaption>SHOUT OUT</figcaption><div class="stage" style="--s:140px"><img src="./images/review/actual-icons/shoutout-actual.png" alt=""/></div></figure>
+      </div>
+    </div>
+    <div class="block">
+      <h2>Optional green LED squares</h2>
+      <div class="row">
+        <figure><figcaption>floqCast</figcaption><div class="led-tile"><img src="./images/review/actual-icons/floqcast-actual.png" alt=""/></div></figure>
+        <figure><figcaption>VIP reserV</figcaption><div class="led-tile"><img src="./images/review/actual-icons/vip-reserv-actual.png" alt=""/></div></figure>
+        <figure><figcaption>FloqAi</figcaption><div class="led-tile"><img src="./images/review/actual-icons/floqai-actual.png" alt=""/></div></figure>
+        <figure><figcaption>SHOUT OUT</figcaption><div class="led-tile"><img src="./images/review/actual-icons/shoutout-actual.png" alt=""/></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const tabs = Array.from(document.querySelectorAll('.tab[data-panel]'));
+      function select(key) {
+        const k = String(key || 'v3');
+        tabs.forEach((t) => {
+          const on = t.getAttribute('data-panel') === k;
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        document.querySelectorAll('.panel[role="tabpanel"]').forEach((panel) => {
+          const on = panel.id === 'panel-' + k;
+          panel.classList.toggle('active', on);
+          panel.hidden = !on;
+        });
+        history.replaceState(null, '', '#' + k);
+      }
+      tabs.forEach((t) => t.addEventListener('click', (e) => {
+        e.preventDefault();
+        select(t.getAttribute('data-panel'));
+      }));
+      const hash = (location.hash || '#v4').replace(/^#/, '');
+      select(['v4', 'v3', 'v1', 'v2', 'set'].includes(hash) ? hash : 'v4');
+    })();
+  </script>
 </body>
 </html>
