@@ -23,11 +23,15 @@ const ICE_CACHE_DOC = "systemConfig/floqcastIceServers";
 const ICE_CACHE_TTL_MS = 50 * 60 * 1000;
 
 function secretOrEnv(secret, envName) {
+  // Gen2 binds secrets as process.env[KEY] — prefer that (defineSecret.value() can
+  // disagree with Secret Manager in some revisions and yield Twilio 401).
+  const fromEnv = String(process.env[envName] || "").trim();
+  if (fromEnv) return fromEnv;
   try {
     const value = secret?.value?.();
-    if (value) return String(value);
+    if (value) return String(value).trim();
   } catch (_) { /* secret not bound in this invoke */ }
-  return String(process.env[envName] || "");
+  return "";
 }
 
 function text(value, max = 200) {
@@ -523,40 +527,48 @@ exports.getFloqCastIceServers = onCall({
 
   const accountSid = secretOrEnv(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID");
   const authToken = secretOrEnv(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN");
-  if (!accountSid || !authToken) {
-    console.warn("getFloqCastIceServers: Twilio secrets missing — STUN only");
+  if (!accountSid || !authToken || !/^AC[0-9a-fA-F]{32}$/.test(accountSid)) {
+    console.warn("getFloqCastIceServers: Twilio secrets missing/invalid — STUN only", {
+      sidLen: accountSid.length,
+      sidPrefix: accountSid.slice(0, 4)
+    });
     return {iceServers: stun, source: "stun-only", ttlMs: 120_000};
   }
 
-  const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Tokens.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "Ttl=3600"
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    console.error("getFloqCastIceServers Twilio token failed", res.status, body.slice(0, 200));
-    throw new HttpsError("unavailable", "FLOQR TURN is temporarily unavailable.");
-  }
-  const payload = await res.json();
-  const twilioServers = Array.isArray(payload.ice_servers) ? payload.ice_servers : [];
-  const iceServers = twilioServers.length ? twilioServers : stun;
-  const expiresAtMs = Date.now() + ICE_CACHE_TTL_MS;
   try {
-    await db.doc(ICE_CACHE_DOC).set({
-      iceServers,
-      source: "twilio",
-      expiresAtMs,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
+    const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Tokens.json`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "Ttl=3600"
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error("getFloqCastIceServers Twilio token failed", res.status, body.slice(0, 200));
+      return {iceServers: stun, source: "stun-only", ttlMs: 60_000, twilioStatus: res.status};
+    }
+    const payload = await res.json();
+    const twilioServers = Array.isArray(payload.ice_servers) ? payload.ice_servers : [];
+    const iceServers = twilioServers.length ? twilioServers : stun;
+    const expiresAtMs = Date.now() + ICE_CACHE_TTL_MS;
+    try {
+      await db.doc(ICE_CACHE_DOC).set({
+        iceServers,
+        source: "twilio",
+        expiresAtMs,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    } catch (err) {
+      console.warn("getFloqCastIceServers cache write failed", String(err?.message || err).slice(0, 160));
+    }
+    return {iceServers, source: "twilio", ttlMs: ICE_CACHE_TTL_MS};
   } catch (err) {
-    console.warn("getFloqCastIceServers cache write failed", String(err?.message || err).slice(0, 160));
+    console.error("getFloqCastIceServers Twilio threw", String(err?.message || err).slice(0, 200));
+    return {iceServers: stun, source: "stun-only", ttlMs: 60_000};
   }
-  return {iceServers, source: "twilio", ttlMs: ICE_CACHE_TTL_MS};
 });
 
 /** Called from commerce fulfillment after Stripe payment. */
