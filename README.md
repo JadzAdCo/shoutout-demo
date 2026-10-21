@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.101 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.101 (stable) + floqCast WebRTC s3.1.102 cache-bust
 
+- s3.1.102 (floqCast WebRTC hold): TURN + ICE restart + displayJoins debounce — stops ~10s live drops. Hard-refresh display2 + floqcast-preview (`?v=s3.1.102`).
 - s3.1.101: Discovery crawl upsert + auto-approve (≥92%) + past-event lifecycle (mark/retire/remove).
 
 - s3.1.100: Clear Washington, DC vs Washington State distinction in crawler markets/Places.

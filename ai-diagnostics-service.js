@@ -1902,6 +1902,15 @@
       troubleshoot:"Still nightlife-only → Save schedule again (live doc may still be old hip-hop-France plan). No Places hits → confirm GOOGLE_PLACES_API_KEY; broaden query. Flea page never appears → paste theparksdc.com/event/fall_festival/ into Source Detail Extraction as a one-off."
     },
     {
+      id:"s3-1-102-floqcast-webrtc-hold",
+      area:"floqCast / Display 2 + Preview",
+      feature:"Live video stays up past ~10s (TURN + ICE restart + join debounce)",
+      changed:"STUN-only + displayJoins rebuilds dropped peers after brief ICE disconnected. Added OpenRelay TURN, restartIce before hard rebuild, peerMediaAlive hold, DISPLAY_JOIN_DEBOUNCE_MS, longer disconnect holds (phone 18s/45s; board 35s). Cache-bust floqcast-webrtc/display-floqcast/floqcast-preview ?v=s3.1.102.",
+      howToTest:"1) Hard-refresh display2.html?location=temp-democlub-1 (or Aurelia) — scripts must show ?v=s3.1.102. 2) Hard-refresh floqcast-preview on phone (s3.1.102). 3) Go live; confirm video on board. 4) Keep both tabs foreground for at least 60s — must NOT drop at ~10s. 5) Brief Wi‑Fi blip: status may say holding/ICE restart, then video returns without End live.",
+      expected:"Stable live ≥60s; blips recover via ICE restart/hold without full session end.",
+      troubleshoot:"Still drops ~10s → hard-refresh both sides (old STUN-only cache). Preview status should mention ICE restart / holding. Confirm phone tab stays foreground. If still failing on hard NAT after refresh, note TURN host reachability (openrelay.metered.ca)."
+    },
+    {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",
       area:"floqCast / Search + Display 2",
       feature:"Aurelia select opens preview (not blank); freeze does not thrash reconnect",

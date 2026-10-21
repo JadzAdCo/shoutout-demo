@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-floqr-chrome="traditional" data-scheme="traditional">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR chrome scheme stage (local)</title>
+  <style>
+    :root, html[data-floqr-chrome="traditional"]{
+      --bg:#2b2b2b; --bg-elev:#353535; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#000; --accent:#fff; --pick:#9dffb0;
+      --hero:linear-gradient(165deg,#3a3a3a,#2b2b2b 45%,#1f1f1f);
+      --font:Georgia,"Times New Roman",serif;
+    }
+    html[data-floqr-chrome="nightlife"]{
+      --bg:#070d18; --bg-elev:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#26d8ff; --accent:#3de7ff; --pick:#dfff5a;
+      --hero:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038);
+      --font:"Avenir Next","Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);background:var(--hero);font-family:var(--font);padding:28px 20px 80px}
+    .banner{display:inline-block;font-weight:800;font-size:13px;border:2px solid var(--line);background:var(--bg-elev);padding:6px 12px;border-radius:999px;margin-bottom:14px}
+    h1{margin:0 0 8px;font-size:clamp(26px,4.5vw,38px)}
+    .lead{max-width:920px;color:var(--muted);line-height:1.5;margin:0 0 18px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 24px;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev)}
+    .btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 14px}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+    .live{font-size:13px;color:var(--muted)}
+    .live strong{color:var(--pick)}
+    .block{margin:0 0 26px;padding:18px;border:2px solid var(--line);border-radius:18px;background:var(--bg-elev)}
+    .block h2{margin:0 0 6px;font-size:19px}
+    .block .sub{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4}
+    .row{display:flex;flex-wrap:wrap;gap:16px}
+    figure{margin:0;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:min(210px,100%)}
+    figure.hero{outline:2px solid var(--accent)}
+    figure.proposal{outline:2px dashed rgba(255,255,255,.35)}
+    figcaption{font-size:12px;font-weight:800;margin-bottom:8px;color:var(--muted)}
+    figure img{display:block;width:100%;border-radius:18px;background:#111;aspect-ratio:1;object-fit:cover}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;margin-left:4px;background:rgba(255,255,255,.12)}
+    .pick{color:var(--pick)}
+    .note{max-width:920px;padding:14px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev);color:var(--muted);font-size:14px;line-height:1.45}
+    code{font-size:12px;background:rgba(0,0,0,.35);padding:1px 6px;border-radius:6px}
+    a{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <div class="banner">LOCAL STAGE — Search / Pages not wired</div>
+  <h1>Patron chrome switch (staged)</h1>
+  <p class="lead">
+    Toggle <strong>Traditional</strong> vs <strong>Nightlife</strong> chrome. Chosen icons swap live on this page via
+    <code>floqr.uiChrome</code> (localStorage). Profile field + Search wiring wait for your go-ahead.
+  </p>
+
+  <div class="toolbar">
+    <button type="button" class="btn" data-floqr-chrome-btn="traditional" aria-pressed="true">Traditional chrome</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="nightlife" aria-pressed="false">Nightlife chrome</button>
+    <span class="live">Active: <strong data-floqr-chrome-label>Traditional chrome</strong></span>
+  </div>
+
+  <section class="block">
+    <h2>1) Chosen — FloqCast + VIP <span class="tag">locked packs</span></h2>
+    <p class="sub">Nightlife FloqCast now uses cyan→magenta nightlife ring (v9). Traditional FloqCast v8 charcoal bezel. VIP nightlife + traditional B locked.</p>
+    <div class="row">
+      <figure class="hero">
+        <figcaption class="pick">FloqCast <span data-floqr-chrome-label></span></figcaption>
+        <img data-floqr-chrome-icon="floqCast" src="./images/review/floqcast-traditional-v8.jpg" alt="FloqCast"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">VIP reserV <span data-floqr-chrome-label></span></figcaption>
+        <img data-floqr-chrome-icon="vipReserv" src="./images/review/vip-traditional-grey-black-border-v6.jpg" alt="VIP reserV"/>
+      </figure>
+      <figure>
+        <figcaption>FloqCast nightlife SVG</figcaption>
+        <img src="./images/review/floqcast-icon-nightlife.svg?v=9" alt="FloqCast nightlife SVG"/>
+      </figure>
+      <figure>
+        <figcaption>FloqCast traditional SVG</figcaption>
+        <img src="./images/review/floqcast-icon-traditional.svg?v=8" alt="FloqCast traditional SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>2) Traditional chrome proposals <span class="tag">pick later</span></h2>
+    <p class="sub">Proposed traditional tiles for ShoutOut, FloqAi, BartR, RydR. Nightlife column still shows current live marks until you choose nightlife packs.</p>
+    <div class="row">
+      <figure class="proposal">
+        <figcaption>ShoutOut</figcaption>
+        <img data-floqr-chrome-icon="shoutOut" src="./images/review/shoutout-traditional-v1.jpg" alt="ShoutOut"/>
+      </figure>
+      <figure class="proposal">
+        <figcaption>FloqAi</figcaption>
+        <img data-floqr-chrome-icon="floqAi" src="./images/review/floqai-traditional-v1.jpg" alt="FloqAi"/>
+      </figure>
+      <figure class="proposal">
+        <figcaption>BartR</figcaption>
+        <img data-floqr-chrome-icon="bartR" src="./images/review/bartr-traditional-v1.jpg" alt="BartR"/>
+      </figure>
+      <figure class="proposal">
+        <figcaption>RydR</figcaption>
+        <img data-floqr-chrome-icon="rydR" src="./images/review/rydr-traditional-v1.jpg" alt="RydR"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>3) Side-by-side reference (both chromes)</h2>
+    <p class="sub">Fixed pairs — does not follow the toggle. Use to compare chrome languages.</p>
+    <div class="row">
+      <figure>
+        <figcaption>FloqCast nightlife v9</figcaption>
+        <img src="./images/review/floqcast-nightlife-v9.jpg?v=9" alt="FloqCast nightlife v9"/>
+      </figure>
+      <figure>
+        <figcaption>FloqCast traditional v8</figcaption>
+        <img src="./images/review/floqcast-traditional-v8.jpg?v=8" alt="FloqCast traditional v8"/>
+      </figure>
+      <figure>
+        <figcaption>VIP nightlife v6</figcaption>
+        <img src="./images/review/vip-nightlife-v6.jpg" alt="VIP nightlife"/>
+      </figure>
+      <figure>
+        <figcaption>VIP traditional B</figcaption>
+        <img src="./images/review/vip-traditional-grey-black-border-v6.jpg" alt="VIP traditional B"/>
+      </figure>
+      <figure>
+        <figcaption>ShoutOut traditional v2 (from original)</figcaption>
+        <img src="./images/review/shoutout-traditional-v2.jpg?v=2" alt="ShoutOut traditional"/>
+      </figure>
+      <figure>
+        <figcaption>FloqAi traditional prop</figcaption>
+        <img src="./images/review/floqai-traditional-v1.jpg" alt="FloqAi traditional"/>
+      </figure>
+      <figure>
+        <figcaption>BartR traditional prop</figcaption>
+        <img src="./images/review/bartr-traditional-v1.jpg" alt="BartR traditional"/>
+      </figure>
+      <figure>
+        <figcaption>RydR traditional prop</figcaption>
+        <img src="./images/review/rydr-traditional-v1.jpg" alt="RydR traditional"/>
+      </figure>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>Prep for go-live (not done yet):</strong> persist <code>profile.uiChrome</code>, apply via <code>FLOQRChromeScheme</code> on Search tiles,
+    My Profile toggle, and cache-bust icon URLs. Also see
+    <a href="./scheme-icons-demo.html?v=9">scheme-icons-demo.html</a> for VIP/FloqCast review history.
+    Reply which traditional proposals to lock, then go-ahead to wire Search.
+  </p>
+
+  <script src="./floqr-chrome-scheme.js?v=stage1"></script>
+  <script>
+    FLOQRChromeScheme.bindToggle(document);
+    // Keep legacy data-scheme in sync for page chrome CSS
+    document.documentElement.setAttribute("data-scheme", FLOQRChromeScheme.getChrome());
+    window.addEventListener("floqr-chrome-change", (e) => {
+      document.documentElement.setAttribute("data-scheme", e.detail.chrome);
+    });
+  </script>
+</body>
+</html>

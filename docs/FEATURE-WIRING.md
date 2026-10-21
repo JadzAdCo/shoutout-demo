@@ -8,7 +8,23 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-20 |
+| Last registry touch | 2026-10-21 |
+
+---
+
+## Patron chrome scheme (staged — not live)
+
+**Purpose:** Let patrons switch Search / product marks between **Traditional** (charcoal bezel, B/W) and **Nightlife** (navy + cyan→magenta neon ring) chrome. Local stage only until go-ahead.
+
+| Layer | Wiring |
+|---|---|
+| Storage (stage) | `localStorage` key `floqr.uiChrome` = `traditional` \| `nightlife` |
+| Planned profile | `profile.uiChrome` (Firestore) — **not wired yet** |
+| Client helper | `floqr-chrome-scheme.js` → `window.FLOQRChromeScheme` (`getChrome` / `setChrome` / `iconUrl` / `bindToggle` / `data-floqr-chrome-icon`) |
+| Local preview | `chrome-scheme-stage.html` + `scheme-icons-demo.html` |
+| Chosen packs | FloqCast nightlife v9 + traditional v8; VIP nightlife v6 + traditional B grey/black |
+| Traditional proposals | `images/review/{shoutout,floqai,bartr,rydr}-traditional-v1.jpg` |
+| Go-live gate | Do **not** swap Search tiles / `index.html` until icons locked + go-ahead |
 
 ---
 
@@ -49,6 +65,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | floqCast venue geo pick (s3.1.88) | `floqcast-search.html` loads `floqr-geo-search.js`. Empty search shows **top 4 nearest** floqCast venues (GPS → IP → profile city via `FLOQRGeoSearch.resolveUserLocation` / `sortNearest`). Typing matches club, brand, city, or `SHOUTOUT_EVENTS` event name. Status line shows nearest-of-N + place/source. Help: `help-floqcast-choose-venue`. |
 | AI crawl daytime events (s3.1.98–100) | Crawler was nightlife-only (clubs/DJ), so daytime listings like The Parks DC **Flea + Fall Festival** never entered `aiDiscoveryQueue`. Added daytime event types (flea / farmers / community market, daytime + fall festival), Community/Festival/Market genres, Places `daytimeEvent` mapping, and daytime approval checklist (organizer + date/time; no DJ). **Washington places:** canonical markets `Washington, DC` (`washington-dc`) vs `Washington State` / `Seattle` (`washington-state` / `seattle-wa`). Bare “Washington” → capital. Places text + lat/lng bias differ (DC 38.91°N vs Seattle 47.61°N). Live schedule cities use **Washington, DC**. |
 | Discovery crawl production upgrades (s3.1.101) | **Bounded concurrency:** `mapPool` (3) in `discoverPlacesForCriteria`; per-host HTML delay via `waitForHostBudget`. **Deterministic upserts:** queue ids `place_{placesId}` / `evt_{sha1(placesId\|start\|title)}` with `mergeQueuePolicy` (protects approved human fields). **Venue→event:** JSON-LD `Event`/`MusicEvent`/`ComedyEvent`/`Festival` → child dated docs (`attachEventsFromHtml`). **Auto-approve:** `processCrawledItem` (`discovery-auto-approve.js`) — identity anchors + schema gates + ≥92% confidence → live `clubLocations`/`events`; else `ADMIN_QUEUE`. **Past events:** `lifecycleStatus` upcoming/past/retired/removed; public feed `eventsView` vs `pastEventsView`; callable `retirePastCrawledEvents` + daily schedule. Modules: `discovery-crawl-core.js`, `discovery-auto-approve.js`, `discovery-past-events.js`. |
+| floqCast ~10s drop / WebRTC hold (s3.1.102) | STUN-only + aggressive `displayJoins` rebuilds killed peers after brief ICE `disconnected` (~10s). Fix in `floqcast-webrtc.js`: OpenRelay TURN + STUN; `restartIce` before hard rebuild; `peerMediaAlive` / hold-media-alive; `DISPLAY_JOIN_DEBOUNCE_MS`; longer disconnect rebuilds (18s / 45s after stable). `display-floqcast.js`: `DISCONNECT_HOLD_MS=35000`, hold when media still flowing. Cache-bust `floqcast-webrtc.js` / `display-floqcast.js` / `floqcast-preview.js` `?v=s3.1.102` on display2 + preview. |
 | floqCast Aurelia blank + freeze reconnect (s3.1.97) | (1) After ICE connect, freeze→disconnect→immediate rebuild fought the board → reconnect errors. Fix: longer rebuild delay after a stable link; skip rebuild if ICE recovers; hold display after `hadVideoTrack`; resume paused preview canvas. (2) Select Aurelia → Go live opened `about:blank` then set **relative** `./floqcast-preview.html` → blank tab. Fix: `absoluteAppUrl` + same-tab on mobile. |
 | floqCast Connecting hang (s3.1.96) | Board stuck **Connecting to patron…**: reattach killed the answering peer while answer SDP stayed → callee ICE ufrags ≠ answer (`saJX` vs `yyVO`/`RaMQ`/…). Fix: stick with peer after answer (disconnected ≠ dead); buffer callee ICE until answer write succeeds; phone filters by ufrag + clears candidate collections on new offer; `displayJoins` uses client Timestamp. **Rules deploy required** (candidate delete + `at is timestamp`). |
 | floqCast retry storm (s3.1.95) | display2 treated every `*-error` as hard reattach, fighting `displayJoins` renegotiate → stuck **Retrying after error…** with SDP answered but ICE never stable. Fix: wait for phone rebuild on offer/rejoin errors; backoff + max reattach; show real error text. |
