@@ -68,10 +68,11 @@
     .tag.trad{background:rgba(255,255,255,.12); color:#ddd}
     .stage{
       --s:200px; width:100%; aspect-ratio:1; max-width:var(--s);
-      margin:0 auto; border-radius:22px; background:#000;
+      margin:0 auto; border-radius:0; background:#000;
       display:grid; place-items:center; overflow:hidden;
     }
     .stage.checker{
+      border-radius:12px;
       background:
         linear-gradient(45deg,#2a2a2a 25%,transparent 25%),
         linear-gradient(-45deg,#2a2a2a 25%,transparent 25%),
@@ -83,9 +84,9 @@
       padding:10px;
     }
     .stage img{
-      width:92%; height:92%; object-fit:contain; display:block; border-radius:8px;
+      width:92%; height:92%; object-fit:contain; display:block; border-radius:0;
     }
-    .stage.solid img{width:100%; height:100%; object-fit:cover; border-radius:18px}
+    .stage.solid img{width:100%; height:100%; object-fit:cover; border-radius:0}
     .note{font-size:13px; color:var(--muted); margin:0}
     .ok{color:var(--ok)}
   </style>
@@ -94,7 +95,8 @@
   <p class="banner">LOCAL REVIEW ONLY — Search / production icons not changed</p>
   <h1>FloqCAST V4 next to chrome icons</h1>
   <p class="sub">
-    Latest <strong class="ok">FloqCAST V4</strong> silhouette draft beside ShoutOut, VIP reserV, and FloqAi
+    Latest <strong class="ok">FloqCAST V4</strong> silhouette draft beside ShoutOut, VIP reserV, and
+    <strong class="ok">FloqBOT</strong> (chatbot for nightlife events — replaces FloqAi mark)
     in <strong>Nightlife</strong> and <strong>Traditional</strong> chrome packs
     (<code>images/chrome/</code>). Branch <code>cursor/icon-square-green-halo-bbee</code>.
   </p>
@@ -108,7 +110,7 @@
     <h2>Nightlife chrome — V4 candidate beside live packs</h2>
     <p>
       FloqCAST V4 uses the nightlife circle language (pink→cyan ring). Compare weight and chrome feel
-      against ShoutOut / VIP / FloqAi nightlife marks.
+      against ShoutOut / VIP / FloqBOT nightlife marks.
     </p>
     <div class="row">
       <figure class="hero">
@@ -129,10 +131,10 @@
           <img src="./images/chrome/vip-nightlife.jpg" alt="VIP reserV nightlife"/>
         </div>
       </figure>
-      <figure>
-        <figcaption>FloqAi <span class="tag nl">nightlife</span></figcaption>
+      <figure class="hero">
+        <figcaption>FloqBOT <span class="tag draft">new</span> <span class="tag nl">nightlife</span></figcaption>
         <div class="stage solid">
-          <img src="./images/chrome/floqai-nightlife.png" alt="FloqAi nightlife"/>
+          <img src="./images/chrome/floqbot-nightlife.png?v=1" alt="FloqBOT nightlife"/>
         </div>
       </figure>
     </div>
@@ -141,8 +143,8 @@
   <section class="block">
     <h2>Traditional chrome — same products</h2>
     <p>
-      Traditional packs for ShoutOut, VIP reserV, and FloqAi. V4 is shown again as the FloqCAST candidate
-      (nightlife silhouette draft — not a traditional recolor yet).
+      Traditional packs for ShoutOut (borderless square, matching nightlife framing), VIP reserV, and FloqBOT.
+      V4 is shown again as the FloqCAST candidate (nightlife silhouette draft — not a traditional recolor yet).
     </p>
     <div class="row">
       <figure class="hero">
@@ -152,9 +154,9 @@
         </div>
       </figure>
       <figure>
-        <figcaption>ShoutOut <span class="tag trad">traditional</span></figcaption>
+        <figcaption>ShoutOut <span class="tag trad">traditional</span> <span class="tag draft">no bezel</span></figcaption>
         <div class="stage solid">
-          <img src="./images/chrome/shoutout-traditional.jpg" alt="ShoutOut traditional"/>
+          <img src="./images/chrome/shoutout-traditional.png?v=2" alt="ShoutOut traditional borderless"/>
         </div>
       </figure>
       <figure>
@@ -163,10 +165,10 @@
           <img src="./images/chrome/vip-traditional.jpg" alt="VIP reserV traditional"/>
         </div>
       </figure>
-      <figure>
-        <figcaption>FloqAi <span class="tag trad">traditional</span></figcaption>
+      <figure class="hero">
+        <figcaption>FloqBOT <span class="tag draft">new</span> <span class="tag trad">traditional</span></figcaption>
         <div class="stage solid">
-          <img src="./images/chrome/floqai-traditional.jpg" alt="FloqAi traditional"/>
+          <img src="./images/chrome/floqbot-traditional.png?v=1" alt="FloqBOT traditional"/>
         </div>
       </figure>
     </div>
@@ -195,15 +197,15 @@
         </div>
       </figure>
       <figure>
-        <figcaption>FloqAi NL</figcaption>
+        <figcaption>FloqBOT NL</figcaption>
         <div class="stage solid" style="--s:160px">
-          <img src="./images/chrome/floqai-nightlife.png" alt=""/>
+          <img src="./images/chrome/floqbot-nightlife.png?v=1" alt=""/>
         </div>
       </figure>
       <figure>
         <figcaption>ShoutOut Trad</figcaption>
         <div class="stage solid" style="--s:160px">
-          <img src="./images/chrome/shoutout-traditional.jpg" alt=""/>
+          <img src="./images/chrome/shoutout-traditional.png?v=2" alt=""/>
         </div>
       </figure>
       <figure>
@@ -213,9 +215,9 @@
         </div>
       </figure>
       <figure>
-        <figcaption>FloqAi Trad</figcaption>
+        <figcaption>FloqBOT Trad</figcaption>
         <div class="stage solid" style="--s:160px">
-          <img src="./images/chrome/floqai-traditional.jpg" alt=""/>
+          <img src="./images/chrome/floqbot-traditional.png?v=1" alt=""/>
         </div>
       </figure>
       <figure>
