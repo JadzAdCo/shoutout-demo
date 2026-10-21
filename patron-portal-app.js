@@ -4751,6 +4751,10 @@
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
       window.FLOQRI18n?.applyDom?.();
+      try {
+        window.FLOQRChromeScheme?.hydrateFromProfile?.(currentProfile);
+        window.FLOQRChromeScheme?.bindToggle?.();
+      } catch (_) {}
     } catch (_) {}
     fillProfileForm(profile, user);
     renderStaffConsentManager();

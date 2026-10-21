@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.101";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.103";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1900,6 +1900,24 @@
       howToTest:"1) Hard-refresh Master Admin → AI Crawling (s3.1.101). 2) Confirm Flea Markets / Fall Festivals / Daytime Events are selected. 3) Cities show Washington, DC (not bare Washington); optionally add Seattle / Washington State. 4) Preview Search Plan — DC jobs say Washington, DC District of Columbia; WA jobs say Washington State / Seattle. 5) Save Automatic Schedule, then Instant Crawl Now. 6) Discovery Queue daytime candidates should be DC-addressed for Washington, DC jobs.",
       expected:"Search plan lists daytime jobs; crawl can surface daytime market/festival candidates; review cards do not require DJ for daytime.",
       troubleshoot:"Still nightlife-only → Save schedule again (live doc may still be old hip-hop-France plan). No Places hits → confirm GOOGLE_PLACES_API_KEY; broaden query. Flea page never appears → paste theparksdc.com/event/fall_festival/ into Source Detail Extraction as a one-off."
+    },
+    {
+      id:"s3-1-102-floqcast-webrtc-hold",
+      area:"floqCast / Display 2 + Preview",
+      feature:"Live video stays up past ~10s (ICE restart + join debounce)",
+      changed:"STUN-only + displayJoins rebuilds dropped peers after brief ICE disconnected. Added restartIce, peerMediaAlive hold, DISPLAY_JOIN_DEBOUNCE_MS, longer disconnect holds. s3.1.103 replaces public OpenRelay with FLOQR Twilio TURN via getFloqCastIceServers.",
+      howToTest:"1) Hard-refresh display2.html?location=temp-democlub-1 — scripts ?v=s3.1.103. 2) Hard-refresh floqcast-preview on phone (s3.1.103). 3) Go live; confirm video on board. 4) Keep both tabs foreground ≥60s — must NOT drop at ~10s. 5) Brief Wi‑Fi blip: holding/ICE restart then video returns.",
+      expected:"Stable live ≥60s; blips recover via ICE restart/hold without full session end.",
+      troubleshoot:"Still drops ~10s → hard-refresh both sides. Confirm Functions deployed (getFloqCastIceServers). Check Network for callable returning iceServers source twilio/floqr-turn (not stun-only)."
+    },
+    {
+      id:"s3-1-103-chrome-scheme-and-floqr-turn",
+      area:"Search + My Profile + floqCast",
+      feature:"Patron Nightlife/Traditional icon chrome + FLOQR Twilio TURN",
+      changed:"Search toolbar + Language Settings toggle icons via FLOQRChromeScheme (images/chrome/*). FloqCast ICE uses getFloqCastIceServers (Twilio Network Traversal). Package s3.1.103.",
+      howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/FloqAi marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
+      expected:"Icons swap instantly; choice survives reload; live stream ≥60s with Twilio TURN.",
+      troubleshoot:"Icons stuck → confirm floqr-chrome-scheme.js loaded and images/chrome/* 200. TURN stun-only → redeploy Functions with TWILIO_* secrets; check getFloqCastIceServers."
     },
     {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",

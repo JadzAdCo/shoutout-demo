@@ -607,6 +607,10 @@
             /* quiet */
           } else if (s === "renegotiating") {
             setStatus("LIVE — restoring venue link after a drop (keep this tab open)…");
+          } else if (s === "ice-restart") {
+            setStatus("LIVE — refreshing network path (ICE restart). Keep this tab open…");
+          } else if (s === "hold-media-alive" || s === "join-ignored") {
+            setStatus("LIVE — brief network blip; video still held. Keep this tab open.");
           } else if (s === "disconnected") {
             setStatus("LIVE — link blip (Wi‑Fi/NAT). Holding… keep this tab open; do not spam End live.");
           } else if (s === "failed") {

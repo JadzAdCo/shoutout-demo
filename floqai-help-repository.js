@@ -1423,6 +1423,21 @@
       page: "patron-portal.html#portalLanguageSettings"
     },
     {
+      id: "help-chrome-scheme",
+      title: "Icon chrome",
+      body: "Choose Nightlife (neon cyan–magenta) or Traditional (charcoal / white) marks for Search product icons. Your choice is saved on this device and on your profile when signed in. Find the switch on Search under Or, or in My Profile → Language Settings.",
+      searchPhrases: [
+        "chrome", "nightlife chrome", "traditional chrome", "icon theme", "icon chrome",
+        "dark icons", "neon icons", "switch icons", "product icons", "search icons"
+      ],
+      links: [
+        {label: "Search (icon chrome)", href: pageUrl("./", {from: "floqai"}), search: "search icons", blurb: "Toggle Nightlife vs Traditional marks"},
+        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "chrome settings", blurb: "Same chrome switch under Language Settings"}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalLanguageSettings"
+    },
+    {
       id: "help-my-profile",
       title: "My Profile & Settings",
       body: "Open My Profile & Settings for roles, seller tools, and account options.",

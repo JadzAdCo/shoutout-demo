@@ -17,28 +17,26 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const page = section(read("index.html"), "categoryPage");
   assert.match(page, /class="category-brand-stack">\s*<img src="\.\/images\/floqr-color\.png" alt="FLOQR" class="product-parent-logo"/);
   assert.ok(page.indexOf("category-brand-stack") < page.indexOf('id="categoryFloqAiSearch"'), "logo sits above FloqAi");
+  assert.match(page, /class="search-chrome-toolbar"/);
+  assert.match(page, /data-floqr-chrome-btn="nightlife"/);
+  assert.match(page, /data-floqr-chrome-btn="traditional"/);
   assert.match(page, /class="search-icon-row"/);
-  assert.match(page, /<button id="shoutoutBtnCard" class="shoutout-icon-card"[^>]*>\s*<img src="\.\/shoutout-logo\.png[^"]*" alt="" class="shoutout-icon-img"[^>]*>\s*<\/button>/);
+  assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*images\/chrome\/shoutout-/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
-  assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[^>]*>[\s\S]*floqcast-icon-face[\s\S]*floqcast-icon\.svg[\s\S]*floqcast-icon-word/);
-  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-reserv-mark\.svg/);
+  assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*data-floqr-chrome-icon="floqCast"[\s\S]*images\/chrome\/floqcast-/);
+  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*data-floqr-chrome-icon="vipReserv"[\s\S]*images\/chrome\/vip-/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
-  assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*floqai-icon-face[\s\S]*floqai-icon-word/);
+  assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*data-floqr-chrome-icon="floqAi"[\s\S]*images\/chrome\/floqai-/);
   const css = read("styles.css");
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
   assert.match(css, /\.search-icon-row\{/);
+  assert.match(css, /\.search-chrome-toolbar\{/);
   assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.vip-icon-face\{[^}]*flex-direction:column/);
-  assert.match(css, /\.floqai-icon-face \.floqai-tile-mark,\.floqcast-icon-face \.floqcast-tile-mark,\.vip-icon-face \.vip-tile-mark\{[^}]*width:80%/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
-  const vipMark = read("images/vip-reserv-mark.svg");
-  assert.match(vipMark, /aria-label="VIP reserV"/);
-  assert.match(vipMark, />VIP</);
-  assert.match(vipMark, /<tspan[^>]*>reser<\/tspan>\s*<tspan[^>]*>V<\/tspan>/);
-  assert.match(vipMark, /vipSeat|Banquette|rear curve against the ring/);
-  const floqMark = read("images/floqcast-icon.svg");
-  assert.doesNotMatch(floqMark, /<use[\s>]/, "floqCast Search mark must be Safari img-safe (no use)");
+  assert.match(read("floqr-chrome-scheme.js"), /FLOQRChromeScheme/);
+  assert.match(read("floqr-chrome-scheme.js"), /images\/chrome\/floqcast-nightlife/);
 });
 
 test("Throw a ShoutOut skips the ShoutOut landing page", () => {

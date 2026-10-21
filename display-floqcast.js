@@ -72,9 +72,9 @@
   let disconnectHoldTimer = null;
 
   const MAX_REATTACH = 8;
-  const ICE_STUCK_MS = 25000;
+  const ICE_STUCK_MS = 35000;
   /** After video was playing, hold through long NAT/Wi‑Fi blips before reattach. */
-  const DISCONNECT_HOLD_MS = 18000;
+  const DISCONNECT_HOLD_MS = 35000;
   let hadVideoTrack = false;
 
   function clearIceWatchdog() {
@@ -221,15 +221,21 @@
           if (!answeredSticky) setLiveStatus(`WebRTC: ${status}`);
           return;
         }
-        if (status === "disconnected") {
+        if (status === "disconnected" || status === "ice-restart" || status === "hold-media-alive") {
           // Hold through NAT/Wi‑Fi blips after answer — do not reattach (kills answering peer).
           // After video was playing, only reattach on failed/closed — not on disconnected alone.
+          if (status === "ice-restart" || status === "hold-media-alive") {
+            setLiveStatus(hadVideoTrack
+              ? "Video hiccup — restoring (keep phone tab open)…"
+              : "Link blip — restoring…");
+            return;
+          }
           if (answeredSticky || hadVideoTrack) {
             setLiveStatus(hadVideoTrack
               ? "Video paused — holding link (keep phone tab open)…"
               : "Link blip — holding…");
             clearDisconnectHold();
-            disconnectHoldTimer = setTimeout(() => {
+            disconnectHoldTimer = setTimeout(async () => {
               disconnectHoldTimer = null;
               const ice = String(activeJoin?.pc?.iceConnectionState || "");
               const conn = String(activeJoin?.pc?.connectionState || "");
@@ -238,6 +244,12 @@
                 window.FLOQRFloqCastRtc.forceVideoPlay?.(video);
                 return;
               }
+              try {
+                if (hadVideoTrack && await window.FLOQRFloqCastRtc.peerMediaAlive?.(activeJoin?.pc)) {
+                  setLiveStatus("Video still flowing — holding (keep phone tab open)…");
+                  return;
+                }
+              } catch (_) { /* ignore */ }
               if (ice === "failed" || conn === "failed" || conn === "closed" || ice === "closed") {
                 peerDead = true;
                 answeredSticky = false;

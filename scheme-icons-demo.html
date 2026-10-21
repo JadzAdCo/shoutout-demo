@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-scheme="traditional">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR icon review v9 (local preview)</title>
+  <style>
+    :root, html[data-scheme="traditional"]{
+      --bg:#2b2b2b; --bg-elev:#353535; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#000; --accent:#fff;
+      --hero:linear-gradient(165deg,#3a3a3a,#2b2b2b 45%,#1f1f1f);
+      --font:Georgia,"Times New Roman",serif;
+    }
+    html[data-scheme="nightlife"]{
+      --bg:#070d18; --bg-elev:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#26d8ff; --accent:#3de7ff;
+      --hero:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038);
+      --font:"Avenir Next","Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);background:var(--hero);font-family:var(--font);padding:28px 20px 72px}
+    .banner{display:inline-block;font-weight:800;font-size:13px;border:2px solid var(--line);background:var(--bg-elev);padding:6px 12px;border-radius:999px;margin-bottom:14px}
+    h1{margin:0 0 8px;font-size:clamp(26px,4.5vw,38px)}
+    .lead{max-width:880px;color:var(--muted);line-height:1.5;margin:0 0 18px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev)}
+    .btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 14px}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+    .block{margin:0 0 26px;padding:18px;border:2px solid var(--line);border-radius:18px;background:var(--bg-elev)}
+    .block h2{margin:0 0 6px;font-size:19px}
+    .block .sub{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4}
+    .row{display:flex;flex-wrap:wrap;gap:16px}
+    figure{margin:0;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:min(230px,100%)}
+    figure.hero{outline:2px solid var(--accent)}
+    figcaption{font-size:12px;font-weight:800;margin-bottom:8px;color:var(--muted)}
+    figure img{display:block;width:100%;border-radius:18px;background:#111}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;margin-left:4px;background:rgba(255,255,255,.12)}
+    .pick{color:#9dffb0}
+    .note{max-width:880px;padding:14px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev);color:var(--muted);font-size:14px;line-height:1.45}
+  </style>
+</head>
+<body>
+  <div class="banner">LOCAL PREVIEW v9 - Search not changed</div>
+  <h1>Icon revisions for your pick</h1>
+  <p class="lead">
+    FloqCast nightlife v9: cyan→magenta nightlife chrome ring + LED overlay wordmark (no bar).
+    FloqCast traditional v8 charcoal bezel kept. VIP nightlife + traditional B locked.
+    Patron chrome switch staged at <a href="./chrome-scheme-stage.html" style="color:inherit">chrome-scheme-stage.html</a>.
+  </p>
+
+  <div class="toolbar">
+    <button type="button" class="btn" id="chromeTrad" aria-pressed="true">Traditional chrome</button>
+    <button type="button" class="btn" id="chromeNight" aria-pressed="false">Nightlife chrome</button>
+  </div>
+
+  <section class="block">
+    <h2>1) FloqCast Nightlife <span class="tag">v9 nightlife chrome ring</span></h2>
+    <p class="sub">Navy card + cyan→magenta ring (VIP nightlife language). FloqCast LED overlay — no caption bar.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Prior v8 (missing nightlife ring)</figcaption>
+        <img src="./images/review/floqcast-nightlife-v8.jpg?v=s3.1.103" alt="FloqCast nightlife v8"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v9 painted</figcaption>
+        <img src="./images/review/floqcast-nightlife-v9.jpg?v=s3.1.103" alt="FloqCast nightlife v9"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v9 SVG (= painted)</figcaption>
+        <img src="./images/review/floqcast-icon-nightlife.svg?v=s3.1.103" alt="FloqCast nightlife SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>2) FloqCast Traditional <span class="tag">v8 LED overlay · no bar</span></h2>
+    <p class="sub">Same overlay rules on charcoal chrome — FloqCast on LED black only.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Prior v6 (bar — reject)</figcaption>
+        <img src="./images/review/floqcast-traditional-v6.jpg?v=s3.1.103" alt="FloqCast traditional v6 bar"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v8 painted</figcaption>
+        <img src="./images/review/floqcast-traditional-v8.jpg?v=s3.1.103" alt="FloqCast traditional v8"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v8 SVG (= painted)</figcaption>
+        <img src="./images/review/floqcast-icon-traditional.svg?v=s3.1.103" alt="FloqCast traditional SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>3) VIP Nightlife <span class="tag">2-line VIP / reserV</span></h2>
+    <p class="sub">Line 1 VIP · Line 2 reser<strong style="color:#dfff5a">V</strong> (green V kept).</p>
+    <div class="row">
+      <figure>
+        <figcaption>Your ref (1-line)</figcaption>
+        <img src="./images/review/vip-nightlife-ref-v5.png" alt="VIP nightlife ref"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 painted</figcaption>
+        <img src="./images/review/vip-nightlife-v6.jpg" alt="VIP nightlife v6"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 SVG (= painted)</figcaption>
+        <img src="./images/review/vip-reserv-mark-nightlife.svg" alt="VIP nightlife SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>4) VIP Traditional - grey booth + red chairs <span class="tag">choose border</span></h2>
+    <p class="sub">Big booth grey; dining chairs stay red. Pick white or black booth border.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Your ref (all red)</figcaption>
+        <img src="./images/review/vip-traditional-ref-v5.png" alt="VIP traditional ref"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">A · grey booth · white border</figcaption>
+        <img src="./images/review/vip-traditional-grey-white-border-v6.jpg" alt="VIP grey white border"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">A SVG</figcaption>
+        <img src="./images/review/vip-reserv-mark-traditional-grey-white.svg" alt="VIP grey white SVG"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">B · grey booth · black border</figcaption>
+        <img src="./images/review/vip-traditional-grey-black-border-v6.jpg" alt="VIP grey black border"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">B SVG</figcaption>
+        <img src="./images/review/vip-reserv-mark-traditional-grey-black.svg" alt="VIP grey black SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>Not shipped.</strong> Chrome switch staged at <code>chrome-scheme-stage.html</code>. Confirm FloqCast nightlife v9 + traditional proposals, then go-ahead to wire Search.
+  </p>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const trad = document.getElementById("chromeTrad");
+      const night = document.getElementById("chromeNight");
+      function setChrome(name) {
+        root.setAttribute("data-scheme", name);
+        trad.setAttribute("aria-pressed", name === "traditional" ? "true" : "false");
+        night.setAttribute("aria-pressed", name === "nightlife" ? "true" : "false");
+      }
+      trad.addEventListener("click", () => setChrome("traditional"));
+      night.addEventListener("click", () => setChrome("nightlife"));
+    })();
+  </script>
+</body>
+</html>

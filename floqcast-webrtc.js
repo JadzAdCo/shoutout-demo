@@ -8,10 +8,44 @@
 (function (global) {
   "use strict";
 
-  const ICE_SERVERS = [
+  /**
+   * STUN always. TURN from FLOQR-owned Twilio Network Traversal (callable
+   * getFloqCastIceServers) — not public OpenRelay. Cached ~50m client-side.
+   * STUN-only often connects briefly then drops (~10s) on hard NAT.
+   */
+  const STUN_SERVERS = [
     {urls: "stun:stun.l.google.com:19302"},
     {urls: "stun:stun1.l.google.com:19302"}
   ];
+  /** Fallback when callable unavailable (tests / offline). Prefer resolved TURN. */
+  const ICE_SERVERS = STUN_SERVERS.slice();
+  let iceServersCache = null;
+  let iceServersCacheUntil = 0;
+  let iceServersInflight = null;
+
+  async function resolveIceServers() {
+    const now = Date.now();
+    if (iceServersCache && now < iceServersCacheUntil) return iceServersCache;
+    if (iceServersInflight) return iceServersInflight;
+    iceServersInflight = (async () => {
+      try {
+        if (typeof firebase === "undefined" || !firebase.app) throw new Error("no-firebase");
+        const callable = firebase.app().functions("us-central1").httpsCallable("getFloqCastIceServers");
+        const res = await callable({});
+        const servers = Array.isArray(res?.data?.iceServers) ? res.data.iceServers : [];
+        const ttlMs = Math.max(60_000, Math.min(3_600_000, Number(res?.data?.ttlMs) || 3_000_000));
+        if (!servers.length) throw new Error("empty-ice");
+        iceServersCache = servers;
+        iceServersCacheUntil = Date.now() + ttlMs;
+        return iceServersCache;
+      } catch (_) {
+        return STUN_SERVERS;
+      } finally {
+        iceServersInflight = null;
+      }
+    })();
+    return iceServersInflight;
+  }
 
   /**
    * Do NOT force 1280×720 landscape. On iPhone Safari that crops a 16:9 strip
@@ -27,16 +61,42 @@
 
   const RECONNECT_DEBOUNCE_MS = 1800;
   /** Brief ICE "disconnected" blips are common; do not tear down a stable peer quickly. */
-  const DISCONNECT_REBUILD_MS = 12000;
+  const DISCONNECT_REBUILD_MS = 18000;
   /** After a successful ICE connect, wait longer before rebuild — avoids freeze→storm. */
-  const DISCONNECT_REBUILD_AFTER_STABLE_MS = 28000;
+  const DISCONNECT_REBUILD_AFTER_STABLE_MS = 45000;
+  /** Prefer ICE restart before killing the peer after a prior stable link. */
+  const ICE_RESTART_BEFORE_REBUILD_MS = 8000;
+  /** Ignore displayJoins storms while media is still flowing. */
+  const DISPLAY_JOIN_DEBOUNCE_MS = 12000;
 
   function db() {
     return firebase.firestore();
   }
 
-  function createPeer() {
-    return new RTCPeerConnection({iceServers: ICE_SERVERS});
+  async function createPeer() {
+    const iceServers = await resolveIceServers();
+    return new RTCPeerConnection({
+      iceServers,
+      iceCandidatePoolSize: 4
+    });
+  }
+
+  /** True when RTP still moves — hold through "disconnected" UI states. */
+  async function peerMediaAlive(pc) {
+    try {
+      if (!pc?.getStats) return false;
+      const stats = await pc.getStats();
+      let bytes = 0;
+      stats.forEach((r) => {
+        if (!r) return;
+        if (r.type === "outbound-rtp" || r.type === "inbound-rtp") {
+          bytes += Number(r.bytesSent || 0) + Number(r.bytesReceived || 0);
+        }
+      });
+      return bytes > 0;
+    } catch (_) {
+      return false;
+    }
   }
 
   /** Extract a=ice-ufrag from SDP (first match). */
@@ -529,7 +589,7 @@
    * Duration clock must arm on real ICE/peer connected — never on SDP answer alone.
    */
   async function startBroadcast({sessionId, stream, onStatus, videoEl = null}) {
-    let pc = createPeer();
+    let pc = await createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let lastAnswerSdp = "";
     let unsubCallee = null;
@@ -540,7 +600,11 @@
     let sendStream = stream; // upright canvas stream for WebRTC (may equal activeStream)
     let upright = null;
     let reconnectTimer = null;
+    let iceRestartTimer = null;
     let everIceConnected = false;
+    let lastDisplayJoinAt = 0;
+    let lastMediaBytes = 0;
+    let lastMediaCheckAt = 0;
 
     // Bake what the visible preview shows into WebRTC pixels (iOS orientation).
     if (typeof document !== "undefined" && typeof HTMLCanvasElement !== "undefined"
@@ -603,21 +667,111 @@
         clearTimeout(reconnectTimer);
         reconnectTimer = null;
       }
+      if (iceRestartTimer) {
+        clearTimeout(iceRestartTimer);
+        iceRestartTimer = null;
+      }
+    }
+
+    async function mediaStillFlowing() {
+      try {
+        const alive = await peerMediaAlive(pc);
+        if (!alive) return false;
+        // Prefer getStats delta when available so we know traffic is recent.
+        const stats = await pc.getStats();
+        let bytes = 0;
+        stats.forEach((r) => {
+          if (r?.type === "outbound-rtp") bytes += Number(r.bytesSent || 0);
+          if (r?.type === "inbound-rtp") bytes += Number(r.bytesReceived || 0);
+        });
+        const now = Date.now();
+        const prev = lastMediaBytes;
+        const prevAt = lastMediaCheckAt;
+        lastMediaBytes = bytes;
+        lastMediaCheckAt = now;
+        if (!prevAt) return bytes > 0;
+        return bytes > prev;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function tryIceRestart(reason) {
+      if (stopped || rebuilding || !pc) return false;
+      if (typeof pc.restartIce !== "function") return false;
+      try {
+        pc.restartIce();
+        onStatus?.("ice-restart", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState,
+          reason: String(reason || "ice-restart")
+        });
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
 
     function scheduleRebuild(reason, waitMs) {
       if (stopped || rebuilding) return;
       clearReconnectTimer();
+      const why = String(reason || "rebuild");
+      // displayJoins while already stable: debounce hard — Xibo refresh storms were
+      // scheduling 1.8s rebuilds that killed working peers during brief ICE blips.
+      if (/display-join|stale-answer|rejoin/i.test(why) && everIceConnected) {
+        const now = Date.now();
+        if (now - lastDisplayJoinAt < DISPLAY_JOIN_DEBOUNCE_MS) {
+          onStatus?.("join-ignored", {
+            connectionState: pc?.connectionState,
+            iceConnectionState: pc?.iceConnectionState,
+            reason: why
+          });
+          return;
+        }
+        lastDisplayJoinAt = now;
+      }
       const delay = Number.isFinite(waitMs) ? waitMs : RECONNECT_DEBOUNCE_MS;
-      reconnectTimer = setTimeout(() => {
+      // After a prior stable link, try ICE restart first; only full rebuild if still dead.
+      if (everIceConnected && /disconnected|failed|display-join/i.test(why)) {
+        iceRestartTimer = setTimeout(async () => {
+          iceRestartTimer = null;
+          try {
+            const ice = String(pc?.iceConnectionState || "");
+            const conn = String(pc?.connectionState || "");
+            if (ice === "connected" || ice === "completed" || conn === "connected") return;
+            if (await mediaStillFlowing()) {
+              onStatus?.("hold-media-alive", {connectionState: conn, iceConnectionState: ice, reason: why});
+              return;
+            }
+            if (tryIceRestart(why)) {
+              // Give restart time to recover before a hard peer rebuild.
+              reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                const ice2 = String(pc?.iceConnectionState || "");
+                const conn2 = String(pc?.connectionState || "");
+                if (ice2 === "connected" || ice2 === "completed" || conn2 === "connected") return;
+                rebuildOffer(`${why}+after-ice-restart`).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
+              }, Math.max(delay, ICE_RESTART_BEFORE_REBUILD_MS));
+              return;
+            }
+          } catch (_) { /* fall through to rebuild */ }
+          rebuildOffer(why).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
+        }, Math.min(delay, ICE_RESTART_BEFORE_REBUILD_MS));
+        return;
+      }
+      reconnectTimer = setTimeout(async () => {
         reconnectTimer = null;
         // Skip if ICE recovered during the wait (common after a freeze blip).
         try {
           const ice = String(pc?.iceConnectionState || "");
           const conn = String(pc?.connectionState || "");
           if (ice === "connected" || ice === "completed" || conn === "connected") return;
+          if (everIceConnected && await mediaStillFlowing()) {
+            onStatus?.("hold-media-alive", {connectionState: conn, iceConnectionState: ice, reason: why});
+            return;
+          }
         } catch (_) {}
-        rebuildOffer(reason).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
+        rebuildOffer(why).catch((e) => onStatus?.(`renegotiate-error:${e.message}`));
       }, delay);
     }
 
@@ -630,7 +784,7 @@
       rebuilding = true;
       try {
         try { pc.close(); } catch (_) {}
-        pc = createPeer();
+        pc = await createPeer();
         attachLocalTracks(pc, sendStream || activeStream);
         await publishOffer(pc);
         onStatus?.("renegotiating", {
@@ -649,7 +803,7 @@
         emitPeerState(peer, state);
         // failed → rebuild soon. disconnected → long hold, especially after a prior stable link
         // (freeze→disconnect→immediate rebuild was causing reconnect errors).
-        if (state === "failed") scheduleRebuild(state, RECONNECT_DEBOUNCE_MS);
+        if (state === "failed") scheduleRebuild(state, everIceConnected ? ICE_RESTART_BEFORE_REBUILD_MS : RECONNECT_DEBOUNCE_MS);
         else if (state === "disconnected") scheduleRebuild(state, disconnectRebuildDelay());
         else if (state === "connected") clearReconnectTimer();
       };
@@ -662,7 +816,7 @@
           else emitPeerState(peer, `ice-${ice}`);
         } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
           emitPeerState(peer, ice === "failed" ? "failed" : ice);
-          if (ice === "failed") scheduleRebuild(ice, RECONNECT_DEBOUNCE_MS);
+          if (ice === "failed") scheduleRebuild(ice, everIceConnected ? ICE_RESTART_BEFORE_REBUILD_MS : RECONNECT_DEBOUNCE_MS);
           else if (ice === "disconnected") scheduleRebuild(ice, disconnectRebuildDelay());
         } else {
           emitPeerState(peer, peer.connectionState || ice);
@@ -699,7 +853,9 @@
       unsubJoins = sessionRef.collection("displayJoins").onSnapshot((qs) => {
         qs.docChanges().forEach((change) => {
           if (change.type !== "added") return;
-          scheduleRebuild(change.doc.data()?.reason || "display-join");
+          const reason = change.doc.data()?.reason || "display-join";
+          // After stable ICE, use long delay so a kiosk refresh does not kill video.
+          scheduleRebuild(reason, everIceConnected ? DISCONNECT_REBUILD_AFTER_STABLE_MS : RECONNECT_DEBOUNCE_MS);
         });
       });
     }
@@ -773,7 +929,7 @@
       },
       stop({stopTracks = false} = {}) {
         stopped = true;
-        if (reconnectTimer) clearTimeout(reconnectTimer);
+        clearReconnectTimer();
         unsubSession();
         if (unsubCallee) unsubCallee();
         if (unsubJoins) unsubJoins();
@@ -797,7 +953,7 @@
    * session with foreign ufrags — phone never completes ICE → "Connecting to patron…".
    */
   async function joinAsDisplay({sessionId, videoEl, onStatus}) {
-    const pc = createPeer();
+    const pc = await createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let answeredOfferSdp = "";
     let answering = false;
@@ -962,6 +1118,9 @@
 
   global.FLOQRFloqCastRtc = {
     ICE_SERVERS,
+    STUN_SERVERS,
+    resolveIceServers,
+    peerMediaAlive,
     getCameraStream,
     listVideoDevices,
     switchCameraStream,

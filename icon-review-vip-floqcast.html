@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>VIP reserV + floqCast icon review (local only)</title>
+  <style>
+    :root{
+      --bg0:#070d18; --bg1:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --accent:#3de7ff; --warn:#ffb86b; --ok:#9dffb0;
+      --floqcast-word-now:13px;
+      --floqai-word-now:14px;
+      --floqcast-word-next:calc(13px * 1.15);
+      --floqai-word-next:calc(14px * 1.15);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:28px 20px 60px;font-family:"Avenir Next","Segoe UI",sans-serif;
+      background:radial-gradient(1200px 600px at 20% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,var(--bg0),var(--bg1) 55%,#0a1628);color:var(--ink)}
+    h1{margin:0 0 8px;font-size:clamp(22px,4vw,34px);letter-spacing:.02em}
+    .banner{color:var(--accent);font-weight:900;margin:0 0 10px}
+    .sub{color:var(--muted);max-width:900px;line-height:1.45;margin:0 0 22px}
+    .sub code{color:#d4b483}
+    .block{margin:22px 0;padding:18px;border:1px dashed rgba(255,255,255,.22);border-radius:18px;background:rgba(0,0,0,.18)}
+    .block.pick{border-color:rgba(61,231,255,.55);box-shadow:0 0 0 1px rgba(61,231,255,.25) inset}
+    .block h2{margin:0 0 6px;font-size:18px}
+    .block p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4}
+    .row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+    figure{margin:0;padding:14px;border-radius:14px;background:rgba(255,255,255,.05);min-width:160px}
+    figure.hero{outline:2px solid rgba(61,231,255,.65);background:rgba(61,231,255,.08)}
+    figcaption{color:#d4b483;font-size:12px;font-weight:800;margin-bottom:10px}
+    img{display:block;width:min(240px,72vw);height:auto;background:#0b1020;border-radius:22px}
+    .tile{width:132px;height:132px;border-radius:22px;background:#000;box-shadow:0 0 18px rgba(38,216,255,.42),0 0 28px rgba(244,58,191,.28);
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;padding:6px 6px 9px;overflow:hidden}
+    .tile img{width:80%;height:auto;aspect-ratio:1;max-height:80%;background:transparent;border-radius:0;object-fit:contain}
+    .tile.mark-only{justify-content:center;padding:8px;gap:0}
+    .tile.mark-only img{width:92%;max-height:92%}
+    .word{color:#fff;font-weight:1000;letter-spacing:.02em;line-height:1.05;text-align:center;
+      text-shadow:0 0 12px rgba(38,216,255,.55),0 0 18px rgba(244,58,191,.35)}
+    .word.now-cast{font-size:var(--floqcast-word-now)}
+    .word.next-cast{font-size:var(--floqcast-word-next)}
+    .word.now-ai{font-size:var(--floqai-word-now)}
+    .word.next-ai{font-size:var(--floqai-word-next)}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;margin-left:6px}
+    .tag.now{background:rgba(255,255,255,.12);color:#ccc}
+    .tag.next{background:rgba(61,231,255,.18);color:var(--accent)}
+    .tag.pick{background:rgba(157,255,176,.2);color:var(--ok)}
+    .ok{color:var(--ok)}.warn{color:var(--warn)}
+    ul{margin:8px 0 0 18px;color:var(--muted);font-size:14px;line-height:1.45}
+  </style>
+</head>
+<body>
+  <p class="banner">LOCAL REVIEW ONLY — Search / Pages / production icons not changed</p>
+  <h1>Preferred picks — revised</h1>
+  <p class="sub">
+    <strong class="ok">floqCast:</strong> your preferred smoke cast + in-mark <code>floqCast</code> text.<br/>
+    <strong class="ok">VIP reserV:</strong> preferred top-down booth layout; seat more red; table black.<br/>
+    Branch <code>cursor/icon-review-vip-floqcast-bbee</code> — pull + open this page, or use the Cursor browser preview.
+  </p>
+
+  <div class="block pick">
+    <h2>1) floqCast — preferred + wordmark</h2>
+    <p>Same smoke silhouette cast composition; <strong>floqCast</strong> text now inside the mark.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Your pick (ref)</figcaption>
+        <img src="./images/review/floqcast-preferred-ref.png" alt="floqCast preferred reference"/>
+      </figure>
+      <figure class="hero">
+        <figcaption>PREFERRED v4 <span class="tag pick">+ floqCast text</span></figcaption>
+        <img src="./images/review/floqcast-review-preferred-v4.jpg" alt="floqCast preferred v4"/>
+      </figure>
+      <figure>
+        <figcaption>SVG vector + text</figcaption>
+        <div class="tile mark-only"><img src="./images/review/floqcast-icon-review.svg" alt="floqCast SVG review"/></div>
+      </figure>
+      <figure>
+        <figcaption>CURRENT Search</figcaption>
+        <div class="tile">
+          <img src="./images/floqcast-icon.svg" alt="current floqCast"/>
+          <span class="word now-cast">floqCast</span>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block pick">
+    <h2>2) VIP reserV — preferred + redder seat + black table</h2>
+    <p>Same curve-seat / nested-table position; seat pushed toward red; table solid black; site ring + lime V kept.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Your pick (ref)</figcaption>
+        <img src="./images/review/vip-preferred-ref.png" alt="VIP preferred reference"/>
+      </figure>
+      <figure class="hero">
+        <figcaption>PREFERRED v4 <span class="tag pick">red seat · black table</span></figcaption>
+        <img src="./images/review/vip-reserv-review-preferred-v4.jpg" alt="VIP preferred v4"/>
+      </figure>
+      <figure>
+        <figcaption>SVG vector (red / black)</figcaption>
+        <div class="tile mark-only"><img src="./images/review/vip-reserv-mark-review.svg" alt="VIP SVG review"/></div>
+      </figure>
+      <figure>
+        <figcaption>CURRENT Search</figcaption>
+        <div class="tile mark-only"><img src="./images/vip-reserv-mark.svg" alt="current VIP"/></div>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>3) Wordmarks +15% (still proposed — not live)</h2>
+    <p class="ok">If preferred floqCast mark already includes the word, Search can use mark-only (like VIP) and skip the under-tile label — or keep under-tile at +15%.</p>
+    <div class="row">
+      <figure>
+        <figcaption>floqCast under-tile now <span class="tag now">13px</span></figcaption>
+        <div class="tile">
+          <img src="./images/floqcast-icon.svg" alt=""/>
+          <span class="word now-cast">floqCast</span>
+        </div>
+      </figure>
+      <figure>
+        <figcaption>floqCast under-tile +15% <span class="tag next">~15px</span></figcaption>
+        <div class="tile">
+          <img src="./images/review/floqcast-icon-review.svg" alt=""/>
+          <span class="word next-cast">floqCast</span>
+        </div>
+      </figure>
+      <figure>
+        <figcaption>FloqAi now <span class="tag now">14px</span></figcaption>
+        <div class="tile">
+          <img src="./images/floqr-tiles-transparent.png" alt=""/>
+          <span class="word now-ai">FloqAi</span>
+        </div>
+      </figure>
+      <figure>
+        <figcaption>FloqAi +15% <span class="tag next">~16px</span></figcaption>
+        <div class="tile">
+          <img src="./images/floqr-tiles-transparent.png" alt=""/>
+          <span class="word next-ai">FloqAi</span>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>How to reply</h2>
+    <ul>
+      <li><strong>Ship preferred v4 painted</strong> for both / only floqCast / only VIP</li>
+      <li><strong>Ship SVG</strong> instead (sharper at small tile size)</li>
+      <li>Iterate seat red / table black / floqCast text size</li>
+      <li>When pleased: “go ahead” → wire Search (still not live until then)</li>
+    </ul>
+  </div>
+</body>
+</html>
