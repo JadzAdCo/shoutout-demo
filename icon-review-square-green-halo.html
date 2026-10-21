@@ -63,6 +63,11 @@
       border-radius:16px; padding:16px; display:grid; place-items:center;
     }
     .checker img{display:block; width:min(280px,70vw); height:auto}
+    .nl-square{
+      background:#000; border-radius:16px; padding:0; display:grid; place-items:center;
+      overflow:hidden; box-shadow:0 0 0 1px rgba(255,255,255,.08);
+    }
+    .nl-square img{display:block; width:min(320px,78vw); height:auto}
     .stage{
       --s:240px; width:var(--s); height:var(--s);
       border-radius:22px; background:#000; display:grid; place-items:center; overflow:hidden;
@@ -86,8 +91,8 @@
   <p class="banner">LOCAL REVIEW ONLY — Search / production icons not changed</p>
   <h1>floqCast mark review</h1>
   <p class="sub">
-    <strong>Tab “V4 silhouette draft”</strong> uses your persisted silhouette photo inside a nightlife circle
-    (transparent outside, like V3), with phone, wireless arcs, red cast arrow, large LED display, and large FloqCast (no text plate).<br/>
+    <strong>Tab “V4 silhouette draft”</strong> — silhouette photo in a nightlife circle on a <strong>full black square</strong>,
+    phone + wireless arcs + cast arrow + LED, wordmark <strong>FloqCAST</strong> (Noto Sans Display Bold Italic, matching ShoutOut) above the ring.<br/>
     Silhouette kept at <code>images/review/floqcast-silhouette-source.jpg</code> and
     <code>/cursor/stores/self/floqcast/</code>. Branch <code>cursor/icon-square-green-halo-bbee</code>.<br/>
     <a href="./icon-review-v4-chrome-compare.html" style="color:var(--cyan);font-weight:800">
@@ -108,15 +113,16 @@
       <h2>V4 — silhouette photo + cast chrome</h2>
       <p>
         Your silhouette cut out and neon-tinted into the LED + phone screens.
-        Solid black outside the nightlife ring. Wordmark <strong>FloqCAST</strong> — white bold-italic (ShoutOut-like):
-        <strong>Floq</strong> ~166px (+10%), <strong>CAST</strong> ~196px (+30%); <strong>F</strong> stays inside the ring (not touching); rest may extend past.
-        LED nudged up clear of the chrome ring. Hard refresh if cached.
+        Full opaque black square (nightlife). Wordmark uses the same face as ShoutOut chrome:
+        <strong>Noto Sans Display Bold Italic</strong> — <strong>Floq</strong> ~166px (+10%), <strong>CAST</strong> ~196px (+30%).
+        <strong>FloqCAST</strong> is the top layer (ring underneath). <strong>F</strong> stays inside the ring; rest may extend past.
+        Hard refresh if cached.
       </p>
       <div class="row">
         <figure class="hero">
-          <figcaption>V4 final draft <span class="tag next">silhouette source</span></figcaption>
-          <div class="checker">
-            <img src="./images/review/actual-icons/floqcast-v4-circle-silhouette.png?v=4j" alt="FloqCAST V4 silhouette circle"/>
+          <figcaption>V4 final draft <span class="tag next">NL black square</span></figcaption>
+          <div class="nl-square">
+            <img src="./images/review/actual-icons/floqcast-v4-circle-silhouette.png?v=4k" alt="FloqCAST V4 silhouette circle"/>
           </div>
         </figure>
         <figure>
