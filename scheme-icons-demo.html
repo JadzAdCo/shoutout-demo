@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-scheme="traditional">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR scheme + icon demo (local preview)</title>
+  <style>
+    :root, html[data-scheme="traditional"]{
+      --bg:#2b2b2b;
+      --bg-elev:#353535;
+      --bg-soft:#3d3d3d;
+      --ink:#ffffff;
+      --ink-muted:rgba(255,255,255,.72);
+      --line:#000000;
+      --btn-bg:#2b2b2b;
+      --btn-ink:#ffffff;
+      --accent:#ffffff;
+      --hero-grad:linear-gradient(165deg,#3a3a3a 0%,#2b2b2b 45%,#1f1f1f 100%);
+      --shadow:0 10px 28px rgba(0,0,0,.35);
+      --font-display:Georgia,"Times New Roman",serif;
+      --font-body:Georgia,"Times New Roman",serif;
+    }
+    html[data-scheme="nightlife"]{
+      --bg:#070d18;
+      --bg-elev:#102038;
+      --bg-soft:#152848;
+      --ink:#ffffff;
+      --ink-muted:rgba(255,255,255,.72);
+      --line:#26d8ff;
+      --btn-bg:#0b1020;
+      --btn-ink:#ffffff;
+      --accent:#3de7ff;
+      --hero-grad:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038 55%,#0a1628);
+      --shadow:0 0 18px rgba(38,216,255,.35);
+      --font-display:"Avenir Next","Segoe UI",sans-serif;
+      --font-body:"Avenir Next","Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);background:var(--hero-grad);
+      font-family:var(--font-body);padding:28px 20px 72px;
+    }
+    .banner{
+      display:inline-block;font-weight:800;letter-spacing:.04em;font-size:13px;
+      border:2px solid var(--line);background:var(--bg-elev);color:var(--ink);
+      padding:6px 12px;border-radius:999px;margin-bottom:14px;
+    }
+    h1{margin:0 0 8px;font-family:var(--font-display);font-size:clamp(28px,5vw,44px);font-weight:700}
+    .lead{max-width:720px;color:var(--ink-muted);line-height:1.5;margin:0 0 22px}
+    .toolbar{
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 28px;
+      padding:14px;border:2px solid var(--line);border-radius:16px;background:var(--bg-elev);
+      box-shadow:var(--shadow);
+    }
+    .toolbar label{font-size:14px;color:var(--ink-muted);margin-right:4px}
+    .btn{
+      appearance:none;cursor:pointer;font:inherit;font-weight:700;
+      border:2px solid var(--line);background:var(--btn-bg);color:var(--btn-ink);
+      border-radius:12px;padding:10px 16px;min-height:44px;
+    }
+    .btn:hover{background:var(--bg-soft)}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+    .btn.primary{background:#111;color:#fff}
+    html[data-scheme="nightlife"] .btn.primary{background:#0b1020;box-shadow:0 0 14px rgba(38,216,255,.35)}
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));max-width:1100px}
+    .tile{
+      border:2px solid var(--line);background:var(--bg-elev);border-radius:20px;
+      padding:16px;box-shadow:var(--shadow);display:grid;gap:12px;justify-items:center;text-align:center;
+    }
+    .tile h2{margin:0;font-size:18px;font-family:var(--font-display)}
+    .tile p{margin:0;color:var(--ink-muted);font-size:13px;line-height:1.35}
+    .mark{
+      width:148px;height:148px;border-radius:28px;border:3px solid var(--line);
+      background:var(--bg);display:grid;place-items:center;overflow:hidden;
+    }
+    .mark img{width:100%;height:100%;object-fit:cover;display:block}
+    .compare{margin-top:28px;max-width:1100px}
+    .compare h2{font-family:var(--font-display);font-size:22px;margin:0 0 10px}
+    .row{display:flex;flex-wrap:wrap;gap:16px}
+    figure{
+      margin:0;padding:12px;border:2px solid var(--line);border-radius:16px;
+      background:var(--bg-elev);width:min(240px,100%);
+    }
+    figcaption{font-size:12px;font-weight:700;margin-bottom:8px;color:var(--ink-muted)}
+    figure img{width:100%;border-radius:18px;border:2px solid var(--line);background:#111;display:block}
+    .note{margin-top:24px;max-width:820px;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev);color:var(--ink-muted);font-size:14px;line-height:1.45}
+    .note strong{color:var(--ink)}
+    code{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="banner">LOCAL PREVIEW — not live Search / Pages</div>
+  <h1>Traditional scheme + revised icons</h1>
+  <p class="lead">
+    Patron-selectable site scheme demo. Default here is <strong>traditional</strong>: charcoal grey background,
+    white text, black outlines on icons/buttons. Toggle Nightlife to compare the current FLOQR neon look.
+    Icons below are revised for this preview only — Search is unchanged until you give go-ahead.
+  </p>
+
+  <div class="toolbar" role="group" aria-label="Site scheme">
+    <label>Site scheme</label>
+    <button type="button" class="btn" id="schemeTraditional" aria-pressed="true">Traditional</button>
+    <button type="button" class="btn" id="schemeNightlife" aria-pressed="false">Nightlife (current)</button>
+    <button type="button" class="btn primary" id="ctaDemo">Book / Cast demo</button>
+  </div>
+
+  <div class="grid">
+    <article class="tile">
+      <div class="mark"><img src="./images/review/floqcast-traditional-v5.jpg" alt="FloqCast traditional icon"/></div>
+      <h2>FloqCast</h2>
+      <p>Preferred cast composition · wordmark <strong>FloqCast</strong> · charcoal / white / black outline</p>
+      <button type="button" class="btn">Open FloqCast</button>
+    </article>
+    <article class="tile">
+      <div class="mark"><img src="./images/review/vip-reserv-traditional-v5.jpg" alt="VIP reserV traditional icon"/></div>
+      <h2>VIP reserV</h2>
+      <p>Red seat · black table · <strong>VIP reserV</strong> unseparated under furniture</p>
+      <button type="button" class="btn">Reserve a table</button>
+    </article>
+    <article class="tile">
+      <div class="mark"><img src="./images/review/floqcast-icon-traditional.svg" alt="FloqCast SVG traditional"/></div>
+      <h2>FloqCast SVG</h2>
+      <p>Vector alternate for sharp small tiles</p>
+      <button type="button" class="btn">Use SVG</button>
+    </article>
+    <article class="tile">
+      <div class="mark"><img src="./images/review/vip-reserv-mark-traditional.svg" alt="VIP reserV SVG traditional"/></div>
+      <h2>VIP SVG</h2>
+      <p>Vector alternate · same red seat / black table / under-furniture wordmark</p>
+      <button type="button" class="btn">Use SVG</button>
+    </article>
+  </div>
+
+  <section class="compare">
+    <h2>Before → after (your preferred v4 → traditional v5)</h2>
+    <div class="row">
+      <figure>
+        <figcaption>FloqCast preferred v4 (neon)</figcaption>
+        <img src="./images/review/floqcast-preferred-v4-ref.png" alt="FloqCast preferred v4 reference"/>
+      </figure>
+      <figure>
+        <figcaption>FloqCast traditional v5</figcaption>
+        <img src="./images/review/floqcast-traditional-v5.jpg" alt="FloqCast traditional v5"/>
+      </figure>
+      <figure>
+        <figcaption>VIP preferred v4 (neon ring)</figcaption>
+        <img src="./images/review/vip-preferred-v4-ref.png" alt="VIP preferred v4 reference"/>
+      </figure>
+      <figure>
+        <figcaption>VIP traditional v5</figcaption>
+        <img src="./images/review/vip-reserv-traditional-v5.jpg" alt="VIP traditional v5"/>
+      </figure>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>Not shipped.</strong> This page only demos a patron scheme switcher + revised marks.
+    Full product wiring (profile <code>uiScheme</code> / localStorage, Search tiles, Club Admin, i18n) waits for your go-ahead.
+    Reply: ship traditional icons (painted / SVG), keep Nightlife as default with Traditional optional, or iterate.
+  </p>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const trad = document.getElementById("schemeTraditional");
+      const night = document.getElementById("schemeNightlife");
+      function setScheme(name) {
+        root.setAttribute("data-scheme", name);
+        trad.setAttribute("aria-pressed", name === "traditional" ? "true" : "false");
+        night.setAttribute("aria-pressed", name === "nightlife" ? "true" : "false");
+        try { localStorage.setItem("floqrPreviewScheme", name); } catch (_e) {}
+      }
+      trad.addEventListener("click", () => setScheme("traditional"));
+      night.addEventListener("click", () => setScheme("nightlife"));
+      document.getElementById("ctaDemo").addEventListener("click", () => {
+        alert("Demo only — no booking/cast action until go-ahead.");
+      });
+      try {
+        const saved = localStorage.getItem("floqrPreviewScheme");
+        if (saved === "nightlife" || saved === "traditional") setScheme(saved);
+      } catch (_e) {}
+    })();
+  </script>
+</body>
+</html>
