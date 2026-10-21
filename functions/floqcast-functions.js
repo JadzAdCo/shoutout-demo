@@ -4,6 +4,7 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {defineSecret} = require("firebase-functions/params");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -14,7 +15,20 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
 
+const TWILIO_ACCOUNT_SID = defineSecret("TWILIO_ACCOUNT_SID");
+const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
+
 const REQUEST_TTL_MS = 3 * 60 * 60 * 1000;
+const ICE_CACHE_DOC = "systemConfig/floqcastIceServers";
+const ICE_CACHE_TTL_MS = 50 * 60 * 1000;
+
+function secretOrEnv(secret, envName) {
+  try {
+    const value = secret?.value?.();
+    if (value) return String(value);
+  } catch (_) { /* secret not bound in this invoke */ }
+  return String(process.env[envName] || "");
+}
 
 function text(value, max = 200) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -457,6 +471,92 @@ exports.endFloqCastLive = onCall({region: "us-central1"}, async (request) => {
     }, {merge: true});
   }
   return {ok: true, sessionId: sid || "", requestId: rid || "", locationId: loc || ""};
+});
+
+/**
+ * FLOQR-owned TURN for floqCast WebRTC (phone ↔ display2).
+ * Prefer explicit FLOQR_TURN_* secrets; else Twilio Network Traversal tokens.
+ * Public callable — display boards have no patron session.
+ */
+exports.getFloqCastIceServers = onCall({
+  region: "us-central1",
+  secrets: [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN],
+  timeoutSeconds: 15,
+  memory: "256MiB"
+}, async () => {
+  const stun = [
+    {urls: "stun:stun.l.google.com:19302"},
+    {urls: "stun:stun1.l.google.com:19302"}
+  ];
+
+  /** Optional Metered / coturn override via Functions env (not public OpenRelay). */
+  const turnUrls = String(process.env.FLOQR_TURN_URLS || "")
+    .split(",")
+    .map((u) => u.trim())
+    .filter(Boolean);
+  const turnUser = String(process.env.FLOQR_TURN_USERNAME || "");
+  const turnCred = String(process.env.FLOQR_TURN_CREDENTIAL || "");
+  if (turnUrls.length && turnUser && turnCred) {
+    return {
+      iceServers: [...stun, {urls: turnUrls, username: turnUser, credential: turnCred}],
+      source: "floqr-turn",
+      ttlMs: ICE_CACHE_TTL_MS
+    };
+  }
+
+  try {
+    const cached = await db.doc(ICE_CACHE_DOC).get();
+    if (cached.exists) {
+      const row = cached.data() || {};
+      const until = Number(row.expiresAtMs || 0);
+      if (until > Date.now() + 30_000 && Array.isArray(row.iceServers) && row.iceServers.length) {
+        return {
+          iceServers: row.iceServers,
+          source: "twilio-cache",
+          ttlMs: Math.max(60_000, until - Date.now())
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("getFloqCastIceServers cache read failed", String(err?.message || err).slice(0, 160));
+  }
+
+  const accountSid = secretOrEnv(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID");
+  const authToken = secretOrEnv(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN");
+  if (!accountSid || !authToken) {
+    console.warn("getFloqCastIceServers: Twilio secrets missing — STUN only");
+    return {iceServers: stun, source: "stun-only", ttlMs: 120_000};
+  }
+
+  const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Tokens.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "Ttl=3600"
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error("getFloqCastIceServers Twilio token failed", res.status, body.slice(0, 200));
+    throw new HttpsError("unavailable", "FLOQR TURN is temporarily unavailable.");
+  }
+  const payload = await res.json();
+  const twilioServers = Array.isArray(payload.ice_servers) ? payload.ice_servers : [];
+  const iceServers = twilioServers.length ? twilioServers : stun;
+  const expiresAtMs = Date.now() + ICE_CACHE_TTL_MS;
+  try {
+    await db.doc(ICE_CACHE_DOC).set({
+      iceServers,
+      source: "twilio",
+      expiresAtMs,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  } catch (err) {
+    console.warn("getFloqCastIceServers cache write failed", String(err?.message || err).slice(0, 160));
+  }
+  return {iceServers, source: "twilio", ttlMs: ICE_CACHE_TTL_MS};
 });
 
 /** Called from commerce fulfillment after Stripe payment. */

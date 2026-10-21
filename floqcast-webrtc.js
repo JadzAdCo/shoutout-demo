@@ -9,24 +9,43 @@
   "use strict";
 
   /**
-   * STUN + public TURN (OpenRelay) so phone↔LED survives symmetric NAT / carrier Wi‑Fi.
-   * STUN-only often connects briefly then drops (~10s) when host/srflx paths die.
-   * Replace with FLOQR TURN creds when available (callable later).
+   * STUN always. TURN from FLOQR-owned Twilio Network Traversal (callable
+   * getFloqCastIceServers) — not public OpenRelay. Cached ~50m client-side.
+   * STUN-only often connects briefly then drops (~10s) on hard NAT.
    */
-  const ICE_SERVERS = [
+  const STUN_SERVERS = [
     {urls: "stun:stun.l.google.com:19302"},
-    {urls: "stun:stun1.l.google.com:19302"},
-    {
-      urls: [
-        "turn:openrelay.metered.ca:80",
-        "turn:openrelay.metered.ca:443",
-        "turn:openrelay.metered.ca:443?transport=tcp",
-        "turns:openrelay.metered.ca:443"
-      ],
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    }
+    {urls: "stun:stun1.l.google.com:19302"}
   ];
+  /** Fallback when callable unavailable (tests / offline). Prefer resolved TURN. */
+  const ICE_SERVERS = STUN_SERVERS.slice();
+  let iceServersCache = null;
+  let iceServersCacheUntil = 0;
+  let iceServersInflight = null;
+
+  async function resolveIceServers() {
+    const now = Date.now();
+    if (iceServersCache && now < iceServersCacheUntil) return iceServersCache;
+    if (iceServersInflight) return iceServersInflight;
+    iceServersInflight = (async () => {
+      try {
+        if (typeof firebase === "undefined" || !firebase.app) throw new Error("no-firebase");
+        const callable = firebase.app().functions("us-central1").httpsCallable("getFloqCastIceServers");
+        const res = await callable({});
+        const servers = Array.isArray(res?.data?.iceServers) ? res.data.iceServers : [];
+        const ttlMs = Math.max(60_000, Math.min(3_600_000, Number(res?.data?.ttlMs) || 3_000_000));
+        if (!servers.length) throw new Error("empty-ice");
+        iceServersCache = servers;
+        iceServersCacheUntil = Date.now() + ttlMs;
+        return iceServersCache;
+      } catch (_) {
+        return STUN_SERVERS;
+      } finally {
+        iceServersInflight = null;
+      }
+    })();
+    return iceServersInflight;
+  }
 
   /**
    * Do NOT force 1280×720 landscape. On iPhone Safari that crops a 16:9 strip
@@ -54,9 +73,10 @@
     return firebase.firestore();
   }
 
-  function createPeer() {
+  async function createPeer() {
+    const iceServers = await resolveIceServers();
     return new RTCPeerConnection({
-      iceServers: ICE_SERVERS,
+      iceServers,
       iceCandidatePoolSize: 4
     });
   }
@@ -569,7 +589,7 @@
    * Duration clock must arm on real ICE/peer connected — never on SDP answer alone.
    */
   async function startBroadcast({sessionId, stream, onStatus, videoEl = null}) {
-    let pc = createPeer();
+    let pc = await createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let lastAnswerSdp = "";
     let unsubCallee = null;
@@ -764,7 +784,7 @@
       rebuilding = true;
       try {
         try { pc.close(); } catch (_) {}
-        pc = createPeer();
+        pc = await createPeer();
         attachLocalTracks(pc, sendStream || activeStream);
         await publishOffer(pc);
         onStatus?.("renegotiating", {
@@ -933,7 +953,7 @@
    * session with foreign ufrags — phone never completes ICE → "Connecting to patron…".
    */
   async function joinAsDisplay({sessionId, videoEl, onStatus}) {
-    const pc = createPeer();
+    const pc = await createPeer();
     const sessionRef = db().collection("suprstrSessions").doc(sessionId);
     let answeredOfferSdp = "";
     let answering = false;
@@ -1098,6 +1118,8 @@
 
   global.FLOQRFloqCastRtc = {
     ICE_SERVERS,
+    STUN_SERVERS,
+    resolveIceServers,
     peerMediaAlive,
     getCameraStream,
     listVideoDevices,

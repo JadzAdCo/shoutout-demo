@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.101";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.103";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1904,11 +1904,20 @@
     {
       id:"s3-1-102-floqcast-webrtc-hold",
       area:"floqCast / Display 2 + Preview",
-      feature:"Live video stays up past ~10s (TURN + ICE restart + join debounce)",
-      changed:"STUN-only + displayJoins rebuilds dropped peers after brief ICE disconnected. Added OpenRelay TURN, restartIce before hard rebuild, peerMediaAlive hold, DISPLAY_JOIN_DEBOUNCE_MS, longer disconnect holds (phone 18s/45s; board 35s). Cache-bust floqcast-webrtc/display-floqcast/floqcast-preview ?v=s3.1.102.",
-      howToTest:"1) Hard-refresh display2.html?location=temp-democlub-1 (or Aurelia) — scripts must show ?v=s3.1.102. 2) Hard-refresh floqcast-preview on phone (s3.1.102). 3) Go live; confirm video on board. 4) Keep both tabs foreground for at least 60s — must NOT drop at ~10s. 5) Brief Wi‑Fi blip: status may say holding/ICE restart, then video returns without End live.",
+      feature:"Live video stays up past ~10s (ICE restart + join debounce)",
+      changed:"STUN-only + displayJoins rebuilds dropped peers after brief ICE disconnected. Added restartIce, peerMediaAlive hold, DISPLAY_JOIN_DEBOUNCE_MS, longer disconnect holds. s3.1.103 replaces public OpenRelay with FLOQR Twilio TURN via getFloqCastIceServers.",
+      howToTest:"1) Hard-refresh display2.html?location=temp-democlub-1 — scripts ?v=s3.1.103. 2) Hard-refresh floqcast-preview on phone (s3.1.103). 3) Go live; confirm video on board. 4) Keep both tabs foreground ≥60s — must NOT drop at ~10s. 5) Brief Wi‑Fi blip: holding/ICE restart then video returns.",
       expected:"Stable live ≥60s; blips recover via ICE restart/hold without full session end.",
-      troubleshoot:"Still drops ~10s → hard-refresh both sides (old STUN-only cache). Preview status should mention ICE restart / holding. Confirm phone tab stays foreground. If still failing on hard NAT after refresh, note TURN host reachability (openrelay.metered.ca)."
+      troubleshoot:"Still drops ~10s → hard-refresh both sides. Confirm Functions deployed (getFloqCastIceServers). Check Network for callable returning iceServers source twilio/floqr-turn (not stun-only)."
+    },
+    {
+      id:"s3-1-103-chrome-scheme-and-floqr-turn",
+      area:"Search + My Profile + floqCast",
+      feature:"Patron Nightlife/Traditional icon chrome + FLOQR Twilio TURN",
+      changed:"Search toolbar + Language Settings toggle icons via FLOQRChromeScheme (images/chrome/*). FloqCast ICE uses getFloqCastIceServers (Twilio Network Traversal). Package s3.1.103.",
+      howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/FloqAi marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
+      expected:"Icons swap instantly; choice survives reload; live stream ≥60s with Twilio TURN.",
+      troubleshoot:"Icons stuck → confirm floqr-chrome-scheme.js loaded and images/chrome/* 200. TURN stun-only → redeploy Functions with TWILIO_* secrets; check getFloqCastIceServers."
     },
     {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",

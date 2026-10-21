@@ -1468,6 +1468,10 @@
       window.FLOQRI18n?.applyDom?.();
       await window.FLOQRI18n?.maybePromptReturningPatron?.({...profile, uid: currentUser?.uid, email: currentUser?.email});
     } catch (_) {}
+    try {
+      window.FLOQRChromeScheme?.hydrateFromProfile?.(profile);
+      window.FLOQRChromeScheme?.bindToggle?.();
+    } catch (_) {}
 
     // Capture public IP for this ShoutOut session (server x-forwarded-for).
     try { window.FLOQRClientIp?.ensure?.(); } catch (_) {}

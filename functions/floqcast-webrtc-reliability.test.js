@@ -37,12 +37,23 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /DISCONNECT_REBUILD_MS\s*=\s*18000/);
   assert.match(rtc, /DISCONNECT_REBUILD_AFTER_STABLE_MS\s*=\s*45000/);
   assert.match(rtc, /everIceConnected/);
-  // s3.1.102: TURN + ICE restart + join debounce for ~10s drop stability
-  assert.match(rtc, /turn:openrelay\.metered\.ca/);
+  // s3.1.102/103: ICE restart + join debounce; FLOQR TURN via callable (no OpenRelay)
+  assert.doesNotMatch(rtc, /openrelay\.metered\.ca/);
+  assert.match(rtc, /resolveIceServers/);
+  assert.match(rtc, /getFloqCastIceServers/);
   assert.match(rtc, /restartIce/);
   assert.match(rtc, /DISPLAY_JOIN_DEBOUNCE_MS/);
   assert.match(rtc, /peerMediaAlive/);
   assert.match(rtc, /hold-media-alive/);
+});
+
+test("getFloqCastIceServers uses Twilio secrets (FLOQR-owned TURN)", () => {
+  const fn = read("functions/floqcast-functions.js");
+  assert.match(fn, /exports\.getFloqCastIceServers/);
+  assert.match(fn, /TWILIO_ACCOUNT_SID/);
+  assert.match(fn, /Tokens\.json/);
+  assert.match(fn, /systemConfig\/floqcastIceServers/);
+  assert.doesNotMatch(fn, /openrelay/);
 });
 
 test("floqCast search opens absolute preview URL (no blank about:blank tab)", () => {
