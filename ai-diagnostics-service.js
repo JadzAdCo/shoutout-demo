@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.103";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.104";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.104",
+      title: "Traditional site theme beta (full-site colors)",
+      checks: [
+        {label:"traditionalTheme catalog key", file:"floqr-feature-services.js", includes:["traditionalTheme", "buttonIds: []"]},
+        {label:"Server catalog traditionalTheme", file:"functions/feature-services-core.js", includes:["traditionalTheme", "Traditional site theme"]},
+        {label:"Theme access gate", file:"floqr-chrome-scheme.js", includes:["FEATURE_KEY", "traditionalTheme", "syncAccessGate", "hasThemeAccess"]},
+        {label:"Traditional CSS theme", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"]", "Traditional site theme"]},
+        {label:"Profile theme panel gated", file:"patron-portal.html", includes:["data-floqr-theme-panel", "data-floqr-chrome-btn=\"traditional\""]},
+        {label:"Search has no chrome toolbar", file:"index.html", includes:["search-icon-row"], notIncludes:["search-chrome-toolbar", "data-floqr-chrome-btn"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.104\""]}
+      ]
+    },
     {
       version: "s3.1.101",
       title: "Discovery crawl upsert + auto-approve + past-event lifecycle",
@@ -1918,6 +1931,15 @@
       howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/FloqAi marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
       expected:"Icons swap instantly; choice survives reload; live stream ≥60s with Twilio TURN.",
       troubleshoot:"Icons stuck → confirm floqr-chrome-scheme.js loaded and images/chrome/* 200. TURN stun-only → redeploy Functions with TWILIO_* secrets; check getFloqCastIceServers."
+    },
+    {
+      id:"s3-1-104-traditional-site-theme-beta",
+      area:"My Profile + site-wide theme",
+      feature:"Traditional site theme beta (full color theme, not Search icons)",
+      changed:"Removed public Search chrome toolbar. traditionalTheme Features & Services beta key (no Search tile). Granted testers see Nightlife/Traditional in My Profile → Language Settings; choosing Traditional applies html[data-floqr-chrome=traditional] site-wide CSS. Package s3.1.104.",
+      howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
+      expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
+      troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
     },
     {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",

@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.103 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.104 (stable)
+
+- s3.1.104: Traditional site theme beta (full-site colors; Features traditionalTheme; removed Search chrome toggle).
 
 - s3.1.103: Patron Nightlife/Traditional icon chrome go-live + FLOQR Twilio TURN for floqCast (getFloqCastIceServers).
 

@@ -1,13 +1,17 @@
 /**
- * FLOQR chrome scheme — Traditional | Nightlife product marks.
+ * FLOQR site theme — Nightlife (default) | Traditional (beta).
+ * Traditional switches the full site color theme (CSS vars + chrome icons where marked).
+ * Gated by Features & Services key `traditionalTheme` (beta invite / assignment).
  * Storage: localStorage "floqr.uiChrome"; optional users/{uid}.uiChrome sync.
+ * Stage pages may set html[data-floqr-theme-ungated="1"] to preview without a beta grant.
  */
 (function (global) {
   "use strict";
 
   const STORAGE_KEY = "floqr.uiChrome";
+  const FEATURE_KEY = "traditionalTheme";
   const SCHEMES = ["traditional", "nightlife"];
-  /** Match current neon Search marks until the patron picks Traditional. */
+  /** Public default — neon nightlife until a granted beta tester picks Traditional. */
   const DEFAULT_SCHEME = "nightlife";
 
   const ICON_PACK = {
@@ -34,6 +38,26 @@
     return SCHEMES.includes(v) ? v : DEFAULT_SCHEME;
   }
 
+  function isUngated() {
+    try {
+      return global.document?.documentElement?.getAttribute("data-floqr-theme-ungated") === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /** True when Features & Services grants traditionalTheme (or stage ungated). */
+  function hasThemeAccess() {
+    if (isUngated()) return true;
+    try {
+      const fs = global.FLOQRFeatureServices;
+      if (!fs?.canAccess) return false;
+      return fs.canAccess(FEATURE_KEY) === true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function getChrome() {
     try {
       return normalize(localStorage.getItem(STORAGE_KEY));
@@ -42,8 +66,18 @@
     }
   }
 
+  /** Effective scheme for paint — Traditional only with beta access. */
+  function effectiveChrome(preferred) {
+    const want = normalize(preferred != null ? preferred : getChrome());
+    if (want === "traditional" && !hasThemeAccess()) return DEFAULT_SCHEME;
+    return want;
+  }
+
   function setChrome(scheme, opts = {}) {
-    const next = normalize(scheme);
+    let next = normalize(scheme);
+    if (next === "traditional" && !hasThemeAccess()) {
+      next = DEFAULT_SCHEME;
+    }
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch (_) { /* ignore */ }
@@ -68,19 +102,18 @@
     } catch (_) { /* ignore */ }
   }
 
-  /** Prefer profile.uiChrome when signed in (once per page). */
+  /** Prefer profile.uiChrome when signed in (once per page); still access-gated. */
   function hydrateFromProfile(profile) {
-    const fromProfile = normalize(profile?.uiChrome);
-    if (!profile?.uiChrome) return getChrome();
+    if (!profile?.uiChrome) return applyDocument(effectiveChrome());
+    const fromProfile = normalize(profile.uiChrome);
     try {
       localStorage.setItem(STORAGE_KEY, fromProfile);
     } catch (_) { /* ignore */ }
-    applyDocument(fromProfile);
-    return fromProfile;
+    return applyDocument(effectiveChrome(fromProfile));
   }
 
   function iconUrl(featureKey, scheme) {
-    const pack = ICON_PACK[normalize(scheme || getChrome())] || ICON_PACK[DEFAULT_SCHEME];
+    const pack = ICON_PACK[normalize(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
     return pack[featureKey] || null;
   }
 
@@ -90,11 +123,11 @@
     if (typeof t === "function") {
       return s === "nightlife" ? t("chrome.nightlifeFull") : t("chrome.traditionalFull");
     }
-    return s === "nightlife" ? "Nightlife chrome" : "Traditional chrome";
+    return s === "nightlife" ? "Nightlife theme" : "Traditional theme";
   }
 
   function applyDocument(scheme) {
-    const s = normalize(scheme || getChrome());
+    const s = effectiveChrome(scheme);
     if (global.document && global.document.documentElement) {
       global.document.documentElement.setAttribute("data-floqr-chrome", s);
     }
@@ -120,6 +153,21 @@
     return s;
   }
 
+  /** Show/hide Profile theme panel; force Nightlife paint without beta. */
+  function syncAccessGate(root) {
+    const allowed = hasThemeAccess();
+    const scope = root || global.document;
+    if (scope?.querySelectorAll) {
+      scope.querySelectorAll("[data-floqr-theme-panel]").forEach((el) => {
+        el.classList.toggle("hidden", !allowed);
+        el.hidden = !allowed;
+        el.setAttribute("aria-hidden", allowed ? "false" : "true");
+      });
+    }
+    applyDocument(allowed ? getChrome() : DEFAULT_SCHEME);
+    return allowed;
+  }
+
   function bindToggle(root) {
     const scope = root || global.document;
     if (!scope) return;
@@ -127,14 +175,19 @@
       if (btn.dataset.floqrChromeBound === "1") return;
       btn.dataset.floqrChromeBound = "1";
       btn.addEventListener("click", () => {
+        if (!hasThemeAccess() && btn.getAttribute("data-floqr-chrome-btn") === "traditional") {
+          syncAccessGate(scope);
+          return;
+        }
         setChrome(btn.getAttribute("data-floqr-chrome-btn"));
       });
     });
-    applyDocument(getChrome());
+    syncAccessGate(scope);
   }
 
   global.FLOQRChromeScheme = {
     STORAGE_KEY,
+    FEATURE_KEY,
     SCHEMES,
     DEFAULT_SCHEME,
     ICON_PACK,
@@ -144,17 +197,31 @@
     iconUrl,
     applyDocument,
     bindToggle,
+    syncAccessGate,
+    hasThemeAccess,
+    effectiveChrome,
     normalize,
     labelFor
   };
 
-  if (global.document?.readyState === "loading") {
-    global.document.addEventListener("DOMContentLoaded", () => {
-      applyDocument(getChrome());
-      bindToggle();
-    });
-  } else {
-    applyDocument(getChrome());
+  function boot() {
+    // Fail closed: Nightlife until Features & Services confirms traditionalTheme access.
+    applyDocument(DEFAULT_SCHEME);
+    if (hasThemeAccess()) applyDocument(getChrome());
     bindToggle();
   }
+
+  if (global.document?.readyState === "loading") {
+    global.document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  try {
+    global.addEventListener("floqr:features-loaded", () => {
+      try {
+        syncAccessGate();
+      } catch (_) { /* ignore */ }
+    });
+  } catch (_) { /* ignore */ }
 })(typeof window !== "undefined" ? window : globalThis);

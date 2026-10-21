@@ -16,7 +16,9 @@
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1}
+    {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
+    // No Search tile — beta theme toggle lives in My Profile → Language Settings only.
+    {key: "traditionalTheme", label: "Traditional site theme", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));
@@ -201,6 +203,12 @@
     viewer = {uid: user?.uid || "", isMasterAdmin, isBetaTester: Object.keys(betaFeatures).length > 0, betaFeatures};
     const result = {features: getFeatures(), viewer: getViewer()};
     loaded = {uid: user?.uid || "", promise: Promise.resolve(result)};
+    try {
+      root.dispatchEvent?.(new CustomEvent("floqr:features-loaded", {detail: result}));
+    } catch (_) { /* ignore */ }
+    try {
+      root.FLOQRChromeScheme?.syncAccessGate?.();
+    } catch (_) { /* ignore */ }
     return result;
   }
 

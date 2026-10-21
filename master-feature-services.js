@@ -172,7 +172,8 @@
       rydr: "RydR",
       floqCast: "floqCast",
       floqAi: "FloqAi",
-      vipReservations: "VIP"
+      vipReservations: "VIP",
+      traditionalTheme: "Theme"
     };
     return map[key] || featureLabel(key);
   }

@@ -300,7 +300,7 @@
     "body": "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). After the booking flow completes (deposit paid on FloqMedia Stripe / Club Stripe, Club POS confirm, or admin recorded payment), isBooked is set to \"1\" and isBookedYes to \"yes\". Free tables stay \"0\" / \"no\". Holds do not set isBooked. Cancel sets isBooked back to \"0\". Club Admin can call ensureVipTables to seed upcoming nights; getVipAvailability also ensures docs."
   },
   "help-chrome-scheme": {
-    "title": "Icon chrome",
-    "body": "Choose Nightlife (neon cyan–magenta) or Traditional (charcoal / white) marks for Search product icons. Your choice is saved on this device and on your profile when signed in. Find the switch on Search under Or, or in My Profile → Language Settings."
+    "title": "Site theme",
+    "body": "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta) and Traditional (charcoal / white). Colors, cards, and chrome update together. Your choice is saved on this device and on your profile. Available when FLOQR invites you or assigns the Traditional site theme beta feature. Find the switch in My Profile → Language Settings (not on public Search)."
   }
 }

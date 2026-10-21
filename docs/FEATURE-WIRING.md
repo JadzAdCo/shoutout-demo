@@ -12,19 +12,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Patron chrome scheme (live — s3.1.103)
+## Traditional site theme (beta — `traditionalTheme`)
 
-**Purpose:** Patrons switch Search product marks between **Traditional** (charcoal / white) and **Nightlife** (cyan→magenta neon) chrome.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife** (neon cyan–magenta) and **Traditional** (charcoal / white) — colors, cards, chrome — not icons alone. Not on public Search.
 
 | Layer | Wiring |
 |---|---|
-| Storage | `localStorage` `floqr.uiChrome` + Firestore `users/{uid}.uiChrome` (merge on set; hydrate on portal/Search login) |
-| Default | `nightlife` (matches prior neon Search marks) |
-| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome-icon`, `data-floqr-chrome-btn`) |
-| Surfaces | Search `index.html` toolbar under **Or**; My Profile → Language Settings |
-| Assets | `images/chrome/{floqcast,vip,shoutout,floqai,bartr,rydr}-{nightlife,traditional}.*` |
+| Feature | `featureServices/traditionalTheme` — catalog `IsFeatureEnabled` + `IsTestFeature` (default off/test); empty `buttonIds` (no Search tile) |
+| Access | Master Admin Features Mgmt enable + invite/assign via `betaTesters.features.traditionalTheme=1` (same beta invite flow) |
+| Storage | `localStorage` `floqr.uiChrome` + Firestore `users/{uid}.uiChrome` |
+| Default | `nightlife`; fail closed until `FLOQRFeatureServices.canAccess("traditionalTheme")` |
+| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome` on `<html>`, `syncAccessGate`, `data-floqr-theme-panel`) |
+| CSS | `styles.css` — `html[data-floqr-chrome="traditional"]` variable + surface overrides |
+| Surfaces | My Profile → Language Settings only (panel hidden without grant); Search/portal/admin inherit theme attribute when granted |
+| Assets | Optional chrome icons `images/chrome/*` for marked nodes; Search tiles stay product defaults |
 | i18n / help | `chrome.*` CHROME keys; FloqAi `help-chrome-scheme` |
-| Stage pages | `chrome-scheme-stage.html` / `scheme-icons-demo.html` (review history; not required for patrons) |
+| Stage | `chrome-scheme-stage.html` with `data-floqr-theme-ungated="1"` (local preview) |
 
 ---
 
