@@ -3,109 +3,141 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FLOQR dual-scheme icon demo (local preview)</title>
+  <title>FLOQR icon review v6 (local preview)</title>
   <style>
     :root, html[data-scheme="traditional"]{
-      --bg:#2b2b2b; --bg-elev:#353535; --bg-soft:#3d3d3d;
-      --ink:#fff; --ink-muted:rgba(255,255,255,.72); --line:#000;
-      --btn-bg:#2b2b2b; --accent:#fff;
+      --bg:#2b2b2b; --bg-elev:#353535; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#000; --accent:#fff;
       --hero:linear-gradient(165deg,#3a3a3a,#2b2b2b 45%,#1f1f1f);
-      --shadow:0 10px 28px rgba(0,0,0,.35);
       --font:Georgia,"Times New Roman",serif;
     }
     html[data-scheme="nightlife"]{
-      --bg:#070d18; --bg-elev:#102038; --bg-soft:#152848;
-      --ink:#fff; --ink-muted:rgba(255,255,255,.72); --line:#26d8ff;
-      --btn-bg:#0b1020; --accent:#3de7ff;
-      --hero:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038 55%,#0a1628);
-      --shadow:0 0 18px rgba(38,216,255,.35);
+      --bg:#070d18; --bg-elev:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#26d8ff; --accent:#3de7ff;
+      --hero:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038);
       --font:"Avenir Next","Segoe UI",sans-serif;
     }
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--ink);background:var(--hero);font-family:var(--font);padding:28px 20px 72px}
     .banner{display:inline-block;font-weight:800;font-size:13px;border:2px solid var(--line);background:var(--bg-elev);padding:6px 12px;border-radius:999px;margin-bottom:14px}
-    h1{margin:0 0 8px;font-size:clamp(26px,4.5vw,40px)}
-    .lead{max-width:820px;color:var(--ink-muted);line-height:1.5;margin:0 0 18px}
-    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 26px;padding:14px;border:2px solid var(--line);border-radius:16px;background:var(--bg-elev);box-shadow:var(--shadow)}
-    .btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;border:2px solid var(--line);background:var(--btn-bg);color:var(--ink);border-radius:12px;padding:10px 16px}
+    h1{margin:0 0 8px;font-size:clamp(26px,4.5vw,38px)}
+    .lead{max-width:880px;color:var(--muted);line-height:1.5;margin:0 0 18px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev)}
+    .btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 14px}
     .btn[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
-    .scheme-block{margin:0 0 28px;padding:18px;border:2px solid var(--line);border-radius:18px;background:var(--bg-elev);box-shadow:var(--shadow)}
-    .scheme-block h2{margin:0 0 6px;font-size:20px}
-    .scheme-block .sub{margin:0 0 14px;color:var(--ink-muted);font-size:14px;line-height:1.4}
+    .block{margin:0 0 26px;padding:18px;border:2px solid var(--line);border-radius:18px;background:var(--bg-elev)}
+    .block h2{margin:0 0 6px;font-size:19px}
+    .block .sub{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4}
     .row{display:flex;flex-wrap:wrap;gap:16px}
-    figure{margin:0;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:min(220px,100%)}
+    figure{margin:0;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);width:min(230px,100%)}
     figure.hero{outline:2px solid var(--accent)}
-    figcaption{font-size:12px;font-weight:800;margin-bottom:8px;color:var(--ink-muted)}
+    figcaption{font-size:12px;font-weight:800;margin-bottom:8px;color:var(--muted)}
     figure img{display:block;width:100%;border-radius:18px;background:#111}
     .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;margin-left:4px;background:rgba(255,255,255,.12)}
-    .note{max-width:860px;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev);color:var(--ink-muted);font-size:14px;line-height:1.45}
-    .note strong{color:var(--ink)}
-    code{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+    .pick{color:#9dffb0}
+    .note{max-width:880px;padding:14px;border:2px solid var(--line);border-radius:14px;background:var(--bg-elev);color:var(--muted);font-size:14px;line-height:1.45}
   </style>
 </head>
 <body>
-  <div class="banner">LOCAL PREVIEW — dual schemes · Search not changed</div>
-  <h1>Icons in Nightlife + Traditional</h1>
+  <div class="banner">LOCAL PREVIEW v6 - Search not changed</div>
+  <h1>Icon revisions for your pick</h1>
   <p class="lead">
-    Same preferred compositions rendered twice: <strong>Nightlife</strong> (current FLOQR neon) and
-    <strong>Traditional</strong> (charcoal / white / black outlines). Page chrome toggles so you can preview patron scheme switching.
+    FloqCast: softer nightlife contrast + larger FloqCast type (+15%, may overlap LED). Traditional: same larger type.
+    VIP Nightlife: <strong>VIP</strong> / <strong>reserV</strong> on two lines (green V). Traditional: grey booth + red chairs - choose white or black booth border.
+    SVG files embed the painted renders so they match exactly.
   </p>
 
   <div class="toolbar">
-    <span>Page chrome</span>
     <button type="button" class="btn" id="chromeTrad" aria-pressed="true">Traditional chrome</button>
     <button type="button" class="btn" id="chromeNight" aria-pressed="false">Nightlife chrome</button>
   </div>
 
-  <section class="scheme-block" id="nightlifeIcons">
-    <h2>Nightlife scheme <span class="tag">current FLOQR</span></h2>
-    <p class="sub">Neon ring/stroke · FloqCast casing · VIP reserV unseparated under furniture · red seat · black table</p>
+  <section class="block">
+    <h2>1) FloqCast Nightlife <span class="tag">less neon +15% text</span></h2>
+    <p class="sub">Softer contrast vs your preferred neon; FloqCast larger (may sit on LED bottom).</p>
     <div class="row">
-      <figure class="hero">
-        <figcaption>FloqCast · painted</figcaption>
-        <img src="./images/review/floqcast-nightlife-v5.jpg" alt="FloqCast nightlife"/>
-      </figure>
       <figure>
-        <figcaption>FloqCast · SVG</figcaption>
+        <figcaption>Your ref (v5)</figcaption>
+        <img src="./images/review/floqcast-nightlife-ref-v5.png" alt="FloqCast nightlife ref"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 painted</figcaption>
+        <img src="./images/review/floqcast-nightlife-v6.jpg" alt="FloqCast nightlife v6"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 SVG (= painted)</figcaption>
         <img src="./images/review/floqcast-icon-nightlife.svg" alt="FloqCast nightlife SVG"/>
       </figure>
-      <figure class="hero">
-        <figcaption>VIP reserV · painted</figcaption>
-        <img src="./images/review/vip-reserv-nightlife-v5.jpg" alt="VIP nightlife"/>
-      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>2) FloqCast Traditional <span class="tag">+15% text</span></h2>
+    <p class="sub">Same charcoal look; FloqCast type +15% (may overlay LED).</p>
+    <div class="row">
       <figure>
-        <figcaption>VIP reserV · SVG</figcaption>
+        <figcaption>Your ref (v5)</figcaption>
+        <img src="./images/review/floqcast-traditional-ref-v5.png" alt="FloqCast traditional ref"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 painted</figcaption>
+        <img src="./images/review/floqcast-traditional-v6.jpg" alt="FloqCast traditional v6"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 SVG (= painted)</figcaption>
+        <img src="./images/review/floqcast-icon-traditional.svg" alt="FloqCast traditional SVG"/>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>3) VIP Nightlife <span class="tag">2-line VIP / reserV</span></h2>
+    <p class="sub">Line 1 VIP · Line 2 reser<strong style="color:#dfff5a">V</strong> (green V kept).</p>
+    <div class="row">
+      <figure>
+        <figcaption>Your ref (1-line)</figcaption>
+        <img src="./images/review/vip-nightlife-ref-v5.png" alt="VIP nightlife ref"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 painted</figcaption>
+        <img src="./images/review/vip-nightlife-v6.jpg" alt="VIP nightlife v6"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">v6 SVG (= painted)</figcaption>
         <img src="./images/review/vip-reserv-mark-nightlife.svg" alt="VIP nightlife SVG"/>
       </figure>
     </div>
   </section>
 
-  <section class="scheme-block" id="traditionalIcons">
-    <h2>Traditional scheme <span class="tag">charcoal / white</span></h2>
-    <p class="sub">Charcoal grey face · black outlines · white text · same layouts</p>
+  <section class="block">
+    <h2>4) VIP Traditional - grey booth + red chairs <span class="tag">choose border</span></h2>
+    <p class="sub">Big booth grey; dining chairs stay red. Pick white or black booth border.</p>
     <div class="row">
-      <figure class="hero">
-        <figcaption>FloqCast · painted</figcaption>
-        <img src="./images/review/floqcast-traditional-v5.jpg" alt="FloqCast traditional"/>
-      </figure>
       <figure>
-        <figcaption>FloqCast · SVG</figcaption>
-        <img src="./images/review/floqcast-icon-traditional.svg" alt="FloqCast traditional SVG"/>
+        <figcaption>Your ref (all red)</figcaption>
+        <img src="./images/review/vip-traditional-ref-v5.png" alt="VIP traditional ref"/>
       </figure>
       <figure class="hero">
-        <figcaption>VIP reserV · painted</figcaption>
-        <img src="./images/review/vip-reserv-traditional-v5.jpg" alt="VIP traditional"/>
+        <figcaption class="pick">A · grey booth · white border</figcaption>
+        <img src="./images/review/vip-traditional-grey-white-border-v6.jpg" alt="VIP grey white border"/>
       </figure>
-      <figure>
-        <figcaption>VIP reserV · SVG</figcaption>
-        <img src="./images/review/vip-reserv-mark-traditional.svg" alt="VIP traditional SVG"/>
+      <figure class="hero">
+        <figcaption class="pick">A SVG</figcaption>
+        <img src="./images/review/vip-reserv-mark-traditional-grey-white.svg" alt="VIP grey white SVG"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">B · grey booth · black border</figcaption>
+        <img src="./images/review/vip-traditional-grey-black-border-v6.jpg" alt="VIP grey black border"/>
+      </figure>
+      <figure class="hero">
+        <figcaption class="pick">B SVG</figcaption>
+        <img src="./images/review/vip-reserv-mark-traditional-grey-black.svg" alt="VIP grey black SVG"/>
       </figure>
     </div>
   </section>
 
   <p class="note">
-    <strong>Not shipped.</strong> Patron scheme capability would map Nightlife vs Traditional icon packs + chrome tokens
-    (<code>uiScheme</code> / localStorage) after go-ahead. Reply which pack(s) to keep iterating or ship.
+    <strong>Not shipped.</strong> Reply e.g. "FloqCast v6 both schemes, VIP nightlife v6, traditional border A (white)" then go-ahead to wire Search.
   </p>
 
   <script>
@@ -117,14 +149,9 @@
         root.setAttribute("data-scheme", name);
         trad.setAttribute("aria-pressed", name === "traditional" ? "true" : "false");
         night.setAttribute("aria-pressed", name === "nightlife" ? "true" : "false");
-        try { localStorage.setItem("floqrPreviewScheme", name); } catch (_e) {}
       }
       trad.addEventListener("click", () => setChrome("traditional"));
       night.addEventListener("click", () => setChrome("nightlife"));
-      try {
-        const saved = localStorage.getItem("floqrPreviewScheme");
-        if (saved === "nightlife" || saved === "traditional") setChrome(saved);
-      } catch (_e) {}
     })();
   </script>
 </body>
