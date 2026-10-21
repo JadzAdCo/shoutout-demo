@@ -36,12 +36,19 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
   const chrome = read("floqr-chrome-scheme.js");
   assert.match(chrome, /FLOQRChromeScheme/);
-  assert.match(chrome, /traditionalTheme/);
+  assert.match(chrome, /siteChrome/);
+  assert.match(chrome, /isSiteChrome/);
   assert.match(chrome, /syncAccessGate/);
   assert.match(chrome, /hasThemeAccess/);
   const portal = read("patron-portal.html");
   assert.match(portal, /data-floqr-theme-panel/);
   assert.match(portal, /data-floqr-chrome-btn="traditional"/);
+  const master = read("master-admin.html");
+  assert.match(master, /id="featuresReleaseControl"[\s\S]*?>Release Control<\/h2>/);
+  assert.doesNotMatch(master, /id="featuresReleaseControl"[\s\S]*?>Features Mgmt<\/h2>/);
+  assert.match(master, /help-feature-promote-live/);
+  assert.match(master, />Test → live<\/h2>/);
+  assert.doesNotMatch(master, /id="featuresReleaseControl"[\s\S]*?<h2>Promote test code to live<\/h2>/);
 });
 
 test("Throw a ShoutOut skips the ShoutOut landing page", () => {

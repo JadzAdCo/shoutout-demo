@@ -89,10 +89,14 @@
   async function loadFeatures() {
     const snap = await db().collection("featureServices").get();
     const next = {};
+    const canon = key => root.FLOQRFeatureServices?.canonicalizeFeatureKey?.(key) || key;
     catalog().forEach(base => { next[base.key] = root.FLOQRFeatureServices.normalize(base.key, null); });
     snap.forEach(doc => {
-      const row = root.FLOQRFeatureServices.normalize(doc.id, doc.data());
-      if (row) next[doc.id] = row;
+      const key = canon(doc.id);
+      const row = root.FLOQRFeatureServices.normalize(key, doc.data());
+      if (!row) return;
+      if (doc.id === "traditionalTheme" && next.siteChrome?.persisted) return;
+      next[key] = row;
     });
     features = next;
     return snap.size;
@@ -112,16 +116,30 @@
     live: "Live — every patron sees it on Search"
   };
 
+  const SITE_CHROME_STATE_TEXT = {
+    off: "Off for everyone — Nightlife stays the only site look",
+    test: "Testing — granted beta testers (and Master Admins) choose Nightlife/Traditional via isSiteChrome in My Profile",
+    live: "Live — every patron can choose Site chrome (isSiteChrome) in My Profile"
+  };
+
+  function stateTextFor(base, state) {
+    if (base?.key === "siteChrome") return SITE_CHROME_STATE_TEXT[state] || STATE_TEXT[state];
+    return STATE_TEXT[state];
+  }
+
   function revisionText(row) {
     return `<span class="feature-revision" title="Number of saved changes to this feature">Revision ${esc(row.revision)}</span>`;
   }
 
   function featureCell(base, row) {
     const state = stateOf(row);
+    const isSiteChrome = base.key === "siteChrome";
     const link = state === "off"
       ? `<small class="feature-open-note">Off — set Enable Feature to 1 to open it.</small>`
-      : `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
-    return `<strong>${esc(base.label)}</strong><small class="feature-state">${esc(STATE_TEXT[state])}</small>${link}`;
+      : isSiteChrome
+        ? `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open Language Settings</a><small class="feature-open-note">isSiteChrome: 0 Nightlife · 1 Traditional · 2/4 reserved</small>`
+        : `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
+    return `<strong>${esc(base.label)}</strong><small class="feature-state">${esc(stateTextFor(base, state))}</small>${link}`;
   }
 
   function stateOf(row) {
@@ -173,7 +191,8 @@
       floqCast: "floqCast",
       floqAi: "FloqAi",
       vipReservations: "VIP",
-      traditionalTheme: "Theme"
+      siteChrome: "Chrome",
+      traditionalTheme: "Chrome"
     };
     return map[key] || featureLabel(key);
   }

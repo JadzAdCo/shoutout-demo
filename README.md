@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.104 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.105 (stable)
+
+- s3.1.105: Site chrome on Release Control (isSiteChrome 0|1|2|4); Release Control / Test → live title polish.
 
 - s3.1.104: Traditional site theme beta (full-site colors; Features traditionalTheme; removed Search chrome toggle).
 

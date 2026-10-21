@@ -1,18 +1,30 @@
 /**
- * FLOQR site theme — Nightlife (default) | Traditional (beta).
- * Traditional switches the full site color theme (CSS vars + chrome icons where marked).
- * Gated by Features & Services key `traditionalTheme` (beta invite / assignment).
- * Storage: localStorage "floqr.uiChrome"; optional users/{uid}.uiChrome sync.
+ * FLOQR Site chrome — Nightlife | Traditional (beta) (+ reserved codes).
+ * Preference datapoint: users.isSiteChrome
+ *   0 = Nightlife chrome
+ *   1 = Traditional
+ *   2 = Reserved_3rd_chrome
+ *   4 = Reserved_4th_chrome
+ * Gated by Features & Services key `siteChrome` (beta invite / assignment).
+ * Also accepts legacy localStorage floqr.uiChrome / users.uiChrome during migration.
  * Stage pages may set html[data-floqr-theme-ungated="1"] to preview without a beta grant.
  */
 (function (global) {
   "use strict";
 
-  const STORAGE_KEY = "floqr.uiChrome";
-  const FEATURE_KEY = "traditionalTheme";
+  const STORAGE_KEY = "floqr.isSiteChrome";
+  const LEGACY_STORAGE_KEY = "floqr.uiChrome";
+  const FEATURE_KEY = "siteChrome";
   const SCHEMES = ["traditional", "nightlife"];
-  /** Public default — neon nightlife until a granted beta tester picks Traditional. */
   const DEFAULT_SCHEME = "nightlife";
+
+  /** Numeric isSiteChrome codes. */
+  const SITE_CHROME = Object.freeze({
+    NIGHTLIFE: 0,
+    TRADITIONAL: 1,
+    RESERVED_3RD: 2,
+    RESERVED_4TH: 4
+  });
 
   const ICON_PACK = {
     traditional: {
@@ -33,9 +45,29 @@
     }
   };
 
-  function normalize(value) {
+  function normalizeScheme(value) {
     const v = String(value || "").trim().toLowerCase();
     return SCHEMES.includes(v) ? v : DEFAULT_SCHEME;
+  }
+
+  function normalizeSiteChrome(value) {
+    const n = Number(value);
+    if (n === SITE_CHROME.TRADITIONAL) return SITE_CHROME.TRADITIONAL;
+    if (n === SITE_CHROME.RESERVED_3RD) return SITE_CHROME.RESERVED_3RD;
+    if (n === SITE_CHROME.RESERVED_4TH) return SITE_CHROME.RESERVED_4TH;
+    if (n === SITE_CHROME.NIGHTLIFE) return SITE_CHROME.NIGHTLIFE;
+    return SITE_CHROME.NIGHTLIFE;
+  }
+
+  /** Map isSiteChrome → paint scheme. Reserved 2/4 fall back to Nightlife until defined. */
+  function schemeFromSiteChrome(code) {
+    const n = normalizeSiteChrome(code);
+    if (n === SITE_CHROME.TRADITIONAL) return "traditional";
+    return DEFAULT_SCHEME;
+  }
+
+  function siteChromeFromScheme(scheme) {
+    return normalizeScheme(scheme) === "traditional" ? SITE_CHROME.TRADITIONAL : SITE_CHROME.NIGHTLIFE;
   }
 
   function isUngated() {
@@ -46,7 +78,6 @@
     }
   }
 
-  /** True when Features & Services grants traditionalTheme (or stage ungated). */
   function hasThemeAccess() {
     if (isUngated()) return true;
     try {
@@ -58,67 +89,103 @@
     }
   }
 
-  function getChrome() {
+  function readStoredSiteChrome() {
     try {
-      return normalize(localStorage.getItem(STORAGE_KEY));
-    } catch (_) {
-      return DEFAULT_SCHEME;
-    }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw != null && raw !== "") return normalizeSiteChrome(raw);
+    } catch (_) { /* ignore */ }
+    try {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy) return siteChromeFromScheme(legacy);
+    } catch (_) { /* ignore */ }
+    return SITE_CHROME.NIGHTLIFE;
   }
 
-  /** Effective scheme for paint — Traditional only with beta access. */
-  function effectiveChrome(preferred) {
-    const want = normalize(preferred != null ? preferred : getChrome());
-    if (want === "traditional" && !hasThemeAccess()) return DEFAULT_SCHEME;
+  function getSiteChrome() {
+    return readStoredSiteChrome();
+  }
+
+  function getChrome() {
+    return schemeFromSiteChrome(getSiteChrome());
+  }
+
+  function effectiveSiteChrome(preferred) {
+    const want = preferred != null ? normalizeSiteChrome(preferred) : getSiteChrome();
+    if (want === SITE_CHROME.TRADITIONAL && !hasThemeAccess()) return SITE_CHROME.NIGHTLIFE;
+    // Reserved codes require access too; until defined they paint as Nightlife.
+    if ((want === SITE_CHROME.RESERVED_3RD || want === SITE_CHROME.RESERVED_4TH) && !hasThemeAccess()) {
+      return SITE_CHROME.NIGHTLIFE;
+    }
     return want;
   }
 
-  function setChrome(scheme, opts = {}) {
-    let next = normalize(scheme);
-    if (next === "traditional" && !hasThemeAccess()) {
-      next = DEFAULT_SCHEME;
+  function effectiveChrome(preferredScheme) {
+    if (preferredScheme != null) {
+      return schemeFromSiteChrome(effectiveSiteChrome(siteChromeFromScheme(preferredScheme)));
+    }
+    return schemeFromSiteChrome(effectiveSiteChrome());
+  }
+
+  function setSiteChrome(code, opts = {}) {
+    let next = normalizeSiteChrome(code);
+    if (next === SITE_CHROME.TRADITIONAL && !hasThemeAccess()) next = SITE_CHROME.NIGHTLIFE;
+    if ((next === SITE_CHROME.RESERVED_3RD || next === SITE_CHROME.RESERVED_4TH) && !hasThemeAccess()) {
+      next = SITE_CHROME.NIGHTLIFE;
     }
     try {
-      localStorage.setItem(STORAGE_KEY, next);
+      localStorage.setItem(STORAGE_KEY, String(next));
+      localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
     } catch (_) { /* ignore */ }
-    applyDocument(next);
-    global.dispatchEvent(new CustomEvent("floqr-chrome-change", {detail: {chrome: next}}));
-    if (opts.persistProfile !== false) {
-      tryPersistProfile(next);
-    }
+    applyDocument(schemeFromSiteChrome(next));
+    global.dispatchEvent(new CustomEvent("floqr-chrome-change", {
+      detail: {chrome: schemeFromSiteChrome(next), isSiteChrome: next}
+    }));
+    if (opts.persistProfile !== false) tryPersistProfile(next);
     return next;
   }
 
-  function tryPersistProfile(scheme) {
+  function setChrome(scheme, opts = {}) {
+    return setSiteChrome(siteChromeFromScheme(scheme), opts);
+  }
+
+  function tryPersistProfile(code) {
     try {
       const auth = global.firebase?.auth?.();
       const db = global.firebase?.firestore?.();
       const uid = auth?.currentUser?.uid;
       if (!uid || !db) return;
+      const isSiteChrome = normalizeSiteChrome(code);
       db.collection("users").doc(uid).set({
-        uiChrome: scheme,
+        isSiteChrome,
+        uiChrome: schemeFromSiteChrome(isSiteChrome),
         uiChromeUpdatedAt: global.firebase.firestore.FieldValue.serverTimestamp()
       }, {merge: true}).catch(() => {});
     } catch (_) { /* ignore */ }
   }
 
-  /** Prefer profile.uiChrome when signed in (once per page); still access-gated. */
   function hydrateFromProfile(profile) {
-    if (!profile?.uiChrome) return applyDocument(effectiveChrome());
-    const fromProfile = normalize(profile.uiChrome);
+    let code = SITE_CHROME.NIGHTLIFE;
+    if (profile && Object.prototype.hasOwnProperty.call(profile, "isSiteChrome")) {
+      code = normalizeSiteChrome(profile.isSiteChrome);
+    } else if (profile?.uiChrome) {
+      code = siteChromeFromScheme(profile.uiChrome);
+    } else {
+      return applyDocument(effectiveChrome());
+    }
     try {
-      localStorage.setItem(STORAGE_KEY, fromProfile);
+      localStorage.setItem(STORAGE_KEY, String(code));
+      localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(code));
     } catch (_) { /* ignore */ }
-    return applyDocument(effectiveChrome(fromProfile));
+    return applyDocument(schemeFromSiteChrome(effectiveSiteChrome(code)));
   }
 
   function iconUrl(featureKey, scheme) {
-    const pack = ICON_PACK[normalize(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
+    const pack = ICON_PACK[normalizeScheme(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
     return pack[featureKey] || null;
   }
 
   function labelFor(scheme) {
-    const s = normalize(scheme);
+    const s = normalizeScheme(scheme);
     const t = global.FLOQRI18n?.t;
     if (typeof t === "function") {
       return s === "nightlife" ? t("chrome.nightlifeFull") : t("chrome.traditionalFull");
@@ -130,6 +197,7 @@
     const s = effectiveChrome(scheme);
     if (global.document && global.document.documentElement) {
       global.document.documentElement.setAttribute("data-floqr-chrome", s);
+      global.document.documentElement.setAttribute("data-is-site-chrome", String(siteChromeFromScheme(s)));
     }
     if (!global.document) return s;
     global.document.querySelectorAll("[data-floqr-chrome-icon]").forEach((el) => {
@@ -153,7 +221,6 @@
     return s;
   }
 
-  /** Show/hide Profile theme panel; force Nightlife paint without beta. */
   function syncAccessGate(root) {
     const allowed = hasThemeAccess();
     const scope = root || global.document;
@@ -175,11 +242,12 @@
       if (btn.dataset.floqrChromeBound === "1") return;
       btn.dataset.floqrChromeBound = "1";
       btn.addEventListener("click", () => {
-        if (!hasThemeAccess() && btn.getAttribute("data-floqr-chrome-btn") === "traditional") {
+        const name = btn.getAttribute("data-floqr-chrome-btn");
+        if (!hasThemeAccess() && name === "traditional") {
           syncAccessGate(scope);
           return;
         }
-        setChrome(btn.getAttribute("data-floqr-chrome-btn"));
+        setChrome(name);
       });
     });
     syncAccessGate(scope);
@@ -187,12 +255,16 @@
 
   global.FLOQRChromeScheme = {
     STORAGE_KEY,
+    LEGACY_STORAGE_KEY,
     FEATURE_KEY,
+    SITE_CHROME,
     SCHEMES,
     DEFAULT_SCHEME,
     ICON_PACK,
     getChrome,
+    getSiteChrome,
     setChrome,
+    setSiteChrome,
     hydrateFromProfile,
     iconUrl,
     applyDocument,
@@ -200,12 +272,15 @@
     syncAccessGate,
     hasThemeAccess,
     effectiveChrome,
-    normalize,
+    effectiveSiteChrome,
+    schemeFromSiteChrome,
+    siteChromeFromScheme,
+    normalize: normalizeScheme,
+    normalizeSiteChrome,
     labelFor
   };
 
   function boot() {
-    // Fail closed: Nightlife until Features & Services confirms traditionalTheme access.
     applyDocument(DEFAULT_SCHEME);
     if (hasThemeAccess()) applyDocument(getChrome());
     bindToggle();

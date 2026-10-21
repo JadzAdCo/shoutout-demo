@@ -839,6 +839,12 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 }
 
 /* Features & Services flags: table on PC, label/value cards on tablet and phone (same pattern as the audit trail). */
+/* Release Control page titles: white (not lime eyebrow), same weight as former Features Mgmt h2 */
+#featuresReleaseControl h2.features-release-title,
+#featuresReleaseControl h2.help-label.features-release-title{
+  color:#fff;
+  margin:0 0 10px;
+}
 .feature-flags-wrap{margin-top:12px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18)}
 .feature-flags-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;line-height:1.4}
 .feature-flags-table thead th{text-align:left;padding:10px 12px;background:#121826;border-bottom:1px solid rgba(255,255,255,.18);font-weight:800;color:#dfe7ff;vertical-align:bottom}

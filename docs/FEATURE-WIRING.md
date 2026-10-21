@@ -12,22 +12,20 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Traditional site theme (beta — `traditionalTheme`)
+## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife** (neon cyan–magenta) and **Traditional** (charcoal / white) — colors, cards, chrome — not icons alone. Not on public Search.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife** and **Traditional** (reserved codes 2/4 later). Not on public Search.
 
 | Layer | Wiring |
 |---|---|
-| Feature | `featureServices/traditionalTheme` — catalog `IsFeatureEnabled` + `IsTestFeature` (default off/test); empty `buttonIds` (no Search tile) |
-| Access | Master Admin Features Mgmt enable + invite/assign via `betaTesters.features.traditionalTheme=1` (same beta invite flow) |
-| Storage | `localStorage` `floqr.uiChrome` + Firestore `users/{uid}.uiChrome` |
-| Default | `nightlife`; fail closed until `FLOQRFeatureServices.canAccess("traditionalTheme")` |
-| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome` on `<html>`, `syncAccessGate`, `data-floqr-theme-panel`) |
-| CSS | `styles.css` — `html[data-floqr-chrome="traditional"]` variable + surface overrides |
-| Surfaces | My Profile → Language Settings only (panel hidden without grant); Search/portal/admin inherit theme attribute when granted |
-| Assets | Optional chrome icons `images/chrome/*` for marked nodes; Search tiles stay product defaults |
-| i18n / help | `chrome.*` CHROME keys; FloqAi `help-chrome-scheme` |
-| Stage | `chrome-scheme-stage.html` with `data-floqr-theme-ungated="1"` (local preview) |
+| Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
+| Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Reserved_3rd_chrome, `4` Reserved_4th_chrome (+ legacy `uiChrome` string) |
+| Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
+| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
+| CSS | `styles.css` — `html[data-floqr-chrome="traditional"]` |
+| Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
+| i18n / help | `chrome.*`; FloqAi `help-chrome-scheme` |
 
 ---
 
