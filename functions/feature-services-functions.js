@@ -268,17 +268,21 @@ exports.seedFeatureServices = onCall(CALL_OPTS, async request => {
     const refs = core.FEATURE_KEYS.map(key => db.collection(C.features).doc(key));
     const snaps = await Promise.all(refs.map(ref => tx.get(ref)));
     const legacySupRstar = await tx.get(db.collection(C.features).doc("supRstar"));
+    const legacyTraditionalTheme = await tx.get(db.collection(C.features).doc("traditionalTheme"));
     const head = await tx.get(headRef());
     const missing = snaps.map((snap, i) => (snap.exists ? null : core.FEATURE_KEYS[i])).filter(Boolean);
     const drifted = snaps.map((snap, i) => (snap.exists && core.linkFieldsDrifted(snap.data()) ? core.FEATURE_KEYS[i] : null)).filter(Boolean);
     if (!missing.length && !drifted.length) return {created: [], backfilled: []};
     missing.forEach(key => {
       // Migrate flags from legacy featureServices/supRstar when seeding floqCast.
-      const legacy = key === "floqCast" && legacySupRstar.exists ? legacySupRstar.data() : null;
+      let legacy = key === "floqCast" && legacySupRstar.exists ? legacySupRstar.data() : null;
+      let reason = "Initial seed from packaged catalog";
+      if (key === "floqCast" && legacy) reason = "Seeded floqCast from legacy featureServices/supRstar";
+      if (key === "siteChrome" && legacyTraditionalTheme.exists) {
+        legacy = legacyTraditionalTheme.data();
+        reason = "Seeded siteChrome from legacy featureServices/traditionalTheme";
+      }
       const feature = {...core.normalizeFeature(key, legacy), revision: legacy ? Number(legacy.revision || 0) || 1 : 1};
-      const reason = legacy
-        ? "Seeded floqCast from legacy featureServices/supRstar"
-        : "Initial seed from packaged catalog";
       tx.set(db.collection(C.features).doc(key), featureDoc(feature, request, email, reason, nowMs));
     });
     const backfill = Object.fromEntries(drifted.map(key => {

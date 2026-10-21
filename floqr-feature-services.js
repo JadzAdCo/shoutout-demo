@@ -16,11 +16,13 @@
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1}
+    {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
+    // No Search tile — Site chrome (Nightlife/Traditional) toggle lives in My Profile → Language Settings.
+    {key: "siteChrome", label: "Site chrome", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));
-  const FEATURE_KEY_ALIASES = Object.freeze({supRstar: "floqCast"});
+  const FEATURE_KEY_ALIASES = Object.freeze({supRstar: "floqCast", traditionalTheme: "siteChrome"});
 
   let features = defaults();
   let viewer = {uid: "", isMasterAdmin: false, isBetaTester: false, betaFeatures: {}};
@@ -50,7 +52,7 @@
   }
 
   function normalize(key, raw) {
-    const base = CATALOG.find(row => row.key === key);
+    const base = CATALOG.find(row => row.key === canonicalizeFeatureKey(key));
     if (!base) return null;
     const data = raw || {};
     const has = field => Object.prototype.hasOwnProperty.call(data, field);
@@ -154,6 +156,7 @@
     const raw = row.features || {};
     const merged = {...raw};
     if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+    if (flag(raw.traditionalTheme) === 1 && flag(merged.siteChrome) !== 1) merged.siteChrome = 1;
     return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
   }
 
@@ -188,6 +191,8 @@
         if (!row) return;
         // Prefer a real floqCast doc over a legacy featureServices/supRstar row.
         if (doc.id === "supRstar" && next.floqCast && next.floqCast.persisted) return;
+        // Prefer siteChrome doc over legacy traditionalTheme alias row.
+        if (doc.id === "traditionalTheme" && next.siteChrome && next.siteChrome.persisted) return;
         next[canon] = row;
       });
       betaRow = betaSnap?.exists ? betaSnap.data() || {} : null;
@@ -201,6 +206,12 @@
     viewer = {uid: user?.uid || "", isMasterAdmin, isBetaTester: Object.keys(betaFeatures).length > 0, betaFeatures};
     const result = {features: getFeatures(), viewer: getViewer()};
     loaded = {uid: user?.uid || "", promise: Promise.resolve(result)};
+    try {
+      root.dispatchEvent?.(new CustomEvent("floqr:features-loaded", {detail: result}));
+    } catch (_) { /* ignore */ }
+    try {
+      root.FLOQRChromeScheme?.syncAccessGate?.();
+    } catch (_) { /* ignore */ }
     return result;
   }
 
@@ -467,6 +478,7 @@
   root.FLOQRFeatureServices = {
     CATALOG,
     BETA_ELIGIBLE_KEYS,
+    canonicalizeFeatureKey,
     normalize,
     stateOf,
     canAccess,

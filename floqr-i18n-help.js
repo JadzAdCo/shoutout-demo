@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.1.103";
+  const VERSION = "s3.1.105";
 
   const packs = {
     "ru": {
@@ -203,8 +203,8 @@
         body: "При первом запуске FloqR читает язык браузера (например nl-NL → Dutch / Nederlands) и переключает интерфейс и меню, если язык поддерживается — категории Search, вкладки My Profile, Club Admin и Master Admin. Неподдерживаемые языки остаются на английском. После этого побеждают My Profile → App language и сохранённый язык профиля. Сохранение App language переводит каждую страницу с FLOQRI18n, не только эту карточку."
       },
       "help-chrome-scheme": {
-        title: "Хром иконок",
-        body: "Выберите Nightlife (неон cyan–magenta) или Traditional (уголь / белый) для иконок Search. Выбор сохраняется на устройстве и в профиле при входе. Переключатель — в Search под Or или в My Profile → Language Settings."
+        title: "Тема сайта",
+        body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон cyan–magenta) и Traditional (уголь / белый). Меняются цвета, карточки и оформление вместе. Выбор сохраняется на устройстве и в профиле. Доступно после приглашения или назначения бета-функции Traditional site theme. Переключатель — в My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -509,8 +509,8 @@
         body: "Bij eerste gebruik leest FloqR de browsertaal (bijvoorbeeld nl-NL → Dutch / Nederlands) en schakelt chrome en menu’s over wanneer die taal wordt ondersteund — Search-categorieën, My Profile-tabbladen, Club Admin-tabbladen en Master Admin-tabbladen. Niet-ondersteunde talen blijven Engels. Daarna winnen My Profile → App language en de opgeslagen profieltaal. App language opslaan vertaalt elke pagina die FLOQRI18n laadt, niet alleen deze kaart."
       },
       "help-chrome-scheme": {
-        title: "Icoon-chrome",
-        body: "Kies Nightlife (neon cyaan–magenta) of Traditional (antraciet / wit) voor Search-producticonen. Je keuze wordt op dit apparaat en in je profiel opgeslagen. Schakelaar: Search onder Or, of My Profile → Language Settings."
+        title: "Sitethema",
+        body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon cyaan–magenta) en Traditional (antraciet / wit). Kleuren, kaarten en chrome veranderen samen. Je keuze wordt op dit apparaat en in je profiel opgeslagen. Beschikbaar als FLOQR je uitnodigt of de beta-functie Traditional site theme toewijst. Schakelaar: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -815,8 +815,8 @@
         body: "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
       },
       "help-chrome-scheme": {
-        title: "Chrome des icônes",
-        body: "Choisissez Nightlife (néon cyan–magenta) ou Traditional (charbon / blanc) pour les icônes Search. Le choix est enregistré sur cet appareil et sur votre profil une fois connecté. Interrupteur : Search sous Or, ou My Profile → Language Settings."
+        title: "Thème du site",
+        body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon cyan–magenta) et Traditional (charbon / blanc). Couleurs, cartes et chrome changent ensemble. Le choix est enregistré sur cet appareil et sur votre profil. Disponible si FLOQR vous invite ou assigne la fonction bêta Traditional site theme. Interrupteur : My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "Mon profil et paramètres",
@@ -1121,8 +1121,8 @@
         body: "Bei der ersten Verwendung liest FloqR die Browsersprache (zum Beispiel nl-NL → Niederländisch / Nederlands) und schaltet Chrome und Menüs auf diese Sprache um, sofern diese unterstützt wird – Suchkategorien, Registerkarten „Mein Profil“, Club Admin-Registerkarten und Master Admin-Registerkarten. Nicht unterstützte Sprachen bleiben auf Englisch. Danach gewinnen Mein Profil → App-Sprache und die gespeicherte Profilsprache. Beim Speichern der App-Sprache wird jede Seite, die FLOQRI18n lädt, neu übersetzt, nicht nur diese Karte."
       },
       "help-chrome-scheme": {
-        title: "Symbol-Chrome",
-        body: "Wähle Nightlife (Neon Cyan–Magenta) oder Traditional (Anthrazit / Weiß) für Search-Produkticons. Die Wahl wird auf diesem Gerät und im Profil gespeichert. Umschalter: Search unter Or oder My Profile → Language Settings."
+        title: "Site-Theme",
+        body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon Cyan–Magenta) und Traditional (Anthrazit / Weiß). Farben, Karten und Chrome ändern sich zusammen. Die Wahl wird auf diesem Gerät und im Profil gespeichert. Verfügbar, wenn FLOQR dich einlädt oder die Beta-Funktion Traditional site theme zuweist. Umschalter: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -1427,8 +1427,8 @@
         body: "En el primer uso, FloqR lee el idioma del navegador (por ejemplo, nl-NL → Holandés/Nederlands) y cambia Chrome y los menús a ese idioma cuando sea compatible: categorías de búsqueda, pestañas Mi perfil, pestañas Club Admin y pestañas Master Admin. Los idiomas no admitidos permanecen en inglés. Después de eso, ganan Mi perfil → Idioma de la aplicación y el idioma del perfil guardado. Al guardar el idioma de la aplicación, se vuelve a traducir cada página que se carga FLOQRI18n, no solo esta tarjeta."
       },
       "help-chrome-scheme": {
-        title: "Chrome de iconos",
-        body: "Elige Nightlife (neón cian–magenta) o Traditional (carbón / blanco) para los iconos de Search. Se guarda en este dispositivo y en tu perfil al iniciar sesión. Interruptor: Search bajo Or, o My Profile → Language Settings."
+        title: "Tema del sitio",
+        body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón cian–magenta) y Traditional (carbón / blanco). Colores, tarjetas y chrome cambian juntos. Se guarda en este dispositivo y en tu perfil. Disponible cuando FLOQR te invita o asigna la función beta Traditional site theme. Interruptor: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -1733,8 +1733,8 @@
         body: "Al primo utilizzo, FloqR legge la lingua del browser (ad esempio nl-NL → olandese/olandese) e imposta Chrome e i menu su quella lingua quando è supportata: categorie di ricerca, schede Il mio profilo, schede Club Admin e schede Master Admin. Le lingue non supportate rimangono l'inglese. Successivamente prevalgono Il mio profilo → Lingua dell'app e la lingua del profilo salvata. Il salvataggio della lingua dell'app traduce nuovamente ogni pagina che carica FLOQRI18n, non solo questa scheda."
       },
       "help-chrome-scheme": {
-        title: "Chrome delle icone",
-        body: "Scegli Nightlife (neon cyan–magenta) o Traditional (antracite / bianco) per le icone Search. La scelta resta su questo dispositivo e sul profilo quando sei connesso. Interruttore: Search sotto Or, o My Profile → Language Settings."
+        title: "Tema del sito",
+        body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon cyan–magenta) e Traditional (antracite / bianco). Colori, schede e chrome cambiano insieme. La scelta resta su questo dispositivo e sul profilo. Disponibile se FLOQR ti invita o assegna la funzione beta Traditional site theme. Interruttore: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2039,8 +2039,8 @@
         body: "Na primeira utilização, FloqR lê o idioma do navegador (por exemplo, nl-NL → Holandês / Nederlands) e alterna o cromo e os menus para esse idioma quando é suportado – categorias de pesquisa, guias Meu perfil, guias Club Admin e guias Master Admin. Os idiomas não suportados permanecem em inglês. Depois disso, Meu Perfil → Idioma do aplicativo e o idioma do perfil salvo vencem. Salvar o idioma do aplicativo traduz novamente todas as páginas que carregam FLOQRI18n, não apenas este cartão."
       },
       "help-chrome-scheme": {
-        title: "Chrome dos ícones",
-        body: "Escolha Nightlife (néon ciano–magenta) ou Traditional (carvão / branco) para os ícones do Search. A escolha fica neste dispositivo e no perfil quando estiver conectado. Interruptor: Search sob Or, ou My Profile → Language Settings."
+        title: "Tema do site",
+        body: "Beta: alterne todo o site FLOQR entre Nightlife (néon ciano–magenta) e Traditional (carvão / branco). Cores, cartões e chrome mudam juntos. A escolha fica neste dispositivo e no perfil. Disponível quando a FLOQR convida ou atribui a função beta Traditional site theme. Interruptor: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2345,8 +2345,8 @@
         body: "Κατά την πρώτη χρήση, το FloqR διαβάζει τη γλώσσα του προγράμματος περιήγησης (για παράδειγμα nl-NL → Ολλανδικά / Ολλανδικά) και αλλάζει το chrome και τα μενού σε αυτήν τη γλώσσα όταν υποστηρίζεται — Κατηγορίες αναζήτησης, καρτέλες Το προφίλ μου, καρτέλες Club Admin και καρτέλες Master Admin. Οι μη υποστηριζόμενες γλώσσες παραμένουν στα Αγγλικά. Μετά από αυτό, το προφίλ μου → Γλώσσα εφαρμογής και η αποθηκευμένη γλώσσα προφίλ κερδίζουν. Η αποθήκευση της γλώσσας εφαρμογής μεταφράζει εκ νέου κάθε σελίδα που φορτώνει το FLOQRI18n, όχι μόνο αυτήν την κάρτα."
       },
       "help-chrome-scheme": {
-        title: "Chrome εικονιδίων",
-        body: "Επιλέξτε Nightlife (neon cyan–magenta) ή Traditional (άνθρακας / λευκό) για τα εικονίδια Search. Η επιλογή αποθηκεύεται στη συσκευή και στο προφίλ όταν είστε συνδεδεμένοι. Διακόπτης: Search κάτω από Or, ή My Profile → Language Settings."
+        title: "Θέμα ιστότοπου",
+        body: "Beta: εναλλαγή ολόκληρου του ιστότοπου FLOQR μεταξύ Nightlife (neon cyan–magenta) και Traditional (άνθρακας / λευκό). Χρώματα, κάρτες και chrome αλλάζουν μαζί. Η επιλογή αποθηκεύεται στη συσκευή και στο προφίλ. Διαθέσιμο όταν η FLOQR σας προσκαλεί ή αναθέτει τη beta λειτουργία Traditional site theme. Διακόπτης: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2651,8 +2651,8 @@
         body: "Przy pierwszym użyciu, FloqR odczytuje język przeglądarki (na przykład nl-NL → holenderski / Nederlands) i zmienia język Chrome i menu na ten język, jeśli jest obsługiwany — Kategorie wyszukiwania, zakładki Mój profil, zakładki Club Admin i zakładki Master Admin. Języki nieobsługiwane pozostają w języku angielskim. Następnie Mój profil → Język aplikacji i zapisany język profilu mają pierwszeństwo. Zapisanie języka aplikacji powoduje ponowne tłumaczenie każdej wczytywanej strony FLOQRI18n, nie tylko tej karty."
       },
       "help-chrome-scheme": {
-        title: "Chrome ikon",
-        body: "Wybierz Nightlife (neon cyan–magenta) lub Traditional (antracyt / biel) dla ikon Search. Wybór zapisuje się na urządzeniu i w profilu po zalogowaniu. Przełącznik: Search pod Or albo My Profile → Language Settings."
+        title: "Motyw strony",
+        body: "Beta: przełącz całą stronę FLOQR między Nightlife (neon cyan–magenta) a Traditional (antracyt / biel). Kolory, karty i chrome zmieniają się razem. Wybór zapisuje się na urządzeniu i w profilu. Dostępne, gdy FLOQR zaprosi Cię lub przypisze funkcję beta Traditional site theme. Przełącznik: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2957,8 +2957,8 @@
         body: "عند الاستخدام الأول، يقرأ FloqR لغة المتصفح (على سبيل المثال nl-NL → الهولندية / Nederlands) ويحوّل كروم والقوائم إلى تلك اللغة عندما تكون مدعومة — فئات البحث، تبويبات ملفي الشخصي، تبويبات Club Admin، وتبويبات Master Admin. اللغات غير المدعومة تبقى بالإنجليزية. بعد ذلك، يكون لملفي الشخصي → لغة التطبيق ولغة الملف الشخصي المحفوظة الأسبقية. حفظ لغة التطبيق يُعيد ترجمة كل صفحة يتم تحميلها FLOQRI18n، وليس هذه البطاقة فقط."
       },
       "help-chrome-scheme": {
-        title: "مظهر الأيقونات",
-        body: "اختر Nightlife (نيون سماوي–أرجواني) أو Traditional (فحمي / أبيض) لأيقونات Search. يُحفظ الاختيار على هذا الجهاز وفي ملفك عند تسجيل الدخول. المفتاح: Search تحت Or، أو My Profile → Language Settings."
+        title: "سمة الموقع",
+        body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون سماوي–أرجواني) وTraditional (فحمي / أبيض). تتغير الألوان والبطاقات والمظهر معاً. يُحفظ الاختيار على هذا الجهاز وفي ملفك. متاح عندما تدعوك FLOQR أو تعيّن ميزة beta لسمة Traditional. المفتاح: My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",

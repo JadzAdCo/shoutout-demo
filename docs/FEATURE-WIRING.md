@@ -12,19 +12,20 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Patron chrome scheme (live — s3.1.103)
+## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Patrons switch Search product marks between **Traditional** (charcoal / white) and **Nightlife** (cyan→magenta neon) chrome.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife** and **Traditional** (reserved codes 2/4 later). Not on public Search.
 
 | Layer | Wiring |
 |---|---|
-| Storage | `localStorage` `floqr.uiChrome` + Firestore `users/{uid}.uiChrome` (merge on set; hydrate on portal/Search login) |
-| Default | `nightlife` (matches prior neon Search marks) |
-| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome-icon`, `data-floqr-chrome-btn`) |
-| Surfaces | Search `index.html` toolbar under **Or**; My Profile → Language Settings |
-| Assets | `images/chrome/{floqcast,vip,shoutout,floqai,bartr,rydr}-{nightlife,traditional}.*` |
-| i18n / help | `chrome.*` CHROME keys; FloqAi `help-chrome-scheme` |
-| Stage pages | `chrome-scheme-stage.html` / `scheme-icons-demo.html` (review history; not required for patrons) |
+| Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
+| Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Reserved_3rd_chrome, `4` Reserved_4th_chrome (+ legacy `uiChrome` string) |
+| Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
+| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
+| CSS | `styles.css` — `html[data-floqr-chrome="traditional"]` |
+| Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
+| i18n / help | `chrome.*`; FloqAi `help-chrome-scheme` |
 
 ---
 

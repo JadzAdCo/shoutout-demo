@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.103";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.105";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,25 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.105",
+      title: "Site chrome Release Control + isSiteChrome",
+      checks: [
+        {label:"siteChrome catalog key", file:"floqr-feature-services.js", includes:["siteChrome", "Site chrome", "buttonIds: []"]},
+        {label:"Server catalog siteChrome + alias", file:"functions/feature-services-core.js", includes:["siteChrome", "traditionalTheme: \"siteChrome\""]},
+        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "RESERVED_3RD", "RESERVED_4TH"]},
+        {label:"Release Control title white + help", file:"master-admin.html", includes:["features-release-title", "help-feature-promote-live", ">Release Control</h2>"], notIncludes:[">Features Mgmt</h2>"]},
+        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.105\""]}
+      ]
+    },
+    {
+      version: "s3.1.104",
+      title: "Traditional site theme beta (full-site colors)",
+      checks: [
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.104\""]}
+      ]
+    },
     {
       version: "s3.1.101",
       title: "Discovery crawl upsert + auto-approve + past-event lifecycle",
@@ -1918,6 +1937,24 @@
       howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/FloqAi marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
       expected:"Icons swap instantly; choice survives reload; live stream ≥60s with Twilio TURN.",
       troubleshoot:"Icons stuck → confirm floqr-chrome-scheme.js loaded and images/chrome/* 200. TURN stun-only → redeploy Functions with TWILIO_* secrets; check getFloqCastIceServers."
+    },
+    {
+      id:"s3-1-104-traditional-site-theme-beta",
+      area:"My Profile + site-wide theme",
+      feature:"Traditional site theme beta (full color theme, not Search icons)",
+      changed:"Removed public Search chrome toolbar. traditionalTheme Features & Services beta key (no Search tile). Granted testers see Nightlife/Traditional in My Profile → Language Settings; choosing Traditional applies html[data-floqr-chrome=traditional] site-wide CSS. Package s3.1.104.",
+      howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
+      expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
+      troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
+    },
+    {
+      id:"s3-1-105-site-chrome-release-control",
+      area:"Master Admin Features Mgmt + Site chrome",
+      feature:"Release Control Site chrome on/off + isSiteChrome datapoint",
+      changed:"Release Control page: white Release Control / Test → live titles (Features Mgmt title removed; Promote test code to live moved into ?). Feature row Site chrome (siteChrome) with Enable/Beta toggles. Preference users.isSiteChrome 0|1|2|4. Package s3.1.105.",
+      howToTest:"1) Hard-refresh Master Admin → Features Mgmt → Release Control (s3.1.105). 2) Page title is Release Control (white, with ?) — no Features Mgmt heading on the page. 3) Test → live is the subsection title (white, with ?); Promote copy is in that ?. 4) Table includes Site chrome — set Enable=1 and Beta=1, Save with reason. 5) Invite a tester with Chrome ticked → they see Site chrome in Language Settings; choice writes isSiteChrome 0/1.",
+      expected:"Site chrome row visible and controllable; titles white; isSiteChrome persisted on choice.",
+      troubleshoot:"No Site chrome row → unlock SOS2FA, Reload (seedFeatureServices creates siteChrome). Still green eyebrow titles → hard refresh master-admin.html + admin.css s3.1.105. Theme not saving → floqr-chrome-scheme.js setSiteChrome / users.isSiteChrome."
     },
     {
       id:"s3-1-97-floqcast-aurelia-blank-and-freeze",

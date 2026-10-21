@@ -11,14 +11,17 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1}
+  {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
+  // Site chrome beta — Nightlife/Traditional theme; no Search tile. Preference datapoint: users.isSiteChrome.
+  {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));
 
 const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));
 
 /** One-release aliases: legacy featureServices / betaTesters.features keys → catalog key. */
 const FEATURE_KEY_ALIASES = Object.freeze({
-  supRstar: "floqCast"
+  supRstar: "floqCast",
+  traditionalTheme: "siteChrome"
 });
 
 const COLLECTIONS = Object.freeze({
@@ -207,6 +210,7 @@ function betaGrantsFrom(row) {
   const merged = {...raw};
   // Legacy betaTesters.features.supRstar → floqCast for one release.
   if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+  if (flag(raw.traditionalTheme) === 1 && flag(merged.siteChrome) !== 1) merged.siteChrome = 1;
   return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
 }
 

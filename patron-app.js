@@ -1289,6 +1289,7 @@
       window.FLOQRFeatureGates?.applyPatronGateUi?.(currentUser, cachedUserProfile);
       window.FLOQRFeatureServices?.applySearchUi?.();
       window.FLOQRFeatureServices?.applyFeatureLinks?.(document);
+      window.FLOQRChromeScheme?.syncAccessGate?.();
     } catch (e) {
       console.warn("Search feature visibility failed", e?.message || e);
     }

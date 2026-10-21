@@ -533,6 +533,10 @@
       console.warn("Portal feature links", error?.message || error);
     }
     fs.applyFeatureLinks(byId("portalPanel") || document);
+    try {
+      window.FLOQRChromeScheme?.syncAccessGate?.(byId("portalPanel") || document);
+      window.FLOQRChromeScheme?.bindToggle?.(byId("portalPanel") || document);
+    } catch (_) { /* ignore */ }
     if (!document.querySelector(".admin-panel-section.active")) showPortalPanel("portalOverview", "portalOverview");
   }
 

@@ -96,6 +96,9 @@
     "help-employee-network": [
       "venueAdmin"
     ],
+    "help-feature-promote-live": [
+      "masterAdmin"
+    ],
     "help-featured-staff": [
       "venueAdmin"
     ],
