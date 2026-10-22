@@ -1841,8 +1841,10 @@ def build_vip_only():
 
 
 def streetbot_wm():
-    """streetBOT — FloqCAST process: st under ring; reet+BO over; T tiffany; BOT +15%."""
-    # street at FC_H; BOT at +15% (same split as Floq / CAST)
+    """street at FC_H; BOT at +15%. st under ring; reet+BOT over (T tiffany).
+
+    Same process as floqcast_wm (baseline align, T fringe cleanup, no fit crush).
+    """
     size_s = 170
     for _ in range(8):
         u, by = render_upright("street", size_s, WHITE)
@@ -1850,10 +1852,11 @@ def streetbot_wm():
             max(50, min(280, round(size_s * FC_H / max(1, finish(u, by).size[1]))))
         )
     size_b = int(round(size_s * 1.15))
+    pad = 64
 
+    # --- street: st under / reet over ---
     font_s = ImageFont.truetype(FONT, int(size_s))
     street_u, by_s = render_upright("street", size_s, WHITE)
-    pad = 64
     bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
         (0, 0), "street", font=font_s, anchor="ls"
     )
@@ -1880,9 +1883,10 @@ def streetbot_wm():
     street_over[ink & ~stmask] = (255, 255, 255, 255)
     SU = Image.fromarray(ink_only(street_under), "RGBA")
     SO = Image.fromarray(ink_only(street_over), "RGBA")
+    street_body = Image.fromarray(ink_only(fa), "RGBA")
     print(f"  street split under={int(stmask.sum())} over={int((ink & ~stmask).sum())}")
 
-    # BOT +15%: BO white + T tiffany (same as CAST)
+    # --- BOT at +15%: BO white + T tiffany (mirror CAST) ---
     font_b = ImageFont.truetype(FONT, int(size_b))
     bot_u, by_b = render_upright("BOT", size_b, WHITE)
     bb_b = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
@@ -1919,33 +1923,141 @@ def streetbot_wm():
     bot_over[tmask, 1] = TIFFANY[1]
     bot_over[tmask, 2] = TIFFANY[2]
     bot_over[tmask, 3] = 255
-    BO = Image.fromarray(ink_only(bot_over), "RGBA")
+    near_white_t = (
+        tmask
+        & (bot_over[:, :, 0] > 140)
+        & (bot_over[:, :, 1] > 140)
+        & (bot_over[:, :, 2] > 140)
+    )
+    bot_over[near_white_t, 0] = TIFFANY[0]
+    bot_over[near_white_t, 1] = TIFFANY[1]
+    bot_over[near_white_t, 2] = TIFFANY[2]
+    bot_over[near_white_t, 3] = 255
+    BOT = Image.fromarray(ink_only(bot_over), "RGBA")
+    _ta = np.array(BOT)
+    _tw = (
+        (_ta[:, :, 3] > 20)
+        & (_ta[:, :, 0] > 200)
+        & (_ta[:, :, 1] > 200)
+        & (_ta[:, :, 2] > 200)
+    )
+    _tt = (
+        (_ta[:, :, 3] > 20)
+        & (_ta[:, :, 0] < 100)
+        & (_ta[:, :, 1] > 150)
+        & (_ta[:, :, 2] > 180)
+    )
+    if _tt.any():
+        _td = (
+            np.array(
+                Image.fromarray((_tt.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(7))
+            )
+            > 0
+        )
+        _ghost = _tw & _td
+        if _ghost.any():
+            _ta[_ghost, 0] = TIFFANY[0]
+            _ta[_ghost, 1] = TIFFANY[1]
+            _ta[_ghost, 2] = TIFFANY[2]
+            BOT = Image.fromarray(_ta, "RGBA")
+            print(f"  BOT T: forced tiffany on {int(_ghost.sum())} fringe px")
 
-    # Compose street + BOT on shared canvas (gap like FloqCAST)
-    gap = 10
-    street_body = Image.alpha_composite(SU, SO)
-    H = max(street_body.size[1], BO.size[1]) + 16
-    W = street_body.size[0] + gap + BO.size[0] + 16
+    # Baseline-align (same as FloqCAST)
+    stre_cap_h = glyph("stre", size_s, WHITE).size[1]
+    gap = max(2, int(size_s * 0.03))
+    W = street_body.size[0] + gap + BOT.size[0]
+    bot_above = max(0, BOT.size[1] - stre_cap_h)
+    H = bot_above + street_body.size[1]
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    sy = (H - street_body.size[1]) // 2
-    by = (H - BO.size[1]) // 2
-    under.alpha_composite(SU, (8, sy))
-    over.alpha_composite(SO, (8, sy))
-    over.alpha_composite(BO, (8 + street_body.size[0] + gap, by))
+    fy = bot_above
+    cy = fy + stre_cap_h - BOT.size[1]
+    under.alpha_composite(SU, (0, fy + (street_body.size[1] - SU.size[1])))
+    over.alpha_composite(SO, (0, fy + (street_body.size[1] - SO.size[1])))
+    over.alpha_composite(BOT, (street_body.size[0] + gap, cy))
+
     body = Image.alpha_composite(under, over)
-    box = ink_bbox(body, 8)
+    box = ink_bbox(body, 10)
+    U = Image.fromarray(
+        ink_only(np.array(under.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    O = Image.fromarray(
+        ink_only(np.array(over.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    B = Image.alpha_composite(U, O)
+    print(
+        f"  TYPE streetBOT street={size_s}/{street_body.size} BOT={size_b}/{BOT.size} "
+        f"(+15%) body={B.size}"
+    )
+    # Soft chord fit only if wider than FloqCAST-ish safe width (no height crush)
+    if B.size[0] > 860:
+        return fit_width(U, O, B, max_w=860)
+    return U, O, B
 
-    def crop_keep(im):
-        return im.crop((box[0], box[1], box[2] + 1, box[3] + 1))
 
-    U, O, B = crop_keep(under), crop_keep(over), crop_keep(body)
-    print(f"  TYPE streetBOT body={B.size} street_sz={size_s} BOT_sz={size_b}")
-    return fit_width(U, O, B)
+def build_streetbot_whiteblack(under, over, left: int, top: int, graphic: Image.Image) -> Path:
+    """streetBOT White/Black from layers — same tip-safe path as FloqCAST WB."""
+    wb_stroke = 3
+    wb_half = wb_stroke / 2.0
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    font_chrome = shiny_chrome_tone(np.full((S, S), 160.0, np.float32), yy, xx, for_type=True)
+    font_chrome = np.clip(font_chrome * 0.72, 10, 110)
+
+    base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+    ga = np.array(graphic.convert("RGBA"))
+    gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
+    glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
+    chrome = shiny_chrome_tone(glum, yy, xx)
+    gout = np.zeros_like(ga)
+    line = (glum >= 30) & (gal > 8) & (dist < (R - 4))
+    gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
+    gout[line, 3] = 255
+    base.alpha_composite(Image.fromarray(gout, "RGBA"))
+
+    def type_layer(im: Image.Image) -> Image.Image:
+        a = np.array(paste_type(im, left, top))
+        ink = a[:, :, 3] > 20
+        out = np.zeros_like(a)
+        for c in range(3):
+            out[:, :, c] = np.where(ink, font_chrome, 0)
+        out[:, :, 3] = np.where(ink, 255, 0)
+        return Image.fromarray(out, "RGBA")
+
+    base.alpha_composite(type_layer(under))
+    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
+    ring_chrome = np.clip(12.0 + ring_chrome * 0.35, 14, 95)
+    ra = np.zeros((S, S, 4), np.uint8)
+    ring_mask = np.abs(dist - R) <= wb_half
+    for c in range(3):
+        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
+    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+    base.alpha_composite(Image.fromarray(ra, "RGBA"))
+    base.alpha_composite(type_layer(over))
+
+    out = np.array(base)
+    out[:, :, 3] = 255
+    type_ink = (np.array(type_layer(under))[:, :, 3] > 20) | (
+        np.array(type_layer(over))[:, :, 3] > 20
+    )
+    outside = dist > (R + wb_half + 0.5)
+    out[outside & ~type_ink, :3] = 255
+    tips = type_ink & (dist > (R + wb_half))
+    for c in range(3):
+        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
+
+    dst = ROOT / "images/chrome/streetbot-whiteblack.jpg"
+    Image.fromarray(out, "RGBA").convert("RGB").save(dst, quality=96, subsampling=0)
+    # Mirror into floqAi pack slot
+    Image.fromarray(out, "RGBA").convert("RGB").save(
+        ROOT / "images/chrome/floqai-whiteblack.jpg", quality=96, subsampling=0
+    )
+    print(f"  streetBOT WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}")
+    return dst
 
 
 def build_streetbot_only():
-    """streetBOT icon — FloqCAST pipeline on djBOT graphic; also fills floqAi pack slots."""
+    """streetBOT — FloqCAST process on djBOT graphic; wires floqAi ICON_PACK slots."""
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     ensure_traditional_ring()
@@ -1953,21 +2065,18 @@ def build_streetbot_only():
     print("=== assemble streetBOT (FloqCAST process) ===")
     g = Image.open(dj_g)
     under, over, body = streetbot_wm()
-    # FloqCAST-style placement: allow tip kiss; keep clear of graphic
-    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 650) + 16, bias=4)
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 650) + 12, bias=4)
     print(f"  place streetBOT left={left} top={top} body={body.size}")
     sb = assemble(g, under, over, left, top, nightlife=True)
     out = ROOT / "images/chrome"
     sb.convert("RGB").save(out / "streetbot-nightlife.jpg", quality=98, subsampling=0)
-    # Also publish into floqAi pack paths (Search tile key floqAi)
     sb.save(out / "floqai-nightlife.png", optimize=True)
     sb.convert("RGB").save(out / "floqbot-nightlife.png", optimize=True)
     trad = traditional_from_nightlife(sb, g, under, over, left, top)
     trad.convert("RGB").save(out / "streetbot-traditional.jpg", quality=98, subsampling=0)
     trad.convert("RGB").save(out / "floqai-traditional.jpg", quality=98, subsampling=0)
     trad.save(out / "floqbot-traditional-green.png", optimize=True)
-    to_white_black(out / "streetbot-traditional.jpg", out / "streetbot-whiteblack.jpg")
-    to_white_black(out / "streetbot-traditional.jpg", out / "floqai-whiteblack.jpg")
+    build_streetbot_whiteblack(under, over, left, top, g)
     preview = sb.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
     preview.save("/opt/cursor/artifacts/streetbot-nightlife.png", quality=95)
     trad.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS).save(
@@ -1976,6 +2085,34 @@ def build_streetbot_only():
     Image.open(out / "streetbot-whiteblack.jpg").resize(
         (640, 640), Image.Resampling.LANCZOS
     ).save("/opt/cursor/artifacts/streetbot-whiteblack.png", quality=95)
+    # Pack strip for QA (streetBOT in FloqAi slot)
+    from PIL import ImageDraw, ImageFont
+
+    pack = [
+        ("VIP", "vip-whiteblack.jpg"),
+        ("ShoutOut", "shoutout-whiteblack.png"),
+        ("streetBOT", "streetbot-whiteblack.jpg"),
+        ("FloqCast", "floqcast-whiteblack.jpg"),
+        ("BartR", "bartr-whiteblack.jpg"),
+        ("RydR", "rydr-whiteblack.jpg"),
+    ]
+    cell, pad = 260, 12
+    W = pad + (cell + pad) * len(pack)
+    H = cell + 56
+    c = Image.new("RGB", (W, H), (245, 245, 247))
+    d = ImageDraw.Draw(c)
+    try:
+        fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+    except Exception:
+        fnt = ImageFont.load_default()
+    d.text((pad, 6), "White/Black pack — streetBOT replaces FloqAi", fill=(30, 30, 35), font=fnt)
+    for i, (lab, fn) in enumerate(pack):
+        x = pad + i * (cell + pad)
+        im = Image.open(out / fn).convert("RGB").resize((cell, cell), Image.Resampling.LANCZOS)
+        d.rectangle([x - 1, 30 - 1, x + cell, 30 + cell], outline=(40, 40, 45), width=2)
+        c.paste(im, (x, 30))
+        d.text((x + 8, 30 + cell + 4), lab, fill=(40, 40, 45), font=fnt)
+    c.save("/opt/cursor/artifacts/whiteblack-streetbot-pack-strip.png", quality=95)
     print("DONE streetBOT —", out / "streetbot-nightlife.jpg")
 
 
