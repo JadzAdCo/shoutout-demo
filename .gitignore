@@ -53,3 +53,5 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+images/chrome/layers/_src-*
+images/chrome/layers/_spin.gif
