@@ -4873,7 +4873,7 @@
       ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
       ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "floqCast")],
       ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
-      ["floqAi", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.floqai", {}, "FloqAi")]
+      ["floqAi", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.floqai", {}, "dj BOT")]
     ];
     featureItems.forEach(([key, href, label]) => {
       const el = upsert(`feature-${key}`, "a", "profile-menu-link");

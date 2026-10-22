@@ -292,28 +292,29 @@
     <div class="category-grid compact-category-grid">
       <div class="category-or" data-i18n="cat.or">Or</div>
       <div class="search-icon-row">
-        <button id="shoutoutBtnCard" class="shoutout-icon-card" type="button" data-feature-key="shoutOut" data-i18n-aria="cat.shoutout" aria-label="Throw a ShoutOut">
-          <img src="./shoutout-logo.png" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png'}else{this.classList.add('hidden')}"/>
-        </button>
-        <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
-        <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
-        <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
+        <!-- Spot order (visible): 1 floqCast · 2 ShoutOut · 3 VIP reserV · 4 dj BOT (was FloqAi; icon TBD) -->
         <a id="floqcastBtnCard" class="shoutout-icon-card floqcast-icon-card hidden" href="./floqcast-search.html?from=search" data-feature-key="floqCast" data-i18n-aria="cat.floqcast" aria-label="floqCast">
           <span class="floqcast-icon-face chrome-photo-face" aria-hidden="true">
             <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-nightlife.jpg" alt="" class="floqcast-tile-mark" width="96" height="96"/>
           </span>
         </a>
+        <button id="shoutoutBtnCard" class="shoutout-icon-card" type="button" data-feature-key="shoutOut" data-i18n-aria="cat.shoutout" aria-label="Throw a ShoutOut">
+          <img src="./shoutout-logo.png" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png'}else{this.classList.add('hidden')}"/>
+        </button>
         <a id="vipReservBtnCard" class="shoutout-icon-card vip-reserv-icon-card hidden" href="./vip.html?from=search" data-feature-key="vipReservations" data-i18n-aria="cat.vipreserv" aria-label="VIP reserV">
           <span class="vip-icon-face vip-icon-face--mark-only" aria-hidden="true">
             <img src="./images/vip-reserv-mark.svg" alt="" class="vip-tile-mark" width="96" height="96"/>
           </span>
         </a>
-        <a id="intentSearchBtnCard" class="shoutout-icon-card floqai-icon-card hidden" href="./floqai.html?from=search" data-feature-key="floqAi" data-i18n-aria="cat.floqai" aria-label="FloqAi">
+        <a id="intentSearchBtnCard" class="shoutout-icon-card floqai-icon-card djbot-icon-card hidden" href="./floqai.html?from=search" data-feature-key="floqAi" data-i18n-aria="cat.floqai" aria-label="dj BOT">
           <span class="floqai-icon-face" aria-hidden="true">
             <span class="category-floqai-mark floqai-tile-mark"><span class="category-floqai-mark-halo"></span><img src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/></span>
-            <span class="floqai-icon-word" data-i18n="cat.floqai">FloqAi</span>
+            <span class="floqai-icon-word" data-i18n="cat.floqai">dj BOT</span>
           </span>
         </a>
+        <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
+        <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
+        <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
       </div>
     </div>
   </section>
@@ -803,7 +804,7 @@
 <script src="./floqr-people-directory.js?v=s3.1.105"></script>
 <script src="./floqr-app-check.js?v=s3.1.105"></script>
 <script src="./floqr-nav.js?v=s3.1.105"></script>
-<script src="./floqr-i18n.js?v=s3.1.105"></script>
+<script src="./floqr-i18n.js?v=27"></script>
 <script src="./floqr-place-i18n.js?v=s3.1.105"></script>
 <script src="./floqai-help-repository.js?v=s3.1.105"></script>
 <script src="./floqr-i18n-help.js?v=s3.1.105"></script>
@@ -849,7 +850,7 @@
 <script src="./floqr-template-preview.js?v=s3.1.105"></script>
 <script src="./floqr-template-tags.js?v=s3.1.105"></script>
 <script src="./floqr-access-notice.js?v=s3.1.105"></script>
-<script src="./patron-app.js?v=27"></script>
+<script src="./patron-app.js?v=28"></script>
 <script src="./ai-assistant-ui.js?v=s3.1.105"></script>
 <script src="./ai-media-service.js?v=s3.1.105"></script>
 <script src="./notification-center.js?v=s3.1.105"></script>

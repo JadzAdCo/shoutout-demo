@@ -453,6 +453,10 @@ When adding a section, use this skeleton:
 | **JS** | `patron-portal-app.js` `showFeatureOrdersPane`, `renderFeatureOrdersStatus`, deep links `tab=feature-orders\|shoutouts\|guest-list-reserv\|invoices` |
 | **i18n** | `nav.featureOrders`, `nav.guestListReserv`, `portal.fo.*`, `portal.savedShoutouts*` — all supported langs |
 
+## Search category icon row (spots)
+
+Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2 ShoutOut** · **3 VIP reserV** · **4 dj BOT** (Search tile label; feature key still `floqAi` until icon pack lands). Hidden: Mingl / BartR / RydR.
+
 ## Chrome icon drafts (nightlife / traditional review)
 
 | Piece | Where |
