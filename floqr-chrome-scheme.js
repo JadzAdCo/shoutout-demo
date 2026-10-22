@@ -1,10 +1,11 @@
 /**
- * FLOQR Site chrome — Nightlife | Traditional | Black Tiffany | Black Dark Green.
+ * FLOQR Site chrome — Nightlife | Traditional | Black Tiffany | White/Black | Black Dark Green.
  * Preference datapoint: users.isSiteChrome
  *   0 = Nightlife chrome
  *   1 = Traditional
- *   2 = Black Tiffany (was Reserved_3rd_chrome)
- *   4 = Black Dark Green (was Reserved_4th_chrome)
+ *   2 = Black Tiffany
+ *   3 = White / Black (light)
+ *   4 = Black Dark Green
  * Gated by Features & Services key `siteChrome` (beta invite / assignment).
  * Also accepts legacy localStorage floqr.uiChrome / users.uiChrome during migration.
  * Stage pages may set html[data-floqr-theme-ungated="1"] to preview without a beta grant.
@@ -15,7 +16,7 @@
   const STORAGE_KEY = "floqr.isSiteChrome";
   const LEGACY_STORAGE_KEY = "floqr.uiChrome";
   const FEATURE_KEY = "siteChrome";
-  const SCHEMES = ["traditional", "nightlife", "blackTiffany", "blackDarkGreen"];
+  const SCHEMES = ["traditional", "nightlife", "blackTiffany", "whiteBlack", "blackDarkGreen"];
   const DEFAULT_SCHEME = "nightlife";
 
   /** Numeric isSiteChrome codes. */
@@ -23,6 +24,7 @@
     NIGHTLIFE: 0,
     TRADITIONAL: 1,
     BLACK_TIFFANY: 2,
+    WHITE_BLACK: 3,
     BLACK_DARK_GREEN: 4,
     /** @deprecated use BLACK_TIFFANY */
     RESERVED_3RD: 2,
@@ -31,7 +33,7 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.05";
+  const ICON_V = "s3.2.06";
   const NIGHTLIFE_ICONS = {
     floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
@@ -48,28 +50,43 @@
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
   };
+  const BLACK_TIFFANY_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
+    vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V
+  });
+  const BLACK_DARK_GREEN_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
+    vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
+  });
+  const WHITE_BLACK_ICONS = {
+    floqCast: "./images/chrome/floqcast-whiteblack.jpg?v=" + ICON_V,
+    vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
+    floqAi: "./images/chrome/floqai-whiteblack.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V
+  };
   const ICON_PACK = {
     traditional: TRADITIONAL_ICONS,
     nightlife: NIGHTLIFE_ICONS,
-    // Black themes keep nightlife icon art; CSS swaps purple → Tiffany / forest
-    blackTiffany: NIGHTLIFE_ICONS,
-    blackDarkGreen: Object.assign({}, NIGHTLIFE_ICONS, {
-      shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
-    })
+    blackTiffany: BLACK_TIFFANY_ICONS,
+    blackDarkGreen: BLACK_DARK_GREEN_ICONS,
+    whiteBlack: WHITE_BLACK_ICONS
   };
 
   const LABEL_KEYS = {
     nightlife: "chrome.nightlifeFull",
     traditional: "chrome.traditionalFull",
     blackTiffany: "chrome.blackTiffanyFull",
-    blackDarkGreen: "chrome.blackDarkGreenFull"
+    blackDarkGreen: "chrome.blackDarkGreenFull",
+    whiteBlack: "chrome.whiteBlackFull"
   };
 
   const LABEL_FALLBACK = {
     nightlife: "Nightlife theme",
     traditional: "Traditional theme",
     blackTiffany: "Black Tiffany theme",
-    blackDarkGreen: "Black Dark Green theme"
+    blackDarkGreen: "Black Dark Green theme",
+    whiteBlack: "White / Black theme"
   };
 
   function normalizeScheme(value) {
@@ -87,6 +104,15 @@
     ) {
       return "blackDarkGreen";
     }
+    if (
+      lower === "whiteblack" ||
+      lower === "white-black" ||
+      lower === "white_black" ||
+      lower === "white/black" ||
+      lower === "light"
+    ) {
+      return "whiteBlack";
+    }
     if (SCHEMES.includes(v)) return v;
     if (lower === "traditional" || lower === "nightlife") return lower;
     return DEFAULT_SCHEME;
@@ -96,6 +122,7 @@
     const n = Number(value);
     if (n === SITE_CHROME.TRADITIONAL) return SITE_CHROME.TRADITIONAL;
     if (n === SITE_CHROME.BLACK_TIFFANY) return SITE_CHROME.BLACK_TIFFANY;
+    if (n === SITE_CHROME.WHITE_BLACK) return SITE_CHROME.WHITE_BLACK;
     if (n === SITE_CHROME.BLACK_DARK_GREEN) return SITE_CHROME.BLACK_DARK_GREEN;
     if (n === SITE_CHROME.NIGHTLIFE) return SITE_CHROME.NIGHTLIFE;
     return SITE_CHROME.NIGHTLIFE;
@@ -105,6 +132,7 @@
     const n = normalizeSiteChrome(code);
     if (n === SITE_CHROME.TRADITIONAL) return "traditional";
     if (n === SITE_CHROME.BLACK_TIFFANY) return "blackTiffany";
+    if (n === SITE_CHROME.WHITE_BLACK) return "whiteBlack";
     if (n === SITE_CHROME.BLACK_DARK_GREEN) return "blackDarkGreen";
     return DEFAULT_SCHEME;
   }
@@ -113,22 +141,18 @@
     const s = normalizeScheme(scheme);
     if (s === "traditional") return SITE_CHROME.TRADITIONAL;
     if (s === "blackTiffany") return SITE_CHROME.BLACK_TIFFANY;
+    if (s === "whiteBlack") return SITE_CHROME.WHITE_BLACK;
     if (s === "blackDarkGreen") return SITE_CHROME.BLACK_DARK_GREEN;
     return SITE_CHROME.NIGHTLIFE;
   }
 
   function isPremiumScheme(scheme) {
     const s = normalizeScheme(scheme);
-    return s === "traditional" || s === "blackTiffany" || s === "blackDarkGreen";
+    return s !== DEFAULT_SCHEME;
   }
 
   function isPremiumCode(code) {
-    const n = normalizeSiteChrome(code);
-    return (
-      n === SITE_CHROME.TRADITIONAL ||
-      n === SITE_CHROME.BLACK_TIFFANY ||
-      n === SITE_CHROME.BLACK_DARK_GREEN
-    );
+    return normalizeSiteChrome(code) !== SITE_CHROME.NIGHTLIFE;
   }
 
   function isUngated() {

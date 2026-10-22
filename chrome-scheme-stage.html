@@ -29,6 +29,12 @@
       --hero:#000;
       --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
     }
+    html[data-floqr-chrome="whiteBlack"]{
+      --bg:#fff; --bg-elev:#f6f6f6; --ink:#2a2a2a; --muted:rgba(42,42,42,.72);
+      --line:#2a2a2a; --accent:#1a1a1a; --pick:#3a3a3a;
+      --hero:#ffffff;
+      --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
+    }
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--ink);background:var(--hero);font-family:var(--font);padding:28px 20px 80px}
     .banner{display:inline-block;font-weight:800;font-size:13px;border:2px solid var(--line);background:var(--bg-elev);padding:6px 12px;border-radius:999px;margin-bottom:14px}
@@ -67,6 +73,7 @@
     <button type="button" class="btn" data-floqr-chrome-btn="traditional" aria-pressed="true">Traditional chrome</button>
     <button type="button" class="btn" data-floqr-chrome-btn="nightlife" aria-pressed="false">Nightlife chrome</button>
     <button type="button" class="btn" data-floqr-chrome-btn="blackTiffany" aria-pressed="false">Black Tiffany</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="whiteBlack" aria-pressed="false">White / Black</button>
     <button type="button" class="btn" data-floqr-chrome-btn="blackDarkGreen" aria-pressed="false">Black Dark Green</button>
     <span class="live">Active: <strong data-floqr-chrome-label>Traditional chrome</strong></span>
   </div>
@@ -163,7 +170,7 @@
     Reply which traditional proposals to lock, then go-ahead to wire Search.
   </p>
 
-  <script src="./floqr-chrome-scheme.js?v=s3.2.05"></script>
+  <script src="./floqr-chrome-scheme.js?v=s3.2.06"></script>
   <script>
     FLOQRChromeScheme.bindToggle(document);
     // Keep legacy data-scheme in sync for page chrome CSS

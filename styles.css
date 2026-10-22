@@ -1498,3 +1498,153 @@ html[data-floqr-chrome="blackDarkGreen"] .highlight-item{
   border-color:#228b22!important;
   box-shadow:0 0 0 2px rgba(34,139,34,.3);
 }
+
+/* —— White / Black (isSiteChrome=3): white bg, charcoal text, slim charcoal borders —— */
+html[data-floqr-chrome="whiteBlack"]{
+  --line:rgba(40,40,40,.55);
+  --text:#2a2a2a;
+  --muted:rgba(42,42,42,.72);
+  --accent:#2a2a2a;
+  --hot:#1a1a1a;
+  --lime:#3a3a3a;
+  --floqr-blue:#2a2a2a;
+  --floqr-ink:#ffffff;
+  --floqr-chrome:#f4f4f4;
+}
+html[data-floqr-chrome="whiteBlack"] body{
+  font-family:var(--floqr-font);
+  background:#ffffff;
+  color:var(--text);
+}
+html[data-floqr-chrome="whiteBlack"] h1,
+html[data-floqr-chrome="whiteBlack"] h2,
+html[data-floqr-chrome="whiteBlack"] h3,
+html[data-floqr-chrome="whiteBlack"] .topbar h1,
+html[data-floqr-chrome="whiteBlack"] .confirmation h1,
+html[data-floqr-chrome="whiteBlack"] .login-card h2,
+html[data-floqr-chrome="whiteBlack"] .hero-logo-fallback,
+html[data-floqr-chrome="whiteBlack"] .club-option h3,
+html[data-floqr-chrome="whiteBlack"] .eyebrow,
+html[data-floqr-chrome="whiteBlack"] .template .name,
+html[data-floqr-chrome="whiteBlack"] .floqr-title{
+  color:#2a2a2a;
+}
+html[data-floqr-chrome="whiteBlack"] .login-card,
+html[data-floqr-chrome="whiteBlack"] .card,
+html[data-floqr-chrome="whiteBlack"] .club-option,
+html[data-floqr-chrome="whiteBlack"] .notice,
+html[data-floqr-chrome="whiteBlack"] .category-card{
+  background:linear-gradient(180deg,#fff,#f6f6f6);
+  border:1px solid rgba(40,40,40,.42);
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+}
+html[data-floqr-chrome="whiteBlack"] .hero-logo{
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.18));
+}
+html[data-floqr-chrome="whiteBlack"] .primary,
+html[data-floqr-chrome="whiteBlack"] .category-card.hot,
+html[data-floqr-chrome="whiteBlack"] .linklike.hot{
+  background:linear-gradient(90deg,#2a2a2a,#1a1a1a);
+  color:#fff;
+}
+html[data-floqr-chrome="whiteBlack"] button,
+html[data-floqr-chrome="whiteBlack"] .buttonlike,
+html[data-floqr-chrome="whiteBlack"] .signin,
+html[data-floqr-chrome="whiteBlack"] .full{
+  background:#fff;
+  color:#2a2a2a;
+  border:1px solid rgba(40,40,40,.55);
+  box-shadow:none;
+  text-shadow:none;
+}
+html[data-floqr-chrome="whiteBlack"] #loginActions .signin,
+html[data-floqr-chrome="whiteBlack"] #loginActions .signin.email.email-selected,
+html[data-floqr-chrome="whiteBlack"] #loginActions > .signin,
+html[data-floqr-chrome="whiteBlack"] #loginActions > .signin.email.email-selected{
+  background:#fff;
+  border:1px solid rgba(40,40,40,.55);
+  color:#2a2a2a;
+  box-shadow:none;
+  text-shadow:none;
+}
+html[data-floqr-chrome="whiteBlack"] button:hover,
+html[data-floqr-chrome="whiteBlack"] .signin:hover{
+  border-color:#111;
+  background:#f7f7f7;
+}
+html[data-floqr-chrome="whiteBlack"] input,
+html[data-floqr-chrome="whiteBlack"] select,
+html[data-floqr-chrome="whiteBlack"] textarea,
+html[data-floqr-chrome="whiteBlack"] .search{
+  border:1px solid rgba(40,40,40,.5);
+  background:#fff;
+  color:#2a2a2a;
+  box-shadow:none;
+}
+html[data-floqr-chrome="whiteBlack"] input:focus,
+html[data-floqr-chrome="whiteBlack"] select:focus,
+html[data-floqr-chrome="whiteBlack"] textarea:focus{
+  outline:2px solid #2a2a2a;
+  outline-offset:1px;
+  border-color:#111;
+}
+html[data-floqr-chrome="whiteBlack"] .search-chrome-toolbar{
+  border:1px solid rgba(40,40,40,.4);
+  background:rgba(0,0,0,.04);
+}
+html[data-floqr-chrome="whiteBlack"] .search-chrome-btn[aria-pressed="true"]{
+  border-color:#111;
+  box-shadow:0 0 0 1px rgba(0,0,0,.25);
+  background:rgba(0,0,0,.06);
+  color:#111;
+}
+html[data-floqr-chrome="whiteBlack"] .user-menu-btn{
+  background:linear-gradient(145deg,#3a3a3a,#1a1a1a)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.2)!important;
+  border:1px solid rgba(0,0,0,.45)!important;
+}
+html[data-floqr-chrome="whiteBlack"] .user-initials{
+  background:linear-gradient(90deg,#2a2a2a,#1a1a1a)!important;
+  color:#fff!important;
+}
+html[data-floqr-chrome="whiteBlack"] .user-dropdown{
+  background:rgba(255,255,255,.98)!important;
+  border:1px solid rgba(40,40,40,.4)!important;
+  color:#2a2a2a!important;
+}
+html[data-floqr-chrome="whiteBlack"] .user-menu a,
+html[data-floqr-chrome="whiteBlack"] .user-dropdown a{color:#2a2a2a!important}
+html[data-floqr-chrome="whiteBlack"] .global-back-btn{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(40,40,40,.5);
+  color:#2a2a2a;
+}
+html[data-floqr-chrome="whiteBlack"] .floqr-assistant-toggle{
+  background:linear-gradient(90deg,#2a2a2a,#1a1a1a);
+  color:#fff;
+}
+html[data-floqr-chrome="whiteBlack"] .floqr-assistant-panel{
+  background:rgba(255,255,255,.98);
+  border:1px solid rgba(40,40,40,.4);
+  color:#2a2a2a;
+}
+html[data-floqr-chrome="whiteBlack"] a,
+html[data-floqr-chrome="whiteBlack"] .linklike{color:#1a1a1a}
+html[data-floqr-chrome="whiteBlack"] .status,
+html[data-floqr-chrome="whiteBlack"] .category-or,
+html[data-floqr-chrome="whiteBlack"] .sub{color:rgba(42,42,42,.78)}
+html[data-floqr-chrome="whiteBlack"] .help-popout[open] summary{
+  background:linear-gradient(90deg,#2a2a2a,#1a1a1a);
+  color:#fff;
+}
+html[data-floqr-chrome="whiteBlack"] .message-envelope.unread,
+html[data-floqr-chrome="whiteBlack"] .highlight-item{
+  border-color:#2a2a2a!important;
+  box-shadow:0 0 0 2px rgba(0,0,0,.15);
+}
+html[data-floqr-chrome="whiteBlack"] .tag-row span,
+html[data-floqr-chrome="whiteBlack"] .status-pill{
+  border:1px solid rgba(40,40,40,.4);
+  background:rgba(0,0,0,.04);
+  color:#2a2a2a;
+}

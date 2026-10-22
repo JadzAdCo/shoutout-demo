@@ -292,9 +292,9 @@
       checks: [
         {label:"siteChrome catalog key", file:"floqr-feature-services.js", includes:["siteChrome", "Site chrome", "buttonIds: []"]},
         {label:"Server catalog siteChrome + alias", file:"functions/feature-services-core.js", includes:["siteChrome", "traditionalTheme: \"siteChrome\""]},
-        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "BLACK_TIFFANY", "BLACK_DARK_GREEN"]},
+        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "BLACK_TIFFANY", "WHITE_BLACK", "BLACK_DARK_GREEN"]},
         {label:"Release Control title white + help", file:"master-admin.html", includes:["features-release-title", "help-feature-promote-live", ">Release Control</h2>"], notIncludes:[">Features Mgmt</h2>"]},
-        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome", "blackTiffany", "blackDarkGreen"]},
+        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome", "blackTiffany", "whiteBlack", "blackDarkGreen"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.105\""]}
       ]
     },
@@ -1966,6 +1966,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-06-white-black-chrome",
+      area:"Site chrome + icons",
+      feature:"White/Black theme + themed VIP icon packs",
+      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/FloqAi/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.06.",
+      howToTest:"1) Hard-refresh Language Settings (s3.2.06) with Site chrome beta. 2) Switch White/Black — page is white with charcoal text and slim dark borders; Search tiles show whiteblack icons. 3) Black Tiffany / Black Dark Green swap VIP tile art. 4) Traditional / Nightlife still work.",
+      expected:"Five themes selectable; White/Black is light; icons match theme.",
+      troubleshoot:"No White/Black button → hard refresh patron-portal + floqr-i18n s3.2.06. Icons stuck dark → confirm ICON_PACK whiteBlack paths 200."
+    },
     {
       id:"s3-2-03-black-tiffany-dark-green-lyft-type",
       area:"Site chrome + typography",

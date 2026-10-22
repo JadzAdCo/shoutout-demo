@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.2.03"/>
+<link rel="stylesheet" href="./styles.css?v=s3.2.06"/>
   <link rel="stylesheet" href="./admin.css?v=s3.2.00"/>
 </head>
 <body>
@@ -583,13 +583,14 @@
             <h3 data-i18n="chrome.pageTitle"
                 data-floqr-help-id="help-chrome-scheme"
                 data-floqr-help-title="Site chrome"
-                data-floqr-help-body="Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta), Traditional (charcoal / white), Black Tiffany (true black + Tiffany blue), and Black Dark Green (true black + forest green). Colors, cards, and chrome update together. Stored as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Available when FLOQR enables Site chrome and invites or assigns you."
-                data-floqr-help-search="site chrome|site theme|traditional theme|nightlife theme|black tiffany|black dark green|forest green|isSiteChrome|beta theme">Site chrome</h3>
-            <p class="sub small" data-i18n="chrome.hint">Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, and Black Dark Green.</p>
+                data-floqr-help-body="Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black (white background + charcoal text/borders), and Black Dark Green. Colors, cards, icons, and chrome update together. Stored as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Black Dark Green). Available when FLOQR enables Site chrome and invites or assigns you."
+                data-floqr-help-search="site chrome|site theme|traditional theme|nightlife theme|black tiffany|black dark green|white black|forest green|isSiteChrome|beta theme">Site chrome</h3>
+            <p class="sub small" data-i18n="chrome.hint">Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black, and Black Dark Green.</p>
             <div class="search-chrome-toolbar" role="group" aria-label="Site chrome" style="justify-content:flex-start">
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="nightlife" data-i18n="chrome.nightlife" aria-pressed="true">Nightlife</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="traditional" data-i18n="chrome.traditional" aria-pressed="false">Traditional</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="blackTiffany" data-i18n="chrome.blackTiffany" aria-pressed="false">Black Tiffany</button>
+              <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="whiteBlack" data-i18n="chrome.whiteBlack" aria-pressed="false">White / Black</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="blackDarkGreen" data-i18n="chrome.blackDarkGreen" aria-pressed="false">Black Dark Green</button>
               <span class="search-chrome-active sub small"><span data-i18n="chrome.active">Active:</span> <strong data-floqr-chrome-label>Nightlife theme</strong></span>
             </div>
@@ -828,7 +829,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.2.00"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.05"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.06"></script>
 <script src="./floqr-people-directory.js?v=s3.2.00"></script>
 <script src="./floqr-app-check.js?v=s3.2.00"></script>
 <script src="./floqr-nav.js?v=s3.2.00"></script>
@@ -845,9 +846,9 @@
   <script src="./floqr-action-feedback.js?v=s3.2.00"></script>
 <script src="./floqr-tab-gates.js?v=s3.2.00"></script>
 <script src="./floqr-feature-services.js?v=s3.2.00"></script>
-<script src="./floqr-i18n.js?v=s3.2.03"></script>
-<script src="./floqai-help-repository.js?v=s3.2.03"></script>
-<script src="./floqr-i18n-help.js?v=s3.2.03"></script>
+<script src="./floqr-i18n.js?v=s3.2.06"></script>
+<script src="./floqai-help-repository.js?v=s3.2.06"></script>
+<script src="./floqr-i18n-help.js?v=s3.2.06"></script>
 <script src="./help-attach.js?v=s3.2.00"></script>
 <script src="./helper-popouts.js?v=s3.2.00"></script>
 <script src="./floqr-identity.js?v=s3.2.00"></script>

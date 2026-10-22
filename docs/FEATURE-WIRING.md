@@ -14,18 +14,19 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, and **Black Dark Green**. Not on public Search.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Black Dark Green**. Not on public Search.
 
 | Layer | Wiring |
 |---|---|
 | Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
 | Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
-| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `4` Black Dark Green (+ legacy `uiChrome` string) |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Black Dark Green (+ legacy `uiChrome` string) |
 | Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
-| CSS | `styles.css` — Lyft-style white titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|blackDarkGreen"]` |
+| Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
+| CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]` |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
-| i18n / help | `chrome.*` (+ `blackTiffany` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |
+| i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |
 
 ---
 
