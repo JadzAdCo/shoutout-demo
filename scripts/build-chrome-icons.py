@@ -689,13 +689,16 @@ def traditional_from_nightlife(
     type_ink = (under_full[:, :, 3] > 20) | (over_full[:, :, 3] > 20)
     # Kill any leftover ring bloom from the graphic extract in the annulus
     crumb = (
-        (dist > 468)
-        & (dist < 505)
-        & sat
+        (dist > 460)
+        & (dist < 512)
         & ~type_ink
         & ~((r > 200) & (gch > 200) & (bch > 200))
-        & ~((r < 100) & (gch > 150) & (bch > 180))
-        & ~((r > 140) & (bch > 140) & (r > gch + 20))  # keep pink LED crumbs if any
+        & ~((r < 100) & (gch > 150) & (bch > 180) & (r + gch + bch > 400))  # keep solid tiffany T
+        & ~((r > 140) & (bch > 140) & (r > gch + 20))  # keep pink LED
+        & (
+            sat
+            | ((bch > 35) & (gch > 25) & (r < 90) & (bch > r + 15))  # faint cyan bloom
+        )
     )
     ta[crumb, :3] = 0
     ta[:, :, 3] = 255
