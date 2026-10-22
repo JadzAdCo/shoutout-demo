@@ -421,10 +421,9 @@
   max-width:720px;
   margin:0 0 18px;
 }
-.category-floqai-intro{
-  display:flex;
-  align-items:flex-end;
-  gap:10px;
+.category-floqai-intro,
+.category-floqai-speech{
+  display:none!important;
 }
 .category-floqai-mark{
   position:relative;

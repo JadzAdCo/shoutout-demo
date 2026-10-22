@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.15";
+  const VERSION = "s3.2.17";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -23,7 +23,7 @@
   const STRINGS = {
     en: {
       "nav.backShort": "< Back",
-      "cat.floqaiPlaceholder": "Search for clubs, lounges, events, etc.",
+      "cat.floqaiPlaceholder": "Search for Clubs, Lounge, Events, etc.",
       "app.whatsappOtpRegion": "(Worldwide)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(US & Canada)",
@@ -60,7 +60,7 @@
     },
     de: {
       "nav.backShort": "< Zurück",
-      "cat.floqaiPlaceholder": "Suche nach Clubs, Lounges, Events usw.",
+      "cat.floqaiPlaceholder": "Suche nach Clubs, Lounge, Events usw.",
       "app.whatsappOtpRegion": "(Weltweit)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(USA & Kanada)",
@@ -97,7 +97,7 @@
     },
     fr: {
       "nav.backShort": "< Retour",
-      "cat.floqaiPlaceholder": "Recherchez clubs, lounges, événements, etc.",
+      "cat.floqaiPlaceholder": "Recherchez Clubs, Lounge, Événements, etc.",
       "app.whatsappOtpRegion": "(Monde entier)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(É.-U. et Canada)",
@@ -134,7 +134,7 @@
     },
     es: {
       "nav.backShort": "< Atrás",
-      "cat.floqaiPlaceholder": "Busca clubs, lounges, eventos, etc.",
+      "cat.floqaiPlaceholder": "Busca Clubs, Lounge, Eventos, etc.",
       "app.whatsappOtpRegion": "(Mundial)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(EE. UU. y Canadá)",
@@ -171,7 +171,7 @@
     },
     it: {
       "nav.backShort": "< Indietro",
-      "cat.floqaiPlaceholder": "Cerca club, lounge, eventi, ecc.",
+      "cat.floqaiPlaceholder": "Cerca Club, Lounge, Eventi, ecc.",
       "app.whatsappOtpRegion": "(Mondiale)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(USA e Canada)",
@@ -208,7 +208,7 @@
     },
     pt: {
       "nav.backShort": "< Voltar",
-      "cat.floqaiPlaceholder": "Pesquise clubs, lounges, eventos, etc.",
+      "cat.floqaiPlaceholder": "Pesquise Clubs, Lounge, Eventos, etc.",
       "app.whatsappOtpRegion": "(Mundial)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(EUA e Canadá)",
@@ -245,7 +245,7 @@
     },
     ru: {
       "nav.backShort": "< Назад",
-      "cat.floqaiPlaceholder": "Ищите клубы, лаунжи, события и т. д.",
+      "cat.floqaiPlaceholder": "Ищите Clubs, Lounge, события и т. д.",
       "app.whatsappOtpRegion": "(Весь мир)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(США и Канада)",
@@ -282,7 +282,7 @@
     },
     el: {
       "nav.backShort": "< Πίσω",
-      "cat.floqaiPlaceholder": "Αναζητήστε clubs, lounges, εκδηλώσεις κ.λπ.",
+      "cat.floqaiPlaceholder": "Αναζητήστε Clubs, Lounge, εκδηλώσεις κ.λπ.",
       "app.whatsappOtpRegion": "(Παγκοσμίως)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(ΗΠΑ και Καναδάς)",
@@ -319,7 +319,7 @@
     },
     pl: {
       "nav.backShort": "< Wstecz",
-      "cat.floqaiPlaceholder": "Szukaj klubów, lounge, wydarzeń itd.",
+      "cat.floqaiPlaceholder": "Szukaj Clubs, Lounge, wydarzeń itd.",
       "app.whatsappOtpRegion": "(Na świecie)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(USA i Kanada)",
@@ -356,7 +356,7 @@
     },
     nl: {
       "nav.backShort": "< Terug",
-      "cat.floqaiPlaceholder": "Zoek naar clubs, lounges, events, enz.",
+      "cat.floqaiPlaceholder": "Zoek naar Clubs, Lounge, Events, enz.",
       "app.whatsappOtpRegion": "(Wereldwijd)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(VS & Canada)",
@@ -393,7 +393,7 @@
     },
     ar: {
       "nav.backShort": "< رجوع",
-      "cat.floqaiPlaceholder": "ابحث عن النوادي والصالات والفعاليات وغيرها.",
+      "cat.floqaiPlaceholder": "ابحث عن Clubs وLounge والفعاليات وغيرها.",
       "app.whatsappOtpRegion": "(عالميًا)",
       "app.whatsappOtp": "WhatsApp OTP",
       "app.smsOtpRegion": "(الولايات المتحدة وكندا)",
@@ -753,7 +753,7 @@
       "otp.enterCode": "Enter the 6-digit code.",
       "otp.verifying": "Verifying code…",
       "otp.verified": "Verified. You are signed in.",
-      "cat.floqaiPlaceholder": "Search for clubs, lounges, events, etc.",
+      "cat.floqaiPlaceholder": "Search for Clubs, Lounge, Events, etc.",
       "cat.floqaiSearching": "Searching {type}",
       "cat.floqaiWelcome": "Welcome, type below to search for Events",
       "editor.createMessage": "Create your message",
@@ -1961,7 +1961,7 @@
       "otp.enterCode": "Saisissez le code à 6 chiffres.",
       "otp.verifying": "Vérification du code…",
       "otp.verified": "Vérifié. Vous êtes connecté.",
-      "cat.floqaiPlaceholder": "Recherchez clubs, lounges, événements, etc.",
+      "cat.floqaiPlaceholder": "Recherchez Clubs, Lounge, Événements, etc.",
       "cat.floqaiSearching": "Recherche : {type}",
       "cat.floqaiWelcome": "Bienvenue, tapez ci-dessous pour rechercher des Événements",
       "editor.createMessage": "Créez votre message",
@@ -3169,7 +3169,7 @@
       "otp.enterCode": "Gib den 6-stelligen Code ein.",
       "otp.verifying": "Code wird geprüft…",
       "otp.verified": "Bestätigt. Du bist angemeldet.",
-      "cat.floqaiPlaceholder": "Suche nach Clubs, Lounges, Events usw.",
+      "cat.floqaiPlaceholder": "Suche nach Clubs, Lounge, Events usw.",
       "cat.floqaiSearching": "Suche: {type}",
       "cat.floqaiWelcome": "Willkommen, tippe unten, um nach Events zu suchen",
       "editor.createMessage": "Nachricht erstellen",
@@ -4377,7 +4377,7 @@
       "otp.enterCode": "Introduce el código de 6 dígitos.",
       "otp.verifying": "Verificando código…",
       "otp.verified": "Verificado. Has iniciado sesión.",
-      "cat.floqaiPlaceholder": "Busca clubs, lounges, eventos, etc.",
+      "cat.floqaiPlaceholder": "Busca Clubs, Lounge, Eventos, etc.",
       "cat.floqaiSearching": "Buscando {type}",
       "cat.floqaiWelcome": "Bienvenido, escribe abajo para buscar Eventos",
       "editor.createMessage": "Crea tu mensaje",
@@ -5585,7 +5585,7 @@
       "otp.enterCode": "Vul de 6-cijferige code in.",
       "otp.verifying": "Code wordt gecontroleerd…",
       "otp.verified": "Geverifieerd. Je bent ingelogd.",
-      "cat.floqaiPlaceholder": "Zoek naar clubs, lounges, events, enz.",
+      "cat.floqaiPlaceholder": "Zoek naar Clubs, Lounge, Events, enz.",
       "cat.floqaiSearching": "Zoeken: {type}",
       "cat.floqaiWelcome": "Welkom, typ hieronder om naar Evenementen te zoeken",
       "editor.createMessage": "Maak je bericht",
@@ -6793,7 +6793,7 @@
       "otp.enterCode": "Введите 6-значный код.",
       "otp.verifying": "Проверяем код…",
       "otp.verified": "Подтверждено. Вы вошли в систему.",
-      "cat.floqaiPlaceholder": "Ищите клубы, лаунжи, события и т. д.",
+      "cat.floqaiPlaceholder": "Ищите Clubs, Lounge, события и т. д.",
       "cat.floqaiSearching": "Ищем: {type}",
       "cat.floqaiWelcome": "Добро пожаловать, введите ниже, чтобы искать События",
       "editor.createMessage": "Создайте сообщение",
@@ -8001,7 +8001,7 @@
       "otp.enterCode": "Inserisci il codice a 6 cifre.",
       "otp.verifying": "Verifica del codice…",
       "otp.verified": "Verificato. Hai effettuato l’accesso.",
-      "cat.floqaiPlaceholder": "Cerca club, lounge, eventi, ecc.",
+      "cat.floqaiPlaceholder": "Cerca Club, Lounge, Eventi, ecc.",
       "cat.floqaiSearching": "Cerco {type}",
       "cat.floqaiWelcome": "Benvenuto, scrivi qui sotto per cercare Eventi",
       "editor.createMessage": "Crea il tuo messaggio",
@@ -9209,7 +9209,7 @@
       "otp.enterCode": "Introduza o código de 6 dígitos.",
       "otp.verifying": "A verificar o código…",
       "otp.verified": "Verificado. Sessão iniciada.",
-      "cat.floqaiPlaceholder": "Pesquise clubs, lounges, eventos, etc.",
+      "cat.floqaiPlaceholder": "Pesquise Clubs, Lounge, Eventos, etc.",
       "cat.floqaiSearching": "Pesquisando {type}",
       "cat.floqaiWelcome": "Bem-vindo, digite abaixo para pesquisar Eventos",
       "editor.createMessage": "Crie a sua mensagem",
@@ -10417,7 +10417,7 @@
       "otp.enterCode": "Εισαγάγετε τον 6ψήφιο κωδικό.",
       "otp.verifying": "Επαλήθευση κωδικού…",
       "otp.verified": "Επαληθεύτηκε. Έχετε συνδεθεί.",
-      "cat.floqaiPlaceholder": "Αναζητήστε clubs, lounges, εκδηλώσεις κ.λπ.",
+      "cat.floqaiPlaceholder": "Αναζητήστε Clubs, Lounge, εκδηλώσεις κ.λπ.",
       "cat.floqaiSearching": "Αναζήτηση: {type}",
       "cat.floqaiWelcome": "Καλώς ήρθατε, πληκτρολογήστε παρακάτω για αναζήτηση Εκδηλώσεων",
       "editor.createMessage": "Δημιουργήστε το μήνυμά σας",
@@ -11625,7 +11625,7 @@
       "otp.enterCode": "Wpisz 6-cyfrowy kod.",
       "otp.verifying": "Sprawdzanie kodu…",
       "otp.verified": "Zweryfikowano. Zalogowano.",
-      "cat.floqaiPlaceholder": "Szukaj klubów, lounge, wydarzeń itd.",
+      "cat.floqaiPlaceholder": "Szukaj Clubs, Lounge, wydarzeń itd.",
       "cat.floqaiSearching": "Szukam: {type}",
       "cat.floqaiWelcome": "Witamy, wpisz poniżej, aby wyszukać Wydarzenia",
       "editor.createMessage": "Utwórz wiadomość",
@@ -12833,7 +12833,7 @@
       "otp.enterCode": "أدخل الرمز المكوّن من 6 أرقام.",
       "otp.verifying": "جارٍ التحقق من الرمز…",
       "otp.verified": "تم التحقق. لقد سجّلت الدخول.",
-      "cat.floqaiPlaceholder": "ابحث عن النوادي والصالات والفعاليات وغيرها.",
+      "cat.floqaiPlaceholder": "ابحث عن Clubs وLounge والفعاليات وغيرها.",
       "cat.floqaiSearching": "جارٍ البحث: {type}",
       "cat.floqaiWelcome": "مرحباً، اكتب أدناه للبحث عن الفعاليات",
       "editor.createMessage": "أنشئ رسالتك",
