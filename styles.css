@@ -97,10 +97,25 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .user-dropdown [data-patron-menu],
 .user-dropdown .profile-menu-link,
 .user-dropdown .profile-menu-line{display:block!important}
-.user-menu-btn{width:58px!important;min-width:58px!important;height:60px!important;min-height:60px!important;padding:4px 7px!important;border-radius:20px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;background:var(--floqr-profile-card-bg)!important;border:1px solid var(--floqr-profile-card-border)!important;box-shadow:var(--floqr-profile-card-shadow)!important;backdrop-filter:blur(14px)!important}
+/* Profile chip = Traditional charcoal on every Site chrome (including Nightlife). Hardcoded so theme vars cannot recolor it pink/cyan. */
+.user-menu-btn,
+html[data-floqr-chrome="nightlife"] .user-menu-btn,
+html[data-floqr-chrome="traditional"] .user-menu-btn,
+html[data-floqr-chrome="blackTiffany"] .user-menu-btn,
+html[data-floqr-chrome="blackDarkGreen"] .user-menu-btn,
+html[data-floqr-chrome="whiteBlack"] .user-menu-btn,
+html:not([data-floqr-chrome]) .user-menu-btn{
+  width:58px!important;min-width:58px!important;height:60px!important;min-height:60px!important;padding:4px 7px!important;border-radius:20px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;
+  background:linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(14px)!important
+}
 /* Retired Search speech bubble + green OR — hide even if stale HTML is cached */
 .category-floqai-intro,
 .category-floqai-speech,
+.category-floqai-mark,
+.category-floqai-mark-halo,
 .category-or{display:none!important}
 .user-photo,.dropdown-user-photo{width:30px!important;height:30px!important;border-radius:999px!important;object-fit:cover!important}
 .user-initials{width:30px!important;height:30px!important;border-radius:999px!important;display:grid!important;place-items:center!important;background:linear-gradient(135deg,#f2f2f2,#9a9a9a)!important;color:#141414!important;font-size:13px!important;font-weight:1000!important}

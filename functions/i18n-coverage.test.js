@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 1194); // + floqcast goLive CTA keys (s3.1.108)
+  assert.equal(chrome.enKeys, 1204); // + login/Search chrome keys (s3.2.18)
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);
@@ -38,11 +38,11 @@ test("help packs cover the canonical help ids for every localized language", () 
   assert.equal(help.gaps.length, 0, JSON.stringify(help.gaps));
 });
 
-test("floqr-i18n and help VERSION are s3.2.00", () => {
+test("floqr-i18n and help VERSION are s3.2.18", () => {
   const fs = require("fs");
   const root = path.join(__dirname, "..");
   const i18n = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   const help = fs.readFileSync(path.join(root, "floqr-i18n-help.js"), "utf8");
-  assert.match(i18n, /const VERSION\s*=\s*"s3.2.00"/);
-  assert.match(help, /const VERSION\s*=\s*"s3.2.00"/);
+  assert.match(i18n, /const VERSION\s*=\s*"s3.2.18"/);
+  assert.match(help, /const VERSION\s*=\s*"s3.2.18"/);
 });

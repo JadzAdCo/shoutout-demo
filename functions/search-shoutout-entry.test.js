@@ -15,7 +15,7 @@ function section(html, id) {
 
 test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VIP / FloqAi icon tiles", () => {
   const page = section(read("index.html"), "categoryPage");
-  assert.match(page, /class="category-brand-stack">\s*<img src="\.\/images\/floqr-color\.png" alt="FLOQR" class="product-parent-logo"/);
+  assert.match(page, /class="category-brand-stack">\s*<a href="\.\/\?start=search" class="floqr-home-link"[\s\S]*?<img src="\.\/images\/floqr-color\.png\?v=s3\.\d+\.\d+" alt="FloqR" class="product-parent-logo"/);
   assert.ok(page.indexOf("category-brand-stack") < page.indexOf('id="categoryFloqAiSearch"'), "logo sits above FloqAi");
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
@@ -28,8 +28,10 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*floqcast-nightlife\.jpg/);
   assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
-  assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*floqr-tiles-transparent\.png/);
-  assert.match(page, /data-i18n="cat.floqai">dj BOT</);
+  assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*botdee-nightlife\.jpg/);
+  assert.match(page, /data-i18n-aria="cat.floqai"[^>]*aria-label="BOT DEE"/);
+  assert.doesNotMatch(page, /Welcome, type below to search for Events/);
+  assert.match(page, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   const css = read("styles.css");
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
   assert.match(css, /\.search-icon-row\{/);

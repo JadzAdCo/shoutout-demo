@@ -149,11 +149,13 @@ test("word list covers every Search-for category", () => {
 test("index.html wires the stationary FloqAi category search", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   assert.match(html, /id="categoryFloqAiSearch"/);
-  assert.match(html, /id="categoryFloqAiSpeech"/);
   assert.match(html, /id="categoryFloqAiInput"/);
-  assert.match(html, /data-i18n="cat\.floqaiWelcome"/);
+  assert.match(html, /data-i18n-placeholder="cat\.floqaiPlaceholder"/);
+  assert.match(html, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(html, /floqr-venue-query\.js\?v=s3\.\d+\.\d+/);
-  assert.ok(html.indexOf("categoryFloqAiSpeech") < html.indexOf("categoryFloqAiInput"), "FloqAi sits above the input");
+  assert.doesNotMatch(html, /id="categoryFloqAiSpeech"/);
+  assert.doesNotMatch(html, /data-i18n="cat\.floqaiWelcome"/);
+  assert.doesNotMatch(html, /class="category-or"/);
   assert.doesNotMatch(html, /id="continueBtn"/);
   assert.doesNotMatch(html, /class="login-copy"/);
   assert.match(html, /data-floqr-help-id="help-welcome"/);
@@ -166,7 +168,8 @@ test("category page has no Search for heading and no venue-type tiles", () => {
   ["eventsBtnCard", "clubsBtnCard", "beachClubsBtnCard", "loungesBtnCard", "loungeClubBtnCard"].forEach(id =>
     assert.doesNotMatch(page, new RegExp(`id="${id}"`), id));
   assert.match(page, /id="shoutoutBtnCard"/);
-  assert.match(page, /class="category-floqai-mark-halo"/);
+  assert.doesNotMatch(page, /class="category-floqai-mark-halo"/);
+  assert.doesNotMatch(page, /Welcome, type below to search for Events/);
 });
 
 test("near me in every language means the user's location, not a place", () => {
@@ -194,7 +197,6 @@ test("an explicit place wins over near me; Monaco is a known place", () => {
 
 test("chrome pack carries the FloqAi category dialog copy", () => {
   const src = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
-  assert.match(src, /"cat\.floqaiWelcome": "Welcome, type below to search for Events"/);
-  assert.match(src, /"cat\.floqaiAlso": "You may also search for: Clubs or Lounges"/);
-  assert.match(src, /"cat\.floqaiPlaceholder": "You may also search for: Clubs or Lounges"/);
+  assert.match(src, /"cat\.floqaiPlaceholder": "Search for Clubs, Lounge, Events, etc\."/);
+  assert.doesNotMatch(src, /"cat\.floqaiPlaceholder": "You may also search for: Clubs or Lounges"/);
 });

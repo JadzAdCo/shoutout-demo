@@ -117,6 +117,7 @@
     ["notifications", "ownMaster", 0, "Patron notifications"],
     ["patronRanks", "public", 0, "Patron leaderboard"],
     ["patronShoutoutArchives", "ownMaster", 0, "A patron's ShoutOut history"],
+    ["passes", "ownMaster", 1, "Digital pass / QR tokens (VIP and event check-in)"],
     ["patronTemplateVariants", "ownMaster", 0, "A patron's saved templates"],
     ["paymentLedger", "clubAdmin", 1, "Payments and payouts"],
     ["pickupRequests", "ownMaster", 1, "RydR pickup requests"],

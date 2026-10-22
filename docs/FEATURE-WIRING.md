@@ -28,22 +28,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.15)
+## Login + Search chrome (s3.2.18)
 
-**Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional login/profile-card styling.
+**Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional charcoal profile chip on every Site chrome.
 
 | Layer | Wiring |
 |---|---|
 | Login copy | `index.html` `.login-welcome-line` → `app.welcomeSignIn` (white); provider buttons icon + short label (`app.google` etc., no “Continue with”) |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
-| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.15` |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.18` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
-| Search | `#categoryFloqAiInput` placeholder `cat.floqaiPlaceholder`; Welcome speech + green `cat.or` removed |
-| Traditional | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card`, `.user-menu-btn` / `.user-dropdown` |
-| Profile card chrome | Closed chip uses `--floqr-profile-card-*` vars. Search/Portal early `<script>` paints `data-floqr-chrome` from `localStorage` before CSS. `FLOQRChromeScheme` boot is optimistic on stored chrome; Nightlife demote only after `floqr:features-loaded` when `siteChrome` access is denied (`s3.2.16`) |
-| i18n | `floqr-i18n.js` s3.2.15 — all chrome langs for new keys |
-| Diagnostics | Manual test `s3-2-15-login-search-traditional` |
+| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.` (`cat.floqaiPlaceholder`); `#categoryFloqAiSpeech` + green `.category-or` removed (CSS also `display:none` as cache safety) |
+| Traditional login | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card` |
+| Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
+| i18n | `floqr-i18n.js` s3.2.18 — all chrome langs for placeholder + login keys |
+| Diagnostics | Manual test `s3-2-18-search-traditional-chip-placeholder` |
 
 ---
 
@@ -421,7 +421,7 @@ When adding a section, use this skeleton:
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
 | **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
 | **Search icon tiles** | `#categoryPage .search-icon-row` order: **floqCast → ShoutOut → VIP reserV → BOT DEE** (tile label; key `floqAi`). All four use chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK` (ShoutOut nightlife `shoutout-nightlife.png`, traditional `shoutout-traditional-green.png`; floqCast/VIP chrome JPGs; BOT DEE chrome photo). Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
-| **Search FloqAi box (s3.1.110)** | Speech (`#categoryFloqAiSpeech`) = Welcome only. Input placeholder (`cat.floqaiPlaceholder`) = “You may also search for: Clubs or Lounges” (localized; same copy as `cat.floqaiAlso`). |
+| **Search FloqAi box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |

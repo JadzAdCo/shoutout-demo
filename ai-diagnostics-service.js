@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.16";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.16";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.18";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.18";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,15 +223,27 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.18",
+      title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
+      checks: [
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.18\""]},
+        {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
+        {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
+        {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
+        {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
+      ]
+    },
+    {
       version: "s3.2.15-login-search-traditional",
       title: "Compact login + Search cleanup + traditional profile card",
       checks: [
         {label:"Login welcome + compact grid", file:"index.html", includes:["app.welcomeSignIn", "Welcome. Please Sign-in / Sign-up", "i18n-text\">Google", "loginActions"]},
         {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
         {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
-        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.15"]},
-        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for clubs, lounges, events, etc.", "categoryFloqAiForm"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.15\""]}
+        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.18"]},
+        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
       ]
     },
 
@@ -1980,6 +1992,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-18-search-traditional-chip-placeholder",
+      area:"Search + Site chrome",
+      feature:"Traditional charcoal profile chip + Clubs/Lounge/Events placeholder; Welcome speech gone",
+      changed:"Profile chip hardcoded Traditional charcoal on every Site chrome (including Nightlife). Welcome speech / green OR removed from Search. Placeholder = Search for Clubs, Lounge, Events, etc. Package s3.2.18.",
+      howToTest:"1) Hard-refresh live Search after Pages publish (styles.css + index.html + floqr-i18n.js ?v=s3.2.18). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife — even when Site chrome is Nightlife. 3) No Welcome, type below… line and no green OR between Search and tiles. 4) Empty search box placeholder reads Search for Clubs, Lounge, Events, etc.",
+      expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
+      troubleshoot:"Still pink chip or Welcome speech → Pages still on old main (confirm styles.css?v=s3.2.18). Cached HTML → hard refresh / clear site data for jadzadco.github.io."
+    },
+    {
       id:"s3-2-16-passes-qr",
       area:"VIP / Passes",
       feature:"Door Passes QR beta wired (passes + pass.html)",
@@ -1991,20 +2012,20 @@
     {
       id:"s3-2-16-profile-card-chrome",
       area:"Site chrome + Search",
-      feature:"Closed profile card follows Site chrome on Search (no Nightlife FOUC)",
-      changed:"Early localStorage paint of data-floqr-chrome on index/patron-portal. FLOQRChromeScheme boot restores stored theme immediately; syncAccessGate demotes to Nightlife only after features-loaded when siteChrome access is denied. Profile chip uses --floqr-profile-card-* CSS vars. Package s3.2.16.",
-      howToTest:"1) Set Site chrome Traditional in Language Settings. 2) Hard-refresh Search (styles + floqr-chrome-scheme ?v=s3.2.16). 3) Before opening the menu, confirm the top-right profile chip is charcoal/white gradient — not pink/cyan Nightlife. 4) Open menu — dropdown matches Traditional.",
-      expected:"Closed Search profile card matches active Site chrome on first paint.",
-      troubleshoot:"Still pink/cyan → confirm localStorage floqr.isSiteChrome=1 and html[data-floqr-chrome=traditional]; hard refresh styles.css s3.2.16. Reverts after load → siteChrome beta access denied (Features & Services)."
+      feature:"Closed profile card is Traditional charcoal (not Nightlife pink)",
+      changed:"Early localStorage paint of data-floqr-chrome on index/patron-portal. Profile chip CSS hardcodes charcoal on nightlife/traditional/tiffany/dark-green/white-black. Package s3.2.18.",
+      howToTest:"1) Hard-refresh Search (styles ?v=s3.2.18). 2) Before opening the menu, confirm the top-right profile chip is charcoal — not pink/cyan. 3) Switch Site chrome themes — chip stays charcoal.",
+      expected:"Closed Search profile chip stays Traditional charcoal regardless of Nightlife Site chrome.",
+      troubleshoot:"Still pink/cyan → Pages not on s3.2.18; hard refresh styles.css. Confirm rule html[data-floqr-chrome=nightlife] .user-menu-btn uses #4a4a4a charcoal gradient."
     },
     {
       id:"s3-2-15-login-search-traditional",
       area:"Login + Search + Site chrome",
       feature:"Compact login, FloqR logo, Search placeholder, history Back, traditional profile card",
-      changed:"Login welcome white copy + 2-col half-size provider buttons (no Continue with). FloqR logo tiles+wordmark without charcoal pill. Search placeholder clubs/lounges/events; Welcome speech + green OR removed. Global Back is < Back via history.back; FloqR mark → Search home. Traditional chrome charcoal/white gradients on login + profile card. Package s3.2.15.",
-      howToTest:"1) Hard-refresh Search (styles/i18n/nav/patron-app ?v=s3.2.15). 2) Signed-out login: white Welcome. Please Sign-in…; Google/Microsoft/Facebook/Email/SMS/WhatsApp in two columns, no Continue with. 3) Sign in → Search: placeholder Search for clubs, lounges, events, etc.; no Welcome speech or green OR. 4) Open My Profile from another page → Back is < Back and returns to previous page; FloqR logo returns to Search. 5) Site chrome Traditional: login + corner profile card charcoal/white gradient.",
-      expected:"Compact login; clean Search; Back≠home; logo→home; traditional profile card matches charcoal theme.",
-      troubleshoot:"Old Continue with → hard refresh index + floqr-i18n s3.2.15. Logo still has gray pill → confirm images/floqr-color.png?v=s3.2.15. Back still to Search → floqr-nav.js s3.2.15 applyGlobalBack history.back."
+      changed:"Login welcome white copy + 2-col half-size provider buttons (no Continue with). FloqR logo tiles+wordmark without charcoal pill. Search placeholder Clubs/Lounge/Events; Welcome speech + green OR removed. Global Back is < Back via history.back; FloqR mark → Search home. Profile chip charcoal on all Site chrome. Package s3.2.18.",
+      howToTest:"1) Hard-refresh Search (styles/i18n/nav ?v=s3.2.18). 2) Signed-out login: white Welcome. Please Sign-in…; Google/Microsoft/Facebook/Email/SMS/WhatsApp in two columns, no Continue with. 3) Sign in → Search: placeholder Search for Clubs, Lounge, Events, etc.; no Welcome speech or green OR. 4) Open My Profile from another page → Back is < Back and returns to previous page; FloqR logo returns to Search. 5) Corner profile card charcoal even on Nightlife Site chrome.",
+      expected:"Compact login; clean Search; Back≠home; logo→home; charcoal profile chip.",
+      troubleshoot:"Old Welcome speech / Clubs or Lounges placeholder → Pages still on old main; need merge + deploy s3.2.18. Back still to Search → floqr-nav.js applyGlobalBack history.back."
     },
     {
       id:"s3-2-06-white-black-chrome",
