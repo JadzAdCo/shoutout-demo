@@ -1,0 +1,133 @@
+---
+description: Nightlife/traditional chrome icon wordmarks — type, ring layers, sizes, rebuild prompt
+alwaysApply: true
+---
+
+# Chrome icon build (nightlife + traditional) — always
+
+Reusable recipe for **FloqCAST**, **djBOT**, **VIP reserVIP**, and peers (ShoutOut). Local review assets under `images/chrome/` and `images/review/actual-icons/`. Not Search production until explicitly published.
+
+## Canvas + ring
+
+| Constant | Value |
+|---|---|
+| Canvas | `S = 1024`, center `(CX,CY) = (512,512)` |
+| Ring radius | `R = 490`, stroke width ≈ 14 |
+| Outside | `dist > 498…502` → pure black |
+| Nightlife | Magenta→tiffany gradient ring (see `rebuild_ring()` pattern) |
+| Traditional | Same interior/wordmark; **no** nightlife ring (or borderless square pack) |
+
+Solid `#000` field inside the ring. **Ink-only wordmarks** — never an opaque plate/rect behind type.
+
+## Type system (all chrome wordmarks)
+
+| Piece | Spec |
+|---|---|
+| Font | `NotoSansDisplay-Bold.ttf` |
+| Shear | `SHEAR = 0.286` (italic lean) |
+| Stretch | After paint, height × **1.10**, then shear |
+| White | `(255,255,255)` |
+| Tiffany accent | `(0, 212, 254)` — final **T** (FloqCAST/djBOT/ShoutOut) or shared **V** (VIP) |
+
+Protected brands stay as spelled: **ShoutOut**, **FloqCAST**, **djBOT**, **reserVIP** (mark reads `reser` + big `V` + `IP`).
+
+## Ring intersection layers (critical)
+
+When type kisses the ring:
+
+```
+layer 0  background  (black + interior graphic)
+layer ½  under-ring fonts  (left tip / first letter(s) — ABOVE bg, BELOW ring)
+layer 1  ring
+layer 2  over-ring fonts   (right tip / accent T or IP — ABOVE ring)
+```
+
+Compose **only** as:
+
+1. `base.alpha_composite(under, (left, top))`
+2. `out = alpha_composite(out, ring)`
+3. `out.alpha_composite(over, (left, top))`
+
+**Never** flatten wordmark then draw ring on top of the whole string. **Never** leave old wordmark pixels in the base (they read as “stuck under the ring”). Hard-clear white/tiffany/green in the wordmark band + strip old ring before rebuild.
+
+### Per-mark under / over split
+
+| Mark | Under ring (left) | Over ring (right) | Accent |
+|---|---|---|---|
+| FloqCAST | **`F`** (full glyph, same-canvas shear mask) | `loqCAST` | Tiffany **T** |
+| djBOT | **`d`** tip | `jBOT` | Tiffany **T** |
+| VIP reserVIP | **`reser` + tiffany `V`** | **`IP`** | **V = 2 ×** reser/IP size |
+| ShoutOut | left tip / `Shout` as needed | rest | Tiffany **T** on **OUT** |
+
+Build under/over on a **shared upright canvas → one finish/shear**, then mask by letter (not a naive % width cut that clips a sheared **F**).
+
+## Target sizes (current review chrome)
+
+Baseline → apply user deltas with `round`; if ink width exceeds ring fit, **uniform-scale** the whole wordmark block to max width (keep proportions).
+
+| Mark | Point / ink target | Notes |
+|---|---|---|
+| FloqCAST | body font ≈ **175–190**, ink h ≈ **200** (`FC_H≈200`) | Fit width ≤ **~720** if tips won’t kiss |
+| djBOT | ink h ≈ **204** (= 170×1.20) | Set/robot up; wordmark under with gap, then kiss ring |
+| VIP reser/IP | **X = 194** (= 162×1.20; 162 was 135×1.20) | **V = 2X = 388**; then fit width ≤ **~720** if needed |
+| VIP furniture | Separate from type: scale lounge **×1.10**, nudge down; **do not** regenerate wordmark when only furniture moves |
+
+## Placement (“kiss the ring”)
+
+- Wordmark sits in the **lower** third; interior graphic in the **upper** ~60%.
+- Nudge `top` so left/right ink tips reach ≈ **`R − 10` … `R − 2`** (into the stroke).
+- Prefer a score minimize `|dL−(R−10)| + |dR−(R−10)|` with penalty if `d > R+4`.
+- Max practical wordmark width ≈ **720–740** so both tips can sit on the lower arc without `dist > 502` clipping.
+- Nightlife + traditional share the **same** wordmark pixels/placement; traditional omits the ring composite.
+
+## Asset paths
+
+| Mark | Nightlife | Traditional | Review / actual |
+|---|---|---|---|
+| FloqCAST | (v4 silhouette is source of truth for ring draft) | `images/chrome/floqcast-traditional-green.png` | `images/review/actual-icons/floqcast-v4-circle-silhouette.png` (+ `-preview`) |
+| djBOT | `images/chrome/floqbot-nightlife.png` + `-spin.gif` | `floqbot-traditional.png` / `-traditional-green.png` (+ spins) | `images/review/floqbot-nightlife-preview.jpg`, `floqbot-nightlife-spin-512.gif` |
+| VIP | `images/chrome/vip-nightlife.jpg` | `images/chrome/vip-traditional.jpg` | `images/review/actual-icons/vip-reserv-actual.png` |
+
+Cache-bust review HTML (`icon-review-*.html`) `?v=` when assets change. **Never** put `?v=` on Xibo `display.html?location=`.
+
+## GIF (djBOT spin)
+
+- Base still = new layout.
+- Restamp **platter motion only** from a clean historical GIF (`eb8693d` nightlife spin).
+- Map motion pixels onto the new turntable bbox; do **not** restamp the whole frame (avoids shearing the set / ghost **T**).
+- After compose, wipe stray tiffany pixels **outside** the wordmark band (ghost **T** mid-icon).
+
+## VIP furniture vs wordmark
+
+- Furniture extract: red booth/chairs + table dark/highlights from lounge source; **do not** wipe chair legs (`y` wipe must stay below ~700 if source has legs).
+- Furniture-only edits: extract/replace lounge; **copy existing wordmark ink layers unchanged**.
+- Wordmark-only edits: hard-clear type+ring band with `keep_red=True`; rebuild type; keep furniture pixels.
+
+## FIX PROMPT — rebuild nightlife + traditional chrome marks
+
+Copy/paste when icons need a full rebuild:
+
+```
+Rebuild FloqCAST, djBOT, VIP reserVIP chrome (nightlife + traditional) per
+.cursor/rules/icon-chrome-build.mdc:
+
+1) Hard-clear old wordmark + old ring from base (keep interior graphic / VIP red).
+2) Render type: NotoSansDisplay-Bold, shear 0.286, ×1.10 height, ink-only.
+3) Accent: tiffany T (FloqCAST/djBOT) or V=2X (VIP). Sizes: FloqCAST h≈200,
+   djBOT h≈204, VIP X=194 V=388; fit_width ≤720 if tips cannot kiss.
+4) Split under/over letters (F|d|reser+V under; T|IP over). Compose:
+   bg → under → ring → over. Traditional: same type, skip ring.
+5) Place wordmarks to kiss ring (tips ≈ R-10). djBOT: restamp platter-only GIF;
+   kill mid-icon stray T.
+6) Write chrome + review actuals; bump icon-review-*.html ?v=; QA strip of all three.
+```
+
+Resume tokens: `@iconchrome$` / `$iconchrome@`.
+
+## Do not
+
+- Revert unfinished icon WIP to “ship furniture only” without re-queuing the open wordmark tasks
+- Opaque plates / JPEG grey bands under type
+- `jerseyCssBack`-style mistakes: photo/graphic must not be covered by a type matte
+- Naive left-18%-width cuts that leave part of **F** over the ring
+- Putting ring on after a flattened full wordmark (inverts F/T layering)

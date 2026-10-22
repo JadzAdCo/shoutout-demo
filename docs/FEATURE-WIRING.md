@@ -452,3 +452,15 @@ When adding a section, use this skeleton:
 | **Nested** | Status (default), Guest List & reserV, My ShoutOuts (Saved/Pending/Completed/Archive/Templates), My FloqCasts, My Invoices |
 | **JS** | `patron-portal-app.js` `showFeatureOrdersPane`, `renderFeatureOrdersStatus`, deep links `tab=feature-orders\|shoutouts\|guest-list-reserv\|invoices` |
 | **i18n** | `nav.featureOrders`, `nav.guestListReserv`, `portal.fo.*`, `portal.savedShoutouts*` — all supported langs |
+
+## Chrome icon drafts (nightlife / traditional review)
+
+| Piece | Where |
+|---|---|
+| **Rule / recipe** | `.cursor/rules/icon-chrome-build.mdc` (always) — type, ring layers, sizes, FIX PROMPT |
+| **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
+| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` |
+| **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` |
+| **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
+| **Layers** | bg → under-ring letters → ring → over-ring letters (F/d/reser+V under; T/IP over) |
+| **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
