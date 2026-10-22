@@ -116,6 +116,10 @@ test("Firestore rules enforce the template roles", () => {
   assert.match(tagsBlock, /allow create: if validVenueTemplateTags\(tagId\)\s*&& canManageTemplates/);
   assert.match(tagsBlock, /canManageTemplates\(resource\.data\.clubLocationId\) && request\.resource\.data\.tags\.hasAll\(resource\.data\.tags\)/);
   assert.match(tagsBlock, /allow delete: if signedIn\(\) && canAdministerTemplates/);
+  assert.match(rules, /function templateOwnedByClub/);
+  assert.match(rules, /clubOwnedTemplateIds/);
+  assert.match(rules, /request\.resource\.data\.ownership == "club"/);
+  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: s3\.2\.28-club-owned-template-tags/);
   const rolesBlock = rules.slice(rules.indexOf("match /venueTemplateRoles/{roleId}"), rules.indexOf("match /venueTemplateTags/{tagId}"));
   assert.match(rolesBlock, /request\.resource\.data\.role in \["administrator", "manager"\]/);
   assert.match(rolesBlock, /isClubManager\(request\.resource\.data\.clubLocationId\)/);

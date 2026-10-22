@@ -1949,6 +1949,13 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
       if (Array.isArray(template.venueIds) && template.venueIds.length && !template.venueIds.includes(id)) return false;
       return window.FLOQRScreenDatapoints.templateFitsVenue(template, loc);
     });
+  // Data classification: which templates this Club Admin may tag (not shared FloqR catalog).
+  loc.clubOwnedTemplateIds = Array.from(new Set(
+    Object.values(window.SHOUTOUT_TEMPLATES || {})
+      .filter(template => Array.isArray(template.venueIds) && template.venueIds.map(String).includes(id))
+      .map(template => template.id)
+      .concat(Array.isArray(loc.clubOwnedTemplateIds) ? loc.clubOwnedTemplateIds : [])
+  ));
   loc.displayUrl = loc.displayUrl || `./display.html?location=${encodeURIComponent(id)}`;
   loc.secondaryDisplayUrl = loc.secondaryDisplayUrl || `./display2.html?location=${encodeURIComponent(id)}`;
   loc.patronTemplateBackgroundEditingEnabled = loc.patronTemplateBackgroundEditingEnabled !== false;

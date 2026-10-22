@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.1.39-board-render-fields
+// FLOQR FIRESTORE RULES VERSION: s3.2.28-club-owned-template-tags
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.39-board-render-fields
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.26-security-phase-1
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.24-rules-stage-2-3
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.21-data-classification
@@ -20,6 +21,9 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.2.28: venueTemplateTags create/update only for club-owned templates (clubLocations.clubOwnedTemplateIds
+//   or templates/{id}.venueIds). Shared FloqR catalog tags stay read-only for Club Admin. Delete still allowed
+//   for Template Administrators so stray shared overlays can be cleaned up.
 // - s3.1.26: every key guard uses diff().affectedKeys() (added/removed keys count); chat/Mingl membership + consent,
 //   userBlocks blocker-only, client "system" messages denied, aiIndex Master Admin writes, floqCast (suprstrSessions) answer write-once;
 //   Master Admin email list needs email_verified (masterAdmin claim unchanged); unowned typo address removed
@@ -786,15 +790,31 @@ service cloud.firestore {
  return canAdministerTemplates(clubId) || hasTemplateRole(clubId, ["manager"]);
  }
 
+ /** Club-owned / venue-scoped template — not a shared FloqR catalog row. */
+ function templateOwnedByClub(clubId, templateId) {
+ let clubPath = /databases/$(database)/documents/clubLocations/$(clubId);
+ let tplPath = /databases/$(database)/documents/templates/$(templateId);
+ return (exists(clubPath)
+ && get(clubPath).data.keys().hasAny(["clubOwnedTemplateIds"])
+ && get(clubPath).data.clubOwnedTemplateIds is list
+ && templateId in get(clubPath).data.clubOwnedTemplateIds)
+ || (exists(tplPath)
+ && get(tplPath).data.keys().hasAny(["venueIds"])
+ && get(tplPath).data.venueIds is list
+ && clubId in get(tplPath).data.venueIds);
+ }
+
  function validVenueTemplateTags(tagId) {
  return signedIn()
- && request.resource.data.keys().hasOnly(["clubLocationId", "templateId", "tags", "updatedByUid", "updatedByEmail", "updatedAt", "revision"])
+ && request.resource.data.keys().hasOnly(["clubLocationId", "templateId", "tags", "ownership", "updatedByUid", "updatedByEmail", "updatedAt", "revision"])
  && request.resource.data.clubLocationId is string
  && request.resource.data.templateId is string
  && tagId == request.resource.data.clubLocationId + "__" + request.resource.data.templateId
+ && request.resource.data.ownership == "club"
  && request.resource.data.tags is list
  && request.resource.data.tags.size() <= 30
- && request.resource.data.updatedByUid == request.auth.uid;
+ && request.resource.data.updatedByUid == request.auth.uid
+ && templateOwnedByClub(request.resource.data.clubLocationId, request.resource.data.templateId);
  }
 
  match /venueTemplateRoles/{roleId} {
@@ -824,6 +844,7 @@ service cloud.firestore {
  canAdministerTemplates(resource.data.clubLocationId)
  || (canManageTemplates(resource.data.clubLocationId) && request.resource.data.tags.hasAll(resource.data.tags))
  );
+ // Administrators may delete any venue tag doc (incl. stray shared overlays) for cleanup.
  allow delete: if signedIn() && canAdministerTemplates(resource.data.clubLocationId);
  }
 

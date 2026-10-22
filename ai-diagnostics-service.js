@@ -228,7 +228,8 @@
       checks: [
         {label:"Package version s3.2.28", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Labeled template copy UI", file:"patron-app.js", includes:["template.descriptionLabel", "template.tagLabel", "template-select-tags-line", "publicTagsForTemplate"]},
-        {label:"Club-owned tag replace helper", file:"floqr-template-tags.js", includes:["isClubOwnedTemplate", "publicTagsFor"]},
+        {label:"Club-owned tag replace helper", file:"floqr-template-tags.js", includes:["isClubOwnedTemplate", "publicTagsFor", "ownership: \"club\""]},
+        {label:"Rules club-owned template tags", file:"firestore.rules", includes:["templateOwnedByClub", "s3.2.28-club-owned-template-tags", "ownership == \"club\""]},
         {label:"Template copy CSS", file:"styles.css", includes:[".template-select-copy", ".template-select-tag-chips"]},
         {label:"Club Admin tag ownership copy", file:"admin.html", includes:["admin.templateCopyOwnership", "templateTags.openFromAdmin"]},
         {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Master Admin owns", "templateManageHowitWorks96"]},
@@ -2109,9 +2110,9 @@
       area:"ShoutOut / Templates",
       feature:"Labeled Description / How it works / Tag on template cards",
       changed:"Template cards show Description:, How it works:, and Tag: lines with individual tag chips. Club Admin edits venue tags (Template Mgmt → Manage template tags); Master Admin owns description + per-size howitWorks. Full catalog seeded with size-specific howitWorks. Package s3.2.28.",
-      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips. 3) Club Admin → Manage template tags — club-owned first and editable; Start from catalog tags then edit; patrons see Tag: replace. 4) Shared FloqR templates show read-only Tag chips (no add form). 5) Master Admin → edit Description + How it works per LED size.",
-      expected:"Three labeled lines; Club Admin edits Tag only on club-owned; shared FloqR read-only; Master owns description/howitWorks.",
-      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Can edit shared tags → must use isClubOwnedTemplate + sharedReadOnly. Club-owned still shows catalog after save → publicTagsFor replace path."
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips. 3) Club Admin → Manage template tags — club-owned first and editable; Start from catalog tags then edit; patrons see Tag: replace. 4) Shared FloqR templates show read-only Tag chips (no add form); direct Firestore write to a shared templateId must fail after rules deploy s3.2.28-club-owned-template-tags. 5) Master Admin → edit Description + How it works per LED size.",
+      expected:"Three labeled lines; Club Admin edits Tag only on club-owned; shared FloqR read-only at UI + rules; Master owns description/howitWorks.",
+      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Can edit shared tags → isClubOwnedTemplate + rules templateOwnedByClub. Club-owned save denied → sync clubOwnedTemplateIds on clubLocations or publish templates/{id}.venueIds; deploy firestore.rules s3.2.28."
     },
     {
       id:"s3-2-27-template-howitworks",

@@ -178,6 +178,25 @@
     }
     state.templates = TT.templatesForVenue(locationId, state.venue);
     state.tags = await TT.loadVenueTags(db, locationId);
+    // Keep Firestore clubOwnedTemplateIds in sync so rules deny Tag writes on shared FloqR templates.
+    if (state.role.canWrite) {
+      const ownedIds = state.templates
+        .filter(template => TT.isClubOwnedTemplate(template, locationId))
+        .map(template => template.id);
+      const live = Array.isArray(state.venue.clubOwnedTemplateIds) ? state.venue.clubOwnedTemplateIds.map(String) : [];
+      const same = ownedIds.length === live.length && ownedIds.every(id => live.includes(id));
+      if (ownedIds.length && !same) {
+        try {
+          await db.collection("clubLocations").doc(locationId).set({
+            clubOwnedTemplateIds: ownedIds,
+            clubOwnedTemplateIdsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, {merge: true});
+          state.venue.clubOwnedTemplateIds = ownedIds;
+        } catch (error) {
+          console.warn("clubOwnedTemplateIds sync skipped", error?.code || "", error?.message || error);
+        }
+      }
+    }
     byId("templateTagsRole").textContent = roleLabel(state.role);
     byId("templateTagsPanel").classList.remove("hidden");
     setStatus("");

@@ -120,6 +120,7 @@
     await ref.set({
       clubLocationId: locationId,
       templateId,
+      ownership: "club",
       tags: tags.map(normalizeTag).filter(Boolean).slice(0, MAX_TAGS),
       updatedByUid: user?.uid || "",
       updatedByEmail: String(user?.email || "").toLowerCase(),

@@ -57,7 +57,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Gallery | `patron-app.js` — `.template-select-copy` with `Description:` / `How it works:` / `Tag:` chips (`publicTagsForTemplate`) |
 | Club Admin | Template Mgmt → Manage template tags; club-owned only are editable (venue tags **replace** catalog tags); shared FloqR templates are **read-only** catalog tags |
 | Master Admin | Description + per-size howitWorks (`templateManageHowitWorks*`); catalog tags are built-in FLOQR tags |
-| i18n | `template.descriptionLabel` / `howItWorks` / `tagLabel` / `noTags`; `templateTags.venueEditable` / `clubOwned*` / `seedFromCatalog`; `admin.templateCopyOwnership` |
+| Data / security | `venueTemplateTags` docs require `ownership:"club"`; rules `templateOwnedByClub` via `clubLocations.clubOwnedTemplateIds` or `templates/{id}.venueIds`. Shared FloqR templates cannot be written. Classification: public read for patron cards; writes club-owned only (`data-classification-core.js`). Rules version `s3.2.28-club-owned-template-tags` (deploy Firestore rules). |
+| i18n | `template.descriptionLabel` / `howItWorks` / `tagLabel` / `noTags`; `templateTags.venueEditable` / `clubOwned*` / `sharedReadOnly` / `seedFromCatalog`; `admin.templateCopyOwnership` |
 | Diagnostics | Manual tests `s3-2-28-template-tag-labels`, `s3-2-27-template-howitworks` |
 
 ## Template howitWorks (s3.2.27)
