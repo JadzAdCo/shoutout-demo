@@ -227,7 +227,8 @@
       title: "s3.2.28 — Template Description / How it works / Tag labels",
       checks: [
         {label:"Package version s3.2.28", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
-        {label:"Labeled template copy UI", file:"patron-app.js", includes:["template.descriptionLabel", "template.tagLabel", "template-select-tags-line"]},
+        {label:"Labeled template copy UI", file:"patron-app.js", includes:["template.descriptionLabel", "template.tagLabel", "template-select-tags-line", "publicTagsForTemplate"]},
+        {label:"Club-owned tag replace helper", file:"floqr-template-tags.js", includes:["isClubOwnedTemplate", "publicTagsFor"]},
         {label:"Template copy CSS", file:"styles.css", includes:[".template-select-copy", ".template-select-tag-chips"]},
         {label:"Club Admin tag ownership copy", file:"admin.html", includes:["admin.templateCopyOwnership", "templateTags.openFromAdmin"]},
         {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Master Admin owns", "templateManageHowitWorks96"]},
