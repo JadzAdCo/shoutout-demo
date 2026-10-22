@@ -103,23 +103,35 @@ Cache-bust review HTML (`icon-review-*.html`) `?v=` when assets change. **Never*
 - Furniture-only edits: extract/replace lounge; **copy existing wordmark ink layers unchanged**.
 - Wordmark-only edits: hard-clear type+ring band with `keep_red=True`; rebuild type; keep furniture pixels.
 
+## Modular builder (preferred)
+
+```bash
+python3 scripts/build-chrome-icons.py           # full rebuild
+python3 scripts/build-chrome-icons.py --ring-only
+python3 scripts/build-chrome-icons.py --graphics-only
+```
+
+Pipeline (do **not** hard-clear graphics when moving type):
+
+1. **RING** → `images/chrome/layers/ring-nightlife.png` (once)
+2. **GRAPHIC** → `*-graphic.png` from a clean git source (FloqCAST=`ef50cfe` silhouette; strip ring + bottom type band only; never wipe LED/phone/signal/arrow)
+3. **TYPE** → ink-only under/over layers
+4. **ASSEMBLE** → black + graphic + under + ring + over; clip type past outer stroke (`R+6`); traditional skips ring
+
+Placement searches **left and top**; rejects any edge ink with max radial `> R-2` (fixes VIP r/e cut outside the ring).
+
 ## FIX PROMPT — rebuild nightlife + traditional chrome marks
 
 Copy/paste when icons need a full rebuild:
 
 ```
-Rebuild FloqCAST, djBOT, VIP reserVIP chrome (nightlife + traditional) per
-.cursor/rules/icon-chrome-build.mdc:
+Rebuild FloqCAST, djBOT, VIP reserVIP chrome via scripts/build-chrome-icons.py
+per .cursor/rules/icon-chrome-build.mdc:
 
-1) Hard-clear old wordmark + old ring from base (keep interior graphic / VIP red).
-2) Render type: NotoSansDisplay-Bold, shear 0.286, ×1.10 height, ink-only.
-3) Accent: tiffany T (FloqCAST/djBOT) or V=2X (VIP). Sizes: FloqCAST h≈200,
-   djBOT h≈204, VIP X=194 V=388; fit_width ≤720 if tips cannot kiss.
-4) Split under/over letters (F|d|reser+V under; T|IP over). Compose:
-   bg → under → ring → over. Traditional: same type, skip ring.
-5) Place wordmarks to kiss ring (tips ≈ R-10). djBOT: restamp platter-only GIF;
-   kill mid-icon stray T.
-6) Write chrome + review actuals; bump icon-review-*.html ?v=; QA strip of all three.
+1) Ring once; graphics from clean sources (FloqCAST ef50cfe — do not hard-clear LED).
+2) Type: NotoSansDisplay-Bold, shear 0.286, ×1.10; tiffany T or V=2X.
+3) Compose bg → under → ring → over. Place with max-radial ≤ R-2, tips ≈ R-10.
+4) Write chrome + review actuals; bump icon-review-*.html ?v=; QA strip.
 ```
 
 Resume tokens: `@iconchrome$` / `$iconchrome@`.

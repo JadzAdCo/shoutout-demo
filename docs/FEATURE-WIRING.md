@@ -458,9 +458,12 @@ When adding a section, use this skeleton:
 | Piece | Where |
 |---|---|
 | **Rule / recipe** | `.cursor/rules/icon-chrome-build.mdc` (always) — type, ring layers, sizes, FIX PROMPT |
+| **Builder** | `scripts/build-chrome-icons.py` — modular: ring once → graphic layers → type under/over → assemble |
+| **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
-| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` |
+| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` — graphic restored from `ef50cfe` (never hard-clear LED) |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (F/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
+| **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
