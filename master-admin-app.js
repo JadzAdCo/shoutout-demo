@@ -1128,7 +1128,7 @@
   }
 
   function clearManagedTemplateForm() {
-    ["templateManageId","templateManageName","templateManageCategory","templateManageTags","templateManageDescription"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+    ["templateManageId","templateManageName","templateManageCategory","templateManageTags","templateManageDescription","templateManageHowitWorks96","templateManageHowitWorks64x48","templateManageHowitWorks64x32"].forEach(id => { if (byId(id)) byId(id).value = ""; });
     if (byId("templateManageClass")) byId("templateManageClass").value = "neon";
     if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = "45";
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = "3";
@@ -1154,6 +1154,11 @@
     if (byId("templateManageCategory")) byId("templateManageCategory").value = template.category || "";
     if (byId("templateManageTags")) byId("templateManageTags").value = (template.tags || []).join(", ");
     if (byId("templateManageDescription")) byId("templateManageDescription").value = template.description || "";
+    const how = template.howitWorks && typeof template.howitWorks === "object" ? template.howitWorks : {};
+    const howStr = typeof template.howitWorks === "string" ? template.howitWorks : "";
+    if (byId("templateManageHowitWorks96")) byId("templateManageHowitWorks96").value = how["led-96x48"] || howStr || "";
+    if (byId("templateManageHowitWorks64x48")) byId("templateManageHowitWorks64x48").value = how["led-64x48"] || howStr || "";
+    if (byId("templateManageHowitWorks64x32")) byId("templateManageHowitWorks64x32").value = how["led-64x32"] || howStr || "";
     if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = template.maxMainCharacters || 45;
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = template.lineCount || 3;
     if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = template.maxCharactersPerLine || 15;
@@ -1195,7 +1200,11 @@
     const wrap = byId("templateManagementList");
     if (!wrap) return;
     const query = String(byId("templateManagementSearch")?.value || "").trim().toLowerCase();
-    const rows = Object.values(managedTemplates).filter(template => !query || [template.id, template.name, template.category, template.description, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query)).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+    const rows = Object.values(managedTemplates).filter(template => {
+      if (!query) return true;
+      const how = template.howitWorks && typeof template.howitWorks === "object" ? Object.values(template.howitWorks).join(" ") : (template.howitWorks || "");
+      return [template.id, template.name, template.category, template.description, how, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query);
+    }).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
     wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
@@ -1243,6 +1252,11 @@
       category:String(byId("templateManageCategory")?.value || "").trim(),
       tags:splitCSV(byId("templateManageTags")?.value),
       description:String(byId("templateManageDescription")?.value || "").trim(),
+      howitWorks:{
+        "led-96x48":String(byId("templateManageHowitWorks96")?.value || "").trim(),
+        "led-64x48":String(byId("templateManageHowitWorks64x48")?.value || "").trim(),
+        "led-64x32":String(byId("templateManageHowitWorks64x32")?.value || "").trim()
+      },
       supportsMedia:!!byId("templateManageSupportsMedia")?.checked,
       backgroundEditable:window.SHOUTOUT_TEMPLATES?.[id] ? true : byId("templateManageBackgroundEditable")?.checked !== false,
       defaultMain:String(byId("templateManagePreviewMain")?.value || "SHOUTOUT").trim(),
@@ -1318,6 +1332,9 @@
       ["Selected display", `${format.label} / ${format.pixelWidth} × ${format.pixelHeight} px`],
       ["Category", template.category || "-"],
       ["Description", template.description || "No description"],
+      ["How it works 96×48", (template.howitWorks && template.howitWorks["led-96x48"]) || (typeof template.howitWorks === "string" ? template.howitWorks : "") || "-"],
+      ["How it works 64×48", (template.howitWorks && template.howitWorks["led-64x48"]) || "-"],
+      ["How it works 64×32", (template.howitWorks && template.howitWorks["led-64x32"]) || "-"],
       ["Tags", (template.tags || []).join(", ") || "-"],
       ["Media", template.supportsMedia || template.supportsImage || template.supportsVideo ? "Image/video enabled" : "Text only"],
       ["Text limits", `${template.lineCount || 3} main lines / ${template.maxCharactersPerLine || 15} per line / ${template.maxMainCharacters || 45} main total / ${template.maxSubCharacters ?? 60} subtext`],
@@ -1368,6 +1385,11 @@
       category:String(byId("templateManageCategory")?.value || "").trim(),
       tags:splitCSV(byId("templateManageTags")?.value),
       description:String(byId("templateManageDescription")?.value || "").trim(),
+      howitWorks:{
+        "led-96x48":String(byId("templateManageHowitWorks96")?.value || "").trim(),
+        "led-64x48":String(byId("templateManageHowitWorks64x48")?.value || "").trim(),
+        "led-64x32":String(byId("templateManageHowitWorks64x32")?.value || "").trim()
+      },
       supportsMedia,
       supportsImage:supportsMedia,
       supportsVideo:supportsMedia,

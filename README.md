@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.26 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.27 (stable)
+
+- s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.
+- s3.2.26: Template select hides floating FloqAi (lens Search only).
 
 - s3.2.26: Template select hides floating FloqAi (lens Search only).
 - s3.2.25: Search product icons sit at viewport bottom on phone/tablet; desktop keeps under-Search layout.
