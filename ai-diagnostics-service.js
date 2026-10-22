@@ -228,7 +228,7 @@
       checks: [
         {label:"Package version s3.2.25", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.25\""]},
         {label:"Mobile/tablet pin Search icons to bottom", file:"styles.css", includes:["max-width:1180px)", "#categoryPage.page.active", "margin-top:auto!important", "100dvh"]},
-        {label:"Desktop under-Search icon layout", file:"styles.css", includes:["html.floqr-desktop-browser #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row)", "margin-top:28px!important"]},
+        {label:"Desktop under-Search icon layout", file:"styles.css", includes:["min-width:1181px)", "margin-top:28px!important", "max-width:720px"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.25\""]}
       ]
     },
