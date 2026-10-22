@@ -54,9 +54,9 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Data | `SHOUTOUT_TEMPLATES.*.description` + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates`; venue tags via `venueTemplateTags` |
 | Helper | `FLOQRTemplateCopy.howitWorks` / `.description`; `FLOQRTemplateTags.publicTagsFor` / `isClubOwnedTemplate` |
-| Gallery | `patron-app.js` — `.template-select-copy` with `Description:` / `How it works:` / `Tag:` chips (`publicTagsForTemplate`) |
-| Club Admin | Template Mgmt → Manage template tags; club-owned only are editable (venue tags **replace** catalog tags); shared FloqR templates are **read-only** catalog tags |
-| Master Admin | Description + per-size howitWorks (`templateManageHowitWorks*`); catalog tags are built-in FLOQR tags |
+| Gallery (Patron) | `patron-app.js` — `.template-select-copy` with labeled `Description:` / `How it works:` / `Tag:` (`publicTagsForTemplate`) — view only |
+| Club Admin | Template Mgmt cards show the same three lines (Description/How it works read-only); **Manage template tags** edits Tag only on club-owned; shared FloqR Tag read-only |
+| Master Admin | Template Management edits Description + per-size howitWorks + catalog tags; list rows show labeled Description/How it works/Tag; save **preserves** `scope`/`venueIds` for club-owned |
 | Data / security | `venueTemplateTags` docs require `ownership:"club"`; rules `templateOwnedByClub` via `clubLocations.clubOwnedTemplateIds` or `templates/{id}.venueIds`. Shared FloqR templates cannot be written. Classification: public read for patron cards; writes club-owned only (`data-classification-core.js`). Rules version `s3.2.28-club-owned-template-tags` (deploy Firestore rules). |
 | i18n | `template.descriptionLabel` / `howItWorks` / `tagLabel` / `noTags`; `templateTags.venueEditable` / `clubOwned*` / `sharedReadOnly` / `seedFromCatalog`; `admin.templateCopyOwnership` |
 | Diagnostics | Manual tests `s3-2-28-template-tag-labels`, `s3-2-27-template-howitworks` |

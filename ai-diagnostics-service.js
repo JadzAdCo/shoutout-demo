@@ -232,7 +232,9 @@
         {label:"Rules club-owned template tags", file:"firestore.rules", includes:["templateOwnedByClub", "s3.2.28-club-owned-template-tags", "ownership == \"club\""]},
         {label:"Template copy CSS", file:"styles.css", includes:[".template-select-copy", ".template-select-tag-chips"]},
         {label:"Club Admin tag ownership copy", file:"admin.html", includes:["admin.templateCopyOwnership", "templateTags.openFromAdmin"]},
-        {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Master Admin owns", "templateManageHowitWorks96"]},
+        {label:"Club Admin cards show Description/How it works/Tag", file:"admin-app.js", includes:["club-template-mgmt-copy", "FLOQRTemplateCopy?.howitWorks", "publicTagsFor"]},
+        {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Ownership:", "templateManageHowitWorks96", "Patrons see the three labeled lines"]},
+        {label:"Master save preserves club venueIds", file:"master-admin-app.js", includes:["Preserve club ownership", "payload.venueIds"]},
         {label:"i18n descriptionLabel + tagLabel", file:"floqr-i18n.js", includes:["\"template.descriptionLabel\": \"Description\"", "\"template.tagLabel\": \"Tag\""]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]

@@ -72,10 +72,19 @@ test("template select UI renders howitWorks datapoint", () => {
   assert.match(master, /id="templateManageHowitWorks96"/);
   assert.match(master, /id="templateManageHowitWorks64x48"/);
   assert.match(master, /id="templateManageHowitWorks64x32"/);
-  assert.match(master, /Master Admin owns/);
+  assert.match(master, /Ownership:/);
+  assert.match(master, /Master Admin edits/);
+  assert.match(master, /Patrons see the three labeled lines/);
   const admin = read("admin.html");
   assert.match(admin, /admin\.templateCopyOwnership/);
   assert.match(admin, /templateTags\.openFromAdmin/);
+  const adminApp = read("admin-app.js");
+  assert.match(adminApp, /club-template-mgmt-copy/);
+  assert.match(adminApp, /FLOQRTemplateCopy\?\.howitWorks/);
+  const masterApp = read("master-admin-app.js");
+  assert.match(masterApp, /Preserve club ownership/);
+  assert.match(masterApp, /payload\.venueIds/);
+  assert.match(masterApp, /<strong>Description:<\/strong>/);
 });
 
 test("every catalog template has description + per-size howitWorks", () => {

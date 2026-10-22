@@ -735,7 +735,7 @@
             <label>Template name<input id="templateManageName" placeholder="Birthday Wide"/></label>
             <label>Visual class<select id="templateManageClass"><option value="neon">Neon</option><option value="gold">Gold</option><option value="ice">Ice</option><option value="fire">Fire</option><option value="classic-bw">Black & White</option><option value="celebration-media">Split Media</option></select></label>
             <label>Category<input id="templateManageCategory" placeholder="Milestone"/></label>
-            <label>Built-in FLOQR tags (catalog; venue Tag chips are club-managed)<input id="templateManageTags" placeholder="birthday, celebration, photo"/></label>
+            <label>Built-in FLOQR tags (catalog). Club Admin may replace Tag chips only on club-owned templates; shared FloqR tags stay Master-owned.<input id="templateManageTags" placeholder="birthday, celebration, photo"/></label>
             <label>Main message total limit<input id="templateManageMainLimit" type="number" min="1" value="45"/></label>
             <label>Maximum main-message lines<input id="templateManageLineCount" type="number" min="1" max="8" value="3"/></label>
             <label>Characters per main-message line<input id="templateManageLineLimit" type="number" min="1" value="15"/></label>
@@ -758,7 +758,7 @@
             <label><input data-template-screen-format="led-64x48" type="checkbox" checked/> Is64x48 — P1.56 64 × 48 cm</label>
             <label><input data-template-screen-format="led-64x32" type="checkbox" checked/> Is64x32 — P1.56 64 × 32 cm</label>
           </div>
-          <p class="sub small" style="margin:10px 0 8px">Master Admin owns <strong>Description</strong> and <strong>How it works</strong> (per LED size). Club Admins edit venue <strong>Tag</strong> chips in Club Admin → Template Mgmt → Manage template tags — they cannot change description or howitWorks.</p>
+          <p class="sub small" style="margin:10px 0 8px"><strong>Ownership:</strong> Master Admin edits <strong>Description</strong> and <strong>How it works</strong> (per LED size) for every template. Club Admin edits <strong>Tag</strong> chips only on club-owned templates (Club Admin → Template Mgmt → Manage template tags). Shared FloqR Tag chips and all Description / How it works copy stay Master-owned — Club Admin sees them read-only. Patrons see the three labeled lines on the template card.</p>
           <label>Description (general — same for all sizes)<textarea id="templateManageDescription" rows="3" placeholder="Two-line overview patrons see on every display size"></textarea></label>
           <p class="eyebrow" style="margin:12px 0 6px">How it works (per display size)</p>
           <label>How it works — 96×48<textarea id="templateManageHowitWorks96" rows="2" placeholder="Size-specific playback / layout notes for led-96x48"></textarea></label>

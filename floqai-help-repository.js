@@ -1668,8 +1668,8 @@
     {
       id: "help-club-template-repository",
       title: "Your club's templates",
-      body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",
-      searchPhrases: ["club templates", "exclusive templates", "assign template", "remove template", "tengo muchos dolares", "heist templates"],
+      body: "Templates made only for your club are listed first and marked Exclusive. Each card shows Description, How it works (for your primary LED), and Tag chips — Description and How it works are Master Admin–owned (read-only). You edit Tag chips only on club-owned templates via Manage template tags; shared FloqR Tag chips stay read-only. Assigned templates are what patrons can pick; use Assign or Remove to change that. Search finds a template even with a missing accent or a small typo.",
+      searchPhrases: ["club templates", "exclusive templates", "assign template", "remove template", "tengo muchos dolares", "heist templates", "template description", "template tags club admin"],
       links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",

@@ -240,7 +240,7 @@
       },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
-        body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
+        body: "Шаблоны только для вашего клуба идут первыми с пометкой «Эксклюзивно». На карточке: Описание, Как это работает (для основного LED) и теги — Описание и Как это работает принадлежат Master Admin (только чтение). Теги можно менять только у клубных шаблонов через «Управление тегами»; у общих FloqR теги только для чтения. Назначенные шаблоны видят гости; меняйте назначение кнопками. Поиск находит шаблон даже без диакритики или с опечаткой."
       },
       "help-employee-network": {
         title: "Сеть сотрудников и персонала",
@@ -546,7 +546,7 @@
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
-        body: "Sjablonen die alleen voor je club zijn, staan bovenaan met ‘Exclusief bij’ en de naam van je locatie. Toegewezen sjablonen kunnen gasten bij je club kiezen; wijzig dat met Sjabloon toewijzen of Sjabloon verwijderen. Zoeken vindt een sjabloon ook zonder accent of met een kleine typfout."
+        body: "Sjablonen alleen voor je club staan bovenaan als Exclusief. Elke kaart toont Beschrijving, Hoe het werkt (voor je primaire LED) en tags — Beschrijving en Hoe het werkt zijn van Master Admin (alleen-lezen). Tags bewerk je alleen op club-eigen sjablonen via Sjabloontags beheren; gedeelde FloqR-tags blijven alleen-lezen. Toegewezen sjablonen kiest de gast; wijzig met Toewijzen of Verwijderen. Zoeken vindt ook zonder accent of met typfout."
       },
       "help-employee-network": {
         title: "Netwerk van medewerkers en personeel",
@@ -852,7 +852,7 @@
       },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
-        body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
+        body: "Les modèles réservés à votre club apparaissent en premier comme Exclusif. Chaque carte montre Description, Comment ça marche (LED principale) et les tags — Description et Comment ça marche sont Master Admin (lecture seule). Vous modifiez les tags uniquement sur les modèles du club via Gérer les tags ; les tags FloqR partagés restent en lecture seule. Les modèles attribués sont ceux des clients ; utilisez Attribuer ou Retirer. La recherche tolère accents manquants et petites fautes."
       },
       "help-employee-network": {
         title: "Réseau des employés et du personnel",
@@ -1158,7 +1158,7 @@
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
-        body: "Vorlagen nur für deinen Club stehen ganz oben und sind mit „Exklusiv bei“ und dem Namen deiner Location markiert. Zugewiesene Vorlagen können Gäste in deinem Club wählen; ändere das mit Vorlage zuweisen oder Vorlage entfernen. Die Suche findet eine Vorlage auch ohne Akzent oder mit einem kleinen Tippfehler."
+        body: "Vorlagen nur für deinen Club stehen oben als Exklusiv. Jede Karte zeigt Beschreibung, So funktioniert’s (primäre LED) und Tags — Beschreibung und So funktioniert’s gehören Master Admin (nur lesbar). Tags bearbeitest du nur bei Club-Vorlagen unter Vorlagen-Tags verwalten; geteilte FloqR-Tags bleiben nur lesbar. Zugewiesene Vorlagen wählen Gäste; ändere das mit Zuweisen oder Entfernen. Suche findet auch ohne Akzent oder mit Tippfehler."
       },
       "help-employee-network": {
         title: "Mitarbeiter- und Personalnetzwerk",
@@ -1464,7 +1464,7 @@
       },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
-        body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
+        body: "Las plantillas solo de tu club aparecen primero como Exclusivo. Cada tarjeta muestra Descripción, Cómo funciona (LED principal) y etiquetas — Descripción y Cómo funciona son de Master Admin (solo lectura). Editas etiquetas solo en plantillas del club en Gestionar etiquetas; las FloqR compartidas son solo lectura. Las asignadas las eligen los clientes; usa Asignar o Quitar. La búsqueda tolera tildes faltantes y erratas."
       },
       "help-employee-network": {
         title: "Red de empleados y personal",
@@ -1770,7 +1770,7 @@
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
-        body: "I modelli creati solo per il tuo club compaiono per primi, contrassegnati da «Esclusivo da» e dal nome del locale. I modelli assegnati sono quelli che i clienti possono scegliere nel tuo club; modificali con Assegna modello o Rimuovi modello. La ricerca trova un modello anche senza accento o con un piccolo errore di battitura."
+        body: "I modelli solo del tuo club compaiono per primi come Esclusivo. Ogni scheda mostra Descrizione, Come funziona (LED principale) e tag — Descrizione e Come funziona sono di Master Admin (sola lettura). Modifichi i tag solo sui modelli del club in Gestisci tag; i FloqR condivisi restano in sola lettura. Quelli assegnati li scelgono i clienti; usa Assegna o Rimuovi. La ricerca tollera accenti mancanti e piccoli errori."
       },
       "help-employee-network": {
         title: "Rete di dipendenti e personale",
@@ -2076,7 +2076,7 @@
       },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
-        body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
+        body: "Os modelos só do seu clube aparecem primeiro como Exclusivo. Cada cartão mostra Descrição, Como funciona (LED principal) e tags — Descrição e Como funciona são do Master Admin (somente leitura). Você edita tags só em modelos do clube em Gerenciar tags; FloqR compartilhados ficam somente leitura. Os atribuídos são os que os clientes escolhem; use Atribuir ou Remover. A busca tolera acentos faltando e erros pequenos."
       },
       "help-employee-network": {
         title: "Rede de funcionários e equipe",
@@ -2382,7 +2382,7 @@
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
-        body: "Τα πρότυπα που έγιναν μόνο για το club σας εμφανίζονται πρώτα, με την ένδειξη «Αποκλειστικά στο» και το όνομα του χώρου. Τα ανατεθειμένα πρότυπα είναι αυτά που μπορούν να επιλέξουν οι πελάτες στο club σας· αλλάξτε τα με Ανάθεση ή Αφαίρεση προτύπου. Η αναζήτηση βρίσκει ένα πρότυπο ακόμη και χωρίς τόνο ή με μικρό ορθογραφικό λάθος."
+        body: "Τα πρότυπα μόνο του club σας εμφανίζονται πρώτα ως Αποκλειστικά. Κάθε κάρτα δείχνει Περιγραφή, Πώς λειτουργεί (κύριο LED) και ετικέτες — Περιγραφή και Πώς λειτουργεί ανήκουν στον Master Admin (μόνο ανάγνωση). Επεξεργάζεστε ετικέτες μόνο σε πρότυπα του χώρου στο Διαχείριση ετικετών· τα κοινά FloqR μένουν μόνο ανάγνωση. Τα ανατεθειμένα επιλέγουν οι πελάτες· χρησιμοποιήστε Ανάθεση ή Αφαίρεση. Η αναζήτηση ανέχεται τόνους που λείπουν και μικρά λάθη."
       },
       "help-employee-network": {
         title: "Δίκτυο υπαλλήλων και προσωπικού",
@@ -2688,7 +2688,7 @@
       },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
-        body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
+        body: "Szablony tylko Twojego klubu są na początku jako Na wyłączność. Każda karta pokazuje Opis, Jak to działa (główny LED) i tagi — Opis i Jak to działa należą do Master Admin (tylko odczyt). Tagi edytujesz tylko w szablonach klubowych w Zarządzaj tagami; współdzielone FloqR są tylko do odczytu. Przypisane wybierają goście; użyj Przypisz lub Usuń. Wyszukiwanie toleruje brak polskich znaków i drobne literówki."
       },
       "help-employee-network": {
         title: "Sieć pracowników i personelu",
@@ -2994,7 +2994,7 @@
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",
-        body: "تظهر القوالب المصممة لناديك فقط في المقدمة مع عبارة «حصريًا في» واسم المكان. القوالب المعيّنة هي التي يمكن للزبائن اختيارها في ناديك؛ غيّر ذلك عبر تعيين القالب أو إزالة القالب. يعثر البحث على القالب حتى بدون علامات التشكيل أو مع خطأ إملائي بسيط."
+        body: "تظهر قوالب ناديك فقط أولاً كحصري. تعرض كل بطاقة الوصف وكيف يعمل (شاشة LED الأساسية) والوسوم — الوصف وكيف يعمل لدى Master Admin (للقراءة فقط). تعدّل الوسوم فقط على قوالب النادي عبر إدارة وسوم القوالب؛ وسوم FloqR المشتركة للقراءة فقط. القوالب المعيّنة يختارها الزبائن؛ استخدم التعيين أو الإزالة. يتحمّل البحث نقص التشكيل والأخطاء البسيطة."
       },
       "help-employee-network": {
         title: "شبكة الموظفين والعاملين",
