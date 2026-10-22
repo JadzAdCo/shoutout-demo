@@ -680,16 +680,42 @@ def floqcast_wm():
     return U, O, B
 
 
+def _fill_right_edge(img: Image.Image, *, kind: str) -> int:
+    """Right edge of fill core (ignore thin border fringe for spacing)."""
+    a = np.array(img.convert("RGBA"))
+    r, g, b, al = (a[:, :, i].astype(int) for i in range(4))
+    if kind == "white":
+        core = (al > 40) & (r > 200) & (g > 200) & (b > 200)
+    else:
+        core = (al > 40) & (r < 100) & (g > 150) & (b > 180)
+    if not core.any():
+        core = al > 40
+    return int(np.where(core)[1].max())
+
+
+def _fill_left_edge(img: Image.Image, *, kind: str) -> int:
+    a = np.array(img.convert("RGBA"))
+    r, g, b, al = (a[:, :, i].astype(int) for i in range(4))
+    if kind == "white":
+        core = (al > 40) & (r > 200) & (g > 200) & (b > 200)
+    else:
+        core = (al > 40) & (r < 100) & (g > 150) & (b > 180)
+    if not core.any():
+        core = al > 40
+    return int(np.where(core)[1].min())
+
+
 def vip_wm():
     """reserVIP — IP top-aligned to V; reser lower; thin Tiffany/purple borders.
 
-    v29: V −7.5%; IP flush with upper part of V; thin line borders (no thick neon);
+    v29.1: equalize ink gap reser↔V and V↔IP (nudge reser left); thin borders;
     full wordmark OVER the ring.
     """
     V = thin_border_glyph(glyph("V", VIP_V, TIFFANY), kind="cyan")
-    ov_r = int(V.size[0] * 0.14)
-    ov_i = int(V.size[0] * 0.20)
+    # Equal fill-core gap on both sides of V (reser↔V == V↔IP)
+    SIDE_GAP = 18
     gap_pad = 8
+    left_slack = 20
 
     def build_reser(target_h: int):
         size = 160
@@ -720,11 +746,11 @@ def vip_wm():
             reser_body.size[0]
             + V.size[0]
             + IP.size[0]
-            - ov_r
-            - ov_i
+            + SIDE_GAP * 2
             + gap_pad * 2
+            + left_slack
         )
-        if need <= VIP_MAX_W:
+        if need <= VIP_MAX_W + 40:
             break
         reser_h_target = max(110, int(reser_h_target * 0.93))
         ip_h_target = max(120, int(ip_h_target * 0.93))
@@ -732,17 +758,25 @@ def vip_wm():
         print(f"  WARN VIP chord still wide after shrink loop need={need}")
 
     reser_h = reser_body.size[1]
-    # Canvas: V height dominates; IP top-aligned with V top
     H = max(V.size[1], reser_h) + gap_pad * 2
-    W = reser_body.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + gap_pad * 2
+    # Place by fill cores so thin borders do not collapse the visual gap
+    v_l = _fill_left_edge(V, kind="cyan")
+    v_r = _fill_right_edge(V, kind="cyan")
+    reser_r = _fill_right_edge(reser_body, kind="white")
+    ip_l = _fill_left_edge(IP, kind="white")
+    rx = gap_pad + left_slack
+    vx = rx + reser_r + SIDE_GAP - v_l
+    ix = vx + v_r + SIDE_GAP - ip_l
+    W = max(
+        ix + IP.size[0] + gap_pad,
+        vx + V.size[0] + gap_pad,
+        rx + reser_body.size[0] + gap_pad,
+    )
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    rx = gap_pad
-    ry = gap_pad + (H - gap_pad * 2 - reser_h)  # lower line — bottom-align with V
-    vx = rx + reser_body.size[0] - ov_r
     vy = gap_pad + (H - gap_pad * 2 - V.size[1])
-    ix = vx + V.size[0] - ov_i
-    iy = vy  # align IP to the upper part / top of V
+    iy = vy
+    ry = gap_pad + (H - gap_pad * 2 - reser_h)
     over.alpha_composite(reser_body, (rx, ry))
     over.alpha_composite(V, (vx, vy))
     over.alpha_composite(IP, (ix, iy))
@@ -755,7 +789,19 @@ def vip_wm():
     U = crop_keep(under)
     O = crop_keep(over)
     B = Image.alpha_composite(U, O)
-    # Fit chord so tips can kiss inside the ring (wide body overhangs)
+    ba = np.array(B)
+    ink = ba[:, :, 3] > 20
+    white = ink & (ba[:, :, 0] > 200)
+    tiffany = ink & (ba[:, :, 0] < 100) & (ba[:, :, 1] > 150) & (ba[:, :, 2] > 180)
+    if tiffany.any() and white.any():
+        vxs = np.where(tiffany)[1]
+        vl, vr = int(vxs.min()), int(vxs.max())
+        reser_w = white & (np.arange(ba.shape[1])[None, :] < vl)
+        ip_w = white & (np.arange(ba.shape[1])[None, :] > vr)
+        g_rv = (vl - int(np.where(reser_w)[1].max())) if reser_w.any() else -1
+        g_vi = (int(np.where(ip_w)[1].min()) - vr) if ip_w.any() else -1
+    else:
+        g_rv = g_vi = -1
     if B.size[0] > VIP_MAX_W:
         fit = VIP_MAX_W / float(B.size[0])
         nw = max(1, int(round(B.size[0] * fit)))
@@ -772,7 +818,8 @@ def vip_wm():
     purp = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 140) & (wa[:, :, 2] > 180) & (wa[:, :, 1] < 180)
     print(
         f"  TYPE VIP reser size={size} IP size={ip_size} (top-align V) "
-        f"white_h={wh_h} V={VIP_V} (−7.5%) tiffany_h={vh} purple_line={int(purp.sum())} "
+        f"gap_reser_V={g_rv} gap_V_IP={g_vi} SIDE_GAP={SIDE_GAP} "
+        f"white_h={wh_h} V={VIP_V} tiffany_h={vh} purple_line={int(purp.sum())} "
         f"body={B.size} thin-border=tiffany+purple"
     )
     return U, O, B
@@ -985,16 +1032,32 @@ def traditional_from_nightlife(
         )
         > 0
     )
+    # Only copy nightlife type onto the verbiage footprint — never ring annulus
+    # (prevents tiffany/purple nightlife ring leaking into traditional silver stroke)
+    typeish = typeish & protect
     out[typeish] = na[typeish]
+    out[:, :, 3] = 255
+
+    # Re-stamp traditional silver ring on ring pixels not covered by type
+    trad_ring = np.array(Image.open(LAYERS / "ring-traditional.png").convert("RGBA"))
+    ring_px = trad_ring[:, :, 3] > 20
+    restamp = ring_px & ~protect
+    out[restamp] = trad_ring[restamp]
     out[:, :, 3] = 255
 
     tip_out = typeish & (dist > R)
     tip_ink = tip_out & (
         (out[:, :, 0] > 40) | (out[:, :, 1] > 40) | (out[:, :, 2] > 40)
     )
+    # QA: ring annulus should stay near-mono (no neon cyan/magenta leftovers)
+    rr, rg, rb = out[:, :, 0].astype(int), out[:, :, 1].astype(int), out[:, :, 2].astype(int)
+    ring_sat = ring_px & ~protect & (
+        (np.maximum(np.maximum(rr, rg), rb) - np.minimum(np.minimum(rr, rg), rb)) > 40
+    )
     print(
         f"  traditional charcoal: line={int(line.sum())} soft→black={int(soft_fill.sum())} "
-        f"tips_outside_ring={int(tip_ink.sum())} ring_px={int(ring.sum())}"
+        f"tips_outside_ring={int(tip_ink.sum())} ring_px={int(ring.sum())} "
+        f"ring_restamp={int(restamp.sum())} ring_neon_left={int(ring_sat.sum())}"
     )
     return Image.fromarray(out, "RGBA")
 
