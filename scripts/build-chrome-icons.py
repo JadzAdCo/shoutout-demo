@@ -1850,9 +1850,9 @@ BOTDEE_MAX_H = 440
 BOTDEE_BOT_DOWN = 26
 # Nudge "BOT" wordmark line down toward DEE (px at render size; survives crop)
 BOTDEE_TYPE_BOT_DOWN = 22
-# Stagger: BOT slightly left, DEE slightly right (px at render size)
-BOTDEE_BOT_X = -32
-BOTDEE_DEE_X = 32
+# Stagger: BOT left, DEE right (px at render size) — make offset obvious
+BOTDEE_BOT_X = -48
+BOTDEE_DEE_X = 48
 
 
 def _strip_botdee_signal_tray(img: Image.Image) -> Image.Image:
@@ -1886,21 +1886,29 @@ def _strip_botdee_signal_tray(img: Image.Image) -> Image.Image:
         print("  WARN botdee: eyes not found — signal tray left intact")
         return img
     eye_bottom = int(np.where(eye)[0].max())
-    # Start slightly above chin so the U-tray lip / faint diagonals are wiped
-    sy0 = eye_bottom - 2
-    sy1 = by1 + 8
-    sx0, sx1 = cx - 110, cx + 110
+    # Wipe everything under the eyes in the center band (equalizer / tray / ghosts)
+    sy0 = eye_bottom - 4
+    sy1 = by1 + 12
+    sx0, sx1 = cx - 130, cx + 130
     mask = (yy >= sy0) & (yy <= sy1) & (xx >= sx0) & (xx <= sx1)
     a[mask] = (0, 0, 0, 255)
-    # Sweep any leftover non-head ink in the mid band (tray ghosts)
-    mid = (
-        (yy > eye_bottom)
-        & (yy < eye_bottom + 80)
-        & (np.abs(xx - cx) < 120)
-        & (((a[:, :, 0] > 30) | (a[:, :, 1] > 30) | (a[:, :, 2] > 30)) & (a[:, :, 3] > 20))
+    # Second pass: any saturated / non-black ink still under the eyes (never touch headphones at sides)
+    leftover = (
+        (yy > eye_bottom - 2)
+        & (yy < by1 + 20)
+        & (np.abs(xx - cx) < 140)
+        & (a[:, :, 3] > 10)
+        & (
+            (a[:, :, 0] > 18)
+            | (a[:, :, 1] > 18)
+            | (a[:, :, 2] > 18)
+        )
     )
-    a[mid] = (0, 0, 0, 255)
-    print(f"  botdee signal tray cleared bbox=({sx0},{sy0},{sx1},{sy1}) mid={int(mid.sum())}")
+    a[leftover] = (0, 0, 0, 255)
+    print(
+        f"  botdee signal tray cleared bbox=({sx0},{sy0},{sx1},{sy1}) "
+        f"leftover={int(leftover.sum())}"
+    )
     return Image.fromarray(a, "RGBA")
 
 
@@ -1971,6 +1979,20 @@ def extract_botdee_graphic() -> Path:
     out = Image.new("RGBA", (S, S), (0, 0, 0, 255))
     out.alpha_composite(scaled, (left, top))
     oa = np.array(out)
+    # Kill faint gray ghost strokes (not bright neon head/headphones/eyes)
+    br = oa[:, :, 0].astype(int)
+    bg = oa[:, :, 1].astype(int)
+    bb = oa[:, :, 2].astype(int)
+    faint = (
+        ((br > 8) | (bg > 8) | (bb > 8))
+        & (br < 90)
+        & (bg < 90)
+        & (bb < 90)
+        & (oa[:, :, 3] > 0)
+    )
+    # Keep pink antenna tip
+    pink = (br > 140) & (bg < 120) & (bb > 100)
+    oa[faint & ~pink] = (0, 0, 0, 255)
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     oa[dist > (R - 16)] = (0, 0, 0, 255)
     dst = LAYERS / "botdee-graphic.png"
