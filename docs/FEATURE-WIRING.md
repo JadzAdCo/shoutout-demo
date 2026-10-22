@@ -25,6 +25,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]` |
+| VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
 | i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |
 
