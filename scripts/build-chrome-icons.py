@@ -1850,6 +1850,9 @@ BOTDEE_MAX_H = 440
 BOTDEE_BOT_DOWN = 26
 # Nudge "BOT" wordmark line down toward DEE (px at render size; survives crop)
 BOTDEE_TYPE_BOT_DOWN = 22
+# Stagger: BOT slightly left, DEE slightly right (px at render size)
+BOTDEE_BOT_X = -32
+BOTDEE_DEE_X = 32
 
 
 def _strip_botdee_signal_tray(img: Image.Image) -> Image.Image:
@@ -1980,21 +1983,26 @@ def extract_botdee_graphic() -> Path:
 
 
 def botdee_wm():
-    """Stacked BOT (white thin border) / DEE (tiffany thin border) — no hyphen."""
+    """Stacked BOT (white thin border) / DEE (tiffany thin border) — no hyphen.
+
+    BOT nudged left, DEE nudged right for a staggered stack.
+    """
     size = BOTDEE_TEXT
     top_g = thin_border_glyph(glyph("BOT", size, WHITE), kind="white")
     dee_g = thin_border_glyph(glyph("DEE", size, TIFFANY), kind="cyan")
     gap = max(2, int(size * 0.012))
     bot_down = BOTDEE_TYPE_BOT_DOWN
-    W = max(top_g.size[0], dee_g.size[0])
+    # Widen canvas so left/right stagger does not clip
+    pad_x = max(abs(BOTDEE_BOT_X), abs(BOTDEE_DEE_X)) + 8
+    W = max(top_g.size[0], dee_g.size[0]) + pad_x * 2
     H = bot_down + top_g.size[1] + gap + dee_g.size[1]
+    bot_x = (W - top_g.size[0]) // 2 + BOTDEE_BOT_X
+    dee_x = (W - dee_g.size[0]) // 2 + BOTDEE_DEE_X
     # All type over the ring (ShoutOut-style weight); empty under for assemble order
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    over.alpha_composite(top_g, ((W - top_g.size[0]) // 2, bot_down))
-    over.alpha_composite(
-        dee_g, ((W - dee_g.size[0]) // 2, bot_down + top_g.size[1] + gap)
-    )
+    over.alpha_composite(top_g, (bot_x, bot_down))
+    over.alpha_composite(dee_g, (dee_x, bot_down + top_g.size[1] + gap))
     body = Image.alpha_composite(under, over)
     # Keep top padding so BOT stays nudged down (don't crop y0 to ink)
     x0, _y0, x1, y1 = ink_bbox(body, 10)
@@ -2008,7 +2016,8 @@ def botdee_wm():
     B = Image.alpha_composite(U, O)
     print(
         f"  TYPE BOT DEE size={size} BOT={top_g.size} DEE={dee_g.size} body={B.size} "
-        f"bot_down={bot_down} (thin border; DEE tiffany; no hyphen)"
+        f"bot_down={bot_down} bot_x={BOTDEE_BOT_X} dee_x={BOTDEE_DEE_X} "
+        f"(thin border; DEE tiffany; no hyphen; staggered)"
     )
     # Match ShoutOut text-block footprint (~528×380) inside the lower chord
     need_w = B.size[0] > BOTDEE_MAX_W
