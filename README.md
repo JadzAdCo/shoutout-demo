@@ -1,5 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.21 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.22 (stable)
 
+- s3.2.22: Login privacy footer + short welcome (Please signin or signup) + inline ?.
 - s3.2.21: Template select — Search lens + LED-true Use-only cards.
 - s3.2.20: Site chrome colors from FloqR tile palette (cyan→violet→magenta→coral).
 - s3.2.19: Search — lens submit in input; grey halo icons (no black tile backgrounds).
