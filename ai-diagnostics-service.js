@@ -2074,7 +2074,7 @@
       area:"Search / Home",
       feature:"Search product icons sit at bottom on phone/tablet",
       changed:"On phones and tablets, FloqCAST / ShoutOut / reserVIP / BOT DEE sit at the bottom of the Search viewport (BOT DEE barely above the safe-area / browser chrome). Desktop keeps the icon cluster under the Search field with balanced spacing. Package s3.2.25.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search&v=s3.2.25 on iPhone/Android (or narrow DevTools). 2) Confirm logo + Search stay near the top; icon cluster is low — bottom of BOT DEE nearly touches the bottom of the content area. 3) Tablet portrait/landscape: same bottom pin. 4) Desktop wide: icons remain under Search (not stuck to the bottom of a tall monitor).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on iPhone/Android (or narrow DevTools) — package s3.2.25. 2) Confirm logo + Search stay near the top; icon cluster is low — bottom of BOT DEE nearly touches the bottom of the content area. 3) Tablet portrait/landscape: same bottom pin. 4) Desktop wide: icons remain under Search (not stuck to the bottom of a tall monitor).",
       expected:"Phone/tablet icons at bottom; desktop under Search.",
       troubleshoot:"Icons still mid-screen → hard refresh styles.css s3.2.25; confirm #categoryPage.page.active flex + margin-top:auto on .category-grid:has(.search-icon-row). Desktop glued to bottom → floqr-desktop-browser override or min-width 1181px rules must win."
     },
