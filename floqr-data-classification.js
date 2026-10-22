@@ -166,7 +166,7 @@
     ["userBlocks", "ownMaster", 0, "Blocked people"],
     ["users", "ownMaster", 1, "Patron accounts (name, email, phone, preferences)"],
     ["venueTemplateRoles", "clubAdmin", 0, "Who may manage a venue's templates"],
-    ["venueTemplateTags", "public", 0, "Venue template tags"],
+    ["venueTemplateTags", "public", 0, "Club-owned template Tag chips only (read public for patron cards; writes denied for shared FloqR templates)"],
     ["workerAssociationRequests", "ownClubAdmin", 1, "Staff requests to join a club"]
   ];
 
