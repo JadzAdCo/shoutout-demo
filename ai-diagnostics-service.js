@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.18";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.18";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.19";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.19";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,15 +223,26 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.19",
+      title: "s3.2.19 — Search lens in input + grey halo icons (no black tile)",
+      checks: [
+        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.19\""]},
+        {label:"Search lens submit in field", file:"index.html", includes:["category-floqai-field", "category-floqai-lens", "id=\"categoryFloqAiGo\""]},
+        {label:"Lens CSS no fill shiny outline", file:"floqai-search.css", includes:[".category-floqai-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
+        {label:"Icon faces transparent + grey halo", file:"styles.css", includes:["background:transparent", "rgba(110,110,110,.38)", "no black tile"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.19\""]}
+      ]
+    },
+    {
       version: "s3.2.18",
       title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
       checks: [
-        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.18\""]},
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.19\""]},
         {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
         {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
         {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
         {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.19\""]}
       ]
     },
     {
@@ -241,9 +252,9 @@
         {label:"Login welcome + compact grid", file:"index.html", includes:["app.welcomeSignIn", "Welcome. Please Sign-in / Sign-up", "i18n-text\">Google", "loginActions"]},
         {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
         {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
-        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.18"]},
+        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.19"]},
         {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.19\""]}
       ]
     },
 
@@ -1992,13 +2003,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-19-search-lens-grey-halo",
+      area:"Search UI",
+      feature:"Search lens in input + grey halo icons (no black tile)",
+      changed:"#categoryFloqAiGo is a lens button inside the search field (same form submit). Icon faces transparent with slight grey halo — no #000 tile. Package s3.2.19.",
+      howToTest:"1) Hard-refresh Search (styles + floqai-search.css ?v=s3.2.19). 2) No full-width black Search button — lens at the right end of the input; tap it or Enter runs Search. 3) FloqCAST / ShoutOut / reserVIP / BOT DEE have no thick black square; soft grey halo. 4) White/Black: lens has shiny black outline, no fill.",
+      expected:"Lens submits search; icons float with grey halo only.",
+      troubleshoot:"Still black tile → styles.css icon-face must be background:transparent. Still big Search button → index uses category-floqai-lens; hard refresh floqai-search.css s3.2.19."
+    },
+    {
       id:"s3-2-18-search-traditional-chip-placeholder",
       area:"Search + Site chrome",
       feature:"Traditional charcoal profile chip + Clubs/Lounge/Events placeholder; Welcome speech gone",
       changed:"Profile chip hardcoded Traditional charcoal on every Site chrome (including Nightlife). Welcome speech / green OR removed from Search. Placeholder = Search for Clubs, Lounge, Events, etc. Package s3.2.18.",
-      howToTest:"1) Hard-refresh live Search after Pages publish (styles.css + index.html + floqr-i18n.js ?v=s3.2.18). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife — even when Site chrome is Nightlife. 3) No Welcome, type below… line and no green OR between Search and tiles. 4) Empty search box placeholder reads Search for Clubs, Lounge, Events, etc.",
+      howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
-      troubleshoot:"Still pink chip or Welcome speech → Pages still on old main (confirm styles.css?v=s3.2.18). Cached HTML → hard refresh / clear site data for jadzadco.github.io."
+      troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
     },
     {
       id:"s3-2-16-passes-qr",

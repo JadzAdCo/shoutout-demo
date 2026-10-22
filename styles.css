@@ -198,19 +198,23 @@ html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"]{bo
 .chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .vip-tile-mark,.chrome-photo-face .shoutout-tile-mark{object-fit:contain;filter:none}
 .search-icon-row{grid-column:1/-1;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;gap:12px;width:100%;overflow:visible;padding-top:10px}
 .search-icon-row > .category-card{flex:0 0 auto;min-width:0;min-height:132px;max-width:132px;font-size:16px;padding:12px 8px}
-/* FloqAi / floqCast / ShoutOut / VIP — black face; mark ~80% of face; word at bottom inside */
-.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;width:132px;height:132px;border-radius:22px;background:#000;box-shadow:0 0 18px rgba(38,216,255,.42),0 0 28px rgba(244,58,191,.28);overflow:hidden;padding:6px 6px 9px;box-sizing:border-box}
-.floqai-icon-face .floqai-tile-mark,.floqai-icon-face .category-floqai-mark.floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:80%!important;height:auto!important;aspect-ratio:1;max-height:80%!important;flex:0 0 auto;margin:0 auto;animation:none!important;position:relative}
+/* FloqAi / floqCast / ShoutOut / VIP — no black tile; slight grey halo around mark */
+.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:132px;height:132px;border-radius:50%;background:transparent;border:0;box-shadow:0 0 0 1px rgba(120,120,120,.22),0 0 14px rgba(110,110,110,.38),0 0 28px rgba(90,90,90,.18);overflow:visible;padding:8px;box-sizing:border-box}
+.floqai-icon-face .floqai-tile-mark,.floqai-icon-face .category-floqai-mark.floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:92%!important;height:auto!important;aspect-ratio:1;max-height:92%!important;flex:0 0 auto;margin:0 auto;animation:none!important;position:relative;border-radius:50%}
 .floqai-icon-face .floqai-tile-mark .category-floqai-mark-halo{display:none!important}
 /* FloqAi nests an <img> inside .floqai-tile-mark; floqCast/ShoutOut/VIP marks ARE the <img> — do not force height:100% on them (collapses when face height is auto). */
-.floqai-icon-face .floqai-tile-mark img{width:100%!important;height:100%!important;display:block;object-fit:contain}
-.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{display:block;object-fit:contain;filter:drop-shadow(0 0 12px rgba(38,216,255,.5))}
+.floqai-icon-face .floqai-tile-mark img{width:100%!important;height:100%!important;display:block;object-fit:contain;border-radius:50%}
+.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{display:block;object-fit:contain;border-radius:50%;filter:drop-shadow(0 1px 2px rgba(0,0,0,.12))}
 .floqai-icon-word,.floqcast-icon-word,.vip-icon-word{flex:0 0 auto;color:#fff;font-size:clamp(11px,2.8vw,14px);font-weight:1000;letter-spacing:.02em;line-height:1.05;white-space:nowrap;text-align:center;max-width:100%;text-shadow:0 0 12px rgba(38,216,255,.55),0 0 18px rgba(244,58,191,.35)}
 .floqcast-icon-word{font-size:clamp(10px,2.6vw,13px)}
 .vip-icon-word{font-size:clamp(9px,2.3vw,12px);letter-spacing:.01em}
-/* VIP / ShoutOut marks fill the black face (wordmark is inside the art) */
+/* VIP / ShoutOut marks fill the face (wordmark is inside the art) */
 .vip-icon-face.vip-icon-face--mark-only,.shoutout-icon-face.chrome-photo-face{justify-content:center;padding:8px;gap:0}
 .vip-icon-face.vip-icon-face--mark-only .vip-tile-mark,.shoutout-icon-face .shoutout-tile-mark{width:92%!important;max-height:92%!important}
+html[data-floqr-chrome="whiteBlack"] .floqai-icon-face,
+html[data-floqr-chrome="whiteBlack"] .floqcast-icon-face,
+html[data-floqr-chrome="whiteBlack"] .shoutout-icon-face,
+html[data-floqr-chrome="whiteBlack"] .vip-icon-face{box-shadow:0 0 0 1px rgba(90,90,90,.28),0 0 12px rgba(80,80,80,.32),0 0 24px rgba(70,70,70,.16)}
 @media(max-width:900px){
   .search-icon-row{flex-wrap:wrap;gap:10px}
   .search-icon-row > .shoutout-icon-card,
@@ -223,7 +227,7 @@ html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"]{bo
   .search-icon-row .floqai-icon-face,
   .search-icon-row .floqcast-icon-face,
   .search-icon-row .shoutout-icon-face,
-  .search-icon-row .vip-icon-face{border-radius:18px;gap:2px;padding:5px 4px 7px;flex-direction:column;justify-content:flex-end}
+  .search-icon-row .vip-icon-face{border-radius:50%;gap:0;padding:6px;flex-direction:column;justify-content:center}
   .search-icon-row .floqai-icon-face .floqai-tile-mark,
   .search-icon-row .floqcast-icon-face .floqcast-tile-mark,
   .search-icon-row .shoutout-icon-face .shoutout-tile-mark,
@@ -233,7 +237,7 @@ html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"]{bo
   .search-icon-row .vip-icon-word{font-size:9px}
   .search-icon-row > .category-card{min-height:0;max-width:none;aspect-ratio:1;display:grid;place-items:center;font-size:13px;padding:8px 4px}
 }
-@media(max-width:520px){.category-brand-stack{margin-top:40px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{border-radius:18px;gap:2px;padding:5px 4px 7px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:80%;height:auto;aspect-ratio:1;max-height:80%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
+@media(max-width:520px){.category-brand-stack{margin-top:40px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{border-radius:50%;gap:0;padding:6px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
 .ad-submit-shell form label,.ad-submit-grid label{display:grid;gap:4px;margin:8px 0}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .ad-submit-preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#050819}

@@ -28,22 +28,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.18)
+## Login + Search chrome (s3.2.19)
 
-**Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional charcoal profile chip on every Site chrome.
+**Purpose:** Compact sign-in, FloqR wordmark without pill, Search lens-in-field, grey-halo icon tiles, Traditional charcoal profile chip.
 
 | Layer | Wiring |
 |---|---|
 | Login copy | `index.html` `.login-welcome-line` → `app.welcomeSignIn` (white); provider buttons icon + short label (`app.google` etc., no “Continue with”) |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
-| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.18` |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.19` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
-| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.` (`cat.floqaiPlaceholder`); `#categoryFloqAiSpeech` + green `.category-or` removed (CSS also `display:none` as cache safety) |
+| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + grey halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card` |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
-| i18n | `floqr-i18n.js` s3.2.18 — all chrome langs for placeholder + login keys |
-| Diagnostics | Manual test `s3-2-18-search-traditional-chip-placeholder` |
+| i18n | `floqr-i18n.js` s3.2.19 — all chrome langs for placeholder + login keys |
+| Diagnostics | Manual test `s3-2-19-search-lens-grey-halo` |
 
 ---
 

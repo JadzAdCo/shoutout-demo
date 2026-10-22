@@ -1,4 +1,7 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.18 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.19 (stable)
+
+- s3.2.19: Search — lens submit in input; grey halo icons (no black tile backgrounds).
+- s3.2.00: Entity Management Venue Links with accurate Display ?k= + Xibo Diag.
 
 - s3.2.18: Search — traditional charcoal profile chip; no Welcome speech / green OR; placeholder Search for Clubs, Lounge, Events, etc.
 - s3.2.00: Entity Management Venue Links with accurate Display ?k= + Xibo Diag.

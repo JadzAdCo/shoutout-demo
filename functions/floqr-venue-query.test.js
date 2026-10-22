@@ -150,6 +150,7 @@ test("index.html wires the stationary FloqAi category search", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   assert.match(html, /id="categoryFloqAiSearch"/);
   assert.match(html, /id="categoryFloqAiInput"/);
+  assert.match(html, /id="categoryFloqAiGo"[^>]*class="category-floqai-lens"/);
   assert.match(html, /data-i18n-placeholder="cat\.floqaiPlaceholder"/);
   assert.match(html, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(html, /floqr-venue-query\.js\?v=s3\.\d+\.\d+/);
