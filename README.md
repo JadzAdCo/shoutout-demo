@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.23 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.24 (stable)
 
+- s3.2.24: Login paints last Site chrome (device + profile); single Privacy footer link.
 - s3.2.23: Login welcome help trim (OTP-focused) + left-align welcome/? + 80px under FloqR mark.
 - s3.2.22: Login privacy footer + short welcome (Please signin or signup) + inline ?.
 - s3.2.21: Template select — Search lens + LED-true Use-only cards.
@@ -1345,7 +1346,6 @@ The next production step is to add real tracking events for:
 - ShoutOut payment status
 - Payout records
 
-
 ---
 
 # v25 Master Admin Security Update
@@ -1400,7 +1400,6 @@ Use Microsoft authentication for Master Admin and enforce MFA with Microsoft Ent
 
 Do not allow phone OTP, Facebook login, personal Gmail, personal Outlook, fake emails, or unverified identities for Master Admin access.
 
-
 ---
 
 # v25.1 Admin Login, Queue, and Text Fixes
@@ -1442,7 +1441,6 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ## Production Note
 
 For production scale, create the Firestore composite index and restore server-side ordering. For the current prototype, client-side sorting avoids deployment friction.
-
 
 ---
 
@@ -1542,7 +1540,6 @@ Master Admin:
 https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ```
 
-
 ---
 
 # v25.3 Admin Authentication Unification
@@ -1596,7 +1593,6 @@ jadzadco.github.io
 
 The app should then retry with redirect fallback automatically.
 
-
 ---
 
 # v25.4 Admin Redirect-Only Authentication Fix
@@ -1644,7 +1640,6 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ## Important
 
 After uploading, do a hard refresh or open the URL in an incognito/private window so the browser does not use cached `admin-app.js`.
-
 
 ---
 
@@ -1711,7 +1706,6 @@ adminRoles/{uid}
 ```text
 https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ```
-
 
 ---
 
@@ -1787,7 +1781,6 @@ jadzadco.github.io
 
 If Microsoft still fails while Google works, the issue is likely Microsoft provider-specific, not the page flow.
 
-
 ---
 
 # v25.7 Master Admin Load Fix
@@ -1820,7 +1813,6 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ## Production Note
 
 Later, move Master Admin roles to Firestore `adminRoles` or Firebase custom claims.
-
 
 ---
 
@@ -1872,7 +1864,6 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 
 After upload, test in an incognito/private window or hard refresh with Ctrl+F5.
 
-
 ---
 
 # v25.9 Admin Auth Matched to Patron Auth
@@ -1919,7 +1910,6 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.8
 ## Production recommendation
 
 For Microsoft redirect sign-in on GitHub Pages, Firebase recommends one of the redirect best-practice options, such as using Firebase Hosting/custom auth domain or proxying the auth helper path, because redirect sign-in relies on a Firebase Auth helper iframe that can be affected by third-party storage restrictions.
-
 
 ---
 
@@ -2092,7 +2082,6 @@ guestListCheckIns
 ```
 
 or Firebase custom claims.
-
 
 ---
 
@@ -2361,7 +2350,6 @@ Confirm these still work:
 
 Friend request approval, inbox, real-time chat, and true end-to-end encrypted chat are not fully implemented in v28. v28 prepares guest-list invitee data structures and friend-based invitee selection for the future `friendships` collection.
 
-
 ---
 
 # v28 Guest List Routing Fix
@@ -2425,7 +2413,6 @@ https://jadzadco.github.io/shoutout-demo/guest-list.html?location=christie-canne
 5. Click **Join Guest List**.
 6. Confirm that the app opens `guest-list.html` and not the ShoutOut editor.
 
-
 ---
 
 # v28 Patron Profile Menu + Editable Patron Portal
@@ -2484,7 +2471,6 @@ Chats (2/14)
 https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.8
 ```
 
-
 ---
 
 # v28 Patron Portal + Profile Menu Correction
@@ -2538,7 +2524,6 @@ Patron home:
 https://jadzadco.github.io/shoutout-demo/?v=28.8
 ```
 
-
 # v28.4 Fix
 
 Fixes patron expanded menu and guest-list routing. Upload all files, replace existing files, commit, then test `?v=28.8`.
@@ -2584,7 +2569,6 @@ match /chatMessages/{id} {
   allow create, read, update, delete: if request.auth != null;
 }
 ```
-
 
 # v28.4 ShoutOut Templates, Photo Upload, AI Suggestions, History, and Role Requests
 
@@ -2703,7 +2687,6 @@ https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-wa
 5. Test with:
    https://jadzadco.github.io/shoutout-demo/?v=28.8
 
-
 ---
 
 # v28.7 ShoutOut Link on All Club Views
@@ -2729,7 +2712,6 @@ button, even if the service catalog is missing it.
 ```text
 https://jadzadco.github.io/shoutout-demo/?v=28.8
 ```
-
 
 # v28.8 Hard Fix âÃ³ÎÃ©Â¼ÎÃÂ¥ ShoutOut Button on Club Options
 

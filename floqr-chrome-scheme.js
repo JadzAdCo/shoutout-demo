@@ -33,7 +33,7 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.23";
+  const ICON_V = "s3.2.24";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -197,9 +197,9 @@
   }
 
   function effectiveSiteChrome(preferred) {
-    const want = preferred != null ? normalizeSiteChrome(preferred) : getSiteChrome();
-    if (isPremiumCode(want) && !hasThemeAccess()) return SITE_CHROME.NIGHTLIFE;
-    return want;
+    // Paint always honors the patron's last-used chrome (localStorage / profile).
+    // Beta access only gates the Language Settings picker + new premium picks.
+    return preferred != null ? normalizeSiteChrome(preferred) : getSiteChrome();
   }
 
   function effectiveChrome(preferredScheme) {
@@ -211,7 +211,16 @@
 
   function setSiteChrome(code, opts = {}) {
     let next = normalizeSiteChrome(code);
-    if (isPremiumCode(next) && !hasThemeAccess()) next = SITE_CHROME.NIGHTLIFE;
+    // Block *new* premium picks only after Features has resolved and access is denied.
+    // Never wipe a previously stored chrome on login / signed-out paint.
+    if (
+      isPremiumCode(next) &&
+      featuresAccessResolved &&
+      !hasThemeAccess() &&
+      opts.force !== true
+    ) {
+      next = SITE_CHROME.NIGHTLIFE;
+    }
     try {
       localStorage.setItem(STORAGE_KEY, String(next));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
@@ -250,13 +259,14 @@
     } else if (profile?.uiChrome) {
       code = siteChromeFromScheme(profile.uiChrome);
     } else {
-      return applyDocument(effectiveChrome());
+      return applyDocument(getChrome());
     }
     try {
       localStorage.setItem(STORAGE_KEY, String(code));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(code));
     } catch (_) { /* ignore */ }
-    return applyDocument(schemeFromSiteChrome(effectiveSiteChrome(code)));
+    // Cross-device: profile wins; paint immediately (incl. signed-out→signed-in on login).
+    return applyDocument(schemeFromSiteChrome(code));
   }
 
   function iconUrl(featureKey, scheme) {
@@ -276,7 +286,8 @@
   }
 
   function applyDocument(scheme) {
-    const s = effectiveChrome(scheme);
+    // Prefer explicit scheme, else last-used storage — never demote for missing beta.
+    const s = scheme != null ? normalizeScheme(scheme) : getChrome();
     if (global.document && global.document.documentElement) {
       global.document.documentElement.setAttribute("data-floqr-chrome", s);
       global.document.documentElement.setAttribute("data-is-site-chrome", String(siteChromeFromScheme(s)));
@@ -318,13 +329,9 @@
         el.setAttribute("aria-hidden", allowed ? "false" : "true");
       });
     }
-    // Keep stored chrome (e.g. Traditional) on Search first paint / before Features resolve.
-    // Only force Nightlife after access is known to be denied.
-    if (allowed || !featuresAccessResolved) {
-      applyDocument(getChrome());
-    } else {
-      applyDocument(DEFAULT_SCHEME);
-    }
+    // Login + Search: always paint last-used chrome (device localStorage). Cross-device
+    // comes from hydrateFromProfile after sign-in. Access gate only toggles the picker.
+    applyDocument(getChrome());
     return allowed;
   }
 
