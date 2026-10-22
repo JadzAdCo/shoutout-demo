@@ -1323,7 +1323,8 @@
   }
 
   const VENUE_LISTING_TYPES = ["events", "clubs", "lounges", "lounge-club", "beach-clubs"];
-  const CATEGORY_FLOQAI_DIALOG = ["cat.floqaiWelcome", "cat.floqaiAlso"];
+  /* Also-search hint lives in the input placeholder (cat.floqaiPlaceholder); speech stays Welcome. */
+  const CATEGORY_FLOQAI_DIALOG = ["cat.floqaiWelcome"];
   const CATEGORY_FLOQAI_DIALOG_MS = 5000;
 
   function venueTypeLabel(type) {
@@ -1419,11 +1420,13 @@
     };
     speak();
 
-    setInterval(() => {
-      if (input.value.trim() || document.hidden || !byId("categoryPage")?.classList.contains("active")) return;
-      step = (step + 1) % CATEGORY_FLOQAI_DIALOG.length;
-      sayDialog(CATEGORY_FLOQAI_DIALOG[step]);
-    }, CATEGORY_FLOQAI_DIALOG_MS);
+    if (CATEGORY_FLOQAI_DIALOG.length > 1) {
+      setInterval(() => {
+        if (input.value.trim() || document.hidden || !byId("categoryPage")?.classList.contains("active")) return;
+        step = (step + 1) % CATEGORY_FLOQAI_DIALOG.length;
+        sayDialog(CATEGORY_FLOQAI_DIALOG[step]);
+      }, CATEGORY_FLOQAI_DIALOG_MS);
+    }
 
     input.addEventListener("input", () => {
       const parsed = parsedListingQuery(input.value, "category");

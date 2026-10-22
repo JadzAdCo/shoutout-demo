@@ -1,4 +1,13 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.107 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.00 (stable)
+
+- s3.2.00: major package line — Search Clubs/Lounges placeholder; Entity Management Venue Links with accurate Display ?k= + Xibo Diag; Xibo load-error venue-mismatch alerts.
+- s3.1.110: Search placeholder = You may also search for: Clubs or Lounges.
+
+- s3.1.110: Search placeholder = You may also search for: Clubs or Lounges (was example Hip Hop/EDM).
+
+- s3.1.109: Xibo load-error Master Admin alerts + same-IP venue mismatch (dual-URL paste).
+
+- s3.1.108: floqCAST idle 64×48 icon ~+30% + Select→Go live CTA; door pass portalHome fix.
 
 - s3.1.107: VIP landing/Terms hero chrome pack + traditional Site chrome swap.
 

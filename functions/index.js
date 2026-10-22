@@ -50,6 +50,7 @@ module.exports = {
   reportDisplayLoadError: displaySecurityFns.reportDisplayLoadError,
   setVenueDisplayIps: displaySecurityFns.setVenueDisplayIps,
   getVenueDisplayTokens: displaySecurityFns.getVenueDisplayTokens,
+  revealVenueDisplayUrls: displaySecurityFns.revealVenueDisplayUrls,
   provisionVenueDisplayTokens: displaySecurityFns.provisionVenueDisplayTokens,
   rotateVenueDisplayToken: displaySecurityFns.rotateVenueDisplayToken,
   listDisplayAccessLogs: displaySecurityFns.listDisplayAccessLogs,

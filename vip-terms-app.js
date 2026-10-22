@@ -238,8 +238,8 @@
     const profileLink = document.getElementById("vipTermsOpenProfile");
     if (profileLink && window.FLOQRNav?.portalHome) {
       profileLink.href = window.FLOQRNav.portalLink
-        ? window.FLOQRNav.portalLink({tab: "guest-list-reserv"})
-        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=guest-list-reserv");
+        ? window.FLOQRNav.portalHome({tab: "passes"})
+        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=passes");
     }
 
     payBtn?.addEventListener("click", submitConsentAndPay);

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.107";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.00";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,48 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.00",
+      title: "s3.2.00 — Venue Links accurate ?k= + Search Clubs/Lounges placeholder",
+      checks: [
+        {label:"Package version s3.2.00", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.00\""]},
+        {label:"revealVenueDisplayUrls callable", file:"functions/display-security-functions.js", includes:["exports.revealVenueDisplayUrls", "assertSos2faSession"]},
+        {label:"Entity All venue links + accurate load", file:"entity-management.js", includes:["All venue links", "loadAccurateDisplayUrls", "revealVenueDisplayUrls"]},
+        {label:"Search placeholder Clubs or Lounges", file:"index.html", includes:["You may also search for: Clubs or Lounges"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.00\""]}
+      ]
+    },
+    {
+      version: "s3.1.110",
+      title: "Search FloqAi placeholder = Clubs or Lounges hint",
+      checks: [
+        {label:"Search placeholder Clubs or Lounges", file:"index.html", includes:["You may also search for: Clubs or Lounges"]},
+        {label:"i18n placeholder matches Also hint", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"You may also search for: Clubs or Lounges\""]},
+        {label:"Speech dialog Welcome only", file:"patron-app.js", includes:["CATEGORY_FLOQAI_DIALOG = [\"cat.floqaiWelcome\"]"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.110\""]}
+      ]
+    },
+    {
+      version: "s3.1.109",
+      title: "Xibo load-error alerts + same-IP venue mismatch",
+      checks: [
+        {label:"reportDisplayLoadError mismatch notify", file:"functions/display-security-functions.js", includes:["pickVenueMismatch", "notifyMasterAdminsDisplayLoadError", "displayVenueMismatch", "displayLoadError"]},
+        {label:"Security feed includes load-error types", file:"master-display-security.js", includes:["displayLoadError", "displayVenueMismatch"]},
+        {label:"Diagnostics lists venue mismatch action", file:"master-diagnostics-panels.js", includes:["display_venue_mismatch"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.109\""]}
+      ]
+    },
+    {
+      version: "s3.1.108",
+      title: "floqCAST idle 64×48 icon +25% + FloqCAST one-CTA + door pass link",
+      checks: [
+        {label:"64x48 idle icon scale CSS", file:"display.css", includes:["floqcast-idle-canvas[data-is-64x48=\"1\"]", "max-height:36vh", "width:min(520px,60vw)", "margin-top:auto!important"]},
+        {label:"Idle stamps screen format flags", file:"display-app.js", includes:["renderFloqCastIdleScreen", "dataset.is64x48", "boardAssignedFormatId"]},
+        {label:"FloqCAST progressive Go live CTA", file:"floqcast-search.js", includes:["data-go-live-venue", "syncGoLiveChrome", "Go live at {venue}"]},
+        {label:"Open door pass uses portalHome passes", file:"vip-app.js", includes:["portalHome({tab: \"passes\"})"], notIncludes:["portalLink({tab:"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.108\""]}
+      ]
+    },
     {
       version: "s3.1.107",
       title: "VIP landing chrome pack + traditional swap",
@@ -1970,6 +2012,42 @@
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
     },
     {
+      id:"s3-2-00-venue-links-accurate-display-urls",
+      area:"Master Admin Entity Management",
+      feature:"Venue Links: Club Admin + Display 1/2 with live ?k= + Xibo Diag",
+      changed:"revealVenueDisplayUrls (SOS2FA) returns accurate Display URLs with live board tokens. Entity Management All venue links + Venue Links tab list Club Admin, Display 1/2, Xibo Diag. Events use clubLocationId. Package s3.2.00; Functions deploy required.",
+      howToTest:"1) Deploy Functions. 2) Master Admin → unlock SOS2FA → Entity Management → Venue Links → search Aurelia. 3) Display 1/2 show ?k= when tokens exist (not bare location-only if secrets are set). 4) Manage selected → All venue links shows the same set + copy. 5) Event with clubLocationId shows venue links for that club.",
+      expected:"Pasteable Xibo Display URLs match Display Security secrets; Xibo Diag location= matches the venue.",
+      troubleshoot:"Location-only URLs when tokens exist → Functions not deployed / SOS2FA session missing. Permission-denied → re-unlock SOS2FA. Wrong venue on Diag → check event.clubLocationId."
+    },
+    {
+      id:"s3-1-110-search-placeholder-clubs-lounges",
+      area:"Search FloqAi",
+      feature:"Placeholder shows You may also search for: Clubs or Lounges",
+      changed:"Moved cat.floqaiAlso copy into the Search input placeholder (all langs). FloqAi speech stays on Welcome only. Package s3.1.110 / rolled into s3.2.00.",
+      howToTest:"1) Hard-refresh Search (s3.2.00). 2) Empty search box shows placeholder You may also search for: Clubs or Lounges (not Hip Hop/EDM examples). 3) FloqAi line above stays Welcome, type below to search for Events. 4) Switch language — placeholder is the localized Also string.",
+      expected:"Hint is inside the input; speech does not rotate the Also line.",
+      troubleshoot:"Old Hip Hop placeholder → hard refresh index.html + floqr-i18n.js + patron-app.js s3.2.00."
+    },
+    {
+      id:"s3-1-109-display-load-error-venue-mismatch",
+      area:"Display Security + Xibo Diagnostics",
+      feature:"Load-error Master Admin alerts + same-IP venue mismatch",
+      changed:"reportDisplayLoadError notifies Master Admin (displayLoadError). If the same client IP had allowed displayAccessLogs for a different locationId within 2h, escalates to displayVenueMismatch (dual Xibo URL paste). Security System Messages feed includes both types. Package s3.1.109; Functions deploy required.",
+      howToTest:"1) Deploy Functions. 2) Open display2 for temp-democlub-1 on a player (creates allowed access log). 3) On that same egress IP, open display-error.html?location=heist-washington-dc&board=2&reason=xibo_page_load_error. 4) Master Admin → Security → Security System Messages — see Display venue mismatch. 5) Diagnostics → Display / Xibo Load Errors also lists the event.",
+      expected:"Mismatch alert names both venues + IP; plain load-error (no prior other venue) still alerts as Display / Xibo load-error fallback. 15-minute cooldown per key.",
+      troubleshoot:"No alert → Functions not deployed / Master Admin UIDs empty / cooldown. No mismatch → access log IP differs (IPv6 rotated) or lookback >2h. Feed missing row → hard refresh master-display-security.js s3.1.109 (types displayLoadError/displayVenueMismatch)."
+    },
+    {
+      id:"s3-1-108-floqcast-idle-64x48-scale",
+      area:"Display 2 floqCAST idle",
+      feature:"64×48 idle floqCAST icon +25%; copy pushed down",
+      changed:"display.css scales floqcast-idle logo to 36vh / 60vw (~+30%) on data-is-64x48; hello/copy uses margin-top:auto under the larger mark. display-app idle stamps screen format flags. Also FloqCAST Select→Go live one CTA; Open door pass → portalHome tab=passes (fixes 404). Package s3.1.108.",
+      howToTest:"1) Open display2.html?location=temp-democlub-1 with secondary format led-64x48 (or venue secondary=64×48). 2) Idle: floqCAST mark larger (~+30%); AWAITING / GO LIVE lines sit lower under the icon; idle note near bottom. 3) floqcast-search: Select venue button becomes Go live. 4) After VIP pay, Open door pass opens My Profile Passes (not 404).",
+      expected:"Larger idle icon on 64×48; verbiage below; no Select+Go live double CTA; door pass link works.",
+      troubleshoot:"Icon still small → hard refresh display.css + display-app.js s3.1.108 (no ?v= on Xibo URL). data-is-64x48 not 1 → check secondaryDisplayScreenFormatId=led-64x48. Short viewport media query must keep 36vh/60vw for 64×48. Door pass 404 → vip-app must use portalHome({tab:\"passes\"})."
+    },
+    {
       id:"s3-1-107-vip-landing-chrome-icons",
       area:"VIP reserV landing + Site chrome",
       feature:"VIP landing/Terms hero uses chrome pack; traditional swaps with isSiteChrome",
@@ -2501,7 +2579,7 @@
       area:"Search / FloqAi",
       feature:"FloqAi venue search on Search for, Welcome help, no signed-in interstitial",
       changed:"Welcome now has a ? help with the landing description. Signed-in patrons go straight to Search for. FloqAi sits above a search box on Search for and understands Events, Clubs, Beach Clubs, Lounges and Lounge-Clubs plus genre and city (e.g. Hip Hop Clubs in DC, EDM Events in New York).",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also search for dialogs. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. FloqAi speech stays Welcome; the search box placeholder is You may also search for: Clubs or Lounges. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
       expected:"Help popout opens beside Welcome. No interstitial. Clubs / Events / Beach Clubs listings open with genre and city filters applied. Dialog text is translated."
     },
     {

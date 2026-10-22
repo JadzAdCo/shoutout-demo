@@ -1,8 +1,9 @@
 /**
  * display-error-app.js
  * Xibo / player fallback when display.html or display2.html fails to load.
- * Reports via public callable reportDisplayLoadError → diagnostic appLogs (30-day).
- * Not a security deny page (that remains on the main display gate).
+ * Reports via public callable reportDisplayLoadError → diagnostic appLogs (30-day)
+ * and Master Admin Security System Messages (load-error / venue-mismatch).
+ * Not an access-deny page (that remains on the main display gate).
  */
 (function () {
   "use strict";

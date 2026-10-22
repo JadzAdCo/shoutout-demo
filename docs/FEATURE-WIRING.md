@@ -112,6 +112,19 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Entity Management Venue Links (accurate Display URLs)
+
+**Purpose:** Master Admin → Entity Management → **Venue Links** / Manage selected shows Club Admin, Display 1/2, and Xibo Diag for a club (or an event’s `clubLocationId`). Display URLs include the live board `?k=` when secrets exist.
+
+| Layer | Wiring |
+|---|---|
+| UI | `entity-management.js` — `All venue links` + per-kind panels; Venue Links list hydrates via `revealVenueDisplayUrls` |
+| Backend | `revealVenueDisplayUrls` (`display-security-functions.js`) — requires SOS2FA session; audited `reveal_venue_display_urls`; does not rotate tokens |
+| Accuracy | `buildDisplayUrl(location, board, token)` — omit `k` only when no secret; never invent a token |
+| Xibo Diag | `display-error.html?location=&board=1\|2&reason=xibo_page_load_error` (no `?v=`) |
+
+---
+
 ## Display Security (IP + board tokens)
 
 **Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows when an allowlisted IP **or** a valid `?k=` board token unlocks the page (OR — not both required).
@@ -140,17 +153,17 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Xibo Trigger on Error / display load-error fallback
 
-**Purpose:** When Xibo cannot load the board Webpage, a fallback layout opens `display-error.html` and logs a diagnostic event (not a Security deny).
+**Purpose:** When Xibo cannot load the board Webpage, a fallback layout opens `display-error.html`, logs a diagnostic event, and alerts Master Admin (Security System Messages). Detects dual-venue Xibo paste when the same player IP recently had allowed loads for a different `locationId`.
 
 | Layer | Wiring |
 |---|---|
 | UI (Diagnostics) | Master Admin → Diagnostics → **Display / Xibo Load Errors** (`#diagnosticsDisplayErrors`) — build/copy fallback URL |
-| UI (Security) | Master Admin → Security → **Display Security Setting** — **Trigger on Error URL** per loaded venue (Display 1 / Display 2) |
-| Client | `master-diagnostics-panels.js` (`buildFallbackUrl`); `master-display-security.js` (`buildTriggerOnErrorUrl`); `display-error-app.js` |
+| UI (Security) | Master Admin → Security → **Security System Messages** — `displayLoadError` / `displayVenueMismatch` (also deny `displayAccessDenied`) |
+| Client | `master-diagnostics-panels.js` (`buildFallbackUrl`); `master-display-security.js` (security feed includes load-error types); `display-error-app.js` |
 | Page | `display-error.html` (stable URL — no `?v=`) |
-| Backend | `reportDisplayLoadError` in `functions/display-security-functions.js` |
-| Data / logs | Diagnostic app logs (≈30-day); **not** Security System Messages |
-| URL contract | `display-error.html?location={id}&board=1\|2&reason=xibo_page_load_error` — no board token required |
+| Backend | `reportDisplayLoadError` in `functions/display-security-functions.js` — `appLogs` + `notifyMasterAdminsDisplayLoadError`; lookback `displayAccessLogs` by `clientIp` (2h) via `pickVenueMismatch` |
+| Data / logs | `appLogs` (displayFallback, 30-day); inbox `type` `displayLoadError` or `displayVenueMismatch` (`messageCategory: security`); cooldown `displayLoadErrorAlerts` (15 min) |
+| URL contract | `display-error.html?location={id}&board=1\|2&reason=xibo_page_load_error` — no board token required; **fallback `location=` must match** the main `display.html` / `display2.html` venue |
 
 **Example — Shôko Barcelona Display 1**
 
@@ -371,7 +384,9 @@ When adding a section, use this skeleton:
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
 | **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
 | **Search icon tiles** | `#categoryPage .search-icon-row` order: **floqCast → ShoutOut → VIP reserV → dj BOT** (tile label; key `floqAi`). All four use chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK` (ShoutOut nightlife `shoutout-nightlife.png`, traditional `shoutout-traditional-green.png`; floqCast/VIP chrome JPGs; dj BOT placeholder mark until pack). Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
+| **Search FloqAi box (s3.1.110)** | Speech (`#categoryFloqAiSpeech`) = Welcome only. Input placeholder (`cat.floqaiPlaceholder`) = “You may also search for: Clubs or Lounges” (localized; same copy as `cat.floqaiAlso`). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
+| **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
 | **floqCast venue picker (s3.1.88)** | `floqcast-search.js` + `floqr-geo-search.js` — empty = nearest 4; typeahead = club/event name match (same geo stack as Search ShoutOut listings). Deep link `?location=` preselects (Search Select → floqCast). |
 | **Search venue Select (s3.1.89)** | `floqr-venue-actions.js` registry + `patron-app.js` `activateListingVenue`. Intent from query → CTA label + route. See “Venue Select routing” below. |

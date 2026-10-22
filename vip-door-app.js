@@ -123,7 +123,7 @@
     try { window.FLOQRI18n?.apply?.(document); } catch (_) { /* ignore */ }
     const profileLink = document.getElementById("vipDoorOpenProfile");
     if (profileLink && window.FLOQRNav?.portalLink) {
-      profileLink.href = window.FLOQRNav.portalLink({tab: "profile"});
+      profileLink.href = window.FLOQRNav.portalHome({tab: "profile"});
     }
     document.getElementById("vipDoorRefresh")?.addEventListener("click", refreshList);
     document.getElementById("vipDoorCheckIn")?.addEventListener("click", () => checkIn({}));
