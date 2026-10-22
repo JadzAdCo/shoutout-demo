@@ -50,12 +50,14 @@ VIP_IP_H = VIP_TEXT_H
 VIP_V = int(round(194 * 2 * 0.925))  # ~359
 # Chord must fit the lower arc so reser+V tips can kiss ≈ R-10 (not overhang)
 VIP_MAX_W = 720
-# Furniture: v28 ×1.20; v29 +10% more and further down toward wordmark
-VIP_FURN_SCALE = 1.20 * 1.10  # 1.32
-VIP_FURN_DOWN = 100
+# Furniture: v28 ×1.20; v29 +10%; v30 +~8% more and further toward wordmark
+VIP_FURN_SCALE = 1.20 * 1.10 * 1.08  # ~1.4256
+VIP_FURN_DOWN = 130
 # Thin border line only (1–2px) — no thick neon bloom
 VIP_LINE_OUTER = 2
 VIP_LINE_INNER = 1
+# Wordmark: bias whole mark right when placing (px)
+VIP_PLACE_RIGHT = 42
 
 
 def git_show(rev: str, path: str, dest: Path) -> None:
@@ -367,9 +369,9 @@ def scale_vip_furniture(g: Image.Image, scale: float, down: int) -> Image.Image:
     scaled = crop.resize((nw, nh), Image.Resampling.LANCZOS)
     # Center horizontally; vertical: prior center + down nudge, then clamp
     # Top clearance: stay below inner ring (clear of stroke)
-    top_clear = CY - (R - 42)
-    # Lower furniture toward wordmark; leave ~20px band before type
-    bottom_cap = 692
+    top_clear = CY - (R - 44)
+    # Lower furniture toward wordmark; leave small band before V/IP
+    bottom_cap = 722
     cx_f = (x0 + x1) / 2.0
     cy_f = (y0 + y1) / 2.0
     left = int(round(cx_f - nw / 2.0))
@@ -705,17 +707,66 @@ def _fill_left_edge(img: Image.Image, *, kind: str) -> int:
     return int(np.where(core)[1].min())
 
 
-def vip_wm():
-    """reserVIP — IP top-aligned to V; reser lower; thin Tiffany/purple borders.
+def _split_reser_under(reser_body: Image.Image, size: int, under_letters: str):
+    """Split bordered 'reser' into under (r or re) / over (rest) via shared-canvas mask."""
+    # Rebuild upright+shear letter mask at same point size, then map onto bordered body
+    u_full, by = render_upright("reser", size, WHITE)
+    full = finish(u_full, by, crop=False)
+    font = ImageFont.truetype(FONT, int(size))
+    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "reser", font=font, anchor="ls"
+    )
+    origin = (64 - bb[0], 64 + (bb[3] - bb[1]))
 
-    v29.1: equalize ink gap reser↔V and V↔IP (nudge reser left); thin borders;
-    full wordmark OVER the ring.
+    def layer(text):
+        im = Image.new("RGBA", u_full.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin, text, font=font, fill=WHITE, anchor="ls")
+        return finish(im, by, crop=False)
+
+    box = ink_bbox(full, 10)
+    fa = np.array(full.crop(box))
+    under_f = layer(under_letters)
+    ua = np.array(under_f.crop(box))
+    ink = fa[:, :, 3] > 20
+    umask = (
+        np.array(Image.fromarray(ua[:, :, 3]).filter(ImageFilter.MaxFilter(7))) > 20
+    ) & ink
+    # Map mask onto bordered reser_body (same aspect after ink crop)
+    # Scale umask to reser_body size
+    mask_img = Image.fromarray((umask.astype(np.uint8) * 255)).resize(
+        reser_body.size, Image.Resampling.NEAREST
+    )
+    um = np.array(mask_img) > 40
+    # Dilate slightly so AA/border fringe of under letters stays under
+    um = (
+        np.array(
+            Image.fromarray((um.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(5))
+        )
+        > 0
+    )
+    ra = np.array(reser_body.convert("RGBA"))
+    rink = ra[:, :, 3] > 20
+    um = um & rink
+    under = np.zeros_like(ra)
+    over = ra.copy()
+    under[um] = ra[um]
+    over[um] = (0, 0, 0, 0)
+    RU = Image.fromarray(under, "RGBA")
+    RO = Image.fromarray(over, "RGBA")
+    return RU, RO, int(um.sum())
+
+
+def vip_wm(under_letters: str = "r"):
+    """reserVIP — IP top-aligned to V; r/re UNDER ring; rest OVER.
+
+    v30: IP tucked to match reser↔V gap; r (or re) under ring; thin borders.
     """
     V = thin_border_glyph(glyph("V", VIP_V, TIFFANY), kind="cyan")
-    # Equal fill-core gap on both sides of V (reser↔V == V↔IP)
-    SIDE_GAP = 18
+    # reser↔V reference gap; IP tighter so optical gap matches r↔V (IP is smaller/higher)
+    SIDE_GAP_R = 16
+    SIDE_GAP_IP = 11
     gap_pad = 8
-    left_slack = 20
+    left_slack = 12
 
     def build_reser(target_h: int):
         size = 160
@@ -725,8 +776,8 @@ def vip_wm():
                 max(50, min(280, round(size * target_h / max(1, finish(u, by).size[1]))))
             )
         reser_body = thin_border_glyph(glyph("reser", size, WHITE), kind="white")
-        RU = Image.new("RGBA", reser_body.size, (0, 0, 0, 0))
-        return size, RU, reser_body, reser_body, 0
+        RU, RO, n = _split_reser_under(reser_body, size, under_letters)
+        return size, RU, RO, reser_body, n
 
     def build_ip(target_h: int):
         size = 160
@@ -746,7 +797,8 @@ def vip_wm():
             reser_body.size[0]
             + V.size[0]
             + IP.size[0]
-            + SIDE_GAP * 2
+            + SIDE_GAP_R
+            + SIDE_GAP_IP
             + gap_pad * 2
             + left_slack
         )
@@ -759,14 +811,13 @@ def vip_wm():
 
     reser_h = reser_body.size[1]
     H = max(V.size[1], reser_h) + gap_pad * 2
-    # Place by fill cores so thin borders do not collapse the visual gap
     v_l = _fill_left_edge(V, kind="cyan")
     v_r = _fill_right_edge(V, kind="cyan")
     reser_r = _fill_right_edge(reser_body, kind="white")
     ip_l = _fill_left_edge(IP, kind="white")
     rx = gap_pad + left_slack
-    vx = rx + reser_r + SIDE_GAP - v_l
-    ix = vx + v_r + SIDE_GAP - ip_l
+    vx = rx + reser_r + SIDE_GAP_R - v_l
+    ix = vx + v_r + SIDE_GAP_IP - ip_l
     W = max(
         ix + IP.size[0] + gap_pad,
         vx + V.size[0] + gap_pad,
@@ -777,7 +828,8 @@ def vip_wm():
     vy = gap_pad + (H - gap_pad * 2 - V.size[1])
     iy = vy
     ry = gap_pad + (H - gap_pad * 2 - reser_h)
-    over.alpha_composite(reser_body, (rx, ry))
+    under.alpha_composite(RU, (rx, ry))
+    over.alpha_composite(RO, (rx, ry))
     over.alpha_composite(V, (vx, vy))
     over.alpha_composite(IP, (ix, iy))
     body = Image.alpha_composite(under, over)
@@ -817,8 +869,8 @@ def vip_wm():
     vh = int(np.where(tv)[0].max() - np.where(tv)[0].min()) + 1 if tv.any() else 0
     purp = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 140) & (wa[:, :, 2] > 180) & (wa[:, :, 1] < 180)
     print(
-        f"  TYPE VIP reser size={size} IP size={ip_size} (top-align V) "
-        f"gap_reser_V={g_rv} gap_V_IP={g_vi} SIDE_GAP={SIDE_GAP} "
+        f"  TYPE VIP reser size={size} IP size={ip_size} under='{under_letters}' n={remask_n} "
+        f"gap_reser_V={g_rv} gap_V_IP={g_vi} SIDE_GAP_R/IP={SIDE_GAP_R}/{SIDE_GAP_IP} "
         f"white_h={wh_h} V={VIP_V} tiffany_h={vh} purple_line={int(purp.sum())} "
         f"body={B.size} thin-border=tiffany+purple"
     )
@@ -1349,19 +1401,11 @@ def build_all():
     print("DONE — layers in", LAYERS)
 
 
-def build_vip_only():
-    """Rebuild VIP nightlife + traditional only (keep FloqCAST / djBOT untouched)."""
-    LAYERS.mkdir(parents=True, exist_ok=True)
-    ensure_ring()
-    ensure_traditional_ring()
-    vip_g = extract_vip_graphic()
-    print("=== assemble VIP (only) ===")
-    g = Image.open(vip_g)
-    under, over, body = vip_wm()
-    furn_bottom = graphic_bottom(g, 700)
+def _place_vip_wordmark(body, furn_bottom: int):
+    """Kiss lower arc; bias whole mark slightly right (VIP_PLACE_RIGHT)."""
     vip_min = furn_bottom + 8
-    left = max(4, (S - body.size[0]) // 2)
-    top = min(max(vip_min, S - body.size[1] - 40), S - body.size[1] - 4)
+    left0 = max(4, (S - body.size[0]) // 2 + VIP_PLACE_RIGHT)
+    top0 = min(max(vip_min, S - body.size[1] - 40), S - body.size[1] - 4)
     ba = np.array(body)
     ink = ba[:, :, 3] > 40
     ys, xs = np.where(ink)
@@ -1378,30 +1422,75 @@ def build_vip_only():
 
     reser_bot, reser_bx = bottom_tip(left_band)
     v_bot, v_bx = bottom_tip(v_band)
-    best_t, best_left, best_sc = top, left, 1e18
-    for L in range(max(4, left - 60), min(S - body.size[0] - 4, left + 60) + 1, 2):
+    best_t, best_left, best_sc = top0, left0, 1e18
+    for L in range(max(4, left0 - 40), min(S - body.size[0] - 4, left0 + 80) + 1, 2):
         for t in range(vip_min, S - body.size[1] - 2, 1):
             rd_r = float(np.hypot(L + reser_bx - CX, t + reser_bot - CY))
             rd_v = float(np.hypot(L + v_bx - CX, t + v_bot - CY))
             if max(rd_r, rd_v) > (R + 4):
                 continue
-            sc = abs(rd_r - TIP_TARGET) * 1.4 + abs(rd_v - TIP_TARGET)
+            # Prefer rightward placements slightly
+            sc = abs(rd_r - TIP_TARGET) * 1.4 + abs(rd_v - TIP_TARGET) - (L - left0) * 0.02
             if sc < best_sc:
                 best_sc, best_t, best_left = sc, t, L
     if best_sc >= 1e17:
-        best_left = left
+        best_left = left0
         for t in range(vip_min, S - body.size[1] - 2, 1):
-            rd_r = float(np.hypot(left + reser_bx - CX, t + reser_bot - CY))
-            rd_v = float(np.hypot(left + v_bx - CX, t + v_bot - CY))
+            rd_r = float(np.hypot(left0 + reser_bx - CX, t + reser_bot - CY))
+            rd_v = float(np.hypot(left0 + v_bx - CX, t + v_bot - CY))
             best_t = t
             if (rd_r + rd_v) / 2 >= (R - 12):
                 break
         best_sc = -1
-    top, left = best_t, best_left
+    return best_left, best_t, best_sc, vip_min
+
+
+def _reser_e_needs_under(under: Image.Image, over: Image.Image, left: int, top: int) -> bool:
+    """True if the first 'e' of reser (over layer white left of V) sits outside the ring."""
+    oa = np.array(paste_type(over, left, top))
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    r, g, b, al = (oa[:, :, i].astype(int) for i in range(4))
+    white = (al > 40) & (r > 200) & (g > 200) & (b > 200)
+    tiffany = (al > 40) & (r < 100) & (g > 150) & (b > 180)
+    if not tiffany.any() or not white.any():
+        return False
+    vl = int(np.where(tiffany)[1].min())
+    # Over-layer white left of V = "eser" (or "ser" if re under) tips
+    left_white = white & (xx < vl - 2)
+    if not left_white.any():
+        return False
+    # Leftmost over tip — if outside ring stroke, push more letters under
+    lx = int(np.where(left_white)[1].min())
+    ly = int(np.where(left_white & (xx == lx))[0].mean())
+    rd = float(np.hypot(lx - CX, ly - CY))
+    return rd > (R - 6)
+
+
+def build_vip_only():
+    """Rebuild VIP nightlife + traditional only (keep FloqCAST / djBOT untouched)."""
+    LAYERS.mkdir(parents=True, exist_ok=True)
+    ensure_ring()
+    ensure_traditional_ring()
+    vip_g = extract_vip_graphic()
+    print("=== assemble VIP (only) ===")
+    g = Image.open(vip_g)
+    under_letters = "r"
+    under, over, body = vip_wm(under_letters=under_letters)
+    furn_bottom = graphic_bottom(g, 720)
+    left, top, best_sc, vip_min = _place_vip_wordmark(body, furn_bottom)
+    if _reser_e_needs_under(under, over, left, top):
+        print("  reser 'e' still above ring → rebuild with under='re'")
+        under_letters = "re"
+        under, over, body = vip_wm(under_letters=under_letters)
+        left, top, best_sc, vip_min = _place_vip_wordmark(body, furn_bottom)
     print(
         f"  place VIP left={left} top={top} body={body.size} furn_bottom={furn_bottom} "
-        f"kiss_score={best_sc:.1f} gap={top - furn_bottom}"
+        f"kiss_score={best_sc:.1f} gap={top - furn_bottom} under={under_letters}"
     )
+    # Guard: furniture must not touch V (gap ≥ 6)
+    if top - furn_bottom < 6:
+        print(f"  WARN furniture/type gap {top - furn_bottom} — consider lower furniture scale")
     vip = assemble(g, under, over, left, top, nightlife=True)
     vip.convert("RGB").save(
         ROOT / "images/chrome/vip-nightlife.jpg", quality=98, subsampling=0
@@ -1413,9 +1502,9 @@ def build_vip_only():
         ROOT / "images/chrome/vip-traditional.jpg", quality=98, subsampling=0
     )
     preview = vip.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/vip-nightlife-v29.png", quality=95)
+    preview.save("/opt/cursor/artifacts/vip-nightlife-v30.png", quality=95)
     trad.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS).save(
-        "/opt/cursor/artifacts/vip-traditional-v29.png", quality=95
+        "/opt/cursor/artifacts/vip-traditional-v30.png", quality=95
     )
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
@@ -1423,6 +1512,10 @@ def build_vip_only():
     r, gch, b = a[:, :, 0].astype(int), a[:, :, 1].astype(int), a[:, :, 2].astype(int)
     white = (r > 210) & (gch > 210) & (b > 210) & (yy > 550)
     print(f"VERIFY VIP white outside R: {int((white & (dist > 490)).sum())}")
+    # Under-layer ink should exist under the ring stroke
+    ua = np.array(paste_type(under, left, top))
+    under_on_ring = (ua[:, :, 3] > 40) & (dist > (R - 16)) & (dist < (R + 8))
+    print(f"VERIFY under-ring ink px={int(under_on_ring.sum())}")
     print("DONE VIP-only —", ROOT / "images/chrome/vip-nightlife.jpg")
 
 
