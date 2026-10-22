@@ -52,16 +52,30 @@
   }
 
   function templateRow(template) {
+    const clubOwned = TT.isClubOwnedTemplate?.(template, locationId);
     const venueTags = state.tags[template.id] || [];
     const builtIn = (template.tags || []).slice(0, 8);
+    const desc = window.FLOQRTemplateCopy?.description?.(template) || template.description || "";
+    const primary = state.venue?.primaryDisplayScreenFormatId || state.venue?.displayScreenFormatIds?.[0] || "led-96x48";
+    const how = window.FLOQRTemplateCopy?.howitWorks?.(template, primary) || "";
     const chips = venueTags.map(tag => `<span class="template-tag-chip">${esc(tag)}${state.role.canDelete ? ` <button type="button" class="ghost" data-tag-remove="${esc(template.id)}" data-tag="${esc(tag)}" aria-label="${esc(t("templateTags.remove", "Remove tag {tag}", {tag}))}">×</button>` : ""}</span>`).join("");
+    const tagHint = clubOwned
+      ? t("templateTags.clubOwnedEditable", "Club-owned template — Tag chips you set here replace the catalog tags patrons see.")
+      : t("templateTags.venueEditable", "Venue tags you can edit (patrons see these on the template card)");
+    const seedBtn = clubOwned && !venueTags.length && builtIn.length && state.role.canWrite
+      ? `<button type="button" class="buttonlike" data-tag-seed="${esc(template.id)}">${esc(t("templateTags.seedFromCatalog", "Start from catalog tags"))}</button>`
+      : "";
     return `<article class="queue-item template-tags-row" data-template-row="${esc(template.id)}">
-      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(template.category || "")}</span></div>
-      <p class="sub small">${esc(t("templateTags.builtIn", "FLOQR tags:"))} ${esc(builtIn.join(", "))}</p>
+      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(clubOwned ? t("templateTags.clubOwned", "Club-owned") : (template.category || ""))}</span></div>
+      ${desc ? `<p class="sub small"><strong>${esc(t("template.descriptionLabel", "Description"))}:</strong> ${esc(desc)}</p>` : ""}
+      ${how ? `<p class="sub small"><strong>${esc(t("template.howItWorks", "How it works"))}:</strong> ${esc(how)}</p>` : ""}
+      <p class="sub small">${esc(t("templateTags.builtIn", "FLOQR tags:"))} ${esc(builtIn.join(", ") || "—")}</p>
+      <p class="sub small"><strong>${esc(t("template.tagLabel", "Tag"))}:</strong> ${esc(tagHint)}</p>
       <div class="template-tag-chips">${chips || `<span class="sub small">${esc(t("templateTags.none", "No venue tags yet."))}</span>`}</div>
       <form class="template-tag-add" data-tag-add="${esc(template.id)}">
         <input type="text" maxlength="${TT.MAX_TAG_LENGTH}" placeholder="${esc(t("templateTags.placeholder", "Add a tag, e.g. game night"))}" aria-label="${esc(t("templateTags.placeholder", "Add a tag, e.g. game night"))}"/>
         <button type="submit" class="primary">${esc(t("templateTags.add", "Add tag"))}</button>
+        ${seedBtn}
       </form>
     </article>`;
   }
@@ -106,6 +120,15 @@
       }
     });
     list.addEventListener("click", event => {
+      const seed = event.target.closest("[data-tag-seed]");
+      if (seed) {
+        const id = seed.dataset.tagSeed;
+        const template = state.templates.find(row => row.id === id);
+        if (!template || !state.role.canWrite) return;
+        const seeded = (template.tags || []).map(TT.normalizeTag).filter(Boolean).slice(0, TT.MAX_TAGS);
+        commit(id, seeded);
+        return;
+      }
       const button = event.target.closest("[data-tag-remove]");
       if (!button) return;
       const id = button.dataset.tagRemove;

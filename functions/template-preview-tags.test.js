@@ -96,11 +96,17 @@ test("template roles: Administrator reads, writes and deletes; Manager reads and
 
 test("template tags cover every template offered at the venue", () => {
   const s = loadModules();
-  const ids = s.FLOQRTemplateTags.templatesForVenue("heist-washington-dc", venue(s, "heist-washington-dc")).map((t) => t.id);
+  const list = s.FLOQRTemplateTags.templatesForVenue("heist-washington-dc", venue(s, "heist-washington-dc"));
+  const ids = list.map((t) => t.id);
   assert.ok(ids.includes("blackwhite"));
   assert.ok(ids.includes("heistVaultDollars"));
   assert.ok(ids.includes("zebbiesFootballTeamIntro"));
   assert.equal(new Set(ids).size, ids.length, "no duplicates");
+  assert.equal(s.FLOQRTemplateTags.isClubOwnedTemplate(list[0], "heist-washington-dc"), true, "club-owned templates sort first");
+  assert.deepEqual(
+    plain(s.FLOQRTemplateTags.publicTagsFor(s.SHOUTOUT_TEMPLATES.heistVaultNight, ["vip"], "heist-washington-dc")),
+    ["vip"]
+  );
 });
 
 test("Firestore rules enforce the template roles", () => {

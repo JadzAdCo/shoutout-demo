@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.27";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.27";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.28";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.28";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,114 +223,127 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.28",
+      title: "s3.2.28 — Template Description / How it works / Tag labels",
+      checks: [
+        {label:"Package version s3.2.28", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
+        {label:"Labeled template copy UI", file:"patron-app.js", includes:["template.descriptionLabel", "template.tagLabel", "template-select-tags-line"]},
+        {label:"Template copy CSS", file:"styles.css", includes:[".template-select-copy", ".template-select-tag-chips"]},
+        {label:"Club Admin tag ownership copy", file:"admin.html", includes:["admin.templateCopyOwnership", "templateTags.openFromAdmin"]},
+        {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Master Admin owns", "templateManageHowitWorks96"]},
+        {label:"i18n descriptionLabel + tagLabel", file:"floqr-i18n.js", includes:["\"template.descriptionLabel\": \"Description\"", "\"template.tagLabel\": \"Tag\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
+      ]
+    },
+    {
       version: "s3.2.27",
       title: "s3.2.27 — Template howitWorks + Traditional description",
       checks: [
-        {label:"Package version s3.2.27", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.27", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Traditional description rewrite", file:"shared-data.js", includes:["antiquated club signs"], notIncludes:["Default shared marquee lightbox for every club"]},
         {label:"howitWorks helper", file:"shared-data.js", includes:["FLOQRTemplateCopy", "howitWorks(template, formatId)"]},
         {label:"Template card howitWorks UI", file:"patron-app.js", includes:["template-select-howitworks", "FLOQRTemplateCopy?.howitWorks"]},
         {label:"i18n howItWorks", file:"floqr-i18n.js", includes:["\"template.howItWorks\": \"How it works\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.26",
       title: "s3.2.26 — Template select without floating FloqAi",
       checks: [
-        {label:"Package version s3.2.26", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.26", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Agent visibility intent-only", file:"floqai-search.js", includes:["const show = !!onIntent;", "Template select already has the lens Search field"], notIncludes:["const show = !!(onIntent || onTemplates)"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.25",
       title: "s3.2.25 — Search icons at bottom on phone/tablet",
       checks: [
-        {label:"Package version s3.2.25", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.25", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Mobile/tablet pin Search icons to bottom", file:"styles.css", includes:["max-width:1180px)", "#categoryPage.page.active", "margin-top:auto!important", "100dvh"]},
         {label:"Desktop under-Search icon layout", file:"styles.css", includes:["min-width:1181px)", "margin-top:28px!important", "max-width:720px"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.24",
       title: "s3.2.24 — Login last Site chrome + single Privacy link",
       checks: [
-        {label:"Package version s3.2.24", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.24", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Chrome paint keeps last-used", file:"floqr-chrome-scheme.js", includes:["always paint last-used chrome", "hydrateFromProfile", "applyDocument(getChrome())"], notIncludes:["Only force Nightlife after access is known to be denied"]},
         {label:"Single Privacy footer link", file:"index.html", includes:["data-i18n=\"app.privacy\">Privacy</a>", "login-page-footer"], notIncludes:["data-i18n=\"app.doNotSell\""]},
         {label:"i18n app.privacy", file:"floqr-i18n.js", includes:["\"app.privacy\": \"Privacy\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.23",
       title: "s3.2.23 — Login welcome help trim + left-align + 80px under logo",
       checks: [
-        {label:"Package version s3.2.23", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.23", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Welcome help OTP-only body", file:"floqai-help-repository.js", includes:["Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Index help body trimmed", file:"index.html", includes:["data-floqr-help-body=\"Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Left-align welcome + 80px under logo", file:"styles.css", includes:["margin:80px 0 14px", "login-welcome-line.help-label{display:flex", "justify-content:flex-start", "text-align:left"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.22",
       title: "s3.2.22 — Login privacy footer + short welcome + ? beside copy",
       checks: [
-        {label:"Package version s3.2.22", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.22", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Welcome copy Please signin or signup", file:"index.html", includes:["Please signin or signup", "help-label-text", "login-page-footer"]},
         {label:"Privacy link in page footer", file:"index.html", includes:["class=\"login-page-footer\"", "class=\"login-legal\"", "data-i18n=\"app.privacy\"", "role=\"contentinfo\""]},
         {label:"Footer CSS pins legal to bottom", file:"styles.css", includes:["#landingPage.page.active{display:flex", "login-page-footer{position:fixed", "bottom:0", "login-welcome-line.help-label"]},
         {label:"i18n welcome short", file:"floqr-i18n.js", includes:["\"app.welcomeSignIn\": \"Please signin or signup\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.21",
       title: "s3.2.21 — Template select LED preview + Search lens",
       checks: [
-        {label:"Package version s3.2.21", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.21", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Template search lens form", file:"index.html", includes:["id=\"templateSearchForm\"", "id=\"templateSearchGo\"", "category-floqai-lens"]},
         {label:"LED preview helpers", file:"patron-app.js", includes:["templateLedPreviewHtml", "mountTemplateLedPreviews", "primaryTemplateFormat"]},
         {label:"Use-only card actions", file:"patron-app.js", includes:["data-template-open", "template-select-card"], notIncludes:["data-template-preview=\"${esc(template.id)}\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.20",
       title: "s3.2.20 — Site chrome from FloqR tile palette",
       checks: [
-        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Tile palette CSS vars", file:"styles.css", includes:["--floqr-tile-cyan:#00c8ff", "--floqr-tile-magenta:#ff2eb8", "--floqr-brand-gradient-h"]},
         {label:"Login stack uses tile gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,var(--floqr-tile-cyan)", "var(--floqr-tile-violet)", "var(--floqr-tile-magenta)"]},
         {label:"Theme blocks consume tile accents", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"]", "--accent:var(--floqr-tile-cyan)", "html[data-floqr-chrome=\"blackTiffany\"]", "html[data-floqr-chrome=\"whiteBlack\"]", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
         {label:"Palette ref path in CSS", file:"styles.css", includes:["images/chrome/floqr-tile-palette-ref.png", "--floqr-tile-coral:#ff4d6a"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.19",
       title: "s3.2.19 — Search lens in input + grey halo icons (no black tile)",
       checks: [
-        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Search lens submit in field", file:"index.html", includes:["category-floqai-field", "category-floqai-lens", "id=\"categoryFloqAiGo\""]},
         {label:"Lens CSS no fill shiny outline", file:"floqai-search.css", includes:[".category-floqai-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
         {label:"Icon faces transparent + tile halo", file:"styles.css", includes:["background:transparent", "rgba(0,200,255,.28)", "rgba(255,46,184,.2)"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.18",
       title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
       checks: [
-        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
         {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
         {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
         {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
@@ -342,7 +355,7 @@
         {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
         {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.27"]},
         {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
 
@@ -2090,6 +2103,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-28-template-tag-labels",
+      area:"ShoutOut / Templates",
+      feature:"Labeled Description / How it works / Tag on template cards",
+      changed:"Template cards show Description:, How it works:, and Tag: lines with individual tag chips. Club Admin edits venue tags (Template Mgmt → Manage template tags); Master Admin owns description + per-size howitWorks. Full catalog seeded with size-specific howitWorks. Package s3.2.28.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips (not mixed into meta). 3) Club Admin → Template Mgmt → Manage template tags — club-owned templates listed first; Start from catalog tags then edit; confirm Tag: on patron cards uses your set (replaces catalog). 4) On a shared template, added venue tags merge with FLOQR tags. 5) Master Admin → Templates → edit Description + How it works per LED size.",
+      expected:"Three labeled lines; Club Admin controls Tag (replace on club-owned); Master owns description/howitWorks.",
+      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Club-owned still shows old catalog tags after save → FLOQRTemplateTags.publicTagsFor replace path. Description editable in Club Admin → should be Master-only."
+    },
     {
       id:"s3-2-27-template-howitworks",
       area:"ShoutOut / Templates",

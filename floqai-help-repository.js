@@ -1620,7 +1620,7 @@
     {
       id: "help-default-template",
       title: "Default Template",
-      body: "Free Traditional Black and White Classic. The card shows a true LED preview at this venue’s primary display size (name and dimension on top; short description, How it works for that LED size, and tags below). Tap Use to open the editor. Search above for public, club-approved, and personal templates by name, description, howitWorks, tags, or popularity.",
+      body: "Free Traditional Black and White Classic. The card shows a true LED preview at this venue’s primary display size, then labeled Description:, How it works: (for that LED size), and Tag: chips. Tap Use to open the editor. Search above for public, club-approved, and personal templates by name, description, howitWorks, tags, or popularity.",
       searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive", "template search", "led preview", "use template"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
@@ -1629,7 +1629,7 @@
     {
       id: "help-floqai-template-search",
       title: "Template search",
-      body: "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venue primary size — Use is the only action.",
+      body: "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venue primary size with labeled Description:, How it works:, and Tag: lines — Use is the only action.",
       searchPhrases: ["floqai template", "template search", "sports jersey", "nba nfl cars humor", "search templates", "led preview"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
@@ -1721,8 +1721,8 @@
     {
       id: "help-template-tags",
       title: "Template tags",
-      body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",
-      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager"],
+      body: "Under each template patrons see Description, How it works (for the venue LED size), and Tag chips. Club Admin and Template Administrators/Managers edit Tag chips here — for club-owned templates, your tags replace catalog tags patrons see. Description and How it works are Master Admin–owned and read-only. Add words patrons might type, such as game night or birthday. Template Managers can add tags; Administrators and Club Admins can also remove them. Assign roles under Role Activity & Permission.",
+      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager", "club owned template tags"],
       links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin", "serviceMember"],
       source: "help-repository-seed",

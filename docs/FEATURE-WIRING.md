@@ -46,18 +46,23 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 ---
 
 
-## Template howitWorks (s3.2.27)
+## Template Description / How it works / Tag (s3.2.28)
 
-**Purpose:** Patrons see a short general `description` plus size-specific **How it works** copy for the venue’s primary LED format.
+**Purpose:** Template gallery cards show three labeled lines — **Description:**, **How it works:** (venue primary LED size), and **Tag:** chips. Club Admin owns venue tags; Master Admin owns description + howitWorks.
 
 | Layer | Wiring |
 |---|---|
-| Data | `SHOUTOUT_TEMPLATES.*.description` (general) + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates` |
-| Helper | `window.FLOQRTemplateCopy.howitWorks(template, formatId)` / `.description(template)` |
-| Gallery | `patron-app.js` `templateCard` / `variantCard` / `updateTemplateSummary` — `.template-select-desc` (2-line clamp) + `.template-select-howitworks` |
-| Admin | Master Admin template form: Description + three How it works textareas (`templateManageHowitWorks*`) |
-| i18n | `template.howItWorks` in all chrome packs |
-| Diagnostics | Manual test `s3-2-27-template-howitworks` |
+| Data | `SHOUTOUT_TEMPLATES.*.description` + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates`; venue tags via `venueTemplateTags` |
+| Helper | `FLOQRTemplateCopy.howitWorks` / `.description`; `FLOQRTemplateTags.publicTagsFor` / `isClubOwnedTemplate` |
+| Gallery | `patron-app.js` — `.template-select-copy` with `Description:` / `How it works:` / `Tag:` chips (`publicTagsForTemplate`) |
+| Club Admin | Template Mgmt → Manage template tags; club-owned templates listed first — venue tags **replace** catalog tags when set; shared templates **merge** venue + catalog tags |
+| Master Admin | Description + per-size howitWorks (`templateManageHowitWorks*`); catalog tags are built-in FLOQR tags |
+| i18n | `template.descriptionLabel` / `howItWorks` / `tagLabel` / `noTags`; `templateTags.venueEditable` / `clubOwned*` / `seedFromCatalog`; `admin.templateCopyOwnership` |
+| Diagnostics | Manual tests `s3-2-28-template-tag-labels`, `s3-2-27-template-howitworks` |
+
+## Template howitWorks (s3.2.27)
+
+**Purpose:** Patrons see a short general `description` plus size-specific **How it works** copy for the venue’s primary LED format. Superseded UI labels in s3.2.28; datapoint unchanged.
 
 ---
 ## Login + Search chrome (s3.2.26)

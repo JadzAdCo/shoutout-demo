@@ -56,7 +56,30 @@
     return tags.filter(existing => !sameTag(existing, value));
   }
 
-  /** Templates patrons can pick at this venue (same set as the patron template picker). */
+  /** Club-exclusive / venue-scoped template this Club Admin owns (not a shared FLOQR catalog row). */
+  function isClubOwnedTemplate(template = {}, locationId = "") {
+    const id = String(locationId || "").trim();
+    if (!id || !template) return false;
+    if (Array.isArray(template.venueIds) && template.venueIds.map(String).includes(id)) return true;
+    return String(template.scope || "").toLowerCase() === "club"
+      && Array.isArray(template.venueIds)
+      && template.venueIds.map(String).includes(id);
+  }
+
+  /**
+   * Tag chips patrons see: for club-owned templates, venue tags replace catalog tags when set
+   * (Club Admin fully controls Tag:). Shared templates merge venue tags with FLOQR catalog tags.
+   */
+  function publicTagsFor(template = {}, venueTags = [], locationId = "") {
+    const venue = (venueTags || []).map(normalizeTag).filter(Boolean);
+    const catalog = (template.tags || []).map(normalizeTag).filter(Boolean);
+    if (isClubOwnedTemplate(template, locationId) && venue.length) {
+      return Array.from(new Set(venue));
+    }
+    return Array.from(new Set([...venue, ...catalog]));
+  }
+
+  /** Templates patrons can pick at this venue (same set as the patron template picker). Club-owned first. */
   function templatesForVenue(locationId, location = {}, templates = global.SHOUTOUT_TEMPLATES || {}, standardIds = global.SHOUTOUT_STANDARD_TEMPLATE_IDS || []) {
     const venueSpecific = Object.values(templates).filter(t => (t.venueIds || []).includes(locationId)).map(t => t.id);
     const standard = location.restrictTemplatesToLocationSet ? standardIds.filter(id => String(id).startsWith("soccer")) : standardIds;
@@ -64,11 +87,12 @@
     const ids = Array.from(new Set([...always, ...(location.templates || []), ...venueSpecific, ...standard]
       .map(id => (/^soccer/i.test(id) && id !== "soccerJersey" ? "soccerJersey" : id))));
     const seen = new Set();
-    return ids.map(id => templates[id]).filter(t => {
+    const list = ids.map(id => templates[id]).filter(t => {
       if (!t || seen.has(t.id)) return false;
       seen.add(t.id);
       return String(t.status || "active") === "active" && global.FLOQRScreenDatapoints?.templateFitsVenue?.(t, location) !== false;
     });
+    return list.sort((a, b) => Number(isClubOwnedTemplate(b, locationId)) - Number(isClubOwnedTemplate(a, locationId)));
   }
 
   async function loadVenueTags(db, locationId) {
@@ -113,6 +137,6 @@
   global.FLOQRTemplateTags = {
     MAX_TAGS, MAX_TAG_LENGTH, ROLES, NO_ROLE,
     tagDocId, roleDocId, normalizeTag, sameTag, roleFor, roleFromPermissions, addTag, removeTag,
-    templatesForVenue, loadVenueTags, saveVenueTags, loadRoleDoc
+    isClubOwnedTemplate, publicTagsFor, templatesForVenue, loadVenueTags, saveVenueTags, loadRoleDoc
   };
 })(typeof window !== "undefined" ? window : globalThis);

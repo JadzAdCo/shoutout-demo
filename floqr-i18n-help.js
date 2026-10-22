@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.27";
+  const VERSION = "s3.2.28";
 
   const packs = {
     "ru": {
@@ -248,7 +248,7 @@
       },
       "help-template-tags": {
         title: "Теги шаблонов",
-        body: "Добавьте слова, которые гости могут ввести при поиске шаблона на вашей площадке, например вечер матча или день рождения. Менеджеры шаблонов могут добавлять теги. Администраторы шаблонов и Club Admin могут также удалять теги. Club Admin назначает эти роли в разделе Role Activity & Permission."
+        body: "Под каждым шаблоном гости видят Описание, Как это работает (для размера LED площадки) и теги. Club Admin и администраторы/менеджеры шаблонов правят здесь теги площадки — Описание и Как это работает остаются у Master Admin (только чтение). Добавляйте слова, которые могут искать гости, например вечер матча или день рождения. Менеджеры могут добавлять теги; администраторы и Club Admin — также удалять. Назначайте роли в Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Предпросмотр шаблона",
@@ -554,7 +554,7 @@
       },
       "help-template-tags": {
         title: "Sjabloontags",
-        body: "Voeg woorden toe die gasten kunnen typen als ze een sjabloon zoeken bij je locatie, zoals wedstrijdavond of verjaardag. Sjabloonmanagers kunnen tags toevoegen. Sjabloonbeheerders en Club Admins kunnen tags ook verwijderen. Club Admin wijst deze rollen toe onder Role Activity & Permission."
+        body: "Onder elk sjabloon zien gasten Beschrijving, Hoe het werkt (voor het LED-formaat van de locatie) en tags. Club Admin en sjabloonbeheerders/-managers bewerken hier locatietags — Beschrijving en Hoe het werkt blijven van Master Admin (alleen-lezen). Voeg woorden toe die gasten kunnen typen, zoals wedstrijdavond of verjaardag. Managers kunnen tags toevoegen; beheerders en Club Admins kunnen ze ook verwijderen. Wijs rollen toe onder Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Een sjabloon bekijken",
@@ -860,7 +860,7 @@
       },
       "help-template-tags": {
         title: "Tags des modèles",
-        body: "Ajoutez des mots que les clients pourraient taper pour trouver un modèle dans votre lieu, comme soirée match ou anniversaire. Les Gestionnaires des modèles peuvent ajouter des tags. Les Administrateurs des modèles et les Club Admins peuvent aussi en retirer. Le Club Admin attribue ces rôles dans Role Activity & Permission."
+        body: "Sous chaque modèle, les clients voient Description, Comment ça marche (selon la taille LED du lieu) et les tags. Le Club Admin et les Administrateurs/Gestionnaires de modèles modifient les tags du lieu ici — Description et Comment ça marche restent Master Admin (lecture seule). Ajoutez des mots que les clients pourraient taper, comme soirée match ou anniversaire. Les Gestionnaires peuvent ajouter des tags ; les Administrateurs et Club Admins peuvent aussi les retirer. Attribuez les rôles dans Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Aperçu d’un modèle",
@@ -1166,7 +1166,7 @@
       },
       "help-template-tags": {
         title: "Vorlagen-Tags",
-        body: "Füge Wörter hinzu, die Gäste eintippen könnten, wenn sie bei deiner Location eine Vorlage suchen, etwa Spieleabend oder Geburtstag. Vorlagen-Manager können Tags hinzufügen. Vorlagen-Administratoren und Club Admins können Tags auch entfernen. Club Admin vergibt diese Rollen unter Role Activity & Permission."
+        body: "Unter jeder Vorlage sehen Gäste Beschreibung, So funktioniert’s (für die LED-Größe der Location) und Tags. Club Admin sowie Vorlagen-Administratoren/-Manager bearbeiten hier die Location-Tags — Beschreibung und So funktioniert’s gehören Master Admin (nur lesbar). Füge Wörter hinzu, die Gäste tippen könnten, z. B. Spieleabend oder Geburtstag. Manager können Tags hinzufügen; Administratoren und Club Admins können sie auch entfernen. Rollen unter Role Activity & Permission zuweisen."
       },
       "help-template-preview": {
         title: "Vorlage ansehen",
@@ -1472,7 +1472,7 @@
       },
       "help-template-tags": {
         title: "Etiquetas de plantillas",
-        body: "Añade palabras que los clientes podrían escribir al buscar una plantilla en tu local, como noche de partido o cumpleaños. Los Gestores de plantillas pueden añadir etiquetas. Los Administradores de plantillas y los Club Admins también pueden quitarlas. El Club Admin asigna estos roles en Role Activity & Permission."
+        body: "Bajo cada plantilla los clientes ven Descripción, Cómo funciona (según el tamaño LED del local) y etiquetas. El Club Admin y los Administradores/Gestores de plantillas editan aquí las etiquetas del local — Descripción y Cómo funciona son de Master Admin (solo lectura). Añade palabras que puedan buscar, como noche de partido o cumpleaños. Los gestores pueden añadir etiquetas; administradores y Club Admins también pueden quitarlas. Asigna roles en Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Vista previa de una plantilla",
@@ -1778,7 +1778,7 @@
       },
       "help-template-tags": {
         title: "Tag dei modelli",
-        body: "Aggiungi parole che i clienti potrebbero scrivere cercando un modello nel tuo locale, come serata partita o compleanno. I Gestori dei modelli possono aggiungere tag. Gli Amministratori dei modelli e i Club Admin possono anche rimuoverli. Il Club Admin assegna questi ruoli in Role Activity & Permission."
+        body: "Sotto ogni modello i clienti vedono Descrizione, Come funziona (per la misura LED della sede) e i tag. Club Admin e Amministratori/Gestori modelli modificano qui i tag della sede — Descrizione e Come funziona restano di Master Admin (sola lettura). Aggiungi parole che i clienti potrebbero digitare, come serata partita o compleanno. I gestori possono aggiungere tag; gli amministratori e i Club Admin possono anche rimuoverli. Assegna i ruoli in Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Anteprima di un modello",
@@ -2084,7 +2084,7 @@
       },
       "help-template-tags": {
         title: "Tags de modelos",
-        body: "Adicione palavras que os clientes possam digitar ao procurar um modelo no seu local, como noite de jogo ou aniversário. Gestores de modelos podem adicionar tags. Administradores de modelos e Club Admins também podem removê-las. O Club Admin atribui esses papéis em Role Activity & Permission."
+        body: "Sob cada modelo os clientes veem Descrição, Como funciona (para o tamanho LED do local) e tags. Club Admin e Administradores/Gestores de modelos editam aqui as tags do local — Descrição e Como funciona ficam com Master Admin (somente leitura). Adicione palavras que os clientes possam digitar, como noite de jogo ou aniversário. Gestores podem adicionar tags; administradores e Club Admins também podem remover. Atribua funções em Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Pré-visualizar um modelo",
@@ -2390,7 +2390,7 @@
       },
       "help-template-tags": {
         title: "Ετικέτες προτύπων",
-        body: "Προσθέστε λέξεις που μπορεί να πληκτρολογήσουν οι πελάτες όταν ψάχνουν πρότυπο στον χώρο σας, όπως βραδιά αγώνα ή γενέθλια. Οι Υπεύθυνοι προτύπων μπορούν να προσθέτουν ετικέτες. Οι Διαχειριστές προτύπων και οι Club Admin μπορούν επίσης να τις αφαιρούν. Ο Club Admin αναθέτει αυτούς τους ρόλους στο Role Activity & Permission."
+        body: "Κάτω από κάθε πρότυπο οι πελάτες βλέπουν Περιγραφή, Πώς λειτουργεί (για το μέγεθος LED του χώρου) και ετικέτες. Ο Club Admin και οι Διαχειριστές/Υπεύθυνοι προτύπων επεξεργάζονται εδώ τις ετικέτες χώρου — Περιγραφή και Πώς λειτουργεί παραμένουν στον Master Admin (μόνο ανάγνωση). Προσθέστε λέξεις που μπορεί να πληκτρολογήσουν, όπως βραδιά αγώνα ή γενέθλια. Οι υπεύθυνοι μπορούν να προσθέτουν ετικέτες· οι διαχειριστές και Club Admin μπορούν και να τις αφαιρούν. Αναθέστε ρόλους στο Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Προεπισκόπηση προτύπου",
@@ -2696,7 +2696,7 @@
       },
       "help-template-tags": {
         title: "Tagi szablonów",
-        body: "Dodaj słowa, które goście mogą wpisać, szukając szablonu w Twoim lokalu, np. wieczór meczowy albo urodziny. Menedżerowie szablonów mogą dodawać tagi. Administratorzy szablonów i Club Admin mogą je też usuwać. Club Admin przydziela te role w sekcji Role Activity & Permission."
+        body: "Pod każdym szablonem goście widzą Opis, Jak to działa (dla rozmiaru LED lokalu) i tagi. Club Admin oraz Administratorzy/Menedżerowie szablonów edytują tu tagi lokalu — Opis i Jak to działa zostają u Master Admin (tylko odczyt). Dodawaj słowa, które mogą wpisywać goście, np. wieczór meczowy lub urodziny. Menedżerowie mogą dodawać tagi; administratorzy i Club Admin także usuwać. Przypisuj role w Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Podgląd szablonu",
@@ -3002,7 +3002,7 @@
       },
       "help-template-tags": {
         title: "وسوم القوالب",
-        body: "أضف كلمات قد يكتبها الزبائن عند البحث عن قالب في مكانك، مثل ليلة المباراة أو عيد الميلاد. يمكن لمديري القوالب إضافة الوسوم. ويمكن لمسؤولي القوالب وClub Admin إزالتها أيضًا. يعيّن Club Admin هذه الأدوار من قسم Role Activity & Permission."
+        body: "تحت كل قالب يرى الزبائن الوصف وكيف يعمل (حسب حجم شاشة LED للمكان) والوسوم. يعدّل Club Admin ومسؤولو/مديرو القوالب هنا وسوم المكان — الوصف وكيف يعمل يبقيان لدى Master Admin (للقراءة فقط). أضف كلمات قد يكتبها الزبائن، مثل ليلة المباراة أو عيد الميلاد. يمكن للمديرين إضافة الوسوم؛ ويمكن للمسؤولين وClub Admin إزالتها أيضًا. عيّن الأدوار من Role Activity & Permission."
       },
       "help-template-preview": {
         title: "معاينة قالب",

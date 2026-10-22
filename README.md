@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.27 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.28 (stable)
+
+- s3.2.28: Template cards show labeled Description / How it works / Tag; Club Admin edits tags; Master Admin owns description + howitWorks; full catalog size-specific copy.
+- s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.
 
 - s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.
 - s3.2.26: Template select hides floating FloqAi (lens Search only).
