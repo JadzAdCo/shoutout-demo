@@ -45,24 +45,25 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.22)
+## Login + Search chrome (s3.2.23)
 
 **Purpose:** Compact sign-in, short welcome, privacy links in page footer, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome.
 
 | Layer | Wiring |
 |---|---|
-| Login copy | `index.html` `.login-welcome-line.help-label` → `app.welcomeSignIn` = **Please signin or signup**; `?` via `help-welcome` / `.help-label-text` immediately beside the line |
+| Login copy | `index.html` `.login-welcome-line.help-label` → `app.welcomeSignIn` = **Please signin or signup**; left-justified with `?` (`align-self:flex-start`); **80px** under FloqR mark (`.login-card > .floqr-home-link`) |
 | Login legal | `footer.login-page-footer` sibling of `.login-card` (not inside the card). Keeps both **Privacy Policy** (`privacy.html`) and **Do Not Sell or Share** (`privacy.html#do-not-sell`) — full policy vs CCPA/CPRA opt-out. CSS: `position:fixed; bottom:0` (+ safe-area + fade) so links stay at the visible phone bottom; `.login-wrap` gets bottom padding so OTP panels clear the bar |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
-| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.22` |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.23` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
 | Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
-| i18n | `floqr-i18n.js` s3.2.22 — all chrome langs for short welcome + login keys |
-| Diagnostics | Manual test `s3-2-22-login-privacy-footer-welcome` |
+| Help | `help-welcome` OTP-only body (no Search and book…friends and family); all packs in `floqr-i18n-help.js` |
+| i18n | `floqr-i18n.js` s3.2.23 — short welcome + login keys |
+| Diagnostics | Manual tests `s3-2-23-login-welcome-help-layout`, `s3-2-22-login-privacy-footer-welcome` |
 
 ---
 

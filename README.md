@@ -1,5 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.2.22 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.23 (stable)
 
+- s3.2.23: Login welcome help trim (OTP-focused) + left-align welcome/? + 80px under FloqR mark.
 - s3.2.22: Login privacy footer + short welcome (Please signin or signup) + inline ?.
 - s3.2.21: Template select — Search lens + LED-true Use-only cards.
 - s3.2.20: Site chrome colors from FloqR tile palette (cyan→violet→magenta→coral).

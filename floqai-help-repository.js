@@ -1154,10 +1154,9 @@
     {
       id: "help-welcome",
       title: "Welcome to FLOQR",
-      body: "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",
+      body: "Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",
       searchPhrases: [
-        "welcome", "what is floqr", "what can i do on floqr", "about floqr",
-        "book nightlife", "send a live shoutout", "mingl with friends",
+        "welcome", "what is floqr", "about floqr", "sign in", "sign up",
         "what is otp", "one time password", "how does otp work", "sign in code",
         "whatsapp otp", "whatsapp code", "sms otp", "sms code", "verification code"
       ],
