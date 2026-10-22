@@ -712,19 +712,22 @@ def traditional_from_nightlife(
     charcoal–silver. Verbiage (white + tiffany accents) is untouched.
     """
     ensure_traditional_ring()
-    # Rebuild with charcoal ring so under/over layering matches nightlife exactly
+    # Rebuild on pure black — field inside the ring stays black (no charcoal fill disc)
     base = Image.new("RGBA", (S, S), (0, 0, 0, 255))
-    # Graphic → charcoal/silver (no type yet)
     ga = np.array(graphic.convert("RGBA"))
     gr, gg, gb = ga[:, :, 0].astype(np.float32), ga[:, :, 1].astype(np.float32), ga[
         :, :, 2
     ].astype(np.float32)
     glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
-    # Neon → charcoal/silver; keep luminance structure so phones/silhouette stay sharp
-    gsilver = np.clip(22.0 + glum * 0.92, 0, 225)
-    gout = ga.copy()
-    glit = ((ga[:, :, 0] > 6) | (ga[:, :, 1] > 6) | (ga[:, :, 2] > 6)) & (ga[:, :, 3] > 8)
-    gout[glit, 0] = gout[glit, 1] = gout[glit, 2] = gsilver[glit].astype(np.uint8)
+    # Only bright neon linework → charcoal/silver. Soft fills / dark screen stay black.
+    LINE_MIN = 42.0
+    gsilver = np.clip(40.0 + glum * 0.85, 0, 230)
+    gout = np.zeros_like(ga)
+    gout[:, :, 3] = ga[:, :, 3]
+    line = (glum >= LINE_MIN) & (ga[:, :, 3] > 8)
+    gout[line, 0] = gout[line, 1] = gout[line, 2] = gsilver[line].astype(np.uint8)
+    # Dim glow that was not true ink → transparent so black base shows through
+    gout[~line, 3] = 0
     base.alpha_composite(Image.fromarray(gout, "RGBA"), (0, 0))
     base = Image.alpha_composite(base, paste_type(under, left, top))
     base = Image.alpha_composite(
@@ -734,35 +737,33 @@ def traditional_from_nightlife(
     out = np.array(base)
     out[:, :, 3] = 255
 
-    # Safety: any leftover neon sat outside type → force charcoal (ring already silver)
     protect = type_protect_mask(under, over, left, top)
+    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     r, gch, bch = out[:, :, 0].astype(int), out[:, :, 1].astype(int), out[:, :, 2].astype(int)
+    lum = (0.299 * r + 0.587 * gch + 0.114 * bch).astype(np.float32)
+
+    # Leftover neon → charcoal linework only
     sat = (np.maximum(np.maximum(r, gch), bch) - np.minimum(np.minimum(r, gch), bch)) > 28
-    fix = sat & ~protect & ((r > 8) | (gch > 8) | (bch > 8))
+    fix = sat & ~protect & ~ring & (lum >= LINE_MIN)
     if fix.any():
-        lum = (0.299 * r + 0.587 * gch + 0.114 * bch).astype(np.float32)
-        silver = np.clip(22.0 + lum * 0.92, 0, 225).astype(np.uint8)
+        silver = np.clip(40.0 + lum * 0.85, 0, 230).astype(np.uint8)
         out[fix, 0] = out[fix, 1] = out[fix, 2] = silver[fix]
 
-    # Geometry check vs nightlife (luminance structure, not RGB)
-    na = np.array(nightlife.convert("RGBA"))
-    nl_lum = (
-        0.299 * na[:, :, 0].astype(np.float32)
-        + 0.587 * na[:, :, 1].astype(np.float32)
-        + 0.114 * na[:, :, 2].astype(np.float32)
-    )
-    tr_lum = (
-        0.299 * out[:, :, 0].astype(np.float32)
-        + 0.587 * out[:, :, 1].astype(np.float32)
-        + 0.114 * out[:, :, 2].astype(np.float32)
-    )
-    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
-    # Structure match: ink presence (not color) should align outside type
-    nl_ink = nl_lum > 18
-    tr_ink = tr_lum > 18
-    mismatch = int((nl_ink != tr_ink).sum())
+    # Inside the ring: crush soft charcoal fills → pure black (keep linework + type + ring)
+    inside = (dist < (R - 6)) & ~ring
+    soft_fill = inside & ~protect & (lum > 0) & (lum < 58)
+    out[soft_fill, 0] = out[soft_fill, 1] = out[soft_fill, 2] = 0
+
+    # Outside the ring square: pure black (no haze)
+    out[dist > (R + 14), :3] = 0
+    out[:, :, 3] = 255
+
+    black_inside = int((inside & (out[:, :, 0] == 0) & (out[:, :, 1] == 0) & (out[:, :, 2] == 0)).sum())
     print(
-        f"  traditional charcoal: sat_fixed={int(fix.sum())} ink_mismatch={mismatch} ring_px={int(ring.sum())}"
+        f"  traditional charcoal: line={int(line.sum())} soft→black={int(soft_fill.sum())} "
+        f"black_inside={black_inside} ring_px={int(ring.sum())}"
     )
     return Image.fromarray(out, "RGBA")
 
