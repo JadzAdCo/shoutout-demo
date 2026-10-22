@@ -19,12 +19,15 @@ function loadShowcase() {
 
 test("Entity Management venue links open a copyable output panel instead of navigating", () => {
   const src = read("entity-management.js");
-  for (const label of ["Open Club Admin", "Display 1", "Display 2", "Public profile", "Xibo Diag"]) {
+  for (const label of ["All venue links", "Open Club Admin", "Display 1", "Display 2", "Public profile", "Xibo Diag"]) {
     assert.ok(src.includes(`label: "${label}"`), `${label} link output entry`);
   }
   assert.match(src, /data-entity-link="\$\{esc\(kind\)\}"/);
   assert.match(src, /id="entityLinkOutput"/);
   assert.match(src, /navigator\.clipboard\.writeText/);
+  assert.match(src, /revealVenueDisplayUrls/);
+  assert.match(src, /loadAccurateDisplayUrls/);
+  assert.match(src, /venueLocationIdForEntity/);
   assert.doesNotMatch(src, /<a class="buttonlike" href="\$\{esc\((adminUrl|displayUrl|display2Url|profileUrl)\)\}"/);
 });
 
@@ -34,8 +37,18 @@ test("Xibo Diag links use display-error.html per board with no cache-bust", () =
   assert.match(src, /searchParams\.set\("reason", "xibo_page_load_error"\)/);
   assert.match(src, /xiboDiagUrl\(id, 1\)/);
   assert.match(src, /xiboDiagUrl\(id, 2\)/);
-  const fn = src.slice(src.indexOf("function xiboDiagUrl"), src.indexOf("function clubLinkOutputs"));
+  const fn = src.slice(src.indexOf("function xiboDiagUrl"), src.indexOf("function venueLocationIdForEntity"));
   assert.doesNotMatch(fn, /"v"|appVersion/);
+});
+
+test("revealVenueDisplayUrls is SOS2FA-gated and returns live ?k= URLs", () => {
+  const src = read("functions/display-security-functions.js");
+  assert.match(src, /exports\.revealVenueDisplayUrls\s*=\s*onCall/);
+  assert.match(src, /assertSos2faSession\(request\)/);
+  assert.match(src, /reveal_venue_display_urls/);
+  assert.match(src, /primaryUrl:\s*buildDisplayUrl\(locationId, "primary", primaryToken\)/);
+  assert.match(src, /secondaryUrl:\s*buildDisplayUrl\(locationId, "secondary", secondaryToken\)/);
+  assert.match(read("functions/index.js"), /revealVenueDisplayUrls:\s*displaySecurityFns\.revealVenueDisplayUrls/);
 });
 
 test("Application access switch explains itself and the link panel is responsive", () => {

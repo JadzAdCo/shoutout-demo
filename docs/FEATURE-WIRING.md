@@ -112,6 +112,19 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Entity Management Venue Links (accurate Display URLs)
+
+**Purpose:** Master Admin → Entity Management → **Venue Links** / Manage selected shows Club Admin, Display 1/2, and Xibo Diag for a club (or an event’s `clubLocationId`). Display URLs include the live board `?k=` when secrets exist.
+
+| Layer | Wiring |
+|---|---|
+| UI | `entity-management.js` — `All venue links` + per-kind panels; Venue Links list hydrates via `revealVenueDisplayUrls` |
+| Backend | `revealVenueDisplayUrls` (`display-security-functions.js`) — requires SOS2FA session; audited `reveal_venue_display_urls`; does not rotate tokens |
+| Accuracy | `buildDisplayUrl(location, board, token)` — omit `k` only when no secret; never invent a token |
+| Xibo Diag | `display-error.html?location=&board=1\|2&reason=xibo_page_load_error` (no `?v=`) |
+
+---
+
 ## Display Security (IP + board tokens)
 
 **Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows when an allowlisted IP **or** a valid `?k=` board token unlocks the page (OR — not both required).

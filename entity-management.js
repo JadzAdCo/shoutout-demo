@@ -13,6 +13,8 @@
   let selected = null;
   let clubUrlFilter = "";
   let pendingManage = null;
+  /** locationId → revealVenueDisplayUrls payload (session cache). */
+  const displayUrlCache = new Map();
 
   function setStatus(msg) {
     const el = byId("entityManageStatus");
@@ -40,29 +42,104 @@
     return url.toString();
   }
 
-  function clubLinkOutputs(id) {
+  function venueLocationIdForEntity(type, row = {}, id = "") {
+    if (type === "club") return String(id || row.id || "").trim().toLowerCase();
+    if (type === "event") {
+      return String(row.clubLocationId || row.locationId || row.primaryLocationId || "").trim().toLowerCase();
+    }
+    return "";
+  }
+
+  function baseDisplayUrls(locationId) {
+    const id = String(locationId || "").trim();
     const displayUrl = window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
     const display2Url = window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
+    return {
+      primaryUrl: absoluteUrl(displayUrl),
+      secondaryUrl: absoluteUrl(display2Url),
+      xiboDiagUrl1: xiboDiagUrl(id, 1),
+      xiboDiagUrl2: xiboDiagUrl(id, 2)
+    };
+  }
+
+  async function loadAccurateDisplayUrls(locationId) {
+    const id = String(locationId || "").trim().toLowerCase();
+    if (!id) return null;
+    if (displayUrlCache.has(id)) return displayUrlCache.get(id);
+    const fallback = {...baseDisplayUrls(id), primaryHasToken: false, secondaryHasToken: false, tokenRequired: null, fromCache: false};
+    try {
+      const result = await invokeCallable("revealVenueDisplayUrls", {locationId: id});
+      const data = result?.data || result || {};
+      const packed = {
+        locationId: id,
+        locationName: data.locationName || id,
+        tokenRequired: data.tokenRequired === true,
+        primaryHasToken: data.primaryHasToken === true,
+        secondaryHasToken: data.secondaryHasToken === true,
+        primaryUrl: textUrl(data.primaryUrl) || fallback.primaryUrl,
+        secondaryUrl: textUrl(data.secondaryUrl) || fallback.secondaryUrl,
+        xiboDiagUrl1: textUrl(data.xiboDiagUrl1) || fallback.xiboDiagUrl1,
+        xiboDiagUrl2: textUrl(data.xiboDiagUrl2) || fallback.xiboDiagUrl2,
+        warning: data.warning || "",
+        fromCache: false
+      };
+      displayUrlCache.set(id, packed);
+      return packed;
+    } catch (err) {
+      fallback.error = err?.message || String(err);
+      fallback.warning = "Could not load board tokens — showing location-only Display URLs. Unlock SOS2FA / check Functions deploy.";
+      displayUrlCache.set(id, fallback);
+      return fallback;
+    }
+  }
+
+  function textUrl(value) {
+    const s = String(value || "").trim();
+    return s || "";
+  }
+
+  function clubLinkOutputs(id, accurate = null) {
+    const base = baseDisplayUrls(id);
+    const d1 = accurate?.primaryUrl || base.primaryUrl;
+    const d2 = accurate?.secondaryUrl || base.secondaryUrl;
+    const x1 = accurate?.xiboDiagUrl1 || base.xiboDiagUrl1;
+    const x2 = accurate?.xiboDiagUrl2 || base.xiboDiagUrl2;
     const profileUrl = window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
       || `./club-profile.html?location=${encodeURIComponent(id)}`;
+    const tokenHint = accurate
+      ? (accurate.primaryHasToken || accurate.secondaryHasToken
+        ? " Includes live board token (?k=) when provisioned — paste into Xibo only."
+        : " No board token on file — location-only URL.")
+      : " Loading accurate Display URLs (with ?k= when provisioned)…";
+    const displayHint = `Paste into the Xibo Webpage widget exactly as shown.${tokenHint}`;
     return {
+      all: {
+        label: "All venue links",
+        hint: `Club Admin, Display 1/2 (accurate ?k= when set), Public profile, ShoutOut, and Xibo Diag fallbacks.${accurate?.warning ? ` ${accurate.warning}` : ""}`,
+        links: [
+          {name: "Club Admin", url: absoluteUrl(masterAdminUrl(id))},
+          {name: "Display 1 (ShoutOut)", url: d1},
+          {name: "Display 2 (floqCast)", url: d2},
+          {name: "Public profile", url: absoluteUrl(profileUrl)},
+          {name: "Throw a ShoutOut", url: window.FLOQRNav?.shoutoutUrl?.({locationId: id}) || absoluteUrl(`./?start=shoutout&location=${encodeURIComponent(id)}`)},
+          {name: "Xibo Diag · Display 1 fallback", url: x1},
+          {name: "Xibo Diag · Display 2 fallback", url: x2}
+        ]
+      },
       admin: {label: "Open Club Admin", hint: "Club Admin console for this venue (opens as Master Admin).", links: [{name: "Club Admin", url: absoluteUrl(masterAdminUrl(id))}]},
-      display1: {label: "Display 1", hint: "Primary LED board. Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 1", url: absoluteUrl(displayUrl)}]},
-      display2: {label: "Display 2", hint: "Secondary LED board (floqCast). Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 2", url: absoluteUrl(display2Url)}]},
+      display1: {label: "Display 1", hint: displayHint, links: [{name: "Display 1", url: d1}]},
+      display2: {label: "Display 2", hint: displayHint, links: [{name: "Display 2", url: d2}]},
       profile: {label: "Public profile", hint: "Patron-facing Club Public Profile.", links: [{name: "Public profile", url: absoluteUrl(profileUrl)}]},
       shoutout: {label: "ShoutOut link", hint: "Opens this venue's ad splash, then its Throw a ShoutOut page (sign-in first when needed). Share it on flyers, QR codes and social posts.", links: [{name: "Throw a ShoutOut", url: window.FLOQRNav?.shoutoutUrl?.({locationId: id}) || absoluteUrl(`./?start=shoutout&location=${encodeURIComponent(id)}`)}]},
-      xibo: {label: "Xibo Diag", hint: "Paste into the Xibo Webpage widget on each board's error / fallback layout. Load failures appear under Diagnostics → Display / Xibo Load Errors.", links: [
-        {name: "Display 1 fallback", url: xiboDiagUrl(id, 1)},
-        {name: "Display 2 fallback", url: xiboDiagUrl(id, 2)}
+      xibo: {label: "Xibo Diag", hint: "Paste into the Xibo Webpage widget on each board's error / fallback layout. Load failures appear under Diagnostics → Display / Xibo Load Errors. Fallback location= must match the main Display URL venue.", links: [
+        {name: "Display 1 fallback", url: x1},
+        {name: "Display 2 fallback", url: x2}
       ]}
     };
   }
 
-  function renderLinkOutput(kind) {
-    const host = byId("entityLinkOutput");
-    if (!host || !selected || selected.type !== "club") return;
-    const entry = clubLinkOutputs(selected.id)[kind];
-    if (!entry) return;
+  function paintLinkOutput(host, entry, kind) {
+    if (!host || !entry) return;
     markActiveLinkButton(kind);
     host.hidden = false;
     host.innerHTML = `
@@ -92,6 +169,24 @@
       markActiveLinkButton("");
     });
     host.scrollIntoView?.({block: "nearest", behavior: "smooth"});
+  }
+
+  async function renderLinkOutput(kind) {
+    const host = byId("entityLinkOutput");
+    if (!host || !selected) return;
+    const locationId = venueLocationIdForEntity(selected.type, selected.row, selected.id);
+    if (!locationId) {
+      paintLinkOutput(host, {
+        label: "Venue links",
+        hint: "This event has no club locationId — assign clubLocationId / locationId on the event to show Display and Club Admin links.",
+        links: []
+      }, kind);
+      return;
+    }
+    paintLinkOutput(host, clubLinkOutputs(locationId, null)[kind] || clubLinkOutputs(locationId, null).all, kind);
+    const accurate = await loadAccurateDisplayUrls(locationId);
+    if (!selected || venueLocationIdForEntity(selected.type, selected.row, selected.id) !== locationId) return;
+    paintLinkOutput(host, clubLinkOutputs(locationId, accurate)[kind] || clubLinkOutputs(locationId, accurate).all, kind);
   }
 
   function fitLinkFields(host = byId("entityLinkOutput")) {
@@ -311,7 +406,9 @@
     const enabled = g?.entityIsAppEnabled(row);
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
-    const linkKinds = type === "club" ? Object.entries(clubLinkOutputs(id)) : [];
+    const venueLocId = venueLocationIdForEntity(type, row, id);
+    const showVenueLinks = (type === "club" || type === "event") && !!venueLocId;
+    const linkKinds = showVenueLinks ? Object.entries(clubLinkOutputs(venueLocId)) : [];
 
     wrap.innerHTML = `
       <div class="entity-manage-head">
@@ -320,12 +417,14 @@
           <h3>${esc(entityTitle(row, type))}</h3>
           <p class="sub small">${esc(entityMeta(row, type))}</p>
           ${statusBadge(row)}
+          ${type === "event" && venueLocId ? `<p class="sub small">Venue links use club location <code>${esc(venueLocId)}</code>.</p>` : ""}
+          ${type === "event" && !venueLocId ? `<p class="sub small">No club locationId on this event — Display / Club Admin / Xibo links unavailable.</p>` : ""}
         </div>
-        ${type === "club" ? `<div class="entity-link-buttons" role="group" aria-label="Venue links">
+        ${showVenueLinks ? `<div class="entity-link-buttons" role="group" aria-label="Venue links">
           ${linkKinds.map(([kind, entry]) => `<button type="button" class="buttonlike" data-entity-link="${esc(kind)}" aria-controls="entityLinkOutput" aria-expanded="false">${esc(entry.label)}</button>`).join("")}
         </div>` : ""}
       </div>
-      ${type === "club" ? `<section id="entityLinkOutput" class="entity-link-output" aria-labelledby="entityLinkOutputTitle" hidden></section>` : ""}
+      ${showVenueLinks ? `<section id="entityLinkOutput" class="entity-link-output" aria-labelledby="entityLinkOutputTitle" hidden></section>` : ""}
       <div class="entity-manage-controls">
         <label class="entity-gate-toggle entity-enable-switch">
           <input id="entityAppEnabledToggle" type="checkbox" ${enabled ? "checked" : ""} ${offboarded || isSuper ? "disabled" : ""}/>
@@ -455,21 +554,31 @@
     const rows = catalog.clubs
       .filter(row => row && row.id)
       .filter(row => !q || matchesQuery(row, "club", q))
-      .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
+      .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")))
+      .slice(0, 40);
     wrap.innerHTML = rows.length ? rows.map(row => {
-      const admin = masterAdminUrl(row.id);
+      const base = baseDisplayUrls(row.id);
+      const admin = absoluteUrl(masterAdminUrl(row.id));
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const g = gates();
       const enabled = g?.entityIsAppEnabled(row);
-      return `<div class="queue-item ${enabled ? "" : "entity-row-disabled"}">
+      return `<div class="queue-item ${enabled ? "" : "entity-row-disabled"}" data-venue-links-for="${esc(row.id)}">
         <div class="message-envelope-head">
           <strong>${esc(entityTitle(row, "club"))}</strong>
           <span>${esc(row.id)}</span>
         </div>
         ${statusBadge(row)}
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
-        <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+        <p class="sub small">Loading accurate Display URLs (with live ?k= when provisioned)…</p>
+        <div class="entity-venue-links-block" data-venue-links-body="${esc(row.id)}">
+          <p><strong>Club Admin:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+          <p><strong>Display 1:</strong> <span class="entity-link-pending">${esc(base.primaryUrl)}</span></p>
+          <p><strong>Display 2:</strong> <span class="entity-link-pending">${esc(base.secondaryUrl)}</span></p>
+          <p><strong>Xibo Diag 1:</strong> <a class="message-inline-link" href="${esc(base.xiboDiagUrl1)}" target="_blank" rel="noopener">${esc(base.xiboDiagUrl1)}</a></p>
+          <p><strong>Xibo Diag 2:</strong> <a class="message-inline-link" href="${esc(base.xiboDiagUrl2)}" target="_blank" rel="noopener">${esc(base.xiboDiagUrl2)}</a></p>
+        </div>
         <div class="queue-actions">
+          <button type="button" data-entity-link-all="${esc(row.id)}">Open all links panel</button>
           <button type="button" data-manage-club="${esc(row.id)}">Manage entity</button>
         </div>
       </div>`;
@@ -480,17 +589,45 @@
         document.querySelector('[data-panel="entityManagement"]')?.click();
       });
     });
+    wrap.querySelectorAll("[data-entity-link-all]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        pendingManage = {type:"club", id:btn.dataset.entityLinkAll, query:btn.dataset.entityLinkAll, openLinks:"all"};
+        document.querySelector('[data-panel="entityManagement"]')?.click();
+      });
+    });
+    hydrateVenueLinksList(rows.map(row => row.id));
+  }
+
+  async function hydrateVenueLinksList(locationIds = []) {
+    const ids = [...new Set(locationIds.map(id => String(id || "").trim().toLowerCase()).filter(Boolean))];
+    await Promise.all(ids.map(async (id) => {
+      const accurate = await loadAccurateDisplayUrls(id);
+      const host = document.querySelector(`[data-venue-links-body="${id.replace(/"/g, "")}"]`);
+      if (!host) return;
+      const admin = absoluteUrl(masterAdminUrl(id));
+      host.innerHTML = `
+        <p><strong>Club Admin:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+        <p><strong>Display 1${accurate.primaryHasToken ? " · token" : ""}:</strong> <a class="message-inline-link" href="${esc(accurate.primaryUrl)}" target="_blank" rel="noopener">${esc(accurate.primaryUrl)}</a></p>
+        <p><strong>Display 2${accurate.secondaryHasToken ? " · token" : ""}:</strong> <a class="message-inline-link" href="${esc(accurate.secondaryUrl)}" target="_blank" rel="noopener">${esc(accurate.secondaryUrl)}</a></p>
+        <p><strong>Xibo Diag 1:</strong> <a class="message-inline-link" href="${esc(accurate.xiboDiagUrl1)}" target="_blank" rel="noopener">${esc(accurate.xiboDiagUrl1)}</a></p>
+        <p><strong>Xibo Diag 2:</strong> <a class="message-inline-link" href="${esc(accurate.xiboDiagUrl2)}" target="_blank" rel="noopener">${esc(accurate.xiboDiagUrl2)}</a></p>
+        ${accurate.warning ? `<p class="sub small">${esc(accurate.warning)}</p>` : ""}
+      `;
+    }));
   }
 
   function applyPendingManage() {
     if (!pendingManage) return;
     if (!window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) return;
-    const {type, id, query} = pendingManage;
+    const {type, id, query, openLinks} = pendingManage;
     pendingManage = null;
     if (byId("entityManageSearch")) byId("entityManageSearch").value = query || id || "";
     if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = type === "club" ? "club" : "all";
     if (id) selectEntity(type || "club", id);
     else renderSearchResults();
+    if (openLinks && id) {
+      setTimeout(() => renderLinkOutput(openLinks), 0);
+    }
   }
 
   function onSos2faUnlocked() {

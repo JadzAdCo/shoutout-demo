@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.110";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.00";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.00",
+      title: "s3.2.00 — Venue Links accurate ?k= + Search Clubs/Lounges placeholder",
+      checks: [
+        {label:"Package version s3.2.00", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.00\""]},
+        {label:"revealVenueDisplayUrls callable", file:"functions/display-security-functions.js", includes:["exports.revealVenueDisplayUrls", "assertSos2faSession"]},
+        {label:"Entity All venue links + accurate load", file:"entity-management.js", includes:["All venue links", "loadAccurateDisplayUrls", "revealVenueDisplayUrls"]},
+        {label:"Search placeholder Clubs or Lounges", file:"index.html", includes:["You may also search for: Clubs or Lounges"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.00\""]}
+      ]
+    },
     {
       version: "s3.1.110",
       title: "Search FloqAi placeholder = Clubs or Lounges hint",
@@ -2001,13 +2012,22 @@
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
     },
     {
+      id:"s3-2-00-venue-links-accurate-display-urls",
+      area:"Master Admin Entity Management",
+      feature:"Venue Links: Club Admin + Display 1/2 with live ?k= + Xibo Diag",
+      changed:"revealVenueDisplayUrls (SOS2FA) returns accurate Display URLs with live board tokens. Entity Management All venue links + Venue Links tab list Club Admin, Display 1/2, Xibo Diag. Events use clubLocationId. Package s3.2.00; Functions deploy required.",
+      howToTest:"1) Deploy Functions. 2) Master Admin → unlock SOS2FA → Entity Management → Venue Links → search Aurelia. 3) Display 1/2 show ?k= when tokens exist (not bare location-only if secrets are set). 4) Manage selected → All venue links shows the same set + copy. 5) Event with clubLocationId shows venue links for that club.",
+      expected:"Pasteable Xibo Display URLs match Display Security secrets; Xibo Diag location= matches the venue.",
+      troubleshoot:"Location-only URLs when tokens exist → Functions not deployed / SOS2FA session missing. Permission-denied → re-unlock SOS2FA. Wrong venue on Diag → check event.clubLocationId."
+    },
+    {
       id:"s3-1-110-search-placeholder-clubs-lounges",
       area:"Search FloqAi",
       feature:"Placeholder shows You may also search for: Clubs or Lounges",
-      changed:"Moved cat.floqaiAlso copy into the Search input placeholder (all langs). FloqAi speech stays on Welcome only. Package s3.1.110.",
-      howToTest:"1) Hard-refresh Search (s3.1.110). 2) Empty search box shows placeholder You may also search for: Clubs or Lounges (not Hip Hop/EDM examples). 3) FloqAi line above stays Welcome, type below to search for Events. 4) Switch language — placeholder is the localized Also string.",
+      changed:"Moved cat.floqaiAlso copy into the Search input placeholder (all langs). FloqAi speech stays on Welcome only. Package s3.1.110 / rolled into s3.2.00.",
+      howToTest:"1) Hard-refresh Search (s3.2.00). 2) Empty search box shows placeholder You may also search for: Clubs or Lounges (not Hip Hop/EDM examples). 3) FloqAi line above stays Welcome, type below to search for Events. 4) Switch language — placeholder is the localized Also string.",
       expected:"Hint is inside the input; speech does not rotate the Also line.",
-      troubleshoot:"Old Hip Hop placeholder → hard refresh index.html + floqr-i18n.js + patron-app.js s3.1.110."
+      troubleshoot:"Old Hip Hop placeholder → hard refresh index.html + floqr-i18n.js + patron-app.js s3.2.00."
     },
     {
       id:"s3-1-109-display-load-error-venue-mismatch",

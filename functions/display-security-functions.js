@@ -778,6 +778,60 @@ exports.setVenueDisplayIps = onCall({
 });
 
 /**
+ * Feature: Entity Management (SOS2FA) — return accurate Display 1/2 Xibo URLs with live ?k=
+ * when tokens exist. Audited. Does not rotate secrets.
+ */
+exports.revealVenueDisplayUrls = onCall({
+  region: "us-central1",
+  timeoutSeconds: 20,
+  memory: "256MiB"
+}, async (request) => {
+  const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+  const {email, sessionId} = await assertSos2faSession(request);
+  const locationId = text((request.data || {}).locationId, 120).toLowerCase();
+  if (!locationId) throw new HttpsError("invalid-argument", "locationId is required.");
+  const clubSnap = await db.collection("clubLocations").doc(locationId).get();
+  const club = clubSnap.exists ? clubSnap.data() || {} : {};
+  const secretsSnap = await db.collection("displayBoardSecrets").doc(locationId).get();
+  const secrets = secretsSnap.exists ? secretsSnap.data() || {} : {};
+  const primaryToken = text(secrets.primaryToken || "", 120);
+  const secondaryToken = text(secrets.secondaryToken || "", 120);
+  const tokenRequired = club.displayTokenRequired !== false;
+  await writeEntityManagementAudit({
+    uid: request.auth?.uid || "",
+    email,
+    action: "reveal_venue_display_urls",
+    sessionId,
+    detail: {
+      locationId,
+      primaryHasToken: !!primaryToken,
+      secondaryHasToken: !!secondaryToken,
+      tokenRequired
+    }
+  });
+  return {
+    ok: true,
+    locationId,
+    locationName: club.locationName || club.brandName || locationId,
+    tokenRequired,
+    primaryHasToken: !!primaryToken,
+    secondaryHasToken: !!secondaryToken,
+    /* Accurate Xibo paste URLs: include live ?k= whenever a board secret exists. */
+    primaryUrl: buildDisplayUrl(locationId, "primary", primaryToken),
+    secondaryUrl: buildDisplayUrl(locationId, "secondary", secondaryToken),
+    primaryUrlObfuscated: buildObfuscatedDisplayUrl(locationId, "primary", primaryToken),
+    secondaryUrlObfuscated: buildObfuscatedDisplayUrl(locationId, "secondary", secondaryToken),
+    primaryTokenObfuscated: obfuscateToken(primaryToken),
+    secondaryTokenObfuscated: obfuscateToken(secondaryToken),
+    xiboDiagUrl1: `${PUBLIC_DISPLAY_BASE}/display-error.html?location=${encodeURIComponent(locationId)}&board=1&reason=xibo_page_load_error`,
+    xiboDiagUrl2: `${PUBLIC_DISPLAY_BASE}/display-error.html?location=${encodeURIComponent(locationId)}&board=2&reason=xibo_page_load_error`,
+    warning: primaryToken || secondaryToken
+      ? "These URLs include the live board token (?k=). Paste into Xibo only. Do not publish outside Master Admin."
+      : "No board tokens provisioned yet — URLs are location-only. Provision/rotate under Display Security if token lock is ON."
+  };
+});
+
+/**
  * Feature: Master Admin Display Security portal.
  * Returns obfuscated tokens only — full cleartext is never re-fetched after provision/rotate.
  */
