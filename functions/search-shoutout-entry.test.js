@@ -25,7 +25,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*floqcast-nightlife\.jpg/);
-  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-reserv-mark\.svg/);
+  assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
   assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*floqr-tiles-transparent\.png/);
   assert.match(page, /data-i18n="cat.floqai">dj BOT</);

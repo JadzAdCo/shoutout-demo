@@ -38,10 +38,9 @@ MAX_WM_W = 720  # safe width so both tips can kiss without clipping
 # Type targets (from icon-chrome-build.mdc)
 FC_H = 200
 DJ_H = 204
-# VIP reser/IP match Floq height, then +20% (user: same as FloqCAST "Floq", +20%)
-VIP_TEXT_H = int(round(FC_H * 1.20))  # 240 — reser/IP match Floq then +20%
-VIP_V = int(round(VIP_TEXT_H * 1.50))  # tall tiffany V
-# Full canvas width — tips overhang ring like FloqCAST (required for +20% "reser"+"IP")
+# VIP reser/IP: Floq height +20%, then −10% (user); tiffany V = original 2× VIP_X (388)
+VIP_TEXT_H = int(round(FC_H * 1.20 * 0.90))  # 216
+VIP_V = 194 * 2  # original tall V — never shrink
 VIP_MAX_W = 1012
 
 
@@ -549,67 +548,71 @@ def floqcast_wm():
 
 
 def vip_wm():
-    """reserVIP — reser/IP = Floq style at Floq height +20%; re under ring; ser+V+IP over.
+    """reserVIP — reser/IP at Floq+20% then −10%; original tall tiffany V (388); re under; IP over.
 
-    Size reser/IP to VIP_TEXT_H first, then scale tiffany V into leftover chord width
-    so +20% text is not crushed by fit_width.
+    Never shrink V. If the chord is too wide, reduce reser/IP point size only.
     """
-    target_h = VIP_TEXT_H
-    size = 190
-    for _ in range(8):
-        u, by = render_upright("reser", size, WHITE)
-        size = int(
-            max(50, min(300, round(size * target_h / max(1, finish(u, by).size[1]))))
+    V = glyph("V", VIP_V, TIFFANY)
+    ov_r = int(V.size[0] * 0.12)
+    ov_i = int(V.size[0] * 0.18)
+    gap_pad = 6
+
+    def build_reser_ip(target_h: int):
+        size = 170
+        for _ in range(8):
+            u, by = render_upright("reser", size, WHITE)
+            size = int(
+                max(50, min(280, round(size * target_h / max(1, finish(u, by).size[1]))))
+            )
+        font = ImageFont.truetype(FONT, int(size))
+        reser_u, by_r = render_upright("reser", size, WHITE)
+        pad = 64
+        bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+            (0, 0), "reser", font=font, anchor="ls"
         )
+        origin = (pad - bb[0], pad + (bb[3] - bb[1]))
 
-    font = ImageFont.truetype(FONT, int(size))
-    reser_u, by_r = render_upright("reser", size, WHITE)
-    pad = 64
-    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
-        (0, 0), "reser", font=font, anchor="ls"
-    )
-    origin = (pad - bb[0], pad + (bb[3] - bb[1]))
+        def layer(text, fill=WHITE):
+            im = Image.new("RGBA", reser_u.size, (0, 0, 0, 0))
+            ImageDraw.Draw(im).text(origin, text, font=font, fill=fill, anchor="ls")
+            return finish(im, by_r, crop=False)
 
-    def layer(text, fill=WHITE):
-        im = Image.new("RGBA", reser_u.size, (0, 0, 0, 0))
-        ImageDraw.Draw(im).text(origin, text, font=font, fill=fill, anchor="ls")
-        return finish(im, by_r, crop=False)
+        full = finish(reser_u, by_r, crop=False)
+        re_l = layer("re")
+        x0, y0b, x1, y1 = ink_bbox(full, 12)
+        box = (x0, y0b, x1 + 1, y1 + 1)
+        fa = np.array(full.crop(box))
+        rea = np.array(re_l.crop(box))
+        ink = fa[:, :, 3] > 20
+        remask = (
+            np.array(Image.fromarray(rea[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
+        ) & ink
+        reser_under = np.zeros_like(fa)
+        reser_over = np.zeros_like(fa)
+        reser_under[remask] = (255, 255, 255, 255)
+        reser_over[ink & ~remask] = (255, 255, 255, 255)
+        RU = Image.fromarray(ink_only(reser_under), "RGBA")
+        RO = Image.fromarray(ink_only(reser_over), "RGBA")
+        reser_body = Image.fromarray(ink_only(fa), "RGBA")
+        IP = glyph("IP", size, WHITE)
+        return size, RU, RO, reser_body, IP, int(remask.sum())
 
-    full = finish(reser_u, by_r, crop=False)
-    re_l = layer("re")
-    x0, y0b, x1, y1 = ink_bbox(full, 12)
-    box = (x0, y0b, x1 + 1, y1 + 1)
-    fa = np.array(full.crop(box))
-    rea = np.array(re_l.crop(box))
-    ink = fa[:, :, 3] > 20
-    remask = (
-        np.array(Image.fromarray(rea[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
-    ) & ink
-    reser_under = np.zeros_like(fa)
-    reser_over = np.zeros_like(fa)
-    reser_under[remask] = (255, 255, 255, 255)
-    reser_over[ink & ~remask] = (255, 255, 255, 255)
-    RU = Image.fromarray(ink_only(reser_under), "RGBA")
-    RO = Image.fromarray(ink_only(reser_over), "RGBA")
-    reser_body = Image.fromarray(ink_only(fa), "RGBA")
-    IP = glyph("IP", size, WHITE)
-
-    # Tiffany V fills leftover width after full-size reser + IP (deep tuck)
-    gap_pad = 2
-    ov_frac_r, ov_frac_i = 0.40, 0.46
-    v_size = VIP_V
-    V = glyph("V", v_size, TIFFANY)
-    for _ in range(20):
-        ov_r = int(V.size[0] * ov_frac_r)
-        ov_i = int(V.size[0] * ov_frac_i)
-        need = reser_body.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + gap_pad * 2
+    target_h = VIP_TEXT_H
+    size = RU = RO = reser_body = IP = remask_n = None
+    for _ in range(14):
+        size, RU, RO, reser_body, IP, remask_n = build_reser_ip(target_h)
+        need = (
+            reser_body.size[0]
+            + V.size[0]
+            + IP.size[0]
+            - ov_r
+            - ov_i
+            + gap_pad * 2
+        )
         if need <= VIP_MAX_W:
             break
-        # Shrink V only — keep reser/IP at Floq+20%
-        v_size = max(160, int(v_size * 0.94))
-        V = glyph("V", v_size, TIFFANY)
-    ov_r = int(V.size[0] * ov_frac_r)
-    ov_i = int(V.size[0] * ov_frac_i)
+        # Shrink reser/IP only — V stays original 388
+        target_h = max(140, int(target_h * 0.94))
 
     reser_h = reser_body.size[1]
     base_y = max(V.size[1], reser_h, IP.size[1] + int(V.size[1] * 0.02))
@@ -636,16 +639,19 @@ def vip_wm():
         ink_only(np.array(over.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
     )
     B = Image.alpha_composite(U, O)
+    # Guard: do not fit_width (that would shrink the restored V)
+    if B.size[0] > VIP_MAX_W:
+        print(f"  WARN VIP width {B.size[0]} > {VIP_MAX_W} — cropping not applied; check placement")
     wa = np.array(B)
-    wh = wa[:, :, 3] > 20
-    ww = wh & (wa[:, :, 0] > 200)
+    ww = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 200)
     wh_h = int(np.where(ww)[0].max() - np.where(ww)[0].min()) + 1 if ww.any() else 0
+    tv = (wa[:, :, 3] > 20) & (wa[:, :, 0] < 100) & (wa[:, :, 1] > 150) & (wa[:, :, 2] > 180)
+    vh = int(np.where(tv)[0].max() - np.where(tv)[0].min()) + 1 if tv.any() else 0
     print(
-        f"  TYPE VIP reser/IP size={size} white_h={wh_h} (target {VIP_TEXT_H}=Floq+20%) "
-        f"V={v_size} body={B.size} re_under={int(remask.sum())}"
+        f"  TYPE VIP reser/IP size={size} white_h={wh_h} (target {VIP_TEXT_H}=Floq+20%−10%) "
+        f"V={VIP_V} tiffany_h={vh} body={B.size} re_under={remask_n}"
     )
-    # Last resort only — V loop should already fit chord
-    return fit_width(U, O, B, max_w=VIP_MAX_W)
+    return U, O, B
 
 
 def place_inside_ring(body, min_top: int, bias=6, max_r=None):
