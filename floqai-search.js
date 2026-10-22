@@ -63,12 +63,13 @@
   }
 
   function syncAgentVisibility(agent, speech) {
+    // Floating FloqAi mark + speech: Ask FloqR / intent only.
+    // Template select already has the lens Search field — no float there.
     const onIntent = document.getElementById("intentSearchPage")?.classList.contains("active");
-    const onTemplates = document.getElementById("templateSelectPage")?.classList.contains("active");
-    const show = !!(onIntent || onTemplates);
+    const show = !!onIntent;
     agent?.classList.toggle("hidden", !show);
     if (!show) {
-      speech?.classList.remove("is-visible");
+      speech?.classList.remove("is-visible", "is-hiding");
       speech?.setAttribute("aria-hidden", "true");
     }
     return show;

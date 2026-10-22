@@ -38,6 +38,19 @@ test("FloqAi page is a guarded satellite with audience-filtered search", () => {
   assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
 });
 
+test("floating FloqAi agent is not shown on template select", () => {
+  const search = read("floqai-search.js");
+  assert.match(search, /function syncAgentVisibility/);
+  assert.match(search, /Template select already has the lens Search field/);
+  assert.match(search, /const onIntent = document\.getElementById\("intentSearchPage"\)/);
+  assert.doesNotMatch(
+    search,
+    /const onTemplates = document\.getElementById\("templateSelectPage"\)[\s\S]{0,120}const show = !!\(onIntent \|\| onTemplates\)/,
+    "template select must not toggle the floating agent visible"
+  );
+  assert.match(search, /const show = !!onIntent;/);
+});
+
 test("FloqAi page chrome is localized", () => {
   const html = read("floqai.html");
   ["page.floqai.title", "floqai.helpIntro", "floqai.helpScope", "floqai.prompt", "floqai.hint"]
