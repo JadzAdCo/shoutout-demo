@@ -38,8 +38,11 @@ MAX_WM_W = 720  # safe width so both tips can kiss without clipping
 # Type targets (from icon-chrome-build.mdc)
 FC_H = 200
 DJ_H = 204
-VIP_X = 194
-VIP_V = VIP_X * 2
+# VIP reser/IP match Floq height, then +20% (user: same as FloqCAST "Floq", +20%)
+VIP_TEXT_H = int(round(FC_H * 1.20))  # 240 — reser/IP match Floq then +20%
+VIP_V = int(round(VIP_TEXT_H * 1.50))  # tall tiffany V
+# Full canvas width — tips overhang ring like FloqCAST (required for +20% "reser"+"IP")
+VIP_MAX_W = 1012
 
 
 def git_show(rev: str, path: str, dest: Path) -> None:
@@ -546,37 +549,108 @@ def floqcast_wm():
 
 
 def vip_wm():
-    reser = glyph("reser", VIP_X, WHITE)
-    IP = glyph("IP", VIP_X, WHITE)
-    V = glyph("V", VIP_V, TIFFANY)
-    ov_r = int(V.size[0] * 0.12)
-    ov_i = int(V.size[0] * 0.18)
-    pad = 6
-    W = reser.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + pad * 2
-    H = V.size[1] + pad * 2
+    """reserVIP — reser/IP = Floq style at Floq height +20%; re under ring; ser+V+IP over.
+
+    Size reser/IP to VIP_TEXT_H first, then scale tiffany V into leftover chord width
+    so +20% text is not crushed by fit_width.
+    """
+    target_h = VIP_TEXT_H
+    size = 190
+    for _ in range(8):
+        u, by = render_upright("reser", size, WHITE)
+        size = int(
+            max(50, min(300, round(size * target_h / max(1, finish(u, by).size[1]))))
+        )
+
+    font = ImageFont.truetype(FONT, int(size))
+    reser_u, by_r = render_upright("reser", size, WHITE)
+    pad = 64
+    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "reser", font=font, anchor="ls"
+    )
+    origin = (pad - bb[0], pad + (bb[3] - bb[1]))
+
+    def layer(text, fill=WHITE):
+        im = Image.new("RGBA", reser_u.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin, text, font=font, fill=fill, anchor="ls")
+        return finish(im, by_r, crop=False)
+
+    full = finish(reser_u, by_r, crop=False)
+    re_l = layer("re")
+    x0, y0b, x1, y1 = ink_bbox(full, 12)
+    box = (x0, y0b, x1 + 1, y1 + 1)
+    fa = np.array(full.crop(box))
+    rea = np.array(re_l.crop(box))
+    ink = fa[:, :, 3] > 20
+    remask = (
+        np.array(Image.fromarray(rea[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
+    ) & ink
+    reser_under = np.zeros_like(fa)
+    reser_over = np.zeros_like(fa)
+    reser_under[remask] = (255, 255, 255, 255)
+    reser_over[ink & ~remask] = (255, 255, 255, 255)
+    RU = Image.fromarray(ink_only(reser_under), "RGBA")
+    RO = Image.fromarray(ink_only(reser_over), "RGBA")
+    reser_body = Image.fromarray(ink_only(fa), "RGBA")
+    IP = glyph("IP", size, WHITE)
+
+    # Tiffany V fills leftover width after full-size reser + IP (deep tuck)
+    gap_pad = 2
+    ov_frac_r, ov_frac_i = 0.40, 0.46
+    v_size = VIP_V
+    V = glyph("V", v_size, TIFFANY)
+    for _ in range(20):
+        ov_r = int(V.size[0] * ov_frac_r)
+        ov_i = int(V.size[0] * ov_frac_i)
+        need = reser_body.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + gap_pad * 2
+        if need <= VIP_MAX_W:
+            break
+        # Shrink V only — keep reser/IP at Floq+20%
+        v_size = max(160, int(v_size * 0.94))
+        V = glyph("V", v_size, TIFFANY)
+    ov_r = int(V.size[0] * ov_frac_r)
+    ov_i = int(V.size[0] * ov_frac_i)
+
+    reser_h = reser_body.size[1]
+    base_y = max(V.size[1], reser_h, IP.size[1] + int(V.size[1] * 0.02))
+    W = reser_body.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + gap_pad * 2
+    H = base_y + gap_pad * 2
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    vx = pad + reser.size[0] - ov_r
-    vy = pad
-    under.alpha_composite(reser, (pad, vy + V.size[1] - reser.size[1] - 2))
-    under.alpha_composite(V, (vx, vy))
-    over.alpha_composite(IP, (vx + V.size[0] - ov_i, vy + int(V.size[1] * 0.02)))
-    combo = Image.alpha_composite(under, over)
-    box = ink_bbox(combo, 10)
-    ua = ink_only(np.array(under.crop((box[0], box[1], box[2] + 1, box[3] + 1))))
-    oa = ink_only(np.array(over.crop((box[0], box[1], box[2] + 1, box[3] + 1))))
-    Hh, Ww = box[3] - box[1] + 1, box[2] - box[0] + 1
-    u2 = np.zeros((Hh, Ww, 4), np.uint8)
-    o2 = np.zeros((Hh, Ww, 4), np.uint8)
-    u2[: ua.shape[0], : ua.shape[1]] = ua
-    o2[: oa.shape[0], : oa.shape[1]] = oa
-    body = Image.alpha_composite(Image.fromarray(u2, "RGBA"), Image.fromarray(o2, "RGBA"))
-    print(f"  TYPE VIP X={VIP_X} V={VIP_V} raw={body.size}")
-    return fit_width(Image.fromarray(u2, "RGBA"), Image.fromarray(o2, "RGBA"), body)
+    rx = gap_pad
+    ry = gap_pad + (base_y - reser_h)
+    vx = rx + reser_body.size[0] - ov_r
+    vy = gap_pad + (base_y - V.size[1])
+    ix = vx + V.size[0] - ov_i
+    iy = gap_pad + (base_y - IP.size[1]) + int(V.size[1] * 0.02)
+    under.alpha_composite(RU, (rx, ry + (reser_h - RU.size[1])))
+    over.alpha_composite(RO, (rx, ry + (reser_h - RO.size[1])))
+    over.alpha_composite(V, (vx, vy))
+    over.alpha_composite(IP, (ix, iy))
+    body = Image.alpha_composite(under, over)
+    box = ink_bbox(body, 10)
+    U = Image.fromarray(
+        ink_only(np.array(under.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    O = Image.fromarray(
+        ink_only(np.array(over.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    B = Image.alpha_composite(U, O)
+    wa = np.array(B)
+    wh = wa[:, :, 3] > 20
+    ww = wh & (wa[:, :, 0] > 200)
+    wh_h = int(np.where(ww)[0].max() - np.where(ww)[0].min()) + 1 if ww.any() else 0
+    print(
+        f"  TYPE VIP reser/IP size={size} white_h={wh_h} (target {VIP_TEXT_H}=Floq+20%) "
+        f"V={v_size} body={B.size} re_under={int(remask.sum())}"
+    )
+    # Last resort only — V loop should already fit chord
+    return fit_width(U, O, B, max_w=VIP_MAX_W)
 
 
-def place_inside_ring(body, min_top: int, bias=6):
-    """Search left+top so ALL ink stays inside R-2 and edge tips kiss ~R-10."""
+def place_inside_ring(body, min_top: int, bias=6, max_r=None):
+    """Search left+top so edge tips kiss ~R-10. max_r defaults to R-2 (strict)."""
+    cap = (R - 2) if max_r is None else float(max_r)
     ba = np.array(body)
     ink = ba[:, :, 3] > 40
     ys, xs = np.where(ink)
@@ -609,7 +683,7 @@ def place_inside_ring(body, min_top: int, bias=6):
     for left in range(left_lo, left_hi + 1, 2):
         for t in range(min_top, S - body.size[1] - 4):
             mr = max_radial(left, t)
-            if mr > (R - 2):
+            if mr > cap:
                 continue
             dl, dr = tips(left, t)
             sc = abs(dl - TIP_TARGET) + abs(dr - TIP_TARGET)
@@ -626,7 +700,7 @@ def place_inside_ring(body, min_top: int, bias=6):
         f"  place left={best_left} top={best_top} tips=({dl:.1f},{dr:.1f}) "
         f"maxR={mr:.1f} score={score:.1f}"
     )
-    assert mr <= (R - 1), f"ink outside ring: maxR={mr}"
+    assert mr <= (cap + 1), f"ink outside ring: maxR={mr} cap={cap}"
     return best_left, best_top
 
 
@@ -894,6 +968,10 @@ def build_all():
     fc = assemble(g, under, over, left, top, nightlife=True)
     fc = force_tiffany_T(fc, left, top, over)
     fc.save(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png", optimize=True)
+    # Site chrome pack (Search + floqr-chrome-scheme ICON_PACK)
+    fc.convert("RGB").save(
+        ROOT / "images/chrome/floqcast-nightlife.jpg", quality=98, subsampling=0
+    )
     yy, xx = np.indices((S, S))
     c = np.where(((xx // 16) + (yy // 16)) % 2 == 0, 50, 28).astype(np.uint8)
     Image.alpha_composite(
@@ -993,28 +1071,27 @@ def build_all():
     print("=== assemble VIP ===")
     g = Image.open(vip_g)
     under, over, body = vip_wm()
-    # Tall V=2X needs room ABOVE the peer baseline — min_top from furniture only.
-    # Prefer tops near FloqCAST/djBOT when tips still kiss; do not force min≈fc_top
-    # (that shoved tips past the arc and forced over-shrink / cut r·e).
+    # FloqCAST-style: keep full +20% type; tips may overhang the ring (re under / IP over).
+    # Do NOT run place_inside_ring shrink loop — that crushed reser/IP back toward Floq size.
     vip_min = graphic_bottom(g, 560) + 8
-    peer_prefer = int((fc_top + dj_top) / 2) - 40
-    for _ in range(8):
-        try:
-            left, top = place_inside_ring(body, vip_min, bias=2)
-            # If we landed far above peers and still have width headroom, nudge min up
-            if top < peer_prefer - 80 and body.size[0] <= MAX_WM_W:
-                try:
-                    left2, top2 = place_inside_ring(
-                        body, max(vip_min, peer_prefer - 100), bias=2
-                    )
-                    left, top = left2, top2
-                except AssertionError:
-                    pass
+    left = max(4, (S - body.size[0]) // 2)
+    top = min(max(vip_min, S - body.size[1] - 36), S - body.size[1] - 4)
+    # Nudge down so wordmark sits on the lower arc (re intersects ring)
+    for t in range(top, S - body.size[1] - 2, 2):
+        ba = np.array(body)
+        ink = ba[:, :, 3] > 40
+        ys, xs = np.where(ink)
+        if not len(ys):
             break
-        except AssertionError:
-            nw = int(body.size[0] * 0.95)
-            under, over, body = fit_width(under, over, body, max_w=nw)
-            print(f"  shrink to {body.size}")
+        # bottom ink radial distance
+        bot = int(ys.max())
+        bx = int(xs[ys == bot].mean())
+        rd = float(np.hypot(left + bx - CX, t + bot - CY))
+        if rd >= (R - 8):
+            top = t
+            break
+        top = t
+    print(f"  place VIP left={left} top={top} body={body.size}")
     vip = assemble(g, under, over, left, top, nightlife=True)
     vip.convert("RGB").save(
         ROOT / "images/chrome/vip-nightlife.jpg", quality=98, subsampling=0
@@ -1025,25 +1102,23 @@ def build_all():
         ROOT / "images/chrome/vip-traditional.jpg", quality=98, subsampling=0
     )
 
-    # QA strip — nightlife vs traditional FloqCAST
+    # QA strip — VIP nightlife (reser +20%, re under) + FloqCAST ref
     panel = Image.new("RGB", (900, 400), (0, 0, 0))
     d = ImageDraw.Draw(panel)
+    panel.paste(
+        Image.open(ROOT / "images/chrome/vip-nightlife.jpg").convert("RGB").resize((360, 360)),
+        (40, 30),
+    )
     panel.paste(
         Image.open(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png")
         .convert("RGB")
         .resize((360, 360)),
-        (40, 30),
-    )
-    panel.paste(
-        Image.open(ROOT / "images/chrome/floqcast-traditional-green.png")
-        .convert("RGB")
-        .resize((360, 360)),
         (480, 30),
     )
-    d.text((40, 8), "Nightlife", fill=(180, 180, 180))
-    d.text((480, 8), "Traditional (charcoal + ring, type same)", fill=(180, 180, 180))
+    d.text((40, 8), "VIP reserVIP (reser/IP = Floq+20%, re under)", fill=(180, 180, 180))
+    d.text((480, 8), "FloqCAST nightlife (type ref)", fill=(180, 180, 180))
     panel.save("/opt/cursor/artifacts/qa-modular-chrome.png")
-    panel.save("/opt/cursor/artifacts/fc-nightlife-vs-traditional.png")
+    panel.save("/opt/cursor/artifacts/vip-vs-floqcast-type.png")
 
     # Verify VIP tips inside
     a = np.array(vip.convert("RGB"))

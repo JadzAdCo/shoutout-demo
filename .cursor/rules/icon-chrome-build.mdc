@@ -86,7 +86,7 @@ Baseline → apply user deltas with `round`; if ink width exceeds ring fit, **un
 |---|---|---|---|
 | FloqCAST | (v4 silhouette is source of truth for ring draft) | `images/chrome/floqcast-traditional-green.png` | `images/review/actual-icons/floqcast-v4-circle-silhouette.png` (+ `-preview`) |
 | djBOT | `images/chrome/floqbot-nightlife.png` + `-spin.gif` | `floqbot-traditional.png` / `-traditional-green.png` (+ spins) | `images/review/floqbot-nightlife-preview.jpg`, `floqbot-nightlife-spin-512.gif` |
-| VIP | `images/chrome/vip-nightlife.jpg` | `images/chrome/vip-traditional.jpg` | `images/review/actual-icons/vip-reserv-actual.png` |
+| VIP | `images/chrome/vip-nightlife.jpg` | `images/chrome/vip-traditional.jpg` | `images/review/actual-icons/vip-reserv-actual.png` — `reser`/`IP` = Floq style at Floq height **+20%**; **`re` under** ring; **`ser`+V+`IP` over** |
 
 Cache-bust review HTML (`icon-review-*.html`) `?v=` when assets change. **Never** put `?v=` on Xibo `display.html?location=`.
 

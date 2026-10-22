@@ -126,7 +126,8 @@ a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid
 html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.45);background:rgba(255,255,255,.12)}
 .search-chrome-active{opacity:.8}
 .chrome-photo-face{justify-content:center!important;padding:8px!important;gap:0!important}
-.chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .floqai-tile-mark{width:92%!important;max-height:92%!important;object-fit:cover;border-radius:16px;filter:none}
+.chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .floqai-tile-mark,.chrome-photo-face .vip-tile-mark{width:92%!important;max-height:92%!important;object-fit:cover;border-radius:16px;filter:none}
+.chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .vip-tile-mark{object-fit:contain;filter:none}
 .search-icon-row{grid-column:1/-1;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;gap:12px;width:100%;overflow:visible;padding-top:10px}
 .search-icon-row > .category-card{flex:0 0 auto;min-width:0;min-height:132px;max-width:132px;font-size:16px;padding:12px 8px}
 /* FloqAi / floqCast / VIP — black face; mark ~80% of face; word at bottom inside (like ShoutOut visual weight) */
