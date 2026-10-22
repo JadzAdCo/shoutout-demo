@@ -766,9 +766,23 @@ def traditional_from_nightlife(
     stamped = Image.alpha_composite(stamped, paste_type(under, left, top))
     stamped = Image.alpha_composite(stamped, paste_type(over, left, top))
     out = np.array(stamped)
+    # Exact tip parity with nightlife: copy nightlife type ink (white/tiffany) onto trad
+    na = np.array(nightlife.convert("RGBA"))
+    nr, ng, nb = na[:, :, 0].astype(int), na[:, :, 1].astype(int), na[:, :, 2].astype(int)
+    typeish = (
+        ((nr > 200) & (ng > 200) & (nb > 200))
+        | ((nr < 120) & (ng > 150) & (nb > 180))
+    ) & (yy > 700)
+    typeish = (
+        np.array(
+            Image.fromarray((typeish.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(3))
+        )
+        > 0
+    )
+    out[typeish] = na[typeish]
     out[:, :, 3] = 255
 
-    tip_out = protect & (dist > R)
+    tip_out = typeish & (dist > R)
     tip_ink = tip_out & (
         (out[:, :, 0] > 40) | (out[:, :, 1] > 40) | (out[:, :, 2] > 40)
     )
