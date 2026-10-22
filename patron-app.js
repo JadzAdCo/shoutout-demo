@@ -1095,6 +1095,15 @@
     byId("backToWelcomeBtn")?.classList.toggle("hidden", !!user);
     byId("dropdownSignInBtn")?.classList.toggle("hidden", !!user);
     byId("dropdownSignOutBtn")?.classList.toggle("hidden", !user);
+    // Profile / user menu only after sign-in — never on Welcome guest sign-in
+    const menu = byId("userMenu");
+    if (menu) {
+      const show = !!user;
+      menu.classList.toggle("hidden", !show);
+      menu.hidden = !show;
+      menu.setAttribute("aria-hidden", show ? "false" : "true");
+      if (!show) byId("userDropdown")?.classList.add("hidden");
+    }
     updateUserMenu(user);
   }
 

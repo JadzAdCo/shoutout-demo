@@ -42,6 +42,7 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .category-card:nth-child(5),.category-card:nth-child(6){min-height:135px}
 
 /* v22 fixes: top-right profile, 10s ad splash, smaller standardized buttons */
+.user-menu.hidden,[hidden].user-menu{display:none!important;visibility:hidden!important;pointer-events:none!important}
 .user-menu{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 10px)!important;right:12px!important;left:auto!important;z-index:99999!important;width:auto!important;max-width:none!important;overflow:visible!important}
 .user-menu > a,
 .user-menu > a.profile-menu-link,
