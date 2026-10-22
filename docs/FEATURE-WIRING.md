@@ -28,28 +28,29 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.19)
+## Login + Search chrome (s3.2.20)
 
-**Purpose:** Compact sign-in, FloqR wordmark without pill, Search lens-in-field, grey-halo icon tiles, Traditional charcoal profile chip.
+**Purpose:** Compact sign-in, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome, Traditional charcoal profile chip.
 
 | Layer | Wiring |
 |---|---|
 | Login copy | `index.html` `.login-welcome-line` → `app.welcomeSignIn` (white); provider buttons icon + short label (`app.google` etc., no “Continue with”) |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
-| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.19` |
+| Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.20` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
-| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + grey halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
-| Traditional login | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card` |
+| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
+| Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
-| i18n | `floqr-i18n.js` s3.2.19 — all chrome langs for placeholder + login keys |
-| Diagnostics | Manual test `s3-2-19-search-lens-grey-halo` |
+| i18n | `floqr-i18n.js` s3.2.20 — all chrome langs for placeholder + login keys |
+| Diagnostics | Manual tests `s3-2-20-tile-palette-site-chrome`, `s3-2-19-search-lens-grey-halo` |
 
 ---
 
 ## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Black Dark Green**. Not on public Search.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Black Dark Green**. Not on public Search. Brand accents come from the FloqR tile palette (`images/chrome/floqr-tile-palette-ref.png`).
 
 | Layer | Wiring |
 |---|---|
@@ -59,7 +60,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
-| CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]`; Traditional login + profile-card charcoal gradients (s3.2.15) |
+| Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
+| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + brand CTAs (grey icon halo); Black Dark Green = violet/coral warm end |
 | VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
 | i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |

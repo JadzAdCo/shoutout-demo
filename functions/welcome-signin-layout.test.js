@@ -66,7 +66,7 @@ test("SMS and WhatsApp region sits on its own second line in every language", ()
 
 test("Welcome buttons share one vertical gradient sliced per button", () => {
   const css = read("styles.css");
-  assert.match(css, /#loginActions > \.signin,#loginActions > \.signin\.email\.email-selected\{background:linear-gradient\(180deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\) 0 calc\(-1 \* var\(--stack-y,0px\)\) \/ 100% var\(--stack-h,100%\) no-repeat;background-origin:border-box\}/);
+  assert.match(css, /#loginActions > \.signin,#loginActions > \.signin\.email\.email-selected\{background:linear-gradient\(180deg,var\(--floqr-tile-cyan\) 0%,var\(--floqr-tile-violet\) 52%,var\(--floqr-tile-magenta\) 100%\) 0 calc\(-1 \* var\(--stack-y,0px\)\) \/ 100% var\(--stack-h,100%\) no-repeat;background-origin:border-box\}/);
   const html = read("index.html");
   assert.match(html, /<script src="\.\/welcome-button-gradient\.js\?v=s3\.\d+\.\d+"><\/script>/);
   const api = loadGradient();

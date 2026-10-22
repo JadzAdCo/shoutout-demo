@@ -96,7 +96,7 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
   assert.match(card, /id="showSmsOtpBtn"[^>]*><span class="icon sms-icon">/);
   assert.match(card, /id="showWhatsAppOtpBtn"[^>]*><span class="icon wa-icon">/);
   const css = read("styles.css");
-  assert.match(css, /#loginActions \.signin\{background:linear-gradient\(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\);color:#fff/);
+  assert.match(css, /#loginActions \.signin\{background:linear-gradient\(90deg,var\(--floqr-tile-cyan\) 0%,var\(--floqr-tile-violet\) 52%,var\(--floqr-tile-magenta\) 100%\);color:#fff/);
   assert.match(css, /#loginActions \.icon\{width:22px;height:22px/);
   assert.match(css, /#loginActions > \.signin\{justify-content:flex-start;text-align:left/, "sign-in icon + label are left-aligned");
   assert.match(card, /id="whatsappCountryCode"/);
