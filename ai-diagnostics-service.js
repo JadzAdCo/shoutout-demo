@@ -229,7 +229,7 @@
         {label:"Package version s3.2.23", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.23\""]},
         {label:"Welcome help OTP-only body", file:"floqai-help-repository.js", includes:["Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Index help body trimmed", file:"index.html", includes:["data-floqr-help-body=\"Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
-        {label:"Left-align welcome + 80px under logo", file:"styles.css", includes:[".login-card > .floqr-home-link{display:block;margin:0 auto 80px", "align-self:flex-start", "justify-content:flex-start"]},
+        {label:"Left-align welcome + 80px under logo", file:"styles.css", includes:["margin:80px 0 14px", "login-welcome-line.help-label{display:flex", "justify-content:flex-start", "text-align:left"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.23\""]}
       ]
     },
