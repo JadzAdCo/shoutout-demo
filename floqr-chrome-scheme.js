@@ -1,10 +1,10 @@
 /**
- * FLOQR Site chrome — Nightlife | Traditional (beta) (+ reserved codes).
+ * FLOQR Site chrome — Nightlife | Traditional | Black Tiffany | Black Dark Green.
  * Preference datapoint: users.isSiteChrome
  *   0 = Nightlife chrome
  *   1 = Traditional
- *   2 = Reserved_3rd_chrome
- *   4 = Reserved_4th_chrome
+ *   2 = Black Tiffany (was Reserved_3rd_chrome)
+ *   4 = Black Dark Green (was Reserved_4th_chrome)
  * Gated by Features & Services key `siteChrome` (beta invite / assignment).
  * Also accepts legacy localStorage floqr.uiChrome / users.uiChrome during migration.
  * Stage pages may set html[data-floqr-theme-ungated="1"] to preview without a beta grant.
@@ -15,61 +15,120 @@
   const STORAGE_KEY = "floqr.isSiteChrome";
   const LEGACY_STORAGE_KEY = "floqr.uiChrome";
   const FEATURE_KEY = "siteChrome";
-  const SCHEMES = ["traditional", "nightlife"];
+  const SCHEMES = ["traditional", "nightlife", "blackTiffany", "blackDarkGreen"];
   const DEFAULT_SCHEME = "nightlife";
 
   /** Numeric isSiteChrome codes. */
   const SITE_CHROME = Object.freeze({
     NIGHTLIFE: 0,
     TRADITIONAL: 1,
+    BLACK_TIFFANY: 2,
+    BLACK_DARK_GREEN: 4,
+    /** @deprecated use BLACK_TIFFANY */
     RESERVED_3RD: 2,
+    /** @deprecated use BLACK_DARK_GREEN */
     RESERVED_4TH: 4
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.02";
+  const ICON_V = "s3.2.03";
+  const NIGHTLIFE_ICONS = {
+    floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
+    vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
+    floqAi: "./images/chrome/floqai-nightlife.png?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
+  };
+  const TRADITIONAL_ICONS = {
+    floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
+    vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
+    floqAi: "./images/chrome/floqai-traditional.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
+  };
   const ICON_PACK = {
-    traditional: {
-      floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
-      vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
-      shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
-      floqAi: "./images/chrome/floqai-traditional.jpg?v=" + ICON_V,
-      bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
-      rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
-    },
-    nightlife: {
-      floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
-      vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
-      shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
-      floqAi: "./images/chrome/floqai-nightlife.png?v=" + ICON_V,
-      bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
-      rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
-    }
+    traditional: TRADITIONAL_ICONS,
+    nightlife: NIGHTLIFE_ICONS,
+    // Black themes keep nightlife icon art; CSS swaps purple → Tiffany / forest
+    blackTiffany: NIGHTLIFE_ICONS,
+    blackDarkGreen: Object.assign({}, NIGHTLIFE_ICONS, {
+      shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
+    })
+  };
+
+  const LABEL_KEYS = {
+    nightlife: "chrome.nightlifeFull",
+    traditional: "chrome.traditionalFull",
+    blackTiffany: "chrome.blackTiffanyFull",
+    blackDarkGreen: "chrome.blackDarkGreenFull"
+  };
+
+  const LABEL_FALLBACK = {
+    nightlife: "Nightlife theme",
+    traditional: "Traditional theme",
+    blackTiffany: "Black Tiffany theme",
+    blackDarkGreen: "Black Dark Green theme"
   };
 
   function normalizeScheme(value) {
-    const v = String(value || "").trim().toLowerCase();
-    return SCHEMES.includes(v) ? v : DEFAULT_SCHEME;
+    const v = String(value || "").trim();
+    const lower = v.toLowerCase();
+    if (lower === "blacktiffany" || lower === "black-tiffany" || lower === "black_tiffany") {
+      return "blackTiffany";
+    }
+    if (
+      lower === "blackdarkgreen" ||
+      lower === "black-dark-green" ||
+      lower === "black_dark_green" ||
+      lower === "blackforest" ||
+      lower === "black-forest"
+    ) {
+      return "blackDarkGreen";
+    }
+    if (SCHEMES.includes(v)) return v;
+    if (lower === "traditional" || lower === "nightlife") return lower;
+    return DEFAULT_SCHEME;
   }
 
   function normalizeSiteChrome(value) {
     const n = Number(value);
     if (n === SITE_CHROME.TRADITIONAL) return SITE_CHROME.TRADITIONAL;
-    if (n === SITE_CHROME.RESERVED_3RD) return SITE_CHROME.RESERVED_3RD;
-    if (n === SITE_CHROME.RESERVED_4TH) return SITE_CHROME.RESERVED_4TH;
+    if (n === SITE_CHROME.BLACK_TIFFANY) return SITE_CHROME.BLACK_TIFFANY;
+    if (n === SITE_CHROME.BLACK_DARK_GREEN) return SITE_CHROME.BLACK_DARK_GREEN;
     if (n === SITE_CHROME.NIGHTLIFE) return SITE_CHROME.NIGHTLIFE;
     return SITE_CHROME.NIGHTLIFE;
   }
 
-  /** Map isSiteChrome → paint scheme. Reserved 2/4 fall back to Nightlife until defined. */
   function schemeFromSiteChrome(code) {
     const n = normalizeSiteChrome(code);
     if (n === SITE_CHROME.TRADITIONAL) return "traditional";
+    if (n === SITE_CHROME.BLACK_TIFFANY) return "blackTiffany";
+    if (n === SITE_CHROME.BLACK_DARK_GREEN) return "blackDarkGreen";
     return DEFAULT_SCHEME;
   }
 
   function siteChromeFromScheme(scheme) {
-    return normalizeScheme(scheme) === "traditional" ? SITE_CHROME.TRADITIONAL : SITE_CHROME.NIGHTLIFE;
+    const s = normalizeScheme(scheme);
+    if (s === "traditional") return SITE_CHROME.TRADITIONAL;
+    if (s === "blackTiffany") return SITE_CHROME.BLACK_TIFFANY;
+    if (s === "blackDarkGreen") return SITE_CHROME.BLACK_DARK_GREEN;
+    return SITE_CHROME.NIGHTLIFE;
+  }
+
+  function isPremiumScheme(scheme) {
+    const s = normalizeScheme(scheme);
+    return s === "traditional" || s === "blackTiffany" || s === "blackDarkGreen";
+  }
+
+  function isPremiumCode(code) {
+    const n = normalizeSiteChrome(code);
+    return (
+      n === SITE_CHROME.TRADITIONAL ||
+      n === SITE_CHROME.BLACK_TIFFANY ||
+      n === SITE_CHROME.BLACK_DARK_GREEN
+    );
   }
 
   function isUngated() {
@@ -113,11 +172,7 @@
 
   function effectiveSiteChrome(preferred) {
     const want = preferred != null ? normalizeSiteChrome(preferred) : getSiteChrome();
-    if (want === SITE_CHROME.TRADITIONAL && !hasThemeAccess()) return SITE_CHROME.NIGHTLIFE;
-    // Reserved codes require access too; until defined they paint as Nightlife.
-    if ((want === SITE_CHROME.RESERVED_3RD || want === SITE_CHROME.RESERVED_4TH) && !hasThemeAccess()) {
-      return SITE_CHROME.NIGHTLIFE;
-    }
+    if (isPremiumCode(want) && !hasThemeAccess()) return SITE_CHROME.NIGHTLIFE;
     return want;
   }
 
@@ -130,10 +185,7 @@
 
   function setSiteChrome(code, opts = {}) {
     let next = normalizeSiteChrome(code);
-    if (next === SITE_CHROME.TRADITIONAL && !hasThemeAccess()) next = SITE_CHROME.NIGHTLIFE;
-    if ((next === SITE_CHROME.RESERVED_3RD || next === SITE_CHROME.RESERVED_4TH) && !hasThemeAccess()) {
-      next = SITE_CHROME.NIGHTLIFE;
-    }
+    if (isPremiumCode(next) && !hasThemeAccess()) next = SITE_CHROME.NIGHTLIFE;
     try {
       localStorage.setItem(STORAGE_KEY, String(next));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
@@ -189,10 +241,12 @@
   function labelFor(scheme) {
     const s = normalizeScheme(scheme);
     const t = global.FLOQRI18n?.t;
+    const key = LABEL_KEYS[s] || LABEL_KEYS[DEFAULT_SCHEME];
     if (typeof t === "function") {
-      return s === "nightlife" ? t("chrome.nightlifeFull") : t("chrome.traditionalFull");
+      const translated = t(key);
+      if (translated && translated !== key) return translated;
     }
-    return s === "nightlife" ? "Nightlife theme" : "Traditional theme";
+    return LABEL_FALLBACK[s] || LABEL_FALLBACK[DEFAULT_SCHEME];
   }
 
   function applyDocument(scheme) {
@@ -218,7 +272,7 @@
     });
     global.document.querySelectorAll("[data-floqr-chrome-btn]").forEach((btn) => {
       const name = btn.getAttribute("data-floqr-chrome-btn");
-      btn.setAttribute("aria-pressed", name === s ? "true" : "false");
+      btn.setAttribute("aria-pressed", normalizeScheme(name) === s ? "true" : "false");
     });
     return s;
   }
@@ -245,7 +299,7 @@
       btn.dataset.floqrChromeBound = "1";
       btn.addEventListener("click", () => {
         const name = btn.getAttribute("data-floqr-chrome-btn");
-        if (!hasThemeAccess() && name === "traditional") {
+        if (!hasThemeAccess() && isPremiumScheme(name)) {
           syncAccessGate(scope);
           return;
         }
@@ -279,7 +333,8 @@
     siteChromeFromScheme,
     normalize: normalizeScheme,
     normalizeSiteChrome,
-    labelFor
+    labelFor,
+    isPremiumScheme
   };
 
   function boot() {

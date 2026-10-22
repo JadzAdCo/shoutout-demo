@@ -49,6 +49,11 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const portal = read("patron-portal.html");
   assert.match(portal, /data-floqr-theme-panel/);
   assert.match(portal, /data-floqr-chrome-btn="traditional"/);
+  assert.match(portal, /data-floqr-chrome-btn="blackTiffany"/);
+  assert.match(portal, /data-floqr-chrome-btn="blackDarkGreen"/);
+  assert.match(chrome, /BLACK_TIFFANY/);
+  assert.match(chrome, /BLACK_DARK_GREEN/);
+  assert.match(chrome, /blackTiffany/);
   const master = read("master-admin.html");
   assert.match(master, /id="featuresReleaseControl"[\s\S]*?>Release Control<\/h2>/);
   assert.doesNotMatch(master, /id="featuresReleaseControl"[\s\S]*?>Features Mgmt<\/h2>/);

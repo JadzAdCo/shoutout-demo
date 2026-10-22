@@ -1279,7 +1279,7 @@
     {
       id: "help-features-services",
       title: "Release Control",
-      body: "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes it live for all patrons. Both = 1 means testing: only granted beta testers (and Master Admins for QA) can use it. Site chrome is the Nightlife / Traditional site theme beta — turn it on here, then invite testers under Beta & Testing with Chrome ticked. Active look is users.isSiteChrome (0 Nightlife, 1 Traditional, 2 and 4 reserved). Save asks for a reason (min 8 characters) under SOS2FA and writes the audit trail. When a test feature is ready, use Test → live below, then run the GitHub promote workflow.",
+      body: "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes it live for all patrons. Both = 1 means testing: only granted beta testers (and Master Admins for QA) can use it. Site chrome is the Nightlife / Traditional / Black Tiffany / Black Dark Green site theme beta — turn it on here, then invite testers under Beta & Testing with Chrome ticked. Active look is users.isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Save asks for a reason (min 8 characters) under SOS2FA and writes the audit trail. When a test feature is ready, use Test → live below, then run the GitHub promote workflow.",
       searchPhrases: [
         "features mgmt", "features and services", "release control", "beta and testing", "feature audit trail", "feature flags", "enable feature", "enable beta feature", "disable feature", "test feature", "beta testers",
         "invite beta tester", "IsFeatureEnabled", "IsTestFeature", "feature links", "beta pill", "revision", "reason for change",
@@ -1439,13 +1439,14 @@
     {
       id: "help-chrome-scheme",
       title: "Site chrome",
-      body: "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta) and Traditional (charcoal / white). Colors, cards, and chrome update together. Your choice is stored as isSiteChrome on your profile (0 = Nightlife, 1 = Traditional; 2 and 4 are reserved). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search).",
+      body: "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta), Traditional (charcoal / white), Black Tiffany (true black + Tiffany blue accents, no purple), and Black Dark Green (true black + forest green). Colors, cards, and chrome update together. Titles use Lyft-style white geometric type. Your choice is stored as isSiteChrome on your profile (0 = Nightlife, 1 = Traditional, 2 = Black Tiffany, 4 = Black Dark Green). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search).",
       searchPhrases: [
         "site chrome", "site theme", "traditional theme", "nightlife theme", "traditional chrome", "nightlife chrome",
+        "black tiffany", "black dark green", "tiffany theme", "forest green theme", "lyft font",
         "beta theme", "isSiteChrome", "chrome", "icon theme", "dark theme", "charcoal theme"
       ],
       links: [
-        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "site chrome settings", blurb: "Nightlife vs Traditional Site chrome (beta)"}
+        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "site chrome settings", blurb: "Nightlife / Traditional / Black Tiffany / Black Dark Green Site chrome (beta)"}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalLanguageSettings"

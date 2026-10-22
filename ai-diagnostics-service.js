@@ -292,9 +292,9 @@
       checks: [
         {label:"siteChrome catalog key", file:"floqr-feature-services.js", includes:["siteChrome", "Site chrome", "buttonIds: []"]},
         {label:"Server catalog siteChrome + alias", file:"functions/feature-services-core.js", includes:["siteChrome", "traditionalTheme: \"siteChrome\""]},
-        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "RESERVED_3RD", "RESERVED_4TH"]},
+        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "BLACK_TIFFANY", "BLACK_DARK_GREEN"]},
         {label:"Release Control title white + help", file:"master-admin.html", includes:["features-release-title", "help-feature-promote-live", ">Release Control</h2>"], notIncludes:[">Features Mgmt</h2>"]},
-        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome"]},
+        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome", "blackTiffany", "blackDarkGreen"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.105\""]}
       ]
     },
@@ -1966,6 +1966,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-03-black-tiffany-dark-green-lyft-type",
+      area:"Site chrome + typography",
+      feature:"Lyft-style white titles + Black Tiffany / Black Dark Green themes",
+      changed:"Plus Jakarta Sans (Lyft-like) for white titles site-wide. isSiteChrome 2=Black Tiffany (black + #00d4fe, no purple), 4=Black Dark Green (black + forest #228b22). Language Settings shows four chrome buttons. Package s3.2.03.",
+      howToTest:"1) Hard-refresh Search / My Profile (styles.css + floqr-chrome-scheme.js ?v=s3.2.03). 2) Confirm titles use bold tight white geometric type. 3) With Site chrome beta access: Language Settings → Black Tiffany — page goes true black, accents Tiffany (search border / buttons), no purple glow. 4) Switch Black Dark Green — accents become forest green. 5) Nightlife / Traditional still work.",
+      expected:"Four themes selectable; Black Tiffany has no purple; Black Dark Green uses forest green; titles match Lyft weight/tracking.",
+      troubleshoot:"No new buttons → hard refresh patron-portal.html + floqr-i18n.js s3.2.03; confirm siteChrome beta. Purple still on Black Tiffany → confirm html[data-floqr-chrome=blackTiffany] and styles.css s3.2.03. Font unchanged → Plus Jakarta Sans Google Fonts link on the page."
+    },
     {
       id:"s3-1-101-discovery-auto-approve-past",
       area:"Master Admin / AI Crawling",
