@@ -500,17 +500,25 @@
         return `<div class="report-row" data-vip-res="${esc(r.reservationId)}">` +
           `<strong>${esc(r.venueName || r.clubLocationId)}</strong> · ${esc(r.sectionLabel || r.sectionId)} · ${esc(r.night)} · ${esc(r.status)} · ${money}` +
           (canPass ? ` <button type="button" class="buttonlike" data-vip-pass="${esc(r.reservationId)}">Show pass</button>` : "") +
-          `<pre class="hidden" id="vipPass-${esc(r.reservationId)}"></pre></div>`;
+          `<div class="hidden vip-pass-panel" id="vipPass-${esc(r.reservationId)}"><div class="floqr-qr" data-vip-qr></div><p class="sub small" data-vip-token></p><p class="sub small"><a data-vip-pass-link href="#" target="_blank" rel="noopener">Open full pass</a></p></div></div>`;
       }).join("");
       list.querySelectorAll("[data-vip-pass]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-vip-pass");
           try {
             const pass = await firebase.app().functions("us-central1").httpsCallable("getVipReservationPass")({reservationId: id});
-            const pre = byId(`vipPass-${id}`);
-            if (pre) {
-              pre.classList.remove("hidden");
-              pre.textContent = pass.data?.passToken || "";
+            const token = pass.data?.passToken || "";
+            const panel = byId(`vipPass-${id}`);
+            if (panel) {
+              panel.classList.remove("hidden");
+              const qrHost = panel.querySelector("[data-vip-qr]");
+              const tokenEl = panel.querySelector("[data-vip-token]");
+              const link = panel.querySelector("[data-vip-pass-link]");
+              if (tokenEl) tokenEl.textContent = token;
+              if (qrHost) window.FLOQRQr?.render?.(qrHost, token, {size: 160});
+              if (link && token) {
+                link.href = `./pass.html?t=${encodeURIComponent(token)}`;
+              }
             }
           } catch (err) {
             if (status) status.textContent = err?.message || String(err);
@@ -626,7 +634,11 @@
         "guest-list-reserv":"portalFeatureOrders",
         vip:"portalFeatureOrders",
         "vip-reservations":"portalFeatureOrders",
-        vipreservations:"portalFeatureOrders"
+        vipreservations:"portalFeatureOrders",
+        passes:"portalFeatureOrders",
+        pass:"portalFeatureOrders",
+        "door-pass":"portalFeatureOrders",
+        doorpass:"portalFeatureOrders"
       };
       const mapped = map[tab] || "";
       const btn = document.querySelector(`[data-panel='${mapped}']`);
@@ -634,7 +646,7 @@
       else if (mapped) showPortalPanel(mapped, mapped);
       if (mapped === "portalFeatureOrders") {
         const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
-        if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations"].includes(tab) || sub === "vip" || sub === "reserv") {
+        if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations", "passes", "pass", "door-pass", "doorpass"].includes(tab) || sub === "vip" || sub === "reserv" || sub === "passes") {
           showFeatureOrdersPane("foVipPane");
         } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
           showFeatureOrdersPane("foShoutoutsPane");

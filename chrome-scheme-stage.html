@@ -15,7 +15,25 @@
       --bg:#070d18; --bg-elev:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
       --line:#26d8ff; --accent:#3de7ff; --pick:#dfff5a;
       --hero:radial-gradient(900px 420px at 15% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,#070d18,#102038);
-      --font:"Avenir Next","Segoe UI",sans-serif;
+      --font:"Plus Jakarta Sans","Avenir Next","Segoe UI",sans-serif;
+    }
+    html[data-floqr-chrome="blackTiffany"]{
+      --bg:#000; --bg-elev:#0a0a0a; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#00d4fe; --accent:#00d4fe; --pick:#7ef0ff;
+      --hero:#000;
+      --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
+    }
+    html[data-floqr-chrome="blackDarkGreen"]{
+      --bg:#000; --bg-elev:#0a0a0a; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#228b22; --accent:#228b22; --pick:#6ddf6d;
+      --hero:#000;
+      --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
+    }
+    html[data-floqr-chrome="whiteBlack"]{
+      --bg:#fff; --bg-elev:#f6f6f6; --ink:#2a2a2a; --muted:rgba(42,42,42,.72);
+      --line:#2a2a2a; --accent:#1a1a1a; --pick:#3a3a3a;
+      --hero:#ffffff;
+      --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
     }
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--ink);background:var(--hero);font-family:var(--font);padding:28px 20px 80px}
@@ -47,13 +65,16 @@
   <div class="banner">LOCAL STAGE — Search / Pages not wired</div>
   <h1>Patron chrome switch (staged)</h1>
   <p class="lead">
-    Toggle <strong>Traditional</strong> vs <strong>Nightlife</strong> chrome. Chosen icons swap live on this page via
-    <code>floqr.uiChrome</code> (localStorage). Profile field + Search wiring wait for your go-ahead.
+    Toggle <strong>Nightlife</strong>, <strong>Traditional</strong>, <strong>Black Tiffany</strong>, or <strong>Black Dark Green</strong>.
+    Chosen icons swap live via <code>floqr.isSiteChrome</code> / <code>floqr.uiChrome</code> (localStorage).
   </p>
 
   <div class="toolbar">
     <button type="button" class="btn" data-floqr-chrome-btn="traditional" aria-pressed="true">Traditional chrome</button>
     <button type="button" class="btn" data-floqr-chrome-btn="nightlife" aria-pressed="false">Nightlife chrome</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="blackTiffany" aria-pressed="false">Black Tiffany</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="whiteBlack" aria-pressed="false">White / Black</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="blackDarkGreen" aria-pressed="false">Black Dark Green</button>
     <span class="live">Active: <strong data-floqr-chrome-label>Traditional chrome</strong></span>
   </div>
 
@@ -63,19 +84,19 @@
     <div class="row">
       <figure class="hero">
         <figcaption class="pick">FloqCast <span data-floqr-chrome-label></span></figcaption>
-        <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-traditional.jpg?v=s3.2.00" alt="FloqCast traditional chrome"/>
+        <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-traditional.jpg?v=s3.2.18" alt="FloqCast traditional chrome"/>
       </figure>
       <figure class="hero">
         <figcaption class="pick">VIP reserV <span data-floqr-chrome-label></span></figcaption>
-        <img data-floqr-chrome-icon="vipReserv" src="./images/chrome/vip-traditional.jpg?v=s3.2.00" alt="VIP reserV traditional"/>
+        <img data-floqr-chrome-icon="vipReserv" src="./images/chrome/vip-traditional.jpg?v=s3.2.18" alt="VIP reserV traditional"/>
       </figure>
       <figure>
         <figcaption>FloqCast nightlife SVG</figcaption>
-        <img src="./images/review/floqcast-icon-nightlife.svg?v=s3.2.00" alt="FloqCast nightlife SVG"/>
+        <img src="./images/review/floqcast-icon-nightlife.svg?v=s3.2.18" alt="FloqCast nightlife SVG"/>
       </figure>
       <figure>
         <figcaption>FloqCast traditional SVG</figcaption>
-        <img src="./images/review/floqcast-icon-traditional.svg?v=s3.2.00" alt="FloqCast traditional SVG"/>
+        <img src="./images/review/floqcast-icon-traditional.svg?v=s3.2.18" alt="FloqCast traditional SVG"/>
       </figure>
     </div>
   </section>
@@ -109,23 +130,23 @@
     <div class="row">
       <figure>
         <figcaption>FloqCAST nightlife (V4)</figcaption>
-        <img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.00" alt="FloqCAST nightlife chrome"/>
+        <img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.18" alt="FloqCAST nightlife chrome"/>
       </figure>
       <figure>
         <figcaption>FloqCAST traditional (charcoal + ring)</figcaption>
-        <img src="./images/chrome/floqcast-traditional.jpg?v=s3.2.00" alt="FloqCAST traditional chrome"/>
+        <img src="./images/chrome/floqcast-traditional.jpg?v=s3.2.18" alt="FloqCAST traditional chrome"/>
       </figure>
       <figure>
         <figcaption>VIP nightlife v6</figcaption>
-        <img src="./images/chrome/vip-nightlife.jpg?v=s3.2.00" alt="VIP nightlife"/>
+        <img src="./images/chrome/vip-nightlife.jpg?v=s3.2.18" alt="VIP nightlife"/>
       </figure>
       <figure>
         <figcaption>VIP traditional B</figcaption>
-        <img src="./images/chrome/vip-traditional.jpg?v=s3.2.00" alt="VIP traditional"/>
+        <img src="./images/chrome/vip-traditional.jpg?v=s3.2.18" alt="VIP traditional"/>
       </figure>
       <figure>
         <figcaption>ShoutOut traditional v2 (from original)</figcaption>
-        <img src="./images/review/shoutout-traditional-v2.jpg?v=s3.2.00" alt="ShoutOut traditional"/>
+        <img src="./images/review/shoutout-traditional-v2.jpg?v=s3.2.18" alt="ShoutOut traditional"/>
       </figure>
       <figure>
         <figcaption>FloqAi traditional prop</figcaption>
@@ -149,7 +170,7 @@
     Reply which traditional proposals to lock, then go-ahead to wire Search.
   </p>
 
-  <script src="./floqr-chrome-scheme.js?v=s3.2.00"></script>
+  <script src="./floqr-chrome-scheme.js?v=s3.2.18"></script>
   <script>
     FLOQRChromeScheme.bindToggle(document);
     // Keep legacy data-scheme in sync for page chrome CSS

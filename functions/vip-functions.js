@@ -465,6 +465,17 @@ exports.getVipReservationPass = onCall(CALL_OPTS, async request => {
     qrTokenHash: tokenHash,
     qrTokenIssuedAtMs: Date.now()
   }, {merge: true});
+  // Mirror into generalized Passes collection (QR door beta).
+  try {
+    const passes = require("./passes-functions").__passesHelpers;
+    if (passes?.upsertPassFromVipReservation) {
+      await passes.upsertPassFromVipReservation(reservationId, {
+        ...row,
+        status: text(row.status, 40),
+        patronUid: uid
+      }, token);
+    }
+  } catch (_) { /* Passes mirror best-effort */ }
   return publicReservation(reservationId, row, {includePassToken: true, passToken: token});
 });
 

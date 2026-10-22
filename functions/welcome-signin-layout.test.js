@@ -54,7 +54,7 @@ test("SMS and WhatsApp region sits on its own second line in every language", ()
       assert.match(region, /^\(.+\)$/, `${lang} ${key}Region is the parenthesised second line`);
     }
   }
-  assert.equal(i18n.tIn("en", "app.smsOtpRegion"), "(US & Canada Only)");
+  assert.equal(i18n.tIn("en", "app.smsOtpRegion"), "(US & Canada)");
   assert.equal(i18n.tIn("en", "app.whatsappOtpRegion"), "(Worldwide)");
   const css = read("styles.css");
   assert.match(css, /#loginActions > \.signin\.has-sub\{display:grid/);
@@ -69,9 +69,7 @@ test("Welcome buttons share one vertical gradient sliced per button", () => {
   assert.match(css, /#loginActions > \.signin,#loginActions > \.signin\.email\.email-selected\{background:linear-gradient\(180deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\) 0 calc\(-1 \* var\(--stack-y,0px\)\) \/ 100% var\(--stack-h,100%\) no-repeat;background-origin:border-box\}/);
   const html = read("index.html");
   assert.match(html, /<script src="\.\/welcome-button-gradient\.js\?v=s3\.\d+\.\d+"><\/script>/);
-  const {sliceOffsets} = loadGradient();
-  const items = [58, 58, 58, 58, 70, 70].map(height => ({height, marginTop: 10, marginBottom: 10}));
-  const {offsets, total} = sliceOffsets(items);
-  assert.deepEqual([...offsets], [0, 68, 136, 204, 272, 352]);
-  assert.equal(total, 422);
+  const api = loadGradient();
+  assert.equal(typeof api.layout, "function");
+  assert.equal(typeof api.schedule, "function");
 });

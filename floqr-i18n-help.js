@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.00";
+  const VERSION = "s3.2.18";
 
   const packs = {
     "ru": {
@@ -204,7 +204,7 @@
       },
       "help-chrome-scheme": {
         title: "Тема сайта",
-        body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон cyan–magenta) и Traditional (уголь / белый). Меняются цвета, карточки и оформление вместе. Выбор сохраняется на устройстве и в профиле. Доступно после приглашения или назначения бета-функции Traditional site theme. Переключатель — в My Profile → Language Settings."
+        body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон), Traditional (уголь/белый), Black Tiffany (чёрный + Tiffany blue) и White/Black, and Black Dark Green (чёрный + лесной зелёный). Меняются цвета, карточки и оформление вместе. Выбор хранится как isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Переключатель — в My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -510,7 +510,7 @@
       },
       "help-chrome-scheme": {
         title: "Sitethema",
-        body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon cyaan–magenta) en Traditional (antraciet / wit). Kleuren, kaarten en chrome veranderen samen. Je keuze wordt op dit apparaat en in je profiel opgeslagen. Beschikbaar als FLOQR je uitnodigt of de beta-functie Traditional site theme toewijst. Schakelaar: My Profile → Language Settings."
+        body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon), Traditional (antraciet/wit), Black Tiffany (zwart + Tiffany blue) en White/Black, and Black Dark Green (zwart + bosgroen). Kleuren, kaarten en chrome veranderen samen. Opgeslagen als isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Schakelaar in My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -816,7 +816,7 @@
       },
       "help-chrome-scheme": {
         title: "Thème du site",
-        body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon cyan–magenta) et Traditional (charbon / blanc). Couleurs, cartes et chrome changent ensemble. Le choix est enregistré sur cet appareil et sur votre profil. Disponible si FLOQR vous invite ou assigne la fonction bêta Traditional site theme. Interrupteur : My Profile → Language Settings."
+        body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon), Traditional (charbon / blanc), Black Tiffany (noir + Tiffany blue) et White/Black, and Black Dark Green (noir + vert forêt). Couleurs, cartes et chrome changent ensemble. Stocké comme isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interrupteur dans My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "Mon profil et paramètres",
@@ -1122,7 +1122,7 @@
       },
       "help-chrome-scheme": {
         title: "Site-Theme",
-        body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon Cyan–Magenta) und Traditional (Anthrazit / Weiß). Farben, Karten und Chrome ändern sich zusammen. Die Wahl wird auf diesem Gerät und im Profil gespeichert. Verfügbar, wenn FLOQR dich einlädt oder die Beta-Funktion Traditional site theme zuweist. Umschalter: My Profile → Language Settings."
+        body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon), Traditional (Anthrazit / Weiß), Black Tiffany (Schwarz + Tiffany-Blau) und White/Black, and Black Dark Green (Schwarz + Waldgrün). Farben, Karten und Chrome ändern sich gemeinsam. Gespeichert als isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Schalter unter My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -1428,7 +1428,7 @@
       },
       "help-chrome-scheme": {
         title: "Tema del sitio",
-        body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón cian–magenta) y Traditional (carbón / blanco). Colores, tarjetas y chrome cambian juntos. Se guarda en este dispositivo y en tu perfil. Disponible cuando FLOQR te invita o asigna la función beta Traditional site theme. Interruptor: My Profile → Language Settings."
+        body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón), Traditional (carbón / blanco), Black Tiffany (negro + Tiffany blue) y White/Black, and Black Dark Green (negro + verde bosque). Colores, tarjetas y chrome cambian juntos. Se guarda como isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruptor en My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -1734,7 +1734,7 @@
       },
       "help-chrome-scheme": {
         title: "Tema del sito",
-        body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon cyan–magenta) e Traditional (antracite / bianco). Colori, schede e chrome cambiano insieme. La scelta resta su questo dispositivo e sul profilo. Disponibile se FLOQR ti invita o assegna la funzione beta Traditional site theme. Interruttore: My Profile → Language Settings."
+        body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon), Traditional (antracite / bianco), Black Tiffany (nero + Tiffany blue) e White/Black, and Black Dark Green (nero + verde foresta). Colori, card e chrome cambiano insieme. Salvato come isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruttore in My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2040,7 +2040,7 @@
       },
       "help-chrome-scheme": {
         title: "Tema do site",
-        body: "Beta: alterne todo o site FLOQR entre Nightlife (néon ciano–magenta) e Traditional (carvão / branco). Cores, cartões e chrome mudam juntos. A escolha fica neste dispositivo e no perfil. Disponível quando a FLOQR convida ou atribui a função beta Traditional site theme. Interruptor: My Profile → Language Settings."
+        body: "Beta: alterne todo o site FLOQR entre Nightlife (néon), Traditional (carvão / branco), Black Tiffany (preto + Tiffany blue) e White/Black, and Black Dark Green (preto + verde floresta). Cores, cartões e chrome mudam juntos. Guardado como isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruptor em My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2346,7 +2346,7 @@
       },
       "help-chrome-scheme": {
         title: "Θέμα ιστότοπου",
-        body: "Beta: εναλλαγή ολόκληρου του ιστότοπου FLOQR μεταξύ Nightlife (neon cyan–magenta) και Traditional (άνθρακας / λευκό). Χρώματα, κάρτες και chrome αλλάζουν μαζί. Η επιλογή αποθηκεύεται στη συσκευή και στο προφίλ. Διαθέσιμο όταν η FLOQR σας προσκαλεί ή αναθέτει τη beta λειτουργία Traditional site theme. Διακόπτης: My Profile → Language Settings."
+        body: "Beta: αλλάξτε ολόκληρο το site FLOQR μεταξύ Nightlife (νεόν), Traditional (ανθρακί / λευκό), Black Tiffany (μαύρο + Tiffany blue) και White/Black, and Black Dark Green (μαύρο + πράσινο δάσους). Χρώματα, κάρτες και chrome αλλάζουν μαζί. Αποθηκεύεται ως isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Διακόπτης στο My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2652,7 +2652,7 @@
       },
       "help-chrome-scheme": {
         title: "Motyw strony",
-        body: "Beta: przełącz całą stronę FLOQR między Nightlife (neon cyan–magenta) a Traditional (antracyt / biel). Kolory, karty i chrome zmieniają się razem. Wybór zapisuje się na urządzeniu i w profilu. Dostępne, gdy FLOQR zaprosi Cię lub przypisze funkcję beta Traditional site theme. Przełącznik: My Profile → Language Settings."
+        body: "Beta: przełącz całą witrynę FLOQR między Nightlife (neon), Traditional (antracyt / biel), Black Tiffany (czerń + Tiffany blue) i White/Black, and Black Dark Green (czerń + zieleń leśna). Kolory, karty i chrome zmieniają się razem. Zapisane jako isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Przełącznik w My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2958,7 +2958,7 @@
       },
       "help-chrome-scheme": {
         title: "سمة الموقع",
-        body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون سماوي–أرجواني) وTraditional (فحمي / أبيض). تتغير الألوان والبطاقات والمظهر معاً. يُحفظ الاختيار على هذا الجهاز وفي ملفك. متاح عندما تدعوك FLOQR أو تعيّن ميزة beta لسمة Traditional. المفتاح: My Profile → Language Settings."
+        body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون) وTraditional (فحمي / أبيض) وBlack Tiffany (أسود + أزرق تيفاني) وWhite/Black, and Black Dark Green (أسود + أخضر غابات). تتغير الألوان والبطاقات والكروم معاً. يُحفظ كـ isSiteChrome (0 Nightlife، 1 Traditional، 2 Black Tiffany، 4 Black Dark Green). المفتاح في My Profile → Language Settings."
       },
       "help-my-profile": {
         title: "My Profile & Settings",

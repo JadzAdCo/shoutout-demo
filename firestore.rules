@@ -1267,6 +1267,14 @@ service cloud.firestore {
  allow create: if isMasterAdmin() || isConstrainedInboxCreate();
  }
 
+ // Door Passes (QR) — server callables write; patrons may read their own rows.
+ match /passes/{passId} {
+   allow read: if isMasterAdmin()
+     || (signedIn() && resource.data.patronUid == request.auth.uid)
+     || (signedIn() && resource.data.issuedByUid == request.auth.uid);
+   allow write: if false;
+ }
+
  match /userBlocks/{blockId} {
  allow read: if isParticipant();
  allow create: if signedIn()

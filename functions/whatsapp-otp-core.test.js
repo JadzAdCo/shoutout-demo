@@ -83,9 +83,9 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
   assert.doesNotMatch(card, /Or use One Time Password/);
   assert.doesNotMatch(card, /class="divider"/);
   assert.match(card, /id="showWhatsAppOtpBtn"[^>]*data-i18n="app\.whatsappOtp"/);
-  assert.match(card, /<span class="i18n-text signin-label">Continue with WhatsApp OTP<\/span><span class="signin-sub" data-i18n="app\.whatsappOtpRegion">\(Worldwide\)<\/span><\/button>/);
+  assert.match(card, /<span class="i18n-text signin-label">WhatsApp OTP<\/span><span class="signin-sub" data-i18n="app\.whatsappOtpRegion">\(Worldwide\)<\/span><\/button>/);
   assert.match(card, /id="showSmsOtpBtn"[^>]*data-i18n="app\.smsOtp"/);
-  assert.match(card, /<span class="i18n-text signin-label">Continue with SMS OTP<\/span><span class="signin-sub" data-i18n="app\.smsOtpRegion">\(US &amp; Canada Only\)<\/span><\/button>/);
+  assert.match(card, /<span class="i18n-text signin-label">SMS OTP<\/span><span class="signin-sub" data-i18n="app\.smsOtpRegion">\(US &amp; Canada\)<\/span><\/button>/);
   const smsSelect = card.slice(card.indexOf('id="phoneCountryCode"'), card.indexOf("</select>", card.indexOf('id="phoneCountryCode"')));
   assert.equal((smsSelect.match(/<option/g) || []).length, 1, "SMS OTP is +1 (US & Canada) only");
   assert.match(smsSelect, /United States \/ Canada \(\+1\)/);
@@ -97,7 +97,7 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
   assert.match(card, /id="showWhatsAppOtpBtn"[^>]*><span class="icon wa-icon">/);
   const css = read("styles.css");
   assert.match(css, /#loginActions \.signin\{background:linear-gradient\(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\);color:#fff/);
-  assert.match(css, /#loginActions \.icon\{width:28px;height:28px/);
+  assert.match(css, /#loginActions \.icon\{width:22px;height:22px/);
   assert.match(css, /#loginActions > \.signin\{justify-content:flex-start;text-align:left/, "sign-in icon + label are left-aligned");
   assert.match(card, /id="whatsappCountryCode"/);
   const legal = card.indexOf('class="login-legal"');

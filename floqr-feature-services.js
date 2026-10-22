@@ -17,6 +17,7 @@
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
+    {key: "passes", label: "Passes", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 0, IsTestFeature: 1},
     // No Search tile — Site chrome (Nightlife/Traditional) toggle lives in My Profile → Language Settings.
     {key: "siteChrome", label: "Site chrome", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
@@ -206,6 +207,9 @@
     viewer = {uid: user?.uid || "", isMasterAdmin, isBetaTester: Object.keys(betaFeatures).length > 0, betaFeatures};
     const result = {features: getFeatures(), viewer: getViewer()};
     loaded = {uid: user?.uid || "", promise: Promise.resolve(result)};
+    try {
+      root.FLOQRChromeScheme?.markFeaturesAccessResolved?.();
+    } catch (_) { /* ignore */ }
     try {
       root.dispatchEvent?.(new CustomEvent("floqr:features-loaded", {detail: result}));
     } catch (_) { /* ignore */ }

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.00";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.18";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.18";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,31 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.18",
+      title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
+      checks: [
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.18\""]},
+        {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
+        {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
+        {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
+        {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
+      ]
+    },
+    {
+      version: "s3.2.15-login-search-traditional",
+      title: "Compact login + Search cleanup + traditional profile card",
+      checks: [
+        {label:"Login welcome + compact grid", file:"index.html", includes:["app.welcomeSignIn", "Welcome. Please Sign-in / Sign-up", "i18n-text\">Google", "loginActions"]},
+        {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
+        {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
+        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.18"]},
+        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.18\""]}
+      ]
+    },
+
+    {
       version: "s3.2.00",
       title: "s3.2.00 — Venue Links accurate ?k= + Search Clubs/Lounges placeholder",
       checks: [
@@ -292,9 +317,9 @@
       checks: [
         {label:"siteChrome catalog key", file:"floqr-feature-services.js", includes:["siteChrome", "Site chrome", "buttonIds: []"]},
         {label:"Server catalog siteChrome + alias", file:"functions/feature-services-core.js", includes:["siteChrome", "traditionalTheme: \"siteChrome\""]},
-        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "RESERVED_3RD", "RESERVED_4TH"]},
+        {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "BLACK_TIFFANY", "WHITE_BLACK", "BLACK_DARK_GREEN"]},
         {label:"Release Control title white + help", file:"master-admin.html", includes:["features-release-title", "help-feature-promote-live", ">Release Control</h2>"], notIncludes:[">Features Mgmt</h2>"]},
-        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome"]},
+        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome", "blackTiffany", "whiteBlack", "blackDarkGreen"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.105\""]}
       ]
     },
@@ -1627,7 +1652,7 @@
       version: "s3.0.107-whatsapp-otp",
       title: "WhatsApp OTP sign-in (Twilio) + SMS US only + privacy links at bottom",
       checks: [
-        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "Continue with WhatsApp OTP", "Continue with SMS OTP", "login-legal"]},
+        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "WhatsApp OTP", "SMS OTP", "login-legal"]},
         {label:"WhatsApp OTP client", file:"patron-app.js", includes:["requestWhatsAppOtp", "verifyWhatsAppOtp", "signInWithCustomToken"]},
         {label:"WhatsApp OTP callables", file:"functions/whatsapp-otp-functions.js", includes:["exports.requestWhatsAppOtp", "exports.verifyWhatsAppOtp", "forceSecurity: true", "fetchTwilioMessage"]},
         {label:"Compliance row forced for auth events", file:"functions/twilio-log.js", includes:["forceSecurity === true", "ContentSid: template"]},
@@ -1966,6 +1991,60 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-18-search-traditional-chip-placeholder",
+      area:"Search + Site chrome",
+      feature:"Traditional charcoal profile chip + Clubs/Lounge/Events placeholder; Welcome speech gone",
+      changed:"Profile chip hardcoded Traditional charcoal on every Site chrome (including Nightlife). Welcome speech / green OR removed from Search. Placeholder = Search for Clubs, Lounge, Events, etc. Package s3.2.18.",
+      howToTest:"1) Hard-refresh live Search after Pages publish (styles.css + index.html + floqr-i18n.js ?v=s3.2.18). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife — even when Site chrome is Nightlife. 3) No Welcome, type below… line and no green OR between Search and tiles. 4) Empty search box placeholder reads Search for Clubs, Lounge, Events, etc.",
+      expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
+      troubleshoot:"Still pink chip or Welcome speech → Pages still on old main (confirm styles.css?v=s3.2.18). Cached HTML → hard refresh / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-16-passes-qr",
+      area:"VIP / Passes",
+      feature:"Door Passes QR beta wired (passes + pass.html)",
+      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16.",
+      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes beta row after seed/reload.",
+      expected:"Untracked QR/passes modules are live on the branch and wired end-to-end for VIP Show pass.",
+      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js s3.2.16. Feature row missing → seedFeatureServices / Reload."
+    },
+    {
+      id:"s3-2-16-profile-card-chrome",
+      area:"Site chrome + Search",
+      feature:"Closed profile card is Traditional charcoal (not Nightlife pink)",
+      changed:"Early localStorage paint of data-floqr-chrome on index/patron-portal. Profile chip CSS hardcodes charcoal on nightlife/traditional/tiffany/dark-green/white-black. Package s3.2.18.",
+      howToTest:"1) Hard-refresh Search (styles ?v=s3.2.18). 2) Before opening the menu, confirm the top-right profile chip is charcoal — not pink/cyan. 3) Switch Site chrome themes — chip stays charcoal.",
+      expected:"Closed Search profile chip stays Traditional charcoal regardless of Nightlife Site chrome.",
+      troubleshoot:"Still pink/cyan → Pages not on s3.2.18; hard refresh styles.css. Confirm rule html[data-floqr-chrome=nightlife] .user-menu-btn uses #4a4a4a charcoal gradient."
+    },
+    {
+      id:"s3-2-15-login-search-traditional",
+      area:"Login + Search + Site chrome",
+      feature:"Compact login, FloqR logo, Search placeholder, history Back, traditional profile card",
+      changed:"Login welcome white copy + 2-col half-size provider buttons (no Continue with). FloqR logo tiles+wordmark without charcoal pill. Search placeholder Clubs/Lounge/Events; Welcome speech + green OR removed. Global Back is < Back via history.back; FloqR mark → Search home. Profile chip charcoal on all Site chrome. Package s3.2.18.",
+      howToTest:"1) Hard-refresh Search (styles/i18n/nav ?v=s3.2.18). 2) Signed-out login: white Welcome. Please Sign-in…; Google/Microsoft/Facebook/Email/SMS/WhatsApp in two columns, no Continue with. 3) Sign in → Search: placeholder Search for Clubs, Lounge, Events, etc.; no Welcome speech or green OR. 4) Open My Profile from another page → Back is < Back and returns to previous page; FloqR logo returns to Search. 5) Corner profile card charcoal even on Nightlife Site chrome.",
+      expected:"Compact login; clean Search; Back≠home; logo→home; charcoal profile chip.",
+      troubleshoot:"Old Welcome speech / Clubs or Lounges placeholder → Pages still on old main; need merge + deploy s3.2.18. Back still to Search → floqr-nav.js applyGlobalBack history.back."
+    },
+    {
+      id:"s3-2-06-white-black-chrome",
+      area:"Site chrome + icons",
+      feature:"White/Black theme + themed VIP icon packs",
+      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/FloqAi/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.07.",
+      howToTest:"1) Hard-refresh Language Settings (s3.2.07) with Site chrome beta. 2) Switch White/Black — page is white with charcoal text and slim dark borders; Search tiles show whiteblack icons. 3) Black Tiffany / Black Dark Green swap VIP tile art. 4) Traditional / Nightlife still work.",
+      expected:"Five themes selectable; White/Black is light; icons match theme.",
+      troubleshoot:"No White/Black button → hard refresh patron-portal + floqr-i18n s3.2.07. Icons stuck dark → confirm ICON_PACK whiteBlack paths 200."
+    },
+    {
+      id:"s3-2-03-black-tiffany-dark-green-lyft-type",
+      area:"Site chrome + typography",
+      feature:"Lyft-style white titles + Black Tiffany / Black Dark Green themes",
+      changed:"Plus Jakarta Sans (Lyft-like) for white titles site-wide. isSiteChrome 2=Black Tiffany (black + #00d4fe, no purple), 4=Black Dark Green (black + forest #228b22). Language Settings shows four chrome buttons. Package s3.2.03.",
+      howToTest:"1) Hard-refresh Search / My Profile (styles.css + floqr-chrome-scheme.js ?v=s3.2.03). 2) Confirm titles use bold tight white geometric type. 3) With Site chrome beta access: Language Settings → Black Tiffany — page goes true black, accents Tiffany (search border / buttons), no purple glow. 4) Switch Black Dark Green — accents become forest green. 5) Nightlife / Traditional still work.",
+      expected:"Four themes selectable; Black Tiffany has no purple; Black Dark Green uses forest green; titles match Lyft weight/tracking.",
+      troubleshoot:"No new buttons → hard refresh patron-portal.html + floqr-i18n.js s3.2.03; confirm siteChrome beta. Purple still on Black Tiffany → confirm html[data-floqr-chrome=blackTiffany] and styles.css s3.2.03. Font unchanged → Plus Jakarta Sans Google Fonts link on the page."
+    },
     {
       id:"s3-1-101-discovery-auto-approve-past",
       area:"Master Admin / AI Crawling",

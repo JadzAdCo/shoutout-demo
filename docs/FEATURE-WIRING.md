@@ -8,24 +8,61 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-21 |
+| Last registry touch | 2026-10-22 |
+
+---
+
+## Passes / door QR (beta — `passes`)
+
+**Purpose:** One-time QR door passes for VIP reserV, guest entry, and promoter clients.
+
+| Layer | Wiring |
+|---|---|
+| Feature | `featureServices/passes` — Release Control beta (`IsTestFeature:1` packaged default) |
+| Callables | `listMyPasses`, `listClubPasses`, `issuePass`, `revealPass`, `checkInPass`, `sharePass`, `resolvePassToken` (`functions/passes-functions.js` + `passes-core.js`) |
+| VIP bridge | `getVipReservationPass` mirrors into `passes` via `__passesHelpers.upsertPassFromVipReservation` |
+| Client QR | `floqr-qrcode-lib.js` + `floqr-qr.js` → `FLOQRQr.render` |
+| Surfaces | `pass.html?t=` public viewer; My Profile → Guest List & reserV **Show pass** (QR + Open full pass); VIP confirm → `patron-portal.html?tab=passes` |
+| Data | Firestore `passes/{passId}` — server-write only; patron/issuer may read own rows |
+| Door | Club Admin / VIP Door still check in VIP via `checkInVipReservation`; Passes `checkInPass` for generalized kinds |
+
+---
+
+## Login + Search chrome (s3.2.18)
+
+**Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional charcoal profile chip on every Site chrome.
+
+| Layer | Wiring |
+|---|---|
+| Login copy | `index.html` `.login-welcome-line` → `app.welcomeSignIn` (white); provider buttons icon + short label (`app.google` etc., no “Continue with”) |
+| Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.18` |
+| Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
+| Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
+| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.` (`cat.floqaiPlaceholder`); `#categoryFloqAiSpeech` + green `.category-or` removed (CSS also `display:none` as cache safety) |
+| Traditional login | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card` |
+| Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
+| i18n | `floqr-i18n.js` s3.2.18 — all chrome langs for placeholder + login keys |
+| Diagnostics | Manual test `s3-2-18-search-traditional-chip-placeholder` |
 
 ---
 
 ## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife** and **Traditional** (reserved codes 2/4 later). Not on public Search.
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Black Dark Green**. Not on public Search.
 
 | Layer | Wiring |
 |---|---|
 | Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
 | Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
-| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Reserved_3rd_chrome, `4` Reserved_4th_chrome (+ legacy `uiChrome` string) |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Black Dark Green (+ legacy `uiChrome` string) |
 | Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
-| CSS | `styles.css` — `html[data-floqr-chrome="traditional"]` |
+| Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
+| CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]`; Traditional login + profile-card charcoal gradients (s3.2.15) |
+| VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
-| i18n / help | `chrome.*`; FloqAi `help-chrome-scheme` |
+| i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |
 
 ---
 
@@ -383,8 +420,8 @@ When adding a section, use this skeleton:
 | **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
 | **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
-| **Search icon tiles** | `#categoryPage .search-icon-row` order: **floqCast → ShoutOut → VIP reserV → dj BOT** (tile label; key `floqAi`). All four use chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK` (ShoutOut nightlife `shoutout-nightlife.png`, traditional `shoutout-traditional-green.png`; floqCast/VIP chrome JPGs; dj BOT placeholder mark until pack). Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
-| **Search FloqAi box (s3.1.110)** | Speech (`#categoryFloqAiSpeech`) = Welcome only. Input placeholder (`cat.floqaiPlaceholder`) = “You may also search for: Clubs or Lounges” (localized; same copy as `cat.floqaiAlso`). |
+| **Search icon tiles** | `#categoryPage .search-icon-row` order: **floqCast → ShoutOut → VIP reserV → BOT DEE** (tile label; key `floqAi`). All four use chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK` (ShoutOut nightlife `shoutout-nightlife.png`, traditional `shoutout-traditional-green.png`; floqCast/VIP chrome JPGs; BOT DEE chrome photo). Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
+| **Search FloqAi box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
@@ -470,7 +507,7 @@ When adding a section, use this skeleton:
 
 ## Search category icon row (spots)
 
-Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2 ShoutOut** · **3 VIP reserV** · **4 dj BOT** (Search tile label; feature key still `floqAi` until icon pack lands). Hidden: Mingl / BartR / RydR.
+Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2 ShoutOut** · **3 VIP reserV** · **4 BOT DEE** (Search tile label; feature key `floqAi`). Hidden: Mingl / BartR / RydR.
 
 ## Chrome icon drafts (nightlife / traditional review)
 
@@ -481,7 +518,8 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
 | **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` / `floqcast-traditional.jpg`; nightlife `floqcast-nightlife.jpg` + V4 PNG. Search tile: `data-floqr-chrome-icon="floqCast"` → ICON_PACK |
-| **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` |
+| **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="floqAi"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
+| **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` (mirrors BOT DEE face) |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
