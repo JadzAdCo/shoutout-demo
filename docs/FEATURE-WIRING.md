@@ -52,7 +52,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Layer | Wiring |
 |---|---|
 | Login copy | `index.html` `.login-welcome-line.help-label` → `app.welcomeSignIn` = **Please signin or signup**; `?` via `help-welcome` / `.help-label-text` immediately beside the line |
-| Login legal | `footer.login-page-footer` sibling of `.login-card` (not inside the card). Keeps both **Privacy Policy** (`privacy.html`) and **Do Not Sell or Share** (`privacy.html#do-not-sell`) — full policy vs CCPA/CPRA opt-out. CSS: `#landingPage` + `.login-wrap` column flex; `.login-page-footer{margin-top:auto}` pins links to the bottom (mobile `100dvh` + safe-area) |
+| Login legal | `footer.login-page-footer` sibling of `.login-card` (not inside the card). Keeps both **Privacy Policy** (`privacy.html`) and **Do Not Sell or Share** (`privacy.html#do-not-sell`) — full policy vs CCPA/CPRA opt-out. CSS: `position:fixed; bottom:0` (+ safe-area + fade) so links stay at the visible phone bottom; `.login-wrap` gets bottom padding so OTP panels clear the bar |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
 | Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.22` |

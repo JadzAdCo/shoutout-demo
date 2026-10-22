@@ -229,7 +229,7 @@
         {label:"Package version s3.2.22", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.22\""]},
         {label:"Welcome copy Please signin or signup", file:"index.html", includes:["Please signin or signup", "help-label-text", "login-page-footer"]},
         {label:"Privacy links in page footer", file:"index.html", includes:["class=\"login-page-footer\"", "class=\"login-legal\"", "privacy.html#do-not-sell", "role=\"contentinfo\""]},
-        {label:"Footer CSS pins legal to bottom", file:"styles.css", includes:["#landingPage.page.active{display:flex", "login-page-footer{margin-top:auto", "login-welcome-line.help-label"]},
+        {label:"Footer CSS pins legal to bottom", file:"styles.css", includes:["#landingPage.page.active{display:flex", "login-page-footer{position:fixed", "bottom:0", "login-welcome-line.help-label"]},
         {label:"i18n welcome short", file:"floqr-i18n.js", includes:["\"app.welcomeSignIn\": \"Please signin or signup\""]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.22\""]}
       ]
@@ -2044,7 +2044,7 @@
       changed:"Privacy Policy and Do Not Sell or Share stay as two links (full policy vs CCPA/CPRA opt-out on privacy.html#do-not-sell) but move into login-page-footer pinned to the bottom of the landing page (mobile-safe). Welcome copy is Please signin or signup; ? sits immediately beside that line via help-label. Package s3.2.22.",
       howToTest:"1) Hard-refresh signed-out home https://jadzadco.github.io/shoutout-demo/?v=s3.2.22 (styles.css + index.html + floqr-i18n.js). 2) Heading reads Please signin or signup with ? immediately to the right of that text (not alone on a row under it). 3) Privacy Policy · Do Not Sell or Share sit at the bottom of the page below the frosted card — not inside the card. 4) On a phone viewport, those links stay at the bottom of the screen architecture above the browser chrome. 5) Tap Privacy → privacy.html; tap Do Not Sell → #do-not-sell section.",
       expected:"Short welcome with inline ?; both privacy links in the page footer outside the login card.",
-      troubleshoot:"Links still inside the card → hard refresh styles.css/index.html s3.2.22; confirm .login-page-footer is a sibling of .login-card. ? alone under heading → help-label + help-label-text on the h2; helper-popouts/help-attach must keep ? in the same inline-flex row."
+      troubleshoot:"Links still inside the card or missing at bottom → hard refresh styles.css/index.html s3.2.22; confirm .login-page-footer is fixed bottom sibling of .login-card (not margin-top:auto only). ? alone under heading → help-label + help-label-text on the h2; helper-popouts/help-attach must keep ? in the same inline-flex row."
     },
     {
       id:"s3-2-21-template-select-led-search",
