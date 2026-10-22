@@ -198,7 +198,11 @@ def strip_type_band(img: Image.Image, y_min: int, protect_cyan_led=False) -> Ima
 
 
 def extract_floqcast_graphic() -> Path:
-    """Restore LED/phone/signal/arrow from last-good commit; no type, no ring."""
+    """Restore LED/phone/signal/arrow from last-good commit; no type, no ring.
+
+    Upper graphic (y < 700) is copied untouched after ring strip — never run
+    MaxFilter type wipes into the phone/LED (that ate the silhouette bottom).
+    """
     src = LAYERS / "_src-floqcast-good.png"
     git_show(
         "ef50cfe",
@@ -206,60 +210,40 @@ def extract_floqcast_graphic() -> Path:
         src,
     )
     g = strip_ring_only(Image.open(src))
-    # Wipe ALL prior wordmark ink in the lower disc — leftover white/tiffany T
-    # under the new type reads as a "double T". LED/phone live above ~640.
     a = np.array(g.convert("RGBA"))
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     r, gch, b, al = [a[:, :, i].astype(np.int16) for i in range(4)]
-    band = (yy >= 640) & (dist < 500)
+    # Wordmark only — phones/LED end above this line on ef50cfe
+    band = (yy >= 720) & (dist < 498)
     white = (al > 20) & (r > 175) & (gch > 175) & (b > 175) & band
-    # Accent T / old green T — low red, high blue (not pink LED silhouette)
-    accent = (
-        (al > 20)
-        & (r < 120)
-        & (gch > 140)
-        & (b > 170)
-        & (b >= gch - 10)
-        & band
+    accent = (al > 20) & (r < 120) & (gch > 140) & (b > 170) & band
+    # Tight dilate — do not reach up into the LED
+    m = Image.fromarray(((white | accent).astype(np.uint8) * 255)).filter(
+        ImageFilter.MaxFilter(5)
     )
-    red = (r > 80) & (r > gch + 25) & (r > b + 25)  # keep arrow
-    pink = (r > 140) & (b > 140) & (r > gch + 20)  # keep LED silhouette glow
-    mask = (white | accent) & ~red & ~pink
-    m = Image.fromarray((mask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(11))
-    a[(np.array(m) > 0) & band & ~red & ~pink] = (0, 0, 0, 255)
-    # Kill residual dark-gray plate in the wordmark band (reads as a black matte over F/T)
-    plate = (
-        band
-        & (al > 20)
-        & (r < 45)
-        & (gch < 45)
-        & (b < 45)
-        & ((r > 4) | (gch > 4) | (b > 4))
-        & ~red
-        & ~pink
-    )
-    a[plate] = (0, 0, 0, 255)
+    a[(np.array(m) > 0) & band] = (0, 0, 0, 255)
     g = Image.fromarray(a, "RGBA")
     out = LAYERS / "floqcast-graphic.png"
     g.save(out, optimize=True)
     upper = (
         (a[:, :, 3] > 40)
         & (dist < 450)
-        & (yy < 640)
+        & (yy < 700)
         & ((a[:, :, 0] > 30) | (a[:, :, 1] > 30) | (a[:, :, 2] > 30))
     )
-    left_tiff = int(
-        (
-            (a[:, :, 0] < 100)
-            & (a[:, :, 1] > 150)
-            & (a[:, :, 2] > 180)
-            & (a[:, :, 3] > 20)
-            & (yy > 640)
-            & (dist < 480)
-        ).sum()
+    phone = (
+        (xx > 120)
+        & (xx < 420)
+        & (yy > 80)
+        & (yy < 620)
+        & (dist < 450)
+        & ((a[:, :, 0] > 30) | (a[:, :, 1] > 30) | (a[:, :, 2] > 30))
+        & (a[:, :, 3] > 40)
     )
-    print(f"GRAPHIC floqcast → {out} upper_ink={int(upper.sum())} leftover_tiff={left_tiff}")
+    print(
+        f"GRAPHIC floqcast → {out} upper_ink={int(upper.sum())} phone_ink={int(phone.sum())}"
+    )
     return out
 
 
@@ -405,6 +389,111 @@ def accent_wm(full, before_t, under_text, size, target_h, fit=True):
     )
     if fit:
         return fit_width(U, O, B)
+    return U, O, B
+
+
+def floqcast_wm():
+    """Floq at FC_H; CAST at +15% point size. Fl under ring; oq+CAST over (T tiffany)."""
+    size_f = 170
+    for _ in range(8):
+        u, by = render_upright("Floq", size_f, WHITE)
+        size_f = int(
+            max(50, min(280, round(size_f * FC_H / max(1, finish(u, by).size[1]))))
+        )
+    size_c = int(round(size_f * 1.15))  # CAST +15% — point size only, no second height chase
+
+    floq = glyph("Floq", size_f, WHITE)
+    cas = glyph("CAS", size_c, WHITE)
+    Tt = glyph("T", size_c, TIFFANY)
+    ov = max(2, int(Tt.size[0] * 0.08))
+    cast_w = cas.size[0] + Tt.size[0] - ov
+    cast_h = max(cas.size[1], Tt.size[1])
+    cast = Image.new("RGBA", (cast_w, cast_h), (0, 0, 0, 0))
+    cast.alpha_composite(cas, (0, cast_h - cas.size[1]))
+    cast.alpha_composite(Tt, (cas.size[0] - ov, cast_h - Tt.size[1]))
+
+    # Fl / oq split on shared Floq canvas
+    font = ImageFont.truetype(FONT, int(size_f))
+    floq_u, by = render_upright("Floq", size_f, WHITE)
+    pad = 64
+    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "Floq", font=font, anchor="ls"
+    )
+    origin = (pad - bb[0], pad + (bb[3] - bb[1]))
+
+    def layer(text):
+        im = Image.new("RGBA", floq_u.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin, text, font=font, fill=WHITE, anchor="ls")
+        return finish(im, by, crop=False)
+
+    full_f = finish(floq_u, by, crop=False)
+    fl_f = layer("Fl")
+    x0, y0b, x1, y1 = ink_bbox(full_f, 12)
+    box = (x0, y0b, x1 + 1, y1 + 1)
+    fa = np.array(full_f.crop(box))
+    fla = np.array(fl_f.crop(box))
+    ink = fa[:, :, 3] > 20
+    flmask = (
+        np.array(Image.fromarray(fla[:, :, 3]).filter(ImageFilter.MaxFilter(3))) > 25
+    ) & ink
+    floq_under = np.zeros_like(fa)
+    floq_over = np.zeros_like(fa)
+    floq_under[flmask] = (255, 255, 255, 255)
+    floq_over[ink & ~flmask] = (255, 255, 255, 255)
+    # Map Fl/oq masks onto floq glyph box
+    floq_a = np.array(floq)
+    fu = Image.new("RGBA", floq.size, (0, 0, 0, 0))
+    fo = Image.new("RGBA", floq.size, (0, 0, 0, 0))
+    FU = Image.fromarray(ink_only(floq_under), "RGBA")
+    FO = Image.fromarray(ink_only(floq_over), "RGBA")
+    fu.paste(FU, (0, floq.size[1] - FU.size[1]), FU)
+    fo.paste(FO, (0, floq.size[1] - FO.size[1]), FO)
+    f_ink = floq_a[:, :, 3] > 20
+    u_m = (np.array(fu)[:, :, 3] > 20) & f_ink
+    o_m = f_ink & ~u_m
+    fu2 = np.zeros_like(floq_a)
+    fo2 = np.zeros_like(floq_a)
+    fu2[u_m] = (255, 255, 255, 255)
+    fo2[o_m] = (255, 255, 255, 255)
+
+    gap = max(2, int(size_f * 0.03))
+    # Baseline-align CAST to Floq (Floq ink bottom is the q descender — not the baseline)
+    flo_cap = glyph("Flo", size_f, WHITE)
+    floq_baseline = flo_cap.size[1]  # from top of Floq ink box to baseline
+    # Canvas tall enough for Floq descender + taller CAST caps
+    H = max(floq.size[1], floq_baseline + (cast.size[1] - flo_cap.size[1]) + cast.size[1])
+    H = max(floq.size[1], floq_baseline + 8, cast.size[1] + (floq.size[1] - floq_baseline))
+    W = floq.size[0] + gap + cast.size[0]
+    under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    fy = 0
+    # CAST bottom at Floq baseline
+    cy = fy + floq_baseline - cast.size[1]
+    cy = max(0, cy)
+    # If CAST is taller than Floq caps, shift Floq down so CAST fits above baseline
+    if cy < 0:
+        fy = -cy
+        cy = 0
+        H = max(H, fy + floq.size[1])
+        under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    under.alpha_composite(Image.fromarray(fu2, "RGBA"), (0, fy))
+    over.alpha_composite(Image.fromarray(fo2, "RGBA"), (0, fy))
+    over.alpha_composite(cast, (floq.size[0] + gap, cy))
+
+    body = Image.alpha_composite(under, over)
+    box = ink_bbox(body, 10)
+    U = Image.fromarray(
+        ink_only(np.array(under.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    O = Image.fromarray(
+        ink_only(np.array(over.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
+    )
+    B = Image.alpha_composite(U, O)
+    print(
+        f"  TYPE FloqCAST Floq={size_f}/{floq.size} CAST={size_c}/{cast.size} "
+        f"(+15%) body={B.size}"
+    )
     return U, O, B
 
 
@@ -595,10 +684,9 @@ def build_all():
     # FloqCAST
     print("=== assemble FloqCAST ===")
     g = Image.open(fc_g)
-    # Full target size — move only, do not shrink the wordmark
-    # Fl under ring; oqCAST + tiffany T over ring
-    under, over, body = accent_wm("FloqCAST", "FloqCAS", "Fl", 170, FC_H, fit=False)
-    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 640) + 8, bias=4)
+    # Floq base size; CAST +15%; Fl under ring; oq + CAST over (T tiffany)
+    under, over, body = floqcast_wm()
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
     fc = assemble(g, under, over, left, top, nightlife=True)
     fc.save(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png", optimize=True)
     yy, xx = np.indices((S, S))

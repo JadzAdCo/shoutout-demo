@@ -67,7 +67,7 @@ Baseline → apply user deltas with `round`; if ink width exceeds ring fit, **un
 
 | Mark | Point / ink target | Notes |
 |---|---|---|
-| FloqCAST | body font ≈ **175–190**, ink h ≈ **200** (`FC_H≈200`) | Fit width ≤ **~720** if tips won’t kiss |
+| FloqCAST | Floq ink h ≈ **200** (`FC_H`); **CAST +15%** point size | Fl under ring; oq+CAST over; q kisses bottom arc |
 | djBOT | ink h ≈ **204** (= 170×1.20) | Set/robot up; wordmark under with gap, then kiss ring |
 | VIP reser/IP | **X = 194** (= 162×1.20; 162 was 135×1.20) | **V = 2X = 388**; then fit width ≤ **~720** if needed |
 | VIP furniture | Separate from type: scale lounge **×1.10**, nudge down; **do not** regenerate wordmark when only furniture moves |
