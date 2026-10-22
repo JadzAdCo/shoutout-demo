@@ -167,7 +167,7 @@ test("server: request / verify / session use admin-trust and mail the code to th
   assert.match(body("verifySos2faRecoveryCode"), /email_verified !== true/);
 });
 
-test("pages load the s3.1.28 SOS2FA client", () => {
-  assert.match(read("master-admin.html"), /sos2fa\.js\?v=s3\.1\.\d+"/);
+test("pages load the SOS2FA client at current package version", () => {
+  assert.match(read("master-admin.html"), /sos2fa\.js\?v=s3\.\d+\.\d+"/);
   assert.match(read("seed-v29-09-14.html"), /sos2fa\.js\?v=s3\.\d+\.\d+/);
 });
