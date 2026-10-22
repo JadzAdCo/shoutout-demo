@@ -463,11 +463,10 @@
     setStatus(t("page.vip.paidOk", "Deposit paid — your VIP reserV table is confirmed. Open My Profile → Reservations for your pass."));
 
     const passLink = document.getElementById("vipConfirmPass");
-    if (passLink && window.FLOQRNav?.portalLink) {
-      passLink.href = window.FLOQRNav.portalLink({tab: "guest-list-reserv"});
-    } else if (passLink && window.FLOQRNav?.portalHome) {
-      const home = window.FLOQRNav.portalHome();
-      passLink.href = home + (home.includes("?") ? "&" : "?") + "tab=guest-list-reserv";
+    if (passLink && window.FLOQRNav?.portalHome) {
+      passLink.href = window.FLOQRNav.portalHome({tab: "passes"});
+    } else if (passLink) {
+      passLink.href = "./patron-portal.html?tab=passes";
     }
 
     try {
@@ -482,11 +481,11 @@
         setConfirmField("vipConfirmNight", match.night || "—");
         setConfirmField("vipConfirmTable", match.sectionLabel || match.sectionId || "—");
         if (match.reservationId && passLink) {
-          if (window.FLOQRNav?.portalLink) {
-            passLink.href = window.FLOQRNav.portalLink({tab: "guest-list-reserv", id: match.reservationId});
+          if (window.FLOQRNav?.portalHome) {
+            passLink.href = window.FLOQRNav.portalHome({tab: "passes", id: match.reservationId});
           } else {
             const base = passLink.href.split("?")[0];
-            passLink.href = `${base}?tab=guest-list-reserv&id=${encodeURIComponent(match.reservationId)}`;
+            passLink.href = `${base}?tab=passes&id=${encodeURIComponent(match.reservationId)}`;
           }
         }
       }
@@ -575,8 +574,8 @@
     const profileLink = document.getElementById("vipOpenProfile");
     if (profileLink && window.FLOQRNav?.portalHome) {
       profileLink.href = window.FLOQRNav.portalLink
-        ? window.FLOQRNav.portalLink({tab: "guest-list-reserv"})
-        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=guest-list-reserv");
+        ? window.FLOQRNav.portalHome({tab: "passes"})
+        : (window.FLOQRNav.portalHome() + (window.FLOQRNav.portalHome().includes("?") ? "&" : "?") + "tab=passes");
     }
 
     searchEl?.addEventListener("input", () => renderVenueGrid());

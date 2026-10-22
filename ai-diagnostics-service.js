@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.107";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.108";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.108",
+      title: "floqCAST idle 64×48 icon +25% + FloqCAST one-CTA + door pass link",
+      checks: [
+        {label:"64x48 idle icon scale CSS", file:"display.css", includes:["floqcast-idle-canvas[data-is-64x48=\"1\"]", "max-height:36vh", "width:min(520px,60vw)", "margin-top:auto!important"]},
+        {label:"Idle stamps screen format flags", file:"display-app.js", includes:["renderFloqCastIdleScreen", "dataset.is64x48", "boardAssignedFormatId"]},
+        {label:"FloqCAST progressive Go live CTA", file:"floqcast-search.js", includes:["data-go-live-venue", "syncGoLiveChrome", "Go live at {venue}"]},
+        {label:"Open door pass uses portalHome passes", file:"vip-app.js", includes:["portalHome({tab: \"passes\"})"], notIncludes:["portalLink({tab:"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.108\""]}
+      ]
+    },
     {
       version: "s3.1.107",
       title: "VIP landing chrome pack + traditional swap",
@@ -1968,6 +1979,15 @@
       howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
       expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
+    },
+    {
+      id:"s3-1-108-floqcast-idle-64x48-scale",
+      area:"Display 2 floqCAST idle",
+      feature:"64×48 idle floqCAST icon +25%; copy pushed down",
+      changed:"display.css scales floqcast-idle logo to 36vh / 60vw (~+30%) on data-is-64x48; hello/copy uses margin-top:auto under the larger mark. display-app idle stamps screen format flags. Also FloqCAST Select→Go live one CTA; Open door pass → portalHome tab=passes (fixes 404). Package s3.1.108.",
+      howToTest:"1) Open display2.html?location=temp-democlub-1 with secondary format led-64x48 (or venue secondary=64×48). 2) Idle: floqCAST mark larger (~+30%); AWAITING / GO LIVE lines sit lower under the icon; idle note near bottom. 3) floqcast-search: Select venue button becomes Go live. 4) After VIP pay, Open door pass opens My Profile Passes (not 404).",
+      expected:"Larger idle icon on 64×48; verbiage below; no Select+Go live double CTA; door pass link works.",
+      troubleshoot:"Icon still small → hard refresh display.css + display-app.js s3.1.108 (no ?v= on Xibo URL). data-is-64x48 not 1 → check secondaryDisplayScreenFormatId=led-64x48. Short viewport media query must keep 36vh/60vw for 64×48. Door pass 404 → vip-app must use portalHome({tab:\"passes\"})."
     },
     {
       id:"s3-1-107-vip-landing-chrome-icons",

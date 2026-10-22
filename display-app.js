@@ -1201,6 +1201,15 @@
       canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
       canvas.style.backgroundImage = "";
       canvas.style.background = "";
+      /* Stamp LED size so idle CSS can scale the floqCAST mark (64×48 +25%). */
+      const formatId = normalizeScreenFormatId(
+        screenFormatOverride || boardAssignedFormatId(location) || canvas.dataset.screenFormatId || ""
+      ) || "led-64x48";
+      canvas.dataset.screenFormatId = formatId;
+      const screenFlags = window.FLOQRScreenDatapoints?.canvasFlags?.(formatId) || {};
+      canvas.dataset.is96x48 = screenFlags.is96x48 || "0";
+      canvas.dataset.is64x48 = screenFlags.is64x48 || (/64x48/i.test(formatId) ? "1" : "0");
+      canvas.dataset.is64x32 = screenFlags.is64x32 || (/64x32/i.test(formatId) ? "1" : "0");
     }
     const bgEl = byId("displayBackground");
     if (bgEl) {

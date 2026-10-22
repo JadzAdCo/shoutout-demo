@@ -352,3 +352,15 @@ test("display pages load the safe render helper first; dead renderers are gone",
   assert.match(display, /style="\$\{stageStyle\}"/);
   assert.match(display, /const stageStyle = safeRender\.styleAttr\(\[/);
 });
+
+test("floqCAST idle 64x48 scales icon and bottom-weights copy", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "display.css"), "utf8");
+  assert.match(css, /floqcast-idle-canvas\[data-is-64x48="1"\]/);
+  assert.match(css, /max-height:\s*36vh/);
+  assert.match(css, /width:\s*min\(520px,\s*60vw\)/);
+  assert.match(css, /margin-top:\s*auto\s*!important/);
+  const app = fs.readFileSync(path.join(__dirname, "..", "display-app.js"), "utf8");
+  assert.match(app, /function renderFloqCastIdleScreen/);
+  assert.match(app, /dataset\.is64x48/);
+  assert.match(app, /boardAssignedFormatId/);
+});

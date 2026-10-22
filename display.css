@@ -1888,7 +1888,7 @@ body.floqcast-live-active .heist-brand-slide{
   display:block;
   text-align:center;
 }
-#displayMain.floqcast-idle-copy .floqcast-idle-line:last-child{
+#displayMain.floqcast-idle-copy .floqcast-idle-line + .floqcast-idle-line{
   color:#dfff5a;
   font-size:.88em;
 }
@@ -1901,6 +1901,54 @@ body.floqcast-live-active .heist-brand-slide{
   color:rgba(244,247,255,.72)!important;
   text-transform:none;
 }
+/* 64×48 LED: floqCAST idle icon ~+30% vs base 28vh/46vw; hello/copy sits lower under the mark. */
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .floqcast-idle-center,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .floqcast-idle-center{
+  width:96vw!important;
+  height:100%!important;
+  min-height:100%!important;
+  box-sizing:border-box!important;
+  justify-content:flex-start!important;
+  padding:2% 2.5% 2%!important;
+  gap:0!important;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .media-slot.floqcast-idle-logo-slot,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .media-slot.floqcast-idle-logo-slot{
+  width:min(520px,60vw);
+  max-height:36vh;
+  margin:1% auto 0;
+  flex:0 0 auto;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .floqcast-idle-logo,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .floqcast-idle-logo{
+  max-height:36vh;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy{
+  margin-top:auto!important;
+  margin-bottom:1%!important;
+  width:96%!important;
+  max-width:96%!important;
+  gap:0.6vh!important;
+  font-size:clamp(20px,4.1vw,48px)!important;
+  line-height:1.04!important;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy .floqcast-idle-line,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy .floqcast-idle-line{
+  max-width:100%;
+  text-wrap:balance;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy .floqcast-idle-line + .floqcast-idle-line,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy .floqcast-idle-line + .floqcast-idle-line{
+  color:#dfff5a;
+  font-size:.9em;
+}
+.display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy .floqcast-idle-note,
+.display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy .floqcast-idle-note{
+  margin-top:1.8vh;
+  font-size:clamp(11px,1.85vw,16px)!important;
+  letter-spacing:.03em;
+}
 /* s3.1.40: 64×32 boards (208px tall) — keep the whole display2 idle screen on the board. */
 @media(max-height:260px){
   .floqcast-idle-center{width:92vw!important;padding:3vh 0!important;gap:3vh!important;box-sizing:border-box!important}
@@ -1908,6 +1956,29 @@ body.floqcast-live-active .heist-brand-slide{
   #displayMain.floqcast-idle-copy{width:100%!important;max-width:100%!important;gap:1.5vh!important;font-size:clamp(14px,4.6vw,26px)!important;line-height:1.05!important}
   #displayMain.floqcast-idle-copy .floqcast-idle-line{max-width:100%;text-wrap:balance}
   #displayMain.floqcast-idle-copy .floqcast-idle-note{margin-top:1vh;font-size:clamp(9px,2.5vw,12px)!important}
+  /* 64×48 short viewport: keep ~+30% icon (do not shrink back toward 64×32 idle) */
+  .display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .floqcast-idle-center,
+  .display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .floqcast-idle-center{
+    padding:1.5% 2% 1.5%!important;
+  }
+  .display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .media-slot.floqcast-idle-logo-slot,
+  .display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .media-slot.floqcast-idle-logo-slot,
+  .display-canvas.floqcast-idle-canvas[data-is-64x48="1"] .floqcast-idle-logo,
+  .display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] .floqcast-idle-logo{
+    max-height:36vh;
+    width:min(520px,60vw);
+  }
+  .display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy,
+  .display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy{
+    margin-top:auto!important;
+    gap:0.4vh!important;
+    font-size:clamp(13px,4vw,24px)!important;
+  }
+  .display-canvas.floqcast-idle-canvas[data-is-64x48="1"] #displayMain.floqcast-idle-copy .floqcast-idle-note,
+  .display-canvas.floqcast-idle-canvas[data-screen-format-id="led-64x48"] #displayMain.floqcast-idle-copy .floqcast-idle-note{
+    margin-top:1vh;
+    font-size:clamp(8px,2.2vw,11px)!important;
+  }
 }
 .display-canvas.display-access-denied{
   background:linear-gradient(145deg,#1a0508,#2a0a10 55%,#0a0204)!important;

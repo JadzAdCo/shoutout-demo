@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.107 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.108 (stable)
+
+- s3.1.108: floqCAST idle 64×48 icon ~+30% + Select→Go live CTA; door pass portalHome fix.
 
 - s3.1.107: VIP landing/Terms hero chrome pack + traditional Site chrome swap.
 

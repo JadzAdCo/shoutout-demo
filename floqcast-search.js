@@ -167,16 +167,36 @@
     grid.innerHTML = rows.map((r) => {
       const selected = r.id === selectedVenueId;
       const place = r.locationLabel || [r.city, r.region, r.country].filter(Boolean).join(", ");
-      const selectLabel = selected
-        ? t("page.floqcast.selected", "Selected")
+      /* One progressive CTA: Select venue → Go live (no separate Selected + Go live pair). */
+      const ctaLabel = selected
+        ? t("page.floqcast.goLiveCta", "Go live, be a floqCast")
         : t("page.floqcast.selectVenue", "Select venue");
+      const ctaAttr = selected
+        ? `data-go-live-venue="${esc(r.id)}"`
+        : `data-select-venue="${esc(r.id)}"`;
       return `<article class="card club-card floqcast-venue-item${selected ? " is-selected" : ""}" role="listitem" data-venue-id="${esc(r.id)}">
         <strong>${esc(r.name)}</strong>
         ${place ? `<p class="sub small" style="margin:4px 0 0">${esc(place)}</p>` : ""}
         <p class="sub small" style="color:var(--lime,#dfff5a);margin:4px 0 10px">floqCast</p>
-        <button type="button" class="buttonlike ${selected ? "primary" : ""}" data-select-venue="${esc(r.id)}">${esc(selectLabel)}</button>
+        <button type="button" class="buttonlike ${selected ? "primary" : ""}" ${ctaAttr}>${esc(ctaLabel)}</button>
       </article>`;
     }).join("");
+    syncGoLiveChrome();
+  }
+
+  function syncGoLiveChrome() {
+    const sticky = byId("floqcastGoLiveBtn");
+    if (!sticky) return;
+    const venue = venueRows.find((r) => r.id === selectedVenueId);
+    if (!venue) {
+      sticky.disabled = true;
+      sticky.textContent = t("page.floqcast.selectFirstCta", "Select a venue to go live");
+      sticky.classList.add("is-waiting");
+      return;
+    }
+    sticky.disabled = false;
+    sticky.classList.remove("is-waiting");
+    sticky.textContent = t("page.floqcast.goLiveAt", "Go live at {venue}", {venue: venue.name});
   }
 
   function selectVenue(id) {
@@ -185,7 +205,7 @@
     const sel = byId("floqcastVenueSelect");
     if (sel) sel.value = id;
     renderVenueGrid();
-    setLiveStatus("");
+    setLiveStatus(t("page.floqcast.readyGoLive", "Venue selected — tap Go live to open private preview."));
   }
 
   function requestedLocationId() {
@@ -390,10 +410,17 @@
     byId("floqcastGoLiveBtn")?.addEventListener("click", () => beginFloqCast());
     byId("floqcastVenueSearch")?.addEventListener("input", () => renderVenueGrid());
     byId("floqcastVenueGrid")?.addEventListener("click", (ev) => {
+      const go = ev.target?.closest?.("[data-go-live-venue]");
+      if (go) {
+        selectVenue(go.getAttribute("data-go-live-venue"));
+        beginFloqCast();
+        return;
+      }
       const btn = ev.target?.closest?.("[data-select-venue]");
       if (!btn) return;
       selectVenue(btn.getAttribute("data-select-venue"));
     });
+    syncGoLiveChrome();
   }
 
   function bindAuth(auth) {
