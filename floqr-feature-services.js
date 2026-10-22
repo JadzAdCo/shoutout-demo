@@ -207,6 +207,9 @@
     const result = {features: getFeatures(), viewer: getViewer()};
     loaded = {uid: user?.uid || "", promise: Promise.resolve(result)};
     try {
+      root.FLOQRChromeScheme?.markFeaturesAccessResolved?.();
+    } catch (_) { /* ignore */ }
+    try {
       root.dispatchEvent?.(new CustomEvent("floqr:features-loaded", {detail: result}));
     } catch (_) { /* ignore */ }
     try {

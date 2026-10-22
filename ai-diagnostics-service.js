@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.15";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.15";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.16";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.16";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1979,6 +1979,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-16-profile-card-chrome",
+      area:"Site chrome + Search",
+      feature:"Closed profile card follows Site chrome on Search (no Nightlife FOUC)",
+      changed:"Early localStorage paint of data-floqr-chrome on index/patron-portal. FLOQRChromeScheme boot restores stored theme immediately; syncAccessGate demotes to Nightlife only after features-loaded when siteChrome access is denied. Profile chip uses --floqr-profile-card-* CSS vars. Package s3.2.16.",
+      howToTest:"1) Set Site chrome Traditional in Language Settings. 2) Hard-refresh Search (styles + floqr-chrome-scheme ?v=s3.2.16). 3) Before opening the menu, confirm the top-right profile chip is charcoal/white gradient — not pink/cyan Nightlife. 4) Open menu — dropdown matches Traditional.",
+      expected:"Closed Search profile card matches active Site chrome on first paint.",
+      troubleshoot:"Still pink/cyan → confirm localStorage floqr.isSiteChrome=1 and html[data-floqr-chrome=traditional]; hard refresh styles.css s3.2.16. Reverts after load → siteChrome beta access denied (Features & Services)."
+    },
     {
       id:"s3-2-15-login-search-traditional",
       area:"Login + Search + Site chrome",

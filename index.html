@@ -8,10 +8,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.2.15"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.2.16"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=s3.2.00"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.2.00"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
+  <script>
+    /* Paint Site chrome before CSS so the closed profile card is not stuck on Nightlife. */
+    try{
+      var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"blackDarkGreen"};
+      var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
+      var __floqrChrome=__floqrChromeMap[__floqrChromeRaw];
+      if(!__floqrChrome){
+        var __legacy=String(localStorage.getItem("floqr.uiChrome")||"").trim();
+        if(__legacy==="traditional"||__legacy==="nightlife"||__legacy==="blackTiffany"||__legacy==="whiteBlack"||__legacy==="blackDarkGreen") __floqrChrome=__legacy;
+      }
+      if(__floqrChrome){
+        document.documentElement.setAttribute("data-floqr-chrome",__floqrChrome);
+        document.documentElement.setAttribute("data-is-site-chrome",String(__floqrChromeRaw!=null&&__floqrChromeRaw!==""?__floqrChromeRaw:({nightlife:0,traditional:1,blackTiffany:2,whiteBlack:3,blackDarkGreen:4})[__floqrChrome]));
+      }
+    }catch(_){}
+  </script>
 </head>
 <body>
 
@@ -806,7 +822,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.2.00"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.14"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.16"></script>
 <script src="./floqr-people-directory.js?v=s3.2.00"></script>
 <script src="./floqr-app-check.js?v=s3.2.00"></script>
 <script src="./floqr-nav.js?v=s3.2.15"></script>
@@ -824,7 +840,7 @@
 <script src="./national-teams-data.js?v=s3.2.00"></script>
 <script src="./jersey-catalog.js?v=s3.2.00"></script>
 <script src="./feature-gates.js?v=s3.2.00"></script>
-<script src="./floqr-feature-services.js?v=s3.2.00"></script>
+<script src="./floqr-feature-services.js?v=s3.2.16"></script>
 <script src="./url-media-field.js?v=s3.2.00"></script>
 <script src="./ai-service.js?v=s3.2.00"></script>
 <script src="./ai-index-service.js?v=s3.2.00"></script>

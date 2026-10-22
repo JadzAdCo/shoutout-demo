@@ -25,6 +25,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
 | Search | `#categoryFloqAiInput` placeholder `cat.floqaiPlaceholder`; Welcome speech + green `cat.or` removed |
 | Traditional | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card`, `.user-menu-btn` / `.user-dropdown` |
+| Profile card chrome | Closed chip uses `--floqr-profile-card-*` vars. Search/Portal early `<script>` paints `data-floqr-chrome` from `localStorage` before CSS. `FLOQRChromeScheme` boot is optimistic on stored chrome; Nightlife demote only after `floqr:features-loaded` when `siteChrome` access is denied (`s3.2.16`) |
 | i18n | `floqr-i18n.js` s3.2.15 — all chrome langs for new keys |
 | Diagnostics | Manual test `s3-2-15-login-search-traditional` |
 

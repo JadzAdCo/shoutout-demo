@@ -33,7 +33,9 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.14";
+  const ICON_V = "s3.2.15";
+  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
+  let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
     floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
@@ -301,8 +303,13 @@
     return s;
   }
 
+  function markFeaturesAccessResolved() {
+    featuresAccessResolved = true;
+  }
+
   function syncAccessGate(root) {
     const allowed = hasThemeAccess();
+    if (allowed) featuresAccessResolved = true;
     const scope = root || global.document;
     if (scope?.querySelectorAll) {
       scope.querySelectorAll("[data-floqr-theme-panel]").forEach((el) => {
@@ -311,7 +318,13 @@
         el.setAttribute("aria-hidden", allowed ? "false" : "true");
       });
     }
-    applyDocument(allowed ? getChrome() : DEFAULT_SCHEME);
+    // Keep stored chrome (e.g. Traditional) on Search first paint / before Features resolve.
+    // Only force Nightlife after access is known to be denied.
+    if (allowed || !featuresAccessResolved) {
+      applyDocument(getChrome());
+    } else {
+      applyDocument(DEFAULT_SCHEME);
+    }
     return allowed;
   }
 
@@ -350,6 +363,7 @@
     applyDocument,
     bindToggle,
     syncAccessGate,
+    markFeaturesAccessResolved,
     hasThemeAccess,
     effectiveChrome,
     effectiveSiteChrome,
@@ -362,8 +376,13 @@
   };
 
   function boot() {
-    applyDocument(DEFAULT_SCHEME);
-    if (hasThemeAccess()) applyDocument(getChrome());
+    // Optimistic: restore last chrome (Traditional, etc.) so the closed profile card
+    // on Search matches the chosen theme before Features & Services returns.
+    applyDocument(getChrome());
+    if (hasThemeAccess()) {
+      featuresAccessResolved = true;
+      applyDocument(getChrome());
+    }
     bindToggle();
   }
 
@@ -376,6 +395,7 @@
   try {
     global.addEventListener("floqr:features-loaded", () => {
       try {
+        featuresAccessResolved = true;
         syncAccessGate();
       } catch (_) { /* ignore */ }
     });
