@@ -313,6 +313,7 @@
         const templateInput = document.getElementById("templateSearch");
         templatePanel?.classList.remove("hidden");
         templateInput?.focus();
+        templateInput?.select?.();
         templatePanel?.scrollIntoView({behavior: "smooth", block: "nearest"});
       } else {
         panel?.classList.add("open");
@@ -326,9 +327,7 @@
       agent.classList.add("is-idle");
       panel?.classList.remove("open");
       panel?.setAttribute("aria-hidden", "true");
-      if (activeMode !== "templates") {
-        document.getElementById("templateSearchPanel")?.classList.add("hidden");
-      }
+      /* Template search field stays visible on templateSelectPage (Search-page lens UI). */
       pickNextMove();
       scheduleSpeech(700, true);
     }
@@ -391,10 +390,7 @@
     setMode("templates");
     if (!boundController) boundController = bindFloqAi({mode: "templates"});
     else boundController.setMode?.("templates");
-    const mount = document.getElementById("templateFloqAiMount");
-    if (mount) {
-      mount.innerHTML = `<p class="floqai-template-hint" data-keep-visible="true">${String(tt("template.floqaiHint", {}, "FloqAi floats on this screen — tap the glowing mark to search templates, or wait for its tips.")).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}</p>`;
-    }
+    document.getElementById("templateSearchPanel")?.classList.remove("hidden");
     const agent = document.getElementById("floqAiAgent");
     agent?.classList.add("is-idle");
     boundController?.syncVisibility?.();

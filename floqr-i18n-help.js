@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.20";
+  const VERSION = "s3.2.21";
 
   const packs = {
     "ru": {
@@ -220,11 +220,11 @@
       },
       "help-default-template": {
         title: "Шаблон по умолчанию",
-        body: "Бесплатный Traditional Black and White Classic. Шаблоны только для этой площадки, например Football Intro или Tengo muchos dólares, собраны в разделе «Эксклюзивно в» с названием площадки. Ниже через FloqAi — шаблоны Sports, Jersey, VIP, Humor, Cars, Video, Pictures и Ballers."
+        body: "Бесплатный классический чёрно-белый Traditional. Карточка показывает настоящее LED-превью в основном размере экрана площадки (имя и размер сверху; описание и теги снизу). Нажмите «Использовать», чтобы открыть редактор. Ищите выше публичные, клубные и личные шаблоны по имени, описанию, тегам или популярности."
       },
       "help-floqai-template-search": {
-        title: "Поиск шаблонов FloqAi",
-        body: "Нажмите движущийся знак FloqAi (или дождитесь речевых пузырей) и попросите Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures или Ballers."
+        title: "Поиск шаблонов",
+        body: "Используйте поле с лупой (тот же дизайн, что у Search), чтобы найти шаблоны по имени, описанию, тегам, спорту, VIP, медиа или популярности. В результатах — официальные шаблоны FLOQR, клубные фоны и ваши личные. Каждая карточка — настоящее LED-превью основного размера; «Использовать» — единственное действие."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -526,11 +526,11 @@
       },
       "help-default-template": {
         title: "Standaardsjabloon",
-        body: "Gratis Traditional Black and White Classic. Sjablonen die alleen voor deze locatie zijn, zoals Football Intro of Tengo muchos dólares, staan onder ‘Exclusief bij’ met de naam van de locatie. Gebruik FloqAi hieronder voor Sports, Jersey, VIP, Humor, Cars, Video, Pictures en Ballers."
+        body: "Gratis Traditional zwart-wit klassiek. De kaart toont een echte LED-voorbeeldweergave op het primaire schermformaat van de locatie (naam en afmeting boven; beschrijving en tags onder). Tik op Gebruiken voor de editor. Zoek hierboven naar openbare, club-goedgekeurde en persoonlijke sjablonen op naam, beschrijving, tags of populariteit."
       },
       "help-floqai-template-search": {
-        title: "FloqAi-sjabloonzoeken",
-        body: "Tik op het bewegende FloqAi-merkteken (of wacht op de speech bubbles) en vraag om Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures of Ballers."
+        title: "Sjabloonzoeken",
+        body: "Gebruik het zoekveld met lens (zelfde ontwerp als Search) om sjablonen te vinden op naam, beschrijving, tags, sport, VIP, media of populariteit. Resultaten omvatten officiële FLOQR-sjablonen, club-goedgekeurde achtergronden en je persoonlijke. Elke kaart is een echte LED-voorbeeld op het primaire formaat — Gebruiken is de enige actie."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -832,11 +832,11 @@
       },
       "help-default-template": {
         title: "Modèle par défaut",
-        body: "Traditional Black and White Classic gratuit. Les modèles réservés à ce lieu, comme Football Intro ou Tengo muchos dólares, apparaissent sous « Exclusif à » suivi du nom du lieu. Utilisez FloqAi ci-dessous pour les modèles Sports, Jersey, VIP, Humor, Cars, Video, Pictures et Ballers."
+        body: "Classique noir et blanc Traditionnel gratuit. La carte montre un vrai aperçu LED à la taille d’écran principale du lieu (nom et dimension en haut ; description et tags en bas). Touchez Utiliser pour ouvrir l’éditeur. Cherchez ci-dessus les modèles publics, approuvés par le club et personnels par nom, description, tags ou popularité."
       },
       "help-floqai-template-search": {
-        title: "FloqAi recherche de modèles",
-        body: "Appuyez sur la marque FloqAi en mouvement (ou attendez ses bulles), puis demandez Sports, Jersey, NBA, NFL, Cars, Humour, VIP, Video, Pictures ou Ballers."
+        title: "Recherche de modèles",
+        body: "Utilisez le champ loupe (même design que Search) pour trouver des modèles par nom, description, tags, sports, VIP, média ou popularité. Les résultats incluent les modèles FLOQR officiels, les fonds approuvés par le club et vos fonds personnels. Chaque carte est un vrai aperçu LED à la taille principale du lieu — Utiliser est la seule action."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -1138,11 +1138,11 @@
       },
       "help-default-template": {
         title: "Standardvorlage",
-        body: "Kostenloses Traditional Black and White Classic. Vorlagen nur für diese Location, etwa Football Intro oder Tengo muchos dólares, stehen unter „Exklusiv bei“ mit dem Namen der Location. Nutze FloqAi unten für Sports, Jersey, VIP, Humor, Cars, Video, Pictures und Ballers."
+        body: "Kostenloses klassisches Schwarz-Weiß Traditional. Die Karte zeigt eine echte LED-Vorschau in der primären Displaygröße des Ortes (Name und Maß oben; Beschreibung und Tags unten). Tippe auf Verwenden für den Editor. Suche oben nach öffentlichen, club-freigegebenen und persönlichen Vorlagen nach Name, Beschreibung, Tags oder Beliebtheit."
       },
       "help-floqai-template-search": {
-        title: "FloqAi Vorlagensuche",
-        body: "Tippen Sie auf die bewegliche FloqAi-Marke (oder warten Sie auf die Sprechblasen) und fragen Sie dann nach „Sport“, „Trikot“, „NBA“, „NFL“, „Autos“, „Humor“, „VIP“, „Video“, „Bilder“ oder „Ballspieler“."
+        title: "Vorlagensuche",
+        body: "Nutze das Suchlinsen-Feld (gleiches Design wie Search), um Vorlagen nach Name, Beschreibung, Tags, Sport, VIP, Medien oder Beliebtheit zu finden. Ergebnisse umfassen offizielle FLOQR-Vorlagen, club-freigegebene Hintergründe und deine persönlichen. Jede Karte ist eine echte LED-Vorschau in der primären Größe — Verwenden ist die einzige Aktion."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -1444,11 +1444,11 @@
       },
       "help-default-template": {
         title: "Plantilla predeterminada",
-        body: "Traditional Black and White Classic gratis. Las plantillas exclusivas de este local, como Football Intro o Tengo muchos dólares, aparecen en «Exclusivo de» con el nombre del local. Usa FloqAi abajo para plantillas Sports, Jersey, VIP, Humor, Cars, Video, Pictures y Ballers."
+        body: "Clásico blanco y negro Traditional gratis. La tarjeta muestra una vista previa LED real al tamaño de pantalla principal del local (nombre y dimensión arriba; descripción y etiquetas abajo). Toca Usar para abrir el editor. Busca arriba plantillas públicas, aprobadas por el club y personales por nombre, descripción, etiquetas o popularidad."
       },
       "help-floqai-template-search": {
-        title: "FloqAi búsqueda de plantillas",
-        body: "Toque la marca FloqAi en movimiento (o espere a que aparezcan los globos de diálogo) y luego pregunte por Deportes, Jersey, NBA, NFL, Autos, Humor, VIP, Video, Imágenes o Jugadores de béisbol."
+        title: "Búsqueda de plantillas",
+        body: "Usa el campo con lupa (mismo diseño que Search) para encontrar plantillas por nombre, descripción, etiquetas, deportes, VIP, medios o popularidad. Los resultados incluyen plantillas oficiales FLOQR, fondos aprobados por el club y tus fondos personales. Cada tarjeta es una vista previa LED real al tamaño principal — Usar es la única acción."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -1750,11 +1750,11 @@
       },
       "help-default-template": {
         title: "Modello predefinito",
-        body: "Traditional Black and White Classic gratuito. I modelli esclusivi di questo locale, come Football Intro o Tengo muchos dólares, sono elencati in «Esclusivo da» con il nome del locale. Usa FloqAi qui sotto per i modelli Sports, Jersey, VIP, Humor, Cars, Video, Pictures e Ballers."
+        body: "Classico bianco e nero Traditional gratuito. La scheda mostra un’anteprima LED reale alla dimensione display principale del locale (nome e dimensione in alto; descrizione e tag in basso). Tocca Usa per aprire l’editor. Cerca sopra modelli pubblici, approvati dal club e personali per nome, descrizione, tag o popolarità."
       },
       "help-floqai-template-search": {
-        title: "FloqAi ricerca modello",
-        body: "Tocca il simbolo FloqAi in movimento (o attendi i fumetti), quindi chiedi Sport, Maglia, NBA, NFL, Automobili, Umorismo, VIP, Video, Immagini o Ballerini."
+        title: "Ricerca modelli",
+        body: "Usa il campo lente (stesso design di Search) per trovare modelli per nome, descrizione, tag, sport, VIP, media o popolarità. I risultati includono modelli FLOQR ufficiali, sfondi approvati dal club e i tuoi personali. Ogni scheda è un’anteprima LED reale alla dimensione principale — Usa è l’unica azione."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -2055,12 +2055,12 @@
         body: "Pesquise perfis públicos por interesses comuns, estilo de vida, música, viagens, comida, eventos, carros, cidade, nome de usuário ou quem você deseja conhecer."
       },
       "help-default-template": {
-        title: "Modelo padrão",
-        body: "Traditional Black and White Classic grátis. Os modelos exclusivos deste local, como Football Intro ou Tengo muchos dólares, aparecem em «Exclusivo em» com o nome do local. Use o FloqAi abaixo para modelos Sports, Jersey, VIP, Humor, Cars, Video, Pictures e Ballers."
+        title: "Modelo predefinido",
+        body: "Clássico preto e branco Traditional gratuito. O cartão mostra uma pré-visualização LED real no tamanho de ecrã principal do local (nome e dimensão em cima; descrição e tags em baixo). Toque em Usar para abrir o editor. Pesquise acima modelos públicos, aprovados pelo clube e pessoais por nome, descrição, tags ou popularidade."
       },
       "help-floqai-template-search": {
-        title: "FloqAi pesquisa de modelos",
-        body: "Toque na marca móvel FloqAi (ou espere pelos balões de fala) e peça Esportes, Jersey, NBA, NFL, Carros, Humor, VIP, Vídeo, Fotos ou Ballers."
+        title: "Pesquisa de modelos",
+        body: "Use o campo com lente (mesmo design da Search) para encontrar modelos por nome, descrição, tags, desporto, VIP, média ou popularidade. Os resultados incluem modelos oficiais FLOQR, fundos aprovados pelo clube e os seus pessoais. Cada cartão é uma pré-visualização LED real no tamanho principal — Usar é a única ação."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -2362,11 +2362,11 @@
       },
       "help-default-template": {
         title: "Προεπιλεγμένο πρότυπο",
-        body: "Δωρεάν Traditional Black and White Classic. Τα πρότυπα μόνο για αυτόν τον χώρο, όπως Football Intro ή Tengo muchos dólares, εμφανίζονται στο «Αποκλειστικά στο» με το όνομα του χώρου. Χρησιμοποιήστε το FloqAi παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
+        body: "Δωρεάν κλασικό ασπρόμαυρο Traditional. Η κάρτα δείχνει πραγματική προεπισκόπηση LED στο κύριο μέγεθος οθόνης του χώρου (όνομα και διάσταση πάνω· περιγραφή και ετικέτες κάτω). Πατήστε Χρήση για τον επεξεργαστή. Αναζητήστε πάνω δημόσια, εγκεκριμένα από club και προσωπικά πρότυπα με όνομα, περιγραφή, ετικέτες ή δημοφιλία."
       },
       "help-floqai-template-search": {
-        title: "FloqAi αναζήτηση προτύπου",
-        body: "Αγγίξτε την κινούμενη ένδειξη FloqAi (ή περιμένετε τα συννεφάκια ομιλίας του), μετά ζητήστε Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures ή Ballers."
+        title: "Αναζήτηση προτύπων",
+        body: "Χρησιμοποιήστε το πεδίο με φακό (ίδιο σχέδιο με το Search) για πρότυπα με όνομα, περιγραφή, ετικέτες, sports, VIP, μέσα ή δημοφιλία. Τα αποτελέσματα περιλαμβάνουν επίσημα πρότυπα FLOQR, εγκεκριμένα φόντα club και τα προσωπικά σας. Κάθε κάρτα είναι πραγματική προεπισκόπηση LED στο κύριο μέγεθος — η Χρήση είναι η μόνη ενέργεια."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -2668,11 +2668,11 @@
       },
       "help-default-template": {
         title: "Domyślny szablon",
-        body: "Darmowy Traditional Black and White Classic. Szablony dostępne tylko w tym lokalu, np. Football Intro lub Tengo muchos dólares, są w sekcji „Na wyłączność w” z nazwą lokalu. Poniżej użyj FloqAi, aby znaleźć szablony Sports, Jersey, VIP, Humor, Cars, Video, Pictures i Ballers."
+        body: "Bezpłatny klasyczny czarno-biały Traditional. Karta pokazuje prawdziwy podgląd LED w głównym rozmiarze ekranu lokalu (nazwa i wymiar u góry; opis i tagi u dołu). Dotknij Użyj, aby otworzyć edytor. Szukaj powyżej publicznych, zatwierdzonych przez klub i osobistych szablonów po nazwie, opisie, tagach lub popularności."
       },
       "help-floqai-template-search": {
-        title: "Wyszukiwanie szablonów FloqAi",
-        body: "Stuknij w poruszający się znak FloqAi (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
+        title: "Wyszukiwanie szablonów",
+        body: "Użyj pola z lupą (ten sam wygląd co Search), aby znaleźć szablony po nazwie, opisie, tagach, sporcie, VIP, mediach lub popularności. Wyniki obejmują oficjalne szablony FLOQR, tła zatwierdzone przez klub i Twoje osobiste. Każda karta to prawdziwy podgląd LED w głównym rozmiarze — Użyj to jedyna akcja."
       },
       "help-football-intro": {
         title: "Football Intro",
@@ -2974,11 +2974,11 @@
       },
       "help-default-template": {
         title: "القالب الافتراضي",
-        body: "قالب Traditional Black and White Classic مجاني. القوالب الخاصة بهذا المكان فقط، مثل Football Intro أو Tengo muchos dólares، تظهر تحت «حصريًا في» مع اسم المكان. استخدم FloqAi أدناه لقوالب Sports وJersey وVIP وHumor وCars وVideo وPictures وBallers."
+        body: "كلاسيكي أسود وأبيض Traditional مجاني. تُظهر البطاقة معاينة LED حقيقية بحجم الشاشة الأساسي للمكان (الاسم والأبعاد في الأعلى؛ الوصف والوسوم في الأسفل). اضغط استخدام لفتح المحرر. ابحث أعلاه عن القوالب العامة والمعتمدة من النادي والشخصية بالاسم أو الوصف أو الوسوم أو الشهرة."
       },
       "help-floqai-template-search": {
-        title: "بحث قالب FloqAi",
-        body: "اضغط على العلامة المتحركة FloqAi (أو انتظر فقاعات حديثها)، ثم اطلب الرياضة، القمصان، NBA، NFL، السيارات، الفكاهة، كبار الشخصيات، الفيديو، الصور، أو اللاعبين."
+        title: "بحث القوالب",
+        body: "استخدم حقل العدسة (نفس تصميم Search) للعثور على القوالب بالاسم أو الوصف أو الوسوم أو الرياضة أو VIP أو الوسائط أو الشهرة. تشمل النتائج قوالب FLOQR الرسمية وخلفيات النادي المعتمدة وخلفياتك الشخصية. كل بطاقة معاينة LED حقيقية بالحجم الأساسي — استخدام هو الإجراء الوحيد."
       },
       "help-football-intro": {
         title: "Football Intro",

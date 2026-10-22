@@ -3476,7 +3476,7 @@
     pendingTemplateQuery = "";
     shoutoutTemplateVenueIds = null;
     if (byId("templateSearch")) byId("templateSearch").value = templateQuery;
-    if (templateQuery) byId("templateSearchPanel")?.classList.remove("hidden");
+    byId("templateSearchPanel")?.classList.remove("hidden");
     renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
@@ -3494,7 +3494,58 @@
     return venueTemplateTags.locationId === locationId() ? (venueTemplateTags.map[t.id] || []) : [];
   }
   function templateSearchText(t) {
-    return `${venueTagsFor(t).join(" ")} ${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    const popular = t.id === "blackwhite" || t.isDefault || Number(t.popularity || t.usageCount || 0) > 0
+      ? `popular trending top ${t.popularity || t.usageCount || ""}`
+      : "";
+    return `${venueTagsFor(t).join(" ")} ${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${popular} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+  }
+  function primaryTemplateFormat(template = {}) {
+    const loc = getLocation() || {};
+    const primary = selectedScreenFormatId || loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
+    const formats = window.FLOQRTemplatePreview?.formatsFor?.(template, loc) || window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, loc) || [];
+    if (formats.includes(primary)) return primary;
+    return formats[0] || primary;
+  }
+  function formatDimLabel(formatId = "") {
+    const labels = {"led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32"};
+    return labels[formatId] || String(formatId || "").replace(/^led-/, "") || "—";
+  }
+  function templateLedPreviewHtml(template = {}, options = {}) {
+    const loc = getLocation() || {};
+    const formatId = options.formatId || primaryTemplateFormat(template);
+    const dim = formatDimLabel(formatId);
+    let src = "";
+    try {
+      if (window.FLOQRTemplatePreview?.previewUrl) {
+        const url = new URL(window.FLOQRTemplatePreview.previewUrl(template, {
+          locationId: locationId(),
+          location: loc,
+          formatId
+        }));
+        if (options.backgroundUrl) url.searchParams.set("backgroundUrl", options.backgroundUrl);
+        if (options.backgroundColor) url.searchParams.set("backgroundColor", options.backgroundColor);
+        if (options.backgroundGradient) url.searchParams.set("backgroundGradient", options.backgroundGradient);
+        // Cap classic/full stock text to the board's max when layout caps exist
+        const caps = window.FLOQRTextLayout?.resolve?.(template, formatId);
+        const main = url.searchParams.get("main") || "";
+        if (caps?.maxMainCharacters && main.length > caps.maxMainCharacters) {
+          url.searchParams.set("main", main.slice(0, caps.maxMainCharacters));
+        }
+        src = url.href;
+      }
+    } catch (error) {
+      console.warn("template LED preview url", error?.message || error);
+    }
+    return `<div class="template-select-led floqr-board-frame" data-board-host="${esc(formatId)}">
+      <iframe class="template-select-frame" title="${esc(tt("template.ledPreviewTitle", {name: template.name || "", dim}, "LED preview {name} ({dim})"))}" data-board-format="${esc(formatId)}" src="${esc(src)}" loading="lazy" tabindex="-1"></iframe>
+    </div>`;
+  }
+  function mountTemplateLedPreviews(root) {
+    if (!root || !window.FLOQRBoardFrame?.mount) return;
+    root.querySelectorAll("iframe.template-select-frame[data-board-format]").forEach(frame => {
+      window.FLOQRBoardFrame.mount(frame, frame.dataset.boardFormat, {maxHeight: "min(42vh, 280px)"});
+      frame.style.pointerEvents = "none";
+    });
   }
   function templateContextQuery() {
     const explicitContext = window.FLOQR_TEMPLATE_CONTEXT_QUERY || document.body?.dataset?.templateContextQuery || "";
@@ -3577,38 +3628,63 @@
   }
   function templateCard(template, options = {}) {
     const selected = !selectedTemplateVariant && (template.id === selectedTemplate || (selectedTemplate === "soccerJersey" && template.id === (byId("soccerTeamId")?.value || "")));
-    const canCustomize = templateBackgroundCanBeCustomized(template);
+    const formatId = primaryTemplateFormat(template);
+    const dim = formatDimLabel(formatId);
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
-    const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32" };
-    const sizeChips = supportedFormats.map(id => sizeLabels[id] || id).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
-    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : Array.from(new Set([...venueTagsFor(template), ...(template.tags || [])])).slice(0, 3);
-    const jerseyTagLine = template.sport === "nfl" && template.defaultBackgroundUrl
+    const sizeChips = supportedFormats.map(id => formatDimLabel(id)).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
+    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : Array.from(new Set([...venueTagsFor(template), ...(template.tags || [])])).slice(0, 6);
+    const mediaLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
       : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? tt("template.mediaPlaceholder", {}, "Image/video placeholder") : tt("template.noMedia", {}, "No image/video"))));
-    return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}" data-soccer-team-id="${esc(template.sport === "soccer" && template.id !== "soccerJersey" ? template.id : "")}">
-      ${jerseyMiniPreview(template)}
-      <div class="name">${esc(template.name)}</div>
-      <div class="tag">${esc(jerseyTagLine)}</div>
-      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+    const desc = String(template.description || mediaLine || "").trim();
+    const chars = [
+      template.category,
+      template.priceCents ? (template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`) : null,
+      template.scope,
+      Number(template.popularity || template.usageCount || 0) > 0 ? tt("template.popular", {}, "Popular") : null
+    ].filter(Boolean);
+    return `<article class="template template-select-card ${esc(template.className || "neon")} ${selected ? "selected" : ""}" data-template-id="${esc(template.id)}" data-soccer-team-id="${esc(template.sport === "soccer" && template.id !== "soccerJersey" ? template.id : "")}">
+      <header class="template-select-head">
+        <h4 class="name">${esc(template.name)}</h4>
+        <span class="template-select-dim" title="${esc(tt("template.renderDimHint", {}, "Primary venue LED size"))}">${esc(dim)}</span>
+      </header>
+      ${templateLedPreviewHtml(template, {formatId})}
+      <p class="template-select-desc">${esc(desc)}</p>
+      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
-        <button type="button" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
-        <button type="button" class="secondary" data-template-preview="${esc(template.id)}">${esc(tt("templatePreview.button", {}, "Preview"))}</button>
-        ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">${esc(tt("template.customizeBackground", {}, "Customize Background"))}</button>` : `<span class="template-background-lock">${esc(template.backgroundEditable === false ? tt("template.backgroundLocked", {}, "Background locked") : tt("template.clubCustomizationOff", {}, "Club customization off"))}</span>`}
+        <button type="button" class="primary" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
       </div>
-    </div>`;
+    </article>`;
   }
   function variantCard(variant = {}, scope = "community") {
     const base = getTemplate(variant.baseTemplateId || "blackwhite");
     const selected = selectedTemplateVariant && (selectedTemplateVariant.id || selectedTemplateVariant.variantId) === (variant.id || variant.variantId);
-    const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(variant) : "";
-    return `<div class="template ${esc(base.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
-      <div class="template-mini-preview" style="${esc(style)}"><strong>${esc(base.defaultMain || "SHOUTOUT")}</strong><span>${esc(variant.variantName || base.category || "")}</span></div>
-      <div class="name">${esc(variant.variantName || tt("template.variantSavedBackground", {}, "Saved Background"))}</div>
-      <div class="tag">${esc(variant.baseTemplateName || base.name)}${scope === "mine" ? tt("template.variantScopeMine", {}, " - Mine") : scope === "club" ? tt("template.variantScopeClub", {}, " - Club approved") : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
-      <div class="tag-row">${(variant.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
-      <button type="button" data-variant-open="${esc(variant.id || variant.variantId || "")}">${esc(tt("template.useTemplate", {}, "Use Template"))}</button>
-    </div>`;
+    const formatId = primaryTemplateFormat(base);
+    const dim = formatDimLabel(formatId);
+    const scopeLabel = scope === "mine"
+      ? tt("template.variantScopeMine", {}, "Personal")
+      : scope === "club"
+        ? tt("template.variantScopeClub", {}, "Club approved")
+        : (variant.ownerDisplayName || tt("template.variantScopeCommunity", {}, "Community"));
+    const desc = [variant.baseTemplateName || base.name, scopeLabel, base.description].filter(Boolean).join(" · ");
+    return `<article class="template template-select-card ${esc(base.className || "neon")} ${selected ? "selected" : ""}" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
+      <header class="template-select-head">
+        <h4 class="name">${esc(variant.variantName || tt("template.variantSavedBackground", {}, "Saved Background"))}</h4>
+        <span class="template-select-dim">${esc(dim)}</span>
+      </header>
+      ${templateLedPreviewHtml(base, {
+        formatId,
+        backgroundUrl: variant.backgroundUrl || "",
+        backgroundColor: variant.backgroundColor || "",
+        backgroundGradient: variant.backgroundGradient || ""
+      })}
+      <p class="template-select-desc">${esc(desc)}</p>
+      <div class="tag-row template-select-meta"><span>${esc(scopeLabel)}</span>${(variant.tags || []).slice(0, 6).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="button-row template-card-actions">
+        <button type="button" class="primary" data-variant-open="${esc(variant.id || variant.variantId || "")}">${esc(tt("template.use", {}, "Use"))}</button>
+      </div>
+    </article>`;
   }
   async function renderTemplates() {
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
@@ -3646,6 +3722,18 @@
     const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active" && patronVariantAllowedAtClub(x));
     const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid && patronVariantAllowedAtClub(x));
     const allVariants = [...club, ...mine, ...community];
+    const rankTemplate = (record) => {
+      const data = record.data || {};
+      const q = discoveryQuery;
+      const name = String(data.name || data.variantName || record.title || "").toLowerCase();
+      let score = Number(data.popularity || data.usageCount || 0);
+      if (data.id === "blackwhite" || data.isDefault) score += 50;
+      if (q && name.startsWith(q)) score += 40;
+      else if (q && name.includes(q)) score += 20;
+      if (q && (data.tags || []).some(tag => String(tag).toLowerCase().includes(q))) score += 15;
+      if ((data.venueIds || []).includes(locationId())) score += 10;
+      return score;
+    };
     if (!discoveryQuery) {
       const defaultRecord = official.find(record => record.id === "blackwhite") || official.find(record => !record.data.priceCents) || official[0];
       const exclusiveRecords = official.filter(record => record !== defaultRecord && (record.data.venueIds || []).includes(locationId()));
@@ -3655,19 +3743,13 @@
           <div class="section-heading-row template-heading-row">
             <h3 data-floqr-help-id="help-default-template">${esc(tt("template.defaultSection", {}, "Default Template"))}</h3>
           </div>
-          <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : `<div class="empty">${esc(tt("template.noDefaultAvailable", {}, "No default template is available."))}</div>`}</div>
+          <div class="template-grid template-select-grid">${defaultRecord ? templateCard(defaultRecord.data) : `<div class="empty">${esc(tt("template.noDefaultAvailable", {}, "No default template is available."))}</div>`}</div>
         </section>
         ${exclusiveRecords.length ? `<section class="template-section template-section-exclusive">
           <h3>${esc(tt("template.venueExclusive", {venue: venueName}, `Exclusive at ${venueName}`))}</h3>
-          <div class="template-grid">${exclusiveRecords.map(record => templateCard(record.data)).join("")}</div>
+          <div class="template-grid template-select-grid">${exclusiveRecords.map(record => templateCard(record.data)).join("")}</div>
         </section>` : ""}
-        <section class="template-section template-section-floqai" id="templateFloqAiHost">
-          <div class="section-heading-row template-heading-row">
-            <h3 data-floqr-help-id="help-floqai-template-search">${esc(tt("template.floqaiSection", {}, "FloqAi template search"))}</h3>
-          </div>
-          <div id="templateFloqAiMount" class="template-floqai-mount"></div>
-        </section>
-        ${club.length ? `<section class="template-section"><h3>${esc(tt("template.clubApproved", {}, "Club-Approved Backgrounds"))}</h3><p class="sub small" data-keep-visible="true">${esc(tt("template.clubApprovedHint", {}, "Customized by this club's admins."))}</p><div class="template-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
+        ${club.length ? `<section class="template-section"><h3>${esc(tt("template.clubApproved", {}, "Club-Approved Backgrounds"))}</h3><p class="sub small" data-keep-visible="true">${esc(tt("template.clubApprovedHint", {}, "Customized by this club's admins."))}</p><div class="template-grid template-select-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicy", {}, "This club has disabled patron background customization. Original and club-approved templates remain available."))}</p>`}`;
       window.FLOQRFloqAi?.ensureTemplateMode?.();
     } else {
@@ -3677,20 +3759,22 @@
         window.floqrSearch(discoveryQuery, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
         window.floqrSearch(discoveryQuery, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
       ]) : [official.filter(record => record.searchText.includes(discoveryQuery)), club.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), mine.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), community.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x}))];
-      const officialHtml = officialRecords
+      const sortHits = rows => [...rows].sort((a, b) => rankTemplate(b) - rankTemplate(a));
+      const officialHtml = sortHits(officialRecords)
         .filter(record => !(soccerPhotoHits.length && record.id === "soccerJersey"))
         .map(record => templateCard(record.data)).join("");
-      const clubHtml = clubRecords.map(record => variantCard(record.data, "club")).join("");
-      const mineHtml = mineRecords.map(record => variantCard(record.data, "mine")).join("");
-      const communityHtml = communityRecords.map(record => variantCard(record.data, "community")).join("");
+      const clubHtml = sortHits(clubRecords).map(record => variantCard(record.data, "club")).join("");
+      const mineHtml = sortHits(mineRecords).map(record => variantCard(record.data, "mine")).join("");
+      const communityHtml = sortHits(communityRecords).map(record => variantCard(record.data, "community")).join("");
       grid.innerHTML = `
-        <section class="template-section"><h3>${esc(tt("template.matchingOfficial", {}, "Matching Official FLOQR Templates"))}</h3><div class="template-grid">${officialHtml || `<div class="empty">${esc(tt("template.noOfficialMatch", {}, "No official templates matched."))}</div>`}</div></section>
-        ${clubHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingClubApproved", {}, "Matching Club-Approved Backgrounds"))}</h3><div class="template-grid">${clubHtml}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() && mineHtml ? `<section class="template-section"><h3>${esc(tt("template.myMatchingBackgrounds", {}, "My Matching Backgrounds"))}</h3><div class="template-grid">${mineHtml}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() && communityHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingCommunity", {}, "Matching Community Backgrounds"))}</h3><div class="template-grid">${communityHtml}</div></section>` : ""}
+        <section class="template-section"><h3>${esc(tt("template.matchingOfficial", {}, "Matching Official FLOQR Templates"))}</h3><div class="template-grid template-select-grid">${officialHtml || `<div class="empty">${esc(tt("template.noOfficialMatch", {}, "No official templates matched."))}</div>`}</div></section>
+        ${clubHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingClubApproved", {}, "Matching Club-Approved Backgrounds"))}</h3><div class="template-grid template-select-grid">${clubHtml}</div></section>` : ""}
+        ${mineHtml ? `<section class="template-section"><h3>${esc(tt("template.myMatchingBackgrounds", {}, "My Matching Backgrounds"))}</h3><div class="template-grid template-select-grid">${mineHtml}</div></section>` : ""}
+        ${communityHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingCommunity", {}, "Matching Community Backgrounds"))}</h3><div class="template-grid template-select-grid">${communityHtml}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicyNote", {}, "This club has disabled patron background customization."))}</p>`}`;
     }
     window.FLOQRHelpAttach?.mountAll?.(grid);
+    mountTemplateLedPreviews(grid);
     grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
       const query = (byId("templateSearch")?.value || "").trim();
@@ -3701,19 +3785,8 @@
         const hit = (window.FLOQRFindSoccerTeamsMatching?.(query) || [])[0];
         populateSoccerTeamSelect((/^soccer/i.test(teamId) && teamId !== "soccerJersey" ? teamId : "") || hit?.id || byId("soccerTeamId")?.value || "");
       }
-      renderTemplates();
       updateTemplateSummary();
       goToEditor();
-    }));
-    grid.querySelectorAll("[data-template-customize]").forEach(btn => btn.addEventListener("click", event => {
-      event.stopPropagation();
-      openStudioForTemplate(getTemplate(btn.dataset.templateCustomize));
-    }));
-    grid.querySelectorAll("[data-template-preview]").forEach(btn => btn.addEventListener("click", event => {
-      event.stopPropagation();
-      const id = btn.dataset.templatePreview;
-      const template = (window.FLOQRSoccerPhotoTeams?.() || []).find(team => team.id === id) || getTemplate(id);
-      window.FLOQRTemplatePreview?.open(template, {locationId:locationId(), location:getLocation() || {}});
     }));
     grid.querySelectorAll("[data-variant-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
@@ -3721,25 +3794,9 @@
       if (!variant) return;
       selectedTemplate = variant.baseTemplateId || "blackwhite";
       selectedTemplateVariant = variant;
-      renderTemplates();
       updateTemplateSummary();
       goToEditor();
     }));
-    grid.querySelectorAll(".template[role='button']").forEach(item => {
-      item.addEventListener("click", () => {
-        if (item.dataset.templateId) {
-          selectedTemplate = normalizeSoccerTemplateSelection(item.dataset.templateId, byId("templateSearch")?.value || "");
-          selectedTemplateVariant = null;
-          if (item.dataset.soccerTeamId) populateSoccerTeamSelect(item.dataset.soccerTeamId);
-        } else if (item.dataset.variantId) {
-          const variant = allVariants.find(x => (x.id || x.variantId) === item.dataset.variantId);
-          selectedTemplate = variant?.baseTemplateId || "blackwhite";
-          selectedTemplateVariant = variant || null;
-        }
-        renderTemplates(); updateTemplateSummary(); goToEditor();
-      });
-      item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); item.click(); } });
-    });
   }
   function updateTemplateSummary() {
     const t = getTemplate();
@@ -5058,7 +5115,11 @@
     floqrId().bindInstagramInput?.(byId("profileInstagram"));
     floqrId().bindFloqrHandleInput?.(byId("profileUsername"));
     floqrId().attachHelpPopout?.(byId("profileFloqrHandleHelp"), floqrId().FLOQR_HANDLE_HELP);
-    byId("templateSearch")?.addEventListener("input", renderTemplates);
+    byId("templateSearch")?.addEventListener("input", () => { renderTemplates(); });
+    byId("templateSearchForm")?.addEventListener("submit", event => {
+      event.preventDefault();
+      renderTemplates();
+    });
     byId("minglImageInput")?.addEventListener("change", renderMinglAttachmentPreview);
     byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
