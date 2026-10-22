@@ -33,12 +33,12 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.10";
+  const ICON_V = "s3.2.11";
   const NIGHTLIFE_ICONS = {
     floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
-    floqAi: "./images/chrome/streetbot-nightlife.jpg?v=" + ICON_V,
+    floqAi: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
   };
@@ -46,7 +46,7 @@
     floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
-    floqAi: "./images/chrome/streetbot-traditional.jpg?v=" + ICON_V,
+    floqAi: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
   };
@@ -61,7 +61,7 @@
     floqCast: "./images/chrome/floqcast-whiteblack.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
-    floqAi: "./images/chrome/streetbot-whiteblack.jpg?v=" + ICON_V,
+    floqAi: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V
   };

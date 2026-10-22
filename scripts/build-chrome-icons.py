@@ -1840,142 +1840,94 @@ def build_vip_only():
     print("DONE VIP-only —", ROOT / "images/chrome/vip-nightlife.jpg")
 
 
-def streetbot_wm():
-    """street at FC_H; BOT at +15%. st under ring; reet+BOT over (T tiffany).
+# BOT-DEE: ShoutOut-scale stacked mark (BOT- white / DEE tiffany), thin borders.
+# Letter height ≥ SHOUT (~198); stacked footprint fills lower chord like ShoutOut.
+BOTDEE_TEXT = 268  # ShoutOut-weight stack (SHOUT≈198 / OUT≈157 → block ~380+)
+BOTDEE_BOT_SCALE = 1.30  # vs prior streetBOT left-bot bbox (~311×399)
+BOTDEE_MAX_W = 600
+BOTDEE_MAX_H = 440
 
-    Same process as floqcast_wm (baseline align, T fringe cleanup, no fit crush).
-    """
-    size_s = 170
-    for _ in range(8):
-        u, by = render_upright("street", size_s, WHITE)
-        size_s = int(
-            max(50, min(280, round(size_s * FC_H / max(1, finish(u, by).size[1]))))
-        )
-    size_b = int(round(size_s * 1.15))
-    pad = 64
 
-    # --- street: st under / reet over ---
-    font_s = ImageFont.truetype(FONT, int(size_s))
-    street_u, by_s = render_upright("street", size_s, WHITE)
-    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
-        (0, 0), "street", font=font_s, anchor="ls"
+def extract_botdee_graphic() -> Path:
+    """Headphones bot only — no turntable; centered; ×1.30 vs prior djBOT left figure."""
+    dj_path = extract_djbot_graphic()
+    g = Image.open(dj_path).convert("RGBA")
+    a = np.array(g)
+    yy, xx = np.indices((S, S))
+    ink = (
+        ((a[:, :, 0] > 25) | (a[:, :, 1] > 25) | (a[:, :, 2] > 25))
+        & (a[:, :, 3] > 20)
+        & (yy < 520)
     )
-    origin_s = (pad - bb[0], pad + (bb[3] - bb[1]))
-
-    def layer_s(text):
-        im = Image.new("RGBA", street_u.size, (0, 0, 0, 0))
-        ImageDraw.Draw(im).text(origin_s, text, font=font_s, fill=WHITE, anchor="ls")
-        return finish(im, by_s, crop=False)
-
-    full_s = finish(street_u, by_s, crop=False)
-    st_f = layer_s("st")
-    x0, y0b, x1, y1 = ink_bbox(full_s, 12)
-    box = (x0, y0b, x1 + 1, y1 + 1)
-    fa = np.array(full_s.crop(box))
-    sta = np.array(st_f.crop(box))
-    ink = fa[:, :, 3] > 20
-    stmask = (
-        np.array(Image.fromarray(sta[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
-    ) & ink
-    street_under = np.zeros_like(fa)
-    street_over = np.zeros_like(fa)
-    street_under[stmask] = (255, 255, 255, 255)
-    street_over[ink & ~stmask] = (255, 255, 255, 255)
-    SU = Image.fromarray(ink_only(street_under), "RGBA")
-    SO = Image.fromarray(ink_only(street_over), "RGBA")
-    street_body = Image.fromarray(ink_only(fa), "RGBA")
-    print(f"  street split under={int(stmask.sum())} over={int((ink & ~stmask).sum())}")
-
-    # --- BOT at +15%: BO white + T tiffany (mirror CAST) ---
-    font_b = ImageFont.truetype(FONT, int(size_b))
-    bot_u, by_b = render_upright("BOT", size_b, WHITE)
-    bb_b = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
-        (0, 0), "BOT", font=font_b, anchor="ls"
+    cols = ink.sum(axis=0)
+    # Gap between bot and turntable (~403–429)
+    cut = 403
+    for x in range(360, 480):
+        if cols[x] == 0 and cols[x : x + 8].sum() == 0:
+            cut = x
+            break
+    bot_m = ink & (xx < cut)
+    if not bot_m.any():
+        raise RuntimeError("BOT-DEE: bot ink not found left of turntable gap")
+    ys, xs = np.where(bot_m)
+    x0, x1 = int(xs.min()), int(xs.max()) + 1
+    y0, y1 = int(ys.min()), int(ys.max()) + 1
+    pad = 6
+    crop = g.crop(
+        (max(0, x0 - pad), max(0, y0 - pad), min(S, x1 + pad), min(S, y1 + pad))
     )
-    origin_b = (pad - bb_b[0], pad + (bb_b[3] - bb_b[1]))
+    # Prior streetBOT left figure ≈ 311×399; enlarge ×1.30
+    cw, ch = crop.size
+    scale = (399 * BOTDEE_BOT_SCALE) / max(1, ch)
+    nw = max(1, int(round(cw * scale)))
+    nh = max(1, int(round(ch * scale)))
+    scaled = crop.resize((nw, nh), Image.Resampling.LANCZOS)
 
-    def layer_b(text, fill=WHITE):
-        im = Image.new("RGBA", bot_u.size, (0, 0, 0, 0))
-        ImageDraw.Draw(im).text(origin_b, text, font=font_b, fill=fill, anchor="ls")
-        return finish(im, by_b, crop=False)
+    top_clear = CY - (R - 36)
+    # Wordmark overlaps lower band; allow bot into upper-central zone at full ×1.30
+    bottom_cap = 590
+    fit_h = bottom_cap - top_clear
+    if nh > fit_h and fit_h > 80:
+        shrink = fit_h / float(nh)
+        nw = max(1, int(round(nw * shrink)))
+        nh = max(1, int(round(nh * shrink)))
+        scaled = scaled.resize((nw, nh), Image.Resampling.LANCZOS)
+        print(f"  BOT-DEE bot shrink-to-fit ×{shrink:.3f} → {nw}x{nh}")
 
-    full_b = finish(bot_u, by_b, crop=False)
-    pre_b = layer_b("BO")
-    bx0, by0, bx1, by1 = ink_bbox(full_b, 12)
-    bbox = (bx0, by0, bx1 + 1, by1 + 1)
-    ba = np.array(full_b.crop(bbox))
-    pa = np.array(pre_b.crop(bbox))
-    bink = ba[:, :, 3] > 15
-    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(5)))
-    tmask = bink & (pre_a < 8)
-    xs = np.where(tmask)[1]
-    if len(xs):
-        tmask[:, : int(np.percentile(xs, 5))] = False
-    tmask = (
-        np.array(
-            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(9))
-        )
-        > 0
-    ) & (ba[:, :, 3] > 8)
-    bot_over = np.zeros_like(ba)
-    bot_over[bink] = (255, 255, 255, 255)
-    bot_over[tmask, 0] = TIFFANY[0]
-    bot_over[tmask, 1] = TIFFANY[1]
-    bot_over[tmask, 2] = TIFFANY[2]
-    bot_over[tmask, 3] = 255
-    near_white_t = (
-        tmask
-        & (bot_over[:, :, 0] > 140)
-        & (bot_over[:, :, 1] > 140)
-        & (bot_over[:, :, 2] > 140)
-    )
-    bot_over[near_white_t, 0] = TIFFANY[0]
-    bot_over[near_white_t, 1] = TIFFANY[1]
-    bot_over[near_white_t, 2] = TIFFANY[2]
-    bot_over[near_white_t, 3] = 255
-    BOT = Image.fromarray(ink_only(bot_over), "RGBA")
-    _ta = np.array(BOT)
-    _tw = (
-        (_ta[:, :, 3] > 20)
-        & (_ta[:, :, 0] > 200)
-        & (_ta[:, :, 1] > 200)
-        & (_ta[:, :, 2] > 200)
-    )
-    _tt = (
-        (_ta[:, :, 3] > 20)
-        & (_ta[:, :, 0] < 100)
-        & (_ta[:, :, 1] > 150)
-        & (_ta[:, :, 2] > 180)
-    )
-    if _tt.any():
-        _td = (
-            np.array(
-                Image.fromarray((_tt.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(7))
-            )
-            > 0
-        )
-        _ghost = _tw & _td
-        if _ghost.any():
-            _ta[_ghost, 0] = TIFFANY[0]
-            _ta[_ghost, 1] = TIFFANY[1]
-            _ta[_ghost, 2] = TIFFANY[2]
-            BOT = Image.fromarray(_ta, "RGBA")
-            print(f"  BOT T: forced tiffany on {int(_ghost.sum())} fringe px")
+    left = (S - nw) // 2
+    # Center bot in the upper-central band (not glued to the top stroke)
+    top = top_clear + max(0, (fit_h - nh) // 2)
+    if top + nh > bottom_cap:
+        top = bottom_cap - nh
+    top = max(top_clear, top)
 
-    # Baseline-align (same as FloqCAST)
-    stre_cap_h = glyph("stre", size_s, WHITE).size[1]
-    gap = max(2, int(size_s * 0.03))
-    W = street_body.size[0] + gap + BOT.size[0]
-    bot_above = max(0, BOT.size[1] - stre_cap_h)
-    H = bot_above + street_body.size[1]
+    out = Image.new("RGBA", (S, S), (0, 0, 0, 255))
+    out.alpha_composite(scaled, (left, top))
+    oa = np.array(out)
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    oa[dist > (R - 16)] = (0, 0, 0, 255)
+    dst = LAYERS / "botdee-graphic.png"
+    Image.fromarray(oa, "RGBA").save(dst, optimize=True)
+    print(
+        f"GRAPHIC botdee → {dst} cut={cut} crop={cw}x{ch} placed={nw}x{nh} "
+        f"@({left},{top}) scale≈{BOTDEE_BOT_SCALE}"
+    )
+    return dst
+
+
+def botdee_wm():
+    """Stacked BOT- (white thin border) / DEE (tiffany thin border) ≈ ShoutOut size."""
+    size = BOTDEE_TEXT
+    top_g = thin_border_glyph(glyph("BOT-", size, WHITE), kind="white")
+    dee_g = thin_border_glyph(glyph("DEE", size, TIFFANY), kind="cyan")
+    gap = max(2, int(size * 0.015))
+    W = max(top_g.size[0], dee_g.size[0])
+    H = top_g.size[1] + gap + dee_g.size[1]
+    # All type over the ring (ShoutOut-style weight); empty under for assemble order
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    fy = bot_above
-    cy = fy + stre_cap_h - BOT.size[1]
-    under.alpha_composite(SU, (0, fy + (street_body.size[1] - SU.size[1])))
-    over.alpha_composite(SO, (0, fy + (street_body.size[1] - SO.size[1])))
-    over.alpha_composite(BOT, (street_body.size[0] + gap, cy))
-
+    over.alpha_composite(top_g, ((W - top_g.size[0]) // 2, 0))
+    over.alpha_composite(dee_g, ((W - dee_g.size[0]) // 2, top_g.size[1] + gap))
     body = Image.alpha_composite(under, over)
     box = ink_bbox(body, 10)
     U = Image.fromarray(
@@ -1986,22 +1938,71 @@ def streetbot_wm():
     )
     B = Image.alpha_composite(U, O)
     print(
-        f"  TYPE streetBOT street={size_s}/{street_body.size} BOT={size_b}/{BOT.size} "
-        f"(+15%) body={B.size}"
+        f"  TYPE BOT-DEE size={size} BOT-={top_g.size} DEE={dee_g.size} body={B.size} "
+        f"(ShoutOut-scale thin border; DEE tiffany)"
     )
-    # Soft chord fit only if wider than FloqCAST-ish safe width (no height crush)
-    if B.size[0] > 860:
-        return fit_width(U, O, B, max_w=860)
+    # Match ShoutOut text-block footprint (~528×380) inside the lower chord
+    need_w = B.size[0] > BOTDEE_MAX_W
+    need_h = B.size[1] > BOTDEE_MAX_H
+    if need_w or need_h:
+        rw = BOTDEE_MAX_W / max(1, B.size[0])
+        rh = BOTDEE_MAX_H / max(1, B.size[1])
+        ratio = min(rw, rh, 1.0)
+        nw = max(1, int(round(B.size[0] * ratio)))
+        nh = max(1, int(round(B.size[1] * ratio)))
+
+        def _rz(im):
+            im = im.resize((nw, nh), Image.Resampling.LANCZOS)
+            a = np.array(im)
+            # Keep thin-border colors (white / tiffany / purple); drop dust only
+            ink = a[:, :, 3] > 18
+            bright = (a[:, :, 0] > 20) | (a[:, :, 1] > 20) | (a[:, :, 2] > 20)
+            a[~(ink & bright)] = (0, 0, 0, 0)
+            return Image.fromarray(a, "RGBA")
+
+        U, O = _rz(U), _rz(O)
+        B = Image.alpha_composite(U, O)
+        print(f"  TYPE BOT-DEE fit → {B.size} (max {BOTDEE_MAX_W}x{BOTDEE_MAX_H})")
     return U, O, B
 
 
-def build_streetbot_whiteblack(under, over, left: int, top: int, graphic: Image.Image) -> Path:
-    """streetBOT White/Black from layers — same tip-safe path as FloqCAST WB."""
+def place_botdee_mark(body, min_top: int):
+    """Center BOT-DEE like ShoutOut — large interior fill; lower tips kiss the arc."""
+    ba = np.array(body)
+    ink = ba[:, :, 3] > 40
+    ys, xs = np.where(ink)
+    bot = int(ys.max())
+    left = max(8, (S - body.size[0]) // 2)
+    # Bottom of DEE near inner ring; keep mark high enough to read as ShoutOut-scale
+    target = R - 4
+    best_top, score = min_top, 1e18
+    for t in range(max(8, min_top - 40), S - body.size[1] - 2):
+        qd = float(np.hypot(left + body.size[0] / 2 - CX, t + bot - CY))
+        if qd > (R + 10):
+            continue
+        sc = abs(qd - target) * 2.0
+        # Strong preference for higher placement (ShoutOut fills the disc)
+        sc += max(0, t - 500) * 0.08
+        if sc < score:
+            score, best_top = sc, t
+    print(
+        f"  place BOT-DEE mark left={left} top={best_top} "
+        f"bot_dist={np.hypot(left + body.size[0] / 2 - CX, best_top + bot - CY):.1f}"
+    )
+    return left, best_top
+
+
+def build_botdee_whiteblack(
+    under, over, left: int, top: int, graphic: Image.Image
+) -> Path:
+    """BOT-DEE White/Black — tip-safe; keep tiffany DEE (not chrome-washed)."""
     wb_stroke = 3
     wb_half = wb_stroke / 2.0
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    font_chrome = shiny_chrome_tone(np.full((S, S), 160.0, np.float32), yy, xx, for_type=True)
+    font_chrome = shiny_chrome_tone(
+        np.full((S, S), 160.0, np.float32), yy, xx, for_type=True
+    )
     font_chrome = np.clip(font_chrome * 0.72, 10, 110)
 
     base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
@@ -2018,9 +2019,18 @@ def build_streetbot_whiteblack(under, over, left: int, top: int, graphic: Image.
     def type_layer(im: Image.Image) -> Image.Image:
         a = np.array(paste_type(im, left, top))
         ink = a[:, :, 3] > 20
+        tiffany = (
+            ink
+            & (a[:, :, 0] < 120)
+            & (a[:, :, 1] > 140)
+            & (a[:, :, 2] > 170)
+        )
         out = np.zeros_like(a)
         for c in range(3):
             out[:, :, c] = np.where(ink, font_chrome, 0)
+        out[tiffany, 0] = TIFFANY[0]
+        out[tiffany, 1] = TIFFANY[1]
+        out[tiffany, 2] = TIFFANY[2]
         out[:, :, 3] = np.where(ink, 255, 0)
         return Image.fromarray(out, "RGBA")
 
@@ -2033,65 +2043,97 @@ def build_streetbot_whiteblack(under, over, left: int, top: int, graphic: Image.
         ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
     ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
     base.alpha_composite(Image.fromarray(ra, "RGBA"))
-    base.alpha_composite(type_layer(over))
+    over_t = type_layer(over)
+    base.alpha_composite(over_t)
 
     out = np.array(base)
     out[:, :, 3] = 255
-    type_ink = (np.array(type_layer(under))[:, :, 3] > 20) | (
-        np.array(type_layer(over))[:, :, 3] > 20
-    )
+    under_t = type_layer(under)
+    type_ink = (np.array(under_t)[:, :, 3] > 20) | (np.array(over_t)[:, :, 3] > 20)
     outside = dist > (R + wb_half + 0.5)
     out[outside & ~type_ink, :3] = 255
     tips = type_ink & (dist > (R + wb_half))
+    # Tip stamp: chrome for white letters; keep tiffany for DEE
+    oa = np.array(over_t)
+    tip_tiff = (
+        tips
+        & (oa[:, :, 3] > 20)
+        & (oa[:, :, 0] < 120)
+        & (oa[:, :, 1] > 140)
+        & (oa[:, :, 2] > 170)
+    )
     for c in range(3):
         out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
+    out[tip_tiff, 0] = TIFFANY[0]
+    out[tip_tiff, 1] = TIFFANY[1]
+    out[tip_tiff, 2] = TIFFANY[2]
 
-    dst = ROOT / "images/chrome/streetbot-whiteblack.jpg"
+    dst = ROOT / "images/chrome/botdee-whiteblack.jpg"
     Image.fromarray(out, "RGBA").convert("RGB").save(dst, quality=96, subsampling=0)
-    # Mirror into floqAi pack slot
     Image.fromarray(out, "RGBA").convert("RGB").save(
         ROOT / "images/chrome/floqai-whiteblack.jpg", quality=96, subsampling=0
     )
-    print(f"  streetBOT WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}")
+    # Legacy streetbot path (redirect)
+    Image.fromarray(out, "RGBA").convert("RGB").save(
+        ROOT / "images/chrome/streetbot-whiteblack.jpg", quality=96, subsampling=0
+    )
+    print(f"  BOT-DEE WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}")
     return dst
 
 
-def build_streetbot_only():
-    """streetBOT — FloqCAST process on djBOT graphic; wires floqAi ICON_PACK slots."""
+def build_botdee_only():
+    """BOT-DEE — centered headphones bot ×1.30; ShoutOut-scale thin-border mark."""
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     ensure_traditional_ring()
-    dj_g = extract_djbot_graphic()
-    print("=== assemble streetBOT (FloqCAST process) ===")
-    g = Image.open(dj_g)
-    under, over, body = streetbot_wm()
-    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 650) + 12, bias=4)
-    print(f"  place streetBOT left={left} top={top} body={body.size}")
+    g_path = extract_botdee_graphic()
+    print("=== assemble BOT-DEE (ShoutOut-scale type, centered bot) ===")
+    g = Image.open(g_path)
+    under, over, body = botdee_wm()
+    left, top = place_botdee_mark(body, graphic_bottom(g, 560) + 6)
+    print(f"  place BOT-DEE left={left} top={top} body={body.size}")
     sb = assemble(g, under, over, left, top, nightlife=True)
     out = ROOT / "images/chrome"
+    sb.convert("RGB").save(out / "botdee-nightlife.jpg", quality=98, subsampling=0)
     sb.convert("RGB").save(out / "streetbot-nightlife.jpg", quality=98, subsampling=0)
     sb.save(out / "floqai-nightlife.png", optimize=True)
     sb.convert("RGB").save(out / "floqbot-nightlife.png", optimize=True)
     trad = traditional_from_nightlife(sb, g, under, over, left, top)
+    trad.convert("RGB").save(out / "botdee-traditional.jpg", quality=98, subsampling=0)
     trad.convert("RGB").save(out / "streetbot-traditional.jpg", quality=98, subsampling=0)
     trad.convert("RGB").save(out / "floqai-traditional.jpg", quality=98, subsampling=0)
     trad.save(out / "floqbot-traditional-green.png", optimize=True)
-    build_streetbot_whiteblack(under, over, left, top, g)
+    build_botdee_whiteblack(under, over, left, top, g)
     preview = sb.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/streetbot-nightlife.png", quality=95)
+    preview.save("/opt/cursor/artifacts/botdee-nightlife.png", quality=95)
     trad.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS).save(
-        "/opt/cursor/artifacts/streetbot-traditional.png", quality=95
+        "/opt/cursor/artifacts/botdee-traditional.png", quality=95
     )
-    Image.open(out / "streetbot-whiteblack.jpg").resize(
+    Image.open(out / "botdee-whiteblack.jpg").resize(
         (640, 640), Image.Resampling.LANCZOS
-    ).save("/opt/cursor/artifacts/streetbot-whiteblack.png", quality=95)
-    # Pack strip for QA (streetBOT in FloqAi slot)
-    from PIL import ImageDraw, ImageFont
+    ).save("/opt/cursor/artifacts/botdee-whiteblack.png", quality=95)
+    # Side-by-side vs ShoutOut for size check
+    so = Image.open(out / "shoutout-nightlife.png").convert("RGB").resize(
+        (640, 640), Image.Resampling.LANCZOS
+    )
+    cmp = Image.new("RGB", (640 * 2 + 24, 700), (20, 20, 24))
+    cmp.paste(so, (0, 40))
+    cmp.paste(preview, (640 + 24, 40))
+    d = ImageDraw.Draw(cmp)
+    try:
+        fnt = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22
+        )
+    except Exception:
+        fnt = ImageFont.load_default()
+    d.text((16, 8), "ShoutOut (type size ref)", fill=(230, 230, 235), font=fnt)
+    d.text((640 + 40, 8), "BOT-DEE", fill=(230, 230, 235), font=fnt)
+    cmp.save("/opt/cursor/artifacts/botdee-vs-shoutout.png", quality=95)
 
     pack = [
         ("VIP", "vip-whiteblack.jpg"),
         ("ShoutOut", "shoutout-whiteblack.png"),
-        ("streetBOT", "streetbot-whiteblack.jpg"),
+        ("BOT-DEE", "botdee-whiteblack.jpg"),
         ("FloqCast", "floqcast-whiteblack.jpg"),
         ("BartR", "bartr-whiteblack.jpg"),
         ("RydR", "rydr-whiteblack.jpg"),
@@ -2102,18 +2144,31 @@ def build_streetbot_only():
     c = Image.new("RGB", (W, H), (245, 245, 247))
     d = ImageDraw.Draw(c)
     try:
-        fnt = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+        fnt = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18
+        )
     except Exception:
         fnt = ImageFont.load_default()
-    d.text((pad, 6), "White/Black pack — streetBOT replaces FloqAi", fill=(30, 30, 35), font=fnt)
+    d.text(
+        (pad, 6),
+        "White/Black pack — BOT-DEE (was streetBOT / FloqAi)",
+        fill=(30, 30, 35),
+        font=fnt,
+    )
     for i, (lab, fn) in enumerate(pack):
         x = pad + i * (cell + pad)
-        im = Image.open(out / fn).convert("RGB").resize((cell, cell), Image.Resampling.LANCZOS)
+        im = Image.open(out / fn).convert("RGB").resize(
+            (cell, cell), Image.Resampling.LANCZOS
+        )
         d.rectangle([x - 1, 30 - 1, x + cell, 30 + cell], outline=(40, 40, 45), width=2)
         c.paste(im, (x, 30))
         d.text((x + 8, 30 + cell + 4), lab, fill=(40, 40, 45), font=fnt)
-    c.save("/opt/cursor/artifacts/whiteblack-streetbot-pack-strip.png", quality=95)
-    print("DONE streetBOT —", out / "streetbot-nightlife.jpg")
+    c.save("/opt/cursor/artifacts/whiteblack-botdee-pack-strip.png", quality=95)
+    print("DONE BOT-DEE —", out / "botdee-nightlife.jpg")
+
+
+# Back-compat aliases
+build_streetbot_only = build_botdee_only
 
 
 def main():
@@ -2122,9 +2177,14 @@ def main():
     ap.add_argument("--graphics-only", action="store_true")
     ap.add_argument("--vip-only", action="store_true", help="Rebuild VIP nightlife+traditional only")
     ap.add_argument(
+        "--botdee-only",
+        action="store_true",
+        help="Rebuild BOT-DEE chrome + floqAi pack slots",
+    )
+    ap.add_argument(
         "--streetbot-only",
         action="store_true",
-        help="Rebuild streetBOT (FloqCAST process) + floqAi pack slots",
+        help="Alias for --botdee-only",
     )
     ap.add_argument(
         "--floqcast-wb-only",
@@ -2139,13 +2199,14 @@ def main():
         LAYERS.mkdir(parents=True, exist_ok=True)
         extract_floqcast_graphic()
         extract_djbot_graphic()
+        extract_botdee_graphic()
         extract_vip_graphic()
         return
     if args.vip_only:
         build_vip_only()
         return
-    if args.streetbot_only:
-        build_streetbot_only()
+    if args.botdee_only or args.streetbot_only:
+        build_botdee_only()
         return
     if args.floqcast_wb_only:
         build_floqcast_whiteblack()
