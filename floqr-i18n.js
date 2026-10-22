@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.26";
+  const VERSION = "s3.2.27";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1540,6 +1540,7 @@
       "template.ledPreviewTitle": "LED preview {name} ({dim})",
       "template.selected": "Selected template",
       "template.use": "Use",
+      "template.howItWorks": "How it works",
       "template.useTemplate": "Use Template",
       "template.variantSavedBackground": "Saved Background",
       "template.variantScopeClub": "Club approved",
@@ -2755,6 +2756,7 @@
       "template.ledPreviewTitle": "Aperçu LED {name} ({dim})",
       "template.selected": "Modèle sélectionné",
       "template.use": "Utiliser",
+      "template.howItWorks": "Comment ça marche",
       "template.useTemplate": "Utiliser le modèle",
       "template.variantSavedBackground": "Arrière-plan enregistré",
       "template.variantScopeClub": "Approuvé par le club",
@@ -3970,6 +3972,7 @@
       "template.ledPreviewTitle": "LED-Vorschau {name} ({dim})",
       "template.selected": "Ausgewählte Vorlage",
       "template.use": "Verwenden",
+      "template.howItWorks": "So funktioniert's",
       "template.useTemplate": "Vorlage verwenden",
       "template.variantSavedBackground": "Gespeicherter Hintergrund",
       "template.variantScopeClub": "Club-freigegeben",
@@ -5185,6 +5188,7 @@
       "template.ledPreviewTitle": "Vista previa LED {name} ({dim})",
       "template.selected": "Plantilla seleccionada",
       "template.use": "Usar",
+      "template.howItWorks": "Cómo funciona",
       "template.useTemplate": "Usar plantilla",
       "template.variantSavedBackground": "Fondo guardado",
       "template.variantScopeClub": "Aprobado por el club",
@@ -6400,6 +6404,7 @@
       "template.ledPreviewTitle": "LED-voorbeeld {name} ({dim})",
       "template.selected": "Geselecteerde template",
       "template.use": "Gebruiken",
+      "template.howItWorks": "Hoe het werkt",
       "template.useTemplate": "Sjabloon gebruiken",
       "template.variantSavedBackground": "Opgeslagen achtergrond",
       "template.variantScopeClub": "Club goedgekeurd",
@@ -7615,6 +7620,7 @@
       "template.ledPreviewTitle": "LED-превью {name} ({dim})",
       "template.selected": "Выбранный шаблон",
       "template.use": "Использовать",
+      "template.howItWorks": "Как это работает",
       "template.useTemplate": "Использовать шаблон",
       "template.variantSavedBackground": "Сохранённый фон",
       "template.variantScopeClub": "Одобрено клубом",
@@ -8830,6 +8836,7 @@
       "template.ledPreviewTitle": "Anteprima LED {name} ({dim})",
       "template.selected": "Template selezionato",
       "template.use": "Usa",
+      "template.howItWorks": "Come funziona",
       "template.useTemplate": "Usa modello",
       "template.variantSavedBackground": "Sfondo salvato",
       "template.variantScopeClub": "Approvato dal club",
@@ -10045,6 +10052,7 @@
       "template.ledPreviewTitle": "Pré-visualização LED {name} ({dim})",
       "template.selected": "Modelo selecionado",
       "template.use": "Usar",
+      "template.howItWorks": "Como funciona",
       "template.useTemplate": "Usar modelo",
       "template.variantSavedBackground": "Fundo guardado",
       "template.variantScopeClub": "Aprovado pelo clube",
@@ -11260,6 +11268,7 @@
       "template.ledPreviewTitle": "Προεπισκόπηση LED {name} ({dim})",
       "template.selected": "Επιλεγμένο πρότυπο",
       "template.use": "Χρήση",
+      "template.howItWorks": "Πώς λειτουργεί",
       "template.useTemplate": "Χρήση προτύπου",
       "template.variantSavedBackground": "Αποθηκευμένο φόντο",
       "template.variantScopeClub": "Εγκεκριμένο από club",
@@ -12475,6 +12484,7 @@
       "template.ledPreviewTitle": "Podgląd LED {name} ({dim})",
       "template.selected": "Wybrany szablon",
       "template.use": "Użyj",
+      "template.howItWorks": "Jak to działa",
       "template.useTemplate": "Użyj szablonu",
       "template.variantSavedBackground": "Zapisane tło",
       "template.variantScopeClub": "Zatwierdzone przez klub",
@@ -13690,6 +13700,7 @@
       "template.ledPreviewTitle": "معاينة LED {name} ({dim})",
       "template.selected": "القالب المحدد",
       "template.use": "استخدام",
+      "template.howItWorks": "كيف يعمل",
       "template.useTemplate": "استخدام القالب",
       "template.variantSavedBackground": "خلفية محفوظة",
       "template.variantScopeClub": "معتمد من النادي",

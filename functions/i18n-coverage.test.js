@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 1211); // + app.privacy short login footer label (s3.2.24)
+  assert.equal(chrome.enKeys, 1212); // + template.howItWorks (s3.2.27)
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);
@@ -38,11 +38,11 @@ test("help packs cover the canonical help ids for every localized language", () 
   assert.equal(help.gaps.length, 0, JSON.stringify(help.gaps));
 });
 
-test("floqr-i18n and help VERSION are s3.2.26", () => {
+test("floqr-i18n and help VERSION are s3.2.27", () => {
   const fs = require("fs");
   const root = path.join(__dirname, "..");
   const i18n = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   const help = fs.readFileSync(path.join(root, "floqr-i18n-help.js"), "utf8");
-  assert.match(i18n, /const VERSION\s*=\s*"s3.2.26"/);
-  assert.match(help, /const VERSION\s*=\s*"s3.2.26"/);
+  assert.match(i18n, /const VERSION\s*=\s*"s3.2.27"/);
+  assert.match(help, /const VERSION\s*=\s*"s3.2.27"/);
 });

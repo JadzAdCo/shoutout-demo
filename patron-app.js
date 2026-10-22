@@ -3497,7 +3497,10 @@
     const popular = t.id === "blackwhite" || t.isDefault || Number(t.popularity || t.usageCount || 0) > 0
       ? `popular trending top ${t.popularity || t.usageCount || ""}`
       : "";
-    return `${venueTagsFor(t).join(" ")} ${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${popular} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    const howBlob = t.howitWorks && typeof t.howitWorks === "object"
+      ? Object.values(t.howitWorks).join(" ")
+      : (t.howitWorks || "");
+    return `${venueTagsFor(t).join(" ")} ${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${howBlob} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${popular} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
   function primaryTemplateFormat(template = {}) {
     const loc = getLocation() || {};
@@ -3637,7 +3640,9 @@
     const mediaLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
       : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? tt("template.mediaPlaceholder", {}, "Image/video placeholder") : tt("template.noMedia", {}, "No image/video"))));
-    const desc = String(template.description || mediaLine || "").trim();
+    const desc = String(window.FLOQRTemplateCopy?.description?.(template) || template.description || mediaLine || "").trim();
+    const how = String(window.FLOQRTemplateCopy?.howitWorks?.(template, formatId) || "").trim();
+    const howLabel = tt("template.howItWorks", {}, "How it works");
     const chars = [
       template.category,
       template.priceCents ? (template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`) : null,
@@ -3651,6 +3656,7 @@
       </header>
       ${templateLedPreviewHtml(template, {formatId})}
       <p class="template-select-desc">${esc(desc)}</p>
+      ${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}
       <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
@@ -3667,7 +3673,10 @@
       : scope === "club"
         ? tt("template.variantScopeClub", {}, "Club approved")
         : (variant.ownerDisplayName || tt("template.variantScopeCommunity", {}, "Community"));
-    const desc = [variant.baseTemplateName || base.name, scopeLabel, base.description].filter(Boolean).join(" · ");
+    const baseDesc = String(window.FLOQRTemplateCopy?.description?.(base) || base.description || "").trim();
+    const desc = [variant.baseTemplateName || base.name, scopeLabel, baseDesc].filter(Boolean).join(" · ");
+    const how = String(window.FLOQRTemplateCopy?.howitWorks?.(base, formatId) || "").trim();
+    const howLabel = tt("template.howItWorks", {}, "How it works");
     return `<article class="template template-select-card ${esc(base.className || "neon")} ${selected ? "selected" : ""}" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
       <header class="template-select-head">
         <h4 class="name">${esc(variant.variantName || tt("template.variantSavedBackground", {}, "Saved Background"))}</h4>
@@ -3680,6 +3689,7 @@
         backgroundGradient: variant.backgroundGradient || ""
       })}
       <p class="template-select-desc">${esc(desc)}</p>
+      ${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}
       <div class="tag-row template-select-meta"><span>${esc(scopeLabel)}</span>${(variant.tags || []).slice(0, 6).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-variant-open="${esc(variant.id || variant.variantId || "")}">${esc(tt("template.use", {}, "Use"))}</button>
@@ -3807,7 +3817,13 @@
     const supportedFormats = window.FLOQRTextLayout?.supportedFormatIds?.(t, venueFormats) || venueFormats;
     const textCompatibility = `${supportedFormats.length} of ${venueFormats.length} venue display sizes supported; the exact text limit updates after you choose the display.`;
     const backgroundLabel = variant?.variantScope === "club" ? "Club-approved background" : t.backgroundEditable === false ? "Background locked" : clubAllowsPatronBackgroundEditing() ? "Background editable" : "Original background only";
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><p class="sub small">${esc(textCompatibility)}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
+    const formatId = primaryTemplateFormat(t);
+    const desc = variant
+      ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.`
+      : (window.FLOQRTemplateCopy?.description?.(t) || t.description || "Template selected.");
+    const how = window.FLOQRTemplateCopy?.howitWorks?.(t, formatId) || "";
+    const howLabel = tt("template.howItWorks", {}, "How it works");
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(desc)}</p>${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}<p class="sub small">${esc(textCompatibility)}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {

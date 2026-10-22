@@ -1620,7 +1620,7 @@
     {
       id: "help-default-template",
       title: "Default Template",
-      body: "Free Traditional Black and White Classic. The card shows a true LED preview at this venue’s primary display size (name and dimension on top; description and tags below). Tap Use to open the editor. Search above for public, club-approved, and personal templates by name, description, tags, or popularity.",
+      body: "Free Traditional Black and White Classic. The card shows a true LED preview at this venue’s primary display size (name and dimension on top; short description, How it works for that LED size, and tags below). Tap Use to open the editor. Search above for public, club-approved, and personal templates by name, description, howitWorks, tags, or popularity.",
       searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive", "template search", "led preview", "use template"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",

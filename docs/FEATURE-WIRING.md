@@ -45,6 +45,21 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+
+## Template howitWorks (s3.2.27)
+
+**Purpose:** Patrons see a short general `description` plus size-specific **How it works** copy for the venue’s primary LED format.
+
+| Layer | Wiring |
+|---|---|
+| Data | `SHOUTOUT_TEMPLATES.*.description` (general) + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates` |
+| Helper | `window.FLOQRTemplateCopy.howitWorks(template, formatId)` / `.description(template)` |
+| Gallery | `patron-app.js` `templateCard` / `variantCard` / `updateTemplateSummary` — `.template-select-desc` (2-line clamp) + `.template-select-howitworks` |
+| Admin | Master Admin template form: Description + three How it works textareas (`templateManageHowitWorks*`) |
+| i18n | `template.howItWorks` in all chrome packs |
+| Diagnostics | Manual test `s3-2-27-template-howitworks` |
+
+---
 ## Login + Search chrome (s3.2.26)
 
 **Purpose:** Compact sign-in, short welcome, privacy links in page footer, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome, Search product icons bottom-pinned on phone/tablet.
