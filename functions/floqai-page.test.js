@@ -13,8 +13,8 @@ test("FloqAi has its own page and every entry point goes there", () => {
   assert.match(nav, /intentSearchHome\(\) \{\s*return buildUrl\("\.\/floqai\.html"\);/);
   assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/floqai\.html"/, "old ?start=intent links redirect");
   assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*floqai-icon-card[^"]*"[^>]*href="\.\/floqai\.html\?from=search"/);
-  assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?floqr-tiles-transparent\.png/);
-  assert.match(read("styles.css"), /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:#000/);
+  assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?botdee-(?:nightlife|traditional|whiteblack)\.jpg/);
+  assert.match(read("styles.css"), /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:transparent/);
   assert.match(read("floqai-search.html"), /location\.replace\("\.\/floqai\.html/);
   assert.match(read("floqr-feature-services.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
   assert.match(read("functions/feature-services-core.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
