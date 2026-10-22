@@ -1711,11 +1711,155 @@ def build_vip_only():
     print("DONE VIP-only —", ROOT / "images/chrome/vip-nightlife.jpg")
 
 
+def streetbot_wm():
+    """streetBOT — FloqCAST process: st under ring; reet+BO over; T tiffany; BOT +15%."""
+    # street at FC_H; BOT at +15% (same split as Floq / CAST)
+    size_s = 170
+    for _ in range(8):
+        u, by = render_upright("street", size_s, WHITE)
+        size_s = int(
+            max(50, min(280, round(size_s * FC_H / max(1, finish(u, by).size[1]))))
+        )
+    size_b = int(round(size_s * 1.15))
+
+    font_s = ImageFont.truetype(FONT, int(size_s))
+    street_u, by_s = render_upright("street", size_s, WHITE)
+    pad = 64
+    bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "street", font=font_s, anchor="ls"
+    )
+    origin_s = (pad - bb[0], pad + (bb[3] - bb[1]))
+
+    def layer_s(text):
+        im = Image.new("RGBA", street_u.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin_s, text, font=font_s, fill=WHITE, anchor="ls")
+        return finish(im, by_s, crop=False)
+
+    full_s = finish(street_u, by_s, crop=False)
+    st_f = layer_s("st")
+    x0, y0b, x1, y1 = ink_bbox(full_s, 12)
+    box = (x0, y0b, x1 + 1, y1 + 1)
+    fa = np.array(full_s.crop(box))
+    sta = np.array(st_f.crop(box))
+    ink = fa[:, :, 3] > 20
+    stmask = (
+        np.array(Image.fromarray(sta[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
+    ) & ink
+    street_under = np.zeros_like(fa)
+    street_over = np.zeros_like(fa)
+    street_under[stmask] = (255, 255, 255, 255)
+    street_over[ink & ~stmask] = (255, 255, 255, 255)
+    SU = Image.fromarray(ink_only(street_under), "RGBA")
+    SO = Image.fromarray(ink_only(street_over), "RGBA")
+    print(f"  street split under={int(stmask.sum())} over={int((ink & ~stmask).sum())}")
+
+    # BOT +15%: BO white + T tiffany (same as CAST)
+    font_b = ImageFont.truetype(FONT, int(size_b))
+    bot_u, by_b = render_upright("BOT", size_b, WHITE)
+    bb_b = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "BOT", font=font_b, anchor="ls"
+    )
+    origin_b = (pad - bb_b[0], pad + (bb_b[3] - bb_b[1]))
+
+    def layer_b(text, fill=WHITE):
+        im = Image.new("RGBA", bot_u.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin_b, text, font=font_b, fill=fill, anchor="ls")
+        return finish(im, by_b, crop=False)
+
+    full_b = finish(bot_u, by_b, crop=False)
+    pre_b = layer_b("BO")
+    bx0, by0, bx1, by1 = ink_bbox(full_b, 12)
+    bbox = (bx0, by0, bx1 + 1, by1 + 1)
+    ba = np.array(full_b.crop(bbox))
+    pa = np.array(pre_b.crop(bbox))
+    bink = ba[:, :, 3] > 15
+    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(5)))
+    tmask = bink & (pre_a < 8)
+    xs = np.where(tmask)[1]
+    if len(xs):
+        tmask[:, : int(np.percentile(xs, 5))] = False
+    tmask = (
+        np.array(
+            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(9))
+        )
+        > 0
+    ) & (ba[:, :, 3] > 8)
+    bot_over = np.zeros_like(ba)
+    bot_over[bink] = (255, 255, 255, 255)
+    bot_over[tmask, 0] = TIFFANY[0]
+    bot_over[tmask, 1] = TIFFANY[1]
+    bot_over[tmask, 2] = TIFFANY[2]
+    bot_over[tmask, 3] = 255
+    BO = Image.fromarray(ink_only(bot_over), "RGBA")
+
+    # Compose street + BOT on shared canvas (gap like FloqCAST)
+    gap = 10
+    street_body = Image.alpha_composite(SU, SO)
+    H = max(street_body.size[1], BO.size[1]) + 16
+    W = street_body.size[0] + gap + BO.size[0] + 16
+    under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sy = (H - street_body.size[1]) // 2
+    by = (H - BO.size[1]) // 2
+    under.alpha_composite(SU, (8, sy))
+    over.alpha_composite(SO, (8, sy))
+    over.alpha_composite(BO, (8 + street_body.size[0] + gap, by))
+    body = Image.alpha_composite(under, over)
+    box = ink_bbox(body, 8)
+
+    def crop_keep(im):
+        return im.crop((box[0], box[1], box[2] + 1, box[3] + 1))
+
+    U, O, B = crop_keep(under), crop_keep(over), crop_keep(body)
+    print(f"  TYPE streetBOT body={B.size} street_sz={size_s} BOT_sz={size_b}")
+    return fit_width(U, O, B)
+
+
+def build_streetbot_only():
+    """streetBOT icon — FloqCAST pipeline on djBOT graphic; also fills floqAi pack slots."""
+    LAYERS.mkdir(parents=True, exist_ok=True)
+    ensure_ring()
+    ensure_traditional_ring()
+    dj_g = extract_djbot_graphic()
+    print("=== assemble streetBOT (FloqCAST process) ===")
+    g = Image.open(dj_g)
+    under, over, body = streetbot_wm()
+    # FloqCAST-style placement: allow tip kiss; keep clear of graphic
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 650) + 16, bias=4)
+    print(f"  place streetBOT left={left} top={top} body={body.size}")
+    sb = assemble(g, under, over, left, top, nightlife=True)
+    out = ROOT / "images/chrome"
+    sb.convert("RGB").save(out / "streetbot-nightlife.jpg", quality=98, subsampling=0)
+    # Also publish into floqAi pack paths (Search tile key floqAi)
+    sb.save(out / "floqai-nightlife.png", optimize=True)
+    sb.convert("RGB").save(out / "floqbot-nightlife.png", optimize=True)
+    trad = traditional_from_nightlife(sb, g, under, over, left, top)
+    trad.convert("RGB").save(out / "streetbot-traditional.jpg", quality=98, subsampling=0)
+    trad.convert("RGB").save(out / "floqai-traditional.jpg", quality=98, subsampling=0)
+    trad.save(out / "floqbot-traditional-green.png", optimize=True)
+    to_white_black(out / "streetbot-traditional.jpg", out / "streetbot-whiteblack.jpg")
+    to_white_black(out / "streetbot-traditional.jpg", out / "floqai-whiteblack.jpg")
+    preview = sb.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
+    preview.save("/opt/cursor/artifacts/streetbot-nightlife.png", quality=95)
+    trad.convert("RGB").resize((640, 640), Image.Resampling.LANCZOS).save(
+        "/opt/cursor/artifacts/streetbot-traditional.png", quality=95
+    )
+    Image.open(out / "streetbot-whiteblack.jpg").resize(
+        (640, 640), Image.Resampling.LANCZOS
+    ).save("/opt/cursor/artifacts/streetbot-whiteblack.png", quality=95)
+    print("DONE streetBOT —", out / "streetbot-nightlife.jpg")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--ring-only", action="store_true")
     ap.add_argument("--graphics-only", action="store_true")
     ap.add_argument("--vip-only", action="store_true", help="Rebuild VIP nightlife+traditional only")
+    ap.add_argument(
+        "--streetbot-only",
+        action="store_true",
+        help="Rebuild streetBOT (FloqCAST process) + floqAi pack slots",
+    )
     args = ap.parse_args()
     if args.ring_only:
         ensure_ring()
@@ -1728,6 +1872,9 @@ def main():
         return
     if args.vip_only:
         build_vip_only()
+        return
+    if args.streetbot_only:
+        build_streetbot_only()
         return
     build_all()
 

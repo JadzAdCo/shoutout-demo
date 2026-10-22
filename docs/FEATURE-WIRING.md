@@ -483,6 +483,7 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
 | **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` / `floqcast-traditional.jpg`; nightlife `floqcast-nightlife.jpg` + V4 PNG. Search tile: `data-floqr-chrome-icon="floqCast"` → ICON_PACK |
+| **streetBOT** | FloqCAST process via `build_streetbot_only()` → `streetbot-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="floqAi"` (`ICON_V` s3.2.08). Legacy `floqbot-*` still written for spin GIF path. |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
