@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.106";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.107";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.107",
+      title: "VIP landing chrome pack + traditional swap",
+      checks: [
+        {label:"VIP landing hero chrome nightlife", file:"vip.html", includes:["data-floqr-chrome-icon=\"vipReserv\"", "vip-nightlife.jpg", "floqr-chrome-scheme.js"], notIncludes:["vip-reserv-icon.svg"]},
+        {label:"VIP terms hero chrome", file:"vip-terms.html", includes:["data-floqr-chrome-icon=\"vipReserv\"", "floqr-chrome-scheme.js"]},
+        {label:"VIP app hydrates Site chrome", file:"vip-app.js", includes:["hydrateSiteChrome", "FLOQRChromeScheme"]},
+        {label:"ICON_PACK VIP traditional", file:"floqr-chrome-scheme.js", includes:["vip-traditional.jpg", "vip-nightlife.jpg"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.107\""]}
+      ]
+    },
     {
       version: "s3.1.106",
       title: "Search ShoutOut chrome + Display2 FloqCAST + Active label i18n",
@@ -1957,6 +1968,15 @@
       howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
       expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
+    },
+    {
+      id:"s3-1-107-vip-landing-chrome-icons",
+      area:"VIP reserV landing + Site chrome",
+      feature:"VIP landing/Terms hero uses chrome pack; traditional swaps with isSiteChrome",
+      changed:"vip.html + vip-terms.html hero: data-floqr-chrome-icon=vipReserv → vip-nightlife.jpg / vip-traditional.jpg. Loads floqr-chrome-scheme.js; vip-app hydrates isSiteChrome from profile. Package s3.1.107.",
+      howToTest:"1) Hard-refresh vip.html (s3.1.107) — hero is lounge + reserVIP chrome (not old SVG ring/banquette). 2) Set Site chrome Traditional in Language Settings → reopen VIP — hero is charcoal traditional pack. 3) Toggle Nightlife — hero returns to nightlife JPG.",
+      expected:"VIP landing matches Search VIP chrome; traditional preference swaps the hero.",
+      troubleshoot:"Still old SVG → hard refresh vip.html + vip.css + floqr-chrome-scheme.js s3.1.107. Traditional not swapping → confirm siteChrome beta access + users.isSiteChrome=1; vip-app hydrateSiteChrome."
     },
     {
       id:"s3-1-106-shoutout-chrome-display2-active-label",

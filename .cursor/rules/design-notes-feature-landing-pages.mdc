@@ -16,9 +16,9 @@ Match **VIP reserV** (`vip.html`) as the reference:
 1. **Back** — `floqrGlobalBack` / `FLOQRNav.applyGlobalBack` (← Back to Search). No hardcoded `?v=` in the href.
 2. **FLOQR parent logo** — `images/floqr-color.png` via `.product-parent-logo` inside `.product-brand-stack` (**centered, alone on its row**).
 3. **Feature icon** — stacked **under** FLOQR (not beside it). Use a black-face hero tile when the Search mark is mark-only:
-   - VIP → `images/vip-reserv-icon.svg`
+   - VIP → chrome pack via `data-floqr-chrome-icon="vipReserv"` (`images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`)
    - floqCast → `images/floqcast-hero-icon.svg` (mark: `floqcast-icon.svg`)
-   - Classes: `product-logo {feature}-hero-logo` (~160×120 max, pink/cyan drop-shadow).
+   - Classes: `product-logo {feature}-hero-logo` (~160×120 max, pink/cyan drop-shadow). Load `floqr-chrome-scheme.js` on landings that use `data-floqr-chrome-icon`.
 4. **Feature title + `?`** — one flex row (`.{feature}-title-row`): `<h1>` + `details.help-popout` summary `?`. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title (VIP pattern).
 5. **Body card** — glass card from `styles.css` / product chrome. Section heads that need help use the same `?` row pattern (`.{feature}-section-head`).
 
@@ -44,8 +44,8 @@ When the landing needs venue pick:
 
 | Surface | Asset shape |
 |---|---|
-| Search tile face | Mark SVG (no outer black square if the HTML face supplies black) |
-| Feature landing hero | Hero SVG with black rounded face **or** same mark sized as VIP hero |
+| Search tile face | Chrome pack JPG/PNG via `data-floqr-chrome-icon` (HTML face supplies black when needed) |
+| Feature landing hero | Same chrome pack as Search for VIP; other features use hero SVG/JPG sized as VIP hero |
 | Display / idle (floqCast board) | Newest FloqCAST chrome nightlife JPG (`display-app.js` `FLOQCAST_LOGO` → `images/chrome/floqcast-nightlife.jpg`) |
 
 Replace retired logos site-wide when a mark ships — do not leave `suprstr-logo.png` on landings.

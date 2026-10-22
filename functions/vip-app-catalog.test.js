@@ -50,6 +50,22 @@ test("VIP hero nests intro/venue hints in ? next to headings — no green Signed
   assert.match(css, /\.vip-page \.status:empty/);
 });
 
+test("VIP landing hero uses chrome pack (nightlife default + traditional swap)", () => {
+  const html = fs.readFileSync(path.join(root, "vip.html"), "utf8");
+  assert.match(html, /data-floqr-chrome-icon="vipReserv"/);
+  assert.match(html, /images\/chrome\/vip-nightlife\.jpg/);
+  assert.doesNotMatch(html, /vip-reserv-icon\.svg/);
+  assert.match(html, /floqr-chrome-scheme\.js\?v=s3\.\d+\.\d+/);
+  const terms = fs.readFileSync(path.join(root, "vip-terms.html"), "utf8");
+  assert.match(terms, /data-floqr-chrome-icon="vipReserv"/);
+  assert.match(terms, /floqr-chrome-scheme\.js\?v=s3\.\d+\.\d+/);
+  const chrome = fs.readFileSync(path.join(root, "floqr-chrome-scheme.js"), "utf8");
+  assert.match(chrome, /vipReserv: "\.\/images\/chrome\/vip-nightlife\.jpg/);
+  assert.match(chrome, /vipReserv: "\.\/images\/chrome\/vip-traditional\.jpg/);
+  assert.match(vipApp, /hydrateSiteChrome/);
+  assert.match(vipApp, /FLOQRChromeScheme/);
+});
+
 test("VIP table details open as centered pop-out — not a bottom sheet", () => {
   const html = fs.readFileSync(path.join(root, "vip.html"), "utf8");
   assert.match(html, /id="vipTablePopoutBackdrop"/);

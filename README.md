@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.106 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.107 (stable)
+
+- s3.1.107: VIP landing/Terms hero chrome pack + traditional Site chrome swap.
 
 - s3.1.106: Search ShoutOut chrome pack; Display2 idle FloqCAST nightlife chrome; fix Site chrome Active label i18n (EN Θέμα / FR Motyw).
 

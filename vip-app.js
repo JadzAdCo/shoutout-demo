@@ -508,6 +508,23 @@
     } catch (_) { /* ignore */ }
   }
 
+  async function hydrateSiteChrome(user) {
+    const cs = window.FLOQRChromeScheme;
+    if (!cs) return;
+    try {
+      cs.syncAccessGate?.();
+      if (!user?.uid || !firebase?.firestore) {
+        cs.applyDocument?.(cs.effectiveChrome?.());
+        return;
+      }
+      const snap = await firebase.firestore().collection("users").doc(user.uid).get();
+      if (snap.exists) cs.hydrateFromProfile?.(snap.data() || {});
+      else cs.applyDocument?.(cs.effectiveChrome?.());
+    } catch (_) {
+      try { cs.syncAccessGate?.(); } catch (__) { /* ignore */ }
+    }
+  }
+
   async function showApp(user) {
     currentUser = user;
     if (gateEl) gateEl.classList.add("hidden");
@@ -515,6 +532,7 @@
     if (confirmEl) confirmEl.classList.add("hidden");
     /* Leave "Restoring…" immediately — keep chrome clean (no green Signed-in line). */
     setStatus("");
+    await hydrateSiteChrome(user);
     const params = new URLSearchParams(location.search);
     fillNights(params.get("night") || "");
     try {
@@ -552,6 +570,7 @@
   function boot() {
     window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
     try { window.FLOQRI18n?.apply?.(document); } catch (_) { /* ignore */ }
+    try { window.FLOQRChromeScheme?.syncAccessGate?.(); } catch (_) { /* ignore */ }
 
     const profileLink = document.getElementById("vipOpenProfile");
     if (profileLink && window.FLOQRNav?.portalHome) {

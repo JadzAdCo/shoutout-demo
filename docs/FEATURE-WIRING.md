@@ -421,7 +421,7 @@ When adding a section, use this skeleton:
 | **VCC tab** | Club Admin `panelFloqCast` label forced to **floqCast** (never legacy `supRstar`) |
 | **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
 | **My Profile** | Feature & Orders → Guest List & reserV (`?tab=guest-list-reserv` / legacy `?tab=reservations`) — list + Show pass |
-| **Search icon** | Black face tile like FloqAi: `images/vip-reserv-mark.svg` + in-face `VIP reserV` word (`.vip-icon-face`); no caption under the tile. Legacy full-bleed art: `images/vip-reserv-icon.svg` |
+| **Search + landing icon** | Chrome pack via `data-floqr-chrome-icon="vipReserv"` → `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg` (`FLOQRChromeScheme`). Landing `vip.html` / `vip-terms.html` hero same pack; hydrate `isSiteChrome` from profile in `vip-app.js`. Legacy SVG (`vip-reserv-icon.svg` / `vip-reserv-mark.svg`) retired from Search/landing. |
 | **Floor plans** | Static `vip-plans/` (`decades.json`, `lima-twist.json`, `aurelia.json`) + `functions/vip-beta-catalog.js`. Aurelia 2D published (`aurelia-floor-map.svg` bookable seats neutralized — no baked Available/Booked); 3D walk-through at `reports/vip-aurelia-demo/` (Explore 3D CTA on `vip.html`). Rebuild: `plan-svg.mjs` `neutralBookable: true` for Pages background art |
 | **POS (future)** | Research/design only: `reports/vip-pos-integrations.md` — top 4 Toast, Square, SpotOn, Clover; Generic CSV/manual fallback. Not built. |
 | **Product chrome** | Same pink/cyan body + glass cards as ShoutOut — `styles.css` + scoped `vip-floor-viewer.css` (never global `:root`/`body` flat black). Rule: `.cursor/rules/design-notes-product-chrome.mdc` |

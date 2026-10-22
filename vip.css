@@ -46,9 +46,16 @@ body.vip-page {
   max-height: 120px;
   margin: 4px 0 8px;
   object-fit: contain;
+  border-radius: 22px;
+  background: #000;
   filter:
     drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
     drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
+}
+html[data-floqr-chrome="traditional"] .vip-hero-logo {
+  filter:
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.28))
+    drop-shadow(0 0 18px rgba(0, 0, 0, 0.45));
 }
 
 .vip-hero h1 {
