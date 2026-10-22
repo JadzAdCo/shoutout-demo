@@ -27,9 +27,9 @@ LAYERS = ROOT / "images/chrome/layers"
 FONT = "/usr/share/fonts/truetype/noto/NotoSansDisplay-Bold.ttf"
 TIFFANY = (0, 212, 254, 255)
 WHITE = (255, 255, 255, 255)
-# ShoutOut nightlife wordmark border theme (sampled from shoutout-nightlife.png)
-SHOOT_MAGENTA = (194, 37, 205, 255)  # white-letter neon outer (SHOUT)
-SHOOT_CYAN = (10, 208, 254, 255)  # cyan-letter neon outer (OUT) ≈ tiffany
+# VIP thin border theme: Tiffany blue + light purple (not thick ShoutOut neon)
+VIP_BORDER_PURPLE = (196, 140, 255, 255)  # light purple line on white letters
+VIP_BORDER_TIFFANY = (0, 212, 254, 255)  # tiffany line on V
 SHEAR = 0.286
 S = 1024
 CX = CY = 512
@@ -46,15 +46,16 @@ VIP_TEXT_H = int(round(FC_H * 1.20 * 0.90))  # 216 — baseline for IP
 # Nightlife v28: reser −10% again; IP stays upper-line at VIP_TEXT_H
 VIP_RESER_H = int(round(VIP_TEXT_H * 0.90))  # ~194
 VIP_IP_H = VIP_TEXT_H
-VIP_V = 194 * 2  # original tall V — never shrink
+# v29: V −7.5% from restored 388
+VIP_V = int(round(194 * 2 * 0.925))  # ~359
 # Chord must fit the lower arc so reser+V tips can kiss ≈ R-10 (not overhang)
-VIP_MAX_W = 760
-# Furniture: prior extract already +10%; v28 adds ×1.20 and a downward nudge
-VIP_FURN_SCALE = 1.20
-VIP_FURN_DOWN = 52  # keep lounge clear of top ring stroke
-# Neon stroke radii matching ShoutOut (≈3–4px outer; ~2px white inner on cyan)
-VIP_NEON_OUTER = 5
-VIP_NEON_INNER = 2
+VIP_MAX_W = 720
+# Furniture: v28 ×1.20; v29 +10% more and further down toward wordmark
+VIP_FURN_SCALE = 1.20 * 1.10  # 1.32
+VIP_FURN_DOWN = 100
+# Thin border line only (1–2px) — no thick neon bloom
+VIP_LINE_OUTER = 2
+VIP_LINE_INNER = 1
 
 
 def git_show(rev: str, path: str, dest: Path) -> None:
@@ -144,50 +145,36 @@ def _erode_mask(mask: np.ndarray, radius: int) -> np.ndarray:
     )
 
 
-def neon_border_glyph(fill_img: Image.Image, *, kind: str) -> Image.Image:
-    """Apply ShoutOut-style neon border theme onto an ink-only glyph.
+def thin_border_glyph(fill_img: Image.Image, *, kind: str) -> Image.Image:
+    """Thin line border — Tiffany blue + light purple (no thick neon bloom).
 
-    kind=\"white\": white fill + magenta neon outer glow (SHOUT).
-    kind=\"cyan\":  tiffany/cyan fill + white inner edge + cyan outer glow (OUT).
+    kind=\"white\": white fill + light-purple outline (reser / IP).
+    kind=\"cyan\":  tiffany fill + thin tiffany/light-purple outline (V).
     """
     src = fill_img.convert("RGBA")
     a = np.array(src)
     if not (a[:, :, 3] > 20).any():
         return src
-    pad = VIP_NEON_OUTER + 4
+    pad = VIP_LINE_OUTER + 3
     canvas = Image.new("RGBA", (src.size[0] + pad * 2, src.size[1] + pad * 2), (0, 0, 0, 0))
     canvas.paste(src, (pad, pad), src)
     ca = np.array(canvas)
     core = ca[:, :, 3] > 20
-    dil = _dilate_mask(core, VIP_NEON_OUTER)
-    outer = dil & ~core
-    soft = np.array(
-        Image.fromarray((outer.astype(np.uint8) * 255)).filter(ImageFilter.GaussianBlur(1.2))
-    )
+    dil = _dilate_mask(core, VIP_LINE_OUTER)
+    ring = dil & ~core
     out = np.zeros_like(ca)
     if kind == "white":
-        # Magenta glow under white fill (ShoutOut SHOUT)
-        glow = SHOOT_MAGENTA
-        hit = soft > 8
-        out[hit, 0] = glow[0]
-        out[hit, 1] = glow[1]
-        out[hit, 2] = glow[2]
-        out[hit, 3] = np.clip(soft[hit].astype(np.int16) + 80, 0, 255).astype(np.uint8)
-        ring = dil & ~_dilate_mask(core, max(1, VIP_NEON_OUTER - 2))
-        out[ring] = SHOOT_MAGENTA
+        out[ring] = VIP_BORDER_PURPLE
         out[core] = WHITE
     else:
-        # Cyan/tiffany fill + white inner border + cyan outer (ShoutOut OUT)
-        glow = SHOOT_CYAN
-        hit = soft > 8
-        out[hit, 0] = glow[0]
-        out[hit, 1] = glow[1]
-        out[hit, 2] = glow[2]
-        out[hit, 3] = np.clip(soft[hit].astype(np.int16) + 90, 0, 255).astype(np.uint8)
-        ring = dil & ~_dilate_mask(core, VIP_NEON_INNER)
-        out[ring] = (*SHOOT_CYAN[:3], 255)
-        white_rim = core & ~_erode_mask(core, VIP_NEON_INNER)
+        # Tiffany fill; outline mixes tiffany + light purple for the dual theme
+        out[ring] = VIP_BORDER_TIFFANY
+        # Soften outer edge with a 1px light-purple fringe
+        fringe = _dilate_mask(core, VIP_LINE_OUTER + 1) & ~dil
+        out[fringe] = VIP_BORDER_PURPLE
         out[core] = TIFFANY
+        # Hairline white inner rim
+        white_rim = core & ~_erode_mask(core, VIP_LINE_INNER)
         out[white_rim] = WHITE
     g = Image.fromarray(out, "RGBA")
     x0, y0, x1, y1 = ink_bbox(g, 8)
@@ -380,18 +367,29 @@ def scale_vip_furniture(g: Image.Image, scale: float, down: int) -> Image.Image:
     scaled = crop.resize((nw, nh), Image.Resampling.LANCZOS)
     # Center horizontally; vertical: prior center + down nudge, then clamp
     # Top clearance: stay below inner ring (clear of stroke)
-    top_clear = CY - (R - 36)
-    # Bottom of furniture must stay above wordmark band (~ lower third)
-    bottom_cap = 600
+    top_clear = CY - (R - 42)
+    # Lower furniture toward wordmark; leave ~20px band before type
+    bottom_cap = 692
     cx_f = (x0 + x1) / 2.0
     cy_f = (y0 + y1) / 2.0
     left = int(round(cx_f - nw / 2.0))
+    # Prefer the down nudge; clamp so bottom ≤ bottom_cap and top ≥ top_clear
     top = int(round(cy_f - nh / 2.0 + down))
-    top = max(top_clear, min(top, bottom_cap - nh))
+    if top + nh > bottom_cap:
+        top = bottom_cap - nh
+    if top < top_clear:
+        fit_h = bottom_cap - top_clear
+        if nh > fit_h and fit_h > 80:
+            shrink = fit_h / float(nh)
+            nw2 = max(1, int(round(nw * shrink)))
+            nh2 = max(1, int(round(nh * shrink)))
+            scaled = scaled.resize((nw2, nh2), Image.Resampling.LANCZOS)
+            nw, nh = nw2, nh2
+            left = int(round(cx_f - nw / 2.0))
+        top = max(top_clear, bottom_cap - nh)
     left = max(CX - (R - 28), min(left, CX + (R - 28) - nw))
     out = Image.new("RGBA", (S, S), (0, 0, 0, 255))
     out.alpha_composite(scaled, (left, top))
-    # Black outside / on ring annulus so ring layer owns the stroke
     oa = np.array(out)
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
@@ -683,13 +681,12 @@ def floqcast_wm():
 
 
 def vip_wm():
-    """reserVIP — IP upper line, reser lower line; tall tiffany V.
+    """reserVIP — IP top-aligned to V; reser lower; thin Tiffany/purple borders.
 
-    Nightlife v28: full reser OVER the ring (ShoutOut-style neon borders stay
-    legible on the kiss arc — under-ring \"re\" was swallowed by the stroke).
-    reser −10% vs prior VIP_TEXT_H; IP on upper line. Never shrink V.
+    v29: V −7.5%; IP flush with upper part of V; thin line borders (no thick neon);
+    full wordmark OVER the ring.
     """
-    V = neon_border_glyph(glyph("V", VIP_V, TIFFANY), kind="cyan")
+    V = thin_border_glyph(glyph("V", VIP_V, TIFFANY), kind="cyan")
     ov_r = int(V.size[0] * 0.14)
     ov_i = int(V.size[0] * 0.20)
     gap_pad = 8
@@ -701,8 +698,7 @@ def vip_wm():
             size = int(
                 max(50, min(280, round(size * target_h / max(1, finish(u, by).size[1]))))
             )
-        reser_body = neon_border_glyph(glyph("reser", size, WHITE), kind="white")
-        # Empty under layer — full reser paints over the ring (ShoutOut parity)
+        reser_body = thin_border_glyph(glyph("reser", size, WHITE), kind="white")
         RU = Image.new("RGBA", reser_body.size, (0, 0, 0, 0))
         return size, RU, reser_body, reser_body, 0
 
@@ -711,7 +707,7 @@ def vip_wm():
         for _ in range(8):
             g = glyph("IP", size, WHITE)
             size = int(max(50, min(280, round(size * target_h / max(1, g.size[1])))))
-        return size, neon_border_glyph(glyph("IP", size, WHITE), kind="white")
+        return size, thin_border_glyph(glyph("IP", size, WHITE), kind="white")
 
     reser_h_target = VIP_RESER_H
     ip_h_target = VIP_IP_H
@@ -730,25 +726,23 @@ def vip_wm():
         )
         if need <= VIP_MAX_W:
             break
-        # Shrink reser/IP only — V stays original 388
         reser_h_target = max(110, int(reser_h_target * 0.93))
         ip_h_target = max(120, int(ip_h_target * 0.93))
     else:
         print(f"  WARN VIP chord still wide after shrink loop need={need}")
 
     reser_h = reser_body.size[1]
-    # Two-line layout: IP upper (near V top-right); reser + V share lower baseline
-    H = max(V.size[1], reser_h + int(V.size[1] * 0.08), IP.size[1] + int(V.size[1] * 0.08)) + gap_pad * 2
+    # Canvas: V height dominates; IP top-aligned with V top
+    H = max(V.size[1], reser_h) + gap_pad * 2
     W = reser_body.size[0] + V.size[0] + IP.size[0] - ov_r - ov_i + gap_pad * 2
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     rx = gap_pad
-    ry = gap_pad + (H - gap_pad * 2 - reser_h)  # lower line — bottom-align
+    ry = gap_pad + (H - gap_pad * 2 - reser_h)  # lower line — bottom-align with V
     vx = rx + reser_body.size[0] - ov_r
     vy = gap_pad + (H - gap_pad * 2 - V.size[1])
     ix = vx + V.size[0] - ov_i
-    iy = vy + int(V.size[1] * 0.08)
-    # Full reser + V + IP all OVER the ring so neon borders stay readable
+    iy = vy  # align IP to the upper part / top of V
     over.alpha_composite(reser_body, (rx, ry))
     over.alpha_composite(V, (vx, vy))
     over.alpha_composite(IP, (ix, iy))
@@ -761,18 +755,25 @@ def vip_wm():
     U = crop_keep(under)
     O = crop_keep(over)
     B = Image.alpha_composite(U, O)
-    if B.size[0] > VIP_MAX_W + 40:
-        print(f"  WARN VIP width {B.size[0]} > {VIP_MAX_W} — check placement")
+    # Fit chord so tips can kiss inside the ring (wide body overhangs)
+    if B.size[0] > VIP_MAX_W:
+        fit = VIP_MAX_W / float(B.size[0])
+        nw = max(1, int(round(B.size[0] * fit)))
+        nh = max(1, int(round(B.size[1] * fit)))
+        U = U.resize((nw, nh), Image.Resampling.LANCZOS)
+        O = O.resize((nw, nh), Image.Resampling.LANCZOS)
+        B = Image.alpha_composite(U, O)
+        print(f"  VIP chord-fit ×{fit:.3f} → body={B.size}")
     wa = np.array(B)
     ww = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 200)
     wh_h = int(np.where(ww)[0].max() - np.where(ww)[0].min()) + 1 if ww.any() else 0
     tv = (wa[:, :, 3] > 20) & (wa[:, :, 0] < 100) & (wa[:, :, 1] > 150) & (wa[:, :, 2] > 180)
     vh = int(np.where(tv)[0].max() - np.where(tv)[0].min()) + 1 if tv.any() else 0
-    mag = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 150) & (wa[:, :, 2] > 150) & (wa[:, :, 1] < 120)
+    purp = (wa[:, :, 3] > 20) & (wa[:, :, 0] > 140) & (wa[:, :, 2] > 180) & (wa[:, :, 1] < 180)
     print(
-        f"  TYPE VIP reser size={size} (h≈{VIP_RESER_H}=prior−10%) IP size={ip_size} "
-        f"(upper) white_h={wh_h} V={VIP_V} tiffany_h={vh} neon_mag={int(mag.sum())} "
-        f"body={B.size} shoutout-border=1 over-ring=1"
+        f"  TYPE VIP reser size={size} IP size={ip_size} (top-align V) "
+        f"white_h={wh_h} V={VIP_V} (−7.5%) tiffany_h={vh} purple_line={int(purp.sum())} "
+        f"body={B.size} thin-border=tiffany+purple"
     )
     return U, O, B
 
@@ -976,7 +977,7 @@ def traditional_from_nightlife(
     typeish = (
         ((nr > 200) & (ng > 200) & (nb > 200))
         | ((nr < 120) & (ng > 150) & (nb > 180))
-        | ((nr > 150) & (nb > 140) & (ng < 120) & (nr > ng + 20))  # magenta neon stroke
+        | ((nr > 140) & (nb > 180) & (ng < 190) & (nb > ng))  # light-purple thin border
     ) & (yy > 650)
     typeish = (
         np.array(
@@ -1294,8 +1295,8 @@ def build_vip_only():
     print("=== assemble VIP (only) ===")
     g = Image.open(vip_g)
     under, over, body = vip_wm()
-    furn_bottom = graphic_bottom(g, 640)
-    vip_min = furn_bottom + 14
+    furn_bottom = graphic_bottom(g, 700)
+    vip_min = furn_bottom + 8
     left = max(4, (S - body.size[0]) // 2)
     top = min(max(vip_min, S - body.size[1] - 40), S - body.size[1] - 4)
     ba = np.array(body)
@@ -1319,13 +1320,12 @@ def build_vip_only():
         for t in range(vip_min, S - body.size[1] - 2, 1):
             rd_r = float(np.hypot(L + reser_bx - CX, t + reser_bot - CY))
             rd_v = float(np.hypot(L + v_bx - CX, t + v_bot - CY))
-            if max(rd_r, rd_v) > (R + 8):
+            if max(rd_r, rd_v) > (R + 4):
                 continue
             sc = abs(rd_r - TIP_TARGET) * 1.4 + abs(rd_v - TIP_TARGET)
             if sc < best_sc:
                 best_sc, best_t, best_left = sc, t, L
     if best_sc >= 1e17:
-        # Fallback: drop until mean bottom tip crosses R-12
         best_left = left
         for t in range(vip_min, S - body.size[1] - 2, 1):
             rd_r = float(np.hypot(left + reser_bx - CX, t + reser_bot - CY))
@@ -1337,7 +1337,7 @@ def build_vip_only():
     top, left = best_t, best_left
     print(
         f"  place VIP left={left} top={top} body={body.size} furn_bottom={furn_bottom} "
-        f"kiss_score={best_sc:.1f}"
+        f"kiss_score={best_sc:.1f} gap={top - furn_bottom}"
     )
     vip = assemble(g, under, over, left, top, nightlife=True)
     vip.convert("RGB").save(
@@ -1350,9 +1350,9 @@ def build_vip_only():
         ROOT / "images/chrome/vip-traditional.jpg", quality=98, subsampling=0
     )
     preview = vip.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/vip-nightlife-v28.png", quality=95)
+    preview.save("/opt/cursor/artifacts/vip-nightlife-v29.png", quality=95)
     trad.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS).save(
-        "/opt/cursor/artifacts/vip-traditional-v28.png", quality=95
+        "/opt/cursor/artifacts/vip-traditional-v29.png", quality=95
     )
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)

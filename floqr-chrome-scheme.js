@@ -27,7 +27,7 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.01";
+  const ICON_V = "s3.2.02";
   const ICON_PACK = {
     traditional: {
       floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
