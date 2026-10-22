@@ -1621,17 +1621,17 @@
     {
       id: "help-default-template",
       title: "Default Template",
-      body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
-      searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
+      body: "Free Traditional Black and White Classic. The card shows a true LED preview at this venue’s primary display size (name and dimension on top; description and tags below). Tap Use to open the editor. Search above for public, club-approved, and personal templates by name, description, tags, or popularity.",
+      searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive", "template search", "led preview", "use template"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"
     },
     {
       id: "help-floqai-template-search",
-      title: "FloqAi template search",
-      body: "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.",
-      searchPhrases: ["floqai template", "sports jersey", "nba nfl cars humor"],
+      title: "Template search",
+      body: "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venue primary size — Use is the only action.",
+      searchPhrases: ["floqai template", "template search", "sports jersey", "nba nfl cars humor", "search templates", "led preview"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"

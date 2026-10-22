@@ -774,10 +774,28 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 .template-heading-row{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:nowrap;margin:0 0 10px}
 .template-heading-row h3{margin:0}
 .template-heading-row .help-popout{justify-self:auto;margin:0;flex:0 0 auto}
-.template-floqai-search-panel{margin:0 0 14px;padding:14px;border:1px solid rgba(38,216,255,.35);border-radius:18px;background:linear-gradient(180deg,rgba(38,216,255,.12),rgba(6,16,28,.45))}
+.template-floqai-search-panel,.template-select-search-panel{margin:0 0 16px;padding:0;border:0;background:transparent;box-shadow:none}
+.template-select-search-panel.category-floqai-search{width:100%}
+.template-select-search-panel .category-floqai-form{width:100%;margin:0}
+.template-select-search-panel .category-floqai-field input.search{margin-top:0}
 .template-floqai-search-panel .intent-help{display:block;margin:0 0 8px;font-size:clamp(16px,3.2vw,22px);font-weight:900;color:#fff}
 .template-floqai-search-panel .search{margin:0}
 .template-floqai-mount .floqai-template-hint{margin:0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.35}
+/* Template select — LED-true card: name+dim top, board preview, desc/tags, Use only */
+.template-select-grid{grid-template-columns:minmax(0,1fr)!important;gap:18px}
+.template-section-default .template-select-grid{grid-template-columns:minmax(0,420px)!important}
+.template-select-card{display:flex;flex-direction:column;gap:12px;padding:16px;min-height:0}
+.template-select-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0}
+.template-select-head .name{margin:0;font-size:clamp(1.05rem,3.4vw,1.35rem);line-height:1.2;flex:1 1 auto}
+.template-select-dim{flex:0 0 auto;font-size:13px;font-weight:900;letter-spacing:.04em;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.28);color:#fff;white-space:nowrap}
+html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,40,40,.45);background:rgba(0,0,0,.06);color:#2a2a2a}
+.template-select-led{position:relative;width:100%;max-width:100%;margin:0 auto;border-radius:14px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.template-select-led.floqr-board-frame,.template-select-led .floqr-board-frame{width:100%;max-width:100%}
+.template-select-frame{display:block;border:0;pointer-events:none;background:#000}
+.template-select-desc{margin:0;color:var(--muted);font-size:14px;font-weight:700;line-height:1.4}
+.template-select-meta{margin-top:0}
+.template-select-card .template-card-actions{margin-top:4px}
+.template-select-card .template-card-actions .primary{width:100%;min-height:48px}
 .floqai-agent.hidden{display:none!important}
 .media-upload-card{margin:16px 0}
 .media-upload-card label{margin-bottom:10px}

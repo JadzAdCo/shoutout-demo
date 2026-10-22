@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.20";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.20";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.21";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.21";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,38 +223,49 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.21",
+      title: "s3.2.21 — Template select LED preview + Search lens",
+      checks: [
+        {label:"Package version s3.2.21", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.21\""]},
+        {label:"Template search lens form", file:"index.html", includes:["id=\"templateSearchForm\"", "id=\"templateSearchGo\"", "category-floqai-lens"]},
+        {label:"LED preview helpers", file:"patron-app.js", includes:["templateLedPreviewHtml", "mountTemplateLedPreviews", "primaryTemplateFormat"]},
+        {label:"Use-only card actions", file:"patron-app.js", includes:["data-template-open", "template-select-card"], notIncludes:["data-template-preview=\"${esc(template.id)}\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.21\""]}
+      ]
+    },
+    {
       version: "s3.2.20",
       title: "s3.2.20 — Site chrome from FloqR tile palette",
       checks: [
-        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.20\""]},
+        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.21\""]},
         {label:"Tile palette CSS vars", file:"styles.css", includes:["--floqr-tile-cyan:#00c8ff", "--floqr-tile-magenta:#ff2eb8", "--floqr-brand-gradient-h"]},
         {label:"Login stack uses tile gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,var(--floqr-tile-cyan)", "var(--floqr-tile-violet)", "var(--floqr-tile-magenta)"]},
         {label:"Theme blocks consume tile accents", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"]", "--accent:var(--floqr-tile-cyan)", "html[data-floqr-chrome=\"blackTiffany\"]", "html[data-floqr-chrome=\"whiteBlack\"]", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
         {label:"Palette ref path in CSS", file:"styles.css", includes:["images/chrome/floqr-tile-palette-ref.png", "--floqr-tile-coral:#ff4d6a"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.20\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.21\""]}
       ]
     },
     {
       version: "s3.2.19",
       title: "s3.2.19 — Search lens in input + grey halo icons (no black tile)",
       checks: [
-        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.20\""]},
+        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.21\""]},
         {label:"Search lens submit in field", file:"index.html", includes:["category-floqai-field", "category-floqai-lens", "id=\"categoryFloqAiGo\""]},
         {label:"Lens CSS no fill shiny outline", file:"floqai-search.css", includes:[".category-floqai-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
         {label:"Icon faces transparent + tile halo", file:"styles.css", includes:["background:transparent", "rgba(0,200,255,.28)", "rgba(255,46,184,.2)"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.20\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.21\""]}
       ]
     },
     {
       version: "s3.2.18",
       title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
       checks: [
-        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.20\""]},
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.21\""]},
         {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
         {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
         {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
         {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.20\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.21\""]}
       ]
     },
     {
@@ -264,9 +275,9 @@
         {label:"Login welcome + compact grid", file:"index.html", includes:["app.welcomeSignIn", "Welcome. Please Sign-in / Sign-up", "i18n-text\">Google", "loginActions"]},
         {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
         {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
-        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.20"]},
+        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.21"]},
         {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.20\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.21\""]}
       ]
     },
 
@@ -2014,6 +2025,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-21-template-select-led-search",
+      area:"ShoutOut template gallery",
+      feature:"Template select Search lens + LED-true Use-only cards",
+      changed:"Template page always shows Search-page lens field. Cards render display.html stock preview at venue primary LED size (name+dimension on top; description/tags below). Only Use remains (Preview/Customize removed from cards). Package s3.2.21.",
+      howToTest:"1) Hard-refresh Search, start ShoutOut → Aurelia (or any venue) template page (?v=s3.2.21). 2) Lens search field is under club meta (same chrome as Search). 3) Default card shows true LED board (not mini CSS thumbnail); top shows template name + e.g. 96×48. 4) Only Use button — no Preview / Customize Background. 5) Search jersey/VIP/birthday — official + club/personal matches; popularity/name ranking. 6) Use opens editor.",
+      expected:"Lens search filters templates; each card is a primary-size LED preview with Use only.",
+      troubleshoot:"No lens → index.html templateSearchForm + floqai-search.css. Mini CSS preview still → patron-app templateLedPreviewHtml + floqr-board-frame.js. Wrong size → venue primaryDisplayScreenFormatId. Preview/Customize still there → hard refresh patron-app.js s3.2.21."
+    },
     {
       id:"s3-2-20-tile-palette-site-chrome",
       area:"Site chrome",

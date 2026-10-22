@@ -28,6 +28,23 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Template selection — LED-true cards + Search lens (s3.2.21)
+
+**Purpose:** Venue template pick uses the Search-page lens field, contextual template-only search, and a true LED preview at the venue primary display size.
+
+| Layer | Wiring |
+|---|---|
+| Surface | `index.html` `#templateSelectPage` — `#templateSearchForm` / `#templateSearch` + `#templateSearchGo.category-floqai-lens` (always visible) |
+| Client | `patron-app.js` — `templateLedPreviewHtml`, `mountTemplateLedPreviews`, `primaryTemplateFormat`; cards Use-only |
+| Preview | `floqr-template-preview.js` `previewUrl` + `sampleFor` stock text/media; `floqr-board-frame.js` mounts native aspect |
+| Format | Venue `primaryDisplayScreenFormatId` (fallback overlapping formats); label on card head with template name |
+| Search scope | Official / club-approved / personal / community via `floqrSearch` + tags/description/popularity ranking |
+| CSS | `styles.css` `.template-select-*`; reuses `floqai-search.css` lens field |
+| Help | `help-default-template`, `help-floqai-template-search` |
+| Diagnostics | Manual test `s3-2-21-template-select-led-search` |
+
+---
+
 ## Login + Search chrome (s3.2.20)
 
 **Purpose:** Compact sign-in, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome, Traditional charcoal profile chip.

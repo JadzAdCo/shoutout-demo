@@ -117,14 +117,24 @@ test("Firestore rules enforce the template roles", () => {
   assert.match(rules, /FLOQR FIRESTORE RULES VERSION: s3\.1\.11-template-rbac/);
 });
 
-test("Preview button, tag search and role assignment are wired", () => {
+test("Template select LED preview, Use-only, tag search and roles are wired", () => {
   const app = read("patron-app.js");
-  assert.match(app, /data-template-preview="\$\{esc\(template\.id\)\}"/);
-  assert.match(app, /window\.FLOQRTemplatePreview\?\.open\(template/);
+  assert.match(app, /templateLedPreviewHtml/);
+  assert.match(app, /mountTemplateLedPreviews/);
+  assert.match(app, /primaryTemplateFormat/);
+  assert.match(app, /data-template-open="\$\{esc\(template\.id\)\}"/);
+  assert.doesNotMatch(app, /data-template-preview="\$\{esc\(template\.id\)\}"/);
+  assert.doesNotMatch(app, /data-template-customize="\$\{esc\(template\.id\)\}"/);
+  assert.match(app, /FLOQRTemplatePreview\.previewUrl/);
+  assert.match(app, /FLOQRBoardFrame\.mount/);
   assert.match(app, /\$\{venueTagsFor\(t\)\.join\(" "\)\}/);
   const index = read("index.html");
+  assert.match(index, /id="templateSearchForm"/);
+  assert.match(index, /id="templateSearchGo"[^>]*class="category-floqai-lens"/);
+  assert.doesNotMatch(index, /id="templateSearchPanel"[^>]*\bhidden\b/);
   assert.ok(index.indexOf("floqr-template-preview.js") < index.indexOf("patron-app.js"));
   assert.ok(index.indexOf("floqr-template-tags.js") < index.indexOf("patron-app.js"));
+  assert.ok(index.indexOf("floqr-board-frame.js") < index.indexOf("patron-app.js"));
   const rep = read("admin-rep-extension.js");
   assert.match(rep, /\["administerTemplates", /);
   assert.match(rep, /\["manageTemplates", /);
