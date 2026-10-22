@@ -15,7 +15,7 @@ Reusable recipe for **FloqCAST**, **djBOT**, **VIP reserVIP**, and peers (ShoutO
 | Ring radius | `R = 490`, stroke width ≈ 14 |
 | Outside | `dist > 498…502` → pure black |
 | Nightlife | Magenta→tiffany gradient ring (see `rebuild_ring()` pattern) |
-| Traditional | Same interior/wordmark; **no** nightlife ring (or borderless square pack) |
+| Traditional | **100% same** graphic + wordmark as nightlife; **only** omit the gradient ring (`traditional_from_nightlife`) |
 
 Solid `#000` field inside the ring. **Ink-only wordmarks** — never an opaque plate/rect behind type.
 

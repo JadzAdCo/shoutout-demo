@@ -435,7 +435,7 @@ def floqcast_wm():
     floq_body = Image.fromarray(ink_only(fa), "RGBA")
     print(f"  Floq split under={int(flmask.sum())} over={int((ink & ~flmask).sum())}")
 
-    # --- CAST at +15%: CAS white + T tiffany (no white under T) ---
+    # --- CAST at +15%: CAS white + T fully tiffany (no white fringe) ---
     font_c = ImageFont.truetype(FONT, int(size_c))
     cast_u, by_c = render_upright("CAST", size_c, WHITE)
     bb_c = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
@@ -450,29 +450,67 @@ def floqcast_wm():
 
     full_c = finish(cast_u, by_c, crop=False)
     pre_c = layer_c("CAS")
+    # T = shared-canvas remainder after CAS (never paint lone "T" at origin — that hits left)
     cx0, cy0, cx1, cy1 = ink_bbox(full_c, 12)
     cbox = (cx0, cy0, cx1 + 1, cy1 + 1)
     ca = np.array(full_c.crop(cbox))
     pa = np.array(pre_c.crop(cbox))
-    cink = ca[:, :, 3] > 20
-    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(3)))
-    tmask = cink & (pre_a < 10)
+    cink = ca[:, :, 3] > 15
+    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(5)))
+    tmask = cink & (pre_a < 8)
     xs = np.where(tmask)[1]
     if len(xs):
-        tmask[:, : int(np.percentile(xs, 8))] = False
+        tmask[:, : int(np.percentile(xs, 5))] = False
+    # Dilate T mask so antialias fringe is included, then force solid tiffany
     tmask = (
         np.array(
-            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(3))
+            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(9))
         )
-        > 127
-    ) & cink
+        > 0
+    ) & (ca[:, :, 3] > 8)
     cast_over = np.zeros_like(ca)
     cast_over[cink] = (255, 255, 255, 255)
     cast_over[tmask, 0] = TIFFANY[0]
     cast_over[tmask, 1] = TIFFANY[1]
     cast_over[tmask, 2] = TIFFANY[2]
     cast_over[tmask, 3] = 255
+    # Kill any remaining near-white pixels inside dilated T (full tiffany cover)
+    near_white_t = (
+        tmask
+        & (cast_over[:, :, 0] > 140)
+        & (cast_over[:, :, 1] > 140)
+        & (cast_over[:, :, 2] > 140)
+    )
+    cast_over[near_white_t, 0] = TIFFANY[0]
+    cast_over[near_white_t, 1] = TIFFANY[1]
+    cast_over[near_white_t, 2] = TIFFANY[2]
+    cast_over[near_white_t, 3] = 255
     CAST = Image.fromarray(ink_only(cast_over), "RGBA")
+    # Verify: zero white inside T cluster
+    _ta = np.array(CAST)
+    _tw = (
+        (_ta[:, :, 3] > 20)
+        & (_ta[:, :, 0] > 200)
+        & (_ta[:, :, 1] > 200)
+        & (_ta[:, :, 2] > 200)
+    )
+    _tt = (
+        (_ta[:, :, 3] > 20)
+        & (_ta[:, :, 0] < 100)
+        & (_ta[:, :, 1] > 150)
+        & (_ta[:, :, 2] > 180)
+    )
+    if _tt.any():
+        _td = np.array(
+            Image.fromarray((_tt.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(7))
+        ) > 0
+        _ghost = _tw & _td
+        if _ghost.any():
+            _ta[_ghost, 0] = TIFFANY[0]
+            _ta[_ghost, 1] = TIFFANY[1]
+            _ta[_ghost, 2] = TIFFANY[2]
+            CAST = Image.fromarray(_ta, "RGBA")
+            print(f"  CAST T: forced tiffany on {int(_ghost.sum())} fringe px")
 
     # Baseline-align: Floq ink top→baseline ≈ "Flo" height; CAST sits on that baseline
     flo_cap_h = glyph("Flo", size_f, WHITE).size[1]
@@ -598,6 +636,82 @@ def paste_type(layer: Image.Image, left: int, top: int) -> Image.Image:
     return full
 
 
+def force_tiffany_T(img: Image.Image, left: int, top: int, over: Image.Image) -> Image.Image:
+    """Ensure every T ink pixel is solid tiffany — no white fringe/ghost."""
+    a = np.array(img.convert("RGBA"))
+    ov = np.array(paste_type(over, left, top))
+    t_src = (
+        (ov[:, :, 3] > 15)
+        & (ov[:, :, 0] < 120)
+        & (ov[:, :, 1] > 140)
+        & (ov[:, :, 2] > 170)
+    )
+    if not t_src.any():
+        return img
+    t_dil = (
+        np.array(
+            Image.fromarray((t_src.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(11))
+        )
+        > 0
+    )
+    white = (a[:, :, 0] > 180) & (a[:, :, 1] > 180) & (a[:, :, 2] > 180)
+    # Recolor only over-layer T footprint (+ white ghosts on that footprint)
+    hit = (t_dil & t_src) | (t_dil & white & (ov[:, :, 3] > 15))
+    a[hit, 0] = TIFFANY[0]
+    a[hit, 1] = TIFFANY[1]
+    a[hit, 2] = TIFFANY[2]
+    a[hit, 3] = 255
+    print(f"  force_tiffany_T px={int(hit.sum())}")
+    return Image.fromarray(a, "RGBA")
+
+
+def traditional_from_nightlife(
+    nightlife: Image.Image,
+    graphic: Image.Image,
+    under: Image.Image,
+    over: Image.Image,
+    left: int,
+    top: int,
+) -> Image.Image:
+    """Traditional = same graphic + type + placement as nightlife; no gradient ring.
+
+    Re-assembles identical layers without the ring (do not strip the ring off the
+    finished nightlife frame — that permanently erases Fl where the ring covered it).
+    """
+    trad = assemble(graphic, under, over, left, top, nightlife=False)
+    ta = np.array(trad.convert("RGBA"))
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    r, gch, bch = [ta[:, :, i].astype(int) for i in range(3)]
+    sat = (np.maximum(np.maximum(r, gch), bch) - np.minimum(np.minimum(r, gch), bch)) > 40
+    under_full = np.array(paste_type(under, left, top))
+    over_full = np.array(paste_type(over, left, top))
+    type_ink = (under_full[:, :, 3] > 20) | (over_full[:, :, 3] > 20)
+    # Kill any leftover ring bloom from the graphic extract in the annulus
+    crumb = (
+        (dist > 468)
+        & (dist < 505)
+        & sat
+        & ~type_ink
+        & ~((r > 200) & (gch > 200) & (bch > 200))
+        & ~((r < 100) & (gch > 150) & (bch > 180))
+        & ~((r > 140) & (bch > 140) & (r > gch + 20))  # keep pink LED crumbs if any
+    )
+    ta[crumb, :3] = 0
+    ta[:, :, 3] = 255
+    # Verify graphic match vs nightlife outside the ring stroke
+    na = np.array(nightlife.convert("RGBA"))
+    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
+    interior = (dist < 460) & ~ring
+    hot = int(
+        (
+            (np.abs(na.astype(int) - ta.astype(int)).sum(axis=2) > 30) & interior
+        ).sum()
+    )
+    print(f"  traditional interior vs nightlife hot={hot}")
+    return Image.fromarray(ta, "RGBA")
+
+
 # ── 4. ASSEMBLE ─────────────────────────────────────────────────
 
 
@@ -697,15 +811,25 @@ def build_all():
     under, over, body = floqcast_wm()
     left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
     fc = assemble(g, under, over, left, top, nightlife=True)
+    fc = force_tiffany_T(fc, left, top, over)
     fc.save(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png", optimize=True)
     yy, xx = np.indices((S, S))
     c = np.where(((xx // 16) + (yy // 16)) % 2 == 0, 50, 28).astype(np.uint8)
     Image.alpha_composite(
         Image.fromarray(np.dstack([c, c, c, np.full_like(c, 255)]), "RGBA"), fc
     ).save(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette-preview.png")
-    # traditional green: graphic + type, no ring
-    trad = assemble(g, under, over, left, top, nightlife=False)
+    # Traditional = 100% same layers/placement as nightlife, only omit the gradient ring
+    trad = traditional_from_nightlife(fc, g, under, over, left, top)
+    trad = force_tiffany_T(trad, left, top, over)
     trad.save(ROOT / "images/chrome/floqcast-traditional-green.png", optimize=True)
+    trad.convert("RGB").save(
+        ROOT / "images/chrome/floqcast-traditional.jpg", quality=98, subsampling=0
+    )
+    trad.save(ROOT / "images/review/actual-icons/floqcast-traditional.png", optimize=True)
+    shutil.copy(
+        ROOT / "images/chrome/floqcast-traditional-green.png",
+        ROOT / "images/review/actual-icons/floqcast-traditional-green.png",
+    )
     fc_top = top
 
     # djBOT
@@ -719,8 +843,9 @@ def build_all():
     dj.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS).save(
         ROOT / "images/review/floqbot-nightlife-preview.jpg", quality=92
     )
-    trad = assemble(g, under, over, left, top, nightlife=False)
+    trad = traditional_from_nightlife(dj, g, under, over, left, top)
     trad.save(ROOT / "images/chrome/floqbot-traditional-green.png", optimize=True)
+    # White-T traditional variant (tiffany → white) for legacy pack
     ta = np.array(trad)
     yy, xx = np.indices((S, S))
     tm = (
@@ -814,22 +939,30 @@ def build_all():
         ROOT / "images/chrome/vip-nightlife.jpg", quality=98, subsampling=0
     )
     vip.save(ROOT / "images/review/actual-icons/vip-reserv-actual.png", optimize=True)
-    trad = assemble(g, under, over, left, top, nightlife=False)
+    trad = traditional_from_nightlife(vip, g, under, over, left, top)
     trad.convert("RGB").save(
         ROOT / "images/chrome/vip-traditional.jpg", quality=98, subsampling=0
     )
 
-    # QA strip
-    panel = Image.new("RGB", (960, 360), (0, 0, 0))
+    # QA strip — nightlife vs traditional FloqCAST
+    panel = Image.new("RGB", (900, 400), (0, 0, 0))
     d = ImageDraw.Draw(panel)
-    for label, path, x in [
-        ("FloqCAST restored", ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png", 20),
-        ("djBOT", ROOT / "images/chrome/floqbot-nightlife.png", 330),
-        ("VIP no-cut", ROOT / "images/chrome/vip-nightlife.jpg", 640),
-    ]:
-        panel.paste(Image.open(path).convert("RGB").resize((280, 280)), (x, 50))
-        d.text((x, 12), label, fill=(180, 180, 180))
+    panel.paste(
+        Image.open(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png")
+        .convert("RGB")
+        .resize((360, 360)),
+        (40, 30),
+    )
+    panel.paste(
+        Image.open(ROOT / "images/chrome/floqcast-traditional-green.png")
+        .convert("RGB")
+        .resize((360, 360)),
+        (480, 30),
+    )
+    d.text((40, 8), "Nightlife", fill=(180, 180, 180))
+    d.text((480, 8), "Traditional (= nightlife, no ring)", fill=(180, 180, 180))
     panel.save("/opt/cursor/artifacts/qa-modular-chrome.png")
+    panel.save("/opt/cursor/artifacts/fc-nightlife-vs-traditional.png")
 
     # Verify VIP tips inside
     a = np.array(vip.convert("RGB"))
