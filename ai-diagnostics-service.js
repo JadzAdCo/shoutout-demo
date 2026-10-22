@@ -1970,10 +1970,10 @@
       id:"s3-2-06-white-black-chrome",
       area:"Site chrome + icons",
       feature:"White/Black theme + themed VIP icon packs",
-      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/FloqAi/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.06.",
-      howToTest:"1) Hard-refresh Language Settings (s3.2.06) with Site chrome beta. 2) Switch White/Black — page is white with charcoal text and slim dark borders; Search tiles show whiteblack icons. 3) Black Tiffany / Black Dark Green swap VIP tile art. 4) Traditional / Nightlife still work.",
+      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/FloqAi/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.07.",
+      howToTest:"1) Hard-refresh Language Settings (s3.2.07) with Site chrome beta. 2) Switch White/Black — page is white with charcoal text and slim dark borders; Search tiles show whiteblack icons. 3) Black Tiffany / Black Dark Green swap VIP tile art. 4) Traditional / Nightlife still work.",
       expected:"Five themes selectable; White/Black is light; icons match theme.",
-      troubleshoot:"No White/Black button → hard refresh patron-portal + floqr-i18n s3.2.06. Icons stuck dark → confirm ICON_PACK whiteBlack paths 200."
+      troubleshoot:"No White/Black button → hard refresh patron-portal + floqr-i18n s3.2.07. Icons stuck dark → confirm ICON_PACK whiteBlack paths 200."
     },
     {
       id:"s3-2-03-black-tiffany-dark-green-lyft-type",

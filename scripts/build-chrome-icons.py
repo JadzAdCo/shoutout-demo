@@ -50,14 +50,19 @@ VIP_IP_H = VIP_TEXT_H
 VIP_V = int(round(194 * 2 * 0.925))  # ~359
 # Chord must fit the lower arc so reser+V tips can kiss ≈ R-10 (not overhang)
 VIP_MAX_W = 720
-# Furniture: v28 ×1.20; v29 +10%; v30 +~8% more and further toward wordmark
-VIP_FURN_SCALE = 1.20 * 1.10 * 1.08  # ~1.4256
-VIP_FURN_DOWN = 130
+# Furniture: v28 ×1.20; v29 +10%; v30 +~8%; v31 slight pull-up for raised mark
+VIP_FURN_SCALE = 1.20 * 1.10 * 1.05  # ~1.386
+VIP_FURN_DOWN = 118
 # Thin border line only (1–2px) — no thick neon bloom
 VIP_LINE_OUTER = 2
 VIP_LINE_INNER = 1
 # Wordmark: bias whole mark right when placing (px)
 VIP_PLACE_RIGHT = 42
+# v31: thinner ring stroke; wordmark raised so over-type clears lower arc
+RING_STROKE = 8  # was 14
+# Over-type just clears inner ring; "re" stays under the stroke
+VIP_TIP_TARGET = R - (RING_STROKE // 2) - 6  # ~ just inside thin ring
+VIP_FURN_GAP = 14  # min px between furniture bottom and wordmark top
 
 
 def git_show(rev: str, path: str, dest: Path) -> None:
@@ -219,10 +224,10 @@ def build_ring() -> Image.Image:
             start=a0 - 90,
             end=a0 - 90 + 2,
             fill=(*color_at(a0 / 360), 255),
-            width=14,
+            width=RING_STROKE,
         )
-    bloom = np.array(ring.filter(ImageFilter.GaussianBlur(3.0)))
-    bloom[:, :, 3] = (bloom[:, :, 3].astype(np.float32) * 0.35).astype(np.uint8)
+    bloom = np.array(ring.filter(ImageFilter.GaussianBlur(2.0)))
+    bloom[:, :, 3] = (bloom[:, :, 3].astype(np.float32) * 0.28).astype(np.uint8)
     return Image.alpha_composite(Image.fromarray(bloom, "RGBA"), ring)
 
 
@@ -370,8 +375,8 @@ def scale_vip_furniture(g: Image.Image, scale: float, down: int) -> Image.Image:
     # Center horizontally; vertical: prior center + down nudge, then clamp
     # Top clearance: stay below inner ring (clear of stroke)
     top_clear = CY - (R - 44)
-    # Lower furniture toward wordmark; leave small band before V/IP
-    bottom_cap = 722
+    # Lower furniture toward wordmark; leave band for raised v31 wordmark
+    bottom_cap = 708
     cx_f = (x0 + x1) / 2.0
     cy_f = (y0 + y1) / 2.0
     left = int(round(cx_f - nw / 2.0))
@@ -756,10 +761,10 @@ def _split_reser_under(reser_body: Image.Image, size: int, under_letters: str):
     return RU, RO, int(um.sum())
 
 
-def vip_wm(under_letters: str = "r"):
-    """reserVIP — IP top-aligned to V; r/re UNDER ring; rest OVER.
+def vip_wm(under_letters: str = "re"):
+    """reserVIP — IP top-aligned to V; 're' UNDER ring; rest OVER.
 
-    v30: IP tucked to match reser↔V gap; r (or re) under ring; thin borders.
+    v31: only 're' under ring; thinner ring; wordmark raised to clear lower arc.
     """
     V = thin_border_glyph(glyph("V", VIP_V, TIFFANY), kind="cyan")
     # reser↔V reference gap; IP tighter so optical gap matches r↔V (IP is smaller/higher)
@@ -854,8 +859,12 @@ def vip_wm(under_letters: str = "r"):
         g_vi = (int(np.where(ip_w)[1].min()) - vr) if ip_w.any() else -1
     else:
         g_rv = g_vi = -1
+    # Fit chord width, then a touch smaller so over-type clears the thin ring
+    fit = 1.0
     if B.size[0] > VIP_MAX_W:
         fit = VIP_MAX_W / float(B.size[0])
+    fit *= 0.92  # v31: slightly smaller mark → clears lower arc when raised
+    if fit < 0.999:
         nw = max(1, int(round(B.size[0] * fit)))
         nh = max(1, int(round(B.size[1] * fit)))
         U = U.resize((nw, nh), Image.Resampling.LANCZOS)
@@ -1401,17 +1410,35 @@ def build_all():
     print("DONE — layers in", LAYERS)
 
 
-def _place_vip_wordmark(body, furn_bottom: int):
-    """Kiss lower arc; bias whole mark slightly right (VIP_PLACE_RIGHT)."""
-    vip_min = furn_bottom + 8
+def _place_vip_wordmark(body, furn_bottom: int, over: Image.Image | None = None):
+    """Raise mark so over-type clears lower ring; bias right (VIP_PLACE_RIGHT).
+
+    Tips are measured on the OVER layer only (ser + V + IP) so under-layer
+    're' may still sit in the ring stroke. Furniture gap ≥ VIP_FURN_GAP.
+    """
+    vip_min = furn_bottom + VIP_FURN_GAP
     left0 = max(4, (S - body.size[0]) // 2 + VIP_PLACE_RIGHT)
-    top0 = min(max(vip_min, S - body.size[1] - 40), S - body.size[1] - 4)
-    ba = np.array(body)
+    # Measure from over layer (excludes under 're')
+    src = over if over is not None else body
+    ba = np.array(src)
+    # Align over crop to body bbox if sizes match after vip_wm crop
+    if over is not None and over.size != body.size:
+        ba = np.array(body)  # fallback
     ink = ba[:, :, 3] > 40
     ys, xs = np.where(ink)
-    x_med = int(np.median(xs)) if len(xs) else body.size[0] // 2
-    left_band = ink & (np.arange(ba.shape[1])[None, :] < x_med)
-    v_band = ink & (np.arange(ba.shape[1])[None, :] >= x_med)
+    if not len(ys):
+        return left0, vip_min, -1.0, vip_min
+    r, g, b, al = (ba[:, :, i].astype(int) for i in range(4))
+    tiffany = ink & (r < 100) & (g > 150) & (b > 180)
+    white = ink & (r > 200) & (g > 200) & (b > 200)
+    if tiffany.any():
+        v_band = tiffany
+        vl = int(np.where(tiffany)[1].min())
+        over_left = white & (np.arange(ba.shape[1])[None, :] < vl)
+    else:
+        x_med = int(np.median(xs))
+        v_band = ink & (np.arange(ba.shape[1])[None, :] >= x_med)
+        over_left = white & (np.arange(ba.shape[1])[None, :] < x_med)
 
     def bottom_tip(band):
         bys, bxs = np.where(band)
@@ -1420,77 +1447,234 @@ def _place_vip_wordmark(body, furn_bottom: int):
         bot = int(bys.max())
         return bot, int(bxs[bys == bot].mean())
 
-    reser_bot, reser_bx = bottom_tip(left_band)
     v_bot, v_bx = bottom_tip(v_band)
-    best_t, best_left, best_sc = top0, left0, 1e18
-    for L in range(max(4, left0 - 40), min(S - body.size[0] - 4, left0 + 80) + 1, 2):
-        for t in range(vip_min, S - body.size[1] - 2, 1):
-            rd_r = float(np.hypot(L + reser_bx - CX, t + reser_bot - CY))
-            rd_v = float(np.hypot(L + v_bx - CX, t + v_bot - CY))
-            if max(rd_r, rd_v) > (R + 4):
+    ol_bot, ol_bx = bottom_tip(over_left) if over_left.any() else (v_bot, v_bx)
+    # Also track IP / right white tip
+    if tiffany.any():
+        vr = int(np.where(tiffany)[1].max())
+        over_right = white & (np.arange(ba.shape[1])[None, :] > vr)
+    else:
+        over_right = np.zeros_like(ink)
+    or_bot, or_bx = bottom_tip(over_right) if over_right.any() else (v_bot, v_bx)
+
+    best_t, best_left, best_sc = vip_min, left0, 1e18
+    ring_inner = R - (RING_STROKE / 2.0) - 3.0
+    # Sample over-edge ink for a real max-radial check (catches IP / V sides)
+    edge = ink.copy()
+    edge[1:-1, 1:-1] = ink[1:-1, 1:-1] & ~(
+        ink[:-2, 1:-1] & ink[2:, 1:-1] & ink[1:-1, :-2] & ink[1:-1, 2:]
+    )
+    ey, ex = np.where(edge)
+    if not len(ey):
+        ey, ex = ys, xs
+
+    def max_radial(L, t):
+        return float(np.sqrt((ex + L - CX) ** 2 + (ey + t - CY) ** 2).max())
+
+    for L in range(max(4, left0 - 48), min(S - body.size[0] - 4, left0 + 96) + 1, 2):
+        max_t = S - body.size[1] - 2
+        for t in range(vip_min, max_t + 1, 1):
+            mr = max_radial(L, t)
+            # Hard: over footprint must clear the stroke (sit inside the disc)
+            if mr > ring_inner + 1.5:
                 continue
-            # Prefer rightward placements slightly
-            sc = abs(rd_r - TIP_TARGET) * 1.4 + abs(rd_v - TIP_TARGET) - (L - left0) * 0.02
+            rd_v = float(np.hypot(L + v_bx - CX, t + v_bot - CY))
+            rd_ol = float(np.hypot(L + ol_bx - CX, t + ol_bot - CY))
+            rd_or = float(np.hypot(L + or_bx - CX, t + or_bot - CY))
+            # Prefer tips just clearing the inner edge (slight raise — not deep inside)
+            sc = (
+                abs(rd_v - VIP_TIP_TARGET) * 2.0
+                + abs(rd_ol - VIP_TIP_TARGET) * 1.0
+                + abs(rd_or - VIP_TIP_TARGET) * 0.8
+                + abs(mr - ring_inner) * 1.5
+            )
+            sc -= (L - left0) * 0.02
             if sc < best_sc:
                 best_sc, best_t, best_left = sc, t, L
     if best_sc >= 1e17:
-        best_left = left0
-        for t in range(vip_min, S - body.size[1] - 2, 1):
-            rd_r = float(np.hypot(left0 + reser_bx - CX, t + reser_bot - CY))
-            rd_v = float(np.hypot(left0 + v_bx - CX, t + v_bot - CY))
-            best_t = t
-            if (rd_r + rd_v) / 2 >= (R - 12):
-                break
-        best_sc = -1
+        best_left, best_t, best_sc = left0, vip_min, -1.0
     return best_left, best_t, best_sc, vip_min
 
 
-def _reser_e_needs_under(under: Image.Image, over: Image.Image, left: int, top: int) -> bool:
-    """True if the first 'e' of reser (over layer white left of V) sits outside the ring."""
-    oa = np.array(paste_type(over, left, top))
-    yy, xx = np.indices((S, S))
+def shiny_chrome_tone(
+    lum: np.ndarray, yy: np.ndarray, xx: np.ndarray, *, for_type: bool = False
+) -> np.ndarray:
+    """Silverish / chromy shiny-black tone map (0–255 grey)."""
+    ang = np.arctan2(yy.astype(np.float32) - CY, xx.astype(np.float32) - CX)
+    # Soft highlight along upper-left → lower-right (chrome sheen)
+    sheen = (np.cos(ang - 0.7) * 0.5 + 0.5) ** 2.4
+    if for_type:
+        # Darker chrome-black body; silver only on specular edge
+        base = np.clip(12.0 + lum * 0.10, 10, 36)
+        hi = np.clip(base + sheen * 95.0 + (lum / 255.0) * 18.0, 12, 155)
+    else:
+        base = np.clip(18.0 + lum * 0.22, 14, 55)
+        hi = np.clip(base + sheen * 130.0 + (lum / 255.0) * 35.0, 16, 200)
+    return hi.astype(np.float32)
+
+
+def to_white_black(src: Path, dst: Path, *, keep_tiffany_v: bool = False) -> None:
+    """Light theme: white field + shiny chrome-black fonts/borders/ring."""
+    im = Image.open(src).convert("RGBA")
+    a = np.array(im)
+    r, g, b, al = [a[:, :, i].astype(np.float32) for i in range(4)]
+    yy, xx = np.indices(a.shape[:2])
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    r, g, b, al = (oa[:, :, i].astype(int) for i in range(4))
-    white = (al > 40) & (r > 200) & (g > 200) & (b > 200)
-    tiffany = (al > 40) & (r < 100) & (g > 150) & (b > 180)
-    if not tiffany.any() or not white.any():
-        return False
-    vl = int(np.where(tiffany)[1].min())
-    # Over-layer white left of V = "eser" (or "ser" if re under) tips
-    left_white = white & (xx < vl - 2)
-    if not left_white.any():
-        return False
-    # Leftmost over tip — if outside ring stroke, push more letters under
-    lx = int(np.where(left_white)[1].min())
-    ly = int(np.where(left_white & (xx == lx))[0].mean())
-    rd = float(np.hypot(lx - CX, ly - CY))
-    return rd > (R - 6)
+    lum = 0.299 * r + 0.587 * g + 0.114 * b
+    near_black = (lum < 28) & (al > 8)
+    white = (r > 200) & (g > 200) & (b > 200) & (al > 20)
+    # Broad cyan / tiffany (fill + glow / AA)
+    tiffany = (b > 150) & (g > 120) & (b > r + 40) & (g > r + 20) & (al > 15)
+    magenta = (r > 140) & (b > 140) & (g < 140) & (al > 20)
+    sat = (np.maximum(np.maximum(r, g), b) - np.minimum(np.minimum(r, g), b)) > 40
+    neon = sat & (al > 20) & ~tiffany
+    purple_border = (r > 140) & (b > 180) & (g < 190) & (b > g) & (al > 20)
+    # Silver / grey type leftover from traditional chrome
+    grey_type = (
+        (al > 20)
+        & (yy > 520)
+        & (np.abs(r - g) < 28)
+        & (np.abs(g - b) < 28)
+        & (lum > 60)
+        & (lum < 230)
+        & (dist < (R + 20))
+    )
+
+    out = np.zeros_like(a)
+    out[:, :, 0] = out[:, :, 1] = out[:, :, 2] = 255
+    out[:, :, 3] = 255
+
+    chrome = shiny_chrome_tone(lum, yy, xx)
+
+    # Graphic linework inside disc → chrome black (furniture / marks)
+    graphic = (al > 20) & ~near_black & ~white & ~tiffany & (dist < (R - 6))
+    for c in range(3):
+        out[:, :, c] = np.where(graphic, chrome, out[:, :, c])
+
+    # Draw a thin shiny chrome ring (do not copy wide nightlife bloom)
+    wb_stroke = 5  # px — smaller than nightlife RING_STROKE
+    wb_half = wb_stroke / 2.0
+    ring_mask = (np.abs(dist - R) <= wb_half) & (dist > 0)
+    # Soft AA rim (1px)
+    ring_aa = (np.abs(dist - R) <= (wb_half + 0.8)) & ~ring_mask
+    ring_chrome = shiny_chrome_tone(np.full_like(lum, 140.0), yy, xx)
+    ring_chrome = np.clip(ring_chrome * 1.25 + 18, 28, 205)
+    for c in range(3):
+        out[:, :, c] = np.where(ring_mask, ring_chrome, out[:, :, c])
+        out[:, :, c] = np.where(ring_aa, ring_chrome * 0.55 + 255 * 0.45, out[:, :, c])
+
+    # Fonts + borders + prior accents → shiny chrome black
+    font_mask = white | purple_border | magenta | grey_type | (neon & (yy > 520)) | tiffany
+    # Dilate slightly so AA / neon borders stay with the glyph
+    font_mask = (
+        np.array(
+            Image.fromarray((font_mask.astype(np.uint8) * 255)).filter(
+                ImageFilter.MaxFilter(3)
+            )
+        )
+        > 0
+    )
+    font_chrome = shiny_chrome_tone(np.maximum(lum, 120), yy, xx, for_type=True)
+    for c in range(3):
+        out[:, :, c] = np.where(font_mask, font_chrome, out[:, :, c])
+
+    # Optional cool glint on former tiffany glyphs (off for VIP — all chrome black)
+    if keep_tiffany_v:
+        cool = np.clip(font_chrome * 0.90, 14, 160)
+        out[:, :, 0] = np.where(tiffany, cool * 0.50, out[:, :, 0])
+        out[:, :, 1] = np.where(tiffany, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1])
+        out[:, :, 2] = np.where(tiffany, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2])
+
+    # Outside ring → pure white, but NEVER wipe type tips (Fl / T / re / etc.)
+    outside = dist > (R + wb_half + 1.2)
+    wipe = outside & ~font_mask
+    out[wipe] = (255, 255, 255, 255)
+    # Re-stamp type last so tips outside the ring stay chrome-black
+    for c in range(3):
+        out[:, :, c] = np.where(font_mask, font_chrome, out[:, :, c])
+    if keep_tiffany_v:
+        cool = np.clip(font_chrome * 0.90, 14, 160)
+        out[:, :, 0] = np.where(tiffany, cool * 0.50, out[:, :, 0])
+        out[:, :, 1] = np.where(tiffany, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1])
+        out[:, :, 2] = np.where(tiffany, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2])
+
+    Image.fromarray(out.astype(np.uint8), "RGBA").convert("RGB").save(
+        dst, quality=96, subsampling=0
+    )
+    print(f"  whiteBlack chrome → {dst.name}")
+
+
+def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
+    """Theme VIP ring only (blackTiffany / blackDarkGreen)."""
+    im = Image.open(src).convert("RGBA")
+    a = np.array(im)
+    r, g, b, al = [a[:, :, i].astype(np.float32) for i in range(4)]
+    yy, xx = np.indices(a.shape[:2])
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    half = RING_STROKE // 2 + 3
+    ring = (al > 20) & (dist >= (R - half - 4)) & (dist <= (R + half + 2))
+    out = a.copy()
+    ang = (np.arctan2(yy - CY, xx - CX) + np.pi) / (2 * np.pi)
+    if mode == "tiffany":
+        tr = 0 * (1 - ang) + 196 * ang
+        tg = 212 * (1 - ang) + 140 * ang
+        tb = 254 * (1 - ang) + 255 * ang
+        out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
+    elif mode == "forest":
+        tr = 20 * (1 - ang) + 34 * ang
+        tg = 60 * (1 - ang) + 139 * ang
+        tb = 30 * (1 - ang) + 34 * ang
+        out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
+    Image.fromarray(out.astype(np.uint8), "RGBA").convert("RGB").save(
+        dst, quality=96, subsampling=0
+    )
+    print(f"  VIP ring {mode} → {dst.name}")
+
+
+def export_theme_vip_packs() -> None:
+    """Derive Black Tiffany / Black Dark Green / White-Black from nightlife+traditional."""
+    out = ROOT / "images/chrome"
+    nl = out / "vip-nightlife.jpg"
+    trad = out / "vip-traditional.jpg"
+    recolor_vip_ring(nl, out / "vip-blacktiffany.jpg", "tiffany")
+    recolor_vip_ring(nl, out / "vip-blackdarkgreen.jpg", "forest")
+    # Full whiteblack pack — fonts + borders use shiny chrome black
+    pairs = [
+        # VIP: all fonts (incl. V) → shiny chrome black
+        ("vip-traditional.jpg", "vip-whiteblack.jpg", False),
+        ("floqcast-traditional.jpg", "floqcast-whiteblack.jpg", False),
+        ("shoutout-traditional-green.png", "shoutout-whiteblack.png", False),
+        ("floqai-traditional.jpg", "floqai-whiteblack.jpg", False),
+        ("bartr-traditional.jpg", "bartr-whiteblack.jpg", False),
+        ("rydr-traditional.jpg", "rydr-whiteblack.jpg", False),
+    ]
+    for src_name, dst_name, keep_t in pairs:
+        src = out / src_name
+        if not src.exists():
+            print(f"  SKIP missing {src_name}")
+            continue
+        to_white_black(src, out / dst_name, keep_tiffany_v=keep_t)
 
 
 def build_vip_only():
-    """Rebuild VIP nightlife + traditional only (keep FloqCAST / djBOT untouched)."""
+    """Rebuild VIP nightlife + traditional + theme variants."""
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     ensure_traditional_ring()
     vip_g = extract_vip_graphic()
-    print("=== assemble VIP (only) ===")
+    print("=== assemble VIP v31 (thin ring, re under, raised mark) ===")
     g = Image.open(vip_g)
-    under_letters = "r"
+    under_letters = "re"  # only "re" under the ring
     under, over, body = vip_wm(under_letters=under_letters)
     furn_bottom = graphic_bottom(g, 720)
-    left, top, best_sc, vip_min = _place_vip_wordmark(body, furn_bottom)
-    if _reser_e_needs_under(under, over, left, top):
-        print("  reser 'e' still above ring → rebuild with under='re'")
-        under_letters = "re"
-        under, over, body = vip_wm(under_letters=under_letters)
-        left, top, best_sc, vip_min = _place_vip_wordmark(body, furn_bottom)
+    left, top, best_sc, vip_min = _place_vip_wordmark(body, furn_bottom, over=over)
     print(
         f"  place VIP left={left} top={top} body={body.size} furn_bottom={furn_bottom} "
-        f"kiss_score={best_sc:.1f} gap={top - furn_bottom} under={under_letters}"
+        f"kiss_score={best_sc:.1f} gap={top - furn_bottom} under={under_letters} "
+        f"ring_stroke={RING_STROKE} tip_target={VIP_TIP_TARGET}"
     )
-    # Guard: furniture must not touch V (gap ≥ 6)
-    if top - furn_bottom < 6:
-        print(f"  WARN furniture/type gap {top - furn_bottom} — consider lower furniture scale")
+    if top - furn_bottom < VIP_FURN_GAP:
+        print(f"  WARN furniture/type gap {top - furn_bottom} < {VIP_FURN_GAP}")
     vip = assemble(g, under, over, left, top, nightlife=True)
     vip.convert("RGB").save(
         ROOT / "images/chrome/vip-nightlife.jpg", quality=98, subsampling=0
@@ -1501,21 +1685,29 @@ def build_vip_only():
     trad.convert("RGB").save(
         ROOT / "images/chrome/vip-traditional.jpg", quality=98, subsampling=0
     )
+    export_theme_vip_packs()
     preview = vip.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/vip-nightlife-v30.png", quality=95)
+    preview.save("/opt/cursor/artifacts/vip-nightlife-v31.png", quality=95)
     trad.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS).save(
-        "/opt/cursor/artifacts/vip-traditional-v30.png", quality=95
+        "/opt/cursor/artifacts/vip-traditional-v31.png", quality=95
     )
+    Image.open(ROOT / "images/chrome/vip-whiteblack.jpg").resize(
+        (512, 512), Image.Resampling.LANCZOS
+    ).save("/opt/cursor/artifacts/vip-white-black-v31.png", quality=95)
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     a = np.array(vip.convert("RGB"))
     r, gch, b = a[:, :, 0].astype(int), a[:, :, 1].astype(int), a[:, :, 2].astype(int)
     white = (r > 210) & (gch > 210) & (b > 210) & (yy > 550)
     print(f"VERIFY VIP white outside R: {int((white & (dist > 490)).sum())}")
-    # Under-layer ink should exist under the ring stroke
     ua = np.array(paste_type(under, left, top))
-    under_on_ring = (ua[:, :, 3] > 40) & (dist > (R - 16)) & (dist < (R + 8))
+    half = RING_STROKE // 2 + 2
+    under_on_ring = (ua[:, :, 3] > 40) & (dist > (R - half - 2)) & (dist < (R + half + 2))
     print(f"VERIFY under-ring ink px={int(under_on_ring.sum())}")
+    # Over tips should mostly clear the ring annulus
+    oa = np.array(paste_type(over, left, top))
+    over_on_ring = (oa[:, :, 3] > 40) & (dist > (R - half)) & (dist < (R + half))
+    print(f"VERIFY over-on-ring ink px={int(over_on_ring.sum())} (lower is better)")
     print("DONE VIP-only —", ROOT / "images/chrome/vip-nightlife.jpg")
 
 
