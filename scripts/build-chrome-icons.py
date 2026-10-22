@@ -400,86 +400,95 @@ def floqcast_wm():
         size_f = int(
             max(50, min(280, round(size_f * FC_H / max(1, finish(u, by).size[1]))))
         )
-    size_c = int(round(size_f * 1.15))  # CAST +15% — point size only, no second height chase
+    size_c = int(round(size_f * 1.15))
 
-    floq = glyph("Floq", size_f, WHITE)
-    cas = glyph("CAS", size_c, WHITE)
-    Tt = glyph("T", size_c, TIFFANY)
-    ov = max(2, int(Tt.size[0] * 0.08))
-    cast_w = cas.size[0] + Tt.size[0] - ov
-    cast_h = max(cas.size[1], Tt.size[1])
-    cast = Image.new("RGBA", (cast_w, cast_h), (0, 0, 0, 0))
-    cast.alpha_composite(cas, (0, cast_h - cas.size[1]))
-    cast.alpha_composite(Tt, (cas.size[0] - ov, cast_h - Tt.size[1]))
-
-    # Fl / oq split on shared Floq canvas
-    font = ImageFont.truetype(FONT, int(size_f))
-    floq_u, by = render_upright("Floq", size_f, WHITE)
+    # --- Floq: shared-canvas Fl under / oq over (same method as accent_wm) ---
+    font_f = ImageFont.truetype(FONT, int(size_f))
+    floq_u, by_f = render_upright("Floq", size_f, WHITE)
     pad = 64
     bb = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
-        (0, 0), "Floq", font=font, anchor="ls"
+        (0, 0), "Floq", font=font_f, anchor="ls"
     )
-    origin = (pad - bb[0], pad + (bb[3] - bb[1]))
+    origin_f = (pad - bb[0], pad + (bb[3] - bb[1]))
 
-    def layer(text):
+    def layer_f(text):
         im = Image.new("RGBA", floq_u.size, (0, 0, 0, 0))
-        ImageDraw.Draw(im).text(origin, text, font=font, fill=WHITE, anchor="ls")
-        return finish(im, by, crop=False)
+        ImageDraw.Draw(im).text(origin_f, text, font=font_f, fill=WHITE, anchor="ls")
+        return finish(im, by_f, crop=False)
 
-    full_f = finish(floq_u, by, crop=False)
-    fl_f = layer("Fl")
+    full_f = finish(floq_u, by_f, crop=False)
+    fl_f = layer_f("Fl")
     x0, y0b, x1, y1 = ink_bbox(full_f, 12)
     box = (x0, y0b, x1 + 1, y1 + 1)
     fa = np.array(full_f.crop(box))
     fla = np.array(fl_f.crop(box))
     ink = fa[:, :, 3] > 20
     flmask = (
-        np.array(Image.fromarray(fla[:, :, 3]).filter(ImageFilter.MaxFilter(3))) > 25
+        np.array(Image.fromarray(fla[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 20
     ) & ink
     floq_under = np.zeros_like(fa)
     floq_over = np.zeros_like(fa)
     floq_under[flmask] = (255, 255, 255, 255)
     floq_over[ink & ~flmask] = (255, 255, 255, 255)
-    # Map Fl/oq masks onto floq glyph box
-    floq_a = np.array(floq)
-    fu = Image.new("RGBA", floq.size, (0, 0, 0, 0))
-    fo = Image.new("RGBA", floq.size, (0, 0, 0, 0))
     FU = Image.fromarray(ink_only(floq_under), "RGBA")
     FO = Image.fromarray(ink_only(floq_over), "RGBA")
-    fu.paste(FU, (0, floq.size[1] - FU.size[1]), FU)
-    fo.paste(FO, (0, floq.size[1] - FO.size[1]), FO)
-    f_ink = floq_a[:, :, 3] > 20
-    u_m = (np.array(fu)[:, :, 3] > 20) & f_ink
-    o_m = f_ink & ~u_m
-    fu2 = np.zeros_like(floq_a)
-    fo2 = np.zeros_like(floq_a)
-    fu2[u_m] = (255, 255, 255, 255)
-    fo2[o_m] = (255, 255, 255, 255)
+    floq_body = Image.fromarray(ink_only(fa), "RGBA")
+    print(f"  Floq split under={int(flmask.sum())} over={int((ink & ~flmask).sum())}")
 
+    # --- CAST at +15%: CAS white + T tiffany (no white under T) ---
+    font_c = ImageFont.truetype(FONT, int(size_c))
+    cast_u, by_c = render_upright("CAST", size_c, WHITE)
+    bb_c = ImageDraw.Draw(Image.new("RGB", (1, 1))).textbbox(
+        (0, 0), "CAST", font=font_c, anchor="ls"
+    )
+    origin_c = (pad - bb_c[0], pad + (bb_c[3] - bb_c[1]))
+
+    def layer_c(text, fill=WHITE):
+        im = Image.new("RGBA", cast_u.size, (0, 0, 0, 0))
+        ImageDraw.Draw(im).text(origin_c, text, font=font_c, fill=fill, anchor="ls")
+        return finish(im, by_c, crop=False)
+
+    full_c = finish(cast_u, by_c, crop=False)
+    pre_c = layer_c("CAS")
+    cx0, cy0, cx1, cy1 = ink_bbox(full_c, 12)
+    cbox = (cx0, cy0, cx1 + 1, cy1 + 1)
+    ca = np.array(full_c.crop(cbox))
+    pa = np.array(pre_c.crop(cbox))
+    cink = ca[:, :, 3] > 20
+    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(3)))
+    tmask = cink & (pre_a < 10)
+    xs = np.where(tmask)[1]
+    if len(xs):
+        tmask[:, : int(np.percentile(xs, 8))] = False
+    tmask = (
+        np.array(
+            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(3))
+        )
+        > 127
+    ) & cink
+    cast_over = np.zeros_like(ca)
+    cast_over[cink] = (255, 255, 255, 255)
+    cast_over[tmask, 0] = TIFFANY[0]
+    cast_over[tmask, 1] = TIFFANY[1]
+    cast_over[tmask, 2] = TIFFANY[2]
+    cast_over[tmask, 3] = 255
+    CAST = Image.fromarray(ink_only(cast_over), "RGBA")
+
+    # Baseline-align: Floq ink top→baseline ≈ "Flo" height; CAST sits on that baseline
+    flo_cap_h = glyph("Flo", size_f, WHITE).size[1]
     gap = max(2, int(size_f * 0.03))
-    # Baseline-align CAST to Floq (Floq ink bottom is the q descender — not the baseline)
-    flo_cap = glyph("Flo", size_f, WHITE)
-    floq_baseline = flo_cap.size[1]  # from top of Floq ink box to baseline
-    # Canvas tall enough for Floq descender + taller CAST caps
-    H = max(floq.size[1], floq_baseline + (cast.size[1] - flo_cap.size[1]) + cast.size[1])
-    H = max(floq.size[1], floq_baseline + 8, cast.size[1] + (floq.size[1] - floq_baseline))
-    W = floq.size[0] + gap + cast.size[0]
+    W = floq_body.size[0] + gap + CAST.size[0]
+    # top padding if CAST caps taller than Floq caps
+    cast_above = max(0, CAST.size[1] - flo_cap_h)
+    H = cast_above + floq_body.size[1]
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    fy = 0
-    # CAST bottom at Floq baseline
-    cy = fy + floq_baseline - cast.size[1]
-    cy = max(0, cy)
-    # If CAST is taller than Floq caps, shift Floq down so CAST fits above baseline
-    if cy < 0:
-        fy = -cy
-        cy = 0
-        H = max(H, fy + floq.size[1])
-        under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    under.alpha_composite(Image.fromarray(fu2, "RGBA"), (0, fy))
-    over.alpha_composite(Image.fromarray(fo2, "RGBA"), (0, fy))
-    over.alpha_composite(cast, (floq.size[0] + gap, cy))
+    fy = cast_above
+    # CAST bottom = Floq baseline = fy + flo_cap_h
+    cy = fy + flo_cap_h - CAST.size[1]
+    under.alpha_composite(FU, (0, fy + (floq_body.size[1] - FU.size[1])))
+    over.alpha_composite(FO, (0, fy + (floq_body.size[1] - FO.size[1])))
+    over.alpha_composite(CAST, (floq_body.size[0] + gap, cy))
 
     body = Image.alpha_composite(under, over)
     box = ink_bbox(body, 10)
@@ -491,8 +500,8 @@ def floqcast_wm():
     )
     B = Image.alpha_composite(U, O)
     print(
-        f"  TYPE FloqCAST Floq={size_f}/{floq.size} CAST={size_c}/{cast.size} "
-        f"(+15%) body={B.size}"
+        f"  TYPE FloqCAST Floq={size_f}/{floq_body.size} CAST={size_c}/{CAST.size} "
+        f"(+15%) body={B.size} under={int(np.array(U)[:,:,3].sum()>0)}"
     )
     return U, O, B
 
