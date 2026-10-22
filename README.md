@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.105 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.106 (stable)
+
+- s3.1.106: Search ShoutOut chrome pack; Display2 idle FloqCAST nightlife chrome; fix Site chrome Active label i18n (EN Θέμα / FR Motyw).
 
 - s3.1.105: Site chrome on Release Control (isSiteChrome 0|1|2|4); Release Control / Test → live title polish.
 

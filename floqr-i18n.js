@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.1.105";
+  const VERSION = "s3.1.106";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -692,7 +692,7 @@
       "chrome.pageTitle": "Site chrome",
       "chrome.hint": "Beta: switch the whole FLOQR site between Nightlife and Traditional colors.",
       "chrome.traditionalFull": "Traditional theme",
-      "chrome.nightlifeFull": "Θέμα Nightlife",
+      "chrome.nightlifeFull": "Nightlife theme",
       "lang.personalCorrections": "My Personal Corrections",
       "lang.preferredGrammar": "Preferred Language (grammar / bio)",
       "lang.saveLanguageSettings": "Save Language Settings",
@@ -1886,7 +1886,7 @@
       "chrome.pageTitle": "Chrome du site",
       "chrome.hint": "Bêta : basculez tout le site FLOQR entre Nightlife et le thème classique.",
       "chrome.traditionalFull": "Thème classique",
-      "chrome.nightlifeFull": "Motyw Nightlife",
+      "chrome.nightlifeFull": "Thème Nightlife",
       "lang.personalCorrections": "Mes corrections personnelles",
       "lang.preferredGrammar": "Langue préférée (grammaire / bio)",
       "lang.saveLanguageSettings": "Enregistrer les paramètres de langue",
@@ -4274,7 +4274,7 @@
       "chrome.pageTitle": "Chrome del sitio",
       "chrome.hint": "Beta: cambia todo el sitio FLOQR entre Nightlife y el tema clásico.",
       "chrome.traditionalFull": "Tema clásico",
-      "chrome.nightlifeFull": "Chrome Nightlife",
+      "chrome.nightlifeFull": "Tema Nightlife",
       "lang.personalCorrections": "Mis correcciones personales",
       "lang.preferredGrammar": "Idioma preferido (gramática / bio)",
       "lang.saveLanguageSettings": "Guardar ajustes de idioma",
@@ -7856,7 +7856,7 @@
       "chrome.pageTitle": "Chrome del sito",
       "chrome.hint": "Beta: passa l’intero sito FLOQR tra Nightlife e il tema classico.",
       "chrome.traditionalFull": "Tema classico",
-      "chrome.nightlifeFull": "Chrome Nightlife",
+      "chrome.nightlifeFull": "Tema Nightlife",
       "lang.personalCorrections": "Le mie correzioni personali",
       "lang.preferredGrammar": "Lingua preferita (grammatica/biografia)",
       "lang.saveLanguageSettings": "Salva le impostazioni della lingua",
@@ -9050,7 +9050,7 @@
       "chrome.pageTitle": "Chrome do site",
       "chrome.hint": "Beta: alterne todo o site FLOQR entre Nightlife e o tema clássico.",
       "chrome.traditionalFull": "Tema clássico",
-      "chrome.nightlifeFull": "Chrome Nightlife",
+      "chrome.nightlifeFull": "Tema Nightlife",
       "lang.personalCorrections": "Minhas correções pessoais",
       "lang.preferredGrammar": "Idioma preferido (gramática / bio)",
       "lang.saveLanguageSettings": "Salvar configurações de idioma",
@@ -10244,7 +10244,7 @@
       "chrome.pageTitle": "Chrome ιστότοπου",
       "chrome.hint": "Beta: εναλλαγή ολόκληρου του ιστότοπου FLOQR μεταξύ Nightlife και κλασικού θέματος.",
       "chrome.traditionalFull": "Κλασικό θέμα",
-      "chrome.nightlifeFull": "Nightlife chrome",
+      "chrome.nightlifeFull": "Θέμα Nightlife",
       "lang.personalCorrections": "Οι προσωπικές μου διορθώσεις",
       "lang.preferredGrammar": "Προτιμώμενη γλώσσα (γραμματική / βιο)",
       "lang.saveLanguageSettings": "Ρυθμίσεις γλώσσας",
@@ -11438,7 +11438,7 @@
       "chrome.pageTitle": "Chrome strony",
       "chrome.hint": "Beta: przełącz całą stronę FLOQR między Nightlife a klasycznym motywem.",
       "chrome.traditionalFull": "Klasyczny motyw",
-      "chrome.nightlifeFull": "Chrome Nightlife",
+      "chrome.nightlifeFull": "Motyw Nightlife",
       "lang.personalCorrections": "Moje korekty osobiste",
       "lang.preferredGrammar": "Preferowany język (gramatyka / bio)",
       "lang.saveLanguageSettings": "Ustawienia językowe",

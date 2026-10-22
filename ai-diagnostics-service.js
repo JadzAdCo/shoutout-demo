@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.105";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.106";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.106",
+      title: "Search ShoutOut chrome + Display2 FloqCAST + Active label i18n",
+      checks: [
+        {label:"Search ShoutOut uses chrome pack", file:"index.html", includes:["data-floqr-chrome-icon=\"shoutOut\"", "shoutout-nightlife.png", "shoutout-icon-face"]},
+        {label:"ICON_PACK ShoutOut traditional green", file:"floqr-chrome-scheme.js", includes:["shoutout-traditional-green.png", "ICON_V = \"s3.1.106\""]},
+        {label:"Display2 idle FloqCAST chrome nightlife", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/chrome/floqcast-nightlife.jpg\""]},
+        {label:"EN Active Nightlife theme (no Greek Θέμα)", file:"floqr-i18n.js", includes:["chrome.nightlifeFull\": \"Nightlife theme\""], notIncludes:["chrome.nightlifeFull\": \"Θέμα Nightlife\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.106\""]}
+      ]
+    },
     {
       version: "s3.1.105",
       title: "Site chrome Release Control + isSiteChrome",
@@ -453,7 +464,7 @@
       checks: [
         {label:"floqCast Search mark img-safe", file:"images/floqcast-icon.svg", includes:["fcSil", "fcLedClip"], notIncludes:["<use "]},
         {label:"floqCast landing VIP-style header", file:"floqcast-search.html", includes:["floqcast-hero-icon.svg", "floqcast-title-row", "help-popout", "floqcastVenueSearch"], notIncludes:["suprstr-logo.png", "floqcast-brand-row"]},
-        {label:"Display idle uses floqcast-icon", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/floqcast-icon.svg\""], notIncludes:["suprstr-logo.png"]},
+        {label:"Display idle uses FloqCAST chrome nightlife", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/chrome/floqcast-nightlife.jpg\""], notIncludes:["suprstr-logo.png"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.77\""]}
       ]
     },
@@ -1946,6 +1957,15 @@
       howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
       expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
+    },
+    {
+      id:"s3-1-106-shoutout-chrome-display2-active-label",
+      area:"Search chrome icons + Display 2 + Language Settings",
+      feature:"ShoutOut chrome pack on Search; Display2 FloqCAST nightlife chrome; Active theme label English",
+      changed:"Search ShoutOut tile uses data-floqr-chrome-icon + ICON_PACK (nightlife PNG / traditional-green). Display2 idle FLOQCAST_LOGO → floqcast-nightlife.jpg. Fixed EN chrome.nightlifeFull (was Greek Θέμα) and FR Motyw leak. Package s3.1.106.",
+      howToTest:"1) Hard-refresh Search (s3.1.106) — ShoutOut tile matches FloqCAST/VIP chrome photo style (not old shoutout-logo.png). 2) Toggle Traditional Site chrome — ShoutOut shows tiffany-T green traditional pack. 3) Open display2.html?location=temp-democlub-1 idle — board shows FloqCAST nightlife chrome icon. 4) Language Settings English → Active: Nightlife theme (no Greek Θέμα).",
+      expected:"ShoutOut chrome on Search; Display2 idle newest FloqCAST chrome; Active label English Nightlife theme.",
+      troubleshoot:"Old ShoutOut logo → hard refresh index.html + floqr-chrome-scheme.js s3.1.106. Display2 still SVG → hard refresh display-app.js (no ?v= on Xibo URL). Still Θέμα → hard refresh floqr-i18n.js s3.1.106."
     },
     {
       id:"s3-1-105-site-chrome-release-control",

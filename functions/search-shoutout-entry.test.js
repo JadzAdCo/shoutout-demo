@@ -22,7 +22,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /class="search-icon-row"/);
   // Spot order: floqCast (1) → ShoutOut (2)
   assert.match(page, /id="floqcastBtnCard"[\s\S]*?id="shoutoutBtnCard"/);
-  assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*shoutout-logo\.png/);
+  assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
+  assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*floqcast-nightlife\.jpg/);
   assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
@@ -33,8 +34,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.vip-icon-face\{[^}]*flex-direction:column/);
-  assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only\{/);
+  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*flex-direction:column/);
+  assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
   const chrome = read("floqr-chrome-scheme.js");
@@ -43,6 +44,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(chrome, /isSiteChrome/);
   assert.match(chrome, /syncAccessGate/);
   assert.match(chrome, /hasThemeAccess/);
+  assert.match(chrome, /shoutout-traditional-green\.png/);
+  assert.match(chrome, /shoutout-nightlife\.png/);
   const portal = read("patron-portal.html");
   assert.match(portal, /data-floqr-theme-panel/);
   assert.match(portal, /data-floqr-chrome-btn="traditional"/);

@@ -61,7 +61,8 @@
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
   const HEIST_BRAND_SLIDE_LABEL = "WASHINGTON DC";
-  const FLOQCAST_LOGO = "./images/floqcast-icon.svg";
+  /* Display2 idle: newest accepted FloqCAST chrome (nightlife pack). */
+  const FLOQCAST_LOGO = "./images/chrome/floqcast-nightlife.jpg";
   let liveContentExpiryTimer = null;
   let expiredLiveKey = "";
   let screenFormatOverride = "";

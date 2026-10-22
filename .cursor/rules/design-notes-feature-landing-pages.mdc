@@ -46,7 +46,7 @@ When the landing needs venue pick:
 |---|---|
 | Search tile face | Mark SVG (no outer black square if the HTML face supplies black) |
 | Feature landing hero | Hero SVG with black rounded face **or** same mark sized as VIP hero |
-| Display / idle (floqCast board) | Mark SVG (`display-app.js` `FLOQCAST_LOGO` → `floqcast-icon.svg`) |
+| Display / idle (floqCast board) | Newest FloqCAST chrome nightlife JPG (`display-app.js` `FLOQCAST_LOGO` → `images/chrome/floqcast-nightlife.jpg`) |
 
 Replace retired logos site-wide when a mark ships — do not leave `suprstr-logo.png` on landings.
 

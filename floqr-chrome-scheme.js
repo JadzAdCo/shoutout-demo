@@ -27,12 +27,12 @@
   });
 
   /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "28";
+  const ICON_V = "s3.1.106";
   const ICON_PACK = {
     traditional: {
       floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
       vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
-      shoutOut: "./images/chrome/shoutout-traditional.jpg?v=" + ICON_V,
+      shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
       floqAi: "./images/chrome/floqai-traditional.jpg?v=" + ICON_V,
       bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
       rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
