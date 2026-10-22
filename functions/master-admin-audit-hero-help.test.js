@@ -148,11 +148,11 @@ test("All Locations help is Master Admin only in the repository and the server c
   assert.deepEqual(classes.help[HELP_ID], ["masterAdmin"]);
 });
 
-test("Master Admin audit/hero assets are cache-busted (s3.1.29 help-attach, s3.1.30 F&S)", () => {
+test("Master Admin audit/hero assets are cache-busted (s3.2.00 package)", () => {
   const html = read("master-admin.html");
-  assert.match(html, /\.\/help-attach\.js\?v=s3\.1\.\d+"/);
+  assert.match(html, /\.\/help-attach\.js\?v=s3\.\d+\.\d+"/);
   for (const file of ["admin.css", "floqai-help-repository.js", "master-feature-services.js"]) {
-    assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.1\\.\\d+"`));
+    assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.\\d+\\.\\d+"`));
   }
   assert.doesNotMatch(html, /display2?\.html\?location=[^"'\s<>]*[?&]v=/);
 });
