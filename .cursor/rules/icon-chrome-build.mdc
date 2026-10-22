@@ -15,7 +15,7 @@ Reusable recipe for **FloqCAST**, **djBOT**, **VIP reserVIP**, and peers (ShoutO
 | Ring radius | `R = 490`, stroke width ≈ 14 |
 | Outside | `dist > 498…502` → pure black |
 | Nightlife | Magenta→tiffany gradient ring (see `rebuild_ring()` pattern) |
-| Traditional | **100% same** graphic + wordmark as nightlife; **only** omit the gradient ring (`traditional_from_nightlife`) |
+| Traditional | **Same** ring + sizes + positions as nightlife; **color scheme only** — graphics/ring → black/charcoal/silver; verbiage untouched (`traditional_from_nightlife`) |
 
 Solid `#000` field inside the ring. **Ink-only wordmarks** — never an opaque plate/rect behind type.
 
@@ -78,7 +78,7 @@ Baseline → apply user deltas with `round`; if ink width exceeds ring fit, **un
 - Nudge `top` so left/right ink tips reach ≈ **`R − 10` … `R − 2`** (into the stroke).
 - Prefer a score minimize `|dL−(R−10)| + |dR−(R−10)|` with penalty if `d > R+4`.
 - Max practical wordmark width ≈ **720–740** so both tips can sit on the lower arc without `dist > 502` clipping.
-- Nightlife + traditional share the **same** wordmark pixels/placement; traditional omits the ring composite.
+- Nightlife + traditional share the **same** wordmark pixels/placement and ring geometry; traditional recolors non-type pixels to charcoal/silver (`ring-traditional.png`).
 
 ## Asset paths
 
@@ -116,7 +116,7 @@ Pipeline (do **not** hard-clear graphics when moving type):
 1. **RING** → `images/chrome/layers/ring-nightlife.png` (once)
 2. **GRAPHIC** → `*-graphic.png` from a clean git source (FloqCAST=`ef50cfe` silhouette; strip ring + bottom type band only; never wipe LED/phone/signal/arrow)
 3. **TYPE** → ink-only under/over layers
-4. **ASSEMBLE** → black + graphic + under + ring + over; clip type past outer stroke (`R+6`); traditional skips ring
+4. **ASSEMBLE** → black + graphic + under + ring + over; traditional = charcoal graphic + silver ring + same type
 
 Placement searches **left and top**; rejects any edge ink with max radial `> R-2` (fixes VIP r/e cut outside the ring).
 

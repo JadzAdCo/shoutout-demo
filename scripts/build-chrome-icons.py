@@ -7,7 +7,8 @@ Architecture (one pipeline for all marks):
   2. GRAPHIC  — extract once from a CLEAN source, save as *-graphic.png (no type, no ring)
   3. TYPE     — render ink-only under/over wordmark layers
   4. ASSEMBLE — black bg + graphic + under-type + ring + over-type
-               traditional = black + graphic + full type (no ring)
+  5. TRADITIONAL — same nightlife frame (ring + sizes + positions); recolor non-type
+               pixels to charcoal/silver. Verbiage (white + tiffany accents) untouched.
 
 Never hard-clear the graphic when swapping type. Only replace type layers.
 """
@@ -665,6 +666,38 @@ def force_tiffany_T(img: Image.Image, left: int, top: int, over: Image.Image) ->
     return Image.fromarray(a, "RGBA")
 
 
+def type_protect_mask(under: Image.Image, over: Image.Image, left: int, top: int) -> np.ndarray:
+    """Verbiage footprint — slightly dilated so AA edges stay untouched."""
+    under_full = np.array(paste_type(under, left, top))
+    over_full = np.array(paste_type(over, left, top))
+    ink = (under_full[:, :, 3] > 12) | (over_full[:, :, 3] > 12)
+    return (
+        np.array(
+            Image.fromarray((ink.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(5))
+        )
+        > 0
+    )
+
+
+def ensure_traditional_ring() -> Path:
+    """Charcoal/silver ring — same stroke as nightlife, mono chrome colors."""
+    dst = LAYERS / "ring-traditional.png"
+    nl = Image.open(LAYERS / "ring-nightlife.png").convert("RGBA")
+    a = np.array(nl)
+    r, g, b = a[:, :, 0].astype(np.float32), a[:, :, 1].astype(np.float32), a[:, :, 2].astype(
+        np.float32
+    )
+    lum = 0.299 * r + 0.587 * g + 0.114 * b
+    # Charcoal → silver chrome stroke (readable on black, no neon)
+    silver = np.clip(70.0 + lum * 0.70, 48, 230)
+    out = a.copy()
+    m = a[:, :, 3] > 8
+    out[m, 0] = out[m, 1] = out[m, 2] = silver[m].astype(np.uint8)
+    Image.fromarray(out, "RGBA").save(dst, optimize=True)
+    print(f"RING traditional → {dst}")
+    return dst
+
+
 def traditional_from_nightlife(
     nightlife: Image.Image,
     graphic: Image.Image,
@@ -673,46 +706,65 @@ def traditional_from_nightlife(
     left: int,
     top: int,
 ) -> Image.Image:
-    """Traditional = same graphic + type + placement as nightlife; no gradient ring.
+    """Traditional = identical layout/sizes/positions as nightlife; color scheme only.
 
-    Re-assembles identical layers without the ring (do not strip the ring off the
-    finished nightlife frame — that permanently erases Fl where the ring covered it).
+    Keeps the ring. Recolors phones / signals / silhouette / ring stroke to black–
+    charcoal–silver. Verbiage (white + tiffany accents) is untouched.
     """
-    trad = assemble(graphic, under, over, left, top, nightlife=False)
-    ta = np.array(trad.convert("RGBA"))
-    yy, xx = np.indices((S, S))
-    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    r, gch, bch = [ta[:, :, i].astype(int) for i in range(3)]
-    sat = (np.maximum(np.maximum(r, gch), bch) - np.minimum(np.minimum(r, gch), bch)) > 40
-    under_full = np.array(paste_type(under, left, top))
-    over_full = np.array(paste_type(over, left, top))
-    type_ink = (under_full[:, :, 3] > 20) | (over_full[:, :, 3] > 20)
-    # Kill any leftover ring bloom from the graphic extract in the annulus
-    crumb = (
-        (dist > 460)
-        & (dist < 512)
-        & ~type_ink
-        & ~((r > 200) & (gch > 200) & (bch > 200))
-        & ~((r < 100) & (gch > 150) & (bch > 180) & (r + gch + bch > 400))  # keep solid tiffany T
-        & ~((r > 140) & (bch > 140) & (r > gch + 20))  # keep pink LED
-        & (
-            sat
-            | ((bch > 35) & (gch > 25) & (r < 90) & (bch > r + 15))  # faint cyan bloom
-        )
+    ensure_traditional_ring()
+    # Rebuild with charcoal ring so under/over layering matches nightlife exactly
+    base = Image.new("RGBA", (S, S), (0, 0, 0, 255))
+    # Graphic → charcoal/silver (no type yet)
+    ga = np.array(graphic.convert("RGBA"))
+    gr, gg, gb = ga[:, :, 0].astype(np.float32), ga[:, :, 1].astype(np.float32), ga[
+        :, :, 2
+    ].astype(np.float32)
+    glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
+    # Neon → charcoal/silver; keep luminance structure so phones/silhouette stay sharp
+    gsilver = np.clip(22.0 + glum * 0.92, 0, 225)
+    gout = ga.copy()
+    glit = ((ga[:, :, 0] > 6) | (ga[:, :, 1] > 6) | (ga[:, :, 2] > 6)) & (ga[:, :, 3] > 8)
+    gout[glit, 0] = gout[glit, 1] = gout[glit, 2] = gsilver[glit].astype(np.uint8)
+    base.alpha_composite(Image.fromarray(gout, "RGBA"), (0, 0))
+    base = Image.alpha_composite(base, paste_type(under, left, top))
+    base = Image.alpha_composite(
+        base, Image.open(LAYERS / "ring-traditional.png").convert("RGBA")
     )
-    ta[crumb, :3] = 0
-    ta[:, :, 3] = 255
-    # Verify graphic match vs nightlife outside the ring stroke
+    base = Image.alpha_composite(base, paste_type(over, left, top))
+    out = np.array(base)
+    out[:, :, 3] = 255
+
+    # Safety: any leftover neon sat outside type → force charcoal (ring already silver)
+    protect = type_protect_mask(under, over, left, top)
+    r, gch, bch = out[:, :, 0].astype(int), out[:, :, 1].astype(int), out[:, :, 2].astype(int)
+    sat = (np.maximum(np.maximum(r, gch), bch) - np.minimum(np.minimum(r, gch), bch)) > 28
+    fix = sat & ~protect & ((r > 8) | (gch > 8) | (bch > 8))
+    if fix.any():
+        lum = (0.299 * r + 0.587 * gch + 0.114 * bch).astype(np.float32)
+        silver = np.clip(22.0 + lum * 0.92, 0, 225).astype(np.uint8)
+        out[fix, 0] = out[fix, 1] = out[fix, 2] = silver[fix]
+
+    # Geometry check vs nightlife (luminance structure, not RGB)
     na = np.array(nightlife.convert("RGBA"))
-    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
-    interior = (dist < 460) & ~ring
-    hot = int(
-        (
-            (np.abs(na.astype(int) - ta.astype(int)).sum(axis=2) > 30) & interior
-        ).sum()
+    nl_lum = (
+        0.299 * na[:, :, 0].astype(np.float32)
+        + 0.587 * na[:, :, 1].astype(np.float32)
+        + 0.114 * na[:, :, 2].astype(np.float32)
     )
-    print(f"  traditional interior vs nightlife hot={hot}")
-    return Image.fromarray(ta, "RGBA")
+    tr_lum = (
+        0.299 * out[:, :, 0].astype(np.float32)
+        + 0.587 * out[:, :, 1].astype(np.float32)
+        + 0.114 * out[:, :, 2].astype(np.float32)
+    )
+    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
+    # Structure match: ink presence (not color) should align outside type
+    nl_ink = nl_lum > 18
+    tr_ink = tr_lum > 18
+    mismatch = int((nl_ink != tr_ink).sum())
+    print(
+        f"  traditional charcoal: sat_fixed={int(fix.sum())} ink_mismatch={mismatch} ring_px={int(ring.sum())}"
+    )
+    return Image.fromarray(out, "RGBA")
 
 
 # ── 4. ASSEMBLE ─────────────────────────────────────────────────
@@ -963,7 +1015,7 @@ def build_all():
         (480, 30),
     )
     d.text((40, 8), "Nightlife", fill=(180, 180, 180))
-    d.text((480, 8), "Traditional (= nightlife, no ring)", fill=(180, 180, 180))
+    d.text((480, 8), "Traditional (charcoal + ring, type same)", fill=(180, 180, 180))
     panel.save("/opt/cursor/artifacts/qa-modular-chrome.png")
     panel.save("/opt/cursor/artifacts/fc-nightlife-vs-traditional.png")
 

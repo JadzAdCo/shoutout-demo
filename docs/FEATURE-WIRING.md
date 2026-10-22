@@ -461,7 +461,7 @@ When adding a section, use this skeleton:
 | **Builder** | `scripts/build-chrome-icons.py` — modular: ring once → graphic layers → type under/over → assemble |
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
-| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` — graphic restored from `ef50cfe` (never hard-clear LED) |
+| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` — same layout/ring as nightlife; charcoal/silver graphics; verbiage untouched |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
