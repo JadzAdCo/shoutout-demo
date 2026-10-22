@@ -12,6 +12,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
+  {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 0, IsTestFeature: 1},
   // Site chrome beta — Nightlife/Traditional theme; no Search tile. Preference datapoint: users.isSiteChrome.
   {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));

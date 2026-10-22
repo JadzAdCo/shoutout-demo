@@ -1980,6 +1980,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-16-passes-qr",
+      area:"VIP / Passes",
+      feature:"Door Passes QR beta wired (passes + pass.html)",
+      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16.",
+      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes beta row after seed/reload.",
+      expected:"Untracked QR/passes modules are live on the branch and wired end-to-end for VIP Show pass.",
+      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js s3.2.16. Feature row missing → seedFeatureServices / Reload."
+    },
+    {
       id:"s3-2-16-profile-card-chrome",
       area:"Site chrome + Search",
       feature:"Closed profile card follows Site chrome on Search (no Nightlife FOUC)",

@@ -12,6 +12,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Passes / door QR (beta — `passes`)
+
+**Purpose:** One-time QR door passes for VIP reserV, guest entry, and promoter clients.
+
+| Layer | Wiring |
+|---|---|
+| Feature | `featureServices/passes` — Release Control beta (`IsTestFeature:1` packaged default) |
+| Callables | `listMyPasses`, `listClubPasses`, `issuePass`, `revealPass`, `checkInPass`, `sharePass`, `resolvePassToken` (`functions/passes-functions.js` + `passes-core.js`) |
+| VIP bridge | `getVipReservationPass` mirrors into `passes` via `__passesHelpers.upsertPassFromVipReservation` |
+| Client QR | `floqr-qrcode-lib.js` + `floqr-qr.js` → `FLOQRQr.render` |
+| Surfaces | `pass.html?t=` public viewer; My Profile → Guest List & reserV **Show pass** (QR + Open full pass); VIP confirm → `patron-portal.html?tab=passes` |
+| Data | Firestore `passes/{passId}` — server-write only; patron/issuer may read own rows |
+| Door | Club Admin / VIP Door still check in VIP via `checkInVipReservation`; Passes `checkInPass` for generalized kinds |
+
+---
+
 ## Login + Search chrome (s3.2.15)
 
 **Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional login/profile-card styling.

@@ -468,10 +468,10 @@
     {
       id: "help-vip-door-pass",
       title: "VIP reserV door pass",
-      body: "After your deposit confirms, open My Profile → Reservations and tap Show pass for a one-time QR token. Bring ID 21+. Late arrivals follow the venue cutoff. Door staff use VIP reserV Door to check you in.",
-      searchPhrases: ["vip pass", "door pass", "qr table", "vip qr", "show pass", "table check in"],
+      body: "After your deposit confirms, open My Profile → Guest List & reserV (or ?tab=passes) and tap Show pass for a one-time QR. Open full pass opens pass.html. Bring ID 21+. Door staff use VIP reserV Door to check you in.",
+      searchPhrases: ["vip pass", "door pass", "qr table", "vip qr", "show pass", "table check in", "passes"],
       links: [
-        {label: "My Reservations", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "reservations"})},
+        {label: "My door passes", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "passes"})},
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",

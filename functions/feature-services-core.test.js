@@ -27,7 +27,7 @@ test("only ShoutOut is live by default; every other feature is test-only", () =>
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });
-  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "floqAi", "vipReservations", "siteChrome"]);
+  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "floqAi", "vipReservations", "passes", "siteChrome"]);
   assert.equal(core.canonicalizeFeatureKey("traditionalTheme"), "siteChrome");
 });
 

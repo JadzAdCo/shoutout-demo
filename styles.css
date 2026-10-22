@@ -120,6 +120,8 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .floqr-global-profile-status .user-dropdown [data-floqr-feature-link].hidden,
 .floqr-global-profile-status .user-dropdown [data-floqr-feature-link][hidden]{display:none!important}
 .global-back-btn{position:sticky;top:12px;z-index:9990;margin:0 0 16px 0;width:auto;min-width:72px;padding:10px 14px;background:rgba(31,22,69,.78);border:1px solid rgba(255,255,255,.24);box-shadow:0 12px 34px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
+.floqr-qr{display:grid;place-items:center;margin:10px 0;padding:12px;background:#fff;border-radius:14px;width:fit-content;color:#111}
+.vip-pass-panel{margin-top:10px}
 .topbar > button[id^="logout"], #logoutBtnClubActions{display:none!important}
 .category-grid,.compact-category-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:10px!important;margin-top:16px!important}
 .category-card{min-height:54px!important;height:auto!important;font-size:15px!important;border-radius:14px!important;padding:10px 12px!important;line-height:1.1!important}
