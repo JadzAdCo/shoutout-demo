@@ -265,6 +265,107 @@ html[data-floqr-chrome="whiteBlack"] .vip-icon-face{box-shadow:0 0 0 1px rgba(90
   .search-icon-row .vip-icon-word{font-size:9px}
   .search-icon-row > .category-card{min-height:0;max-width:none;aspect-ratio:1;display:grid;place-items:center;font-size:13px;padding:8px 4px}
 }
+
+/* Search tiles: phones/tablets — icon cluster at the bottom of the viewport.
+   Use viewport width (not floqr-desktop-browser): headless / “Request Desktop Website”
+   still report desktop device class on tablet-sized widths. */
+@media(max-width:1180px){
+  .app:has(#categoryPage.page.active){
+    height:100dvh;
+    height:100svh;
+    max-height:100dvh;
+    max-height:100svh;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    box-sizing:border-box;
+    padding-bottom:max(2px,env(safe-area-inset-bottom,0px))!important;
+    overflow:hidden;
+  }
+  #categoryPage.page.active{
+    display:flex!important;
+    flex-direction:column;
+    flex:1 1 auto;
+    min-height:0!important; /* beat .page{min-height:100vh} so flex fill works */
+    max-height:100%;
+    width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  #categoryPage.page.active .category-brand-stack{margin-top:28px;margin-bottom:8px}
+  #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+    margin-top:auto!important;
+    margin-bottom:0!important;
+    padding-bottom:0;
+  }
+  #categoryPage.page.active .search-icon-row{
+    padding-top:4px;
+    padding-bottom:0;
+    align-content:flex-end;
+  }
+}
+html.floqr-mobile-browser .app:has(#categoryPage.page.active),
+html.floqr-tablet-browser .app:has(#categoryPage.page.active){
+  height:100dvh;
+  height:100svh;
+  max-height:100dvh;
+  max-height:100svh;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  box-sizing:border-box;
+  padding-bottom:max(2px,env(safe-area-inset-bottom,0px))!important;
+  overflow:hidden;
+}
+html.floqr-mobile-browser #categoryPage.page.active,
+html.floqr-tablet-browser #categoryPage.page.active{
+  display:flex!important;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0!important;
+  max-height:100%;
+  width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+html.floqr-mobile-browser #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row),
+html.floqr-tablet-browser #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+  margin-top:auto!important;
+  margin-bottom:0!important;
+  padding-bottom:0;
+}
+html.floqr-mobile-browser #categoryPage.page.active .search-icon-row,
+html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
+  padding-top:4px;
+  padding-bottom:0;
+  align-content:flex-end;
+}
+/* Wide desktop: icons stay under Search with balanced spacing (not glued to viewport bottom) */
+@media(min-width:1181px){
+  .app:has(#categoryPage.page.active){
+    min-height:0;
+    display:block;
+    padding-bottom:24px;
+  }
+  #categoryPage.page.active{
+    display:block!important;
+    flex:none;
+    min-height:0;
+  }
+  #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+    margin-top:28px!important;
+    margin-bottom:48px!important;
+    max-width:720px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  #categoryPage.page.active .search-icon-row{
+    padding-top:18px;
+    padding-bottom:8px;
+    gap:18px;
+    align-content:flex-start;
+  }
+}
 @media(max-width:520px){.category-brand-stack{margin-top:40px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{border-radius:50%;gap:0;padding:6px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
 .ad-submit-shell form label,.ad-submit-grid label{display:grid;gap:4px;margin:8px 0}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
