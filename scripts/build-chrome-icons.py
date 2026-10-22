@@ -1513,8 +1513,19 @@ def shiny_chrome_tone(
     return hi.astype(np.float32)
 
 
-def to_white_black(src: Path, dst: Path, *, keep_tiffany_v: bool = False) -> None:
-    """Light theme: white field + shiny chrome-black fonts/borders/ring."""
+def to_white_black(
+    src: Path,
+    dst: Path,
+    *,
+    keep_tiffany_v: bool = False,
+    tip_preserve: bool = False,
+    ring_stroke: int = 5,
+) -> None:
+    """Light theme: white field + shiny chrome-black fonts/borders/ring.
+
+    tip_preserve: FloqCAST-style — never white-halo the ring over Fl/T tips;
+    stamp outside-ring type last so tips stay visible on white.
+    """
     im = Image.open(src).convert("RGBA")
     a = np.array(im)
     r, g, b, al = [a[:, :, i].astype(np.float32) for i in range(4)]
@@ -1529,7 +1540,7 @@ def to_white_black(src: Path, dst: Path, *, keep_tiffany_v: bool = False) -> Non
     sat = (np.maximum(np.maximum(r, g), b) - np.minimum(np.minimum(r, g), b)) > 40
     neon = sat & (al > 20) & ~tiffany
     purple_border = (r > 140) & (b > 180) & (g < 190) & (b > g) & (al > 20)
-    # Silver / grey type leftover from traditional chrome
+    # Type ink anywhere in lower band (incl. tips outside the ring)
     grey_type = (
         (al > 20)
         & (yy > 520)
@@ -1537,7 +1548,6 @@ def to_white_black(src: Path, dst: Path, *, keep_tiffany_v: bool = False) -> Non
         & (np.abs(g - b) < 28)
         & (lum > 60)
         & (lum < 230)
-        & (dist < (R + 20))
     )
 
     out = np.zeros_like(a)
@@ -1546,62 +1556,175 @@ def to_white_black(src: Path, dst: Path, *, keep_tiffany_v: bool = False) -> Non
 
     chrome = shiny_chrome_tone(lum, yy, xx)
 
-    # Graphic linework inside disc → chrome black (furniture / marks)
-    graphic = (al > 20) & ~near_black & ~white & ~tiffany & (dist < (R - 6))
-    for c in range(3):
-        out[:, :, c] = np.where(graphic, chrome, out[:, :, c])
-
-    # Draw a thin shiny chrome ring (do not copy wide nightlife bloom)
-    wb_stroke = 5  # px — smaller than nightlife RING_STROKE
-    wb_half = wb_stroke / 2.0
-    ring_mask = (np.abs(dist - R) <= wb_half) & (dist > 0)
-    # Soft AA rim (1px)
-    ring_aa = (np.abs(dist - R) <= (wb_half + 0.8)) & ~ring_mask
-    ring_chrome = shiny_chrome_tone(np.full_like(lum, 140.0), yy, xx)
-    ring_chrome = np.clip(ring_chrome * 1.25 + 18, 28, 205)
-    for c in range(3):
-        out[:, :, c] = np.where(ring_mask, ring_chrome, out[:, :, c])
-        out[:, :, c] = np.where(ring_aa, ring_chrome * 0.55 + 255 * 0.45, out[:, :, c])
-
-    # Fonts + borders + prior accents → shiny chrome black
+    # Font mask first (tips included) — drives wipe + stamp order
     font_mask = white | purple_border | magenta | grey_type | (neon & (yy > 520)) | tiffany
-    # Dilate slightly so AA / neon borders stay with the glyph
     font_mask = (
         np.array(
             Image.fromarray((font_mask.astype(np.uint8) * 255)).filter(
-                ImageFilter.MaxFilter(3)
+                ImageFilter.MaxFilter(5 if tip_preserve else 3)
             )
         )
         > 0
     )
     font_chrome = shiny_chrome_tone(np.maximum(lum, 120), yy, xx, for_type=True)
+
+    # Graphic linework inside disc → chrome black (furniture / marks)
+    graphic = (al > 20) & ~near_black & ~white & ~tiffany & (dist < (R - 6)) & ~font_mask
+    for c in range(3):
+        out[:, :, c] = np.where(graphic, chrome, out[:, :, c])
+
+    # Type under the ring (full glyph first)
     for c in range(3):
         out[:, :, c] = np.where(font_mask, font_chrome, out[:, :, c])
-
-    # Optional cool glint on former tiffany glyphs (off for VIP — all chrome black)
     if keep_tiffany_v:
         cool = np.clip(font_chrome * 0.90, 14, 160)
         out[:, :, 0] = np.where(tiffany, cool * 0.50, out[:, :, 0])
         out[:, :, 1] = np.where(tiffany, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1])
         out[:, :, 2] = np.where(tiffany, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2])
 
-    # Outside ring → pure white, but NEVER wipe type tips (Fl / T / re / etc.)
-    outside = dist > (R + wb_half + 1.2)
+    # Smaller shiny chrome-black ring — no white AA halo
+    wb_stroke = max(2, int(ring_stroke))
+    wb_half = wb_stroke / 2.0
+    ring_mask = (np.abs(dist - R) <= wb_half) & (dist > 0)
+    ring_chrome = shiny_chrome_tone(np.full_like(lum, 160.0), yy, xx)
+    ring_chrome = np.clip(ring_chrome * 1.30 + 22, 24, 190)
+    # Soft dark AA only (never blend toward white — that erased Fl/T)
+    ring_aa = (np.abs(dist - R) <= (wb_half + 0.7)) & ~ring_mask
+    for c in range(3):
+        out[:, :, c] = np.where(ring_mask, ring_chrome, out[:, :, c])
+        out[:, :, c] = np.where(
+            ring_aa & ~font_mask, np.clip(ring_chrome * 0.65, 20, 160), out[:, :, c]
+        )
+
+    # Outside ring → pure white, but NEVER wipe type tips
+    outside = dist > (R + wb_half + 0.5)
     wipe = outside & ~font_mask
     out[wipe] = (255, 255, 255, 255)
-    # Re-stamp type last so tips outside the ring stay chrome-black
-    for c in range(3):
-        out[:, :, c] = np.where(font_mask, font_chrome, out[:, :, c])
-    if keep_tiffany_v:
-        cool = np.clip(font_chrome * 0.90, 14, 160)
-        out[:, :, 0] = np.where(tiffany, cool * 0.50, out[:, :, 0])
-        out[:, :, 1] = np.where(tiffany, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1])
-        out[:, :, 2] = np.where(tiffany, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2])
+
+    # Tips outside / grazing the outer edge — stamp last over white + ring AA
+    tips = font_mask & (dist >= (R - wb_half * 0.25))
+    if tip_preserve:
+        # All tip/over type above the ring AA; solid ring still covers true under-ink
+        over_type = font_mask & ~ring_mask
+        for c in range(3):
+            out[:, :, c] = np.where(over_type, font_chrome, out[:, :, c])
+        # Re-apply solid ring so Fl under-chord stays tucked
+        for c in range(3):
+            out[:, :, c] = np.where(ring_mask, ring_chrome, out[:, :, c])
+        # Final tip pass: anything outside the solid stroke always wins
+        tip_out = font_mask & (dist > (R + wb_half))
+        for c in range(3):
+            out[:, :, c] = np.where(tip_out, font_chrome, out[:, :, c])
+        if keep_tiffany_v:
+            cool = np.clip(font_chrome * 0.90, 14, 160)
+            out[:, :, 0] = np.where(tiffany & tip_out, cool * 0.50, out[:, :, 0])
+            out[:, :, 1] = np.where(
+                tiffany & tip_out, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1]
+            )
+            out[:, :, 2] = np.where(
+                tiffany & tip_out, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2]
+            )
+    else:
+        for c in range(3):
+            out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
+        if keep_tiffany_v:
+            cool = np.clip(font_chrome * 0.90, 14, 160)
+            out[:, :, 0] = np.where(tiffany & tips, cool * 0.50, out[:, :, 0])
+            out[:, :, 1] = np.where(
+                tiffany & tips, np.clip(cool * 0.70 + 22, 16, 140), out[:, :, 1]
+            )
+            out[:, :, 2] = np.where(
+                tiffany & tips, np.clip(cool * 0.80 + 32, 18, 150), out[:, :, 2]
+            )
 
     Image.fromarray(out.astype(np.uint8), "RGBA").convert("RGB").save(
         dst, quality=96, subsampling=0
     )
-    print(f"  whiteBlack chrome → {dst.name}")
+    print(f"  whiteBlack chrome → {dst.name} tip_preserve={tip_preserve} ring={wb_stroke}px")
+
+
+def build_floqcast_whiteblack() -> Path:
+    """FloqCAST White/Black from layers — Fl/T tips never wiped by white outside ring.
+
+    Order: white bg → chrome graphic → under type (Fl) → thin shiny black ring → over type (oqCAST+T).
+    """
+    LAYERS.mkdir(parents=True, exist_ok=True)
+    ensure_ring()
+    g = Image.open(extract_floqcast_graphic())
+    under, over, body = floqcast_wm()
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
+    print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
+
+    wb_stroke = 3  # small shiny-black ring
+    wb_half = wb_stroke / 2.0
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    # Darker chrome-black type for white field contrast
+    font_chrome = shiny_chrome_tone(np.full((S, S), 160.0, np.float32), yy, xx, for_type=True)
+    font_chrome = np.clip(font_chrome * 0.72, 10, 110)
+
+    base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+
+    # Graphic → chrome linework on white
+    ga = np.array(g.convert("RGBA"))
+    gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
+    glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
+    chrome = shiny_chrome_tone(glum, yy, xx)
+    gout = np.zeros_like(ga)
+    line = (glum >= 30) & (gal > 8) & (dist < (R - 4))
+    gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
+    gout[line, 3] = 255
+    base.alpha_composite(Image.fromarray(gout, "RGBA"))
+
+    def type_layer(im: Image.Image) -> Image.Image:
+        a = np.array(paste_type(im, left, top))
+        ink = a[:, :, 3] > 20
+        out = np.zeros_like(a)
+        for c in range(3):
+            out[:, :, c] = np.where(ink, font_chrome, 0)
+        out[:, :, 3] = np.where(ink, 255, 0)
+        return Image.fromarray(out, "RGBA")
+
+    # Under (Fl) → thin shiny-black ring → over (oqCAST + T)
+    base.alpha_composite(type_layer(under))
+    # Shiny black ring: dark body + silver specular (not light grey)
+    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
+    ring_chrome = np.clip(12.0 + ring_chrome * 0.35, 14, 95)
+    ra = np.zeros((S, S, 4), np.uint8)
+    ring_mask = np.abs(dist - R) <= wb_half
+    for c in range(3):
+        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
+    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+    base.alpha_composite(Image.fromarray(ra, "RGBA"))
+    base.alpha_composite(type_layer(over))
+
+    out = np.array(base)
+    out[:, :, 3] = 255
+    # Outside white — but keep any type ink that extends past the ring (Fl / T tips)
+    type_ink = (np.array(type_layer(under))[:, :, 3] > 20) | (
+        np.array(type_layer(over))[:, :, 3] > 20
+    )
+    outside = dist > (R + wb_half + 0.5)
+    out[outside & ~type_ink, :3] = 255
+    # Final tip stamp over white field
+    tips = type_ink & (dist > (R + wb_half))
+    for c in range(3):
+        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
+
+    dst = ROOT / "images/chrome/floqcast-whiteblack.jpg"
+    Image.fromarray(out, "RGBA").convert("RGB").save(dst, quality=96, subsampling=0)
+    preview = Image.fromarray(out, "RGBA").convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
+    preview.save("/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95)
+    Image.fromarray(out, "RGBA").convert("RGB").crop((0, 600, 360, 1024)).resize(
+        (360, 424), Image.Resampling.LANCZOS
+    ).save("/opt/cursor/artifacts/floqcast-wb-fl-fixed.png", quality=95)
+    Image.fromarray(out, "RGBA").convert("RGB").crop((660, 600, 1024, 1024)).resize(
+        (364, 424), Image.Resampling.LANCZOS
+    ).save("/opt/cursor/artifacts/floqcast-wb-t-fixed.png", quality=95)
+    print(
+        f"  FloqCAST WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}"
+    )
+    return dst
 
 
 def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
@@ -1639,21 +1762,27 @@ def export_theme_vip_packs() -> None:
     recolor_vip_ring(nl, out / "vip-blacktiffany.jpg", "tiffany")
     recolor_vip_ring(nl, out / "vip-blackdarkgreen.jpg", "forest")
     # Full whiteblack pack — fonts + borders use shiny chrome black
+    # FloqCAST WB from layers (preserves Fl/T tips) — not flat JPG convert
+    build_floqcast_whiteblack()
     pairs = [
-        # VIP: all fonts (incl. V) → shiny chrome black
-        ("vip-traditional.jpg", "vip-whiteblack.jpg", False),
-        ("floqcast-traditional.jpg", "floqcast-whiteblack.jpg", False),
-        ("shoutout-traditional-green.png", "shoutout-whiteblack.png", False),
-        ("floqai-traditional.jpg", "floqai-whiteblack.jpg", False),
-        ("bartr-traditional.jpg", "bartr-whiteblack.jpg", False),
-        ("rydr-traditional.jpg", "rydr-whiteblack.jpg", False),
+        ("vip-traditional.jpg", "vip-whiteblack.jpg", False, False, 5),
+        ("shoutout-traditional-green.png", "shoutout-whiteblack.png", False, False, 5),
+        ("floqai-traditional.jpg", "floqai-whiteblack.jpg", False, False, 5),
+        ("bartr-traditional.jpg", "bartr-whiteblack.jpg", False, False, 5),
+        ("rydr-traditional.jpg", "rydr-whiteblack.jpg", False, False, 5),
     ]
-    for src_name, dst_name, keep_t in pairs:
+    for src_name, dst_name, keep_t, tip_p, stroke in pairs:
         src = out / src_name
         if not src.exists():
             print(f"  SKIP missing {src_name}")
             continue
-        to_white_black(src, out / dst_name, keep_tiffany_v=keep_t)
+        to_white_black(
+            src,
+            out / dst_name,
+            keep_tiffany_v=keep_t,
+            tip_preserve=tip_p,
+            ring_stroke=stroke,
+        )
 
 
 def build_vip_only():
@@ -1860,6 +1989,11 @@ def main():
         action="store_true",
         help="Rebuild streetBOT (FloqCAST process) + floqAi pack slots",
     )
+    ap.add_argument(
+        "--floqcast-wb-only",
+        action="store_true",
+        help="Rebuild FloqCAST White/Black only (layer assemble, tip-safe)",
+    )
     args = ap.parse_args()
     if args.ring_only:
         ensure_ring()
@@ -1875,6 +2009,9 @@ def main():
         return
     if args.streetbot_only:
         build_streetbot_only()
+        return
+    if args.floqcast_wb_only:
+        build_floqcast_whiteblack()
         return
     build_all()
 
