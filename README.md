@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.108 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.109 (stable)
+
+- s3.1.109: Xibo load-error Master Admin alerts + same-IP venue mismatch (dual-URL paste).
 
 - s3.1.108: floqCAST idle 64×48 icon ~+30% + Select→Go live CTA; door pass portalHome fix.
 

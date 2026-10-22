@@ -622,7 +622,9 @@
             .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
             .filter((row) => {
               const isSecurity = row.messageCategory === "security"
-                || row.type === "displayAccessDenied";
+                || row.type === "displayAccessDenied"
+                || row.type === "displayLoadError"
+                || row.type === "displayVenueMismatch";
               return isSecurity && row.deleted !== true;
             })
             .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))

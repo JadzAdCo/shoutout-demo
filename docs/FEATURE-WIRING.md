@@ -140,17 +140,17 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Xibo Trigger on Error / display load-error fallback
 
-**Purpose:** When Xibo cannot load the board Webpage, a fallback layout opens `display-error.html` and logs a diagnostic event (not a Security deny).
+**Purpose:** When Xibo cannot load the board Webpage, a fallback layout opens `display-error.html`, logs a diagnostic event, and alerts Master Admin (Security System Messages). Detects dual-venue Xibo paste when the same player IP recently had allowed loads for a different `locationId`.
 
 | Layer | Wiring |
 |---|---|
 | UI (Diagnostics) | Master Admin → Diagnostics → **Display / Xibo Load Errors** (`#diagnosticsDisplayErrors`) — build/copy fallback URL |
-| UI (Security) | Master Admin → Security → **Display Security Setting** — **Trigger on Error URL** per loaded venue (Display 1 / Display 2) |
-| Client | `master-diagnostics-panels.js` (`buildFallbackUrl`); `master-display-security.js` (`buildTriggerOnErrorUrl`); `display-error-app.js` |
+| UI (Security) | Master Admin → Security → **Security System Messages** — `displayLoadError` / `displayVenueMismatch` (also deny `displayAccessDenied`) |
+| Client | `master-diagnostics-panels.js` (`buildFallbackUrl`); `master-display-security.js` (security feed includes load-error types); `display-error-app.js` |
 | Page | `display-error.html` (stable URL — no `?v=`) |
-| Backend | `reportDisplayLoadError` in `functions/display-security-functions.js` |
-| Data / logs | Diagnostic app logs (≈30-day); **not** Security System Messages |
-| URL contract | `display-error.html?location={id}&board=1\|2&reason=xibo_page_load_error` — no board token required |
+| Backend | `reportDisplayLoadError` in `functions/display-security-functions.js` — `appLogs` + `notifyMasterAdminsDisplayLoadError`; lookback `displayAccessLogs` by `clientIp` (2h) via `pickVenueMismatch` |
+| Data / logs | `appLogs` (displayFallback, 30-day); inbox `type` `displayLoadError` or `displayVenueMismatch` (`messageCategory: security`); cooldown `displayLoadErrorAlerts` (15 min) |
+| URL contract | `display-error.html?location={id}&board=1\|2&reason=xibo_page_load_error` — no board token required; **fallback `location=` must match** the main `display.html` / `display2.html` venue |
 
 **Example — Shôko Barcelona Display 1**
 

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.108";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.109";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.1.109",
+      title: "Xibo load-error alerts + same-IP venue mismatch",
+      checks: [
+        {label:"reportDisplayLoadError mismatch notify", file:"functions/display-security-functions.js", includes:["pickVenueMismatch", "notifyMasterAdminsDisplayLoadError", "displayVenueMismatch", "displayLoadError"]},
+        {label:"Security feed includes load-error types", file:"master-display-security.js", includes:["displayLoadError", "displayVenueMismatch"]},
+        {label:"Diagnostics lists venue mismatch action", file:"master-diagnostics-panels.js", includes:["display_venue_mismatch"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.109\""]}
+      ]
+    },
     {
       version: "s3.1.108",
       title: "floqCAST idle 64×48 icon +25% + FloqCAST one-CTA + door pass link",
@@ -1979,6 +1989,15 @@
       howToTest:"1) Hard-refresh Search as a normal patron — no Nightlife/Traditional toolbar under Or. 2) Master Admin → Features Mgmt: enable traditionalTheme (Enabled=1, Test=1), invite a tester with Theme ticked (or assign). 3) As that tester accept beta invite → My Profile → Language Settings → Site theme appears. 4) Choose Traditional — Search, Profile, and other pages use charcoal/white theme (not neon). 5) Without grant, Site theme panel stays hidden and site stays Nightlife.",
       expected:"Public Search has no theme toggle; only beta-granted (or Master Admin) users can switch; Traditional changes whole-site colors.",
       troubleshoot:"Toggle still on Search → hard refresh index.html s3.1.104+. Panel missing for invitee → confirm featureServices/traditionalTheme Enabled+Test and betaTesters.features.traditionalTheme=1. Theme not applying → floqr-chrome-scheme.js syncAccessGate + styles.css traditional block; html data-floqr-chrome=traditional."
+    },
+    {
+      id:"s3-1-109-display-load-error-venue-mismatch",
+      area:"Display Security + Xibo Diagnostics",
+      feature:"Load-error Master Admin alerts + same-IP venue mismatch",
+      changed:"reportDisplayLoadError notifies Master Admin (displayLoadError). If the same client IP had allowed displayAccessLogs for a different locationId within 2h, escalates to displayVenueMismatch (dual Xibo URL paste). Security System Messages feed includes both types. Package s3.1.109; Functions deploy required.",
+      howToTest:"1) Deploy Functions. 2) Open display2 for temp-democlub-1 on a player (creates allowed access log). 3) On that same egress IP, open display-error.html?location=heist-washington-dc&board=2&reason=xibo_page_load_error. 4) Master Admin → Security → Security System Messages — see Display venue mismatch. 5) Diagnostics → Display / Xibo Load Errors also lists the event.",
+      expected:"Mismatch alert names both venues + IP; plain load-error (no prior other venue) still alerts as Display / Xibo load-error fallback. 15-minute cooldown per key.",
+      troubleshoot:"No alert → Functions not deployed / Master Admin UIDs empty / cooldown. No mismatch → access log IP differs (IPv6 rotated) or lookback >2h. Feed missing row → hard refresh master-display-security.js s3.1.109 (types displayLoadError/displayVenueMismatch)."
     },
     {
       id:"s3-1-108-floqcast-idle-64x48-scale",

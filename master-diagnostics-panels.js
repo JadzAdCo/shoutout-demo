@@ -199,7 +199,9 @@
             .filter((row) => {
               const cat = String(row.category || "").toLowerCase();
               const action = String(row.action || "").toLowerCase();
-              return cat === "displayfallback" || action === "xibo_page_load_error";
+              return cat === "displayfallback"
+                || action === "xibo_page_load_error"
+                || action === "display_venue_mismatch";
             })
             .slice(0, 50);
           renderLoadErrors(rows);

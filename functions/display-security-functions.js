@@ -10,7 +10,9 @@
  *  5) rotateVenueDisplayToken — issues a new secret; cleartext URL returned once for Xibo paste.
  *  6) listDisplayAccessLogs — per-venue access history for Master Admin.
  *  7) reportDisplayLoadError — public callable from display-error.html (Xibo page-load fallback).
- *     Writes diagnostic appLogs (30-day retention). Not a security deny event.
+ *     Writes diagnostic appLogs (30-day) and Master Admin Security System Messages.
+ *     When the same client IP recently had allowed loads for a different locationId,
+ *     notifies as displayVenueMismatch (wrong Xibo fallback / dual-venue paste).
  * Secrets collection: displayBoardSecrets/{locationId} (not publicly readable).
  */
 const crypto = require("crypto");
@@ -279,6 +281,9 @@ async function writeAccessLog(entry = {}) {
 }
 
 const DISPLAY_DENIAL_NOTIFY_COOLDOWN_MS = 15 * 60 * 1000;
+const DISPLAY_LOAD_ERROR_NOTIFY_COOLDOWN_MS = 15 * 60 * 1000;
+/** Look back this far in displayAccessLogs for a different allowed venue on the same IP. */
+const DISPLAY_MISMATCH_LOOKBACK_MS = 2 * 60 * 60 * 1000;
 
 /** Resolve Master Admin UIDs (email allowlist + users flagged masterAdmin). */
 async function resolveMasterAdminUids(extraUids = []) {
@@ -378,6 +383,176 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
     skipped: ""
   }, {merge: true});
   return {notified: true, recipientCount: recipientUids.length};
+}
+
+/**
+ * Pure helper: first recent allowed access row whose locationId differs from the error URL venue.
+ * Used to catch Xibo dual-paste (main Webpage venue A, Trigger-on-Error venue B).
+ */
+function pickVenueMismatch(errorLocationId, rows = []) {
+  const err = text(errorLocationId, 120).toLowerCase();
+  if (!err || !Array.isArray(rows) || !rows.length) return null;
+  for (const row of rows) {
+    const loc = text(row?.locationId, 120).toLowerCase();
+    if (!loc || loc === err) continue;
+    if (row?.allowed !== true) continue;
+    const board = text(row?.displayBoard, 40).toLowerCase();
+    if (board === "master-admin" || board === "ip-probe") continue;
+    return {
+      recentLocationId: loc,
+      recentLocationName: text(row?.locationName, 200) || loc,
+      recentDisplayBoard: text(row?.displayBoard, 40) || "primary",
+      recentPageUrl: text(row?.pageUrl, 500),
+      recentCreatedAtMs: Number(row?.createdAtMs || 0) || 0
+    };
+  }
+  return null;
+}
+
+async function loadRecentAllowedAccessForClient(clientIp, sinceMs) {
+  const ip = normalizeIp(clientIp);
+  if (!ip) return [];
+  const keep = (row) => {
+    const ms = Number(row.createdAtMs || 0) || 0;
+    return ms >= sinceMs && row.allowed === true;
+  };
+  try {
+    const snap = await db.collection("displayAccessLogs")
+      .where("clientIp", "==", ip)
+      .orderBy("createdAtMs", "desc")
+      .limit(40)
+      .get();
+    return snap.docs.map((doc) => ({id: doc.id, ...(doc.data() || {})})).filter(keep);
+  } catch (err) {
+    try {
+      const snap = await db.collection("displayAccessLogs")
+        .where("clientIp", "==", ip)
+        .limit(40)
+        .get();
+      return snap.docs
+        .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
+        .filter(keep)
+        .sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+    } catch (err2) {
+      console.warn("display load-error access lookback failed", err2?.message || err2, err?.message || err);
+      return [];
+    }
+  }
+}
+
+/**
+ * Feature: Master Admin alert when Xibo shows display-error.html.
+ * Always alert-worthy (not diagnostics-only). Escalates to venue-mismatch when the
+ * same player IP recently had allowed loads for a different locationId.
+ */
+async function notifyMasterAdminsDisplayLoadError(entry = {}) {
+  const locationId = text(entry.locationId, 120).toLowerCase();
+  const displayBoard = text(entry.displayBoard, 40) || "unknown";
+  const clientIp = normalizeIp(entry.clientIp);
+  const reason = text(entry.reason, 240) || "xibo_page_load_error";
+  const mismatch = entry.mismatch && entry.mismatch.recentLocationId ? entry.mismatch : null;
+  const alertKind = mismatch ? "displayVenueMismatch" : "displayLoadError";
+  if (!locationId && !mismatch) return {notified: false, reason: "missing_location"};
+
+  const coolKey = crypto
+    .createHash("sha1")
+    .update(`${alertKind}|${locationId}|${displayBoard}|${clientIp}|${reason}|${mismatch?.recentLocationId || ""}`)
+    .digest("hex")
+    .slice(0, 40);
+  const coolRef = db.collection("displayLoadErrorAlerts").doc(coolKey);
+  const nowMs = Date.now();
+  const coolSnap = await coolRef.get();
+  const lastMs = Number(coolSnap.exists ? coolSnap.data()?.lastNotifiedAtMs || 0 : 0);
+  if (lastMs && nowMs - lastMs < DISPLAY_LOAD_ERROR_NOTIFY_COOLDOWN_MS) {
+    return {
+      notified: false,
+      reason: "cooldown",
+      cooldownRemainingMs: DISPLAY_LOAD_ERROR_NOTIFY_COOLDOWN_MS - (nowMs - lastMs),
+      alertKind
+    };
+  }
+
+  const boardLabel = (() => {
+    const b = String(displayBoard || "").toLowerCase();
+    if (b === "2" || b === "secondary" || b === "display2") return "Display 2 (floqCast)";
+    if (b === "1" || b === "primary" || b === "display") return "Display 1 (ShoutOut)";
+    return displayBoard ? `Board ${displayBoard}` : "Display";
+  })();
+  const locationName = text(entry.locationName, 200) || locationId || "unknown venue";
+
+  let title;
+  let body;
+  if (mismatch) {
+    title = "Display venue mismatch (Xibo config)";
+    body = [
+      `${boardLabel} load-error fallback is for ${locationName} (${locationId}),`,
+      `but this IP recently loaded ${mismatch.recentLocationName} (${mismatch.recentLocationId}).`,
+      clientIp ? `IP ${clientIp}.` : "",
+      "Likely wrong Trigger-on-Error / fallback Webpage pasted into Xibo (dual-venue on one board).",
+      "Fix: fallback URL location= must match the main display.html / display2.html venue."
+    ].filter(Boolean).join(" ");
+  } else {
+    title = "Display / Xibo load-error fallback";
+    body = [
+      `${boardLabel} showed display-error.html for ${locationName}.`,
+      clientIp ? `IP ${clientIp}.` : "",
+      `Reason: ${reason}.`,
+      "Logged under Diagnostics → Display / Xibo Load Errors. Check Xibo Webpage URL and network."
+    ].filter(Boolean).join(" ");
+  }
+
+  const recipientUids = await resolveMasterAdminUids(entry.masterAdminUids || []);
+  if (!recipientUids.length) {
+    await coolRef.set({
+      locationId,
+      displayBoard,
+      clientIp,
+      reason,
+      alertKind,
+      lastNotifiedAtMs: nowMs,
+      lastAttemptAtMs: nowMs,
+      notifiedCount: 0,
+      skipped: "no_master_admin_uids"
+    }, {merge: true});
+    return {notified: false, reason: "no_recipients", alertKind};
+  }
+
+  const note = {
+    type: alertKind,
+    messageCategory: "security",
+    title,
+    subject: title,
+    body,
+    clubLocationId: locationId,
+    locationName,
+    displayBoard,
+    clientIp,
+    denialReason: reason,
+    mismatchLocationId: mismatch?.recentLocationId || "",
+    mismatchLocationName: mismatch?.recentLocationName || "",
+    accessLogId: text(entry.appLogId, 120),
+    read: false,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAtMs: nowMs,
+    link: mismatch
+      ? "./master-admin.html#diagnosticsDisplayErrors"
+      : "./master-admin.html#diagnosticsDisplayErrors"
+  };
+  await Promise.all(recipientUids.map((uid) => db.collection("inboxNotifications").add({...note, recipientUid: uid})));
+  await coolRef.set({
+    locationId,
+    displayBoard,
+    clientIp,
+    reason,
+    alertKind,
+    mismatchLocationId: mismatch?.recentLocationId || "",
+    lastNotifiedAtMs: nowMs,
+    lastAttemptAtMs: nowMs,
+    notifiedCount: admin.firestore.FieldValue.increment(1),
+    recipientCount: recipientUids.length,
+    skipped: ""
+  }, {merge: true});
+  return {notified: true, recipientCount: recipientUids.length, alertKind};
 }
 
 /** Best-effort reverse DNS for log “Hostname” column (often empty for residential/CGNAT IPs). */
@@ -855,11 +1030,13 @@ exports.listDisplayAccessLogs = onCall({
 
 /**
  * Public: Xibo / player reports that display.html or display2.html failed to load
- * and the fallback display-error.html page was shown. Diagnostic only (not Security).
+ * and the fallback display-error.html page was shown.
+ * Writes diagnostic appLogs + Master Admin Security System Message.
+ * Venue mismatch (same IP, different recent allowed locationId) → displayVenueMismatch.
  */
 exports.reportDisplayLoadError = onCall({
   region: "us-central1",
-  timeoutSeconds: 15,
+  timeoutSeconds: 20,
   memory: "256MiB",
   invoker: "public"
 }, async (request) => {
@@ -876,6 +1053,25 @@ exports.reportDisplayLoadError = onCall({
   const now = Date.now();
   const retentionMs = 30 * 24 * 60 * 60 * 1000;
 
+  let clubName = locationId;
+  let masterAdminUids = [];
+  if (locationId) {
+    try {
+      const clubSnap = await db.collection("clubLocations").doc(locationId).get();
+      if (clubSnap.exists) {
+        const club = clubSnap.data() || {};
+        clubName = club.locationName || club.brandName || locationId;
+        if (Array.isArray(club.masterAdminUids)) masterAdminUids = club.masterAdminUids;
+      }
+    } catch (_) {}
+  }
+
+  const recentAllowed = await loadRecentAllowedAccessForClient(
+    clientIp,
+    now - DISPLAY_MISMATCH_LOOKBACK_MS
+  );
+  const mismatch = pickVenueMismatch(locationId, recentAllowed);
+
   const details = {
     locationId,
     displayBoard,
@@ -885,19 +1081,30 @@ exports.reportDisplayLoadError = onCall({
     pageUrl,
     clientIp,
     platform,
-    reportedAtMs: Number(data.reportedAtMs || now) || now
+    reportedAtMs: Number(data.reportedAtMs || now) || now,
+    venueMismatch: mismatch ? true : false,
+    mismatchLocationId: mismatch?.recentLocationId || "",
+    mismatchLocationName: mismatch?.recentLocationName || "",
+    mismatchPageUrl: mismatch?.recentPageUrl || ""
   };
+
+  const message = mismatch
+    ? text(
+      `Xibo load-error fallback venue mismatch: error URL ${locationId || "?"} but IP recently loaded ${mismatch.recentLocationId}.`,
+      2000
+    )
+    : text(
+      data.message || `Xibo/display load-error fallback shown${locationId ? ` for ${locationId}` : ""}.`,
+      2000
+    );
 
   const ref = await db.collection("appLogs").add({
     level: "error",
     category: "displayFallback",
-    action: "xibo_page_load_error",
-    message: text(
-      data.message || `Xibo/display load-error fallback shown${locationId ? ` for ${locationId}` : ""}.`,
-      2000
-    ),
+    action: mismatch ? "display_venue_mismatch" : "xibo_page_load_error",
+    message,
     details,
-    logCategory: "diagnostic",
+    logCategory: mismatch ? "security" : "diagnostic",
     source: "display-error",
     uid: request.auth?.uid || "anonymous-display-player",
     email: text(request.auth?.token?.email, 200),
@@ -910,7 +1117,33 @@ exports.reportDisplayLoadError = onCall({
     expireAtMs: now + retentionMs
   });
 
-  return {ok: true, id: ref.id, locationId, displayBoard, reason};
+  let masterNotify = null;
+  try {
+    masterNotify = await notifyMasterAdminsDisplayLoadError({
+      locationId,
+      locationName: clubName,
+      displayBoard,
+      clientIp,
+      reason,
+      mismatch,
+      appLogId: ref.id,
+      masterAdminUids
+    });
+  } catch (notifyErr) {
+    console.warn("display load-error master notify failed", notifyErr?.message || notifyErr);
+    masterNotify = {notified: false, reason: "notify_error"};
+  }
+
+  return {
+    ok: true,
+    id: ref.id,
+    locationId,
+    displayBoard,
+    reason,
+    venueMismatch: !!mismatch,
+    mismatchLocationId: mismatch?.recentLocationId || "",
+    masterNotify
+  };
 });
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -1032,5 +1265,8 @@ exports.__displaySecurityHelpers = {
   ipAllowed,
   extractClientIp,
   normalizeBoard,
-  buildDisplayUrl
+  buildDisplayUrl,
+  pickVenueMismatch,
+  DISPLAY_MISMATCH_LOOKBACK_MS,
+  DISPLAY_LOAD_ERROR_NOTIFY_COOLDOWN_MS
 };
