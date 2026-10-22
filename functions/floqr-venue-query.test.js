@@ -196,4 +196,5 @@ test("chrome pack carries the FloqAi category dialog copy", () => {
   const src = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   assert.match(src, /"cat\.floqaiWelcome": "Welcome, type below to search for Events"/);
   assert.match(src, /"cat\.floqaiAlso": "You may also search for: Clubs or Lounges"/);
+  assert.match(src, /"cat\.floqaiPlaceholder": "You may also search for: Clubs or Lounges"/);
 });

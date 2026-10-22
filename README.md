@@ -1,4 +1,6 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.109 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.110 (stable)
+
+- s3.1.110: Search placeholder = You may also search for: Clubs or Lounges (was example Hip Hop/EDM).
 
 - s3.1.109: Xibo load-error Master Admin alerts + same-IP venue mismatch (dual-URL paste).
 
