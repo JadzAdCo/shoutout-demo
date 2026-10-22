@@ -54,7 +54,7 @@ Compose **only** as:
 
 | Mark | Under ring (left) | Over ring (right) | Accent |
 |---|---|---|---|
-| FloqCAST | **`F`** (full glyph, same-canvas shear mask) | `loqCAST` | Tiffany **T** |
+| FloqCAST | **`Fl`** (same-canvas shear mask) | `oqCAST` | Tiffany **T** |
 | djBOT | **`d`** tip | `jBOT` | Tiffany **T** |
 | VIP reserVIP | **`reser` + tiffany `V`** | **`IP`** | **V = 2 ×** reser/IP size |
 | ShoutOut | left tip / `Shout` as needed | rest | Tiffany **T** on **OUT** |

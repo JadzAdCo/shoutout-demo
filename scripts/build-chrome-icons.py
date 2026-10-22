@@ -206,26 +206,60 @@ def extract_floqcast_graphic() -> Path:
         src,
     )
     g = strip_ring_only(Image.open(src))
-    # Clear bottom type only — LED ends ~650–700 on good asset
-    g = strip_type_band(g, y_min=700, protect_cyan_led=True)
-    # Also clear any leftover top wordmark from older revs if present
-    g = strip_type_band(g, y_min=80)  # will only hit white/green in that band
-    # Re-protect: strip_type_band at y_min=80 would kill LED white outlines!
-    # So re-extract from good with ONLY bottom clear
-    g = strip_ring_only(Image.open(src))
-    g = strip_type_band(g, y_min=720, protect_cyan_led=True)
-    out = LAYERS / "floqcast-graphic.png"
-    g.save(out, optimize=True)
-    a = np.array(g)
+    # Wipe ALL prior wordmark ink in the lower disc — leftover white/tiffany T
+    # under the new type reads as a "double T". LED/phone live above ~640.
+    a = np.array(g.convert("RGBA"))
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    r, gch, b, al = [a[:, :, i].astype(np.int16) for i in range(4)]
+    band = (yy >= 640) & (dist < 500)
+    white = (al > 20) & (r > 175) & (gch > 175) & (b > 175) & band
+    # Accent T / old green T — low red, high blue (not pink LED silhouette)
+    accent = (
+        (al > 20)
+        & (r < 120)
+        & (gch > 140)
+        & (b > 170)
+        & (b >= gch - 10)
+        & band
+    )
+    red = (r > 80) & (r > gch + 25) & (r > b + 25)  # keep arrow
+    pink = (r > 140) & (b > 140) & (r > gch + 20)  # keep LED silhouette glow
+    mask = (white | accent) & ~red & ~pink
+    m = Image.fromarray((mask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(11))
+    a[(np.array(m) > 0) & band & ~red & ~pink] = (0, 0, 0, 255)
+    # Kill residual dark-gray plate in the wordmark band (reads as a black matte over F/T)
+    plate = (
+        band
+        & (al > 20)
+        & (r < 45)
+        & (gch < 45)
+        & (b < 45)
+        & ((r > 4) | (gch > 4) | (b > 4))
+        & ~red
+        & ~pink
+    )
+    a[plate] = (0, 0, 0, 255)
+    g = Image.fromarray(a, "RGBA")
+    out = LAYERS / "floqcast-graphic.png"
+    g.save(out, optimize=True)
     upper = (
         (a[:, :, 3] > 40)
         & (dist < 450)
-        & (yy < 650)
+        & (yy < 640)
         & ((a[:, :, 0] > 30) | (a[:, :, 1] > 30) | (a[:, :, 2] > 30))
     )
-    print(f"GRAPHIC floqcast → {out} upper_ink={int(upper.sum())}")
+    left_tiff = int(
+        (
+            (a[:, :, 0] < 100)
+            & (a[:, :, 1] > 150)
+            & (a[:, :, 2] > 180)
+            & (a[:, :, 3] > 20)
+            & (yy > 640)
+            & (dist < 480)
+        ).sum()
+    )
+    print(f"GRAPHIC floqcast → {out} upper_ink={int(upper.sum())} leftover_tiff={left_tiff}")
     return out
 
 
@@ -300,7 +334,12 @@ def fit_width(under, over, body, max_w=MAX_WM_W):
     return fix(under), fix(over), fix(body)
 
 
-def accent_wm(full, before_t, under_text, size, target_h):
+def accent_wm(full, before_t, under_text, size, target_h, fit=True):
+    """Shared-canvas wordmark: under_text under ring; rest over; final letter = tiffany T.
+
+    Never paint a lone "T" at the string origin — that stamps a ghost T on the first letter.
+    T is the shared-canvas remainder after before_t (FloqCAS / djBO).
+    """
     for _ in range(8):
         u, by = render_upright(full, size, WHITE)
         size = int(
@@ -321,41 +360,52 @@ def accent_wm(full, before_t, under_text, size, target_h):
         return finish(im, by, crop=False)
 
     full_f = finish(full_u, by, crop=False)
-    pre_f = layer(before_t)
-    under_f = layer(under_text)
+    pre_f = layer(before_t)  # FloqCAS / djBO
+    under_f = layer(under_text)  # F / d
     x0, y0b, x1, y1 = ink_bbox(full_f, 12)
-    fa = np.array(full_f.crop((x0, y0b, x1 + 1, y1 + 1)))
-    pa = np.array(pre_f.crop((x0, y0b, x1 + 1, y1 + 1)))
-    ua = np.array(under_f.crop((x0, y0b, x1 + 1, y1 + 1)))
-    pre_a = Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(7))
-    tmask = (fa[:, :, 3] > 40) & (np.array(pre_a) < 15)
+    box = (x0, y0b, x1 + 1, y1 + 1)
+    fa = np.array(full_f.crop(box))
+    pa = np.array(pre_f.crop(box))
+    ua = np.array(under_f.crop(box))
+    ink = fa[:, :, 3] > 20
+    # T = ink present in full but not in before_t (rightmost letter only)
+    pre_a = np.array(Image.fromarray(pa[:, :, 3]).filter(ImageFilter.MaxFilter(3)))
+    tmask = ink & (pre_a < 10)
     xs = np.where(tmask)[1]
     if len(xs):
-        tmask[:, : int(np.percentile(xs, 5))] = False
+        # Drop any stray left-side noise; keep the right-hand T cluster
+        tmask[:, : int(np.percentile(xs, 8))] = False
     tmask = (
         np.array(
-            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(5))
+            Image.fromarray((tmask.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(3))
         )
         > 127
-    ) & (fa[:, :, 3] > 20)
-    ink = fa[:, :, 3] > 20
-    body = np.zeros_like(fa)
-    body[ink] = (255, 255, 255, 255)
-    body[tmask, 0] = TIFFANY[0]
-    body[tmask, 1] = TIFFANY[1]
-    body[tmask, 2] = TIFFANY[2]
-    umask = np.array(Image.fromarray(ua[:, :, 3]).filter(ImageFilter.MaxFilter(5))) > 25
+    ) & ink
+    # Under = under_text only (F / d)
+    umask = np.array(Image.fromarray(ua[:, :, 3]).filter(ImageFilter.MaxFilter(3))) > 25
     umask &= ink & ~tmask
+    # Over = loqCAS… + T (everything not under)
     omask = ink & ~umask
-    under = np.zeros_like(body)
-    over = np.zeros_like(body)
-    under[umask] = body[umask]
-    over[omask] = body[omask]
+    under = np.zeros_like(fa)
+    over = np.zeros_like(fa)
+    under[umask] = (255, 255, 255, 255)
+    over[omask] = (255, 255, 255, 255)
+    # T is pure tiffany in OVER only — never leave a white T under it
+    over[tmask, 0] = TIFFANY[0]
+    over[tmask, 1] = TIFFANY[1]
+    over[tmask, 2] = TIFFANY[2]
+    over[tmask, 3] = 255
+    under[tmask] = (0, 0, 0, 0)  # belt-and-suspenders: no T under the ring
     U = Image.fromarray(ink_only(under), "RGBA")
     O = Image.fromarray(ink_only(over), "RGBA")
-    B = Image.fromarray(ink_only(body), "RGBA")
-    print(f"  TYPE '{full}' size={size} {B.size}")
-    return fit_width(U, O, B)
+    B = Image.alpha_composite(U, O)
+    print(
+        f"  TYPE '{full}' size={size} {B.size} under={int(umask.sum())} "
+        f"over={int(omask.sum())} T={int(tmask.sum())}"
+    )
+    if fit:
+        return fit_width(U, O, B)
+    return U, O, B
 
 
 def vip_wm():
@@ -443,39 +493,32 @@ def place_inside_ring(body, min_top: int, bias=6):
     return best_left, best_top
 
 
-def clip_type_to_ring(layer: Image.Image, left: int, top: int) -> Image.Image:
-    """Zero type ink past the outer stroke so under-layer never reads as a second ring."""
+def paste_type(layer: Image.Image, left: int, top: int) -> Image.Image:
+    """Full-canvas type layer — do NOT circular-mask; F/T tips must stay visible."""
     full = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     full.alpha_composite(layer, (left, top))
-    a = np.array(full)
-    yy, xx = np.indices((S, S))
-    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    # Outer edge of stroke ≈ R + 7; keep kiss inside stroke, kill outside halo
-    a[dist > (R + 6)] = (0, 0, 0, 0)
-    return Image.fromarray(a, "RGBA")
+    return full
 
 
 # ── 4. ASSEMBLE ─────────────────────────────────────────────────
 
 
 def assemble(graphic: Image.Image, under, over, left, top, nightlife=True) -> Image.Image:
+    """bg → under (F) → ring → over (loqCAST + tiffany T).
+
+    No circular black wipe on type — that was covering F/T tips outside the ring.
+    F stays under the ring at the intersection; full T paints on top of the ring.
+    """
     base = Image.new("RGBA", (S, S), (0, 0, 0, 255))
     base.alpha_composite(graphic.convert("RGBA"), (0, 0))
-    # Clip under/over to full-canvas positions so tips cannot leak outside the ring
-    under_full = clip_type_to_ring(under, left, top)
-    over_full = clip_type_to_ring(over, left, top)
-    base = Image.alpha_composite(base, under_full)
+    base = Image.alpha_composite(base, paste_type(under, left, top))
     if nightlife:
         ring = Image.open(LAYERS / "ring-nightlife.png").convert("RGBA")
         base = Image.alpha_composite(base, ring)
-    base = Image.alpha_composite(base, over_full)
-    oa = np.array(base)
-    oa[:, :, 3] = 255
-    yy, xx = np.indices((S, S))
-    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    # Outside outer ring edge only — do NOT clip ink on the stroke
-    oa[dist > 505, :3] = 0
-    return Image.fromarray(oa, "RGBA")
+    base = Image.alpha_composite(base, paste_type(over, left, top))
+    out = np.array(base)
+    out[:, :, 3] = 255
+    return Image.fromarray(out, "RGBA")
 
 
 def graphic_bottom(graphic: Image.Image, y_cap=700) -> int:
@@ -491,6 +534,57 @@ def graphic_bottom(graphic: Image.Image, y_cap=700) -> int:
     return int(np.where(content)[0].max()) if content.any() else 560
 
 
+def place_floqcast_q_kiss(body, min_top: int, bias=4):
+    """Drop FloqCAST so the q descender barely kisses the bottom ring (inner edge)."""
+    ba = np.array(body)
+    ink = ba[:, :, 3] > 40
+    ys, xs = np.where(ink)
+    # q sits in the left-center of "FloqCAST" — take bottom ink in that x band
+    x_lo = int(np.percentile(xs, 20))
+    x_hi = int(np.percentile(xs, 45))
+    q_band = ink & (np.arange(ba.shape[1])[None, :] >= x_lo) & (
+        np.arange(ba.shape[1])[None, :] <= x_hi
+    )
+    qys, qxs = np.where(q_band)
+    if len(qys) == 0:
+        qys, qxs = ys, xs
+    bot = int(qys.max())
+    qx = int(qxs[qys == bot].mean())
+    edge = ink.copy()
+    edge[1:-1, 1:-1] = ink[1:-1, 1:-1] & ~(
+        ink[:-2, 1:-1] & ink[2:, 1:-1] & ink[1:-1, :-2] & ink[1:-1, 2:]
+    )
+    ey, ex = np.where(edge)
+    center_left = max(8, (S - body.size[0]) // 2 + bias)
+    # q on bottom arc. Side F/T may cross the stroke (F under / T over);
+    # assemble clips past R+6 so nothing draws outside the ring.
+    Q_TARGET = R - 4
+    best_left, best_top, score = center_left, min_top, 1e18
+    for left in range(max(8, center_left - 80), min(S - body.size[0] - 8, center_left + 80) + 1, 2):
+        for t in range(min_top, S - body.size[1] - 4):
+            qd = float(np.hypot(left + qx - CX, t + bot - CY))
+            # Keep q on/just inside the stroke — not past outer edge
+            if qd > (R + 4):
+                continue
+            mr = float(np.sqrt((ex + left - CX) ** 2 + (ey + t - CY) ** 2).max())
+            sc = abs(qd - Q_TARGET) * 3.0
+            # Mild preference to not fling side tips absurdly far outside
+            if mr > (R + 30):
+                sc += (mr - (R + 30)) * 0.15
+            if sc < score:
+                score, best_left, best_top = sc, left, t
+    qd = float(np.hypot(best_left + qx - CX, best_top + bot - CY))
+    mr = float(
+        np.sqrt((ex + best_left - CX) ** 2 + (ey + best_top - CY) ** 2).max()
+    )
+    print(
+        f"  place FloqCAST q-kiss left={best_left} top={best_top} "
+        f"q_dist={qd:.1f} maxR={mr:.1f} score={score:.1f}"
+    )
+    assert score < 1e17, "FloqCAST q-kiss placement failed"
+    return best_left, best_top
+
+
 def build_all():
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
@@ -501,8 +595,10 @@ def build_all():
     # FloqCAST
     print("=== assemble FloqCAST ===")
     g = Image.open(fc_g)
-    under, over, body = accent_wm("FloqCAST", "FloqCAS", "F", 170, FC_H)
-    left, top = place_inside_ring(body, graphic_bottom(g, 700) + 12, bias=4)
+    # Full target size — move only, do not shrink the wordmark
+    # Fl under ring; oqCAST + tiffany T over ring
+    under, over, body = accent_wm("FloqCAST", "FloqCAS", "Fl", 170, FC_H, fit=False)
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 640) + 8, bias=4)
     fc = assemble(g, under, over, left, top, nightlife=True)
     fc.save(ROOT / "images/review/actual-icons/floqcast-v4-circle-silhouette.png", optimize=True)
     yy, xx = np.indices((S, S))
@@ -519,9 +615,8 @@ def build_all():
     print("=== assemble djBOT ===")
     g = Image.open(dj_g)
     under, over, body = accent_wm("djBOT", "djBO", "d", 155, DJ_H)
-    left, top = place_inside_ring(
-        body, max(graphic_bottom(g, 650) + 28, fc_top - 20), bias=8
-    )
+    # Independent of FloqCAST top (FloqCAST sits lower for q-kiss)
+    left, top = place_inside_ring(body, graphic_bottom(g, 650) + 28, bias=8)
     dj = assemble(g, under, over, left, top, nightlife=True)
     dj.save(ROOT / "images/chrome/floqbot-nightlife.png", optimize=True)
     dj.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS).save(
