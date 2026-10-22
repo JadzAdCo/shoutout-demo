@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.25 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.26 (stable)
+
+- s3.2.26: Template select hides floating FloqAi (lens Search only).
+- s3.2.25: Search product icons sit at viewport bottom on phone/tablet; desktop keeps under-Search layout.
 
 - s3.2.25: Search product icons sit at viewport bottom on phone/tablet; desktop keeps under-Search layout.
 - s3.2.24: Login paints last Site chrome (device + profile); single Privacy footer link.
