@@ -712,58 +712,69 @@ def traditional_from_nightlife(
     charcoal–silver. Verbiage (white + tiffany accents) is untouched.
     """
     ensure_traditional_ring()
-    # Rebuild on pure black — field inside the ring stays black (no charcoal fill disc)
+    # Layer 0: full-canvas black UNDER everything — never circular-wipe type tips (F/L/T).
     base = Image.new("RGBA", (S, S), (0, 0, 0, 255))
     ga = np.array(graphic.convert("RGBA"))
     gr, gg, gb = ga[:, :, 0].astype(np.float32), ga[:, :, 1].astype(np.float32), ga[
         :, :, 2
     ].astype(np.float32)
     glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
-    # Only bright neon linework → charcoal/silver. Soft fills / dark screen stay black.
+    # Bright neon linework → charcoal/silver; soft fills stay transparent → black shows through
     LINE_MIN = 42.0
     gsilver = np.clip(40.0 + glum * 0.85, 0, 230)
     gout = np.zeros_like(ga)
-    gout[:, :, 3] = ga[:, :, 3]
     line = (glum >= LINE_MIN) & (ga[:, :, 3] > 8)
     gout[line, 0] = gout[line, 1] = gout[line, 2] = gsilver[line].astype(np.uint8)
-    # Dim glow that was not true ink → transparent so black base shows through
-    gout[~line, 3] = 0
+    gout[line, 3] = 255
+    # Layer 1: graphic linework only
     base.alpha_composite(Image.fromarray(gout, "RGBA"), (0, 0))
+    # Soft-fill crush on graphic only (before type) — disc interior stays black
+    ba = np.array(base)
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
+    r, gch, bch = ba[:, :, 0].astype(int), ba[:, :, 1].astype(int), ba[:, :, 2].astype(int)
+    lum = (0.299 * r + 0.587 * gch + 0.114 * bch).astype(np.float32)
+    inside = (dist < (R - 6)) & ~ring
+    soft_fill = inside & (lum > 0) & (lum < 58)
+    ba[soft_fill, 0] = ba[soft_fill, 1] = ba[soft_fill, 2] = 0
+    ba[soft_fill, 3] = 255
+    base = Image.fromarray(ba, "RGBA")
+    # Layer 2: under type (Fl) — tips may extend outside the ring
     base = Image.alpha_composite(base, paste_type(under, left, top))
+    # Layer 3: silver ring
     base = Image.alpha_composite(
         base, Image.open(LAYERS / "ring-traditional.png").convert("RGBA")
     )
+    # Layer 4: over type (oqCAST + tiffany T) — tips may extend outside the ring
     base = Image.alpha_composite(base, paste_type(over, left, top))
     out = np.array(base)
     out[:, :, 3] = 255
 
+    # Leftover neon on graphic (never touch type) → charcoal
     protect = type_protect_mask(under, over, left, top)
-    ring = np.array(Image.open(LAYERS / "ring-nightlife.png").convert("RGBA"))[:, :, 3] > 20
-    yy, xx = np.indices((S, S))
-    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     r, gch, bch = out[:, :, 0].astype(int), out[:, :, 1].astype(int), out[:, :, 2].astype(int)
     lum = (0.299 * r + 0.587 * gch + 0.114 * bch).astype(np.float32)
-
-    # Leftover neon → charcoal linework only
     sat = (np.maximum(np.maximum(r, gch), bch) - np.minimum(np.minimum(r, gch), bch)) > 28
     fix = sat & ~protect & ~ring & (lum >= LINE_MIN)
     if fix.any():
         silver = np.clip(40.0 + lum * 0.85, 0, 230).astype(np.uint8)
         out[fix, 0] = out[fix, 1] = out[fix, 2] = silver[fix]
 
-    # Inside the ring: crush soft charcoal fills → pure black (keep linework + type + ring)
-    inside = (dist < (R - 6)) & ~ring
-    soft_fill = inside & ~protect & (lum > 0) & (lum < 58)
-    out[soft_fill, 0] = out[soft_fill, 1] = out[soft_fill, 2] = 0
-
-    # Outside the ring square: pure black (no haze)
-    out[dist > (R + 14), :3] = 0
+    # Re-stamp type last so F/L/T tips outside the ring cannot be nicked
+    stamped = Image.fromarray(out, "RGBA")
+    stamped = Image.alpha_composite(stamped, paste_type(under, left, top))
+    stamped = Image.alpha_composite(stamped, paste_type(over, left, top))
+    out = np.array(stamped)
     out[:, :, 3] = 255
 
-    black_inside = int((inside & (out[:, :, 0] == 0) & (out[:, :, 1] == 0) & (out[:, :, 2] == 0)).sum())
+    tip_out = protect & (dist > R)
+    tip_ink = tip_out & (
+        (out[:, :, 0] > 40) | (out[:, :, 1] > 40) | (out[:, :, 2] > 40)
+    )
     print(
         f"  traditional charcoal: line={int(line.sum())} soft→black={int(soft_fill.sum())} "
-        f"black_inside={black_inside} ring_px={int(ring.sum())}"
+        f"tips_outside_ring={int(tip_ink.sum())} ring_px={int(ring.sum())}"
     )
     return Image.fromarray(out, "RGBA")
 
