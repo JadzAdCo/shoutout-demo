@@ -1840,16 +1840,69 @@ def build_vip_only():
     print("DONE VIP-only —", ROOT / "images/chrome/vip-nightlife.jpg")
 
 
-# BOT-DEE: ShoutOut-scale stacked mark (BOT- white / DEE tiffany), thin borders.
+# BOT DEE: ShoutOut-scale stacked mark (BOT white / DEE tiffany), thin borders.
 # Letter height ≥ SHOUT (~198); stacked footprint fills lower chord like ShoutOut.
 BOTDEE_TEXT = 268  # ShoutOut-weight stack (SHOUT≈198 / OUT≈157 → block ~380+)
 BOTDEE_BOT_SCALE = 1.30  # vs prior streetBOT left-bot bbox (~311×399)
 BOTDEE_MAX_W = 600
 BOTDEE_MAX_H = 440
+# Nudge headphones-bot down from top stroke (px after ×1.30 place)
+BOTDEE_BOT_DOWN = 26
+# Nudge "BOT" wordmark line down toward DEE (px at render size; survives crop)
+BOTDEE_TYPE_BOT_DOWN = 22
+
+
+def _strip_botdee_signal_tray(img: Image.Image) -> Image.Image:
+    """Remove equalizer / signal bars under the eyes (cyan U-tray + bars)."""
+    a = np.array(img.convert("RGBA"))
+    yy, xx = np.indices(a.shape[:2])
+    r, gc, b, al = (
+        a[:, :, 0].astype(int),
+        a[:, :, 1].astype(int),
+        a[:, :, 2].astype(int),
+        a[:, :, 3],
+    )
+    ink = ((r > 25) | (gc > 25) | (b > 25)) & (al > 20)
+    if not ink.any():
+        return img
+    ys, xs = np.where(ink)
+    bx0, bx1 = int(xs.min()), int(xs.max())
+    by0, by1 = int(ys.min()), int(ys.max())
+    cx = (bx0 + bx1) // 2
+    # Eyes = cyan disks in the center band (not side headphone cups)
+    eye = (
+        (r < 100)
+        & (gc > 140)
+        & (b > 180)
+        & (al > 40)
+        & (np.abs(xx - cx) < 90)
+        & (yy > by0 + 40)
+        & (yy < by0 + int((by1 - by0) * 0.55))
+    )
+    if not eye.any():
+        print("  WARN botdee: eyes not found — signal tray left intact")
+        return img
+    eye_bottom = int(np.where(eye)[0].max())
+    # Start slightly above chin so the U-tray lip / faint diagonals are wiped
+    sy0 = eye_bottom - 2
+    sy1 = by1 + 8
+    sx0, sx1 = cx - 110, cx + 110
+    mask = (yy >= sy0) & (yy <= sy1) & (xx >= sx0) & (xx <= sx1)
+    a[mask] = (0, 0, 0, 255)
+    # Sweep any leftover non-head ink in the mid band (tray ghosts)
+    mid = (
+        (yy > eye_bottom)
+        & (yy < eye_bottom + 80)
+        & (np.abs(xx - cx) < 120)
+        & (((a[:, :, 0] > 30) | (a[:, :, 1] > 30) | (a[:, :, 2] > 30)) & (a[:, :, 3] > 20))
+    )
+    a[mid] = (0, 0, 0, 255)
+    print(f"  botdee signal tray cleared bbox=({sx0},{sy0},{sx1},{sy1}) mid={int(mid.sum())}")
+    return Image.fromarray(a, "RGBA")
 
 
 def extract_botdee_graphic() -> Path:
-    """Headphones bot only — no turntable; centered; ×1.30 vs prior djBOT left figure."""
+    """Headphones bot only — no turntable / signal tray; centered; ×1.30; nudged down."""
     dj_path = extract_djbot_graphic()
     g = Image.open(dj_path).convert("RGBA")
     a = np.array(g)
@@ -1868,7 +1921,7 @@ def extract_botdee_graphic() -> Path:
             break
     bot_m = ink & (xx < cut)
     if not bot_m.any():
-        raise RuntimeError("BOT-DEE: bot ink not found left of turntable gap")
+        raise RuntimeError("BOT DEE: bot ink not found left of turntable gap")
     ys, xs = np.where(bot_m)
     x0, x1 = int(xs.min()), int(xs.max()) + 1
     y0, y1 = int(ys.min()), int(ys.max()) + 1
@@ -1876,27 +1929,38 @@ def extract_botdee_graphic() -> Path:
     crop = g.crop(
         (max(0, x0 - pad), max(0, y0 - pad), min(S, x1 + pad), min(S, y1 + pad))
     )
-    # Prior streetBOT left figure ≈ 311×399; enlarge ×1.30
+    # Scale ×1.30 from pre-tray figure, then strip tray and tight-crop the head
     cw, ch = crop.size
     scale = (399 * BOTDEE_BOT_SCALE) / max(1, ch)
     nw = max(1, int(round(cw * scale)))
     nh = max(1, int(round(ch * scale)))
     scaled = crop.resize((nw, nh), Image.Resampling.LANCZOS)
+    scaled = _strip_botdee_signal_tray(scaled)
+    sa = np.array(scaled)
+    sink = (
+        ((sa[:, :, 0] > 25) | (sa[:, :, 1] > 25) | (sa[:, :, 2] > 25))
+        & (sa[:, :, 3] > 20)
+    )
+    if sink.any():
+        sys_, sxs = np.where(sink)
+        scaled = scaled.crop(
+            (int(sxs.min()), int(sys_.min()), int(sxs.max()) + 1, int(sys_.max()) + 1)
+        )
+        nw, nh = scaled.size
 
     top_clear = CY - (R - 36)
-    # Wordmark overlaps lower band; allow bot into upper-central zone at full ×1.30
-    bottom_cap = 590
+    # Wordmark band below; bot upper-central, nudged down
+    bottom_cap = 560
     fit_h = bottom_cap - top_clear
     if nh > fit_h and fit_h > 80:
         shrink = fit_h / float(nh)
         nw = max(1, int(round(nw * shrink)))
         nh = max(1, int(round(nh * shrink)))
         scaled = scaled.resize((nw, nh), Image.Resampling.LANCZOS)
-        print(f"  BOT-DEE bot shrink-to-fit ×{shrink:.3f} → {nw}x{nh}")
+        print(f"  BOT DEE bot shrink-to-fit ×{shrink:.3f} → {nw}x{nh}")
 
     left = (S - nw) // 2
-    # Center bot in the upper-central band (not glued to the top stroke)
-    top = top_clear + max(0, (fit_h - nh) // 2)
+    top = top_clear + max(0, (fit_h - nh) // 2) + BOTDEE_BOT_DOWN
     if top + nh > bottom_cap:
         top = bottom_cap - nh
     top = max(top_clear, top)
@@ -1909,27 +1973,32 @@ def extract_botdee_graphic() -> Path:
     dst = LAYERS / "botdee-graphic.png"
     Image.fromarray(oa, "RGBA").save(dst, optimize=True)
     print(
-        f"GRAPHIC botdee → {dst} cut={cut} crop={cw}x{ch} placed={nw}x{nh} "
-        f"@({left},{top}) scale≈{BOTDEE_BOT_SCALE}"
+        f"GRAPHIC botdee → {dst} cut={cut} crop={cw}x{ch} head={nw}x{nh} "
+        f"@({left},{top}) scale≈{BOTDEE_BOT_SCALE} down={BOTDEE_BOT_DOWN}"
     )
     return dst
 
 
 def botdee_wm():
-    """Stacked BOT- (white thin border) / DEE (tiffany thin border) ≈ ShoutOut size."""
+    """Stacked BOT (white thin border) / DEE (tiffany thin border) — no hyphen."""
     size = BOTDEE_TEXT
-    top_g = thin_border_glyph(glyph("BOT-", size, WHITE), kind="white")
+    top_g = thin_border_glyph(glyph("BOT", size, WHITE), kind="white")
     dee_g = thin_border_glyph(glyph("DEE", size, TIFFANY), kind="cyan")
-    gap = max(2, int(size * 0.015))
+    gap = max(2, int(size * 0.012))
+    bot_down = BOTDEE_TYPE_BOT_DOWN
     W = max(top_g.size[0], dee_g.size[0])
-    H = top_g.size[1] + gap + dee_g.size[1]
+    H = bot_down + top_g.size[1] + gap + dee_g.size[1]
     # All type over the ring (ShoutOut-style weight); empty under for assemble order
     under = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    over.alpha_composite(top_g, ((W - top_g.size[0]) // 2, 0))
-    over.alpha_composite(dee_g, ((W - dee_g.size[0]) // 2, top_g.size[1] + gap))
+    over.alpha_composite(top_g, ((W - top_g.size[0]) // 2, bot_down))
+    over.alpha_composite(
+        dee_g, ((W - dee_g.size[0]) // 2, bot_down + top_g.size[1] + gap)
+    )
     body = Image.alpha_composite(under, over)
-    box = ink_bbox(body, 10)
+    # Keep top padding so BOT stays nudged down (don't crop y0 to ink)
+    x0, _y0, x1, y1 = ink_bbox(body, 10)
+    box = (x0, 0, x1, y1)
     U = Image.fromarray(
         ink_only(np.array(under.crop((box[0], box[1], box[2] + 1, box[3] + 1)))), "RGBA"
     )
@@ -1938,8 +2007,8 @@ def botdee_wm():
     )
     B = Image.alpha_composite(U, O)
     print(
-        f"  TYPE BOT-DEE size={size} BOT-={top_g.size} DEE={dee_g.size} body={B.size} "
-        f"(ShoutOut-scale thin border; DEE tiffany)"
+        f"  TYPE BOT DEE size={size} BOT={top_g.size} DEE={dee_g.size} body={B.size} "
+        f"bot_down={bot_down} (thin border; DEE tiffany; no hyphen)"
     )
     # Match ShoutOut text-block footprint (~528×380) inside the lower chord
     need_w = B.size[0] > BOTDEE_MAX_W
@@ -2090,7 +2159,7 @@ def build_botdee_only():
     print("=== assemble BOT-DEE (ShoutOut-scale type, centered bot) ===")
     g = Image.open(g_path)
     under, over, body = botdee_wm()
-    left, top = place_botdee_mark(body, graphic_bottom(g, 560) + 6)
+    left, top = place_botdee_mark(body, graphic_bottom(g, 560) + 22)
     print(f"  place BOT-DEE left={left} top={top} body={body.size}")
     sb = assemble(g, under, over, left, top, nightlife=True)
     out = ROOT / "images/chrome"
@@ -2127,13 +2196,13 @@ def build_botdee_only():
     except Exception:
         fnt = ImageFont.load_default()
     d.text((16, 8), "ShoutOut (type size ref)", fill=(230, 230, 235), font=fnt)
-    d.text((640 + 40, 8), "BOT-DEE", fill=(230, 230, 235), font=fnt)
+    d.text((640 + 40, 8), "BOT DEE", fill=(230, 230, 235), font=fnt)
     cmp.save("/opt/cursor/artifacts/botdee-vs-shoutout.png", quality=95)
 
     pack = [
         ("VIP", "vip-whiteblack.jpg"),
         ("ShoutOut", "shoutout-whiteblack.png"),
-        ("BOT-DEE", "botdee-whiteblack.jpg"),
+        ("BOT DEE", "botdee-whiteblack.jpg"),
         ("FloqCast", "floqcast-whiteblack.jpg"),
         ("BartR", "bartr-whiteblack.jpg"),
         ("RydR", "rydr-whiteblack.jpg"),
@@ -2151,7 +2220,7 @@ def build_botdee_only():
         fnt = ImageFont.load_default()
     d.text(
         (pad, 6),
-        "White/Black pack — BOT-DEE (was streetBOT / FloqAi)",
+        "White/Black pack — BOT DEE (was streetBOT / FloqAi)",
         fill=(30, 30, 35),
         font=fnt,
     )
