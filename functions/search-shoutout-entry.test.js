@@ -48,6 +48,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
+  assert.match(css, /max-width:1180px\)[\s\S]*#categoryPage\.page\.active[\s\S]*margin-top:auto!important/, "phones/tablets pin Search icon row to viewport bottom");
+  assert.match(css, /html\.floqr-desktop-browser #categoryPage\.page\.active \.category-grid\.compact-category-grid:has\(\.search-icon-row\)\{[\s\S]*margin-top:28px!important/, "desktop keeps icons under Search");
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
   const searchCss = read("floqai-search.css");
   assert.match(searchCss, /\.category-floqai-lens\{/);

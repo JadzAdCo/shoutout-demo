@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.24 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.25 (stable)
+
+- s3.2.25: Search product icons sit at viewport bottom on phone/tablet; desktop keeps under-Search layout.
+- s3.2.24: Login paints last Site chrome (device + profile); single Privacy footer link.
 
 - s3.2.24: Login paints last Site chrome (device + profile); single Privacy footer link.
 - s3.2.23: Login welcome help trim (OTP-focused) + left-align welcome/? + 80px under FloqR mark.

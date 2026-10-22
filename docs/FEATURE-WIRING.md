@@ -45,9 +45,9 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.24)
+## Login + Search chrome (s3.2.25)
 
-**Purpose:** Compact sign-in, short welcome, privacy links in page footer, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome.
+**Purpose:** Compact sign-in, short welcome, privacy links in page footer, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome, Search product icons bottom-pinned on phone/tablet.
 
 | Layer | Wiring |
 |---|---|
@@ -56,15 +56,16 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Login Site chrome | Early localStorage paint (`floqr.isSiteChrome`) + `FLOQRChromeScheme` always paints last-used chrome on login/Search (does **not** demote to Nightlife when beta access is unresolved/denied). Cross-device: `hydrateFromProfile` reads `users.isSiteChrome` after sign-in and writes localStorage. Picker UI still gated by `siteChrome` beta |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
-| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.23` |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.25` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
 | Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
 | Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
+| Search icon position | Phone/tablet (`max-width:1180px` + `floqr-mobile-browser` / `floqr-tablet-browser`): `#categoryPage` flex column, `.category-grid:has(.search-icon-row)` `margin-top:auto` so FloqCAST / ShoutOut / reserVIP / BOT DEE sit at the bottom of the viewport (safe-area aware). Desktop (`floqr-desktop-browser` / `min-width:1181px`): icons stay under Search with centered max-width row |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
 | Help | `help-welcome` OTP-only body (no Search and book…friends and family); all packs in `floqr-i18n-help.js` |
-| i18n | `floqr-i18n.js` s3.2.23 — short welcome + login keys |
-| Diagnostics | Manual tests `s3-2-23-login-welcome-help-layout`, `s3-2-22-login-privacy-footer-welcome` |
+| i18n | `floqr-i18n.js` s3.2.25 — short welcome + login keys |
+| Diagnostics | Manual tests `s3-2-25-search-icons-bottom`, `s3-2-24-login-chrome-privacy`, `s3-2-23-login-welcome-help-layout` |
 
 ---
 
