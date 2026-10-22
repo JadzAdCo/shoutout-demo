@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.2.06"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.2.15"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=s3.2.00"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.2.00"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -38,16 +38,19 @@
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
-        <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
-        <div class="hero-logo-fallback hidden">FLOQR</div>
+        <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
+          <img src="./images/floqr-color.png?v=s3.2.15" alt="FloqR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <div class="hero-logo-fallback hidden">FloqR</div>
+        </a>
         <h2
-          data-i18n="app.welcome"
+          class="login-welcome-line"
+          data-i18n="app.welcomeSignIn"
           data-floqr-help-id="help-welcome"
           data-floqr-help-title="Welcome to FLOQR"
           data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout|what is otp|one time password|how does otp work|whatsapp otp|sms otp|sign in code"
           data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
-        >Welcome</h2>
-        <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
+        >Welcome. Please Sign-in / Sign-up…Continue with:</h2>
+        <p id="signedInAs" class="status login-signed-in-status hidden"></p>
 
         <div id="signedInActions" class="hidden">
           <button id="logoutBtn1" class="ghost full" type="button" data-i18n="app.signOut">Sign out</button>
@@ -63,12 +66,12 @@
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
               </svg>
             </span>
-            Continue with Google
+            <span class="i18n-text">Google</span>
           </button>
-          <button id="microsoftLoginBtn" class="signin microsoft" type="button" data-i18n="app.microsoft"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
-          <button id="facebookLoginBtn" class="signin facebook" type="button" data-i18n="app.facebook"><span class="icon fb-icon">f</span>Continue with Facebook</button>
+          <button id="microsoftLoginBtn" class="signin microsoft" type="button" data-i18n="app.microsoft"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span><span class="i18n-text">Microsoft</span></button>
+          <button id="facebookLoginBtn" class="signin facebook" type="button" data-i18n="app.facebook"><span class="icon fb-icon">f</span><span class="i18n-text">Facebook</span></button>
 
-          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false"><span class="icon mail-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3" fill="#fff"/><path d="M5.5 9.5 16 17.5l10.5-8" fill="none" stroke="#3a63ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Continue with your own Email</button>
+          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false"><span class="icon mail-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3" fill="#fff"/><path d="M5.5 9.5 16 17.5l10.5-8" fill="none" stroke="#3a63ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="i18n-text">Email</span></button>
           <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
             <label>Email address
               <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
@@ -81,7 +84,7 @@
             <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 6 minutes after delivery.</p>
           </div>
 
-          <button id="showSmsOtpBtn" class="signin sms has-sub" type="button" data-i18n="app.smsOtp" aria-controls="smsOtpPanel"><span class="icon sms-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 6h20a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H13l-6 5v-5H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z" fill="#fff"/><circle cx="10.5" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="16" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="21.5" cy="14.5" r="1.9" fill="#3a63ff"/></svg></span><span class="i18n-text signin-label">Continue with SMS OTP</span><span class="signin-sub" data-i18n="app.smsOtpRegion">(US &amp; Canada Only)</span></button>
+          <button id="showSmsOtpBtn" class="signin sms has-sub" type="button" data-i18n="app.smsOtp" aria-controls="smsOtpPanel"><span class="icon sms-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 6h20a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H13l-6 5v-5H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z" fill="#fff"/><circle cx="10.5" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="16" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="21.5" cy="14.5" r="1.9" fill="#3a63ff"/></svg></span><span class="i18n-text signin-label">SMS OTP</span><span class="signin-sub" data-i18n="app.smsOtpRegion">(US &amp; Canada)</span></button>
           <div id="smsOtpPanel" class="sms-otp-panel hidden">
           <p class="sub small" data-i18n="otp.smsUsOnly">SMS codes go to US and Canadian numbers (+1) only. Everywhere else, use WhatsApp OTP.</p>
           <div class="phone-row sms-number-row">
@@ -103,7 +106,7 @@
           </div>
           </div>
 
-          <button id="showWhatsAppOtpBtn" class="signin whatsapp has-sub" type="button" data-i18n="app.whatsappOtp" aria-controls="whatsappOtpPanel" aria-expanded="false"><span class="icon wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3z"/><path fill="#25d366" d="M16 5.3a10.7 10.7 0 0 0-9.1 16.3l.3.4-1.1 4 4.1-1.1.4.2A10.7 10.7 0 1 0 16 5.3z"/><path fill="#fff" d="M12.2 9.6c-.3-.6-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4.1 6.4 5.6 3.2 1.2 3.8 1 4.5.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5l-2.4-1.2c-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7z"/></svg></span><span class="i18n-text signin-label">Continue with WhatsApp OTP</span><span class="signin-sub" data-i18n="app.whatsappOtpRegion">(Worldwide)</span></button>
+          <button id="showWhatsAppOtpBtn" class="signin whatsapp has-sub" type="button" data-i18n="app.whatsappOtp" aria-controls="whatsappOtpPanel" aria-expanded="false"><span class="icon wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3z"/><path fill="#25d366" d="M16 5.3a10.7 10.7 0 0 0-9.1 16.3l.3.4-1.1 4 4.1-1.1.4.2A10.7 10.7 0 1 0 16 5.3z"/><path fill="#fff" d="M12.2 9.6c-.3-.6-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4.1 6.4 5.6 3.2 1.2 3.8 1 4.5.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5l-2.4-1.2c-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7z"/></svg></span><span class="i18n-text signin-label">WhatsApp OTP</span><span class="signin-sub" data-i18n="app.whatsappOtpRegion">(Worldwide)</span></button>
           <div id="whatsappOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
             <p class="sub small" data-i18n="otp.whatsappNote">FLOQR sends one sign-in code to this WhatsApp number. It expires in 5 minutes.</p>
             <div class="phone-row sms-number-row">
@@ -177,7 +180,7 @@
   <section id="signupProfilePage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeFromProfileBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
+        <button id="backToWelcomeFromProfileBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <h1>Create your profile</h1>
         <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
       </div>
@@ -272,28 +275,25 @@
   <section id="categoryPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
+        <button id="backToWelcomeBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
       </div>
       <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
 
     <div class="category-brand-stack">
-      <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+      <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
+        <img src="./images/floqr-color.png?v=s3.2.15" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+      </a>
     </div>
 
     <div id="categoryFloqAiSearch" class="category-floqai-search">
-      <div class="category-floqai-intro">
-        <span class="category-floqai-mark" aria-hidden="true"><span class="category-floqai-mark-halo"></span><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
-        <p id="categoryFloqAiSpeech" class="category-floqai-speech" role="status" aria-live="polite" data-i18n="cat.floqaiWelcome">Welcome, type below to search for Events</p>
-      </div>
       <form id="categoryFloqAiForm" class="category-floqai-form" role="search" autocomplete="off">
-        <input id="categoryFloqAiInput" type="search" enterkeyhint="search" data-i18n-placeholder="cat.floqaiPlaceholder" placeholder="You may also search for: Clubs or Lounges" data-i18n="cat.floqaiLabel" data-i18n-attr="aria-label" aria-label="Search events and venues with FloqAi"/>
+        <input id="categoryFloqAiInput" type="search" enterkeyhint="search" data-i18n-placeholder="cat.floqaiPlaceholder" placeholder="Search for clubs, lounges, events, etc." data-i18n="cat.floqaiLabel" data-i18n-attr="aria-label" aria-label="Search events and venues with FloqAi"/>
         <button id="categoryFloqAiGo" class="primary" type="submit" data-i18n="cat.floqaiGo">Search</button>
       </form>
     </div>
 
     <div class="category-grid compact-category-grid">
-      <div class="category-or" data-i18n="cat.or">Or</div>
       <div class="search-icon-row">
         <!-- Spot order (visible): 1 floqCast · 2 ShoutOut · 3 VIP reserV · 4 BOT DEE -->
         <a id="floqcastBtnCard" class="shoutout-icon-card floqcast-icon-card hidden" href="./floqcast-search.html?from=search" data-feature-key="floqCast" data-i18n-aria="cat.floqcast" aria-label="floqCast">
@@ -327,8 +327,10 @@
     <div class="intent-search-shell floqai-top-stack">
       <div class="floqai-search-main intent-search-main">
         <div class="floqai-brand-row">
-          <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
-          <div class="hero-logo-fallback hidden">FLOQR</div>
+          <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
+            <img src="./images/floqr-color.png?v=s3.2.15" alt="FloqR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+            <div class="hero-logo-fallback hidden">FloqR</div>
+          </a>
           <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="FloqAi help">?</button>
         </div>
         <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi help" aria-hidden="true">
@@ -372,9 +374,9 @@
   <section id="shoutoutLandingPage" class="page product-page shoutout-product-page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromShoutoutLandingBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
+        <button id="backToCategoriesFromShoutoutLandingBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="product-brand-stack">
-          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./images/floqr-color.png?v=s3.2.15" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img src="./shoutout-logo.png?v=s3.2.00" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=s3.2.00'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
@@ -391,9 +393,9 @@
   <section id="minglLandingPage" class="page product-page mingl-product-page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromMinglBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
+        <button id="backToCategoriesFromMinglBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="product-brand-stack">
-          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./images/floqr-color.png?v=s3.2.15" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
           <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
         </div>
@@ -444,7 +446,7 @@
   <section id="clubActionsPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromActionsBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <button id="backToCategoriesFromActionsBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <h1 data-i18n="page.clubActions.title">What would you like to do?</h1>
         <p class="sub" data-i18n="page.clubActions.sub">Choose a club action, then select the exact location.</p>
       </div>
@@ -464,14 +466,14 @@
   <section id="adSplashPage" class="page">
     <div class="splash-wrap">
       <div class="splash-card">
-        <button id="backFromAdBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <button id="backFromAdBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="splash-logo-row">
           <div id="splashClubLogoWrap" class="splash-logo-wrap">
             <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
             <div id="splashClubLogoFallback" class="hero-logo-fallback splash-fallback-logo">CLUB</div>
           </div>
           <div id="splashFloqrLogoWrap" class="splash-logo-wrap">
-            <img src="./images/floqr-color.png" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.2.15" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
             <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
           </div>
         </div>
@@ -509,7 +511,7 @@
     <input type="hidden" id="listingType" value="clubs"/>
     <header class="topbar">
       <div>
-        <button id="backToCategoriesBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <button id="backToCategoriesBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <h1 id="listingTitle" data-i18n="listing.searchClubs">Search Clubs</h1>
         <p id="listingIntro" class="sub" data-i18n="listing.intro">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
@@ -532,7 +534,7 @@
   <section id="templateSelectPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToListingBtn" type="button" data-i18n="nav.backToClubSearch">&larr; Back to club search</button>
+        <button id="backToListingBtn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <h1 id="selectedClubTitle">Location</h1>
         <p id="selectedClubMeta" class="sub"></p>
       </div>
@@ -554,7 +556,7 @@
 
   <section id="editorPage" class="page">
     <header class="topbar">
-      <div><button id="backToTemplatesBtn" type="button" data-i18n="nav.backToTemplates">&larr; Back to template selection</button><h1 id="editorClubTitle" data-i18n="editor.createMessage">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <div><button id="backToTemplatesBtn" type="button" data-i18n="nav.backShort">&lt; Back</button><h1 id="editorClubTitle" data-i18n="editor.createMessage">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
       <button id="logoutBtn5" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
     <div class="composer">
@@ -807,8 +809,8 @@
 <script src="./floqr-chrome-scheme.js?v=s3.2.14"></script>
 <script src="./floqr-people-directory.js?v=s3.2.00"></script>
 <script src="./floqr-app-check.js?v=s3.2.00"></script>
-<script src="./floqr-nav.js?v=s3.2.00"></script>
-<script src="./floqr-i18n.js?v=s3.2.12"></script>
+<script src="./floqr-nav.js?v=s3.2.15"></script>
+<script src="./floqr-i18n.js?v=s3.2.15"></script>
 <script src="./floqr-place-i18n.js?v=s3.2.00"></script>
 <script src="./floqai-help-repository.js?v=s3.2.06"></script>
 <script src="./floqr-i18n-help.js?v=s3.2.06"></script>
@@ -847,14 +849,14 @@
 <script src="./floqr-logger.js?v=s3.2.00"></script>
 <script src="./floqr-client-ip.js?v=s3.2.00"></script>
 <script src="./payment-service.js?v=s3.2.00"></script>
-<script src="./welcome-button-gradient.js?v=s3.2.00"></script>
+<script src="./welcome-button-gradient.js?v=s3.2.15"></script>
 <script src="./floqr-name-shoutout.js?v=s3.2.00"></script>
 <script src="./floqr-board-frame.js?v=s3.2.00"></script>
 <script src="./floqr-safe-render.js?v=s3.2.00"></script>
 <script src="./floqr-template-preview.js?v=s3.2.00"></script>
 <script src="./floqr-template-tags.js?v=s3.2.00"></script>
 <script src="./floqr-access-notice.js?v=s3.2.00"></script>
-<script src="./patron-app.js?v=s3.2.00"></script>
+<script src="./patron-app.js?v=s3.2.15"></script>
 <script src="./ai-assistant-ui.js?v=s3.2.00"></script>
 <script src="./ai-media-service.js?v=s3.2.00"></script>
 <script src="./notification-center.js?v=s3.2.00"></script>

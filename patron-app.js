@@ -679,6 +679,18 @@
     document.body.classList.toggle("device-tablet", isTablet);
     document.body.classList.toggle("device-desktop", !isMobile && !isTablet);
   }
+  function floqrHistoryBackOr(fallback) {
+    try {
+      if (window.history && window.history.length > 1 && document.referrer) {
+        const ref = String(document.referrer || "");
+        const sameOrigin = !ref || ref.startsWith(location.origin);
+        if (sameOrigin) { history.back(); return true; }
+      }
+    } catch (_) {}
+    if (typeof fallback === "function") fallback();
+    return false;
+  }
+
   function showPage(id) {
     if (!id || !byId(id)) return;
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -1089,7 +1101,13 @@
   }
 
   function updateLoginUI(user) {
-    setText("signedInAs", user ? "" : "Please Sign-In or Sign-Up:");
+    const signedInAs = byId("signedInAs");
+    if (signedInAs) {
+      signedInAs.textContent = "";
+      signedInAs.classList.add("hidden");
+    }
+    const welcomeLine = document.querySelector(".login-welcome-line");
+    if (welcomeLine) welcomeLine.classList.toggle("hidden", !!user);
     byId("signedInActions")?.classList.toggle("hidden", !user);
     byId("loginActions")?.classList.toggle("hidden", !!user);
     byId("backToWelcomeBtn")?.classList.toggle("hidden", !!user);
@@ -1323,8 +1341,8 @@
   }
 
   const VENUE_LISTING_TYPES = ["events", "clubs", "lounges", "lounge-club", "beach-clubs"];
-  /* Also-search hint lives in the input placeholder (cat.floqaiPlaceholder); speech stays Welcome. */
-  const CATEGORY_FLOQAI_DIALOG = ["cat.floqaiWelcome"];
+  /* Search placeholder carries the prompt (cat.floqaiPlaceholder); speech bubble retired. */
+  const CATEGORY_FLOQAI_DIALOG = [];
   const CATEGORY_FLOQAI_DIALOG_MS = 5000;
 
   function venueTypeLabel(type) {
@@ -1398,47 +1416,12 @@
   function bindCategoryFloqAi() {
     const form = byId("categoryFloqAiForm");
     const input = byId("categoryFloqAiInput");
-    const speech = byId("categoryFloqAiSpeech");
-    if (!form || !input || !speech || form.dataset.bound === "1") return;
+    if (!form || !input || form.dataset.bound === "1") return;
     form.dataset.bound = "1";
-    let step = 0;
 
     const shell = byId("categoryFloqAiSearch");
-    const speak = () => {
-      speech.classList.remove("is-speaking");
-      void speech.offsetWidth;
-      speech.classList.add("is-speaking");
-    };
-    const sayDialog = key => {
-      speech.setAttribute("data-i18n", key);
-      speech.classList.add("is-swapping");
-      setTimeout(() => {
-        speech.textContent = tt(key, {}, speech.textContent);
-        speech.classList.remove("is-swapping");
-        speak();
-      }, 220);
-    };
-    speak();
-
-    if (CATEGORY_FLOQAI_DIALOG.length > 1) {
-      setInterval(() => {
-        if (input.value.trim() || document.hidden || !byId("categoryPage")?.classList.contains("active")) return;
-        step = (step + 1) % CATEGORY_FLOQAI_DIALOG.length;
-        sayDialog(CATEGORY_FLOQAI_DIALOG[step]);
-      }, CATEGORY_FLOQAI_DIALOG_MS);
-    }
-
     input.addEventListener("input", () => {
-      const parsed = parsedListingQuery(input.value, "category");
       shell?.classList.toggle("is-listening", !!input.value.trim());
-      if (!parsed) {
-        step = 0;
-        sayDialog(CATEGORY_FLOQAI_DIALOG[0]);
-        return;
-      }
-      speech.removeAttribute("data-i18n");
-      speech.classList.remove("is-swapping");
-      speech.textContent = describeVenueQuery(parsed);
     });
 
     form.addEventListener("submit", event => {
@@ -5020,8 +5003,8 @@
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
-    bind("backToWelcomeFromProfileBtn", () => showPage("landingPage"));
-    bind("backToWelcomeBtn", () => showPage("landingPage"));
+    bind("backToWelcomeFromProfileBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
+    bind("backToWelcomeBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
     bind("backToCategoriesFromShoutoutLandingBtn", () => showPage("categoryPage"));
     bind("backToCategoriesFromShoutoutLandingBtn2", () => showPage("categoryPage"));
     bind("startShoutoutFlowBtn", () => openCategory("shoutout"));

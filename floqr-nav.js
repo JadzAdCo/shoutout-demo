@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.2.00";
+  const APP_V = "s3.2.15";
 
   function navT(key, fallback) {
     try {
@@ -189,8 +189,10 @@
       const from = queryFrom || anchor.dataset.from || "";
       if (queryFrom) anchor.dataset.from = queryFrom;
       const target = this.resolveBack(from);
+      const shortLabel = navT("nav.backShort", "< Back");
       anchor.href = target.href;
-      anchor.textContent = target.label;
+      anchor.textContent = shortLabel;
+      anchor.setAttribute("aria-label", shortLabel);
       // On Club Admin / Master Admin NIC home, hide a no-op "home" back.
       const hub = pageName();
       if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {
@@ -200,7 +202,55 @@
         anchor.classList.remove("hidden");
         anchor.removeAttribute("aria-hidden");
       }
-      return target;
+      if (!anchor.dataset.floqrHistoryBackBound) {
+        anchor.dataset.floqrHistoryBackBound = "1";
+        anchor.addEventListener("click", (event) => {
+          const fromNow = qs("from") || anchor.dataset.from || "";
+          const next = this.resolveBack(fromNow);
+          if (next.stay && (pageName() === "admin.html" || pageName() === "master-admin.html") && !qs("from")) {
+            return;
+          }
+          try {
+            if (global.history && global.history.length > 1) {
+              event.preventDefault();
+              global.history.back();
+            }
+          } catch (_) {}
+        });
+      }
+      return {...target, label: shortLabel};
+    },
+    /** FloqR mark → Search home (never history.back). */
+    bindHomeLogos(root = document) {
+      const href = this.searchHome();
+      root.querySelectorAll("[data-floqr-home-logo], .floqr-hero-logo, .product-parent-logo, .intent-floqr-logo").forEach((el) => {
+        const link = el.closest("a.floqr-home-link") || (el.matches?.("a.floqr-home-link") ? el : null);
+        if (link) {
+          link.href = href;
+          return;
+        }
+        if (el.tagName === "IMG" && !el.closest("a")) {
+          const wrap = document.createElement("a");
+          wrap.href = href;
+          wrap.className = "floqr-home-link";
+          wrap.setAttribute("data-floqr-home-logo", "");
+          wrap.setAttribute("aria-label", "FloqR home");
+          el.parentNode?.insertBefore(wrap, el);
+          wrap.appendChild(el);
+        }
+      });
+      root.querySelectorAll("[data-floqr-history-back]").forEach((el) => {
+        if (el.dataset.floqrHistoryBackBound) return;
+        el.dataset.floqrHistoryBackBound = "1";
+        el.addEventListener("click", (event) => {
+          try {
+            if (global.history && global.history.length > 1) {
+              event.preventDefault();
+              global.history.back();
+            }
+          } catch (_) {}
+        });
+      });
     },
     /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */
     applyStartPage(showPage) {
@@ -224,5 +274,14 @@
     global.addEventListener("floqr:ui-language", () => {
       try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}
     });
+    const bootNav = () => {
+      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}
+      try { FLOQRNav.bindHomeLogos(); } catch (_) {}
+    };
+    if (global.document?.readyState === "loading") {
+      global.document.addEventListener("DOMContentLoaded", bootNav);
+    } else {
+      bootNav();
+    }
   }
 })(typeof window !== "undefined" ? window : globalThis);

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.00";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.15";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.15";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.15-login-search-traditional",
+      title: "Compact login + Search cleanup + traditional profile card",
+      checks: [
+        {label:"Login welcome + compact grid", file:"index.html", includes:["app.welcomeSignIn", "Welcome. Please Sign-in / Sign-up", "i18n-text\">Google", "loginActions"]},
+        {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
+        {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
+        {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.15"]},
+        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for clubs, lounges, events, etc.", "categoryFloqAiForm"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.15\""]}
+      ]
+    },
+
     {
       version: "s3.2.00",
       title: "s3.2.00 — Venue Links accurate ?k= + Search Clubs/Lounges placeholder",
@@ -1627,7 +1640,7 @@
       version: "s3.0.107-whatsapp-otp",
       title: "WhatsApp OTP sign-in (Twilio) + SMS US only + privacy links at bottom",
       checks: [
-        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "Continue with WhatsApp OTP", "Continue with SMS OTP", "login-legal"]},
+        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "WhatsApp OTP", "SMS OTP", "login-legal"]},
         {label:"WhatsApp OTP client", file:"patron-app.js", includes:["requestWhatsAppOtp", "verifyWhatsAppOtp", "signInWithCustomToken"]},
         {label:"WhatsApp OTP callables", file:"functions/whatsapp-otp-functions.js", includes:["exports.requestWhatsAppOtp", "exports.verifyWhatsAppOtp", "forceSecurity: true", "fetchTwilioMessage"]},
         {label:"Compliance row forced for auth events", file:"functions/twilio-log.js", includes:["forceSecurity === true", "ContentSid: template"]},
@@ -1966,6 +1979,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-15-login-search-traditional",
+      area:"Login + Search + Site chrome",
+      feature:"Compact login, FloqR logo, Search placeholder, history Back, traditional profile card",
+      changed:"Login welcome white copy + 2-col half-size provider buttons (no Continue with). FloqR logo tiles+wordmark without charcoal pill. Search placeholder clubs/lounges/events; Welcome speech + green OR removed. Global Back is < Back via history.back; FloqR mark → Search home. Traditional chrome charcoal/white gradients on login + profile card. Package s3.2.15.",
+      howToTest:"1) Hard-refresh Search (styles/i18n/nav/patron-app ?v=s3.2.15). 2) Signed-out login: white Welcome. Please Sign-in…; Google/Microsoft/Facebook/Email/SMS/WhatsApp in two columns, no Continue with. 3) Sign in → Search: placeholder Search for clubs, lounges, events, etc.; no Welcome speech or green OR. 4) Open My Profile from another page → Back is < Back and returns to previous page; FloqR logo returns to Search. 5) Site chrome Traditional: login + corner profile card charcoal/white gradient.",
+      expected:"Compact login; clean Search; Back≠home; logo→home; traditional profile card matches charcoal theme.",
+      troubleshoot:"Old Continue with → hard refresh index + floqr-i18n s3.2.15. Logo still has gray pill → confirm images/floqr-color.png?v=s3.2.15. Back still to Search → floqr-nav.js s3.2.15 applyGlobalBack history.back."
+    },
     {
       id:"s3-2-06-white-black-chrome",
       area:"Site chrome + icons",

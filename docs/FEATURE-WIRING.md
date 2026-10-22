@@ -8,7 +8,25 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-21 |
+| Last registry touch | 2026-10-22 |
+
+---
+
+## Login + Search chrome (s3.2.15)
+
+**Purpose:** Compact sign-in, FloqR wordmark without pill, Search placeholder cleanup, history Back, Traditional login/profile-card styling.
+
+| Layer | Wiring |
+|---|---|
+| Login copy | `index.html` `.login-welcome-line` → `app.welcomeSignIn` (white); provider buttons icon + short label (`app.google` etc., no “Continue with”) |
+| Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
+| Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.15` |
+| Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
+| Back | `applyGlobalBack` label `nav.backShort` (`< Back`); click prefers `history.back()` with `resolveBack` href fallback |
+| Search | `#categoryFloqAiInput` placeholder `cat.floqaiPlaceholder`; Welcome speech + green `cat.or` removed |
+| Traditional | `html[data-floqr-chrome="traditional"]` charcoal/white gradients on `.login-card`, `#loginActions .signin`, `.profile-card`, `.user-menu-btn` / `.user-dropdown` |
+| i18n | `floqr-i18n.js` s3.2.15 — all chrome langs for new keys |
+| Diagnostics | Manual test `s3-2-15-login-search-traditional` |
 
 ---
 
@@ -24,7 +42,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
-| CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]` |
+| CSS | `styles.css` — Lyft-style titles (`Plus Jakarta Sans`); `html[data-floqr-chrome="traditional\|blackTiffany\|whiteBlack\|blackDarkGreen"]`; Traditional login + profile-card charcoal gradients (s3.2.15) |
 | VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
 | i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |

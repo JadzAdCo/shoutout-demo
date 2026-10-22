@@ -1,4 +1,5 @@
-/* Welcome sign-in buttons share one top-to-bottom gradient; each button shows its slice. */
+/* Welcome sign-in buttons share one top-to-bottom gradient; each button shows its slice.
+   Works with the 2-column #loginActions grid (uses offsetTop within the host). */
 (function (global) {
   "use strict";
 
@@ -9,36 +10,18 @@
     return el.getClientRects().length > 0;
   }
 
-  function sliceOffsets(items) {
-    let y = 0;
-    let prevMarginBottom = null;
-    const offsets = items.map(({ height, marginTop, marginBottom }) => {
-      if (prevMarginBottom !== null) y += Math.max(prevMarginBottom, marginTop);
-      const top = y;
-      y += height;
-      prevMarginBottom = marginBottom;
-      return top;
-    });
-    return { offsets, total: y };
-  }
-
   function layout() {
     frame = 0;
     const host = global.document.getElementById(HOST_ID);
     if (!host) return;
     const buttons = [...host.children].filter(el => el.classList.contains("signin") && isShown(el));
     if (!buttons.length) return;
-    const items = buttons.map(btn => {
-      const style = global.getComputedStyle(btn);
-      return {
-        height: btn.offsetHeight,
-        marginTop: parseFloat(style.marginTop) || 0,
-        marginBottom: parseFloat(style.marginBottom) || 0
-      };
-    });
-    const { offsets, total } = sliceOffsets(items);
+    const hostTop = host.getBoundingClientRect().top;
+    const tops = buttons.map(btn => Math.max(0, Math.round(btn.getBoundingClientRect().top - hostTop)));
+    const bottoms = buttons.map((btn, i) => tops[i] + btn.offsetHeight);
+    const total = Math.max(...bottoms, 1);
     buttons.forEach((btn, i) => {
-      btn.style.setProperty("--stack-y", `${offsets[i]}px`);
+      btn.style.setProperty("--stack-y", `${tops[i]}px`);
       btn.style.setProperty("--stack-h", `${total}px`);
     });
   }
@@ -70,7 +53,7 @@
     schedule();
   }
 
-  global.FLOQRWelcomeGradient = { layout, schedule, sliceOffsets };
+  global.FLOQRWelcomeGradient = { layout, schedule };
   if (global.document.readyState === "loading") global.document.addEventListener("DOMContentLoaded", watch);
   else watch();
 })(window);
