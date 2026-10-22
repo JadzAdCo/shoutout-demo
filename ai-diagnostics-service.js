@@ -2109,9 +2109,9 @@
       area:"ShoutOut / Templates",
       feature:"Labeled Description / How it works / Tag on template cards",
       changed:"Template cards show Description:, How it works:, and Tag: lines with individual tag chips. Club Admin edits venue tags (Template Mgmt → Manage template tags); Master Admin owns description + per-size howitWorks. Full catalog seeded with size-specific howitWorks. Package s3.2.28.",
-      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips (not mixed into meta). 3) Club Admin → Template Mgmt → Manage template tags — club-owned templates listed first; Start from catalog tags then edit; confirm Tag: on patron cards uses your set (replaces catalog). 4) On a shared template, added venue tags merge with FLOQR tags. 5) Master Admin → Templates → edit Description + How it works per LED size.",
-      expected:"Three labeled lines; Club Admin controls Tag (replace on club-owned); Master owns description/howitWorks.",
-      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Club-owned still shows old catalog tags after save → FLOQRTemplateTags.publicTagsFor replace path. Description editable in Club Admin → should be Master-only."
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips. 3) Club Admin → Manage template tags — club-owned first and editable; Start from catalog tags then edit; patrons see Tag: replace. 4) Shared FloqR templates show read-only Tag chips (no add form). 5) Master Admin → edit Description + How it works per LED size.",
+      expected:"Three labeled lines; Club Admin edits Tag only on club-owned; shared FloqR read-only; Master owns description/howitWorks.",
+      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Can edit shared tags → must use isClubOwnedTemplate + sharedReadOnly. Club-owned still shows catalog after save → publicTagsFor replace path."
     },
     {
       id:"s3-2-27-template-howitworks",

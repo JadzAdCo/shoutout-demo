@@ -123,6 +123,6 @@ test("club-owned template tags replace catalog tags when venue tags are set", ()
   );
   assert.ok(T.publicTagsFor(heist, [], "heist-washington-dc").includes("heist"));
   const shared = ctx.SHOUTOUT_TEMPLATES.neon;
-  assert.ok(T.publicTagsFor(shared, ["local"], "heist-washington-dc").includes("local"));
+  assert.equal(T.publicTagsFor(shared, ["local"], "heist-washington-dc").includes("local"), false, "shared ignores venue tags");
   assert.ok(T.publicTagsFor(shared, ["local"], "heist-washington-dc").includes("neon"));
 });

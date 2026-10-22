@@ -1721,8 +1721,8 @@
     {
       id: "help-template-tags",
       title: "Template tags",
-      body: "Under each template patrons see Description, How it works (for the venue LED size), and Tag chips. Club Admin and Template Administrators/Managers edit Tag chips here — for club-owned templates, your tags replace catalog tags patrons see. Description and How it works are Master Admin–owned and read-only. Add words patrons might type, such as game night or birthday. Template Managers can add tags; Administrators and Club Admins can also remove them. Assign roles under Role Activity & Permission.",
-      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager", "club owned template tags"],
+      body: "Under each template patrons see Description, How it works (for the venue LED size), and Tag chips. Club Admin and Template Administrators/Managers edit Tag chips only on club-owned templates (your tags replace catalog tags). Shared FloqR templates stay read-only — FLOQR / Master Admin owns those tags. Description and How it works are always Master Admin–owned. Add words patrons might type, such as game night or birthday. Template Managers can add tags; Administrators and Club Admins can also remove them. Assign roles under Role Activity & Permission.",
+      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager", "club owned template tags", "shared floqr tags"],
       links: [{label: "Club Admin", href: pageUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin", "serviceMember"],
       source: "help-repository-seed",

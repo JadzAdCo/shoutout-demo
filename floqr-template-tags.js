@@ -67,16 +67,16 @@
   }
 
   /**
-   * Tag chips patrons see: for club-owned templates, venue tags replace catalog tags when set
-   * (Club Admin fully controls Tag:). Shared templates merge venue tags with FLOQR catalog tags.
+   * Tag chips patrons see:
+   * - Club-owned templates: venue tags replace catalog tags when set (Club Admin controls Tag:).
+   * - Shared FloqR templates: catalog tags only (Club Admin cannot override FLOQR-owned tags).
    */
   function publicTagsFor(template = {}, venueTags = [], locationId = "") {
     const venue = (venueTags || []).map(normalizeTag).filter(Boolean);
     const catalog = (template.tags || []).map(normalizeTag).filter(Boolean);
-    if (isClubOwnedTemplate(template, locationId) && venue.length) {
-      return Array.from(new Set(venue));
-    }
-    return Array.from(new Set([...venue, ...catalog]));
+    if (!isClubOwnedTemplate(template, locationId)) return Array.from(new Set(catalog));
+    if (venue.length) return Array.from(new Set(venue));
+    return Array.from(new Set(catalog));
   }
 
   /** Templates patrons can pick at this venue (same set as the patron template picker). Club-owned first. */
@@ -106,7 +106,11 @@
     return map;
   }
 
-  async function saveVenueTags(db, {locationId, templateId, tags, user, revision = 0}) {
+  async function saveVenueTags(db, {locationId, templateId, tags, user, revision = 0, templates = global.SHOUTOUT_TEMPLATES || {}}) {
+    const template = templates[templateId];
+    if (!isClubOwnedTemplate(template, locationId)) {
+      throw new Error("not-club-owned");
+    }
     const ref = db.collection("venueTemplateTags").doc(tagDocId(locationId, templateId));
     const FieldValue = global.firebase?.firestore?.FieldValue;
     if (!tags.length) {
