@@ -40,7 +40,11 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
   assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:transparent/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*rgba\(110,110,110/);
+  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*rgba\(0,200,255/);
+  assert.match(css, /--floqr-tile-cyan:#00c8ff/);
+  assert.match(css, /--floqr-brand-gradient-h:linear-gradient/);
+  assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
+  assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.primary/);
   assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
