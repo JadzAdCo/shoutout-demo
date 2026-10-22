@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.23";
+  const VERSION = "s3.2.24";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -716,6 +716,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(US & Canada)",
       "app.privacyPolicy": "Privacy Policy",
+      "app.privacy": "Privacy",
       "app.doNotSell": "Do Not Sell or Share",
       "otp.countryCode": "Country code",
       "otp.phoneNumber": "Phone number",
@@ -1930,6 +1931,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(É.-U. et Canada)",
       "app.privacyPolicy": "Politique de confidentialité",
+      "app.privacy": "Confidentialité",
       "app.doNotSell": "Ne pas vendre ni partager",
       "otp.countryCode": "Indicatif pays",
       "otp.phoneNumber": "Numéro de téléphone",
@@ -3144,6 +3146,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(USA & Kanada)",
       "app.privacyPolicy": "Datenschutzerklärung",
+      "app.privacy": "Datenschutz",
       "app.doNotSell": "Nicht verkaufen oder teilen",
       "otp.countryCode": "Ländervorwahl",
       "otp.phoneNumber": "Telefonnummer",
@@ -4358,6 +4361,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(EE. UU. y Canadá)",
       "app.privacyPolicy": "Política de privacidad",
+      "app.privacy": "Privacidad",
       "app.doNotSell": "No vender ni compartir",
       "otp.countryCode": "Código de país",
       "otp.phoneNumber": "Número de teléfono",
@@ -5572,6 +5576,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(VS & Canada)",
       "app.privacyPolicy": "Privacybeleid",
+      "app.privacy": "Privacy",
       "app.doNotSell": "Niet verkopen of delen",
       "otp.countryCode": "Landcode",
       "otp.phoneNumber": "Telefoonnummer",
@@ -6786,6 +6791,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(США и Канада)",
       "app.privacyPolicy": "Политика конфиденциальности",
+      "app.privacy": "Конфиденциальность",
       "app.doNotSell": "Не продавать и не передавать",
       "otp.countryCode": "Код страны",
       "otp.phoneNumber": "Номер телефона",
@@ -8000,6 +8006,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(USA e Canada)",
       "app.privacyPolicy": "Informativa sulla privacy",
+      "app.privacy": "Privacy",
       "app.doNotSell": "Non vendere né condividere",
       "otp.countryCode": "Prefisso internazionale",
       "otp.phoneNumber": "Numero di telefono",
@@ -9214,6 +9221,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(EUA e Canadá)",
       "app.privacyPolicy": "Política de privacidade",
+      "app.privacy": "Privacidade",
       "app.doNotSell": "Não vender nem partilhar",
       "otp.countryCode": "Indicativo do país",
       "otp.phoneNumber": "Número de telefone",
@@ -10428,6 +10436,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(ΗΠΑ και Καναδάς)",
       "app.privacyPolicy": "Πολιτική απορρήτου",
+      "app.privacy": "Απόρρητο",
       "app.doNotSell": "Μη πώληση ή κοινοποίηση",
       "otp.countryCode": "Κωδικός χώρας",
       "otp.phoneNumber": "Αριθμός τηλεφώνου",
@@ -11642,6 +11651,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(USA i Kanada)",
       "app.privacyPolicy": "Polityka prywatności",
+      "app.privacy": "Prywatność",
       "app.doNotSell": "Nie sprzedawaj ani nie udostępniaj",
       "otp.countryCode": "Kod kraju",
       "otp.phoneNumber": "Numer telefonu",
@@ -12856,6 +12866,7 @@
       "app.smsOtp": "SMS OTP",
       "app.smsOtpRegion": "(الولايات المتحدة وكندا)",
       "app.privacyPolicy": "سياسة الخصوصية",
+      "app.privacy": "الخصوصية",
       "app.doNotSell": "عدم البيع أو المشاركة",
       "otp.countryCode": "رمز الدولة",
       "otp.phoneNumber": "رقم الهاتف",

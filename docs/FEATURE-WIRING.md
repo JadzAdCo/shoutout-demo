@@ -45,14 +45,15 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Login + Search chrome (s3.2.23)
+## Login + Search chrome (s3.2.24)
 
 **Purpose:** Compact sign-in, short welcome, privacy links in page footer, FloqR wordmark without pill, Search lens-in-field, tile-palette Site chrome.
 
 | Layer | Wiring |
 |---|---|
 | Login copy | `index.html` `.login-welcome-line.help-label` → `app.welcomeSignIn` = **Please signin or signup**; left-justified with `?` (`align-self:flex-start`); **80px** under FloqR mark (`.login-card > .floqr-home-link`) |
-| Login legal | `footer.login-page-footer` sibling of `.login-card` (not inside the card). Keeps both **Privacy Policy** (`privacy.html`) and **Do Not Sell or Share** (`privacy.html#do-not-sell`) — full policy vs CCPA/CPRA opt-out. CSS: `position:fixed; bottom:0` (+ safe-area + fade) so links stay at the visible phone bottom; `.login-wrap` gets bottom padding so OTP panels clear the bar |
+| Login legal | `footer.login-page-footer` — single **Privacy** link (`app.privacy` → `privacy.html`). CSS: `position:fixed; bottom:0` (+ safe-area). DNS/GPC controls remain under My Profile → My Privacy |
+| Login Site chrome | Early localStorage paint (`floqr.isSiteChrome`) + `FLOQRChromeScheme` always paints last-used chrome on login/Search (does **not** demote to Nightlife when beta access is unresolved/denied). Cross-device: `hydrateFromProfile` reads `users.isSiteChrome` after sign-in and writes localStorage. Picker UI still gated by `siteChrome` beta |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
 | Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.23` |
@@ -76,8 +77,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
 | Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
 | Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Black Dark Green (+ legacy `uiChrome` string) |
-| Default | `0` / Nightlife; fail closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
-| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate`, `data-floqr-theme-panel`) |
+| Default | `0` / Nightlife for new patrons; last-used chrome is painted from localStorage / profile even when beta access is off (login + Search). Picker UI fail-closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
+| Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` gated) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
 | CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + brand CTAs (grey icon halo); Black Dark Green = violet/coral warm end |
