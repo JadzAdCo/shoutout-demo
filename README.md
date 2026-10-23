@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.41 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.42 (stable)
+
+- s3.2.42: Venue Command Center ? help; remove FLOQR Club Admin / Location View / verified banners.
+- s3.2.41: Traditional search-output pills + VIP/FloqCast venue cards match View Club cyan.
 
 - s3.2.41: Traditional search-output pills + VIP/FloqCast venue cards match View Club cyan.
 - s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.

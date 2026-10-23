@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.41";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.41";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.42";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.42";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.42",
+      title: "s3.2.42 — Venue Command Center ? help + remove privilege banners",
+      checks: [
+        {label:"Package version s3.2.42", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.42\""]},
+        {label:"Venue Command help-label", file:"admin.html", includes:["help-venue-command-center", "help-label-text", "admin.venueCommand"], notIncludes:["FLOQR Club Admin", "admin.locationView", "admin.subtitle"]},
+        {label:"Help locale pack", file:"floqr-i18n-help.js", includes:["help-venue-command-center"]},
+        {label:"Access least disclosure", file:"admin-app.js", includes:["Do not disclose privilege tier", "hasClubAdminAccess"], notIncludes:["Master Admin verified for Club Admin."]},
+        {label:"Manual test s3.2.42", file:"ai-diagnostics-service.js", includes:["s3-2-42-venue-command-help-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.42\""]}
+      ]
+    },
     {
       version: "s3.2.41",
       title: "s3.2.41 — Traditional search-output pills + VIP/FloqCast chrome",
@@ -2383,6 +2395,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-42-venue-command-help-chrome",
+      area:"Club Admin",
+      feature:"Venue Command Center ? help; remove privilege banners",
+      changed:"Removed FLOQR Club Admin eyebrow, Location View label, and idle Master Admin verified status. Moved former subtitle into h1 ? help (help-venue-command-center) with venueAdmin+masterAdmin audiences and full locale packs. Access still hasClubAdminAccess; privilege tier not shown after gate. Package s3.2.42.",
+      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1 (?v=s3.2.42) as Club Admin or Master Admin. 2) Header shows Venue Command Center + ? only — no FLOQR Club Admin, no Location View, no Master Admin verified line, no grey subtitle paragraph. 3) Tap ? — body equals former Approve ShoutOuts… blurb (localized). 4) Unaffiliated account still hits venue gate; assigned admin still opens panel.",
+      expected:"Clean header; help ? has subtitle copy; access gate unchanged; no privilege disclosure string.",
+      troubleshoot:"Still see verified line → admin-app.js must setText(adminStatus,\"\") after gate. Missing ? → help-attach.js + help-venue-command-center in floqai-help-repository + floqr-i18n-help. Wrong language → run i18n-coverage-report.js."
     },
     {
       id:"s3-2-41-traditional-search-output-chrome",

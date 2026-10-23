@@ -306,5 +306,9 @@
   "help-chrome-audit": {
     "title": "Site chrome audit",
     "body": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+  },
+  "help-venue-command-center": {
+    "title": "Venue Command Center",
+    "body": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location."
   }
 }

@@ -8,7 +8,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-22 |
+| Last registry touch | 2026-10-23 |
+
+---
+
+## Venue Command Center (`admin.html`) — header + access (s3.2.42)
+
+**Purpose:** Club Admin hub for one affiliated venue. Header chrome is title + `?` help only (no privilege banners).
+
+| Layer | Wiring |
+|---|---|
+| Surface | `admin.html` — `h1.help-label` → `help-venue-command-center`; `#adminStatus` hidden unless an error/action message is set |
+| Removed chrome | Eyebrow `FLOQR Club Admin`, subtitle paragraph, `Location View` label, idle `Master Admin verified for Club Admin.` / `Club admin verified.` status lines |
+| Help | `help-venue-command-center` — body is former `admin.subtitle`; audiences **`venueAdmin` + `masterAdmin`** (FloqAi partition); locales in `floqr-i18n-help.js` + `scripts/_help-en.json` |
+| Access (server/client) | `admin-app.js` `hasClubAdminAccess` — Master Admin allow-list **or** active `clubAdminAssignments/{locationId_uid}` **or** `clubLocations.adminUids` / `adminEmails` **or** demo `temp_clubadmin_N` → `temp-democlub-N`. MFA required for non-demo Club Admins |
+| Data classification | `clubAdminAssignments` = clubAdmin tier (`data-classification-core.js`); Master Admin oversight does not write a public status string. Least disclosure: privilege tier is not shown in the header after gate pass |
+| Diagnostics | Manual test `s3-2-42-venue-command-help-chrome` |
 
 ---
 
