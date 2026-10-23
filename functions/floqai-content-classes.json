@@ -43,7 +43,8 @@
       "patron"
     ],
     "help-club-admin-affiliation": [
-      "masterAdmin"
+      "masterAdmin",
+      "venueAdmin"
     ],
     "help-club-display-screens": [
       "venueAdmin"
@@ -272,6 +273,10 @@
     ],
     "help-twilio-logging": [
       "masterAdmin"
+    ],
+    "help-venue-command-center": [
+      "masterAdmin",
+      "venueAdmin"
     ],
     "help-venue-crawl-datapoints": [
       "masterAdmin"
