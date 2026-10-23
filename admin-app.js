@@ -165,6 +165,7 @@
     );
     const floqCastTab = document.querySelector('.admin-subtab[data-panel="panelFloqCast"]');
     const vipTab = document.querySelector('.admin-subtab[data-panel="panelVipReserv"]');
+    const passesTab = document.querySelector('.admin-subtab[data-panel="panelPasses"]');
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
@@ -177,9 +178,10 @@
     const shoutOk = g.venueMayUse("shoutOut", row);
     const floqCastOk = g.venueMayUse("floqCast", row);
     const vipOk = g.venueMayUse("vipReservations", row);
+    const passesOk = g.venueMayUse("passes", row) || vipOk;
     const bartrOk = g.venueMayUse("bartrStores", row);
     const marketingOk = uberOk || windowOk;
-    const featureOk = shoutOk || floqCastOk || vipOk;
+    const featureOk = shoutOk || floqCastOk || vipOk || passesOk;
     if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
     if (spotSubtab) spotSubtab.classList.toggle("hidden", !uberOk);
     if (marketingCard) marketingCard.classList.toggle("hidden", !marketingOk);
@@ -195,6 +197,7 @@
       floqCastTab.textContent = "floqCast";
     }
     if (vipTab) vipTab.classList.toggle("hidden", !vipOk);
+    if (passesTab) passesTab.classList.toggle("hidden", !passesOk);
     if (featureMgmtGroup) featureMgmtGroup.classList.toggle("hidden", !featureOk);
     if (featureMgmtParent) featureMgmtParent.classList.toggle("hidden", !featureOk);
     document.querySelectorAll("[data-bartr-store-gate]").forEach(el => el.classList.toggle("hidden", !bartrOk));
@@ -1128,6 +1131,9 @@
       }
 
       if (panelId === "panelReconciliation") loadClubPaymentLedger();
+      if (panelId === "panelPasses") {
+        try { window.FLOQRAdminPasses?.render?.(); } catch (_) { /* ignore */ }
+      }
       try {
         if (location.hash !== `#${panelId}`) history.replaceState(null, "", `#${panelId}`);
       } catch (_) {}
@@ -1206,7 +1212,9 @@
       paneltemplatebackgrounds: "panelTemplateBackgrounds",
       vipreserv: "panelVipReserv",
       vip: "panelVipReserv",
-      panelvipreserv: "panelVipReserv"
+      panelvipreserv: "panelVipReserv",
+      passes: "panelPasses",
+      panelpasses: "panelPasses"
     };
     const featurePanel = FEATURE_ALIASES[wanted] || "";
     if (marketingPanel && byId(marketingPanel)) {
@@ -1239,6 +1247,10 @@
     }
 
     window.FLOQRAdminTabs = {activatePanel};
+    window.FLOQRAdmin = Object.assign(window.FLOQRAdmin || {}, {
+      getLocationId: () => locationId,
+      get locationId() { return locationId; }
+    });
   }
 
   let suprstarQueueUnsub = null;
@@ -3597,6 +3609,7 @@
       renderQueue();
       renderFloqCastQueue();
       renderVipAdmin();
+      try { window.FLOQRAdminPasses?.bind?.(); } catch (_) { /* ignore */ }
       loadClubPublicProfile().then(async () => {
         await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);
       });

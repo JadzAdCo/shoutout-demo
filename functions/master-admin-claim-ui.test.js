@@ -63,6 +63,6 @@ test("only a boolean true claim counts and the provider rule still applies", () 
 test("auth state handler reads token claims before the security check", () => {
   const source = read("master-admin-app.js");
   assert.match(source, /getIdTokenResult\(true\)/);
-  assert.match(source, /masterSecurityCheck\(user, claims\)/);
+  assert.match(source, /masterSecurityCheck\(user, claims(?:,\s*\{[^}]*\})?\)/);
   assert.match(read("master-admin.html"), /master-admin-app\.js\?v=s3\.\d+\.\d+"/);
 });

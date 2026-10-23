@@ -81,8 +81,12 @@
     });
   }
 
-  /** True when RTP still moves — hold through "disconnected" UI states. */
-  async function peerMediaAlive(pc) {
+  /**
+   * True when RTP bytes grew since the last check (delta).
+   * Cumulative bytes>0 forever after first video — that deadlocked reconnect.
+   * Pass an optional state bag `{bytes, at}` to keep per-peer history.
+   */
+  async function peerMediaAlive(pc, state) {
     try {
       if (!pc?.getStats) return false;
       const stats = await pc.getStats();
@@ -93,7 +97,28 @@
           bytes += Number(r.bytesSent || 0) + Number(r.bytesReceived || 0);
         }
       });
-      return bytes > 0;
+      const bag = state && typeof state === "object" ? state : null;
+      const now = Date.now();
+      if (!bag) {
+        // Stateless callers: require a short second sample so lifetime totals
+        // after a dead peer do not look "alive".
+        await new Promise(r => setTimeout(r, 400));
+        const stats2 = await pc.getStats();
+        let bytes2 = 0;
+        stats2.forEach((r) => {
+          if (!r) return;
+          if (r.type === "outbound-rtp" || r.type === "inbound-rtp") {
+            bytes2 += Number(r.bytesSent || 0) + Number(r.bytesReceived || 0);
+          }
+        });
+        return bytes2 > bytes;
+      }
+      const prev = Number(bag.bytes || 0);
+      const prevAt = Number(bag.at || 0);
+      bag.bytes = bytes;
+      bag.at = now;
+      if (!prevAt) return bytes > 0;
+      return bytes > prev;
     } catch (_) {
       return false;
     }
@@ -696,20 +721,46 @@
       }
     }
 
-    function tryIceRestart(reason) {
+    async function publishIceRestartOffer(reason) {
       if (stopped || rebuilding || !pc) return false;
-      if (typeof pc.restartIce !== "function") return false;
       try {
-        pc.restartIce();
+        lastAnswerSdp = "";
+        await clearIceCollections(sessionRef);
+        wireIce(pc, sessionRef, "callerCandidates");
+        listenCalleeIce(pc);
+        if (typeof pc.restartIce === "function") {
+          try { pc.restartIce(); } catch (_) { /* createOffer iceRestart below */ }
+        }
+        const offer = await pc.createOffer({
+          iceRestart: true,
+          offerToReceiveAudio: false,
+          offerToReceiveVideo: false
+        });
+        await pc.setLocalDescription(offer);
+        await sessionRef.set({
+          offer: {type: offer.type, sdp: offer.sdp},
+          answer: null,
+          status: "offering",
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge: true});
         onStatus?.("ice-restart", {
           connectionState: pc.connectionState,
           iceConnectionState: pc.iceConnectionState,
+          signalingState: pc.signalingState,
           reason: String(reason || "ice-restart")
         });
         return true;
-      } catch (_) {
+      } catch (err) {
+        onStatus?.(`renegotiate-error:${err?.message || err}`);
         return false;
       }
+    }
+
+    function tryIceRestart(reason) {
+      if (stopped || rebuilding || !pc) return false;
+      // Real ICE restart requires a new offer/answer — bare restartIce() is not enough.
+      publishIceRestartOffer(reason).catch(() => {});
+      return true;
     }
 
     function scheduleRebuild(reason, waitMs) {

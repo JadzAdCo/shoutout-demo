@@ -94,29 +94,69 @@
     return u.pathname.split("/").pop() + u.search;
   }
 
-  function fillNights(preferred) {
+  function localYmd(d = new Date()) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  /** Fill night select from club open nights (hoursStructured) when provided. */
+  function fillNights(preferred, bookableNights) {
     if (!nightEl) return;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
     nightEl.innerHTML = "";
+    let rows = Array.isArray(bookableNights) ? bookableNights.filter(n => n && (n.night || n)) : [];
+    if (!rows.length && window.FLOQRVenueCalendar && currentVenue) {
+      const api = window.FLOQRVenueCalendar;
+      const club = {
+        hoursStructured: currentVenue.hoursStructured || currentVenue.openingHours,
+        hoursExceptions: currentVenue.hoursExceptions || [],
+        country: currentVenue.country || "US"
+      };
+      const cursor = new Date();
+      cursor.setHours(12, 0, 0, 0);
+      for (let i = 0; i < 60 && rows.length < 14; i += 1) {
+        const hours = api.hoursForDate(club, cursor);
+        if (!hours.closed) {
+          const night = api.ymd(cursor);
+          const window = hours.open && hours.close ? ` · ${hours.open}–${hours.close}` : "";
+          rows.push({
+            night,
+            label: `${cursor.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"})}${window}`
+          });
+        }
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    }
+    if (!rows.length) {
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+      for (let i = 0; i < 14; i += 1) {
+        const d = new Date(today.getTime() + i * 86400000);
+        rows.push({
+          night: localYmd(d),
+          label: d.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"})
+        });
+      }
+    }
     let matched = false;
-    for (let i = 0; i < 14; i += 1) {
-      const d = new Date(today.getTime() + i * 86400000);
-      const iso = d.toISOString().slice(0, 10);
+    rows.forEach(row => {
+      const iso = typeof row === "string" ? row : String(row.night || "");
+      if (!iso) return;
       const opt = document.createElement("option");
       opt.value = iso;
-      opt.textContent = d.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"});
+      opt.textContent = (typeof row === "object" && row.label) ? row.label : iso;
       if (preferred && preferred === iso) {
         opt.selected = true;
         matched = true;
       }
       nightEl.appendChild(opt);
-    }
+    });
     if (preferred && !matched) nightEl.value = nightEl.options[0]?.value || "";
   }
 
   function selectedNight() {
-    return nightEl?.value || new Date().toISOString().slice(0, 10);
+    return nightEl?.value || localYmd();
   }
 
   async function refreshAvailability(opts) {
@@ -126,6 +166,13 @@
         clubLocationId: currentVenue.id,
         night: selectedNight()
       });
+      if (Array.isArray(res.data?.bookableNights) && res.data.bookableNights.length) {
+        const pref = selectedNight();
+        fillNights(pref, res.data.bookableNights);
+      }
+      if (res.data?.nightOpen === false) {
+        setStatus(t("page.vip.nightClosed", "Club is closed this night — pick an open night from the list."));
+      }
       const sections = res.data?.sections || [];
       const states = {};
       let available = 0;
@@ -231,7 +278,9 @@
   }
 
   async function createHold({sectionId, partySize}) {
-    if (!currentVenue || currentVenue.pending) return;
+    if (!currentVenue || currentVenue.pending) {
+      throw new Error(t("page.vip.holdFailed", "Could not hold that table."));
+    }
     setStatus(t("page.vip.holding", "Holding your table…"));
     try {
       const res = await callable("createVipHold")({
@@ -245,16 +294,25 @@
         clubLocationId: currentVenue.id
       });
       storeHold(activeHold);
+      // Close table popout so #vipHoldBanner / Continue to Terms is visible.
+      window.FLOQRVipFloorViewer?.closePopout?.();
       renderHoldBanner();
+      try {
+        holdBanner?.scrollIntoView?.({behavior: "smooth", block: "nearest"});
+      } catch (_) { /* ignore */ }
       const needsDeposit = Number(activeHold.depositRequired) !== 0
         && Number(activeHold.amounts?.depositCents || activeHold.amounts?.chargedCents || 0) > 0;
       setStatus(needsDeposit
         ? t("page.vip.holdReady", "Table held for 30 minutes. Continue to Terms, then pay the deposit.")
         : t("page.vip.holdReadyNoDeposit", "Table held for 30 minutes. Continue to Terms to confirm — no deposit required at this venue."));
-      refreshAvailability();
+      await refreshAvailability({announce: false});
+      return activeHold;
     } catch (err) {
       const msg = err?.message || err?.details || String(err);
-      setStatus(msg.replace(/^.*?:\s*/, "") || t("page.vip.holdFailed", "Could not hold that table."));
+      const clean = msg.replace(/^Firebase:\s*/i, "").replace(/^.*?:\s*/, "")
+        || t("page.vip.holdFailed", "Could not hold that table.");
+      setStatus(clean);
+      throw new Error(clean);
     }
   }
 
@@ -388,6 +446,8 @@
         country: club.country || "",
         genres: Array.isArray(club.genres) ? club.genres : [],
         logoUrl: club.logoUrl || club.coverImageUrl || "",
+        hoursStructured: club.hoursStructured || club.openingHours || null,
+        hoursExceptions: club.hoursExceptions || [],
         plan,
         pending
       };
@@ -414,6 +474,7 @@
     }
     currentVenue = venue;
     clearHoldUi();
+    fillNights(selectedNight(), null);
     if (gridEl) gridEl.classList.add("hidden");
     if (searchEl) searchEl.classList.add("hidden");
     if (countEl) countEl.textContent = "";

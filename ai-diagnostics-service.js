@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.33";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.33";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.39";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.39";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,85 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.39",
+      title: "s3.2.39 — VIP White/Black white page background",
+      checks: [
+        {label:"Package version s3.2.39", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.39\""]},
+        {label:"VIP whiteBlack body override", file:"vip.css", includes:["White / Black: white page", "html[data-floqr-chrome=\"whiteBlack\"] body.vip-page{", "background:#ffffff!important"]},
+        {label:"VIP whiteBlack Select venue CTA", file:"vip.css", includes:["vip-pick-cta.primary", "border:2px solid #0a0a0a!important"]},
+        {label:"Manual test s3.2.39", file:"ai-diagnostics-service.js", includes:["s3-2-39-vip-whiteblack-page"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.39\""]}
+      ]
+    },
+    {
+      version: "s3.2.38",
+      title: "s3.2.38 — White/Black white cards + letter-fit + FloqR Admin",
+      checks: [
+        {label:"Package version s3.2.38", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.38\""]},
+        {label:"White/Black white template cards", file:"styles.css", includes:["Template select under White/Black: white card chrome", "html[data-floqr-chrome=\"whiteBlack\"] .template.template-select-card"]},
+        {label:"Letter-fit tags", file:"patron-app.js", includes:["letterChips", "template.letterFitHint"]},
+        {label:"FloqR Admin templates rule", file:"firestore.rules", includes:["canManageCatalogTemplates", "floqrAdmins"]},
+        {label:"Manual test s3.2.38", file:"ai-diagnostics-service.js", includes:["s3-2-38-whiteblack-letter-fit-floqr-admin"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.38\""]}
+      ]
+    },
+    {
+      version: "s3.2.37",
+      title: "s3.2.37 — Strict black-and-white classic-bw + White/Black chrome",
+      checks: [
+        {label:"Package version s3.2.37", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.37\""]},
+        {label:"classic-bw select card monochrome", file:"styles.css", includes:["Traditional Black & White — strict monochrome", "linear-gradient(135deg,#050505,#1a1a1a 42%"]},
+        {label:"White/Black solid CTAs", file:"styles.css", includes:["solid B&W CTAs", "background:#111!important"]},
+        {label:"White/Black template-select B&W chrome", file:"styles.css", includes:["template-select-card{", "linear-gradient(160deg,#0a0a0a 0%,#1c1c1c 48%"]},
+        {label:"classic-bw LED no red frame", file:"display.css", includes:["border-color:#fff!important", "background:#050505!important"]},
+        {label:"classic identity shell B&W", file:"display.css", includes:["Strict B&W FloqR card on classic board", "background:#050505"]},
+        {label:"admin classic-bw preview monochrome", file:"admin.css", includes:[".template-view-preview.classic-bw{background:linear-gradient(135deg,#050505,#1b1b1b 40%"]},
+        {label:"Manual test s3.2.37", file:"ai-diagnostics-service.js", includes:["s3-2-37-classic-bw-whiteblack-strict"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.37\""]}
+      ]
+    },
+    {
+      version: "s3.2.36",
+      title: "s3.2.36 — VIP hold UX + floqCast ICE + Passes Live Club Admin",
+      checks: [
+        {label:"Package version s3.2.36", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.36\""]},
+        {label:"VIP closePopout after hold", file:"vip-app.js", includes:["closePopout", "scrollIntoView"]},
+        {label:"VIP bookableNights / nightClosed", file:"vip-app.js", includes:["bookableNights", "page.vip.nightClosed"]},
+        {label:"expireVipHolds scheduled", file:"functions/vip-functions.js", includes:["exports.expireVipHolds", "every 5 minutes"]},
+        {label:"floqCast public TURN invoker", file:"functions/floqcast-functions.js", includes:["invoker: \"public\"", "getFloqCastIceServers"]},
+        {label:"ICE restart offer", file:"floqcast-webrtc.js", includes:["publishIceRestartOffer", "iceRestart: true"]},
+        {label:"Club Admin Passes panel", file:"admin.html", includes:["panelPasses", "admin-passes.js"]},
+        {label:"Passes Live catalog", file:"functions/feature-services-core.js", includes:["key: \"passes\"", "IsFeatureEnabled: 1"]},
+        {label:"Manual tests s3.2.36", file:"ai-diagnostics-service.js", includes:["s3-2-36-vip-hold-popout-open-nights", "s3-2-36-floqcast-turn-ice-reconnect", "s3-2-36-passes-live-club-admin"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.36\""]}
+      ]
+    },
+    {
+      version: "s3.2.35",
+      title: "s3.2.35 — Mobile Google sign-in uses redirect (no blocked popup)",
+      checks: [
+        {label:"Package version s3.2.35", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.35\""]},
+        {label:"oauthPopupsUnreliable helper", file:"patron-app.js", includes:["oauthPopupsUnreliable", "signInProviderRedirect"]},
+        {label:"Mobile skips popup", file:"patron-app.js", includes:["if (oauthPopupsUnreliable())"]},
+        {label:"Portal mobile redirect", file:"patron-portal-app.js", includes:["signInWithRedirect(provider)", "popupsBad"]},
+        {label:"Manual test mobile Google", file:"ai-diagnostics-service.js", includes:["s3-2-35-google-mobile-redirect"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.35\""]}
+      ]
+    },
+    {
+      version: "s3.2.34",
+      title: "s3.2.34 — Unified Image-2 Back pill + header brand",
+      checks: [
+        {label:"Package version s3.2.34", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.34\""]},
+        {label:"Periwinkle Back pill CSS", file:"styles.css", includes:["--floqr-back-bg", ".floqr-back-btn", "border-radius:999px"]},
+        {label:"FloqR page brand header", file:"styles.css", includes:[".floqr-page-brand"]},
+        {label:"Listing header brand + floqr-back", file:"index.html", includes:["floqr-back-btn", "floqr-page-brand", "backToCategoriesBtn"]},
+        {label:"Portal FloqR under Back", file:"patron-portal.html", includes:["floqr-page-brand", "global-back-btn"]},
+        {label:"Manual test unified Back", file:"ai-diagnostics-service.js", includes:["s3-2-34-unified-back-header"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.34\""]}
+      ]
+    },
     {
       version: "s3.2.33",
       title: "s3.2.33 — Profile & Settings chrome + short Back",
@@ -2137,6 +2216,24 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-35-google-mobile-redirect",
+        area:"Auth / Welcome",
+        feature:"Google sign-in on phone skips blocked popup",
+        changed:"iPhone / iPad / Android / WebView use signInWithRedirect immediately (no popup → 'Google popup was blocked'). Desktop still uses popup; popup-blocked still falls back to redirect. getRedirectResult waits briefly for onAuthStateChanged. Package s3.2.35.",
+        howToTest:"1) Hard-refresh Welcome on iPhone Safari (s3.2.35). 2) Tap Google — full-page Google account picker (not a blocked popup message). 3) Finish sign-in → Search. 4) Desktop Chrome: Google still opens a popup. 5) My Profile signed-out Google button uses the same mobile redirect path.",
+        expected:"Phone never shows 'Google popup was blocked'; desktop popup still works; cancel on desktop stays retryable.",
+        troubleshoot:"Still popup-blocked on iPhone → hard-refresh patron-app.js s3.2.35; confirm oauthPopupsUnreliable. Redirect returns to Welcome unsigned → Firebase authorized domains include jadzadco.github.io; retry once."
+      },
+      {
+        id:"s3-2-34-unified-back-header",
+        area:"Site chrome / Nav",
+        feature:"Image-2 periwinkle Back pill + FloqR header brand site-wide",
+        changed:"All Back controls use the centered periwinkle pill (< Back): .global-back-btn, .floqr-back-btn, topbar nav.backShort. Page headers: Back → centered FloqR mark (.floqr-page-brand / brand stacks) → title. Removed left sticky dark outlined Back. Package s3.2.34.",
+        howToTest:"1) Hard-refresh Search (?start=search) s3.2.34. 2) Back is a centered light periwinkle pill with white < Back above the FloqR logo (not left dark outlined). 3) Open Choose Location / listing — same Back + FloqR mark under it, then title. 4) My Profile — same Back + FloqR mark + Profile & Settings. 5) VIP / Guest List / Services — same Back pill.",
+        expected:"One Back style site-wide (Image 2); headers show FloqR under Back before the page title.",
+        troubleshoot:"Still left dark sticky → hard refresh styles.css s3.2.34. Index backs default grey → need floqr-back-btn / data-i18n=nav.backShort selectors. No FloqR under Back on listing → floqr-page-brand in index.html."
+      },
+      {
         id:"s3-2-33-profile-settings-chrome",
         area:"My Profile",
         feature:"Profile & Settings title, ? help blurb, < Back",
@@ -2263,13 +2360,67 @@
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
     },
     {
+      id:"s3-2-39-vip-whiteblack-page",
+      area:"VIP reserV / Site chrome",
+      feature:"VIP choose-venue page is white under White/Black chrome",
+      changed:"vip.css overrides body.vip-page nightlife gradient for whiteBlack: white page, white venue cards, shiny-black outline Select venue. Package s3.2.39.",
+      howToTest:"1) Set Site chrome White/Black. 2) Hard-refresh vip.html (?v=s3.2.39). 3) Top brand area and page background are white (no purple/blue gradient). 4) Select venue is white with black border/text.",
+      expected:"VIP venue list matches White/Black chrome; no nightlife hero wash.",
+      troubleshoot:"Still purple → vip.css whiteBlack body.vip-page !important missing or cache on s3.2.33 live Pages."
+    },
+    {
+      id:"s3-2-38-whiteblack-letter-fit-floqr-admin",
+      area:"Site chrome / Templates",
+      feature:"White/Black white cards + letter-fit tags + FloqR Admin template access",
+      changed:"White/Black: white template-select cards; login welcome shiny black; login/Use = white fill + shiny black border/ink. Client FLOQRTextLayout 64×48 caps synced (full 3×10=30, classic 3×12=36). Cards show letter-fit tags. floqrAdmins + canManageCatalogTemplates. Package s3.2.38.",
+      howToTest:"1) Hard-refresh login + template select under White/Black (?v=s3.2.38). 2) Welcome line is shiny black on white; sign-in buttons white with black border/text (no cyan→magenta). 3) Template cards white; Use outline black. 4) Tags include e.g. 96×48: 3×15=45 / 64×48: 3×12=36 / 64×32: 3×10=30 on Traditional. 5) Deploy Firestore rules. Master Admin Entity Onboarding → Assign FloqR Admin; that user opens Template Management.",
+      expected:"White cards + outline B&W chrome; correct letter tags; FloqR Admin can save templates.",
+      troubleshoot:"Gradient login → styles.css whiteBlack #loginActions rules + hard refresh. Wrong 64×48 letters → shared-data FLOQRTextLayout 29.09.31 vs commerce SHOUTOUT_TEXT_LIMITS. FloqR Admin denied → rules deploy + floqrAdmins/{uid} status=active."
+    },
+    {
+      id:"s3-2-37-classic-bw-whiteblack-strict",
+      area:"Site chrome / Templates",
+      feature:"Strict black-and-white classic-bw + White/Black template chrome",
+      changed:"Traditional Black and White select card, LED board, and FloqR PRESENTED BY rail use black/white/grey only (no red). White/Black site chrome uses solid black CTAs; template-select cards force monochrome chrome (LED preview art unchanged). Package s3.2.37.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → Aurelia template select (styles.css + display.css ?v=s3.2.37). 2) Set Site chrome to White/Black. 3) Traditional Black and White card: black card, white letter board, black/white FloqR rail — no red frame or red banner. 4) Use buttons are solid black or white (no cyan→magenta). 5) Club-approved / gold-class cards render as black/grey chrome under White/Black.",
+      expected:"No red on classic-bw; White/Black theme has no brand-gradient Use buttons on template select.",
+      troubleshoot:"Still red → hard refresh styles.css + display.css s3.2.37 (Xibo boards need display.css publish). Still gradient Use → confirm html[data-floqr-chrome=whiteBlack] and cache-bust."
+    },
+    {
+      id:"s3-2-36-vip-hold-popout-open-nights",
+      area:"VIP reserV",
+      feature:"Hold popout close + open-night calendar + hold expiry frees table",
+      changed:"createHold closes table popout and scrolls Continue to Terms. getVipAvailability/createVipHold use hoursStructured open nights; expireVipHolds every 5m + lazy free; createVipHold rejects isBooked tables. Package s3.2.36.",
+      howToTest:"1) Hard-refresh vip.html?location=temp-democlub-1. 2) Night list shows only club open days (hours on options). 3) Hold a green table — popout closes; yellow Hold active + Continue to Terms visible. 4) Wait for hold expiry (or shorten HOLD_MS in QA) — table returns green/available.",
+      expected:"No stuck popout after hold; closed weekdays not selectable; expired holds free inventory.",
+      troubleshoot:"Still stuck under popout → cache vip-app/vip-floor-viewer s3.2.36. Closed days still listed → club missing hoursStructured (seed demo pack / Club Public Profile hours). Table stays amber after 30m → confirm expireVipHolds deployed."
+    },
+    {
+      id:"s3-2-36-floqcast-turn-ice-reconnect",
+      area:"floqCast",
+      feature:"Public TURN + real ICE-restart offer + force reattach",
+      changed:"getFloqCastIceServers invoker:public. Phone publishIceRestartOffer(iceRestart:true). peerMediaAlive is delta-based. display2 force-reattaches after disconnect hold. Package s3.2.36.",
+      howToTest:"1) Deploy Functions. 2) Go live at Aurelia; confirm phone + display2 get Twilio/TURN (not STUN-only). 3) Toggle Wi‑Fi briefly — status shows ice-restart / reattaching and video recovers without a dead wait.",
+      expected:"Link recovers after NAT blip; board does not wait forever after hadVideoTrack.",
+      troubleshoot:"Still drops at ~10s → Functions missing invoker public or Twilio secrets. Reconnect hangs → hard refresh floqcast-webrtc.js + display-floqcast.js s3.2.36."
+    },
+    {
+      id:"s3-2-36-passes-live-club-admin",
+      area:"VIP / Passes",
+      feature:"Passes Live + Club Admin Passes tab",
+      changed:"featureServices/passes Live packaged. Club Admin Feature Mgmt → Passes (issue/list/reveal/check-in). Venue gate passes. Callables must be deployed. Package s3.2.36.",
+      howToTest:"1) Deploy Functions + Master Release Control Reload (seed Passes Live). 2) admin.html?location=temp-democlub-1&tab=passes — Issue pass, Show QR, Check in with ID 21+. 3) VIP Show pass + pass.html?t= still work.",
+      expected:"Passes callables present; Club Admin Passes tab usable; VIP Show pass unchanged.",
+      troubleshoot:"Callable not found → firebase deploy functions. Tab hidden → featureGates.passes / vipReservations on club. Access denied → seedFeatureServices so IsFeatureEnabled=1."
+    },
+    {
       id:"s3-2-16-passes-qr",
       area:"VIP / Passes",
       feature:"Door Passes QR beta wired (passes + pass.html)",
-      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16.",
-      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes beta row after seed/reload.",
+      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16. Superseded by s3-2-36-passes-live-club-admin for Live + Club Admin tab.",
+      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes row after seed/reload.",
       expected:"Untracked QR/passes modules are live on the branch and wired end-to-end for VIP Show pass.",
-      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js s3.2.16. Feature row missing → seedFeatureServices / Reload."
+      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js. Feature row missing → seedFeatureServices / Reload."
     },
     {
       id:"s3-2-16-profile-card-chrome",

@@ -20,7 +20,9 @@
     shoutOut: true,
     floqCast: true,
     /* Opt-in: only clubs subscribed to VIP reserV appear in VIP venue search. */
-    vipReservations: false
+    vipReservations: false,
+    /* Opt-in: Club Admin Passes (QR door) tab — seed on for VIP beta clubs. */
+    passes: false
   });
 
   const PATRON_GATE_LABELS = Object.freeze({
@@ -37,7 +39,8 @@
     bartrStores: "BartR Stores",
     shoutOut: "ShoutOut Capability",
     floqCast: "floqCast live video",
-    vipReservations: "VIP reserV tables"
+    vipReservations: "VIP reserV tables",
+    passes: "Door Passes (QR)"
   });
 
   let cachedPatronGates = { ...DEFAULT_PATRON_GATES };

@@ -450,7 +450,7 @@
     }
   }
 
-  function masterSecurityCheck(user, claims) {
+  function masterSecurityCheck(user, claims, options = {}) {
     if (!user) return { ok:false, reason:"Not signed in." };
 
     const email = safeUser(user);
@@ -458,13 +458,14 @@
     const providers = getProviderIds(user);
     // Server-issued claim; some IdPs (Microsoft) report email_verified=false for real work accounts.
     const hasAdminClaim = claims?.masterAdmin === true || claims?.superAdmin === true;
+    const hasFloqrAdmin = claims?.floqrAdmin === true || options.floqrAdminDocActive === true;
 
     if (!email || email === "unknown" || !email.includes("@")) {
       return { ok:false, reason:"Master Admin requires email-based Google or Microsoft sign-in." };
     }
 
-    if (!hasAdminClaim && !MASTER_ADMIN_EMAILS.includes(email)) {
-      return { ok:false, reason:`${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS.` };
+    if (!hasAdminClaim && !MASTER_ADMIN_EMAILS.includes(email) && !hasFloqrAdmin) {
+      return { ok:false, reason:`${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS and is not an assigned FloqR Admin.` };
     }
 
     const providerOk = providers.some(p => ALLOWED_PROVIDERS.includes(p));
@@ -473,16 +474,20 @@
     }
 
     const isTemporaryException = TEMPORARY_EXCEPTION_EMAILS.includes(email);
-    if (ENFORCE_DOMAINS && !ALLOWED_DOMAINS.includes(domain) && !isTemporaryException) {
+    if (ENFORCE_DOMAINS && !ALLOWED_DOMAINS.includes(domain) && !isTemporaryException && !hasFloqrAdmin) {
       return { ok:false, reason:`Master Admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
     }
 
-    if (!hasAdminClaim && REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
+    if (!hasAdminClaim && !hasFloqrAdmin && REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
       return { ok:false, reason:"Master Admin email must be verified by the provider." };
     }
 
+    const floqrAdminOnly = hasFloqrAdmin && !hasAdminClaim && !MASTER_ADMIN_EMAILS.includes(email);
+
     const domainMessage = hasAdminClaim
       ? "Master Admin claim present on the sign-in token."
+      : floqrAdminOnly
+        ? "Assigned FloqR Admin — Template Management access only."
       : ENFORCE_DOMAINS
         ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
         : "Domain enforcement disabled; explicit email allow-list is active.";
@@ -491,7 +496,115 @@
       ? "Firebase MFA enrollment detected."
       : "MFA should be enforced by the identity provider for production Master Admin accounts.";
 
-    return { ok:true, reason:`Master admin verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}`, shortStatus: "Signed in as Master Admin." };
+    return {
+      ok:true,
+      floqrAdminOnly,
+      reason:`${floqrAdminOnly ? "FloqR Admin" : "Master admin"} verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}`,
+      shortStatus: floqrAdminOnly ? "Signed in as FloqR Admin (templates)." : "Signed in as Master Admin."
+    };
+  }
+
+  async function readFloqrAdminActive(uid) {
+    if (!uid) return false;
+    try {
+      const snap = await db.collection("floqrAdmins").doc(uid).get();
+      return snap.exists && String(snap.data()?.status || "") === "active";
+    } catch (error) {
+      console.warn("floqrAdmins read failed", error?.message || error);
+      return false;
+    }
+  }
+
+  function applyFloqrAdminOnlyChrome(enabled) {
+    document.documentElement.toggleAttribute("data-floqr-admin-only", !!enabled);
+    document.querySelectorAll(".admin-tab-group, .admin-tab, .admin-subtab").forEach(el => {
+      const panel = el.getAttribute("data-panel") || el.getAttribute("data-group") || "";
+      const keep = !enabled || panel === "templateManagement" || panel === "entityManagement";
+      if (el.classList.contains("admin-tab-group") && el.getAttribute("data-tab-group") === "entityManagement") {
+        el.classList.toggle("hidden", false);
+        return;
+      }
+      if (el.classList.contains("admin-subtab")) {
+        el.classList.toggle("hidden", enabled && panel !== "templateManagement");
+        return;
+      }
+      if (el.classList.contains("admin-tab-parent") && el.getAttribute("data-group") === "entityManagement") {
+        el.classList.toggle("hidden", false);
+        return;
+      }
+      if (el.classList.contains("admin-tab") || el.classList.contains("admin-tab-group")) {
+        el.classList.toggle("hidden", enabled && el.getAttribute("data-group") !== "entityManagement" && el.getAttribute("data-tab-group") !== "entityManagement");
+      }
+    });
+    if (enabled) {
+      document.querySelector('[data-panel="templateManagement"]')?.click();
+    }
+  }
+
+  async function refreshFloqrAdminList() {
+    const wrap = byId("floqrAdminList");
+    const options = byId("floqrAdminPatronOptions");
+    if (options) {
+      options.innerHTML = networkUsers.slice(0, 400).map(row => {
+        const uid = row.uid || row.id;
+        return `<option value="${esc(uid)}">${esc(`${row.displayName || row.email || uid} — ${row.email || uid}`)}</option>`;
+      }).join("");
+    }
+    if (!wrap) return;
+    try {
+      const snap = await db.collection("floqrAdmins").where("status", "==", "active").limit(100).get();
+      const rows = snap.docs.map(d => ({id: d.id, ...(d.data() || {})}));
+      wrap.innerHTML = rows.length
+        ? rows.map(row => `<div class="queue-item"><strong>${esc(row.displayName || row.email || row.uid || row.id)}</strong><p>${esc(row.email || "")}</p><small>uid ${esc(row.uid || row.id)} · granted by ${esc(row.grantedByEmail || "—")}</small></div>`).join("")
+        : "<p class='sub'>No active FloqR Admins yet.</p>";
+    } catch (error) {
+      wrap.innerHTML = `<p class='sub'>Could not load FloqR Admins: ${esc(error?.message || error)}</p>`;
+    }
+  }
+
+  async function assignFloqrAdmin() {
+    const raw = String(byId("floqrAdminPatronSearch")?.value || "").trim();
+    const patron = networkUsers.find(row => {
+      const uid = String(row.uid || row.id || "");
+      return uid === raw || String(row.email || "").toLowerCase() === raw.toLowerCase();
+    }) || (raw ? {uid: raw, email: "", displayName: raw} : null);
+    if (!patron?.uid && !patron?.id) {
+      setText("floqrAdminAssignStatus", "Choose a patron uid or email first.");
+      return;
+    }
+    const uid = patron.uid || patron.id;
+    const email = String(patron.email || "").toLowerCase();
+    await db.collection("floqrAdmins").doc(uid).set({
+      uid,
+      email,
+      displayName: patron.displayName || patron.username || email || uid,
+      status: "active",
+      grantedByUid: auth.currentUser?.uid || "",
+      grantedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    setText("floqrAdminAssignStatus", `Assigned FloqR Admin: ${patron.displayName || email || uid}. They can open Template Management after Google/Microsoft sign-in.`);
+    refreshFloqrAdminList();
+  }
+
+  async function revokeFloqrAdmin() {
+    const raw = String(byId("floqrAdminPatronSearch")?.value || "").trim();
+    const uid = networkUsers.find(row => String(row.uid || row.id) === raw || String(row.email || "").toLowerCase() === raw.toLowerCase())?.uid
+      || networkUsers.find(row => String(row.uid || row.id) === raw || String(row.email || "").toLowerCase() === raw.toLowerCase())?.id
+      || raw;
+    if (!uid) {
+      setText("floqrAdminAssignStatus", "Choose a patron uid or email to revoke.");
+      return;
+    }
+    await db.collection("floqrAdmins").doc(uid).set({
+      uid,
+      status: "revoked",
+      grantedByUid: auth.currentUser?.uid || "",
+      grantedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    setText("floqrAdminAssignStatus", `Revoked FloqR Admin for ${uid}.`);
+    refreshFloqrAdminList();
   }
 
   function simpleRows(rows) {
@@ -1205,12 +1318,27 @@
       const how = template.howitWorks && typeof template.howitWorks === "object" ? Object.values(template.howitWorks).join(" ") : (template.howitWorks || "");
       return [template.id, template.name, template.category, template.description, how, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query);
     }).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
-    wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
-      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
-      <p>${esc(template.description || "No description")}</p>
-      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | ${Number(template.priceCents) > 0 ? `$${(Number(template.priceCents) / 100).toFixed(2)}` : "Free"} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
-      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button><button type="button" data-template-delete="${esc(template.id)}">Delete</button></div>
-    </div>`).join("") || "<p class='sub'>No templates matched.</p>";
+    wrap.innerHTML = rows.map(template => {
+      const letterFit = ["led-96x48", "led-64x48", "led-64x32"].map(id => {
+        const caps = window.FLOQRTextLayout?.resolve?.(template, id);
+        if (!caps?.supported) return null;
+        return String(caps.formatLabel || id).replace(/^LED\s*/i, "") + ": " + caps.lineCount + "x" + caps.perLine + "=" + caps.main;
+      }).filter(Boolean).join(" · ");
+      const priceLabel = Number(template.priceCents) > 0
+        ? ("$" + (Number(template.priceCents) / 100).toFixed(2))
+        : "Free";
+      const statusLabel = template.status === "deleted" ? "deactivated" : "active";
+      const toggleLabel = template.status === "deleted" ? "Activate" : "Deactivate";
+      const bgLabel = template.backgroundEditable === false ? "locked" : "editable";
+      return [
+        '<div class="queue-item managed-template-row ' + (template.status === "deleted" ? "is-deactivated" : "") + '">',
+        '<div class="message-envelope-head"><strong>' + esc(template.name || template.id) + '</strong><span>' + statusLabel + '</span></div>',
+        '<p>' + esc(template.description || "No description") + '</p>',
+        '<small>' + esc(template.id) + ' | ' + esc((template.tags || []).join(", ")) + ' | ' + esc(priceLabel) + ' | Screens: ' + esc((template.screenFormatIds || []).join(", ") || "not tagged") + ' | Letter fit (1-3 m): ' + esc(letterFit || "n/a") + ' | Background: ' + bgLabel + '</small>',
+        '<div class="queue-actions"><button type="button" data-template-view="' + esc(template.id) + '">View</button><button type="button" data-template-preview="' + esc(template.id) + '">Preview</button><button type="button" data-template-edit="' + esc(template.id) + '">Edit</button><button type="button" data-template-toggle="' + esc(template.id) + '">' + toggleLabel + '</button><button type="button" data-template-delete="' + esc(template.id) + '">Delete</button></div>',
+        '</div>'
+      ].join("");
+    }).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
     wrap.querySelectorAll("[data-template-preview]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templatePreview] || {})));
     wrap.querySelectorAll("[data-template-edit]").forEach(button => button.addEventListener("click", () => fillManagedTemplateForm(managedTemplates[button.dataset.templateEdit] || {})));
@@ -2163,6 +2291,8 @@
     bind("importClubOnboardingCsvBtn", importClubCsv);
     bind("createPromoterOnboardingBtn", createPromoterOnboarding);
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
+    bind("assignFloqrAdminBtn", assignFloqrAdmin);
+    bind("revokeFloqrAdminBtn", revokeFloqrAdmin);
     bind("refreshNetworkReconBtn", loadNetworkPaymentLedger);
     bind("purgeTestPaymentsReconBtn", purgeNetworkTestPayments);
     bind("refreshAllQueuesBtn", () => loadNetworkReports({force: true}));
@@ -2214,7 +2344,9 @@
 
       const claims = await readTokenClaims(user);
       if (auth.currentUser?.uid !== user.uid) return;
-      const check = masterSecurityCheck(user, claims);
+      const floqrAdminDocActive = await readFloqrAdminActive(user.uid);
+      if (auth.currentUser?.uid !== user.uid) return;
+      const check = masterSecurityCheck(user, claims, {floqrAdminDocActive});
       if (!check.ok) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");
@@ -2226,6 +2358,8 @@
       byId("masterPanel").classList.remove("hidden");
       setText("masterStatus", check.shortStatus || "Signed in as Master Admin.");
       setText("masterPanelSecurityStatus", check.reason);
+      applyFloqrAdminOnlyChrome(!!check.floqrAdminOnly);
+      if (!check.floqrAdminOnly) refreshFloqrAdminList().catch(() => {});
       const resumed = window.FLOQRMasterTabs?.resumeDeepLinkPanel?.() || "";
       if (resumed && ENTITY_MGMT_PANEL_IDS.includes(resumed) && !window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
         setText("masterActionFeedback", `${panelLabel(resumed)} is ready after SOS2FA unlock.`);

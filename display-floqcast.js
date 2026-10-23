@@ -256,10 +256,14 @@
                 scheduleReattach(sessionId, "WebRTC failed after blip — retrying…");
                 return;
               }
-              // Still only "disconnected" after a prior video track — keep holding; phone rebuilds.
+              // Still only "disconnected" after a prior video track — do not wait forever.
+              // Force board reattach so displayJoins / new offer can recover the link.
               if (hadVideoTrack) {
-                setLiveStatus("Waiting for phone to restore the link… keep preview open.");
+                setLiveStatus("Waiting for phone… reattaching board… keep preview open.");
                 waitingForPhoneRebuild = true;
+                peerDead = true;
+                answeredSticky = false;
+                scheduleReattach(sessionId, "WebRTC still disconnected after hold — reattaching…");
                 return;
               }
               peerDead = true;

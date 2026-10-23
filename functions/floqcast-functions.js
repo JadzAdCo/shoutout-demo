@@ -484,6 +484,8 @@ exports.endFloqCastLive = onCall({region: "us-central1"}, async (request) => {
  */
 exports.getFloqCastIceServers = onCall({
   region: "us-central1",
+  // display2.html has no patron Auth — must stay publicly invokable for TURN.
+  invoker: "public",
   secrets: [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN],
   timeoutSeconds: 15,
   memory: "256MiB"

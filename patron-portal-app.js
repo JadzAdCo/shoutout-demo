@@ -673,8 +673,34 @@
   }
 
   async function loginGoogle() {
-    try { setText("portalStatus", "Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-    catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try { provider.setCustomParameters({prompt: "select_account"}); } catch (_) {}
+    const ua = String(navigator.userAgent || "");
+    const touch = Number(navigator.maxTouchPoints || 0) > 0;
+    const popupsBad = /iPhone|iPod|iPad|Android/i.test(ua) || (/Macintosh/i.test(ua) && touch)
+      || /\bwv\b|; wv\)|FBAN|FBAV|Instagram/i.test(ua);
+    try {
+      setText("portalStatus", popupsBad ? "Opening Google secure sign-in…" : "Opening Google sign-in...");
+      if (popupsBad) await auth.signInWithRedirect(provider);
+      else await auth.signInWithPopup(provider);
+    } catch (e) {
+      const code = e?.code || "";
+      if (code === "auth/popup-blocked") {
+        try {
+          setText("portalStatus", "Google popup was blocked. Trying full-page sign-in…");
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (redirectErr) {
+          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          return;
+        }
+      }
+      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        setText("portalStatus", "Google was cancelled. Tap Continue with Google again.");
+        return;
+      }
+      setText("portalStatus", `${code || "error"}: ${e?.message || e}`);
+    }
   }
 
   async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?start=search"; }

@@ -1,4 +1,22 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.33 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.39 (stable)
+
+- s3.2.39: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
+
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
+
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
+
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
+
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
+
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
+- s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
 
 - s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
 - s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit.

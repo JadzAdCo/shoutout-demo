@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.33";
+  const ICON_V = "s3.2.39";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
