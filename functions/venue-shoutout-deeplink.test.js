@@ -33,8 +33,8 @@ test("shoutoutLink builds the venue / event deep link with no v= and no current-
     "./?start=shoutout&location=zebbies-garden-washington-dc&event=evt+7"
   );
   assert.equal(nav.shoutoutLink({eventId: "evt-9"}), "./?start=shoutout&event=evt-9");
-  assert.equal(nav.shoutoutLink({}), "./?start=search");
-  assert.equal(nav.shoutoutLink(), "./?start=search");
+  assert.equal(nav.shoutoutLink({}), "./shoutout-search.html?from=search");
+  assert.equal(nav.shoutoutLink(), "./shoutout-search.html?from=search");
   assert.doesNotMatch(nav.shoutoutLink({locationId: "a"}), /[?&]v=/);
 });
 

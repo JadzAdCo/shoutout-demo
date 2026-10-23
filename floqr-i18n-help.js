@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.43";
+  const VERSION = "s3.2.44";
 
   const packs = {
     "ru": {
@@ -88,7 +88,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Выберите площадку floqCast",
-        body: "Первые четыре клуба — ближайшие площадки floqCast (геолокация браузера, как в ShoutOut). Введите название клуба или события, чтобы найти совпадения."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -96,7 +100,7 @@
       },
       "help-vip-choose-venue": {
         title: "Выберите клуб VIP reserV",
-        body: "Здесь отображаются только клубы с подпиской VIP reserV — как при выборе площадки для ShoutOut. Ищите по названию, городу или жанру, затем нажмите Select venue, чтобы открыть карту зала и выбор ночи."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -398,7 +402,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Kies een floqCast-venue",
-        body: "De eerste vier clubs zijn de dichtstbijzijnde floqCast-venues (browserlocatie, zoals bij ShoutOut). Typ een club- of eventnaam om matches te zien."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
@@ -406,7 +414,7 @@
       },
       "help-vip-choose-venue": {
         title: "Kies een VIP reserV-venue",
-        body: "Alleen clubs met een VIP reserV-abonnement verschijnen hier — hetzelfde idee als een ShoutOut-venue kiezen. Zoek op naam, stad of genre en tik Select venue om de plattegrond en nachtkeuze te openen."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -708,7 +716,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Choisir un lieu floqCast",
-        body: "Les quatre premiers clubs sont les lieux floqCast les plus proches (géolocalisation du navigateur, comme ShoutOut). Tapez un nom de club ou d'événement pour afficher les correspondances."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -716,7 +728,7 @@
       },
       "help-vip-choose-venue": {
         title: "Choisir un lieu VIP reserV",
-        body: "Seuls les clubs abonnés à VIP reserV apparaissent ici — même idée que pour choisir un lieu ShoutOut. Recherchez par nom, ville ou genre, puis sélectionnez le lieu pour ouvrir le plan et la nuit."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1018,7 +1030,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "floqCast-Venue wählen",
-        body: "Die ersten vier Clubs sind die nächsten floqCast-Venues (Browser-Standort, wie bei ShoutOut). Tippe einen Club- oder Eventnamen, um Treffer zu sehen."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
@@ -1026,7 +1042,7 @@
       },
       "help-vip-choose-venue": {
         title: "VIP reserV-Venue wählen",
-        body: "Hier erscheinen nur Clubs mit VIP reserV-Abo — wie bei der ShoutOut-Venue-Auswahl. Suche nach Name, Stadt oder Genre und tippe Select venue, um den Floorplan und die Nachtauswahl zu öffnen."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1328,7 +1344,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Elige un local floqCast",
-        body: "Los cuatro primeros clubs son los locales floqCast más cercanos (geolocalización del navegador, como ShoutOut). Escribe un club o evento para ver coincidencias."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -1336,7 +1356,7 @@
       },
       "help-vip-choose-venue": {
         title: "Elegir un local VIP reserV",
-        body: "Aquí solo aparecen clubs con suscripción VIP reserV — igual que al elegir un local para ShoutOut. Busca por nombre, ciudad o género y pulsa Select venue para abrir el mapa y la noche."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1638,7 +1658,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Scegli un locale floqCast",
-        body: "I primi quattro club sono i locali floqCast più vicini (geolocalizzazione del browser, come ShoutOut). Digita un club o un evento per vedere le corrispondenze."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
@@ -1646,7 +1670,7 @@
       },
       "help-vip-choose-venue": {
         title: "Scegli un locale VIP reserV",
-        body: "Qui compaiono solo i club abbonati a VIP reserV — stessa idea della scelta locale ShoutOut. Cerca per nome, città o genere, poi Select venue per aprire la mappa e la notte."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1948,7 +1972,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Escolher um local floqCast",
-        body: "Os primeiros quatro clubes são os locais floqCast mais próximos (geolocalização do navegador, como ShoutOut). Escreva um clube ou evento para ver correspondências."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -1956,7 +1984,7 @@
       },
       "help-vip-choose-venue": {
         title: "Escolher um local VIP reserV",
-        body: "Só aparecem aqui clubes com assinatura VIP reserV — a mesma ideia de escolher um local ShoutOut. Pesquise por nome, cidade ou género e toque Select venue para abrir o mapa e a noite."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2258,7 +2286,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Επιλέξτε χώρο floqCast",
-        body: "Τα πρώτα τέσσερα κλαμπ είναι οι πλησιέστεροι χώροι floqCast (γεωτοποθεσία προγράμματος περιήγησης, όπως στο ShoutOut). Πληκτρολογήστε όνομα κλαμπ ή εκδήλωσης για αντιστοιχίες."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -2266,7 +2298,7 @@
       },
       "help-vip-choose-venue": {
         title: "Επιλέξτε χώρο VIP reserV",
-        body: "Εδώ εμφανίζονται μόνο clubs με συνδρομή VIP reserV — ίδια ιδέα με την επιλογή χώρου ShoutOut. Αναζητήστε με όνομα, πόλη ή είδος και πατήστε Select venue για χάρτη και βραδιά."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2568,7 +2600,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Wybierz lokal floqCast",
-        body: "Pierwsze cztery kluby to najbliższe lokale floqCast (geolokalizacja przeglądarki, jak w ShoutOut). Wpisz nazwę klubu lub wydarzenia, aby zobaczyć dopasowania."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
@@ -2576,7 +2612,7 @@
       },
       "help-vip-choose-venue": {
         title: "Wybierz lokal VIP reserV",
-        body: "Tutaj widać tylko kluby z subskrypcją VIP reserV — tak jak przy wyborze lokalu ShoutOut. Szukaj po nazwie, mieście lub gatunku, potem Select venue, aby otworzyć mapę i noc."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2878,7 +2914,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "اختر مكان floqCast",
-        body: "أول أربعة أندية هي أقرب أماكن floqCast (موقع المتصفح، مثل ShoutOut). اكتب اسم نادٍ أو حدث لإظهار التطابقات."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",
@@ -2886,7 +2926,7 @@
       },
       "help-vip-choose-venue": {
         title: "اختر مكان VIP reserV",
-        body: "تظهر هنا فقط النوادي المشتركة في VIP reserV — نفس فكرة اختيار مكان ShoutOut. ابحث بالاسم أو المدينة أو النوع ثم Select venue لفتح الخريطة والليلة."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",

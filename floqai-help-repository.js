@@ -399,13 +399,27 @@
     {
       id: "help-floqcast-choose-venue",
       title: "Choose a floqCast venue",
-      body: "The first four clubs are the nearest floqCast venues (browser location, like ShoutOut). Type a club or event name to bring up matches. Only clubs with floqCast enabled appear here.",
+      body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here.",
       searchPhrases: [
         "choose a floqcast venue", "floqcast venue", "nearest floqcast", "floqcast near me",
-        "search floqcast club", "floqcast event venue", "closest floqcast"
+        "search floqcast club", "floqcast event venue", "closest floqcast", "floqcast sound", "floqcast screen size"
       ],
       links: [
         {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron"]
+    },
+    {
+      id: "help-shoutout-choose-venue",
+      title: "Choose a ShoutOut venue",
+      body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates.",
+      searchPhrases: [
+        "choose a shoutout venue", "shoutout venue", "nearest shoutout", "throw a shoutout",
+        "search shoutout club", "display sizes", "patron custom shoutout", "choose location for shoutout"
+      ],
+      links: [
+        {label: "Open ShoutOut", href: pageUrl("./shoutout-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron"]
@@ -430,10 +444,10 @@
     {
       id: "help-vip-choose-venue",
       title: "Choose a VIP reserV venue",
-      body: "Only clubs subscribed to VIP reserV appear here — same idea as picking a ShoutOut venue. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker.",
+      body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker.",
       searchPhrases: [
         "choose a venue", "vip venue", "subscribed clubs", "vip reserv clubs",
-        "only clubs subscribed", "select venue vip"
+        "only clubs subscribed", "select venue vip", "vip deposit", "vip dress code", "nearest vip"
       ],
       links: [
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "floqai"})}

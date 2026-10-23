@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title data-i18n="page.shoutoutLanding.title">Throw a ShoutOut | FLOQR</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.2.44"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.2.44"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.2.44"/>
+  <link rel="stylesheet" href="./floqcast-search.css?v=s3.2.44"/>
+</head>
+<body class="shoutout-search-page" data-floqr-feature="shoutOut">
+<main class="app admin-shell floqcast-shell">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./">&lt; Back</a>
+
+  <section class="page active product-page shoutout-product-page feature-landing-page" data-feature-landing="1">
+    <header class="topbar floqcast-hero">
+      <div class="floqcast-hero-copy">
+        <div class="product-brand-stack">
+          <img data-floqr-chrome-icon="shoutOut" src="./images/chrome/shoutout-nightlife.png" alt="ShoutOut" class="product-logo shoutout-hero-logo feature-landing-hero-logo"/>
+        </div>
+        <div class="floqcast-title-row feature-landing-title-row">
+          <h1 data-i18n="page.shoutoutLanding.title">Throw a ShoutOut</h1>
+          <details class="help-popout" data-floqr-help-id="help-shoutout-choose-venue">
+            <summary aria-label="Help">?</summary>
+            <div class="help-popout-body">
+              <strong data-i18n="page.shoutoutLanding.title">Throw a ShoutOut</strong>
+              <p data-i18n="page.shoutoutLanding.sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display. The first four clubs are nearest (GPS). Cards show display sizes and whether patrons can create custom ShoutOuts.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <p id="shoutoutGateStatus" class="status" aria-live="polite"></p>
+
+    <div id="shoutoutGate" class="card floqcast-gate hidden" data-floqr-auth-chrome>
+      <p data-i18n="app.signInToContinue">Sign in to continue</p>
+      <p class="sub small">Use the same FLOQR account as Search / My Profile.</p>
+      <div class="auth-grid">
+        <button id="shoutoutGoogleLoginBtn" type="button" data-floqr-login-btn data-i18n="app.google">Continue with Google</button>
+        <button id="shoutoutMicrosoftLoginBtn" type="button" data-floqr-login-btn data-i18n="app.microsoft">Continue with Microsoft</button>
+      </div>
+      <p class="sub small"><a href="./patron-portal.html?tab=profile">Open My Profile &amp; Settings</a></p>
+    </div>
+
+    <div id="shoutoutApp" class="floqcast-app hidden">
+      <div class="card floqcast-venue-card feature-landing-venue-card">
+        <div class="floqcast-section-head feature-landing-section-head">
+          <h2 data-i18n="page.floqcast.chooseVenue">Choose a venue</h2>
+          <details class="help-popout" data-floqr-help-id="help-shoutout-choose-venue">
+            <summary aria-label="Help">?</summary>
+            <div class="help-popout-body">
+              <strong data-i18n="page.floqcast.chooseVenue">Choose a venue</strong>
+              <p>Search or choose a FLOQR club that supports ShoutOut. Nearest four first; type to find more.</p>
+            </div>
+          </details>
+        </div>
+        <input id="shoutoutVenueSearch" class="search" type="search" autocomplete="off"
+          data-i18n-placeholder="featureLanding.searchPlaceholder"
+          placeholder="Search or choose a venue…"/>
+        <p id="shoutoutVenueStatus" class="sub small" aria-live="polite">Showing the 4 closest ShoutOut venues.</p>
+        <div id="shoutoutVenueGrid" class="club-grid floqcast-venue-grid feature-landing-venue-grid" role="list"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.2.44"></script>
+<script src="./floqr-i18n.js?v=s3.2.44"></script>
+<script src="./floqr-session-shell.js?v=s3.2.44"></script>
+<script src="./shared-data.js?v=s3.2.44"></script>
+<script src="./feature-gates.js?v=s3.2.44"></script>
+<script src="./floqr-feature-services.js?v=s3.2.44"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.44"></script>
+<script src="./floqr-nav.js?v=s3.2.44"></script>
+<script src="./floqr-geo-search.js?v=s3.2.44"></script>
+<script src="./floqr-feature-landing.js?v=s3.2.44"></script>
+<script src="./floqai-help-repository.js?v=s3.2.44"></script>
+<script src="./helper-popouts.js?v=s3.2.44"></script>
+<script src="./shoutout-search.js?v=s3.2.44"></script>
+</body>
+</html>

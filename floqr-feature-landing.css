@@ -1,0 +1,147 @@
+/* Shared feature landing chrome — product icon (no FloqR), Choose a venue, fact cards.
+   Resume: @feature-landing$ */
+
+.product-page.feature-landing-page .product-brand-stack > .product-parent-logo,
+.product-page[data-feature-landing="1"] .product-brand-stack > .product-parent-logo,
+body[data-floqr-feature] .product-page .product-brand-stack > .product-parent-logo {
+  display: none !important;
+}
+
+.product-page .product-brand-stack {
+  display: grid;
+  justify-items: center;
+  margin: 4px 0 8px;
+}
+
+.product-page .product-logo,
+.feature-landing-hero-logo {
+  width: min(160px, 42vw);
+  max-height: 120px;
+  margin: 4px 0 8px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
+    drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
+}
+
+.feature-landing-title-row,
+.feature-landing-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.feature-landing-title-row h1,
+.feature-landing-section-head h2 {
+  margin: 0;
+}
+
+.feature-landing-venue-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.feature-landing-venue-card .search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 24, 0.72);
+  color: inherit;
+  font: inherit;
+}
+
+.feature-landing-venue-grid,
+.club-grid.feature-landing-venue-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.feature-landing-card {
+  padding: 16px !important;
+  border-radius: 18px !important;
+  text-align: left;
+}
+
+.feature-landing-card.is-selected {
+  border-color: rgba(38, 216, 255, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(38, 216, 255, 0.35), 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.feature-landing-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feature-landing-card-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.feature-landing-place {
+  margin: 4px 0 0;
+}
+
+.feature-landing-product-badge {
+  color: var(--lime, #dfff5a);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.feature-landing-facts {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.feature-landing-facts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: rgba(244, 246, 255, 0.88);
+}
+
+.feature-landing-fact-label {
+  opacity: 0.72;
+  min-width: 5.5rem;
+}
+
+.feature-landing-fact-value {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.feature-landing-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feature-landing-actions .buttonlike,
+.feature-landing-actions .primary {
+  flex: 1 1 auto;
+  min-width: 7rem;
+  text-align: center;
+}
+
+html[data-floqr-chrome="traditional"] .feature-landing-product-badge,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-product-badge {
+  color: var(--accent, #00c8ff);
+}
+
+html[data-floqr-chrome="traditional"] .feature-landing-facts li,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-facts li {
+  color: inherit;
+}

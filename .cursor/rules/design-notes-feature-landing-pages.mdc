@@ -5,60 +5,59 @@ alwaysApply: true
 
 # Feature landing pages (site architecture — always)
 
-Patron feature landings (VIP reserV, floqCast, ShoutOut, BartR, RydR, Mingl, FloqAi when it is a product page) share **one** header + chrome pattern. Same color scheme, same hierarchy, **different feature icon only**.
+Patron feature landings (VIP reserV, floqCast, ShoutOut, and future products) share **one** header + venue-search pattern. Same Site chrome, same hierarchy, **different feature icon only**. Do **not** put the FloqR parent logo on feature landings — FloqR branding stays on Search / Welcome hubs.
 
 Resume: `@feature-landing$` / `$feature-landing$`.
 
+Shared module: `floqr-feature-landing.js` + `floqr-feature-landing.css` (`window.FLOQRFeatureLanding`).
+
 ## Canonical header stack (top → bottom)
 
-Match **VIP reserV** (`vip.html`) as the reference:
-
 1. **Back** — `floqrGlobalBack` / `FLOQRNav.applyGlobalBack` (← Back to Search). No hardcoded `?v=` in the href.
-2. **FLOQR parent logo** — `images/floqr-color.png` via `.product-parent-logo` inside `.product-brand-stack` (**centered, alone on its row**).
-3. **Feature icon** — stacked **under** FLOQR (not beside it). Use a black-face hero tile when the Search mark is mark-only:
-   - VIP → chrome pack via `data-floqr-chrome-icon="vipReserv"` (`images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`)
-   - floqCast → `images/floqcast-hero-icon.svg` (mark: `floqcast-icon.svg`)
-   - Classes: `product-logo {feature}-hero-logo` (~160×120 max, pink/cyan drop-shadow). Load `floqr-chrome-scheme.js` on landings that use `data-floqr-chrome-icon`.
-4. **Feature title + `?`** — one flex row (`.{feature}-title-row`): `<h1>` + `details.help-popout` summary `?`. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title (VIP pattern).
-5. **Body card** — glass card from `styles.css` / product chrome. Section heads that need help use the same `?` row pattern (`.{feature}-section-head`).
+2. **Feature icon only** — chrome pack via `data-floqr-chrome-icon` (VIP / ShoutOut / floqCast). Centered in `.product-brand-stack`. **No** `.product-parent-logo` / FloqR mark on the landing.
+3. **Feature title + `?`** — one flex row (`.{feature}-title-row` / `.feature-landing-title-row`): `<h1>` + `details.help-popout` summary `?`. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title.
+4. **Body card** — glass card. Section head **Choose a venue** + `?` (`.feature-landing-section-head`). Search input + status line + result grid.
 
 ### Forbidden header layouts
 
-- Feature icon **on the same line** as the FLOQR logo (old floqCast `floqcast-brand-row` / FloqAi-inline pattern on product landings).
-- Legacy `suprstr-logo.png` / SupRstR art as the floqCast mark — use `floqcast-icon.svg` / `floqcast-hero-icon.svg` everywhere.
+- FloqR parent logo above or beside the feature icon on a feature landing.
+- Feature icon **on the same line** as a FloqR logo.
+- Legacy `suprstr-logo.png` as the floqCast mark — use chrome pack / `floqcast-hero-icon.svg` only as fallback.
 - Flat admin `#111` body on product landings — see `design-notes-product-chrome.mdc`.
+
+## Venue / contextual search (required)
+
+- GPS → IP → profile via `FLOQRGeoSearch` / `FLOQRFeatureLanding.resolvePatronLocation`.
+- Empty search: **top 4 nearest** venues that allow the feature (`NEARBY_TOP = 4`).
+- Typing: all matches, still nearest-first. Haystack includes name, brand, city, genres, event names.
+- Cards use `FLOQRFeatureLanding.renderVenueCardHtml` with **feature-specific facts**:
+  - **ShoutOut** — LED sizes supported, patron custom ShoutOuts yes/no, template count, nights
+  - **VIP reserV** — open days, min deposit, dress code, age, genres
+  - **floqCast** — screen size, sound yes/no/ask, floqCast board size, genres
+  - **General Search** — contact, category/genre, FLOQR public page, website, social handles
+- CTA: **Select venue** (feature may then continue: Go live / floor map / Throw ShoutOut).
 
 ## Color / chrome
 
-Same tokens as Search / ShoutOut (`--hot` `#f43abf`, `--accent` `#26d8ff`, pink+cyan radial washes). Primary CTA = hot→accent gradient. Do not invent a second theme per feature.
-
-## Venue / contextual search
-
-When the landing needs venue pick:
-
-- Prefer the **VIP-style** contextual search: search input + result cards (“Select venue”), not a bare orphan `<select>` as the only UI.
-- Copy: only clubs with that feature enabled appear (parity with ShoutOut / VIP / floqCast gates).
-- Hidden `<select>` may remain as a sync target for existing JS if needed.
+Same Site chrome tokens as Search (`FLOQRChromeScheme` / `isSiteChrome`). Load `floqr-chrome-scheme.js` on every feature landing that uses `data-floqr-chrome-icon`. Primary CTA = hot→accent gradient.
 
 ## Icons — one mark, two surfaces
 
-| Surface | Asset shape |
+| Surface | Asset |
 |---|---|
-| Search tile face | Chrome pack JPG/PNG via `data-floqr-chrome-icon` (HTML face supplies black when needed) |
-| Feature landing hero | Same chrome pack as Search for VIP; other features use hero SVG/JPG sized as VIP hero |
-| Display / idle (floqCast board) | Newest FloqCAST chrome nightlife JPG (`display-app.js` `FLOQCAST_LOGO` → `images/chrome/floqcast-nightlife.jpg`) |
-
-Replace retired logos site-wide when a mark ships — do not leave `suprstr-logo.png` on landings.
+| Search tile face | Chrome pack JPG/PNG via `data-floqr-chrome-icon` |
+| Feature landing hero | **Same** chrome pack (no FloqR parent) |
+| Display / idle (floqCast board) | `images/chrome/floqcast-nightlife.jpg` |
 
 ## Checklist (new or edited feature landing)
 
-- [ ] Header order: Back → FLOQR → feature icon (below) → title + `?`
-- [ ] Feature icon is the current mark (not a side-by-side FloqAi row)
-- [ ] `?` uses `details.help-popout` / FloqAi help repository id
-- [ ] Body wash = product chrome; card = glass
-- [ ] Venue pick uses search+cards when venue list exists
-- [ ] No hardcoded `?v=` in nav links; asset tags re-stamped by bump script
-- [ ] Update `docs/FEATURE-WIRING.md` if the landing contract changed
+- [ ] Header: Back → feature icon (no FloqR) → title + `?`
+- [ ] Loads `floqr-feature-landing.js` + `.css` + `floqr-geo-search.js` + chrome scheme
+- [ ] Empty list = nearest 4; status line shows place/source
+- [ ] Cards show feature-specific facts + Select venue
+- [ ] `?` mirrored in `floqai-help-repository.js` + i18n help packs
+- [ ] No hardcoded `?v=` in nav links
+- [ ] Update `docs/FEATURE-WIRING.md`
 
 ## Related
 

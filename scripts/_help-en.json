@@ -25,7 +25,7 @@
   },
   "help-floqcast-choose-venue": {
     "title": "Choose a floqCast venue",
-    "body": "The first four clubs are the nearest floqCast venues (browser location, like ShoutOut). Type a club or event name to bring up matches. Only clubs with floqCast enabled appear here."
+    "body": "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
   },
   "help-become-club-admin": {
     "title": "Become a Club Admin",
@@ -285,7 +285,7 @@
   },
   "help-vip-choose-venue": {
     "title": "Choose a VIP reserV venue",
-    "body": "Only clubs subscribed to VIP reserV appear here — same idea as picking a ShoutOut venue. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
+    "body": "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
   },
   "help-vip-floqr-stripe-aurelia": {
     "title": "Set FloqMedia Stripe for Aurelia (Demo Club)",
@@ -306,5 +306,9 @@
   "help-chrome-audit": {
     "title": "Site chrome audit",
     "body": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+  },
+  "help-shoutout-choose-venue": {
+    "title": "Choose a ShoutOut venue",
+    "body": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
   }
 }

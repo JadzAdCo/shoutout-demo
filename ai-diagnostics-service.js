@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.43";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.43";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.44";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.44";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,21 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.44",
+      title: "s3.2.44 — Standardized feature landings (ShoutOut / VIP / floqCast)",
+      checks: [
+        {label:"Package version s3.2.44", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.44\""]},
+        {label:"Shared feature landing module", file:"floqr-feature-landing.js", includes:["NEARBY_TOP = 4", "factsForFeature", "FLOQRFeatureLanding"]},
+        {label:"ShoutOut feature landing", file:"shoutout-search.html", includes:["floqr-feature-landing.js", "data-floqr-chrome-icon=\"shoutOut\"", "data-feature-landing=\"1\""]},
+        {label:"No FloqR parent on ShoutOut landing", file:"shoutout-search.html", notIncludes:["product-parent-logo"]},
+        {label:"VIP uses feature landing + geo", file:"vip.html", includes:["floqr-feature-landing.js", "floqr-geo-search.js", "data-feature-landing=\"1\""]},
+        {label:"floqCast chrome icon hero", file:"floqcast-search.html", includes:["data-floqr-chrome-icon=\"floqCast\"", "floqr-feature-landing.js"]},
+        {label:"Search tile → shoutout-search", file:"index.html", includes:["href=\"./shoutout-search.html?from=search\""]},
+        {label:"Manual test s3.2.44", file:"ai-diagnostics-service.js", includes:["s3-2-44-feature-landing-standard"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.44\""]}
+      ]
+    },
     {
       version: "s3.2.43",
       title: "s3.2.43 — Google sign-in popup-first (fix mobile redirect ITP)",
@@ -2240,6 +2255,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-44-feature-landing-standard",
+        area:"Search / Feature landings",
+        feature:"Standardized ShoutOut / VIP / floqCast venue landings",
+        changed:"Shared FLOQRFeatureLanding: product chrome icon (no FloqR), Choose a venue, GPS nearest 4 cards with feature-specific facts. ShoutOut → shoutout-search.html; VIP + floqCast wired the same. General Search listing uses fact cards + top-4 when empty. Package s3.2.44.",
+        howToTest:"1) Hard-refresh Search (?v=s3.2.44). 2) Tap ShoutOut tile → shoutout-search: product icon only, 4 nearest cards with Displays + Patron ShoutOuts. 3) Tap VIP → same chrome pattern + open/deposit/dress/age facts. 4) Tap floqCast → screen + sound facts. 5) Empty club Search on hub shows 4 nearest general fact cards. Allow location when prompted.",
+        expected:"All three feature landings match: no FloqR logo, Search/Choose a venue, ~4 GPS cards, feature facts visible; Select venue continues each flow.",
+        troubleshoot:"Still FloqR on landing → hard refresh floqr-feature-landing.css + page HTML s3.2.44. Full alphabet list → empty the search box (typed query shows all matches). Missing facts → check club seed fields (VenueSupports*, agePolicy, dressCode, vipSettings)."
+      },
       {
         id:"s3-2-43-google-signin-popup-first",
         area:"Auth / Welcome",

@@ -47,17 +47,25 @@
   let currentUser = null;
   let activeHold = null;
   let holdTimer = null;
+  let locationContext = null;
 
-  function t(key, fallback) {
+  function FL() {
+    return window.FLOQRFeatureLanding;
+  }
+
+  function t(key, fallback, vars) {
+    if (FL()?.t) return FL().t(key, fallback, vars);
     try {
-      const v = window.FLOQRI18n?.t?.(key);
+      const v = window.FLOQRI18n?.t?.(key, vars);
       if (v && v !== key) return v;
     } catch (_) { /* ignore */ }
-    return fallback;
+    let s = fallback != null ? String(fallback) : String(key || "");
+    if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : ""));
+    return s;
   }
 
   function esc(value) {
-    return String(value == null ? "" : value)
+    return FL()?.esc?.(value) || String(value == null ? "" : value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -317,16 +325,25 @@
   }
 
   function venueSearchHaystack(v) {
-    return [
-      v.label, v.brandName, v.hint, v.city, v.region, v.country,
+    return FL()?.venueHaystack?.(v) || [
+      v.label, v.name, v.brandName, v.hint, v.locationLabel, v.city, v.region, v.country,
       ...(v.genres || [])
     ].join(" ").toLowerCase();
   }
 
   function filteredVenues() {
-    const q = String(searchEl?.value || "").trim().toLowerCase();
-    if (!q) return venueCatalog.slice();
-    return venueCatalog.filter(v => venueSearchHaystack(v).includes(q));
+    const q = String(searchEl?.value || "").trim();
+    if (FL()?.filterAndRank) {
+      return FL().filterAndRank(venueCatalog, {
+        query: q,
+        locationContext,
+        haystackOf: venueSearchHaystack,
+        nearbyTop: FL().NEARBY_TOP || 4
+      });
+    }
+    const lower = q.toLowerCase();
+    const rows = !lower ? venueCatalog.slice() : venueCatalog.filter((v) => venueSearchHaystack(v).includes(lower));
+    return lower ? rows : rows.slice(0, 4);
   }
 
   function showSearchMode() {
@@ -343,34 +360,58 @@
   function renderVenueGrid() {
     if (!gridEl) return;
     const rows = filteredVenues();
+    const q = String(searchEl?.value || "").trim();
     if (countEl) {
-      countEl.textContent = rows.length
-        ? t("page.vip.venueCount", "{n} VIP reserV venue(s)").replace("{n}", String(rows.length))
-        : t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV.");
+      if (!venueCatalog.length) {
+        countEl.textContent = t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV.");
+      } else if (FL()?.statusLine) {
+        countEl.textContent = FL().statusLine({
+          total: venueCatalog.length,
+          shown: rows.length,
+          query: q,
+          locationContext,
+          featureLabel: "VIP reserV venues"
+        });
+      } else {
+        countEl.textContent = rows.length
+          ? t("page.vip.venueCount", "{n} VIP reserV venue(s)", {n: rows.length})
+          : t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV.");
+      }
     }
     if (!rows.length) {
       gridEl.innerHTML = `<p class="sub">${esc(t("page.vip.noVenues", "No VIP reserV–subscribed clubs match. Ask the venue to enable VIP reserV."))}</p>`;
       return;
     }
     gridEl.innerHTML = "";
-    rows.forEach(v => {
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "club-option vip-venue-option";
+    rows.forEach((v) => {
+      const card = document.createElement("div");
+      card.className = "vip-venue-option";
       card.setAttribute("role", "listitem");
       card.dataset.venue = v.id;
       const badges = [];
       if (v.pending) badges.push(t("page.vip.comingSoon", "Soon"));
       else badges.push(t("page.vip.bookable", "Bookable"));
-      (v.genres || []).slice(0, 3).forEach(g => badges.push(g));
-      const place = v.hint || [v.city, v.region, v.country].filter(Boolean).join(", ") || "";
-      card.innerHTML =
-        `<div><div class="club-option-head"><div><h3>${esc(v.label)}</h3>` +
-        `<p>${esc(place)}</p></div><strong>VIP reserV</strong></div>` +
-        `<div class="badge-row">${badges.map(b => `<span>${esc(b)}</span>`).join("")}</div></div>` +
-        `<span class="primary vip-pick-cta">${esc(v.pending ? t("page.vip.comingSoon", "Soon") : t("page.vip.pickVenue", "Select venue"))}</span>`;
-      card.disabled = false;
-      card.addEventListener("click", () => selectVenue(v));
+      const venueForFacts = Object.assign({}, v, {
+        name: v.label || v.name,
+        locationLabel: v.hint || v.locationLabel
+      });
+      const ctaLabel = v.pending
+        ? t("page.vip.comingSoon", "Soon")
+        : t("page.vip.pickVenue", "Select venue");
+      if (FL()?.renderVenueCardHtml) {
+        card.innerHTML = FL().renderVenueCardHtml(venueForFacts, {
+          feature: FL().FEATURES.VIP,
+          productBadge: "VIP reserV",
+          ctaLabel,
+          ctaAttr: `data-vip-pick="${esc(v.id)}"`,
+          extraBadges: badges
+        });
+      } else {
+        card.innerHTML = `<button type="button" class="club-option" data-vip-pick="${esc(v.id)}"><h3>${esc(v.label)}</h3><span class="primary">${esc(ctaLabel)}</span></button>`;
+      }
+      card.addEventListener("click", (ev) => {
+        if (ev.target?.closest?.("[data-vip-pick], .feature-landing-card, .club-option")) selectVenue(v);
+      });
       gridEl.appendChild(card);
     });
   }
@@ -436,11 +477,14 @@
       const plan = PLAN_BY_ID[id] || beta.planFile || null;
       /* Static plan in PLAN_BY_ID wins over a stale Functions pending flag. */
       const pending = plan == null || (!PLAN_BY_ID[id] && !!beta.pending);
+      const base = FL()?.normalizeVenue?.(id, club) || {};
       return {
+        ...base,
         id,
         label: club.locationName || club.brandName || beta.name || id,
+        name: club.locationName || club.brandName || beta.name || id,
         brandName: club.brandName || "",
-        hint: club.locationLabel || [club.city, club.region || club.regionType, club.country].filter(Boolean).join(", ") || beta.city || "",
+        hint: club.locationLabel || base.locationLabel || [club.city, club.region || club.regionType, club.country].filter(Boolean).join(", ") || beta.city || "",
         city: club.city || beta.city || "",
         region: club.region || "",
         country: club.country || "",
@@ -448,12 +492,22 @@
         logoUrl: club.logoUrl || club.coverImageUrl || "",
         hoursStructured: club.hoursStructured || club.openingHours || null,
         hoursExceptions: club.hoursExceptions || [],
+        hours: club.hours || "",
+        agePolicy: club.agePolicy || "",
+        dressCode: club.dressCode || "",
+        activityDates: Array.isArray(club.activityDates) ? club.activityDates : [],
+        vipSettings: club.vipSettings || {},
         plan,
         pending
       };
     }))).filter(Boolean);
-    rows.sort((a, b) => a.label.localeCompare(b.label));
-    venueCatalog = rows;
+    if (countEl) countEl.textContent = t("page.floqcast.locating", "Finding venues near you…");
+    try {
+      locationContext = await FL()?.resolvePatronLocation?.({auth: firebase.auth()}) || null;
+    } catch (_) {
+      locationContext = null;
+    }
+    venueCatalog = FL()?.sortNearest?.(rows, locationContext, {nameOf: (r) => r.label || r.name || r.id}) || rows;
     renderVenueGrid();
   }
 
@@ -631,6 +685,7 @@
     window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
     try { window.FLOQRI18n?.apply?.(document); } catch (_) { /* ignore */ }
     try { window.FLOQRChromeScheme?.syncAccessGate?.(); } catch (_) { /* ignore */ }
+    try { window.FLOQRFeatureLanding?.stripParentLogos?.(document); } catch (_) { /* ignore */ }
 
     const profileLink = document.getElementById("vipOpenProfile");
     if (profileLink && window.FLOQRNav?.portalHome) {
