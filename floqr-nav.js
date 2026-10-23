@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.2.43";
+  const APP_V = "s3.2.44";
 
   function navT(key, fallback) {
     try {
@@ -63,11 +63,15 @@
     searchHome() {
       return `./?start=search`;
     },
-    /** Throw a ShoutOut at one venue or event: Search shows that venue's ad splash, then its ShoutOut landing. */
+    /** ShoutOut feature landing — choose venue (GPS nearest 4). */
+    shoutoutHome(extra = {}) {
+      return buildUrl("./shoutout-search.html", { from: "search", ...extra });
+    },
+    /** Throw a ShoutOut at one venue or event: Search shows that venue's ad splash, then templates. */
     shoutoutLink({ locationId = "", eventId = "" } = {}) {
       const location = String(locationId || "").trim();
       const event = String(eventId || "").trim();
-      if (!location && !event) return this.searchHome();
+      if (!location && !event) return this.shoutoutHome();
       return buildUrl("./", { start: "shoutout", location, event });
     },
     /** Absolute form of shoutoutLink for iframes on club websites and copied links. */

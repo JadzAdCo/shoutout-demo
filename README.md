@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.43 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.44 (stable)
+
+- s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
+- s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.
 
 - s3.2.43: Google / Microsoft / Facebook Welcome sign-in popup-first again (fix s3.2.35 mobile redirect ITP).
 - s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.

@@ -2296,7 +2296,11 @@
       }
     }
     shoutoutTemplateVenueIds = null;
-    openCategory("shoutout");
+    /* Standardized feature landing (GPS + top 4 + ShoutOut facts) — not FloqR listing. */
+    const href = window.FLOQRNav?.shoutoutHome
+      ? window.FLOQRNav.shoutoutHome({from: "search"})
+      : "./shoutout-search.html?from=search";
+    location.assign(href);
   }
 
   function normalizeTemplateQuery(value) {
@@ -3411,10 +3415,29 @@
         && (!parsed || window.FLOQRVenueQuery.matchesFilters(parsed, l));
     });
     const matches = sortListingNearest(filtered, context, ([id,l]) => window.FLOQRGeoSearch?.recordCoordinates(l) || null, ([id,l]) => l.locationName || id);
-    grid.innerHTML = matches.length ? "" : '<div class="empty">No matching results found.</div>';
-    matches.forEach(([id,l]) => {
+    const FL = window.FLOQRFeatureLanding;
+    const emptyQuery = !String(textQuery || "").trim() && !parsed?.city && !parsed?.country;
+    const shown = emptyQuery && FL?.NEARBY_TOP ? matches.slice(0, FL.NEARBY_TOP) : matches;
+    const featureKey = type === "shoutout"
+      ? (FL?.FEATURES?.SHOUTOUT || "shoutOut")
+      : (venueAction?.id === "floqcast"
+        ? (FL?.FEATURES?.FLOQCAST || "floqCast")
+        : venueAction?.id === "vip"
+          ? (FL?.FEATURES?.VIP || "vipReservations")
+          : (FL?.FEATURES?.GENERAL || "general"));
+    if (byId("locationRankingStatus") && FL?.statusLine && matches.length) {
+      byId("locationRankingStatus").textContent = FL.statusLine({
+        total: matches.length,
+        shown: shown.length,
+        query: textQuery,
+        locationContext: context,
+        featureLabel: type === "shoutout" ? "ShoutOut venues" : "venues"
+      });
+    }
+    grid.innerHTML = shown.length ? "" : '<div class="empty">No matching results found.</div>';
+    shown.forEach(([id,l]) => {
       const card = document.createElement("div");
-      card.className = "club-option";
+      card.className = "club-option feature-landing-card-host";
       const viewClubLabel = esc(tt("listing.viewClub", {}, "View Club"));
       const actionLabel = esc(
         window.FLOQRVenueActions?.ctaLabel?.(venueAction, (key, _vars, fallback) => tt(key, {}, fallback))
@@ -3429,8 +3452,24 @@
       const countryLabel = Place?.country?.(l.country) || l.country;
       const genreLine = (Place?.genres?.(l.genres) || l.genres || []).join(" • ");
       const badges = (l.activityDates || []).slice(0, 4).map((x) => Place?.offering?.(x) || x);
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a><button class="primary" type="button" data-venue-action="${esc(venueAction.id || "")}">${actionLabel}</button></div>`;
-      card.querySelector("button").addEventListener("click", () => activateListingVenue(id));
+      if (FL?.normalizeVenue && FL?.renderVenueCardHtml) {
+        const venue = FL.normalizeVenue(id, l);
+        const productBadge = featureKey === "shoutOut" ? "ShoutOut"
+          : featureKey === "floqCast" ? "floqCast"
+            : featureKey === "vipReservations" ? "VIP reserV"
+              : (countryLabel || "Club");
+        const actions = `<a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a>`
+          + `<button class="primary" type="button" data-venue-action="${esc(venueAction.id || "")}">${actionLabel}</button>`;
+        card.innerHTML = FL.renderVenueCardHtml(venue, {
+          feature: featureKey,
+          productBadge,
+          extraBadges: badges.slice(0, 3),
+          actionsHtml: actions
+        });
+      } else {
+        card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a><button class="primary" type="button" data-venue-action="${esc(venueAction.id || "")}">${actionLabel}</button></div>`;
+      }
+      card.querySelector("button.primary, button[data-venue-action]")?.addEventListener("click", () => activateListingVenue(id));
       grid.appendChild(card);
     });
   }

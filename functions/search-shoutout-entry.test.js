@@ -93,13 +93,24 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(master, /id="featuresReleaseControl"[\s\S]*?<h2>Promote test code to live<\/h2>/);
 });
 
-test("Throw a ShoutOut skips the ShoutOut landing page", () => {
+test("Throw a ShoutOut opens standardized feature landing (shoutout-search)", () => {
   const app = read("patron-app.js");
-  const fn = app.slice(app.indexOf("async function showShoutoutLanding()"), app.indexOf("function readReuseShoutoutDraft()"));
+  const fn = app.slice(app.indexOf("async function showShoutoutLanding()"), app.indexOf("function normalizeTemplateQuery("));
   assert.doesNotMatch(fn, /showPage\("shoutoutLandingPage"\)/);
-  assert.match(fn, /openCategory\("shoutout"\);/);
+  assert.doesNotMatch(fn, /openCategory\("shoutout"\);/);
+  assert.match(fn, /shoutout-search\.html|shoutoutHome/);
   assert.match(fn, /await selectLocationForShoutOut\(draft\.locationId\);\s*return;/);
   assert.match(app, /bind\("shoutoutBtnCard", showShoutoutLanding\)/);
+  const index = read("index.html");
+  assert.match(index, /id="shoutoutBtnCard"[^>]*href="\.\/shoutout-search\.html/);
+  const landing = read("shoutout-search.html");
+  assert.match(landing, /floqr-feature-landing\.js/);
+  assert.match(landing, /data-floqr-chrome-icon="shoutOut"/);
+  assert.doesNotMatch(landing, /product-parent-logo/);
+  const shared = read("floqr-feature-landing.js");
+  assert.match(shared, /NEARBY_TOP = 4/);
+  assert.match(shared, /factsForFeature/);
+  assert.match(shared, /FEATURES/);
 });
 
 test("ad splash FLOQR logo is unframed and FloqMedia contacts are not underlined", () => {
