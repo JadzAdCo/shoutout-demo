@@ -5,6 +5,7 @@
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {defineSecret} = require("firebase-functions/params");
 const {__featureServiceHelpers: featureAccess} = require("./feature-services-functions");
 const assertFeatureAccess = (auth, key, req = null) => featureAccess.assertFeatureAccess(auth, key, req);
@@ -23,7 +24,54 @@ const CALL_OPTS_STRIPE = {region: "us-central1", cors: true, secrets: [STRIPE_SE
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
   validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
   holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked,
-  tableNumberFromSection} = core;
+  tableNumberFromSection, bookableNightsFromClub, isNightBookable, isTableBookedValue} = core;
+
+async function loadClubLocation(clubLocationId) {
+  const id = text(clubLocationId, 120);
+  if (!id) return {};
+  const snap = await db.collection("clubLocations").doc(id).get();
+  return snap.exists ? (snap.data() || {}) : {};
+}
+
+/** Free inventory + mark hold expired when expiresAtMs has passed. */
+async function expireHoldRow(holdId, hold = {}, now = Date.now()) {
+  const holdRef = db.collection("vipHolds").doc(holdId);
+  const invKey = text(hold.inventoryKey, 200);
+  await db.runTransaction(async tx => {
+    const holdSnap = await tx.get(holdRef);
+    if (!holdSnap.exists) return;
+    const row = holdSnap.data() || {};
+    if (!["active", "pendingPayment"].includes(text(row.status, 40))) return;
+    if (Number(row.expiresAtMs || 0) > now) return;
+    tx.set(holdRef, {status: "expired", updatedAtMs: now, expiredAtMs: now}, {merge: true});
+    if (invKey) {
+      const invRef = db.collection("vipInventory").doc(invKey);
+      const invSnap = await tx.get(invRef);
+      if (invSnap.exists) {
+        const inv = invSnap.data() || {};
+        if (inv.holdId === holdId && inv.status === "held") {
+          tx.set(invRef, {
+            status: "available",
+            isReserved: 0,
+            holdId: "",
+            holdUid: "",
+            expiresAtMs: 0,
+            updatedAtMs: now
+          }, {merge: true});
+        }
+      }
+    }
+    const uid = text(row.uid, 120);
+    const night = text(row.night, 20);
+    if (uid && night) {
+      const pointerRef = db.collection("vipActiveHolds").doc(`${uid}_${night}`);
+      const pointerSnap = await tx.get(pointerRef);
+      if (pointerSnap.exists && text(pointerSnap.data()?.holdId, 120) === holdId) {
+        tx.delete(pointerRef);
+      }
+    }
+  });
+}
 
 function resolveTableNumber(holdOrRow = {}, section = null) {
   if (section) return tableNumberFromSection(section, holdOrRow.sectionId);
@@ -186,10 +234,13 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     console.warn("ensureVipTablesForNightSafe", clubLocationId, night, e?.message || e);
   }
   const vipSettings = await loadVipSettings(clubLocationId);
+  const clubRow = await loadClubLocation(clubLocationId);
+  const bookableNights = bookableNightsFromClub(clubRow, {count: 14, horizonDays: 60});
   const tableRows = await tableStatus.listTablesForNight(db, clubLocationId, night);
   // Firestore isBooked is the booking-status control (set only after payment / admin confirm).
   const bookedByTable = new Map(tableRows.filter(t => t.isBooked === "1").map(t => [t.tableNumber, t]));
   const sections = [];
+  const staleHoldCleanups = [];
   for (const section of catalog.sections) {
     const key = inventoryKey(clubLocationId, night, section.id);
     const invSnap = await db.collection("vipInventory").doc(key).get();
@@ -201,6 +252,10 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       status = "booked";
     } else if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now) {
       status = "held";
+    } else if (inv.status === "held" && Number(inv.expiresAtMs || 0) <= now && inv.holdId) {
+      // Lazy free: expired hold still shows available; schedule write cleanup.
+      staleHoldCleanups.push(expireHoldRow(text(inv.holdId, 120), inv, now));
+      status = "available";
     } else if (inv.status === "blocked") {
       status = "closed";
     }
@@ -217,18 +272,28 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       status,
       isReserved: status === "booked" ? 1 : 0,
       isBooked: status === "booked" ? "1" : "0",
+      holdExpiresAtMs: status === "held" ? Number(inv.expiresAtMs || 0) : 0,
       depositCents: amounts.depositCents,
       depositRequired,
       minimumAmountCents: amounts.minimumAmountCents,
       extraGuestFeeCents: amounts.extraGuestFeeCents
     });
   }
+  if (staleHoldCleanups.length) {
+    Promise.allSettled(staleHoldCleanups).catch(() => {});
+  }
   return {
     clubLocationId,
     night,
     venueName: catalog.venueName,
-    nights: upcomingNights(14),
+    nights: bookableNights.map(n => n.night),
+    bookableNights,
+    nightOpen: isNightBookable(clubRow, night),
+    nightHours: (() => {
+      try { return core.hoursForNight(clubRow, night); } catch (_) { return null; }
+    })(),
     depositRequired: vipSettings.depositRequired,
+    holdMinutes: Math.round(HOLD_MS / 60000),
     sections,
     tables: tableRows
   };
@@ -251,6 +316,10 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
   if (partySize < 1 || partySize > Number(section.maxCapacity || 0)) {
     throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
   }
+  const clubRow = await loadClubLocation(clubLocationId);
+  if (!isNightBookable(clubRow, night)) {
+    throw new HttpsError("failed-precondition", "That night the club is closed. Pick an open night from the calendar.");
+  }
   const amounts = computePartyAmounts(section, partySize);
   const vipSettings = await loadVipSettings(clubLocationId);
   const depositRequired = resolveDepositRequired(vipSettings, amounts);
@@ -263,6 +332,12 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
     posProvider = pay.posProvider || "";
   } catch (_) { /* default FloqR Stripe */ }
   const key = inventoryKey(clubLocationId, night, sectionId);
+  const tableNumber = tableNumberFromSection(section);
+  const tableRef = tableStatus.tableDocRef
+    ? tableStatus.tableDocRef(db, clubLocationId, night, tableNumber)
+    : db.collection("clubLocations").doc(clubLocationId)
+      .collection("vipNights").doc(night)
+      .collection("tables").doc(tableNumber);
   const now = Date.now();
   const expiresAtMs = holdExpiresAtMs(now);
   const holdRef = db.collection("vipHolds").doc();
@@ -270,6 +345,10 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
   const pointerRef = db.collection("vipActiveHolds").doc(`${uid}_${night}`);
 
   await db.runTransaction(async tx => {
+    const tableSnap = await tx.get(tableRef);
+    if (tableSnap.exists && isTableBookedValue(tableSnap.data()?.isBooked)) {
+      throw new HttpsError("failed-precondition", "That table is already reserved for this night.");
+    }
     const pointerSnap = await tx.get(pointerRef);
     if (pointerSnap.exists) {
       const priorId = text(pointerSnap.data()?.holdId, 120);
@@ -295,6 +374,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
 
     const invSnap = await tx.get(invRef);
     const inv = invSnap.exists ? invSnap.data() || {} : {};
+    // Paid booked uses vipNights tables.isBooked (checked above) AND inventory booked flags.
     if (Number(inv.isReserved) === 1 || inv.status === "booked" || inv.status === "confirmed") {
       throw new HttpsError("failed-precondition", "That table is already reserved for this night.");
     }
@@ -304,15 +384,22 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
     if (inv.status === "held" && Number(inv.expiresAtMs || 0) > now && inv.holdUid !== uid) {
       throw new HttpsError("failed-precondition", "Someone else is holding that table. Try another section.");
     }
+    // Stale held row past expiresAtMs → reclaim as free before writing the new hold.
+    if (inv.status === "held" && Number(inv.expiresAtMs || 0) <= now) {
+      /* fall through — overwrite with this hold */
+    }
 
     // Hold never marks booked — isReserved stays 0 until payment (when required).
+    // expiresAtMs is the hold TTL datapoint (30 min); scheduled expireVipHolds frees the table.
     tx.set(invRef, {
       inventoryKey: key,
       clubLocationId,
       night,
       sectionId,
+      tableNumber,
       status: "held",
       isReserved: 0,
+      isBooked: "0",
       holdId: holdRef.id,
       holdUid: uid,
       expiresAtMs,
@@ -326,6 +413,7 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
       night,
       sectionId,
       sectionLabel: section.label || sectionId,
+      tableNumber,
       venueName: catalog.venueName,
       partySize: amounts.partySize,
       includedGuests: amounts.includedGuests,
@@ -1188,6 +1276,37 @@ exports.ensureVipTables = onCall(CALL_OPTS, async request => {
   };
 });
 
+/**
+ * Scheduled: expire holds past expiresAtMs and free vipInventory (table available).
+ * Complements lazy cleanup in getVipAvailability / createVipHold.
+ */
+exports.expireVipHolds = onSchedule({
+  region: "us-central1",
+  schedule: "every 5 minutes",
+  timeZone: "UTC",
+  timeoutSeconds: 120,
+  memory: "256MiB"
+}, async () => {
+  const now = Date.now();
+  const snap = await db.collection("vipHolds")
+    .where("expiresAtMs", "<=", now)
+    .limit(150)
+    .get();
+  let expired = 0;
+  for (const doc of snap.docs) {
+    const row = doc.data() || {};
+    if (!["active", "pendingPayment"].includes(text(row.status, 40))) continue;
+    try {
+      await expireHoldRow(doc.id, row, now);
+      expired += 1;
+    } catch (err) {
+      console.warn("expireVipHolds", doc.id, err?.message || err);
+    }
+  }
+  console.log("expireVipHolds", {scanned: snap.size, expired, atMs: now});
+  return {scanned: snap.size, expired};
+});
+
 exports.__vipHelpers = {
   fulfillVipReservationOrder,
   resolveSection,
@@ -1196,6 +1315,7 @@ exports.__vipHelpers = {
   loadVipSettings,
   inventoryBookedPatch,
   resolveTableNumber,
+  expireHoldRow,
   BETA_TERMS,
   core,
   tableStatus

@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.35 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.36 (stable)
+
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
 
 - s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
 - s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.

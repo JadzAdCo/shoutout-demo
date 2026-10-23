@@ -46,6 +46,33 @@ test("hold expiry is 30 minutes", () => {
   assert.equal(core.HOLD_MS, 30 * 60 * 1000);
 });
 
+test("bookableNightsFromClub respects hoursStructured open days", () => {
+  const club = {
+    hoursStructured: {
+      sun: {closed: true, open: "", close: ""},
+      mon: {closed: true, open: "", close: ""},
+      tue: {closed: true, open: "", close: ""},
+      wed: {closed: true, open: "", close: ""},
+      thu: {closed: false, open: "22:00", close: "02:00"},
+      fri: {closed: false, open: "22:00", close: "03:00"},
+      sat: {closed: false, open: "22:00", close: "03:00"}
+    }
+  };
+  // Anchor on a known Wednesday so Thu/Fri/Sat are next open nights.
+  const from = new Date(2026, 9, 21, 12, 0, 0); // Wed Oct 21, 2026 local
+  const nights = core.bookableNightsFromClub(club, {count: 3, horizonDays: 14, fromDate: from});
+  assert.equal(nights.length, 3);
+  assert.deepEqual(nights.map(n => n.night), ["2026-10-22", "2026-10-23", "2026-10-24"]);
+  assert.equal(core.isNightBookable(club, "2026-10-21"), false);
+  assert.equal(core.isNightBookable(club, "2026-10-22"), true);
+});
+
+test("bookableNightsFromClub falls back when no structured hours", () => {
+  const nights = core.bookableNightsFromClub({}, {count: 5, horizonDays: 10});
+  assert.equal(nights.length, 5);
+  assert.ok(nights.every(n => /^\d{4}-\d{2}-\d{2}$/.test(n.night)));
+});
+
 test("paid-before-booked: deposit policy gates isReserved", () => {
   assert.equal(core.resolveDepositRequired({depositRequired: 1}, {depositCents: 0}), true);
   assert.equal(core.resolveDepositRequired({depositRequired: 0}, {depositCents: 5000}), false);

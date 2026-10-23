@@ -188,6 +188,137 @@ function upcomingNights(count = 14, fromMs = Date.now()) {
   return nights;
 }
 
+/** Local YYYY-MM-DD (venue calendar day) — avoids UTC skew near midnight. */
+function localYmd(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date);
+  if (!Number.isFinite(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+const DAY_KEYS = Object.freeze(["sun", "mon", "tue", "wed", "thu", "fri", "sat"]);
+const DAY_LABELS = Object.freeze(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]);
+
+function parseYmdLocal(night) {
+  const n = validateNight(night);
+  if (!n) return null;
+  const [y, m, d] = n.split("-").map(Number);
+  const dt = new Date(y, m - 1, d, 12, 0, 0, 0);
+  return Number.isFinite(dt.getTime()) ? dt : null;
+}
+
+/**
+ * Normalize clubLocations.hoursStructured (sun–sat open/closed + HH:MM).
+ * Empty / all-closed → null (caller falls back to consecutive nights).
+ */
+function normalizeHoursStructured(raw = {}) {
+  const src = raw && typeof raw === "object" ? raw : {};
+  const out = {};
+  let anyOpen = false;
+  DAY_KEYS.forEach(key => {
+    const row = src[key] && typeof src[key] === "object" ? src[key] : {};
+    const closed = row.closed === true || row.closed === 1 || row.closed === "1"
+      || (!row.open && !row.close && row.closed !== false);
+    const open = text(row.open, 8);
+    const close = text(row.close, 8);
+    out[key] = closed || !open || !close
+      ? {closed: true, open: "", close: ""}
+      : {closed: false, open, close};
+    if (!out[key].closed) anyOpen = true;
+  });
+  return anyOpen ? out : null;
+}
+
+function normalizeHoursExceptions(list) {
+  if (!Array.isArray(list)) return [];
+  return list.map(row => ({
+    startDate: validateNight(row.startDate) || text(row.startDate, 12),
+    endDate: validateNight(row.endDate || row.startDate) || text(row.endDate || row.startDate, 12),
+    closed: row.closed === true || row.closed === 1 || row.closed === "1",
+    open: text(row.open, 8),
+    close: text(row.close, 8),
+    label: text(row.label, 120)
+  })).filter(row => row.startDate && row.endDate);
+}
+
+/** Effective hours for a VIP night (YYYY-MM-DD) from club schedule datapoints. */
+function hoursForNight(club = {}, night) {
+  const date = parseYmdLocal(night);
+  if (!date) return {closed: true, open: "", close: "", source: "invalid"};
+  const key = localYmd(date);
+  const exceptions = normalizeHoursExceptions(club.hoursExceptions);
+  const ex = exceptions.find(row => key >= row.startDate && key <= row.endDate);
+  if (ex) {
+    if (ex.closed) {
+      return {closed: true, open: "", close: "", source: "exception", label: ex.label || "Closed"};
+    }
+    return {closed: false, open: ex.open, close: ex.close, source: "exception", label: ex.label || "Special hours"};
+  }
+  const structured = normalizeHoursStructured(club.hoursStructured || club.openingHours || {});
+  if (!structured) {
+    // No structured schedule — treat as bookable (legacy venues).
+    return {closed: false, open: "", close: "", source: "unstructured", label: DAY_LABELS[date.getDay()]};
+  }
+  const day = structured[DAY_KEYS[date.getDay()]] || {closed: true, open: "", close: ""};
+  return {
+    closed: !!day.closed,
+    open: day.open || "",
+    close: day.close || "",
+    source: "default",
+    label: DAY_LABELS[date.getDay()]
+  };
+}
+
+/**
+ * Bookable VIP nights from club hoursStructured / hoursExceptions.
+ * Returns {night, open, close, label}[]. Falls back to consecutive calendar nights
+ * when the club has no structured open days.
+ */
+function bookableNightsFromClub(club = {}, {count = 14, horizonDays = 60, fromDate = new Date()} = {}) {
+  const want = Math.max(1, Math.min(30, Math.floor(Number(count) || 14)));
+  const horizon = Math.max(want, Math.min(120, Math.floor(Number(horizonDays) || 60)));
+  const structured = normalizeHoursStructured(club.hoursStructured || club.openingHours || {});
+  const hasExceptions = normalizeHoursExceptions(club.hoursExceptions).length > 0;
+  const enforceSchedule = !!(structured || hasExceptions);
+  const out = [];
+  const start = new Date(fromDate);
+  start.setHours(12, 0, 0, 0);
+  for (let i = 0; i < horizon && out.length < want; i += 1) {
+    const d = new Date(start.getTime() + i * 86400000);
+    const night = localYmd(d);
+    const hours = hoursForNight(club, night);
+    if (enforceSchedule && hours.closed) continue;
+    const weekday = d.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"});
+    const window = hours.open && hours.close ? ` · ${hours.open}–${hours.close}` : "";
+    out.push({
+      night,
+      open: hours.open || "",
+      close: hours.close || "",
+      source: hours.source || (enforceSchedule ? "default" : "fallback"),
+      label: `${weekday}${window}`
+    });
+  }
+  if (out.length) return out;
+  // Fallback: next N calendar days (schedule missing or all closed in horizon).
+  return upcomingNights(want).map(night => {
+    const d = parseYmdLocal(night);
+    const weekday = d
+      ? d.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"})
+      : night;
+    return {night, open: "", close: "", source: "fallback", label: weekday};
+  });
+}
+
+function isNightBookable(club = {}, night) {
+  const n = validateNight(night);
+  if (!n) return false;
+  const structured = normalizeHoursStructured(club.hoursStructured || club.openingHours || {});
+  if (!structured && !normalizeHoursExceptions(club.hoursExceptions).length) return true;
+  return !hoursForNight(club, n).closed;
+}
+
 function validateNight(night) {
   const n = text(night, 20);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(n)) return "";
@@ -234,6 +365,8 @@ module.exports = {
   REQUIRED_CONSENT_CHECKS,
   EXPANDED_CONSENT_CHECKS,
   BETA_VENUES,
+  DAY_KEYS,
+  DAY_LABELS,
   text,
   inventoryKey,
   tableNumberFromSection,
@@ -246,6 +379,12 @@ module.exports = {
   resolveDepositRequired,
   canMarkTableBooked,
   upcomingNights,
+  localYmd,
+  normalizeHoursStructured,
+  normalizeHoursExceptions,
+  hoursForNight,
+  bookableNightsFromClub,
+  isNightBookable,
   validateNight,
   betaVenue,
   hashToken,

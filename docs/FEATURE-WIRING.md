@@ -12,19 +12,21 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## Passes / door QR (beta — `passes`)
+## Passes / door QR (`passes`)
 
 **Purpose:** One-time QR door passes for VIP reserV, guest entry, and promoter clients.
 
 | Layer | Wiring |
 |---|---|
-| Feature | `featureServices/passes` — Release Control beta (`IsTestFeature:1` packaged default) |
+| Feature | `featureServices/passes` — packaged **Live** (`IsFeatureEnabled:1`, `IsTestFeature:0`); seed via Master → Features Mgmt → Release Control → Reload |
+| Venue gate | `clubLocations.featureGates.passes` (opt-in; seeded on for Aurelia / Decades / Lima Twist) — Club Admin tab visibility |
 | Callables | `listMyPasses`, `listClubPasses`, `issuePass`, `revealPass`, `checkInPass`, `sharePass`, `resolvePassToken` (`functions/passes-functions.js` + `passes-core.js`) |
 | VIP bridge | `getVipReservationPass` mirrors into `passes` via `__passesHelpers.upsertPassFromVipReservation` |
 | Client QR | `floqr-qrcode-lib.js` + `floqr-qr.js` → `FLOQRQr.render` |
-| Surfaces | `pass.html?t=` public viewer; My Profile → Guest List & reserV **Show pass** (QR + Open full pass); VIP confirm → `patron-portal.html?tab=passes` |
+| Surfaces | `pass.html?t=` public viewer; My Profile → Guest List & reserV **Show pass**; Club Admin → **Feature Mgmt → Passes** (`admin-passes.js`, `#panelPasses`); VIP confirm → `patron-portal.html?tab=passes` |
+| Deep links | `admin.html?location=<id>&tab=passes` / `#panelPasses` |
 | Data | Firestore `passes/{passId}` — server-write only; patron/issuer may read own rows |
-| Door | Club Admin / VIP Door still check in VIP via `checkInVipReservation`; Passes `checkInPass` for generalized kinds |
+| Door | Club Admin / VIP Door still check in VIP via `checkInVipReservation`; Passes `checkInPass` for generalized kinds (ID 21+ required) |
 
 ---
 
@@ -150,7 +152,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | AI crawl daytime events (s3.1.98–100) | Crawler was nightlife-only (clubs/DJ), so daytime listings like The Parks DC **Flea + Fall Festival** never entered `aiDiscoveryQueue`. Added daytime event types (flea / farmers / community market, daytime + fall festival), Community/Festival/Market genres, Places `daytimeEvent` mapping, and daytime approval checklist (organizer + date/time; no DJ). **Washington places:** canonical markets `Washington, DC` (`washington-dc`) vs `Washington State` / `Seattle` (`washington-state` / `seattle-wa`). Bare “Washington” → capital. Places text + lat/lng bias differ (DC 38.91°N vs Seattle 47.61°N). Live schedule cities use **Washington, DC**. |
 | Discovery crawl production upgrades (s3.1.101) | **Bounded concurrency:** `mapPool` (3) in `discoverPlacesForCriteria`; per-host HTML delay via `waitForHostBudget`. **Deterministic upserts:** queue ids `place_{placesId}` / `evt_{sha1(placesId\|start\|title)}` with `mergeQueuePolicy` (protects approved human fields). **Venue→event:** JSON-LD `Event`/`MusicEvent`/`ComedyEvent`/`Festival` → child dated docs (`attachEventsFromHtml`). **Auto-approve:** `processCrawledItem` (`discovery-auto-approve.js`) — identity anchors + schema gates + ≥92% confidence → live `clubLocations`/`events`; else `ADMIN_QUEUE`. **Past events:** `lifecycleStatus` upcoming/past/retired/removed; public feed `eventsView` vs `pastEventsView`; callable `retirePastCrawledEvents` + daily schedule. Modules: `discovery-crawl-core.js`, `discovery-auto-approve.js`, `discovery-past-events.js`. |
 | floqCast ~10s drop / WebRTC hold (s3.1.102) | STUN-only + aggressive `displayJoins` rebuilds killed peers after brief ICE `disconnected` (~10s). Fix: `restartIce` before hard rebuild; `peerMediaAlive` / hold-media-alive; `DISPLAY_JOIN_DEBOUNCE_MS`; longer disconnect holds. |
-| floqCast FLOQR TURN (s3.1.103) | Public OpenRelay removed. Callable `getFloqCastIceServers` (`floqcast-functions.js`) returns STUN + **Twilio Network Traversal** tokens (existing `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN`), optional env `FLOQR_TURN_*` Metered/coturn override. Cached in `systemConfig/floqcastIceServers`. Client `floqcast-webrtc.js` `resolveIceServers()` before `createPeer`. Display boards call without auth. |
+| floqCast FLOQR TURN (s3.1.103+) | Public OpenRelay removed. Callable `getFloqCastIceServers` (`floqcast-functions.js`, **`invoker: "public"`**) returns STUN + **Twilio Network Traversal** tokens (existing `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN`), optional env `FLOQR_TURN_*` Metered/coturn override. Cached in `systemConfig/floqcastIceServers`. Client `floqcast-webrtc.js` `resolveIceServers()` before `createPeer`. Display boards call without auth. Reconnect: `publishIceRestartOffer` (`createOffer({iceRestart:true})`), delta `peerMediaAlive`, display force-reattach after disconnect hold. |
 | floqCast Aurelia blank + freeze reconnect (s3.1.97) | (1) After ICE connect, freeze→disconnect→immediate rebuild fought the board → reconnect errors. Fix: longer rebuild delay after a stable link; skip rebuild if ICE recovers; hold display after `hadVideoTrack`; resume paused preview canvas. (2) Select Aurelia → Go live opened `about:blank` then set **relative** `./floqcast-preview.html` → blank tab. Fix: `absoluteAppUrl` + same-tab on mobile. |
 | floqCast Connecting hang (s3.1.96) | Board stuck **Connecting to patron…**: reattach killed the answering peer while answer SDP stayed → callee ICE ufrags ≠ answer (`saJX` vs `yyVO`/`RaMQ`/…). Fix: stick with peer after answer (disconnected ≠ dead); buffer callee ICE until answer write succeeds; phone filters by ufrag + clears candidate collections on new offer; `displayJoins` uses client Timestamp. **Rules deploy required** (candidate delete + `at is timestamp`). |
 | floqCast retry storm (s3.1.95) | display2 treated every `*-error` as hard reattach, fighting `displayJoins` renegotiate → stuck **Retrying after error…** with SDP answered but ICE never stable. Fix: wait for phone rebuild on offer/rejoin errors; backoff + max reattach; show real error text. |
@@ -532,6 +534,9 @@ When adding a section, use this skeleton:
 | **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **floqCast** (`#panelFloqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. |
 | **Master Admin** | Features Mgmt → VIP reserV Payments (`#featuresVipPayments`) — enable providers, seed catalog, network billing statements. |
 | **Per-table Firestore status** | `clubLocations/{clubLocationId}/vipNights/{night}/tables/{tableNumber}` — doc id = printed table number. Fields: `isBooked` (`"1"` / `"0"`), `isBookedYes` (`"yes"` / `"no"`), `status`, `reservationId`. **Booking-status control:** `getVipAvailability` marks a section booked only when `isBooked==="1"` (not legacy `vipInventory.isReserved` alone). Set to booked only after payment completes (Stripe fulfill, no-deposit confirm, Club POS confirm, admin walk-in with payment recorded). Cancel always clears `isBooked` to `"0"`. Rules: public read, Functions-only write. Classified as `clubLocations/vipNights`. |
+| **Hold TTL + free table** | Hold datapoints: `vipHolds.expiresAtMs`, `vipInventory.status=held` + `expiresAtMs` (30 min via `HOLD_MS`). **Not booked** while held (`isReserved:0`, `isBooked:"0"`). `expireVipHolds` scheduled every 5 min frees inventory; `getVipAvailability` lazy-expires stale held rows. Client hold banner countdown clears UI at expiry. |
+| **Open nights calendar** | Night picker uses `clubLocations.hoursStructured` + `hoursExceptions` (same datapoints as Club Public Profile / Guest List). `getVipAvailability` returns `bookableNights`; `createVipHold` rejects closed nights. Client also filters via `FLOQRVenueCalendar` when structured hours are on the venue row. |
+| **Hold UX** | After successful hold, table popout closes and `#vipHoldBanner` (Continue to Terms) scrolls into view; hold errors surface in the popout. |
 | **Cancel + refund (s3.1.83)** | Club Admin → VIP reserV Cancel. Always frees inventory + clears `isBooked`. FloqMedia Stripe / Club Stripe: optional Stripe refund (`processRefund`, default on) using `vipSettings.refundPolicy` — club cancel mode `full` (default) / `policy` (hours windows) / `none`. Club POS / CSV: table freed; POS void stays on Toast/SpotOn. UI: refund-on-cancel checkbox + policy hours. |
 | **Data** | `vipInventory` (legacy night×section lock), `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations`, `clubLocations.vipSettings`, `clubLocations/.../vipNights/.../tables`, `vipPosConnections`, `vipPosProviders`, `vipPosStatements` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |

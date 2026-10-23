@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.35";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.35";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.36";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.36";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,22 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.36",
+      title: "s3.2.36 — VIP hold UX + floqCast ICE + Passes Live Club Admin",
+      checks: [
+        {label:"Package version s3.2.36", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.36\""]},
+        {label:"VIP closePopout after hold", file:"vip-app.js", includes:["closePopout", "scrollIntoView"]},
+        {label:"VIP bookableNights / nightClosed", file:"vip-app.js", includes:["bookableNights", "page.vip.nightClosed"]},
+        {label:"expireVipHolds scheduled", file:"functions/vip-functions.js", includes:["exports.expireVipHolds", "every 5 minutes"]},
+        {label:"floqCast public TURN invoker", file:"functions/floqcast-functions.js", includes:["invoker: \"public\"", "getFloqCastIceServers"]},
+        {label:"ICE restart offer", file:"floqcast-webrtc.js", includes:["publishIceRestartOffer", "iceRestart: true"]},
+        {label:"Club Admin Passes panel", file:"admin.html", includes:["panelPasses", "admin-passes.js"]},
+        {label:"Passes Live catalog", file:"functions/feature-services-core.js", includes:["key: \"passes\"", "IsFeatureEnabled: 1"]},
+        {label:"Manual tests s3.2.36", file:"ai-diagnostics-service.js", includes:["s3-2-36-vip-hold-popout-open-nights", "s3-2-36-floqcast-turn-ice-reconnect", "s3-2-36-passes-live-club-admin"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.36\""]}
+      ]
+    },
     {
       version: "s3.2.35",
       title: "s3.2.35 — Mobile Google sign-in uses redirect (no blocked popup)",
@@ -2306,13 +2322,40 @@
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
     },
     {
+      id:"s3-2-36-vip-hold-popout-open-nights",
+      area:"VIP reserV",
+      feature:"Hold popout close + open-night calendar + hold expiry frees table",
+      changed:"createHold closes table popout and scrolls Continue to Terms. getVipAvailability/createVipHold use hoursStructured open nights; expireVipHolds every 5m + lazy free; createVipHold rejects isBooked tables. Package s3.2.36.",
+      howToTest:"1) Hard-refresh vip.html?location=temp-democlub-1. 2) Night list shows only club open days (hours on options). 3) Hold a green table — popout closes; yellow Hold active + Continue to Terms visible. 4) Wait for hold expiry (or shorten HOLD_MS in QA) — table returns green/available.",
+      expected:"No stuck popout after hold; closed weekdays not selectable; expired holds free inventory.",
+      troubleshoot:"Still stuck under popout → cache vip-app/vip-floor-viewer s3.2.36. Closed days still listed → club missing hoursStructured (seed demo pack / Club Public Profile hours). Table stays amber after 30m → confirm expireVipHolds deployed."
+    },
+    {
+      id:"s3-2-36-floqcast-turn-ice-reconnect",
+      area:"floqCast",
+      feature:"Public TURN + real ICE-restart offer + force reattach",
+      changed:"getFloqCastIceServers invoker:public. Phone publishIceRestartOffer(iceRestart:true). peerMediaAlive is delta-based. display2 force-reattaches after disconnect hold. Package s3.2.36.",
+      howToTest:"1) Deploy Functions. 2) Go live at Aurelia; confirm phone + display2 get Twilio/TURN (not STUN-only). 3) Toggle Wi‑Fi briefly — status shows ice-restart / reattaching and video recovers without a dead wait.",
+      expected:"Link recovers after NAT blip; board does not wait forever after hadVideoTrack.",
+      troubleshoot:"Still drops at ~10s → Functions missing invoker public or Twilio secrets. Reconnect hangs → hard refresh floqcast-webrtc.js + display-floqcast.js s3.2.36."
+    },
+    {
+      id:"s3-2-36-passes-live-club-admin",
+      area:"VIP / Passes",
+      feature:"Passes Live + Club Admin Passes tab",
+      changed:"featureServices/passes Live packaged. Club Admin Feature Mgmt → Passes (issue/list/reveal/check-in). Venue gate passes. Callables must be deployed. Package s3.2.36.",
+      howToTest:"1) Deploy Functions + Master Release Control Reload (seed Passes Live). 2) admin.html?location=temp-democlub-1&tab=passes — Issue pass, Show QR, Check in with ID 21+. 3) VIP Show pass + pass.html?t= still work.",
+      expected:"Passes callables present; Club Admin Passes tab usable; VIP Show pass unchanged.",
+      troubleshoot:"Callable not found → firebase deploy functions. Tab hidden → featureGates.passes / vipReservations on club. Access denied → seedFeatureServices so IsFeatureEnabled=1."
+    },
+    {
       id:"s3-2-16-passes-qr",
       area:"VIP / Passes",
       feature:"Door Passes QR beta wired (passes + pass.html)",
-      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16.",
-      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes beta row after seed/reload.",
+      changed:"Committed floqr-qr.js / floqr-qrcode-lib.js / passes-core + passes-functions. Exported callables; featureServices/passes; pass.html viewer; Show pass renders QR; getVipReservationPass mirrors into passes. Package s3.2.16. Superseded by s3-2-36-passes-live-club-admin for Live + Club Admin tab.",
+      howToTest:"1) Functions deploy required for new callables. 2) Confirm VIP booking → My Profile ?tab=passes → Show pass shows QR + Open full pass. 3) pass.html?t=… renders QR. 4) Master Admin Features shows Passes row after seed/reload.",
       expected:"Untracked QR/passes modules are live on the branch and wired end-to-end for VIP Show pass.",
-      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js s3.2.16. Feature row missing → seedFeatureServices / Reload."
+      troubleshoot:"Callable missing → deploy functions. Show pass still plain text → hard refresh patron-portal-app + floqr-qr*.js. Feature row missing → seedFeatureServices / Reload."
     },
     {
       id:"s3-2-16-profile-card-chrome",

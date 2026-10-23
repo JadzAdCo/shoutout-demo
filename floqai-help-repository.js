@@ -480,8 +480,8 @@
     {
       id: "help-vip-door-ops",
       title: "VIP reserV door check-in",
-      body: "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status.",
-      searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door"],
+      body: "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status. Club Admin → Feature Mgmt → Passes issues guest/promoter QR passes, lists tonight’s passes, reveals QR, and check-in (ID 21+). VIP table Show pass on My Profile still uses the same pass.html viewer.",
+      searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door", "club admin passes", "issue pass", "qr door pass", "passes tab"],
       links: [
         {label: "VIP reserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
       ],

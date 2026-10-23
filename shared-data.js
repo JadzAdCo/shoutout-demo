@@ -725,8 +725,20 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   /* Aurelia demo club is on the VIP reserV beta list (2D map pending). */
   const aurelia = locations["temp-democlub-1"];
   if (aurelia) {
-    aurelia.featureGates = Object.assign({}, aurelia.featureGates || {}, {vipReservations: true});
+    aurelia.featureGates = Object.assign({}, aurelia.featureGates || {}, {
+      vipReservations: true,
+      passes: true
+    });
   }
+  ["decades-washington-dc", "lima-twist-washington-dc"].forEach(id => {
+    const row = locations[id];
+    if (row) {
+      row.featureGates = Object.assign({}, row.featureGates || {}, {
+        vipReservations: true,
+        passes: true
+      });
+    }
+  });
 })(window.SHOUTOUT_CLUB_LOCATIONS);
 
 window.SHOUTOUT_EVENTS = {
