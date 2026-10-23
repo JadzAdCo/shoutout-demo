@@ -200,3 +200,34 @@ body.floqcast-page {
 @media (max-width: 720px) {
   .floqcast-hero-logo { width: min(132px, 40vw); max-height: 100px; }
 }
+
+/* Traditional: Select venue matches View Club (charcoal + cyan); active = cyan border */
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary){
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+  color:var(--floqr-tile-cyan,#00c8ff)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan,#00c8ff)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary):hover,
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary):focus-visible{
+  border-color:var(--floqr-tile-cyan,#00c8ff)!important;
+}
+html[data-floqr-chrome="traditional"] .floqcast-venue-item.is-selected{
+  border-color:var(--floqr-tile-cyan,#00c8ff)!important;
+  box-shadow:0 0 0 1px rgba(0,200,255,.35),0 18px 40px rgba(0,0,0,.28)!important;
+}
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike.primary{
+  background:var(--floqr-brand-gradient-h,linear-gradient(90deg,#00c8ff 0%,#5b2dff 48%,#ff2eb8 100%))!important;
+  color:#06101c!important;
+  -webkit-text-fill-color:#06101c!important;
+  border:0!important;
+}
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .badge-row span{
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+  color:var(--floqr-tile-cyan,#00c8ff)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan,#00c8ff)!important;
+  font-weight:900;
+}
