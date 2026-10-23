@@ -15,6 +15,7 @@ function section(html, id) {
 
 test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VIP / FloqAi icon tiles", () => {
   const page = section(read("index.html"), "categoryPage");
+  assert.match(page, /id="backToWelcomeBtn"[^>]*class="floqr-back-btn"[^>]*data-i18n="nav\.backShort"/);
   assert.match(page, /class="category-brand-stack">\s*<a href="\.\/\?start=search" class="floqr-home-link"[\s\S]*?<img src="\.\/images\/floqr-color\.png\?v=s3\.\d+\.\d+" alt="FloqR" class="product-parent-logo"/);
   assert.ok(page.indexOf("category-brand-stack") < page.indexOf('id="categoryFloqAiSearch"'), "logo sits above FloqAi");
   assert.doesNotMatch(page, /search-chrome-toolbar/);
@@ -36,7 +37,10 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /class="category-floqai-field"/);
   assert.doesNotMatch(page, /id="categoryFloqAiGo"[^>]*class="primary"/);
   const css = read("styles.css");
-  assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:44px 0 12px\}/);
+  // Tighter brand stack under centered Image-2 Back pill (was 44px before unified Back)
+  assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:8px 0 12px\}/);
+  assert.match(css, /--floqr-back-bg:rgba\(148,142,198/);
+  assert.match(css, /\.floqr-back-btn,/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
   assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:transparent/);
