@@ -4946,11 +4946,8 @@
       `Expected ${sum.expectedChrome}: ${sum.passCount} pass / ${sum.failCount} fail (${sum.pages.length} probes).`
     );
     const rows = (sum.pages || []).map(p => {
-      const badge = p.pass
-        ? `<span class="status-badge ok">PASS</span>`
-        : `<span class="status-badge bad">FAIL</span>`;
       return `<div class="queue-item">
-        <div class="message-envelope-head"><strong>${esc(p.page)}</strong> ${badge}</div>
+        <div class="message-envelope-head"><strong>${esc(p.page)}</strong> ${statusBadge(p.pass ? "Pass" : "Failed")}</div>
         <p>expected=<code>${esc(p.expected)}</code> actual=<code>${esc(p.actual)}</code></p>
         <p class="sub small">module=${p.hasChromeModule ? "yes" : "no"} · data-attr=${p.dataAttrPresent ? "yes" : "no"} · ${esc(p.at)}</p>
       </div>`;
