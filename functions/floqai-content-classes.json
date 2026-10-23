@@ -36,6 +36,9 @@
     "help-beta-tester": [
       "patron"
     ],
+    "help-chrome-audit": [
+      "masterAdmin"
+    ],
     "help-chrome-scheme": [
       "patron"
     ],

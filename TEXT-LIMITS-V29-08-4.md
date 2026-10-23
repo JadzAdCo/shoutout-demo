@@ -1,6 +1,6 @@
-# FLOQR display-aware text limits (v29.08.4)
+# FLOQR display-aware text limits (v29.08.4 / s3.2.38)
 
-These are readability ceilings, not writing targets. The patron editor, preview, recommendation system, stored payload, display renderer, paid-checkout normalization, and direct Black and White Firestore submission now use the same template-and-display rules.
+These are readability ceilings, not writing targets. Sized for **Papi HD P1.56** boards (`led-96x48`, `led-64x48`, `led-64x32`) readable at about **1–3 meters** (letter height ≥ ~15 mm at 3 m). The patron editor, preview, recommendation system, stored payload, display renderer, paid-checkout normalization, and direct Black and White Firestore submission now use the same template-and-display rules (`FLOQRTextLayout` in `shared-data.js` must match `SHOUTOUT_TEXT_LIMITS` in `functions/commerce-functions.js`).
 
 Main and subtext render 30% larger than v29.08.2: `16 -> 20.8` and `6 -> 7.8` percent of display height before template-specific layout scaling.
 

@@ -23,6 +23,12 @@
       --hero:#000;
       --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
     }
+    html[data-floqr-chrome="purpleWhite"]{
+      --bg:#000; --bg-elev:#0a0a0a; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --line:#5b2dff; --accent:#ff4d6a; --pick:#ff9ab8;
+      --hero:#000;
+      --font:"Plus Jakarta Sans","Segoe UI",sans-serif;
+    }
     html[data-floqr-chrome="blackDarkGreen"]{
       --bg:#000; --bg-elev:#0a0a0a; --ink:#fff; --muted:rgba(255,255,255,.72);
       --line:#228b22; --accent:#228b22; --pick:#6ddf6d;
@@ -65,7 +71,7 @@
   <div class="banner">LOCAL STAGE — Search / Pages not wired</div>
   <h1>Patron chrome switch (staged)</h1>
   <p class="lead">
-    Toggle <strong>Nightlife</strong>, <strong>Traditional</strong>, <strong>Black Tiffany</strong>, or <strong>Black Dark Green</strong>.
+    Toggle <strong>Nightlife</strong>, <strong>Traditional</strong>, <strong>Black Tiffany</strong>, <strong>Purple & White</strong>, or <strong>Black & Dark Green</strong>.
     Chosen icons swap live via <code>floqr.isSiteChrome</code> / <code>floqr.uiChrome</code> (localStorage).
   </p>
 
@@ -74,7 +80,9 @@
     <button type="button" class="btn" data-floqr-chrome-btn="nightlife" aria-pressed="false">Nightlife chrome</button>
     <button type="button" class="btn" data-floqr-chrome-btn="blackTiffany" aria-pressed="false">Black Tiffany</button>
     <button type="button" class="btn" data-floqr-chrome-btn="whiteBlack" aria-pressed="false">White / Black</button>
-    <button type="button" class="btn" data-floqr-chrome-btn="blackDarkGreen" aria-pressed="false">Black Dark Green</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="purpleWhite" aria-pressed="false">Purple & White</button>
+    <button type="button" class="btn" data-floqr-chrome-btn="blackDarkGreen" aria-pressed="false">Black & Dark Green</button>
+    <img data-floqr-brand-logo class="product-parent-logo" src="./images/floqr-color.png" alt="FloqR" style="height:40px;width:auto;object-fit:contain"/>
     <span class="live">Active: <strong data-floqr-chrome-label>Traditional chrome</strong></span>
   </div>
 
@@ -84,19 +92,19 @@
     <div class="row">
       <figure class="hero">
         <figcaption class="pick">FloqCast <span data-floqr-chrome-label></span></figcaption>
-        <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-traditional.jpg?v=s3.2.29" alt="FloqCast traditional chrome"/>
+        <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-traditional.jpg?v=s3.2.40" alt="FloqCast traditional chrome"/>
       </figure>
       <figure class="hero">
         <figcaption class="pick">VIP reserV <span data-floqr-chrome-label></span></figcaption>
-        <img data-floqr-chrome-icon="vipReserv" src="./images/chrome/vip-traditional.jpg?v=s3.2.29" alt="VIP reserV traditional"/>
+        <img data-floqr-chrome-icon="vipReserv" src="./images/chrome/vip-traditional.jpg?v=s3.2.40" alt="VIP reserV traditional"/>
       </figure>
       <figure>
         <figcaption>FloqCast nightlife SVG</figcaption>
-        <img src="./images/review/floqcast-icon-nightlife.svg?v=s3.2.29" alt="FloqCast nightlife SVG"/>
+        <img src="./images/review/floqcast-icon-nightlife.svg?v=s3.2.40" alt="FloqCast nightlife SVG"/>
       </figure>
       <figure>
         <figcaption>FloqCast traditional SVG</figcaption>
-        <img src="./images/review/floqcast-icon-traditional.svg?v=s3.2.29" alt="FloqCast traditional SVG"/>
+        <img src="./images/review/floqcast-icon-traditional.svg?v=s3.2.40" alt="FloqCast traditional SVG"/>
       </figure>
     </div>
   </section>
@@ -130,23 +138,23 @@
     <div class="row">
       <figure>
         <figcaption>FloqCAST nightlife (V4)</figcaption>
-        <img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.29" alt="FloqCAST nightlife chrome"/>
+        <img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.40" alt="FloqCAST nightlife chrome"/>
       </figure>
       <figure>
         <figcaption>FloqCAST traditional (charcoal + ring)</figcaption>
-        <img src="./images/chrome/floqcast-traditional.jpg?v=s3.2.29" alt="FloqCAST traditional chrome"/>
+        <img src="./images/chrome/floqcast-traditional.jpg?v=s3.2.40" alt="FloqCAST traditional chrome"/>
       </figure>
       <figure>
         <figcaption>VIP nightlife v6</figcaption>
-        <img src="./images/chrome/vip-nightlife.jpg?v=s3.2.29" alt="VIP nightlife"/>
+        <img src="./images/chrome/vip-nightlife.jpg?v=s3.2.40" alt="VIP nightlife"/>
       </figure>
       <figure>
         <figcaption>VIP traditional B</figcaption>
-        <img src="./images/chrome/vip-traditional.jpg?v=s3.2.29" alt="VIP traditional"/>
+        <img src="./images/chrome/vip-traditional.jpg?v=s3.2.40" alt="VIP traditional"/>
       </figure>
       <figure>
         <figcaption>ShoutOut traditional v2 (from original)</figcaption>
-        <img src="./images/review/shoutout-traditional-v2.jpg?v=s3.2.29" alt="ShoutOut traditional"/>
+        <img src="./images/review/shoutout-traditional-v2.jpg?v=s3.2.40" alt="ShoutOut traditional"/>
       </figure>
       <figure>
         <figcaption>FloqAi traditional prop</figcaption>
@@ -170,7 +178,7 @@
     Reply which traditional proposals to lock, then go-ahead to wire Search.
   </p>
 
-  <script src="./floqr-chrome-scheme.js?v=s3.2.29"></script>
+  <script src="./floqr-chrome-scheme.js?v=s3.2.40"></script>
   <script>
     FLOQRChromeScheme.bindToggle(document);
     // Keep legacy data-scheme in sync for page chrome CSS

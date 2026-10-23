@@ -42,14 +42,19 @@ test("phone broadcaster and display2 share FLOQRFloqCastRtc helpers", () => {
   assert.match(rtc, /resolveIceServers/);
   assert.match(rtc, /getFloqCastIceServers/);
   assert.match(rtc, /restartIce/);
+  assert.match(rtc, /iceRestart:\s*true/);
+  assert.match(rtc, /publishIceRestartOffer/);
   assert.match(rtc, /DISPLAY_JOIN_DEBOUNCE_MS/);
   assert.match(rtc, /peerMediaAlive/);
   assert.match(rtc, /hold-media-alive/);
+  // Delta mediaAlive — no forever-true cumulative bytes>0 alone
+  assert.match(rtc, /bytes2 > bytes|bytes > prev/);
 });
 
 test("getFloqCastIceServers uses Twilio secrets (FLOQR-owned TURN)", () => {
   const fn = read("functions/floqcast-functions.js");
   assert.match(fn, /exports\.getFloqCastIceServers/);
+  assert.match(fn, /invoker:\s*"public"/);
   assert.match(fn, /TWILIO_ACCOUNT_SID/);
   assert.match(fn, /Tokens\.json/);
   assert.match(fn, /systemConfig\/floqcastIceServers/);
@@ -80,7 +85,8 @@ test("display2 reattaches when peer dies and shows connecting status", () => {
   assert.match(display, /Link blip/);
   assert.match(display, /function peerLooksDead\(pc\)[\s\S]*?return \["failed", "closed"\]\.includes\(state\) \|\| \["failed", "closed"\]\.includes\(ice\)/);
   assert.match(display, /hadVideoTrack/);
-  assert.match(display, /Waiting for phone to restore/);
+  assert.match(display, /Waiting for phone/);
+  assert.match(display, /still disconnected after hold/);
   assert.match(display, /DISCONNECT_HOLD_MS\s*=\s*35000/);
   assert.match(display, /peerMediaAlive/);
 });

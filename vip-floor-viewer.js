@@ -366,14 +366,36 @@
     if (canBook) bindParty(item);
     const bookBtn = info.querySelector("button.book");
     if (bookBtn && canBook) {
-      bookBtn.addEventListener("click", () => {
+      bookBtn.addEventListener("click", async () => {
         const partyEl = info.querySelector("#partySize");
         const partyText = partyEl ? partyEl.textContent : "";
         const party = Math.max(1, parseInt(String(partyText).split(" ")[0], 10) || item.includedGuests || 1);
         const handler = window.FLOQRVipFloorViewer?.onBookRequest;
-        if (typeof handler === "function") handler({sectionId: item.id, partySize: party, item});
+        if (typeof handler !== "function") return;
+        bookBtn.disabled = true;
+        const prev = bookBtn.textContent;
+        bookBtn.textContent = "Holding…";
+        try {
+          await Promise.resolve(handler({sectionId: item.id, partySize: party, item}));
+        } catch (err) {
+          const msg = err?.message || err?.details || String(err || "Could not hold that table.");
+          const clean = String(msg).replace(/^Firebase:\s*/i, "").replace(/^.*?:\s*/, "");
+          const errEl = document.createElement("p");
+          errEl.className = "vip-popout-error";
+          errEl.setAttribute("role", "alert");
+          errEl.textContent = clean || "Could not hold that table.";
+          info.querySelector(".vip-popout-error")?.remove();
+          bookBtn.insertAdjacentElement("beforebegin", errEl);
+          bookBtn.disabled = false;
+          bookBtn.textContent = prev;
+        }
       });
     }
+  }
+
+  function closePopout() {
+    selectedId = null;
+    showInfo(null);
   }
 
   // Demo amounts only — real minimums / fees come from the section's minimumAmount / extraGuestFee / deposit.
@@ -469,6 +491,7 @@
     load,
     select,
     setMode,
+    closePopout,
     getPlan: () => plan,
     setStates: next => {
       states = next && typeof next === "object" ? next : {};
@@ -477,6 +500,12 @@
         chips.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.area === mode)));
         renderOverlay();
         renderList();
+        // Refresh open popout so status/colors match live inventory (no stale Available).
+        if (selectedId) {
+          const item = byId(selectedId);
+          if (item) showInfo(item);
+          else closePopout();
+        }
       }
     },
     onBookRequest: null

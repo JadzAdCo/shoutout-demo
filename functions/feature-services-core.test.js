@@ -20,10 +20,11 @@ function loadClientModule() {
   return sandbox.window.FLOQRFeatureServices;
 }
 
-test("only ShoutOut is live by default; every other feature is test-only", () => {
+test("ShoutOut and Passes are live by default; every other feature is test-only", () => {
   const live = core.FEATURE_CATALOG.filter(row => row.IsFeatureEnabled === 1).map(row => row.key);
-  assert.deepEqual(live, ["shoutOut"]);
-  core.FEATURE_CATALOG.filter(row => row.key !== "shoutOut").forEach(row => {
+  assert.deepEqual(live, ["shoutOut", "passes"]);
+  const liveKeys = new Set(live);
+  core.FEATURE_CATALOG.filter(row => !liveKeys.has(row.key)).forEach(row => {
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });

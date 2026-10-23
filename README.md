@@ -1,11 +1,41 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.29 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.40 (stable)
 
+- s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.
+- s3.2.39: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
 - s3.2.29: PC Search composition centered (logo + Search + icons); desktop shell margin auto; Search field no longer left-docked.
 - s3.2.28: Template Description / How it works / Tag labels; Club Admin club-owned tags; Master owns description/howitWorks.
 
-- s3.2.28: Template cards show labeled Description / How it works / Tag; Club Admin edits tags; Master Admin owns description + howitWorks; full catalog size-specific copy.
-- s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.
+- s3.2.40: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
 
+- s3.2.39: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
+
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
+
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
+
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
+
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
+
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
+- s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
+
+- s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
+- s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit.
+
+- s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit diagnostics.
+- s3.2.31: Appearance tab + Site chrome cards; Nightlife white neon halo mark.
+
+- s3.2.31: Appearance tab + Site chrome card picker; Nightlife white script + neon halo mark.
+- s3.2.30: Script FloqR marks; Purple & White + Black & Dark Green chrome.
+
+- s3.2.30: Script FloqR chrome marks; rename Black Dark Green → Purple & White; true Black & Dark Green (code 5).
 - s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.
 - s3.2.26: Template select hides floating FloqAi (lens Search only).
 

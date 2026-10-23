@@ -725,8 +725,20 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   /* Aurelia demo club is on the VIP reserV beta list (2D map pending). */
   const aurelia = locations["temp-democlub-1"];
   if (aurelia) {
-    aurelia.featureGates = Object.assign({}, aurelia.featureGates || {}, {vipReservations: true});
+    aurelia.featureGates = Object.assign({}, aurelia.featureGates || {}, {
+      vipReservations: true,
+      passes: true
+    });
   }
+  ["decades-washington-dc", "lima-twist-washington-dc"].forEach(id => {
+    const row = locations[id];
+    if (row) {
+      row.featureGates = Object.assign({}, row.featureGates || {}, {
+        vipReservations: true,
+        passes: true
+      });
+    }
+  });
 })(window.SHOUTOUT_CLUB_LOCATIONS);
 
 window.SHOUTOUT_EVENTS = {
@@ -1465,11 +1477,12 @@ window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = ["led-96x48", "led-64x48", "led-64x32"
 
 /* v29.08.4: display-aware text contracts. Limits are readability ceilings, not targets. */
 window.FLOQR_TEMPLATE_TEXT_PROFILES = {
+  /* Caps sized for Papi HD P1.56 boards readable at ~1–3 m (letter height ≥ ~15 mm @ 3 m). */
   full: {
     label:"Full-screen message",
     formats:{
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:58},
-      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:58},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:22,minimumFontPixels:58,advice:"64×48 full-screen: max 10 characters per line (30 total) for 1–3 m readability."},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters so text does not clip."}
     }
   },
@@ -1477,7 +1490,7 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     label:"Three-line classic board",
     formats:{
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
-      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:18,minimumFontPixels:46},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:18,minimumFontPixels:46,advice:"64×48 classic board: max 12 characters per line (36 total) for 1–3 m readability."},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; FloqR card stays PRESENTED BY FloqMedia when no handle is shared."}
     }
   },
@@ -1797,7 +1810,7 @@ window.FLOQRScreenDatapoints = {
 };
 
 window.FLOQRTextLayout = {
-  version:"29.09.30",
+  version:"29.09.31",
   profileId(template = {}) {
     const id = String(template.id || "");
     if (template.layout === "nfl-jersey" || (template.sport === "nfl" && template.nflDualLayout) || /^nfl/i.test(id) && template.nflDualLayout) return "nflJersey";

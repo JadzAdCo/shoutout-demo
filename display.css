@@ -212,7 +212,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 /* Pre-shoutout / idle classic board — dark message panel + white type (lower LED current) */
 .classic-bw.classic-bw-idle .display-center:after{
   background:linear-gradient(180deg,#050505,#101114 42%,#0a0a0a)!important;
-  border-color:#ef1111!important;
+  border-color:#fff!important;
   box-shadow:0 18px 40px rgba(0,0,0,.45),inset 0 8px 20px rgba(255,255,255,.04)!important;
 }
 .classic-bw.classic-bw-idle #displayMain.classic-bw-board{

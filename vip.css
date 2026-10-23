@@ -157,6 +157,8 @@ html[data-floqr-chrome="traditional"] .vip-hero-logo {
 }
 
 .vip-hold-banner {
+  position: relative;
+  z-index: 40;
   margin: 0.85rem 0;
   padding: 0.75rem 1rem;
   border-radius: 12px;
@@ -166,6 +168,17 @@ html[data-floqr-chrome="traditional"] .vip-hero-logo {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+}
+
+.vip-popout-error {
+  margin: 0.65rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+  font-size: 0.92rem;
+  line-height: 1.35;
 }
 
 .vip-consent {
@@ -266,3 +279,91 @@ html[data-floqr-chrome="traditional"] .vip-hero-logo {
 }
 
 .vip-stripe-hint{margin:.55rem 0 0;opacity:.85;}
+
+/* —— White / Black: white page + shiny-black outline CTAs (override nightlife VIP body) —— */
+html[data-floqr-chrome="whiteBlack"] body.vip-page{
+  background:#ffffff!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-hero,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-hero-copy,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-title-row h1,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .brand-mixed-case,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h1,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h2,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .eyebrow,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .status,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-section-head h2{
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .product-parent-logo{
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.14));
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-product-page{
+  background:transparent!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-hero-logo{
+  background:#fff;
+  border:1px solid rgba(10,10,10,.28);
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.14));
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .card,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-venue-card,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-gate,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-consent{
+  background:#fff!important;
+  border:1px solid rgba(10,10,10,.35)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.08)!important;
+  color:#0a0a0a!important;
+  backdrop-filter:none;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-venue-option{
+  background:#fff!important;
+  border:1px solid rgba(10,10,10,.28)!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-venue-option:hover,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-venue-option:focus-visible{
+  border-color:#0a0a0a!important;
+  box-shadow:0 0 0 2px rgba(10,10,10,.18)!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-pick-cta.primary,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .primary,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-gate .primary,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .info button.primary,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .info button.book{
+  background:#fff!important;
+  color:#0a0a0a!important;
+  border:2px solid #0a0a0a!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 2px 8px rgba(0,0,0,.12)!important;
+  text-shadow:none!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-night{
+  background:#fff!important;
+  border:1px solid rgba(10,10,10,.35)!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-explore-3d{
+  background:#fff!important;
+  border:2px solid #0a0a0a!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-terms-body{
+  background:rgba(0,0,0,.04)!important;
+  border:1px dashed rgba(10,10,10,.35)!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-hold-banner{
+  border-color:rgba(10,10,10,.35)!important;
+  background:rgba(0,0,0,.05)!important;
+  color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] body.vip-page .tag-row span,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .status-pill{
+  border:1px solid rgba(10,10,10,.35)!important;
+  background:#fff!important;
+  color:#0a0a0a!important;
+}

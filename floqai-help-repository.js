@@ -480,8 +480,8 @@
     {
       id: "help-vip-door-ops",
       title: "VIP reserV door check-in",
-      body: "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status.",
-      searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door"],
+      body: "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status. Club Admin → Feature Mgmt → Passes issues guest/promoter QR passes, lists tonight’s passes, reveals QR, and check-in (ID 21+). VIP table Show pass on My Profile still uses the same pass.html viewer.",
+      searchPhrases: ["vip door", "door check in", "vip manager", "mark no show", "table door", "club admin passes", "issue pass", "qr door pass", "passes tab"],
       links: [
         {label: "VIP reserV Door", href: pageUrl("./vip-door.html", {from: "floqai"})}
       ],
@@ -1278,7 +1278,7 @@
     {
       id: "help-features-services",
       title: "Release Control",
-      body: "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes it live for all patrons. Both = 1 means testing: only granted beta testers (and Master Admins for QA) can use it. Site chrome is the Nightlife / Traditional / Black Tiffany / White-Black / Black Dark Green site theme beta — turn it on here, then invite testers under Beta & Testing with Chrome ticked. Active look is users.isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Black Dark Green). Save asks for a reason (min 8 characters) under SOS2FA and writes the audit trail. When a test feature is ready, use Test → live below, then run the GitHub promote workflow.",
+      body: "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes it live for all patrons. Both = 1 means testing: only granted beta testers (and Master Admins for QA) can use it. Site chrome is the Nightlife / Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green site theme beta — turn it on here, then invite testers under Beta & Testing with Chrome ticked. Active look is users.isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green). Save asks for a reason (min 8 characters) under SOS2FA and writes the audit trail. When a test feature is ready, use Test → live below, then run the GitHub promote workflow.",
       searchPhrases: [
         "features mgmt", "features and services", "release control", "beta and testing", "feature audit trail", "feature flags", "enable feature", "enable beta feature", "disable feature", "test feature", "beta testers",
         "invite beta tester", "IsFeatureEnabled", "IsTestFeature", "feature links", "beta pill", "revision", "reason for change",
@@ -1438,25 +1438,44 @@
     {
       id: "help-chrome-scheme",
       title: "Site chrome",
-      body: "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta), Traditional (charcoal / white), Black Tiffany (true black + Tiffany blue accents), White/Black (white background, charcoal text, slim charcoal/black borders), and Black Dark Green (true black + forest green). Colors, cards, icons, and chrome update together. Titles use Lyft-style geometric type. Your choice is stored as isSiteChrome on your profile (0 = Nightlife, 1 = Traditional, 2 = Black Tiffany, 3 = White/Black, 4 = Black Dark Green). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search).",
+      body: "Beta: pick one Site chrome for the whole FloqR site. Nightlife (white script mark with neon cyan–magenta border halo), Traditional (charcoal / white + script FloqR mark), Black Tiffany (true black + Tiffany blue script mark), White/Black (white background, charcoal text, black script mark), Purple & White (true black + violet/coral), and Black & Dark Green (true black + forest green). Colors, cards, icons, FloqR wordmark, receipts, and chrome update together. Tap a card to apply instantly — saved as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green). Available when FLOQR enables Site chrome and invites or assigns you. Find it under My Profile → Appearance → Site chrome (not Language Settings).",
       searchPhrases: [
-        "site chrome", "site theme", "traditional theme", "nightlife theme", "traditional chrome", "nightlife chrome",
-        "black tiffany", "black dark green", "white black", "white / black", "light theme", "tiffany theme", "forest green theme", "lyft font",
-        "beta theme", "isSiteChrome", "chrome", "icon theme", "dark theme", "charcoal theme"
+        "site chrome", "appearance", "site theme", "traditional theme", "nightlife theme", "traditional chrome", "nightlife chrome",
+        "black tiffany", "purple white", "purple & white", "black dark green", "black & dark green", "white black", "white / black", "light theme", "tiffany theme", "forest green theme", "lyft font",
+        "beta theme", "isSiteChrome", "chrome", "icon theme", "dark theme", "charcoal theme", "site look"
       ],
       links: [
-        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "site chrome settings", blurb: "Nightlife / Traditional / Black Tiffany / White-Black / Black Dark Green Site chrome (beta)"}
+        {label: "Appearance (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "appearance"}), search: "site chrome appearance", blurb: "Site chrome card picker — Nightlife / Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green (beta)"}
       ],
       source: "help-repository-seed",
-      page: "patron-portal.html#portalLanguageSettings"
+      page: "patron-portal.html#portalAppearance"
+    },
+    {
+      id: "help-chrome-audit",
+      title: "Site chrome audit",
+      body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex.",
+      searchPhrases: [
+        "site chrome audit", "chrome follow through", "receipt chrome", "payment-return chrome", "chrome pass fail", "appearance audit"
+      ],
+      links: [
+        {label: "Site chrome audit (Diagnostics)", href: pageUrl("./master-admin.html", {from: "floqai"}), search: "chrome audit diagnostics", blurb: "Read pass/fail probes after a Master Admin chrome switch"},
+        {label: "Appearance", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "appearance"}), search: "switch site chrome", blurb: "Switch Site chrome to start an audit session"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsManualTests"
     },
     {
       id: "help-my-profile",
-      title: "My Profile & Settings",
-      body: "Open My Profile & Settings for roles, seller tools, and account options.",
-      searchPhrases: ["my profile", "profile and settings", "settings", "account", "my profile & settings"],
-      links: [{label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})}],
-      source: "help-repository-seed"
+      title: "Profile & Settings",
+      body: "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options.",
+      searchPhrases: [
+        "my profile", "profile and settings", "profile & settings", "settings", "account",
+        "my profile & settings", "manage profile", "floqr inbox", "guest lists", "public media"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})}],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
     },
     {
       id: "help-onboarding",

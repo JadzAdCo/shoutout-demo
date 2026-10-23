@@ -9,13 +9,18 @@ const readReleaseFile = relativePath => fs.readFileSync(path.resolve(__dirname, 
 
 test("Welcome OAuth does not redirect on popup-closed (GitHub Pages redirect is unreliable)", () => {
   const app = readReleaseFile("patron-app.js");
-  assert.match(app, /Prefer popup\. Do NOT redirect on popup-closed-by-user/);
+  assert.match(app, /Desktop: prefer popup\. Do NOT redirect on popup-closed-by-user/);
   assert.match(app, /AUTH_REDIRECT_PENDING_KEY/);
+  assert.match(app, /oauthPopupsUnreliable/);
+  assert.match(app, /signInProviderRedirect/);
+  // Mobile/tablet skips popup (browsers block it) and uses redirect first.
+  assert.match(app, /if \(oauthPopupsUnreliable\(\)\) \{\s*await signInProviderRedirect/);
   // popup-closed must set cancel copy via oauthAuthErrorMessage — not kick off redirect.
   assert.match(app, /code === "auth\/popup-closed-by-user"[\s\S]{0,180}setStatus\(oauthAuthErrorMessage/);
   assert.match(app, /was cancelled\. Tap Continue with/);
   // User-facing status string must not be minted (comment may mention the old bug).
   assert.doesNotMatch(app, /setStatus\(`\$\{label\} popup closed or blocked\. Redirecting/);
+  assert.doesNotMatch(app, /\$\{label\} popup was blocked\. Trying full-page sign-in/);
 });
 
 test("email sign-in matches the Facebook color and exposes a selected confirmation", () => {

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en" data-floqr-theme-ungated="1">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FloqR script mark — chrome variants</title>
+  <style>
+    :root{
+      --ink:#e8eef6;
+      --muted:rgba(232,238,246,.72);
+      --line:rgba(255,255,255,.16);
+      --bg:#070a12;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Plus Jakarta Sans",Segoe UI,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 0%,rgba(45,138,153,.28),transparent 34%),
+        radial-gradient(circle at 88% 8%,rgba(0,200,255,.18),transparent 36%),
+        linear-gradient(165deg,#05070d,#0a1020 55%,#070a12);
+      padding:28px 18px 64px;
+    }
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{margin:0 0 8px;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.03em}
+    .lede{color:var(--muted);max-width:62ch;line-height:1.45;margin:0 0 22px}
+    .source-row{
+      display:grid;gap:14px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+      margin-bottom:28px;
+    }
+    @media(max-width:720px){.source-row{grid-template-columns:1fr}}
+    .card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:rgba(0,0,0,.28);
+    }
+    .card h2{margin:0 0 6px;font-size:1.05rem}
+    .card p{margin:0 0 12px;color:var(--muted);font-size:.92rem;line-height:1.4}
+    .card img{display:block;width:100%;height:auto;border-radius:12px;background:#fff}
+    .card img.on-dark{background:#0a0c14}
+    .swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .swatch{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:12px;
+    }
+    .swatch i{width:14px;height:14px;border-radius:50%;display:block;border:1px solid rgba(255,255,255,.25)}
+    .grid{
+      display:grid;gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    }
+    .plate{
+      border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#000;
+    }
+    .plate img{display:block;width:100%;height:auto}
+    .plate .meta{padding:12px 14px;background:rgba(255,255,255,.04)}
+    .plate .meta strong{display:block;margin-bottom:4px}
+    .plate .meta span{color:var(--muted);font-size:.86rem;line-height:1.35}
+    .section{margin:28px 0 10px}
+    .section h2{margin:0 0 10px;font-size:1.2rem}
+    .marks{
+      display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    }
+    .mark{
+      border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;
+      background:rgba(0,0,0,.35);
+    }
+    .mark img{width:88px;height:88px;object-fit:contain;margin:0 auto 8px;display:block}
+    .mark small{color:var(--muted);font-size:12px}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{border-top:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+    th{color:var(--muted);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+    code{font-size:.85em}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>FloqR script mark — chrome variants</h1>
+    <p class="lede">
+      Exact recolors of your teal script wordmark (bird above the <em>q</em>), plus AI directional treatments.
+      Letterforms below prefer the <strong>exact PNG recolors</strong> so the shape stays true to your source.
+    </p>
+
+    <div class="source-row">
+      <div class="card">
+        <h2>Your source</h2>
+        <p>Sampled ink ≈ <code>#2D8A99</code>. Transparent master used for all exact recolors.</p>
+        <img src="./images/chrome/floqr-script/floqr-script-user-source.png" alt="User-provided floqR script logo"/>
+        <div class="swatches">
+          <span class="swatch"><i style="background:#2D8A99"></i> Source teal</span>
+          <span class="swatch"><i style="background:#00C8FF"></i> Nightlife cyan</span>
+          <span class="swatch"><i style="background:#81D8D0"></i> Tiffany</span>
+          <span class="swatch"><i style="background:#2D8A5A"></i> Dark green</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Recommended pairing</h2>
+        <p>One wordmark color per chrome. Bird-only for favicons / app icons; full script for Search / login hero.</p>
+        <table>
+          <thead><tr><th>Chrome</th><th>Wordmark</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Nightlife</td><td><code>#00C8FF</code></td><td>Matches tile cyan; white alt for max contrast</td></tr>
+            <tr><td>Traditional</td><td><code>#E8ECF0</code></td><td>Silver on charcoal; ink alt for light cards</td></tr>
+            <tr><td>Black Tiffany</td><td><code>#81D8D0</code></td><td>Classic Tiffany; deep <code>#0ABAB5</code> alt</td></tr>
+            <tr><td>White / Black</td><td><code>#111114</code></td><td>Black ink on light chrome</td></tr>
+            <tr><td>Purple & White</td><td><code>#5B2DFF</code></td><td>Violet script (code 4)</td></tr>
+            <tr><td>Black & Dark Green</td><td><code>#2D8A5A</code></td><td>Forest <code>#226E44</code> alt</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section"><h2>Exact recolors on chrome plates</h2></div>
+    <div class="grid">
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/plate-nightlife.png" alt="Nightlife cyan floqR"/>
+        <div class="meta"><strong>Nightlife</strong><span>Cyan wordmark — primary recommendation for default chrome.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/plate-traditional.png" alt="Traditional silver floqR"/>
+        <div class="meta"><strong>Traditional</strong><span>Silver wordmark on charcoal.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/plate-blackTiffany.png" alt="Black Tiffany floqR"/>
+        <div class="meta"><strong>Black Tiffany</strong><span>Tiffany blue wordmark on black.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/plate-whiteBlack.png" alt="White Black floqR"/>
+        <div class="meta"><strong>White / Black</strong><span>Near-black ink on light plate.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/plate-blackDarkGreen.png" alt="Black & Dark Green floqR"/>
+        <div class="meta"><strong>Black & Dark Green</strong><span>Forest green wordmark on black-green.</span></div>
+      </article>
+    </div>
+
+    <div class="section"><h2>Bird-only marks (favicon / tile)</h2></div>
+    <div class="marks">
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-nightlife-cyan.png" alt="Bird nightlife"/><small>Nightlife</small></div>
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-traditional-silver.png" alt="Bird traditional"/><small>Traditional</small></div>
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-blacktiffany.png" alt="Bird tiffany"/><small>Black Tiffany</small></div>
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-whiteblack-ink.png" alt="Bird whiteblack" style="background:#f3f4f6;border-radius:12px;padding:8px"/><small>White / Black</small></div>
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-blackdarkgreen.png" alt="Bird dark green"/><small>Black & Dark Green</small></div>
+      <div class="mark"><img src="./images/chrome/floqr-script/floqr-bird-only-source-teal.png" alt="Bird source teal"/><small>Source teal</small></div>
+    </div>
+
+    <div class="section"><h2>AI directional treatments (optional polish)</h2></div>
+    <p class="lede">Same motif, redrawn. Use for mood only — letterforms differ slightly from your source. Prefer exact recolors for production until we vectorize the original.</p>
+    <div class="grid">
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-replica-teal.jpg" alt="AI replica teal"/>
+        <div class="meta"><strong>AI replica</strong><span>Teal on white — closest AI redraw of your source.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-nightlife-cyan-glow.jpg" alt="AI nightlife"/>
+        <div class="meta"><strong>Nightlife + glow</strong><span>Cyan neon treatment for dark Search chrome.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-blacktiffany.jpg" alt="AI black tiffany"/>
+        <div class="meta"><strong>Black Tiffany</strong><span>Soft Tiffany glow on black.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-traditional.jpg" alt="AI traditional"/>
+        <div class="meta"><strong>Traditional</strong><span>Silver on charcoal.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-whiteblack.jpg" alt="AI white black"/>
+        <div class="meta"><strong>White / Black</strong><span>Black ink on white.</span></div>
+      </article>
+      <article class="plate">
+        <img src="./images/chrome/floqr-script/floqr-script-ai-blackdarkgreen.jpg" alt="AI black dark green"/>
+        <div class="meta"><strong>Black & Dark Green</strong><span>Forest green on black-green.</span></div>
+      </article>
+    </div>
+
+    <div class="section"><h2>Suggested next step</h2></div>
+    <div class="card">
+      <p style="margin:0;color:var(--muted)">
+        Pick a primary wordmark per chrome (table above). Next we can (1) vectorize your source to SVG,
+        (2) wire <code>floqr-chrome-scheme.js</code> to swap Search/login hero logos by chrome,
+        and (3) retire or keep the current tile-square <code>floqr-color.png</code> as a secondary mark.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

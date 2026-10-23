@@ -124,8 +124,8 @@
     "body": "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card."
   },
   "help-my-profile": {
-    "title": "My Profile & Settings",
-    "body": "Open My Profile & Settings for roles, seller tools, and account options."
+    "title": "Profile & Settings",
+    "body": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options."
   },
   "help-onboarding": {
     "title": "Onboarding",
@@ -302,5 +302,9 @@
   "help-chrome-scheme": {
     "title": "Site chrome",
     "body": "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta) and Traditional (charcoal / white). Colors, cards, and chrome update together. Your choice is stored as isSiteChrome on your profile (0 = Nightlife, 1 = Traditional; 2 and 4 are reserved). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search)."
+  },
+  "help-chrome-audit": {
+    "title": "Site chrome audit",
+    "body": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
   }
 }

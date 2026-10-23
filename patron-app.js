@@ -1477,6 +1477,22 @@
 
   const AUTH_REDIRECT_PENDING_KEY = "floqr.authRedirectPending";
 
+  /** iPhone / iPad / Android / in-app browsers block OAuth popups — use redirect first. */
+  function oauthPopupsUnreliable() {
+    try {
+      const ua = String(navigator.userAgent || "");
+      const touch = Number(navigator.maxTouchPoints || 0) > 0;
+      const ios = /iPhone|iPod|iPad/i.test(ua) || (/Macintosh/i.test(ua) && touch);
+      const android = /Android/i.test(ua);
+      const webview = /\bwv\b|; wv\)|FBAN|FBAV|Instagram|Line\//i.test(ua);
+      const standalone = navigator.standalone === true
+        || (typeof matchMedia === "function" && matchMedia("(display-mode: standalone)").matches);
+      return !!(ios || android || webview || standalone);
+    } catch (_) {
+      return false;
+    }
+  }
+
   function oauthAuthErrorMessage(e, label = "Sign-in") {
     const code = e?.code || "error";
     const message = e?.message || String(e || "Unknown error");
@@ -1484,7 +1500,7 @@
       return `${label} was cancelled. Tap Continue with ${label} again.`;
     }
     if (code === "auth/popup-blocked") {
-      return `Your browser blocked the ${label} popup. Allow popups for jadzadco.github.io, then try again.`;
+      return `Your browser blocked the ${label} window. Tap Continue with ${label} again — FLOQR will use full-page sign-in on this device.`;
     }
     if (code === "auth/unauthorized-domain") {
       return "This site is not authorized for sign-in. Add jadzadco.github.io under Firebase Authentication → Settings → Authorized domains.";
@@ -1501,13 +1517,28 @@
     return `${code}: ${message}`;
   }
 
+  async function signInProviderRedirect(provider, label) {
+    try {
+      sessionStorage.setItem(AUTH_REDIRECT_PENDING_KEY, label);
+      setStatus(`Opening ${label} secure sign-in…`);
+      await auth.signInWithRedirect(provider);
+    } catch (redirectErr) {
+      try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}
+      setStatus(oauthAuthErrorMessage(redirectErr, label));
+    }
+  }
+
   /**
-   * Prefer popup. Do NOT redirect on popup-closed-by-user — full-page redirect between
+   * Desktop: prefer popup. Do NOT redirect on popup-closed-by-user — full-page redirect between
    * jadzadco.github.io and *.firebaseapp.com often returns no session (third-party storage),
-   * leaving Welcome stuck on "Redirecting to secure sign-in…".
-   * Redirect only when the browser truly blocked the popup.
+   * leaving Welcome stuck on "Redirecting…".
+   * Phone / tablet / WebView: skip popup (browsers block it) and use redirect immediately.
    */
   async function signInProvider(provider, label) {
+    if (oauthPopupsUnreliable()) {
+      await signInProviderRedirect(provider, label);
+      return;
+    }
     try {
       setStatus(`Opening ${label} sign-in...`);
       await auth.signInWithPopup(provider);
@@ -1518,21 +1549,17 @@
         return;
       }
       if (code === "auth/popup-blocked") {
-        try {
-          sessionStorage.setItem(AUTH_REDIRECT_PENDING_KEY, label);
-          setStatus(`${label} popup was blocked. Trying full-page sign-in…`);
-          await auth.signInWithRedirect(provider);
-          return;
-        } catch (redirectErr) {
-          try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}
-          setStatus(oauthAuthErrorMessage(redirectErr, label));
-          return;
-        }
+        await signInProviderRedirect(provider, label);
+        return;
       }
       setStatus(oauthAuthErrorMessage(e, label));
     }
   }
-  async function loginGoogle() { await signInProvider(new firebase.auth.GoogleAuthProvider(), "Google"); }
+  async function loginGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try { provider.setCustomParameters({prompt: "select_account"}); } catch (_) {}
+    await signInProvider(provider, "Google");
+  }
   async function loginFacebook() { await signInProvider(new firebase.auth.FacebookAuthProvider(), "Facebook"); }
   function microsoftAuthErrorMessage(e) {
     return oauthAuthErrorMessage(e, "Microsoft");
@@ -3642,6 +3669,12 @@
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
     const sizeChips = supportedFormats.map(id => formatDimLabel(id)).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
+    const letterChips = supportedFormats.map(id => {
+      const caps = window.FLOQRTextLayout?.resolve?.(template, id);
+      if (!caps?.supported || !caps.lineCount || !caps.perLine) return "";
+      const dim = formatDimLabel(id);
+      return `${dim}: ${caps.lineCount}×${caps.perLine}=${caps.main}`;
+    }).filter(Boolean).slice(0, 3);
     const tags = publicTagsForTemplate(template);
     const mediaLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
@@ -3668,7 +3701,7 @@
         ${how ? `<p class="template-select-howitworks"><span class="template-copy-label">${esc(howLabel)}:</span> ${esc(how)}</p>` : ""}
         <div class="template-select-tags-line"><span class="template-copy-label">${esc(tagLabel)}:</span><div class="tag-row template-select-tag-chips">${tags.length ? tags.map(tag => `<span>${esc(tag)}</span>`).join("") : `<span class="template-tag-empty">${esc(tt("template.noTags", {}, "None"))}</span>`}</div></div>
       </div>
-      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}</div>
+      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${letterChips.map(label => `<span title="${esc(tt("template.letterFitHint", {}, "Max letters for ~1–3 m viewing on this LED size"))}">${esc(label)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
       </div>
@@ -5058,7 +5091,7 @@
     window.addEventListener("resize", detectRenderContext);
     window.addEventListener("orientationchange", detectRenderContext);
     setStatus("");
-    auth.getRedirectResult().then(result => {
+    auth.getRedirectResult().then(async result => {
       let pending = "";
       try {
         pending = sessionStorage.getItem(AUTH_REDIRECT_PENDING_KEY) || "";
@@ -5068,9 +5101,25 @@
         setStatus(`Signed in as ${result.user.email || result.user.displayName || result.user.uid}`);
         return;
       }
-      // Redirect between github.io and firebaseapp.com often yields null — clear stuck "Redirecting…" copy.
+      // Redirect may hydrate via onAuthStateChanged a tick later — wait briefly before failing.
       if (pending) {
-        setStatus(`${pending} full-page sign-in did not finish. Allow popups for jadzadco.github.io, then tap Continue with ${pending} again.`);
+        const waited = await new Promise(resolve => {
+          if (auth.currentUser) { resolve(auth.currentUser); return; }
+          let done = false;
+          const finish = (user) => {
+            if (done) return;
+            done = true;
+            try { unsub(); } catch (_) {}
+            resolve(user || null);
+          };
+          const unsub = auth.onAuthStateChanged(user => { if (user) finish(user); });
+          setTimeout(() => finish(auth.currentUser || null), 2500);
+        });
+        if (waited) {
+          setStatus(`Signed in as ${waited.email || waited.displayName || waited.uid}`);
+          return;
+        }
+        setStatus(`${pending} full-page sign-in did not finish. Tap Continue with ${pending} again.`);
       }
     }).catch(e => {
       try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}

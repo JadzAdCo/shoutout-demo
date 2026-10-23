@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.29";
+  const VERSION = "s3.2.40";
 
   const packs = {
     "ru": {
@@ -204,11 +204,15 @@
       },
       "help-chrome-scheme": {
         title: "Тема сайта",
-        body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон), Traditional (уголь/белый), Black Tiffany (чёрный + Tiffany blue) и White/Black, and Black Dark Green (чёрный + лесной зелёный). Меняются цвета, карточки и оформление вместе. Выбор хранится как isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Переключатель — в My Profile → Language Settings."
+        body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон), Traditional (уголь/белый), Black Tiffany (чёрный + Tiffany), White/Black, Purple & White (фиолетовый/коралл) и Black & Dark Green (чёрный + лесной зелёный). Меняются цвета, карточки, логотип FloqR и оформление. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Переключатель — в My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Откройте My Profile & Settings для ролей, инструментов продавца и настроек аккаунта."
+        title: "Профиль и настройки",
+        body: "Управляйте профилем, My Privacy, уведомлениями AI, шаблонами ShoutOut, публичными медиа, ShoutOuts, списками гостей, FloqR Inbox и Mingl. Откройте Профиль и настройки для ролей, инструментов продавца и параметров аккаунта."
       },
       "help-onboarding": {
         title: "Онбординг",
@@ -240,7 +244,7 @@
       },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
-        body: "Шаблоны только для вашего клуба идут первыми с пометкой «Эксклюзивно». На карточке: Описание, Как это работает (для основного LED) и теги — Описание и Как это работает принадлежат Master Admin (только чтение). Теги можно менять только у клубных шаблонов через «Управление тегами»; у общих FloqR теги только для чтения. Назначенные шаблоны видят гости; меняйте назначение кнопками. Поиск находит шаблон даже без диакритики или с опечаткой."
+        body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
       },
       "help-employee-network": {
         title: "Сеть сотрудников и персонала",
@@ -248,7 +252,7 @@
       },
       "help-template-tags": {
         title: "Теги шаблонов",
-        body: "Под каждым шаблоном гости видят Описание, Как это работает (для размера LED площадки) и теги. Club Admin и администраторы/менеджеры шаблонов правят здесь теги площадки — Описание и Как это работает остаются у Master Admin (только чтение). Добавляйте слова, которые могут искать гости, например вечер матча или день рождения. Менеджеры могут добавлять теги; администраторы и Club Admin — также удалять. Назначайте роли в Role Activity & Permission."
+        body: "Добавьте слова, которые гости могут ввести при поиске шаблона на вашей площадке, например вечер матча или день рождения. Менеджеры шаблонов могут добавлять теги. Администраторы шаблонов и Club Admin могут также удалять теги. Club Admin назначает эти роли в разделе Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Предпросмотр шаблона",
@@ -510,11 +514,15 @@
       },
       "help-chrome-scheme": {
         title: "Sitethema",
-        body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon), Traditional (antraciet/wit), Black Tiffany (zwart + Tiffany blue) en White/Black, and Black Dark Green (zwart + bosgroen). Kleuren, kaarten en chrome veranderen samen. Opgeslagen als isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Schakelaar in My Profile → Language Settings."
+        body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon), Traditional (antraciet/wit), Black Tiffany (zwart + Tiffany), White/Black, Purple & White (violet/koraal) en Black & Dark Green (zwart + bosgroen). Kleuren, kaarten, FloqR-woordmerk en chrome veranderen samen. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Schakelaar in My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Open My Profile & Settings voor rollen, verkoperstools en accountopties."
+        title: "Profiel & instellingen",
+        body: "Beheer je profiel, My Privacy, AI-meldingen, ShoutOut-templates, openbare media, ShoutOuts, gastenlijsten, FloqR Inbox en Mingl. Open Profiel & instellingen voor rollen, verkoperstools en accountopties."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -546,7 +554,7 @@
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
-        body: "Sjablonen alleen voor je club staan bovenaan als Exclusief. Elke kaart toont Beschrijving, Hoe het werkt (voor je primaire LED) en tags — Beschrijving en Hoe het werkt zijn van Master Admin (alleen-lezen). Tags bewerk je alleen op club-eigen sjablonen via Sjabloontags beheren; gedeelde FloqR-tags blijven alleen-lezen. Toegewezen sjablonen kiest de gast; wijzig met Toewijzen of Verwijderen. Zoeken vindt ook zonder accent of met typfout."
+        body: "Sjablonen die alleen voor je club zijn, staan bovenaan met ‘Exclusief bij’ en de naam van je locatie. Toegewezen sjablonen kunnen gasten bij je club kiezen; wijzig dat met Sjabloon toewijzen of Sjabloon verwijderen. Zoeken vindt een sjabloon ook zonder accent of met een kleine typfout."
       },
       "help-employee-network": {
         title: "Netwerk van medewerkers en personeel",
@@ -554,7 +562,7 @@
       },
       "help-template-tags": {
         title: "Sjabloontags",
-        body: "Onder elk sjabloon zien gasten Beschrijving, Hoe het werkt (voor het LED-formaat van de locatie) en tags. Club Admin en sjabloonbeheerders/-managers bewerken hier locatietags — Beschrijving en Hoe het werkt blijven van Master Admin (alleen-lezen). Voeg woorden toe die gasten kunnen typen, zoals wedstrijdavond of verjaardag. Managers kunnen tags toevoegen; beheerders en Club Admins kunnen ze ook verwijderen. Wijs rollen toe onder Role Activity & Permission."
+        body: "Voeg woorden toe die gasten kunnen typen als ze een sjabloon zoeken bij je locatie, zoals wedstrijdavond of verjaardag. Sjabloonmanagers kunnen tags toevoegen. Sjabloonbeheerders en Club Admins kunnen tags ook verwijderen. Club Admin wijst deze rollen toe onder Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Een sjabloon bekijken",
@@ -816,11 +824,15 @@
       },
       "help-chrome-scheme": {
         title: "Thème du site",
-        body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon), Traditional (charbon / blanc), Black Tiffany (noir + Tiffany blue) et White/Black, and Black Dark Green (noir + vert forêt). Couleurs, cartes et chrome changent ensemble. Stocké comme isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interrupteur dans My Profile → Language Settings."
+        body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon), Traditional (charbon / blanc), Black Tiffany (noir + Tiffany), White/Black, Purple & White (violet/corail) et Black & Dark Green (noir + vert forêt). Couleurs, cartes, logo FloqR et chrome changent ensemble. isSiteChrome : 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interrupteur dans My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "Mon profil et paramètres",
-        body: "Ouvrez My Profile & Settings pour les rôles, les outils de vendeur et les options de compte."
+        title: "Profil et paramètres",
+        body: "Gérez votre profil, My Privacy, les notifications AI, les modèles ShoutOut, les médias publics, les ShoutOuts, les listes d’invités, FloqR Inbox et Mingl. Ouvrez Profil et paramètres pour les rôles, les outils vendeur et les options de compte."
       },
       "help-onboarding": {
         title: "Intégration",
@@ -852,7 +864,7 @@
       },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
-        body: "Les modèles réservés à votre club apparaissent en premier comme Exclusif. Chaque carte montre Description, Comment ça marche (LED principale) et les tags — Description et Comment ça marche sont Master Admin (lecture seule). Vous modifiez les tags uniquement sur les modèles du club via Gérer les tags ; les tags FloqR partagés restent en lecture seule. Les modèles attribués sont ceux des clients ; utilisez Attribuer ou Retirer. La recherche tolère accents manquants et petites fautes."
+        body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
       },
       "help-employee-network": {
         title: "Réseau des employés et du personnel",
@@ -860,7 +872,7 @@
       },
       "help-template-tags": {
         title: "Tags des modèles",
-        body: "Sous chaque modèle, les clients voient Description, Comment ça marche (selon la taille LED du lieu) et les tags. Le Club Admin et les Administrateurs/Gestionnaires de modèles modifient les tags du lieu ici — Description et Comment ça marche restent Master Admin (lecture seule). Ajoutez des mots que les clients pourraient taper, comme soirée match ou anniversaire. Les Gestionnaires peuvent ajouter des tags ; les Administrateurs et Club Admins peuvent aussi les retirer. Attribuez les rôles dans Role Activity & Permission."
+        body: "Ajoutez des mots que les clients pourraient taper pour trouver un modèle dans votre lieu, comme soirée match ou anniversaire. Les Gestionnaires des modèles peuvent ajouter des tags. Les Administrateurs des modèles et les Club Admins peuvent aussi en retirer. Le Club Admin attribue ces rôles dans Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Aperçu d’un modèle",
@@ -1122,11 +1134,15 @@
       },
       "help-chrome-scheme": {
         title: "Site-Theme",
-        body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon), Traditional (Anthrazit / Weiß), Black Tiffany (Schwarz + Tiffany-Blau) und White/Black, and Black Dark Green (Schwarz + Waldgrün). Farben, Karten und Chrome ändern sich gemeinsam. Gespeichert als isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Schalter unter My Profile → Language Settings."
+        body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon), Traditional (Anthrazit / Weiß), Black Tiffany (Schwarz + Tiffany), White/Black, Purple & White (Violett/Koralle) und Black & Dark Green (Schwarz + Waldgrün). Farben, Karten, FloqR-Wortmarke und Chrome ändern sich gemeinsam. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Schalter unter My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Öffnen Sie My Profile & Settings für Rollen, Verkäufer-Tools und Kontooptionen."
+        title: "Profil & Einstellungen",
+        body: "Verwalte dein Profil, My Privacy, AI-Benachrichtigungen, ShoutOut-Vorlagen, öffentliche Medien, ShoutOuts, Gästelisten, FloqR Inbox und Mingl. Öffne Profil & Einstellungen für Rollen, Verkäufer-Tools und Kontooptionen."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -1158,7 +1174,7 @@
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
-        body: "Vorlagen nur für deinen Club stehen oben als Exklusiv. Jede Karte zeigt Beschreibung, So funktioniert’s (primäre LED) und Tags — Beschreibung und So funktioniert’s gehören Master Admin (nur lesbar). Tags bearbeitest du nur bei Club-Vorlagen unter Vorlagen-Tags verwalten; geteilte FloqR-Tags bleiben nur lesbar. Zugewiesene Vorlagen wählen Gäste; ändere das mit Zuweisen oder Entfernen. Suche findet auch ohne Akzent oder mit Tippfehler."
+        body: "Vorlagen nur für deinen Club stehen ganz oben und sind mit „Exklusiv bei“ und dem Namen deiner Location markiert. Zugewiesene Vorlagen können Gäste in deinem Club wählen; ändere das mit Vorlage zuweisen oder Vorlage entfernen. Die Suche findet eine Vorlage auch ohne Akzent oder mit einem kleinen Tippfehler."
       },
       "help-employee-network": {
         title: "Mitarbeiter- und Personalnetzwerk",
@@ -1166,7 +1182,7 @@
       },
       "help-template-tags": {
         title: "Vorlagen-Tags",
-        body: "Unter jeder Vorlage sehen Gäste Beschreibung, So funktioniert’s (für die LED-Größe der Location) und Tags. Club Admin sowie Vorlagen-Administratoren/-Manager bearbeiten hier die Location-Tags — Beschreibung und So funktioniert’s gehören Master Admin (nur lesbar). Füge Wörter hinzu, die Gäste tippen könnten, z. B. Spieleabend oder Geburtstag. Manager können Tags hinzufügen; Administratoren und Club Admins können sie auch entfernen. Rollen unter Role Activity & Permission zuweisen."
+        body: "Füge Wörter hinzu, die Gäste eintippen könnten, wenn sie bei deiner Location eine Vorlage suchen, etwa Spieleabend oder Geburtstag. Vorlagen-Manager können Tags hinzufügen. Vorlagen-Administratoren und Club Admins können Tags auch entfernen. Club Admin vergibt diese Rollen unter Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Vorlage ansehen",
@@ -1428,11 +1444,15 @@
       },
       "help-chrome-scheme": {
         title: "Tema del sitio",
-        body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón), Traditional (carbón / blanco), Black Tiffany (negro + Tiffany blue) y White/Black, and Black Dark Green (negro + verde bosque). Colores, tarjetas y chrome cambian juntos. Se guarda como isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruptor en My Profile → Language Settings."
+        body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón), Traditional (carbón / blanco), Black Tiffany (negro + Tiffany), White/Black, Purple & White (violeta/coral) y Black & Dark Green (negro + verde bosque). Colores, tarjetas, marca FloqR y chrome cambian juntos. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruptor en My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Abra My Profile & Settings para funciones, herramientas de vendedor y opciones de cuenta."
+        title: "Perfil y ajustes",
+        body: "Gestiona tu perfil, My Privacy, notificaciones AI, plantillas ShoutOut, medios públicos, ShoutOuts, listas de invitados, FloqR Inbox y Mingl. Abre Perfil y ajustes para roles, herramientas de vendedor y opciones de cuenta."
       },
       "help-onboarding": {
         title: "Incorporación",
@@ -1464,7 +1484,7 @@
       },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
-        body: "Las plantillas solo de tu club aparecen primero como Exclusivo. Cada tarjeta muestra Descripción, Cómo funciona (LED principal) y etiquetas — Descripción y Cómo funciona son de Master Admin (solo lectura). Editas etiquetas solo en plantillas del club en Gestionar etiquetas; las FloqR compartidas son solo lectura. Las asignadas las eligen los clientes; usa Asignar o Quitar. La búsqueda tolera tildes faltantes y erratas."
+        body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
       },
       "help-employee-network": {
         title: "Red de empleados y personal",
@@ -1472,7 +1492,7 @@
       },
       "help-template-tags": {
         title: "Etiquetas de plantillas",
-        body: "Bajo cada plantilla los clientes ven Descripción, Cómo funciona (según el tamaño LED del local) y etiquetas. El Club Admin y los Administradores/Gestores de plantillas editan aquí las etiquetas del local — Descripción y Cómo funciona son de Master Admin (solo lectura). Añade palabras que puedan buscar, como noche de partido o cumpleaños. Los gestores pueden añadir etiquetas; administradores y Club Admins también pueden quitarlas. Asigna roles en Role Activity & Permission."
+        body: "Añade palabras que los clientes podrían escribir al buscar una plantilla en tu local, como noche de partido o cumpleaños. Los Gestores de plantillas pueden añadir etiquetas. Los Administradores de plantillas y los Club Admins también pueden quitarlas. El Club Admin asigna estos roles en Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Vista previa de una plantilla",
@@ -1734,11 +1754,15 @@
       },
       "help-chrome-scheme": {
         title: "Tema del sito",
-        body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon), Traditional (antracite / bianco), Black Tiffany (nero + Tiffany blue) e White/Black, and Black Dark Green (nero + verde foresta). Colori, card e chrome cambiano insieme. Salvato come isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruttore in My Profile → Language Settings."
+        body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon), Traditional (antracite / bianco), Black Tiffany (nero + Tiffany), White/Black, Purple & White (viola/corallo) e Black & Dark Green (nero + verde foresta). Colori, card, wordmark FloqR e chrome cambiano insieme. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruttore in My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Apri My Profile & Settings per ruoli, strumenti del venditore e opzioni dell'account."
+        title: "Profilo e impostazioni",
+        body: "Gestisci il tuo profilo, My Privacy, notifiche AI, modelli ShoutOut, media pubblici, ShoutOuts, liste ospiti, FloqR Inbox e Mingl. Apri Profilo e impostazioni per ruoli, strumenti venditore e opzioni account."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -1770,7 +1794,7 @@
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
-        body: "I modelli solo del tuo club compaiono per primi come Esclusivo. Ogni scheda mostra Descrizione, Come funziona (LED principale) e tag — Descrizione e Come funziona sono di Master Admin (sola lettura). Modifichi i tag solo sui modelli del club in Gestisci tag; i FloqR condivisi restano in sola lettura. Quelli assegnati li scelgono i clienti; usa Assegna o Rimuovi. La ricerca tollera accenti mancanti e piccoli errori."
+        body: "I modelli creati solo per il tuo club compaiono per primi, contrassegnati da «Esclusivo da» e dal nome del locale. I modelli assegnati sono quelli che i clienti possono scegliere nel tuo club; modificali con Assegna modello o Rimuovi modello. La ricerca trova un modello anche senza accento o con un piccolo errore di battitura."
       },
       "help-employee-network": {
         title: "Rete di dipendenti e personale",
@@ -1778,7 +1802,7 @@
       },
       "help-template-tags": {
         title: "Tag dei modelli",
-        body: "Sotto ogni modello i clienti vedono Descrizione, Come funziona (per la misura LED della sede) e i tag. Club Admin e Amministratori/Gestori modelli modificano qui i tag della sede — Descrizione e Come funziona restano di Master Admin (sola lettura). Aggiungi parole che i clienti potrebbero digitare, come serata partita o compleanno. I gestori possono aggiungere tag; gli amministratori e i Club Admin possono anche rimuoverli. Assegna i ruoli in Role Activity & Permission."
+        body: "Aggiungi parole che i clienti potrebbero scrivere cercando un modello nel tuo locale, come serata partita o compleanno. I Gestori dei modelli possono aggiungere tag. Gli Amministratori dei modelli e i Club Admin possono anche rimuoverli. Il Club Admin assegna questi ruoli in Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Anteprima di un modello",
@@ -2040,11 +2064,15 @@
       },
       "help-chrome-scheme": {
         title: "Tema do site",
-        body: "Beta: alterne todo o site FLOQR entre Nightlife (néon), Traditional (carvão / branco), Black Tiffany (preto + Tiffany blue) e White/Black, and Black Dark Green (preto + verde floresta). Cores, cartões e chrome mudam juntos. Guardado como isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Interruptor em My Profile → Language Settings."
+        body: "Beta: alterne todo o site FLOQR entre Nightlife (néon), Traditional (carvão / branco), Black Tiffany (preto + Tiffany), White/Black, Purple & White (violeta/coral) e Black & Dark Green (preto + verde floresta). Cores, cartões, wordmark FloqR e chrome mudam juntos. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruptor em My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Abra My Profile & Settings para funções, ferramentas de vendedor e opções de conta."
+        title: "Perfil e configurações",
+        body: "Gerencie seu perfil, My Privacy, notificações AI, modelos ShoutOut, mídia pública, ShoutOuts, listas de convidados, FloqR Inbox e Mingl. Abra Perfil e configurações para funções, ferramentas de vendedor e opções de conta."
       },
       "help-onboarding": {
         title: "Integração",
@@ -2076,7 +2104,7 @@
       },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
-        body: "Os modelos só do seu clube aparecem primeiro como Exclusivo. Cada cartão mostra Descrição, Como funciona (LED principal) e tags — Descrição e Como funciona são do Master Admin (somente leitura). Você edita tags só em modelos do clube em Gerenciar tags; FloqR compartilhados ficam somente leitura. Os atribuídos são os que os clientes escolhem; use Atribuir ou Remover. A busca tolera acentos faltando e erros pequenos."
+        body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
       },
       "help-employee-network": {
         title: "Rede de funcionários e equipe",
@@ -2084,7 +2112,7 @@
       },
       "help-template-tags": {
         title: "Tags de modelos",
-        body: "Sob cada modelo os clientes veem Descrição, Como funciona (para o tamanho LED do local) e tags. Club Admin e Administradores/Gestores de modelos editam aqui as tags do local — Descrição e Como funciona ficam com Master Admin (somente leitura). Adicione palavras que os clientes possam digitar, como noite de jogo ou aniversário. Gestores podem adicionar tags; administradores e Club Admins também podem remover. Atribua funções em Role Activity & Permission."
+        body: "Adicione palavras que os clientes possam digitar ao procurar um modelo no seu local, como noite de jogo ou aniversário. Gestores de modelos podem adicionar tags. Administradores de modelos e Club Admins também podem removê-las. O Club Admin atribui esses papéis em Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Pré-visualizar um modelo",
@@ -2346,11 +2374,15 @@
       },
       "help-chrome-scheme": {
         title: "Θέμα ιστότοπου",
-        body: "Beta: αλλάξτε ολόκληρο το site FLOQR μεταξύ Nightlife (νεόν), Traditional (ανθρακί / λευκό), Black Tiffany (μαύρο + Tiffany blue) και White/Black, and Black Dark Green (μαύρο + πράσινο δάσους). Χρώματα, κάρτες και chrome αλλάζουν μαζί. Αποθηκεύεται ως isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Διακόπτης στο My Profile → Language Settings."
+        body: "Beta: αλλάξτε ολόκληρο το site FLOQR μεταξύ Nightlife (νεόν), Traditional (ανθρακί / λευκό), Black Tiffany (μαύρο + Tiffany), White/Black, Purple & White (μοβ/κοραλί) και Black & Dark Green (μαύρο + πράσινο δάσους). Χρώματα, κάρτες, FloqR wordmark και chrome αλλάζουν μαζί. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Διακόπτης στο My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Ανοίξτε το My Profile & Settings για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
+        title: "Προφίλ και ρυθμίσεις",
+        body: "Διαχειριστείτε το προφίλ σας, My Privacy, ειδοποιήσεις AI, πρότυπα ShoutOut, δημόσια μέσα, ShoutOuts, λίστες επισκεπτών, FloqR Inbox και Mingl. Ανοίξτε Προφίλ και ρυθμίσεις για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
       },
       "help-onboarding": {
         title: "Ενσωμάτωση",
@@ -2382,7 +2414,7 @@
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
-        body: "Τα πρότυπα μόνο του club σας εμφανίζονται πρώτα ως Αποκλειστικά. Κάθε κάρτα δείχνει Περιγραφή, Πώς λειτουργεί (κύριο LED) και ετικέτες — Περιγραφή και Πώς λειτουργεί ανήκουν στον Master Admin (μόνο ανάγνωση). Επεξεργάζεστε ετικέτες μόνο σε πρότυπα του χώρου στο Διαχείριση ετικετών· τα κοινά FloqR μένουν μόνο ανάγνωση. Τα ανατεθειμένα επιλέγουν οι πελάτες· χρησιμοποιήστε Ανάθεση ή Αφαίρεση. Η αναζήτηση ανέχεται τόνους που λείπουν και μικρά λάθη."
+        body: "Τα πρότυπα που έγιναν μόνο για το club σας εμφανίζονται πρώτα, με την ένδειξη «Αποκλειστικά στο» και το όνομα του χώρου. Τα ανατεθειμένα πρότυπα είναι αυτά που μπορούν να επιλέξουν οι πελάτες στο club σας· αλλάξτε τα με Ανάθεση ή Αφαίρεση προτύπου. Η αναζήτηση βρίσκει ένα πρότυπο ακόμη και χωρίς τόνο ή με μικρό ορθογραφικό λάθος."
       },
       "help-employee-network": {
         title: "Δίκτυο υπαλλήλων και προσωπικού",
@@ -2390,7 +2422,7 @@
       },
       "help-template-tags": {
         title: "Ετικέτες προτύπων",
-        body: "Κάτω από κάθε πρότυπο οι πελάτες βλέπουν Περιγραφή, Πώς λειτουργεί (για το μέγεθος LED του χώρου) και ετικέτες. Ο Club Admin και οι Διαχειριστές/Υπεύθυνοι προτύπων επεξεργάζονται εδώ τις ετικέτες χώρου — Περιγραφή και Πώς λειτουργεί παραμένουν στον Master Admin (μόνο ανάγνωση). Προσθέστε λέξεις που μπορεί να πληκτρολογήσουν, όπως βραδιά αγώνα ή γενέθλια. Οι υπεύθυνοι μπορούν να προσθέτουν ετικέτες· οι διαχειριστές και Club Admin μπορούν και να τις αφαιρούν. Αναθέστε ρόλους στο Role Activity & Permission."
+        body: "Προσθέστε λέξεις που μπορεί να πληκτρολογήσουν οι πελάτες όταν ψάχνουν πρότυπο στον χώρο σας, όπως βραδιά αγώνα ή γενέθλια. Οι Υπεύθυνοι προτύπων μπορούν να προσθέτουν ετικέτες. Οι Διαχειριστές προτύπων και οι Club Admin μπορούν επίσης να τις αφαιρούν. Ο Club Admin αναθέτει αυτούς τους ρόλους στο Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Προεπισκόπηση προτύπου",
@@ -2652,11 +2684,15 @@
       },
       "help-chrome-scheme": {
         title: "Motyw strony",
-        body: "Beta: przełącz całą witrynę FLOQR między Nightlife (neon), Traditional (antracyt / biel), Black Tiffany (czerń + Tiffany blue) i White/Black, and Black Dark Green (czerń + zieleń leśna). Kolory, karty i chrome zmieniają się razem. Zapisane jako isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 4 Black Dark Green). Przełącznik w My Profile → Language Settings."
+        body: "Beta: przełącz całą witrynę FLOQR między Nightlife (neon), Traditional (antracyt / biel), Black Tiffany (czerń + Tiffany), White/Black, Purple & White (fiolet/koral) i Black & Dark Green (czerń + zieleń leśna). Kolory, karty, wordmark FloqR i chrome zmieniają się razem. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Przełącznik w My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Otwórz My Profile & Settings, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
+        title: "Profil i ustawienia",
+        body: "Zarządzaj profilem, My Privacy, powiadomieniami AI, szablonami ShoutOut, mediami publicznymi, ShoutOuts, listami gości, FloqR Inbox i Mingl. Otwórz Profil i ustawienia, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
       },
       "help-onboarding": {
         title: "Wprowadzenie",
@@ -2688,7 +2724,7 @@
       },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
-        body: "Szablony tylko Twojego klubu są na początku jako Na wyłączność. Każda karta pokazuje Opis, Jak to działa (główny LED) i tagi — Opis i Jak to działa należą do Master Admin (tylko odczyt). Tagi edytujesz tylko w szablonach klubowych w Zarządzaj tagami; współdzielone FloqR są tylko do odczytu. Przypisane wybierają goście; użyj Przypisz lub Usuń. Wyszukiwanie toleruje brak polskich znaków i drobne literówki."
+        body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
       },
       "help-employee-network": {
         title: "Sieć pracowników i personelu",
@@ -2696,7 +2732,7 @@
       },
       "help-template-tags": {
         title: "Tagi szablonów",
-        body: "Pod każdym szablonem goście widzą Opis, Jak to działa (dla rozmiaru LED lokalu) i tagi. Club Admin oraz Administratorzy/Menedżerowie szablonów edytują tu tagi lokalu — Opis i Jak to działa zostają u Master Admin (tylko odczyt). Dodawaj słowa, które mogą wpisywać goście, np. wieczór meczowy lub urodziny. Menedżerowie mogą dodawać tagi; administratorzy i Club Admin także usuwać. Przypisuj role w Role Activity & Permission."
+        body: "Dodaj słowa, które goście mogą wpisać, szukając szablonu w Twoim lokalu, np. wieczór meczowy albo urodziny. Menedżerowie szablonów mogą dodawać tagi. Administratorzy szablonów i Club Admin mogą je też usuwać. Club Admin przydziela te role w sekcji Role Activity & Permission."
       },
       "help-template-preview": {
         title: "Podgląd szablonu",
@@ -2958,11 +2994,15 @@
       },
       "help-chrome-scheme": {
         title: "سمة الموقع",
-        body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون) وTraditional (فحمي / أبيض) وBlack Tiffany (أسود + أزرق تيفاني) وWhite/Black, and Black Dark Green (أسود + أخضر غابات). تتغير الألوان والبطاقات والكروم معاً. يُحفظ كـ isSiteChrome (0 Nightlife، 1 Traditional، 2 Black Tiffany، 4 Black Dark Green). المفتاح في My Profile → Language Settings."
+        body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون) وTraditional (فحمي / أبيض) وBlack Tiffany (أسود + تيفاني) وWhite/Black وPurple & White (بنفسجي/مرجاني) وBlack & Dark Green (أسود + أخضر غابات). تتغير الألوان والبطاقات وشعار FloqR والكروم معاً. isSiteChrome: 0 Nightlife، 1 Traditional، 2 Black Tiffany، 3 White/Black، 4 Purple & White، 5 Black & Dark Green. المفتاح في My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "افتح My Profile & Settings للأدوار، أدوات البائع، وخيارات الحساب."
+        title: "الملف والإعدادات",
+        body: "أدِر ملفك وMy Privacy وإشعارات AI وقوالب ShoutOut والوسائط العامة وShoutOuts وقوائم الضيوف وFloqR Inbox وMingl. افتح الملف والإعدادات للأدوار وأدوات البائع وخيارات الحساب."
       },
       "help-onboarding": {
         title: "الإعداد",
@@ -2994,7 +3034,7 @@
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",
-        body: "تظهر قوالب ناديك فقط أولاً كحصري. تعرض كل بطاقة الوصف وكيف يعمل (شاشة LED الأساسية) والوسوم — الوصف وكيف يعمل لدى Master Admin (للقراءة فقط). تعدّل الوسوم فقط على قوالب النادي عبر إدارة وسوم القوالب؛ وسوم FloqR المشتركة للقراءة فقط. القوالب المعيّنة يختارها الزبائن؛ استخدم التعيين أو الإزالة. يتحمّل البحث نقص التشكيل والأخطاء البسيطة."
+        body: "تظهر القوالب المصممة لناديك فقط في المقدمة مع عبارة «حصريًا في» واسم المكان. القوالب المعيّنة هي التي يمكن للزبائن اختيارها في ناديك؛ غيّر ذلك عبر تعيين القالب أو إزالة القالب. يعثر البحث على القالب حتى بدون علامات التشكيل أو مع خطأ إملائي بسيط."
       },
       "help-employee-network": {
         title: "شبكة الموظفين والعاملين",
@@ -3002,7 +3042,7 @@
       },
       "help-template-tags": {
         title: "وسوم القوالب",
-        body: "تحت كل قالب يرى الزبائن الوصف وكيف يعمل (حسب حجم شاشة LED للمكان) والوسوم. يعدّل Club Admin ومسؤولو/مديرو القوالب هنا وسوم المكان — الوصف وكيف يعمل يبقيان لدى Master Admin (للقراءة فقط). أضف كلمات قد يكتبها الزبائن، مثل ليلة المباراة أو عيد الميلاد. يمكن للمديرين إضافة الوسوم؛ ويمكن للمسؤولين وClub Admin إزالتها أيضًا. عيّن الأدوار من Role Activity & Permission."
+        body: "أضف كلمات قد يكتبها الزبائن عند البحث عن قالب في مكانك، مثل ليلة المباراة أو عيد الميلاد. يمكن لمديري القوالب إضافة الوسوم. ويمكن لمسؤولي القوالب وClub Admin إزالتها أيضًا. يعيّن Club Admin هذه الأدوار من قسم Role Activity & Permission."
       },
       "help-template-preview": {
         title: "معاينة قالب",

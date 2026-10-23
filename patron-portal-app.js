@@ -601,6 +601,11 @@
         settings:"portalProfile",
         language:"portalLanguageSettings",
         "language-settings":"portalLanguageSettings",
+        appearance:"portalAppearance",
+        chrome:"portalAppearance",
+        "site-chrome":"portalAppearance",
+        "sitechrome":"portalAppearance",
+        theme:"portalAppearance",
         "my-privacy":"portalPrivacy",
         "ai-notifications":"portalAiNotifications",
         templates:"portalFeatureOrders",
@@ -668,8 +673,34 @@
   }
 
   async function loginGoogle() {
-    try { setText("portalStatus", "Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-    catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try { provider.setCustomParameters({prompt: "select_account"}); } catch (_) {}
+    const ua = String(navigator.userAgent || "");
+    const touch = Number(navigator.maxTouchPoints || 0) > 0;
+    const popupsBad = /iPhone|iPod|iPad|Android/i.test(ua) || (/Macintosh/i.test(ua) && touch)
+      || /\bwv\b|; wv\)|FBAN|FBAV|Instagram/i.test(ua);
+    try {
+      setText("portalStatus", popupsBad ? "Opening Google secure sign-in…" : "Opening Google sign-in...");
+      if (popupsBad) await auth.signInWithRedirect(provider);
+      else await auth.signInWithPopup(provider);
+    } catch (e) {
+      const code = e?.code || "";
+      if (code === "auth/popup-blocked") {
+        try {
+          setText("portalStatus", "Google popup was blocked. Trying full-page sign-in…");
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (redirectErr) {
+          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          return;
+        }
+      }
+      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        setText("portalStatus", "Google was cancelled. Tap Continue with Google again.");
+        return;
+      }
+      setText("portalStatus", `${code || "error"}: ${e?.message || e}`);
+    }
   }
 
   async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?start=search"; }
@@ -1696,6 +1727,7 @@
       if (status) status.textContent = "…";
       await window.FLOQRI18n?.setLanguage?.(code, {persist: true, markPrompt: true});
       window.FLOQRI18n?.applyDom?.();
+      window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
       renderUiLanguagePreview();
       const native = window.FLOQRI18n?.meta?.(code)?.native || code;
       if (status) status.textContent = window.FLOQRI18n?.t?.("lang.languageSaved", {native}) || `FloqR language set to ${native}.`;
@@ -4767,6 +4799,8 @@
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
       window.FLOQRI18n?.applyDom?.();
+      // Re-stamp global Back after i18n so it stays "< Back" (not "← Back to Search").
+      window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
       try {
         window.FLOQRChromeScheme?.hydrateFromProfile?.(currentProfile);
         window.FLOQRChromeScheme?.bindToggle?.();
