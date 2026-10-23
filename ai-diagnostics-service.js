@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.28";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.28";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.29";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.29";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.29",
+      title: "s3.2.29 — PC Search composition centered",
+      checks: [
+        {label:"Package version s3.2.29", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.29\""]},
+        {label:"Search field centered", file:"floqai-search.css", includes:["margin:0 auto 18px"]},
+        {label:"Desktop Search composition", file:"styles.css", includes:["floqr-desktop-browser #categoryPage.page.active", "justify-content:center", "max-width:720px"]},
+        {label:"Desktop app column centered", file:"styles.css", includes:["html.floqr-desktop-browser .app{", "margin-left:auto", "margin-right:auto"]},
+        {label:"Desktop admin shell centered", file:"admin.css", includes:["html.floqr-desktop-browser .admin-shell{", "max-width:1180px", "margin-left:auto"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.29\""]}
+      ]
+    },
     {
       version: "s3.2.28",
       title: "s3.2.28 — Template Description / How it works / Tag labels",
@@ -2107,6 +2119,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-29-pc-search-centered",
+      area:"Search / Home",
+      feature:"PC Search composition centered",
+      changed:"Search field centered under FloqR mark. On PC (desktop device class or width ≥1181px), logo + Search + icons form one vertically centered column — icons no longer stuck to the bottom of tall monitors. Package s3.2.29.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on a PC (package s3.2.29). 2) Confirm FloqR logo, Search bar, and product icons are horizontally centered and grouped mid-viewport (not logo/search at top with icons alone at bottom). 3) Narrow window / phone: icons may still pin toward the bottom. 4) Login and Club Admin shells remain centered in the content column.",
+      expected:"PC: centered column composition. Phone/tablet: prior bottom-pin behavior kept.",
+      troubleshoot:"Still left-docked Search → floqai-search.css margin:0 auto 18px + hard refresh. Icons at bottom on PC → floqr-desktop-browser class missing or styles.css desktop override not loaded (s3.2.29)."
+    },
     {
       id:"s3-2-28-template-tag-labels",
       area:"ShoutOut / Templates",

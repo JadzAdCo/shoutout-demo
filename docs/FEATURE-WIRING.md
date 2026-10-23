@@ -46,6 +46,21 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 ---
 
 
+## PC Search composition (s3.2.29)
+
+**Purpose:** On PC monitors, Search is one centered composition (FloqR mark + Search field + product icons), not left-docked Search with icons pinned to the viewport bottom.
+
+| Layer | Wiring |
+|---|---|
+| Search field | `floqai-search.css` `.category-floqai-search` — `margin:0 auto 18px`, `max-width:720px` |
+| Desktop layout | `styles.css` — `html.floqr-desktop-browser` + `@media(min-width:1181px)` center `#categoryPage` with `justify-content:center`; icon row stays under Search (`margin-top:28px`, not `auto`) |
+| Shell | `html.floqr-desktop-browser .app` — `max-width:1180px; margin-left/right:auto` |
+| Admin shells | `admin.css` — `html.floqr-desktop-browser .admin-shell` same 1180px centered column |
+| Phone/tablet | Unchanged bottom-pin via `@media(max-width:1180px)` + `floqr-mobile-browser` / `floqr-tablet-browser` |
+| Diagnostics | Manual test `s3-2-29-pc-search-centered` |
+
+---
+
 ## Template Description / How it works / Tag (s3.2.28)
 
 **Purpose:** Template gallery cards show three labeled lines — **Description:**, **How it works:** (venue primary LED size), and **Tag:** chips. Club Admin owns venue tags; Master Admin owns description + howitWorks.

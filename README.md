@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.28 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.29 (stable)
+
+- s3.2.29: PC Search composition centered (logo + Search + icons); desktop shell margin auto; Search field no longer left-docked.
+- s3.2.28: Template Description / How it works / Tag labels; Club Admin club-owned tags; Master owns description/howitWorks.
 
 - s3.2.28: Template cards show labeled Description / How it works / Tag; Club Admin edits tags; Master Admin owns description + howitWorks; full catalog size-specific copy.
 - s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.

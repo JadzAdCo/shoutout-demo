@@ -472,6 +472,14 @@ html.floqr-tablet-browser .admin-grid{grid-template-columns:1fr}
 html.floqr-tablet-browser .profile-grid,
 html.floqr-tablet-browser .media-template-grid,
 html.floqr-tablet-browser .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* PC: keep Club/Master admin content column centered on wide monitors */
+html.floqr-desktop-browser .admin-shell{
+  width:min(100%,1180px);
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+  box-sizing:border-box;
+}
 html.floqr-desktop-browser .admin-tabs{flex-wrap:wrap;overflow:visible;scroll-snap-type:none}
 html.floqr-desktop-browser .admin-tab,
 html.floqr-desktop-browser .admin-tab-link,
