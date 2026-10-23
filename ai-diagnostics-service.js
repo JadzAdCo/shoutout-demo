@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.44";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.44";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.45";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.45";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,22 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.45",
+      title: "s3.2.45 — FloqCAST Image 2 chrome + SVG sync (nightlife / traditional / whiteblack)",
+      checks: [
+        {label:"Package version s3.2.45", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.45\""]},
+        {label:"ICON_V s3.2.45", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.45\"", "floqcast-nightlife.jpg"]},
+        {label:"FloqCAST nightlife SVG embeds Image 2", file:"images/review/floqcast-icon-nightlife.svg", includes:["aria-label=\"FloqCAST nightlife\"", "data:image/jpeg;base64,"]},
+        {label:"FloqCAST traditional SVG", file:"images/review/floqcast-icon-traditional.svg", includes:["aria-label=\"FloqCAST traditional\"", "data:image/jpeg;base64,"]},
+        {label:"FloqCAST whiteblack SVG", file:"images/review/floqcast-icon-whiteblack.svg", includes:["aria-label=\"FloqCAST white black\"", "data:image/jpeg;base64,"]},
+        {label:"Display idle FloqCAST nightlife", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/chrome/floqcast-nightlife.jpg\""]},
+        {label:"Desktop Search bar centered", file:"floqai-search.css", includes:["margin:0 auto 18px"]},
+        {label:"Review page Image 2 pack", file:"icon-review-floqcast-botdee-nf.html", includes:["s3.2.45", "floqcast-icon-nightlife.svg", "floqcast-icon-whiteblack.svg"]},
+        {label:"Manual test s3.2.45", file:"ai-diagnostics-service.js", includes:["s3-2-45-floqcast-image2-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.45\""]}
+      ]
+    },
     {
       version: "s3.2.44",
       title: "s3.2.44 — Standardized feature landings (ShoutOut / VIP / floqCast)",
@@ -2255,6 +2271,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-45-floqcast-image2-chrome",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST Image 2 (V4) nightlife + traditional + whiteblack in production",
+        changed:"Rebuilt FloqCAST chrome from V4 layers (FloqCAST + Tiffany T). Production: floqcast-nightlife.jpg / traditional.jpg / traditional-green.png / whiteblack.jpg. Review SVGs embed the same JPEGs (floqcast-icon-nightlife|traditional|whiteblack.svg). ICON_V s3.2.45. Display2 idle still FLOQCAST_LOGO → nightlife JPG.",
+        howToTest:"1) Hard-refresh Search with floqr-chrome-scheme.js?v=s3.2.45 + floqai-search.css?v=s3.2.45. 2) floqCast tile shows full FloqCAST mark (capital F, Tiffany T, phone→LED). 3) On a wide desktop window: Search bar is centered under the FloqR logo (not left-stuck). 4) Open icon-review-floqcast-botdee-nf.html — Nightlife JPG and SVG match; Traditional + White/Black siblings match. 5) Language Settings → Traditional / White-Black: floqCast tile swaps. 6) display2.html?location=temp-democlub-1 idle shows same nightlife mark (no ?v=).",
+        expected:"Search + landing + Display2 idle all show Image 2 FloqCAST; desktop Search bar centered under FloqR; scheme swaps load matching traditional/whiteblack chrome.",
+        troubleshoot:"Old monitor-style v9 mark → hard refresh floqr-chrome-scheme.js s3.2.45 + floqcast-nightlife.jpg. Search bar still left → hard refresh floqai-search.css s3.2.45 (must have margin:0 auto 18px on .category-floqai-search). SVG ≠ JPG → re-embed from chrome JPGs. Display2 stale → Xibo layout cache / hard refresh display-app.js (never add ?v= on Display URL)."
+      },
       {
         id:"s3-2-44-feature-landing-standard",
         area:"Search / Feature landings",

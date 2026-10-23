@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.44 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.45 (stable)
+
+- s3.2.45: FloqCAST Image 2 chrome + SVG sync; desktop Search bar centered under FloqR.
+- s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
 
 - s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
 - s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.

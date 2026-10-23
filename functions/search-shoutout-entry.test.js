@@ -60,6 +60,11 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const searchCss = read("floqai-search.css");
   assert.match(searchCss, /\.category-floqai-lens\{/);
   assert.match(searchCss, /background:transparent!important/);
+  assert.match(
+    searchCss,
+    /\.category-floqai-search\{[^}]*margin:0 auto 18px/,
+    "desktop Search bar centered under FloqR logo"
+  );
   const chrome = read("floqr-chrome-scheme.js");
   assert.match(chrome, /FLOQRChromeScheme/);
   assert.match(chrome, /siteChrome/);
