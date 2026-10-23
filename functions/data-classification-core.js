@@ -103,6 +103,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["floqAiAccessThrottle", "secret", 0, "FloqAi access-denial log rate limits"],
+    ["floqrAdmins", "master", 1, "Assigned FloqR Admins (template catalog access)"],
     ["friendRequests", "ownMaster", 0, "Friend requests"],
     ["friendships", "ownMaster", 0, "Friend connections"],
     ["guestListCampaigns", "public", 0, "Published guest list offers"],
