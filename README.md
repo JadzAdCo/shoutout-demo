@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.40 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.43 (stable)
+
+- s3.2.43: Google / Microsoft / Facebook Welcome sign-in popup-first again (fix s3.2.35 mobile redirect ITP).
+- s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.
 
 - s3.2.40: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
 - s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
