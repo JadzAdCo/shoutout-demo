@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.37";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.37";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.38";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.38";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -2335,6 +2335,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-38-whiteblack-letter-fit-floqr-admin",
+      area:"Site chrome / Templates",
+      feature:"White/Black white cards + letter-fit tags + FloqR Admin template access",
+      changed:"White/Black: white template-select cards; login welcome shiny black; login/Use = white fill + shiny black border/ink. Client FLOQRTextLayout 64×48 caps synced (full 3×10=30, classic 3×12=36). Cards show letter-fit tags. floqrAdmins + canManageCatalogTemplates. Package s3.2.38.",
+      howToTest:"1) Hard-refresh login + template select under White/Black (?v=s3.2.38). 2) Welcome line is shiny black on white; sign-in buttons white with black border/text (no cyan→magenta). 3) Template cards white; Use outline black. 4) Tags include e.g. 96×48: 3×15=45 / 64×48: 3×12=36 / 64×32: 3×10=30 on Traditional. 5) Deploy Firestore rules. Master Admin Entity Onboarding → Assign FloqR Admin; that user opens Template Management.",
+      expected:"White cards + outline B&W chrome; correct letter tags; FloqR Admin can save templates.",
+      troubleshoot:"Gradient login → styles.css whiteBlack #loginActions rules + hard refresh. Wrong 64×48 letters → shared-data FLOQRTextLayout 29.09.31 vs commerce SHOUTOUT_TEXT_LIMITS. FloqR Admin denied → rules deploy + floqrAdmins/{uid} status=active."
     },
     {
       id:"s3-2-37-classic-bw-whiteblack-strict",

@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.37";
+  const VERSION = "s3.2.38";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1582,6 +1582,7 @@
       "template.selected": "Selected template",
       "template.use": "Use",
       "template.howItWorks": "How it works",
+      "template.letterFitHint": "Max letters for ~1–3 m viewing on this LED size",
       "template.useTemplate": "Use Template",
       "template.variantSavedBackground": "Saved Background",
       "template.variantScopeClub": "Club approved",
@@ -2839,6 +2840,7 @@
       "template.selected": "Modèle sélectionné",
       "template.use": "Utiliser",
       "template.howItWorks": "Comment ça marche",
+      "template.letterFitHint": "Maximum de lettres pour une lecture à ~1–3 m sur cette taille LED",
       "template.useTemplate": "Utiliser le modèle",
       "template.variantSavedBackground": "Arrière-plan enregistré",
       "template.variantScopeClub": "Approuvé par le club",
@@ -4096,6 +4098,7 @@
       "template.selected": "Ausgewählte Vorlage",
       "template.use": "Verwenden",
       "template.howItWorks": "So funktioniert's",
+      "template.letterFitHint": "Max. Buchstaben für ~1–3 m Lesbarkeit auf dieser LED-Größe",
       "template.useTemplate": "Vorlage verwenden",
       "template.variantSavedBackground": "Gespeicherter Hintergrund",
       "template.variantScopeClub": "Club-freigegeben",
@@ -5353,6 +5356,7 @@
       "template.selected": "Plantilla seleccionada",
       "template.use": "Usar",
       "template.howItWorks": "Cómo funciona",
+      "template.letterFitHint": "Máximo de letras legibles a ~1–3 m en este tamaño LED",
       "template.useTemplate": "Usar plantilla",
       "template.variantSavedBackground": "Fondo guardado",
       "template.variantScopeClub": "Aprobado por el club",
@@ -6610,6 +6614,7 @@
       "template.selected": "Geselecteerde template",
       "template.use": "Gebruiken",
       "template.howItWorks": "Hoe het werkt",
+      "template.letterFitHint": "Max. letters leesbaar op ~1–3 m voor dit LED-formaat",
       "template.useTemplate": "Sjabloon gebruiken",
       "template.variantSavedBackground": "Opgeslagen achtergrond",
       "template.variantScopeClub": "Club goedgekeurd",
@@ -7867,6 +7872,7 @@
       "template.selected": "Выбранный шаблон",
       "template.use": "Использовать",
       "template.howItWorks": "Как это работает",
+      "template.letterFitHint": "Макс. букв для чтения с ~1–3 м на этом размере LED",
       "template.useTemplate": "Использовать шаблон",
       "template.variantSavedBackground": "Сохранённый фон",
       "template.variantScopeClub": "Одобрено клубом",
@@ -9124,6 +9130,7 @@
       "template.selected": "Template selezionato",
       "template.use": "Usa",
       "template.howItWorks": "Come funziona",
+      "template.letterFitHint": "Massimo lettere leggibili a ~1–3 m su questo formato LED",
       "template.useTemplate": "Usa modello",
       "template.variantSavedBackground": "Sfondo salvato",
       "template.variantScopeClub": "Approvato dal club",
@@ -10381,6 +10388,7 @@
       "template.selected": "Modelo selecionado",
       "template.use": "Usar",
       "template.howItWorks": "Como funciona",
+      "template.letterFitHint": "Máximo de letras legíveis a ~1–3 m neste tamanho LED",
       "template.useTemplate": "Usar modelo",
       "template.variantSavedBackground": "Fundo guardado",
       "template.variantScopeClub": "Aprovado pelo clube",
@@ -11638,6 +11646,7 @@
       "template.selected": "Επιλεγμένο πρότυπο",
       "template.use": "Χρήση",
       "template.howItWorks": "Πώς λειτουργεί",
+      "template.letterFitHint": "Μέγιστα γράμματα για ανάγνωση στα ~1–3 m σε αυτό το μέγεθος LED",
       "template.useTemplate": "Χρήση προτύπου",
       "template.variantSavedBackground": "Αποθηκευμένο φόντο",
       "template.variantScopeClub": "Εγκεκριμένο από club",
@@ -12895,6 +12904,7 @@
       "template.selected": "Wybrany szablon",
       "template.use": "Użyj",
       "template.howItWorks": "Jak to działa",
+      "template.letterFitHint": "Maks. liter czytelnych z ~1–3 m na tym rozmiarze LED",
       "template.useTemplate": "Użyj szablonu",
       "template.variantSavedBackground": "Zapisane tło",
       "template.variantScopeClub": "Zatwierdzone przez klub",
@@ -14152,6 +14162,7 @@
       "template.selected": "القالب المحدد",
       "template.use": "استخدام",
       "template.howItWorks": "كيف يعمل",
+      "template.letterFitHint": "الحد الأقصى للحروف للقراءة من ~1–3 م على حجم LED هذا",
       "template.useTemplate": "استخدام القالب",
       "template.variantSavedBackground": "خلفية محفوظة",
       "template.variantScopeClub": "معتمد من النادي",

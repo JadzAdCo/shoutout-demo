@@ -3663,6 +3663,12 @@
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
     const sizeChips = supportedFormats.map(id => formatDimLabel(id)).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
+    const letterChips = supportedFormats.map(id => {
+      const caps = window.FLOQRTextLayout?.resolve?.(template, id);
+      if (!caps?.supported || !caps.lineCount || !caps.perLine) return "";
+      const dim = formatDimLabel(id);
+      return `${dim}: ${caps.lineCount}×${caps.perLine}=${caps.main}`;
+    }).filter(Boolean).slice(0, 3);
     const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : Array.from(new Set([...venueTagsFor(template), ...(template.tags || [])])).slice(0, 6);
     const mediaLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
@@ -3684,7 +3690,7 @@
       ${templateLedPreviewHtml(template, {formatId})}
       <p class="template-select-desc">${esc(desc)}</p>
       ${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}
-      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${letterChips.map(label => `<span title="${esc(tt("template.letterFitHint", {}, "Max letters for ~1–3 m viewing on this LED size"))}">${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
       </div>

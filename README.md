@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.37 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.38 (stable)
+
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
 
 - s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
 - s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
