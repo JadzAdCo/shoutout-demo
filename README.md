@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.34 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.35 (stable)
+
+- s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
 
 - s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
 - s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".

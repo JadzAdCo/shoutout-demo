@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.34";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.34";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.35";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.35";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.35",
+      title: "s3.2.35 — Mobile Google sign-in uses redirect (no blocked popup)",
+      checks: [
+        {label:"Package version s3.2.35", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.35\""]},
+        {label:"oauthPopupsUnreliable helper", file:"patron-app.js", includes:["oauthPopupsUnreliable", "signInProviderRedirect"]},
+        {label:"Mobile skips popup", file:"patron-app.js", includes:["if (oauthPopupsUnreliable())"]},
+        {label:"Portal mobile redirect", file:"patron-portal-app.js", includes:["signInWithRedirect(provider)", "popupsBad"]},
+        {label:"Manual test mobile Google", file:"ai-diagnostics-service.js", includes:["s3-2-35-google-mobile-redirect"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.35\""]}
+      ]
+    },
     {
       version: "s3.2.34",
       title: "s3.2.34 — Unified Image-2 Back pill + header brand",
@@ -2149,6 +2161,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-35-google-mobile-redirect",
+        area:"Auth / Welcome",
+        feature:"Google sign-in on phone skips blocked popup",
+        changed:"iPhone / iPad / Android / WebView use signInWithRedirect immediately (no popup → 'Google popup was blocked'). Desktop still uses popup; popup-blocked still falls back to redirect. getRedirectResult waits briefly for onAuthStateChanged. Package s3.2.35.",
+        howToTest:"1) Hard-refresh Welcome on iPhone Safari (s3.2.35). 2) Tap Google — full-page Google account picker (not a blocked popup message). 3) Finish sign-in → Search. 4) Desktop Chrome: Google still opens a popup. 5) My Profile signed-out Google button uses the same mobile redirect path.",
+        expected:"Phone never shows 'Google popup was blocked'; desktop popup still works; cancel on desktop stays retryable.",
+        troubleshoot:"Still popup-blocked on iPhone → hard-refresh patron-app.js s3.2.35; confirm oauthPopupsUnreliable. Redirect returns to Welcome unsigned → Firebase authorized domains include jadzadco.github.io; retry once."
+      },
       {
         id:"s3-2-34-unified-back-header",
         area:"Site chrome / Nav",
