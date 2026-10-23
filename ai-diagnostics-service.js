@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.33";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.33";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.34";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.34";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.34",
+      title: "s3.2.34 — Unified Image-2 Back pill + header brand",
+      checks: [
+        {label:"Package version s3.2.34", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.34\""]},
+        {label:"Periwinkle Back pill CSS", file:"styles.css", includes:["--floqr-back-bg", ".floqr-back-btn", "border-radius:999px"]},
+        {label:"FloqR page brand header", file:"styles.css", includes:[".floqr-page-brand"]},
+        {label:"Listing header brand + floqr-back", file:"index.html", includes:["floqr-back-btn", "floqr-page-brand", "backToCategoriesBtn"]},
+        {label:"Portal FloqR under Back", file:"patron-portal.html", includes:["floqr-page-brand", "global-back-btn"]},
+        {label:"Manual test unified Back", file:"ai-diagnostics-service.js", includes:["s3-2-34-unified-back-header"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.34\""]}
+      ]
+    },
     {
       version: "s3.2.33",
       title: "s3.2.33 — Profile & Settings chrome + short Back",
@@ -2136,6 +2149,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-34-unified-back-header",
+        area:"Site chrome / Nav",
+        feature:"Image-2 periwinkle Back pill + FloqR header brand site-wide",
+        changed:"All Back controls use the centered periwinkle pill (< Back): .global-back-btn, .floqr-back-btn, topbar nav.backShort. Page headers: Back → centered FloqR mark (.floqr-page-brand / brand stacks) → title. Removed left sticky dark outlined Back. Package s3.2.34.",
+        howToTest:"1) Hard-refresh Search (?start=search) s3.2.34. 2) Back is a centered light periwinkle pill with white < Back above the FloqR logo (not left dark outlined). 3) Open Choose Location / listing — same Back + FloqR mark under it, then title. 4) My Profile — same Back + FloqR mark + Profile & Settings. 5) VIP / Guest List / Services — same Back pill.",
+        expected:"One Back style site-wide (Image 2); headers show FloqR under Back before the page title.",
+        troubleshoot:"Still left dark sticky → hard refresh styles.css s3.2.34. Index backs default grey → need floqr-back-btn / data-i18n=nav.backShort selectors. No FloqR under Back on listing → floqr-page-brand in index.html."
+      },
       {
         id:"s3-2-33-profile-settings-chrome",
         area:"My Profile",

@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.33 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.34 (stable)
+
+- s3.2.34: Site-wide Image-2 periwinkle Back pill + FloqR mark under Back on page headers.
+- s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
 
 - s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
 - s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit.
