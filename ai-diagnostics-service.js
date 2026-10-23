@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.31";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.31";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.32";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.32";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.32",
+      title: "s3.2.32 — Receipt chrome follow-through + chrome audit",
+      checks: [
+        {label:"Package version s3.2.32", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.32\""]},
+        {label:"payment-return chrome scheme", file:"payment-return.html", includes:["floqr-chrome-scheme.js", "floqr-chrome-audit.js", "floqr.isSiteChrome"]},
+        {label:"Chrome audit module", file:"floqr-chrome-audit.js", includes:["FLOQRChromeAudit", "buildFixPrompt"]},
+        {label:"Diagnostics chrome audit buttons", file:"master-admin.html", includes:["readChromeAuditBtn", "copyChromeAuditPromptBtn"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.32\""]}
+      ]
+    },
     {
       version: "s3.2.31",
       title: "s3.2.31 — Appearance tab + Nightlife white neon halo mark",
@@ -2114,6 +2125,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-32-receipt-chrome-audit",
+        area:"Receipts / Diagnostics",
+        feature:"Receipt Site chrome follow-through + Master Admin chrome audit",
+        changed:"payment-return / ad-invoice / pass early-paint + floqr-chrome-scheme + hydrateFromProfile. floqr-chrome-audit.js records Master Admin chrome switches and page pass/fail. Diagnostics → Read Site chrome audit + Copy chrome fix prompt. Package s3.2.32.",
+        howToTest:"1) Master Admin → Appearance → pick Traditional (or Tiffany). 2) Open a paid ShoutOut payment-return receipt — card/background must match that chrome (not Nightlife purple). 3) Open pass.html / Search — same chrome. 4) Master Admin → Diagnostics → Manual Feature Tests → Read Site chrome audit — probes show PASS. 5) If any FAIL, Copy chrome fix prompt.",
+        expected:"Receipts inherit Appearance chrome; audit shows pass for probed pages; fix prompt lists failed pages when wiring breaks.",
+        troubleshoot:"Receipt still Nightlife → hard refresh payment-return.html s3.2.32; confirm floqr-chrome-scheme.js + early paint + users.isSiteChrome hydrate. Audit empty → switch chrome while signed in as Master Admin first. No diagnostics button → master-admin.html readChromeAuditBtn + floqr-chrome-audit.js."
+      },
       {
         id:"s3-2-31-appearance-site-chrome",
         area:"My Profile / Appearance",
@@ -4895,6 +4915,70 @@
       "",
       "Please inspect the relevant files, fix the issue incrementally, update Diagnostics/README if needed, run syntax/static checks, and create the next full package ZIP."
     ].join("\n");
+  }
+
+  function renderChromeAuditDiagnostics() {
+    const audit = window.FLOQRChromeAudit;
+    const status = byId("chromeAuditStatus");
+    const report = byId("chromeAuditReport");
+    const output = byId("chromeAuditOutput");
+    const promptBox = byId("chromeAuditPrompt");
+    if (!report) return null;
+    if (!audit) {
+      setText("chromeAuditStatus", "floqr-chrome-audit.js not loaded on this page.");
+      report.textContent = "Load Master Admin with floqr-chrome-audit.js.";
+      return null;
+    }
+    // Probe current page while reading
+    audit.probePage?.({reason: "diagnostics-read"});
+    const sum = audit.summarize();
+    const text = audit.buildReportText(sum);
+    const prompt = audit.buildFixPrompt(sum);
+    if (output) output.value = text;
+    if (promptBox) promptBox.value = prompt;
+    if (!sum.active) {
+      setText("chromeAuditStatus", sum.message || "No audit session.");
+      report.innerHTML = `<p class="sub">${esc(sum.message || "No session")}</p>`;
+      return sum;
+    }
+    setText(
+      "chromeAuditStatus",
+      `Expected ${sum.expectedChrome}: ${sum.passCount} pass / ${sum.failCount} fail (${sum.pages.length} probes).`
+    );
+    const rows = (sum.pages || []).map(p => {
+      const badge = p.pass
+        ? `<span class="status-badge ok">PASS</span>`
+        : `<span class="status-badge bad">FAIL</span>`;
+      return `<div class="queue-item">
+        <div class="message-envelope-head"><strong>${esc(p.page)}</strong> ${badge}</div>
+        <p>expected=<code>${esc(p.expected)}</code> actual=<code>${esc(p.actual)}</code></p>
+        <p class="sub small">module=${p.hasChromeModule ? "yes" : "no"} · data-attr=${p.dataAttrPresent ? "yes" : "no"} · ${esc(p.at)}</p>
+      </div>`;
+    }).join("");
+    report.innerHTML = rows || `<p class="sub">Session started but no page probes yet. Open Search, payment-return, pass, or VIP.</p>`;
+    return sum;
+  }
+
+  async function copyChromeAuditPrompt() {
+    const sum = renderChromeAuditDiagnostics();
+    const prompt = window.FLOQRChromeAudit?.buildFixPrompt?.(sum) || byId("chromeAuditPrompt")?.value || "";
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setText("chromeAuditStatus", "Chrome fix prompt copied.");
+    } catch (_) {
+      setText("chromeAuditStatus", "Could not copy — select the Prompt for Codex box manually.");
+    }
+  }
+
+  function clearChromeAuditSession() {
+    window.FLOQRChromeAudit?.clearSession?.();
+    setText("chromeAuditStatus", "Audit session cleared.");
+    const report = byId("chromeAuditReport");
+    if (report) report.textContent = "No audit loaded yet.";
+    const output = byId("chromeAuditOutput");
+    const promptBox = byId("chromeAuditPrompt");
+    if (output) output.value = "";
+    if (promptBox) promptBox.value = "";
   }
 
   function renderManualFeatureDiagnostics() {
@@ -8095,6 +8179,14 @@
     byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
     byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
     byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
+    byId("readChromeAuditBtn")?.addEventListener("click", () => {
+      try { renderChromeAuditDiagnostics(); }
+      catch (error) { setText("chromeAuditStatus", error?.message || String(error)); }
+    });
+    byId("copyChromeAuditPromptBtn")?.addEventListener("click", () => {
+      copyChromeAuditPrompt().catch(error => setText("chromeAuditStatus", error?.message || String(error)));
+    });
+    byId("clearChromeAuditBtn")?.addEventListener("click", clearChromeAuditSession);
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
     byId("archivePassedPackageDiagnosticsBtn")?.addEventListener("click", archivePassedPackageDiagnostics);
     byId("downloadPackageDiagnosticsArchiveCsvBtn")?.addEventListener("click", downloadPackageDiagnosticsArchiveCsv);

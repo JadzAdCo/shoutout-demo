@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.31 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.32 (stable)
+
+- s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit diagnostics.
+- s3.2.31: Appearance tab + Site chrome cards; Nightlife white neon halo mark.
 
 - s3.2.31: Appearance tab + Site chrome card picker; Nightlife white script + neon halo mark.
 - s3.2.30: Script FloqR marks; Purple & White + Black & Dark Green chrome.

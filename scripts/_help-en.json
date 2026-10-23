@@ -302,5 +302,9 @@
   "help-chrome-scheme": {
     "title": "Site chrome",
     "body": "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta) and Traditional (charcoal / white). Colors, cards, and chrome update together. Your choice is stored as isSiteChrome on your profile (0 = Nightlife, 1 = Traditional; 2 and 4 are reserved). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search)."
+  },
+  "help-chrome-audit": {
+    "title": "Site chrome audit",
+    "body": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
   }
 }

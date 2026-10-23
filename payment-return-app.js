@@ -225,11 +225,28 @@
     } catch (_) {}
   }
 
+  async function hydrateSiteChrome(user) {
+    try {
+      if (user?.uid) {
+        const snap = await db.collection("users").doc(user.uid).get();
+        window.FLOQRChromeScheme?.hydrateFromProfile?.(snap.data() || {});
+      } else {
+        window.FLOQRChromeScheme?.applyDocument?.();
+      }
+    } catch (_) {
+      window.FLOQRChromeScheme?.applyDocument?.();
+    }
+    window.FLOQRChromeAudit?.probePage?.({reason: "payment-return-hydrate"});
+  }
+
   auth.onAuthStateChanged(user => {
     if (!user) {
       byId("paymentReturnTitle").textContent = "Sign in to view payment";
+      window.FLOQRChromeScheme?.applyDocument?.();
+      window.FLOQRChromeAudit?.probePage?.({reason: "payment-return-signed-out"});
       return;
     }
+    hydrateSiteChrome(user);
     if (!orderId) return render({ status: "missing order" });
     clearCancelledCheckout();
     db.collection("serviceOrders").doc(orderId).onSnapshot(

@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.31";
+  const VERSION = "s3.2.32";
 
   const packs = {
     "ru": {
@@ -205,6 +205,10 @@
       "help-chrome-scheme": {
         title: "Тема сайта",
         body: "Бета: переключайте весь сайт FLOQR между Nightlife (неон), Traditional (уголь/белый), Black Tiffany (чёрный + Tiffany), White/Black, Purple & White (фиолетовый/коралл) и Black & Dark Green (чёрный + лесной зелёный). Меняются цвета, карточки, логотип FloqR и оформление. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Переключатель — в My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -512,6 +516,10 @@
         title: "Sitethema",
         body: "Beta: wissel de hele FLOQR-site tussen Nightlife (neon), Traditional (antraciet/wit), Black Tiffany (zwart + Tiffany), White/Black, Purple & White (violet/koraal) en Black & Dark Green (zwart + bosgroen). Kleuren, kaarten, FloqR-woordmerk en chrome veranderen samen. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Schakelaar in My Profile → Appearance → Site chrome."
       },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+      },
       "help-my-profile": {
         title: "My Profile & Settings",
         body: "Open My Profile & Settings voor rollen, verkoperstools en accountopties."
@@ -817,6 +825,10 @@
       "help-chrome-scheme": {
         title: "Thème du site",
         body: "Bêta : basculez tout le site FLOQR entre Nightlife (néon), Traditional (charbon / blanc), Black Tiffany (noir + Tiffany), White/Black, Purple & White (violet/corail) et Black & Dark Green (noir + vert forêt). Couleurs, cartes, logo FloqR et chrome changent ensemble. isSiteChrome : 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interrupteur dans My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
         title: "Mon profil et paramètres",
@@ -1124,6 +1136,10 @@
         title: "Site-Theme",
         body: "Beta: Wechsle die gesamte FLOQR-Site zwischen Nightlife (Neon), Traditional (Anthrazit / Weiß), Black Tiffany (Schwarz + Tiffany), White/Black, Purple & White (Violett/Koralle) und Black & Dark Green (Schwarz + Waldgrün). Farben, Karten, FloqR-Wortmarke und Chrome ändern sich gemeinsam. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Schalter unter My Profile → Appearance → Site chrome."
       },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+      },
       "help-my-profile": {
         title: "My Profile & Settings",
         body: "Öffnen Sie My Profile & Settings für Rollen, Verkäufer-Tools und Kontooptionen."
@@ -1429,6 +1445,10 @@
       "help-chrome-scheme": {
         title: "Tema del sitio",
         body: "Beta: cambia todo el sitio FLOQR entre Nightlife (neón), Traditional (carbón / blanco), Black Tiffany (negro + Tiffany), White/Black, Purple & White (violeta/coral) y Black & Dark Green (negro + verde bosque). Colores, tarjetas, marca FloqR y chrome cambian juntos. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruptor en My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -1736,6 +1756,10 @@
         title: "Tema del sito",
         body: "Beta: passa l’intero sito FLOQR tra Nightlife (neon), Traditional (antracite / bianco), Black Tiffany (nero + Tiffany), White/Black, Purple & White (viola/corallo) e Black & Dark Green (nero + verde foresta). Colori, card, wordmark FloqR e chrome cambiano insieme. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruttore in My Profile → Appearance → Site chrome."
       },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+      },
       "help-my-profile": {
         title: "My Profile & Settings",
         body: "Apri My Profile & Settings per ruoli, strumenti del venditore e opzioni dell'account."
@@ -2041,6 +2065,10 @@
       "help-chrome-scheme": {
         title: "Tema do site",
         body: "Beta: alterne todo o site FLOQR entre Nightlife (néon), Traditional (carvão / branco), Black Tiffany (preto + Tiffany), White/Black, Purple & White (violeta/coral) e Black & Dark Green (preto + verde floresta). Cores, cartões, wordmark FloqR e chrome mudam juntos. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Interruptor em My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
         title: "My Profile & Settings",
@@ -2348,6 +2376,10 @@
         title: "Θέμα ιστότοπου",
         body: "Beta: αλλάξτε ολόκληρο το site FLOQR μεταξύ Nightlife (νεόν), Traditional (ανθρακί / λευκό), Black Tiffany (μαύρο + Tiffany), White/Black, Purple & White (μοβ/κοραλί) και Black & Dark Green (μαύρο + πράσινο δάσους). Χρώματα, κάρτες, FloqR wordmark και chrome αλλάζουν μαζί. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Διακόπτης στο My Profile → Appearance → Site chrome."
       },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+      },
       "help-my-profile": {
         title: "My Profile & Settings",
         body: "Ανοίξτε το My Profile & Settings για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
@@ -2654,6 +2686,10 @@
         title: "Motyw strony",
         body: "Beta: przełącz całą witrynę FLOQR między Nightlife (neon), Traditional (antracyt / biel), Black Tiffany (czerń + Tiffany), White/Black, Purple & White (fiolet/koral) i Black & Dark Green (czerń + zieleń leśna). Kolory, karty, wordmark FloqR i chrome zmieniają się razem. isSiteChrome: 0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green. Przełącznik w My Profile → Appearance → Site chrome."
       },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+      },
       "help-my-profile": {
         title: "My Profile & Settings",
         body: "Otwórz My Profile & Settings, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
@@ -2959,6 +2995,10 @@
       "help-chrome-scheme": {
         title: "سمة الموقع",
         body: "تجريبي: بدّل موقع FLOQR بالكامل بين Nightlife (نيون) وTraditional (فحمي / أبيض) وBlack Tiffany (أسود + تيفاني) وWhite/Black وPurple & White (بنفسجي/مرجاني) وBlack & Dark Green (أسود + أخضر غابات). تتغير الألوان والبطاقات وشعار FloqR والكروم معاً. isSiteChrome: 0 Nightlife، 1 Traditional، 2 Black Tiffany، 3 White/Black، 4 Purple & White، 5 Black & Dark Green. المفتاح في My Profile → Appearance → Site chrome."
+      },
+      "help-chrome-audit": {
+        title: "Site chrome audit",
+        body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
         title: "My Profile & Settings",

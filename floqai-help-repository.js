@@ -1451,6 +1451,21 @@
       page: "patron-portal.html#portalAppearance"
     },
     {
+      id: "help-chrome-audit",
+      title: "Site chrome audit",
+      body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex.",
+      searchPhrases: [
+        "site chrome audit", "chrome follow through", "receipt chrome", "payment-return chrome", "chrome pass fail", "appearance audit"
+      ],
+      links: [
+        {label: "Site chrome audit (Diagnostics)", href: pageUrl("./master-admin.html", {from: "floqai"}), search: "chrome audit diagnostics", blurb: "Read pass/fail probes after a Master Admin chrome switch"},
+        {label: "Appearance", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "appearance"}), search: "switch site chrome", blurb: "Switch Site chrome to start an audit session"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsManualTests"
+    },
+    {
       id: "help-my-profile",
       title: "My Profile & Settings",
       body: "Open My Profile & Settings for roles, seller tools, and account options.",
