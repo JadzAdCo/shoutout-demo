@@ -675,14 +675,10 @@
   async function loginGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     try { provider.setCustomParameters({prompt: "select_account"}); } catch (_) {}
-    const ua = String(navigator.userAgent || "");
-    const touch = Number(navigator.maxTouchPoints || 0) > 0;
-    const popupsBad = /iPhone|iPod|iPad|Android/i.test(ua) || (/Macintosh/i.test(ua) && touch)
-      || /\bwv\b|; wv\)|FBAN|FBAV|Instagram/i.test(ua);
+    /* Prefer popup on every device — GitHub Pages ↔ firebaseapp.com redirect often loses session. */
     try {
-      setText("portalStatus", popupsBad ? "Opening Google secure sign-in…" : "Opening Google sign-in...");
-      if (popupsBad) await auth.signInWithRedirect(provider);
-      else await auth.signInWithPopup(provider);
+      setText("portalStatus", "Opening Google sign-in...");
+      await auth.signInWithPopup(provider);
     } catch (e) {
       const code = e?.code || "";
       if (code === "auth/popup-blocked") {
@@ -691,7 +687,7 @@
           await auth.signInWithRedirect(provider);
           return;
         } catch (redirectErr) {
-          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}. Allow popups for jadzadco.github.io, or use Email OTP on Search.`);
           return;
         }
       }

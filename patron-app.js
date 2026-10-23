@@ -1476,22 +1476,7 @@
   }
 
   const AUTH_REDIRECT_PENDING_KEY = "floqr.authRedirectPending";
-
-  /** iPhone / iPad / Android / in-app browsers block OAuth popups — use redirect first. */
-  function oauthPopupsUnreliable() {
-    try {
-      const ua = String(navigator.userAgent || "");
-      const touch = Number(navigator.maxTouchPoints || 0) > 0;
-      const ios = /iPhone|iPod|iPad/i.test(ua) || (/Macintosh/i.test(ua) && touch);
-      const android = /Android/i.test(ua);
-      const webview = /\bwv\b|; wv\)|FBAN|FBAV|Instagram|Line\//i.test(ua);
-      const standalone = navigator.standalone === true
-        || (typeof matchMedia === "function" && matchMedia("(display-mode: standalone)").matches);
-      return !!(ios || android || webview || standalone);
-    } catch (_) {
-      return false;
-    }
-  }
+  const AUTH_PREFER_POPUP_KEY = "floqr.authPreferPopup";
 
   function oauthAuthErrorMessage(e, label = "Sign-in") {
     const code = e?.code || "error";
@@ -1500,7 +1485,7 @@
       return `${label} was cancelled. Tap Continue with ${label} again.`;
     }
     if (code === "auth/popup-blocked") {
-      return `Your browser blocked the ${label} window. Tap Continue with ${label} again — FLOQR will use full-page sign-in on this device.`;
+      return `Your browser blocked the ${label} window. Allow popups for jadzadco.github.io, then tap Continue with ${label} again.`;
     }
     if (code === "auth/unauthorized-domain") {
       return "This site is not authorized for sign-in. Add jadzadco.github.io under Firebase Authentication → Settings → Authorized domains.";
@@ -1529,19 +1514,16 @@
   }
 
   /**
-   * Desktop: prefer popup. Do NOT redirect on popup-closed-by-user — full-page redirect between
-   * jadzadco.github.io and *.firebaseapp.com often returns no session (third-party storage),
-   * leaving Welcome stuck on "Redirecting…".
-   * Phone / tablet / WebView: skip popup (browsers block it) and use redirect immediately.
+   * Prefer popup from the user tap on every device (incl. iPhone).
+   * Do NOT redirect-first on mobile: jadzadco.github.io ↔ *.firebaseapp.com full-page
+   * redirect often returns no session under ITP (s3.2.35 regression: "full-page sign-in
+   * did not finish"). Never redirect on popup-closed. Redirect only when popup-blocked.
    */
   async function signInProvider(provider, label) {
-    if (oauthPopupsUnreliable()) {
-      await signInProviderRedirect(provider, label);
-      return;
-    }
     try {
       setStatus(`Opening ${label} sign-in...`);
       await auth.signInWithPopup(provider);
+      try { sessionStorage.removeItem(AUTH_PREFER_POPUP_KEY); } catch (_) {}
     } catch (e) {
       const code = e?.code || "";
       if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
@@ -1549,6 +1531,12 @@
         return;
       }
       if (code === "auth/popup-blocked") {
+        let preferPopup = false;
+        try { preferPopup = sessionStorage.getItem(AUTH_PREFER_POPUP_KEY) === "1"; } catch (_) {}
+        if (preferPopup) {
+          setStatus(oauthAuthErrorMessage(e, label) + " Or use Email / SMS OTP.");
+          return;
+        }
         await signInProviderRedirect(provider, label);
         return;
       }
@@ -5092,10 +5080,13 @@
           setStatus(`Signed in as ${waited.email || waited.displayName || waited.uid}`);
           return;
         }
-        setStatus(`${pending} full-page sign-in did not finish. Tap Continue with ${pending} again.`);
+        /* Redirect restored no session (common on iOS ITP + GitHub Pages). Prefer popup next. */
+        try { sessionStorage.setItem(AUTH_PREFER_POPUP_KEY, "1"); } catch (_) {}
+        setStatus(`${pending} full-page sign-in could not finish on this browser. Tap Continue with ${pending} again and allow the popup, or use Email / SMS OTP.`);
       }
     }).catch(e => {
       try { sessionStorage.removeItem(AUTH_REDIRECT_PENDING_KEY); } catch (_) {}
+      try { sessionStorage.setItem(AUTH_PREFER_POPUP_KEY, "1"); } catch (_) {}
       setStatus(oauthAuthErrorMessage(e, "Sign-in"));
     });
     setTimeout(() => document.documentElement.classList.remove("floqr-auth-resolving"), 8000);

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.40";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.40";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.43";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.43";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.43",
+      title: "s3.2.43 — Google sign-in popup-first (fix mobile redirect ITP)",
+      checks: [
+        {label:"Package version s3.2.43", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.43\""]},
+        {label:"Welcome popup-first OAuth", file:"patron-app.js", includes:["Prefer popup from the user tap on every device", "AUTH_PREFER_POPUP_KEY", "signInWithPopup(provider)"]},
+        {label:"No mobile redirect-first", file:"patron-app.js", notIncludes:["oauthPopupsUnreliable", "if (oauthPopupsUnreliable())"]},
+        {label:"Portal Google popup-first", file:"patron-portal-app.js", includes:["Prefer popup on every device", "signInWithPopup(provider)"]},
+        {label:"Manual test s3.2.43", file:"ai-diagnostics-service.js", includes:["s3-2-43-google-signin-popup-first"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.43\""]}
+      ]
+    },
     {
       version: "s3.2.40",
       title: "s3.2.40 — Traditional View Club buttons + classic-bw red LED",
@@ -2229,13 +2241,22 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-43-google-signin-popup-first",
+        area:"Auth / Welcome",
+        feature:"Google sign-in popup-first (fix mobile redirect ITP)",
+        changed:"Reverted s3.2.35 mobile redirect-first. Welcome + My Profile Google use signInWithPopup from the user tap on every device. Redirect only if popup-blocked. Failed redirect sets floqr.authPreferPopup and tells patron to allow popup or use Email/SMS OTP. Fixes 'Google full-page sign-in did not finish' on iPhone + GitHub Pages. Package s3.2.43.",
+        howToTest:"1) Hard-refresh Welcome on iPhone Safari (?v=s3.2.43). Clear site data for jadzadco.github.io if a prior failed redirect left sessionStorage. 2) Tap Continue with Google — Google account UI should open (popup / sheet from the tap), not immediately full-page redirect. 3) Finish → Search signed in. 4) If browser blocks popup: allow popups for jadzadco.github.io and retry, or use Email OTP. 5) Desktop Chrome popup still works; cancel stays retryable.",
+        expected:"No 'full-page sign-in did not finish' after a normal Google complete; phone signs in via popup from the tap.",
+        troubleshoot:"Still full-page did not finish → hard refresh patron-app.js s3.2.43 (must NOT call oauthPopupsUnreliable redirect-first). Popup blocked → Settings → Safari → allow popups for the site, or Email OTP. Firebase authorized domains must include jadzadco.github.io."
+      },
+      {
         id:"s3-2-35-google-mobile-redirect",
         area:"Auth / Welcome",
-        feature:"Google sign-in on phone skips blocked popup",
-        changed:"iPhone / iPad / Android / WebView use signInWithRedirect immediately (no popup → 'Google popup was blocked'). Desktop still uses popup; popup-blocked still falls back to redirect. getRedirectResult waits briefly for onAuthStateChanged. Package s3.2.35.",
-        howToTest:"1) Hard-refresh Welcome on iPhone Safari (s3.2.35). 2) Tap Google — full-page Google account picker (not a blocked popup message). 3) Finish sign-in → Search. 4) Desktop Chrome: Google still opens a popup. 5) My Profile signed-out Google button uses the same mobile redirect path.",
-        expected:"Phone never shows 'Google popup was blocked'; desktop popup still works; cancel on desktop stays retryable.",
-        troubleshoot:"Still popup-blocked on iPhone → hard-refresh patron-app.js s3.2.35; confirm oauthPopupsUnreliable. Redirect returns to Welcome unsigned → Firebase authorized domains include jadzadco.github.io; retry once."
+        feature:"(superseded) Google mobile redirect-first — caused ITP failures",
+        changed:"s3.2.35 used signInWithRedirect first on phone. That regresses on GitHub Pages under ITP. Superseded by s3-2-43-google-signin-popup-first (s3.2.43).",
+        howToTest:"Skip — use s3-2-43-google-signin-popup-first instead.",
+        expected:"N/A — superseded.",
+        troubleshoot:"See s3-2-43-google-signin-popup-first."
       },
       {
         id:"s3-2-34-unified-back-header",
