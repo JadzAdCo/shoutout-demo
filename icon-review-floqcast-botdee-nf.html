@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>floqCast + BOT DEE Nightlife icons (deployed)</title>
+  <style>
+    :root{
+      --bg0:#070d18; --bg1:#102038; --ink:#fff; --muted:rgba(255,255,255,.72);
+      --accent:#3de7ff; --hot:#f43abf; --ok:#9dffb0;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:28px 20px 80px;font-family:"Avenir Next","Segoe UI",sans-serif;
+      background:radial-gradient(1200px 600px at 20% -10%,#1a2a4a 0%,transparent 55%),linear-gradient(160deg,var(--bg0),var(--bg1) 55%,#0a1628);color:var(--ink)}
+    h1{margin:0 0 8px;font-size:clamp(22px,4vw,34px)}
+    .banner{color:var(--accent);font-weight:900;margin:0 0 10px}
+    .sub{color:var(--muted);max-width:920px;line-height:1.45;margin:0 0 22px}
+    .sub code{color:#d4b483}
+    .block{margin:22px 0;padding:18px;border:1px dashed rgba(255,255,255,.22);border-radius:18px;background:rgba(0,0,0,.18)}
+    .block.live{border-color:rgba(61,231,255,.55);box-shadow:0 0 0 1px rgba(61,231,255,.25) inset}
+    .block h2{margin:0 0 6px;font-size:18px}
+    .block p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4}
+    .row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+    figure{margin:0;padding:14px;border-radius:14px;background:rgba(255,255,255,.05);min-width:160px}
+    figcaption{color:#d4b483;font-size:12px;font-weight:800;margin-bottom:10px}
+    img.mark{display:block;width:min(280px,78vw);height:auto;background:#000;border-radius:22px}
+    .tile{width:132px;height:132px;border-radius:22px;background:#000;
+      box-shadow:0 0 18px rgba(38,216,255,.42),0 0 28px rgba(244,58,191,.28);
+      display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
+    .tile img{width:92%;height:auto;aspect-ratio:1;object-fit:contain;background:transparent;border-radius:0}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;margin-left:6px}
+    .tag.live{background:rgba(61,231,255,.18);color:var(--accent)}
+    .tag.nl{background:rgba(244,58,191,.2);color:#ff9ad8}
+    ul{margin:8px 0 0 18px;color:var(--muted);font-size:14px;line-height:1.45}
+    a{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <p class="banner">DEPLOYED ON MAIN (s3.2.44) — Nightlife / NF chrome</p>
+  <h1>floqCast + BOT DEE Nightlife icons</h1>
+  <p class="sub">
+    These are the marks Search / feature landings load via <code>data-floqr-chrome-icon</code>
+    → <code>FLOQRChromeScheme.ICON_PACK.nightlife</code>.
+    Hard-refresh with <code>?v=s3.2.44</code> on Pages if the tile looks stale.
+  </p>
+
+  <div class="block live">
+    <h2>1) floqCast Nightlife <span class="tag live">live</span> <span class="tag nl">NF</span></h2>
+    <p>File: <code>images/chrome/floqcast-nightlife.jpg</code> — Search tile, floqCast landing hero, Display2 idle.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Full mark (1024)</figcaption>
+        <img class="mark" src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.44" alt="floqCast nightlife deployed"/>
+      </figure>
+      <figure>
+        <figcaption>Search tile size</figcaption>
+        <div class="tile"><img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.44" alt="floqCast tile"/></div>
+      </figure>
+      <figure>
+        <figcaption>Review V4 silhouette (PNG)</figcaption>
+        <img class="mark" src="./images/review/actual-icons/floqcast-v4-circle-silhouette.png?v=s3.2.44" alt="floqCast V4 review"/>
+      </figure>
+    </div>
+    <ul>
+      <li>Phone → signal → LED panel with neon silhouette; <strong>FloqCAST</strong> wordmark (Tiffany <strong>T</strong>).</li>
+      <li>V4 PNG is the ring/silhouette draft sibling — compare if live JPG needs a refresh.</li>
+    </ul>
+  </div>
+
+  <div class="block live">
+    <h2>2) BOT DEE Nightlife <span class="tag live">live</span> <span class="tag nl">NF</span></h2>
+    <p>File: <code>images/chrome/botdee-nightlife.jpg</code> — Search tile (<code>data-floqr-chrome-icon="floqAi"</code>).</p>
+    <div class="row">
+      <figure>
+        <figcaption>Full mark (1024)</figcaption>
+        <img class="mark" src="./images/chrome/botdee-nightlife.jpg?v=s3.2.44" alt="BOT DEE nightlife deployed"/>
+      </figure>
+      <figure>
+        <figcaption>Search tile size</figcaption>
+        <div class="tile"><img src="./images/chrome/botdee-nightlife.jpg?v=s3.2.44" alt="BOT DEE tile"/></div>
+      </figure>
+      <figure>
+        <figcaption>Traditional twin</figcaption>
+        <img class="mark" src="./images/chrome/botdee-traditional.jpg?v=s3.2.44" alt="BOT DEE traditional"/>
+      </figure>
+    </div>
+    <ul>
+      <li>Centered headphones bot; stacked <strong>BOT</strong> (white) / <strong>DEE</strong> (Tiffany); no DJ deck / signal tray.</li>
+      <li>Prior polish notes: black patch over graphics / antenna cut — call out if still visible at tile size.</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>3) Live Search row order</h2>
+    <p>Same as production: floqCast → ShoutOut → VIP → BOT DEE.</p>
+    <div class="row">
+      <figure><figcaption>1 floqCast</figcaption><div class="tile"><img src="./images/chrome/floqcast-nightlife.jpg?v=s3.2.44" alt=""/></div></figure>
+      <figure><figcaption>2 ShoutOut</figcaption><div class="tile"><img src="./images/chrome/shoutout-nightlife.png?v=s3.2.44" alt=""/></div></figure>
+      <figure><figcaption>3 VIP</figcaption><div class="tile"><img src="./images/chrome/vip-nightlife.jpg?v=s3.2.44" alt=""/></div></figure>
+      <figure><figcaption>4 BOT DEE</figcaption><div class="tile"><img src="./images/chrome/botdee-nightlife.jpg?v=s3.2.44" alt=""/></div></figure>
+    </div>
+  </div>
+
+  <p class="sub">
+    Related: <a href="./icon-review-v4-chrome-compare.html">V4 chrome compare</a> ·
+    <a href="./icon-review-vip-floqcast.html">VIP + floqCast picks</a> ·
+    Rebuild: <code>python3 scripts/build-chrome-icons.py --botdee-only</code>
+  </p>
+</body>
+</html>
