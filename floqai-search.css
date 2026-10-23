@@ -418,8 +418,10 @@
 .category-floqai-search{
   display:grid;
   gap:10px;
+  width:100%;
   max-width:720px;
-  margin:0 0 18px;
+  margin:0 auto 18px; /* center under FloqR mark on PC + phone */
+  box-sizing:border-box;
 }
 .category-floqai-intro,
 .category-floqai-speech{

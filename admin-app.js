@@ -627,15 +627,35 @@
       .filter(template => templateMatchesQuery(template, query))
       .sort((a,b) => rank(a) - rank(b) || String(a.name || a.id).localeCompare(String(b.name || b.id)));
     const exclusiveLabel = clubExclusiveLabel();
+    const primaryFormat = publicClubProfile?.primaryDisplayScreenFormatId
+      || loc?.primaryDisplayScreenFormatId
+      || (publicClubProfile?.displayScreenFormatIds || loc?.displayScreenFormatIds || [])[0]
+      || "led-96x48";
     wrap.innerHTML = rows.map(template => {
       const editable = template.backgroundEditable !== false;
       const count = clubTemplateVariants.filter(variant => variant.baseTemplateId === template.id && String(variant.status || "active") === "active").length;
       const assigned = assignedIds.has(template.id) || isExclusive(template);
+      const clubOwned = isExclusive(template);
+      const desc = String(window.FLOQRTemplateCopy?.description?.(template) || template.description || "").trim();
+      const how = String(window.FLOQRTemplateCopy?.howitWorks?.(template, primaryFormat) || "").trim();
+      const venueTags = clubVenueTemplateTags?.[template.id] || [];
+      const tags = window.FLOQRTemplateTags?.publicTagsFor
+        ? window.FLOQRTemplateTags.publicTagsFor(template, venueTags, locationId)
+        : (clubOwned && venueTags.length ? venueTags : (template.tags || []));
+      const tagNote = clubOwned
+        ? (window.FLOQRI18n?.t?.("templateTags.clubOwnedEditable") || "Club-owned — edit Tag chips under Manage template tags")
+        : (window.FLOQRI18n?.t?.("templateTags.sharedReadOnly") || "Shared FloqR — Tag chips read-only");
       return `<article class="template ${esc(template.className || "neon")}" data-template-id="${esc(template.id)}">
         <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
         <div class="name">${esc(template.name || template.id)}</div>
         <div class="tag">${editable ? "Editable background" : "Background locked by Master Admin"}</div>
-        <div class="tag-row">${isExclusive(template) ? `<span class="template-exclusive-tag">${esc(exclusiveLabel)}</span>` : ""}<span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
+        <div class="template-select-copy club-template-mgmt-copy">
+          ${desc ? `<p class="template-select-desc"><span class="template-copy-label">Description:</span> ${esc(desc)}</p>` : ""}
+          ${how ? `<p class="template-select-howitworks"><span class="template-copy-label">How it works:</span> ${esc(how)}</p>` : ""}
+          <div class="template-select-tags-line"><span class="template-copy-label">Tag:</span><div class="tag-row template-select-tag-chips">${(tags || []).length ? tags.map(tag => `<span>${esc(tag)}</span>`).join("") : `<span class="template-tag-empty">None</span>`}</div></div>
+          <p class="sub small">${esc(tagNote)}</p>
+        </div>
+        <div class="tag-row">${isExclusive(template) ? `<span class="template-exclusive-tag">${esc(exclusiveLabel)}</span>` : `<span>Shared FloqR</span>`}<span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
         <div class="queue-actions">
           ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
           ${assigned ? `<button type="button" data-club-template-remove="${esc(template.id)}">Remove template</button>` : `<button type="button" data-club-template-assign="${esc(template.id)}">Assign template</button>`}

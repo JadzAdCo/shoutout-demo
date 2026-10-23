@@ -3520,6 +3520,12 @@
   function venueTagsFor(t = {}) {
     return venueTemplateTags.locationId === locationId() ? (venueTemplateTags.map[t.id] || []) : [];
   }
+  function publicTagsForTemplate(t = {}) {
+    if ((t.sport === "soccer" || t.sport === "nfl") && t.defaultBackgroundUrl) return jerseyPublicTags(t);
+    const TT = window.FLOQRTemplateTags;
+    if (TT?.publicTagsFor) return TT.publicTagsFor(t, venueTagsFor(t), locationId()).slice(0, 12);
+    return Array.from(new Set([...venueTagsFor(t), ...(t.tags || [])])).slice(0, 12);
+  }
   function templateSearchText(t) {
     const popular = t.id === "blackwhite" || t.isDefault || Number(t.popularity || t.usageCount || 0) > 0
       ? `popular trending top ${t.popularity || t.usageCount || ""}`
@@ -3669,13 +3675,15 @@
       const dim = formatDimLabel(id);
       return `${dim}: ${caps.lineCount}×${caps.perLine}=${caps.main}`;
     }).filter(Boolean).slice(0, 3);
-    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : Array.from(new Set([...venueTagsFor(template), ...(template.tags || [])])).slice(0, 6);
+    const tags = publicTagsForTemplate(template);
     const mediaLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
       : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? tt("template.mediaPlaceholder", {}, "Image/video placeholder") : tt("template.noMedia", {}, "No image/video"))));
     const desc = String(window.FLOQRTemplateCopy?.description?.(template) || template.description || mediaLine || "").trim();
     const how = String(window.FLOQRTemplateCopy?.howitWorks?.(template, formatId) || "").trim();
+    const descLabel = tt("template.descriptionLabel", {}, "Description");
     const howLabel = tt("template.howItWorks", {}, "How it works");
+    const tagLabel = tt("template.tagLabel", {}, "Tag");
     const chars = [
       template.category,
       template.priceCents ? (template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`) : null,
@@ -3688,9 +3696,12 @@
         <span class="template-select-dim" title="${esc(tt("template.renderDimHint", {}, "Primary venue LED size"))}">${esc(dim)}</span>
       </header>
       ${templateLedPreviewHtml(template, {formatId})}
-      <p class="template-select-desc">${esc(desc)}</p>
-      ${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}
-      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${letterChips.map(label => `<span title="${esc(tt("template.letterFitHint", {}, "Max letters for ~1–3 m viewing on this LED size"))}">${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="template-select-copy">
+        ${desc ? `<p class="template-select-desc"><span class="template-copy-label">${esc(descLabel)}:</span> ${esc(desc)}</p>` : ""}
+        ${how ? `<p class="template-select-howitworks"><span class="template-copy-label">${esc(howLabel)}:</span> ${esc(how)}</p>` : ""}
+        <div class="template-select-tags-line"><span class="template-copy-label">${esc(tagLabel)}:</span><div class="tag-row template-select-tag-chips">${tags.length ? tags.map(tag => `<span>${esc(tag)}</span>`).join("") : `<span class="template-tag-empty">${esc(tt("template.noTags", {}, "None"))}</span>`}</div></div>
+      </div>
+      <div class="tag-row template-select-meta">${chars.map(c => `<span>${esc(c)}</span>`).join("")}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${letterChips.map(label => `<span title="${esc(tt("template.letterFitHint", {}, "Max letters for ~1–3 m viewing on this LED size"))}">${esc(label)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
       </div>
@@ -3709,7 +3720,10 @@
     const baseDesc = String(window.FLOQRTemplateCopy?.description?.(base) || base.description || "").trim();
     const desc = [variant.baseTemplateName || base.name, scopeLabel, baseDesc].filter(Boolean).join(" · ");
     const how = String(window.FLOQRTemplateCopy?.howitWorks?.(base, formatId) || "").trim();
+    const tags = Array.from(new Set([...(variant.tags || []), ...publicTagsForTemplate(base)])).slice(0, 12);
+    const descLabel = tt("template.descriptionLabel", {}, "Description");
     const howLabel = tt("template.howItWorks", {}, "How it works");
+    const tagLabel = tt("template.tagLabel", {}, "Tag");
     return `<article class="template template-select-card ${esc(base.className || "neon")} ${selected ? "selected" : ""}" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
       <header class="template-select-head">
         <h4 class="name">${esc(variant.variantName || tt("template.variantSavedBackground", {}, "Saved Background"))}</h4>
@@ -3721,9 +3735,12 @@
         backgroundColor: variant.backgroundColor || "",
         backgroundGradient: variant.backgroundGradient || ""
       })}
-      <p class="template-select-desc">${esc(desc)}</p>
-      ${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}
-      <div class="tag-row template-select-meta"><span>${esc(scopeLabel)}</span>${(variant.tags || []).slice(0, 6).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="template-select-copy">
+        ${desc ? `<p class="template-select-desc"><span class="template-copy-label">${esc(descLabel)}:</span> ${esc(desc)}</p>` : ""}
+        ${how ? `<p class="template-select-howitworks"><span class="template-copy-label">${esc(howLabel)}:</span> ${esc(how)}</p>` : ""}
+        <div class="template-select-tags-line"><span class="template-copy-label">${esc(tagLabel)}:</span><div class="tag-row template-select-tag-chips">${tags.length ? tags.map(tag => `<span>${esc(tag)}</span>`).join("") : `<span class="template-tag-empty">${esc(tt("template.noTags", {}, "None"))}</span>`}</div></div>
+      </div>
+      <div class="tag-row template-select-meta"><span>${esc(scopeLabel)}</span></div>
       <div class="button-row template-card-actions">
         <button type="button" class="primary" data-variant-open="${esc(variant.id || variant.variantId || "")}">${esc(tt("template.use", {}, "Use"))}</button>
       </div>
@@ -3855,8 +3872,18 @@
       ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.`
       : (window.FLOQRTemplateCopy?.description?.(t) || t.description || "Template selected.");
     const how = window.FLOQRTemplateCopy?.howitWorks?.(t, formatId) || "";
+    const tags = publicTagsForTemplate(t);
+    const descLabel = tt("template.descriptionLabel", {}, "Description");
     const howLabel = tt("template.howItWorks", {}, "How it works");
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(desc)}</p>${how ? `<p class="template-select-howitworks"><span class="template-howitworks-label">${esc(howLabel)}</span> ${esc(how)}</p>` : ""}<p class="sub small">${esc(textCompatibility)}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
+    const tagLabel = tt("template.tagLabel", {}, "Tag");
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3>
+      <div class="template-select-copy">
+        <p class="template-select-desc"><span class="template-copy-label">${esc(descLabel)}:</span> ${esc(desc)}</p>
+        ${how ? `<p class="template-select-howitworks"><span class="template-copy-label">${esc(howLabel)}:</span> ${esc(how)}</p>` : ""}
+        <div class="template-select-tags-line"><span class="template-copy-label">${esc(tagLabel)}:</span><div class="tag-row template-select-tag-chips">${tags.length ? tags.map(tag => `<span>${esc(tag)}</span>`).join("") : `<span class="template-tag-empty">${esc(tt("template.noTags", {}, "None"))}</span>`}</div></div>
+      </div>
+      <p class="sub small">${esc(textCompatibility)}</p>
+      <div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {

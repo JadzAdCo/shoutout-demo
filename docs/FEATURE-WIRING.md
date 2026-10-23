@@ -48,18 +48,39 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 ---
 
 
-## Template howitWorks (s3.2.27)
+## PC Search composition (s3.2.29)
 
-**Purpose:** Patrons see a short general `description` plus size-specific **How it works** copy for the venue’s primary LED format.
+**Purpose:** On PC monitors, Search is one centered composition (FloqR mark + Search field + product icons), not left-docked Search with icons pinned to the viewport bottom.
 
 | Layer | Wiring |
 |---|---|
-| Data | `SHOUTOUT_TEMPLATES.*.description` (general) + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates` |
-| Helper | `window.FLOQRTemplateCopy.howitWorks(template, formatId)` / `.description(template)` |
-| Gallery | `patron-app.js` `templateCard` / `variantCard` / `updateTemplateSummary` — `.template-select-desc` (2-line clamp) + `.template-select-howitworks` |
-| Admin | Master Admin template form: Description + three How it works textareas (`templateManageHowitWorks*`) |
-| i18n | `template.howItWorks` in all chrome packs |
-| Diagnostics | Manual test `s3-2-27-template-howitworks` |
+| Search field | `floqai-search.css` `.category-floqai-search` — `margin:0 auto 18px`, `max-width:720px` |
+| Desktop layout | `styles.css` — `html.floqr-desktop-browser` + `@media(min-width:1181px)` center `#categoryPage` with `justify-content:center`; icon row stays under Search (`margin-top:28px`, not `auto`) |
+| Shell | `html.floqr-desktop-browser .app` — `max-width:1180px; margin-left/right:auto` |
+| Admin shells | `admin.css` — `html.floqr-desktop-browser .admin-shell` same 1180px centered column |
+| Phone/tablet | Unchanged bottom-pin via `@media(max-width:1180px)` + `floqr-mobile-browser` / `floqr-tablet-browser` |
+| Diagnostics | Manual test `s3-2-29-pc-search-centered` |
+
+---
+
+## Template Description / How it works / Tag (s3.2.28)
+
+**Purpose:** Template gallery cards show three labeled lines — **Description:**, **How it works:** (venue primary LED size), and **Tag:** chips. Club Admin owns venue tags; Master Admin owns description + howitWorks.
+
+| Layer | Wiring |
+|---|---|
+| Data | `SHOUTOUT_TEMPLATES.*.description` + `howitWorks: { "led-96x48", "led-64x48", "led-64x32" }` in `shared-data.js` / Firestore `templates`; venue tags via `venueTemplateTags` |
+| Helper | `FLOQRTemplateCopy.howitWorks` / `.description`; `FLOQRTemplateTags.publicTagsFor` / `isClubOwnedTemplate` |
+| Gallery (Patron) | `patron-app.js` — `.template-select-copy` with labeled `Description:` / `How it works:` / `Tag:` (`publicTagsForTemplate`) — view only |
+| Club Admin | Template Mgmt cards show the same three lines (Description/How it works read-only); **Manage template tags** edits Tag only on club-owned; shared FloqR Tag read-only |
+| Master Admin | Template Management edits Description + per-size howitWorks + catalog tags; list rows show labeled Description/How it works/Tag; save **preserves** `scope`/`venueIds` for club-owned |
+| Data / security | `venueTemplateTags` docs require `ownership:"club"`; rules `templateOwnedByClub` via `clubLocations.clubOwnedTemplateIds` or `templates/{id}.venueIds`. Shared FloqR templates cannot be written. Classification: public read for patron cards; writes club-owned only (`data-classification-core.js`). Rules version `s3.2.28-club-owned-template-tags` (deploy Firestore rules). |
+| i18n | `template.descriptionLabel` / `howItWorks` / `tagLabel` / `noTags`; `templateTags.venueEditable` / `clubOwned*` / `sharedReadOnly` / `seedFromCatalog`; `admin.templateCopyOwnership` |
+| Diagnostics | Manual tests `s3-2-28-template-tag-labels`, `s3-2-27-template-howitworks` |
+
+## Template howitWorks (s3.2.27)
+
+**Purpose:** Patrons see a short general `description` plus size-specific **How it works** copy for the venue’s primary LED format. Superseded UI labels in s3.2.28; datapoint unchanged.
 
 ---
 ## Login + Search chrome (s3.2.26)

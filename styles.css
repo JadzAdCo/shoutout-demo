@@ -411,32 +411,116 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
   padding-bottom:0;
   align-content:flex-end;
 }
-/* Wide desktop: icons stay under Search with balanced spacing (not glued to viewport bottom) */
+/* Wide desktop + PC (pointer/desktop class): one centered composition — logo, Search, icons together.
+   Do not pin icons to the viewport bottom (that phone/tablet layout looks “far off” on monitors). */
 @media(min-width:1181px){
   .app:has(#categoryPage.page.active){
-    min-height:0;
-    display:block;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    margin-left:auto;
+    margin-right:auto;
     padding-bottom:24px;
+    height:auto;
+    max-height:none;
+    overflow:visible;
   }
   #categoryPage.page.active{
-    display:block!important;
-    flex:none;
+    display:flex!important;
+    flex-direction:column;
+    flex:1 1 auto;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    padding-top:56px;
     min-height:0;
+    width:100%;
+    box-sizing:border-box;
   }
+  #categoryPage.page.active > .topbar{
+    position:absolute;
+    top:0;left:0;right:0;
+    margin:0;
+    z-index:2;
+  }
+  #categoryPage.page.active .category-brand-stack,
+  #categoryPage.page.active .category-floqai-search,
   #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
-    margin-top:28px!important;
-    margin-bottom:48px!important;
+    width:100%;
     max-width:720px;
     margin-left:auto;
     margin-right:auto;
+  }
+  #categoryPage.page.active .category-brand-stack{margin-top:0;margin-bottom:12px}
+  #categoryPage.page.active .category-floqai-search{margin-bottom:8px}
+  #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+    margin-top:28px!important;
+    margin-bottom:0!important;
   }
   #categoryPage.page.active .search-icon-row{
     padding-top:18px;
     padding-bottom:8px;
     gap:18px;
     align-content:flex-start;
+    justify-content:center;
   }
 }
+/* Desktop device class wins even when the window is ≤1180px (laptop / side-by-side). */
+html.floqr-desktop-browser .app:has(#categoryPage.page.active){
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  margin-left:auto;
+  margin-right:auto;
+  padding-bottom:24px!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+html.floqr-desktop-browser #categoryPage.page.active{
+  display:flex!important;
+  flex-direction:column;
+  flex:1 1 auto;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  padding-top:56px;
+  min-height:0!important;
+  max-height:none;
+  width:100%;
+  overflow:visible;
+  box-sizing:border-box;
+}
+html.floqr-desktop-browser #categoryPage.page.active > .topbar{
+  position:absolute;
+  top:0;left:0;right:0;
+  margin:0;
+  z-index:2;
+}
+html.floqr-desktop-browser #categoryPage.page.active .category-brand-stack,
+html.floqr-desktop-browser #categoryPage.page.active .category-floqai-search,
+html.floqr-desktop-browser #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+  width:100%;
+  max-width:720px;
+  margin-left:auto;
+  margin-right:auto;
+}
+html.floqr-desktop-browser #categoryPage.page.active .category-brand-stack{margin-top:0;margin-bottom:12px}
+html.floqr-desktop-browser #categoryPage.page.active .category-grid.compact-category-grid:has(.search-icon-row){
+  margin-top:28px!important;
+  margin-bottom:0!important;
+  padding-bottom:0;
+}
+html.floqr-desktop-browser #categoryPage.page.active .search-icon-row{
+  padding-top:18px;
+  padding-bottom:8px;
+  gap:18px;
+  align-content:flex-start;
+  justify-content:center;
+}
+@media(max-width:520px){.category-brand-stack{margin-top:40px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{border-radius:50%;gap:0;padding:6px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
 @media(max-width:520px){.category-brand-stack{margin-top:4px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face{border-radius:50%;gap:0;padding:6px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
 .ad-submit-shell form label,.ad-submit-grid label{display:grid;gap:4px;margin:8px 0}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
@@ -984,9 +1068,14 @@ html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,4
 .template-select-led{position:relative;width:100%;max-width:100%;margin:0 auto;border-radius:14px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .template-select-led.floqr-board-frame,.template-select-led .floqr-board-frame{width:100%;max-width:100%}
 .template-select-frame{display:block;border:0;pointer-events:none;background:#000}
+.template-select-copy{display:grid;gap:8px;margin:10px 0 0}
 .template-select-desc{margin:0;color:var(--muted);font-size:14px;font-weight:700;line-height:1.4;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-.template-select-howitworks{margin:8px 0 0;color:var(--text);font-size:13px;font-weight:650;line-height:1.45}
-.template-howitworks-label{display:inline;font-weight:1000;letter-spacing:.02em;text-transform:uppercase;font-size:11px;color:var(--lime,#dfff5a);margin-right:6px}
+.template-select-howitworks{margin:0;color:var(--text);font-size:13px;font-weight:650;line-height:1.45}
+.template-copy-label,.template-howitworks-label{display:inline;font-weight:1000;letter-spacing:.02em;text-transform:none;font-size:13px;color:var(--lime,#dfff5a);margin-right:6px}
+.template-select-tags-line{display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 8px}
+.template-select-tag-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto;min-width:0}
+.template-select-tag-chips span{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);font-size:12px;font-weight:800}
+.template-tag-empty{opacity:.65;border-style:dashed!important}
 .template-select-meta{margin-top:0}
 .template-select-card .template-card-actions{margin-top:4px}
 .template-select-card .template-card-actions .primary{width:100%;min-height:48px}
@@ -1384,7 +1473,26 @@ html.floqr-tablet-browser .card,
 html.floqr-tablet-browser .login-card,
 html.floqr-tablet-browser .club-option{border-radius:24px}
 
-html.floqr-desktop-browser .app{width:min(100%,1180px)}
+/* PC shell: keep the content column centered in wide monitors */
+html.floqr-desktop-browser .app{
+  width:min(100%,1180px);
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+  box-sizing:border-box;
+}
+html.floqr-desktop-browser body{
+  display:block;
+}
+html.floqr-desktop-browser .login-wrap{
+  margin-left:auto;
+  margin-right:auto;
+}
+html.floqr-desktop-browser .admin-shell,
+html.floqr-desktop-browser main.app{
+  margin-left:auto;
+  margin-right:auto;
+}
 
 /* v28.87 Mingl chat composer and read receipts */
 @media(max-width:640px){

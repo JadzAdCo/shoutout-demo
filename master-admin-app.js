@@ -1319,6 +1319,12 @@
       return [template.id, template.name, template.category, template.description, how, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query);
     }).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
     wrap.innerHTML = rows.map(template => {
+      const how = template.howitWorks && typeof template.howitWorks === "object" ? template.howitWorks : {};
+      const how96 = how["led-96x48"] || (typeof template.howitWorks === "string" ? template.howitWorks : "");
+      const clubOwned = Array.isArray(template.venueIds) && template.venueIds.length;
+      const scopeLabel = clubOwned
+        ? ("Club-owned (" + (template.venueIds || []).join(", ") + ")")
+        : (template.scope || "Shared");
       const letterFit = ["led-96x48", "led-64x48", "led-64x32"].map(id => {
         const caps = window.FLOQRTextLayout?.resolve?.(template, id);
         if (!caps?.supported) return null;
@@ -1330,11 +1336,16 @@
       const statusLabel = template.status === "deleted" ? "deactivated" : "active";
       const toggleLabel = template.status === "deleted" ? "Activate" : "Deactivate";
       const bgLabel = template.backgroundEditable === false ? "locked" : "editable";
+      const tagNote = clubOwned
+        ? "<em>(catalog; Club Admin may replace with venue Tag chips)</em>"
+        : "<em>(FLOQR catalog — Club Admin read-only)</em>";
       return [
         '<div class="queue-item managed-template-row ' + (template.status === "deleted" ? "is-deactivated" : "") + '">',
-        '<div class="message-envelope-head"><strong>' + esc(template.name || template.id) + '</strong><span>' + statusLabel + '</span></div>',
-        '<p>' + esc(template.description || "No description") + '</p>',
-        '<small>' + esc(template.id) + ' | ' + esc((template.tags || []).join(", ")) + ' | ' + esc(priceLabel) + ' | Screens: ' + esc((template.screenFormatIds || []).join(", ") || "not tagged") + ' | Letter fit (1-3 m): ' + esc(letterFit || "n/a") + ' | Background: ' + bgLabel + '</small>',
+        '<div class="message-envelope-head"><strong>' + esc(template.name || template.id) + '</strong><span>' + statusLabel + ' · ' + esc(scopeLabel) + '</span></div>',
+        '<p><strong>Description:</strong> ' + esc(template.description || "No description") + '</p>',
+        how96 ? ('<p class="sub small"><strong>How it works (96×48):</strong> ' + esc(how96) + '</p>') : '',
+        '<p class="sub small"><strong>Tag:</strong> ' + esc((template.tags || []).join(", ") || "None") + ' ' + tagNote + '</p>',
+        '<small>' + esc(template.id) + ' | ' + esc(priceLabel) + ' | Screens: ' + esc((template.screenFormatIds || []).join(", ") || "not tagged") + ' | Letter fit (1-3 m): ' + esc(letterFit || "n/a") + ' | Background: ' + bgLabel + '</small>',
         '<div class="queue-actions"><button type="button" data-template-view="' + esc(template.id) + '">View</button><button type="button" data-template-preview="' + esc(template.id) + '">Preview</button><button type="button" data-template-edit="' + esc(template.id) + '">Edit</button><button type="button" data-template-toggle="' + esc(template.id) + '">' + toggleLabel + '</button><button type="button" data-template-delete="' + esc(template.id) + '">Delete</button></div>',
         '</div>'
       ].join("");
@@ -1538,11 +1549,21 @@
       Is64x32: screenFlags.Is64x32,
       screenFormatIds: screenFlags.screenFormatIds || screenFormatIds,
       status:managedTemplates[id]?.status || "active",
-      scope:"Shared",
+      // Preserve club ownership — never force Shared over an exclusive venue template.
+      scope: (() => {
+        const existing = managedTemplates[id] || window.SHOUTOUT_TEMPLATES?.[id] || {};
+        const venueIds = Array.isArray(existing.venueIds) ? existing.venueIds.map(String).filter(Boolean) : [];
+        if (venueIds.length) return String(existing.scope || "Club");
+        return String(existing.scope || "Shared") || "Shared";
+      })(),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedByUid:auth.currentUser?.uid || "",
       updatedByEmail:safeUser(auth.currentUser)
     };
+    const existingOwned = managedTemplates[id] || window.SHOUTOUT_TEMPLATES?.[id] || {};
+    if (Array.isArray(existingOwned.venueIds) && existingOwned.venueIds.length) {
+      payload.venueIds = existingOwned.venueIds.map(String).filter(Boolean);
+    }
     await db.collection("templates").doc(id).set(payload, {merge:true});
     setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} main and ${maxSubCharacters} subtext characters, ${mainTextSizePercent}%/${subTextSizePercent}% text sizing, ${screenFormatIds.length} display type(s), and a ${payload.backgroundEditable ? "customizable" : "locked"} background.`);
     await loadManagedTemplates();

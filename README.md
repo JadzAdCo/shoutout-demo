@@ -1,5 +1,10 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.2.40 (stable)
 
+- s3.2.40: Traditional View Club buttons + restore classic-bw red/black LED art; vault card follows Site chrome.
+- s3.2.39: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
+- s3.2.29: PC Search composition centered (logo + Search + icons); desktop shell margin auto; Search field no longer left-docked.
+- s3.2.28: Template Description / How it works / Tag labels; Club Admin club-owned tags; Master owns description/howitWorks.
+
 - s3.2.40: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
 - s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
 
