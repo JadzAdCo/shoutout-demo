@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.39";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.39";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.40";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.40";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.40",
+      title: "s3.2.40 — Traditional View Club buttons + classic-bw red LED",
+      checks: [
+        {label:"Package version s3.2.40", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.40\""]},
+        {label:"Traditional View Club buttons", file:"styles.css", includes:["View Club–style secondary buttons", "color:var(--floqr-tile-cyan)!important"]},
+        {label:"classic-bw vault card follows chrome", file:"styles.css", includes:["red/black LED art only", "vault card shell follows Site chrome"]},
+        {label:"classic-bw LED red frame restored", file:"display.css", includes:["border-color:#f51717!important", "#f01818 29%"]},
+        {label:"classic identity shell red banner", file:"display.css", includes:["#ec111a 18% 82%"]},
+        {label:"Manual test s3.2.40", file:"ai-diagnostics-service.js", includes:["s3-2-40-traditional-viewclub-classic-bw-red"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.40\""]}
+      ]
+    },
     {
       version: "s3.2.39",
       title: "s3.2.39 — VIP White/Black white page background",
@@ -2358,6 +2371,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-40-traditional-viewclub-classic-bw-red",
+      area:"Site chrome / Templates",
+      feature:"Traditional View Club buttons + classic-bw red LED / chrome vault card",
+      changed:"Traditional secondary buttons match View Club (charcoal + cyan ink; active = thin cyan border). Restored classic-bw red/black LED + FloqR identity banner. Vault classic-bw card shell follows Site chrome (not red wash). Package s3.2.40.",
+      howToTest:"1) Site chrome Traditional; hard-refresh Search (?v=s3.2.40). 2) Club card View Club = charcoal + cyan text; other secondary buttons match; pressed/active get thin cyan border. 3) Aurelia template vault: Traditional Black and White card shell is charcoal Traditional chrome; LED/mini-preview shows red/black letterboard + red PRESENTED BY rail.",
+      expected:"View Club–style Traditional buttons; red on LED art only; vault card matches Traditional chrome.",
+      troubleshoot:"Still red card shell → styles.css classic-bw transparent/neutral shell + traditional template-select-card rules. Still B&W LED → display.css red frame / identity #ec111a + hard refresh."
     },
     {
       id:"s3-2-39-vip-whiteblack-page",

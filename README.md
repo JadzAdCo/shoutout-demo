@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.39 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.40 (stable)
+
+- s3.2.40: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
+- s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
 
 - s3.2.39: VIP reserV White/Black white page background + shiny-black Select venue CTAs.
 - s3.2.38: White/Black white template cards + shiny-black outline login/Use; client letter caps sync for 1–3 m; FloqR Admin template catalog access.
