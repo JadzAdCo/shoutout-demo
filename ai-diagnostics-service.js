@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.32";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.32";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.33";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.33";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.33",
+      title: "s3.2.33 — Profile & Settings chrome + short Back",
+      checks: [
+        {label:"Package version s3.2.33", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.33\""]},
+        {label:"Profile & Settings title", file:"floqr-i18n.js", includes:["\"portal.title\": \"Profile & Settings\""]},
+        {label:"Portal title help popout", file:"patron-portal.html", includes:["help-my-profile", "Profile &amp; Settings", "nav.backShort", "data-floqr-help-body=\"Manage your profile"], notIncludes:["data-i18n=\"portal.subtitle\""]},
+        {label:"Global Back short label stamp", file:"floqr-nav.js", includes:["data-i18n\", \"nav.backShort\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.33\""]}
+      ]
+    },
     {
       version: "s3.2.32",
       title: "s3.2.32 — Receipt chrome follow-through + chrome audit",
@@ -2125,6 +2136,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-33-profile-settings-chrome",
+        area:"My Profile",
+        feature:"Profile & Settings title, ? help blurb, < Back",
+        changed:"Page title is Profile & Settings. Manage-your-profile blurb lives in the title ? help (not under the H1). Global Back stays < Back (i18n no longer overwrites with ← Back to Search). Package s3.2.33.",
+        howToTest:"1) Hard-refresh My Profile s3.2.33. 2) Title reads Profile & Settings. 3) No long Manage your profile… paragraph under the title — open the ? next to the title to read it. 4) Top Back control shows < Back (not ← Back to Search).",
+        expected:"Short title, blurb in ?, short Back label.",
+        troubleshoot:"Still Back to Search → floqr-nav applyGlobalBack sets data-i18n=nav.backShort after applyDom. Old title → hard refresh floqr-i18n.js s3.2.33."
+      },
       {
         id:"s3-2-32-receipt-chrome-audit",
         area:"Receipts / Diagnostics",

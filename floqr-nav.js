@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.2.32";
+  const APP_V = "s3.2.33";
 
   function navT(key, fallback) {
     try {
@@ -106,7 +106,7 @@
     floqcastHome(extra = {}) {
       return buildUrl("./floqcast-search.html", { from: "master", ...extra });
     },
-    /** Satellite page under My Profile and Settings */
+    /** Satellite page under Profile & Settings */
     portalLink(path, extra = {}) {
       return buildUrl(path, { from: "portal", ...extra });
     },
@@ -162,7 +162,7 @@
       }
 
       if (from === "portal" || from === "profile") {
-        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };
+        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to Profile & Settings") };
       }
       if (from === "admin" || from === "club") {
         return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };
@@ -193,6 +193,8 @@
       anchor.href = target.href;
       anchor.textContent = shortLabel;
       anchor.setAttribute("aria-label", shortLabel);
+      // Keep i18n from overwriting with long "← Back to Search" labels.
+      anchor.setAttribute("data-i18n", "nav.backShort");
       // On Club Admin / Master Admin NIC home, hide a no-op "home" back.
       const hub = pageName();
       if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {

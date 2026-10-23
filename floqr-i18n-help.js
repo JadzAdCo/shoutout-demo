@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.32";
+  const VERSION = "s3.2.33";
 
   const packs = {
     "ru": {
@@ -211,8 +211,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Откройте My Profile & Settings для ролей, инструментов продавца и настроек аккаунта."
+        title: "Профиль и настройки",
+        body: "Управляйте профилем, My Privacy, уведомлениями AI, шаблонами ShoutOut, публичными медиа, ShoutOuts, списками гостей, FloqR Inbox и Mingl. Откройте Профиль и настройки для ролей, инструментов продавца и параметров аккаунта."
       },
       "help-onboarding": {
         title: "Онбординг",
@@ -521,8 +521,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Open My Profile & Settings voor rollen, verkoperstools en accountopties."
+        title: "Profiel & instellingen",
+        body: "Beheer je profiel, My Privacy, AI-meldingen, ShoutOut-templates, openbare media, ShoutOuts, gastenlijsten, FloqR Inbox en Mingl. Open Profiel & instellingen voor rollen, verkoperstools en accountopties."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -831,8 +831,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "Mon profil et paramètres",
-        body: "Ouvrez My Profile & Settings pour les rôles, les outils de vendeur et les options de compte."
+        title: "Profil et paramètres",
+        body: "Gérez votre profil, My Privacy, les notifications AI, les modèles ShoutOut, les médias publics, les ShoutOuts, les listes d’invités, FloqR Inbox et Mingl. Ouvrez Profil et paramètres pour les rôles, les outils vendeur et les options de compte."
       },
       "help-onboarding": {
         title: "Intégration",
@@ -1141,8 +1141,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Öffnen Sie My Profile & Settings für Rollen, Verkäufer-Tools und Kontooptionen."
+        title: "Profil & Einstellungen",
+        body: "Verwalte dein Profil, My Privacy, AI-Benachrichtigungen, ShoutOut-Vorlagen, öffentliche Medien, ShoutOuts, Gästelisten, FloqR Inbox und Mingl. Öffne Profil & Einstellungen für Rollen, Verkäufer-Tools und Kontooptionen."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -1451,8 +1451,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Abra My Profile & Settings para funciones, herramientas de vendedor y opciones de cuenta."
+        title: "Perfil y ajustes",
+        body: "Gestiona tu perfil, My Privacy, notificaciones AI, plantillas ShoutOut, medios públicos, ShoutOuts, listas de invitados, FloqR Inbox y Mingl. Abre Perfil y ajustes para roles, herramientas de vendedor y opciones de cuenta."
       },
       "help-onboarding": {
         title: "Incorporación",
@@ -1761,8 +1761,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Apri My Profile & Settings per ruoli, strumenti del venditore e opzioni dell'account."
+        title: "Profilo e impostazioni",
+        body: "Gestisci il tuo profilo, My Privacy, notifiche AI, modelli ShoutOut, media pubblici, ShoutOuts, liste ospiti, FloqR Inbox e Mingl. Apri Profilo e impostazioni per ruoli, strumenti venditore e opzioni account."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -2071,8 +2071,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Abra My Profile & Settings para funções, ferramentas de vendedor e opções de conta."
+        title: "Perfil e configurações",
+        body: "Gerencie seu perfil, My Privacy, notificações AI, modelos ShoutOut, mídia pública, ShoutOuts, listas de convidados, FloqR Inbox e Mingl. Abra Perfil e configurações para funções, ferramentas de vendedor e opções de conta."
       },
       "help-onboarding": {
         title: "Integração",
@@ -2381,8 +2381,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Ανοίξτε το My Profile & Settings για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
+        title: "Προφίλ και ρυθμίσεις",
+        body: "Διαχειριστείτε το προφίλ σας, My Privacy, ειδοποιήσεις AI, πρότυπα ShoutOut, δημόσια μέσα, ShoutOuts, λίστες επισκεπτών, FloqR Inbox και Mingl. Ανοίξτε Προφίλ και ρυθμίσεις για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
       },
       "help-onboarding": {
         title: "Ενσωμάτωση",
@@ -2691,8 +2691,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "Otwórz My Profile & Settings, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
+        title: "Profil i ustawienia",
+        body: "Zarządzaj profilem, My Privacy, powiadomieniami AI, szablonami ShoutOut, mediami publicznymi, ShoutOuts, listami gości, FloqR Inbox i Mingl. Otwórz Profil i ustawienia, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
       },
       "help-onboarding": {
         title: "Wprowadzenie",
@@ -3001,8 +3001,8 @@
         body: "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
-        body: "افتح My Profile & Settings للأدوار، أدوات البائع، وخيارات الحساب."
+        title: "الملف والإعدادات",
+        body: "أدِر ملفك وMy Privacy وإشعارات AI وقوالب ShoutOut والوسائط العامة وShoutOuts وقوائم الضيوف وFloqR Inbox وMingl. افتح الملف والإعدادات للأدوار وأدوات البائع وخيارات الحساب."
       },
       "help-onboarding": {
         title: "الإعداد",

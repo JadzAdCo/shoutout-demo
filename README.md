@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.32 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.33 (stable)
+
+- s3.2.33: Profile & Settings title; page blurb in ? help; global Back stays "< Back".
+- s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit.
 
 - s3.2.32: Receipt Site chrome follow-through + Master Admin chrome audit diagnostics.
 - s3.2.31: Appearance tab + Site chrome cards; Nightlife white neon halo mark.

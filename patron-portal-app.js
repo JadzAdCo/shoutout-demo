@@ -1701,6 +1701,7 @@
       if (status) status.textContent = "…";
       await window.FLOQRI18n?.setLanguage?.(code, {persist: true, markPrompt: true});
       window.FLOQRI18n?.applyDom?.();
+      window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
       renderUiLanguagePreview();
       const native = window.FLOQRI18n?.meta?.(code)?.native || code;
       if (status) status.textContent = window.FLOQRI18n?.t?.("lang.languageSaved", {native}) || `FloqR language set to ${native}.`;
@@ -4772,6 +4773,8 @@
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
       window.FLOQRI18n?.applyDom?.();
+      // Re-stamp global Back after i18n so it stays "< Back" (not "← Back to Search").
+      window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack");
       try {
         window.FLOQRChromeScheme?.hydrateFromProfile?.(currentProfile);
         window.FLOQRChromeScheme?.bindToggle?.();

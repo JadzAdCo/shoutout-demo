@@ -124,8 +124,8 @@
     "body": "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card."
   },
   "help-my-profile": {
-    "title": "My Profile & Settings",
-    "body": "Open My Profile & Settings for roles, seller tools, and account options."
+    "title": "Profile & Settings",
+    "body": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options."
   },
   "help-onboarding": {
     "title": "Onboarding",

@@ -1467,11 +1467,15 @@
     },
     {
       id: "help-my-profile",
-      title: "My Profile & Settings",
-      body: "Open My Profile & Settings for roles, seller tools, and account options.",
-      searchPhrases: ["my profile", "profile and settings", "settings", "account", "my profile & settings"],
-      links: [{label: "My Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})}],
-      source: "help-repository-seed"
+      title: "Profile & Settings",
+      body: "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options.",
+      searchPhrases: [
+        "my profile", "profile and settings", "profile & settings", "settings", "account",
+        "my profile & settings", "manage profile", "floqr inbox", "guest lists", "public media"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "floqai"})}],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
     },
     {
       id: "help-onboarding",
