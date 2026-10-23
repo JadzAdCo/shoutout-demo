@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.30";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.30";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.31";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.31";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,18 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.31",
+      title: "s3.2.31 — Appearance tab + Nightlife white neon halo mark",
+      checks: [
+        {label:"Package version s3.2.31", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.31\""]},
+        {label:"Appearance panel", file:"patron-portal.html", includes:["portalAppearance", "chrome-select-grid", "data-floqr-theme-locked"]},
+        {label:"Nightlife white-glow brand logo", file:"floqr-chrome-scheme.js", includes:["floqr-hero-nightlife-white-glow.png"]},
+        {label:"Appearance i18n keys", file:"floqr-i18n.js", includes:["nav.appearance", "appearance.pageTitle", "chrome.lockedHint"]},
+        {label:"siteChrome route Appearance", file:"floqr-feature-services.js", includes:["tab=appearance"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.31\""]}
+      ]
+    },
+    {
       version: "s3.2.30",
       title: "s3.2.30 — Script FloqR marks + Purple & White / Black & Dark Green",
       checks: [
@@ -233,7 +245,7 @@
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.30\""]}
       ]
     },
-    
+
     {
       version: "s3.2.27",
       title: "s3.2.27 — Template howitWorks + Traditional description",
@@ -430,7 +442,7 @@
         {label:"Server catalog siteChrome + alias", file:"functions/feature-services-core.js", includes:["siteChrome", "traditionalTheme: \"siteChrome\""]},
         {label:"isSiteChrome datapoint", file:"floqr-chrome-scheme.js", includes:["isSiteChrome", "SITE_CHROME", "BLACK_TIFFANY", "WHITE_BLACK", "BLACK_DARK_GREEN"]},
         {label:"Release Control title white + help", file:"master-admin.html", includes:["features-release-title", "help-feature-promote-live", ">Release Control</h2>"], notIncludes:[">Features Mgmt</h2>"]},
-        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["data-floqr-theme-panel", "Site chrome", "blackTiffany", "whiteBlack", "blackDarkGreen"]},
+        {label:"Profile Site chrome panel", file:"patron-portal.html", includes:["portalAppearance", "data-floqr-theme-panel", "chrome-select-grid", "blackTiffany", "whiteBlack", "blackDarkGreen"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.105\""]}
       ]
     },
@@ -2103,13 +2115,22 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-31-appearance-site-chrome",
+        area:"My Profile / Appearance",
+        feature:"Appearance tab + Site chrome cards + Nightlife white neon mark",
+        changed:"New Appearance tab hosts Site chrome (moved off Language Settings). Card picker with swatch + script logo + checkmark. Nightlife FloqR mark is white script with tinniest cyan→violet→magenta border halo. Package s3.2.31.",
+        howToTest:"1) Hard-refresh My Profile (s3.2.31) → open Appearance tab (not Language Settings). 2) With Site chrome beta: Site chrome section + ? help; six look cards. 3) Tap Nightlife — white script mark with neon halo; Search/login logos match. 4) Tap Traditional / Tiffany / White-Black / Purple & White / Black & Dark Green — chrome + wordmark swap. 5) Without beta: locked hint only. 6) FloqAi “site chrome” → Appearance deep link.",
+        expected:"Appearance → Site chrome is the only picker; Nightlife uses white+neon halo mark; Language Settings has no chrome buttons.",
+        troubleshoot:"Still under Language Settings → hard refresh patron-portal.html s3.2.31. No Appearance tab → nav.appearance i18n + portalAppearance. Nightlife still multicolor floqr-color → BRAND_LOGOS nightlife → floqr-hero-nightlife-white-glow.png. Cards missing → siteChrome beta + syncAccessGate."
+      },
+      {
         id:"s3-2-30-chrome-brand-logos",
         area:"Chrome",
         feature:"Script FloqR marks + Purple & White / Black & Dark Green",
         changed:"Black Tiffany uses transparent Tiffany script mark. Traditional / White-Black use script mark from user image 2. Former Black Dark Green (violet) renamed Purple & White (isSiteChrome=4). New Black & Dark Green forest chrome is isSiteChrome=5. Brand logos swap on Search, login, VIP, pass, confirmation receipts. Package s3.2.30.",
-        howToTest:"1) My Profile → Language Settings → Site chrome. 2) Black Tiffany — Tiffany script mark. 3) Traditional — silver script. 4) Purple & White — violet mark + violet/coral chrome. 5) Black & Dark Green — forest green mark. 6) Confirmation / pass.html logos match chrome.",
+        howToTest:"1) My Profile → Appearance → Site chrome. 2) Black Tiffany — Tiffany script mark. 3) Traditional — silver script. 4) Purple & White — violet mark + violet/coral chrome. 5) Black & Dark Green — forest green mark. 6) Confirmation / pass.html logos match chrome.",
         expected:"Wordmark and chrome colors match the selected theme on Search, receipts, and door pass.",
-        troubleshoot:"Old Black Dark Green label → hard refresh s3.2.30; code 4 is Purple & White. Missing script mark → floqr-hero-*.png + applyBrandLogos."
+        troubleshoot:"Old Black Dark Green label → hard refresh; code 4 is Purple & White. Missing script mark → floqr-hero-*.png + applyBrandLogos."
       },
     {
       id:"s3-2-27-template-howitworks",

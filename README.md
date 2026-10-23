@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.30 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.31 (stable)
+
+- s3.2.31: Appearance tab + Site chrome card picker; Nightlife white script + neon halo mark.
+- s3.2.30: Script FloqR marks; Purple & White + Black & Dark Green chrome.
 
 - s3.2.30: Script FloqR chrome marks; rename Black Dark Green → Purple & White; true Black & Dark Green (code 5).
 - s3.2.27: Template howitWorks datapoint (per LED size) + Traditional description rewrite.

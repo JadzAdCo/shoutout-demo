@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.30";
+  const ICON_V = "s3.2.31";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -92,7 +92,8 @@
 
   /** FloqR parent / hero wordmarks — transparent PNGs sized to match floqr-color height. */
   const BRAND_LOGOS = {
-    nightlife: "./images/floqr-color.png?v=" + ICON_V,
+    // White script + tinniest Nightlife cyan→violet→magenta border/halo (user base mark)
+    nightlife: "./images/chrome/floqr-script/floqr-hero-nightlife-white-glow.png?v=" + ICON_V,
     traditional: "./images/chrome/floqr-script/floqr-hero-traditional.png?v=" + ICON_V,
     blackTiffany: "./images/chrome/floqr-script/floqr-hero-blacktiffany.png?v=" + ICON_V,
     whiteBlack: "./images/chrome/floqr-script/floqr-hero-whiteblack.png?v=" + ICON_V,
@@ -378,6 +379,8 @@
     global.document.querySelectorAll(BRAND_LOGO_SELECTOR).forEach((el) => {
       const img = el.tagName === "IMG" ? el : el.querySelector?.("img");
       if (!img) return;
+      // Picker thumbnails stay scheme-specific — do not overwrite with active chrome.
+      if (img.classList.contains("chrome-select-logo") || img.closest?.(".chrome-select-card")) return;
       // Skip product logos that are not FloqR parent marks
       const alt = String(img.getAttribute("alt") || "").toLowerCase();
       const src = String(img.getAttribute("src") || "");
@@ -438,6 +441,11 @@
         el.classList.toggle("hidden", !allowed);
         el.hidden = !allowed;
         el.setAttribute("aria-hidden", allowed ? "false" : "true");
+      });
+      scope.querySelectorAll("[data-floqr-theme-locked]").forEach((el) => {
+        el.classList.toggle("hidden", allowed);
+        el.hidden = allowed;
+        el.setAttribute("aria-hidden", allowed ? "true" : "false");
       });
     }
     applyDocument(getChrome());

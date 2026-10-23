@@ -14,7 +14,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 0, IsTestFeature: 1},
   // Site chrome beta — Nightlife/Traditional theme; no Search tile. Preference datapoint: users.isSiteChrome.
-  {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=language", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
+  {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=appearance", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));
 
 const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));

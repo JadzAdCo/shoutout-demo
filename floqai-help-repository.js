@@ -1438,17 +1438,17 @@
     {
       id: "help-chrome-scheme",
       title: "Site chrome",
-      body: "Beta: switch the whole FLOQR site between Nightlife (neon cyan–magenta), Traditional (charcoal / white + script FloqR mark), Black Tiffany (true black + Tiffany blue script mark), White/Black (white background, charcoal text, black script mark), Purple & White (true black + violet/coral — formerly mislabeled Black Dark Green), and Black & Dark Green (true black + forest green). Colors, cards, icons, FloqR wordmark, receipts, and chrome update together. Stored as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green). Available when FLOQR enables Site chrome and invites or assigns you. Find the switch in My Profile → Language Settings (not on public Search).",
+      body: "Beta: pick one Site chrome for the whole FloqR site. Nightlife (white script mark with neon cyan–magenta border halo), Traditional (charcoal / white + script FloqR mark), Black Tiffany (true black + Tiffany blue script mark), White/Black (white background, charcoal text, black script mark), Purple & White (true black + violet/coral), and Black & Dark Green (true black + forest green). Colors, cards, icons, FloqR wordmark, receipts, and chrome update together. Tap a card to apply instantly — saved as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green). Available when FLOQR enables Site chrome and invites or assigns you. Find it under My Profile → Appearance → Site chrome (not Language Settings).",
       searchPhrases: [
-        "site chrome", "site theme", "traditional theme", "nightlife theme", "traditional chrome", "nightlife chrome",
+        "site chrome", "appearance", "site theme", "traditional theme", "nightlife theme", "traditional chrome", "nightlife chrome",
         "black tiffany", "purple white", "purple & white", "black dark green", "black & dark green", "white black", "white / black", "light theme", "tiffany theme", "forest green theme", "lyft font",
-        "beta theme", "isSiteChrome", "chrome", "icon theme", "dark theme", "charcoal theme"
+        "beta theme", "isSiteChrome", "chrome", "icon theme", "dark theme", "charcoal theme", "site look"
       ],
       links: [
-        {label: "Language Settings (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "site chrome settings", blurb: "Nightlife / Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green Site chrome (beta)"}
+        {label: "Appearance (My Profile)", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "appearance"}), search: "site chrome appearance", blurb: "Site chrome card picker — Nightlife / Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green (beta)"}
       ],
       source: "help-repository-seed",
-      page: "patron-portal.html#portalLanguageSettings"
+      page: "patron-portal.html#portalAppearance"
     },
     {
       id: "help-my-profile",
