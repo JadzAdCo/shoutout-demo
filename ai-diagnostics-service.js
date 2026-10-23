@@ -226,6 +226,7 @@
       version: "s3.2.45",
       title: "s3.2.45 — FloqCAST Image 2 chrome + SVG sync (nightlife / traditional / whiteblack)",
       checks: [
+        {label:"Package version s3.2.45", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.45\""]},
         {label:"ICON_V s3.2.45", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.45\"", "floqcast-nightlife.jpg"]},
         {label:"FloqCAST nightlife SVG embeds Image 2", file:"images/review/floqcast-icon-nightlife.svg", includes:["aria-label=\"FloqCAST nightlife\"", "data:image/jpeg;base64,"]},
         {label:"FloqCAST traditional SVG", file:"images/review/floqcast-icon-traditional.svg", includes:["aria-label=\"FloqCAST traditional\"", "data:image/jpeg;base64,"]},
