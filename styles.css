@@ -1565,30 +1565,36 @@ html[data-floqr-chrome="traditional"] .primary{
   background:var(--floqr-brand-gradient-h);
   color:#06101c;
 }
-/* View Club–style secondary buttons: charcoal fill + cyan ink; active = thin cyan border */
-html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn),
+/* View Club–style secondary buttons: charcoal fill + cyan ink; active = thin cyan border.
+   Exclude full-card venue pickers (VIP) — those keep white card copy; pills/CTAs styled below. */
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):not(.vip-venue-option),
 html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn),
 html[data-floqr-chrome="traditional"] .ghost,
 html[data-floqr-chrome="traditional"] .club-option .queue-actions .buttonlike,
+html[data-floqr-chrome="traditional"] .club-option .queue-actions a.buttonlike,
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary),
 html[data-floqr-chrome="traditional"] .search-chrome-btn,
 html[data-floqr-chrome="traditional"] .admin-tab:not(.active),
 html[data-floqr-chrome="traditional"] .admin-subtab:not(.active){
   background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
   color:var(--floqr-tile-cyan)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan)!important;
   border:1px solid rgba(255,255,255,.16)!important;
   box-shadow:none!important;
   text-shadow:none!important;
 }
-html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):hover,
-html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):focus-visible,
-html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn)[aria-pressed="true"],
-html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn).active,
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):not(.vip-venue-option):hover,
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):not(.vip-venue-option):focus-visible,
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):not(.vip-venue-option)[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):not(.vip-venue-option).active,
 html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn):hover,
 html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn):focus-visible,
 html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn)[aria-pressed="true"],
 html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn).active,
 html[data-floqr-chrome="traditional"] .ghost:hover,
 html[data-floqr-chrome="traditional"] .ghost:focus-visible,
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary):hover,
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike:not(.primary):focus-visible,
 html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"],
 html[data-floqr-chrome="traditional"] .search-chrome-btn:focus-visible,
 html[data-floqr-chrome="traditional"] .admin-tab.active,
@@ -1596,6 +1602,7 @@ html[data-floqr-chrome="traditional"] .admin-subtab.active{
   border-color:var(--floqr-tile-cyan)!important;
   box-shadow:none!important;
   color:var(--floqr-tile-cyan)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan)!important;
   background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
 }
 html[data-floqr-chrome="traditional"] .status{color:#fff}
@@ -1663,12 +1670,89 @@ html[data-floqr-chrome="traditional"] textarea{
 }
 html[data-floqr-chrome="traditional"] a{color:var(--accent)}
 html[data-floqr-chrome="traditional"] .linklike{color:#fff}
+/* Search-output pills (ShoutOut / VIP / FloqCast / services / templates): match View Club cyan.
+   !important beats body/inherited --text and feature CSS loaded after styles.css. */
 html[data-floqr-chrome="traditional"] .tag-row span,
 html[data-floqr-chrome="traditional"] .status-pill,
-html[data-floqr-chrome="traditional"] .badge-row span{
-  border-color:rgba(255,255,255,.16);
-  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%);
-  color:var(--floqr-tile-cyan);
+html[data-floqr-chrome="traditional"] .badge-row span,
+html[data-floqr-chrome="traditional"] .club-option .badge-row span,
+html[data-floqr-chrome="traditional"] .vip-venue-option .badge-row span,
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .badge-row span{
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+  color:var(--floqr-tile-cyan)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan)!important;
+  font-weight:900;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+html[data-floqr-chrome="traditional"] .tag-row span:hover,
+html[data-floqr-chrome="traditional"] .tag-row span:focus-visible,
+html[data-floqr-chrome="traditional"] .tag-row span.active,
+html[data-floqr-chrome="traditional"] .tag-row span[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] .status-pill:hover,
+html[data-floqr-chrome="traditional"] .status-pill:focus-visible,
+html[data-floqr-chrome="traditional"] .status-pill.active,
+html[data-floqr-chrome="traditional"] .badge-row span:hover,
+html[data-floqr-chrome="traditional"] .badge-row span:focus-visible,
+html[data-floqr-chrome="traditional"] .badge-row span.active,
+html[data-floqr-chrome="traditional"] .badge-row span[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] .badge-row span.is-selected{
+  border-color:var(--floqr-tile-cyan)!important;
+  color:var(--floqr-tile-cyan)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan)!important;
+}
+/* VIP reserV full-card venue picker: white copy on charcoal card; cyan border when active */
+html[data-floqr-chrome="traditional"] button.vip-venue-option,
+html[data-floqr-chrome="traditional"] .vip-venue-option{
+  background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(0,0,0,.28) 55%,rgba(20,20,20,.55))!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border:1px solid rgba(0,0,0,.65)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.5)!important;
+  text-shadow:none!important;
+}
+html[data-floqr-chrome="traditional"] button.vip-venue-option:hover,
+html[data-floqr-chrome="traditional"] button.vip-venue-option:focus-visible,
+html[data-floqr-chrome="traditional"] button.vip-venue-option.is-selected,
+html[data-floqr-chrome="traditional"] .vip-venue-option:hover,
+html[data-floqr-chrome="traditional"] .vip-venue-option:focus-visible,
+html[data-floqr-chrome="traditional"] .vip-venue-option.is-selected{
+  border-color:var(--floqr-tile-cyan)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(0,0,0,.28) 55%,rgba(20,20,20,.55))!important;
+  box-shadow:0 0 0 1px rgba(0,200,255,.35),0 18px 48px rgba(0,0,0,.5)!important;
+}
+html[data-floqr-chrome="traditional"] .vip-venue-option .club-option-head h3,
+html[data-floqr-chrome="traditional"] .vip-venue-option .club-option-head p,
+html[data-floqr-chrome="traditional"] .vip-venue-option .dj{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html[data-floqr-chrome="traditional"] .vip-venue-option .club-option-head strong{
+  color:var(--lime,#cfefff)!important;
+  -webkit-text-fill-color:var(--lime,#cfefff)!important;
+}
+html[data-floqr-chrome="traditional"] .vip-venue-option .primary,
+html[data-floqr-chrome="traditional"] .vip-venue-option .vip-pick-cta{
+  background:var(--floqr-brand-gradient-h)!important;
+  color:#06101c!important;
+  -webkit-text-fill-color:#06101c!important;
+  border:0!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+/* FloqCast venue cards: selected ring matches cyan active border */
+html[data-floqr-chrome="traditional"] .floqcast-venue-item.is-selected{
+  border-color:var(--floqr-tile-cyan)!important;
+  box-shadow:0 0 0 1px rgba(0,200,255,.35),0 18px 40px rgba(0,0,0,.28)!important;
+}
+html[data-floqr-chrome="traditional"] .floqcast-venue-item .buttonlike.primary{
+  background:var(--floqr-brand-gradient-h)!important;
+  color:#06101c!important;
+  -webkit-text-fill-color:#06101c!important;
+  border:0!important;
 }
 /* classic-bw vault card follows Traditional chrome (LED preview keeps red art) */
 html[data-floqr-chrome="traditional"] .template.classic-bw.template-select-card,

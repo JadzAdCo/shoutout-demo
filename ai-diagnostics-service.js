@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.40";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.40";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.41";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.41";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.41",
+      title: "s3.2.41 — Traditional search-output pills + VIP/FloqCast chrome",
+      checks: [
+        {label:"Package version s3.2.41", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.41\""]},
+        {label:"Search-output badge cyan !important", file:"styles.css", includes:["Search-output pills", "-webkit-text-fill-color:var(--floqr-tile-cyan)!important"]},
+        {label:"VIP venue option Traditional slice", file:"vip.css", includes:["Traditional search-output venue cards", "vip-venue-option .badge-row span"]},
+        {label:"FloqCast Select venue Traditional", file:"floqcast-search.css", includes:["Select venue matches View Club", "floqcast-venue-item .buttonlike:not(.primary)"]},
+        {label:"Manual test s3.2.41", file:"ai-diagnostics-service.js", includes:["s3-2-41-traditional-search-output-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.41\""]}
+      ]
+    },
     {
       version: "s3.2.40",
       title: "s3.2.40 — Traditional View Club buttons + classic-bw red LED",
@@ -2371,6 +2383,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-41-traditional-search-output-chrome",
+      area:"Site chrome / Search",
+      feature:"Traditional search-output pills + VIP/FloqCast venue cards match View Club",
+      changed:"Search-output .badge-row / .tag-row pills use View Club cyan ink + charcoal fill with !important (ShoutOut club cards, VIP venue cards, FloqCast, services). VIP full-card venue buttons keep white copy + cyan active border. FloqCast Select venue CTAs match. Package s3.2.41.",
+      howToTest:"1) Site chrome Traditional; hard-refresh Search + vip.html + floqcast-search.html (?v=s3.2.41). 2) ShoutOut location card: night pills (Thursday/Friday/Saturday) = cyan text on charcoal (same as View Club ink); View Club unchanged. 3) VIP reserV venue cards: Bookable/genre pills cyan; Select venue primary gradient; hover card gets thin cyan border. 4) FloqCast: Select venue = charcoal + cyan; selected card cyan ring; Go live stays primary gradient.",
+      expected:"All dynamic search-output secondary pills/CTAs match View Club Traditional chrome; primaries stay brand gradient.",
+      troubleshoot:"Still white pill text → hard refresh styles.css + vip.css + floqcast-search.css s3.2.41 (feature CSS loads after styles). Confirm html[data-floqr-chrome=traditional]."
     },
     {
       id:"s3-2-40-traditional-viewclub-classic-bw-red",
