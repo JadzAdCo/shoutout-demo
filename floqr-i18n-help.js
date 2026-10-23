@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.40";
+  const VERSION = "s3.2.42";
 
   const packs = {
     "ru": {
@@ -189,6 +189,10 @@
       "help-club-admin-affiliation": {
         title: "Назначение Club Admin на площадку",
         body: "Club Admins открывают Venue Command Center только для назначенного клуба. Открытие admin.html без площадки больше не ведёт по умолчанию на Zebbies. Демо-аккаунты temp_clubadmin_N@floqr-demo.com соответствуют temp-democlub-N. Неназначенные админы запрашивают назначение у Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "Центр управления площадкой",
+        body: "Одобряйте ShoutOuts, смотрите показатели площадки и сверяйте активность аккаунта для этой локации."
       },
       "help-general-notifications": {
         title: "Общие уведомления",
@@ -500,6 +504,10 @@
         title: "Club Admin-venue toewijzing",
         body: "Club Admins openen het Venue Command Center alleen voor een club waaraan ze zijn toegewezen. admin.html zonder venue opent niet langer standaard Zebbies. Demo-accounts temp_clubadmin_N@floqr-demo.com horen bij temp-democlub-N. Niet-toegewezen admins vragen toewijzing aan bij Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Keur ShoutOuts goed, bekijk venue-prestaties en stem accountactiviteit af voor deze locatie."
+      },
       "help-general-notifications": {
         title: "Algemene meldingen",
         body: "SOS2FA en andere FloqR-systeemberichten volgen deze vlaggen in het gebruikersrecord van een patron. Venues of onafhankelijke service members moeten zich abonneren op betaalde SMS/WhatsApp Twilio-diensten."
@@ -809,6 +817,10 @@
       "help-club-admin-affiliation": {
         title: "Club Admin affectation du lieu",
         body: "Les 3 joueurs n'ouvrent le Venue Command Center que pour le club auquel ils sont affectés. L'ouverture de admin.html sans lieu n'est plus par défaut Zebbies. Les comptes de démonstration temp_clubadmin_N@floqr-demo.com correspondent à temp-democlub-N. Les administrateurs non attribués demandent une affectation à Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "Centre de commande du lieu",
+        body: "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club."
       },
       "help-general-notifications": {
         title: "Notifications générales",
@@ -1120,6 +1132,10 @@
         title: "Club Admin Veranstaltungsortzuweisung",
         body: "Club Admins öffnen das Venue Command Center nur für einen Club, dem sie zugewiesen sind. Beim Öffnen von admin.html ohne Veranstaltungsort wird nicht mehr standardmäßig Zebbies verwendet. Demokonten temp_clubadmin_N@floqr-demo.com sind temp-democlub-N zugeordnet. Nicht zugewiesene Administratoren beantragen eine Zuweisung ab Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "ShoutOuts freigeben, Venue-Leistung prüfen und Kontoaktivität für diesen Standort abstimmen."
+      },
       "help-general-notifications": {
         title: "Allgemeine Benachrichtigungen",
         body: "SOS2FA und andere FloqR-Systemmeldungen folgen diesen Flags, die in einem Benutzerdatensatz Ihres Benutzers festgelegt sind. Veranstaltungsorte oder bestimmte unabhängige Servicemitglieder müssen kostenpflichtige Twilio-Dienste für SMS/WhatsApp abonnieren"
@@ -1429,6 +1445,10 @@
       "help-club-admin-affiliation": {
         title: "Club Admin asignación de lugar",
         body: "Los 3 solo abren el Centro de comando del lugar para un club al que están asignados. Abrir admin.html sin un lugar ya no es el predeterminado Zebbies. Las cuentas de demostración temp_clubadmin_N@floqr-demo.com se asignan a temp-democlub-N. Los administradores no asignados solicitan la asignación desde Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Aprueba ShoutOuts, revisa el rendimiento del local y concilia la actividad de la cuenta de esta ubicación."
       },
       "help-general-notifications": {
         title: "Notificaciones generales",
@@ -1740,6 +1760,10 @@
         title: "Club Admin assegnazione della sede",
         body: "I 3 aprono il Venue Command Center solo per il club a cui sono assegnati. L'apertura di admin.html senza una sede non viene più impostata su Zebbies. I conti demo temp_clubadmin_N@floqr-demo.com sono mappati su temp-democlub-N. Gli amministratori non assegnati richiedono l'assegnazione da Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Approva ShoutOuts, esamina il rendimento della sede e riconcilia l'attività dell'account per questa sede."
+      },
       "help-general-notifications": {
         title: "Notifiche generali",
         body: "SOS2FA e altri messaggi di sistema FloqR seguono questi flag come impostati nel record utente di un utente. Le sedi o i membri specifici del servizio indipendente devono abbonarsi ai servizi Twilio a pagamento SMS/WhatsApp"
@@ -2049,6 +2073,10 @@
       "help-club-admin-affiliation": {
         title: "Club Admin atribuição de local",
         body: "Club Adminsó abrem o Venue Command Center para um clube ao qual estão atribuídos. Abrir admin.html sem um local não é mais o padrão Zebbies. As contas de demonstração temp_clubadmin_N@floqr-demo.com são mapeadas para temp-democlub-N. Administradores não atribuídos solicitam atribuição de Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "Centro de Comando do Local",
+        body: "Aprovar ShoutOuts, avaliar o desempenho do local e reconciliar a atividade da conta para este local."
       },
       "help-general-notifications": {
         title: "Notificações Gerais",
@@ -2360,6 +2388,10 @@
         title: "Club Admin ανάθεση χώρου",
         body: "Club Admin ανοίγει μόνο το Κέντρο Διοίκησης του Χώρου για μια λέσχη στην οποία έχουν ανατεθεί. Το άνοιγμα του admin.html χωρίς χώρο δεν είναι πλέον ως προεπιλογή Zebbies. Οι δοκιμαστικοί λογαριασμοί temp_clubadmin_N@floqr-demo.com αντιστοιχίζονται στο temp-democlub-N. Οι μη εκχωρημένοι διαχειριστές ζητούν εκχώρηση από το Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Κέντρο εντολών του χώρου διεξαγωγής",
+        body: "Έγκριση ShoutOuts, έλεγχος απόδοσης χώρου και αντιστοίχιση δραστηριότητας λογαριασμού για αυτήν την τοποθεσία."
+      },
       "help-general-notifications": {
         title: "Γενικές Ειδοποιήσεις",
         body: "Το SOS2FA και άλλα μηνύματα συστήματος FloqR ακολουθούν αυτές τις σημαίες, όπως έχουν οριστεί στο αρχείο χρηστών σας. Χώροι εκδηλώσεων ή συγκεκριμένα ανεξάρτητα μέλη υπηρεσίας πρέπει να εγγραφούν στις επί πληρωμή υπηρεσίες SMS/WhatsApp Twilio"
@@ -2670,6 +2702,10 @@
         title: "Club Admin przypisanie lokalu",
         body: "Club Adminotwierza tylko Centrum Dowodzenia Miejsca dla klubu, do którego są przypisani. Otwarcie admin.html bez miejsca nie domyślnie ustawia już Zebbies. Konta demonstracyjne temp_clubadmin_N@floqr-demo.com mapują na temp-democlub-N. Nieprzypisani administratorzy proszą o przypisanie od Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Centrum dowodzenia obiektem",
+        body: "Zatwierdź ShoutOuts, sprawdź wydajność atrakcji i uzgodnij aktywność na koncie dla tej lokalizacji."
+      },
       "help-general-notifications": {
         title: "Powiadomienia ogólne",
         body: "SOS2FA i inne systemowe wiadomości FloqR podążają za tymi flagami ustawionymi w rekordzie użytkownika patrona. Miejsca lub konkretnych niezależnych członków usługowych muszą subskrybować płatne usługi Twilio SMS/WhatsApp"
@@ -2979,6 +3015,10 @@
       "help-club-admin-affiliation": {
         title: "Club Admin تعيين المكان",
         body: "Club Admin يفتح فقط مركز قيادة المكان للنادي الذي يتم تعيينه له. فتح admin.html بدون مكان لم يعد يحدد Zebbies افتراضياً. حسابات العرض temp_clubadmin_N@floqr-demo.com تتطابق مع temp-democlub-N. المطالبين الذين لم يتم تعيينهم يطلبون التعيين من Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "مركز قيادة المنشأة",
+        body: "الموافقة على ShoutOuts، ومراجعة أداء المكان، وتسوية نشاط الحساب لهذا الموقع."
       },
       "help-general-notifications": {
         title: "الإشعارات العامة",

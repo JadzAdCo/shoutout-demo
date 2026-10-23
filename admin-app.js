@@ -3,7 +3,14 @@
   "use strict";
 
   const byId = id => document.getElementById(id);
-  const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  const setText = (id, value) => {
+    const el = byId(id);
+    if (!el) return;
+    const text = value == null ? "" : String(value);
+    el.textContent = text;
+    /* Do not leave idle success lines (e.g. Master Admin verified) on the header. */
+    if (id === "adminStatus") el.classList.toggle("hidden", !text.trim());
+  };
   const qs = (name, fallback = "") => new URL(window.location.href).searchParams.get(name) || fallback;
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
@@ -3604,7 +3611,9 @@
       byId("adminLogin").classList.add("hidden");
       byId("adminMfaPanel")?.classList.add("hidden");
       byId("adminPanel").classList.remove("hidden");
-      setText("adminStatus", isMasterAdmin ? "Master Admin verified for Club Admin." : "Club admin verified.");
+      /* Access already enforced via hasClubAdminAccess (clubAdminAssignments / roster /
+         Master Admin allow-list). Do not disclose privilege tier in the header. */
+      setText("adminStatus", "");
       enforceVenueFeatureGates();
       renderQueue();
       renderFloqCastQueue();

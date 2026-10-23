@@ -248,7 +248,11 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   const admin = readReleaseFile("admin.html");
   assert.match(admin, /floqr-i18n\.js\?v=s3\./);
   assert.match(admin, /data-i18n="admin.dashboard"/);
-  assert.match(admin, /data-i18n="admin.locationView"/);
+  assert.match(admin, /data-floqr-help-id="help-venue-command-center"/);
+  assert.match(admin, /class="help-label-text"[^>]*data-i18n="admin.venueCommand"/);
+  assert.doesNotMatch(admin, /FLOQR Club Admin/);
+  assert.doesNotMatch(admin, /data-i18n="admin.locationView"/);
+  assert.doesNotMatch(admin, /data-i18n="admin.subtitle"/);
   const portalApp = readReleaseFile("patron-portal-app.js");
   assert.match(portalApp, /lang\.aiGrammar/);
   assert.match(portalApp, /floqr:ui-language/);

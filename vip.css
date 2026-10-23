@@ -57,6 +57,35 @@ html[data-floqr-chrome="traditional"] .vip-hero-logo {
     drop-shadow(0 0 10px rgba(255, 255, 255, 0.28))
     drop-shadow(0 0 18px rgba(0, 0, 0, 0.45));
 }
+/* Traditional search-output venue cards: View Club cyan pills + cyan active border */
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option{
+  background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(0,0,0,.28) 55%,rgba(20,20,20,.55))!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border:1px solid rgba(0,0,0,.65)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.5)!important;
+}
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option:hover,
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option:focus-visible,
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option.is-selected{
+  border-color:var(--floqr-tile-cyan,#00c8ff)!important;
+  box-shadow:0 0 0 1px rgba(0,200,255,.35),0 18px 48px rgba(0,0,0,.5)!important;
+  transform:none;
+}
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option .badge-row span{
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+  color:var(--floqr-tile-cyan,#00c8ff)!important;
+  -webkit-text-fill-color:var(--floqr-tile-cyan,#00c8ff)!important;
+  font-weight:900;
+}
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option .vip-pick-cta.primary,
+html[data-floqr-chrome="traditional"] body.vip-page .vip-venue-option .primary{
+  background:var(--floqr-brand-gradient-h,linear-gradient(90deg,#00c8ff 0%,#5b2dff 48%,#ff2eb8 100%))!important;
+  color:#06101c!important;
+  -webkit-text-fill-color:#06101c!important;
+  border:0!important;
+}
 
 .vip-hero h1 {
   font-size: clamp(2rem, 6vw, 3.2rem);

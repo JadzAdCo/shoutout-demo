@@ -8,7 +8,22 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-22 |
+| Last registry touch | 2026-10-23 |
+
+---
+
+## Venue Command Center (`admin.html`) — header + access (s3.2.42)
+
+**Purpose:** Club Admin hub for one affiliated venue. Header chrome is title + `?` help only (no privilege banners).
+
+| Layer | Wiring |
+|---|---|
+| Surface | `admin.html` — `h1.help-label` → `help-venue-command-center`; `#adminStatus` hidden unless an error/action message is set |
+| Removed chrome | Eyebrow `FLOQR Club Admin`, subtitle paragraph, `Location View` label, idle `Master Admin verified for Club Admin.` / `Club admin verified.` status lines |
+| Help | `help-venue-command-center` — body is former `admin.subtitle`; audiences **`venueAdmin` + `masterAdmin`** (FloqAi partition); locales in `floqr-i18n-help.js` + `scripts/_help-en.json` |
+| Access (server/client) | `admin-app.js` `hasClubAdminAccess` — Master Admin allow-list **or** active `clubAdminAssignments/{locationId_uid}` **or** `clubLocations.adminUids` / `adminEmails` **or** demo `temp_clubadmin_N` → `temp-democlub-N`. MFA required for non-demo Club Admins |
+| Data classification | `clubAdminAssignments` = clubAdmin tier (`data-classification-core.js`); Master Admin oversight does not write a public status string. Least disclosure: privilege tier is not shown in the header after gate pass |
+| Diagnostics | Manual test `s3-2-42-venue-command-help-chrome` |
 
 ---
 
@@ -101,7 +116,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` / `data-floqr-theme-locked` gated) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
-| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Traditional secondary buttons = View Club style (charcoal fill, `--floqr-tile-cyan` ink; active = thin cyan border); Black Tiffany = cyan/azure; White/Black = white surfaces + **white cards** + shiny-black outline CTAs/login (white fill, `#0a0a0a` border + ink); VIP `vip.css` also forces white `body.vip-page` under whiteBlack (overrides nightlife hero wash); Purple & White = violet/coral; Black & Dark Green = forest green |
+| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Traditional secondary buttons = View Club style (charcoal fill, `--floqr-tile-cyan` ink; active = thin cyan border); **search-output pills** (`.badge-row` / `.tag-row` on ShoutOut club cards, VIP venue cards, FloqCast venue items, services) use the same cyan ink + charcoal fill (`!important`, plus `-webkit-text-fill-color`); VIP full-card `button.vip-venue-option` keeps white copy and gets cyan border on hover/focus; FloqCast `Select venue` CTAs match via `styles.css` + `floqcast-search.css` / `vip.css` Traditional slices; Black Tiffany = cyan/azure; White/Black = white surfaces + **white cards** + shiny-black outline CTAs/login (white fill, `#0a0a0a` border + ink); VIP `vip.css` also forces white `body.vip-page` under whiteBlack (overrides nightlife hero wash); Purple & White = violet/coral; Black & Dark Green = forest green |
 | Classic B&W template | `className: classic-bw` — LED board + FloqR identity rail use **red/black letterboard art**. Vault select **card shell** follows Site chrome (Traditional charcoal, White/Black white); only the mini-preview/LED keeps red. |
 | Letter fit tags | Patron template cards show `FLOQRTextLayout` maxima per venue size (`96×48: 3×15=45`). Caps sized for ~1–3 m on P1.56. |
 | FloqR Admin (templates) | Firestore `floqrAdmins/{uid}` (status active) or claim `floqrAdmin`. Rules: `canManageCatalogTemplates()` → `templates` write. Master Admin → Entity Onboarding card assigns/revokes. FloqR Admin-only session opens Template Management. |

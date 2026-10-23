@@ -1100,8 +1100,24 @@
         {label: "Request Club Admin access", href: pageUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
         {label: "Club Admin portal", href: pageUrl("./admin.html", {from: "floqai"})}
       ],
+      audiences: ["venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "admin.html#adminVenueGate"
+    },
+    {
+      id: "help-venue-command-center",
+      title: "Venue Command Center",
+      body: "Approve ShoutOuts, review venue performance, and reconcile account activity for this location.",
+      searchPhrases: [
+        "venue command center", "club admin", "approve shoutouts", "venue performance",
+        "account activity", "reconcile account", "floqr club admin"
+      ],
+      links: [
+        {label: "Venue Command Center", href: pageUrl("./admin.html", {from: "floqai"})}
+      ],
+      audiences: ["venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
     },
     {
       id: "help-sos2fa-request-channels",
