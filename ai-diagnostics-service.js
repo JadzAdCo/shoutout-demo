@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.38";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.38";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.39";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.39";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,29 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.39",
+      title: "s3.2.39 — VIP White/Black white page background",
+      checks: [
+        {label:"Package version s3.2.39", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.39\""]},
+        {label:"VIP whiteBlack body override", file:"vip.css", includes:["White / Black: white page", "html[data-floqr-chrome=\"whiteBlack\"] body.vip-page{", "background:#ffffff!important"]},
+        {label:"VIP whiteBlack Select venue CTA", file:"vip.css", includes:["vip-pick-cta.primary", "border:2px solid #0a0a0a!important"]},
+        {label:"Manual test s3.2.39", file:"ai-diagnostics-service.js", includes:["s3-2-39-vip-whiteblack-page"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.39\""]}
+      ]
+    },
+    {
+      version: "s3.2.38",
+      title: "s3.2.38 — White/Black white cards + letter-fit + FloqR Admin",
+      checks: [
+        {label:"Package version s3.2.38", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.38\""]},
+        {label:"White/Black white template cards", file:"styles.css", includes:["Template select under White/Black: white card chrome", "html[data-floqr-chrome=\"whiteBlack\"] .template.template-select-card"]},
+        {label:"Letter-fit tags", file:"patron-app.js", includes:["letterChips", "template.letterFitHint"]},
+        {label:"FloqR Admin templates rule", file:"firestore.rules", includes:["canManageCatalogTemplates", "floqrAdmins"]},
+        {label:"Manual test s3.2.38", file:"ai-diagnostics-service.js", includes:["s3-2-38-whiteblack-letter-fit-floqr-admin"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.38\""]}
+      ]
+    },
     {
       version: "s3.2.37",
       title: "s3.2.37 — Strict black-and-white classic-bw + White/Black chrome",
@@ -2335,6 +2358,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-39-vip-whiteblack-page",
+      area:"VIP reserV / Site chrome",
+      feature:"VIP choose-venue page is white under White/Black chrome",
+      changed:"vip.css overrides body.vip-page nightlife gradient for whiteBlack: white page, white venue cards, shiny-black outline Select venue. Package s3.2.39.",
+      howToTest:"1) Set Site chrome White/Black. 2) Hard-refresh vip.html (?v=s3.2.39). 3) Top brand area and page background are white (no purple/blue gradient). 4) Select venue is white with black border/text.",
+      expected:"VIP venue list matches White/Black chrome; no nightlife hero wash.",
+      troubleshoot:"Still purple → vip.css whiteBlack body.vip-page !important missing or cache on s3.2.33 live Pages."
     },
     {
       id:"s3-2-38-whiteblack-letter-fit-floqr-admin",
