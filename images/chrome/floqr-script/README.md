@@ -1,23 +1,14 @@
-# FloqR script mark (bird above *q*)
+# FloqR script / hero marks (chrome)
 
-User-provided teal script wordmark, exact PNG recolors for site chromes, plus optional AI directional plates.
+Transparent wordmarks (height matched to `floqr-color.png` = 106px).
 
-## Source
-
-- `floqr-script-user-source.png` — original upload (teal on white)
-- `floqr-script-master-teal.png` — transparent master used for recolors
-- Sampled ink ≈ `#2D8A99`
-
-## Recommended chrome pairing
-
-| Chrome | Wordmark file | Hex |
+| Chrome | File | Notes |
 |---|---|---|
-| Nightlife | `floqr-script-nightlife-cyan.png` | `#00C8FF` |
-| Traditional | `floqr-script-traditional-silver.png` | `#E8ECF0` |
-| Black Tiffany | `floqr-script-blacktiffany.png` | `#81D8D0` |
-| White / Black | `floqr-script-whiteblack-ink.png` | `#111114` |
-| Black Dark Green | `floqr-script-blackdarkgreen.png` | `#2D8A5A` |
+| Nightlife | `../../floqr-color.png` (tile mark) | Unchanged |
+| Traditional | `floqr-hero-traditional.png` | Silver from user image 2 (dark chrome) |
+| Black Tiffany | `floqr-hero-blacktiffany.png` | User image 1, black bg knocked out |
+| White / Black | `floqr-hero-whiteblack.png` | Black ink from image 2 |
+| Purple & White | `floqr-hero-purplewhite.png` | Violet `#5b2dff` (code 4) |
+| Black & Dark Green | `floqr-hero-blackdarkgreen.png` | Forest `#226E44` (code 5) |
 
-Bird-only: `floqr-bird-only-*.png`. Preview: `/floqr-script-logo-preview.html`.
-
-Exact recolors preserve letterforms. `floqr-script-ai-*.jpg` are mood references only.
+Wired via `FLOQRChromeScheme.BRAND_LOGOS` / `applyBrandLogos`.

@@ -1,11 +1,13 @@
 /**
- * FLOQR Site chrome — Nightlife | Traditional | Black Tiffany | White/Black | Black Dark Green.
+ * FLOQR Site chrome — Nightlife | Traditional | Black Tiffany | White/Black |
+ * Purple & White | Black & Dark Green.
  * Preference datapoint: users.isSiteChrome
  *   0 = Nightlife chrome
  *   1 = Traditional
  *   2 = Black Tiffany
  *   3 = White / Black (light)
- *   4 = Black Dark Green
+ *   4 = Purple & White (formerly mislabeled “Black Dark Green”; violet/coral)
+ *   5 = Black & Dark Green (true forest green)
  * Gated by Features & Services key `siteChrome` (beta invite / assignment).
  * Also accepts legacy localStorage floqr.uiChrome / users.uiChrome during migration.
  * Stage pages may set html[data-floqr-theme-ungated="1"] to preview without a beta grant.
@@ -16,7 +18,14 @@
   const STORAGE_KEY = "floqr.isSiteChrome";
   const LEGACY_STORAGE_KEY = "floqr.uiChrome";
   const FEATURE_KEY = "siteChrome";
-  const SCHEMES = ["traditional", "nightlife", "blackTiffany", "whiteBlack", "blackDarkGreen"];
+  const SCHEMES = [
+    "traditional",
+    "nightlife",
+    "blackTiffany",
+    "whiteBlack",
+    "purpleWhite",
+    "blackDarkGreen"
+  ];
   const DEFAULT_SCHEME = "nightlife";
 
   /** Numeric isSiteChrome codes. */
@@ -25,15 +34,16 @@
     TRADITIONAL: 1,
     BLACK_TIFFANY: 2,
     WHITE_BLACK: 3,
-    BLACK_DARK_GREEN: 4,
+    PURPLE_WHITE: 4,
+    BLACK_DARK_GREEN: 5,
+    /** @deprecated use PURPLE_WHITE — code 4 was mislabeled Black Dark Green */
+    RESERVED_4TH: 4,
     /** @deprecated use BLACK_TIFFANY */
-    RESERVED_3RD: 2,
-    /** @deprecated use BLACK_DARK_GREEN */
-    RESERVED_4TH: 4
+    RESERVED_3RD: 2
   });
 
-  /** Asset cache-bust for chrome icon packs (not navigation). */
-  const ICON_V = "s3.2.27";
+  /** Asset cache-bust for chrome icon / brand packs (not navigation). */
+  const ICON_V = "s3.2.30";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -55,6 +65,10 @@
   const BLACK_TIFFANY_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
     vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V
   });
+  const PURPLE_WHITE_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
+    // Purple chrome keeps neon nightlife tiles; VIP mark stays nightlife neon
+    shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V
+  });
   const BLACK_DARK_GREEN_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
     vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
@@ -71,14 +85,26 @@
     traditional: TRADITIONAL_ICONS,
     nightlife: NIGHTLIFE_ICONS,
     blackTiffany: BLACK_TIFFANY_ICONS,
+    purpleWhite: PURPLE_WHITE_ICONS,
     blackDarkGreen: BLACK_DARK_GREEN_ICONS,
     whiteBlack: WHITE_BLACK_ICONS
+  };
+
+  /** FloqR parent / hero wordmarks — transparent PNGs sized to match floqr-color height. */
+  const BRAND_LOGOS = {
+    nightlife: "./images/floqr-color.png?v=" + ICON_V,
+    traditional: "./images/chrome/floqr-script/floqr-hero-traditional.png?v=" + ICON_V,
+    blackTiffany: "./images/chrome/floqr-script/floqr-hero-blacktiffany.png?v=" + ICON_V,
+    whiteBlack: "./images/chrome/floqr-script/floqr-hero-whiteblack.png?v=" + ICON_V,
+    purpleWhite: "./images/chrome/floqr-script/floqr-hero-purplewhite.png?v=" + ICON_V,
+    blackDarkGreen: "./images/chrome/floqr-script/floqr-hero-blackdarkgreen.png?v=" + ICON_V
   };
 
   const LABEL_KEYS = {
     nightlife: "chrome.nightlifeFull",
     traditional: "chrome.traditionalFull",
     blackTiffany: "chrome.blackTiffanyFull",
+    purpleWhite: "chrome.purpleWhiteFull",
     blackDarkGreen: "chrome.blackDarkGreenFull",
     whiteBlack: "chrome.whiteBlackFull"
   };
@@ -87,9 +113,44 @@
     nightlife: "Nightlife theme",
     traditional: "Traditional theme",
     blackTiffany: "Black Tiffany theme",
-    blackDarkGreen: "Black Dark Green theme",
+    purpleWhite: "Purple & White theme",
+    blackDarkGreen: "Black & Dark Green theme",
     whiteBlack: "White / Black theme"
   };
+
+  const BRAND_LOGO_SELECTOR = [
+    "img.floqr-hero-logo",
+    "img.product-parent-logo",
+    "img.intent-floqr-logo",
+    "img.floqai-hero-logo",
+    "img.splash-logo",
+    "img[data-floqr-brand-logo]",
+    "[data-floqr-brand-logo] img"
+  ].join(",");
+
+  function isPurpleAlias(lower) {
+    return (
+      lower === "purplewhite" ||
+      lower === "purple-white" ||
+      lower === "purple_white" ||
+      lower === "purple&white" ||
+      lower === "purple and white" ||
+      lower === "purple / white" ||
+      lower === "purple/white"
+    );
+  }
+
+  function isBlackDarkGreenAlias(lower) {
+    return (
+      lower === "blackdarkgreen" ||
+      lower === "black-dark-green" ||
+      lower === "black_dark_green" ||
+      lower === "black & dark green" ||
+      lower === "black and dark green" ||
+      lower === "blackforest" ||
+      lower === "black-forest"
+    );
+  }
 
   function normalizeScheme(value) {
     const v = String(value || "").trim();
@@ -97,15 +158,8 @@
     if (lower === "blacktiffany" || lower === "black-tiffany" || lower === "black_tiffany") {
       return "blackTiffany";
     }
-    if (
-      lower === "blackdarkgreen" ||
-      lower === "black-dark-green" ||
-      lower === "black_dark_green" ||
-      lower === "blackforest" ||
-      lower === "black-forest"
-    ) {
-      return "blackDarkGreen";
-    }
+    if (isPurpleAlias(lower)) return "purpleWhite";
+    if (isBlackDarkGreenAlias(lower)) return "blackDarkGreen";
     if (
       lower === "whiteblack" ||
       lower === "white-black" ||
@@ -125,6 +179,7 @@
     if (n === SITE_CHROME.TRADITIONAL) return SITE_CHROME.TRADITIONAL;
     if (n === SITE_CHROME.BLACK_TIFFANY) return SITE_CHROME.BLACK_TIFFANY;
     if (n === SITE_CHROME.WHITE_BLACK) return SITE_CHROME.WHITE_BLACK;
+    if (n === SITE_CHROME.PURPLE_WHITE) return SITE_CHROME.PURPLE_WHITE;
     if (n === SITE_CHROME.BLACK_DARK_GREEN) return SITE_CHROME.BLACK_DARK_GREEN;
     if (n === SITE_CHROME.NIGHTLIFE) return SITE_CHROME.NIGHTLIFE;
     return SITE_CHROME.NIGHTLIFE;
@@ -135,6 +190,7 @@
     if (n === SITE_CHROME.TRADITIONAL) return "traditional";
     if (n === SITE_CHROME.BLACK_TIFFANY) return "blackTiffany";
     if (n === SITE_CHROME.WHITE_BLACK) return "whiteBlack";
+    if (n === SITE_CHROME.PURPLE_WHITE) return "purpleWhite";
     if (n === SITE_CHROME.BLACK_DARK_GREEN) return "blackDarkGreen";
     return DEFAULT_SCHEME;
   }
@@ -144,8 +200,24 @@
     if (s === "traditional") return SITE_CHROME.TRADITIONAL;
     if (s === "blackTiffany") return SITE_CHROME.BLACK_TIFFANY;
     if (s === "whiteBlack") return SITE_CHROME.WHITE_BLACK;
+    if (s === "purpleWhite") return SITE_CHROME.PURPLE_WHITE;
     if (s === "blackDarkGreen") return SITE_CHROME.BLACK_DARK_GREEN;
     return SITE_CHROME.NIGHTLIFE;
+  }
+
+  /** Old localStorage / profile uiChrome "blackDarkGreen" meant purple (code 4). */
+  function migrateLegacyChromeStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (raw === "4" && (legacy === "blackDarkGreen" || !legacy)) {
+        localStorage.setItem(LEGACY_STORAGE_KEY, "purpleWhite");
+      }
+      if ((raw == null || raw === "") && legacy === "blackDarkGreen") {
+        localStorage.setItem(STORAGE_KEY, "4");
+        localStorage.setItem(LEGACY_STORAGE_KEY, "purpleWhite");
+      }
+    } catch (_) { /* ignore */ }
   }
 
   function isPremiumScheme(scheme) {
@@ -177,13 +249,20 @@
   }
 
   function readStoredSiteChrome() {
+    migrateLegacyChromeStorage();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw != null && raw !== "") return normalizeSiteChrome(raw);
     } catch (_) { /* ignore */ }
     try {
       const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacy) return siteChromeFromScheme(legacy);
+      if (legacy) {
+        // Pre-rename string always meant purple (code 4)
+        if (String(legacy).toLowerCase() === "blackdarkgreen") {
+          return SITE_CHROME.PURPLE_WHITE;
+        }
+        return siteChromeFromScheme(legacy);
+      }
     } catch (_) { /* ignore */ }
     return SITE_CHROME.NIGHTLIFE;
   }
@@ -197,8 +276,6 @@
   }
 
   function effectiveSiteChrome(preferred) {
-    // Paint always honors the patron's last-used chrome (localStorage / profile).
-    // Beta access only gates the Language Settings picker + new premium picks.
     return preferred != null ? normalizeSiteChrome(preferred) : getSiteChrome();
   }
 
@@ -211,8 +288,6 @@
 
   function setSiteChrome(code, opts = {}) {
     let next = normalizeSiteChrome(code);
-    // Block *new* premium picks only after Features has resolved and access is denied.
-    // Never wipe a previously stored chrome on login / signed-out paint.
     if (
       isPremiumCode(next) &&
       featuresAccessResolved &&
@@ -257,7 +332,13 @@
     if (profile && Object.prototype.hasOwnProperty.call(profile, "isSiteChrome")) {
       code = normalizeSiteChrome(profile.isSiteChrome);
     } else if (profile?.uiChrome) {
-      code = siteChromeFromScheme(profile.uiChrome);
+      const legacyName = String(profile.uiChrome).trim().toLowerCase();
+      // Old profiles stored uiChrome "blackDarkGreen" for the purple theme (code 4)
+      if (legacyName === "blackdarkgreen" || legacyName === "black dark green") {
+        code = SITE_CHROME.PURPLE_WHITE;
+      } else {
+        code = siteChromeFromScheme(profile.uiChrome);
+      }
     } else {
       return applyDocument(getChrome());
     }
@@ -265,13 +346,17 @@
       localStorage.setItem(STORAGE_KEY, String(code));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(code));
     } catch (_) { /* ignore */ }
-    // Cross-device: profile wins; paint immediately (incl. signed-out→signed-in on login).
     return applyDocument(schemeFromSiteChrome(code));
   }
 
   function iconUrl(featureKey, scheme) {
     const pack = ICON_PACK[normalizeScheme(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
     return pack[featureKey] || null;
+  }
+
+  function brandLogoUrl(scheme) {
+    const s = normalizeScheme(scheme || effectiveChrome());
+    return BRAND_LOGOS[s] || BRAND_LOGOS[DEFAULT_SCHEME];
   }
 
   function labelFor(scheme) {
@@ -285,8 +370,33 @@
     return LABEL_FALLBACK[s] || LABEL_FALLBACK[DEFAULT_SCHEME];
   }
 
+  function applyBrandLogos(scheme) {
+    if (!global.document) return;
+    const url = brandLogoUrl(scheme);
+    if (!url) return;
+    const bust = (url.includes("?") ? "&" : "?") + "chrome=" + encodeURIComponent(scheme);
+    global.document.querySelectorAll(BRAND_LOGO_SELECTOR).forEach((el) => {
+      const img = el.tagName === "IMG" ? el : el.querySelector?.("img");
+      if (!img) return;
+      // Skip product logos that are not FloqR parent marks
+      const alt = String(img.getAttribute("alt") || "").toLowerCase();
+      const src = String(img.getAttribute("src") || "");
+      const isFloqr =
+        img.classList.contains("floqr-hero-logo") ||
+        img.classList.contains("product-parent-logo") ||
+        img.classList.contains("intent-floqr-logo") ||
+        img.classList.contains("floqai-hero-logo") ||
+        img.classList.contains("splash-logo") ||
+        img.hasAttribute("data-floqr-brand-logo") ||
+        /floqr/i.test(alt) ||
+        /floqr-color|floqr-hero|floqr-script/i.test(src);
+      if (!isFloqr) return;
+      img.setAttribute("src", url + bust);
+      img.setAttribute("data-floqr-brand-logo", scheme);
+    });
+  }
+
   function applyDocument(scheme) {
-    // Prefer explicit scheme, else last-used storage — never demote for missing beta.
     const s = scheme != null ? normalizeScheme(scheme) : getChrome();
     if (global.document && global.document.documentElement) {
       global.document.documentElement.setAttribute("data-floqr-chrome", s);
@@ -304,6 +414,7 @@
         el.style.backgroundImage = 'url("' + url + bust + '")';
       }
     });
+    applyBrandLogos(s);
     global.document.querySelectorAll("[data-floqr-chrome-label]").forEach((el) => {
       el.textContent = labelFor(s);
     });
@@ -329,8 +440,6 @@
         el.setAttribute("aria-hidden", allowed ? "false" : "true");
       });
     }
-    // Login + Search: always paint last-used chrome (device localStorage). Cross-device
-    // comes from hydrateFromProfile after sign-in. Access gate only toggles the picker.
     applyDocument(getChrome());
     return allowed;
   }
@@ -361,13 +470,17 @@
     SCHEMES,
     DEFAULT_SCHEME,
     ICON_PACK,
+    BRAND_LOGOS,
+    ICON_V,
     getChrome,
     getSiteChrome,
     setChrome,
     setSiteChrome,
     hydrateFromProfile,
     iconUrl,
+    brandLogoUrl,
     applyDocument,
+    applyBrandLogos,
     bindToggle,
     syncAccessGate,
     markFeaturesAccessResolved,
@@ -383,8 +496,7 @@
   };
 
   function boot() {
-    // Optimistic: restore last chrome (Traditional, etc.) so the closed profile card
-    // on Search matches the chosen theme before Features & Services returns.
+    migrateLegacyChromeStorage();
     applyDocument(getChrome());
     if (hasThemeAccess()) {
       featuresAccessResolved = true;

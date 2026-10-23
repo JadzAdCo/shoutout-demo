@@ -45,6 +45,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /--floqr-brand-gradient-h:linear-gradient/);
   assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
   assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.primary/);
+  assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
+  assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#2d8a5a/);
   assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
@@ -67,10 +69,15 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(portal, /data-floqr-chrome-btn="traditional"/);
   assert.match(portal, /data-floqr-chrome-btn="blackTiffany"/);
   assert.match(portal, /data-floqr-chrome-btn="whiteBlack"/);
+  assert.match(portal, /data-floqr-chrome-btn="purpleWhite"/);
   assert.match(portal, /data-floqr-chrome-btn="blackDarkGreen"/);
   assert.match(chrome, /BLACK_TIFFANY/);
   assert.match(chrome, /WHITE_BLACK/);
+  assert.match(chrome, /PURPLE_WHITE/);
   assert.match(chrome, /BLACK_DARK_GREEN/);
+  assert.match(chrome, /purpleWhite/);
+  assert.match(chrome, /brandLogoUrl/);
+  assert.match(chrome, /floqr-hero-blacktiffany\.png/);
   assert.match(chrome, /blackTiffany/);
   assert.match(chrome, /whiteBlack/);
   assert.match(chrome, /vip-whiteblack\.jpg/);

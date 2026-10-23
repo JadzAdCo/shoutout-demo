@@ -87,23 +87,25 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Site chrome (beta — `siteChrome` / `isSiteChrome`)
 
-**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Black Dark Green**. Not on public Search. Brand accents come from the FloqR tile palette (`images/chrome/floqr-tile-palette-ref.png`).
+**Purpose:** Granted beta testers switch the **whole FLOQR site** between **Nightlife**, **Traditional**, **Black Tiffany**, **White/Black**, and **Purple & White / Black & Dark Green**. Not on public Search. Brand accents come from the FloqR tile palette (`images/chrome/floqr-tile-palette-ref.png`).
 
 | Layer | Wiring |
 |---|---|
 | Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
 | Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
-| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Black Dark Green (+ legacy `uiChrome` string) |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Purple & White / Black & Dark Green (+ legacy `uiChrome` string) |
 | Default | `0` / Nightlife for new patrons; last-used chrome is painted from localStorage / profile even when beta access is off (login + Search). Picker UI fail-closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` gated) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
-| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + brand CTAs (grey icon halo); Black Dark Green = violet/coral warm end |
+| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + brand CTAs (grey icon halo); Purple & White / Black & Dark Green = violet/coral warm end |
 | VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → Language Settings (gated); Release Control titles use white `h2.features-release-title` + `?` (`help-features-services`, `help-feature-promote-live`) |
 | i18n / help | `chrome.*` (+ `blackTiffany` / `whiteBlack` / `blackDarkGreen`); FloqAi `help-chrome-scheme` |
 
 ---
+
+| Brand logos | `FLOQRChromeScheme.BRAND_LOGOS` + `applyBrandLogos` — transparent script marks for Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green; Nightlife keeps `floqr-color.png`. Wired on Search, login, VIP, pass, confirmation receipts |
 
 ## Post-feature QA email + Manual Feature Diagnostics
 

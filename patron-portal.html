@@ -8,21 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.2.27"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.2.27"/>
+<link rel="stylesheet" href="./styles.css?v=s3.2.30"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.2.30"/>
   <script>
     /* Paint Site chrome before CSS so the closed profile card matches the chosen theme. */
     try{
-      var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"blackDarkGreen"};
+      var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
       var __floqrChrome=__floqrChromeMap[__floqrChromeRaw];
       if(!__floqrChrome){
         var __legacy=String(localStorage.getItem("floqr.uiChrome")||"").trim();
-        if(__legacy==="traditional"||__legacy==="nightlife"||__legacy==="blackTiffany"||__legacy==="whiteBlack"||__legacy==="blackDarkGreen") __floqrChrome=__legacy;
+        if(__legacy==="traditional"||__legacy==="nightlife"||__legacy==="blackTiffany"||__legacy==="whiteBlack"||__legacy==="blackDarkGreen"||__legacy==="purpleWhite") __floqrChrome=__legacy;
       }
       if(__floqrChrome){
         document.documentElement.setAttribute("data-floqr-chrome",__floqrChrome);
-        document.documentElement.setAttribute("data-is-site-chrome",String(__floqrChromeRaw!=null&&__floqrChromeRaw!==""?__floqrChromeRaw:({nightlife:0,traditional:1,blackTiffany:2,whiteBlack:3,blackDarkGreen:4})[__floqrChrome]));
+        document.documentElement.setAttribute("data-is-site-chrome",String(__floqrChromeRaw!=null&&__floqrChromeRaw!==""?__floqrChromeRaw:({nightlife:0,traditional:1,blackTiffany:2,whiteBlack:3,purpleWhite:4,blackDarkGreen:5})[__floqrChrome]));
       }
     }catch(_){}
   </script>
@@ -599,15 +599,16 @@
             <h3 data-i18n="chrome.pageTitle"
                 data-floqr-help-id="help-chrome-scheme"
                 data-floqr-help-title="Site chrome"
-                data-floqr-help-body="Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black (white background + charcoal text/borders), and Black Dark Green. Colors, cards, icons, and chrome update together. Stored as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Black Dark Green). Available when FLOQR enables Site chrome and invites or assigns you."
-                data-floqr-help-search="site chrome|site theme|traditional theme|nightlife theme|black tiffany|black dark green|white black|forest green|isSiteChrome|beta theme">Site chrome</h3>
-            <p class="sub small" data-i18n="chrome.hint">Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black, and Black Dark Green.</p>
+                data-floqr-help-body="Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black, Purple & White (violet/coral on black), and Black & Dark Green (forest green on black). Colors, cards, icons, FloqR wordmark, and chrome update together. Stored as isSiteChrome (0 Nightlife, 1 Traditional, 2 Black Tiffany, 3 White/Black, 4 Purple & White, 5 Black & Dark Green). Available when FLOQR enables Site chrome and invites or assigns you."
+                data-floqr-help-search="site chrome|site theme|traditional theme|nightlife theme|black tiffany|purple white|black dark green|white black|forest green|isSiteChrome|beta theme">Site chrome</h3>
+            <p class="sub small" data-i18n="chrome.hint">Beta: switch the whole FLOQR site between Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, and Black & Dark Green.</p>
             <div class="search-chrome-toolbar" role="group" aria-label="Site chrome" style="justify-content:flex-start">
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="nightlife" data-i18n="chrome.nightlife" aria-pressed="true">Nightlife</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="traditional" data-i18n="chrome.traditional" aria-pressed="false">Traditional</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="blackTiffany" data-i18n="chrome.blackTiffany" aria-pressed="false">Black Tiffany</button>
               <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="whiteBlack" data-i18n="chrome.whiteBlack" aria-pressed="false">White / Black</button>
-              <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="blackDarkGreen" data-i18n="chrome.blackDarkGreen" aria-pressed="false">Black Dark Green</button>
+              <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="purpleWhite" data-i18n="chrome.purpleWhite" aria-pressed="false">Purple & White</button>
+              <button type="button" class="search-chrome-btn" data-floqr-chrome-btn="blackDarkGreen" data-i18n="chrome.blackDarkGreen" aria-pressed="false">Black & Dark Green</button>
               <span class="search-chrome-active sub small"><span data-i18n="chrome.active">Active:</span> <strong data-floqr-chrome-label>Nightlife theme</strong></span>
             </div>
           </div>
@@ -844,52 +845,52 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.2.27"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.27"></script>
-<script src="./floqr-people-directory.js?v=s3.2.27"></script>
-<script src="./floqr-app-check.js?v=s3.2.27"></script>
-<script src="./floqr-nav.js?v=s3.2.27"></script>
-<script src="./floqr-qrcode-lib.js?v=s3.2.27"></script>
-<script src="./floqr-qr.js?v=s3.2.27"></script>
-<script src="./global-profile-status.js?v=s3.2.27"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.2.27"></script>
-<script src="./shared-data.js?v=s3.2.27"></script>
-<script src="./url-media-field.js?v=s3.2.27"></script>
-<script src="./ai-service.js?v=s3.2.27"></script>
-<script src="./ai-index-service.js?v=s3.2.27"></script>
-<script src="./ai-search-service.js?v=s3.2.27"></script>
-<script src="./ai-notification-service.js?v=s3.2.27"></script>
-<script src="./ai-template-studio.js?v=s3.2.27"></script>
-<script src="./ai-grammar-service.js?v=s3.2.27"></script>
-  <script src="./floqr-action-feedback.js?v=s3.2.27"></script>
-<script src="./floqr-tab-gates.js?v=s3.2.27"></script>
-<script src="./floqr-feature-services.js?v=s3.2.27"></script>
-<script src="./floqr-i18n.js?v=s3.2.27"></script>
-<script src="./floqai-help-repository.js?v=s3.2.27"></script>
-<script src="./floqr-i18n-help.js?v=s3.2.27"></script>
-<script src="./help-attach.js?v=s3.2.27"></script>
-<script src="./helper-popouts.js?v=s3.2.27"></script>
-<script src="./floqr-identity.js?v=s3.2.27"></script>
-<script src="./floqr-blocks.js?v=s3.2.27"></script>
-<script src="./payment-service.js?v=s3.2.27"></script>
-<script src="./dj-commerce-policy.js?v=s3.2.27"></script>
-<script src="./floqr-service-access.js?v=s3.2.27"></script>
-<script src="./floqr-venue-picker.js?v=s3.2.27"></script>
-<script src="./floqr-employee-network.js?v=s3.2.27"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.2.27"></script>
-<script src="./floqr-canonical.js?v=s3.2.27"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.2.27"></script>
-<script src="./floqr-consent-mode.js?v=s3.2.27"></script>
-<script src="./floqr-ad-pricing.js?v=s3.2.27"></script>
-<script src="./ad-campaigns.js?v=s3.2.27"></script>
-<script src="./floqr-ad-composer.js?v=s3.2.27"></script>
-<script src="./patron-ad-campaigns.js?v=s3.2.27"></script>
-<script src="./floqr-access-notice.js?v=s3.2.27"></script>
-<script src="./floqr-safe-render.js?v=s3.2.27"></script>
-<script src="./floqr-board-frame.js?v=s3.2.27"></script>
-<script src="./floqr-template-preview.js?v=s3.2.27"></script>
-<script src="./patron-portal-app.js?v=s3.2.27"></script>
-  <script src="./profile-access-guard.js?v=s3.2.27"></script>
+<script src="./firebase-config.js?v=s3.2.30"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.30"></script>
+<script src="./floqr-people-directory.js?v=s3.2.30"></script>
+<script src="./floqr-app-check.js?v=s3.2.30"></script>
+<script src="./floqr-nav.js?v=s3.2.30"></script>
+<script src="./floqr-qrcode-lib.js?v=s3.2.30"></script>
+<script src="./floqr-qr.js?v=s3.2.30"></script>
+<script src="./global-profile-status.js?v=s3.2.30"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.2.30"></script>
+<script src="./shared-data.js?v=s3.2.30"></script>
+<script src="./url-media-field.js?v=s3.2.30"></script>
+<script src="./ai-service.js?v=s3.2.30"></script>
+<script src="./ai-index-service.js?v=s3.2.30"></script>
+<script src="./ai-search-service.js?v=s3.2.30"></script>
+<script src="./ai-notification-service.js?v=s3.2.30"></script>
+<script src="./ai-template-studio.js?v=s3.2.30"></script>
+<script src="./ai-grammar-service.js?v=s3.2.30"></script>
+  <script src="./floqr-action-feedback.js?v=s3.2.30"></script>
+<script src="./floqr-tab-gates.js?v=s3.2.30"></script>
+<script src="./floqr-feature-services.js?v=s3.2.30"></script>
+<script src="./floqr-i18n.js?v=s3.2.30"></script>
+<script src="./floqai-help-repository.js?v=s3.2.30"></script>
+<script src="./floqr-i18n-help.js?v=s3.2.30"></script>
+<script src="./help-attach.js?v=s3.2.30"></script>
+<script src="./helper-popouts.js?v=s3.2.30"></script>
+<script src="./floqr-identity.js?v=s3.2.30"></script>
+<script src="./floqr-blocks.js?v=s3.2.30"></script>
+<script src="./payment-service.js?v=s3.2.30"></script>
+<script src="./dj-commerce-policy.js?v=s3.2.30"></script>
+<script src="./floqr-service-access.js?v=s3.2.30"></script>
+<script src="./floqr-venue-picker.js?v=s3.2.30"></script>
+<script src="./floqr-employee-network.js?v=s3.2.30"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.2.30"></script>
+<script src="./floqr-canonical.js?v=s3.2.30"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.2.30"></script>
+<script src="./floqr-consent-mode.js?v=s3.2.30"></script>
+<script src="./floqr-ad-pricing.js?v=s3.2.30"></script>
+<script src="./ad-campaigns.js?v=s3.2.30"></script>
+<script src="./floqr-ad-composer.js?v=s3.2.30"></script>
+<script src="./patron-ad-campaigns.js?v=s3.2.30"></script>
+<script src="./floqr-access-notice.js?v=s3.2.30"></script>
+<script src="./floqr-safe-render.js?v=s3.2.30"></script>
+<script src="./floqr-board-frame.js?v=s3.2.30"></script>
+<script src="./floqr-template-preview.js?v=s3.2.30"></script>
+<script src="./patron-portal-app.js?v=s3.2.30"></script>
+  <script src="./profile-access-guard.js?v=s3.2.30"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

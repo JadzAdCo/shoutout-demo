@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.27";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.27";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.30";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.30";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.30",
+      title: "s3.2.30 — Script FloqR marks + Purple & White / Black & Dark Green",
+      checks: [
+        {label:"Package version s3.2.30", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.30\""]},
+        {label:"Purple & White scheme", file:"floqr-chrome-scheme.js", includes:["PURPLE_WHITE", "purpleWhite", "BRAND_LOGOS"]},
+        {label:"Black & Dark Green code 5", file:"floqr-chrome-scheme.js", includes:["BLACK_DARK_GREEN: 5"]},
+        {label:"Tiffany transparent hero path", file:"floqr-chrome-scheme.js", includes:["floqr-hero-blacktiffany.png"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.30\""]}
+      ]
+    },
+    
     {
       version: "s3.2.27",
       title: "s3.2.27 — Template howitWorks + Traditional description",
@@ -2090,6 +2102,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-30-chrome-brand-logos",
+        area:"Chrome",
+        feature:"Script FloqR marks + Purple & White / Black & Dark Green",
+        changed:"Black Tiffany uses transparent Tiffany script mark. Traditional / White-Black use script mark from user image 2. Former Black Dark Green (violet) renamed Purple & White (isSiteChrome=4). New Black & Dark Green forest chrome is isSiteChrome=5. Brand logos swap on Search, login, VIP, pass, confirmation receipts. Package s3.2.30.",
+        howToTest:"1) My Profile → Language Settings → Site chrome. 2) Black Tiffany — Tiffany script mark. 3) Traditional — silver script. 4) Purple & White — violet mark + violet/coral chrome. 5) Black & Dark Green — forest green mark. 6) Confirmation / pass.html logos match chrome.",
+        expected:"Wordmark and chrome colors match the selected theme on Search, receipts, and door pass.",
+        troubleshoot:"Old Black Dark Green label → hard refresh s3.2.30; code 4 is Purple & White. Missing script mark → floqr-hero-*.png + applyBrandLogos."
+      },
     {
       id:"s3-2-27-template-howitworks",
       area:"ShoutOut / Templates",

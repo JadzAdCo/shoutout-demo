@@ -118,7 +118,7 @@
 
   const SITE_CHROME_STATE_TEXT = {
     off: "Off for everyone — Nightlife stays the only site look",
-    test: "Testing — granted beta testers (and Master Admins) choose Nightlife/Traditional via isSiteChrome in My Profile",
+    test: "Testing — granted beta testers (and Master Admins) choose Nightlife / Traditional / Black Tiffany / White-Black / Purple & White / Black & Dark Green via isSiteChrome in My Profile",
     live: "Live — every patron can choose Site chrome (isSiteChrome) in My Profile"
   };
 
@@ -137,7 +137,7 @@
     const link = state === "off"
       ? `<small class="feature-open-note">Off — set Enable Feature to 1 to open it.</small>`
       : isSiteChrome
-        ? `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open Language Settings</a><small class="feature-open-note">isSiteChrome: 0 Nightlife · 1 Traditional · 2/4 reserved</small>`
+        ? `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open Language Settings</a><small class="feature-open-note">isSiteChrome: 0 Nightlife · 1 Traditional · 2 Black Tiffany · 3 White/Black · 4 Purple & White · 5 Black & Dark Green</small>`
         : `<a class="feature-open-link" href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
     return `<strong>${esc(base.label)}</strong><small class="feature-state">${esc(stateTextFor(base, state))}</small>${link}`;
   }
