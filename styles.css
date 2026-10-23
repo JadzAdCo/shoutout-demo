@@ -84,7 +84,7 @@ h3,.club-option h3,.template .name{
 .login-legal{margin:0;color:#fff;font-size:15px;font-weight:800;line-height:1.4}.login-legal a{color:#fff;text-decoration:underline;text-underline-offset:3px}.login-legal a:hover,.login-legal a:focus-visible{color:#dfff5a}
 html[data-floqr-chrome="whiteBlack"] .login-page-footer{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.88) 42%,rgba(255,255,255,.98))}
 html[data-floqr-chrome="whiteBlack"] .login-legal,html[data-floqr-chrome="whiteBlack"] .login-legal a{color:#10132a}
-html[data-floqr-chrome="whiteBlack"] .login-legal a:hover,html[data-floqr-chrome="whiteBlack"] .login-legal a:focus-visible{color:#0066aa}
+html[data-floqr-chrome="whiteBlack"] .login-legal a:hover,html[data-floqr-chrome="whiteBlack"] .login-legal a:focus-visible{color:#000}
 .signin.email.email-selected{background:linear-gradient(90deg,#1877f2,#22c7ff);border-color:#dfff5a;box-shadow:0 0 0 3px rgba(223,255,90,.24),0 0 24px rgba(34,199,255,.38)}
 .signin.email.email-selected::before{content:"✓";display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#dfff5a;color:#07101c;font-size:18px;font-weight:1000}
 /* Welcome sign-in: FloqR tile cyan→violet→magenta stack, white labels */
@@ -526,8 +526,13 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
 .template.soccer-jersey .tag-row span{text-transform:none}
 .template-mini-preview strong{display:block;font-size:22px;line-height:1.05;text-transform:uppercase}
 .template-mini-preview span{display:block;margin-top:6px;font-size:13px;color:rgba(255,255,255,.78);text-transform:uppercase}
-.template.classic-bw{background:linear-gradient(135deg,#060606,#1b1b1b 32%,#e41616 33%,#111 58%,#e41616 74%,#060606);color:#fff}
-.template.classic-bw .template-mini-preview{background:#f6f8fb;color:#070707;border:4px solid #e41616;box-shadow:inset 0 0 0 5px #fff}
+/* Traditional Black & White — strict monochrome (no red accents) */
+.template.classic-bw{background:linear-gradient(135deg,#050505,#1a1a1a 42%,#0a0a0a 78%,#000);color:#fff}
+.template.classic-bw .name,
+.template.classic-bw .template-select-desc,
+.template.classic-bw .template-select-howitworks{color:rgba(255,255,255,.92)}
+.template.classic-bw .template-howitworks-label{color:#fff}
+.template.classic-bw .template-mini-preview{background:#f6f8fb;color:#070707;border:4px solid #111;box-shadow:inset 0 0 0 5px #fff}
 .template.classic-bw .template-mini-preview span{color:#222}
 .template.car .template-mini-preview{background:linear-gradient(180deg,#333,#050505);position:relative;overflow:hidden}
 .template.car .template-mini-preview:before{content:"";position:absolute;left:14%;right:14%;bottom:18px;height:32px;background:#e41616;border-radius:60px 60px 18px 18px;box-shadow:0 -16px 0 #111 inset}
@@ -536,8 +541,8 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
 .template.celebration-media .template-mini-preview:before,.template.anniversary-media .template-mini-preview:before,.template.engagement-media .template-mini-preview:before{content:"IMAGE / VIDEO";display:grid;place-items:center;align-self:stretch;border:2px dashed rgba(255,255,255,.75);border-radius:12px;font-size:11px;font-weight:1000;color:rgba(255,255,255,.82)}
 
 /* v28.11 preview revision: tighter selector thumbnail for traditional template */
-.template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 28%,#e41616 29%,#111 50%,#e41616 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #e41616;color:#fff;overflow:hidden}
-.template.classic-bw .template-mini-preview strong{display:inline-block;background:#f5f8fb;color:#050505;border:3px solid #e41616;border-radius:10px;padding:8px 12px;max-width:92%}
+.template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 40%,#0d0d0d 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #222;color:#fff;overflow:hidden}
+.template.classic-bw .template-mini-preview strong{display:inline-block;background:#f5f8fb;color:#050505;border:3px solid #111;border-radius:10px;padding:8px 12px;max-width:92%}
 .template.classic-bw .template-mini-preview span{color:#f5f8fb}
 
 /* v28.14 classic thumbnail: show the three-row physical board idea */
@@ -2016,24 +2021,21 @@ html[data-floqr-chrome="blackDarkGreen"] .vip-icon-face{
   box-shadow:0 0 0 1px rgba(45,138,90,.35),0 0 14px rgba(34,110,68,.32),0 0 28px rgba(45,138,90,.18);
 }
 
-/* —— White / Black (isSiteChrome=3): white bg, charcoal text, FloqR tile brand CTAs —— */
+/* —— White / Black (isSiteChrome=3): white bg, charcoal text, solid B&W CTAs —— */
 html[data-floqr-chrome="whiteBlack"]{
   --line:rgba(40,40,40,.55);
   --text:#2a2a2a;
   --muted:rgba(42,42,42,.72);
-  --accent:var(--floqr-tile-azure);
-  --hot:var(--floqr-tile-magenta);
+  --accent:#111111;
+  --hot:#111111;
   --lime:#3a3a3a;
-  --floqr-blue:var(--floqr-tile-azure);
+  --floqr-blue:#111111;
   --floqr-ink:#ffffff;
   --floqr-chrome:#f4f4f4;
 }
 html[data-floqr-chrome="whiteBlack"] body{
   font-family:var(--floqr-font);
-  background:
-    radial-gradient(circle at 12% 0%,rgba(0,200,255,.06),transparent 28%),
-    radial-gradient(circle at 88% 8%,rgba(255,46,184,.05),transparent 30%),
-    #ffffff;
+  background:#ffffff;
   color:var(--text);
 }
 html[data-floqr-chrome="whiteBlack"] h1,
@@ -2059,13 +2061,16 @@ html[data-floqr-chrome="whiteBlack"] .category-card{
   box-shadow:0 10px 28px rgba(0,0,0,.08);
 }
 html[data-floqr-chrome="whiteBlack"] .hero-logo{
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,.18)) drop-shadow(0 0 10px rgba(0,200,255,.18));
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.18));
 }
 html[data-floqr-chrome="whiteBlack"] .primary,
 html[data-floqr-chrome="whiteBlack"] .category-card.hot,
 html[data-floqr-chrome="whiteBlack"] .linklike.hot{
-  background:var(--floqr-brand-gradient-h);
-  color:#fff;
+  background:#111!important;
+  color:#fff!important;
+  border:1px solid #111!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
 }
 html[data-floqr-chrome="whiteBlack"] button,
 html[data-floqr-chrome="whiteBlack"] .buttonlike,
@@ -2081,22 +2086,28 @@ html[data-floqr-chrome="whiteBlack"] #loginActions .signin,
 html[data-floqr-chrome="whiteBlack"] #loginActions .signin.email.email-selected,
 html[data-floqr-chrome="whiteBlack"] #loginActions > .signin,
 html[data-floqr-chrome="whiteBlack"] #loginActions > .signin.email.email-selected{
-  background:var(--floqr-brand-gradient-h) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
+  background:#111 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
   background-origin:border-box;
-  border:1px solid rgba(40,40,40,.35);
+  border:1px solid #111;
   color:#fff;
-  box-shadow:0 6px 16px rgba(0,200,255,.14),0 4px 14px rgba(255,46,184,.1);
-  text-shadow:0 1px 2px rgba(6,10,40,.28);
+  box-shadow:none;
+  text-shadow:none;
 }
 html[data-floqr-chrome="whiteBlack"] button:hover,
 html[data-floqr-chrome="whiteBlack"] .signin:hover{
-  border-color:var(--floqr-tile-azure);
+  border-color:#111;
   background:#f7f7f7;
+}
+html[data-floqr-chrome="whiteBlack"] .primary:hover,
+html[data-floqr-chrome="whiteBlack"] .primary:focus-visible{
+  background:#000!important;
+  border-color:#000!important;
+  color:#fff!important;
 }
 html[data-floqr-chrome="whiteBlack"] #loginActions .signin:hover,
 html[data-floqr-chrome="whiteBlack"] #loginActions .signin:focus-visible{
-  border-color:var(--floqr-tile-cyan);
-  background:var(--floqr-brand-gradient-h) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
+  border-color:#000;
+  background:#000 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
 }
 html[data-floqr-chrome="whiteBlack"] input,
 html[data-floqr-chrome="whiteBlack"] select,
@@ -2110,18 +2121,18 @@ html[data-floqr-chrome="whiteBlack"] .search{
 html[data-floqr-chrome="whiteBlack"] input:focus,
 html[data-floqr-chrome="whiteBlack"] select:focus,
 html[data-floqr-chrome="whiteBlack"] textarea:focus{
-  outline:2px solid var(--floqr-tile-azure);
+  outline:2px solid #111;
   outline-offset:1px;
-  border-color:var(--floqr-tile-azure);
+  border-color:#111;
 }
 html[data-floqr-chrome="whiteBlack"] .search-chrome-toolbar{
   border:1px solid rgba(40,40,40,.4);
   background:rgba(0,0,0,.04);
 }
 html[data-floqr-chrome="whiteBlack"] .search-chrome-btn[aria-pressed="true"]{
-  border-color:var(--floqr-tile-azure);
-  box-shadow:0 0 0 1px rgba(26,122,255,.35);
-  background:rgba(0,200,255,.08);
+  border-color:#111;
+  box-shadow:0 0 0 1px rgba(0,0,0,.28);
+  background:rgba(0,0,0,.08);
   color:#111;
 }
 html[data-floqr-chrome="whiteBlack"] .user-menu-btn{
@@ -2130,7 +2141,7 @@ html[data-floqr-chrome="whiteBlack"] .user-menu-btn{
   box-shadow:var(--floqr-profile-card-shadow)!important;
 }
 html[data-floqr-chrome="whiteBlack"] .user-initials{
-  background:var(--floqr-brand-gradient-h)!important;
+  background:#111!important;
   color:#fff!important;
 }
 html[data-floqr-chrome="whiteBlack"] .user-dropdown{
@@ -2144,12 +2155,12 @@ html[data-floqr-chrome="whiteBlack"] .global-back-btn,
 html[data-floqr-chrome="whiteBlack"] .floqr-back-btn,
 html[data-floqr-chrome="whiteBlack"] .topbar button[data-i18n="nav.backShort"],
 html[data-floqr-chrome="whiteBlack"] .topbar a[data-i18n="nav.backShort"]{
-  background:rgba(148,142,198,.42);
-  border:1px solid rgba(90,80,160,.55);
-  color:#1a1428;
+  background:rgba(0,0,0,.08);
+  border:1px solid rgba(40,40,40,.45);
+  color:#111;
 }
 html[data-floqr-chrome="whiteBlack"] .floqr-assistant-toggle{
-  background:var(--floqr-brand-gradient-h);
+  background:#111;
   color:#fff;
 }
 html[data-floqr-chrome="whiteBlack"] .floqr-assistant-panel{
@@ -2158,22 +2169,51 @@ html[data-floqr-chrome="whiteBlack"] .floqr-assistant-panel{
   color:#2a2a2a;
 }
 html[data-floqr-chrome="whiteBlack"] a,
-html[data-floqr-chrome="whiteBlack"] .linklike{color:var(--floqr-tile-azure)}
+html[data-floqr-chrome="whiteBlack"] .linklike{color:#111}
 html[data-floqr-chrome="whiteBlack"] .status,
 html[data-floqr-chrome="whiteBlack"] .category-or,
 html[data-floqr-chrome="whiteBlack"] .sub{color:rgba(42,42,42,.78)}
 html[data-floqr-chrome="whiteBlack"] .help-popout[open] summary{
-  background:var(--floqr-brand-gradient-h);
+  background:#111;
   color:#fff;
 }
 html[data-floqr-chrome="whiteBlack"] .message-envelope.unread,
 html[data-floqr-chrome="whiteBlack"] .highlight-item{
-  border-color:var(--floqr-tile-azure)!important;
-  box-shadow:0 0 0 2px rgba(26,122,255,.2);
+  border-color:#111!important;
+  box-shadow:0 0 0 2px rgba(0,0,0,.18);
 }
 html[data-floqr-chrome="whiteBlack"] .tag-row span,
 html[data-floqr-chrome="whiteBlack"] .status-pill{
   border:1px solid rgba(40,40,40,.4);
   background:rgba(0,0,0,.04);
   color:#2a2a2a;
+}
+/* Template select under White/Black: card chrome is strict B&W (LED preview content unchanged) */
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card{
+  background:linear-gradient(160deg,#0a0a0a 0%,#1c1c1c 48%,#111 100%)!important;
+  color:#fff!important;
+  border-color:rgba(0,0,0,.55)!important;
+}
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .name,
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .template-select-desc,
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .template-select-howitworks{
+  color:rgba(255,255,255,.92)!important;
+}
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .template-howitworks-label{color:#fff!important}
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .tag-row span,
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .template-select-dim{
+  border-color:rgba(255,255,255,.28)!important;
+  background:rgba(0,0,0,.35)!important;
+  color:#fff!important;
+}
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .primary{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #fff!important;
+}
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .primary:hover,
+html[data-floqr-chrome="whiteBlack"] .template.template-select-card .primary:focus-visible{
+  background:#e8e8e8!important;
+  color:#000!important;
+  border-color:#e8e8e8!important;
 }

@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.36 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.37 (stable)
+
+- s3.2.37: Strict black-and-white for classic-bw template + White/Black site chrome (no red board accents; solid B&W Use CTAs).
+- s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
 
 - s3.2.36: VIP hold popout close + open-night calendar + expireVipHolds; floqCast public TURN + ICE-restart; Passes Live + Club Admin Passes tab.
 - s3.2.35: Phone/tablet Google sign-in uses full-page redirect (no blocked popup).

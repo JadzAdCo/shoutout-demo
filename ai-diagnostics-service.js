@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.36";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.36";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.37";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.37";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,21 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.37",
+      title: "s3.2.37 — Strict black-and-white classic-bw + White/Black chrome",
+      checks: [
+        {label:"Package version s3.2.37", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.37\""]},
+        {label:"classic-bw select card monochrome", file:"styles.css", includes:["Traditional Black & White — strict monochrome", "linear-gradient(135deg,#050505,#1a1a1a 42%"]},
+        {label:"White/Black solid CTAs", file:"styles.css", includes:["solid B&W CTAs", "background:#111!important"]},
+        {label:"White/Black template-select B&W chrome", file:"styles.css", includes:["template-select-card{", "linear-gradient(160deg,#0a0a0a 0%,#1c1c1c 48%"]},
+        {label:"classic-bw LED no red frame", file:"display.css", includes:["border-color:#fff!important", "background:#050505!important"]},
+        {label:"classic identity shell B&W", file:"display.css", includes:["Strict B&W FloqR card on classic board", "background:#050505"]},
+        {label:"admin classic-bw preview monochrome", file:"admin.css", includes:[".template-view-preview.classic-bw{background:linear-gradient(135deg,#050505,#1b1b1b 40%"]},
+        {label:"Manual test s3.2.37", file:"ai-diagnostics-service.js", includes:["s3-2-37-classic-bw-whiteblack-strict"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.37\""]}
+      ]
+    },
     {
       version: "s3.2.36",
       title: "s3.2.36 — VIP hold UX + floqCast ICE + Passes Live Club Admin",
@@ -2320,6 +2335,15 @@
       howToTest:"1) Hard-refresh live Search (styles.css + index.html + floqr-i18n.js ?v=s3.2.19). 2) Top-right profile chip is charcoal/gray — not pink/cyan Nightlife. 3) No Welcome speech or green OR. 4) Placeholder: Search for Clubs, Lounge, Events, etc.",
       expected:"Charcoal closed profile chip; clean Search with new placeholder only.",
       troubleshoot:"Still pink chip or Welcome speech → hard refresh styles.css?v=s3.2.19 / clear site data for jadzadco.github.io."
+    },
+    {
+      id:"s3-2-37-classic-bw-whiteblack-strict",
+      area:"Site chrome / Templates",
+      feature:"Strict black-and-white classic-bw + White/Black template chrome",
+      changed:"Traditional Black and White select card, LED board, and FloqR PRESENTED BY rail use black/white/grey only (no red). White/Black site chrome uses solid black CTAs; template-select cards force monochrome chrome (LED preview art unchanged). Package s3.2.37.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → Aurelia template select (styles.css + display.css ?v=s3.2.37). 2) Set Site chrome to White/Black. 3) Traditional Black and White card: black card, white letter board, black/white FloqR rail — no red frame or red banner. 4) Use buttons are solid black or white (no cyan→magenta). 5) Club-approved / gold-class cards render as black/grey chrome under White/Black.",
+      expected:"No red on classic-bw; White/Black theme has no brand-gradient Use buttons on template select.",
+      troubleshoot:"Still red → hard refresh styles.css + display.css s3.2.37 (Xibo boards need display.css publish). Still gradient Use → confirm html[data-floqr-chrome=whiteBlack] and cache-bust."
     },
     {
       id:"s3-2-36-vip-hold-popout-open-nights",

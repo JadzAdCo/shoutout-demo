@@ -101,7 +101,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` / `data-floqr-theme-locked` gated) |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
-| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + brand CTAs (grey icon halo); Purple & White = violet/coral; Black & Dark Green = forest green |
+| CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Black Tiffany = cyan/azure; White/Black = white surfaces + **solid black CTAs** (no cyan→magenta); template-select cards forced monochrome chrome; Purple & White = violet/coral; Black & Dark Green = forest green |
+| Classic B&W template | `className: classic-bw` — select card + LED board + FloqR identity rail are **strict black/white/grey** (no red frame, no red PRESENTED BY banner). `styles.css` / `display.css` / `admin.css` |
 | VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
 | Surfaces | My Profile → **Appearance** → **Site chrome** card picker (`.chrome-select-*`); Language Settings no longer hosts the picker. Release Control titles use white `h2.features-release-title` + `?` |
 | Routes | `patron-portal.html?tab=appearance` (`portalAppearance`); aliases `chrome` / `site-chrome` / `theme` |
