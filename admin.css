@@ -555,8 +555,8 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 .template-view-preview.fire{background:radial-gradient(circle at 50% 45%,rgba(255,106,0,.82),transparent 35%),linear-gradient(135deg,#190202,#421006,#050202)}
 .template-view-preview.summer{background:linear-gradient(135deg,#00a7d4,#f4c950,#ff668f);color:#101020}
 .template-view-preview.car{background:linear-gradient(145deg,#080808,#242424 48%,#8d0808 49%,#080808 76%)}
-.template-view-preview.classic-bw{background:linear-gradient(135deg,#050505,#1b1b1b 40%,#0d0d0d 72%,#070707)}
-.template-view-preview.classic-bw::before{content:"";position:absolute;inset:12%;z-index:0;border:1.2cqh solid #111;border-radius:5cqh;background:#f5f7f9;box-shadow:0 0 0 .7cqh #fff inset}
+.template-view-preview.classic-bw{background:linear-gradient(135deg,#050505,#1b1b1b 28%,#f01818 29%,#111 42%,#f01818 62%,#070707 78%)}
+.template-view-preview.classic-bw::before{content:"";position:absolute;inset:12%;z-index:0;border:1.2cqh solid #f51b1b;border-radius:5cqh;background:#f5f7f9;box-shadow:0 0 0 .7cqh #fff inset}
 .template-view-preview.celebration-media,.template-view-preview.anniversary-media,.template-view-preview.engagement-media{background:linear-gradient(135deg,#190019,#103a7a)}
 .template-preview-pixel-grid{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.15;background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#000 4px),repeating-linear-gradient(90deg,transparent 0,transparent 3px,#000 4px)}
 .template-preview-content{position:relative;z-index:2;width:88%;display:grid;gap:2cqh;place-items:center;padding:3cqh}

@@ -526,13 +526,12 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
 .template.soccer-jersey .tag-row span{text-transform:none}
 .template-mini-preview strong{display:block;font-size:22px;line-height:1.05;text-transform:uppercase}
 .template-mini-preview span{display:block;margin-top:6px;font-size:13px;color:rgba(255,255,255,.78);text-transform:uppercase}
-/* Traditional Black & White — strict monochrome (no red accents) */
-.template.classic-bw{background:linear-gradient(135deg,#050505,#1a1a1a 42%,#0a0a0a 78%,#000);color:#fff}
-.template.classic-bw .name,
-.template.classic-bw .template-select-desc,
-.template.classic-bw .template-select-howitworks{color:rgba(255,255,255,.92)}
-.template.classic-bw .template-howitworks-label{color:#fff}
-.template.classic-bw .template-mini-preview{background:#f6f8fb;color:#070707;border:4px solid #111;box-shadow:inset 0 0 0 5px #fff}
+/* Traditional Black & White — red/black LED art only; vault card shell follows Site chrome (not red) */
+.template.classic-bw{
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.28));
+  color:var(--text,#fff);
+}
+.template.classic-bw .template-mini-preview{background:#f6f8fb;color:#070707;border:4px solid #e41616;box-shadow:inset 0 0 0 5px #fff}
 .template.classic-bw .template-mini-preview span{color:#222}
 .template.car .template-mini-preview{background:linear-gradient(180deg,#333,#050505);position:relative;overflow:hidden}
 .template.car .template-mini-preview:before{content:"";position:absolute;left:14%;right:14%;bottom:18px;height:32px;background:#e41616;border-radius:60px 60px 18px 18px;box-shadow:0 -16px 0 #111 inset}
@@ -541,8 +540,8 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
 .template.celebration-media .template-mini-preview:before,.template.anniversary-media .template-mini-preview:before,.template.engagement-media .template-mini-preview:before{content:"IMAGE / VIDEO";display:grid;place-items:center;align-self:stretch;border:2px dashed rgba(255,255,255,.75);border-radius:12px;font-size:11px;font-weight:1000;color:rgba(255,255,255,.82)}
 
 /* v28.11 preview revision: tighter selector thumbnail for traditional template */
-.template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 40%,#0d0d0d 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #222;color:#fff;overflow:hidden}
-.template.classic-bw .template-mini-preview strong{display:inline-block;background:#f5f8fb;color:#050505;border:3px solid #111;border-radius:10px;padding:8px 12px;max-width:92%}
+.template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 28%,#e41616 29%,#111 50%,#e41616 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #e41616;color:#fff;overflow:hidden}
+.template.classic-bw .template-mini-preview strong{display:inline-block;background:#f5f8fb;color:#050505;border:3px solid #e41616;border-radius:10px;padding:8px 12px;max-width:92%}
 .template.classic-bw .template-mini-preview span{color:#f5f8fb}
 
 /* v28.14 classic thumbnail: show the three-row physical board idea */
@@ -1566,6 +1565,39 @@ html[data-floqr-chrome="traditional"] .primary{
   background:var(--floqr-brand-gradient-h);
   color:#06101c;
 }
+/* View Club–style secondary buttons: charcoal fill + cyan ink; active = thin cyan border */
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn),
+html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn),
+html[data-floqr-chrome="traditional"] .ghost,
+html[data-floqr-chrome="traditional"] .club-option .queue-actions .buttonlike,
+html[data-floqr-chrome="traditional"] .search-chrome-btn,
+html[data-floqr-chrome="traditional"] .admin-tab:not(.active),
+html[data-floqr-chrome="traditional"] .admin-subtab:not(.active){
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+  color:var(--floqr-tile-cyan)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):hover,
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn):focus-visible,
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn)[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] button:not(.primary):not(.global-back-btn):not(.floqr-back-btn).active,
+html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn):hover,
+html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn):focus-visible,
+html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn)[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] .buttonlike:not(.primary):not(.global-back-btn):not(.floqr-back-btn).active,
+html[data-floqr-chrome="traditional"] .ghost:hover,
+html[data-floqr-chrome="traditional"] .ghost:focus-visible,
+html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"],
+html[data-floqr-chrome="traditional"] .search-chrome-btn:focus-visible,
+html[data-floqr-chrome="traditional"] .admin-tab.active,
+html[data-floqr-chrome="traditional"] .admin-subtab.active{
+  border-color:var(--floqr-tile-cyan)!important;
+  box-shadow:none!important;
+  color:var(--floqr-tile-cyan)!important;
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%)!important;
+}
 html[data-floqr-chrome="traditional"] .status{color:#fff}
 html[data-floqr-chrome="traditional"] .category-or{color:#fff}
 html[data-floqr-chrome="traditional"] .category-card.hot,
@@ -1577,25 +1609,21 @@ html[data-floqr-chrome="traditional"] #loginActions .signin,
 html[data-floqr-chrome="traditional"] #loginActions .signin.email.email-selected,
 html[data-floqr-chrome="traditional"] #loginActions > .signin,
 html[data-floqr-chrome="traditional"] #loginActions > .signin.email.email-selected{
-  background:linear-gradient(180deg,#4a4a4a 0%,#2a2a2a 45%,#151515 78%,rgba(91,45,255,.35) 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat!important;
   background-origin:border-box;
-  color:#fff;
-  border-color:rgba(0,200,255,.28);
-  box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 18px rgba(0,200,255,.12);
-  text-shadow:0 1px 2px rgba(0,0,0,.45);
+  color:var(--floqr-tile-cyan)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
 }
 html[data-floqr-chrome="traditional"] #loginActions .signin:hover,
-html[data-floqr-chrome="traditional"] #loginActions .signin:focus-visible{border-color:var(--floqr-tile-cyan)}
-html[data-floqr-chrome="traditional"] button:hover,
-html[data-floqr-chrome="traditional"] .signin:hover{border-color:var(--floqr-tile-cyan)}
+html[data-floqr-chrome="traditional"] #loginActions .signin:focus-visible,
+html[data-floqr-chrome="traditional"] #loginActions .signin.email.email-selected{
+  border-color:var(--floqr-tile-cyan)!important;
+}
 html[data-floqr-chrome="traditional"] .search-chrome-toolbar{
   border-color:rgba(0,0,0,.5);
   background:rgba(0,0,0,.35);
-}
-html[data-floqr-chrome="traditional"] .search-chrome-btn[aria-pressed="true"]{
-  border-color:#fff;
-  box-shadow:0 0 0 1px rgba(255,255,255,.45);
-  background:rgba(255,255,255,.12);
 }
 html[data-floqr-chrome="traditional"] .help-popout[open] summary{
   background:var(--floqr-brand-gradient-h);
@@ -1636,9 +1664,25 @@ html[data-floqr-chrome="traditional"] textarea{
 html[data-floqr-chrome="traditional"] a{color:var(--accent)}
 html[data-floqr-chrome="traditional"] .linklike{color:#fff}
 html[data-floqr-chrome="traditional"] .tag-row span,
-html[data-floqr-chrome="traditional"] .status-pill{
-  border-color:rgba(255,255,255,.22);
-  background:rgba(255,255,255,.1);
+html[data-floqr-chrome="traditional"] .status-pill,
+html[data-floqr-chrome="traditional"] .badge-row span{
+  border-color:rgba(255,255,255,.16);
+  background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 52%,#1c1c1c 100%);
+  color:var(--floqr-tile-cyan);
+}
+/* classic-bw vault card follows Traditional chrome (LED preview keeps red art) */
+html[data-floqr-chrome="traditional"] .template.classic-bw.template-select-card,
+html[data-floqr-chrome="traditional"] .template.template-select-card{
+  background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(0,0,0,.28) 55%,rgba(20,20,20,.55))!important;
+  border:1px solid rgba(0,0,0,.65)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.5)!important;
+  color:#fff!important;
+}
+html[data-floqr-chrome="traditional"] .template.template-select-card .name,
+html[data-floqr-chrome="traditional"] .template.template-select-card .template-select-desc,
+html[data-floqr-chrome="traditional"] .template.template-select-card .template-select-howitworks,
+html[data-floqr-chrome="traditional"] .template.template-select-card .template-howitworks-label{
+  color:#fff!important;
 }
 html[data-floqr-chrome="traditional"] .floqr-assistant-toggle{
   background:var(--floqr-brand-gradient-h);
@@ -2229,8 +2273,12 @@ html[data-floqr-chrome="whiteBlack"] .template.template-select-card .primary:foc
   color:#000!important;
   border-color:#000!important;
 }
+/* White/Black card chrome stays white; classic-bw LED thumbnail keeps red/black art */
 html[data-floqr-chrome="whiteBlack"] .template.classic-bw .template-mini-preview{
-  background:linear-gradient(135deg,#050505,#1b1b1b 40%,#0d0d0d 72%,#060606)!important;
+  background:linear-gradient(135deg,#050505,#1b1b1b 28%,#e41616 29%,#111 50%,#e41616 72%,#060606)!important;
   border-color:#090909!important;
-  box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #222!important;
+  box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #e41616!important;
+}
+html[data-floqr-chrome="whiteBlack"] .template.classic-bw .template-mini-preview strong{
+  border-color:#e41616!important;
 }
