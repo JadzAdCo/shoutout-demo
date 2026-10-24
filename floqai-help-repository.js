@@ -372,10 +372,10 @@
     },
     {
       id: "help-floqai-page",
-      title: "BOT DEE",
-      body: "Chat with BOT DEE on the FloqAi page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      title: "FloqAi",
+      body: "Chat with FloqAi on the FloqAi page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee"],
-      links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
+      links: [{label: "Open FloqAi", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "floqai.html#botDeeChatPage"

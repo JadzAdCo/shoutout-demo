@@ -40,7 +40,8 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(heyHits.results.length, 0, "hey must not substring-match they/…");
 
   const reply = bot.chitchatReply("master");
-  assert.match(reply, /Hey|good to see you/i);
+  assert.match(reply, /FloqAi here/i);
+  assert.doesNotMatch(reply, /BOT DEE/);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
 

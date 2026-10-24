@@ -116,7 +116,7 @@
     grid.innerHTML = rows.map((r) => {
       const selected = r.id === selectedVenueId;
       const ctaLabel = selected
-        ? t("page.floqcast.goLiveCta", "Go live, be a floqCast")
+        ? t("page.floqcast.goLiveCta", "Go live, start a cast")
         : t("page.floqcast.selectVenue", "Select venue");
       const ctaAttr = selected
         ? `data-go-live-venue="${esc(r.id)}"`
@@ -159,7 +159,7 @@
     const sel = byId("floqcastVenueSelect");
     if (sel) sel.value = id;
     renderVenueGrid();
-    setLiveStatus(t("page.floqcast.readyGoLive", "Venue selected — tap Go live to open private preview."));
+    setLiveStatus(t("page.floqcast.readyGoLive", "Venue selected — tap Go live, start a cast to open private preview."));
   }
 
   function requestedLocationId() {

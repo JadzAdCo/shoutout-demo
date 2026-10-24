@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.58";
+  const VERSION = "s3.2.59";
 
   const packs = {
     "ru": {
@@ -15,8 +15,8 @@
         body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Общайтесь с BOT DEE на странице FloqAi простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
+        title: "FloqAi",
+        body: "Общайтесь с FloqAi на странице FloqAi простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -333,8 +333,8 @@
         body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Chat met BOT DEE op de FloqAi-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
+        title: "FloqAi",
+        body: "Chat met FloqAi op de FloqAi-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
       },
       "help-search-settings-appearance": {
         title: "Settings op Search",
@@ -651,8 +651,8 @@
         body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Discutez avec BOT DEE sur la page FloqAi en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
+        title: "FloqAi",
+        body: "Discutez avec FloqAi sur la page FloqAi en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -969,8 +969,8 @@
         body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Chatte mit BOT DEE auf der FloqAi-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
+        title: "FloqAi",
+        body: "Chatte mit FloqAi auf der FloqAi-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
       },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
@@ -1287,8 +1287,8 @@
         body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Chatea con BOT DEE en la página FloqAi con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
+        title: "FloqAi",
+        body: "Chatea con FloqAi en la página FloqAi con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1605,8 +1605,8 @@
         body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Chatta con BOT DEE nella pagina FloqAi con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
+        title: "FloqAi",
+        body: "Chatta con FloqAi nella pagina FloqAi con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
       },
       "help-search-settings-appearance": {
         title: "Settings su Search",
@@ -1923,8 +1923,8 @@
         body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Converse com o BOT DEE na página FloqAi em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
+        title: "FloqAi",
+        body: "Converse com o FloqAi na página FloqAi em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2241,8 +2241,8 @@
         body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Συνομιλήστε με τον BOT DEE στη σελίδα FloqAi με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
+        title: "FloqAi",
+        body: "Συνομιλήστε με τον FloqAi στη σελίδα FloqAi με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
       },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
@@ -2559,8 +2559,8 @@
         body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "Czatuj z BOT DEE na stronie FloqAi prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
+        title: "FloqAi",
+        body: "Czatuj z FloqAi na stronie FloqAi prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2877,8 +2877,8 @@
         body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."
       },
       "help-floqai-page": {
-        title: "BOT DEE",
-        body: "تحدث مع BOT DEE في صفحة FloqAi بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
+        title: "FloqAi",
+        body: "تحدث مع FloqAi في صفحة FloqAi بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",
