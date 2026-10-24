@@ -165,6 +165,16 @@
     });
 
     auth.onAuthStateChanged(async (user) => {
+      try {
+        const cs = global.FLOQRChromeScheme;
+        if (cs && user && global.firebase?.firestore) {
+          const snap = await firebase.firestore().collection("users").doc(user.uid).get();
+          if (snap.exists) cs.hydrateFromProfile?.(snap.data() || {});
+          else cs.applyDocument?.(cs.effectiveChrome?.());
+        } else {
+          cs?.applyDocument?.(cs?.effectiveChrome?.());
+        }
+      } catch (_) { /* ignore chrome hydrate */ }
       if (!user) {
         showGate(true);
         setStatus(t("app.signInToContinue", "Sign in to continue"));

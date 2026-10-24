@@ -1,6 +1,99 @@
 /* Shared feature landing chrome — product icon (no FloqR), Choose a venue, fact cards.
    Resume: @feature-landing$ */
 
+/* —— Site chrome body wash (floqCast / ShoutOut / VIP landings) ——
+   Feature CSS used to pin Nightlife with !important; that ignored the patron’s
+   selected chrome. Mirror styles.css body washes for these body classes. */
+body.floqcast-page,
+body.shoutout-search-page,
+body.vip-page {
+  min-height: 100vh;
+  color: var(--text);
+}
+
+html:not([data-floqr-chrome]) body.floqcast-page,
+html:not([data-floqr-chrome]) body.shoutout-search-page,
+html:not([data-floqr-chrome]) body.vip-page,
+html[data-floqr-chrome="nightlife"] body.floqcast-page,
+html[data-floqr-chrome="nightlife"] body.shoutout-search-page,
+html[data-floqr-chrome="nightlife"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 46, 184, 0.34), transparent 32%),
+    radial-gradient(circle at 82% 18%, rgba(0, 200, 255, 0.36), transparent 36%),
+    radial-gradient(circle at 50% 70%, rgba(91, 45, 255, 0.22), transparent 42%),
+    linear-gradient(135deg, #000000, #07101c 42%, #0a1238 68%, #090b12) !important;
+}
+
+html[data-floqr-chrome="traditional"] body.floqcast-page,
+html[data-floqr-chrome="traditional"] body.shoutout-search-page,
+html[data-floqr-chrome="traditional"] body.vip-page {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(0, 200, 255, 0.10), transparent 34%),
+    radial-gradient(circle at 84% 18%, rgba(255, 46, 184, 0.08), transparent 38%),
+    linear-gradient(165deg, #3a3a3a 0%, #2a2a2a 42%, #141414 100%) !important;
+}
+
+html[data-floqr-chrome="blackTiffany"] body.floqcast-page,
+html[data-floqr-chrome="blackTiffany"] body.shoutout-search-page,
+html[data-floqr-chrome="blackTiffany"] body.vip-page {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(0, 200, 255, 0.22), transparent 36%),
+    radial-gradient(circle at 80% 70%, rgba(26, 122, 255, 0.16), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page,
+html[data-floqr-chrome="whiteBlack"] body.vip-page {
+  background: #ffffff !important;
+  color: #0a0a0a !important;
+}
+
+html[data-floqr-chrome="purpleWhite"] body.floqcast-page,
+html[data-floqr-chrome="purpleWhite"] body.shoutout-search-page,
+html[data-floqr-chrome="purpleWhite"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(91, 45, 255, 0.28), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(255, 77, 106, 0.18), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="blackDarkGreen"] body.floqcast-page,
+html[data-floqr-chrome="blackDarkGreen"] body.shoutout-search-page,
+html[data-floqr-chrome="blackDarkGreen"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(34, 110, 68, 0.32), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(45, 138, 90, 0.18), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .floqcast-shell,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .floqcast-product-page,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .floqcast-shell,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .shoutout-product-page,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-product-page {
+  background: transparent !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page h1,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page h2,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .status,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page h1,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page h2,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .status,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h1,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h2,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .status {
+  color: #0a0a0a !important;
+}
+
 .product-page.feature-landing-page .product-brand-stack > .product-parent-logo,
 .product-page[data-feature-landing="1"] .product-brand-stack > .product-parent-logo,
 body[data-floqr-feature] .product-page .product-brand-stack > .product-parent-logo {
@@ -22,6 +115,22 @@ body[data-floqr-feature] .product-page .product-brand-stack > .product-parent-lo
   filter:
     drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
     drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
+}
+
+html[data-floqr-chrome="traditional"] .product-page .product-logo,
+html[data-floqr-chrome="traditional"] .feature-landing-hero-logo {
+  filter: drop-shadow(0 0 8px rgba(0, 200, 255, 0.28)) drop-shadow(0 0 14px rgba(255, 46, 184, 0.18));
+}
+
+html[data-floqr-chrome="whiteBlack"] .product-page .product-logo,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .floqcast-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .shoutout-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .vip-hero-logo {
+  background: #fff;
+  border: 1px solid rgba(10, 10, 10, 0.28);
+  border-radius: 18px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14));
 }
 
 .feature-landing-title-row,
@@ -53,6 +162,14 @@ body[data-floqr-feature] .product-page .product-brand-stack > .product-parent-lo
   background: rgba(10, 14, 24, 0.72);
   color: inherit;
   font: inherit;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-venue-card .search,
+html[data-floqr-chrome="whiteBlack"] .floqcast-venue-card .search {
+  border: 1px solid rgba(40, 40, 40, 0.5);
+  background: #fff;
+  color: #2a2a2a;
+  box-shadow: none;
 }
 
 .feature-landing-venue-grid,
@@ -144,4 +261,28 @@ html[data-floqr-chrome="whiteBlack"] .feature-landing-product-badge {
 html[data-floqr-chrome="traditional"] .feature-landing-facts li,
 html[data-floqr-chrome="whiteBlack"] .feature-landing-facts li {
   color: inherit;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-fact-value {
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-card.is-selected {
+  border-color: rgba(10, 10, 10, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.25), 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-venue-card,
+html[data-floqr-chrome="whiteBlack"] .floqcast-venue-card,
+html[data-floqr-chrome="whiteBlack"] .floqcast-gate {
+  background: #fff !important;
+  border: 1px solid rgba(10, 10, 10, 0.35) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08) !important;
+  color: #0a0a0a !important;
+  backdrop-filter: none;
+}
+
+html[data-floqr-chrome="whiteBlack"] .floqcast-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .floqcast-page .floqcast-hero-logo {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14));
 }

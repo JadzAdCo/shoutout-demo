@@ -1,13 +1,11 @@
-/* floqCast — same FLOQR product chrome as VIP reserV / ShoutOut.
+/* floqCast / ShoutOut landings — Site chrome from styles.css + floqr-feature-landing.css.
+   Do NOT lock Nightlife body with !important (broke White/Black + other schemes).
    See design-notes-feature-landing-pages.mdc + design-notes-product-chrome.mdc. */
 
-body.floqcast-page {
-  background:
-    radial-gradient(circle at 18% 8%, rgba(244, 58, 191, 0.32), transparent 32%),
-    radial-gradient(circle at 82% 18%, rgba(38, 216, 255, 0.34), transparent 36%),
-    linear-gradient(135deg, #07101c, #071b63 68%, #090b12) !important;
+body.floqcast-page,
+body.shoutout-search-page {
   color: var(--text, #f4f6ff);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
+  font-family: var(--floqr-font, Inter, Segoe UI, Arial, sans-serif);
   min-height: 100vh;
 }
 

@@ -22,14 +22,18 @@ Scope viewer styles under a page root (e.g. `.vip-map-section`). Local vars (`--
 
 Inventory **state** colors on the map (green available · amber held · red booked · blue DJ) stay as in `vip-floorplan-ingest.mdc` — those are legend states, not page chrome.
 
+## Site chrome (all schemes)
+
+Product landings must honor the patron’s **Site chrome** (`html[data-floqr-chrome]`). Feature CSS must **not** force the Nightlife pink/cyan navy wash with `!important`. Shared body washes: `floqr-feature-landing.css`. Early-paint the chrome attr before CSS (same snippet as Search).
+
 ## Checklist (new or edited product HTML)
 
-- [ ] `styles.css` loaded first
-- [ ] Feature CSS does not set bare `body` / `:root` background or global `--accent`
+- [ ] `styles.css` loaded first; early-paint `data-floqr-chrome` before CSS
+- [ ] Feature CSS does not set bare `body` / `:root` Nightlife `!important` background or global `--accent`
 - [ ] Hero uses `product-brand-stack` + FloqR parent logo when other products do
 - [ ] Feature icon stacked **under** FLOQR (never beside it) — see `design-notes-feature-landing-pages.mdc`
 - [ ] Title row uses `details.help-popout` `?` like VIP reserV
 - [ ] Cards / CTAs read as the same family as ShoutOut on Search
-- [ ] Hard-refresh QA against `vip.html` / Search side-by-side
+- [ ] Hard-refresh QA against `vip.html` / Search side-by-side for **active** Site chrome
 
 Resume: `@product-chrome$` / `$shoutout-colors$` / `@feature-landing$`.
