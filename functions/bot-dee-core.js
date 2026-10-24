@@ -24,7 +24,7 @@ const TOOL_DEFS = [
   {
     name: "contextualSearch",
     description:
-      "Search FLOQR help topics and product intents the signed-in viewer may access. Use for how-to questions. Returns classification-filtered results only.",
+      "Search FLOQR help topics and product intents the signed-in viewer may access. Use only for how-to / product questions with a clear intent. Never call for greetings or small talk (hi, hey, thanks). Returns classification-filtered results only.",
     parameters: obj({query: str("Plain-language search query from the patron.")}, ["query"])
   },
   {
@@ -112,23 +112,48 @@ function tokens(value) {
   return normalize(value).split(/\s+/).filter(token => token.length > 1);
 }
 
+/** Word-boundary match after normalize (avoids \"hey\" matching inside \"they\"). */
+function hasWord(hay, word) {
+  const w = normalize(word);
+  if (!w) return false;
+  return (` ${normalize(hay)} `).includes(` ${w} `);
+}
+
+const MIN_SEARCH_SCORE = 3;
+
+/** Greetings / small talk — reply as a chatbot, never dump search hits. */
+function isChitchatPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 80) return false;
+  return /^(hey|hi|hello|howdy|yo|sup|hiya|hola|thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you|good morning|good afternoon|good evening|good night|how are you|what s up|whats up)( bot dee| floqai| there| again)?$/.test(q);
+}
+
+function chitchatReply(role) {
+  const roleHint = role && role !== "anonymous" && role !== "patron"
+    ? ` I can see you as ${role}.`
+    : "";
+  return `Hey — good to see you.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
+}
+
 function scoreEntry(query, entry) {
   const q = normalize(query);
   if (!q) return 0;
   const qTokens = tokens(q);
   let score = 0;
   const hay = normalize([entry.label, entry.blurb, ...(entry.phrases || [])].join(" "));
-  if (hay.includes(q)) score += 8;
+  if (hasWord(hay, q) || hay.includes(` ${q} `) || hay === q) score += 8;
+  else if (q.length >= 4 && hay.includes(q)) score += 6;
   (entry.phrases || []).forEach(phrase => {
-    if (!phrase) return;
-    if (phrase === q) score += 10;
-    else if (phrase.startsWith(q) || q.startsWith(phrase)) score += 5;
-    else if (phrase.includes(q) || q.includes(phrase)) score += 3;
+    const p = normalize(phrase);
+    if (!p) return;
+    if (p === q) score += 10;
+    else if (p.startsWith(q) || q.startsWith(p)) score += 5;
+    else if (hasWord(p, q) || (q.length >= 4 && (p.includes(q) || q.includes(p)))) score += 3;
   });
   const label = normalize(entry.label);
-  if (label && q.includes(label)) score += 4;
+  if (label && (q.includes(label) || hasWord(q, label))) score += 4;
   qTokens.forEach(token => {
-    if (hay.includes(token)) score += 1;
+    if (hasWord(hay, token)) score += 1;
   });
   return score;
 }
@@ -157,11 +182,12 @@ function contextualSearch(query, viewerRole) {
     if (points <= 0) return;
     scored.push({entry, points});
   });
-  scored.sort((a, b) => b.points - a.points || a.entry.sourceId.localeCompare(b.entry.sourceId));
-  const candidates = scored.slice(0, 40).map(row => row.entry.sourceId);
+  const strong = scored.filter(row => row.points >= MIN_SEARCH_SCORE);
+  strong.sort((a, b) => b.points - a.points || a.entry.sourceId.localeCompare(b.entry.sourceId));
+  const candidates = strong.slice(0, 40).map(row => row.entry.sourceId);
   const {allowed, denied} = classification.filterContent(candidates, FLOQAI_CONTENT, {role});
   const allowedSet = new Set(allowed);
-  const results = scored
+  const results = strong
     .filter(row => allowedSet.has(row.entry.sourceId))
     .slice(0, MAX_RESULTS)
     .map(row => ({
@@ -200,9 +226,10 @@ function toolDeclarations() {
 
 function systemInstruction(role) {
   return [
-    "You are BOT DEE, FLOQR's in-app assistant on the FloqAi page.",
+    "You are BOT DEE, FLOQR's in-app chatbot on the FloqAi page. Talk like a helpful person, not a search engine.",
+    "Greetings and small talk (hi, hey, thanks, how are you): reply in 1–2 short sentences, ask what they want to do, and do NOT call any tools.",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
-    "Use contextualSearch for how-to. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
+    "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
@@ -266,10 +293,13 @@ module.exports = {
   MAX_TOOL_ROUNDS,
   MAX_HISTORY,
   MAX_MESSAGE_CHARS,
+  MIN_SEARCH_SCORE,
   TOOL_NAMES,
   toolDeclarations,
   sanitizeUserPrompt,
   sanitizeHistory,
+  isChitchatPrompt,
+  chitchatReply,
   contextualSearch,
   runTool,
   systemInstruction,
