@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.49 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.50 (stable)
+
+- s3.2.50: FloqCAST WB: Image-2 full-width wordmark + ring proportions (no chord-fit shrink).
+- s3.2.45: FloqCAST Image 2 + centered Search; s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
 
 - s3.2.49: FloqCAST WB: reinstate peer-sized in-asset ring; white→graphic→type→ring→F/L/T tip halo.
 - s3.2.45: FloqCAST Image 2 + centered Search; s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).

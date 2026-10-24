@@ -1643,100 +1643,25 @@ def to_white_black(
     print(f"  whiteBlack chrome → {dst.name} tip_preserve={tip_preserve} ring={wb_stroke}px")
 
 
-def _place_floqcast_wb_tips(body: Image.Image, min_top: int, bias: int = 4):
-    """Place FloqCAST so q kisses the lower arc; F / L / T tips kiss just outside the ring."""
-    ba = np.array(body)
-    ink = ba[:, :, 3] > 40
-    ys, xs = np.where(ink)
-    # Letter bands on the body crop (italic FloqCAST)
-    w = ba.shape[1]
-    f_band = ink & (np.arange(w)[None, :] < int(w * 0.12))
-    l_band = ink & (np.arange(w)[None, :] >= int(w * 0.08)) & (
-        np.arange(w)[None, :] < int(w * 0.22)
-    )
-    t_band = ink & (np.arange(w)[None, :] > int(w * 0.82))
-    x_lo = int(np.percentile(xs, 20))
-    x_hi = int(np.percentile(xs, 45))
-    q_band = ink & (np.arange(w)[None, :] >= x_lo) & (np.arange(w)[None, :] <= x_hi)
-    qys, qxs = np.where(q_band) if q_band.any() else (ys, xs)
-    bot = int(qys.max())
-    qx = int(qxs[qys == bot].mean())
-
-    def tip_r(band, left, t):
-        if not band.any():
-            return 0.0
-        bys, bxs = np.where(band)
-        return float(np.hypot(bxs + left - CX, bys + t - CY).max())
-
-    center_left = max(8, (S - body.size[0]) // 2 + bias)
-    Q_TARGET = R - 4
-    # F/L/T tips should sit just outside the stroke (halo lives there)
-    TIP_LO, TIP_HI = R + 2, R + 22
-    best_left, best_top, score = center_left, min_top, 1e18
-    for left in range(max(8, center_left - 90), min(S - body.size[0] - 8, center_left + 90) + 1, 2):
-        for t in range(min_top, S - body.size[1] - 4):
-            qd = float(np.hypot(left + qx - CX, t + bot - CY))
-            if qd > (R + 6):
-                continue
-            fr = tip_r(f_band, left, t)
-            lr = tip_r(l_band, left, t)
-            tr = tip_r(t_band, left, t)
-            sc = abs(qd - Q_TARGET) * 2.5
-            for tip in (fr, lr, tr):
-                if tip <= 0:
-                    continue
-                if tip < TIP_LO:
-                    sc += (TIP_LO - tip) * 0.8
-                elif tip > TIP_HI:
-                    sc += (tip - TIP_HI) * 1.1
-            if sc < score:
-                score, best_left, best_top = sc, left, t
-    fr = tip_r(f_band, best_left, best_top)
-    lr = tip_r(l_band, best_left, best_top)
-    tr = tip_r(t_band, best_left, best_top)
-    qd = float(np.hypot(best_left + qx - CX, best_top + bot - CY))
-    print(
-        f"  place WB F/L/T tips left={best_left} top={best_top} q={qd:.1f} "
-        f"F={fr:.1f} L={lr:.1f} T={tr:.1f} score={score:.1f}"
-    )
-    return best_left, best_top
-
-
 def build_floqcast_whiteblack() -> Path:
-    """FloqCAST White/Black — peer-sized disc (same R as BOT DEE).
+    """FloqCAST White/Black — Image-2 geometry, WB palette.
 
-    Build order:
-      1) white circle, no border (R identical to peer WB icons)
-      2) cast graphic
-      3) FloqCAST verbiage
-      4) in-asset chrome ring
-      5) F / L / T tip adjust vs ring + soft tip halo outside the stroke
+    Same ring + full-width FloqCAST placement as Nightlife Image 2
+    (`place_floqcast_q_kiss`). WB colors only: white field, chrome ink
+    graphic, dark FloqCAS + Tiffany T, chrome ring, tip halo.
+
+    Order: white → graphic → under (Fl) → ring → over (oqCAST+T) → tip halo.
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     g = Image.open(extract_floqcast_graphic())
     under, over, body = floqcast_wm()
-    # Chord-fit so F / L / T tips kiss just outside the peer ring (R+2…R+22)
-    # Wide Nightlife body (~875) throws side tips past the CSS circle; shrink for WB.
-    tip_span = max(1, body.size[0])
-    # Keep side tips inside Search CSS circle (S/2) while kissing past ring R
-    max_chord = min(MAX_WM_W, int(R * 1.20))  # ~588 at R=490 — F/L/T inside CSS circle
-    if tip_span > max_chord:
-        fit = max_chord / float(tip_span)
-        nw = max(1, int(round(body.size[0] * fit)))
-        nh = max(1, int(round(body.size[1] * fit)))
-        under = under.resize((nw, nh), Image.Resampling.LANCZOS)
-        over = over.resize((nw, nh), Image.Resampling.LANCZOS)
-        body = Image.alpha_composite(under, over)
-        print(f"  FloqCAST WB chord-fit ×{fit:.3f} → body={body.size} (max_chord={max_chord})")
-    # Slight left bias — italic F tip reaches farther than T; balance vs ring
-    left, top = _place_floqcast_wb_tips(body, graphic_bottom(g, 700) + 8, bias=-6)
-    # Raise mark so ring grazes bottom tips of F/L/T (not mid-letter chord)
-    top = max(graphic_bottom(g, 700) + 4, top - 28)
-    print(f"  FloqCAST WB place left={left} top={top} body={body.size} (raised for tip-kiss)")
+    # Image-2 placement — full Nightlife body size (no chord-fit shrink)
+    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
+    print(f"  FloqCAST WB Image-2 place left={left} top={top} body={body.size}")
 
-    # Match BOT DEE / VIP thin chrome ring (R=490)
-    wb_stroke = 3
+    # Ring presence closer to Nightlife stroke (not hairline BOT-DEE 3px)
+    wb_stroke = max(5, RING_STROKE - 2)  # ~6 at RING_STROKE=8
     wb_half = wb_stroke / 2.0
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
@@ -1745,17 +1670,16 @@ def build_floqcast_whiteblack() -> Path:
     )
     font_chrome = np.clip(font_chrome * 0.48, 8, 48)
 
-    # 1) White circle, no border — same radius as peer icons
+    # 1) White circle / field (no border yet)
     base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
-    # (full white field; circle identity comes from the ring at R — matches BOT DEE)
 
-    # 2) Cast graphic (inside disc; leave ring annulus clear for the stroke)
+    # 2) Cast graphic (Image-2 silhouette → chrome ink)
     ga = np.array(g.convert("RGBA"))
     gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
     glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
     chrome = np.clip(shiny_chrome_tone(glum, yy, xx) * 0.55, 10, 72)
     gout = np.zeros_like(ga)
-    line = (glum >= 26) & (gal > 8) & (dist < (R - 8))
+    line = (glum >= 26) & (gal > 8) & (dist < (R - 6))
     gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
     gout[line, 3] = 255
     base.alpha_composite(Image.fromarray(gout, "RGBA"))
@@ -1778,29 +1702,36 @@ def build_floqcast_whiteblack() -> Path:
         out[:, :, 3] = np.where(ink, 255, 0)
         return Image.fromarray(out, "RGBA")
 
-    # 3) Verbiage FloqCAST (full body — F, L, oq, CAST, T)
-    body_t = type_layer(body)
     under_t = type_layer(under)
     over_t = type_layer(over)
-    base.alpha_composite(body_t)
 
-    # 4) In-asset chrome ring (peer size R=490, stroke matches BOT DEE)
+    # 3) Under type (Fl) — Image-2: F/L sit under the ring chord
+    base.alpha_composite(under_t)
+
+    # 4) In-asset chrome ring — same R as Nightlife Image 2
     ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
-    ring_chrome = np.clip(10.0 + ring_chrome * 0.28, 12, 55)
+    ring_chrome = np.clip(8.0 + ring_chrome * 0.32, 10, 60)
     ra = np.zeros((S, S, 4), np.uint8)
     ring_mask = np.abs(dist - R) <= wb_half
+    # Soft AA outside solid stroke (never toward white through type)
+    ring_aa = (np.abs(dist - R) <= (wb_half + 0.9)) & ~ring_mask
     for c in range(3):
         ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
-    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+        ra[:, :, c] = np.where(
+            ring_aa, np.clip(ring_chrome * 0.55, 14, 90).astype(np.uint8), ra[:, :, c]
+        )
+    ra[:, :, 3] = np.where(ring_mask | ring_aa, 255, 0).astype(np.uint8)
     base.alpha_composite(Image.fromarray(ra, "RGBA"))
+
+    # 5) Over type (oqCAST + Tiffany T) — on top of ring like Image 2
+    base.alpha_composite(over_t)
 
     out = np.array(base)
     out[:, :, 3] = 255
 
-    # 5) F / L / T vs ring — soft halo outside, then tip kiss ON TOP of the stroke
+    # Tip halo + restamp outside ring (Image-2 tip overhang on white)
     ua = np.array(under_t)
     oa = np.array(over_t)
-    # Under = Fl (F + L); over holds T (tiffany)
     fl_ink = ua[:, :, 3] > 20
     t_ink = (
         (oa[:, :, 3] > 20)
@@ -1808,61 +1739,65 @@ def build_floqcast_whiteblack() -> Path:
         & (oa[:, :, 1] > 140)
         & (oa[:, :, 2] > 170)
     )
-    # Tip kiss = glyph ink grazing / crossing / outside the ring (not deep interior)
-    kiss = (fl_ink | t_ink) & (dist >= (R - wb_half - 1.5))
-    tips_out = kiss & (dist > (R + wb_half))
+    type_ink = (ua[:, :, 3] > 20) | (oa[:, :, 3] > 20)
+    tips_out = type_ink & (dist > (R + wb_half))
+    tip_fl = tips_out & fl_ink
+    tip_t = tips_out & t_ink
 
-    # Soft tip halo on white outside the ring (under the solid tip ink)
     tip_dilate = (
         np.array(
             Image.fromarray((tips_out.astype(np.uint8) * 255)).filter(
-                ImageFilter.MaxFilter(9)
+                ImageFilter.MaxFilter(11)
             )
         )
         > 0
     )
-    halo = tip_dilate & ~kiss & (dist > (R + wb_half)) & (dist < (R + 36))
+    halo = tip_dilate & ~type_ink & (dist > (R + wb_half)) & (dist < (R + 42))
     halo_tone = np.clip(
-        210.0 + shiny_chrome_tone(np.full((S, S), 40.0, np.float32), yy, xx) * 0.08,
-        200,
-        236,
+        205.0 + shiny_chrome_tone(np.full((S, S), 40.0, np.float32), yy, xx) * 0.10,
+        195,
+        232,
     )
     t_halo = halo & (
         np.array(
-            Image.fromarray((t_ink.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(11))
+            Image.fromarray((t_ink.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(13))
         )
         > 0
     )
     for c in range(3):
         out[:, :, c] = np.where(halo, halo_tone, out[:, :, c])
-    out[t_halo, 0] = np.minimum(out[t_halo, 0], 180)
-    out[t_halo, 1] = np.maximum(out[t_halo, 1], 230)
-    out[t_halo, 2] = np.maximum(out[t_halo, 2], 245)
+    # Soft cyan tip-halo under Tiffany T (Image-2 neon fringe → WB)
+    out[t_halo, 0] = np.minimum(out[t_halo, 0], 170)
+    out[t_halo, 1] = np.maximum(out[t_halo, 1], 228)
+    out[t_halo, 2] = np.maximum(out[t_halo, 2], 248)
 
-    # Solid F/L/T tip restamp ABOVE ring + halo (ring stays; tips kiss over it)
+    # Solid tips last (F/L chrome, T tiffany) — never nicked by ring AA
     for c in range(3):
-        out[:, :, c] = np.where(kiss & fl_ink, font_chrome, out[:, :, c])
-    out[kiss & t_ink, 0] = TIFFANY[0]
-    out[kiss & t_ink, 1] = TIFFANY[1]
-    out[kiss & t_ink, 2] = TIFFANY[2]
+        out[:, :, c] = np.where(tip_fl, font_chrome, out[:, :, c])
+    out[tip_t, 0] = TIFFANY[0]
+    out[tip_t, 1] = TIFFANY[1]
+    out[tip_t, 2] = TIFFANY[2]
 
-    # Outside disc (beyond tip halo) stays pure white — no junk
-    wipe = (dist > (R + 36)) & ~kiss & ~halo
+    # Outside far field white (keep tip + halo)
+    wipe = (dist > (R + 42)) & ~tips_out & ~halo
     out[wipe, :3] = 255
 
     final = Image.fromarray(out, "RGBA").convert("RGB")
 
-    # QA vs peer ring radius
     fa = np.array(final)
     flum = fa.mean(axis=2)
-    fdist = dist
     ring_peak = 0
     ring_r = None
     for r0 in np.linspace(470, 505, 71):
-        n = int(((np.abs(fdist - r0) <= 1.0) & (flum < 90)).sum())
+        n = int(((np.abs(dist - r0) <= 1.0) & (flum < 90)).sum())
         if n > ring_peak:
             ring_peak, ring_r = n, float(r0)
-    tip_max = float(fdist[kiss].max()) if kiss.any() else 0.0
+    tip_max = float(dist[tips_out].max()) if tips_out.any() else 0.0
+    # Type width vs Nightlife Image 2 (should be ~full chord, not shrunk)
+    type_m = ((flum < 90) & (yy > 650)) | (
+        (fa[:, :, 0] < 120) & (fa[:, :, 1] > 140) & (fa[:, :, 2] > 170) & (yy > 650)
+    )
+    tw = int(np.where(type_m)[1].max() - np.where(type_m)[1].min()) + 1 if type_m.any() else 0
 
     dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
     dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
@@ -1875,21 +1810,20 @@ def build_floqcast_whiteblack() -> Path:
     final.resize((110, 110), Image.Resampling.LANCZOS).save(
         "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
     )
-    final.crop((60, 760, 300, 1010)).save("/opt/cursor/artifacts/wb-fl-tip-after.png")
-    final.crop((720, 760, 1000, 1010)).save("/opt/cursor/artifacts/wb-t-tip-after.png")
-    peers = Image.new("RGB", (110 * 3 + 20, 130), (245, 245, 245))
-    for i, p in enumerate(
-        [
-            final.resize((110, 110)),
-            Image.open(ROOT / "images/chrome/botdee-whiteblack.jpg").resize((110, 110)),
-            Image.open(ROOT / "images/chrome/shoutout-whiteblack.png").resize((110, 110)),
-        ]
-    ):
-        peers.paste(p.convert("RGB"), (10 + i * 110, 15))
-    peers.save("/opt/cursor/artifacts/wb-floqcast-peer-size.png")
+    # Image-2 vs WB wordmark proof
+    nl = Image.open(ROOT / "images/chrome/floqcast-nightlife.jpg").convert("RGB")
+    proof = Image.new("RGB", (960, 460), (20, 20, 20))
+    proof.paste(nl.crop((30, 700, 994, 1010)).resize((920, 180)), (20, 40))
+    proof.paste(final.crop((30, 700, 994, 1010)).resize((920, 180)), (20, 260))
+    ImageDraw.Draw(proof).text((20, 12), "IMAGE 2 Nightlife wordmark", fill=(255, 220, 80))
+    ImageDraw.Draw(proof).text(
+        (20, 232), "WB Image-2 proportions (full width)", fill=(160, 210, 255)
+    )
+    proof.save("/opt/cursor/artifacts/wb_image2_proportions_fixed.png")
+
     print(
-        f"  FloqCAST WB layers=white→graphic→type→ring→halo+kiss "
-        f"ring_r={ring_r} peak={ring_peak} kiss={int(kiss.sum())} "
+        f"  FloqCAST WB Image-2 props ring_r={ring_r} peak={ring_peak} "
+        f"stroke={wb_stroke} typeW={tw} tips_out={int(tips_out.sum())} "
         f"halo={int(halo.sum())} tip_max={tip_max:.1f} → {dst_png.name}"
     )
     return dst_png
