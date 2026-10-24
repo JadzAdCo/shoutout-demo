@@ -15,7 +15,7 @@ Shared module: `floqr-feature-landing.js` + `floqr-feature-landing.css` (`window
 
 1. **Back** — `floqrGlobalBack` / `FLOQRNav.applyGlobalBack` (← Back to Search). No hardcoded `?v=` in the href.
 2. **Feature icon only** — chrome pack via `data-floqr-chrome-icon` (VIP / ShoutOut / floqCast). Centered in `.product-brand-stack`. **No** `.product-parent-logo` / FloqR mark on the landing.
-3. **Feature title + `?`** — one flex row (`.{feature}-title-row` / `.feature-landing-title-row`): `<h1>` + `details.help-popout` summary `?`. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title.
+3. **Feature title + `?`** — one flex row (`.{feature}-title-row` / `.feature-landing-title-row` / `.floqr-page-title-row`): `<h1 class="floqr-page-title">` + `details.help-popout` summary `?`. **Font size = Appearance panel h2** (`--floqr-page-title-size` → `--floqr-title-size`). Same schema as Profile & Settings. Intro / how-to copy lives **inside** the `?`, not as a long paragraph under the title.
 4. **Body card** — glass card. Section head **Choose a venue** + `?` (`.feature-landing-section-head`). Search input + status line + result grid.
 
 ### Forbidden header layouts

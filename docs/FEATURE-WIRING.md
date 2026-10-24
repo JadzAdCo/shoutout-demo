@@ -405,7 +405,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`) |
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
-| Page title size | Profile & Settings + feature search landings (floqCast / ShoutOut / VIP) use `--floqr-title-size` (same as Appearance `h2`); Profile title `white-space:nowrap` (`admin.css` / `floqr-feature-landing.css`). |
+| Page title size | Shared schema: `.floqr-page-title` / `.floqr-page-title-row` + feature `.feature-landing-title-row`. Size = Appearance `h2` via `--floqr-page-title-size` (= `--floqr-title-size`). All title text (`.help-label-text`) inherits; `?` stays 11px badge. Profile & Settings one line (`admin.css` / `floqr-feature-landing.css`). |
 
 ---
 

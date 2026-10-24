@@ -31,6 +31,11 @@
   --floqr-title-tracking:-.035em;
   --floqr-title-size:clamp(1.75rem,5.2vw,2.125rem);
   --floqr-title-line:1.12;
+  /* Page / feature-search titles = Appearance panel h2 (never the large marketing h1 clamp) */
+  --floqr-page-title-size:var(--floqr-title-size);
+  --floqr-page-title-line:var(--floqr-title-line);
+  --floqr-page-title-tracking:var(--floqr-title-tracking);
+  --floqr-page-title-weight:var(--floqr-title-weight);
   /* Unified Back pill — small left-justified; chrome schemes recolor fill/border */
   --floqr-back-bg:rgba(148,142,198,.58);
   --floqr-back-border:rgba(176,168,220,.82);
@@ -1340,13 +1345,15 @@ html.floqr-mobile-browser .confirmation h1{font-size:clamp(34px,12vw,56px);line-
 /* Profile & feature landings stay Appearance-sized on mobile (not the huge marketing h1 clamp). */
 html.floqr-mobile-browser .admin-shell .topbar h1,
 html.floqr-mobile-browser .admin-shell .topbar h1.help-label,
+html.floqr-mobile-browser .admin-shell .topbar h1.floqr-page-title,
+html.floqr-mobile-browser .floqr-page-title,
 html.floqr-mobile-browser body.floqcast-page .floqcast-hero h1,
 html.floqr-mobile-browser body.vip-page .vip-hero h1,
 html.floqr-mobile-browser body.shoutout-search-page .feature-landing-title-row h1,
 html.floqr-mobile-browser .feature-landing-title-row h1{
-  font-size:var(--floqr-title-size)!important;
-  line-height:var(--floqr-title-line)!important;
-  letter-spacing:var(--floqr-title-tracking);
+  font-size:var(--floqr-page-title-size,var(--floqr-title-size))!important;
+  line-height:var(--floqr-page-title-line,var(--floqr-title-line))!important;
+  letter-spacing:var(--floqr-page-title-tracking,var(--floqr-title-tracking));
 }
 html.floqr-mobile-browser .sub{font-size:15px;line-height:1.38}
 html.floqr-mobile-browser .card,
@@ -1444,13 +1451,15 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
   .topbar h1,.confirmation h1{font-size:clamp(34px,12vw,56px);line-height:.98;letter-spacing:0}
   .admin-shell .topbar h1,
   .admin-shell .topbar h1.help-label,
+  .admin-shell .topbar h1.floqr-page-title,
+  .floqr-page-title,
   body.floqcast-page .floqcast-hero h1,
   body.vip-page .vip-hero h1,
   body.shoutout-search-page .feature-landing-title-row h1,
   .feature-landing-title-row h1{
-    font-size:var(--floqr-title-size)!important;
-    line-height:var(--floqr-title-line)!important;
-    letter-spacing:var(--floqr-title-tracking);
+    font-size:var(--floqr-page-title-size,var(--floqr-title-size))!important;
+    line-height:var(--floqr-page-title-line,var(--floqr-title-line))!important;
+    letter-spacing:var(--floqr-page-title-tracking,var(--floqr-title-tracking));
   }
   .sub{font-size:15px;line-height:1.38}
   .card,.login-card,.club-option,.notice{padding:16px;border-radius:20px}

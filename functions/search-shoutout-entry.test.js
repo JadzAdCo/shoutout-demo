@@ -146,16 +146,24 @@ test("White/Black profile card is white with shiny black initials; dark chromes 
 });
 
 test("Profile & Settings and feature search titles match Appearance h2 size", () => {
+  const root = read("styles.css");
+  assert.match(root, /--floqr-page-title-size:var\(--floqr-title-size\)/);
   const admin = read("admin.css");
-  assert.match(admin, /Match Appearance panel h2/);
-  assert.match(admin, /\.admin-shell \.topbar h1/);
+  assert.match(admin, /Profile & Settings title space = Appearance h2 size/);
+  assert.match(admin, /\.admin-shell \.topbar h1\.floqr-page-title/);
   assert.match(admin, /white-space:nowrap/);
-  assert.match(admin, /font-size:var\(--floqr-title-size/);
+  assert.match(admin, /font-size:var\(--floqr-page-title-size/);
+  assert.match(admin, /\.help-label-text\{[\s\S]*font-size:inherit!important/);
   const landing = read("floqr-feature-landing.css");
-  assert.match(landing, /Same size as Profile → Appearance h2/);
-  assert.match(landing, /\.feature-landing-title-row h1/);
-  assert.match(landing, /font-size: var\(--floqr-title-size/);
+  assert.match(landing, /Feature search title schema/);
+  assert.match(landing, /\.floqr-page-title/);
+  assert.match(landing, /font-size: var\(--floqr-page-title-size/);
   const portal = read("patron-portal.html");
+  assert.match(portal, /class="floqr-page-title-row"/);
+  assert.match(portal, /class="floqr-page-title help-label"/);
   assert.match(portal, /data-i18n="portal\.title"/);
   assert.match(portal, /data-i18n="appearance\.pageTitle"/);
+  assert.match(read("floqcast-search.html"), /class="floqr-page-title"/);
+  assert.match(read("shoutout-search.html"), /class="floqr-page-title"/);
+  assert.match(read("vip.html"), /class="floqr-page-title brand-mixed-case"/);
 });
