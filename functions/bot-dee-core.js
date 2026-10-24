@@ -132,7 +132,7 @@ function chitchatReply(role) {
   const roleHint = role && role !== "anonymous" && role !== "patron"
     ? ` I can see you as ${role}.`
     : "";
-  return `Hey — FloqAi here.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
+  return `Hey — BOT DEE here.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
 }
 
 function scoreEntry(query, entry) {
@@ -226,14 +226,14 @@ function toolDeclarations() {
 
 function systemInstruction(role) {
   return [
-    "You are FloqAi, FLOQR's in-app chatbot (formerly called BOT DEE). Talk like a helpful person, not a search engine. Introduce yourself as FloqAi only — never as BOT DEE.",
+    "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
     "Greetings and small talk (hi, hey, thanks, how are you): reply in 1–2 short sentences, ask what they want to do, and do NOT call any tools.",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
-    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, VIP reserV."
+    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, BOT DEE, VIP reserV."
   ].join(" ");
 }
 

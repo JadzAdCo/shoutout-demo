@@ -79,7 +79,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | White/Black active controls (s3.2.52) | Active tabs/buttons stay **white fill + shiny black text** with thin **Tiffany** border (`--floqr-tiffany` / `#00d4fe` — FloqCAST T / BOT DEE). Never grey/black fill (was `--hot/--accent` both `#111` on `.admin-tab.active`). |
 | Welcome OAuth | `patron-app.js` `signInProvider`: **popup first on every device** (user tap). Never redirect-first on mobile — GitHub Pages ↔ `*.firebaseapp.com` redirect often returns null under ITP (s3.2.35 regression: “full-page sign-in did not finish”). `auth/popup-blocked` → redirect last resort; never redirect on popup-closed. Failed redirect sets `floqr.authPreferPopup` and tells the patron to allow the popup or use Email/SMS OTP. `getRedirectResult` waits briefly for `onAuthStateChanged`. Portal Google (`patron-portal-app.js`) matches: popup first. |
 | Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). `.category-floqai-search` is `max-width:720px; margin:0 auto` so the desktop bar centers under the FloqR logo. Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
-| Template FloqAi | Floating `#floqAiAgent` / speech **off** on `#templateSelectPage` (`floqai-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
+| Template BOT DEE | Floating `#floqAiAgent` / speech **off** on `#templateSelectPage` (`floqai-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
 | Search icon position | Phone/tablet (`max-width:1180px` + `floqr-mobile-browser` / `floqr-tablet-browser`): `#categoryPage` flex column, `.category-grid:has(.search-icon-row)` `margin-top:auto` so FloqCAST / ShoutOut / reserVIP / BOT DEE sit at the bottom of the viewport (safe-area aware). Wide desktop (`min-width:1181px`): icons stay under Search with centered max-width row — viewport width wins over `floqr-desktop-browser` so iPad “desktop site” still pins |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
@@ -112,7 +112,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Profile chrome | Page title `portal.title` = **Profile & Settings**; manage blurb in title `?` (`help-my-profile`); global Back = compact left `< Back` via `FLOQRNav.applyGlobalBack` after i18n; FloqR mark under Back (`.floqr-page-brand`) |
 | Receipts | `payment-return.html` / `ad-invoice.html` / `pass.html` — early-paint `data-floqr-chrome` + `floqr-chrome-scheme.js`; payment-return hydrates `users.isSiteChrome` after auth |
 | Chrome audit | `floqr-chrome-audit.js` — Master Admin switch starts a localStorage session; each loaded page probes expected vs actual → pass/fail. Master Admin → Diagnostics → Manual Feature Tests → **Read Site chrome audit** / **Copy chrome fix prompt** |
-| i18n / help | `nav.appearance`, `appearance.*`, `chrome.*` (+ blurbs / `lockedHint`); FloqAi `help-chrome-scheme` → Appearance; Master `help-chrome-audit` |
+| i18n / help | `nav.appearance`, `appearance.*`, `chrome.*` (+ blurbs / `lockedHint`); BOT DEE `help-chrome-scheme` → Appearance; Master `help-chrome-audit` |
 
 ---
 
@@ -150,7 +150,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Sign-in (QA) | Home → Email sign-in → `temp_*@floqr-demo.com` → Send 6-minute code → **8-character** OTP arrives at `bans.don@gmail.com` with subject `[FLOQR demo → …]` → Verify. Seed sets `profileCompleted: true`. Club Admin skips SMS MFA for `@floqr-demo.com`. Table “QA ref” is tracking only (not the OTP). |
 | Private pages | No Google-only login. Unsigned users redirect to home (`floqr-auth-gate.js` / `profile-access-guard.js`) with `returnTo`. |
 | Welcome OAuth (s3.1.85) | `patron-app.js` `signInProvider`: Google/Facebook/Microsoft use **popup**. `auth/popup-closed-by-user` does **not** call `signInWithRedirect` (GitHub Pages ↔ `*.firebaseapp.com` often returns null and left Welcome stuck on “Redirecting to secure sign-in…”). Only `auth/popup-blocked` tries full-page redirect; `getRedirectResult` clears pending status. |
-| Search beta tiles (s3.1.86) | `searchVisible` / `searchTileVisible`: test features show for **Master Admin** (Beta pill, QA) and granted beta testers. floqCast / VIP / FloqAi stay `hidden` for regular patrons until Live or a beta grant. CSS: floqCast/VIP `<img>` marks no longer `height:100%` (was collapsing when face height is auto). |
+| Search beta tiles (s3.1.86) | `searchVisible` / `searchTileVisible`: test features show for **Master Admin** (Beta pill, QA) and granted beta testers. floqCast / VIP / BOT DEE stay `hidden` for regular patrons until Live or a beta grant. CSS: floqCast/VIP `<img>` marks no longer `height:100%` (was collapsing when face height is auto). |
 | floqCast mark + live arm (s3.1.87) | `images/floqcast-icon.svg` must be valid UTF-8 (Windows-1252 `0x97` in a comment broke SVG-as-`<img>` → blank Search mark). Preview: `armFloqCastLiveDuration` only after stable ICE (`floqcast-webrtc.js` reports `answered` ≠ `connected`). `repairFloqCastPaidOrders` skips `ended`/`rejected` (no false “Moved N into queue”). Queue UI hides ended rows. |
 | floqCast venue geo pick (s3.1.88) | `floqcast-search.html` loads `floqr-geo-search.js`. Empty search shows **top 4 nearest** floqCast venues (GPS → IP → profile city via `FLOQRGeoSearch.resolveUserLocation` / `sortNearest`). Typing matches club, brand, city, or `SHOUTOUT_EVENTS` event name. Status line shows nearest-of-N + place/source. Help: `help-floqcast-choose-venue`. |
 | Feature landing standard (s3.2.44) | Shared `floqr-feature-landing.js` + `.css` (`FLOQRFeatureLanding`). **ShoutOut** `shoutout-search.html`, **VIP** `vip.html`, **floqCast** `floqcast-search.html`: Back → **product chrome icon only** (no FloqR parent) → title + `?` → Choose a venue → GPS nearest **4** cards with feature facts (ShoutOut: LED sizes + patron custom; VIP: open days / deposit / dress / age; floqCast: screen + sound). Search hub listing also uses fact cards + top-4 when the query is empty. Help: `help-shoutout-choose-venue`, `help-vip-choose-venue`, `help-floqcast-choose-venue`. Nav: `FLOQRNav.shoutoutHome()`. |
@@ -277,7 +277,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | UI | `master-admin.html` SOS2FA gate + channel radios (Both / SMS / Email) |
 | Styles | `admin.css` `.sos2fa-channel-option` (radio sizing); `styles.css` must not force radios to `width:100%` |
 | Backend | `functions/sos2fa-functions.js` (+ Twilio / mail paths as deployed) |
-| Help | SOS2FA popouts + FloqAi repository entries |
+| Help | SOS2FA popouts + BOT DEE repository entries |
 
 ---
 
@@ -374,13 +374,13 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## FloqAi intent search (plain-language router)
+## BOT DEE intent search (plain-language router)
 
 **Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR). Stays the **feature-optimized fast path / fallback** under BOT DEE chat (and inside feature searches).
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / FloqAi (`index.html` intent panel); `floqai.html` collapsible **Quick intent search** |
+| UI | Search / BOT DEE (`index.html` intent panel); `floqai.html` collapsible **Quick intent search** |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
 | Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
 | Cache bust | `intent-search.js?v=` on `index.html` / `floqai.html` |
@@ -389,14 +389,14 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ## BOT DEE chat (Phase 1 — `executeBotSession`)
 
-**Purpose:** Headless FloqAi agent: Auth + `floqAi` feature gate + data classification → Gemini (`@google/genai`) + tools. Tools re-validate product gates and wrap existing VIP / ShoutOut / FloqCAST / checkout runners. Chat never collects card data.
+**Purpose:** Headless BOT DEE agent: Auth + `floqAi` feature gate + data classification → Gemini (`@google/genai`) + tools. Tools re-validate product gates and wrap existing VIP / ShoutOut / FloqCAST / checkout runners. Chat never collects card data.
 
 | Layer | Wiring |
 |---|---|
 | UI | `floqai.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint |
-| Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getFloqAiAccess` still gate intent cards |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getBOT DEEAccess` still gate intent cards |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
-| Chat vs search | Greetings / small talk (`isChitchatPrompt`: hi/hey/thanks/…) → `chitchatReply` with **no** `contextualSearch` hits (provider `local-chitchat`). Search tool + local fallback only for clear how-to intents; token match is word-boundary (`hey` ≠ `they`); min score 3. |
+| Chat vs search | Greetings / small talk (`isChitchatPrompt`: hi/hey/thanks/…) → `chitchatReply` as **BOT DEE** with **no** `contextualSearch` hits (provider `local-chitchat`). Search tool + local fallback only for clear how-to intents; token match is word-boundary (`hey` ≠ `they`); min score 3. |
 | Tools | `contextualSearch`; `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates (`functions/bot-dee-tools.js`) |
 | VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
@@ -404,8 +404,8 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Tests | `functions/bot-dee-core.test.js`, `functions/floqai-page.test.js` |
 | Help | `help-floqai-page` (BOT DEE chat + intent fallback phrases) |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
-| Search icon order | **1 ShoutOut · 2 FloqAi · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **FloqAi**) |
-| FloqAi brand (s3.2.59) | Chat chrome / welcome / errors / help say **FloqAi** (not BOT DEE). Internal module names may still say bot-dee. |
+| Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **BOT DEE**) |
+| BOT DEE verbiage (s3.2.60) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi` / `floqai.html`. |
 | FloqCast Go live CTA (s3.2.59) | Venue button + sticky: **Go live, start a cast** (`page.floqcast.goLiveCta` / `floqcast-search.js`). |
 | Black & Dark Green icons (s3.2.58) | `BLACK_DARK_GREEN_ICONS` full pack (`*-blackdarkgreen.*`) — accent = Settings wordmark \"tings\" **`#5ac783`** (+ companion `#2e8a5a`). Build: `scripts/build-blackdarkgreen-icons.py`. CSS `html[data-floqr-chrome=blackDarkGreen] --accent:#5ac783`. |
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
@@ -446,7 +446,7 @@ VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/
 | Backend | Reservation callables; cancel → Stripe refund; hours gate; party-join via ref (no waitress accept) |
 | Data | Table maps/sections/reservations; section→waitress/CSR; activity `referenceNumber` on receipt + inbox |
 | Hours | Require structured club hours before enabling live hail during “open” |
-| Help / FloqAi | “VIP table”, “hail waitress”, “table reservation”, “join table party” |
+| Help / BOT DEE | “VIP table”, “hail waitress”, “table reservation”, “join table party” |
 
 ### Test methodology (abbrev.)
 
@@ -456,7 +456,7 @@ VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/
 4. Outside hours → hard block + CSR/on-duty text option; fix hours in VCC and retest open window.  
 5. Existing hail auto-attaches ref; New-service hail allowed without prior VIP purchase.
 
-**Manual QA hub (layouts, scheduling, today’s ship):** `feature-tests-v29-09-122.html` on the feature branch — deep links for Shôko Scheduling, birthday layouts, supRstar timer, display IP-or-token, FloqAi cues.
+**Manual QA hub (layouts, scheduling, today’s ship):** `feature-tests-v29-09-122.html` on the feature branch — deep links for Shôko Scheduling, birthday layouts, supRstar timer, display IP-or-token, BOT DEE cues.
 
 When adding a section, use this skeleton:
 
@@ -499,9 +499,9 @@ When adding a section, use this skeleton:
 | **Beta invite email handoff (s3.1.61–62)** | Email/private browsers have no Firebase session — landing no longer sticks on Restoring/Checking. `ensureAuth()` initializes Firebase before `auth()`; stashes invite `t` in `FLOQR_BETA_INVITE_TOKEN`; **Sign in to accept this invite** → home OTP with `returnTo` keeping `t`. `createBetaInvite` Inbox `link` is absolute Pages URL. |
 | **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
-| **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
+| **BOT DEE Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white BOT DEE word beside mark. |
 | **Search icon tiles** | `#categoryPage .search-icon-row` order: **ShoutOut → BOT DEE → VIP reserV → Settings → floqCast** (BOT DEE key `floqAi`). Chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK`. Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
-| **Search FloqAi box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
+| **Search BOT DEE box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
@@ -517,14 +517,14 @@ When adding a section, use this skeleton:
 1. Register one row in `floqr-venue-actions.js` `ACTIONS`: `id`, `featureKey`, `patterns` / `strip`, `ctaKey`, `buildUrl(locationId)` or `mode: "shoutout"`.
 2. Listing reads `FLOQRVenueActions.resolve({query, listingType})` for label + click.
 3. Satellite accepts `?location=` (floqCast / VIP already) and still runs `FLOQRFeatureServices` / session shell / callables.
-4. Mirror patterns in `intent-search.js` `PRODUCT_INTENTS` for FloqAi carpets (keep in sync when adding a product).
+4. Mirror patterns in `intent-search.js` `PRODUCT_INTENTS` for BOT DEE carpets (keep in sync when adding a product).
 5. Tests: `functions/floqr-venue-actions.test.js` — intent → URL, gate deny → fallback, index script order.
 
 **Security (Bible §8.3 / §11):** Query string and CTA are **UX only**. Authorization stays on: feature flags (`searchVisible` / `guardPage`), Firebase Auth + satellite session shell, Firestore rules, money/live callables. Never grant floqCast/VIP from a crafted `?location=` alone.
 
 **Default:** No product cue → Select still starts ShoutOut (historical primary LED product). Explicit `listingType=shoutout` → “Throw ShoutOut Here”.
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
-| **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — FloqAi/floqCast/VIP tiles are shoutout-icon-card, not category-card.
+| **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — BOT DEE/floqCast/VIP tiles are shoutout-icon-card, not category-card.
 | **Package** | s3.1.80 |
 
 ## Beta invite landing (`beta-invite.html`)
@@ -536,7 +536,7 @@ When adding a section, use this skeleton:
 | Client | `beta-invite-app.js` stashes/restores `t`, wires `FLOQRSessionShell.loginHref()` returnTo, passes `{token, checks}` to `acceptBetaInvite`; `unlockAgreementUi` clears status (no Signed-in line) |
 | Server | `functions/feature-services-functions.js` `createBetaInvite` / `respondToInvite` — absolute invite URL; refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` (canonical v2 FloqR, reverse-payments refund) |
 | Data | `betaInvites/{hash}` + `betaTesters/{uid}.consent` |
-| Help / FloqAi | `help-beta-tester`, `help-beta-booking-disclaimer`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
+| Help / BOT DEE | `help-beta-tester`, `help-beta-booking-disclaimer`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
 | Link reuse | `betaInvites.isBetaLinkused` `0|1` — set `1` on successful accept (terms + subscribe); `evaluateInvite` denies reuse with clear “link already used” error |
 
 ## VIP reserV (`vipReservations`) — Phase 2
@@ -560,7 +560,7 @@ When adding a section, use this skeleton:
 | **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-terms.html` / `vip-door.html`. Do not await a full clubLocations scan before clearing Restoring (see s3.1.66 `vipCandidateIds`). |
 | **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent` (single Terms check + expand), `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`, `getVipClubSettings`, `saveVipClubSettings` (deposit + `refundPolicy`), `setVipSectionBlocked`, `confirmVipReservationWithoutDeposit`, `adminConfirmVipReservation`, `cancelVipReservation` (clears `isBooked`; FloqMedia/Club Stripe `refunds.create` by policy). Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
 | **Paid-before-booked** | Club `clubLocations.vipSettings.depositRequired` (default on when depositCents &gt; 0). Hold → `status:held` + `isReserved:0` only. Floor map `booked` / `isReserved:1` only after Stripe `fulfillVipReservationOrder` (paymentConfirmed=1), or `confirmVipReservationWithoutDeposit` when deposit not required, or Club Admin `adminConfirmVipReservation` with `paymentRecorded` when deposit required, or Club POS confirm (`confirmVipReservationForClubPos`). |
-| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: FloqAi `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
+| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: BOT DEE `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
 | **POS providers** | Toast / SpotOn (open tab ★) / Square / Clover / Generic — sandbox flags: Toast, SpotOn, Square, Clover. Live OAuth/webhook adapters activate when partner credentials are deployed; Connect workflow + connection codes ship now. |
 | **Club Admin** | `admin.html` → **Feature Mgmt** → **VIP reserV** (`#panelVipReserv`) — collector picker, POS connect (sandbox/live), CSV export, billing list, deposit policy, nights, check-in / cancel / block / walk-in. Help: `help-vip-club-admin`, `help-vip-deposit-settings`, `help-vip-payment-collector`. |
 | **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **floqCast** (`#panelFloqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. |
@@ -572,7 +572,7 @@ When adding a section, use this skeleton:
 | **Cancel + refund (s3.1.83)** | Club Admin → VIP reserV Cancel. Always frees inventory + clears `isBooked`. FloqMedia Stripe / Club Stripe: optional Stripe refund (`processRefund`, default on) using `vipSettings.refundPolicy` — club cancel mode `full` (default) / `policy` (hours windows) / `none`. Club POS / CSV: table freed; POS void stays on Toast/SpotOn. UI: refund-on-cancel checkbox + policy hours. |
 | **Data** | `vipInventory` (legacy night×section lock), `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations`, `clubLocations.vipSettings`, `clubLocations/.../vipNights/.../tables`, `vipPosConnections`, `vipPosProviders`, `vipPosStatements` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
-| **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
+| **Help / BOT DEE** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
 | **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant. Venue opt-in: `clubLocations.featureGates.vipReservations` (default **false** in `feature-gates.js`). Beta seeds: Decades, Lima Twist, Aurelia (`temp-democlub-1`) |
 | **Not yet** | Promoter path, counsel Live Terms, Model B invoicing |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc`, `.cursor/rules/design-notes-product-chrome.mdc`, `.cursor/rules/design-notes-aurelia-scene-standard.mdc` |

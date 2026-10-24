@@ -1,11 +1,11 @@
-/* FLOQR app-wide help repository — source of truth for FloqAi contextual search.
+/* FLOQR app-wide help repository — source of truth for BOT DEE contextual search.
  * Every "?" help popout verbiage must be registered here (static seed and/or runtime).
  */
 (function (global) {
   "use strict";
 
   const byId = new Map();
-  /** Canonical FloqAi help partitions (one audience key each). */
+  /** Canonical BOT DEE help partitions (one audience key each). */
   const HELP_PARTITIONS = {
     patron: "patronHelpverbiage",
     serviceMember: "serviceMemberHelpverbiage",
@@ -346,15 +346,15 @@
     });
   }
 
-  /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
+  /* Seed: BOT DEE "?" popout + core onboarding / role help (must stay in sync with UI). */
   registerMany([
     {
       id: "floqai-ask-floqr",
-      title: "Ask FloqR with FloqAi",
-      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      title: "Ask FloqR with BOT DEE",
+      body: "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open FloqAi", href: pageUrl("./floqai.html")},
+        {label: "Open BOT DEE", href: pageUrl("./floqai.html")},
         {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
@@ -372,10 +372,10 @@
     },
     {
       id: "help-floqai-page",
-      title: "FloqAi",
-      body: "Chat with FloqAi on the FloqAi page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      title: "BOT DEE",
+      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee"],
-      links: [{label: "Open FloqAi", href: pageUrl("./floqai.html")}],
+      links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "floqai.html#botDeeChatPage"
@@ -546,7 +546,7 @@
     {
       id: "help-vip-payment-collector",
       title: "VIP reserV payment collector & Club POS",
-      body: "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps.",
+      body: "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask BOT DEE how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps.",
       searchPhrases: [
         "club pos vip", "toast vip", "spoton vip", "vip payment collector", "floqr stripe vip",
         "club stripe vip", "vip csv export", "vip sandbox", "pos owns payment"
@@ -898,8 +898,8 @@
     },
     {
       id: "help-floqai-audience-sections",
-      title: "FloqAi help audiences",
-      body: "FloqAi shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
+      title: "BOT DEE help audiences",
+      body: "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
       searchPhrases: [
         "floqai audience", "help sections", "master admin help", "venue admin help",
         "service member help", "patron help", "help security", "blank floqai answer"
@@ -911,7 +911,7 @@
     {
       id: "help-data-classification",
       title: "Data classification",
-      body: "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release.",
+      body: "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. BOT DEE and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release.",
       searchPhrases: [
         "data classification", "classify data", "who can read", "data access", "personal data", "pii",
         "retention", "exposure report", "system access", "security tab", "floqai access",
@@ -981,7 +981,7 @@
     {
       id: "help-create-publish-schedule",
       title: "Create and publish a staff schedule",
-      body: "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff.",
+      body: "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff.",
       steps: [
         "Open Club Admin → Scheduling after the venue is paid this month.",
         "Manual: tap + on a cell, set worker/role/times, Save as draft. Repeat, or use Round Robin / Copy previous week.",
@@ -1348,7 +1348,7 @@
     {
       id: "help-master-ops-status",
       title: "Master Admin security and action status",
-      body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask FloqAi about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",
+      body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask BOT DEE about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",
       searchPhrases: [
         "ops status", "master ops", "ops status banner", "security status pending", "no admin action clicked yet",
         "master admin status", "master security status", "admin action feedback", "master admin unlock status"

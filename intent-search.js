@@ -164,7 +164,7 @@
       label: "Make me a floqCast / superstar",
       blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the floqCast Queue → Go live on the floqCast board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
       steps: [
-        "Open floqCast from Search or FloqAi.",
+        "Open floqCast from Search or BOT DEE.",
         "Choose a venue that has floqCast enabled.",
         "Tap Go live, be a floqCast — a private preview page opens (camera only, not on the board yet).",
         "Pay $20 in the Stripe pop-out while the preview stays open.",
@@ -770,10 +770,10 @@
       id: "help-shoutout",
       kind: "help",
       label: "How to throw a ShoutOut",
-      blurb: "Pick a club, choose a template (free Black & White Classic, or FloqAi for paid themes), pay if needed, and send to the live display.",
+      blurb: "Pick a club, choose a template (free Black & White Classic, or BOT DEE for paid themes), pay if needed, and send to the live display.",
       links: [
         {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
-        {label: "Ask FloqAi for templates", href: pageUrl("./floqai.html")}
+        {label: "Ask BOT DEE for templates", href: pageUrl("./floqai.html")}
       ],
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
@@ -795,7 +795,7 @@
       blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
       links: [
         {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
-        {label: "Ask FloqAi for jersey templates", href: pageUrl("./floqai.html")}
+        {label: "Ask BOT DEE for jersey templates", href: pageUrl("./floqai.html")}
       ],
       patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
     },
@@ -874,7 +874,7 @@
     {
       id: "help-general",
       kind: "help",
-      label: "What can FloqAi help with?",
+      label: "What can BOT DEE help with?",
       blurb: "Say what you want in plain words — products (Mingl, RydR, BartR, ShoutOut), goals like “I want to be a Club Admin,” or help-popout phrases like “Onboarding.”",
       links: [
         {label: "Onboarding", href: pageUrl("./role-request.html", {from: "floqai"})},

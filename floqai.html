@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title data-i18n="page.floqai.title">FloqAi</title>
+  <title data-i18n="page.floqai.title">BOT DEE</title>
   <script>
-    /* Paint Site chrome before CSS so FloqAi is not stuck on Nightlife. */
+    /* Paint Site chrome before CSS so BOT DEE is not stuck on Nightlife. */
     try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
@@ -23,27 +23,27 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.2.59"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.2.59"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=s3.2.59"/>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.2.59"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.2.60"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.2.60"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=s3.2.60"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.2.60"/>
 </head>
 <body class="floqai-standalone botdee-page" data-floqr-feature="floqAi">
 <main class="floqai-standalone-main botdee-shell">
   <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&lt; Back</a>
 
-  <section id="botDeeChatPage" class="page botdee-chat-page active" aria-label="FloqAi chat">
+  <section id="botDeeChatPage" class="page botdee-chat-page active" aria-label="BOT DEE chat">
     <header class="botdee-chat-header">
       <img data-floqr-chrome-icon="floqAi" src="./images/chrome/botdee-nightlife.jpg" alt="" class="botdee-chat-icon" width="56" height="56"/>
       <div class="botdee-chat-heading">
-        <h1 class="botdee-chat-title" data-i18n="page.floqai.title">FloqAi</h1>
+        <h1 class="botdee-chat-title" data-i18n="page.floqai.title">BOT DEE</h1>
         <p id="floqAiScopeNote" class="sub small floqai-scope-note botdee-scope-note" role="status"></p>
       </div>
       <details class="help-popout botdee-help-popout" data-floqr-help-id="help-floqai-page">
-        <summary aria-label="Help" title="FloqAi help">?</summary>
+        <summary aria-label="Help" title="BOT DEE help">?</summary>
           <div class="help-popout-body">
-          <strong data-i18n="page.floqai.title">FloqAi</strong>
-          <p data-i18n="floqai.helpIntro">Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.</p>
+          <strong data-i18n="page.floqai.title">BOT DEE</strong>
+          <p data-i18n="floqai.helpIntro">Ask BOT DEE anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.</p>
           <p class="sub small" data-i18n="floqai.helpScope">Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.</p>
         </div>
       </details>
@@ -55,7 +55,7 @@
     <form id="botDeeChatForm" class="botdee-chat-form" autocomplete="off">
       <label class="botdee-chat-label" for="botDeeChatInput">
         <span class="visually-hidden" data-i18n="floqai.prompt">Tell me what you want to do</span>
-        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="floqai.chatPlaceholder" placeholder="Ask FloqAi… ShoutOut · VIP · floqCast · schedule" aria-describedby="botDeeChatStatus"></textarea>
+        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="floqai.chatPlaceholder" placeholder="Ask BOT DEE… ShoutOut · VIP · floqCast · schedule" aria-describedby="botDeeChatStatus"></textarea>
       </label>
       <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="floqai.chatSend">Send</button>
     </form>
@@ -80,7 +80,7 @@
     </section>
   </details>
 
-  <button id="floqAiAgent" class="floqai-agent hidden" type="button" aria-label="FloqAi - open contextual search" title="FloqAi">
+  <button id="floqAiAgent" class="floqai-agent hidden" type="button" aria-label="BOT DEE - open contextual search" title="BOT DEE">
     <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
       <img class="floqai-mark-img" data-floqr-chrome-icon="floqAi" src="./images/chrome/botdee-nightlife.jpg" alt="" width="96" height="96"/>
     </span>
@@ -94,24 +94,24 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.2.59"></script>
-<script src="./floqr-app-check.js?v=s3.2.59"></script>
-<script src="./floqr-session-shell.js?v=s3.2.59"></script>
-<script src="./floqr-nav.js?v=s3.2.59"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.59"></script>
-<script src="./floqr-i18n.js?v=s3.2.59"></script>
-<script src="./floqr-place-i18n.js?v=s3.2.59"></script>
-<script src="./floqai-help-repository.js?v=s3.2.59"></script>
-<script src="./floqr-i18n-help.js?v=s3.2.59"></script>
-<script src="./floqr-venue-query.js?v=s3.2.59"></script>
-<script src="./floqr-data-classification.js?v=s3.2.59"></script>
-<script src="./floqai-access.js?v=s3.2.59"></script>
-<script src="./intent-search.js?v=s3.2.59"></script>
-<script src="./floqai-search.js?v=s3.2.59"></script>
-<script src="./feature-gates.js?v=s3.2.59"></script>
-<script src="./floqr-feature-services.js?v=s3.2.59"></script>
-<script src="./helper-popouts.js?v=s3.2.59"></script>
-<script src="./bot-dee-chat.js?v=s3.2.59"></script>
-<script src="./floqai-page.js?v=s3.2.59"></script>
+<script src="./firebase-config.js?v=s3.2.60"></script>
+<script src="./floqr-app-check.js?v=s3.2.60"></script>
+<script src="./floqr-session-shell.js?v=s3.2.60"></script>
+<script src="./floqr-nav.js?v=s3.2.60"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.60"></script>
+<script src="./floqr-i18n.js?v=s3.2.60"></script>
+<script src="./floqr-place-i18n.js?v=s3.2.60"></script>
+<script src="./floqai-help-repository.js?v=s3.2.60"></script>
+<script src="./floqr-i18n-help.js?v=s3.2.60"></script>
+<script src="./floqr-venue-query.js?v=s3.2.60"></script>
+<script src="./floqr-data-classification.js?v=s3.2.60"></script>
+<script src="./floqai-access.js?v=s3.2.60"></script>
+<script src="./intent-search.js?v=s3.2.60"></script>
+<script src="./floqai-search.js?v=s3.2.60"></script>
+<script src="./feature-gates.js?v=s3.2.60"></script>
+<script src="./floqr-feature-services.js?v=s3.2.60"></script>
+<script src="./helper-popouts.js?v=s3.2.60"></script>
+<script src="./bot-dee-chat.js?v=s3.2.60"></script>
+<script src="./floqai-page.js?v=s3.2.60"></script>
 </body>
 </html>

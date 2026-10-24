@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.59";
+  const VERSION = "s3.2.60";
 
   const packs = {
     "ru": {
@@ -15,8 +15,8 @@
         body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Общайтесь с FloqAi на странице FloqAi простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
+        title: "BOT DEE",
+        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -79,8 +79,8 @@
         body: "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
       },
       "floqai-ask-floqr": {
-        title: "Спросите FloqR через FloqAi",
-        body: "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
+        title: "Спросите FloqR через BOT DEE",
+        body: "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
       },
       "help-soccer-jersey": {
         title: "ShoutOut в футбольной майке",
@@ -172,7 +172,7 @@
       },
       "help-create-publish-schedule": {
         title: "Создать и опубликовать расписание персонала",
-        body: "Добавьте черновики на сетке люди × дни, проверьте чипы, затем Publish schedule. Работники должны подтвердить смену, прежде чем она станет confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Добавьте черновики на сетке люди × дни, проверьте чипы, затем Publish schedule. Работники должны подтвердить смену, прежде чем она станет confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Удалить несколько запланированных или черновых смен",
@@ -312,7 +312,7 @@
       },
       "help-vip-payment-collector": {
         title: "Сборщик оплаты VIP reserV и Club POS",
-        body: "Предпочтительно для живых клубов с Toast/SpotOn: Club POS — FLOQR бронирует/держит/карту; POS владеет депозитом, счётом и тратами. Альтернативы: Club Stripe, FloqMedia Stripe (FloqR) или движок VIP + CSV. Aurelia (Demo Club) по умолчанию FloqMedia Stripe — спросите FloqAi шаги Master и Club Admin."
+        body: "Предпочтительно для живых клубов с Toast/SpotOn: Club POS — FLOQR бронирует/держит/карту; POS владеет депозитом, счётом и тратами. Альтернативы: Club Stripe, FloqMedia Stripe (FloqR) или движок VIP + CSV. Aurelia (Demo Club) по умолчанию FloqMedia Stripe — спросите BOT DEE шаги Master и Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Статус isBooked VIP-столов в Firestore",
@@ -333,8 +333,8 @@
         body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Chat met FloqAi op de FloqAi-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
+        title: "BOT DEE",
+        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
       },
       "help-search-settings-appearance": {
         title: "Settings op Search",
@@ -397,8 +397,8 @@
         body: "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
       },
       "floqai-ask-floqr": {
-        title: "Vraag FloqR met FloqAi",
-        body: "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
+        title: "Vraag FloqR met BOT DEE",
+        body: "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
       },
       "help-soccer-jersey": {
         title: "Voetbalshirt ShoutOut",
@@ -490,7 +490,7 @@
       },
       "help-create-publish-schedule": {
         title: "Personeelsrooster maken en publiceren",
-        body: "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Meerdere geplande of conceptdiensten verwijderen",
@@ -630,7 +630,7 @@
       },
       "help-vip-payment-collector": {
         title: "VIP reserV-betalingscollector & Club POS",
-        body: "Voorkeur voor live clubs met Toast/SpotOn: Club POS — FLOQR boekt/houdt/kaart; POS beheert borg, tab en besteding. Alternatieven: Club Stripe, FloqMedia Stripe (FloqR) of VIP-engine + CSV. Aurelia (Demo Club) standaard FloqMedia Stripe — vraag FloqAi om Master- en Club Admin-stappen."
+        body: "Voorkeur voor live clubs met Toast/SpotOn: Club POS — FLOQR boekt/houdt/kaart; POS beheert borg, tab en besteding. Alternatieven: Club Stripe, FloqMedia Stripe (FloqR) of VIP-engine + CSV. Aurelia (Demo Club) standaard FloqMedia Stripe — vraag BOT DEE om Master- en Club Admin-stappen."
       },
       "help-vip-table-isbooked": {
         title: "VIP-tafel isBooked-status in Firestore",
@@ -651,8 +651,8 @@
         body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Discutez avec FloqAi sur la page FloqAi en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
+        title: "BOT DEE",
+        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -715,8 +715,8 @@
         body: "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
       },
       "floqai-ask-floqr": {
-        title: "Demandez FloqR avec FloqAi",
-        body: "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
+        title: "Demandez FloqR avec BOT DEE",
+        body: "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
       },
       "help-soccer-jersey": {
         title: "Maillot de football ShoutOut",
@@ -808,7 +808,7 @@
       },
       "help-create-publish-schedule": {
         title: "Créer et publier un planning du personnel",
-        body: "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. FloqAi : create a schedule, publish schedule, how to schedule staff."
+        body: "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. BOT DEE : create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Supprimer plusieurs équipes planifiées ou brouillons",
@@ -948,7 +948,7 @@
       },
       "help-vip-payment-collector": {
         title: "Collecteur de paiement VIP reserV et Club POS",
-        body: "Préféré pour les clubs live avec Toast/SpotOn : Club POS — FLOQR réserve/maintient/carte ; le POS gère acompte, addition et dépenses. Alternatives : Club Stripe, FloqMedia Stripe (FloqR), ou moteur VIP + CSV. Aurelia (Demo Club) utilise FloqMedia Stripe par défaut — demandez à FloqAi les étapes Master Admin et Club Admin."
+        body: "Préféré pour les clubs live avec Toast/SpotOn : Club POS — FLOQR réserve/maintient/carte ; le POS gère acompte, addition et dépenses. Alternatives : Club Stripe, FloqMedia Stripe (FloqR), ou moteur VIP + CSV. Aurelia (Demo Club) utilise FloqMedia Stripe par défaut — demandez à BOT DEE les étapes Master Admin et Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Statut isBooked des tables VIP dans Firestore",
@@ -969,8 +969,8 @@
         body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Chatte mit FloqAi auf der FloqAi-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
+        title: "BOT DEE",
+        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
       },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
@@ -1033,8 +1033,8 @@
         body: "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
       },
       "floqai-ask-floqr": {
-        title: "Fragen Sie FloqR mit FloqAi",
-        body: "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
+        title: "Fragen Sie FloqR mit BOT DEE",
+        body: "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
       },
       "help-soccer-jersey": {
         title: "Fußballtrikot ShoutOut",
@@ -1126,7 +1126,7 @@
       },
       "help-create-publish-schedule": {
         title: "Erstellen und veröffentlichen Sie einen Personalplan",
-        body: "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Löschen Sie mehrere geplante oder Entwurfsschichten",
@@ -1266,7 +1266,7 @@
       },
       "help-vip-payment-collector": {
         title: "VIP reserV Zahlungskollektor & Club POS",
-        body: "Bevorzugt für Live-Clubs mit Toast/SpotOn: Club POS — FLOQR bucht/hält/karte; POS übernimmt Anzahlung, Tab und Umsatz. Alternativen: Club Stripe, FloqMedia Stripe (FloqR) oder VIP-Engine + CSV. Aurelia (Demo Club) standardmäßig FloqMedia Stripe — FloqAi für Master-/Club-Admin-Schritte fragen."
+        body: "Bevorzugt für Live-Clubs mit Toast/SpotOn: Club POS — FLOQR bucht/hält/karte; POS übernimmt Anzahlung, Tab und Umsatz. Alternativen: Club Stripe, FloqMedia Stripe (FloqR) oder VIP-Engine + CSV. Aurelia (Demo Club) standardmäßig FloqMedia Stripe — BOT DEE für Master-/Club-Admin-Schritte fragen."
       },
       "help-vip-table-isbooked": {
         title: "VIP-Tisch isBooked-Status in Firestore",
@@ -1287,8 +1287,8 @@
         body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Chatea con FloqAi en la página FloqAi con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
+        title: "BOT DEE",
+        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1351,8 +1351,8 @@
         body: "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
       },
       "floqai-ask-floqr": {
-        title: "Pregunta FloqR con FloqAi",
-        body: "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
+        title: "Pregunta FloqR con BOT DEE",
+        body: "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
       },
       "help-soccer-jersey": {
         title: "Camiseta de fútbol ShoutOut",
@@ -1444,7 +1444,7 @@
       },
       "help-create-publish-schedule": {
         title: "Crear y publicar un horario de personal",
-        body: "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Eliminar múltiples turnos programados o borradores",
@@ -1584,7 +1584,7 @@
       },
       "help-vip-payment-collector": {
         title: "Cobrador de pago VIP reserV y Club POS",
-        body: "Preferido para clubs en vivo con Toast/SpotOn: Club POS — FLOQR reserva/retiene/mapa; el POS cobra depósito, cuenta y gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) o motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por defecto — pregunte a FloqAi los pasos Master y Club Admin."
+        body: "Preferido para clubs en vivo con Toast/SpotOn: Club POS — FLOQR reserva/retiene/mapa; el POS cobra depósito, cuenta y gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) o motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por defecto — pregunte a BOT DEE los pasos Master y Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked de mesas VIP en Firestore",
@@ -1605,8 +1605,8 @@
         body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Chatta con FloqAi nella pagina FloqAi con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
+        title: "BOT DEE",
+        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
       },
       "help-search-settings-appearance": {
         title: "Settings su Search",
@@ -1669,8 +1669,8 @@
         body: "Archive memorizza una copia compressa del testo e dei media dello ShoutOut completato (se presenti) in storage Firebase economico e lo rimuove da Completati. Apri Archive quando vuoi. Riusa funziona anche da Archive."
       },
       "floqai-ask-floqr": {
-        title: "Chiedi FloqR con FloqAi",
-        body: "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
+        title: "Chiedi FloqR con BOT DEE",
+        body: "Chiedi FloqR con BOT DEE: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
       },
       "help-soccer-jersey": {
         title: "Maglia da calcio ShoutOut",
@@ -1762,7 +1762,7 @@
       },
       "help-create-publish-schedule": {
         title: "Creare e pubblicare un programma del personale",
-        body: "Aggiungi i turni provvisori sulla griglia persone x giorni, rivedi i chip, quindi Publish schedule. I lavoratori devono confermare prima che un turno venga confermato. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Aggiungi i turni provvisori sulla griglia persone x giorni, rivedi i chip, quindi Publish schedule. I lavoratori devono confermare prima che un turno venga confermato. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Elimina più turni programmati o bozze",
@@ -1902,7 +1902,7 @@
       },
       "help-vip-payment-collector": {
         title: "Collettore pagamento VIP reserV e Club POS",
-        body: "Preferito per club live con Toast/SpotOn: Club POS — FLOQR prenota/mantiene/mappa; il POS gestisce deposito, conto e spesa. Alternative: Club Stripe, FloqMedia Stripe (FloqR) o motore VIP + CSV. Aurelia (Demo Club) di default FloqMedia Stripe — chiedi a FloqAi i passi Master e Club Admin."
+        body: "Preferito per club live con Toast/SpotOn: Club POS — FLOQR prenota/mantiene/mappa; il POS gestisce deposito, conto e spesa. Alternative: Club Stripe, FloqMedia Stripe (FloqR) o motore VIP + CSV. Aurelia (Demo Club) di default FloqMedia Stripe — chiedi a BOT DEE i passi Master e Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Stato isBooked tavoli VIP in Firestore",
@@ -1923,8 +1923,8 @@
         body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Converse com o FloqAi na página FloqAi em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
+        title: "BOT DEE",
+        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -1987,8 +1987,8 @@
         body: "Archive guarda uma cópia comprimida do texto e da mídia do seu ShoutOut concluído (se o original tinha mídia) em armazenamento Firebase econômico e remove de Concluídos. Abra Archive a qualquer momento. Reutilizar também funciona a partir de Archive."
       },
       "floqai-ask-floqr": {
-        title: "Pergunte FloqR com FloqAi",
-        body: "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+        title: "Pergunte FloqR com BOT DEE",
+        body: "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
       },
       "help-soccer-jersey": {
         title: "Camisa de futebol ShoutOut",
@@ -2080,7 +2080,7 @@
       },
       "help-create-publish-schedule": {
         title: "Crie e publique uma agenda de equipe",
-        body: "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Excluir vários turnos agendados ou rascunhos",
@@ -2220,7 +2220,7 @@
       },
       "help-vip-payment-collector": {
         title: "Cobrador de pagamento VIP reserV e Club POS",
-        body: "Preferido para clubs ao vivo com Toast/SpotOn: Club POS — FLOQR reserva/segura/mapa; o POS trata depósito, conta e gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) ou motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por omissão — pergunte ao FloqAi os passos Master e Club Admin."
+        body: "Preferido para clubs ao vivo com Toast/SpotOn: Club POS — FLOQR reserva/segura/mapa; o POS trata depósito, conta e gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) ou motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por omissão — pergunte ao BOT DEE os passos Master e Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked das mesas VIP no Firestore",
@@ -2241,8 +2241,8 @@
         body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Συνομιλήστε με τον FloqAi στη σελίδα FloqAi με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
+        title: "BOT DEE",
+        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
       },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
@@ -2305,8 +2305,8 @@
         body: "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
       },
       "floqai-ask-floqr": {
-        title: "Ρωτήστε το FloqR με το FloqAi",
-        body: "Ρωτήστε το FloqR με το FloqAi — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
+        title: "Ρωτήστε το FloqR με το BOT DEE",
+        body: "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
       },
       "help-soccer-jersey": {
         title: "Ποδοσφαιρική φανέλα ShoutOut",
@@ -2398,7 +2398,7 @@
       },
       "help-create-publish-schedule": {
         title: "Δημιουργήστε και δημοσιεύστε ένα πρόγραμμα προσωπικού",
-        body: "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Διαγράψτε πολλές προγραμματισμένες ή πρόχειρες βάρδιες",
@@ -2538,7 +2538,7 @@
       },
       "help-vip-payment-collector": {
         title: "Συλλέκτης πληρωμής VIP reserV και Club POS",
-        body: "Προτιμώμενο για ζωντανά clubs με Toast/SpotOn: Club POS — το FLOQR κρατάει/χαρτογραφεί· το POS διαχειρίζεται προκαταβολή, λογαριασμό και δαπάνη. Εναλλακτικές: Club Stripe, FloqMedia Stripe (FloqR) ή VIP engine + CSV. Η Aurelia (Demo Club) προεπιλέγει FloqMedia Stripe — ρωτήστε το FloqAi τα βήματα Master και Club Admin."
+        body: "Προτιμώμενο για ζωντανά clubs με Toast/SpotOn: Club POS — το FLOQR κρατάει/χαρτογραφεί· το POS διαχειρίζεται προκαταβολή, λογαριασμό και δαπάνη. Εναλλακτικές: Club Stripe, FloqMedia Stripe (FloqR) ή VIP engine + CSV. Η Aurelia (Demo Club) προεπιλέγει FloqMedia Stripe — ρωτήστε το BOT DEE τα βήματα Master και Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Κατάσταση isBooked τραπεζιών VIP στο Firestore",
@@ -2559,8 +2559,8 @@
         body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "Czatuj z FloqAi na stronie FloqAi prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
+        title: "BOT DEE",
+        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2623,8 +2623,8 @@
         body: "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
       },
       "floqai-ask-floqr": {
-        title: "Zapytaj FloqR z FloqAi",
-        body: "Zapytaj FloqR z FloqAi — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
+        title: "Zapytaj FloqR z BOT DEE",
+        body: "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
       },
       "help-soccer-jersey": {
         title: "Koszulka piłkarska ShoutOut",
@@ -2716,7 +2716,7 @@
       },
       "help-create-publish-schedule": {
         title: "Tworzenie i publikowanie harmonogramu pracy personelu",
-        body: "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Usuń wiele zaplanowanych lub roboczych zmian",
@@ -2856,7 +2856,7 @@
       },
       "help-vip-payment-collector": {
         title: "Kolektor płatności VIP reserV i Club POS",
-        body: "Preferowane dla klubów live z Toast/SpotOn: Club POS — FLOQR rezerwuje/trzyma/mapę; POS obsługuje depozyt, rachunek i wydatki. Alternatywy: Club Stripe, FloqMedia Stripe (FloqR) lub silnik VIP + CSV. Aurelia (Demo Club) domyślnie FloqMedia Stripe — zapytaj FloqAi o kroki Master i Club Admin."
+        body: "Preferowane dla klubów live z Toast/SpotOn: Club POS — FLOQR rezerwuje/trzyma/mapę; POS obsługuje depozyt, rachunek i wydatki. Alternatywy: Club Stripe, FloqMedia Stripe (FloqR) lub silnik VIP + CSV. Aurelia (Demo Club) domyślnie FloqMedia Stripe — zapytaj BOT DEE o kroki Master i Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Status isBooked stolików VIP w Firestore",
@@ -2877,8 +2877,8 @@
         body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."
       },
       "help-floqai-page": {
-        title: "FloqAi",
-        body: "تحدث مع FloqAi في صفحة FloqAi بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
+        title: "BOT DEE",
+        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",
@@ -2941,8 +2941,8 @@
         body: "يخزّن Archive نسخة مضغوطة من نص ووسائط ShoutOut المكتمل (إن وُجدت وسائط) في تخزين Firebase منخفض التكلفة ويزيله من المكتملة. افتح Archive في أي وقت. تعمل إعادة الاستخدام أيضاً من Archive."
       },
       "floqai-ask-floqr": {
-        title: "اسأل FloqR مع FloqAi",
-        body: "اسأل FloqR مع FloqAi — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
+        title: "اسأل FloqR مع BOT DEE",
+        body: "اسأل FloqR مع BOT DEE — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
       },
       "help-soccer-jersey": {
         title: "قميص كرة القدم ShoutOut",
@@ -3034,7 +3034,7 @@
       },
       "help-create-publish-schedule": {
         title: "إنشاء ونشر جدول الموظفين",
-        body: "أضف نوبات مسودة على شبكة الأشخاص × الأيام، راجع البطاقات، ثم Publish schedule. يجب على العمال التأكيد قبل أن تصبح النوبة مؤكدة. FloqAi: create a schedule، publish schedule، how to schedule staff."
+        body: "أضف نوبات مسودة على شبكة الأشخاص × الأيام، راجع البطاقات، ثم Publish schedule. يجب على العمال التأكيد قبل أن تصبح النوبة مؤكدة. BOT DEE: create a schedule، publish schedule، how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "حذف عدة نوبات مجدولة أو مسودة",
@@ -3174,7 +3174,7 @@
       },
       "help-vip-payment-collector": {
         title: "جامع دفع VIP reserV وClub POS",
-        body: "المفضّل للأندية الحية مع Toast/SpotOn: Club POS — FLOQR يحجز/يمسك/خريطة؛ الـ POS يملك العربون والحساب والإنفاق. بدائل: Club Stripe أو FloqMedia Stripe (FloqR) أو محرك VIP + CSV. Aurelia (Demo Club) افتراضياً FloqMedia Stripe — اسأل FloqAi عن خطوات Master وClub Admin."
+        body: "المفضّل للأندية الحية مع Toast/SpotOn: Club POS — FLOQR يحجز/يمسك/خريطة؛ الـ POS يملك العربون والحساب والإنفاق. بدائل: Club Stripe أو FloqMedia Stripe (FloqR) أو محرك VIP + CSV. Aurelia (Demo Club) افتراضياً FloqMedia Stripe — اسأل BOT DEE عن خطوات Master وClub Admin."
       },
       "help-vip-table-isbooked": {
         title: "حالة isBooked لطاولات VIP في Firestore",
