@@ -1643,42 +1643,119 @@ def to_white_black(
     print(f"  whiteBlack chrome → {dst.name} tip_preserve={tip_preserve} ring={wb_stroke}px")
 
 
-def build_floqcast_whiteblack() -> Path:
-    """FloqCAST White/Black — Image-2 silhouette on white (matches ShoutOut/BOT DEE WB).
+def _place_floqcast_wb_tips(body: Image.Image, min_top: int, bias: int = 4):
+    """Place FloqCAST so q kisses the lower arc; F / L / T tips kiss just outside the ring."""
+    ba = np.array(body)
+    ink = ba[:, :, 3] > 40
+    ys, xs = np.where(ink)
+    # Letter bands on the body crop (italic FloqCAST)
+    w = ba.shape[1]
+    f_band = ink & (np.arange(w)[None, :] < int(w * 0.12))
+    l_band = ink & (np.arange(w)[None, :] >= int(w * 0.08)) & (
+        np.arange(w)[None, :] < int(w * 0.22)
+    )
+    t_band = ink & (np.arange(w)[None, :] > int(w * 0.82))
+    x_lo = int(np.percentile(xs, 20))
+    x_hi = int(np.percentile(xs, 45))
+    q_band = ink & (np.arange(w)[None, :] >= x_lo) & (np.arange(w)[None, :] <= x_hi)
+    qys, qxs = np.where(q_band) if q_band.any() else (ys, xs)
+    bot = int(qys.max())
+    qx = int(qxs[qys == bot].mean())
 
-    White field + dark chrome graphic + FloqCAS ink + Tiffany T.
-    No asset-drawn ring: Search already circular-crops the tile (`border-radius:50%`).
-    A second in-PNG ring was notching Fl/T (F under ring) and reading as a double crop.
-    Type stamped last; inset keeps Fl/T inside the CSS circle.
-    PNG primary for tile crispness (not muddy mid-grey JPEG convert).
+    def tip_r(band, left, t):
+        if not band.any():
+            return 0.0
+        bys, bxs = np.where(band)
+        return float(np.hypot(bxs + left - CX, bys + t - CY).max())
+
+    center_left = max(8, (S - body.size[0]) // 2 + bias)
+    Q_TARGET = R - 4
+    # F/L/T tips should sit just outside the stroke (halo lives there)
+    TIP_LO, TIP_HI = R + 2, R + 22
+    best_left, best_top, score = center_left, min_top, 1e18
+    for left in range(max(8, center_left - 90), min(S - body.size[0] - 8, center_left + 90) + 1, 2):
+        for t in range(min_top, S - body.size[1] - 4):
+            qd = float(np.hypot(left + qx - CX, t + bot - CY))
+            if qd > (R + 6):
+                continue
+            fr = tip_r(f_band, left, t)
+            lr = tip_r(l_band, left, t)
+            tr = tip_r(t_band, left, t)
+            sc = abs(qd - Q_TARGET) * 2.5
+            for tip in (fr, lr, tr):
+                if tip <= 0:
+                    continue
+                if tip < TIP_LO:
+                    sc += (TIP_LO - tip) * 0.8
+                elif tip > TIP_HI:
+                    sc += (tip - TIP_HI) * 1.1
+            if sc < score:
+                score, best_left, best_top = sc, left, t
+    fr = tip_r(f_band, best_left, best_top)
+    lr = tip_r(l_band, best_left, best_top)
+    tr = tip_r(t_band, best_left, best_top)
+    qd = float(np.hypot(best_left + qx - CX, best_top + bot - CY))
+    print(
+        f"  place WB F/L/T tips left={best_left} top={best_top} q={qd:.1f} "
+        f"F={fr:.1f} L={lr:.1f} T={tr:.1f} score={score:.1f}"
+    )
+    return best_left, best_top
+
+
+def build_floqcast_whiteblack() -> Path:
+    """FloqCAST White/Black — peer-sized disc (same R as BOT DEE).
+
+    Build order:
+      1) white circle, no border (R identical to peer WB icons)
+      2) cast graphic
+      3) FloqCAST verbiage
+      4) in-asset chrome ring
+      5) F / L / T tip adjust vs ring + soft tip halo outside the stroke
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     g = Image.open(extract_floqcast_graphic())
     under, over, body = floqcast_wm()
-    left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
-    print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
+    # Chord-fit so F / L / T tips kiss just outside the peer ring (R+2…R+22)
+    # Wide Nightlife body (~875) throws side tips past the CSS circle; shrink for WB.
+    tip_span = max(1, body.size[0])
+    # Keep side tips inside Search CSS circle (S/2) while kissing past ring R
+    max_chord = min(MAX_WM_W, int(R * 1.20))  # ~588 at R=490 — F/L/T inside CSS circle
+    if tip_span > max_chord:
+        fit = max_chord / float(tip_span)
+        nw = max(1, int(round(body.size[0] * fit)))
+        nh = max(1, int(round(body.size[1] * fit)))
+        under = under.resize((nw, nh), Image.Resampling.LANCZOS)
+        over = over.resize((nw, nh), Image.Resampling.LANCZOS)
+        body = Image.alpha_composite(under, over)
+        print(f"  FloqCAST WB chord-fit ×{fit:.3f} → body={body.size} (max_chord={max_chord})")
+    # Slight left bias — italic F tip reaches farther than T; balance vs ring
+    left, top = _place_floqcast_wb_tips(body, graphic_bottom(g, 700) + 8, bias=-6)
+    # Raise mark so ring grazes bottom tips of F/L/T (not mid-letter chord)
+    top = max(graphic_bottom(g, 700) + 4, top - 28)
+    print(f"  FloqCAST WB place left={left} top={top} body={body.size} (raised for tip-kiss)")
 
+    # Match BOT DEE / VIP thin chrome ring (R=490)
+    wb_stroke = 3
+    wb_half = wb_stroke / 2.0
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    # Darker than prior muddy convert — ShoutOut/BOT-DEE WB weight at tile size
     font_chrome = shiny_chrome_tone(
         np.full((S, S), 160.0, np.float32), yy, xx, for_type=True
     )
     font_chrome = np.clip(font_chrome * 0.48, 8, 48)
 
+    # 1) White circle, no border — same radius as peer icons
     base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+    # (full white field; circle identity comes from the ring at R — matches BOT DEE)
+
+    # 2) Cast graphic (inside disc; leave ring annulus clear for the stroke)
     ga = np.array(g.convert("RGBA"))
     gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
     glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
-    chrome = shiny_chrome_tone(glum, yy, xx)
-    # Pull graphic toward ink-black while keeping AA / wispy smoke
-    chrome = np.clip(chrome * 0.55, 10, 72)
+    chrome = np.clip(shiny_chrome_tone(glum, yy, xx) * 0.55, 10, 72)
     gout = np.zeros_like(ga)
-    # Interior graphic only — strip ring-annulus leftovers from the nightlife extract
-    # (unsaturated AA at ~R survived strip_ring_only and read as a second grey ring).
-    safe_r = R - 36  # well inside nightlife stroke; phones/LED sit < ~450
-    line = (glum >= 26) & (gal > 8) & (dist < safe_r)
+    line = (glum >= 26) & (gal > 8) & (dist < (R - 8))
     gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
     gout[line, 3] = 255
     base.alpha_composite(Image.fromarray(gout, "RGBA"))
@@ -1701,42 +1778,91 @@ def build_floqcast_whiteblack() -> Path:
         out[:, :, 3] = np.where(ink, 255, 0)
         return Image.fromarray(out, "RGBA")
 
-    # Full body mark (Fl+oq+CAST+T) — not under/over sandwich; no ring chord through glyphs
+    # 3) Verbiage FloqCAST (full body — F, L, oq, CAST, T)
     body_t = type_layer(body)
+    under_t = type_layer(under)
+    over_t = type_layer(over)
     base.alpha_composite(body_t)
+
+    # 4) In-asset chrome ring (peer size R=490, stroke matches BOT DEE)
+    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
+    ring_chrome = np.clip(10.0 + ring_chrome * 0.28, 12, 55)
+    ra = np.zeros((S, S, 4), np.uint8)
+    ring_mask = np.abs(dist - R) <= wb_half
+    for c in range(3):
+        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
+    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+    base.alpha_composite(Image.fromarray(ra, "RGBA"))
 
     out = np.array(base)
     out[:, :, 3] = 255
-    type_ink = np.array(body_t)[:, :, 3] > 20
-    tip_r = float(dist[type_ink].max()) if type_ink.any() else 0.0
-    # Search CSS circle = S/2. Inset so tips stay inside with margin.
-    css_r = S / 2.0
-    tip_margin = 18.0
-    inset = 0.88
-    if tip_r > 1:
-        inset = min(inset, (css_r - tip_margin) / tip_r)
-    inset = max(0.78, min(0.90, inset))
 
-    composed = Image.fromarray(out, "RGBA")
-    nw = max(1, int(round(S * inset)))
-    scaled = composed.resize((nw, nw), Image.Resampling.LANCZOS)
-    pad = Image.new("RGBA", (S, S), (255, 255, 255, 255))
-    ox = (S - nw) // 2
-    pad.paste(scaled, (ox, ox), scaled)
-    final = pad.convert("RGB")
+    # 5) F / L / T vs ring — soft halo outside, then tip kiss ON TOP of the stroke
+    ua = np.array(under_t)
+    oa = np.array(over_t)
+    # Under = Fl (F + L); over holds T (tiffany)
+    fl_ink = ua[:, :, 3] > 20
+    t_ink = (
+        (oa[:, :, 3] > 20)
+        & (oa[:, :, 0] < 120)
+        & (oa[:, :, 1] > 140)
+        & (oa[:, :, 2] > 170)
+    )
+    # Tip kiss = glyph ink grazing / crossing / outside the ring (not deep interior)
+    kiss = (fl_ink | t_ink) & (dist >= (R - wb_half - 1.5))
+    tips_out = kiss & (dist > (R + wb_half))
 
-    # QA: no dark annulus (second ring); tips inside CSS circle
+    # Soft tip halo on white outside the ring (under the solid tip ink)
+    tip_dilate = (
+        np.array(
+            Image.fromarray((tips_out.astype(np.uint8) * 255)).filter(
+                ImageFilter.MaxFilter(9)
+            )
+        )
+        > 0
+    )
+    halo = tip_dilate & ~kiss & (dist > (R + wb_half)) & (dist < (R + 36))
+    halo_tone = np.clip(
+        210.0 + shiny_chrome_tone(np.full((S, S), 40.0, np.float32), yy, xx) * 0.08,
+        200,
+        236,
+    )
+    t_halo = halo & (
+        np.array(
+            Image.fromarray((t_ink.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(11))
+        )
+        > 0
+    )
+    for c in range(3):
+        out[:, :, c] = np.where(halo, halo_tone, out[:, :, c])
+    out[t_halo, 0] = np.minimum(out[t_halo, 0], 180)
+    out[t_halo, 1] = np.maximum(out[t_halo, 1], 230)
+    out[t_halo, 2] = np.maximum(out[t_halo, 2], 245)
+
+    # Solid F/L/T tip restamp ABOVE ring + halo (ring stays; tips kiss over it)
+    for c in range(3):
+        out[:, :, c] = np.where(kiss & fl_ink, font_chrome, out[:, :, c])
+    out[kiss & t_ink, 0] = TIFFANY[0]
+    out[kiss & t_ink, 1] = TIFFANY[1]
+    out[kiss & t_ink, 2] = TIFFANY[2]
+
+    # Outside disc (beyond tip halo) stays pure white — no junk
+    wipe = (dist > (R + 36)) & ~kiss & ~halo
+    out[wipe, :3] = 255
+
+    final = Image.fromarray(out, "RGBA").convert("RGB")
+
+    # QA vs peer ring radius
     fa = np.array(final)
     flum = fa.mean(axis=2)
-    fyy, fxx = np.indices((S, S))
-    fdist = np.sqrt((fxx - CX) ** 2 + (fyy - CY) ** 2)
-    # dark ink heuristic (type + graphic)
-    ink_f = flum < 90
-    tip_max = float(fdist[ink_f].max()) if ink_f.any() else 0.0
+    fdist = dist
     ring_peak = 0
-    for r0 in np.linspace(400, 505, 106):
-        n = int(((np.abs(fdist - r0) <= 1.0) & (flum < 90) & (flum > 40)).sum())
-        ring_peak = max(ring_peak, n)
+    ring_r = None
+    for r0 in np.linspace(470, 505, 71):
+        n = int(((np.abs(fdist - r0) <= 1.0) & (flum < 90)).sum())
+        if n > ring_peak:
+            ring_peak, ring_r = n, float(r0)
+    tip_max = float(fdist[kiss].max()) if kiss.any() else 0.0
 
     dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
     dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
@@ -1749,18 +1875,23 @@ def build_floqcast_whiteblack() -> Path:
     final.resize((110, 110), Image.Resampling.LANCZOS).save(
         "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
     )
-    # Tip zooms for QA
     final.crop((60, 760, 300, 1010)).save("/opt/cursor/artifacts/wb-fl-tip-after.png")
     final.crop((720, 760, 1000, 1010)).save("/opt/cursor/artifacts/wb-t-tip-after.png")
+    peers = Image.new("RGB", (110 * 3 + 20, 130), (245, 245, 245))
+    for i, p in enumerate(
+        [
+            final.resize((110, 110)),
+            Image.open(ROOT / "images/chrome/botdee-whiteblack.jpg").resize((110, 110)),
+            Image.open(ROOT / "images/chrome/shoutout-whiteblack.png").resize((110, 110)),
+        ]
+    ):
+        peers.paste(p.convert("RGB"), (10 + i * 110, 15))
+    peers.save("/opt/cursor/artifacts/wb-floqcast-peer-size.png")
     print(
-        f"  FloqCAST WB Image-2 on white tip_r_pre={tip_r:.1f} inset={inset:.3f} "
-        f"tip_max_final={tip_max:.1f} css_r={css_r:.0f} ring_peak={ring_peak} "
-        f"→ {dst_png.name}"
+        f"  FloqCAST WB layers=white→graphic→type→ring→halo+kiss "
+        f"ring_r={ring_r} peak={ring_peak} kiss={int(kiss.sum())} "
+        f"halo={int(halo.sum())} tip_max={tip_max:.1f} → {dst_png.name}"
     )
-    if tip_max >= css_r - 2:
-        print("  WARNING: tips still reach CSS circle — increase inset")
-    if ring_peak > 2500:
-        print("  WARNING: dark annulus still present (second ring)")
     return dst_png
 
 
