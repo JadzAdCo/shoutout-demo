@@ -404,6 +404,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Help | `help-floqai-page` (BOT DEE chat + intent fallback phrases) |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`) |
+| Black & Dark Green icons (s3.2.58) | `BLACK_DARK_GREEN_ICONS` full pack (`*-blackdarkgreen.*`) — accent = Settings wordmark \"tings\" **`#5ac783`** (+ companion `#2e8a5a`). Build: `scripts/build-blackdarkgreen-icons.py`. CSS `html[data-floqr-chrome=blackDarkGreen] --accent:#5ac783`. |
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
 | Page title size | Shared schema: `.floqr-page-title` / `.floqr-page-title-row` + feature `.feature-landing-title-row`. Size = Appearance `h2` via `--floqr-page-title-size` (= `--floqr-title-size`). All title text (`.help-label-text`) inherits; `?` stays 11px badge. Profile & Settings one line (`admin.css` / `floqr-feature-landing.css`). |
 

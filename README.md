@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.57 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.58 (stable)
+
+- s3.2.58: Black & Dark Green Search icons use Settings tings green #5ac783; Search icon order live on main.
+- s3.2.54: BOT DEE product tools + Search Settings chrome tile → Appearance; Functions/Pages ship.
 
 - s3.2.57: Profile & feature page titles share floqr-page-title schema (= Appearance h2 size).
 - s3.2.56: White/Black profile card white+shiny black initials; Profile & feature titles = Appearance size (one line).

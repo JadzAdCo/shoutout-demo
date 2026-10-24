@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.57";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.57";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.58";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.58";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.58",
+      title: "s3.2.58 — Black & Dark Green icons = Settings tings #5ac783",
+      checks: [
+        {label:"Package version s3.2.58", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.58\""]},
+        {label:"BDG accent Settings tings green", file:"styles.css", includes:["--accent:#5ac783", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
+        {label:"BDG full icon pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blackdarkgreen.jpg", "botdee-blackdarkgreen.jpg", "shoutout-blackdarkgreen.png", "bartr-blackdarkgreen.png", "rydr-blackdarkgreen.png"]},
+        {label:"BDG icon build script", file:"scripts/build-blackdarkgreen-icons.py", includes:["#5ac783", "TINGS"]},
+        {label:"Search icon order", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"Manual test s3.2.58", file:"ai-diagnostics-service.js", includes:["s3-2-58-bdg-icons-tings-green"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.58\""]}
+      ]
+    },
     {
       version: "s3.2.57",
       title: "s3.2.57 — floqr-page-title schema (= Appearance h2)",
@@ -2405,6 +2418,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-58-bdg-icons-tings-green",
+        area:"Site chrome / Search",
+        feature:"Black & Dark Green icons match Settings tings green + Search order live",
+        changed:"Black & Dark Green Search tiles (ShoutOut/BOT DEE/VIP/floqCast/BartR/RydR) recolored to Settings \"tings\" fill #5ac783 (companion #2e8a5a). CSS --accent=#5ac783. Full BLACK_DARK_GREEN_ICONS pack (not nightlife leftovers). Search order 1–5 ships on main. Package s3.2.58.",
+        howToTest:"1) Hard-refresh Search s3.2.58 — order left-to-right: ShoutOut, BOT DEE, VIP, Settings, floqCast. 2) Appearance → Black & Dark Green — tile greens match Settings wordmark \"tings\" (bright #5ac783, not old forest #2d8a5a). 3) Spot-check VIP/floqCast/BOT DEE faces. 4) Mark Succeed/Failed.",
+        expected:"Icon order correct; BDG tiles use Settings tings green; Settings tile unchanged as source.",
+        troubleshoot:"Old green → hard refresh floqr-chrome-scheme.js + images/chrome/*-blackdarkgreen.* + styles.css?v=s3.2.58. Nightlife faces on BDG → ICON_PACK blackDarkGreen must list *-blackdarkgreen paths. Wrong order → confirm index.html spot comment + card ids; Pages deploy of main."
+      },
       {
         id:"s3-2-57-page-title-appearance",
         area:"Profile / Feature landings",

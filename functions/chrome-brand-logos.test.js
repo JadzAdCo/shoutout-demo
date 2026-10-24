@@ -35,7 +35,7 @@ test("chrome schemes include Purple & White + Black & Dark Green with brand logo
   assert.match(css, /Purple & White \(isSiteChrome=4\)/);
   assert.match(css, /Black & Dark Green \(isSiteChrome=5\)/);
   assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
-  assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#2d8a5a/);
+  assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#5ac783/);
   assert.match(css, /\.chrome-select-grid/);
   const portal = read("patron-portal.html");
   assert.match(portal, /id="portalAppearance"/);

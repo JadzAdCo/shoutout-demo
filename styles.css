@@ -1271,7 +1271,7 @@ html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,4
 .chrome-select-swatch--blackTiffany{background:linear-gradient(90deg,#000 35%,#81d8d0)}
 .chrome-select-swatch--whiteBlack{background:linear-gradient(90deg,#fff 55%,#111)}
 .chrome-select-swatch--purpleWhite{background:linear-gradient(90deg,#5b2dff,#ff2eb8 55%,#ff4d6a)}
-.chrome-select-swatch--blackDarkGreen{background:linear-gradient(90deg,#000 30%,#226e44 70%,#3cb371)}
+.chrome-select-swatch--blackDarkGreen{background:linear-gradient(90deg,#000 30%,#2e8a5a 55%,#5ac783)}
 .chrome-select-logo{
   display:block;width:auto;max-width:100%;height:36px;object-fit:contain;
   filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));
@@ -2025,23 +2025,23 @@ html[data-floqr-chrome="purpleWhite"] .vip-icon-face{
 }
 
 
-/* —— Black & Dark Green (isSiteChrome=5): true black + forest green —— */
+/* —— Black & Dark Green (isSiteChrome=5): true black + Settings \"tings\" green #5ac783 —— */
 html[data-floqr-chrome="blackDarkGreen"]{
-  --line:rgba(34,110,68,.5);
+  --line:rgba(90,199,131,.45);
   --text:#ffffff;
   --muted:rgba(255,255,255,.72);
-  --accent:#2d8a5a;
-  --hot:#3cb371;
+  --accent:#5ac783;
+  --hot:#2e8a5a;
   --lime:#7dffa8;
-  --floqr-blue:#2d8a5a;
+  --floqr-blue:#5ac783;
   --floqr-ink:#000000;
   --floqr-chrome:#e8fff2;
 }
 html[data-floqr-chrome="blackDarkGreen"] body{
   font-family:var(--floqr-font);
   background:
-    radial-gradient(circle at 18% 14%,rgba(34,110,68,.32),transparent 36%),
-    radial-gradient(circle at 82% 72%,rgba(45,138,90,.18),transparent 40%),
+    radial-gradient(circle at 18% 14%,rgba(90,199,131,.28),transparent 36%),
+    radial-gradient(circle at 82% 72%,rgba(46,138,90,.18),transparent 40%),
     #000;
   color:var(--text);
 }
@@ -2060,14 +2060,14 @@ html[data-floqr-chrome="blackDarkGreen"] .hero-logo{
 html[data-floqr-chrome="blackDarkGreen"] .primary,
 html[data-floqr-chrome="blackDarkGreen"] .category-card.hot,
 html[data-floqr-chrome="blackDarkGreen"] .linklike.hot{
-  background:linear-gradient(90deg,#226e44,#2d8a5a 55%,#3cb371);
+  background:linear-gradient(90deg,#2e8a5a,#5ac783 55%,#7dffa8);
   color:#fff;
 }
 html[data-floqr-chrome="blackDarkGreen"] #loginActions .signin,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions .signin.email.email-selected,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions > .signin,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions > .signin.email.email-selected{
-  background:linear-gradient(180deg,#226e44 0%,#2d8a5a 52%,#3cb371 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
+  background:linear-gradient(180deg,#226e44 0%,#2e8a5a 52%,#5ac783 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
   background-origin:border-box;
   border:1px solid rgba(45,138,90,.6);
   color:#fff;
@@ -2086,20 +2086,20 @@ html[data-floqr-chrome="blackDarkGreen"] .search{
 html[data-floqr-chrome="blackDarkGreen"] input:focus,
 html[data-floqr-chrome="blackDarkGreen"] select:focus,
 html[data-floqr-chrome="blackDarkGreen"] textarea:focus{
-  outline:2px solid #2d8a5a;
+  outline:2px solid #5ac783;
   outline-offset:1px;
-  border-color:#2d8a5a;
+  border-color:#5ac783;
 }
 html[data-floqr-chrome="blackDarkGreen"] .search-chrome-btn[aria-pressed="true"]{
-  border-color:#2d8a5a;
-  box-shadow:0 0 0 1px rgba(45,138,90,.55);
-  background:rgba(45,138,90,.16);
+  border-color:#5ac783;
+  box-shadow:0 0 0 1px rgba(90,199,131,.55);
+  background:rgba(90,199,131,.16);
 }
 html[data-floqr-chrome="blackDarkGreen"]{
   --floqr-profile-card-bg:linear-gradient(145deg,#163025,#0a1610 55%,#050a08);
   --floqr-profile-card-border:rgba(45,138,90,.5);
   --floqr-profile-card-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 1px rgba(45,138,90,.2),inset 0 1px 0 rgba(60,179,113,.18);
-  --floqr-profile-initials-bg:linear-gradient(90deg,#226e44,#3cb371);
+  --floqr-profile-initials-bg:linear-gradient(90deg,#2e8a5a,#5ac783);
   --floqr-profile-initials-color:#fff;
   --floqr-profile-dots:#d8ffe8;
 }
@@ -2145,8 +2145,8 @@ html[data-floqr-chrome="blackDarkGreen"] .help-popout[open] summary{
 }
 html[data-floqr-chrome="blackDarkGreen"] .message-envelope.unread,
 html[data-floqr-chrome="blackDarkGreen"] .highlight-item{
-  border-color:#2d8a5a!important;
-  box-shadow:0 0 0 2px rgba(45,138,90,.28);
+  border-color:#5ac783!important;
+  box-shadow:0 0 0 2px rgba(90,199,131,.28);
 }
 html[data-floqr-chrome="blackDarkGreen"] .floqai-icon-face,
 html[data-floqr-chrome="blackDarkGreen"] .floqcast-icon-face,

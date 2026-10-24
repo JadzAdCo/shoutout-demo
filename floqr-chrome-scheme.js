@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.57";
+  const ICON_V = "s3.2.58";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -73,11 +73,16 @@
     shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
     settings: "./images/chrome/settings-purplewhite.jpg?v=" + ICON_V
   });
-  const BLACK_DARK_GREEN_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
+  /* Accents use Settings \"tings\" green #5ac783 (see scripts/build-blackdarkgreen-icons.py). */
+  const BLACK_DARK_GREEN_ICONS = {
+    floqCast: "./images/chrome/floqcast-blackdarkgreen.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
-    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
-    settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V
-  });
+    shoutOut: "./images/chrome/shoutout-blackdarkgreen.png?v=" + ICON_V,
+    floqAi: "./images/chrome/botdee-blackdarkgreen.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-blackdarkgreen.png?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-blackdarkgreen.png?v=" + ICON_V
+  };
   const WHITE_BLACK_ICONS = {
     floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
