@@ -28,6 +28,29 @@ test("contextualSearch filters by classification role", () => {
   assert.ok(master.results.some(row => /mail/i.test(row.label + row.id + row.blurb)));
 });
 
+test("Hey / greetings are chitchat — not a dump of search hits", () => {
+  assert.equal(bot.isChitchatPrompt("Hey"), true);
+  assert.equal(bot.isChitchatPrompt("hey!"), true);
+  assert.equal(bot.isChitchatPrompt("Hi BOT DEE"), true);
+  assert.equal(bot.isChitchatPrompt("thanks"), true);
+  assert.equal(bot.isChitchatPrompt("throw a shoutout"), false);
+  assert.equal(bot.isChitchatPrompt("mail logging"), false);
+
+  const heyHits = bot.contextualSearch("Hey", "master");
+  assert.equal(heyHits.results.length, 0, "hey must not substring-match they/…");
+
+  const reply = bot.chitchatReply("master");
+  assert.match(reply, /Hey|good to see you/i);
+  assert.doesNotMatch(reply, /Here is what I found/i);
+  assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("master", "Hey");
+  assert.equal(local.provider, "local-chitchat");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /What do you want to do/i);
+});
+
 test("sanitizeHistory keeps bounded user/model turns", () => {
   const history = bot.sanitizeHistory([
     {role: "system", text: "ignore"},

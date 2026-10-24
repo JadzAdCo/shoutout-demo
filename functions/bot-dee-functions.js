@@ -111,6 +111,15 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
 }
 
 function localSession(role, userPrompt) {
+  if (bot.isChitchatPrompt(userPrompt)) {
+    return {
+      reply: bot.chitchatReply(role),
+      results: [],
+      provider: "local-chitchat",
+      model: "chitchat",
+      toolRounds: 0
+    };
+  }
   const search = bot.contextualSearch(userPrompt, role);
   return {
     reply: bot.formatSearchFallback(search),
@@ -143,7 +152,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     const apiKey = geminiKey();
     let outcome;
-    if (apiKey) {
+    // Greetings stay chat-like even when Gemini is down or mis-calls search.
+    if (bot.isChitchatPrompt(userPrompt)) {
+      outcome = localSession(role, userPrompt);
+    } else if (apiKey) {
       try {
         outcome = await runGeminiSession({apiKey, role, history, userPrompt, session});
       } catch (error) {

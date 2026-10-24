@@ -2419,6 +2419,15 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-58-botdee-chitchat-not-hits",
+        area:"FloqAi / BOT DEE",
+        feature:"BOT DEE greets like a chatbot (Hey ≠ search hits)",
+        changed:"executeBotSession short-circuits greetings/small talk (hi/hey/thanks) to a conversational reply with zero contextualSearch results. Search token match is word-boundary (hey≠they); min score 3. Functions deploy bot-dee-core + bot-dee-functions.",
+        howToTest:"1) Open BOT DEE (floqai.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
+        expected:"Hey → chat greeting; real intents still searchable; no hit-list dump for small talk.",
+        troubleshoot:"Still hit list → Functions deploy executeBotSession (bot-dee-functions + bot-dee-core) not Pages-only; confirm provider local-chitchat in function logs for Hey. Gemini path should not run for isChitchatPrompt."
+      },
+      {
         id:"s3-2-58-bdg-icons-tings-green",
         area:"Site chrome / Search",
         feature:"Black & Dark Green icons match Settings tings green + Search order live",
