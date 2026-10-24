@@ -14,6 +14,7 @@ module.exports = {
   ...require("./scheduling-functions"),
   ...require("./venue-ingest-functions"),
   ...require("./data-classification-functions"),
+  executeBotSession: require("./bot-dee-functions").executeBotSession,
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),

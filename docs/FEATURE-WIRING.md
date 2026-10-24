@@ -376,14 +376,32 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ## FloqAi intent search (plain-language router)
 
-**Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR).
+**Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR). Stays the **feature-optimized fast path / fallback** under BOT DEE chat (and inside feature searches).
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / FloqAi (`index.html` intent panel) |
+| UI | Search / FloqAi (`index.html` intent panel); `floqai.html` collapsible **Quick intent search** |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
 | Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
-| Cache bust | `intent-search.js?v=` on `index.html` |
+| Cache bust | `intent-search.js?v=` on `index.html` / `floqai.html` |
+
+---
+
+## BOT DEE chat (Phase 1 — `executeBotSession`)
+
+**Purpose:** Headless FloqAi agent: Auth + `floqAi` feature gate + data classification → Gemini (`@google/genai`) + tools. Phase 1 ships read-only `contextualSearch` only; VIP / ShoutOut / FloqCAST / pay tools come later and must re-validate role + wrap existing hold→consent→Stripe callables.
+
+| Layer | Wiring |
+|---|---|
+| UI | `floqai.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getFloqAiAccess` still gate intent cards |
+| Backend | `functions/bot-dee-functions.js` `executeBotSession`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
+| Tools (Phase 1) | `contextualSearch(query)` — scores catalog, `filterContent` via `floqai-content-classes.json` + viewer role from `roleFactsFor` |
+| Secrets | `GEMINI_API_KEY` (same as other Gemini callables); local fallback runs `contextualSearch` if Gemini missing/fails |
+| Gate | `assertFeatureAccess(..., "floqAi")`; signed-in required for chat |
+| Later tools (not wired yet) | `listShoutOutTemplates`, `startShoutOutCheckout`, `createVipHold` / consent / checkout, `createFloqCastRequest` / checkout |
+| Tests | `functions/bot-dee-core.test.js`, `functions/floqai-page.test.js` |
+| Help | `help-floqai-page` (BOT DEE chat + intent fallback phrases) |
 
 ---
 

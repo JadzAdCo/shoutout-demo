@@ -21,21 +21,36 @@ test("FloqAi has its own page and every entry point goes there", () => {
   assert.match(read("global-profile-status.js"), /intentSearchHome/);
 });
 
-test("FloqAi page is a guarded satellite with audience-filtered search", () => {
+test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", () => {
   const html = read("floqai.html");
-  assert.match(html, /<body class="floqai-standalone" data-floqr-feature="floqAi">/, "off/test feature shows the not-available card, no bounce to event search");
+  assert.match(html, /<body class="floqai-standalone botdee-page" data-floqr-feature="floqAi">/, "off/test feature shows the not-available card, no bounce to event search");
   assert.doesNotMatch(html, /data-floqr-public/);
-  const order = ["firebase-config.js", "floqr-session-shell.js", "floqai-help-repository.js", "intent-search.js", "floqr-feature-services.js", "floqai-page.js"]
-    .map(file => html.indexOf(`./${file}`));
+  assert.match(html, /data-floqr-chrome/);
+  assert.match(html, /data-floqr-chrome-icon="floqAi"/);
+  assert.match(html, /id="botDeeChatPage"/);
+  assert.match(html, /id="botDeeTranscript"/);
+  assert.match(html, /id="botDeeChatForm"/);
+  assert.match(html, /id="botDeeIntentFallback"/);
+  const order = [
+    "firebase-config.js",
+    "floqr-session-shell.js",
+    "floqai-help-repository.js",
+    "intent-search.js",
+    "floqr-feature-services.js",
+    "bot-dee-chat.js",
+    "floqai-page.js"
+  ].map(file => html.indexOf(`./${file}`));
   assert.ok(order.every(i => i > 0), "scripts present");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "script order");
   ["intentSearchPage", "intentSearchInput", "intentSearchResults", "floqAiSearchPanel", "floqAiAgent", "floqAiMark", "floqAiScopeNote"]
     .forEach(id => assert.match(html, new RegExp(`id="${id}"`)));
   const page = read("floqai-page.js");
   assert.match(page, /bindIntentSearch\(/);
+  assert.match(page, /FLOQRBotDeeChat\?\.bind/);
   assert.match(page, /syncHelpAudienceFromAuth/);
   assert.match(page, /getViewerAudience/);
   assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
+  assert.match(read("bot-dee-chat.js"), /executeBotSession/);
 });
 
 test("floating FloqAi agent is not shown on template select", () => {
@@ -53,11 +68,13 @@ test("floating FloqAi agent is not shown on template select", () => {
 
 test("FloqAi page chrome is localized", () => {
   const html = read("floqai.html");
-  ["page.floqai.title", "floqai.helpIntro", "floqai.helpScope", "floqai.prompt", "floqai.hint"]
+  ["page.floqai.title", "floqai.helpIntro", "floqai.helpScope", "floqai.prompt", "floqai.hint", "floqai.intentFallback", "floqai.chatSend"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.match(html, /data-i18n-placeholder="floqai\.placeholder"/);
+  assert.match(html, /data-i18n-placeholder="floqai\.chatPlaceholder"/);
   const search = read("intent-search.js");
   assert.match(search, /tr\("floqai\.noMatch"/);
   assert.match(search, /tr\("floqai\.wantTo"/);
   assert.match(read("floqai-help-repository.js"), /id: "help-floqai-page"/);
+  assert.match(read("floqr-i18n.js"), /"floqai\.chatWelcome"/);
 });

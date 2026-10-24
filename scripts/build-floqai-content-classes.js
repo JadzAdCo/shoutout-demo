@@ -65,4 +65,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = {buildManifest, serialize, OUT};
+module.exports = {buildManifest, serialize, OUT, loadBrowserModules};

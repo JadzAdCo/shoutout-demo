@@ -362,13 +362,13 @@
     },
     {
       id: "help-floqai-page",
-      title: "FloqAi",
-      body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
-      searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
-      links: [{label: "Open FloqAi", href: pageUrl("./floqai.html")}],
+      title: "BOT DEE",
+      body: "Chat with BOT DEE on the FloqAi page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
-      page: "floqai.html#floqAiHelpPopout"
+      page: "floqai.html#botDeeChatPage"
     },
     {
       id: "help-soccer-jersey",

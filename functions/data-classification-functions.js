@@ -209,6 +209,9 @@ function anonymousThrottleKey(request) {
   return `anon_${require("crypto").createHash("sha256").update(ip || "unknown").digest("hex").slice(0, 32)}`;
 }
 
+/** Shared by BOT DEE executeBotSession — same tier facts as getFloqAiAccess. */
+exports.__floqAiHelpers = {roleFactsFor, FLOQAI_CONTENT, FLOQAI_OPTS};
+
 exports.getFloqAiAccess = onCall(FLOQAI_OPTS, async request => {
   const sourceIds = core.sanitizeSourceIds(request.data?.sourceIds);
   await audit.assertFeatureAccess(request.auth || null, "floqAi", request);

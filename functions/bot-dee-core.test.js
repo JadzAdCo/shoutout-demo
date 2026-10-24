@@ -1,0 +1,59 @@
+"use strict";
+
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("fs");
+const path = require("path");
+const bot = require("./bot-dee-core");
+const {buildCatalog, serialize} = require("../scripts/build-bot-dee-search-catalog");
+
+const root = path.join(__dirname, "..");
+const read = file => fs.readFileSync(path.join(root, file), "utf8");
+
+test("BOT DEE search catalog is fresh from help + intents", () => {
+  const current = fs.readFileSync(path.join(__dirname, "bot-dee-search-catalog.json"), "utf8").replace(/\r\n/g, "\n");
+  assert.equal(current, serialize(buildCatalog(root)), "run node scripts/build-bot-dee-search-catalog.js");
+  assert.ok(bot.SEARCH_CATALOG.entries.length > 50);
+});
+
+test("contextualSearch filters by classification role", () => {
+  const patron = bot.contextualSearch("throw a shoutout", "patron");
+  assert.ok(patron.results.some(row => /shout/i.test(row.label) || row.id === "shoutout"));
+  assert.ok(patron.results.every(row => row.sourceId && row.href));
+
+  const anon = bot.contextualSearch("mail logging", "anonymous");
+  assert.ok(!anon.results.some(row => /mail.?log/i.test(row.label + row.id)));
+
+  const master = bot.contextualSearch("mail logging", "master");
+  assert.ok(master.results.some(row => /mail/i.test(row.label + row.id + row.blurb)));
+});
+
+test("sanitizeHistory keeps bounded user/model turns", () => {
+  const history = bot.sanitizeHistory([
+    {role: "system", text: "ignore"},
+    {role: "user", text: "hello"},
+    {role: "assistant", text: "hi"},
+    {role: "user", text: "x".repeat(5000)}
+  ]);
+  assert.equal(history.length, 3);
+  assert.equal(history[0].role, "user");
+  assert.equal(history[1].role, "model");
+  assert.ok(history[2].text.length <= bot.MAX_MESSAGE_CHARS);
+});
+
+test("executeBotSession wiring is exported and Phase 1 tool is contextualSearch only", () => {
+  const src = read("functions/bot-dee-functions.js");
+  assert.match(src, /exports\.executeBotSession/);
+  assert.match(src, /assertFeatureAccess\(request\.auth, "floqAi"/);
+  assert.match(src, /@google\/genai/);
+  assert.match(src, /contextualSearch/);
+  assert.doesNotMatch(src, /purchaseVIPReservation/);
+  assert.doesNotMatch(src, /startShoutOutCheckout/);
+  assert.match(read("functions/index.js"), /executeBotSession:\s*require\("\.\/bot-dee-functions"\)\.executeBotSession/);
+  assert.deepEqual(bot.toolDeclarations().map(t => t.name), ["contextualSearch"]);
+});
+
+test("package depends on @google/genai", () => {
+  const pkg = JSON.parse(read("functions/package.json"));
+  assert.ok(pkg.dependencies["@google/genai"]);
+});

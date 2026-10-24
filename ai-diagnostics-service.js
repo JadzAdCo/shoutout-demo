@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.52";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.52";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.53";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.53";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.53",
+      title: "s3.2.53 — BOT DEE Phase 1 chat + executeBotSession",
+      checks: [
+        {label:"Package version s3.2.53", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.53\""]},
+        {label:"BOT DEE chat shell", file:"floqai.html", includes:["id=\"botDeeChatPage\"", "bot-dee-chat.js", "botDeeIntentFallback"]},
+        {label:"executeBotSession export", file:"functions/index.js", includes:["executeBotSession"]},
+        {label:"contextualSearch tool", file:"functions/bot-dee-core.js", includes:["contextualSearch"]},
+        {label:"Manual test s3.2.53", file:"ai-diagnostics-service.js", includes:["s3-2-53-bot-dee-phase1-chat"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.53\""]}
+      ]
+    },
     {
       version: "s3.2.52",
       title: "s3.2.52 — WB Tiffany active tabs + compact left Back",
@@ -2346,6 +2358,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-53-bot-dee-phase1-chat",
+        area:"FloqAi / BOT DEE",
+        feature:"BOT DEE Phase 1 — chat shell + executeBotSession contextualSearch",
+        changed:"floqai.html is a chrome chat window (left BOT DEE icon, compact Back, transcript + Send) wired to executeBotSession. Phase 1 tool: classification-gated contextualSearch. Quick intent search stays a collapsible fast path. Package s3.2.53. Requires Functions deploy of executeBotSession + GEMINI_API_KEY for Gemini replies (local search fallback without Gemini).",
+        howToTest:"1) Hard-refresh Search tile BOT DEE → floqai.html (package s3.2.53) while signed in with floqAi access. 2) Confirm chat header icon + Back left; type “throw a shoutout” and Send. 3) Expect a BOT DEE reply and/or result links filtered to your role. 4) Open Quick intent search — cards still appear for the same query. 5) Sign out / no floqAi grant → feature not-available or chat sign-in error, not a silent bounce to Event search.",
+        expected:"Chat UI primary; intent fallback works; answers respect classification; no VIP/pay tools yet.",
+        troubleshoot:"No chat UI → hard refresh floqai.html + bot-dee-chat.js?v=s3.2.53. Callable missing → deploy Functions executeBotSession. Gemini errors but links appear → local contextualSearch fallback OK. Empty results for patron-only topics while Master Admin → check roleFactsFor / floqai-content-classes."
+      },
       {
         id:"s3-2-52-wb-active-tiffany-back",
         area:"Site chrome / Profile",

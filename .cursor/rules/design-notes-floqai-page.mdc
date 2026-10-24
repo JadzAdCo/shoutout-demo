@@ -1,40 +1,45 @@
 ---
-description: FloqAi standalone page floqai.html (s3.1.20) — every FloqAi entry point lands there, feature-guarded, audience-filtered contextual search; old ?start=intent redirects
+description: FloqAi / BOT DEE page floqai.html — chat via executeBotSession + intent-search fast path; feature-guarded; audience-filtered
 alwaysApply: false
 ---
 
-# FloqAi page (s3.1.20)
+# FloqAi / BOT DEE page
 
-Resume: `@floqai-page$`.
+Resume: `@floqai-page$` / `@botdee$`.
 
-Owner (Oct 7 2026): clicking FloqAi on the profile card went to a FloqAi search page and then to Event search. Wrong — FloqAi defaults to **its own page**, general contextual search over everything the viewer may use.
+## Product shape (Phase 1)
 
-## Root cause of the bounce
+`floqai.html` is a **chat shell** (BOT DEE) wired to Cloud Function `executeBotSession`, with **Quick intent search** kept as a collapsible fast path / fallback (same `intent-search.js` used in feature searches).
 
-`featureServices/floqAi` live = `IsFeatureEnabled 0, IsTestFeature 1` → state **off**. `patron-app.js` `continueToMainCategories` saw `#intentSearchPage` active with `!featureServiceAllows("floqAi")` and called `showPage("categoryPage")` (Event search). The flag is still the gate; only the UX changed.
+| Piece | Role |
+|---|---|
+| Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `floqAi` gate + classification → Gemini + `contextualSearch`) |
+| Intent fallback | `#botDeeIntentFallback` + `#intentSearchPage` — feature-optimized router cards |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="floqAi"`); compact left Back; no FloqR parent logo |
 
 ## Routing
 
 | Entry | Target |
 |---|---|
-| Profile card FloqAi (`global-profile-status.js` → `FLOQRNav.intentSearchHome()`) | `./floqai.html?v=APP_V` |
-| Search tile `#intentSearchBtnCard` | `./floqai.html?v=…&from=search` |
-| Feature catalog route (`floqr-feature-services.js` + `functions/feature-services-core.js`, parity test) | `./floqai.html` |
-| Old `./?start=intent|ask|wish[&q=]` (`FLOQRNav.applyStartPage`) | `location.replace(./floqai.html?v=…[&q=])` |
-| `floqai-search.html` | redirect to `floqai.html` (keeps `q`) |
+| Profile card FloqAi (`FLOQRNav.intentSearchHome()`) | `./floqai.html` |
+| Search tile `#intentSearchBtnCard` | `./floqai.html?from=search` |
+| Feature catalog route | `./floqai.html` |
+| Old `./?start=intent|ask|wish[&q=]` | `location.replace(./floqai.html[?q=])` |
+| `floqai-search.html` | redirect to `floqai.html` |
 
-The index `#intentSearchPage` section stays (template-mode FloqAi on the composer still uses `floqai-search.js`); the `continueToMainCategories` fallback stays as a safety net (test asserts it).
+## Access
 
-## Page
+`<body data-floqr-feature="floqAi">` — off / not granted → not-available card + Back. Satellite session shell. Chat callable requires signed-in + feature gate. Intent cards still use `getFloqAiAccess` / packaged classification.
 
-`floqai.html` + `floqai-page.js`: satellite — `floqr-session-shell.js` (signed out → general sign-in with `returnTo=floqai.html`), `<body data-floqr-feature="floqAi">` (off / not granted → “This feature isn't available on your account yet.” + Back to Search, `logFeatureAccessAttempt`), never a silent bounce. Reuses `#intentSearchPage.active` markup so `floqai-search.js` agent + `floqai-search.css` work unchanged. `?q=` prefills.
+## Backend (Phase 1)
 
-## Audience filtering
-
-`intent-search.js` `allIntents()` filters product + help intents by `FLOQRHelpRepository.canAccessHelpEntry({audiences}, flags)`; flags come from `syncHelpAudienceFromAuth()` (`users/{uid}` + token claims → `IsPatron / IsServiceMember / IsVenueAdmin / IsMasterAdmin`). The page shows the scope line (`floqai.scope*`). This is **UX filtering only** — the data each link opens is enforced by Firestore rules / callables. Server-side classification is the data-classification proposal (`design-notes-data-classification.mdc`).
+- `functions/bot-dee-functions.js` — `executeBotSession`
+- `functions/bot-dee-core.js` — tools, scoring, sanitization
+- Catalog: `node scripts/build-bot-dee-search-catalog.js`
+- Later: VIP / ShoutOut / FloqCAST / pay tools wrapping existing callables (each re-validates role)
 
 ## Owner action
 
-FloqAi stays invisible until Master Admin → Features & Services sets **FloqAi** `IsFeatureEnabled = 1` (Test = beta testers + Master Admins; Live = everyone). Do not flip it through MCP/Admin SDK — that skips the SOS2FA audit chain.
+FloqAi stays invisible until Master Admin → Features & Services sets **FloqAi** Live/Test. Deploy Functions for `executeBotSession` + `GEMINI_API_KEY` before chat answers via Gemini (local `contextualSearch` fallback works without Gemini).
 
-i18n: chrome `page.floqai.title` + `floqai.*` (15 × 11 packs); help `help-floqai-page` (all audiences). Script `scripts/add-floqai-page-i18n.js`. Tests `functions/floqai-page.test.js`.
+Tests: `functions/floqai-page.test.js`, `functions/bot-dee-core.test.js`.

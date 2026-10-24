@@ -1,0 +1,279 @@
+/* BOT DEE chat shell on floqai.html — chrome icon left, compact Back, max transcript space. */
+
+body.botdee-page,
+body.floqai-standalone.botdee-page {
+  min-height: 100vh;
+  color: var(--text);
+}
+
+html:not([data-floqr-chrome]) body.botdee-page,
+html[data-floqr-chrome="nightlife"] body.botdee-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 46, 184, 0.34), transparent 32%),
+    radial-gradient(circle at 82% 18%, rgba(0, 200, 255, 0.36), transparent 36%),
+    radial-gradient(circle at 50% 70%, rgba(91, 45, 255, 0.22), transparent 42%),
+    linear-gradient(135deg, #000000, #07101c 42%, #0a1238 68%, #090b12) !important;
+}
+
+html[data-floqr-chrome="traditional"] body.botdee-page {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(0, 200, 255, 0.10), transparent 34%),
+    radial-gradient(circle at 84% 18%, rgba(255, 46, 184, 0.08), transparent 38%),
+    linear-gradient(165deg, #3a3a3a 0%, #2a2a2a 42%, #141414 100%) !important;
+}
+
+html[data-floqr-chrome="blackTiffany"] body.botdee-page {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(0, 200, 255, 0.22), transparent 36%),
+    radial-gradient(circle at 80% 70%, rgba(26, 122, 255, 0.16), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.botdee-page {
+  background: #ffffff !important;
+  color: #0a0a0a !important;
+}
+
+html[data-floqr-chrome="purpleWhite"] body.botdee-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(91, 45, 255, 0.28), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(255, 77, 106, 0.18), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(34, 110, 68, 0.32), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(45, 138, 90, 0.18), transparent 40%),
+    #000 !important;
+}
+
+.botdee-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 14px 20px;
+  box-sizing: border-box;
+}
+
+.botdee-shell > .global-back-btn {
+  align-self: flex-start;
+  margin: 0 0 8px;
+}
+
+.botdee-chat-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 8px;
+}
+
+.botdee-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.botdee-chat-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 14px;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(0, 212, 254, 0.35);
+}
+
+.botdee-chat-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.botdee-chat-title {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.botdee-scope-note {
+  margin: 2px 0 0;
+  opacity: 0.85;
+}
+
+.botdee-help-popout {
+  flex: 0 0 auto;
+}
+
+.botdee-transcript {
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: min(58vh, 560px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 4px 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.botdee-bubble {
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.botdee-bubble-user {
+  align-self: flex-end;
+  background: rgba(0, 212, 254, 0.18);
+  border: 1px solid rgba(0, 212, 254, 0.45);
+}
+
+.botdee-bubble-bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-bubble-user {
+  background: rgba(0, 212, 254, 0.12);
+  border-color: #00d4fe;
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-bubble-bot {
+  background: #f3f3f3;
+  border-color: #d0d0d0;
+  color: #0a0a0a;
+}
+
+.botdee-bubble-text {
+  font-size: 0.95rem;
+}
+
+.botdee-result-links {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.botdee-result-link {
+  font-weight: 700;
+  color: var(--floqr-tiffany, #00d4fe);
+  text-decoration: underline;
+}
+
+.botdee-result-blurb {
+  display: block;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.botdee-chat-status {
+  min-height: 1.2em;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.botdee-chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+  flex: 0 0 auto;
+}
+
+.botdee-chat-label {
+  display: block;
+  margin: 0;
+}
+
+.botdee-chat-form textarea {
+  width: 100%;
+  min-height: 52px;
+  max-height: 140px;
+  resize: vertical;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.35);
+  color: inherit;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chat-form textarea {
+  background: #fff;
+  border-color: #111;
+  color: #0a0a0a;
+}
+
+.botdee-chat-send {
+  min-width: 4.5rem;
+  height: 44px;
+  align-self: stretch;
+}
+
+.botdee-intent-fallback {
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 8px;
+  flex: 0 0 auto;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
+  border-top-color: #ddd;
+}
+
+.botdee-intent-fallback > summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 6px 2px;
+  list-style-position: outside;
+}
+
+.botdee-intent-fallback #intentSearchPage {
+  display: block;
+  padding: 8px 0 0;
+}
+
+.botdee-intent-fallback .floqai-search-panel {
+  display: block;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 560px) {
+  .botdee-transcript {
+    max-height: min(52vh, 480px);
+  }
+  .botdee-chat-icon {
+    width: 48px;
+    height: 48px;
+  }
+}

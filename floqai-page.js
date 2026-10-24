@@ -1,5 +1,5 @@
-/* FloqAi standalone page — contextual search filtered to the signed-in viewer's access. */
-// Design notes: .cursor/rules/design-notes-floqai-page.mdc
+/* FloqAi / BOT DEE standalone page — chat via executeBotSession + intent-search fallback.
+   Design notes: .cursor/rules/design-notes-floqai-page.mdc */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -40,61 +40,42 @@
     if (el) el.textContent = t(key, fallback);
   }
 
-  function rerun() {
+  function rerunIntent() {
     const input = byId("intentSearchInput");
     if (input?.value) input.dispatchEvent(new Event("input"));
-  }
-
-  function bindHelpPopout() {
-    const btn = byId("floqAiHelpBtn");
-    const pop = byId("floqAiHelpPopout");
-    const setOpen = open => {
-      if (!btn || !pop) return;
-      pop.classList.toggle("hidden", !open);
-      pop.setAttribute("aria-hidden", open ? "false" : "true");
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-    };
-    btn?.addEventListener("click", event => {
-      event.stopPropagation();
-      setOpen(pop?.classList.contains("hidden"));
-    });
-    byId("floqAiHelpClose")?.addEventListener("click", () => setOpen(false));
-    document.addEventListener("click", event => {
-      if (!pop || pop.classList.contains("hidden") || pop.contains(event.target) || btn?.contains(event.target)) return;
-      setOpen(false);
-    });
-    document.addEventListener("keydown", event => { if (event.key === "Escape") setOpen(false); });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     ensureFirebase();
     access()?.activate?.();
-    access()?.onChange?.(() => { showScope(); rerun(); });
+    access()?.onChange?.(() => { showScope(); rerunIntent(); });
     nav()?.applyGlobalBack?.("floqrGlobalBack");
+    window.FLOQRChromeScheme?.applyDocument?.();
     window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
     window.FLOQRIntentSearch?.bindIntentSearch({
       onShoutout: () => window.showShoutoutLanding(),
       onMingl: () => { location.href = href("./", {start: "mingl"}); }
     });
-    bindHelpPopout();
     window.FLOQRFloqAi?.bindFloqAi({
       mode: "intent",
       onOpenSearch() { byId("intentSearchInput")?.focus(); }
     });
-    const input = byId("intentSearchInput");
+    window.FLOQRBotDeeChat?.bind({});
     const q = new URL(location.href).searchParams.get("q");
-    if (input && q) {
-      input.value = q.slice(0, 200);
-      rerun();
+    if (q) {
+      const intentInput = byId("intentSearchInput");
+      if (intentInput) {
+        intentInput.value = q.slice(0, 200);
+        rerunIntent();
+      }
     }
-    input?.focus();
     showScope();
     window.firebase?.auth?.().onAuthStateChanged(async () => {
       access()?.reset?.();
       try { await window.FLOQRIntentSearch?.syncHelpAudienceFromAuth?.(); } catch (_) {}
       showScope();
-      rerun();
+      rerunIntent();
     });
-    window.addEventListener("floqr:ui-language", () => { showScope(); rerun(); });
+    window.addEventListener("floqr:ui-language", () => { showScope(); rerunIntent(); });
   });
 })();
