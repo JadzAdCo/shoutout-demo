@@ -2351,9 +2351,9 @@
         area:"Site chrome / Profile",
         feature:"White/Black active tabs Tiffany border + compact left Back",
         changed:"WB active admin-tabs/buttons: white fill, shiny black text, thin Tiffany (#00d4fe) border — never grey fill. Global Back is small left-justified site-wide (excluded from mobile buttonlike width:100%). Package s3.2.52.",
-        howToTest:"1) Hard-refresh patron-portal.html?v=s3.2.52 with White/Black chrome. 2) Open Appearance: active tab readable (white + Tiffany border, black text). 3) Confirm < Back is a small chip on the LEFT, not full-width. 4) Spot-check floqcast-search / vip Back chips.",
+        howToTest:"1) Hard-refresh Profile & Settings (package s3.2.52) with White/Black chrome. 2) Open Appearance: active tab readable (white + Tiffany border, black text). 3) Confirm < Back is a small chip on the LEFT, not full-width. 4) Spot-check floqCast / VIP landing Back chips.",
         expected:"Active Appearance tab text visible; Back compact left; WB button chrome consistent.",
-        troubleshoot:"Grey active tab → hard refresh styles.css + admin.css ?v=s3.2.52. Full-width Back → confirm .global-back-btn has width:auto!important and mobile .buttonlike:not(.global-back-btn)."
+        troubleshoot:"Grey active tab → hard refresh styles.css and admin.css cache-bust for s3.2.52. Full-width Back → confirm .global-back-btn has width:auto!important and mobile .buttonlike excludes .global-back-btn."
       },
       {
         id:"s3-2-51-feature-landing-chrome",
