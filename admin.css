@@ -12,6 +12,16 @@
   white-space:nowrap;text-align:center;text-decoration:none;overflow:visible
 }
 .admin-tab.active{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;border:0}
+/* White/Black: never grey/black fill on active tabs (hides text) — Tiffany thin border */
+html[data-floqr-chrome="whiteBlack"] .admin-tab.active,
+html[data-floqr-chrome="whiteBlack"] .admin-subtab.active{
+  background:#fff!important;
+  background-image:none!important;
+  color:#0a0a0a!important;
+  border:2px solid var(--floqr-tiffany,#00d4fe)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 0 0 1px rgba(0,212,254,.22)!important;
+  text-shadow:none!important;
+}
 .admin-panel-section{display:none}
 .admin-panel-section.active{display:block}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:12px 0 18px}

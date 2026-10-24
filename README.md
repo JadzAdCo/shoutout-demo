@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.51 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.52 (stable)
+
+- s3.2.52: WB active tabs = white + Tiffany border; site-wide compact left Back.
+- s3.2.51: Feature landings follow selected Site chrome.
 
 - s3.2.51: Feature landings follow selected Site chrome (early-paint + no Nightlife body lock).
 - s3.2.50: FloqCAST WB Image-2 full-width wordmark + ring proportions.

@@ -28,10 +28,12 @@
   --floqr-title-tracking:-.035em;
   --floqr-title-size:clamp(1.75rem,5.2vw,2.125rem);
   --floqr-title-line:1.12;
-  /* Unified Back pill (Image 2 periwinkle) */
+  /* Unified Back pill — small left-justified; chrome schemes recolor fill/border */
   --floqr-back-bg:rgba(148,142,198,.58);
   --floqr-back-border:rgba(176,168,220,.82);
   --floqr-back-shadow:0 6px 16px rgba(0,0,0,.22);
+  /* FloqCAST T / BOT DEE Tiffany fill — active WB tabs/buttons */
+  --floqr-tiffany:#00d4fe;
 }
 *{box-sizing:border-box}
 /* Nightlife default — tile cyan/magenta glow on black */
@@ -170,23 +172,24 @@ html:not([data-floqr-chrome]) .user-menu-btn{
 .floqr-global-profile-status .user-dropdown .profile-menu-link[hidden],
 .floqr-global-profile-status .user-dropdown [data-floqr-feature-link].hidden,
 .floqr-global-profile-status .user-dropdown [data-floqr-feature-link][hidden]{display:none!important}
-/* Unified Back — Image 2: centered periwinkle pill "< Back" (site-wide) */
+/* Unified Back — small left-justified "< Back" (site-wide). Never full-bleed. */
 .global-back-btn,
 .floqr-back-btn,
 .topbar button[data-i18n="nav.backShort"],
 .topbar a[data-i18n="nav.backShort"],
 #backFromAdBtn[data-i18n="nav.backShort"]{
-  display:flex;
+  display:inline-flex;
   align-items:center;
   justify-content:center;
   position:relative;
   top:auto;
   z-index:5;
-  width:fit-content;
+  width:auto!important;
+  max-width:max-content;
   min-width:0;
   min-height:36px;
-  margin:0 auto 14px;
-  padding:8px 18px;
+  margin:0 0 14px;
+  padding:8px 16px;
   border-radius:999px;
   border:1px solid var(--floqr-back-border);
   background:var(--floqr-back-bg);
@@ -199,18 +202,20 @@ html:not([data-floqr-chrome]) .user-menu-btn{
   backdrop-filter:blur(10px);
   text-align:center;
   text-decoration:none;
+  align-self:flex-start;
+  box-sizing:border-box;
 }
 .topbar > div:first-child > .global-back-btn,
 .topbar > div:first-child > .floqr-back-btn,
 .topbar > div:first-child > button[data-i18n="nav.backShort"],
-.topbar > div:first-child > a[data-i18n="nav.backShort"]{align-self:center}
+.topbar > div:first-child > a[data-i18n="nav.backShort"]{align-self:flex-start}
 .topbar > div:first-child:has(> button[data-i18n="nav.backShort"]),
 .topbar > div:first-child:has(> .floqr-back-btn),
 .topbar > div:first-child:has(> .global-back-btn),
 .topbar > div:first-child:has(> a[data-i18n="nav.backShort"]){
   display:flex;
   flex-direction:column;
-  align-items:stretch;
+  align-items:flex-start;
 }
 /* FloqR mark under Back — shared page header brand */
 .floqr-page-brand{
@@ -235,12 +240,13 @@ html:not([data-floqr-chrome]) .user-menu-btn{
 .category-card{min-height:54px!important;height:auto!important;font-size:15px!important;border-radius:14px!important;padding:10px 12px!important;line-height:1.1!important}
 .linklike{font-size:inherit!important;padding:0!important;min-height:0!important;border-radius:0!important}
 button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
-/* Beat generic button/buttonlike so the Image-2 Back pill wins */
+/* Beat generic button/buttonlike + mobile width:100% so Back stays compact */
 button.global-back-btn,a.global-back-btn,button.floqr-back-btn,a.floqr-back-btn,
 .topbar button[data-i18n="nav.backShort"],.topbar a[data-i18n="nav.backShort"],
 #backFromAdBtn[data-i18n="nav.backShort"],
 button.global-back-btn.buttonlike,a.global-back-btn.buttonlike{
-  min-height:36px;padding:8px 18px;border-radius:999px;
+  width:auto!important;max-width:max-content;min-height:36px;padding:8px 16px;border-radius:999px;
+  margin:0 0 14px;align-self:flex-start;
   background:var(--floqr-back-bg);border:1px solid var(--floqr-back-border);color:#fff;
   box-shadow:var(--floqr-back-shadow);font-weight:800;font-size:15px;
 }
@@ -1261,7 +1267,7 @@ html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,4
 }
 .chrome-select-active{margin:4px 0 0}
 html[data-floqr-chrome="whiteBlack"] .chrome-select-card{background:rgba(0,0,0,.04)}
-html[data-floqr-chrome="whiteBlack"] .chrome-select-card[aria-pressed="true"]{background:rgba(0,0,0,.08)}
+/* active chrome card: Tiffany border handled with other WB active rules below */
 .floqr-grammar-modal{position:fixed;inset:0;z-index:10001;display:grid;place-items:center;background:rgba(4,8,24,.72);backdrop-filter:blur(10px);padding:18px}
 .floqr-grammar-dialog{width:min(680px,94vw);max-height:88vh;overflow:auto;border:1px solid var(--line);border-radius:20px;background:rgba(10,14,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:20px}
 .floqr-grammar-dialog h2{margin-top:0}
@@ -1345,7 +1351,15 @@ html.floqr-mobile-browser .manual-test-actions{display:grid;grid-template-column
 html.floqr-mobile-browser .button-row button,
 html.floqr-mobile-browser .queue-actions button,
 html.floqr-mobile-browser .manual-test-actions button,
-html.floqr-mobile-browser .buttonlike{width:100%;text-align:center}
+html.floqr-mobile-browser .buttonlike:not(.global-back-btn):not(.floqr-back-btn){width:100%;text-align:center}
+/* Global Back never full-bleed — small left chip on phone */
+html.floqr-mobile-browser .global-back-btn,
+html.floqr-mobile-browser .floqr-back-btn,
+html.floqr-mobile-browser a.global-back-btn.buttonlike,
+html.floqr-mobile-browser button.global-back-btn.buttonlike,
+html.floqr-mobile-browser #floqrGlobalBack{
+  width:auto!important;max-width:max-content;margin:0 0 14px;align-self:flex-start;text-align:center
+}
 /* Keep admin/portal tab chips as auto-width chips (not full-bleed / shrink-to-zero) */
 html.floqr-mobile-browser .admin-tabs .admin-tab,
 html.floqr-mobile-browser .admin-tabs .buttonlike,
@@ -1411,7 +1425,10 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
   .card,.login-card,.club-option,.notice{padding:16px;border-radius:20px}
   .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:1fr!important}
   .button-row,.queue-actions,.manual-test-actions{display:grid;grid-template-columns:1fr;gap:9px}
-  .button-row button,.queue-actions button,.manual-test-actions button,.buttonlike{width:100%;text-align:center}
+  .button-row button,.queue-actions button,.manual-test-actions button,.buttonlike:not(.global-back-btn):not(.floqr-back-btn){width:100%;text-align:center}
+  .global-back-btn,.floqr-back-btn,a.global-back-btn.buttonlike,#floqrGlobalBack{
+    width:auto!important;max-width:max-content;margin:0 0 14px;align-self:flex-start
+  }
   .admin-tabs .admin-tab,.admin-tabs .buttonlike,.admin-tabs .admin-tab-link{
     width:auto!important;max-width:none;min-width:max-content;flex:0 0 auto;flex-shrink:0
   }
@@ -2182,11 +2199,25 @@ html[data-floqr-chrome="whiteBlack"] .search-chrome-toolbar{
   border:1px solid rgba(40,40,40,.4);
   background:rgba(0,0,0,.04);
 }
-html[data-floqr-chrome="whiteBlack"] .search-chrome-btn[aria-pressed="true"]{
-  border-color:#111;
-  box-shadow:0 0 0 1px rgba(0,0,0,.28);
-  background:rgba(0,0,0,.08);
-  color:#111;
+/* Active / highlighted: white fill + shiny black text + thin Tiffany border (never grey fill) */
+html[data-floqr-chrome="whiteBlack"] .admin-tab.active,
+html[data-floqr-chrome="whiteBlack"] .admin-subtab.active,
+html[data-floqr-chrome="whiteBlack"] .admin-tab[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .admin-subtab[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] button.active,
+html[data-floqr-chrome="whiteBlack"] .buttonlike.active,
+html[data-floqr-chrome="whiteBlack"] button[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .buttonlike[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .search-chrome-btn[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .chrome-select-card[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .segmented-control button[aria-pressed="true"],
+html[data-floqr-chrome="whiteBlack"] .segmented-control button.active{
+  background:#fff!important;
+  background-image:none!important;
+  color:#0a0a0a!important;
+  border:2px solid var(--floqr-tiffany,#00d4fe)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 0 0 1px rgba(0,212,254,.22)!important;
+  text-shadow:none!important;
 }
 html[data-floqr-chrome="whiteBlack"] .user-menu-btn{
   background:var(--floqr-profile-card-bg)!important;
@@ -2204,13 +2235,22 @@ html[data-floqr-chrome="whiteBlack"] .user-dropdown{
 }
 html[data-floqr-chrome="whiteBlack"] .user-menu a,
 html[data-floqr-chrome="whiteBlack"] .user-dropdown a{color:#2a2a2a!important}
+/* Back follows WB chrome: white fill, shiny black text, black outline; compact left chip */
 html[data-floqr-chrome="whiteBlack"] .global-back-btn,
 html[data-floqr-chrome="whiteBlack"] .floqr-back-btn,
 html[data-floqr-chrome="whiteBlack"] .topbar button[data-i18n="nav.backShort"],
-html[data-floqr-chrome="whiteBlack"] .topbar a[data-i18n="nav.backShort"]{
-  background:rgba(0,0,0,.08);
-  border:1px solid rgba(40,40,40,.45);
-  color:#111;
+html[data-floqr-chrome="whiteBlack"] .topbar a[data-i18n="nav.backShort"],
+html[data-floqr-chrome="whiteBlack"] #floqrGlobalBack,
+html[data-floqr-chrome="whiteBlack"] a.global-back-btn.buttonlike{
+  background:#fff!important;
+  border:2px solid #0a0a0a!important;
+  color:#0a0a0a!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 2px 8px rgba(0,0,0,.1)!important;
+  width:auto!important;
+  max-width:max-content;
+  margin:0 0 14px!important;
+  align-self:flex-start!important;
+  text-shadow:none!important;
 }
 html[data-floqr-chrome="whiteBlack"] .floqr-assistant-toggle{
   background:#111;

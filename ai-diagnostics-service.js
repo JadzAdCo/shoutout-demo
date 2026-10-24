@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.51";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.51";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.52";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.52";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.52",
+      title: "s3.2.52 — WB Tiffany active tabs + compact left Back",
+      checks: [
+        {label:"Package version s3.2.52", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.52\""]},
+        {label:"Tiffany token", file:"styles.css", includes:["--floqr-tiffany:#00d4fe"]},
+        {label:"WB active Tiffany border", file:"styles.css", includes:["admin-tab.active", "var(--floqr-tiffany"]},
+        {label:"Back not full-bleed mobile", file:"styles.css", includes:["buttonlike:not(.global-back-btn)", "width:auto!important"]},
+        {label:"Manual test s3.2.52", file:"ai-diagnostics-service.js", includes:["s3-2-52-wb-active-tiffany-back"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.52\""]}
+      ]
+    },
     {
       version: "s3.2.51",
       title: "s3.2.51 — Feature landings follow selected Site chrome",
@@ -2334,6 +2346,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-52-wb-active-tiffany-back",
+        area:"Site chrome / Profile",
+        feature:"White/Black active tabs Tiffany border + compact left Back",
+        changed:"WB active admin-tabs/buttons: white fill, shiny black text, thin Tiffany (#00d4fe) border — never grey fill. Global Back is small left-justified site-wide (excluded from mobile buttonlike width:100%). Package s3.2.52.",
+        howToTest:"1) Hard-refresh patron-portal.html?v=s3.2.52 with White/Black chrome. 2) Open Appearance: active tab readable (white + Tiffany border, black text). 3) Confirm < Back is a small chip on the LEFT, not full-width. 4) Spot-check floqcast-search / vip Back chips.",
+        expected:"Active Appearance tab text visible; Back compact left; WB button chrome consistent.",
+        troubleshoot:"Grey active tab → hard refresh styles.css + admin.css ?v=s3.2.52. Full-width Back → confirm .global-back-btn has width:auto!important and mobile .buttonlike:not(.global-back-btn)."
+      },
       {
         id:"s3-2-51-feature-landing-chrome",
         area:"Feature landings / Site chrome",
