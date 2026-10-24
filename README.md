@@ -1,8 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.2.57 (stable)
 
 - s3.2.57: Profile & feature page titles share floqr-page-title schema (= Appearance h2 size).
-- s3.2.54: BOT DEE product tools + Search Settings chrome tile → Appearance; Functions/Pages ship.
-
 - s3.2.56: White/Black profile card white+shiny black initials; Profile & feature titles = Appearance size (one line).
 - s3.2.55: Search icon order ShoutOut→BOT DEE→VIP→Settings→floqCast; VIP createVipCheckout follows venue collector (Toast/POS vs Stripe); floqAi seed Beta enabled.
 - s3.2.54: BOT DEE product tools + Search Settings chrome tile → Appearance; Functions/Pages ship.

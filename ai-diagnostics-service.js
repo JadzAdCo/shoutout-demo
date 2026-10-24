@@ -223,13 +223,24 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.57",
+      title: "s3.2.57 — floqr-page-title schema (= Appearance h2)",
+      checks: [
+        {label:"Package version s3.2.57", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.57\""]},
+        {label:"page-title token", file:"styles.css", includes:["--floqr-page-title-size:var(--floqr-title-size)"]},
+        {label:"Profile title row schema", file:"patron-portal.html", includes:["floqr-page-title-row", "floqr-page-title help-label"]},
+        {label:"Profile title CSS inherits Appearance size", file:"admin.css", includes:["Profile & Settings title space = Appearance h2 size", "font-size:var(--floqr-page-title-size", "font-size:inherit!important"]},
+        {label:"Feature landing page-title schema", file:"floqr-feature-landing.css", includes:["Feature search title schema", ".floqr-page-title", "font-size: var(--floqr-page-title-size"]},
+        {label:"Manual test s3.2.57", file:"ai-diagnostics-service.js", includes:["s3-2-57-page-title-appearance"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.57\""]}
+      ]
+    },
+    {
       version: "s3.2.56",
       title: "s3.2.56 — WB profile card + Appearance-sized page titles",
       checks: [
         {label:"Package version s3.2.56", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.56\""]},
         {label:"WB profile white + shiny black initials", file:"styles.css", includes:["Never list whiteBlack here", "background:#ffffff!important", "Shiny black initials", "-webkit-text-fill-color:#0a0a0a!important"]},
-        {label:"Profile title one line Appearance size", file:"admin.css", includes:["Match Appearance panel h2", "white-space:nowrap", "font-size:var(--floqr-title-size"]},
-        {label:"Feature landing title = Appearance h2", file:"floqr-feature-landing.css", includes:["Same size as Profile → Appearance h2", "font-size: var(--floqr-title-size"]},
         {label:"Manual test s3.2.56", file:"ai-diagnostics-service.js", includes:["s3-2-56-wb-profile-title-size"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.56\""]}
       ]
@@ -2394,6 +2405,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-57-page-title-appearance",
+        area:"Profile / Feature landings",
+        feature:"floqr-page-title schema = Appearance h2 size",
+        changed:"Shared .floqr-page-title / .floqr-page-title-row for Profile & Settings and feature search landings. Title text inherits --floqr-page-title-size (= Appearance h2). One line; ? stays badge-sized. Package s3.2.57.",
+        howToTest:"1) Hard-refresh Profile & Settings s3.2.57 — title one line, same size as Appearance heading in that panel. 2) Open Appearance tab and compare side-by-side. 3) Open floqCast / ShoutOut / VIP search — titles use same size. 4) Mark Succeed/Failed.",
+        expected:"Profile & Settings title text matches Appearance; feature search titles match; no oversized marketing h1.",
+        troubleshoot:"Still large → hard refresh styles.css + admin.css + floqr-feature-landing.css?v=s3.2.57; confirm --floqr-page-title-size and class floqr-page-title on the h1."
+      },
       {
         id:"s3-2-56-wb-profile-title-size",
         area:"Site chrome / Profile / Feature landings",
