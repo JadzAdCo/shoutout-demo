@@ -12,10 +12,11 @@ const read = relativePath => fs.readFileSync(path.resolve(__dirname, "..", relat
 
 test("createVipHold never sets isReserved=1 (hold stays amber)", () => {
   const fn = read("functions/vip-functions.js");
-  const holdFn = fn.slice(fn.indexOf("exports.createVipHold"), fn.indexOf("exports.releaseVipHold"));
+  const holdFn = fn.slice(fn.indexOf("async function runCreateVipHold"), fn.indexOf("exports.createVipHold"));
   assert.match(holdFn, /isReserved:\s*0/);
   assert.doesNotMatch(holdFn, /isReserved:\s*1/);
   assert.match(holdFn, /status:\s*"held"/);
+  assert.match(fn, /exports\.createVipHold\s*=\s*onCall\(CALL_OPTS,\s*runCreateVipHold\)/);
 });
 
 test("Stripe fulfillment and no-deposit confirm are the only booked writers in vip-functions", () => {
