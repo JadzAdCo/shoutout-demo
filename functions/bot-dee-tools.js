@@ -111,13 +111,65 @@ async function createVipCheckout(args, sessionRequest) {
   if (!holdId || !consentId) {
     throw new HttpsError("invalid-argument", "VIP checkout needs holdId and consentId.");
   }
+  const holdSnap = await db.collection("vipHolds").doc(holdId).get();
+  if (!holdSnap.exists) throw new HttpsError("not-found", "VIP hold not found.");
+  const hold = holdSnap.data() || {};
+  const vipPos = require("./vip-pos-functions").__vipPosHelpers;
+  const paySettings = await vipPos.loadClubPaymentSettings(text(hold.clubLocationId, 120));
+  const collector = text(hold.paymentCollector || paySettings.paymentCollector, 40) || "floqrStripe";
+  const payReq = asRequest(sessionRequest, {holdId, consentId});
+
+  // Same dynamic path as vip-terms-app: Club POS (Toast/SpotOn) → confirm for POS; no card URL.
+  if (collector === "clubPos") {
+    const result = await vipPos.runConfirmVipReservationForClubPos(payReq);
+    return {
+      ok: true,
+      tool: "createVipCheckout",
+      paymentCollector: "clubPos",
+      checkoutMode: "clubPos",
+      checkoutUrl: null,
+      passHref: result.reservationId
+        ? `./vip.html?vipPaid=1&collector=clubPos&reservationId=${encodeURIComponent(result.reservationId)}`
+        : "./vip.html?vipPaid=1&collector=clubPos",
+      ...result
+    };
+  }
+
+  const depositRequired = Number(hold.depositRequired) === 0
+    ? false
+    : (Number(hold.depositRequired) === 1
+      || Number(hold.amounts?.chargedCents || hold.amounts?.depositCents || 0) > 0);
+
+  // No deposit (or zero-charge manual CSV) → confirm without Stripe — never invent a checkoutUrl.
+  if (!depositRequired || (collector === "manualCsv" && Number(hold.amounts?.chargedCents || 0) <= 0)) {
+    if (!depositRequired) {
+      const result = await vip.runConfirmVipReservationWithoutDeposit(payReq);
+      return {
+        ok: true,
+        tool: "createVipCheckout",
+        paymentCollector: collector,
+        checkoutMode: "noDeposit",
+        checkoutUrl: null,
+        passHref: "./vip.html?vipPaid=1",
+        ...result
+      };
+    }
+  }
+
+  // floqrStripe / clubStripe (and charged manual CSV) → FloqR Checkout Session URL.
   const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
     orderType: "vipReservation",
     payload: {holdId, consentId},
     returnBase: args?.returnBase,
     correlationId: args?.correlationId
   }));
-  return {ok: true, tool: "createVipCheckout", ...result};
+  return {
+    ok: true,
+    tool: "createVipCheckout",
+    paymentCollector: collector,
+    checkoutMode: collector === "clubStripe" ? "clubStripe" : "floqrStripe",
+    ...result
+  };
 }
 
 async function createFloqCastRequest(args, sessionRequest) {

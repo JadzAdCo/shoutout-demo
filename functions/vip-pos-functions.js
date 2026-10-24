@@ -421,7 +421,7 @@ exports.seedVipPosProviders = onCall(CALL_OPTS, async request => {
  * Club POS path: FLOQR confirms the reservation after Terms; POS owns deposit/tab/spend.
  * Inventory marks booked so the map shows reserved; paymentConfirmed stays 0 until POS webhook (later).
  */
-exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, async request => {
+async function runConfirmVipReservationForClubPos(request) {
   await featureAccess.assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
@@ -529,11 +529,14 @@ exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, async request => {
     reservationId: reservationRef.id,
     passToken
   };
-});
+}
+
+exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, runConfirmVipReservationForClubPos);
 
 exports.__vipPosHelpers = {
   loadClubPaymentSettings,
   loadClubStripeReady,
   normalizePaymentSettings,
+  runConfirmVipReservationForClubPos,
   payments
 };

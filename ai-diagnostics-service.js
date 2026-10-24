@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.54";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.54";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.55";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.55";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.55",
+      title: "s3.2.55 — Search icon order + VIP collector-aware BOT DEE pay",
+      checks: [
+        {label:"Package version s3.2.55", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.55\""]},
+        {label:"Search icon order ShoutOut→BOT DEE→VIP→Settings→floqCast", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"VIP createVipCheckout collector branch", file:"functions/bot-dee-tools.js", includes:["runConfirmVipReservationForClubPos", "checkoutMode: \"clubPos\"", "runConfirmVipReservationWithoutDeposit"]},
+        {label:"floqAi seed Beta enabled", file:"functions/feature-services-core.js", includes:["key: \"floqAi\"", "IsFeatureEnabled: 1", "IsTestFeature: 1"]},
+        {label:"Manual test s3.2.55", file:"ai-diagnostics-service.js", includes:["s3-2-55-search-order-vip-collector"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.55\""]}
+      ]
+    },
     {
       version: "s3.2.54",
       title: "s3.2.54 — BOT DEE pay tools + Search Settings → Appearance",
@@ -2370,6 +2382,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-55-search-order-vip-collector",
+        area:"Search / FloqAi / VIP",
+        feature:"Search icon order + BOT DEE VIP pay follows venue collector",
+        changed:"Search spots: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast. createVipCheckout branches clubPos (Toast/SpotOn confirm, no Stripe URL) / no-deposit confirm / floqrStripe|clubStripe checkoutUrl — same as vip-terms. floqAi packaged Beta enabled. Package s3.2.55 + full Functions deploy.",
+        howToTest:"1) Hard-refresh Search s3.2.55 — left-to-right: ShoutOut, BOT DEE, VIP (if gated on), Settings, floqCast (if gated on). 2) Settings → Appearance. 3) BOT DEE: for a clubPos venue after hold+consent, tool should confirm for POS (passHref / message) not invent Stripe checkoutUrl; Aurelia floqrStripe may still return checkoutUrl. 4) Mark Succeed/Failed.",
+        expected:"Icon order matches; VIP pay path matches venue collector; no card entry in chat; floqAi Beta tile visible to testers.",
+        troubleshoot:"Wrong order → hard refresh index.html s3.2.55. BOT DEE gated → featureServices/floqAi IsFeatureEnabled=1 + IsTestFeature=1 (already Beta live). Stripe on Toast venue → Functions deploy bot-dee-tools + vip-pos runConfirmVipReservationForClubPos; check hold.paymentCollector."
+      },
       {
         id:"s3-2-54-bot-dee-tools-settings",
         area:"FloqAi / Search",

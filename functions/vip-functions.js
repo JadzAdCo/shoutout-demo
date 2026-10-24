@@ -840,7 +840,7 @@ exports.setVipSectionBlocked = onCall(CALL_OPTS, async request => {
  * Confirm a hold without Stripe when the club does not require a deposit
  * (or chargedCents is 0). Never marks booked when deposit is required.
  */
-exports.confirmVipReservationWithoutDeposit = onCall(CALL_OPTS, async request => {
+async function runConfirmVipReservationWithoutDeposit(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
@@ -927,7 +927,9 @@ exports.confirmVipReservationWithoutDeposit = onCall(CALL_OPTS, async request =>
       passToken
     })
   };
-});
+}
+
+exports.confirmVipReservationWithoutDeposit = onCall(CALL_OPTS, runConfirmVipReservationWithoutDeposit);
 
 /**
  * Club Admin walk-in / manage: confirm a table as booked.
@@ -1316,6 +1318,7 @@ exports.expireVipHolds = onSchedule({
 exports.__vipHelpers = {
   runCreateVipHold,
   runRecordVipConsent,
+  runConfirmVipReservationWithoutDeposit,
   fulfillVipReservationOrder,
   resolveSection,
   publicHold,

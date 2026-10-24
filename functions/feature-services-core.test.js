@@ -20,11 +20,14 @@ function loadClientModule() {
   return sandbox.window.FLOQRFeatureServices;
 }
 
-test("ShoutOut and Passes are live by default; every other feature is test-only", () => {
-  const live = core.FEATURE_CATALOG.filter(row => row.IsFeatureEnabled === 1).map(row => row.key);
-  assert.deepEqual(live, ["shoutOut", "passes"]);
-  const liveKeys = new Set(live);
-  core.FEATURE_CATALOG.filter(row => !liveKeys.has(row.key)).forEach(row => {
+test("ShoutOut and Passes are live by default; floqAi is Beta-enabled; others test-only off", () => {
+  const enabled = core.FEATURE_CATALOG.filter(row => row.IsFeatureEnabled === 1).map(row => row.key);
+  assert.deepEqual(enabled, ["shoutOut", "floqAi", "passes"]);
+  assert.equal(core.catalogEntry("floqAi").IsTestFeature, 1, "floqAi stays Beta (test)");
+  assert.equal(core.catalogEntry("shoutOut").IsTestFeature, 0);
+  assert.equal(core.catalogEntry("passes").IsTestFeature, 0);
+  const enabledKeys = new Set(enabled);
+  core.FEATURE_CATALOG.filter(row => !enabledKeys.has(row.key)).forEach(row => {
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });
