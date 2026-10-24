@@ -1,4 +1,4 @@
-/* FloqAi / BOT DEE standalone page — chat via executeBotSession + intent-search fallback.
+/* BOT DEE standalone page — chat via executeBotSession + intent-search fallback.
    Design notes: .cursor/rules/design-notes-floqai-page.mdc */
 (function () {
   "use strict";
@@ -29,7 +29,7 @@
     try {
       if (window.firebase && !firebase.apps.length && window.firebaseConfig) firebase.initializeApp(window.firebaseConfig);
     } catch (error) {
-      console.warn("FloqAi could not start Firebase", error?.message || error);
+      console.warn("BOT DEE could not start Firebase", error?.message || error);
     }
   }
 
