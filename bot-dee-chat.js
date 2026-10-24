@@ -90,7 +90,7 @@
     appendBubble("user", text);
     pushHistory("user", text);
     setBusy(true);
-    setStatus(t("floqai.chatThinking", "BOT DEE is thinking…"));
+    setStatus(t("floqai.chatThinking", "FloqAi is thinking…"));
 
     const fn = callable();
     if (!fn) {
@@ -114,16 +114,16 @@
       setStatus("");
     } catch (error) {
       const code = String(error?.code || "");
-      let msg = t("floqai.chatError", "BOT DEE could not answer. Try quick intent search.");
+      let msg = t("floqai.chatError", "FloqAi could not answer. Try quick intent search.");
       if (code.includes("unauthenticated")) {
-        msg = t("floqai.chatSignIn", "Sign in to chat with BOT DEE.");
+        msg = t("floqai.chatSignIn", "Sign in to chat with FloqAi.");
       } else if (code.includes("failed-precondition")) {
-        msg = t("floqai.chatFeatureOff", "BOT DEE is not available on your account yet.");
+        msg = t("floqai.chatFeatureOff", "FloqAi is not available on your account yet.");
       }
       appendBubble("bot", msg);
       setStatus("");
       openIntentFallback();
-      console.warn("BOT DEE chat failed", code || error?.message || error);
+      console.warn("FloqAi chat failed", code || error?.message || error);
     } finally {
       setBusy(false);
       input?.focus();
@@ -149,7 +149,7 @@
     if (!log || log.childElementCount) return;
     appendBubble("bot", t(
       "floqai.chatWelcome",
-      "Hi — I am BOT DEE. Ask in plain words what you want to do in FLOQR. Quick intent search stays available below."
+      "Hi — I am FloqAi. Ask in plain words what you want to do in FLOQR. Quick intent search stays available below."
     ));
   }
 

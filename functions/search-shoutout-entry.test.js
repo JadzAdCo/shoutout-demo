@@ -21,7 +21,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
-  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast
+  // Spot order: 1 ShoutOut · 2 FloqAi · 3 VIP · 4 Settings · 5 floqCast
   assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"/);
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
   assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
@@ -33,7 +33,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /id="settingsBtnCard"[^>]*href="\.\/patron-portal\.html\?from=search&tab=appearance"/);
   assert.match(page, /data-floqr-chrome-icon="settings"/);
   assert.match(page, /settings-nightlife\.jpg/);
-  assert.match(page, /data-i18n-aria="cat.floqai"[^>]*aria-label="BOT DEE"/);
+  assert.match(page, /data-i18n-aria="cat.floqai"[^>]*aria-label="FloqAi"/);
   assert.doesNotMatch(page, /Welcome, type below to search for Events/);
   assert.match(page, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(page, /id="categoryFloqAiGo"[^>]*class="category-floqai-lens"[^>]*type="submit"/);

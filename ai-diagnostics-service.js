@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.58";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.58";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.59";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.59";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.59",
+      title: "s3.2.59 — FloqAi chat brand + Go live, start a cast",
+      checks: [
+        {label:"Package version s3.2.59", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.59\""]},
+        {label:"Search tile FloqAi (not BOT DEE)", file:"floqr-i18n.js", includes:["\"cat.floqai\": \"FloqAi\"", "\"floqai.chatWelcome\""]},
+        {label:"Chat welcome FloqAi", file:"bot-dee-chat.js", includes:["I am FloqAi"]},
+        {label:"FloqCast Go live CTA", file:"floqr-i18n.js", includes:["Go live, start a cast"]},
+        {label:"FloqCast search fallback CTA", file:"floqcast-search.js", includes:["Go live, start a cast"]},
+        {label:"Manual test s3.2.59", file:"ai-diagnostics-service.js", includes:["s3-2-59-floqai-brand-golive-cast"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.59\""]}
+      ]
+    },
+    {
       version: "s3.2.58",
       title: "s3.2.58 — Black & Dark Green icons = Settings tings #5ac783",
       checks: [
@@ -230,7 +243,7 @@
         {label:"BDG accent Settings tings green", file:"styles.css", includes:["--accent:#5ac783", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
         {label:"BDG full icon pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blackdarkgreen.jpg", "botdee-blackdarkgreen.jpg", "shoutout-blackdarkgreen.png", "bartr-blackdarkgreen.png", "rydr-blackdarkgreen.png"]},
         {label:"BDG icon build script", file:"scripts/build-blackdarkgreen-icons.py", includes:["#5ac783", "TINGS"]},
-        {label:"Search icon order", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"Search icon order", file:"index.html", includes:["1 ShoutOut · 2 FloqAi · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
         {label:"Manual test s3.2.58", file:"ai-diagnostics-service.js", includes:["s3-2-58-bdg-icons-tings-green"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.58\""]}
       ]
@@ -2419,11 +2432,20 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-59-floqai-brand-golive-cast",
+        area:"FloqAi / floqCast",
+        feature:"FloqAi chat brand + Go live, start a cast CTA",
+        changed:"UI/help/i18n: chat and Search tile say FloqAi (not BOT DEE). FloqCast venue CTA is “Go live, start a cast” (all langs). Package s3.2.59 + Functions executeBotSession brand strings.",
+        howToTest:"1) Hard-refresh Search s3.2.59 — FloqAi tile aria/label is FloqAi. 2) Open FloqAi chat — title + welcome + placeholder say FloqAi (not BOT DEE). 3) Send Hey — FloqAi greets, no hit list. 4) floqCast search — venue button reads Go live, start a cast. 5) Mark Succeed/Failed.",
+        expected:"No BOT DEE in patron chat chrome; FloqCast CTA grammar matches; Hey stays conversational.",
+        troubleshoot:"Still BOT DEE → hard refresh floqr-i18n.js + floqai.html + bot-dee-chat.js?v=s3.2.59. Old CTA → floqcast-search.js + i18n goLiveCta. Hey hits → Functions deploy executeBotSession."
+      },
+      {
         id:"s3-2-58-botdee-chitchat-not-hits",
-        area:"FloqAi / BOT DEE",
-        feature:"BOT DEE greets like a chatbot (Hey ≠ search hits)",
+        area:"FloqAi",
+        feature:"FloqAi greets like a chatbot (Hey ≠ search hits)",
         changed:"executeBotSession short-circuits greetings/small talk (hi/hey/thanks) to a conversational reply with zero contextualSearch results. Search token match is word-boundary (hey≠they); min score 3. Functions deploy bot-dee-core + bot-dee-functions.",
-        howToTest:"1) Open BOT DEE (floqai.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
+        howToTest:"1) Open FloqAi (floqai.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
         expected:"Hey → chat greeting; real intents still searchable; no hit-list dump for small talk.",
         troubleshoot:"Still hit list → Functions deploy executeBotSession (bot-dee-functions + bot-dee-core) not Pages-only; confirm provider local-chitchat in function logs for Hey. Gemini path should not run for isChitchatPrompt."
       },

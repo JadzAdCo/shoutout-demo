@@ -1,6 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.58 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.59 (stable)
 
+- s3.2.59: FloqAi chat brand (replaces BOT DEE UI copy); FloqCast CTA “Go live, start a cast”.
 - s3.2.58: Black & Dark Green Search icons use Settings tings green #5ac783; Search icon order live on main.
+
 - s3.2.54: BOT DEE product tools + Search Settings chrome tile → Appearance; Functions/Pages ship.
 
 - s3.2.57: Profile & feature page titles share floqr-page-title schema (= Appearance h2 size).

@@ -23,8 +23,8 @@ const CALL_OPTS = {
 function asHttps(error) {
   if (error instanceof HttpsError) return error;
   if (error?.code === "invalid-argument") return new HttpsError("invalid-argument", error.message);
-  console.error("BOT DEE session failed", error?.message || error);
-  return new HttpsError("internal", "BOT DEE could not complete that request. Try again.");
+  console.error("FloqAi session failed", error?.message || error);
+  return new HttpsError("internal", "FloqAi could not complete that request. Try again.");
 }
 
 function geminiKey() {
@@ -133,12 +133,12 @@ function localSession(role, userPrompt) {
 exports.executeBotSession = onCall(CALL_OPTS, async request => {
   try {
     if (!request.auth?.uid) {
-      throw new HttpsError("unauthenticated", "Sign in to chat with BOT DEE.");
+      throw new HttpsError("unauthenticated", "Sign in to chat with FloqAi.");
     }
     await audit.assertFeatureAccess(request.auth, "floqAi", request);
 
     const userPrompt = bot.sanitizeUserPrompt(request.data?.message || request.data?.prompt || "");
-    if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for BOT DEE.");
+    if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for FloqAi.");
 
     const history = bot.sanitizeHistory(request.data?.history);
     const facts = await __floqAiHelpers.roleFactsFor(request.auth);
@@ -159,7 +159,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       try {
         outcome = await runGeminiSession({apiKey, role, history, userPrompt, session});
       } catch (error) {
-        console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
+        console.warn("FloqAi Gemini failed; using contextualSearch fallback", error?.message || error);
         outcome = localSession(role, userPrompt);
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
