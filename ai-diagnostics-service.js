@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.55";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.55";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.56";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.56";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.56",
+      title: "s3.2.56 — WB profile card + Appearance-sized page titles",
+      checks: [
+        {label:"Package version s3.2.56", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.56\""]},
+        {label:"WB profile white + shiny black initials", file:"styles.css", includes:["Never list whiteBlack here", "background:#ffffff!important", "Shiny black initials", "-webkit-text-fill-color:#0a0a0a!important"]},
+        {label:"Profile title one line Appearance size", file:"admin.css", includes:["Match Appearance panel h2", "white-space:nowrap", "font-size:var(--floqr-title-size"]},
+        {label:"Feature landing title = Appearance h2", file:"floqr-feature-landing.css", includes:["Same size as Profile → Appearance h2", "font-size: var(--floqr-title-size"]},
+        {label:"Manual test s3.2.56", file:"ai-diagnostics-service.js", includes:["s3-2-56-wb-profile-title-size"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.56\""]}
+      ]
+    },
     {
       version: "s3.2.55",
       title: "s3.2.55 — Search icon order + VIP collector-aware BOT DEE pay",
@@ -2382,6 +2394,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-56-wb-profile-title-size",
+        area:"Site chrome / Profile / Feature landings",
+        feature:"White/Black profile card + Appearance-sized titles",
+        changed:"WB profile chip is white with shiny black initials (no charcoal override). Other chromes keep accent-tuned cards. Profile & Settings + floqCast/ShoutOut/VIP feature search titles use --floqr-title-size (same as Appearance h2) and stay one line. Package s3.2.56.",
+        howToTest:"1) Hard-refresh Search s3.2.56 with White/Black chrome — profile chip top-right is white, initials shiny black (not white-on-black). 2) Open Profile & Settings — title is one line, same size as Appearance heading. 3) Open floqCast / ShoutOut / VIP search landings — title size matches Appearance. 4) Spot-check Nightlife/Traditional/Tiffany profile chips still charcoal/accent. 5) Mark Succeed/Failed.",
+        expected:"WB chip white + black initials; Profile & Settings one line; feature landing titles match Appearance.",
+        troubleshoot:"Still charcoal on WB → hard refresh styles.css s3.2.56; confirm html[data-floqr-chrome=whiteBlack] and no charcoal rule listing whiteBlack. Title wraps → admin.css nowrap + --floqr-title-size; feature landings need floqr-feature-landing.css?v=s3.2.56."
+      },
       {
         id:"s3-2-55-search-order-vip-collector",
         area:"Search / FloqAi / VIP",

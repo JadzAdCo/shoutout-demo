@@ -57,9 +57,8 @@ html[data-floqr-chrome="traditional"] .vip-hero-logo {
 }
 
 .vip-hero h1 {
-  font-size: clamp(2rem, 6vw, 3.2rem);
+  /* Size from floqr-feature-landing.css — match Appearance h2 */
   margin: 0.15rem 0 0.35rem;
-  letter-spacing: 0.02em;
 }
 
 .vip-page .card,

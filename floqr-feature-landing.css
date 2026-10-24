@@ -147,6 +147,22 @@ html[data-floqr-chrome="whiteBlack"] .vip-hero-logo {
   margin: 0;
 }
 
+/* Same size as Profile → Appearance h2 (styles.css --floqr-title-size) */
+.feature-landing-title-row h1,
+body.floqcast-page .floqcast-hero h1,
+body.vip-page .vip-hero h1,
+body.shoutout-search-page .feature-landing-title-row h1,
+body.shoutout-search-page .topbar h1 {
+  font-size: var(--floqr-title-size, clamp(1.75rem, 5.2vw, 2.125rem)) !important;
+  line-height: var(--floqr-title-line, 1.12) !important;
+  letter-spacing: var(--floqr-title-tracking, -0.035em);
+  font-weight: var(--floqr-title-weight, 800);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .feature-landing-venue-card {
   display: grid;
   gap: 12px;

@@ -126,3 +126,36 @@ test("ad splash FLOQR logo is unframed and FloqMedia contacts are not underlined
   assert.match(css, /#splashFloqrLogoWrap\{border:0;background:none;padding:0;min-height:0;border-radius:0\}/);
   assert.match(css, /\.splash-house-list a\{color:#fff;text-decoration:none\}/);
 });
+
+test("White/Black profile card is white with shiny black initials; dark chromes stay charcoal", () => {
+  const css = read("styles.css");
+  // Must not force charcoal onto whiteBlack (live regression).
+  assert.doesNotMatch(
+    css,
+    /html\[data-floqr-chrome="whiteBlack"\] \.user-menu-btn,[\s\S]{0,200}background:linear-gradient\(145deg,#4a4a4a/
+  );
+  assert.match(css, /Never list whiteBlack here/);
+  assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.user-menu-btn/);
+  assert.match(css, /background:#ffffff!important/);
+  assert.match(css, /Shiny black initials/);
+  assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.user-initials/);
+  assert.match(css, /-webkit-text-fill-color:#0a0a0a!important/);
+  // Other chromes keep accent-tuned initials
+  assert.match(css, /html\[data-floqr-chrome="blackTiffany"\] \.user-initials/);
+  assert.match(css, /html\[data-floqr-chrome="traditional"\] \.user-initials/);
+});
+
+test("Profile & Settings and feature search titles match Appearance h2 size", () => {
+  const admin = read("admin.css");
+  assert.match(admin, /Match Appearance panel h2/);
+  assert.match(admin, /\.admin-shell \.topbar h1/);
+  assert.match(admin, /white-space:nowrap/);
+  assert.match(admin, /font-size:var\(--floqr-title-size/);
+  const landing = read("floqr-feature-landing.css");
+  assert.match(landing, /Same size as Profile → Appearance h2/);
+  assert.match(landing, /\.feature-landing-title-row h1/);
+  assert.match(landing, /font-size: var\(--floqr-title-size/);
+  const portal = read("patron-portal.html");
+  assert.match(portal, /data-i18n="portal\.title"/);
+  assert.match(portal, /data-i18n="appearance\.pageTitle"/);
+});
