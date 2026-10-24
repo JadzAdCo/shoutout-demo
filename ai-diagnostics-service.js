@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.47";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.47";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.48";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.48";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.48",
+      title: "s3.2.48 — FloqCAST WB: no second asset ring (Fl/T tips solid)",
+      checks: [
+        {label:"Package version s3.2.48", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.48\""]},
+        {label:"ICON_V s3.2.48", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.48\"", "floqcast-whiteblack.png"]},
+        {label:"WB builder drops asset ring", file:"scripts/build-chrome-icons.py", includes:["No asset-drawn ring", "safe_r = R - 36"]},
+        {label:"Manual test s3.2.48", file:"ai-diagnostics-service.js", includes:["s3-2-48-floqcast-wb-no-double-ring"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.48\""]}
+      ]
+    },
     {
       version: "s3.2.47",
       title: "s3.2.47 — FloqCAST White/Black Image-2 on white (not Nightlife neon)",
@@ -2291,6 +2302,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-48-floqcast-wb-no-double-ring",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — no second ring cutting Fl/T",
+        changed:"WB floqcast-whiteblack.png no longer draws an in-asset ring (Search CSS border-radius:50% is the only circle). Graphic ring-annulus leftovers stripped; full body wordmark stamped last; inset keeps Fl/T inside CSS circle. Package s3.2.48.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.48. 2) Language Settings → White / Black. 3) Zoom floqCast tile: FloqCAS + cyan T are solid — no thin grey ring notching F or T. 4) Nightlife chrome still has its neon ring (unchanged).",
+        expected:"One circular crop (CSS). Fl and T tips solid, not sliced by an inner ring.",
+        troubleshoot:"Still see inner ring through F/T → hard refresh floqcast-whiteblack.png?v=s3.2.48; rebuild scripts/build-chrome-icons.py --floqcast-wb-only. Nightlife wrongly lost ring → only WB builder changed."
+      },
       {
         id:"s3-2-47-floqcast-wb-white-ink",
         area:"Search / Chrome icons",
