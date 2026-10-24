@@ -223,12 +223,22 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.49",
+      title: "s3.2.49 — FloqCAST WB reinstate peer ring + F/L/T tip halo",
+      checks: [
+        {label:"Package version s3.2.49", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.49\""]},
+        {label:"ICON_V s3.2.49", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.49\"", "floqcast-whiteblack.png"]},
+        {label:"WB builder layer order", file:"scripts/build-chrome-icons.py", includes:["white circle, no border", "in-asset chrome ring", "_place_floqcast_wb_tips"]},
+        {label:"Manual test s3.2.49", file:"ai-diagnostics-service.js", includes:["s3-2-49-floqcast-wb-ring-halo"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.49\""]}
+      ]
+    },
+    {
       version: "s3.2.48",
       title: "s3.2.48 — FloqCAST WB: no second asset ring (Fl/T tips solid)",
       checks: [
         {label:"Package version s3.2.48", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.48\""]},
-        {label:"ICON_V s3.2.48", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.48\"", "floqcast-whiteblack.png"]},
-        {label:"WB builder drops asset ring", file:"scripts/build-chrome-icons.py", includes:["No asset-drawn ring", "safe_r = R - 36"]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
         {label:"Manual test s3.2.48", file:"ai-diagnostics-service.js", includes:["s3-2-48-floqcast-wb-no-double-ring"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.48\""]}
       ]
@@ -2302,6 +2312,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-49-floqcast-wb-ring-halo",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — peer ring + F/L/T tip halo",
+        changed:"Reinstate in-asset chrome ring at peer R=490. Build order: white circle (no border) → cast graphic → FloqCAST type → ring → F/L/T tip kiss + soft halo. Package s3.2.49.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.49. 2) Language Settings → White / Black. 3) floqCast tile ring matches BOT DEE circle size. 4) F / L / T tips kiss the ring with a soft halo outside — not mid-letter notches. 5) Nightlife neon ring unchanged.",
+        expected:"WB floqCast has peer-sized in-asset ring; F/L/T tips sit on/over the stroke with tip halo.",
+        troubleshoot:"No ring → hard refresh floqcast-whiteblack.png?v=s3.2.49. Ring cuts mid-letter → rebuild --floqcast-wb-only (raise + tip kiss). Ring size ≠ BOT DEE → confirm R=490 stroke."
+      },
       {
         id:"s3-2-48-floqcast-wb-no-double-ring",
         area:"Search / Chrome icons",
