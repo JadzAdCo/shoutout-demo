@@ -1101,12 +1101,7 @@ const CHECKOUT_FEATURE_KEYS = Object.freeze({
   vipReservation: "vipReservations"
 });
 
-exports.createFloqrCheckoutSession = onCall({
-  region:"us-central1",
-  secrets:[STRIPE_SECRET_KEY],
-  timeoutSeconds:30,
-  memory:"256MiB"
-}, async request => {
+async function runCreateFloqrCheckoutSession(request) {
   const correlationId = text(request.data?.correlationId, 80) || `chk_${Date.now().toString(36)}`;
   const type = text(request.data?.orderType, 80);
   const logBase = {
@@ -1344,7 +1339,15 @@ exports.createFloqrCheckoutSession = onCall({
     });
     throw error;
   }
-});
+}
+
+exports.createFloqrCheckoutSession = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, runCreateFloqrCheckoutSession);
+
 
 async function cancelUnpaidOrder(orderId, authContext, reason = "cancelled") {
   const id = text(orderId, 120);
@@ -2827,6 +2830,7 @@ exports.sendTestPaidShoutoutReceipt = onCall({
   };
 });
 
+exports.__checkoutHelpers = {runCreateFloqrCheckoutSession};
 exports.__receiptHelpers = {
   buildTempShoutoutReceipt,
   promoteShoutoutReceipt,

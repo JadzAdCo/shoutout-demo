@@ -396,12 +396,12 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | UI | `floqai.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint |
 | Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getFloqAiAccess` still gate intent cards |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
-| Tools (Phase 1) | `contextualSearch(query)` — scores catalog, `filterContent` via `floqai-content-classes.json` + viewer role from `roleFactsFor` |
-| Secrets | `GEMINI_API_KEY` (same as other Gemini callables); local fallback runs `contextualSearch` if Gemini missing/fails |
-| Gate | `assertFeatureAccess(..., "floqAi")`; signed-in required for chat |
-| Later tools (not wired yet) | `listShoutOutTemplates`, `startShoutOutCheckout`, `createVipHold` / consent / checkout, `createFloqCastRequest` / checkout |
+| Tools | `contextualSearch`; `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates to `runCreateVipHold` / `runRecordVipConsent` / `runCreateFloqCastRequest` / `runCreateFloqrCheckoutSession` (`functions/bot-dee-tools.js`) |
+| Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (checkout tools); local `contextualSearch` fallback if Gemini missing/fails |
+| Gate | `assertFeatureAccess(..., "floqAi")` on session; product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
 | Tests | `functions/bot-dee-core.test.js`, `functions/floqai-page.test.js` |
 | Help | `help-floqai-page` (BOT DEE chat + intent fallback phrases) |
+| Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 
 ---
 

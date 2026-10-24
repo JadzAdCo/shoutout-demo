@@ -1568,6 +1568,26 @@
       ]
     },
     {
+      "sourceId": "help:help-search-settings-appearance",
+      "id": "help-search-settings-appearance",
+      "kind": "help",
+      "label": "Settings on Search",
+      "blurb": "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks.",
+      "href": "./patron-portal.html?from=search&tab=appearance",
+      "phrases": [
+        "settings on search",
+        "on the home search screen tap settings to open profile settings on the appearance tab site chrome nightlife traditional black tiffany white/black purple white b",
+        "settings",
+        "appearance",
+        "site chrome",
+        "search settings",
+        "theme settings",
+        "change chrome",
+        "open appearance",
+        "help-search-settings-appearance"
+      ]
+    },
+    {
       "sourceId": "help:help-service-members",
       "id": "help-service-members",
       "kind": "help",

@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.53";
+  const VERSION = "s3.2.54";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1728,7 +1728,8 @@
       "master.featuresBetaTestingEyebrow": "Beta & Testing",
       "master.featuresBetaTestingTitle": "Invite a beta tester",
       "master.featuresAuditTrailEyebrow": "Audit Trail",
-      "master.featuresAuditTrailTitle": "Feature & beta activity"
+      "master.featuresAuditTrailTitle": "Feature & beta activity",
+      "cat.settings": "Settings"
     },
     fr: {
       "nav.backShort": "< Retour",
@@ -3027,7 +3028,8 @@
       "floqai.chatError": "BOT DEE n’a pas pu répondre. Essayez la recherche d’intention rapide.",
       "floqai.chatSignIn": "Connectez-vous pour discuter avec BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE n’est pas encore disponible sur votre compte.",
-      "floqai.intentFallback": "Recherche d’intention rapide"
+      "floqai.intentFallback": "Recherche d’intention rapide",
+      "cat.settings": "Réglages"
     },
     de: {
       "nav.backShort": "< Zurück",
@@ -4326,7 +4328,8 @@
       "floqai.chatError": "BOT DEE konnte nicht antworten. Versuche die schnelle Intent-Suche.",
       "floqai.chatSignIn": "Melde dich an, um mit BOT DEE zu chatten.",
       "floqai.chatFeatureOff": "BOT DEE ist für dein Konto noch nicht verfügbar.",
-      "floqai.intentFallback": "Schnelle Intent-Suche"
+      "floqai.intentFallback": "Schnelle Intent-Suche",
+      "cat.settings": "Einstellungen"
     },
     es: {
       "nav.backShort": "< Atrás",
@@ -5625,7 +5628,8 @@
       "floqai.chatError": "BOT DEE no pudo responder. Prueba la búsqueda rápida de intención.",
       "floqai.chatSignIn": "Inicia sesión para chatear con BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE aún no está disponible en tu cuenta.",
-      "floqai.intentFallback": "Búsqueda rápida de intención"
+      "floqai.intentFallback": "Búsqueda rápida de intención",
+      "cat.settings": "Ajustes"
     },
     nl: {
       "nav.backShort": "< Terug",
@@ -6924,7 +6928,8 @@
       "floqai.chatError": "BOT DEE kon niet antwoorden. Probeer de snelle intent-zoekactie.",
       "floqai.chatSignIn": "Log in om met BOT DEE te chatten.",
       "floqai.chatFeatureOff": "BOT DEE is nog niet beschikbaar op je account.",
-      "floqai.intentFallback": "Snelle intent-zoekactie"
+      "floqai.intentFallback": "Snelle intent-zoekactie",
+      "cat.settings": "Instellingen"
     },
     ru: {
       "nav.backShort": "< Назад",
@@ -8223,7 +8228,8 @@
       "floqai.chatError": "BOT DEE не смог ответить. Попробуйте быстрый поиск намерений.",
       "floqai.chatSignIn": "Войдите, чтобы общаться с BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE пока недоступен для вашего аккаунта.",
-      "floqai.intentFallback": "Быстрый поиск намерений"
+      "floqai.intentFallback": "Быстрый поиск намерений",
+      "cat.settings": "Настройки"
     },
     it: {
       "nav.backShort": "< Indietro",
@@ -9522,7 +9528,8 @@
       "floqai.chatError": "BOT DEE non ha potuto rispondere. Prova la ricerca rapida di intent.",
       "floqai.chatSignIn": "Accedi per chattare con BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE non è ancora disponibile sul tuo account.",
-      "floqai.intentFallback": "Ricerca rapida di intent"
+      "floqai.intentFallback": "Ricerca rapida di intent",
+      "cat.settings": "Impostazioni"
     },
     pt: {
       "nav.backShort": "< Voltar",
@@ -10821,7 +10828,8 @@
       "floqai.chatError": "BOT DEE não conseguiu responder. Tente a pesquisa rápida de intenção.",
       "floqai.chatSignIn": "Inicie sessão para conversar com o BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE ainda não está disponível na sua conta.",
-      "floqai.intentFallback": "Pesquisa rápida de intenção"
+      "floqai.intentFallback": "Pesquisa rápida de intenção",
+      "cat.settings": "Definições"
     },
     el: {
       "nav.backShort": "< Πίσω",
@@ -12120,7 +12128,8 @@
       "floqai.chatError": "Ο BOT DEE δεν μπόρεσε να απαντήσει. Δοκίμασε τη γρήγορη αναζήτηση πρόθεσης.",
       "floqai.chatSignIn": "Συνδέσου για συνομιλία με τον BOT DEE.",
       "floqai.chatFeatureOff": "Ο BOT DEE δεν είναι ακόμα διαθέσιμος στον λογαριασμό σου.",
-      "floqai.intentFallback": "Γρήγορη αναζήτηση πρόθεσης"
+      "floqai.intentFallback": "Γρήγορη αναζήτηση πρόθεσης",
+      "cat.settings": "Ρυθμίσεις"
     },
     pl: {
       "nav.backShort": "< Wstecz",
@@ -13419,7 +13428,8 @@
       "floqai.chatError": "BOT DEE nie mógł odpowiedzieć. Spróbuj szybkiego wyszukiwania intencji.",
       "floqai.chatSignIn": "Zaloguj się, aby czatować z BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE nie jest jeszcze dostępny na Twoim koncie.",
-      "floqai.intentFallback": "Szybkie wyszukiwanie intencji"
+      "floqai.intentFallback": "Szybkie wyszukiwanie intencji",
+      "cat.settings": "Ustawienia"
     },
     ar: {
       "nav.backShort": "< رجوع",
@@ -14718,7 +14728,8 @@
       "floqai.chatError": "تعذّر على BOT DEE الإجابة. جرّب البحث السريع عن النية.",
       "floqai.chatSignIn": "سجّل الدخول للدردشة مع BOT DEE.",
       "floqai.chatFeatureOff": "BOT DEE غير متاح على حسابك بعد.",
-      "floqai.intentFallback": "بحث سريع عن النية"
+      "floqai.intentFallback": "بحث سريع عن النية",
+      "cat.settings": "الإعدادات"
     }
   };
 

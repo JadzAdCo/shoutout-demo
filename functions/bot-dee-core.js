@@ -1,5 +1,5 @@
 /* BOT DEE session core — tool defs, classification-gated contextualSearch, Gemini message shaping.
-   Phase 1: read-only contextualSearch only. Pay / VIP / ShoutOut tools land later and re-validate role. */
+   Product tools (VIP / ShoutOut / FloqCAST / checkout) re-validate role via bot-dee-tools.js. */
 "use strict";
 
 const {Type} = require("@google/genai");
@@ -10,24 +10,95 @@ const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 const MAX_HISTORY = 12;
 const MAX_MESSAGE_CHARS = 2000;
 const MAX_RESULTS = 8;
-const MAX_TOOL_ROUNDS = 3;
+const MAX_TOOL_ROUNDS = 4;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 
-const TOOL_CONTEXTUAL_SEARCH = {
-  name: "contextualSearch",
-  description:
-    "Search FLOQR help topics and product intents the signed-in viewer may access. Use for questions about ShoutOut, VIP, floqCast, scheduling, clubs, profile, or how to do something in FLOQR. Returns classification-filtered results only.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {
-      query: {
-        type: Type.STRING,
-        description: "Plain-language search query from the patron."
-      }
-    },
-    required: ["query"]
+const str = (description) => ({type: Type.STRING, description});
+const obj = (properties, required) => ({
+  type: Type.OBJECT,
+  properties,
+  ...(required ? {required} : {})
+});
+
+const TOOL_DEFS = [
+  {
+    name: "contextualSearch",
+    description:
+      "Search FLOQR help topics and product intents the signed-in viewer may access. Use for how-to questions. Returns classification-filtered results only.",
+    parameters: obj({query: str("Plain-language search query from the patron.")}, ["query"])
+  },
+  {
+    name: "listShoutOutTemplates",
+    description: "List ShoutOut templates available at a club (or return compose link). Re-validates shoutOut access.",
+    parameters: obj({
+      clubLocationId: str("Club location id when known."),
+      locationId: str("Alias for clubLocationId.")
+    })
+  },
+  {
+    name: "startShoutOutCheckout",
+    description:
+      "Start Stripe Checkout for a composed ShoutOut. Requires clubLocationId and shoutout payload (templateId, text fields, screenFormatId as collected). Re-validates shoutOut. Returns checkoutUrl — never collect card data.",
+    parameters: obj({
+      clubLocationId: str("Venue location id."),
+      shoutout: {type: Type.OBJECT, description: "ShoutOut compose payload (templateId, message fields, screenFormatId, etc.)."},
+      payload: {type: Type.OBJECT, description: "Optional wrapper with clubLocationId + shoutout."},
+      returnBase: str("Optional return base URL."),
+      correlationId: str("Optional correlation id.")
+    })
+  },
+  {
+    name: "createVipHold",
+    description: "Hold a VIP table section for 30 minutes. Needs clubLocationId, night (YYYY-MM-DD), sectionId, partySize. Re-validates vipReservations.",
+    parameters: obj({
+      clubLocationId: str("Venue id."),
+      night: str("Night date YYYY-MM-DD."),
+      sectionId: str("Floor section id."),
+      partySize: {type: Type.INTEGER, description: "Party size within section capacity."}
+    }, ["clubLocationId", "night", "sectionId", "partySize"])
+  },
+  {
+    name: "recordVipConsent",
+    description: "Record VIP Terms consent for an active hold before checkout. checks.terms must be true. Re-validates vipReservations.",
+    parameters: obj({
+      holdId: str("Hold id from createVipHold."),
+      checks: {type: Type.OBJECT, description: "Consent checks; terms:true required."}
+    }, ["holdId"])
+  },
+  {
+    name: "createVipCheckout",
+    description: "Start FloqR Stripe Checkout for a VIP hold after consent. Needs holdId + consentId. Re-validates vipReservations. Returns checkoutUrl.",
+    parameters: obj({
+      holdId: str("Active hold id."),
+      consentId: str("Consent id from recordVipConsent."),
+      returnBase: str("Optional return base URL."),
+      correlationId: str("Optional correlation id.")
+    }, ["holdId", "consentId"])
+  },
+  {
+    name: "createFloqCastRequest",
+    description: "Create a private floqCast preview request for a venue (secondary board). Re-validates floqCast. Returns previewPath.",
+    parameters: obj({
+      locationId: str("Venue location id."),
+      clubLocationId: str("Alias for locationId."),
+      locationName: str("Optional venue display name."),
+      displayBoard: str("Board; defaults to secondary.")
+    })
+  },
+  {
+    name: "createFloqCastCheckout",
+    description: "Start Stripe Checkout for an existing floqCast request. Needs requestId. Re-validates floqCast. Returns checkoutUrl.",
+    parameters: obj({
+      requestId: str("Request id / access token from createFloqCastRequest."),
+      clubLocationId: str("Optional venue id."),
+      locationId: str("Optional venue id."),
+      returnBase: str("Optional return base URL."),
+      correlationId: str("Optional correlation id.")
+    }, ["requestId"])
   }
-};
+];
+
+const TOOL_NAMES = TOOL_DEFS.map(t => t.name);
 
 function normalize(value) {
   return String(value || "")
@@ -116,20 +187,24 @@ async function runTool(name, args, session) {
   if (name === "contextualSearch") {
     return contextualSearch(args?.query || session?.lastUserPrompt || "", session.role);
   }
-  return {ok: false, error: `Tool not available in Phase 1: ${name}`};
+  const tools = require("./bot-dee-tools");
+  if (!session?.request) {
+    return {ok: false, error: "Session request missing for product tool."};
+  }
+  return tools.runProductTool(name, args, session.request);
 }
 
 function toolDeclarations() {
-  return [TOOL_CONTEXTUAL_SEARCH];
+  return TOOL_DEFS;
 }
 
 function systemInstruction(role) {
   return [
     "You are BOT DEE, FLOQR's in-app assistant on the FloqAi page.",
-    "Answer briefly in plain language. Prefer short steps and links from tool results.",
-    "Only recommend products or help topics returned by contextualSearch for this viewer.",
-    "Never invent payment, VIP holds, ShoutOut checkout, or card flows — those tools are not enabled yet.",
-    "If search returns nothing useful, say so and suggest the classic intent search or classic Search.",
+    "Answer briefly. Prefer tool results and real checkoutUrl / previewPath / holdId values.",
+    "Use contextualSearch for how-to. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
+    "Never ask for or accept card numbers — only return Stripe checkoutUrl from tools.",
+    "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
     "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, BOT DEE, VIP reserV."
   ].join(" ");
@@ -174,13 +249,25 @@ function resultsForClient(search) {
   }));
 }
 
+function linksFromToolResult(result) {
+  if (!result || typeof result !== "object") return [];
+  const links = [];
+  if (result.checkoutUrl) links.push({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"});
+  if (result.previewPath) links.push({label: "Open floqCast preview", href: result.previewPath, kind: "floqcast"});
+  if (result.composeHref) links.push({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"});
+  if (result.holdId && !result.checkoutUrl) {
+    links.push({label: "Continue VIP Terms", href: `./vip-terms.html?hold=${encodeURIComponent(result.holdId)}`, kind: "vip"});
+  }
+  return links;
+}
+
 module.exports = {
   TEXT_MODEL,
   MAX_TOOL_ROUNDS,
   MAX_HISTORY,
   MAX_MESSAGE_CHARS,
+  TOOL_NAMES,
   toolDeclarations,
-  TOOL_CONTEXTUAL_SEARCH,
   sanitizeUserPrompt,
   sanitizeHistory,
   contextualSearch,
@@ -190,6 +277,7 @@ module.exports = {
   extractText,
   formatSearchFallback,
   resultsForClient,
+  linksFromToolResult,
   FLOQAI_CONTENT,
   SEARCH_CATALOG
 };

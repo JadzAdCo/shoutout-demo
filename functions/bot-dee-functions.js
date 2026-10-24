@@ -1,5 +1,5 @@
 /* BOT DEE — executeBotSession callable (Auth + floqAi gate + classification → Gemini + tools).
-   Phase 1 tools: contextualSearch (read-only). */
+   Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role). */
 "use strict";
 
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
@@ -11,12 +11,13 @@ const {__featureServiceHelpers: audit} = require("./feature-services-functions")
 const {__floqAiHelpers} = require("./data-classification-functions");
 
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 
 const CALL_OPTS = {
   region: "us-central1",
-  timeoutSeconds: 60,
+  timeoutSeconds: 90,
   memory: "512MiB",
-  secrets: [GEMINI_API_KEY]
+  secrets: [GEMINI_API_KEY, STRIPE_SECRET_KEY]
 };
 
 function asHttps(error) {
@@ -49,6 +50,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
   const contents = bot.historyToContents(history, userPrompt);
   const tools = [{functionDeclarations: bot.toolDeclarations()}];
   let lastSearch = null;
+  const actionLinks = [];
   let rounds = 0;
 
   while (rounds < bot.MAX_TOOL_ROUNDS) {
@@ -62,7 +64,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
         toolConfig: {
           functionCallingConfig: {
             mode: FunctionCallingConfigMode.AUTO,
-            allowedFunctionNames: ["contextualSearch"]
+            allowedFunctionNames: bot.TOOL_NAMES
           }
         },
         temperature: 0.4
@@ -74,7 +76,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       const text = bot.extractText(response);
       return {
         reply: text || bot.formatSearchFallback(lastSearch),
-        results: bot.resultsForClient(lastSearch),
+        results: [...bot.resultsForClient(lastSearch), ...actionLinks],
         provider: "gemini",
         model: bot.TEXT_MODEL,
         toolRounds: rounds - (text ? 1 : 0)
@@ -92,6 +94,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       const args = call.args && typeof call.args === "object" ? call.args : {};
       const result = await bot.runTool(call.name, args, session);
       if (call.name === "contextualSearch") lastSearch = result;
+      bot.linksFromToolResult(result).forEach(link => actionLinks.push(link));
       responseParts.push(functionResponsePart(call, result));
     }
     contents.push({role: "user", parts: responseParts});
@@ -99,7 +102,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
 
   return {
     reply: bot.formatSearchFallback(lastSearch),
-    results: bot.resultsForClient(lastSearch),
+    results: [...bot.resultsForClient(lastSearch), ...actionLinks],
     provider: "gemini",
     model: bot.TEXT_MODEL,
     toolRounds: rounds,
@@ -134,7 +137,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const session = Object.freeze({
       userId: request.auth.uid,
       role,
-      lastUserPrompt: userPrompt
+      lastUserPrompt: userPrompt,
+      request
     });
 
     const apiKey = geminiKey();

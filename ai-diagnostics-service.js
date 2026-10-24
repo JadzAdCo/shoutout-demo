@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.53";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.53";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.54";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.54";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.54",
+      title: "s3.2.54 — BOT DEE pay tools + Search Settings → Appearance",
+      checks: [
+        {label:"Package version s3.2.54", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.54\""]},
+        {label:"Settings search tile", file:"index.html", includes:["id=\"settingsBtnCard\"", "tab=appearance", "data-floqr-chrome-icon=\"settings\""]},
+        {label:"Settings chrome icons", file:"floqr-chrome-scheme.js", includes:["settings-nightlife.jpg", "settings-whiteblack.jpg"]},
+        {label:"BOT DEE product tools", file:"functions/bot-dee-tools.js", includes:["createVipCheckout", "startShoutOutCheckout", "createFloqCastCheckout"]},
+        {label:"Manual test s3.2.54", file:"ai-diagnostics-service.js", includes:["s3-2-54-bot-dee-tools-settings"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.54\""]}
+      ]
+    },
     {
       version: "s3.2.53",
       title: "s3.2.53 — BOT DEE Phase 1 chat + executeBotSession",
@@ -2358,6 +2370,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-54-bot-dee-tools-settings",
+        area:"FloqAi / Search",
+        feature:"BOT DEE VIP/ShoutOut/FloqCAST tools + Search Settings → Appearance",
+        changed:"executeBotSession tools wrap createVipHold/consent/checkout, ShoutOut checkout, FloqCAST request/checkout (role re-validated). Search adds Settings chrome tile for all schemes; opens Profile Appearance. Package s3.2.54 + Functions deploy.",
+        howToTest:"1) Hard-refresh Search s3.2.54 — Settings tile appears after BOT DEE; icon swaps with Site chrome. 2) Tap Settings → My Profile opens on Appearance tab. 3) Open BOT DEE chat (floqAi granted) — ask for VIP/ShoutOut/floqCast help; tool replies may include checkout/preview links (no card entry in chat). 4) Confirm Manual Feature Test row Succeed/Failed.",
+        expected:"Settings → Appearance; BOT DEE can start hold/consent/checkout flows via tools; Stripe URLs only (no PAN in chat).",
+        troubleshoot:"No Settings tile → hard refresh index.html + floqr-chrome-scheme.js + settings-*.jpg. Wrong tab → href must include tab=appearance. Tool errors → Functions deploy executeBotSession with GEMINI_API_KEY + STRIPE_SECRET_KEY; feature gates shoutOut/vipReservations/floqCast."
+      },
       {
         id:"s3-2-53-bot-dee-phase1-chat",
         area:"FloqAi / BOT DEE",

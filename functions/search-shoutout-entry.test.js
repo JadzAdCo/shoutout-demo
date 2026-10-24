@@ -30,6 +30,9 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
   assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*botdee-nightlife\.jpg/);
+  assert.match(page, /id="settingsBtnCard"[^>]*href="\.\/patron-portal\.html\?from=search&tab=appearance"/);
+  assert.match(page, /data-floqr-chrome-icon="settings"/);
+  assert.match(page, /settings-nightlife\.jpg/);
   assert.match(page, /data-i18n-aria="cat.floqai"[^>]*aria-label="BOT DEE"/);
   assert.doesNotMatch(page, /Welcome, type below to search for Events/);
   assert.match(page, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
@@ -43,15 +46,15 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.floqr-back-btn,/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:transparent/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*rgba\(0,200,255/);
+  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
+  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*rgba\(0,200,255/);
   assert.match(css, /--floqr-tile-cyan:#00c8ff/);
   assert.match(css, /--floqr-brand-gradient-h:linear-gradient/);
   assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
   assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.primary/);
   assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
   assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#2d8a5a/);
-  assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face\{[^}]*background:#000/);
+  assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face(?:,\.settings-icon-face)?\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /max-width:1180px\)[\s\S]*#categoryPage\.page\.active[\s\S]*margin-top:auto!important/, "phones/tablets pin Search icon row to viewport bottom");

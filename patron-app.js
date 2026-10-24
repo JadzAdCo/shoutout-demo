@@ -5155,6 +5155,11 @@
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
+    const settingsCard = byId("settingsBtnCard");
+    if (settingsCard) {
+      settingsCard.href = window.FLOQRNav?.portalHome?.({from: "search", tab: "appearance"})
+        || "./patron-portal.html?from=search&tab=appearance";
+    }
     bind("backToWelcomeFromProfileBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
     bind("backToWelcomeBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
     bind("backToCategoriesFromShoutoutLandingBtn", () => showPage("categoryPage"));

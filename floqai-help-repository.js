@@ -361,6 +361,16 @@
       page: "index.html#floqAiHelpPopout"
     },
     {
+      id: "help-search-settings-appearance",
+      title: "Settings on Search",
+      body: "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks.",
+      searchPhrases: ["settings", "appearance", "site chrome", "search settings", "theme settings", "change chrome"],
+      links: [{label: "Open Appearance", href: pageUrl("./patron-portal.html", {from: "search", tab: "appearance"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#settingsBtnCard"
+    },
+    {
       id: "help-floqai-page",
       title: "BOT DEE",
       body: "Chat with BOT DEE on the FloqAi page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",

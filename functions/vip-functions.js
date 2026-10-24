@@ -300,7 +300,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
 });
 
 /** Transactional inventory hold (30 min). */
-exports.createVipHold = onCall(CALL_OPTS, async request => {
+async function runCreateVipHold(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const clubLocationId = text(request.data?.clubLocationId, 120);
@@ -443,7 +443,10 @@ exports.createVipHold = onCall(CALL_OPTS, async request => {
     paymentCollector,
     posProvider
   });
-});
+}
+
+exports.createVipHold = onCall(CALL_OPTS, runCreateVipHold);
+
 
 exports.releaseVipHold = onCall(CALL_OPTS, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
@@ -478,7 +481,7 @@ exports.releaseVipHold = onCall(CALL_OPTS, async request => {
   return {ok: true, holdId};
 });
 
-exports.recordVipConsent = onCall(CALL_OPTS, async request => {
+async function runRecordVipConsent(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
@@ -520,7 +523,10 @@ exports.recordVipConsent = onCall(CALL_OPTS, async request => {
     termsVersion: BETA_TERMS.termsVersion,
     holdId
   };
-});
+}
+
+exports.recordVipConsent = onCall(CALL_OPTS, runRecordVipConsent);
+
 
 exports.getMyVipReservations = onCall(CALL_OPTS, async request => {
   await assertFeatureAccess(request.auth, "vipReservations", request);
@@ -1308,6 +1314,8 @@ exports.expireVipHolds = onSchedule({
 });
 
 exports.__vipHelpers = {
+  runCreateVipHold,
+  runRecordVipConsent,
   fulfillVipReservationOrder,
   resolveSection,
   publicHold,

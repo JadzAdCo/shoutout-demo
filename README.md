@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.53 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.54 (stable)
+
+- s3.2.54: BOT DEE product tools + Search Settings chrome tile → Appearance; Functions/Pages ship.
+- s3.2.53: BOT DEE Phase 1 chat + executeBotSession contextualSearch.
 
 - s3.2.53: BOT DEE Phase 1 — floqai.html chat + executeBotSession contextualSearch; intent search fallback.
 - s3.2.52: WB active tabs = white + Tiffany border; site-wide compact left Back.

@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.53";
+  const ICON_V = "s3.2.54";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -51,6 +51,7 @@
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
     floqAi: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-nightlife.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
   };
@@ -59,25 +60,30 @@
     vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
     floqAi: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-traditional.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
   };
   const BLACK_TIFFANY_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
-    vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V
+    vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-blacktiffany.jpg?v=" + ICON_V
   });
   const PURPLE_WHITE_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
     // Purple chrome keeps neon nightlife tiles; VIP mark stays nightlife neon
-    shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V
+    shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
+    settings: "./images/chrome/settings-purplewhite.jpg?v=" + ICON_V
   });
   const BLACK_DARK_GREEN_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
     vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
-    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
+    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
+    settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V
   });
   const WHITE_BLACK_ICONS = {
     floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
     floqAi: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V
   };

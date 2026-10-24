@@ -213,6 +213,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-search-settings-appearance": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-service-members": [
       "venueAdmin"
     ],

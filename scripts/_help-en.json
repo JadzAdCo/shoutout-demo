@@ -310,5 +310,9 @@
   "help-shoutout-choose-venue": {
     "title": "Choose a ShoutOut venue",
     "body": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+  },
+  "help-search-settings-appearance": {
+    "title": "Settings on Search",
+    "body": "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks."
   }
 }

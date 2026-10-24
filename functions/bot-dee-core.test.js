@@ -41,16 +41,22 @@ test("sanitizeHistory keeps bounded user/model turns", () => {
   assert.ok(history[2].text.length <= bot.MAX_MESSAGE_CHARS);
 });
 
-test("executeBotSession wiring is exported and Phase 1 tool is contextualSearch only", () => {
+test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST checkout", () => {
   const src = read("functions/bot-dee-functions.js");
   assert.match(src, /exports\.executeBotSession/);
   assert.match(src, /assertFeatureAccess\(request\.auth, "floqAi"/);
   assert.match(src, /@google\/genai/);
   assert.match(src, /contextualSearch/);
   assert.doesNotMatch(src, /purchaseVIPReservation/);
-  assert.doesNotMatch(src, /startShoutOutCheckout/);
+  assert.match(read("functions/bot-dee-tools.js"), /startShoutOutCheckout/);
+  assert.match(read("functions/bot-dee-tools.js"), /createVipHold/);
+  assert.match(read("functions/bot-dee-tools.js"), /createFloqCastCheckout/);
   assert.match(read("functions/index.js"), /executeBotSession:\s*require\("\.\/bot-dee-functions"\)\.executeBotSession/);
-  assert.deepEqual(bot.toolDeclarations().map(t => t.name), ["contextualSearch"]);
+  const names = bot.toolDeclarations().map(t => t.name);
+  assert.ok(names.includes("contextualSearch"));
+  assert.ok(names.includes("startShoutOutCheckout"));
+  assert.ok(names.includes("createVipCheckout"));
+  assert.ok(names.includes("createFloqCastRequest"));
 });
 
 test("package depends on @google/genai", () => {

@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.53";
+  const VERSION = "s3.2.54";
 
   const packs = {
     "ru": {
@@ -17,6 +17,10 @@
       "help-floqai-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице FloqAi простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings на Search",
+        body: "На экране Home Search нажмите Settings, чтобы открыть Profile & Settings на вкладке Appearance — там Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Плитка Settings использует тот же набор chrome-иконок, что и другие метки Search."
       },
       "help-club-website-feed": {
         title: "Фид для сайта клуба",
@@ -332,6 +336,10 @@
         title: "BOT DEE",
         body: "Chat met BOT DEE op de FloqAi-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
       },
+      "help-search-settings-appearance": {
+        title: "Settings op Search",
+        body: "Tik op Search op Settings om Profile & Settings te openen op het tabblad Appearance — daar staat Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). De Settings-tegel gebruikt hetzelfde chrome-iconenpakket als de andere Search-merken."
+      },
       "help-club-website-feed": {
         title: "Feed voor de clubwebsite",
         body: "Toon je gepubliceerde FLOQR-clubpagina op je eigen website. Tik op ‘Sleutel en links aanmaken’ en plak de iframe-code in je website, of geef je webbeheerder de JSON- of RSS-link. De feed toont komende evenementen, uitgelichte dj’s, uitgelicht personeel, de galerij en contactgegevens, volgens je instellingen voor de openbare pagina. Foto’s van personeel verschijnen alleen als de fototoestemming is bevestigd. Een nieuwe sleutel schakelt de oude links uit, ook de links van het personeelsrooster."
@@ -645,6 +653,10 @@
       "help-floqai-page": {
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page FloqAi en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings sur Search",
+        body: "Sur l’écran Search, touchez Settings pour ouvrir Profile & Settings sur l’onglet Appearance — le Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) s’y trouve. La tuile Settings utilise le même pack d’icônes chrome que les autres marques Search."
       },
       "help-club-website-feed": {
         title: "Flux pour le site du club",
@@ -960,6 +972,10 @@
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der FloqAi-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
       },
+      "help-search-settings-appearance": {
+        title: "Settings auf Search",
+        body: "Tippe auf dem Search-Bildschirm auf Settings, um Profile & Settings auf dem Tab Appearance zu öffnen — dort liegt Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Die Settings-Kachel nutzt dasselbe Chrome-Icon-Paket wie die anderen Search-Marken."
+      },
       "help-club-website-feed": {
         title: "Feed für die Club-Website",
         body: "Zeige deine veröffentlichte FLOQR-Clubseite auf deiner eigenen Website. Tippe auf „Schlüssel und Links erzeugen“ und füge den iframe-Code in deine Website ein oder gib deinem Webadmin den JSON- oder RSS-Link. Der Feed zeigt kommende Events, hervorgehobene DJs und hervorgehobenes Personal, die Galerie und Kontaktdaten gemäß deinen Einstellungen für die öffentliche Seite. Fotos des Personals erscheinen nur, wenn die Foto-Einwilligung bestätigt ist. Ein neuer Schlüssel deaktiviert die alten Links, auch die Links zum Mitarbeiterplan."
@@ -1273,6 +1289,10 @@
       "help-floqai-page": {
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página FloqAi con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings en Search",
+        body: "En la pantalla Search, toca Settings para abrir Profile & Settings en la pestaña Appearance — ahí está Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). La ficha Settings usa el mismo pack de iconos chrome que las demás marcas de Search."
       },
       "help-club-website-feed": {
         title: "Feed para la web del club",
@@ -1588,6 +1608,10 @@
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina FloqAi con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
       },
+      "help-search-settings-appearance": {
+        title: "Settings su Search",
+        body: "Nella schermata Search tocca Settings per aprire Profile & Settings sulla scheda Appearance — lì c’è Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). La tile Settings usa lo stesso pack di icone chrome degli altri marchi Search."
+      },
       "help-club-website-feed": {
         title: "Feed per il sito del club",
         body: "Mostra la pagina del club FLOQR pubblicata sul tuo sito. Tocca «Genera chiave e link», poi incolla il codice iframe nel sito o dai il link JSON o RSS al tuo webmaster. Il feed mostra prossimi eventi, DJ e personale in evidenza, galleria e contatti, secondo le impostazioni della pagina pubblica. Le foto del personale compaiono solo se il consenso per le foto è confermato. Generare una nuova chiave disattiva i vecchi link, compresi quelli dell’orario del personale."
@@ -1901,6 +1925,10 @@
       "help-floqai-page": {
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página FloqAi em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings na Search",
+        body: "No ecrã Search, toque em Settings para abrir Profile & Settings no separador Appearance — o Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) fica aí. O mosaico Settings usa o mesmo pack de ícones chrome das outras marcas Search."
       },
       "help-club-website-feed": {
         title: "Feed para o site do clube",
@@ -2216,6 +2244,10 @@
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα FloqAi με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
       },
+      "help-search-settings-appearance": {
+        title: "Settings στην Search",
+        body: "Στην οθόνη Search πατήστε Settings για να ανοίξετε Profile & Settings στην καρτέλα Appearance — εκεί είναι το Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Το πλακίδιο Settings χρησιμοποιεί το ίδιο πακέτο εικονιδίων chrome με τα άλλα σήματα Search."
+      },
       "help-club-website-feed": {
         title: "Ροή για τον ιστότοπο του κλαμπ",
         body: "Δείξτε τη δημοσιευμένη σελίδα του κλαμπ στο FLOQR στον δικό σας ιστότοπο. Πατήστε «Δημιουργία κλειδιού και συνδέσμων» και επικολλήστε τον κώδικα iframe στον ιστότοπο ή δώστε τον σύνδεσμο JSON ή RSS στον διαχειριστή του. Η ροή δείχνει επερχόμενες εκδηλώσεις, προβεβλημένους DJ και προσωπικό, τη συλλογή και τα στοιχεία επικοινωνίας, σύμφωνα με τις ρυθμίσεις της δημόσιας σελίδας. Οι φωτογραφίες του προσωπικού εμφανίζονται μόνο όταν η συγκατάθεση έχει επιβεβαιωθεί. Ένα νέο κλειδί απενεργοποιεί τους παλιούς συνδέσμους, και αυτούς του προγράμματος προσωπικού."
@@ -2530,6 +2562,10 @@
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie FloqAi prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
       },
+      "help-search-settings-appearance": {
+        title: "Settings na Search",
+        body: "Na ekranie Search stuknij Settings, aby otworzyć Profile & Settings na karcie Appearance — tam jest Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Kafelek Settings używa tego samego pakietu ikon chrome co inne znaki Search."
+      },
       "help-club-website-feed": {
         title: "Kanał dla strony klubu",
         body: "Pokaż opublikowaną stronę klubu FLOQR na własnej stronie. Naciśnij „Utwórz klucz i linki”, a potem wklej kod iframe na stronę albo przekaż webmasterowi link JSON lub RSS. Kanał pokazuje nadchodzące wydarzenia, wyróżnionych DJ-ów i personel, galerię oraz dane kontaktowe zgodnie z ustawieniami strony publicznej. Zdjęcia personelu pojawiają się tylko po potwierdzeniu zgody na zdjęcia. Nowy klucz wyłącza stare linki, także linki do grafiku personelu."
@@ -2843,6 +2879,10 @@
       "help-floqai-page": {
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة FloqAi بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings في Search",
+        body: "في شاشة Search، اضغط Settings لفتح Profile & Settings على تبويب Appearance — حيث يوجد Site chrome (Nightlife وTraditional وBlack Tiffany وWhite/Black وPurple & White وBlack & Dark Green). تستخدم بلاطة Settings نفس حزمة أيقونات الكروم لعلامات Search الأخرى."
       },
       "help-club-website-feed": {
         title: "موجز موقع النادي",

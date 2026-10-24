@@ -110,7 +110,7 @@ async function notifyClubFloqCastRequest(request = {}) {
 }
 
 /** Patron starts flow: pick venue → private preview page (camera only, not on venue board yet). */
-exports.createFloqCastRequest = onCall({region: "us-central1"}, async (request) => {
+async function runCreateFloqCastRequest(request) {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const locationId = text(request.data?.locationId || request.data?.clubLocationId, 120);
   if (!locationId) throw new HttpsError("invalid-argument", "Choose a venue.");
@@ -150,7 +150,10 @@ exports.createFloqCastRequest = onCall({region: "us-central1"}, async (request) 
     referenceNumber,
     previewPath: `./floqcast-preview.html?t=${encodeURIComponent(accessToken)}`
   };
-});
+}
+
+exports.createFloqCastRequest = onCall({region: "us-central1"}, runCreateFloqCastRequest);
+
 
 /** Club admin approves paid request — patron preview page can then go live. */
 exports.approveFloqCastRequest = onCall({region: "us-central1"}, async (request) => {
@@ -602,3 +605,5 @@ exports.startSuprstrLive = exports.startFloqCastLive;
 exports.armSuprstrLiveDuration = exports.armFloqCastLiveDuration;
 exports.endSuprstrLive = exports.endFloqCastLive;
 exports.markSuprstarRequestPaid = exports.markFloqCastRequestPaid;
+
+exports.__floqCastHelpers = {runCreateFloqCastRequest};
