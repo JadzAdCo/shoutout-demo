@@ -1846,9 +1846,10 @@ def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
         tb = 254 * (1 - ang) + 255 * ang
         out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
     elif mode == "forest":
-        tr = 20 * (1 - ang) + 34 * ang
-        tg = 60 * (1 - ang) + 139 * ang
-        tb = 30 * (1 - ang) + 34 * ang
+        # Settings blackDarkGreen \"tings\" #5ac783 → darker #2e8a5a along the ring
+        tr = 46 * (1 - ang) + 90 * ang
+        tg = 138 * (1 - ang) + 199 * ang
+        tb = 90 * (1 - ang) + 131 * ang
         out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
     Image.fromarray(out.astype(np.uint8), "RGBA").convert("RGB").save(
         dst, quality=96, subsampling=0

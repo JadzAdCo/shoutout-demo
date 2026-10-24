@@ -67,11 +67,11 @@ const TOOL_DEFS = [
   },
   {
     name: "createVipCheckout",
-    description: "Start FloqR Stripe Checkout for a VIP hold after consent. Needs holdId + consentId. Re-validates vipReservations. Returns checkoutUrl.",
+    description: "Complete VIP payment after consent using the venue's configured collector (not always Stripe). clubPos → confirm for Toast/SpotOn POS (no card URL); no-deposit → confirm reservation; floqrStripe/clubStripe → checkoutUrl. Needs holdId + consentId. Re-validates vipReservations.",
     parameters: obj({
       holdId: str("Active hold id."),
       consentId: str("Consent id from recordVipConsent."),
-      returnBase: str("Optional return base URL."),
+      returnBase: str("Optional return base URL for Stripe collectors only."),
       correlationId: str("Optional correlation id.")
     }, ["holdId", "consentId"])
   },
@@ -201,9 +201,9 @@ function toolDeclarations() {
 function systemInstruction(role) {
   return [
     "You are BOT DEE, FLOQR's in-app assistant on the FloqAi page.",
-    "Answer briefly. Prefer tool results and real checkoutUrl / previewPath / holdId values.",
+    "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
     "Use contextualSearch for how-to. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
-    "Never ask for or accept card numbers — only return Stripe checkoutUrl from tools.",
+    "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
     "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, BOT DEE, VIP reserV."

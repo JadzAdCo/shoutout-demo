@@ -63,3 +63,18 @@ test("package depends on @google/genai", () => {
   const pkg = JSON.parse(read("functions/package.json"));
   assert.ok(pkg.dependencies["@google/genai"]);
 });
+
+test("createVipCheckout branches on venue paymentCollector (not Stripe-only)", () => {
+  const tools = read("functions/bot-dee-tools.js");
+  assert.match(tools, /loadClubPaymentSettings/);
+  assert.match(tools, /runConfirmVipReservationForClubPos/);
+  assert.match(tools, /runConfirmVipReservationWithoutDeposit/);
+  assert.match(tools, /checkoutMode:\s*"clubPos"/);
+  assert.match(tools, /checkoutMode:\s*"noDeposit"/);
+  assert.match(tools, /orderType:\s*"vipReservation"/);
+  const core = read("functions/bot-dee-core.js");
+  assert.match(core, /venue collector/);
+  assert.match(core, /clubPos/);
+  assert.match(read("functions/vip-pos-functions.js"), /async function runConfirmVipReservationForClubPos/);
+  assert.match(read("functions/vip-functions.js"), /async function runConfirmVipReservationWithoutDeposit/);
+});

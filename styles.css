@@ -18,16 +18,24 @@
   --floqr-blue:var(--floqr-tile-azure);
   --floqr-ink:#06101c;
   --floqr-chrome:#eaf2ff;
-  /* Profile card = Traditional charcoal (not Nightlife pink/cyan), all site chrome themes */
+  /* Profile card defaults (dark chromes). White/Black overrides to white + shiny black initials. */
   --floqr-profile-card-bg:linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e);
   --floqr-profile-card-border:rgba(255,255,255,.28);
   --floqr-profile-card-shadow:0 10px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12);
+  --floqr-profile-initials-bg:linear-gradient(135deg,#f2f2f2,#9a9a9a);
+  --floqr-profile-initials-color:#141414;
+  --floqr-profile-dots:#fff;
   /* Lyft-like geometric title type (Plus Jakarta Sans ≈ Lyft Pro weight/tracking) */
   --floqr-font:"Plus Jakarta Sans",Inter,"Segoe UI",Arial,sans-serif;
   --floqr-title-weight:800;
   --floqr-title-tracking:-.035em;
   --floqr-title-size:clamp(1.75rem,5.2vw,2.125rem);
   --floqr-title-line:1.12;
+  /* Page / feature-search titles = Appearance panel h2 (never the large marketing h1 clamp) */
+  --floqr-page-title-size:var(--floqr-title-size);
+  --floqr-page-title-line:var(--floqr-title-line);
+  --floqr-page-title-tracking:var(--floqr-title-tracking);
+  --floqr-page-title-weight:var(--floqr-title-weight);
   /* Unified Back pill — small left-justified; chrome schemes recolor fill/border */
   --floqr-back-bg:rgba(148,142,198,.58);
   --floqr-back-border:rgba(176,168,220,.82);
@@ -129,19 +137,19 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .user-dropdown [data-patron-menu],
 .user-dropdown .profile-menu-link,
 .user-dropdown .profile-menu-line{display:block!important}
-/* Profile chip = Traditional charcoal on every Site chrome (including Nightlife). Hardcoded so theme vars cannot recolor it pink/cyan. */
+/* Profile chip size/layout. Dark chromes share charcoal face; White/Black is a separate white face rule.
+   Never list whiteBlack here — a charcoal !important on WB is what kept Search DP on black live. */
 .user-menu-btn,
 html[data-floqr-chrome="nightlife"] .user-menu-btn,
 html[data-floqr-chrome="traditional"] .user-menu-btn,
 html[data-floqr-chrome="blackTiffany"] .user-menu-btn,
 html[data-floqr-chrome="purpleWhite"] .user-menu-btn,
 html[data-floqr-chrome="blackDarkGreen"] .user-menu-btn,
-html[data-floqr-chrome="whiteBlack"] .user-menu-btn,
 html:not([data-floqr-chrome]) .user-menu-btn{
   width:58px!important;min-width:58px!important;height:60px!important;min-height:60px!important;padding:4px 7px!important;border-radius:20px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;
-  background:linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)!important;
-  border:1px solid rgba(255,255,255,.28)!important;
-  box-shadow:0 10px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  background:var(--floqr-profile-card-bg)!important;
+  border:1px solid var(--floqr-profile-card-border)!important;
+  box-shadow:var(--floqr-profile-card-shadow)!important;
   backdrop-filter:blur(14px)!important
 }
 /* Retired Search speech bubble + green OR — hide even if stale HTML is cached */
@@ -151,8 +159,8 @@ html:not([data-floqr-chrome]) .user-menu-btn{
 .category-floqai-mark-halo,
 .category-or{display:none!important}
 .user-photo,.dropdown-user-photo{width:30px!important;height:30px!important;border-radius:999px!important;object-fit:cover!important}
-.user-initials{width:30px!important;height:30px!important;border-radius:999px!important;display:grid!important;place-items:center!important;background:linear-gradient(135deg,#f2f2f2,#9a9a9a)!important;color:#141414!important;font-size:13px!important;font-weight:1000!important}
-.user-dots,.menu-dots{font-size:13px!important;line-height:.7!important;letter-spacing:2px!important;color:#fff!important}.avatar-circle{width:32px!important;height:32px!important;border-radius:999px!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:rgba(6,16,28,.82)!important;color:#fff!important;font-weight:1000!important}.avatar-circle img{width:100%!important;height:100%!important;object-fit:cover!important}
+.user-initials{width:30px!important;height:30px!important;border-radius:999px!important;display:grid!important;place-items:center!important;background:var(--floqr-profile-initials-bg)!important;color:var(--floqr-profile-initials-color)!important;font-size:13px!important;font-weight:1000!important}
+.user-dots,.menu-dots{font-size:13px!important;line-height:.7!important;letter-spacing:2px!important;color:var(--floqr-profile-dots,#fff)!important}.avatar-circle{width:32px!important;height:32px!important;border-radius:999px!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:var(--floqr-profile-initials-bg)!important;color:var(--floqr-profile-initials-color)!important;font-weight:1000!important;font-size:13px!important}.avatar-circle img{width:100%!important;height:100%!important;object-fit:cover!important}
 .user-dropdown{position:absolute!important;right:0!important;top:66px!important;width:278px!important;max-height:min(72vh,440px)!important;overflow-x:hidden!important;overflow-y:auto!important;border:1px solid var(--line)!important;background:rgba(10,10,28,.96)!important;box-shadow:0 22px 70px rgba(0,0,0,.45)!important;border-radius:20px!important;padding:14px!important;backdrop-filter:blur(14px)!important;z-index:100000!important}
 .user-dropdown-row{display:flex!important;gap:12px!important;align-items:center!important;margin-bottom:12px!important}
 .user-dropdown-row p{margin:3px 0 0!important;color:var(--muted)!important;font-size:13px!important;word-break:break-word!important}
@@ -680,7 +688,10 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 .product-logo.small-logo{width:min(330px,82vw);max-height:130px}
 .product-logo.shoutout-hero-logo{width:min(380px,82vw);max-height:220px;margin:0;object-position:left center}
 .product-logo.mingl-hero-logo{justify-self:start;width:min(620px,92vw);height:172px;max-height:none;object-fit:cover;object-position:left center;margin:-8px 0 -2px;filter:drop-shadow(0 18px 28px rgba(0,0,0,.28))}
-.shoutout-product-page .topbar{margin-bottom:8px}.shoutout-product-page .topbar h1{font-size:clamp(44px,8vw,96px);letter-spacing:0;margin:8px 0 6px;max-width:1120px}.shoutout-product-page .sub{margin:0 0 16px}.shoutout-product-page .product-action-row{max-width:1040px;grid-template-columns:minmax(240px,560px) minmax(220px,560px)}
+.shoutout-product-page .topbar{margin-bottom:8px}
+/* In-flow ShoutOut composer landing can stay large; feature search pages use Appearance-sized titles via floqr-feature-landing.css */
+.shoutout-product-page:not([data-feature-landing]) .topbar h1{font-size:clamp(44px,8vw,96px);letter-spacing:0;margin:8px 0 6px;max-width:1120px}
+.shoutout-product-page .sub{margin:0 0 16px}.shoutout-product-page .product-action-row{max-width:1040px;grid-template-columns:minmax(240px,560px) minmax(220px,560px)}
 .product-action-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:760px}
 .mingl-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:18px}
 .mingl-discovery-card{display:grid;gap:14px}
@@ -961,7 +972,7 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .profile-grid-wide{grid-column:1/-1}.nested-card{margin:16px 0;background:rgba(255,255,255,.025)}.nested-card>label{display:grid;gap:7px;margin:12px 0}.nested-card textarea{width:100%}.club-profile-section-controls{margin-top:8px}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}.mingl-chat-popout{position:fixed;inset:10px;z-index:10020;max-height:none;overflow:auto;border-radius:22px}.mingl-chat-popout .mingl-messages{max-height:calc(100vh - 230px)}}
 @media(max-width:760px){.profile-datapoint{position:static}.profile-datapoint[open]{flex-basis:100%}.profile-datapoint div{position:static;width:100%;min-width:0;max-width:100%;box-shadow:none}.mingl-person-card,.mingl-self-card{overflow:hidden}.mingl-nested-datapoints .profile-datapoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mingl-nested-datapoints .profile-datapoint summary{text-align:center}}
-@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page:not([data-feature-landing]) .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
 
 /* FLOQR AI layer */
 textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);font-size:15px;min-height:120px}
@@ -1260,7 +1271,7 @@ html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,4
 .chrome-select-swatch--blackTiffany{background:linear-gradient(90deg,#000 35%,#81d8d0)}
 .chrome-select-swatch--whiteBlack{background:linear-gradient(90deg,#fff 55%,#111)}
 .chrome-select-swatch--purpleWhite{background:linear-gradient(90deg,#5b2dff,#ff2eb8 55%,#ff4d6a)}
-.chrome-select-swatch--blackDarkGreen{background:linear-gradient(90deg,#000 30%,#226e44 70%,#3cb371)}
+.chrome-select-swatch--blackDarkGreen{background:linear-gradient(90deg,#000 30%,#2e8a5a 55%,#5ac783)}
 .chrome-select-logo{
   display:block;width:auto;max-width:100%;height:36px;object-fit:contain;
   filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));
@@ -1331,6 +1342,19 @@ html.floqr-mobile-browser .app{width:100%;max-width:100%;padding:calc(env(safe-a
 html.floqr-mobile-browser .topbar{display:grid;grid-template-columns:1fr;gap:12px}
 html.floqr-mobile-browser .topbar h1,
 html.floqr-mobile-browser .confirmation h1{font-size:clamp(34px,12vw,56px);line-height:.98;letter-spacing:0}
+/* Profile & feature landings stay Appearance-sized on mobile (not the huge marketing h1 clamp). */
+html.floqr-mobile-browser .admin-shell .topbar h1,
+html.floqr-mobile-browser .admin-shell .topbar h1.help-label,
+html.floqr-mobile-browser .admin-shell .topbar h1.floqr-page-title,
+html.floqr-mobile-browser .floqr-page-title,
+html.floqr-mobile-browser body.floqcast-page .floqcast-hero h1,
+html.floqr-mobile-browser body.vip-page .vip-hero h1,
+html.floqr-mobile-browser body.shoutout-search-page .feature-landing-title-row h1,
+html.floqr-mobile-browser .feature-landing-title-row h1{
+  font-size:var(--floqr-page-title-size,var(--floqr-title-size))!important;
+  line-height:var(--floqr-page-title-line,var(--floqr-title-line))!important;
+  letter-spacing:var(--floqr-page-title-tracking,var(--floqr-title-tracking));
+}
 html.floqr-mobile-browser .sub{font-size:15px;line-height:1.38}
 html.floqr-mobile-browser .card,
 html.floqr-mobile-browser .login-card,
@@ -1425,6 +1449,18 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
   .app{width:100%;max-width:100%;padding:calc(env(safe-area-inset-top,0px) + 64px) 14px 24px}
   .topbar{display:grid;grid-template-columns:1fr;gap:12px}
   .topbar h1,.confirmation h1{font-size:clamp(34px,12vw,56px);line-height:.98;letter-spacing:0}
+  .admin-shell .topbar h1,
+  .admin-shell .topbar h1.help-label,
+  .admin-shell .topbar h1.floqr-page-title,
+  .floqr-page-title,
+  body.floqcast-page .floqcast-hero h1,
+  body.vip-page .vip-hero h1,
+  body.shoutout-search-page .feature-landing-title-row h1,
+  .feature-landing-title-row h1{
+    font-size:var(--floqr-page-title-size,var(--floqr-title-size))!important;
+    line-height:var(--floqr-page-title-line,var(--floqr-title-line))!important;
+    letter-spacing:var(--floqr-page-title-tracking,var(--floqr-title-tracking));
+  }
   .sub{font-size:15px;line-height:1.38}
   .card,.login-card,.club-option,.notice{padding:16px;border-radius:20px}
   .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:1fr!important}
@@ -1798,15 +1834,26 @@ html[data-floqr-chrome="blackTiffany"] .search-chrome-btn[aria-pressed="true"]{
   box-shadow:0 0 0 1px rgba(0,200,255,.55);
   background:rgba(0,200,255,.14);
 }
+html[data-floqr-chrome="blackTiffany"]{
+  --floqr-profile-card-bg:linear-gradient(145deg,#1a1a1a,#050505 60%,#000);
+  --floqr-profile-card-border:rgba(0,200,255,.45);
+  --floqr-profile-card-shadow:0 10px 28px rgba(0,0,0,.55),0 0 0 1px rgba(0,200,255,.18),inset 0 1px 0 rgba(0,200,255,.2);
+  --floqr-profile-initials-bg:linear-gradient(90deg,var(--floqr-tile-cyan),var(--floqr-tile-azure));
+  --floqr-profile-initials-color:#000;
+  --floqr-profile-dots:#e8fbff;
+}
 html[data-floqr-chrome="blackTiffany"] .user-menu-btn{
   background:var(--floqr-profile-card-bg)!important;
   border:1px solid var(--floqr-profile-card-border)!important;
   box-shadow:var(--floqr-profile-card-shadow)!important;
 }
-html[data-floqr-chrome="blackTiffany"] .user-initials{
-  background:linear-gradient(90deg,var(--floqr-tile-cyan),var(--floqr-tile-azure))!important;
-  color:#000!important;
+html[data-floqr-chrome="blackTiffany"] .user-initials,
+html[data-floqr-chrome="blackTiffany"] .avatar-circle{
+  background:var(--floqr-profile-initials-bg)!important;
+  color:var(--floqr-profile-initials-color)!important;
 }
+html[data-floqr-chrome="blackTiffany"] .user-dots,
+html[data-floqr-chrome="blackTiffany"] .menu-dots{color:var(--floqr-profile-dots)!important}
 html[data-floqr-chrome="blackTiffany"] .user-dropdown{
   background:rgba(0,0,0,.96)!important;
   border-color:rgba(0,200,255,.35)!important;
@@ -1917,15 +1964,26 @@ html[data-floqr-chrome="purpleWhite"] .search-chrome-btn[aria-pressed="true"]{
   box-shadow:0 0 0 1px rgba(91,45,255,.55);
   background:rgba(91,45,255,.16);
 }
+html[data-floqr-chrome="purpleWhite"]{
+  --floqr-profile-card-bg:linear-gradient(145deg,#2a1848,#12081f 55%,#0a0614);
+  --floqr-profile-card-border:rgba(91,45,255,.5);
+  --floqr-profile-card-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 1px rgba(91,45,255,.2),inset 0 1px 0 rgba(255,255,255,.1);
+  --floqr-profile-initials-bg:linear-gradient(90deg,var(--floqr-tile-violet),var(--floqr-tile-coral));
+  --floqr-profile-initials-color:#fff;
+  --floqr-profile-dots:#f3e8ff;
+}
 html[data-floqr-chrome="purpleWhite"] .user-menu-btn{
   background:var(--floqr-profile-card-bg)!important;
   border:1px solid var(--floqr-profile-card-border)!important;
   box-shadow:var(--floqr-profile-card-shadow)!important;
 }
-html[data-floqr-chrome="purpleWhite"] .user-initials{
-  background:linear-gradient(90deg,var(--floqr-tile-violet),var(--floqr-tile-coral))!important;
-  color:#fff!important;
+html[data-floqr-chrome="purpleWhite"] .user-initials,
+html[data-floqr-chrome="purpleWhite"] .avatar-circle{
+  background:var(--floqr-profile-initials-bg)!important;
+  color:var(--floqr-profile-initials-color)!important;
 }
+html[data-floqr-chrome="purpleWhite"] .user-dots,
+html[data-floqr-chrome="purpleWhite"] .menu-dots{color:var(--floqr-profile-dots)!important}
 html[data-floqr-chrome="purpleWhite"] .user-dropdown{
   background:rgba(0,0,0,.96)!important;
   border-color:rgba(91,45,255,.4)!important;
@@ -1967,23 +2025,23 @@ html[data-floqr-chrome="purpleWhite"] .vip-icon-face{
 }
 
 
-/* —— Black & Dark Green (isSiteChrome=5): true black + forest green —— */
+/* —— Black & Dark Green (isSiteChrome=5): true black + Settings \"tings\" green #5ac783 —— */
 html[data-floqr-chrome="blackDarkGreen"]{
-  --line:rgba(34,110,68,.5);
+  --line:rgba(90,199,131,.45);
   --text:#ffffff;
   --muted:rgba(255,255,255,.72);
-  --accent:#2d8a5a;
-  --hot:#3cb371;
+  --accent:#5ac783;
+  --hot:#2e8a5a;
   --lime:#7dffa8;
-  --floqr-blue:#2d8a5a;
+  --floqr-blue:#5ac783;
   --floqr-ink:#000000;
   --floqr-chrome:#e8fff2;
 }
 html[data-floqr-chrome="blackDarkGreen"] body{
   font-family:var(--floqr-font);
   background:
-    radial-gradient(circle at 18% 14%,rgba(34,110,68,.32),transparent 36%),
-    radial-gradient(circle at 82% 72%,rgba(45,138,90,.18),transparent 40%),
+    radial-gradient(circle at 18% 14%,rgba(90,199,131,.28),transparent 36%),
+    radial-gradient(circle at 82% 72%,rgba(46,138,90,.18),transparent 40%),
     #000;
   color:var(--text);
 }
@@ -2002,14 +2060,14 @@ html[data-floqr-chrome="blackDarkGreen"] .hero-logo{
 html[data-floqr-chrome="blackDarkGreen"] .primary,
 html[data-floqr-chrome="blackDarkGreen"] .category-card.hot,
 html[data-floqr-chrome="blackDarkGreen"] .linklike.hot{
-  background:linear-gradient(90deg,#226e44,#2d8a5a 55%,#3cb371);
+  background:linear-gradient(90deg,#2e8a5a,#5ac783 55%,#7dffa8);
   color:#fff;
 }
 html[data-floqr-chrome="blackDarkGreen"] #loginActions .signin,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions .signin.email.email-selected,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions > .signin,
 html[data-floqr-chrome="blackDarkGreen"] #loginActions > .signin.email.email-selected{
-  background:linear-gradient(180deg,#226e44 0%,#2d8a5a 52%,#3cb371 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
+  background:linear-gradient(180deg,#226e44 0%,#2e8a5a 52%,#5ac783 100%) 0 calc(-1 * var(--stack-y,0px)) / 100% var(--stack-h,100%) no-repeat;
   background-origin:border-box;
   border:1px solid rgba(45,138,90,.6);
   color:#fff;
@@ -2028,24 +2086,35 @@ html[data-floqr-chrome="blackDarkGreen"] .search{
 html[data-floqr-chrome="blackDarkGreen"] input:focus,
 html[data-floqr-chrome="blackDarkGreen"] select:focus,
 html[data-floqr-chrome="blackDarkGreen"] textarea:focus{
-  outline:2px solid #2d8a5a;
+  outline:2px solid #5ac783;
   outline-offset:1px;
-  border-color:#2d8a5a;
+  border-color:#5ac783;
 }
 html[data-floqr-chrome="blackDarkGreen"] .search-chrome-btn[aria-pressed="true"]{
-  border-color:#2d8a5a;
-  box-shadow:0 0 0 1px rgba(45,138,90,.55);
-  background:rgba(45,138,90,.16);
+  border-color:#5ac783;
+  box-shadow:0 0 0 1px rgba(90,199,131,.55);
+  background:rgba(90,199,131,.16);
+}
+html[data-floqr-chrome="blackDarkGreen"]{
+  --floqr-profile-card-bg:linear-gradient(145deg,#163025,#0a1610 55%,#050a08);
+  --floqr-profile-card-border:rgba(45,138,90,.5);
+  --floqr-profile-card-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 1px rgba(45,138,90,.2),inset 0 1px 0 rgba(60,179,113,.18);
+  --floqr-profile-initials-bg:linear-gradient(90deg,#2e8a5a,#5ac783);
+  --floqr-profile-initials-color:#fff;
+  --floqr-profile-dots:#d8ffe8;
 }
 html[data-floqr-chrome="blackDarkGreen"] .user-menu-btn{
   background:var(--floqr-profile-card-bg)!important;
   border:1px solid var(--floqr-profile-card-border)!important;
   box-shadow:var(--floqr-profile-card-shadow)!important;
 }
-html[data-floqr-chrome="blackDarkGreen"] .user-initials{
-  background:linear-gradient(90deg,#226e44,#3cb371)!important;
-  color:#fff!important;
+html[data-floqr-chrome="blackDarkGreen"] .user-initials,
+html[data-floqr-chrome="blackDarkGreen"] .avatar-circle{
+  background:var(--floqr-profile-initials-bg)!important;
+  color:var(--floqr-profile-initials-color)!important;
 }
+html[data-floqr-chrome="blackDarkGreen"] .user-dots,
+html[data-floqr-chrome="blackDarkGreen"] .menu-dots{color:var(--floqr-profile-dots)!important}
 html[data-floqr-chrome="blackDarkGreen"] .user-dropdown{
   background:rgba(0,0,0,.96)!important;
   border-color:rgba(34,110,68,.45)!important;
@@ -2076,8 +2145,8 @@ html[data-floqr-chrome="blackDarkGreen"] .help-popout[open] summary{
 }
 html[data-floqr-chrome="blackDarkGreen"] .message-envelope.unread,
 html[data-floqr-chrome="blackDarkGreen"] .highlight-item{
-  border-color:#2d8a5a!important;
-  box-shadow:0 0 0 2px rgba(45,138,90,.28);
+  border-color:#5ac783!important;
+  box-shadow:0 0 0 2px rgba(90,199,131,.28);
 }
 html[data-floqr-chrome="blackDarkGreen"] .floqai-icon-face,
 html[data-floqr-chrome="blackDarkGreen"] .floqcast-icon-face,
@@ -2097,6 +2166,12 @@ html[data-floqr-chrome="whiteBlack"]{
   --floqr-blue:#111111;
   --floqr-ink:#ffffff;
   --floqr-chrome:#f4f4f4;
+  --floqr-profile-card-bg:#ffffff;
+  --floqr-profile-card-border:#0a0a0a;
+  --floqr-profile-card-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 10px rgba(0,0,0,.12);
+  --floqr-profile-initials-bg:linear-gradient(180deg,#ffffff 0%,#f2f2f2 100%);
+  --floqr-profile-initials-color:#0a0a0a;
+  --floqr-profile-dots:#0a0a0a;
 }
 html[data-floqr-chrome="whiteBlack"] body{
   font-family:var(--floqr-font);
@@ -2223,14 +2298,36 @@ html[data-floqr-chrome="whiteBlack"] .segmented-control button.active{
   box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 0 0 1px rgba(0,212,254,.22)!important;
   text-shadow:none!important;
 }
-html[data-floqr-chrome="whiteBlack"] .user-menu-btn{
-  background:var(--floqr-profile-card-bg)!important;
-  border:1px solid var(--floqr-profile-card-border)!important;
-  box-shadow:var(--floqr-profile-card-shadow)!important;
+/* White/Black profile chip: white face + shiny black name initials (beats any charcoal leftover) */
+html[data-floqr-chrome="whiteBlack"] .user-menu-btn,
+html[data-floqr-chrome="whiteBlack"] #userMenuBtn,
+html[data-floqr-chrome="whiteBlack"] #floqrGlobalProfileBtn{
+  width:58px!important;min-width:58px!important;height:60px!important;min-height:60px!important;padding:4px 7px!important;border-radius:20px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;
+  background:#ffffff!important;
+  background-image:none!important;
+  border:2px solid #0a0a0a!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.85) inset,0 2px 10px rgba(0,0,0,.14)!important;
+  backdrop-filter:blur(14px)!important;
+  color:#0a0a0a!important;
 }
-html[data-floqr-chrome="whiteBlack"] .user-initials{
-  background:#111!important;
-  color:#fff!important;
+html[data-floqr-chrome="whiteBlack"] .user-initials,
+html[data-floqr-chrome="whiteBlack"] .avatar-circle,
+html[data-floqr-chrome="whiteBlack"] #userInitials{
+  background:linear-gradient(180deg,#ffffff 0%,#f0f0f0 55%,#e6e6e6 100%)!important;
+  background-image:linear-gradient(180deg,#ffffff 0%,#f0f0f0 55%,#e6e6e6 100%)!important;
+  color:#0a0a0a!important;
+  border:1px solid rgba(10,10,10,.35)!important;
+  /* Shiny black initials — light top edge + soft depth (not white on black) */
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.95),
+    0 1px 1px rgba(0,0,0,.35),
+    0 0 1px rgba(0,0,0,.45)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(0,0,0,.1)!important;
+  -webkit-text-fill-color:#0a0a0a!important;
+}
+html[data-floqr-chrome="whiteBlack"] .user-dots,
+html[data-floqr-chrome="whiteBlack"] .menu-dots{
+  color:#0a0a0a!important;
 }
 html[data-floqr-chrome="whiteBlack"] .user-dropdown{
   background:rgba(255,255,255,.98)!important;

@@ -10,7 +10,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "bartr", label: "Trade by BartR", patronGate: "bartr", route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1},
+  {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
   {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
   // Live: Club Admin Passes + patron door QR (VIP Show pass still uses vipReservations).
   {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},

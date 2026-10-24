@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.54";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.54";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.58";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.58";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,54 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.58",
+      title: "s3.2.58 — Black & Dark Green icons = Settings tings #5ac783",
+      checks: [
+        {label:"Package version s3.2.58", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.58\""]},
+        {label:"BDG accent Settings tings green", file:"styles.css", includes:["--accent:#5ac783", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
+        {label:"BDG full icon pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blackdarkgreen.jpg", "botdee-blackdarkgreen.jpg", "shoutout-blackdarkgreen.png", "bartr-blackdarkgreen.png", "rydr-blackdarkgreen.png"]},
+        {label:"BDG icon build script", file:"scripts/build-blackdarkgreen-icons.py", includes:["#5ac783", "TINGS"]},
+        {label:"Search icon order", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"Manual test s3.2.58", file:"ai-diagnostics-service.js", includes:["s3-2-58-bdg-icons-tings-green"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.58\""]}
+      ]
+    },
+    {
+      version: "s3.2.57",
+      title: "s3.2.57 — floqr-page-title schema (= Appearance h2)",
+      checks: [
+        {label:"Package version s3.2.57", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.57\""]},
+        {label:"page-title token", file:"styles.css", includes:["--floqr-page-title-size:var(--floqr-title-size)"]},
+        {label:"Profile title row schema", file:"patron-portal.html", includes:["floqr-page-title-row", "floqr-page-title help-label"]},
+        {label:"Profile title CSS inherits Appearance size", file:"admin.css", includes:["Profile & Settings title space = Appearance h2 size", "font-size:var(--floqr-page-title-size", "font-size:inherit!important"]},
+        {label:"Feature landing page-title schema", file:"floqr-feature-landing.css", includes:["Feature search title schema", ".floqr-page-title", "font-size: var(--floqr-page-title-size"]},
+        {label:"Manual test s3.2.57", file:"ai-diagnostics-service.js", includes:["s3-2-57-page-title-appearance"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.57\""]}
+      ]
+    },
+    {
+      version: "s3.2.56",
+      title: "s3.2.56 — WB profile card + Appearance-sized page titles",
+      checks: [
+        {label:"Package version s3.2.56", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.56\""]},
+        {label:"WB profile white + shiny black initials", file:"styles.css", includes:["Never list whiteBlack here", "background:#ffffff!important", "Shiny black initials", "-webkit-text-fill-color:#0a0a0a!important"]},
+        {label:"Manual test s3.2.56", file:"ai-diagnostics-service.js", includes:["s3-2-56-wb-profile-title-size"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.56\""]}
+      ]
+    },
+    {
+      version: "s3.2.55",
+      title: "s3.2.55 — Search icon order + VIP collector-aware BOT DEE pay",
+      checks: [
+        {label:"Package version s3.2.55", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.55\""]},
+        {label:"Search icon order ShoutOut→BOT DEE→VIP→Settings→floqCast", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"VIP createVipCheckout collector branch", file:"functions/bot-dee-tools.js", includes:["runConfirmVipReservationForClubPos", "checkoutMode: \"clubPos\"", "runConfirmVipReservationWithoutDeposit"]},
+        {label:"floqAi seed Beta enabled", file:"functions/feature-services-core.js", includes:["key: \"floqAi\"", "IsFeatureEnabled: 1", "IsTestFeature: 1"]},
+        {label:"Manual test s3.2.55", file:"ai-diagnostics-service.js", includes:["s3-2-55-search-order-vip-collector"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.55\""]}
+      ]
+    },
     {
       version: "s3.2.54",
       title: "s3.2.54 — BOT DEE pay tools + Search Settings → Appearance",
@@ -2370,6 +2418,42 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-58-bdg-icons-tings-green",
+        area:"Site chrome / Search",
+        feature:"Black & Dark Green icons match Settings tings green + Search order live",
+        changed:"Black & Dark Green Search tiles (ShoutOut/BOT DEE/VIP/floqCast/BartR/RydR) recolored to Settings \"tings\" fill #5ac783 (companion #2e8a5a). CSS --accent=#5ac783. Full BLACK_DARK_GREEN_ICONS pack (not nightlife leftovers). Search order 1–5 ships on main. Package s3.2.58.",
+        howToTest:"1) Hard-refresh Search s3.2.58 — order left-to-right: ShoutOut, BOT DEE, VIP, Settings, floqCast. 2) Appearance → Black & Dark Green — tile greens match Settings wordmark \"tings\" (bright #5ac783, not old forest #2d8a5a). 3) Spot-check VIP/floqCast/BOT DEE faces. 4) Mark Succeed/Failed.",
+        expected:"Icon order correct; BDG tiles use Settings tings green; Settings tile unchanged as source.",
+        troubleshoot:"Old green → hard refresh floqr-chrome-scheme.js + images/chrome/*-blackdarkgreen.* + styles.css?v=s3.2.58. Nightlife faces on BDG → ICON_PACK blackDarkGreen must list *-blackdarkgreen paths. Wrong order → confirm index.html spot comment + card ids; Pages deploy of main."
+      },
+      {
+        id:"s3-2-57-page-title-appearance",
+        area:"Profile / Feature landings",
+        feature:"floqr-page-title schema = Appearance h2 size",
+        changed:"Shared .floqr-page-title / .floqr-page-title-row for Profile & Settings and feature search landings. Title text inherits --floqr-page-title-size (= Appearance h2). One line; ? stays badge-sized. Package s3.2.57.",
+        howToTest:"1) Hard-refresh Profile & Settings s3.2.57 — title one line, same size as Appearance heading in that panel. 2) Open Appearance tab and compare side-by-side. 3) Open floqCast / ShoutOut / VIP search — titles use same size. 4) Mark Succeed/Failed.",
+        expected:"Profile & Settings title text matches Appearance; feature search titles match; no oversized marketing h1.",
+        troubleshoot:"Still large → hard refresh styles.css + admin.css + floqr-feature-landing.css?v=s3.2.57; confirm --floqr-page-title-size and class floqr-page-title on the h1."
+      },
+      {
+        id:"s3-2-56-wb-profile-title-size",
+        area:"Site chrome / Profile / Feature landings",
+        feature:"White/Black profile card + Appearance-sized titles",
+        changed:"WB profile chip is white with shiny black initials (no charcoal override). Other chromes keep accent-tuned cards. Profile & Settings + floqCast/ShoutOut/VIP feature search titles use --floqr-title-size (same as Appearance h2) and stay one line. Package s3.2.56.",
+        howToTest:"1) Hard-refresh Search s3.2.56 with White/Black chrome — profile chip top-right is white, initials shiny black (not white-on-black). 2) Open Profile & Settings — title is one line, same size as Appearance heading. 3) Open floqCast / ShoutOut / VIP search landings — title size matches Appearance. 4) Spot-check Nightlife/Traditional/Tiffany profile chips still charcoal/accent. 5) Mark Succeed/Failed.",
+        expected:"WB chip white + black initials; Profile & Settings one line; feature landing titles match Appearance.",
+        troubleshoot:"Still charcoal on WB → hard refresh styles.css s3.2.56; confirm html[data-floqr-chrome=whiteBlack] and no charcoal rule listing whiteBlack. Title wraps → admin.css nowrap + --floqr-title-size; feature landings need floqr-feature-landing.css?v=s3.2.56."
+      },
+      {
+        id:"s3-2-55-search-order-vip-collector",
+        area:"Search / FloqAi / VIP",
+        feature:"Search icon order + BOT DEE VIP pay follows venue collector",
+        changed:"Search spots: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast. createVipCheckout branches clubPos (Toast/SpotOn confirm, no Stripe URL) / no-deposit confirm / floqrStripe|clubStripe checkoutUrl — same as vip-terms. floqAi packaged Beta enabled. Package s3.2.55 + full Functions deploy.",
+        howToTest:"1) Hard-refresh Search s3.2.55 — left-to-right: ShoutOut, BOT DEE, VIP (if gated on), Settings, floqCast (if gated on). 2) Settings → Appearance. 3) BOT DEE: for a clubPos venue after hold+consent, tool should confirm for POS (passHref / message) not invent Stripe checkoutUrl; Aurelia floqrStripe may still return checkoutUrl. 4) Mark Succeed/Failed.",
+        expected:"Icon order matches; VIP pay path matches venue collector; no card entry in chat; floqAi Beta tile visible to testers.",
+        troubleshoot:"Wrong order → hard refresh index.html s3.2.55. BOT DEE gated → featureServices/floqAi IsFeatureEnabled=1 + IsTestFeature=1 (already Beta live). Stripe on Toast venue → Functions deploy bot-dee-tools + vip-pos runConfirmVipReservationForClubPos; check hold.paymentCollector."
+      },
       {
         id:"s3-2-54-bot-dee-tools-settings",
         area:"FloqAi / Search",

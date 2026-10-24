@@ -2,7 +2,53 @@
 .admin-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.admin-preview{width:100%;height:360px;border:1px solid var(--line);border-radius:18px;background:#000}.admin-club-card{min-width:280px}.queue-item{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:rgba(0,0,0,.22)}.mail-log-row{display:block;width:100%;text-align:left;cursor:pointer}.mail-log-row.active{border-color:rgba(80,255,180,.55);background:rgba(80,255,180,.12)}.queue-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.archive-media-thumb{margin:0 0 10px;max-width:160px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000}.archive-media-thumb img{display:block;width:100%;height:auto;max-height:120px;object-fit:cover}.approve{background:rgba(80,255,180,.25)}.reject{background:rgba(255,80,80,.25)}@media(max-width:900px){.admin-grid{grid-template-columns:1fr}.admin-preview{height:260px}}
 
 /* v24 admin dashboards */
-.admin-shell .topbar h1{max-width:900px}
+/*
+ * Profile & Settings title space = Appearance h2 size (shared with feature search landings).
+ * Every text glyph in this title row inherits --floqr-page-title-size; ? control stays badge-sized.
+ */
+.admin-shell .topbar .floqr-page-title-row,
+.admin-shell .topbar h1.floqr-page-title,
+.admin-shell .topbar h1,
+.admin-shell .topbar h1.help-label{
+  max-width:100%;
+  font-size:var(--floqr-page-title-size,var(--floqr-title-size,clamp(1.75rem,5.2vw,2.125rem)))!important;
+  line-height:var(--floqr-page-title-line,var(--floqr-title-line,1.12))!important;
+  letter-spacing:var(--floqr-page-title-tracking,var(--floqr-title-tracking,-.035em));
+  font-weight:var(--floqr-page-title-weight,var(--floqr-title-weight,800));
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.admin-shell .topbar h1.help-label,
+.admin-shell .topbar h1.floqr-page-title.help-label{
+  display:inline-flex;
+  align-items:center;
+  flex-wrap:nowrap;
+  gap:6px 8px;
+  width:fit-content;
+}
+.admin-shell .topbar h1 .help-label-text,
+.admin-shell .topbar h1.floqr-page-title,
+.admin-shell .topbar h1.floqr-page-title .help-label-text,
+.admin-shell .topbar .floqr-page-title-row .help-label-text{
+  font-size:inherit!important;
+  line-height:inherit!important;
+  letter-spacing:inherit;
+  font-weight:inherit;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.admin-shell .topbar h1 .help-popout summary,
+.admin-shell .topbar h1 .floqr-help-popout,
+.admin-shell .topbar .floqr-page-title-row .help-popout summary{
+  font-size:11px!important;
+  font-weight:1000;
+  letter-spacing:0;
+  line-height:1;
+  white-space:nowrap;
+}
 .admin-tabs{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:18px 0 22px;max-width:100%}
 .admin-tab,.admin-tab-link,a.admin-tab-link.buttonlike{
   display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;

@@ -21,8 +21,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
-  // Spot order: floqCast (1) → ShoutOut (2)
-  assert.match(page, /id="floqcastBtnCard"[\s\S]*?id="shoutoutBtnCard"/);
+  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast
+  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"/);
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
   assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
@@ -53,7 +53,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
   assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.primary/);
   assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
-  assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#2d8a5a/);
+  assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#5ac783/);
   assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face(?:,\.settings-icon-face)?\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
@@ -125,4 +125,45 @@ test("ad splash FLOQR logo is unframed and FloqMedia contacts are not underlined
   const css = read("styles.css");
   assert.match(css, /#splashFloqrLogoWrap\{border:0;background:none;padding:0;min-height:0;border-radius:0\}/);
   assert.match(css, /\.splash-house-list a\{color:#fff;text-decoration:none\}/);
+});
+
+test("White/Black profile card is white with shiny black initials; dark chromes stay charcoal", () => {
+  const css = read("styles.css");
+  // Must not force charcoal onto whiteBlack (live regression).
+  assert.doesNotMatch(
+    css,
+    /html\[data-floqr-chrome="whiteBlack"\] \.user-menu-btn,[\s\S]{0,200}background:linear-gradient\(145deg,#4a4a4a/
+  );
+  assert.match(css, /Never list whiteBlack here/);
+  assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.user-menu-btn/);
+  assert.match(css, /background:#ffffff!important/);
+  assert.match(css, /Shiny black initials/);
+  assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.user-initials/);
+  assert.match(css, /-webkit-text-fill-color:#0a0a0a!important/);
+  // Other chromes keep accent-tuned initials
+  assert.match(css, /html\[data-floqr-chrome="blackTiffany"\] \.user-initials/);
+  assert.match(css, /html\[data-floqr-chrome="traditional"\] \.user-initials/);
+});
+
+test("Profile & Settings and feature search titles match Appearance h2 size", () => {
+  const root = read("styles.css");
+  assert.match(root, /--floqr-page-title-size:var\(--floqr-title-size\)/);
+  const admin = read("admin.css");
+  assert.match(admin, /Profile & Settings title space = Appearance h2 size/);
+  assert.match(admin, /\.admin-shell \.topbar h1\.floqr-page-title/);
+  assert.match(admin, /white-space:nowrap/);
+  assert.match(admin, /font-size:var\(--floqr-page-title-size/);
+  assert.match(admin, /\.help-label-text\{[\s\S]*font-size:inherit!important/);
+  const landing = read("floqr-feature-landing.css");
+  assert.match(landing, /Feature search title schema/);
+  assert.match(landing, /\.floqr-page-title/);
+  assert.match(landing, /font-size: var\(--floqr-page-title-size/);
+  const portal = read("patron-portal.html");
+  assert.match(portal, /class="floqr-page-title-row"/);
+  assert.match(portal, /class="floqr-page-title help-label"/);
+  assert.match(portal, /data-i18n="portal\.title"/);
+  assert.match(portal, /data-i18n="appearance\.pageTitle"/);
+  assert.match(read("floqcast-search.html"), /class="floqr-page-title"/);
+  assert.match(read("shoutout-search.html"), /class="floqr-page-title"/);
+  assert.match(read("vip.html"), /class="floqr-page-title brand-mixed-case"/);
 });
