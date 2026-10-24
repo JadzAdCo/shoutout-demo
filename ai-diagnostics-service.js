@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.46";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.46";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.47";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.47";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.47",
+      title: "s3.2.47 — FloqCAST White/Black Image-2 on white (not Nightlife neon)",
+      checks: [
+        {label:"Package version s3.2.47", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.47\""]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.47", file:"ai-diagnostics-service.js", includes:["s3-2-47-floqcast-wb-white-ink"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.47\""]}
+      ]
+    },
     {
       version: "s3.2.46",
       title: "s3.2.46 — FloqCAST White/Black Search tile matches Image-2 SVG",
@@ -2281,6 +2291,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-47-floqcast-wb-white-ink",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black = Image-2 on white (matches peer WB tiles)",
+        changed:"Rebuild floqcast-whiteblack.png as white-field Image-2 silhouette + dark ink + Tiffany T (same language as ShoutOut/BOT DEE WB). Not Nightlife neon on WB. Package s3.2.47.",
+        howToTest:"1) Hard-refresh Search floqr-chrome-scheme.js?v=s3.2.47. 2) Language Settings → White / Black. 3) floqCast tile: white disc, black phone→LED silhouette, FloqCAS black + cyan T — same chrome language as ShoutOut/BOT DEE. 4) Nightlife chrome still shows neon Image-2.",
+        expected:"WB Search floqCast is black-on-white Image-2, not neon Nightlife and not muddy grey.",
+        troubleshoot:"Still neon black disc → hard refresh; confirm src floqcast-whiteblack.png s3.2.47. Still grey mud → rebuild via scripts/build-chrome-icons.py --floqcast-wb-only."
+      },
       {
         id:"s3-2-46-floqcast-wb-svg-tile",
         area:"Search / Chrome icons",
