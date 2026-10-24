@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.45";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.45";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.46";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.46";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.46",
+      title: "s3.2.46 — FloqCAST White/Black Search tile matches Image-2 SVG",
+      checks: [
+        {label:"Package version s3.2.46", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.46\""]},
+        {label:"WB floqCast uses PNG Image-2 mark", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.46", file:"ai-diagnostics-service.js", includes:["s3-2-46-floqcast-wb-svg-tile"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.46\""]}
+      ]
+    },
     {
       version: "s3.2.45",
       title: "s3.2.45 — FloqCAST Image 2 chrome + SVG sync (nightlife / traditional / whiteblack)",
@@ -2271,6 +2281,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-46-floqcast-wb-svg-tile",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black Search tile matches Image-2 SVG",
+        changed:"White/Black floqCast no longer uses muddy grey convert. ICON_PACK whiteBlack.floqCast → floqcast-whiteblack.png (same Image-2 nightlife assemble as the review SVG). Package s3.2.46.",
+        howToTest:"1) Hard-refresh Search floqr-chrome-scheme.js?v=s3.2.46. 2) Language Settings → White / Black. 3) floqCast tile shows neon Image-2 mark (pink smoke, Tiffany T, neon ring) — same as Nightlife / SVG — not grey mud. 4) Compare to icon-review-floqcast-botdee-nf.html White/Black.",
+        expected:"WB Search floqCast matches the SVG/Nightlife FloqCAST mark; sharp at tile size.",
+        troubleshoot:"Still grey → hard refresh floqr-chrome-scheme.js s3.2.46; confirm img src is floqcast-whiteblack.png not old jpg grey convert."
+      },
       {
         id:"s3-2-45-floqcast-image2-chrome",
         area:"Search / Chrome icons",

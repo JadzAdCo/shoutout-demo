@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.45";
+  const ICON_V = "s3.2.46";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -74,7 +74,7 @@
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
   });
   const WHITE_BLACK_ICONS = {
-    floqCast: "./images/chrome/floqcast-whiteblack.jpg?v=" + ICON_V,
+    floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
     floqAi: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
