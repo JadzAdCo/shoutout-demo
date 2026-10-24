@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.60";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.60";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.61";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.61";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.61",
+      title: "s3.2.61 — Live Site chrome resync + profile card close",
+      checks: [
+        {label:"Package version s3.2.61", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.61\""]},
+        {label:"Chrome syncFromStorage", file:"floqr-chrome-scheme.js", includes:["syncFromStorage", "bindLiveSync", "BroadcastChannel", "floqr:auth-signed-out"]},
+        {label:"Search profile closes on nav", file:"patron-app.js", includes:["closeUserDropdown", "closeUserDropdownOnNavClick", "userDropdownHasContent"]},
+        {label:"Global profile empty-box guard", file:"global-profile-status.js", includes:["menuReady", "closeDropdown", "pageshow"]},
+        {label:"Manual test s3.2.61", file:"ai-diagnostics-service.js", includes:["s3-2-61-chrome-live-profile-card"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.61\""]}
+      ]
+    },
     {
       version: "s3.2.60",
       title: "s3.2.60 — BOT DEE verbiage (not FloqAi) + Go live, start a cast",
@@ -2444,6 +2456,24 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-61-chrome-live-profile-card",
+        area:"Site chrome / Profile menu",
+        feature:"Live chrome after Appearance + login chrome after logout + profile card closes on nav",
+        changed:"floqr-chrome-scheme syncFromStorage on storage/BroadcastChannel/pageshow/focus/visibility + floqr:auth-signed-out. Search/global profile menus close on in-card link, showPage, pageshow, popstate; refuse empty slim open until content rendered. Package s3.2.61.",
+        howToTest:"1) Hard-refresh Search s3.2.61 signed in with Site chrome beta. 2) Appearance → pick a non-Nightlife chrome → Back to Search (no hard refresh) — tiles/logos match new chrome. 3) Sign out — login/welcome shows same chrome without F5. 4) Sign in → open profile card → tap My Profile / Inbox / a feature link — card closes as destination opens. 5) Return to Search — card must be closed; reopen shows full menu text (not empty slim box). 6) Mark Succeed/Failed.",
+        expected:"Chrome updates without manual refresh; logout login matches selection; profile card never sticks open or opens empty.",
+        troubleshoot:"Stale chrome → confirm floqr-chrome-scheme.js?v=s3.2.61 has syncFromStorage/bindLiveSync; bfcache needs pageshow. Login Nightlife after logout → floqr:auth-signed-out + syncFromStorage({force:true}) in patron-app updateLoginUI. Empty slim card → global-profile-status menuReady / patron-app userDropdownHasContent; close on .profile-menu-link before navigate."
+      },
+      {
+        id:"s3-2-60-botdee-verbiage",
+        area:"BOT DEE / floqCast",
+        feature:"BOT DEE verbiage (not FloqAi) + Go live, start a cast",
+        changed:"Patron-facing FloqAi labels are BOT DEE. FloqCast CTA “Go live, start a cast”. Package s3.2.60.",
+        howToTest:"1) Hard-refresh Search — tile is BOT DEE. 2) Open chat — welcome BOT DEE. 3) Send Hey — greeting, no hits. 4) floqCast — Go live, start a cast. 5) Mark Succeed/Failed.",
+        expected:"Patron chrome says BOT DEE; FloqCast CTA matches.",
+        troubleshoot:"Still FloqAi → hard refresh floqr-i18n.js + floqai.html + bot-dee-chat.js."
+      },
       {
         id:"s3-2-59-floqai-brand-golive-cast",
         area:"BOT DEE / floqCast",

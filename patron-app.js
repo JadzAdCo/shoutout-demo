@@ -691,8 +691,16 @@
     return false;
   }
 
+  function closeUserDropdown() {
+    const menu = byId("userDropdown");
+    if (!menu) return;
+    menu.classList.add("hidden");
+    menu.setAttribute("aria-hidden", "true");
+  }
+
   function showPage(id) {
     if (!id || !byId(id)) return;
+    closeUserDropdown();
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
     if (id === "templateSelectPage") {
@@ -757,14 +765,39 @@
     }
   }
 
+  function userDropdownHasContent(menu) {
+    if (!menu) return false;
+    // Empty slim box = open before render, or stale open from bfcache with wiped children.
+    return !!(menu.querySelector("#dropdownUserName") || menu.querySelector(".profile-menu-link") || menu.querySelector("#dropdownSignOutBtn"));
+  }
+
   function toggleUserDropdown(event) {
     if (event) event.stopPropagation();
-    byId("userDropdown")?.classList.toggle("hidden");
+    const menu = byId("userDropdown");
+    if (!menu) return;
+    const willOpen = menu.classList.contains("hidden");
+    if (willOpen) {
+      if (currentUser) ensureProfileMenuEnhancements(currentUser);
+      if (!userDropdownHasContent(menu)) {
+        closeUserDropdown();
+        return;
+      }
+      menu.classList.remove("hidden");
+      menu.setAttribute("aria-hidden", "false");
+    } else {
+      closeUserDropdown();
+    }
   }
 
   function closeUserDropdownOnOutsideClick(event) {
     const menu = byId("userMenu");
-    if (menu && !menu.contains(event.target)) byId("userDropdown")?.classList.add("hidden");
+    if (menu && !menu.contains(event.target)) closeUserDropdown();
+  }
+
+  function closeUserDropdownOnNavClick(event) {
+    const link = event.target?.closest?.("a.profile-menu-link, a[data-patron-menu]");
+    if (!link || !byId("userDropdown")?.contains(link)) return;
+    closeUserDropdown();
   }
 
   const AD_CONTENT = {
@@ -1120,9 +1153,16 @@
       menu.classList.toggle("hidden", !show);
       menu.hidden = !show;
       menu.setAttribute("aria-hidden", show ? "false" : "true");
-      if (!show) byId("userDropdown")?.classList.add("hidden");
+      if (!show) closeUserDropdown();
     }
     updateUserMenu(user);
+    if (!user) {
+      // Soft sign-out must re-paint login/welcome with last-used Site chrome (no manual refresh).
+      try {
+        window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
+        window.dispatchEvent(new CustomEvent("floqr:auth-signed-out"));
+      } catch (_) { /* ignore */ }
+    }
   }
 
   
@@ -1707,7 +1747,21 @@
       }
     }
   }
-  async function logout() { await auth.signOut(); window.location.href = "./"; }
+  async function logout() {
+    closeUserDropdown();
+    try {
+      window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
+      window.dispatchEvent(new CustomEvent("floqr:auth-signed-out"));
+    } catch (_) { /* ignore */ }
+    await auth.signOut();
+    // Soft land on welcome with current chrome first; hard nav is backup for stale SPA state.
+    showPage("landingPage");
+    updateLoginUI(null);
+    try {
+      window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
+    } catch (_) { /* ignore */ }
+    window.location.href = "./";
+  }
   window.jadzPatronLogout = logout;
 
   function otpText(key, fallback, vars) {
@@ -5129,14 +5183,22 @@
       setStatus(oauthAuthErrorMessage(e, "Sign-in"));
     });
     setTimeout(() => document.documentElement.classList.remove("floqr-auth-resolving"), 8000);
+    let hadSignedInUser = false;
     auth.onAuthStateChanged(async user => {
+      const wasSignedIn = hadSignedInUser;
       currentUser = user;
       updateLoginUI(user);
       rememberSignedInHint(user);
       if (!user) {
+        closeUserDropdown();
+        try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) { /* ignore */ }
+        // Only soft-route to login after a real sign-out — not the initial null before session restore.
+        if (wasSignedIn && !byId("landingPage")?.classList.contains("active")) showPage("landingPage");
+        hadSignedInUser = false;
         if (safeReturnTo(pendingReturnTo)) setStatus(tt("app.signInToContinue", null, "Sign in to continue to the page you opened."));
         return;
       }
+      hadSignedInUser = true;
       if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
       await afterLogin();
         applyMenuFeatureLinks(currentUser);
@@ -5211,6 +5273,15 @@
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
+    byId("userDropdown")?.addEventListener("click", closeUserDropdownOnNavClick);
+    window.addEventListener("pageshow", () => {
+      closeUserDropdown();
+      try { window.FLOQRChromeScheme?.syncFromStorage?.(); } catch (_) { /* ignore */ }
+    });
+    window.addEventListener("popstate", () => closeUserDropdown());
+    window.addEventListener("floqr-chrome-change", () => {
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) { /* ignore */ }
+    });
     bind("saveProfileBtn", saveProfile);
     floqrId().bindInstagramInput?.(byId("profileInstagram"));
     floqrId().bindFloqrHandleInput?.(byId("profileUsername"));

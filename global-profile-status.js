@@ -1,12 +1,15 @@
-/* global-profile-status.js s3.1.65 — translated profile pill; admin hubs open patron apps in a new tab;
+/* global-profile-status.js — translated profile pill; admin hubs open patron apps in a new tab;
    feature links follow Features & Services (FLOQRFeatureServices.linkState).
-   Inbox counts = non-deleted inboxNotifications + messages by recipientUid (match Search menu). */
+   Inbox counts = non-deleted inboxNotifications + messages by recipientUid (match Search menu).
+   Menu closes on in-card nav / pageshow; never toggles open until content is rendered. */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
   window.__FLOQR_GLOBAL_PROFILE_STATUS__ = true;
 
   let lastUser;
+  let menuReady = false;
+  let renderToken = 0;
 
   function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
   function t(key, fallback) {
@@ -76,9 +79,33 @@
     shell = document.createElement("div");
     shell.id = "floqrGlobalProfileStatus";
     shell.className = "user-menu floqr-global-profile-status";
-    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="${esc(t("profile.menu.ariaLabel", "Profile status"))}"><span class="avatar-circle">?</span><span class="menu-dots">&#8226;&#8226;&#8226;</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
+    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="${esc(t("profile.menu.ariaLabel", "Profile status"))}" aria-expanded="false"><span class="avatar-circle">?</span><span class="menu-dots">&#8226;&#8226;&#8226;</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden" aria-hidden="true"></div>`;
     document.body.appendChild(shell);
     return shell;
+  }
+  function dropdownEl() {
+    return document.getElementById("floqrGlobalProfileDropdown");
+  }
+  function closeDropdown() {
+    const dropdown = dropdownEl();
+    if (!dropdown) return;
+    dropdown.classList.add("hidden");
+    dropdown.setAttribute("aria-hidden", "true");
+    const btn = document.getElementById("floqrGlobalProfileBtn");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+  function openDropdown() {
+    const dropdown = dropdownEl();
+    if (!dropdown || !menuReady || !dropdownHasContent(dropdown)) return false;
+    dropdown.classList.remove("hidden");
+    dropdown.setAttribute("aria-hidden", "false");
+    const btn = document.getElementById("floqrGlobalProfileBtn");
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    return true;
+  }
+  function dropdownHasContent(dropdown) {
+    if (!dropdown) return false;
+    return !!(dropdown.querySelector("strong") || dropdown.querySelector(".profile-menu-link") || dropdown.querySelector("button"));
   }
   async function counts(db, uid){
     const out = {messages:"0/0", chats:"0/0"};
@@ -116,6 +143,8 @@
     const dropdown = shell.querySelector("#floqrGlobalProfileDropdown");
     const aria = t("profile.menu.ariaLabel", "Profile status");
     if (button) button.setAttribute("aria-label", aria);
+    const token = ++renderToken;
+    menuReady = false;
     let profile = {};
     const db = window.firebase?.firestore ? firebase.firestore() : null;
     if (user && db) {
@@ -124,15 +153,23 @@
         profile = snap.exists ? snap.data() : {};
       } catch(e) {}
     }
+    if (token !== renderToken) return;
     const photo = profile.photoURL || user?.photoURL || "";
     const badge = photo ? `<img src="${esc(photo)}" alt="">` : esc(initials(user, profile));
     const avatar = button?.querySelector(".avatar-circle");
     if (avatar) avatar.innerHTML = badge;
     if (!user) {
       dropdown.innerHTML = `<strong>${esc(t("profile.menu.notSignedIn", "Not signed in"))}</strong><a class="profile-menu-link" href="./index.html">${esc(t("portal.signInTitle", "Sign in"))}</a>`;
+      menuReady = true;
+      // Soft sign-out on satellite pages: keep Site chrome on last-used paint.
+      try {
+        window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
+        window.dispatchEvent(new CustomEvent("floqr:auth-signed-out"));
+      } catch (_) {}
       return;
     }
     const c = await counts(db, user.uid);
+    if (token !== renderToken) return;
     const blank = patronLinkAttrs();
     const hint = isAdminHub()
       ? `<p class="sub small profile-admin-patron-hint">${esc(t("profile.menu.adminPatronHint", "A new tab / new window is opening. The admin portal will stay open on this browser session. Please hold."))}</p>`
@@ -149,7 +186,11 @@
       ${featureLink("vipReservations", hrefStamp("./vip.html", { from: "search" }), t("cat.vipreserv", "VIP reserV"), blank)}
       ${featureLink("floqAi", hrefFloqAi(), t("cat.floqai", "FloqAi"), blank)}
       <button id="floqrGlobalSignOutBtn" type="button">${esc(t("app.signOut", "Sign out"))}</button>`;
-    dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
+    dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => {
+      closeDropdown();
+      firebase.auth().signOut();
+    });
+    menuReady = true;
     applyFeatureLinks(dropdown, db, user, profile).catch(error => console.warn("Profile menu feature links", error?.message || error));
   }
   function warnAdminPatronTab() {
@@ -186,6 +227,22 @@
       return null;
     }
   }
+  async function toggleDropdown(event) {
+    event?.stopPropagation?.();
+    const dropdown = dropdownEl();
+    if (!dropdown) return;
+    const willOpen = dropdown.classList.contains("hidden");
+    if (!willOpen) {
+      closeDropdown();
+      return;
+    }
+    if (!menuReady || !dropdownHasContent(dropdown)) {
+      closeDropdown();
+      if (lastUser !== undefined) await render(lastUser);
+      if (!menuReady || !dropdownHasContent(dropdownEl())) return;
+    }
+    openDropdown();
+  }
   function init(){
     // The patron landing page owns its richer profile menu; avoid stacking a second global button on top of it.
     if (document.getElementById("userMenu")) return;
@@ -193,22 +250,33 @@
     if (!auth) return;
     const shell = ensureShell();
     shell.querySelector("#floqrGlobalProfileBtn")?.addEventListener("click", event => {
-      event.stopPropagation();
-      shell.querySelector("#floqrGlobalProfileDropdown")?.classList.toggle("hidden");
+      void toggleDropdown(event);
     });
     document.addEventListener("click", event => {
-      if (!shell.contains(event.target)) shell.querySelector("#floqrGlobalProfileDropdown")?.classList.add("hidden");
+      if (!shell.contains(event.target)) closeDropdown();
     });
     shell.addEventListener("click", event => {
       const link = event.target?.closest?.(".profile-menu-link");
-      if (!link || !isAdminHub() || link.getAttribute("target") !== "_blank") return;
-      warnAdminPatronTab();
+      if (!link || !shell.contains(link)) return;
+      // Close before navigation so bfcache / return home never restores an open empty card.
+      closeDropdown();
+      if (isAdminHub() && link.getAttribute("target") === "_blank") warnAdminPatronTab();
     });
     window.addEventListener("floqr:ui-language", () => {
       if (lastUser !== undefined) render(lastUser);
     });
+    window.addEventListener("pageshow", () => {
+      closeDropdown();
+      try { window.FLOQRChromeScheme?.syncFromStorage?.(); } catch (_) {}
+      if (lastUser !== undefined) void render(lastUser);
+    });
+    window.addEventListener("floqr:auth-signed-out", () => {
+      closeDropdown();
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) {}
+    });
     auth.onAuthStateChanged(user => {
       lastUser = user || null;
+      closeDropdown();
       render(user);
     });
   }

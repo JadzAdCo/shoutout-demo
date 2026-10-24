@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.60";
+  const ICON_V = "s3.2.61";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   const NIGHTLIFE_ICONS = {
@@ -312,10 +312,12 @@
       localStorage.setItem(STORAGE_KEY, String(next));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
     } catch (_) { /* ignore */ }
-    applyDocument(schemeFromSiteChrome(next));
+    const scheme = schemeFromSiteChrome(next);
+    applyDocument(scheme);
     global.dispatchEvent(new CustomEvent("floqr-chrome-change", {
-      detail: {chrome: schemeFromSiteChrome(next), isSiteChrome: next}
+      detail: {chrome: scheme, isSiteChrome: next}
     }));
+    broadcastChrome(scheme, next);
     if (opts.persistProfile !== false) tryPersistProfile(next);
     return next;
   }
@@ -410,6 +412,14 @@
     });
   }
 
+  function paintedScheme() {
+    try {
+      return normalizeScheme(global.document?.documentElement?.getAttribute("data-floqr-chrome") || "");
+    } catch (_) {
+      return "";
+    }
+  }
+
   function applyDocument(scheme) {
     const s = scheme != null ? normalizeScheme(scheme) : getChrome();
     if (global.document && global.document.documentElement) {
@@ -437,6 +447,62 @@
       btn.setAttribute("aria-pressed", normalizeScheme(name) === s ? "true" : "false");
     });
     return s;
+  }
+
+  /** Re-paint from localStorage when bfcache / other tab / focus restored chrome out of date. */
+  function syncFromStorage(opts = {}) {
+    const stored = getChrome();
+    const force = opts.force === true;
+    if (!force && paintedScheme() === stored) return stored;
+    return applyDocument(stored);
+  }
+
+  function broadcastChrome(scheme, code) {
+    try {
+      if (!global.__floqrChromeBroadcast) {
+        global.__floqrChromeBroadcast = typeof BroadcastChannel !== "undefined"
+          ? new BroadcastChannel("floqr-chrome")
+          : null;
+      }
+      global.__floqrChromeBroadcast?.postMessage({
+        type: "floqr-chrome-change",
+        chrome: scheme,
+        isSiteChrome: code
+      });
+    } catch (_) { /* ignore */ }
+  }
+
+  function bindLiveSync() {
+    if (global.__floqrChromeLiveSyncBound) return;
+    global.__floqrChromeLiveSyncBound = true;
+    const resync = () => {
+      try { syncFromStorage(); } catch (_) { /* ignore */ }
+    };
+    try {
+      global.addEventListener("storage", (ev) => {
+        if (!ev) return;
+        if (ev.key && ev.key !== STORAGE_KEY && ev.key !== LEGACY_STORAGE_KEY) return;
+        resync();
+      });
+    } catch (_) { /* ignore */ }
+    try {
+      global.addEventListener("pageshow", resync);
+      global.addEventListener("focus", resync);
+      global.document?.addEventListener?.("visibilitychange", () => {
+        if (global.document.visibilityState === "visible") resync();
+      });
+    } catch (_) { /* ignore */ }
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        const bus = new BroadcastChannel("floqr-chrome");
+        global.__floqrChromeBroadcast = bus;
+        bus.onmessage = (ev) => {
+          const data = ev?.data;
+          if (!data || data.type !== "floqr-chrome-change") return;
+          resync();
+        };
+      }
+    } catch (_) { /* ignore */ }
   }
 
   function markFeaturesAccessResolved() {
@@ -500,6 +566,7 @@
     brandLogoUrl,
     applyDocument,
     applyBrandLogos,
+    syncFromStorage,
     bindToggle,
     syncAccessGate,
     markFeaturesAccessResolved,
@@ -522,6 +589,7 @@
       applyDocument(getChrome());
     }
     bindToggle();
+    bindLiveSync();
   }
 
   if (global.document?.readyState === "loading") {
@@ -536,6 +604,13 @@
         featuresAccessResolved = true;
         syncAccessGate();
       } catch (_) { /* ignore */ }
+    });
+  } catch (_) { /* ignore */ }
+
+  // Soft sign-out (no full reload) must keep the login/welcome paint on last-used chrome.
+  try {
+    global.addEventListener("floqr:auth-signed-out", () => {
+      try { syncFromStorage({force: true}); } catch (_) { /* ignore */ }
     });
   } catch (_) { /* ignore */ }
 })(typeof window !== "undefined" ? window : globalThis);
