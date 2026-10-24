@@ -1644,9 +1644,11 @@ def to_white_black(
 
 
 def build_floqcast_whiteblack() -> Path:
-    """FloqCAST White/Black from layers — Fl/T tips never wiped by white outside ring.
+    """FloqCAST White/Black = same Image-2 mark as the nightlife SVG (no grey convert).
 
-    Order: white bg → chrome graphic → under type (Fl) → thin shiny black ring → over type (oqCAST+T).
+    Grey WB conversions muddy the smoke at Search-tile size. Ship the identical
+    nightlife assemble (pink smoke, Tiffany T, neon ring) as floqcast-whiteblack.*
+    so White/Black Search matches the SVG / Nightlife tile.
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
@@ -1655,76 +1657,28 @@ def build_floqcast_whiteblack() -> Path:
     left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
     print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
 
-    wb_stroke = 3  # small shiny-black ring
-    wb_half = wb_stroke / 2.0
-    yy, xx = np.indices((S, S))
-    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    # Darker chrome-black type for white field contrast
-    font_chrome = shiny_chrome_tone(np.full((S, S), 160.0, np.float32), yy, xx, for_type=True)
-    font_chrome = np.clip(font_chrome * 0.72, 10, 110)
+    nl = assemble(g, under, over, left, top, nightlife=True)
+    nl = force_tiffany_T(nl, left, top, over)
+    final = nl.convert("RGB")
 
-    base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+    dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
+    dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
+    # Prefer PNG for Search tile crispness; keep JPG for legacy paths
+    final.save(dst_png, optimize=True)
+    final.save(dst_jpg, quality=98, subsampling=0)
+    # Keep nightlife JPG in sync when rebuilding WB from layers
+    nl_jpg = ROOT / "images/chrome/floqcast-nightlife.jpg"
+    if not nl_jpg.exists() or nl_jpg.stat().st_mtime < dst_png.stat().st_mtime:
+        final.save(nl_jpg, quality=98, subsampling=0)
 
-    # Graphic → chrome linework on white
-    ga = np.array(g.convert("RGBA"))
-    gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
-    glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
-    chrome = shiny_chrome_tone(glum, yy, xx)
-    gout = np.zeros_like(ga)
-    line = (glum >= 30) & (gal > 8) & (dist < (R - 4))
-    gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
-    gout[line, 3] = 255
-    base.alpha_composite(Image.fromarray(gout, "RGBA"))
-
-    def type_layer(im: Image.Image) -> Image.Image:
-        a = np.array(paste_type(im, left, top))
-        ink = a[:, :, 3] > 20
-        out = np.zeros_like(a)
-        for c in range(3):
-            out[:, :, c] = np.where(ink, font_chrome, 0)
-        out[:, :, 3] = np.where(ink, 255, 0)
-        return Image.fromarray(out, "RGBA")
-
-    # Under (Fl) → thin shiny-black ring → over (oqCAST + T)
-    base.alpha_composite(type_layer(under))
-    # Shiny black ring: dark body + silver specular (not light grey)
-    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
-    ring_chrome = np.clip(12.0 + ring_chrome * 0.35, 14, 95)
-    ra = np.zeros((S, S, 4), np.uint8)
-    ring_mask = np.abs(dist - R) <= wb_half
-    for c in range(3):
-        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
-    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
-    base.alpha_composite(Image.fromarray(ra, "RGBA"))
-    base.alpha_composite(type_layer(over))
-
-    out = np.array(base)
-    out[:, :, 3] = 255
-    # Outside white — but keep any type ink that extends past the ring (Fl / T tips)
-    type_ink = (np.array(type_layer(under))[:, :, 3] > 20) | (
-        np.array(type_layer(over))[:, :, 3] > 20
+    final.resize((640, 640), Image.Resampling.LANCZOS).save(
+        "/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95
     )
-    outside = dist > (R + wb_half + 0.5)
-    out[outside & ~type_ink, :3] = 255
-    # Final tip stamp over white field
-    tips = type_ink & (dist > (R + wb_half))
-    for c in range(3):
-        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
-
-    dst = ROOT / "images/chrome/floqcast-whiteblack.jpg"
-    Image.fromarray(out, "RGBA").convert("RGB").save(dst, quality=96, subsampling=0)
-    preview = Image.fromarray(out, "RGBA").convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95)
-    Image.fromarray(out, "RGBA").convert("RGB").crop((0, 600, 360, 1024)).resize(
-        (360, 424), Image.Resampling.LANCZOS
-    ).save("/opt/cursor/artifacts/floqcast-wb-fl-fixed.png", quality=95)
-    Image.fromarray(out, "RGBA").convert("RGB").crop((660, 600, 1024, 1024)).resize(
-        (364, 424), Image.Resampling.LANCZOS
-    ).save("/opt/cursor/artifacts/floqcast-wb-t-fixed.png", quality=95)
-    print(
-        f"  FloqCAST WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}"
+    final.resize((110, 110), Image.Resampling.LANCZOS).save(
+        "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
     )
-    return dst
+    print(f"  FloqCAST WB = Image-2 SVG/nightlife mark → {dst_png.name}")
+    return dst_png
 
 
 def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
