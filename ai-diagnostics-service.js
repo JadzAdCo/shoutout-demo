@@ -223,12 +223,22 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.50",
+      title: "s3.2.50 — FloqCAST WB Image-2 full-width wordmark + ring proportions",
+      checks: [
+        {label:"Package version s3.2.50", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.50\""]},
+        {label:"ICON_V s3.2.50", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.50\"", "floqcast-whiteblack.png"]},
+        {label:"WB uses Image-2 placement", file:"scripts/build-chrome-icons.py", includes:["Image-2 geometry", "place_floqcast_q_kiss", "no chord-fit shrink"]},
+        {label:"Manual test s3.2.50", file:"ai-diagnostics-service.js", includes:["s3-2-50-floqcast-wb-image2-props"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.50\""]}
+      ]
+    },
+    {
       version: "s3.2.49",
       title: "s3.2.49 — FloqCAST WB reinstate peer ring + F/L/T tip halo",
       checks: [
         {label:"Package version s3.2.49", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.49\""]},
-        {label:"ICON_V s3.2.49", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.49\"", "floqcast-whiteblack.png"]},
-        {label:"WB builder layer order", file:"scripts/build-chrome-icons.py", includes:["white circle, no border", "in-asset chrome ring", "_place_floqcast_wb_tips"]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
         {label:"Manual test s3.2.49", file:"ai-diagnostics-service.js", includes:["s3-2-49-floqcast-wb-ring-halo"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.49\""]}
       ]
@@ -2312,6 +2322,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-50-floqcast-wb-image2-props",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — Image-2 ring + full-width text proportions",
+        changed:"WB floqcast-whiteblack.png uses Nightlife Image-2 geometry: place_floqcast_q_kiss full-width wordmark (~875), ring R=490 stroke~6, under→ring→over, tip halo. No chord-fit shrink. Package s3.2.50.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.50. 2) Language Settings → White / Black. 3) Compare floqCast WB tile to Nightlife: same text/ring proportions (full-width FloqCAST under the arc), WB colors only. 4) Wordmark not tiny/chord-shrunk inside the circle.",
+        expected:"WB matches Image-2 layout scale; dark ink + Tiffany T on white with chrome ring.",
+        troubleshoot:"Text still tiny → hard refresh floqcast-whiteblack.png?v=s3.2.50; rebuild must call place_floqcast_q_kiss without chord-fit. Nightlife wrong → only WB builder changed."
+      },
       {
         id:"s3-2-49-floqcast-wb-ring-halo",
         area:"Search / Chrome icons",
