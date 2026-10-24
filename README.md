@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.60 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.61 (stable)
+
+- s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.
+- s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.
 
 - s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.
 - s3.2.59: FloqCast CTA “Go live, start a cast”; chat chitchat for greetings.
