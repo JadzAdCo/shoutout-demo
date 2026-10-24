@@ -1644,11 +1644,11 @@ def to_white_black(
 
 
 def build_floqcast_whiteblack() -> Path:
-    """FloqCAST White/Black = same Image-2 mark as the nightlife SVG (no grey convert).
+    """FloqCAST White/Black — Image-2 silhouette on white (matches ShoutOut/BOT DEE WB).
 
-    Grey WB conversions muddy the smoke at Search-tile size. Ship the identical
-    nightlife assemble (pink smoke, Tiffany T, neon ring) as floqcast-whiteblack.*
-    so White/Black Search matches the SVG / Nightlife tile.
+    White field + dark chrome graphic + FloqCAS ink + Tiffany T + thin ring.
+    Tip-safe Fl/T. Slight inset so Search CSS circle doesn't clip tips.
+    PNG primary for tile crispness (not muddy mid-grey JPEG convert).
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
@@ -1657,19 +1657,94 @@ def build_floqcast_whiteblack() -> Path:
     left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
     print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
 
-    nl = assemble(g, under, over, left, top, nightlife=True)
-    nl = force_tiffany_T(nl, left, top, over)
-    final = nl.convert("RGB")
+    wb_stroke = 3
+    wb_half = wb_stroke / 2.0
+    yy, xx = np.indices((S, S))
+    dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
+    # Darker than prior muddy convert — ShoutOut/BOT-DEE WB weight at tile size
+    font_chrome = shiny_chrome_tone(
+        np.full((S, S), 160.0, np.float32), yy, xx, for_type=True
+    )
+    font_chrome = np.clip(font_chrome * 0.48, 8, 48)
+
+    base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+    ga = np.array(g.convert("RGBA"))
+    gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
+    glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
+    chrome = shiny_chrome_tone(glum, yy, xx)
+    # Pull graphic toward ink-black while keeping AA / wispy smoke
+    chrome = np.clip(chrome * 0.55, 10, 72)
+    gout = np.zeros_like(ga)
+    line = (glum >= 26) & (gal > 8) & (dist < (R - 4))
+    gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
+    gout[line, 3] = 255
+    base.alpha_composite(Image.fromarray(gout, "RGBA"))
+
+    def type_layer(im: Image.Image) -> Image.Image:
+        a = np.array(paste_type(im, left, top))
+        ink = a[:, :, 3] > 20
+        tiffany = (
+            ink
+            & (a[:, :, 0] < 120)
+            & (a[:, :, 1] > 140)
+            & (a[:, :, 2] > 170)
+        )
+        out = np.zeros_like(a)
+        for c in range(3):
+            out[:, :, c] = np.where(ink, font_chrome, 0)
+        out[tiffany, 0] = TIFFANY[0]
+        out[tiffany, 1] = TIFFANY[1]
+        out[tiffany, 2] = TIFFANY[2]
+        out[:, :, 3] = np.where(ink, 255, 0)
+        return Image.fromarray(out, "RGBA")
+
+    base.alpha_composite(type_layer(under))
+    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
+    ring_chrome = np.clip(10.0 + ring_chrome * 0.28, 12, 55)
+    ra = np.zeros((S, S, 4), np.uint8)
+    ring_mask = np.abs(dist - R) <= wb_half
+    for c in range(3):
+        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
+    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+    base.alpha_composite(Image.fromarray(ra, "RGBA"))
+    over_t = type_layer(over)
+    base.alpha_composite(over_t)
+
+    out = np.array(base)
+    out[:, :, 3] = 255
+    under_t = type_layer(under)
+    type_ink = (np.array(under_t)[:, :, 3] > 20) | (np.array(over_t)[:, :, 3] > 20)
+    outside = dist > (R + wb_half + 0.5)
+    out[outside & ~type_ink, :3] = 255
+    tips = type_ink & (dist > (R + wb_half))
+    oa = np.array(over_t)
+    tip_tiff = (
+        tips
+        & (oa[:, :, 3] > 20)
+        & (oa[:, :, 0] < 120)
+        & (oa[:, :, 1] > 140)
+        & (oa[:, :, 2] > 170)
+    )
+    for c in range(3):
+        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
+    out[tip_tiff, 0] = TIFFANY[0]
+    out[tip_tiff, 1] = TIFFANY[1]
+    out[tip_tiff, 2] = TIFFANY[2]
+
+    composed = Image.fromarray(out, "RGBA")
+    # Inset so Search tile CSS circle + BETA don't clip Fl/q/T
+    inset = 0.92
+    nw = max(1, int(round(S * inset)))
+    scaled = composed.resize((nw, nw), Image.Resampling.LANCZOS)
+    pad = Image.new("RGBA", (S, S), (255, 255, 255, 255))
+    ox = (S - nw) // 2
+    pad.paste(scaled, (ox, ox), scaled)
+    final = pad.convert("RGB")
 
     dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
     dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
-    # Prefer PNG for Search tile crispness; keep JPG for legacy paths
     final.save(dst_png, optimize=True)
     final.save(dst_jpg, quality=98, subsampling=0)
-    # Keep nightlife JPG in sync when rebuilding WB from layers
-    nl_jpg = ROOT / "images/chrome/floqcast-nightlife.jpg"
-    if not nl_jpg.exists() or nl_jpg.stat().st_mtime < dst_png.stat().st_mtime:
-        final.save(nl_jpg, quality=98, subsampling=0)
 
     final.resize((640, 640), Image.Resampling.LANCZOS).save(
         "/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95
@@ -1677,7 +1752,10 @@ def build_floqcast_whiteblack() -> Path:
     final.resize((110, 110), Image.Resampling.LANCZOS).save(
         "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
     )
-    print(f"  FloqCAST WB = Image-2 SVG/nightlife mark → {dst_png.name}")
+    print(
+        f"  FloqCAST WB Image-2 on white tips={int(tips.sum())} "
+        f"tiffany_tips={int(tip_tiff.sum())} inset={inset} → {dst_png.name}"
+    )
     return dst_png
 
 

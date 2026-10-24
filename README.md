@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.46 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.47 (stable)
+
+- s3.2.47: FloqCAST White/Black = Image-2 silhouette on white (Tiffany T), matches ShoutOut/BOT DEE WB.
+- s3.2.45: FloqCAST Image 2 + centered Search; s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
 
 - s3.2.46: FloqCAST White/Black Search tile = Image-2 SVG mark (no muddy grey convert).
 - s3.2.45: FloqCAST Image 2 + centered Search; s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
