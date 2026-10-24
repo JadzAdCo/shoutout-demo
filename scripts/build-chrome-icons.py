@@ -1646,8 +1646,10 @@ def to_white_black(
 def build_floqcast_whiteblack() -> Path:
     """FloqCAST White/Black — Image-2 silhouette on white (matches ShoutOut/BOT DEE WB).
 
-    White field + dark chrome graphic + FloqCAS ink + Tiffany T + thin ring.
-    Tip-safe Fl/T. Slight inset so Search CSS circle doesn't clip tips.
+    White field + dark chrome graphic + FloqCAS ink + Tiffany T.
+    No asset-drawn ring: Search already circular-crops the tile (`border-radius:50%`).
+    A second in-PNG ring was notching Fl/T (F under ring) and reading as a double crop.
+    Type stamped last; inset keeps Fl/T inside the CSS circle.
     PNG primary for tile crispness (not muddy mid-grey JPEG convert).
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
@@ -1657,8 +1659,6 @@ def build_floqcast_whiteblack() -> Path:
     left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
     print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
 
-    wb_stroke = 3
-    wb_half = wb_stroke / 2.0
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
     # Darker than prior muddy convert — ShoutOut/BOT-DEE WB weight at tile size
@@ -1675,7 +1675,10 @@ def build_floqcast_whiteblack() -> Path:
     # Pull graphic toward ink-black while keeping AA / wispy smoke
     chrome = np.clip(chrome * 0.55, 10, 72)
     gout = np.zeros_like(ga)
-    line = (glum >= 26) & (gal > 8) & (dist < (R - 4))
+    # Interior graphic only — strip ring-annulus leftovers from the nightlife extract
+    # (unsaturated AA at ~R survived strip_ring_only and read as a second grey ring).
+    safe_r = R - 36  # well inside nightlife stroke; phones/LED sit < ~450
+    line = (glum >= 26) & (gal > 8) & (dist < safe_r)
     gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
     gout[line, 3] = 255
     base.alpha_composite(Image.fromarray(gout, "RGBA"))
@@ -1698,48 +1701,42 @@ def build_floqcast_whiteblack() -> Path:
         out[:, :, 3] = np.where(ink, 255, 0)
         return Image.fromarray(out, "RGBA")
 
-    base.alpha_composite(type_layer(under))
-    ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
-    ring_chrome = np.clip(10.0 + ring_chrome * 0.28, 12, 55)
-    ra = np.zeros((S, S, 4), np.uint8)
-    ring_mask = np.abs(dist - R) <= wb_half
-    for c in range(3):
-        ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
-    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
-    base.alpha_composite(Image.fromarray(ra, "RGBA"))
-    over_t = type_layer(over)
-    base.alpha_composite(over_t)
+    # Full body mark (Fl+oq+CAST+T) — not under/over sandwich; no ring chord through glyphs
+    body_t = type_layer(body)
+    base.alpha_composite(body_t)
 
     out = np.array(base)
     out[:, :, 3] = 255
-    under_t = type_layer(under)
-    type_ink = (np.array(under_t)[:, :, 3] > 20) | (np.array(over_t)[:, :, 3] > 20)
-    outside = dist > (R + wb_half + 0.5)
-    out[outside & ~type_ink, :3] = 255
-    tips = type_ink & (dist > (R + wb_half))
-    oa = np.array(over_t)
-    tip_tiff = (
-        tips
-        & (oa[:, :, 3] > 20)
-        & (oa[:, :, 0] < 120)
-        & (oa[:, :, 1] > 140)
-        & (oa[:, :, 2] > 170)
-    )
-    for c in range(3):
-        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
-    out[tip_tiff, 0] = TIFFANY[0]
-    out[tip_tiff, 1] = TIFFANY[1]
-    out[tip_tiff, 2] = TIFFANY[2]
+    type_ink = np.array(body_t)[:, :, 3] > 20
+    tip_r = float(dist[type_ink].max()) if type_ink.any() else 0.0
+    # Search CSS circle = S/2. Inset so tips stay inside with margin.
+    css_r = S / 2.0
+    tip_margin = 18.0
+    inset = 0.88
+    if tip_r > 1:
+        inset = min(inset, (css_r - tip_margin) / tip_r)
+    inset = max(0.78, min(0.90, inset))
 
     composed = Image.fromarray(out, "RGBA")
-    # Inset so Search tile CSS circle + BETA don't clip Fl/q/T
-    inset = 0.92
     nw = max(1, int(round(S * inset)))
     scaled = composed.resize((nw, nw), Image.Resampling.LANCZOS)
     pad = Image.new("RGBA", (S, S), (255, 255, 255, 255))
     ox = (S - nw) // 2
     pad.paste(scaled, (ox, ox), scaled)
     final = pad.convert("RGB")
+
+    # QA: no dark annulus (second ring); tips inside CSS circle
+    fa = np.array(final)
+    flum = fa.mean(axis=2)
+    fyy, fxx = np.indices((S, S))
+    fdist = np.sqrt((fxx - CX) ** 2 + (fyy - CY) ** 2)
+    # dark ink heuristic (type + graphic)
+    ink_f = flum < 90
+    tip_max = float(fdist[ink_f].max()) if ink_f.any() else 0.0
+    ring_peak = 0
+    for r0 in np.linspace(400, 505, 106):
+        n = int(((np.abs(fdist - r0) <= 1.0) & (flum < 90) & (flum > 40)).sum())
+        ring_peak = max(ring_peak, n)
 
     dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
     dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
@@ -1752,10 +1749,18 @@ def build_floqcast_whiteblack() -> Path:
     final.resize((110, 110), Image.Resampling.LANCZOS).save(
         "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
     )
+    # Tip zooms for QA
+    final.crop((60, 760, 300, 1010)).save("/opt/cursor/artifacts/wb-fl-tip-after.png")
+    final.crop((720, 760, 1000, 1010)).save("/opt/cursor/artifacts/wb-t-tip-after.png")
     print(
-        f"  FloqCAST WB Image-2 on white tips={int(tips.sum())} "
-        f"tiffany_tips={int(tip_tiff.sum())} inset={inset} → {dst_png.name}"
+        f"  FloqCAST WB Image-2 on white tip_r_pre={tip_r:.1f} inset={inset:.3f} "
+        f"tip_max_final={tip_max:.1f} css_r={css_r:.0f} ring_peak={ring_peak} "
+        f"→ {dst_png.name}"
     )
+    if tip_max >= css_r - 2:
+        print("  WARNING: tips still reach CSS circle — increase inset")
+    if ring_peak > 2500:
+        print("  WARNING: dark annulus still present (second ring)")
     return dst_png
 
 
