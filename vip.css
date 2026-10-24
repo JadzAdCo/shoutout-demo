@@ -2,13 +2,11 @@
    Never load a global flat body/#111 override on this page. See design-notes-product-chrome.mdc. */
 
 body.vip-page {
-  /* Reinforce ShoutOut body when a satellite CSS tries to flatten it */
-  background:
-    radial-gradient(circle at 18% 8%, rgba(244, 58, 191, 0.32), transparent 32%),
-    radial-gradient(circle at 82% 18%, rgba(38, 216, 255, 0.34), transparent 36%),
-    linear-gradient(135deg, #07101c, #071b63 68%, #090b12) !important;
+  /* Body wash follows Site chrome (styles.css + floqr-feature-landing.css).
+     Do not lock Nightlife with !important — that blocked White/Black etc. */
   color: var(--text, #f4f6ff);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
+  font-family: var(--floqr-font, Inter, Segoe UI, Arial, sans-serif);
+  min-height: 100vh;
 }
 
 .vip-shell { max-width: 1100px; }

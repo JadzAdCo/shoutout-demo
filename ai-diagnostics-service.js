@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.50";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.50";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.51";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.51";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.51",
+      title: "s3.2.51 — Feature landings follow selected Site chrome",
+      checks: [
+        {label:"Package version s3.2.51", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.51\""]},
+        {label:"ICON_V s3.2.51", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.51\""]},
+        {label:"Feature landing chrome washes", file:"floqr-feature-landing.css", includes:["html[data-floqr-chrome=\"whiteBlack\"] body.floqcast-page", "body.shoutout-search-page", "body.vip-page"]},
+        {label:"floqCast early-paint", file:"floqcast-search.html", includes:["floqr.isSiteChrome", "data-floqr-chrome"]},
+        {label:"Manual test s3.2.51", file:"ai-diagnostics-service.js", includes:["s3-2-51-feature-landing-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.51\""]}
+      ]
+    },
     {
       version: "s3.2.50",
       title: "s3.2.50 — FloqCAST WB Image-2 full-width wordmark + ring proportions",
@@ -2322,6 +2334,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-51-feature-landing-chrome",
+        area:"Feature landings / Site chrome",
+        feature:"floqCast / ShoutOut / VIP landings honor selected Site chrome",
+        changed:"Early-paint data-floqr-chrome on feature landings; floqr-feature-landing.css body washes per scheme; removed Nightlife !important lock from floqcast-search.css + vip.css. Package s3.2.51.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.51. 2) Appearance → White / Black. 3) Open floqCast tile → floqcast-search.html: page background white (not NL purple/navy), WB floqCast icon, dark title. 4) Repeat for shoutout-search.html and vip.html. 5) Switch Nightlife — landings show NL wash again.",
+        expected:"Feature landing body + icons match the active Site chrome on all three product search pages.",
+        troubleshoot:"Still NL purple on WB → hard refresh floqr-feature-landing.css?v=s3.2.51; confirm early-paint script in landing HTML; floqcast-search.css must not set Nightlife body !important."
+      },
       {
         id:"s3-2-50-floqcast-wb-image2-props",
         area:"Search / Chrome icons",

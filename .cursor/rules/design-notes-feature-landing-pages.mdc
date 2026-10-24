@@ -41,6 +41,8 @@ Shared module: `floqr-feature-landing.js` + `floqr-feature-landing.css` (`window
 
 Same Site chrome tokens as Search (`FLOQRChromeScheme` / `isSiteChrome`). Load `floqr-chrome-scheme.js` on every feature landing that uses `data-floqr-chrome-icon`. Primary CTA = hot→accent gradient.
 
+**Required:** early-paint `data-floqr-chrome` from `localStorage floqr.isSiteChrome` (same head snippet as `index.html` / `patron-portal.html`) **before** CSS. Body wash for `body.floqcast-page` / `body.shoutout-search-page` / `body.vip-page` lives in `floqr-feature-landing.css` per scheme — **never** pin Nightlife with `!important` in feature CSS.
+
 ## Icons — one mark, two surfaces
 
 | Surface | Asset |
@@ -52,7 +54,8 @@ Same Site chrome tokens as Search (`FLOQRChromeScheme` / `isSiteChrome`). Load `
 ## Checklist (new or edited feature landing)
 
 - [ ] Header: Back → feature icon (no FloqR) → title + `?`
-- [ ] Loads `floqr-feature-landing.js` + `.css` + `floqr-geo-search.js` + chrome scheme
+- [ ] Early-paint `data-floqr-chrome` + loads `floqr-feature-landing.js` + `.css` + `floqr-geo-search.js` + chrome scheme
+- [ ] Body wash follows selected Site chrome (not Nightlife-locked)
 - [ ] Empty list = nearest 4; status line shows place/source
 - [ ] Cards show feature-specific facts + Select venue
 - [ ] `?` mirrored in `floqai-help-repository.js` + i18n help packs

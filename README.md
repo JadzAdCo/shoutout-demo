@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.50 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.51 (stable)
+
+- s3.2.51: Feature landings follow selected Site chrome (early-paint + no Nightlife body lock).
+- s3.2.50: FloqCAST WB Image-2 full-width wordmark + ring proportions.
 
 - s3.2.50: FloqCAST WB: Image-2 full-width wordmark + ring proportions (no chord-fit shrink).
 - s3.2.45: FloqCAST Image 2 + centered Search; s3.2.44: Standardized ShoutOut / VIP / floqCast feature landings (product icon, GPS top-4, feature fact cards).
