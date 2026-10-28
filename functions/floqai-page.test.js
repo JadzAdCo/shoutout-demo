@@ -51,6 +51,9 @@ test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", (
   assert.match(page, /getViewerAudience/);
   assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
+  assert.match(read("bot-dee-chat.js"), /isChitchatPrompt/);
+  assert.match(read("bot-dee-chat.js"), /floqai\.chatHello/);
+  assert.match(read("bot-dee-chat.js"), /Chatbot first/);
 });
 
 test("floating FloqAi agent is not shown on template select", () => {

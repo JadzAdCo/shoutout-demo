@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.63";
+  const VERSION = "s3.2.64";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1584,6 +1584,7 @@
       "floqai.checkingAccess": "Checking what your account can see…",
       "floqai.scopePublic": "Showing public answers. Sign in to see answers for your account.",
       "floqai.chatWelcome": "Hi — I am BOT DEE. Ask in plain words what you want to do in FLOQR. Quick intent search stays available below.",
+      "floqai.chatHello": "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.",
       "floqai.chatPlaceholder": "Ask BOT DEE… ShoutOut · VIP · floqCast · schedule",
       "floqai.chatSend": "Send",
       "floqai.chatThinking": "BOT DEE is thinking…",
@@ -3020,6 +3021,7 @@
       "master.featuresAuditTrailEyebrow": "Journal d’audit",
       "master.featuresAuditTrailTitle": "Activité fonctions et bêta",
       "floqai.chatWelcome": "Bonjour — je suis BOT DEE. Dites en mots simples ce que vous voulez faire dans FLOQR. La recherche d’intention rapide reste disponible ci-dessous.",
+      "floqai.chatHello": "Salut — BOT DEE ici. Que voulez-vous faire dans FLOQR ? ShoutOut, table VIP, floqCast, planning, ou autre chose — dites-le en mots simples.",
       "floqai.chatPlaceholder": "Demandez à BOT DEE… ShoutOut · VIP · floqCast · planning",
       "floqai.chatSend": "Envoyer",
       "floqai.chatThinking": "BOT DEE réfléchit…",
@@ -4320,6 +4322,7 @@
       "master.featuresAuditTrailEyebrow": "Audit-Protokoll",
       "master.featuresAuditTrailTitle": "Feature- und Beta-Aktivität",
       "floqai.chatWelcome": "Hallo — ich bin BOT DEE. Sag in einfachen Worten, was du in FLOQR tun möchtest. Die schnelle Intent-Suche bleibt unten verfügbar.",
+      "floqai.chatHello": "Hey — BOT DEE hier. Was möchtest du in FLOQR tun? ShoutOut, VIP-Tisch, floqCast, Schichtplan oder etwas anderes — einfach in normalen Worten sagen.",
       "floqai.chatPlaceholder": "Frag BOT DEE… ShoutOut · VIP · floqCast · Plan",
       "floqai.chatSend": "Senden",
       "floqai.chatThinking": "BOT DEE denkt nach…",
@@ -5620,6 +5623,7 @@
       "master.featuresAuditTrailEyebrow": "Registro de auditoría",
       "master.featuresAuditTrailTitle": "Actividad de funciones y beta",
       "floqai.chatWelcome": "Hola — soy BOT DEE. Di en palabras sencillas qué quieres hacer en FLOQR. La búsqueda rápida de intención sigue abajo.",
+      "floqai.chatHello": "Hola — BOT DEE aquí. ¿Qué quieres hacer en FLOQR? ShoutOut, mesa VIP, floqCast, horarios u otra cosa — dilo en palabras sencillas.",
       "floqai.chatPlaceholder": "Pregunta a BOT DEE… ShoutOut · VIP · floqCast · horario",
       "floqai.chatSend": "Enviar",
       "floqai.chatThinking": "BOT DEE está pensando…",
@@ -6920,6 +6924,7 @@
       "master.featuresAuditTrailEyebrow": "Audittrail",
       "master.featuresAuditTrailTitle": "Feature- en beta-activiteit",
       "floqai.chatWelcome": "Hoi — ik ben BOT DEE. Zeg in gewone taal wat je in FLOQR wilt doen. Snelle intent-zoekactie blijft hieronder beschikbaar.",
+      "floqai.chatHello": "Hoi — BOT DEE hier. Wat wil je in FLOQR doen? ShoutOut, VIP-tafel, floqCast, roosters of iets anders — zeg het gewoon in normale woorden.",
       "floqai.chatPlaceholder": "Vraag BOT DEE… ShoutOut · VIP · floqCast · planning",
       "floqai.chatSend": "Versturen",
       "floqai.chatThinking": "BOT DEE denkt na…",
@@ -8220,6 +8225,7 @@
       "master.featuresAuditTrailEyebrow": "Журнал аудита",
       "master.featuresAuditTrailTitle": "Активность функций и беты",
       "floqai.chatWelcome": "Привет — я BOT DEE. Скажите простыми словами, что хотите сделать в FLOQR. Быстрый поиск намерений остаётся ниже.",
+      "floqai.chatHello": "Привет — на связи BOT DEE. Что хотите сделать в FLOQR? ShoutOut, VIP-стол, floqCast, расписание или что-то ещё — просто скажите своими словами.",
       "floqai.chatPlaceholder": "Спросите BOT DEE… ShoutOut · VIP · floqCast · расписание",
       "floqai.chatSend": "Отправить",
       "floqai.chatThinking": "BOT DEE думает…",
@@ -9520,6 +9526,7 @@
       "master.featuresAuditTrailEyebrow": "Registro di audit",
       "master.featuresAuditTrailTitle": "Attività funzioni e beta",
       "floqai.chatWelcome": "Ciao — sono BOT DEE. Dimmi con parole semplici cosa vuoi fare in FLOQR. La ricerca rapida di intent resta disponibile sotto.",
+      "floqai.chatHello": "Ciao — BOT DEE qui. Cosa vuoi fare in FLOQR? ShoutOut, tavolo VIP, floqCast, turni o altro — dillo con parole semplici.",
       "floqai.chatPlaceholder": "Chiedi a BOT DEE… ShoutOut · VIP · floqCast · turni",
       "floqai.chatSend": "Invia",
       "floqai.chatThinking": "BOT DEE sta pensando…",
@@ -10820,6 +10827,7 @@
       "master.featuresAuditTrailEyebrow": "Registo de auditoria",
       "master.featuresAuditTrailTitle": "Atividade de recursos e beta",
       "floqai.chatWelcome": "Olá — sou BOT DEE. Diga em palavras simples o que quer fazer no FLOQR. A pesquisa rápida de intenção continua abaixo.",
+      "floqai.chatHello": "Olá — BOT DEE aqui. O que quer fazer no FLOQR? ShoutOut, mesa VIP, floqCast, escala ou outra coisa — diga em palavras simples.",
       "floqai.chatPlaceholder": "Pergunte ao BOT DEE… ShoutOut · VIP · floqCast · escala",
       "floqai.chatSend": "Enviar",
       "floqai.chatThinking": "BOT DEE está a pensar…",
@@ -12120,6 +12128,7 @@
       "master.featuresAuditTrailEyebrow": "Ίχνος ελέγχου",
       "master.featuresAuditTrailTitle": "Δραστηριότητα λειτουργιών και beta",
       "floqai.chatWelcome": "Γεια — είμαι ο BOT DEE. Πες με απλά λόγια τι θέλεις να κάνεις στο FLOQR. Η γρήγορη αναζήτηση πρόθεσης μένει παρακάτω.",
+      "floqai.chatHello": "Γεια — εδώ ο BOT DEE. Τι θέλεις να κάνεις στο FLOQR; ShoutOut, VIP τραπέζι, floqCast, πρόγραμμα ή κάτι άλλο — πες το με απλά λόγια.",
       "floqai.chatPlaceholder": "Ρώτα τον BOT DEE… ShoutOut · VIP · floqCast · πρόγραμμα",
       "floqai.chatSend": "Αποστολή",
       "floqai.chatThinking": "Ο BOT DEE σκέφτεται…",
@@ -13420,6 +13429,7 @@
       "master.featuresAuditTrailEyebrow": "Ślad audytu",
       "master.featuresAuditTrailTitle": "Aktywność funkcji i bety",
       "floqai.chatWelcome": "Cześć — jestem BOT DEE. Powiedz prostymi słowami, co chcesz zrobić w FLOQR. Szybkie wyszukiwanie intencji zostaje poniżej.",
+      "floqai.chatHello": "Cześć — tu BOT DEE. Co chcesz zrobić w FLOQR? ShoutOut, stolik VIP, floqCast, grafik albo coś innego — powiedz zwykłymi słowami.",
       "floqai.chatPlaceholder": "Zapytaj BOT DEE… ShoutOut · VIP · floqCast · grafik",
       "floqai.chatSend": "Wyślij",
       "floqai.chatThinking": "BOT DEE myśli…",
@@ -14720,6 +14730,7 @@
       "master.featuresAuditTrailEyebrow": "سجل التدقيق",
       "master.featuresAuditTrailTitle": "نشاط الميزات والبيتا",
       "floqai.chatWelcome": "مرحبًا — أنا BOT DEE. قل بكلمات بسيطة ما تريد فعله في FLOQR. يبقى البحث السريع عن النية أدناه.",
+      "floqai.chatHello": "مرحبًا — BOT DEE هنا. ماذا تريد أن تفعل في FLOQR؟ ShoutOut أو طاولة VIP أو floqCast أو الجدولة أو شيء آخر — قلها بكلمات بسيطة.",
       "floqai.chatPlaceholder": "اسأل BOT DEE… ShoutOut · VIP · floqCast · الجدول",
       "floqai.chatSend": "إرسال",
       "floqai.chatThinking": "BOT DEE يفكر…",

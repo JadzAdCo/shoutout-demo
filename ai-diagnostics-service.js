@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.63";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.63";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.64";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.64";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.64",
+      title: "s3.2.64 — BOT DEE greets on hello (not search miss)",
+      checks: [
+        {label:"Package version s3.2.64", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.64\""]},
+        {label:"Client chitchat hello", file:"bot-dee-chat.js", includes:["isChitchatPrompt", "floqai.chatHello", "Chatbot first"]},
+        {label:"Server hello chitchat", file:"functions/bot-dee-core.js", includes:["hello how are you", "isChitchatPrompt"]},
+        {label:"Manual test s3.2.64", file:"ai-diagnostics-service.js", includes:["s3-2-64-botdee-hello-chitchat"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.64\""]}
+      ]
+    },
     {
       version: "s3.2.63",
       title: "s3.2.63 — Settings square chrome + Search tile CSS",
@@ -2479,6 +2490,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-64-botdee-hello-chitchat",
+        area:"BOT DEE / FloqAi",
+        feature:"Hello greets like a chatbot (not a search miss)",
+        changed:"bot-dee-chat.js answers greetings locally before executeBotSession; server isChitchatPrompt widened (hello / hello how are you). Package s3.2.64. Functions deploy still needed for server path parity.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.64) signed in with floqAi access. 2) Type hello (or Hi / Hey) → BOT DEE replies Hey — BOT DEE here… (not a clear-match / search-miss message). 3) Type throw a shoutout → product help / results (search path still works). 4) Mark Succeed/Failed.",
+        expected:"Greetings get a conversational reply; how-to questions still search/tool.",
+        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on floqai.html; confirm you are on floqai.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
+      },
       {
         id:"s3-2-63-settings-square-chrome",
         area:"Site chrome / Search",

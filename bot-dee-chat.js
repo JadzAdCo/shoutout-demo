@@ -1,5 +1,7 @@
 /* BOT DEE chat client — wires floqai.html transcript to executeBotSession.
-   Intent search stays available as a collapsible fast path / fallback. */
+   Intent search stays available as a collapsible fast path / fallback.
+   Greetings are answered locally (chatbot) so a stale Functions deploy cannot
+   turn "hello" into a contextual-search miss. */
 (function (global) {
   "use strict";
 
@@ -11,6 +13,34 @@
     const value = global.FLOQRI18n?.t?.(key);
     return value && value !== key ? value : fallback;
   };
+
+  /** Mirror of functions/bot-dee-core.js isChitchatPrompt / chitchatReply. */
+  function normalizeChat(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9@\s._/-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
+
+  function isChitchatPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 100) return false;
+    if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
+    if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
+    if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
+    if (new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you)${CHITCHAT_TAIL}$`).test(q)) return true;
+    return false;
+  }
+
+  function chitchatReply() {
+    return t(
+      "floqai.chatHello",
+      "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
+    );
+  }
 
   function callable() {
     try {
@@ -89,6 +119,17 @@
     if (input) input.value = "";
     appendBubble("user", text);
     pushHistory("user", text);
+
+    // Chatbot first: never let "hello" fall through to a search-miss reply.
+    if (isChitchatPrompt(text)) {
+      const reply = chitchatReply();
+      appendBubble("bot", reply);
+      pushHistory("model", reply);
+      setStatus("");
+      input?.focus();
+      return;
+    }
+
     setBusy(true);
     setStatus(t("floqai.chatThinking", "BOT DEE is thinking…"));
 
@@ -108,7 +149,11 @@
         history: history.slice(0, -1).map(row => ({role: row.role, text: row.text}))
       };
       const data = (await fn(payload))?.data || {};
-      const reply = String(data.reply || "").trim() || t("floqai.chatEmpty", "No answer yet — try quick intent search.");
+      let reply = String(data.reply || "").trim();
+      // Stale Functions may still search-miss a greeting-shaped reply — never show that.
+      if (!reply || /could not find a clear match/i.test(reply)) {
+        reply = t("floqai.chatEmpty", "No answer yet — try quick intent search.");
+      }
       appendBubble("bot", reply, data.results);
       pushHistory("model", reply);
       setStatus("");
