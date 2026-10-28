@@ -10,7 +10,7 @@
   const STORAGE_KEY = "floqr.chromeAudit";
   const MASTER_HINT_KEY = "floqr.chromeAudit.masterHint";
   const MAX_PAGES = 80;
-  const VERSION = "s3.2.63";
+  const VERSION = "s3.2.64";
 
   const CHROME_MAP = Object.freeze({
     0: "nightlife",

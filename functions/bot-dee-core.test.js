@@ -31,13 +31,17 @@ test("contextualSearch filters by classification role", () => {
 test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isChitchatPrompt("Hey"), true);
   assert.equal(bot.isChitchatPrompt("hey!"), true);
+  assert.equal(bot.isChitchatPrompt("Hello"), true);
+  assert.equal(bot.isChitchatPrompt("hello!"), true);
   assert.equal(bot.isChitchatPrompt("Hi BOT DEE"), true);
+  assert.equal(bot.isChitchatPrompt("hello how are you"), true);
   assert.equal(bot.isChitchatPrompt("thanks"), true);
   assert.equal(bot.isChitchatPrompt("throw a shoutout"), false);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 
   const heyHits = bot.contextualSearch("Hey", "master");
   assert.equal(heyHits.results.length, 0, "hey must not substring-match they/…");
+  assert.equal(bot.contextualSearch("Hello", "master").results.length, 0);
 
   const reply = bot.chitchatReply("master");
   assert.match(reply, /BOT DEE here/i);
@@ -46,10 +50,12 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
 
   const fns = require("./bot-dee-functions");
-  const local = fns.__botDeeHelpers.localSession("master", "Hey");
-  assert.equal(local.provider, "local-chitchat");
-  assert.equal(local.results.length, 0);
-  assert.match(local.reply, /What do you want to do/i);
+  for (const prompt of ["Hey", "Hello", "hello how are you"]) {
+    const local = fns.__botDeeHelpers.localSession("master", prompt);
+    assert.equal(local.provider, "local-chitchat", prompt);
+    assert.equal(local.results.length, 0, prompt);
+    assert.match(local.reply, /What do you want to do/i);
+  }
 });
 
 test("sanitizeHistory keeps bounded user/model turns", () => {

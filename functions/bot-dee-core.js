@@ -121,11 +121,22 @@ function hasWord(hay, word) {
 
 const MIN_SEARCH_SCORE = 3;
 
-/** Greetings / small talk — reply as a chatbot, never dump search hits. */
+/** Soft name / filler after a greeting (bot dee, there, friend, …). */
+const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
+
+/**
+ * Greetings / small talk — reply as a chatbot, never dump search hits.
+ * Keep in sync with bot-dee-chat.js client mirror (Pages can greet before Functions deploy).
+ */
 function isChitchatPrompt(raw) {
   const q = normalize(raw);
-  if (!q || q.length > 80) return false;
-  return /^(hey|hi|hello|howdy|yo|sup|hiya|hola|thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you|good morning|good afternoon|good evening|good night|how are you|what s up|whats up)( bot dee| floqai| there| again)?$/.test(q);
+  if (!q || q.length > 100) return false;
+  // hi / hello / hey (+ optional name) — also "hello how are you"
+  if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
+  if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
+  if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
+  if (new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you)${CHITCHAT_TAIL}$`).test(q)) return true;
+  return false;
 }
 
 function chitchatReply(role) {
