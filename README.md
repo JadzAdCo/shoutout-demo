@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.62 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.63 (stable)
+
+- s3.2.63: Settings Search icon → rounded-square (no circular ring/crop); Search tile CSS border-radius 8.6% (SQ_CORNER/S).
+- s3.2.62: Rounded-square Search feature icons (FloqCast/BOT DEE tips padded; VIP seats-removed lounge; ShoutOut tiffany OUT).
 
 - s3.2.62: Rounded-square Search feature icons (FloqCast/BOT DEE tips padded; VIP seats-removed lounge; ShoutOut tiffany OUT).
 - s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.

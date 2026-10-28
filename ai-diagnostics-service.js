@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.62";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.62";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.63";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.63";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.63",
+      title: "s3.2.63 — Settings square chrome + Search tile CSS",
+      checks: [
+        {label:"Package version s3.2.63", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.63\""]},
+        {label:"ICON_V s3.2.63", file:"floqr-chrome-scheme.js", includes:["const ICON_V = \"s3.2.63\""]},
+        {label:"Search tile square radius", file:"styles.css", includes:["border-radius:8.6%", "settings-icon-face"]},
+        {label:"Manual test s3.2.63", file:"ai-diagnostics-service.js", includes:["s3-2-63-settings-square-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.63\""]}
+      ]
+    },
     {
       version: "s3.2.62",
       title: "s3.2.62 — Rounded-square Search feature icons",
@@ -2469,12 +2480,21 @@
 
   const MANUAL_FEATURE_TESTS = [
       {
+        id:"s3-2-63-settings-square-chrome",
+        area:"Site chrome / Search",
+        feature:"Settings icon rounded-square (matches FloqCast/VIP) + Search tile CSS",
+        changed:"Settings chrome JPGs rebuilt as rounded-square (no circular ring) for all 6 Site chromes. Search tile CSS border-radius 50% → 8.6% (SQ_CORNER/S) so square rings are not circular-cropped. ICON_V / package s3.2.63.",
+        howToTest:"1) Hard-refresh Search (package s3.2.63) https://jadzadco.github.io/shoutout-demo/ — Settings tile matches FloqCast/VIP as a rounded square (same corner radius; no circular ring). 2) Appearance → cycle all 6 chromes — Settings updates with each. 3) FloqCast F tip and other square marks still intact (CSS no longer clips). 4) Mark Succeed/Failed.",
+        expected:"Settings and every feature face share rounded-square chrome; circular crop gone.",
+        troubleshoot:"Settings still round → hard refresh styles.css + images/chrome/settings-nightlife.jpg (ICON_V s3.2.63). Square corners clipped → confirm styles.css uses border-radius:8.6% on icon-face/tile-mark (not 50%). Stale art → check settings-*.jpg file dates vs s3.2.63."
+      },
+      {
         id:"s3-2-62-square-chrome-icons",
         area:"Site chrome / Search",
         feature:"Rounded-square feature icons (FloqCast F + BOT DEE B tips complete)",
-        changed:"Search/product feature marks are rounded-square for all 6 Site chromes (FloqCast, ShoutOut, VIP ReserV, BOT DEE, BartR, RydR). FloqCast F and BOT DEE B tips regenerated inside square safe inset (no circular crop/ring clip). VIP seats-removed lounge. ShoutOut traditional/WB tiffany OUT. Settings icons unchanged (circular). ICON_V s3.2.62.",
+        changed:"Search/product feature marks are rounded-square for all 6 Site chromes (FloqCast, ShoutOut, VIP ReserV, BOT DEE, BartR, RydR). FloqCast F and BOT DEE B tips regenerated inside square safe inset (no circular crop/ring clip). VIP seats-removed lounge. ShoutOut traditional/WB tiffany OUT. Settings later squared in s3.2.63. ICON_V s3.2.62.",
         howToTest:"1) Hard-refresh Search (package s3.2.62) https://jadzadco.github.io/shoutout-demo/ — tiles are rounded squares (not circles). 2) FloqCast: leading F top-left tip complete (not flat-cut). 3) BOT DEE: B tip + antenna complete. 4) Appearance → cycle Nightlife / Traditional / White-Black / Black Tiffany / Purple & White / Black & Dark Green — each feature face updates. 5) ShoutOut Traditional + White/Black: OUT is tiffany. 6) VIP lounge has no dining seats. 7) Mark Succeed/Failed.",
-        expected:"All six chromes show square feature icons; FloqCast F and BOT DEE B tips intact; Settings tile still circular.",
+        expected:"All six chromes show square feature icons; FloqCast F and BOT DEE B tips intact.",
         troubleshoot:"Still round → hard refresh floqr-chrome-scheme.js (asset cache-bust s3.2.62) + images/chrome/floqcast-nightlife.jpg (and peers). F tip cut → confirm square pack nightlife JPG not old round file; ICON_V must be s3.2.62. Wrong chrome face → check BLACK_TIFFANY_ICONS / PURPLE_WHITE_ICONS full packs (not nightlife Object.assign leftovers)."
       },
       {
