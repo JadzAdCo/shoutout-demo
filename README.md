@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.61 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.62 (stable)
+
+- s3.2.62: Rounded-square Search feature icons (FloqCast/BOT DEE tips padded; VIP seats-removed lounge; ShoutOut tiffany OUT).
+- s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.
 
 - s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.
 - s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.

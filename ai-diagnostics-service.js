@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.61";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.61";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.62";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.62";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.62",
+      title: "s3.2.62 — Rounded-square Search feature icons",
+      checks: [
+        {label:"Package version s3.2.62", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.62\""]},
+        {label:"ICON_V s3.2.62", file:"floqr-chrome-scheme.js", includes:["const ICON_V = \"s3.2.62\""]},
+        {label:"Square FloqCast blackTiffany pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blacktiffany.jpg", "botdee-blacktiffany.jpg", "shoutout-blacktiffany.jpg"]},
+        {label:"Square purpleWhite pack", file:"floqr-chrome-scheme.js", includes:["floqcast-purplewhite.jpg", "vip-purplewhite.jpg", "bartr-purplewhite.jpg"]},
+        {label:"Manual test s3.2.62", file:"ai-diagnostics-service.js", includes:["s3-2-62-square-chrome-icons"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.62\""]}
+      ]
+    },
     {
       version: "s3.2.61",
       title: "s3.2.61 — Live Site chrome resync + profile card close",
@@ -2456,6 +2468,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-62-square-chrome-icons",
+        area:"Site chrome / Search",
+        feature:"Rounded-square feature icons (FloqCast F + BOT DEE B tips complete)",
+        changed:"Search/product feature marks are rounded-square for all 6 Site chromes (FloqCast, ShoutOut, VIP ReserV, BOT DEE, BartR, RydR). FloqCast F and BOT DEE B tips regenerated inside square safe inset (no circular crop/ring clip). VIP seats-removed lounge. ShoutOut traditional/WB tiffany OUT. Settings icons unchanged (circular). ICON_V s3.2.62.",
+        howToTest:"1) Hard-refresh Search https://jadzadco.github.io/shoutout-demo/?v=s3.2.62 — tiles are rounded squares (not circles). 2) FloqCast: leading F top-left tip complete (not flat-cut). 3) BOT DEE: B tip + antenna complete. 4) Appearance → cycle Nightlife / Traditional / White-Black / Black Tiffany / Purple & White / Black & Dark Green — each feature face updates. 5) ShoutOut Traditional + White/Black: OUT is tiffany. 6) VIP lounge has no dining seats. 7) Mark Succeed/Failed.",
+        expected:"All six chromes show square feature icons; FloqCast F and BOT DEE B tips intact; Settings tile still circular.",
+        troubleshoot:"Still round → hard refresh floqr-chrome-scheme.js?v=s3.2.62 + images/chrome/floqcast-nightlife.jpg (and peers). F tip cut → confirm square pack nightlife JPG not old round file; ICON_V must be s3.2.62. Wrong chrome face → check BLACK_TIFFANY_ICONS / PURPLE_WHITE_ICONS full packs (not nightlife Object.assign leftovers)."
+      },
       {
         id:"s3-2-61-chrome-live-profile-card",
         area:"Site chrome / Profile menu",
