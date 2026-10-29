@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.64";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.64";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.65";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.65";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.65",
+      title: "s3.2.65 — BOT DEE welcome How can I help you?",
+      checks: [
+        {label:"Package version s3.2.65", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.65\""]},
+        {label:"Welcome copy", file:"floqr-i18n.js", includes:["\"floqai.chatWelcome\": \"Hi, I am BOT DEE. How can I help you?\""]},
+        {label:"Manual test s3.2.65", file:"ai-diagnostics-service.js", includes:["s3-2-65-botdee-welcome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.65\""]}
+      ]
+    },
+    {
       version: "s3.2.64",
       title: "s3.2.64 — BOT DEE greets on hello (not search miss)",
       checks: [
@@ -275,7 +285,7 @@
         {label:"Package version s3.2.60", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.60\""]},
         {label:"Search tile BOT DEE", file:"floqr-i18n.js", includes:["\"cat.floqai\": \"BOT DEE\"", "\"page.floqai.title\": \"BOT DEE\""]},
         {label:"Chat welcome BOT DEE", file:"bot-dee-chat.js", includes:["I am BOT DEE"]},
-        {label:"No FloqAi chat welcome", file:"floqr-i18n.js", includes:["\"floqai.chatWelcome\": \"Hi — I am BOT DEE"]},
+        {label:"No FloqAi chat welcome", file:"floqr-i18n.js", includes:["\"floqai.chatWelcome\": \"Hi, I am BOT DEE. How can I help you?\""]},
         {label:"FloqCast Go live CTA", file:"floqr-i18n.js", includes:["Go live, start a cast"]},
         {label:"Manual test s3.2.60", file:"ai-diagnostics-service.js", includes:["s3-2-60-botdee-verbiage"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.60\""]}
@@ -2490,6 +2500,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-65-botdee-welcome",
+        area:"BOT DEE / FloqAi",
+        feature:"Welcome — How can I help you?",
+        changed:"floqai.chatWelcome is now Hi, I am BOT DEE. How can I help you? (all langs). Package s3.2.65.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.65). 2) Opening bubble is Hi, I am BOT DEE. How can I help you? — no Quick intent search line in the greeting. 3) Mark Succeed/Failed.",
+        expected:"Short welcome only.",
+        troubleshoot:"Old long greeting → hard refresh floqr-i18n.js + bot-dee-chat.js (s3.2.65)."
+      },
       {
         id:"s3-2-64-botdee-hello-chitchat",
         area:"BOT DEE / FloqAi",
