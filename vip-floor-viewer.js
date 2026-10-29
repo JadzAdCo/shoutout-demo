@@ -38,6 +38,8 @@
   const DARK_ICON_ON = new Set(["available", "held", "notBookable"]);
 
   let legend = null, plan = null, planFile = "", states = {}, mode = "all", selectedId = null;
+  /** Live amounts from getVipAvailability keyed by sectionId (night-scoped NYE prices, etc.). */
+  let livePricing = {};
   let W = 0, H = 0, view = {cx: 0, cy: 0, s: 1}, lastScale = null;
 
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
@@ -398,30 +400,73 @@
     showInfo(null);
   }
 
-  // Demo amounts only — real minimums / fees come from the section's minimumAmount / extraGuestFee / deposit.
+  // Demo amounts only when livePricing for this section is missing (regular nights / placeholders).
   function demoPrices(item) {
-    const minimum = item.type === "vipTable" ? 1000 : item.maxCapacity >= 6 ? 500 : item.maxCapacity >= 4 ? 300 : 150;
-    return {minimum, extraFee: item.extraGuestFee ? (item.type === "vipTable" ? 50 : 40) : 0, depositRate: 0.25};
+    const live = livePricing[item.id];
+    if (live && Number(live.minimumAmountCents) > 0) {
+      const maxCapacity = Math.max(1, Math.floor(Number(live.maxCapacity || item.maxCapacity || 4)));
+      const includedGuests = Math.max(1, Math.min(maxCapacity, Math.floor(Number(live.includedGuests || item.includedGuests || maxCapacity))));
+      return {
+        minimum: Number(live.minimumAmountCents) / 100,
+        extraFee: Number(live.extraGuestFeeCents || 0) / 100,
+        deposit: Number(live.depositCents != null ? live.depositCents : live.minimumAmountCents) / 100,
+        depositRate: null,
+        currency: String(live.currency || "USD").toUpperCase(),
+        includedGuests,
+        maxCapacity,
+        nightPriced: !!live.nightPriced,
+        live: true
+      };
+    }
+    const minimum = item.type === "vipTable" || item.type === "vipArea" ? 1000 : item.maxCapacity >= 6 ? 500 : item.maxCapacity >= 4 ? 300 : 150;
+    return {
+      minimum,
+      extraFee: item.extraGuestFee ? (item.type === "vipTable" || item.type === "vipArea" ? 50 : 40) : 0,
+      deposit: null,
+      depositRate: 0.25,
+      currency: "USD",
+      includedGuests: item.includedGuests,
+      maxCapacity: item.maxCapacity,
+      nightPriced: false,
+      live: false
+    };
+  }
+
+  function moneyFmt(n, currency) {
+    const cur = String(currency || "USD").toUpperCase();
+    try {
+      return Number(n || 0).toLocaleString("en-US", {style: "currency", currency: cur, minimumFractionDigits: 2, maximumFractionDigits: 2});
+    } catch (_) {
+      const sym = cur === "EUR" ? "€" : "$";
+      return sym + Number(n || 0).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
   }
 
   function bindParty(item) {
     const p = demoPrices(item);
+    const maxCapacity = p.maxCapacity || item.maxCapacity;
+    const includedGuests = p.includedGuests || item.includedGuests;
     const asked = item.id === params.get("sel") ? Number(params.get("party")) : NaN;
-    let party = Number.isInteger(asked) ? Math.min(item.maxCapacity, Math.max(1, asked)) : item.includedGuests;
-    const usd = n => "$" + n.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    let party = Number.isInteger(asked) ? Math.min(maxCapacity, Math.max(1, asked)) : includedGuests;
     const draw = () => {
-      const extra = Math.max(0, party - item.includedGuests), extraTotal = extra * p.extraFee, deposit = p.minimum * p.depositRate;
-      info.querySelector("#partySize").textContent = `${party} of ${item.maxCapacity}`;
-      info.querySelectorAll(".stepper button").forEach(b => { b.disabled = b.dataset.step === "-1" ? party <= 1 : party >= item.maxCapacity; });
+      const extra = Math.max(0, party - includedGuests);
+      const extraTotal = extra * p.extraFee;
+      const deposit = p.deposit != null ? p.deposit : p.minimum * (p.depositRate || 0.25);
+      const balance = Math.max(0, p.minimum - deposit);
+      info.querySelector("#partySize").textContent = `${party} of ${maxCapacity}`;
+      info.querySelectorAll(".stepper button").forEach(b => { b.disabled = b.dataset.step === "-1" ? party <= 1 : party >= maxCapacity; });
+      const note = p.nightPriced
+        ? "NYE package price for this night only — regular nights use Club Admin pricing."
+        : (p.live ? "Live VIP reserV amounts for this night." : "Demo amounts — the club sets the real ones.");
       info.querySelector("#fees").innerHTML =
-        `<tr><td>Minimum spend (covers ${item.includedGuests} guests)</td><td>${usd(p.minimum)}</td></tr>` +
-        (p.extraFee ? `<tr><td>Extra guests: ${extra} × ${usd(p.extraFee)} VIP entry</td><td>${usd(extraTotal)}</td></tr>` : "") +
-        `<tr class="sub"><td>Pay today: deposit (25% of minimum)${extraTotal ? " + extra-guest fees" : ""}</td><td>${usd(deposit + extraTotal)}</td></tr>` +
-        `<tr class="sub"><td>Balance of minimum at the venue</td><td>${usd(p.minimum - deposit)}</td></tr>` +
-        `<tr class="note"><td colspan="2">Demo amounts — the club sets the real ones.</td></tr>`;
+        `<tr><td>Minimum spend (covers ${includedGuests} guests)</td><td>${moneyFmt(p.minimum, p.currency)}</td></tr>` +
+        (p.extraFee ? `<tr><td>Extra guests: ${extra} × ${moneyFmt(p.extraFee, p.currency)} VIP entry</td><td>${moneyFmt(extraTotal, p.currency)}</td></tr>` : "") +
+        `<tr class="sub"><td>Pay today${p.nightPriced ? " (full package)" : " (deposit)"}${extraTotal ? " + extra-guest fees" : ""}</td><td>${moneyFmt(deposit + extraTotal, p.currency)}</td></tr>` +
+        (balance > 0.009 ? `<tr class="sub"><td>Balance of minimum at the venue</td><td>${moneyFmt(balance, p.currency)}</td></tr>` : "") +
+        `<tr class="note"><td colspan="2">${note}</td></tr>`;
     };
     info.querySelectorAll(".stepper button").forEach(b => b.addEventListener("click", () => {
-      party = Math.min(item.maxCapacity, Math.max(1, party + Number(b.dataset.step)));
+      party = Math.min(maxCapacity, Math.max(1, party + Number(b.dataset.step)));
       draw();
     }));
     draw();
@@ -493,6 +538,13 @@
     setMode,
     closePopout,
     getPlan: () => plan,
+    setLivePricing: next => {
+      livePricing = next && typeof next === "object" ? next : {};
+      if (plan && selectedId) {
+        const item = byId(selectedId);
+        if (item) showInfo(item);
+      }
+    },
     setStates: next => {
       states = next && typeof next === "object" ? next : {};
       if (plan) {

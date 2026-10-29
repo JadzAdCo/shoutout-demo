@@ -525,5 +525,1318 @@ module.exports = {
         "extraGuestFee": true
       }
     ]
+  },
+  "shoko-barcelona-spain": {
+    "clubLocationId": "shoko-barcelona-spain",
+    "planFile": "shoko-barcelona.json",
+    "venueName": "Shôko Barcelona",
+    "currency": "EUR",
+    "extraNights": [
+      "2026-12-31"
+    ],
+    "nightPricing": {
+      "2026-12-31": {
+        "eventId": "shoko-nye-2027",
+        "eventName": "NYE'27 — New Year's Eve 2027",
+        "currency": "EUR",
+        "note": "Table package prices from Shôko NYE'27 flyer legend. Regular nights use Club Admin pricing (placeholders on sections).",
+        "sections": {
+          "shoko-t01": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t02": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t03": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t04": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t05": {
+            "minimumAmountCents": 600000,
+            "depositCents": 600000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 8,
+            "maxCapacity": 8,
+            "colorTier": "magenta",
+            "listPriceEur": 6000
+          },
+          "shoko-t06": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t07": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t08": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t09": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t10": {
+            "minimumAmountCents": 600000,
+            "depositCents": 600000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 8,
+            "maxCapacity": 8,
+            "colorTier": "magenta",
+            "listPriceEur": 6000
+          },
+          "shoko-t11": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t12": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t13": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t14": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t15": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t16": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t17": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t18": {
+            "minimumAmountCents": 400000,
+            "depositCents": 400000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "purple",
+            "listPriceEur": 4000
+          },
+          "shoko-t19": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t20": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t21": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t22": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t23": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t24": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t25": {
+            "minimumAmountCents": 800000,
+            "depositCents": 800000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 10,
+            "maxCapacity": 10,
+            "colorTier": "red",
+            "listPriceEur": 8000
+          },
+          "shoko-t26": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t27": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t28": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t29": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t30": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t31": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t32": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t33": {
+            "minimumAmountCents": 350000,
+            "depositCents": 350000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "cyan",
+            "listPriceEur": 3500
+          },
+          "shoko-t34": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t35": {
+            "minimumAmountCents": 100000,
+            "depositCents": 100000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 2,
+            "maxCapacity": 2,
+            "colorTier": "lightyellow",
+            "listPriceEur": 1000
+          },
+          "shoko-t36": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t37": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t38": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t39": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t40": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t41": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t42": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t43": {
+            "minimumAmountCents": 350000,
+            "depositCents": 350000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "cyan",
+            "listPriceEur": 3500
+          },
+          "shoko-t44": {
+            "minimumAmountCents": 800000,
+            "depositCents": 800000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 10,
+            "maxCapacity": 10,
+            "colorTier": "red",
+            "listPriceEur": 8000
+          },
+          "shoko-t45": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t46": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t47": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t48": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t49": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t50": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t51": {
+            "minimumAmountCents": 800000,
+            "depositCents": 800000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 10,
+            "maxCapacity": 10,
+            "colorTier": "red",
+            "listPriceEur": 8000
+          },
+          "shoko-t52": {
+            "minimumAmountCents": 1200000,
+            "depositCents": 1200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 10,
+            "maxCapacity": 10,
+            "colorTier": "darkred",
+            "listPriceEur": 12000
+          },
+          "shoko-t53": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t54": {
+            "minimumAmountCents": 350000,
+            "depositCents": 350000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "cyan",
+            "listPriceEur": 3500
+          },
+          "shoko-t55": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t56": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t57": {
+            "minimumAmountCents": 800000,
+            "depositCents": 800000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 10,
+            "maxCapacity": 10,
+            "colorTier": "red",
+            "listPriceEur": 8000
+          },
+          "shoko-t58": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t59": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t60": {
+            "minimumAmountCents": 200000,
+            "depositCents": 200000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "lightgreen",
+            "listPriceEur": 2000
+          },
+          "shoko-t61": {
+            "minimumAmountCents": 350000,
+            "depositCents": 350000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "cyan",
+            "listPriceEur": 3500
+          },
+          "shoko-t62": {
+            "minimumAmountCents": 250000,
+            "depositCents": 250000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 4,
+            "maxCapacity": 4,
+            "colorTier": "green",
+            "listPriceEur": 2500
+          },
+          "shoko-t63": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-t64": {
+            "minimumAmountCents": 150000,
+            "depositCents": 150000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 6,
+            "maxCapacity": 6,
+            "colorTier": "yellow",
+            "listPriceEur": 1500
+          },
+          "shoko-sv1": {
+            "minimumAmountCents": 2000000,
+            "depositCents": 2000000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 15,
+            "maxCapacity": 15,
+            "colorTier": "supervip",
+            "listPriceEur": 20000
+          },
+          "shoko-sv2": {
+            "minimumAmountCents": 2000000,
+            "depositCents": 2000000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 15,
+            "maxCapacity": 15,
+            "colorTier": "supervip",
+            "listPriceEur": 20000
+          },
+          "shoko-kz": {
+            "minimumAmountCents": 800000,
+            "depositCents": 800000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 15,
+            "maxCapacity": 15,
+            "colorTier": "kaizen",
+            "listPriceEur": 8000
+          },
+          "shoko-la-suite": {
+            "minimumAmountCents": 3000000,
+            "depositCents": 3000000,
+            "extraGuestFeeCents": 0,
+            "currency": "EUR",
+            "includedGuests": 30,
+            "maxCapacity": 30,
+            "colorTier": "suite",
+            "listPriceEur": 30000
+          }
+        }
+      }
+    },
+    "sections": [
+      {
+        "id": "shoko-t01",
+        "label": "T01",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t02",
+        "label": "T02",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t03",
+        "label": "T03",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t04",
+        "label": "T04",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t05",
+        "label": "T05",
+        "type": "table",
+        "maxCapacity": 8,
+        "includedGuests": 8,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t06",
+        "label": "T06",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t07",
+        "label": "T07",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t08",
+        "label": "T08",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t09",
+        "label": "T09",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t10",
+        "label": "T10",
+        "type": "table",
+        "maxCapacity": 8,
+        "includedGuests": 8,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t11",
+        "label": "T11",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t12",
+        "label": "T12",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t13",
+        "label": "T13",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t14",
+        "label": "T14",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t15",
+        "label": "T15",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t16",
+        "label": "T16",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t17",
+        "label": "T17",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t18",
+        "label": "T18",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t19",
+        "label": "T19",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t20",
+        "label": "T20",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t21",
+        "label": "T21",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t22",
+        "label": "T22",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t23",
+        "label": "T23",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t24",
+        "label": "T24",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t25",
+        "label": "T25",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 10,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t26",
+        "label": "T26",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t27",
+        "label": "T27",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t28",
+        "label": "T28",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t29",
+        "label": "T29",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t30",
+        "label": "T30",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t31",
+        "label": "T31",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t32",
+        "label": "T32",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t33",
+        "label": "T33",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t34",
+        "label": "T34",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t35",
+        "label": "T35",
+        "type": "table",
+        "maxCapacity": 2,
+        "includedGuests": 2,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t36",
+        "label": "T36",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t37",
+        "label": "T37",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t38",
+        "label": "T38",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t39",
+        "label": "T39",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t40",
+        "label": "T40",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t41",
+        "label": "T41",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t42",
+        "label": "T42",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t43",
+        "label": "T43",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t44",
+        "label": "T44",
+        "type": "table",
+        "maxCapacity": 10,
+        "includedGuests": 10,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t45",
+        "label": "T45",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t46",
+        "label": "T46",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t47",
+        "label": "T47",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t48",
+        "label": "T48",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t49",
+        "label": "T49",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t50",
+        "label": "T50",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t51",
+        "label": "T51",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 10,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t52",
+        "label": "T52",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 10,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t53",
+        "label": "T53",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t54",
+        "label": "T54",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t55",
+        "label": "T55",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t56",
+        "label": "T56",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t57",
+        "label": "T57",
+        "type": "vipTable",
+        "maxCapacity": 10,
+        "includedGuests": 10,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t58",
+        "label": "T58",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t59",
+        "label": "T59",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t60",
+        "label": "T60",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t61",
+        "label": "T61",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t62",
+        "label": "T62",
+        "type": "table",
+        "maxCapacity": 4,
+        "includedGuests": 4,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t63",
+        "label": "T63",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-t64",
+        "label": "T64",
+        "type": "table",
+        "maxCapacity": 6,
+        "includedGuests": 6,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-sv1",
+        "label": "SUPER VIP 1",
+        "type": "vipArea",
+        "maxCapacity": 15,
+        "includedGuests": 15,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-sv2",
+        "label": "SUPER VIP 2",
+        "type": "vipArea",
+        "maxCapacity": 15,
+        "includedGuests": 15,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-kz",
+        "label": "KAI ZEN",
+        "type": "vipArea",
+        "maxCapacity": 15,
+        "includedGuests": 15,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      },
+      {
+        "id": "shoko-la-suite",
+        "label": "LA SUÏTE",
+        "type": "vipArea",
+        "maxCapacity": 30,
+        "includedGuests": 30,
+        "extraGuestFee": false,
+        "currency": "EUR"
+      }
+    ]
   }
 };

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.67";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.67";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.68";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.68";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.68",
+      title: "s3.2.68 — Shôko Barcelona VIP floor plan + NYE'27 prices",
+      checks: [
+        {label:"Shôko VIP plan", file:"vip-plans/shoko-barcelona.json", includes:["shoko-barcelona-spain", "nightPricing", "2026-12-31"]},
+        {label:"VIP app maps Shôko", file:"vip-app.js", includes:["shoko-barcelona-spain", "shoko-barcelona.json"]},
+        {label:"VIP beta catalog Shôko", file:"functions/vip-beta-catalog.js", includes:["shoko-barcelona-spain", "nightPricing"]},
+        {label:"NYE event seed", file:"shared-data.js", includes:["shoko-nye-2027", "NYE'27"]},
+        {label:"Manual test Shôko VIP", file:"ai-diagnostics-service.js", includes:["s3-2-68-shoko-vip-nye"]},
+        {label:"Diagnostics package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]},
+        {label:"VIP pages cache-bust", file:"vip.html", includes:["vip-app.js?v=s3.2.68", "vip-floor-viewer.js?v=s3.2.68"]}
+      ]
+    },
+    {
       version: "s3.2.67",
       title: "s3.2.67 — BOT DEE Gemini fix + help popout + robot avatar",
       checks: [
@@ -235,7 +248,7 @@
         {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar", "pixelated"]},
         {label:"Manual test Gemini", file:"ai-diagnostics-service.js", includes:["s3-2-67-botdee-gemini-name"]},
         {label:"Manual test help popout", file:"ai-diagnostics-service.js", includes:["s3-2-67-help-popout-viewport"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.67\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]}
       ]
     },
     {
@@ -2527,6 +2540,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-68-shoko-vip-nye",
+      area:"VIP reserV / Events",
+      feature:"Shôko Barcelona VIP floor plan + NYE'27 event-only table prices",
+      changed:"vip-plans/shoko-barcelona.json (68 bookable + DJ); PLAN_BY_ID + vip-beta-catalog + BETA_VENUES; nightPricing 2026-12-31 EUR packages from flyer legend; shared-data event shoko-nye-2027 + featureGates.vipReservations; regular nights refuse holds until Club Admin prices. Package s3.2.68. Functions deploy required for live holds/prices.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=shoko-barcelona-spain (s3.2.68) with vipReservations access. 2) Map shows Terraza / Lounge / SUPER VIP / KAI ZEN / LA SUÏTE. 3) Night list includes 2026-12-31 (NYE'27). 4) On NYE, table popout shows EUR package (e.g. SUPER VIP 20.000€). 5) Search/events lists NYE'27 for Shôko. 6) Non-NYE night → hold rejected until regular pricing. 7) BOT DEE: Aurelia still resolves (temp-democlub-1).",
+      expected:"Shôko appears in VIP venue search; NYE night shows flyer EUR prices; other nights unpriced; NYE event on club calendar; Aurelia club lookup still works.",
+      troubleshoot:"Blank map → confirm vip-plans/shoko-barcelona.json + floor PNG on Pages. No NYE night → Functions deploy vip-functions (extraNights merge). Wrong currency $ → deploy commerce + vip-functions currency path. Aurelia not found → confirm executeBotSession has resolveClubLocationId aliases on us-central1."
+    },
       {
         id:"s3-2-67-botdee-gemini-name",
         area:"BOT DEE / FloqAi",

@@ -24,7 +24,20 @@ const CALL_OPTS_STRIPE = {region: "us-central1", cors: true, secrets: [STRIPE_SE
 const {text, BETA_VENUES, BETA_TERMS, inventoryKey, computePartyAmounts, upcomingNights,
   validateNight, betaVenue, hashToken, newQrToken, consentChecksComplete, expandConsentChecks,
   holdExpiresAtMs, HOLD_MS, normalizeVipSettings, resolveDepositRequired, canMarkTableBooked,
-  tableNumberFromSection, bookableNightsFromClub, isNightBookable, isTableBookedValue} = core;
+  tableNumberFromSection, bookableNightsFromClub, isNightBookable, isTableBookedValue,
+  nightPriceOverride, mergeExtraBookableNights} = core;
+
+function catalogNightOverride(catalog, night, sectionId) {
+  return nightPriceOverride(catalog?.nightPricing, night, sectionId);
+}
+
+function clubNightBookable(clubRow, catalog, night) {
+  if (isNightBookable(clubRow, night)) return true;
+  const extras = Array.isArray(catalog?.extraNights) ? catalog.extraNights : [];
+  if (extras.some(n => validateNight(n) === night)) return true;
+  if (catalog?.nightPricing && catalog.nightPricing[night]) return true;
+  return false;
+}
 
 async function loadClubLocation(clubLocationId) {
   const id = text(clubLocationId, 120);
@@ -235,7 +248,13 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
   }
   const vipSettings = await loadVipSettings(clubLocationId);
   const clubRow = await loadClubLocation(clubLocationId);
-  const bookableNights = bookableNightsFromClub(clubRow, {count: 14, horizonDays: 60});
+  const bookableNights = mergeExtraBookableNights(
+    bookableNightsFromClub(clubRow, {count: 14, horizonDays: 90}),
+    [
+      ...(Array.isArray(catalog.extraNights) ? catalog.extraNights : []),
+      ...Object.keys(catalog.nightPricing || {})
+    ]
+  );
   const tableRows = await tableStatus.listTablesForNight(db, clubLocationId, night);
   // Firestore isBooked is the booking-status control (set only after payment / admin confirm).
   const bookedByTable = new Map(tableRows.filter(t => t.isBooked === "1").map(t => [t.tableNumber, t]));
@@ -260,7 +279,22 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       status = "closed";
     }
     // Do not treat legacy vipInventory.isReserved alone as booked — isBooked wins.
-    const amounts = computePartyAmounts(section, section.includedGuests);
+    const nightOverride = catalogNightOverride(catalog, night, section.id);
+    const eventPricedClub = !!(catalog.nightPricing && Object.keys(catalog.nightPricing).length);
+    const amounts = nightOverride || !eventPricedClub
+      ? computePartyAmounts(section, section.includedGuests, {
+        nightOverride,
+        currency: catalog.currency || nightOverride?.currency
+      })
+      : {
+        // Regular nights at event-priced clubs stay unpriced until Club Admin publishes.
+        minimumAmountCents: 0,
+        depositCents: 0,
+        extraGuestFeeCents: 0,
+        includedGuests: section.includedGuests,
+        maxCapacity: section.maxCapacity,
+        currency: catalog.currency || "EUR"
+      };
     const depositRequired = resolveDepositRequired(vipSettings, amounts) ? 1 : 0;
     sections.push({
       sectionId: section.id,
@@ -276,7 +310,10 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       depositCents: amounts.depositCents,
       depositRequired,
       minimumAmountCents: amounts.minimumAmountCents,
-      extraGuestFeeCents: amounts.extraGuestFeeCents
+      extraGuestFeeCents: amounts.extraGuestFeeCents,
+      currency: amounts.currency || "USD",
+      nightPriced: !!nightOverride,
+      pricesPublished: !!nightOverride || !eventPricedClub
     });
   }
   if (staleHoldCleanups.length) {
@@ -288,12 +325,13 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     venueName: catalog.venueName,
     nights: bookableNights.map(n => n.night),
     bookableNights,
-    nightOpen: isNightBookable(clubRow, night),
+    nightOpen: clubNightBookable(clubRow, catalog, night),
     nightHours: (() => {
       try { return core.hoursForNight(clubRow, night); } catch (_) { return null; }
     })(),
     depositRequired: vipSettings.depositRequired,
     holdMinutes: Math.round(HOLD_MS / 60000),
+    currency: catalog.currency || "USD",
     sections,
     tables: tableRows
   };
@@ -313,14 +351,28 @@ async function runCreateVipHold(request) {
   const venue = betaVenue(clubLocationId);
   if (!venue || venue.pending) throw new HttpsError("failed-precondition", "This venue is not bookable on VIP reserV yet.");
   const {catalog, section} = resolveSection(clubLocationId, sectionId);
-  if (partySize < 1 || partySize > Number(section.maxCapacity || 0)) {
-    throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
+  const nightOverride = catalogNightOverride(catalog, night, sectionId);
+  const maxCap = Math.max(1, Math.floor(Number(
+    nightOverride?.maxCapacity || section.maxCapacity || 0
+  )));
+  if (partySize < 1 || partySize > maxCap) {
+    throw new HttpsError("invalid-argument", `Party size must be between 1 and ${maxCap}.`);
   }
   const clubRow = await loadClubLocation(clubLocationId);
-  if (!isNightBookable(clubRow, night)) {
+  if (!clubNightBookable(clubRow, catalog, night)) {
     throw new HttpsError("failed-precondition", "That night the club is closed. Pick an open night from the calendar.");
   }
-  const amounts = computePartyAmounts(section, partySize);
+  const amounts = computePartyAmounts(section, partySize, {
+    nightOverride,
+    currency: catalog.currency || nightOverride?.currency
+  });
+  // Event-priced clubs (e.g. Shôko): refuse holds on nights without published package prices.
+  if (catalog.nightPricing && !nightOverride) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Table prices for this night are not published yet. Pick the event night (e.g. NYE) or wait for Club Admin regular-night pricing."
+    );
+  }
   const vipSettings = await loadVipSettings(clubLocationId);
   const depositRequired = resolveDepositRequired(vipSettings, amounts);
   let paymentCollector = "floqrStripe";
@@ -950,10 +1002,17 @@ exports.adminConfirmVipReservation = onCall(CALL_OPTS, async request => {
   }
   await requireClubManager(request.auth, clubLocationId);
   const {catalog, section} = resolveSection(clubLocationId, sectionId);
-  if (partySize < 1 || partySize > Number(section.maxCapacity || 0)) {
-    throw new HttpsError("invalid-argument", `Party size must be between 1 and ${section.maxCapacity}.`);
+  const nightOverride = catalogNightOverride(catalog, night, sectionId);
+  const maxCap = Math.max(1, Math.floor(Number(
+    nightOverride?.maxCapacity || section.maxCapacity || 0
+  )));
+  if (partySize < 1 || partySize > maxCap) {
+    throw new HttpsError("invalid-argument", `Party size must be between 1 and ${maxCap}.`);
   }
-  const amounts = computePartyAmounts(section, partySize);
+  const amounts = computePartyAmounts(section, partySize, {
+    nightOverride,
+    currency: catalog.currency || nightOverride?.currency
+  });
   const vipSettings = await loadVipSettings(clubLocationId);
   const depositRequired = resolveDepositRequired(vipSettings, amounts);
   if (depositRequired && !paymentRecorded) {

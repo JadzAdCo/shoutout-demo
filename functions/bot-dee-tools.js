@@ -45,7 +45,12 @@ const CLUB_NAME_ALIASES = Object.freeze({
   "lima twist": "lima-twist-washington-dc",
   "lima twist club": "lima-twist-washington-dc",
   "lima twist washington": "lima-twist-washington-dc",
-  "lima twist washington dc": "lima-twist-washington-dc"
+  "lima twist washington dc": "lima-twist-washington-dc",
+  shoko: "shoko-barcelona-spain",
+  "shoko barcelona": "shoko-barcelona-spain",
+  "shoko barcelona spain": "shoko-barcelona-spain",
+  "shôko": "shoko-barcelona-spain",
+  "shôko barcelona": "shoko-barcelona-spain"
 });
 
 function normalizeClubNeedle(value) {
