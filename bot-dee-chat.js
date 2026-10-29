@@ -35,10 +35,28 @@
     return false;
   }
 
+  function isIdentityPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 120) return false;
+    if (/^(?:who are you|what(?:'s| s| is) your name|what are you called)\b/.test(q)) return true;
+    if (/how (?:is|do you|do i|to) (?:your |the )?name pronounc/.test(q)) return true;
+    if (/how (?:do you|to) pronounce (?:your name|bot\s*dee|floqai|floq\s*ai|floqr)\b/.test(q)) return true;
+    if (/^(?:pronounce|pronunciation) (?:bot\s*dee|your name|floqai|floqr)?\b/.test(q)) return true;
+    if (/^what does (?:bot\s*dee|floqai|floq\s*ai) (?:mean|stand for)\b/.test(q)) return true;
+    return false;
+  }
+
   function chitchatReply() {
     return t(
       "floqai.chatHello",
       "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
+    );
+  }
+
+  function identityReply() {
+    return t(
+      "floqai.chatIdentity",
+      "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper. What do you want to do — ShoutOut, VIP table, floqCast, scheduling, or something else?"
     );
   }
 
@@ -59,11 +77,8 @@
       .replace(/"/g, "&quot;");
   }
 
-  function botAvatarSrc() {
-    const header = document.querySelector(".botdee-chat-icon[data-floqr-chrome-icon=\"floqAi\"]");
-    const src = header?.getAttribute("src");
-    return src || "./images/chrome/botdee-nightlife.jpg";
-  }
+  // Dedicated robot-head mark for bubble origin (not Site-chrome pack JPG).
+  const BOT_AVATAR_SRC = "./images/botdee-chat-avatar.png";
 
   function appendBubble(role, text, results) {
     const log = byId("botDeeTranscript");
@@ -75,8 +90,7 @@
     if (!isUser) {
       const avatar = document.createElement("img");
       avatar.className = "botdee-msg-avatar";
-      avatar.setAttribute("data-floqr-chrome-icon", "floqAi");
-      avatar.src = botAvatarSrc();
+      avatar.src = BOT_AVATAR_SRC;
       avatar.alt = "BOT DEE";
       avatar.width = 36;
       avatar.height = 36;
@@ -119,10 +133,6 @@
     }
     row.appendChild(article);
     log.appendChild(row);
-    // Refresh Site chrome face on newly minted avatar nodes.
-    try {
-      global.FLOQRChromeScheme?.applyDocument?.();
-    } catch (_) { /* ignore */ }
     log.scrollTop = log.scrollHeight;
   }
 
@@ -153,9 +163,9 @@
     appendBubble("user", text);
     pushHistory("user", text);
 
-    // Chatbot first: never let "hello" fall through to a search-miss reply.
-    if (isChitchatPrompt(text)) {
-      const reply = chitchatReply();
+    // Chatbot first: never let hello / name questions fall through to a search miss.
+    if (isChitchatPrompt(text) || isIdentityPrompt(text)) {
+      const reply = isIdentityPrompt(text) ? identityReply() : chitchatReply();
       appendBubble("bot", reply);
       pushHistory("model", reply);
       setStatus("");

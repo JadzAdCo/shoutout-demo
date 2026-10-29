@@ -139,6 +139,22 @@ function isChitchatPrompt(raw) {
   return false;
 }
 
+/** Name / identity — answer as BOT DEE; never dump search hits. */
+function isIdentityPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 120) return false;
+  if (/^(?:who are you|what(?:'s| s| is) your name|what are you called)\b/.test(q)) return true;
+  if (/how (?:is|do you|do i|to) (?:your |the )?name pronounc/.test(q)) return true;
+  if (/how (?:do you|to) pronounce (?:your name|bot\s*dee|floqai|floq\s*ai|floqr)\b/.test(q)) return true;
+  if (/^(?:pronounce|pronunciation) (?:bot\s*dee|your name|floqai|floqr)?\b/.test(q)) return true;
+  if (/^what does (?:bot\s*dee|floqai|floq\s*ai) (?:mean|stand for)\b/.test(q)) return true;
+  return false;
+}
+
+function identityReply() {
+  return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper. What do you want to do — ShoutOut, VIP table, floqCast, scheduling, or something else?";
+}
+
 function chitchatReply(role) {
   const roleHint = role && role !== "anonymous" && role !== "patron"
     ? ` I can see you as ${role}.`
@@ -239,6 +255,7 @@ function systemInstruction(role) {
   return [
     "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
     "Greetings and small talk (hi, hey, thanks, how are you): reply in 1–2 short sentences, ask what they want to do, and do NOT call any tools.",
+    "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D).",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
@@ -310,6 +327,8 @@ module.exports = {
   sanitizeUserPrompt,
   sanitizeHistory,
   isChitchatPrompt,
+  isIdentityPrompt,
+  identityReply,
   chitchatReply,
   contextualSearch,
   runTool,
