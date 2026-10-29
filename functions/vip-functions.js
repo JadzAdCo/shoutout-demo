@@ -280,21 +280,10 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     }
     // Do not treat legacy vipInventory.isReserved alone as booked — isBooked wins.
     const nightOverride = catalogNightOverride(catalog, night, section.id);
-    const eventPricedClub = !!(catalog.nightPricing && Object.keys(catalog.nightPricing).length);
-    const amounts = nightOverride || !eventPricedClub
-      ? computePartyAmounts(section, section.includedGuests, {
-        nightOverride,
-        currency: catalog.currency || nightOverride?.currency
-      })
-      : {
-        // Regular nights at event-priced clubs stay unpriced until Club Admin publishes.
-        minimumAmountCents: 0,
-        depositCents: 0,
-        extraGuestFeeCents: 0,
-        includedGuests: section.includedGuests,
-        maxCapacity: section.maxCapacity,
-        currency: catalog.currency || "EUR"
-      };
+    const amounts = computePartyAmounts(section, section.includedGuests, {
+      nightOverride,
+      currency: catalog.currency || nightOverride?.currency || section.minimumAmount?.currency
+    });
     const depositRequired = resolveDepositRequired(vipSettings, amounts) ? 1 : 0;
     sections.push({
       sectionId: section.id,
@@ -313,7 +302,7 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
       extraGuestFeeCents: amounts.extraGuestFeeCents,
       currency: amounts.currency || "USD",
       nightPriced: !!nightOverride,
-      pricesPublished: !!nightOverride || !eventPricedClub
+      pricesPublished: Number(amounts.minimumAmountCents || 0) > 0
     });
   }
   if (staleHoldCleanups.length) {
@@ -364,13 +353,12 @@ async function runCreateVipHold(request) {
   }
   const amounts = computePartyAmounts(section, partySize, {
     nightOverride,
-    currency: catalog.currency || nightOverride?.currency
+    currency: catalog.currency || nightOverride?.currency || section.minimumAmount?.currency
   });
-  // Event-priced clubs (e.g. Shôko): refuse holds on nights without published package prices.
-  if (catalog.nightPricing && !nightOverride) {
+  if (!(Number(amounts.minimumAmountCents || 0) > 0) && !(Number(amounts.depositCents || 0) > 0)) {
     throw new HttpsError(
       "failed-precondition",
-      "Table prices for this night are not published yet. Pick the event night (e.g. NYE) or wait for Club Admin regular-night pricing."
+      "Table prices for this night are not published yet. Pick a priced night or wait for Club Admin pricing."
     );
   }
   const vipSettings = await loadVipSettings(clubLocationId);

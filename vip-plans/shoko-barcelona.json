@@ -22,689 +22,758 @@
       "eventId": "shoko-nye-2027",
       "eventName": "NYE'27 \u2014 New Year's Eve 2027",
       "currency": "EUR",
-      "note": "Table package prices from Sh\u00f4ko NYE'27 flyer legend. Regular nights use Club Admin pricing (placeholders on sections).",
+      "note": "NYE'27 table package list prices from Sh\u00f4ko flyer. minimumAmount = full NYE list; deposit/minimum reservation = 50% of NYE list. Regular nights use section.minimumAmount = NYE/4 (standard) with deposit = 25% of standard.",
       "sections": {
         "shoko-t01": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t02": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t03": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t04": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t05": {
           "minimumAmountCents": 600000,
-          "depositCents": 600000,
+          "depositCents": 300000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 8,
           "maxCapacity": 8,
           "colorTier": "magenta",
-          "listPriceEur": 6000
+          "listPriceEur": 6000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t06": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t07": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t08": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t09": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t10": {
           "minimumAmountCents": 600000,
-          "depositCents": 600000,
+          "depositCents": 300000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 8,
           "maxCapacity": 8,
           "colorTier": "magenta",
-          "listPriceEur": 6000
+          "listPriceEur": 6000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t11": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t12": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t13": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t14": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t15": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t16": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t17": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t18": {
           "minimumAmountCents": 400000,
-          "depositCents": 400000,
+          "depositCents": 200000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "purple",
-          "listPriceEur": 4000
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t19": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t20": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t21": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t22": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t23": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t24": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t25": {
           "minimumAmountCents": 800000,
-          "depositCents": 800000,
+          "depositCents": 400000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 10,
           "maxCapacity": 10,
           "colorTier": "red",
-          "listPriceEur": 8000
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t26": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t27": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t28": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t29": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t30": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t31": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t32": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t33": {
           "minimumAmountCents": 350000,
-          "depositCents": 350000,
+          "depositCents": 175000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "cyan",
-          "listPriceEur": 3500
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t34": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t35": {
           "minimumAmountCents": 100000,
-          "depositCents": 100000,
+          "depositCents": 50000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 2,
           "maxCapacity": 2,
           "colorTier": "lightyellow",
-          "listPriceEur": 1000
+          "listPriceEur": 1000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t36": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t37": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t38": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t39": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t40": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t41": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t42": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t43": {
           "minimumAmountCents": 350000,
-          "depositCents": 350000,
+          "depositCents": 175000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "cyan",
-          "listPriceEur": 3500
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t44": {
           "minimumAmountCents": 800000,
-          "depositCents": 800000,
+          "depositCents": 400000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 10,
           "maxCapacity": 10,
           "colorTier": "red",
-          "listPriceEur": 8000
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t45": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t46": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t47": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t48": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t49": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t50": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t51": {
           "minimumAmountCents": 800000,
-          "depositCents": 800000,
+          "depositCents": 400000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 10,
           "maxCapacity": 10,
           "colorTier": "red",
-          "listPriceEur": 8000
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t52": {
           "minimumAmountCents": 1200000,
-          "depositCents": 1200000,
+          "depositCents": 600000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 10,
           "maxCapacity": 10,
           "colorTier": "darkred",
-          "listPriceEur": 12000
+          "listPriceEur": 12000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t53": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t54": {
           "minimumAmountCents": 350000,
-          "depositCents": 350000,
+          "depositCents": 175000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "cyan",
-          "listPriceEur": 3500
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t55": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t56": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t57": {
           "minimumAmountCents": 800000,
-          "depositCents": 800000,
+          "depositCents": 400000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 10,
           "maxCapacity": 10,
           "colorTier": "red",
-          "listPriceEur": 8000
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t58": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t59": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t60": {
           "minimumAmountCents": 200000,
-          "depositCents": 200000,
+          "depositCents": 100000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "lightgreen",
-          "listPriceEur": 2000
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t61": {
           "minimumAmountCents": 350000,
-          "depositCents": 350000,
+          "depositCents": 175000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "cyan",
-          "listPriceEur": 3500
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t62": {
           "minimumAmountCents": 250000,
-          "depositCents": 250000,
+          "depositCents": 125000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 4,
           "maxCapacity": 4,
           "colorTier": "green",
-          "listPriceEur": 2500
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t63": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-t64": {
           "minimumAmountCents": 150000,
-          "depositCents": 150000,
+          "depositCents": 75000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 6,
           "maxCapacity": 6,
           "colorTier": "yellow",
-          "listPriceEur": 1500
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
         },
         "shoko-sv1": {
           "minimumAmountCents": 2000000,
-          "depositCents": 2000000,
+          "depositCents": 1000000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 15,
           "maxCapacity": 15,
           "colorTier": "supervip",
-          "listPriceEur": 20000
+          "listPriceEur": 20000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-sv2": {
           "minimumAmountCents": 2000000,
-          "depositCents": 2000000,
+          "depositCents": 1000000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 15,
           "maxCapacity": 15,
           "colorTier": "supervip",
-          "listPriceEur": 20000
+          "listPriceEur": 20000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-kz": {
           "minimumAmountCents": 800000,
-          "depositCents": 800000,
+          "depositCents": 400000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 15,
           "maxCapacity": 15,
           "colorTier": "kaizen",
-          "listPriceEur": 8000
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
         },
         "shoko-la-suite": {
           "minimumAmountCents": 3000000,
-          "depositCents": 3000000,
+          "depositCents": 1500000,
           "extraGuestFeeCents": 0,
           "currency": "EUR",
           "includedGuests": 30,
           "maxCapacity": 30,
           "colorTier": "suite",
-          "listPriceEur": 30000
+          "listPriceEur": 30000,
+          "depositPercentOfMinimum": 50
         }
-      }
+      },
+      "depositPercentOfMinimum": 50
     }
   },
   "areas": [
@@ -1101,24 +1170,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T01 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t02",
@@ -1151,24 +1223,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T02 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t03",
@@ -1201,24 +1276,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T03 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t04",
@@ -1251,24 +1329,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T04 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t05",
@@ -1301,24 +1382,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE magenta \u00b7 8 PAX",
       "colorTier": "magenta",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 150000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (6000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T05 (magenta tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1500,
+      "nyeListPriceEur": 6000
     },
     {
       "id": "shoko-t06",
@@ -1351,24 +1435,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T06 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t07",
@@ -1401,24 +1488,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T07 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t08",
@@ -1451,24 +1541,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T08 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t09",
@@ -1501,24 +1594,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T09 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t10",
@@ -1551,24 +1647,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE magenta \u00b7 8 PAX",
       "colorTier": "magenta",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 150000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (6000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T10 (magenta tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1500,
+      "nyeListPriceEur": 6000
     },
     {
       "id": "shoko-t11",
@@ -1601,24 +1700,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T11 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t12",
@@ -1651,24 +1753,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T12 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t13",
@@ -1701,24 +1806,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T13 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t14",
@@ -1751,24 +1859,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T14 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t15",
@@ -1801,24 +1912,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T15 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t16",
@@ -1851,24 +1965,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T16 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t17",
@@ -1901,24 +2018,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T17 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t18",
@@ -1951,24 +2071,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
       "colorTier": "purple",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 100000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T18 (purple tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
     },
     {
       "id": "shoko-t19",
@@ -2001,24 +2124,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T19 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t20",
@@ -2051,24 +2177,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T20 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t21",
@@ -2101,24 +2230,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T21 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t22",
@@ -2151,24 +2283,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T22 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t23",
@@ -2201,24 +2336,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T23 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t24",
@@ -2251,24 +2389,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T24 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t25",
@@ -2301,24 +2442,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
       "colorTier": "red",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 200000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T25 (red tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
     },
     {
       "id": "shoko-t26",
@@ -2351,24 +2495,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T26 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t27",
@@ -2401,24 +2548,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T27 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t28",
@@ -2451,24 +2601,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T28 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t29",
@@ -2501,24 +2654,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T29 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t30",
@@ -2551,24 +2707,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T30 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t31",
@@ -2601,24 +2760,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T31 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t32",
@@ -2651,24 +2813,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T32 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t33",
@@ -2701,24 +2866,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
       "colorTier": "cyan",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 87500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 21875,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T33 (cyan tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
     },
     {
       "id": "shoko-t34",
@@ -2751,24 +2919,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T34 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t35",
@@ -2801,24 +2972,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light yellow \u00b7 2 PAX",
       "colorTier": "lightyellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 25000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 6250,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T35 (lightyellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 250,
+      "nyeListPriceEur": 1000
     },
     {
       "id": "shoko-t36",
@@ -2851,24 +3025,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T36 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t37",
@@ -2901,24 +3078,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T37 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t38",
@@ -2951,24 +3131,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T38 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t39",
@@ -3001,24 +3184,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T39 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t40",
@@ -3051,24 +3237,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T40 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t41",
@@ -3101,24 +3290,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T41 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t42",
@@ -3151,24 +3343,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T42 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t43",
@@ -3201,24 +3396,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
       "colorTier": "cyan",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 87500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 21875,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T43 (cyan tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
     },
     {
       "id": "shoko-t44",
@@ -3251,24 +3449,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
       "colorTier": "red",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 200000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T44 (red tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
     },
     {
       "id": "shoko-t45",
@@ -3301,24 +3502,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T45 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t46",
@@ -3351,24 +3555,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T46 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t47",
@@ -3401,24 +3608,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T47 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t48",
@@ -3451,24 +3661,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T48 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t49",
@@ -3501,24 +3714,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T49 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t50",
@@ -3551,24 +3767,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T50 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t51",
@@ -3601,24 +3820,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
       "colorTier": "red",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 200000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T51 (red tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
     },
     {
       "id": "shoko-t52",
@@ -3651,24 +3873,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE dark red \u00b7 10 PAX",
       "colorTier": "darkred",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 300000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (12000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 75000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T52 (darkred tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 3000,
+      "nyeListPriceEur": 12000
     },
     {
       "id": "shoko-t53",
@@ -3701,24 +3926,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T53 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t54",
@@ -3751,24 +3979,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
       "colorTier": "cyan",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 87500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 21875,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T54 (cyan tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
     },
     {
       "id": "shoko-t55",
@@ -3801,24 +4032,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T55 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t56",
@@ -3851,24 +4085,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T56 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t57",
@@ -3901,24 +4138,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
       "colorTier": "red",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 200000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T57 (red tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
     },
     {
       "id": "shoko-t58",
@@ -3951,24 +4191,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T58 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t59",
@@ -4001,24 +4244,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T59 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t60",
@@ -4051,24 +4297,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
       "colorTier": "lightgreen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 12500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T60 (lightgreen tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
     },
     {
       "id": "shoko-t61",
@@ -4101,24 +4350,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
       "colorTier": "cyan",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 87500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 21875,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T61 (cyan tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
     },
     {
       "id": "shoko-t62",
@@ -4151,24 +4403,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
       "colorTier": "green",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 62500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 15625,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T62 (green tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
     },
     {
       "id": "shoko-t63",
@@ -4201,24 +4456,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T63 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-t64",
@@ -4251,24 +4509,27 @@
       "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
       "colorTier": "yellow",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 37500,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets prices later"
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 9375,
         "currency": "EUR",
-        "placeholder": true,
-        "note": "Regular nights \u2014 Club Admin sets deposit later"
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko table T64 (yellow tier on NYE map)",
       "photos": [],
       "availability": {
         "defaultNights": [],
         "note": "NYE prices apply only on 2026-12-31"
-      }
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
     },
     {
       "id": "shoko-sv1",
@@ -4301,15 +4562,18 @@
       "capacityNote": "NYE'27 legend \u00b7 SUPER VIP 1 \u00b7 15 PAX",
       "colorTier": "supervip",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 500000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (20000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 125000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko SUPER VIP 1 (NYE package)",
       "photos": [],
@@ -4317,7 +4581,9 @@
         "defaultNights": [
           "2026-12-31"
         ]
-      }
+      },
+      "standardPriceEur": 5000,
+      "nyeListPriceEur": 20000
     },
     {
       "id": "shoko-sv2",
@@ -4350,15 +4616,18 @@
       "capacityNote": "NYE'27 legend \u00b7 SUPER VIP 2 \u00b7 15 PAX",
       "colorTier": "supervip",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 500000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (20000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 125000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko SUPER VIP 2 (NYE package)",
       "photos": [],
@@ -4366,7 +4635,9 @@
         "defaultNights": [
           "2026-12-31"
         ]
-      }
+      },
+      "standardPriceEur": 5000,
+      "nyeListPriceEur": 20000
     },
     {
       "id": "shoko-kz",
@@ -4399,15 +4670,18 @@
       "capacityNote": "NYE'27 legend \u00b7 KAI ZEN \u00b7 15 PAX",
       "colorTier": "kaizen",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 200000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 50000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "Sh\u00f4ko KAI ZEN (NYE package)",
       "photos": [],
@@ -4415,7 +4689,9 @@
         "defaultNights": [
           "2026-12-31"
         ]
-      }
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
     },
     {
       "id": "shoko-la-suite",
@@ -4448,15 +4724,18 @@
       "capacityNote": "NYE'27 legend \u00b7 LA SU\u00cfTE \u00b7 30 PAX (position approximate \u2014 suite is a separate room on the flyer map)",
       "colorTier": "suite",
       "minimumAmount": {
-        "amountCents": null,
+        "amountCents": 750000,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (30000\u20ac). Regular nights."
       },
       "extraGuestFee": null,
       "deposit": {
-        "amountCents": null,
+        "amountCents": 187500,
         "currency": "EUR",
-        "placeholder": true
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
       },
       "description": "LA SU\u00cfTE private room \u2014 NYE package 30.000\u20ac / 30 PAX",
       "photos": [],
@@ -4464,7 +4743,9 @@
         "defaultNights": [
           "2026-12-31"
         ]
-      }
+      },
+      "standardPriceEur": 7500,
+      "nyeListPriceEur": 30000
     }
   ],
   "nonBookable": [
@@ -4513,5 +4794,12 @@
     "nonBookable": 1,
     "djBooths": 1,
     "nyePricedSections": 68
+  },
+  "pricingPolicy": {
+    "currency": "EUR",
+    "nyeNight": "2026-12-31",
+    "standardVsNye": "standard = NYE list / 4 (NYE is ~400% of standard)",
+    "regularDepositPercentOfStandard": 25,
+    "nyeDepositPercentOfNyeList": 50
   }
 }

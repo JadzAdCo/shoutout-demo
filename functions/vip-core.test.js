@@ -45,7 +45,7 @@ test("beta catalog covers Decades, Lima Twist, Aurelia, and Shôko bookable sect
   assert.equal(core.BETA_VENUES.find(v => v.id === "shoko-barcelona-spain")?.pending, false);
 });
 
-test("Shôko NYE night pricing overrides regular demo amounts (EUR)", () => {
+test("Shôko standard = NYE/4; deposits 25% regular / 50% NYE", () => {
   const section = catalog["shoko-barcelona-spain"].sections.find(s => s.id === "shoko-sv1");
   assert.ok(section, "SUPER VIP 1 section");
   const override = core.nightPriceOverride(
@@ -56,11 +56,14 @@ test("Shôko NYE night pricing overrides regular demo amounts (EUR)", () => {
   assert.equal(override.listPriceEur, 20000);
   const nye = core.computePartyAmounts(section, 15, {nightOverride: override});
   assert.equal(nye.currency, "EUR");
-  assert.equal(nye.minimumAmountCents, 2000000);
-  assert.equal(nye.depositCents, 2000000);
-  assert.equal(nye.chargedCents, 2000000);
+  assert.equal(nye.minimumAmountCents, 2000000); // full NYE list
+  assert.equal(nye.depositCents, 1000000); // 50% of NYE
+  assert.equal(nye.chargedCents, 1000000);
   const regular = core.computePartyAmounts(section, 15);
-  assert.notEqual(regular.minimumAmountCents, nye.minimumAmountCents);
+  assert.equal(regular.currency, "EUR");
+  assert.equal(regular.minimumAmountCents, 500000); // standard = NYE/4
+  assert.equal(regular.depositCents, 125000); // 25% of standard
+  assert.equal(regular.chargedCents, 125000);
 });
 
 test("mergeExtraBookableNights keeps NYE beyond rolling horizon", () => {

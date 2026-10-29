@@ -2544,10 +2544,10 @@
       id:"s3-2-68-shoko-vip-nye",
       area:"VIP reserV / Events",
       feature:"Shôko Barcelona VIP floor plan + NYE'27 event-only table prices",
-      changed:"vip-plans/shoko-barcelona.json (68 bookable + DJ); PLAN_BY_ID + vip-beta-catalog + BETA_VENUES; nightPricing 2026-12-31 EUR packages from flyer legend; shared-data event shoko-nye-2027 + featureGates.vipReservations; regular nights refuse holds until Club Admin prices. Package s3.2.68. Functions deploy required for live holds/prices.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=shoko-barcelona-spain (s3.2.68) with vipReservations access. 2) Map shows Terraza / Lounge / SUPER VIP / KAI ZEN / LA SUÏTE. 3) Night list includes 2026-12-31 (NYE'27). 4) On NYE, table popout shows EUR package (e.g. SUPER VIP 20.000€). 5) Search/events lists NYE'27 for Shôko. 6) Non-NYE night → hold rejected until regular pricing. 7) BOT DEE: Aurelia still resolves (temp-democlub-1).",
-      expected:"Shôko appears in VIP venue search; NYE night shows flyer EUR prices; other nights unpriced; NYE event on club calendar; Aurelia club lookup still works.",
-      troubleshoot:"Blank map → confirm vip-plans/shoko-barcelona.json + floor PNG on Pages. No NYE night → Functions deploy vip-functions (extraNights merge). Wrong currency $ → deploy commerce + vip-functions currency path. Aurelia not found → confirm executeBotSession has resolveClubLocationId aliases on us-central1."
+      changed:"vip-plans/shoko-barcelona.json (68 bookable + DJ); nightPricing 2026-12-31 EUR flyer list; standard (non-NYE) = NYE÷4; deposit 25% of standard (regular) / 50% of NYE list (NYE). Event shoko-nye-2027. Package s3.2.68. Functions deploy required for live holds/prices.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=shoko-barcelona-spain (s3.2.68) with vipReservations access. 2) Map shows Terraza / Lounge / SUPER VIP / KAI ZEN / LA SUÏTE. 3) Non-NYE night: SUPER VIP minimum 5.000€, pay today 1.250€ (25%). 4) Night 2026-12-31: SUPER VIP minimum 20.000€, pay today 10.000€ (50%). 5) Search/events lists NYE'27. 6) BOT DEE: Aurelia still resolves.",
+      expected:"Regular nights use standard = NYE/4 with 25% deposit; NYE uses flyer list with 50% deposit; both EUR; Aurelia still resolves.",
+      troubleshoot:"Blank map → vip-plans/shoko-barcelona.json + PNG on Pages. Wrong deposit % → Functions deploy vip-functions/vip-beta-catalog. No NYE night → extraNights merge deploy. Aurelia not found → executeBotSession resolveClubLocationId on us-central1."
     },
       {
         id:"s3-2-67-botdee-gemini-name",

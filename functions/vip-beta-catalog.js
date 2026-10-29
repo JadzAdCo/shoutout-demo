@@ -539,689 +539,758 @@ module.exports = {
         "eventId": "shoko-nye-2027",
         "eventName": "NYE'27 — New Year's Eve 2027",
         "currency": "EUR",
-        "note": "Table package prices from Shôko NYE'27 flyer legend. Regular nights use Club Admin pricing (placeholders on sections).",
+        "note": "NYE'27 table package list prices from Shôko flyer. minimumAmount = full NYE list; deposit/minimum reservation = 50% of NYE list. Regular nights use section.minimumAmount = NYE/4 (standard) with deposit = 25% of standard.",
         "sections": {
           "shoko-t01": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t02": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t03": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t04": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t05": {
             "minimumAmountCents": 600000,
-            "depositCents": 600000,
+            "depositCents": 300000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 8,
             "maxCapacity": 8,
             "colorTier": "magenta",
-            "listPriceEur": 6000
+            "listPriceEur": 6000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t06": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t07": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t08": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t09": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t10": {
             "minimumAmountCents": 600000,
-            "depositCents": 600000,
+            "depositCents": 300000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 8,
             "maxCapacity": 8,
             "colorTier": "magenta",
-            "listPriceEur": 6000
+            "listPriceEur": 6000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t11": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t12": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t13": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t14": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t15": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t16": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t17": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t18": {
             "minimumAmountCents": 400000,
-            "depositCents": 400000,
+            "depositCents": 200000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "purple",
-            "listPriceEur": 4000
+            "listPriceEur": 4000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t19": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t20": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t21": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t22": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t23": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t24": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t25": {
             "minimumAmountCents": 800000,
-            "depositCents": 800000,
+            "depositCents": 400000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 10,
             "maxCapacity": 10,
             "colorTier": "red",
-            "listPriceEur": 8000
+            "listPriceEur": 8000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t26": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t27": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t28": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t29": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t30": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t31": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t32": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t33": {
             "minimumAmountCents": 350000,
-            "depositCents": 350000,
+            "depositCents": 175000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "cyan",
-            "listPriceEur": 3500
+            "listPriceEur": 3500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t34": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t35": {
             "minimumAmountCents": 100000,
-            "depositCents": 100000,
+            "depositCents": 50000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 2,
             "maxCapacity": 2,
             "colorTier": "lightyellow",
-            "listPriceEur": 1000
+            "listPriceEur": 1000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t36": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t37": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t38": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t39": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t40": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t41": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t42": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t43": {
             "minimumAmountCents": 350000,
-            "depositCents": 350000,
+            "depositCents": 175000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "cyan",
-            "listPriceEur": 3500
+            "listPriceEur": 3500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t44": {
             "minimumAmountCents": 800000,
-            "depositCents": 800000,
+            "depositCents": 400000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 10,
             "maxCapacity": 10,
             "colorTier": "red",
-            "listPriceEur": 8000
+            "listPriceEur": 8000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t45": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t46": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t47": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t48": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t49": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t50": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t51": {
             "minimumAmountCents": 800000,
-            "depositCents": 800000,
+            "depositCents": 400000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 10,
             "maxCapacity": 10,
             "colorTier": "red",
-            "listPriceEur": 8000
+            "listPriceEur": 8000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t52": {
             "minimumAmountCents": 1200000,
-            "depositCents": 1200000,
+            "depositCents": 600000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 10,
             "maxCapacity": 10,
             "colorTier": "darkred",
-            "listPriceEur": 12000
+            "listPriceEur": 12000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t53": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t54": {
             "minimumAmountCents": 350000,
-            "depositCents": 350000,
+            "depositCents": 175000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "cyan",
-            "listPriceEur": 3500
+            "listPriceEur": 3500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t55": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t56": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t57": {
             "minimumAmountCents": 800000,
-            "depositCents": 800000,
+            "depositCents": 400000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 10,
             "maxCapacity": 10,
             "colorTier": "red",
-            "listPriceEur": 8000
+            "listPriceEur": 8000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t58": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t59": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t60": {
             "minimumAmountCents": 200000,
-            "depositCents": 200000,
+            "depositCents": 100000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "lightgreen",
-            "listPriceEur": 2000
+            "listPriceEur": 2000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t61": {
             "minimumAmountCents": 350000,
-            "depositCents": 350000,
+            "depositCents": 175000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "cyan",
-            "listPriceEur": 3500
+            "listPriceEur": 3500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t62": {
             "minimumAmountCents": 250000,
-            "depositCents": 250000,
+            "depositCents": 125000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 4,
             "maxCapacity": 4,
             "colorTier": "green",
-            "listPriceEur": 2500
+            "listPriceEur": 2500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t63": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-t64": {
             "minimumAmountCents": 150000,
-            "depositCents": 150000,
+            "depositCents": 75000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 6,
             "maxCapacity": 6,
             "colorTier": "yellow",
-            "listPriceEur": 1500
+            "listPriceEur": 1500,
+            "depositPercentOfMinimum": 50
           },
           "shoko-sv1": {
             "minimumAmountCents": 2000000,
-            "depositCents": 2000000,
+            "depositCents": 1000000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 15,
             "maxCapacity": 15,
             "colorTier": "supervip",
-            "listPriceEur": 20000
+            "listPriceEur": 20000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-sv2": {
             "minimumAmountCents": 2000000,
-            "depositCents": 2000000,
+            "depositCents": 1000000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 15,
             "maxCapacity": 15,
             "colorTier": "supervip",
-            "listPriceEur": 20000
+            "listPriceEur": 20000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-kz": {
             "minimumAmountCents": 800000,
-            "depositCents": 800000,
+            "depositCents": 400000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 15,
             "maxCapacity": 15,
             "colorTier": "kaizen",
-            "listPriceEur": 8000
+            "listPriceEur": 8000,
+            "depositPercentOfMinimum": 50
           },
           "shoko-la-suite": {
             "minimumAmountCents": 3000000,
-            "depositCents": 3000000,
+            "depositCents": 1500000,
             "extraGuestFeeCents": 0,
             "currency": "EUR",
             "includedGuests": 30,
             "maxCapacity": 30,
             "colorTier": "suite",
-            "listPriceEur": 30000
+            "listPriceEur": 30000,
+            "depositPercentOfMinimum": 50
           }
-        }
+        },
+        "depositPercentOfMinimum": 50
       }
     },
     "sections": [
@@ -1232,7 +1301,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t02",
@@ -1241,7 +1322,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t03",
@@ -1250,7 +1343,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t04",
@@ -1259,7 +1364,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t05",
@@ -1268,7 +1385,19 @@ module.exports = {
         "maxCapacity": 8,
         "includedGuests": 8,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 150000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1500,
+        "nyeListPriceEur": 6000
       },
       {
         "id": "shoko-t06",
@@ -1277,7 +1406,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t07",
@@ -1286,7 +1427,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t08",
@@ -1295,7 +1448,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t09",
@@ -1304,7 +1469,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t10",
@@ -1313,7 +1490,19 @@ module.exports = {
         "maxCapacity": 8,
         "includedGuests": 8,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 150000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1500,
+        "nyeListPriceEur": 6000
       },
       {
         "id": "shoko-t11",
@@ -1322,7 +1511,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t12",
@@ -1331,7 +1532,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t13",
@@ -1340,7 +1553,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t14",
@@ -1349,7 +1574,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t15",
@@ -1358,7 +1595,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t16",
@@ -1367,7 +1616,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t17",
@@ -1376,7 +1637,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t18",
@@ -1385,7 +1658,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 100000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 1000,
+        "nyeListPriceEur": 4000
       },
       {
         "id": "shoko-t19",
@@ -1394,7 +1679,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t20",
@@ -1403,7 +1700,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t21",
@@ -1412,7 +1721,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t22",
@@ -1421,7 +1742,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t23",
@@ -1430,7 +1763,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t24",
@@ -1439,7 +1784,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t25",
@@ -1448,7 +1805,19 @@ module.exports = {
         "maxCapacity": 10,
         "includedGuests": 10,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 200000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 2000,
+        "nyeListPriceEur": 8000
       },
       {
         "id": "shoko-t26",
@@ -1457,7 +1826,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t27",
@@ -1466,7 +1847,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t28",
@@ -1475,7 +1868,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t29",
@@ -1484,7 +1889,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t30",
@@ -1493,7 +1910,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t31",
@@ -1502,7 +1931,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t32",
@@ -1511,7 +1952,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t33",
@@ -1520,7 +1973,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 87500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 21875,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 875,
+        "nyeListPriceEur": 3500
       },
       {
         "id": "shoko-t34",
@@ -1529,7 +1994,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t35",
@@ -1538,7 +2015,19 @@ module.exports = {
         "maxCapacity": 2,
         "includedGuests": 2,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 25000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 6250,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 250,
+        "nyeListPriceEur": 1000
       },
       {
         "id": "shoko-t36",
@@ -1547,7 +2036,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t37",
@@ -1556,7 +2057,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t38",
@@ -1565,7 +2078,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t39",
@@ -1574,7 +2099,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t40",
@@ -1583,7 +2120,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t41",
@@ -1592,7 +2141,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t42",
@@ -1601,7 +2162,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t43",
@@ -1610,7 +2183,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 87500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 21875,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 875,
+        "nyeListPriceEur": 3500
       },
       {
         "id": "shoko-t44",
@@ -1619,7 +2204,19 @@ module.exports = {
         "maxCapacity": 10,
         "includedGuests": 10,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 200000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 2000,
+        "nyeListPriceEur": 8000
       },
       {
         "id": "shoko-t45",
@@ -1628,7 +2225,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t46",
@@ -1637,7 +2246,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t47",
@@ -1646,7 +2267,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t48",
@@ -1655,7 +2288,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t49",
@@ -1664,7 +2309,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t50",
@@ -1673,7 +2330,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t51",
@@ -1682,7 +2351,19 @@ module.exports = {
         "maxCapacity": 10,
         "includedGuests": 10,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 200000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 2000,
+        "nyeListPriceEur": 8000
       },
       {
         "id": "shoko-t52",
@@ -1691,7 +2372,19 @@ module.exports = {
         "maxCapacity": 10,
         "includedGuests": 10,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 300000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 75000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 3000,
+        "nyeListPriceEur": 12000
       },
       {
         "id": "shoko-t53",
@@ -1700,7 +2393,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t54",
@@ -1709,7 +2414,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 87500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 21875,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 875,
+        "nyeListPriceEur": 3500
       },
       {
         "id": "shoko-t55",
@@ -1718,7 +2435,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t56",
@@ -1727,7 +2456,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t57",
@@ -1736,7 +2477,19 @@ module.exports = {
         "maxCapacity": 10,
         "includedGuests": 10,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 200000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 2000,
+        "nyeListPriceEur": 8000
       },
       {
         "id": "shoko-t58",
@@ -1745,7 +2498,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t59",
@@ -1754,7 +2519,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t60",
@@ -1763,7 +2540,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 12500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 500,
+        "nyeListPriceEur": 2000
       },
       {
         "id": "shoko-t61",
@@ -1772,7 +2561,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 87500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 21875,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 875,
+        "nyeListPriceEur": 3500
       },
       {
         "id": "shoko-t62",
@@ -1781,7 +2582,19 @@ module.exports = {
         "maxCapacity": 4,
         "includedGuests": 4,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 62500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 15625,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 625,
+        "nyeListPriceEur": 2500
       },
       {
         "id": "shoko-t63",
@@ -1790,7 +2603,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-t64",
@@ -1799,7 +2624,19 @@ module.exports = {
         "maxCapacity": 6,
         "includedGuests": 6,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 37500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 9375,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 375,
+        "nyeListPriceEur": 1500
       },
       {
         "id": "shoko-sv1",
@@ -1808,7 +2645,19 @@ module.exports = {
         "maxCapacity": 15,
         "includedGuests": 15,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 500000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 125000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 5000,
+        "nyeListPriceEur": 20000
       },
       {
         "id": "shoko-sv2",
@@ -1817,7 +2666,19 @@ module.exports = {
         "maxCapacity": 15,
         "includedGuests": 15,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 500000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 125000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 5000,
+        "nyeListPriceEur": 20000
       },
       {
         "id": "shoko-kz",
@@ -1826,7 +2687,19 @@ module.exports = {
         "maxCapacity": 15,
         "includedGuests": 15,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 200000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 50000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 2000,
+        "nyeListPriceEur": 8000
       },
       {
         "id": "shoko-la-suite",
@@ -1835,8 +2708,25 @@ module.exports = {
         "maxCapacity": 30,
         "includedGuests": 30,
         "extraGuestFee": false,
-        "currency": "EUR"
+        "currency": "EUR",
+        "minimumAmount": {
+          "amountCents": 750000,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "deposit": {
+          "amountCents": 187500,
+          "currency": "EUR",
+          "placeholder": false
+        },
+        "standardPriceEur": 7500,
+        "nyeListPriceEur": 30000
       }
-    ]
+    ],
+    "pricingPolicy": {
+      "standardVsNye": "standard = NYE list / 4",
+      "regularDepositPercentOfStandard": 25,
+      "nyeDepositPercentOfNyeList": 50
+    }
   }
 };

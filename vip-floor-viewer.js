@@ -456,12 +456,14 @@
       info.querySelector("#partySize").textContent = `${party} of ${maxCapacity}`;
       info.querySelectorAll(".stepper button").forEach(b => { b.disabled = b.dataset.step === "-1" ? party <= 1 : party >= maxCapacity; });
       const note = p.nightPriced
-        ? "NYE package price for this night only — regular nights use Club Admin pricing."
-        : (p.live ? "Live VIP reserV amounts for this night." : "Demo amounts — the club sets the real ones.");
+        ? "NYE'27 list price — pay 50% today to reserve; balance of minimum at the venue."
+        : (p.live
+          ? "Standard (non-NYE) table price — pay 25% today to reserve; balance of minimum at the venue."
+          : "Demo amounts — the club sets the real ones.");
       info.querySelector("#fees").innerHTML =
         `<tr><td>Minimum spend (covers ${includedGuests} guests)</td><td>${moneyFmt(p.minimum, p.currency)}</td></tr>` +
         (p.extraFee ? `<tr><td>Extra guests: ${extra} × ${moneyFmt(p.extraFee, p.currency)} VIP entry</td><td>${moneyFmt(extraTotal, p.currency)}</td></tr>` : "") +
-        `<tr class="sub"><td>Pay today${p.nightPriced ? " (full package)" : " (deposit)"}${extraTotal ? " + extra-guest fees" : ""}</td><td>${moneyFmt(deposit + extraTotal, p.currency)}</td></tr>` +
+        `<tr class="sub"><td>Pay today (minimum reservation)${extraTotal ? " + extra-guest fees" : ""}</td><td>${moneyFmt(deposit + extraTotal, p.currency)}</td></tr>` +
         (balance > 0.009 ? `<tr class="sub"><td>Balance of minimum at the venue</td><td>${moneyFmt(balance, p.currency)}</td></tr>` : "") +
         `<tr class="note"><td colspan="2">${note}</td></tr>`;
     };
