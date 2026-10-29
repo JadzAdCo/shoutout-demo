@@ -33,10 +33,92 @@ function toolError(error) {
   return {ok: false, error: String(error?.message || error).slice(0, 240), code: "internal"};
 }
 
+/** Human club names patrons type in chat → Firestore clubLocations doc ids. */
+const CLUB_NAME_ALIASES = Object.freeze({
+  aurelia: "temp-democlub-1",
+  "aurelia demo": "temp-democlub-1",
+  "aurelia demo club": "temp-democlub-1",
+  "demo club": "temp-democlub-1",
+  decades: "decades-washington-dc",
+  "decades washington": "decades-washington-dc",
+  "decades washington dc": "decades-washington-dc",
+  "lima twist": "lima-twist-washington-dc",
+  "lima twist club": "lima-twist-washington-dc",
+  "lima twist washington": "lima-twist-washington-dc",
+  "lima twist washington dc": "lima-twist-washington-dc"
+});
+
+function normalizeClubNeedle(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Resolve a clubLocationId or human venue name (e.g. "Aurelia") to a clubLocations doc id.
+ * Gemini often passes the display name; Firestore keys are slugs like temp-democlub-1.
+ */
+async function resolveClubLocationId(raw) {
+  const id = text(raw, 120);
+  if (!id) return "";
+  const direct = await db.collection("clubLocations").doc(id).get();
+  if (direct.exists) return id;
+
+  const needle = normalizeClubNeedle(id);
+  if (!needle) return "";
+
+  const alias = CLUB_NAME_ALIASES[needle];
+  if (alias) {
+    const aliasSnap = await db.collection("clubLocations").doc(alias).get();
+    if (aliasSnap.exists) return alias;
+  }
+
+  const slug = needle.replace(/\s+/g, "-");
+  if (slug && slug !== id) {
+    const slugSnap = await db.collection("clubLocations").doc(slug).get();
+    if (slugSnap.exists) return slug;
+  }
+
+  const snap = await db.collection("clubLocations").limit(250).get();
+  let bestId = "";
+  let bestScore = 0;
+  snap.forEach(doc => {
+    const row = doc.data() || {};
+    const names = [doc.id, row.locationName, row.brandName, row.displayName]
+      .map(normalizeClubNeedle)
+      .filter(Boolean);
+    names.forEach(name => {
+      let score = 0;
+      if (name === needle) score = 100;
+      else if (name.startsWith(needle) || needle.startsWith(name)) score = 80;
+      else if (name.includes(needle) || (needle.length >= 4 && name.includes(needle))) score = 60;
+      if (score > bestScore) {
+        bestScore = score;
+        bestId = doc.id;
+      }
+    });
+  });
+  return bestScore >= 60 ? bestId : "";
+}
+
+async function requireClubLocationId(raw) {
+  const resolved = await resolveClubLocationId(raw);
+  if (!resolved) {
+    throw new HttpsError(
+      "not-found",
+      `Club not found for "${text(raw, 80)}". Try the venue slug (e.g. temp-democlub-1 for Aurelia) or open Search.`
+    );
+  }
+  return resolved;
+}
+
 async function listShoutOutTemplates(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "shoutOut", sessionRequest);
   await featureGates.assertPatronFeature(sessionRequest.auth, "shoutOut");
-  const clubLocationId = text(args?.clubLocationId || args?.locationId, 120);
+  const rawClub = text(args?.clubLocationId || args?.locationId || args?.locationName, 120);
+  const clubLocationId = rawClub ? await requireClubLocationId(rawClub) : "";
   let venueTemplateIds = null;
   let venueName = "";
   if (clubLocationId) {
@@ -68,31 +150,33 @@ async function listShoutOutTemplates(args, sessionRequest) {
 async function startShoutOutCheckout(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "shoutOut", sessionRequest);
   const payload = args?.payload && typeof args.payload === "object" ? args.payload : {};
-  const clubLocationId = text(payload.clubLocationId || args?.clubLocationId, 120);
+  const rawClub = text(payload.clubLocationId || args?.clubLocationId || args?.locationName, 120);
   const shoutout = payload.shoutout && typeof payload.shoutout === "object"
     ? payload.shoutout
     : (args?.shoutout && typeof args.shoutout === "object" ? args.shoutout : null);
-  if (!clubLocationId || !shoutout) {
+  if (!rawClub || !shoutout) {
     throw new HttpsError("invalid-argument", "startShoutOutCheckout needs clubLocationId and shoutout payload.");
   }
+  const clubLocationId = await requireClubLocationId(rawClub);
   const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
     orderType: "shoutout",
     payload: {clubLocationId, shoutout, priceCents: args?.priceCents || payload.priceCents},
     returnBase: args?.returnBase,
     correlationId: args?.correlationId
   }));
-  return {ok: true, tool: "startShoutOutCheckout", ...result};
+  return {ok: true, tool: "startShoutOutCheckout", clubLocationId, ...result};
 }
 
 async function createVipHold(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+  const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
   const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
-    clubLocationId: args?.clubLocationId,
+    clubLocationId,
     night: args?.night,
     sectionId: args?.sectionId,
     partySize: args?.partySize
   }));
-  return {ok: true, tool: "createVipHold", ...result};
+  return {ok: true, tool: "createVipHold", clubLocationId, ...result};
 }
 
 async function recordVipConsent(args, sessionRequest) {
@@ -175,26 +259,31 @@ async function createVipCheckout(args, sessionRequest) {
 async function createFloqCastRequest(args, sessionRequest) {
   // createFloqCastRequest asserts club floqCast; also require patron floqCast feature for BOT DEE.
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "floqCast", sessionRequest);
+  const clubLocationId = await requireClubLocationId(
+    args?.locationId || args?.clubLocationId || args?.locationName
+  );
   const result = await floqCast.runCreateFloqCastRequest(asRequest(sessionRequest, {
-    locationId: args?.locationId || args?.clubLocationId,
-    clubLocationId: args?.clubLocationId || args?.locationId,
+    locationId: clubLocationId,
+    clubLocationId,
     locationName: args?.locationName,
     displayBoard: args?.displayBoard || "secondary"
   }));
-  return {ok: true, tool: "createFloqCastRequest", ...result};
+  return {ok: true, tool: "createFloqCastRequest", clubLocationId, ...result};
 }
 
 async function createFloqCastCheckout(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "floqCast", sessionRequest);
   const requestId = text(args?.requestId, 120);
   if (!requestId) throw new HttpsError("invalid-argument", "createFloqCastCheckout needs requestId.");
+  const rawClub = text(args?.clubLocationId || args?.locationId || args?.locationName, 120);
+  const clubLocationId = rawClub ? await requireClubLocationId(rawClub) : "";
   const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
     orderType: "suprstarRequest",
-    payload: {requestId, clubLocationId: args?.clubLocationId || args?.locationId},
+    payload: {requestId, clubLocationId: clubLocationId || undefined},
     returnBase: args?.returnBase,
     correlationId: args?.correlationId
   }));
-  return {ok: true, tool: "createFloqCastCheckout", ...result};
+  return {ok: true, tool: "createFloqCastCheckout", clubLocationId: clubLocationId || null, ...result};
 }
 
 const TOOL_RUNNERS = {
@@ -226,5 +315,9 @@ module.exports = {
   recordVipConsent,
   createVipCheckout,
   createFloqCastRequest,
-  createFloqCastCheckout
+  createFloqCastCheckout,
+  resolveClubLocationId,
+  requireClubLocationId,
+  normalizeClubNeedle,
+  CLUB_NAME_ALIASES
 };
