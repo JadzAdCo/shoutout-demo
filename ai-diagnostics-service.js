@@ -2532,7 +2532,7 @@
         area:"BOT DEE / FloqAi",
         feature:"Gemini answers name pronunciation (not search dump)",
         changed:"Root cause: Gemini 400 when AUTO + allowedFunctionNames — every non-greeting silently fell back to contextualSearch (Here is what I found…). Fixed toolConfig; identity prompts (how is your name pronounced) answered locally as BOT DEE. Functions redeploy required. Package s3.2.67.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html?v=s3.2.67 signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.67) signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
         expected:"Identity/name questions get a conversational BOT DEE reply; product how-tos still search/tool.",
         troubleshoot:"Still search dump → confirm Functions executeBotSession redeployed from main with GEMINI_API_KEY secret; check Cloud Logs for botdee.session provider=gemini (not local-fallback). Client-only identity path works without redeploy for the exact name prompt."
       },
@@ -2541,7 +2541,7 @@
         area:"Help / BOT DEE",
         feature:"Help ? panels stay fully in view (PC + mobile)",
         changed:"help-popout-body max-width + overflow-wrap; helper-popouts fitHelpPopoutInViewport flips left/right and nudges on screen. BOT DEE header ? opens leftward. Package s3.2.67.",
-        howToTest:"1) Hard-refresh floqai.html?v=s3.2.67 on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh floqai.html (package s3.2.67) on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
         expected:"Entire help verbiage readable inside the viewport.",
         troubleshoot:"Still clipped → hard refresh styles.css + helper-popouts.js + bot-dee-chat.css (s3.2.67). Parent overflow:hidden → check botdee-shell overflow:visible."
       },
@@ -2550,7 +2550,7 @@
         area:"BOT DEE / FloqAi",
         feature:"Robot-head avatar on bot chat bubbles",
         changed:"Bot bubbles use images/botdee-chat-avatar.png (cyan-eye robot head) + speech tip. Not the full Site-chrome BOT DEE JPG. Package s3.2.67.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html?v=s3.2.67 signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.67) signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
         expected:"Bubble origin = robot-head avatar; tip points at it.",
         troubleshoot:"Still full chrome face in bubbles → hard refresh bot-dee-chat.js + botdee-chat-avatar.png (s3.2.67). 404 on avatar → confirm images/botdee-chat-avatar.png on Pages main."
       },
