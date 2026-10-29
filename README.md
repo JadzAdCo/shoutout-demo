@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.65 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.66 (stable)
+
+- s3.2.66: BOT DEE chat bubbles show Site-chrome avatar + speech-origin tip.
+- s3.2.65: BOT DEE welcome — “Hi, I am BOT DEE. How can I help you?”
 
 - s3.2.65: BOT DEE welcome — “Hi, I am BOT DEE. How can I help you?”
 - s3.2.64: BOT DEE greets on hello (client + server chitchat) — never a search-miss for greetings.

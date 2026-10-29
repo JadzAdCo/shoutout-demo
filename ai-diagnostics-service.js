@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.65";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.65";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.66";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.66";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.66",
+      title: "s3.2.66 — BOT DEE bubble avatar + speech tip",
+      checks: [
+        {label:"Package version s3.2.66", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.66\""]},
+        {label:"Bot bubble avatar", file:"bot-dee-chat.js", includes:["botdee-msg-avatar", "botdee-bubble-tail", "data-floqr-chrome-icon"]},
+        {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar"]},
+        {label:"Manual test s3.2.66", file:"ai-diagnostics-service.js", includes:["s3-2-66-botdee-bubble-avatar"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.66\""]}
+      ]
+    },
     {
       version: "s3.2.65",
       title: "s3.2.65 — BOT DEE welcome How can I help you?",

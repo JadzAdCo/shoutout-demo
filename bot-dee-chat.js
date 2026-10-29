@@ -59,12 +59,40 @@
       .replace(/"/g, "&quot;");
   }
 
+  function botAvatarSrc() {
+    const header = document.querySelector(".botdee-chat-icon[data-floqr-chrome-icon=\"floqAi\"]");
+    const src = header?.getAttribute("src");
+    return src || "./images/chrome/botdee-nightlife.jpg";
+  }
+
   function appendBubble(role, text, results) {
     const log = byId("botDeeTranscript");
     if (!log) return;
+    const isUser = role === "user";
+    const row = document.createElement("div");
+    row.className = `botdee-msg botdee-msg-${isUser ? "user" : "bot"}`;
+
+    if (!isUser) {
+      const avatar = document.createElement("img");
+      avatar.className = "botdee-msg-avatar";
+      avatar.setAttribute("data-floqr-chrome-icon", "floqAi");
+      avatar.src = botAvatarSrc();
+      avatar.alt = "BOT DEE";
+      avatar.width = 36;
+      avatar.height = 36;
+      avatar.decoding = "async";
+      row.appendChild(avatar);
+    }
+
     const article = document.createElement("article");
-    article.className = `botdee-bubble botdee-bubble-${role === "user" ? "user" : "bot"}`;
-    article.setAttribute("data-role", role === "user" ? "user" : "bot");
+    article.className = `botdee-bubble botdee-bubble-${isUser ? "user" : "bot"}`;
+    article.setAttribute("data-role", isUser ? "user" : "bot");
+    if (!isUser) {
+      const tail = document.createElement("span");
+      tail.className = "botdee-bubble-tail";
+      tail.setAttribute("aria-hidden", "true");
+      article.appendChild(tail);
+    }
     const body = document.createElement("div");
     body.className = "botdee-bubble-text";
     body.textContent = text;
@@ -72,24 +100,29 @@
     if (Array.isArray(results) && results.length) {
       const list = document.createElement("ul");
       list.className = "botdee-result-links";
-      results.slice(0, 6).forEach(row => {
+      results.slice(0, 6).forEach(rowResult => {
         const li = document.createElement("li");
         const a = document.createElement("a");
-        a.href = row.href || "./";
-        a.textContent = row.label || row.sourceId || "Open";
+        a.href = rowResult.href || "./";
+        a.textContent = rowResult.label || rowResult.sourceId || "Open";
         a.className = "botdee-result-link";
         li.appendChild(a);
-        if (row.blurb) {
+        if (rowResult.blurb) {
           const span = document.createElement("span");
           span.className = "botdee-result-blurb";
-          span.textContent = row.blurb;
+          span.textContent = rowResult.blurb;
           li.appendChild(span);
         }
         list.appendChild(li);
       });
       article.appendChild(list);
     }
-    log.appendChild(article);
+    row.appendChild(article);
+    log.appendChild(row);
+    // Refresh Site chrome face on newly minted avatar nodes.
+    try {
+      global.FLOQRChromeScheme?.applyDocument?.();
+    } catch (_) { /* ignore */ }
     log.scrollTop = log.scrollHeight;
   }
 
