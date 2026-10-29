@@ -58,6 +58,29 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   }
 });
 
+test("cool / ok acknowledgments stay conversational — not a greeting restart or search", () => {
+  for (const prompt of ["cool", "Cool!", "ok", "okay", "thanks", "got it", "sounds good", "that's cool", "awesome"]) {
+    assert.equal(bot.isAckPrompt(prompt), true, prompt);
+    assert.equal(bot.isChitchatPrompt(prompt), true, prompt);
+  }
+  assert.equal(bot.isAckPrompt("hey"), false);
+  assert.equal(bot.isAckPrompt("throw a shoutout"), false);
+
+  const ack = bot.ackReply("patron");
+  assert.match(ack, /Cool/i);
+  assert.match(ack, /keep going|ShoutOut/i);
+  assert.doesNotMatch(ack, /BOT DEE here/i);
+  assert.doesNotMatch(ack, /Here is what I found/i);
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("patron", "cool");
+  assert.equal(local.provider, "local-chitchat");
+  assert.equal(local.model, "ack");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /Cool/i);
+  assert.doesNotMatch(local.reply, /BOT DEE here/i);
+});
+
 test("Name / pronunciation is identity — not a search dump", () => {
   assert.equal(bot.isIdentityPrompt("how is your name pronounced?"), true);
   assert.equal(bot.isIdentityPrompt("How do you pronounce BOT DEE"), true);

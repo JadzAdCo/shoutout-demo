@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.68";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.68";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.69";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.69";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.69",
+      title: "s3.2.69 — BOT DEE cool/ok acknowledgments stay conversational",
+      checks: [
+        {label:"Ack prompt helper", file:"functions/bot-dee-core.js", includes:["isAckPrompt", "ackReply", "Acknowledgments mid-chat"]},
+        {label:"Client ack mirror", file:"bot-dee-chat.js", includes:["isAckPrompt", "ackReply", "floqai.chatAck"]},
+        {label:"Chrome ack key", file:"floqr-i18n.js", includes:["floqai.chatAck", "VERSION = \"s3.2.69\""]},
+        {label:"Manual test cool ack", file:"ai-diagnostics-service.js", includes:["s3-2-69-botdee-cool-ack"]},
+        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.69"]}
+      ]
+    },
     {
       version: "s3.2.68",
       title: "s3.2.68 — Shôko Barcelona VIP floor plan + NYE'27 prices",
@@ -2540,6 +2551,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-69-botdee-cool-ack",
+      area:"BOT DEE / FloqAi",
+      feature:"Acknowledgments (cool / ok / thanks) stay conversational",
+      changed:"isAckPrompt + ackReply — mid-chat cool/ok/thanks get a short continue reply, not a Hey BOT DEE restart and not search. Client mirror in bot-dee-chat.js; Gemini systemInstruction forbids tools on acks. Package s3.2.69.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.69) signed in with floqAi. 2) Say hello → greeting. 3) Say cool → reply like Cool. Want to keep going?… — NOT Here is what I found and NOT Hey — BOT DEE here. 4) Say thanks / ok / got it → same ack style.",
+      expected:"cool stays chat mode with a continue prompt; no search dump; no full re-intro.",
+      troubleshoot:"Still greeting restart → hard refresh bot-dee-chat.js ?v=s3.2.69. Still search → Functions deploy executeBotSession (bot-dee-core isAckPrompt). Old Pages cache → confirm floqai.html script ?v=."
+    },
     {
       id:"s3-2-68-shoko-vip-nye",
       area:"VIP reserV / Events",

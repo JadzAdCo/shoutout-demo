@@ -126,17 +126,31 @@ const MIN_SEARCH_SCORE = 3;
 const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
 
 /**
+ * Short acknowledgments mid-chat ("cool", "ok", "thanks") — conversational continue,
+ * not a fresh "Hey — BOT DEE here" intro and never a search dump.
+ * Keep in sync with bot-dee-chat.js.
+ */
+function isAckPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 80) return false;
+  if (new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|k|kk|cool|nice|great|awesome|perfect|sweet|lit|bet|fire|dope|solid|rad|alright|all right|got it|sounds good|sounds cool|that s cool|thats cool|that is cool|makes sense|copy|roger|yes|yeah|yep|yup|sure|absolutely|for sure|no problem|np|bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Greetings / small talk — reply as a chatbot, never dump search hits.
  * Keep in sync with bot-dee-chat.js client mirror (Pages can greet before Functions deploy).
  */
 function isChitchatPrompt(raw) {
   const q = normalize(raw);
   if (!q || q.length > 100) return false;
+  if (isAckPrompt(q)) return true;
   // hi / hello / hey (+ optional name) — also "hello how are you"
   if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
   if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
   if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
-  if (new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you)${CHITCHAT_TAIL}$`).test(q)) return true;
   return false;
 }
 
@@ -161,6 +175,14 @@ function chitchatReply(role) {
     ? ` I can see you as ${role}.`
     : "";
   return `Hey — BOT DEE here.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
+}
+
+/** Follow-up after "cool" / "ok" / "thanks" — stay in chat mode, don't re-introduce. */
+function ackReply(role) {
+  const roleHint = role && role !== "anonymous" && role !== "patron"
+    ? ` (${role})`
+    : "";
+  return `Cool.${roleHint} Want to keep going? ShoutOut, VIP table, floqCast, scheduling — or ask me anything in plain words.`;
 }
 
 function scoreEntry(query, entry) {
@@ -255,7 +277,8 @@ function toolDeclarations() {
 function systemInstruction(role) {
   return [
     "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
-    "Greetings and small talk (hi, hey, thanks, how are you): reply in 1–2 short sentences, ask what they want to do, and do NOT call any tools.",
+    "Greetings (hi, hey, hello, how are you): reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
+    "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah, bye): reply conversationally in one short line — do NOT re-introduce yourself, do NOT dump search results, do NOT call any tools. Offer to keep helping (ShoutOut / VIP / floqCast / scheduling).",
     "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D).",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
@@ -330,8 +353,10 @@ module.exports = {
   sanitizeHistory,
   isChitchatPrompt,
   isIdentityPrompt,
+  isAckPrompt,
   identityReply,
   chitchatReply,
+  ackReply,
   contextualSearch,
   runTool,
   systemInstruction,

@@ -117,6 +117,15 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
 }
 
 function localSession(role, userPrompt) {
+  if (bot.isAckPrompt(userPrompt)) {
+    return {
+      reply: bot.ackReply(role),
+      results: [],
+      provider: "local-chitchat",
+      model: "ack",
+      toolRounds: 0
+    };
+  }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
       reply: bot.chitchatReply(role),

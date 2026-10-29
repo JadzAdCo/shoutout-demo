@@ -14,7 +14,7 @@
     return value && value !== key ? value : fallback;
   };
 
-  /** Mirror of functions/bot-dee-core.js isChitchatPrompt / chitchatReply. */
+  /** Mirror of functions/bot-dee-core.js isChitchatPrompt / isAckPrompt / replies. */
   function normalizeChat(value) {
     return String(value || "")
       .toLowerCase()
@@ -25,13 +25,19 @@
 
   const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
 
+  function isAckPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 80) return false;
+    return new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|k|kk|cool|nice|great|awesome|perfect|sweet|lit|bet|fire|dope|solid|rad|alright|all right|got it|sounds good|sounds cool|that s cool|thats cool|that is cool|makes sense|copy|roger|yes|yeah|yep|yup|sure|absolutely|for sure|no problem|np|bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q);
+  }
+
   function isChitchatPrompt(raw) {
     const q = normalizeChat(raw);
     if (!q || q.length > 100) return false;
+    if (isAckPrompt(q)) return true;
     if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
     if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
     if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
-    if (new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|cool|nice|great|bye|goodbye|see ya|see you)${CHITCHAT_TAIL}$`).test(q)) return true;
     return false;
   }
 
@@ -50,6 +56,13 @@
     return t(
       "floqai.chatHello",
       "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
+    );
+  }
+
+  function ackReply() {
+    return t(
+      "floqai.chatAck",
+      "Cool. Want to keep going? ShoutOut, VIP table, floqCast, scheduling — or ask me anything in plain words."
     );
   }
 
@@ -163,9 +176,11 @@
     appendBubble("user", text);
     pushHistory("user", text);
 
-    // Chatbot first: never let hello / name questions fall through to a search miss.
-    if (isChitchatPrompt(text) || isIdentityPrompt(text)) {
-      const reply = isIdentityPrompt(text) ? identityReply() : chitchatReply();
+    // Chatbot first: never let hello / "cool" / name questions fall through to a search miss.
+    if (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text)) {
+      const reply = isIdentityPrompt(text)
+        ? identityReply()
+        : (isAckPrompt(text) ? ackReply() : chitchatReply());
       appendBubble("bot", reply);
       pushHistory("model", reply);
       setStatus("");

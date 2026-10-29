@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.67";
+  const VERSION = "s3.2.69";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1586,6 +1586,7 @@
       "floqai.chatWelcome": "Hi, I am BOT DEE. How can I help you?",
       "floqai.chatHello": "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.",
       "floqai.chatIdentity": "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper. What do you want to do — ShoutOut, VIP table, floqCast, scheduling, or something else?",
+      "floqai.chatAck": "Cool. Want to keep going? ShoutOut, VIP table, floqCast, scheduling — or ask me anything in plain words.",
       "floqai.chatPlaceholder": "Ask BOT DEE… ShoutOut · VIP · floqCast · schedule",
       "floqai.chatSend": "Send",
       "floqai.chatThinking": "BOT DEE is thinking…",
@@ -3024,6 +3025,7 @@
       "floqai.chatWelcome": "Bonjour, je suis BOT DEE. Comment puis-je vous aider ?",
       "floqai.chatHello": "Salut — BOT DEE ici. Que voulez-vous faire dans FLOQR ? ShoutOut, table VIP, floqCast, planning, ou autre chose — dites-le en mots simples.",
       "floqai.chatIdentity": "Je suis BOT DEE — prononcez « bot » + « dee » (comme la lettre D). Je suis l’assistant intégré de FLOQR. Que voulez-vous faire — ShoutOut, table VIP, floqCast, planning, ou autre chose ?",
+      "floqai.chatAck": "Cool. On continue ? ShoutOut, table VIP, floqCast, planning — ou posez-moi une question en mots simples.",
       "floqai.chatPlaceholder": "Demandez à BOT DEE… ShoutOut · VIP · floqCast · planning",
       "floqai.chatSend": "Envoyer",
       "floqai.chatThinking": "BOT DEE réfléchit…",
@@ -4326,6 +4328,7 @@
       "floqai.chatWelcome": "Hallo, ich bin BOT DEE. Wie kann ich dir helfen?",
       "floqai.chatHello": "Hey — BOT DEE hier. Was möchtest du in FLOQR tun? ShoutOut, VIP-Tisch, floqCast, Schichtplan oder etwas anderes — einfach in normalen Worten sagen.",
       "floqai.chatIdentity": "Ich bin BOT DEE — sprich es wie „bot“ + „dee“ (Buchstabe D). Ich bin FLOQRs In-App-Hilfe. Was möchtest du tun — ShoutOut, VIP-Tisch, floqCast, Schichtplan oder etwas anderes?",
+      "floqai.chatAck": "Cool. Weiter? ShoutOut, VIP-Tisch, floqCast, Schichtplan — oder frag mich einfach in normalen Worten.",
       "floqai.chatPlaceholder": "Frag BOT DEE… ShoutOut · VIP · floqCast · Plan",
       "floqai.chatSend": "Senden",
       "floqai.chatThinking": "BOT DEE denkt nach…",
@@ -5628,6 +5631,7 @@
       "floqai.chatWelcome": "Hola, soy BOT DEE. ¿En qué puedo ayudarte?",
       "floqai.chatHello": "Hola — BOT DEE aquí. ¿Qué quieres hacer en FLOQR? ShoutOut, mesa VIP, floqCast, horarios u otra cosa — dilo en palabras sencillas.",
       "floqai.chatIdentity": "Soy BOT DEE — se dice «bot» + «dee» (la letra D). Soy el asistente integrado de FLOQR. ¿Qué quieres hacer — ShoutOut, mesa VIP, floqCast, horarios u otra cosa?",
+      "floqai.chatAck": "Cool. ¿Seguimos? ShoutOut, mesa VIP, floqCast, horarios — o pregúntame lo que quieras en palabras sencillas.",
       "floqai.chatPlaceholder": "Pregunta a BOT DEE… ShoutOut · VIP · floqCast · horario",
       "floqai.chatSend": "Enviar",
       "floqai.chatThinking": "BOT DEE está pensando…",
@@ -6930,6 +6934,7 @@
       "floqai.chatWelcome": "Hoi, ik ben BOT DEE. Hoe kan ik je helpen?",
       "floqai.chatHello": "Hoi — BOT DEE hier. Wat wil je in FLOQR doen? ShoutOut, VIP-tafel, floqCast, roosters of iets anders — zeg het gewoon in normale woorden.",
       "floqai.chatIdentity": "Ik ben BOT DEE — zeg het als „bot” + „dee” (de letter D). Ik ben FLOQR’s in-app helper. Wat wil je doen — ShoutOut, VIP-tafel, floqCast, roosters of iets anders?",
+      "floqai.chatAck": "Cool. Doorgaan? ShoutOut, VIP-tafel, floqCast, roosters — of vraag me gewoon iets in normale woorden.",
       "floqai.chatPlaceholder": "Vraag BOT DEE… ShoutOut · VIP · floqCast · planning",
       "floqai.chatSend": "Versturen",
       "floqai.chatThinking": "BOT DEE denkt na…",
@@ -8232,6 +8237,7 @@
       "floqai.chatWelcome": "Привет, я BOT DEE. Чем могу помочь?",
       "floqai.chatHello": "Привет — на связи BOT DEE. Что хотите сделать в FLOQR? ShoutOut, VIP-стол, floqCast, расписание или что-то ещё — просто скажите своими словами.",
       "floqai.chatIdentity": "Я BOT DEE — произносится «бот» + «ди» (буква D). Я встроенный помощник FLOQR. Что хотите сделать — ShoutOut, VIP-стол, floqCast, расписание или что-то ещё?",
+      "floqai.chatAck": "Круто. Продолжим? ShoutOut, VIP-стол, floqCast, расписание — или спросите что угодно своими словами.",
       "floqai.chatPlaceholder": "Спросите BOT DEE… ShoutOut · VIP · floqCast · расписание",
       "floqai.chatSend": "Отправить",
       "floqai.chatThinking": "BOT DEE думает…",
@@ -9534,6 +9540,7 @@
       "floqai.chatWelcome": "Ciao, sono BOT DEE. Come posso aiutarti?",
       "floqai.chatHello": "Ciao — BOT DEE qui. Cosa vuoi fare in FLOQR? ShoutOut, tavolo VIP, floqCast, turni o altro — dillo con parole semplici.",
       "floqai.chatIdentity": "Sono BOT DEE — si dice «bot» + «dee» (la lettera D). Sono l’assistente in-app di FLOQR. Cosa vuoi fare — ShoutOut, tavolo VIP, floqCast, turni o altro?",
+      "floqai.chatAck": "Cool. Continuamo? ShoutOut, tavolo VIP, floqCast, turni — o chiedimi qualsiasi cosa con parole semplici.",
       "floqai.chatPlaceholder": "Chiedi a BOT DEE… ShoutOut · VIP · floqCast · turni",
       "floqai.chatSend": "Invia",
       "floqai.chatThinking": "BOT DEE sta pensando…",
@@ -10836,6 +10843,7 @@
       "floqai.chatWelcome": "Olá, sou BOT DEE. Como posso ajudar?",
       "floqai.chatHello": "Olá — BOT DEE aqui. O que quer fazer no FLOQR? ShoutOut, mesa VIP, floqCast, escala ou outra coisa — diga em palavras simples.",
       "floqai.chatIdentity": "Sou BOT DEE — diga «bot» + «dee» (a letra D). Sou o assistente in-app da FLOQR. O que quer fazer — ShoutOut, mesa VIP, floqCast, escala ou outra coisa?",
+      "floqai.chatAck": "Cool. Continuamos? ShoutOut, mesa VIP, floqCast, escala — ou pergunte o que quiser em palavras simples.",
       "floqai.chatPlaceholder": "Pergunte ao BOT DEE… ShoutOut · VIP · floqCast · escala",
       "floqai.chatSend": "Enviar",
       "floqai.chatThinking": "BOT DEE está a pensar…",
@@ -12138,6 +12146,7 @@
       "floqai.chatWelcome": "Γεια, είμαι ο BOT DEE. Πώς μπορώ να βοηθήσω;",
       "floqai.chatHello": "Γεια — εδώ ο BOT DEE. Τι θέλεις να κάνεις στο FLOQR; ShoutOut, VIP τραπέζι, floqCast, πρόγραμμα ή κάτι άλλο — πες το με απλά λόγια.",
       "floqai.chatIdentity": "Είμαι ο BOT DEE — προφέρεται «bot» + «dee» (το γράμμα D). Είμαι ο βοηθός της FLOQR στην εφαρμογή. Τι θέλεις να κάνεις — ShoutOut, VIP τραπέζι, floqCast, πρόγραμμα ή κάτι άλλο;",
+      "floqai.chatAck": "Ωραία. Συνεχίζουμε; ShoutOut, VIP τραπέζι, floqCast, πρόγραμμα — ή ρώτα με ό,τι θέλεις με απλά λόγια.",
       "floqai.chatPlaceholder": "Ρώτα τον BOT DEE… ShoutOut · VIP · floqCast · πρόγραμμα",
       "floqai.chatSend": "Αποστολή",
       "floqai.chatThinking": "Ο BOT DEE σκέφτεται…",
@@ -13440,6 +13449,7 @@
       "floqai.chatWelcome": "Cześć, jestem BOT DEE. W czym mogę pomóc?",
       "floqai.chatHello": "Cześć — tu BOT DEE. Co chcesz zrobić w FLOQR? ShoutOut, stolik VIP, floqCast, grafik albo coś innego — powiedz zwykłymi słowami.",
       "floqai.chatIdentity": "Jestem BOT DEE — mów «bot» + «dee» (litera D). Jestem wbudowanym pomocnikiem FLOQR. Co chcesz zrobić — ShoutOut, stolik VIP, floqCast, grafik albo coś innego?",
+      "floqai.chatAck": "Cool. Jedziemy dalej? ShoutOut, stolik VIP, floqCast, grafik — albo zapytaj mnie o cokolwiek zwykłymi słowami.",
       "floqai.chatPlaceholder": "Zapytaj BOT DEE… ShoutOut · VIP · floqCast · grafik",
       "floqai.chatSend": "Wyślij",
       "floqai.chatThinking": "BOT DEE myśli…",
@@ -14742,6 +14752,7 @@
       "floqai.chatWelcome": "مرحبًا، أنا BOT DEE. كيف يمكنني مساعدتك؟",
       "floqai.chatHello": "مرحبًا — BOT DEE هنا. ماذا تريد أن تفعل في FLOQR؟ ShoutOut أو طاولة VIP أو floqCast أو الجدولة أو شيء آخر — قلها بكلمات بسيطة.",
       "floqai.chatIdentity": "أنا BOT DEE — تُنطق «بوت» + «دي» (حرف D). أنا مساعد FLOQR داخل التطبيق. ماذا تريد أن تفعل — ShoutOut أو طاولة VIP أو floqCast أو الجدولة أو شيء آخر؟",
+      "floqai.chatAck": "تمام. نكمّل؟ ShoutOut أو طاولة VIP أو floqCast أو الجدولة — أو اسألني أي شيء بكلمات بسيطة.",
       "floqai.chatPlaceholder": "اسأل BOT DEE… ShoutOut · VIP · floqCast · الجدول",
       "floqai.chatSend": "إرسال",
       "floqai.chatThinking": "BOT DEE يفكر…",
