@@ -373,12 +373,22 @@
     {
       id: "help-floqai-page",
       title: "BOT DEE",
-      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "floqai.html#botDeeChatPage"
+    },
+    {
+      id: "help-bot-dee-mgmt",
+      title: "BOT DEE conversation pause",
+      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
+      searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause"],
+      links: [{label: "BOT DEE (Master Admin)", href: pageUrl("./master-admin.html", {from: "floqai"}) + "#featuresBotDee"}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#featuresBotDee"
     },
     {
       id: "help-soccer-jersey",

@@ -166,10 +166,38 @@ function isIdentityPrompt(raw) {
   return false;
 }
 
-function identityReply() {
-  return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper. What do you want to do — ShoutOut, VIP table, floqCast, scheduling, or something else?";
+/** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
+const DEFAULT_IDLE_SECONDS = 60;
+const MIN_IDLE_SECONDS = 15;
+const MAX_IDLE_SECONDS = 600;
+
+function clampIdleSeconds(raw) {
+  const n = Math.round(Number(raw));
+  if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
+  return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
 }
 
+function normalizeBotDeeSettings(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    conversationIdleSeconds: clampIdleSeconds(
+      row.conversationIdleSeconds != null ? row.conversationIdleSeconds : DEFAULT_IDLE_SECONDS
+    ),
+    revision: Math.max(0, Math.floor(Number(row.revision) || 0))
+  };
+}
+
+function isFarewellPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 80) return false;
+  return new RegExp(`^(?:bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q);
+}
+
+function identityReply() {
+  return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper.";
+}
+
+/** Offer-help CTA — conversation start / idle resume only (not every mid-chat turn). */
 function chitchatReply(role) {
   const roleHint = role && role !== "anonymous" && role !== "patron"
     ? ` I can see you as ${role}.`
@@ -177,12 +205,28 @@ function chitchatReply(role) {
   return `Hey — BOT DEE here.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
 }
 
-/** Follow-up after "cool" / "ok" / "thanks" — stay in chat mode, don't re-introduce. */
-function ackReply(role) {
-  const roleHint = role && role !== "anonymous" && role !== "patron"
-    ? ` (${role})`
-    : "";
-  return `Cool.${roleHint} Want to keep going? ShoutOut, VIP table, floqCast, scheduling — or ask me anything in plain words.`;
+/** Soft mid-chat ack — no product pitch, no re-intro. */
+function ackReply(role, raw) {
+  void role;
+  const q = normalize(raw);
+  if (isFarewellPrompt(q)) return "Take care — say hi when you want to pick up again.";
+  if (/^(?:thanks|thank you|thx|ty)\b/.test(q)) return "You're welcome.";
+  return "Cool.";
+}
+
+/** Mid-chat greeting while the conversation is still active — no offer-help repeat. */
+function stillHereReply() {
+  return "Hey — still here.";
+}
+
+/** After idle end, when the patron comes back with a greeting. */
+function resumeReply(role) {
+  return chitchatReply(role);
+}
+
+/** Shown when the idle timer ends the conversation. */
+function idleEndedReply() {
+  return "I'll pause here for now. Say hi when you want to pick up again.";
 }
 
 function scoreEntry(query, entry) {
@@ -277,9 +321,12 @@ function toolDeclarations() {
 function systemInstruction(role) {
   return [
     "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
-    "Greetings (hi, hey, hello, how are you): reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
-    "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah, bye): reply conversationally in one short line — do NOT re-introduce yourself, do NOT dump search results, do NOT call any tools. Offer to keep helping (ShoutOut / VIP / floqCast / scheduling).",
-    "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D).",
+    "Ask \"what do you want to do\" / list products (ShoutOut, VIP, floqCast, scheduling) ONLY on the first turn of a conversation or when the patron clearly restarts after a pause — never every reply.",
+    "Greetings on a fresh/restarted chat: reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
+    "Greetings mid-chat while already talking: one short line (e.g. \"Hey — still here.\") — do NOT re-list products, do NOT call tools.",
+    "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah): one short line only (Cool. / You're welcome.) — do NOT re-introduce yourself, do NOT ask what they want to do, do NOT dump search results, do NOT call any tools.",
+    "Farewells (bye, goodbye, later): short goodbye — do NOT call tools.",
+    "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
@@ -347,6 +394,9 @@ module.exports = {
   MAX_HISTORY,
   MAX_MESSAGE_CHARS,
   MIN_SEARCH_SCORE,
+  DEFAULT_IDLE_SECONDS,
+  MIN_IDLE_SECONDS,
+  MAX_IDLE_SECONDS,
   TOOL_NAMES,
   toolDeclarations,
   sanitizeUserPrompt,
@@ -354,9 +404,15 @@ module.exports = {
   isChitchatPrompt,
   isIdentityPrompt,
   isAckPrompt,
+  isFarewellPrompt,
   identityReply,
   chitchatReply,
   ackReply,
+  stillHereReply,
+  resumeReply,
+  idleEndedReply,
+  clampIdleSeconds,
+  normalizeBotDeeSettings,
   contextualSearch,
   runTool,
   systemInstruction,

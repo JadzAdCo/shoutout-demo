@@ -719,6 +719,12 @@ service cloud.firestore {
  allow read, write: if false;
  }
 
+ // BOT DEE conversation settings (idle pause). Signed-in read; Functions-write only (SOS2FA).
+ match /botDeeSettings/{docId} {
+ allow read: if signedIn();
+ allow write: if false;
+ }
+
  // Staff marketing media consent evidence: written only by recordStaffMarketingConsent.
  match /staffMarketingConsentLogs/{logId} {
  allow read: if isMasterAdmin();

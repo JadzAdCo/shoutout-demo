@@ -1,12 +1,23 @@
 /* BOT DEE chat client — wires floqai.html transcript to executeBotSession.
    Intent search stays available as a collapsible fast path / fallback.
-   Greetings are answered locally (chatbot) so a stale Functions deploy cannot
-   turn "hello" into a contextual-search miss. */
+   Greetings / acks are answered locally (chatbot) so a stale Functions deploy cannot
+   turn "hello"/"cool" into a contextual-search miss.
+   Offer-help CTA only at conversation start and after an idle-ended resume.
+   Idle pause (default 60s, Master Admin botDeeSettings/default) ends the chat. */
 (function (global) {
   "use strict";
 
   const MAX_HISTORY = 12;
+  const DEFAULT_IDLE_SECONDS = 60;
+  const MIN_IDLE_SECONDS = 15;
+  const MAX_IDLE_SECONDS = 600;
   const history = [];
+
+  /** fresh = welcome only · active = talking · ended = idle/farewell closed */
+  let phase = "fresh";
+  let idleSeconds = DEFAULT_IDLE_SECONDS;
+  let idleTimer = null;
+  let settingsLoaded = false;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -31,6 +42,12 @@
     return new RegExp(`^(?:thanks|thank you|thx|ty|ok|okay|k|kk|cool|nice|great|awesome|perfect|sweet|lit|bet|fire|dope|solid|rad|alright|all right|got it|sounds good|sounds cool|that s cool|thats cool|that is cool|makes sense|copy|roger|yes|yeah|yep|yup|sure|absolutely|for sure|no problem|np|bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q);
   }
 
+  function isFarewellPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 80) return false;
+    return new RegExp(`^(?:bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q);
+  }
+
   function isChitchatPrompt(raw) {
     const q = normalizeChat(raw);
     if (!q || q.length > 100) return false;
@@ -52,6 +69,13 @@
     return false;
   }
 
+  function clampIdleSeconds(raw) {
+    const n = Math.round(Number(raw));
+    if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
+    return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
+  }
+
+  /** Offer-help — start / idle-resume greetings only. */
   function chitchatReply() {
     return t(
       "floqai.chatHello",
@@ -59,17 +83,40 @@
     );
   }
 
-  function ackReply() {
-    return t(
-      "floqai.chatAck",
-      "Cool. Want to keep going? ShoutOut, VIP table, floqCast, scheduling — or ask me anything in plain words."
-    );
+  /** Soft mid-chat ack — no product pitch. */
+  function ackReply(raw) {
+    const q = normalizeChat(raw);
+    if (isFarewellPrompt(q)) {
+      return t("floqai.chatBye", "Take care — say hi when you want to pick up again.");
+    }
+    if (/^(?:thanks|thank you|thx|ty)\b/.test(q)) {
+      return t("floqai.chatThanks", "You're welcome.");
+    }
+    return t("floqai.chatAck", "Cool.");
   }
 
   function identityReply() {
     return t(
       "floqai.chatIdentity",
-      "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper. What do you want to do — ShoutOut, VIP table, floqCast, scheduling, or something else?"
+      "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper."
+    );
+  }
+
+  function stillHereReply() {
+    return t("floqai.chatStillHere", "Hey — still here.");
+  }
+
+  function idleEndedReply() {
+    return t(
+      "floqai.chatIdleEnded",
+      "I'll pause here for now. Say hi when you want to pick up again."
+    );
+  }
+
+  function resumeReply() {
+    return t(
+      "floqai.chatResume",
+      "Welcome back. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
     );
   }
 
@@ -168,26 +215,101 @@
     while (history.length > MAX_HISTORY) history.shift();
   }
 
+  function clearIdleTimer() {
+    if (idleTimer) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  }
+
+  function endConversation(reason) {
+    clearIdleTimer();
+    if (phase === "ended") return;
+    phase = "ended";
+    history.length = 0;
+    if (reason !== "silent") {
+      const reply = idleEndedReply();
+      appendBubble("bot", reply);
+    }
+  }
+
+  function armIdleTimer() {
+    clearIdleTimer();
+    // fresh (welcome painted) and active both idle-out; ended stays quiet.
+    if (phase === "ended") return;
+    const ms = clampIdleSeconds(idleSeconds) * 1000;
+    idleTimer = setTimeout(() => endConversation("idle"), ms);
+  }
+
+  function markActive() {
+    phase = "active";
+    armIdleTimer();
+  }
+
+  async function loadIdleSettings() {
+    if (settingsLoaded) return idleSeconds;
+    settingsLoaded = true;
+    try {
+      if (!global.firebase?.firestore || !global.firebase.apps?.length) return idleSeconds;
+      const snap = await global.firebase.app().firestore().doc("botDeeSettings/default").get();
+      if (snap.exists) {
+        idleSeconds = clampIdleSeconds(snap.data()?.conversationIdleSeconds);
+      }
+    } catch (error) {
+      console.warn("BOT DEE idle settings load failed", error?.message || error);
+    }
+    return idleSeconds;
+  }
+
+  function localBotReply(text, {resuming}) {
+    if (isIdentityPrompt(text)) return identityReply();
+    if (isAckPrompt(text)) return ackReply(text);
+    if (isChitchatPrompt(text)) {
+      // Offer-help only after an idle/farewell resume — welcome already asked once.
+      if (resuming) return resumeReply();
+      return stillHereReply();
+    }
+    return null;
+  }
+
   async function sendMessage(raw) {
     const text = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 2000);
     if (!text) return;
     const input = byId("botDeeChatInput");
     if (input) input.value = "";
+
+    const resuming = phase === "ended";
+    if (resuming) {
+      // New conversation after idle / farewell — history already cleared.
+      phase = "fresh";
+    }
+
     appendBubble("user", text);
     pushHistory("user", text);
 
     // Chatbot first: never let hello / "cool" / name questions fall through to a search miss.
     if (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text)) {
-      const reply = isIdentityPrompt(text)
-        ? identityReply()
-        : (isAckPrompt(text) ? ackReply() : chitchatReply());
+      const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
       setStatus("");
+      if (isFarewellPrompt(text)) {
+        endConversation("silent");
+      } else {
+        markActive();
+      }
       input?.focus();
       return;
     }
 
+    // Substantive restart after idle: one short welcome-back, then answer their ask.
+    if (resuming) {
+      const hello = resumeReply();
+      appendBubble("bot", hello);
+      pushHistory("model", hello);
+    }
+
+    markActive();
     setBusy(true);
     setStatus(t("floqai.chatThinking", "BOT DEE is thinking…"));
 
@@ -215,6 +337,7 @@
       appendBubble("bot", reply, data.results);
       pushHistory("model", reply);
       setStatus("");
+      armIdleTimer();
     } catch (error) {
       const code = String(error?.code || "");
       let msg = t("floqai.chatError", "BOT DEE could not answer. Try quick intent search.");
@@ -254,19 +377,32 @@
       "floqai.chatWelcome",
       "Hi, I am BOT DEE. How can I help you?"
     ));
+    phase = "fresh";
+    // Arm idle so an abandoned welcome also ends cleanly.
+    armIdleTimer();
   }
 
   function bind(opts = {}) {
     bindForm();
-    welcome();
+    loadIdleSettings().finally(() => {
+      welcome();
+      // Re-arm with loaded idle seconds if welcome already painted.
+      if (phase === "fresh" || phase === "active") armIdleTimer();
+    });
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");
       if (input) input.value = String(q).slice(0, 200);
     }
     byId("botDeeChatInput")?.focus();
-    return {sendMessage, openIntentFallback};
+    return {sendMessage, openIntentFallback, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
   }
 
-  global.FLOQRBotDeeChat = {bind, sendMessage, openIntentFallback};
+  global.FLOQRBotDeeChat = {
+    bind,
+    sendMessage,
+    openIntentFallback,
+    DEFAULT_IDLE_SECONDS,
+    clampIdleSeconds
+  };
 })(typeof window !== "undefined" ? window : global);

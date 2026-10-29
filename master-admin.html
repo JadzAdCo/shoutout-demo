@@ -129,6 +129,7 @@
             <button class="admin-subtab" data-panel="featuresReleaseControl" type="button" data-i18n="master.featuresReleaseControl">Release Control</button>
             <button class="admin-subtab" data-panel="featuresBetaTesting" type="button" data-i18n="master.featuresBetaTesting">Beta &amp; Testing</button>
             <button class="admin-subtab" data-panel="featuresVipPayments" type="button" data-i18n="master.featuresVipPayments">VIP reserV Payments</button>
+            <button class="admin-subtab" data-panel="featuresBotDee" type="button" data-i18n="master.featuresBotDee">BOT DEE</button>
             <button class="admin-subtab" data-panel="featuresAuditTrail" type="button" data-i18n="master.featuresAuditTrail">Audit Trail</button>
           </div>
         </div>
@@ -1383,6 +1384,31 @@
         </div>
       </section>
 
+      <section id="featuresBotDee" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow" data-i18n="master.featuresBotDee">BOT DEE</p>
+          <h2
+            class="brand-mixed-case"
+            data-floqr-help-id="help-bot-dee-mgmt"
+            data-floqr-help-title="BOT DEE conversation"
+            data-floqr-help-search="bot dee|botdee|idle pause|conversation timeout|floqai settings"
+            data-floqr-help-body="Controls how long BOT DEE waits after the last message before ending the chat. After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat replies stay short and do not repeat the offer-help pitch."
+          >Conversation pause</h2>
+          <p class="sub small">After this many seconds with no new message, BOT DEE ends the conversation. Saying hi (or anything) after that starts a fresh chat. Default is 60 seconds (1 minute). Range 15–600.</p>
+          <p id="botDeeSettingsStatus" class="status" aria-live="polite"></p>
+          <div class="profile-grid">
+            <label>Idle pause (seconds)
+              <input id="botDeeIdleSeconds" type="number" min="15" max="600" step="1" value="60" inputmode="numeric"/>
+            </label>
+          </div>
+          <p class="button-row">
+            <button type="button" id="botDeeSettingsSave" class="primary">Save BOT DEE settings</button>
+            <button type="button" id="botDeeSettingsReload" class="buttonlike">Reload</button>
+          </p>
+          <p class="sub small" id="botDeeSettingsMeta"></p>
+        </div>
+      </section>
+
       <section id="featuresAuditTrail" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow" data-i18n="master.featuresAuditTrailEyebrow">Audit Trail</p>
@@ -1860,7 +1886,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.2.67"></script>
+<script src="./floqr-i18n.js?v=s3.2.70"></script>
 <script src="./firebase-config.js?v=s3.2.67"></script>
 <script src="./floqr-chrome-scheme.js?v=s3.2.67"></script>
 <script src="./floqr-chrome-audit.js?v=s3.2.67"></script>
@@ -1870,7 +1896,7 @@
 <script src="./floqr-temp-qa-showcase.js?v=s3.2.67"></script>
 <script src="./shared-data.js?v=s3.2.67"></script>
 <script src="./feature-gates.js?v=s3.2.67"></script>
-<script src="./sos2fa.js?v=s3.2.67"></script>
+<script src="./sos2fa.js?v=s3.2.70"></script>
 <script src="./entity-management.js?v=s3.2.67"></script>
 <script src="./ai-service.js?v=s3.2.67"></script>
 <script src="./ai-index-service.js?v=s3.2.67"></script>
@@ -1878,7 +1904,7 @@
 <script src="./floqr-venue-datapoints.js?v=s3.2.67"></script>
 <script src="./ai-discovery-service.js?v=s3.2.67"></script>
 <script src="./floqr-action-feedback.js?v=s3.2.67"></script>
-<script src="./floqai-help-repository.js?v=s3.2.67"></script>
+<script src="./floqai-help-repository.js?v=s3.2.70"></script>
 <script src="./floqr-i18n-help.js?v=s3.2.67"></script>
 <script src="./help-attach.js?v=s3.2.67"></script>
 <script src="./helper-popouts.js?v=s3.2.67"></script>
@@ -1886,17 +1912,17 @@
 <script src="./dc-spot-ad-campaigns.js?v=s3.2.67"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.2.67"></script>
 <script src="./ad-campaigns.js?v=s3.2.67"></script>
-<script src="./ai-diagnostics-service.js?v=s3.2.69"></script>
+<script src="./ai-diagnostics-service.js?v=s3.2.70"></script>
 <script src="./duplicate-record-service.js?v=s3.2.67"></script>
 <script src="./floqr-logger.js?v=s3.2.67"></script>
 <script src="./payment-service.js?v=s3.2.67"></script>
 <script src="./floqr-access-notice.js?v=s3.2.67"></script>
-<script src="./master-admin-app.js?v=s3.2.67"></script>
+<script src="./master-admin-app.js?v=s3.2.70"></script>
 <script src="./master-ad-management.js?v=s3.2.67"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.2.67"></script>
 <script src="./floqr-feature-services.js?v=s3.2.67"></script>
 <script src="./floqr-reason-prompt.js?v=s3.2.67"></script>
-<script src="./master-feature-services.js?v=s3.2.67"></script>
+<script src="./master-feature-services.js?v=s3.2.70"></script>
 <script src="./master-demo-employees.js?v=s3.2.67"></script>
 <script src="./floqr-data-classification.js?v=s3.2.67"></script>
 <script src="./master-data-classification.js?v=s3.2.67"></script>

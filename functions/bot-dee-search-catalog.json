@@ -265,6 +265,26 @@
       ]
     },
     {
+      "sourceId": "help:help-bot-dee-mgmt",
+      "id": "help-bot-dee-mgmt",
+      "kind": "help",
+      "label": "BOT DEE conversation pause",
+      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat cool/ok/thanks stay short and do not repeat th",
+      "href": "./master-admin.html?from=floqai#featuresBotDee",
+      "phrases": [
+        "bot dee conversation pause",
+        "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the chat default 60 . after the pause the next message starts a f",
+        "bot dee idle",
+        "bot dee pause",
+        "conversation timeout",
+        "bot dee settings",
+        "botdee mgmt",
+        "idle pause",
+        "bot dee master admin",
+        "help-bot-dee-mgmt"
+      ]
+    },
+    {
       "sourceId": "help:help-chrome-audit",
       "id": "help-chrome-audit",
       "kind": "help",
@@ -852,11 +872,11 @@
       "id": "help-floqai-page",
       "kind": "help",
       "label": "BOT DEE",
-      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Answers use classification for your account. Quick intent search stays available as a fast path when you want produc",
+      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat rep",
       "href": "./floqai.html",
       "phrases": [
         "bot dee",
-        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. answe",
+        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. bot d",
         "floqai",
         "floqai page",
         "ask floqai",
