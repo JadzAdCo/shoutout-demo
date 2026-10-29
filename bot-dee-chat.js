@@ -194,7 +194,7 @@
     if (!log || log.childElementCount) return;
     appendBubble("bot", t(
       "floqai.chatWelcome",
-      "Hi — I am BOT DEE. Ask in plain words what you want to do in FLOQR. Quick intent search stays available below."
+      "Hi, I am BOT DEE. How can I help you?"
     ));
   }
 

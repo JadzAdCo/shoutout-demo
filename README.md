@@ -1,4 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.64 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.65 (stable)
+
+- s3.2.65: BOT DEE welcome — “Hi, I am BOT DEE. How can I help you?”
+- s3.2.64: BOT DEE greets on hello (client + server chitchat) — never a search-miss for greetings.
 
 - s3.2.64: BOT DEE greets on hello (client + server chitchat) — never a search-miss for greetings.
 - s3.2.63: Settings Search icon → rounded-square (no circular ring/crop); Search tile CSS border-radius 8.6% (SQ_CORNER/S).
