@@ -102,6 +102,7 @@
     ["featureServiceAuditHead", "master", 0, "Audit chain head"],
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
+    ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
     ["floqAiAccessThrottle", "secret", 0, "FloqAi access-denial log rate limits"],
     ["floqrAdmins", "master", 1, "Assigned FloqR Admins (template catalog access)"],
     ["friendRequests", "ownMaster", 0, "Friend requests"],
