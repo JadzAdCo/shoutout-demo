@@ -68,6 +68,17 @@ test("filterAndRank empty query caps at NEARBY_TOP", () => {
   assert.equal(out.length, 4);
 });
 
+test("filterAndRank folds accents so Shoko matches Shôko", () => {
+  const rows = [
+    {id: "shoko-barcelona-spain", name: "Shôko Barcelona", brandName: "Shôko", city: "Barcelona"},
+    {id: "decades-washington-dc", name: "Decades Nightclub", brandName: "Decades", city: "Washington"}
+  ];
+  const out = FL.filterAndRank(rows, {query: "shoko", locationContext: null, nearbyTop: 0});
+  assert.equal(out.length, 1);
+  assert.equal(out[0].id, "shoko-barcelona-spain");
+  assert.equal(FL.foldSearch("Shôko"), "shoko");
+});
+
 test("feature landing pages omit FloqR parent logo and load shared module", () => {
   for (const file of ["floqcast-search.html", "vip.html", "shoutout-search.html"]) {
     const html = fs.readFileSync(path.join(root, file), "utf8");
