@@ -45,6 +45,70 @@
     });
   }
 
+  /** Keep help verbiage fully inside the viewport (PC + mobile). */
+  function fitHelpPopoutInViewport(details) {
+    if (!details || !details.open) return;
+    const body = details.querySelector(".help-popout-body, div:not(summary)");
+    if (!body) return;
+    const pad = 12;
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+    // Reset measured transforms / forced coords before measuring.
+    body.style.left = "";
+    body.style.right = "";
+    body.style.top = "";
+    body.style.bottom = "";
+    body.style.maxWidth = "";
+    body.style.transform = "";
+    details.removeAttribute("data-help-align");
+
+    const preferEnd = details.classList.contains("botdee-help-popout")
+      || getComputedStyle(details).getPropertyValue("--help-anchor").trim() === "end";
+    if (preferEnd) details.setAttribute("data-help-align", "end");
+    else details.setAttribute("data-help-align", "start");
+
+    // Cap width to remaining viewport room from the ? anchor.
+    const anchor = details.getBoundingClientRect();
+    const roomStart = Math.max(160, Math.floor(anchor.left - pad));
+    const roomEnd = Math.max(160, Math.floor(vw - anchor.right - pad));
+    const roomBoth = Math.max(160, vw - pad * 2);
+    const preferWidth = Math.min(320, roomBoth);
+    body.style.maxWidth = `${preferWidth}px`;
+    body.style.width = `min(320px, ${preferWidth}px)`;
+
+    // Force a layout pass, then flip if still clipped.
+    let rect = body.getBoundingClientRect();
+    if (rect.right > vw - pad && roomStart >= Math.min(preferWidth, roomEnd)) {
+      details.setAttribute("data-help-align", "end");
+      body.style.left = "auto";
+      body.style.right = "0";
+      rect = body.getBoundingClientRect();
+    } else if (rect.left < pad && roomEnd >= Math.min(preferWidth, roomStart)) {
+      details.setAttribute("data-help-align", "start");
+      body.style.left = "0";
+      body.style.right = "auto";
+      rect = body.getBoundingClientRect();
+    }
+
+    // Final nudge if still slightly over either edge (narrow phones).
+    rect = body.getBoundingClientRect();
+    let shiftX = 0;
+    if (rect.right > vw - pad) shiftX = (vw - pad) - rect.right;
+    if (rect.left + shiftX < pad) shiftX = pad - rect.left;
+    if (shiftX) body.style.transform = `translateX(${Math.round(shiftX)}px)`;
+
+    // Vertical: if body would go below the fold, pull it up a bit.
+    rect = body.getBoundingClientRect();
+    if (rect.bottom > vh - pad) {
+      const up = Math.min(rect.height - 40, rect.bottom - (vh - pad));
+      if (up > 0) {
+        const prev = body.style.transform || "";
+        body.style.transform = `${prev} translateY(${Math.round(-up)}px)`.trim();
+      }
+    }
+  }
+
   function bindDismissBehavior() {
     document.addEventListener("click", event => {
       const openHelp = event.target.closest?.("details.help-popout, details.mingl-action-details");
@@ -53,8 +117,25 @@
         return;
       }
       if (event.target.closest("summary")) {
-        setTimeout(() => closeOtherPopouts(openHelp.open ? openHelp : null), 0);
+        setTimeout(() => {
+          closeOtherPopouts(openHelp.open ? openHelp : null);
+          if (openHelp.open && openHelp.classList.contains("help-popout")) {
+            fitHelpPopoutInViewport(openHelp);
+          }
+        }, 0);
       }
+    });
+    document.addEventListener("toggle", event => {
+      const details = event.target;
+      if (!(details instanceof HTMLDetailsElement)) return;
+      if (!details.classList.contains("help-popout")) return;
+      if (details.open) {
+        closeOtherPopouts(details);
+        requestAnimationFrame(() => fitHelpPopoutInViewport(details));
+      }
+    }, true);
+    window.addEventListener("resize", () => {
+      document.querySelectorAll("details.help-popout[open]").forEach(fitHelpPopoutInViewport);
     });
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") closeOtherPopouts(null);

@@ -58,6 +58,35 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   }
 });
 
+test("Name / pronunciation is identity — not a search dump", () => {
+  assert.equal(bot.isIdentityPrompt("how is your name pronounced?"), true);
+  assert.equal(bot.isIdentityPrompt("How do you pronounce BOT DEE"), true);
+  assert.equal(bot.isIdentityPrompt("who are you"), true);
+  assert.equal(bot.isIdentityPrompt("what's your name"), true);
+  assert.equal(bot.isIdentityPrompt("throw a shoutout"), false);
+
+  const reply = bot.identityReply();
+  assert.match(reply, /BOT DEE/i);
+  assert.match(reply, /dee/i);
+  assert.doesNotMatch(reply, /Here is what I found/i);
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("master", "how is your name pronounced?");
+  assert.equal(local.provider, "local-identity");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /bot/i);
+});
+
+test("Gemini toolConfig uses AUTO without allowedFunctionNames", () => {
+  const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-functions.js"), "utf8");
+  assert.match(src, /FunctionCallingConfigMode\.AUTO/);
+  assert.doesNotMatch(
+    src,
+    /functionCallingConfig:\s*\{[^}]*allowedFunctionNames/,
+    "allowedFunctionNames with AUTO 400s on Gemini and forces search fallback"
+  );
+});
+
 test("sanitizeHistory keeps bounded user/model turns", () => {
   const history = bot.sanitizeHistory([
     {role: "system", text: "ignore"},

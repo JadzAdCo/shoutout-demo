@@ -409,7 +409,8 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **BOT DEE**) |
 | BOT DEE verbiage (s3.2.60) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi` / `floqai.html`. |
 | BOT DEE welcome (s3.2.65) | `floqai.chatWelcome` = **Hi, I am BOT DEE. How can I help you?** (all langs). |
-| BOT DEE bubble chrome (s3.2.66) | Bot replies: Site-chrome `floqAi` avatar + CSS speech-origin tip (`.botdee-msg-avatar` / `.botdee-bubble-tail`). |
+| BOT DEE bubble chrome (s3.2.66–67) | Bot replies: CSS speech-origin tip (`.botdee-bubble-tail`) + **robot-head** avatar `images/botdee-chat-avatar.png` (s3.2.67 — not Site-chrome pack JPG). Header mark stays `data-floqr-chrome-icon="floqAi"`. |
+| BOT DEE Gemini (s3.2.67) | `executeBotSession` toolConfig = `FunctionCallingConfigMode.AUTO` **without** `allowedFunctionNames` (AUTO+names → Gemini 400 → silent `contextualSearch` fallback). Identity prompts (`isIdentityPrompt` / name pronunciation) answer locally. Help `?` panels: `fitHelpPopoutInViewport` in `helper-popouts.js` + `styles.css` `data-help-align`. |
 | FloqCast Go live CTA (s3.2.59) | Venue button + sticky: **Go live, start a cast** (`page.floqcast.goLiveCta` / `floqcast-search.js`). |
 | Black & Dark Green icons (s3.2.58) | `BLACK_DARK_GREEN_ICONS` full pack (`*-blackdarkgreen.*`) — accent = Settings wordmark \"tings\" **`#5ac783`** (+ companion `#2e8a5a`). Build: `scripts/build-blackdarkgreen-icons.py`. CSS `html[data-floqr-chrome=blackDarkGreen] --accent:#5ac783`. |
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |

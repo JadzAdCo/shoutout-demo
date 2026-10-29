@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.66";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.66";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.67";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.67";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,11 +223,27 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.67",
+      title: "s3.2.67 — BOT DEE Gemini fix + help popout + robot avatar",
+      checks: [
+        {label:"Package version s3.2.67", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.67\""]},
+        {label:"Gemini AUTO without allowedFunctionNames", file:"functions/bot-dee-functions.js", includes:["FunctionCallingConfigMode.AUTO"], notIncludes:["allowedFunctionNames: bot.TOOL_NAMES"]},
+        {label:"Identity prompt local path", file:"functions/bot-dee-core.js", includes:["isIdentityPrompt", "identityReply"]},
+        {label:"Help popout viewport fit", file:"helper-popouts.js", includes:["fitHelpPopoutInViewport", "data-help-align"]},
+        {label:"Help popout CSS no clip", file:"styles.css", includes:["data-help-align=\"end\"", "overflow-wrap:anywhere"]},
+        {label:"Robot-head avatar src", file:"bot-dee-chat.js", includes:["botdee-chat-avatar.png", "isIdentityPrompt", "botdee-msg-avatar"]},
+        {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar", "pixelated"]},
+        {label:"Manual test Gemini", file:"ai-diagnostics-service.js", includes:["s3-2-67-botdee-gemini-name"]},
+        {label:"Manual test help popout", file:"ai-diagnostics-service.js", includes:["s3-2-67-help-popout-viewport"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.67\""]}
+      ]
+    },
+    {
       version: "s3.2.66",
       title: "s3.2.66 — BOT DEE bubble avatar + speech tip",
       checks: [
         {label:"Package version s3.2.66", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.66\""]},
-        {label:"Bot bubble avatar", file:"bot-dee-chat.js", includes:["botdee-msg-avatar", "botdee-bubble-tail", "data-floqr-chrome-icon"]},
+        {label:"Bot bubble avatar", file:"bot-dee-chat.js", includes:["botdee-msg-avatar", "botdee-bubble-tail"]},
         {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar"]},
         {label:"Manual test s3.2.66", file:"ai-diagnostics-service.js", includes:["s3-2-66-botdee-bubble-avatar"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.66\""]}
@@ -2511,6 +2527,42 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+        id:"s3-2-67-botdee-gemini-name",
+        area:"BOT DEE / FloqAi",
+        feature:"Gemini answers name pronunciation (not search dump)",
+        changed:"Root cause: Gemini 400 when AUTO + allowedFunctionNames — every non-greeting silently fell back to contextualSearch (Here is what I found…). Fixed toolConfig; identity prompts (how is your name pronounced) answered locally as BOT DEE. Functions redeploy required. Package s3.2.67.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html?v=s3.2.67 signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
+        expected:"Identity/name questions get a conversational BOT DEE reply; product how-tos still search/tool.",
+        troubleshoot:"Still search dump → confirm Functions executeBotSession redeployed from main with GEMINI_API_KEY secret; check Cloud Logs for botdee.session provider=gemini (not local-fallback). Client-only identity path works without redeploy for the exact name prompt."
+      },
+      {
+        id:"s3-2-67-help-popout-viewport",
+        area:"Help / BOT DEE",
+        feature:"Help ? panels stay fully in view (PC + mobile)",
+        changed:"help-popout-body max-width + overflow-wrap; helper-popouts fitHelpPopoutInViewport flips left/right and nudges on screen. BOT DEE header ? opens leftward. Package s3.2.67.",
+        howToTest:"1) Hard-refresh floqai.html?v=s3.2.67 on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
+        expected:"Entire help verbiage readable inside the viewport.",
+        troubleshoot:"Still clipped → hard refresh styles.css + helper-popouts.js + bot-dee-chat.css (s3.2.67). Parent overflow:hidden → check botdee-shell overflow:visible."
+      },
+      {
+        id:"s3-2-67-botdee-robot-avatar",
+        area:"BOT DEE / FloqAi",
+        feature:"Robot-head avatar on bot chat bubbles",
+        changed:"Bot bubbles use images/botdee-chat-avatar.png (cyan-eye robot head) + speech tip. Not the full Site-chrome BOT DEE JPG. Package s3.2.67.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html?v=s3.2.67 signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
+        expected:"Bubble origin = robot-head avatar; tip points at it.",
+        troubleshoot:"Still full chrome face in bubbles → hard refresh bot-dee-chat.js + botdee-chat-avatar.png (s3.2.67). 404 on avatar → confirm images/botdee-chat-avatar.png on Pages main."
+      },
+      {
+        id:"s3-2-66-botdee-bubble-avatar",
+        area:"BOT DEE / FloqAi",
+        feature:"Bot bubble avatar + speech tip (superseded by s3.2.67 robot head)",
+        changed:"s3.2.66 added bubble avatar + .botdee-bubble-tail. s3.2.67 swaps avatar to robot-head PNG.",
+        howToTest:"Prefer s3-2-67-botdee-robot-avatar. Confirm tip still present on bot bubbles.",
+        expected:"Speech tip on bot bubbles.",
+        troubleshoot:"No tip → hard refresh bot-dee-chat.css (s3.2.67)."
+      },
       {
         id:"s3-2-65-botdee-welcome",
         area:"BOT DEE / FloqAi",

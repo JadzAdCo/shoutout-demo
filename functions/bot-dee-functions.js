@@ -28,10 +28,14 @@ function asHttps(error) {
 }
 
 function geminiKey() {
+  // Gen2 binds secrets as process.env[KEY] — prefer that (defineSecret.value()
+  // can disagree with Secret Manager on some revisions).
+  const fromEnv = String(process.env.GEMINI_API_KEY || "").trim();
+  if (fromEnv) return fromEnv;
   try {
-    return GEMINI_API_KEY.value() || process.env.GEMINI_API_KEY || "";
+    return String(GEMINI_API_KEY.value() || "").trim();
   } catch (_) {
-    return process.env.GEMINI_API_KEY || "";
+    return "";
   }
 }
 
@@ -61,10 +65,12 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       config: {
         systemInstruction: bot.systemInstruction(role),
         tools,
+        // AUTO must NOT set allowedFunctionNames — Gemini 400s with
+        // "Please set allowed_function_names only when function calling mode is ANY"
+        // and every turn silently fell back to contextualSearch.
         toolConfig: {
           functionCallingConfig: {
-            mode: FunctionCallingConfigMode.AUTO,
-            allowedFunctionNames: bot.TOOL_NAMES
+            mode: FunctionCallingConfigMode.AUTO
           }
         },
         temperature: 0.4
@@ -120,6 +126,15 @@ function localSession(role, userPrompt) {
       toolRounds: 0
     };
   }
+  if (bot.isIdentityPrompt(userPrompt)) {
+    return {
+      reply: bot.identityReply(),
+      results: [],
+      provider: "local-identity",
+      model: "identity",
+      toolRounds: 0
+    };
+  }
   const search = bot.contextualSearch(userPrompt, role);
   return {
     reply: bot.formatSearchFallback(search),
@@ -152,8 +167,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     const apiKey = geminiKey();
     let outcome;
-    // Greetings stay chat-like even when Gemini is down or mis-calls search.
-    if (bot.isChitchatPrompt(userPrompt)) {
+    // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
+    if (bot.isChitchatPrompt(userPrompt) || bot.isIdentityPrompt(userPrompt)) {
       outcome = localSession(role, userPrompt);
     } else if (apiKey) {
       try {

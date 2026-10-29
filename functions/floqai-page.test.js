@@ -56,8 +56,11 @@ test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", (
   assert.match(read("bot-dee-chat.js"), /Chatbot first/);
   assert.match(read("bot-dee-chat.js"), /botdee-msg-avatar/);
   assert.match(read("bot-dee-chat.js"), /botdee-bubble-tail/);
+  assert.match(read("bot-dee-chat.js"), /botdee-chat-avatar\.png/);
+  assert.doesNotMatch(read("bot-dee-chat.js"), /botdee-msg-avatar[\s\S]{0,200}data-floqr-chrome-icon/, "bubble avatar is the robot-head asset, not Site chrome");
   assert.match(read("bot-dee-chat.css"), /\.botdee-bubble-tail/);
   assert.match(read("bot-dee-chat.css"), /\.botdee-msg-avatar/);
+  assert.ok(fs.existsSync(path.join(root, "images", "botdee-chat-avatar.png")), "chat avatar PNG present");
 });
 
 test("floating FloqAi agent is not shown on template select", () => {

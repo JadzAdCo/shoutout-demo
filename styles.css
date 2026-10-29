@@ -698,14 +698,22 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 .mingl-discovery-card{display:grid;gap:14px}
 .section-title-row{display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap}
 .section-title-row h2{margin:0}
-.help-popout{position:relative;justify-self:auto;flex:0 0 auto;margin:0}
+.help-popout{position:relative;justify-self:auto;flex:0 0 auto;margin:0;overflow:visible}
 .help-popout summary{list-style:none;width:20px;height:20px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.10);font-weight:1000;font-size:11px;cursor:pointer}
 .help-popout summary::-webkit-details-marker{display:none}
 .help-popout[open] summary{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c}
 .help-popout > div,
 .help-popout .help-popout-body{
-  position:absolute;left:0;right:auto;z-index:20;width:min(320px,calc(100vw - 38px));margin-top:8px;border:1px solid var(--line);border-radius:16px;background:#12183a;color:#fff;padding:12px;box-shadow:0 18px 48px rgba(0,0,0,.42);font-size:14px;line-height:1.35
+  position:absolute;left:0;right:auto;z-index:120;width:min(320px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(70vh,520px);overflow-x:hidden;overflow-y:auto;margin-top:8px;border:1px solid var(--line);border-radius:16px;background:#12183a;color:#fff;padding:12px;box-shadow:0 18px 48px rgba(0,0,0,.42);font-size:14px;line-height:1.45;box-sizing:border-box;overflow-wrap:anywhere;word-break:normal;hyphens:auto
 }
+.help-popout .help-popout-body p,
+.help-popout > div p{margin:8px 0 0;max-width:100%}
+.help-popout .help-popout-body p:first-of-type,
+.help-popout > div p:first-of-type{margin-top:6px}
+.help-popout[data-help-align="end"] > div,
+.help-popout[data-help-align="end"] .help-popout-body{left:auto;right:0}
+.help-popout[data-help-align="start"] > div,
+.help-popout[data-help-align="start"] .help-popout-body{left:0;right:auto}
 /* Site-wide: ? sits immediately beside its correlated verbiage (PC / tablet / phone).
    Never stretch .help-label to full row width — that parks ? on the far right. */
 .help-label{
