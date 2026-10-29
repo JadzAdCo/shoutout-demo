@@ -21,6 +21,7 @@
     "featuresServices",
     "featuresReleaseControl",
     "featuresBetaTesting",
+    "featuresBotDee",
     "featuresAuditTrail",
     "dataClassification",
     "adApprovalQueue",

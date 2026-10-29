@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.67";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.67";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.70";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.70";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,46 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.70",
+      title: "s3.2.70 — BOT DEE idle end + offer-help only on start/resume",
+      checks: [
+        {label:"Idle helpers", file:"functions/bot-dee-core.js", includes:["DEFAULT_IDLE_SECONDS", "idleEndedReply", "stillHereReply", "ONLY on the first turn"]},
+        {label:"Soft ack", file:"functions/bot-dee-core.js", includes:["You're welcome.", "Take care — say hi"]},
+        {label:"Settings callable", file:"functions/bot-dee-functions.js", includes:["exports.setBotDeeSettings", "botDeeSettings/default"]},
+        {label:"Client idle session", file:"bot-dee-chat.js", includes:["endConversation", "chatResume", "chatStillHere", "botDeeSettings/default"]},
+        {label:"Master Admin BOT DEE panel", file:"master-admin.html", includes:["id=\"featuresBotDee\"", "botDeeIdleSeconds"]},
+        {label:"Features mount", file:"master-feature-services.js", includes:["loadBotDeeSettings", "setBotDeeSettings"]},
+        {label:"Rules", file:"firestore.rules", includes:["match /botDeeSettings/{docId}"]},
+        {label:"Chrome keys", file:"floqr-i18n.js", includes:["floqai.chatResume", "master.featuresBotDee", "VERSION = \"s3.2.70\""]},
+        {label:"Manual test idle", file:"ai-diagnostics-service.js", includes:["s3-2-70-botdee-idle-resume"]},
+        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+      ]
+    },
+    {
+      version: "s3.2.69",
+      title: "s3.2.69 — BOT DEE cool/ok acknowledgments stay conversational",
+      checks: [
+        {label:"Ack prompt helper", file:"functions/bot-dee-core.js", includes:["isAckPrompt", "ackReply", "Acknowledgments mid-chat"]},
+        {label:"Client ack mirror", file:"bot-dee-chat.js", includes:["isAckPrompt", "ackReply", "floqai.chatAck"]},
+        {label:"Chrome ack key", file:"floqr-i18n.js", includes:["floqai.chatAck", "VERSION = \"s3.2.70\""]},
+        {label:"Manual test cool ack", file:"ai-diagnostics-service.js", includes:["s3-2-69-botdee-cool-ack"]},
+        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+      ]
+    },
+    {
+      version: "s3.2.68",
+      title: "s3.2.68 — Shôko Barcelona VIP floor plan + NYE'27 prices",
+      checks: [
+        {label:"Shôko VIP plan", file:"vip-plans/shoko-barcelona.json", includes:["shoko-barcelona-spain", "nightPricing", "2026-12-31"]},
+        {label:"VIP app maps Shôko", file:"vip-app.js", includes:["shoko-barcelona-spain", "shoko-barcelona.json"]},
+        {label:"VIP beta catalog Shôko", file:"functions/vip-beta-catalog.js", includes:["shoko-barcelona-spain", "nightPricing"]},
+        {label:"NYE event seed", file:"shared-data.js", includes:["shoko-nye-2027", "NYE'27"]},
+        {label:"Manual test Shôko VIP", file:"ai-diagnostics-service.js", includes:["s3-2-68-shoko-vip-nye"]},
+        {label:"Diagnostics package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]},
+        {label:"VIP pages cache-bust", file:"vip.html", includes:["vip-app.js?v=s3.2.68", "vip-floor-viewer.js?v=s3.2.68"]}
+      ]
+    },
+    {
       version: "s3.2.67",
       title: "s3.2.67 — BOT DEE Gemini fix + help popout + robot avatar",
       checks: [
@@ -235,7 +275,7 @@
         {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar", "pixelated"]},
         {label:"Manual test Gemini", file:"ai-diagnostics-service.js", includes:["s3-2-67-botdee-gemini-name"]},
         {label:"Manual test help popout", file:"ai-diagnostics-service.js", includes:["s3-2-67-help-popout-viewport"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.67\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]}
       ]
     },
     {
@@ -2527,6 +2567,33 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-70-botdee-idle-resume",
+      area:"BOT DEE / FloqAi",
+      feature:"Offer-help once + idle end (~60s) + Master Admin idle setting",
+      changed:"Mid-chat cool/ok/thanks → short Cool./You're welcome. (no product pitch). Offer-help only on welcome and after idle resume. Idle timer (default 60s, botDeeSettings/default) ends the chat. Master Admin → Features Mgmt → BOT DEE sets conversationIdleSeconds via setBotDeeSettings (SOS2FA + reason). Package s3.2.70.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.70) with floqAi. 2) Welcome asks how it can help once. 3) Say cool → Cool. only — no Want to keep going / product list. 4) Say hey mid-chat → Hey — still here. 5) Wait ~60s idle → pause message; next hi gets Welcome back + offer-help. 6) Master Admin → Features Mgmt → BOT DEE → set idle seconds → Save with reason (SOS2FA).",
+      expected:"No repetitive offer-help mid-chat; idle ends conversation; resume asks once; Master Admin can change idle seconds.",
+      troubleshoot:"Still repeating pitch → hard refresh bot-dee-chat.js ?v=s3.2.70. Idle never ends → check botDeeSettings/default read + console. Save fails → Functions deploy setBotDeeSettings + SOS2FA unlock. Panel missing → master-admin.html #featuresBotDee."
+    },
+    {
+      id:"s3-2-69-botdee-cool-ack",
+      area:"BOT DEE / FloqAi",
+      feature:"Acknowledgments (cool / ok / thanks) stay conversational",
+      changed:"isAckPrompt + ackReply — mid-chat cool/ok/thanks get a short continue reply, not a Hey BOT DEE restart and not search. Client mirror in bot-dee-chat.js; Gemini systemInstruction forbids tools on acks. Softened further in s3.2.70 (no product pitch on ack).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.70) signed in with floqAi. 2) Say hello. 3) Say cool → Cool. — NOT Here is what I found and NOT Hey — BOT DEE here. 4) Say thanks → You're welcome.",
+      expected:"cool stays chat mode; short ack; no search dump; no full re-intro.",
+      troubleshoot:"Still greeting restart → hard refresh bot-dee-chat.js ?v=s3.2.70. Still search → Functions deploy executeBotSession (bot-dee-core isAckPrompt). Old Pages cache → confirm floqai.html script ?v=."
+    },
+    {
+      id:"s3-2-68-shoko-vip-nye",
+      area:"VIP reserV / Events",
+      feature:"Shôko Barcelona VIP floor plan + NYE'27 event-only table prices",
+      changed:"vip-plans/shoko-barcelona.json (68 bookable + DJ); nightPricing 2026-12-31 EUR flyer list; standard (non-NYE) = NYE÷4; deposit 25% of standard (regular) / 50% of NYE list (NYE). Event shoko-nye-2027. Package s3.2.68. Functions deploy required for live holds/prices.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=shoko-barcelona-spain (s3.2.68) with vipReservations access. 2) Map shows Terraza / Lounge / SUPER VIP / KAI ZEN / LA SUÏTE. 3) Non-NYE night: SUPER VIP minimum 5.000€, pay today 1.250€ (25%). 4) Night 2026-12-31: SUPER VIP minimum 20.000€, pay today 10.000€ (50%). 5) Search/events lists NYE'27. 6) BOT DEE: Aurelia still resolves.",
+      expected:"Regular nights use standard = NYE/4 with 25% deposit; NYE uses flyer list with 50% deposit; both EUR; Aurelia still resolves.",
+      troubleshoot:"Blank map → vip-plans/shoko-barcelona.json + PNG on Pages. Wrong deposit % → Functions deploy vip-functions/vip-beta-catalog. No NYE night → extraNights merge deploy. Aurelia not found → executeBotSession resolveClubLocationId on us-central1."
+    },
       {
         id:"s3-2-67-botdee-gemini-name",
         area:"BOT DEE / FloqAi",

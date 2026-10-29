@@ -174,6 +174,7 @@
     "featuresReleaseControl",
     "featuresBetaTesting",
     "featuresVipPayments",
+    "featuresBotDee",
     "featuresAuditTrail",
     "dataClassification",
     "adApprovalQueue",
@@ -183,12 +184,13 @@
     "adSettingsPanel"
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
-  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresAuditTrail"];
+  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresBotDee", "featuresAuditTrail"];
   const PANEL_LABELS = {
     featuresServices: "Features Mgmt",
     featuresReleaseControl: "Features Mgmt · Release Control",
     featuresBetaTesting: "Features Mgmt · Beta & Testing",
     featuresVipPayments: "Features Mgmt · VIP reserV Payments",
+    featuresBotDee: "Features Mgmt · BOT DEE",
     featuresAuditTrail: "Features Mgmt · Audit Trail",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",

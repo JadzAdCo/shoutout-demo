@@ -1,7 +1,9 @@
 /* BOT DEE — executeBotSession callable (Auth + floqAi gate + classification → Gemini + tools).
-   Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role). */
+   Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role).
+   Master Admin: setBotDeeSettings (idle pause) under SOS2FA. */
 "use strict";
 
+const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {GoogleGenAI, FunctionCallingConfigMode} = require("@google/genai");
@@ -9,6 +11,12 @@ const core = require("./data-classification-core");
 const bot = require("./bot-dee-core");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const {__floqAiHelpers} = require("./data-classification-functions");
+const {assertSos2faSession} = require("./sos2fa-functions");
+const {isServerAdminAuth} = require("./admin-trust");
+
+if (!admin.apps.length) admin.initializeApp();
+const db = admin.firestore();
+const {FieldValue} = admin.firestore;
 
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
@@ -20,9 +28,14 @@ const CALL_OPTS = {
   secrets: [GEMINI_API_KEY, STRIPE_SECRET_KEY]
 };
 
+const ADMIN_CALL_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
+const BOT_DEE_SETTINGS_DOC = "botDeeSettings/default";
+const REASON_MIN = 8;
+
 function asHttps(error) {
   if (error instanceof HttpsError) return error;
   if (error?.code === "invalid-argument") return new HttpsError("invalid-argument", error.message);
+  if (error?.code === "failed-precondition") return new HttpsError("failed-precondition", error.message);
   console.error("BOT DEE session failed", error?.message || error);
   return new HttpsError("internal", "BOT DEE could not complete that request. Try again.");
 }
@@ -117,6 +130,15 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
 }
 
 function localSession(role, userPrompt) {
+  if (bot.isAckPrompt(userPrompt)) {
+    return {
+      reply: bot.ackReply(role, userPrompt),
+      results: [],
+      provider: "local-chitchat",
+      model: "ack",
+      toolRounds: 0
+    };
+  }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
       reply: bot.chitchatReply(role),
@@ -205,8 +227,64 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
   }
 });
 
+/**
+ * Master Admin — save BOT DEE conversation settings (idle pause seconds).
+ * SOS2FA + reason; Functions-write only (clients read botDeeSettings/default).
+ */
+exports.setBotDeeSettings = onCall(ADMIN_CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    }
+    if (!isServerAdminAuth(request.auth)) {
+      throw new HttpsError("permission-denied", "Master Admin only.");
+    }
+    const {email, sessionId} = await assertSos2faSession(request);
+    const reason = String(request.data?.reason || "").trim();
+    if (reason.length < REASON_MIN) {
+      throw new HttpsError(
+        "invalid-argument",
+        `Enter a reason of at least ${REASON_MIN} characters. It is saved in the audit trail.`
+      );
+    }
+    const nextIdle = bot.clampIdleSeconds(request.data?.conversationIdleSeconds);
+    const ref = db.doc(BOT_DEE_SETTINGS_DOC);
+    const snap = await ref.get();
+    const before = bot.normalizeBotDeeSettings(snap.exists ? snap.data() : null);
+    if (before.conversationIdleSeconds === nextIdle) {
+      throw new HttpsError("failed-precondition", "Nothing changed — idle pause already has that value.");
+    }
+    const nowMs = Date.now();
+    const after = {
+      conversationIdleSeconds: nextIdle,
+      revision: before.revision + 1,
+      updatedAtMs: nowMs,
+      updatedAtIso: new Date(nowMs).toISOString(),
+      updatedByUid: request.auth.uid,
+      updatedByEmail: email || request.auth.token?.email || "",
+      lastChangeReason: reason.slice(0, 500),
+      sos2faSessionHash: String(sessionId || "").slice(0, 16)
+    };
+    await ref.set({
+      ...after,
+      updatedAt: FieldValue.serverTimestamp()
+    }, {merge: true});
+    console.info(JSON.stringify({
+      event: "botdee.settings_changed",
+      actorEmail: after.updatedByEmail,
+      before: {conversationIdleSeconds: before.conversationIdleSeconds},
+      after: {conversationIdleSeconds: after.conversationIdleSeconds},
+      reason: after.lastChangeReason
+    }));
+    return {ok: true, settings: bot.normalizeBotDeeSettings(after), before, after};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
 exports.__botDeeHelpers = {
   runGeminiSession,
   localSession,
-  geminiKey
+  geminiKey,
+  BOT_DEE_SETTINGS_DOC
 };

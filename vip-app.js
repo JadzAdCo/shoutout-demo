@@ -8,7 +8,8 @@
   const PLAN_BY_ID = Object.freeze({
     "decades-washington-dc": "decades.json",
     "lima-twist-washington-dc": "lima-twist.json",
-    "temp-democlub-1": "aurelia.json"
+    "temp-democlub-1": "aurelia.json",
+    "shoko-barcelona-spain": "shoko-barcelona.json"
   });
 
   /** Optional 3D walk-through (Aurelia demo only — reports/vip-aurelia-demo). */
@@ -80,8 +81,15 @@
     return firebase.app().functions("us-central1").httpsCallable(name);
   }
 
-  function money(cents) {
-    return "$" + (Number(cents || 0) / 100).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  function money(cents, currency) {
+    const cur = String(currency || "USD").toUpperCase();
+    const amount = Number(cents || 0) / 100;
+    try {
+      return amount.toLocaleString("en-US", {style: "currency", currency: cur, minimumFractionDigits: 2, maximumFractionDigits: 2});
+    } catch (_) {
+      const sym = cur === "EUR" ? "€" : "$";
+      return sym + amount.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
   }
 
   function storeHold(hold) {
@@ -206,6 +214,20 @@
         }
       });
       window.FLOQRVipFloorViewer?.setStates?.(states);
+      const pricing = {};
+      sections.forEach(s => {
+        if (!s.sectionId) return;
+        pricing[s.sectionId] = {
+          minimumAmountCents: s.minimumAmountCents,
+          depositCents: s.depositCents,
+          extraGuestFeeCents: s.extraGuestFeeCents,
+          includedGuests: s.includedGuests,
+          maxCapacity: s.maxCapacity,
+          currency: s.currency || res.data?.currency || "USD",
+          nightPriced: !!s.nightPriced
+        };
+      });
+      window.FLOQRVipFloorViewer?.setLivePricing?.(pricing);
       if (opts?.announce !== false && !activeHold) {
         const base = t("page.vip.inventorySummary", "{available} available · {held} held · {booked} booked — tap a green table to hold.")
           .replace("{available}", String(available))
@@ -254,7 +276,7 @@
       holdBanner.innerHTML =
         `<strong data-i18n-skip>${t("page.vip.holdActive", "Hold active")}</strong> — ` +
         `${esc(activeHold.sectionLabel || activeHold.sectionId)} · ${esc(activeHold.night)} · ` +
-        `${t("page.vip.payToday", "Pay today")} ${money(amounts.chargedCents)} · ` +
+        `${t("page.vip.payToday", "Pay today")} ${money(amounts.chargedCents, amounts.currency)} · ` +
         `<span id="vipHoldClock">${mins}:${String(secs).padStart(2, "0")}</span>` +
         ` <button type="button" id="vipReleaseHold" class="buttonlike">${t("page.vip.releaseHold", "Release hold")}</button>` +
         ` <button type="button" id="vipContinueConsent" class="primary">${t("page.vip.continueTerms", "Continue to Terms")}</button>`;

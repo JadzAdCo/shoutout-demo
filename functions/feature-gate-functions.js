@@ -14,7 +14,18 @@ const MASTER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 const SUPER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 
 const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, floqAi:true, shoutOut:true};
-const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true, floqCast:true};
+/* Keep in sync with feature-gates.js DEFAULT_VENUE_GATES (client).
+ * vipReservations + passes are opt-in (default false). Older server catalogs
+ * omitted them, so setVenueFeatureGates silently dropped VIP / Passes ticks. */
+const DEFAULT_VENUE_GATES = {
+  uberAds: true,
+  windowAds: true,
+  bartrStores: true,
+  shoutOut: true,
+  floqCast: true,
+  vipReservations: false,
+  passes: false
+};
 
 const CLUB_PUBLIC_CLEAR_FIELDS = [
   "logoUrl", "logoStoragePath", "mainMediaUrl", "mainMediaType", "mainMediaStoragePath",
@@ -190,8 +201,20 @@ exports.setVenueFeatureGates = onCall({region:"us-central1", timeoutSeconds:30, 
   const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubId = text(request.data?.clubId || request.data?.entityId, 120);
   if (!clubId) throw new HttpsError("invalid-argument", "clubId is required.");
+  const clubRef = db.collection("clubLocations").doc(clubId);
+  const clubSnap = await clubRef.get();
+  if (!clubSnap.exists) throw new HttpsError("not-found", "Club not found.");
+  const clubRow = clubSnap.data() || {};
+  const status = text(clubRow.status, 40).toLowerCase();
+  const canon = text(clubRow.canonicalLocationId || clubRow.mergedInto || clubRow.aliasOf, 120);
+  if (status === "merged" || (clubRow.active === false && canon && canon !== clubId)) {
+    throw new HttpsError(
+      "failed-precondition",
+      `This club id is a merged duplicate. Save feature gates on canonical venue "${canon || "unknown"}" instead.`
+    );
+  }
   const gates = normalizeVenueGates(request.data?.gates || request.data?.featureGates || {});
-  await db.collection("clubLocations").doc(clubId).set({
+  await clubRef.set({
     featureGates: gates,
     featureGatesUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
     featureGatesUpdatedByUid: request.auth.uid,

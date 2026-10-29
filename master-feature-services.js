@@ -7,8 +7,13 @@
   const PANEL_IDS = Object.freeze([
     "featuresReleaseControl",
     "featuresBetaTesting",
+    "featuresBotDee",
     "featuresAuditTrail"
   ]);
+  const BOT_DEE_SETTINGS_DOC = "botDeeSettings/default";
+  const DEFAULT_IDLE_SECONDS = 60;
+  const MIN_IDLE_SECONDS = 15;
+  const MAX_IDLE_SECONDS = 600;
   const AUDIT_LIMIT = 40;
   const USER_SCAN_LIMIT = 120;
   const RESULT_LIMIT = 20;
@@ -702,6 +707,8 @@
     byId("featurePromotionBtn")?.addEventListener("click", () => recordPromotion());
     byId("featureAuditReloadBtn")?.addEventListener("click", () => loadAudit());
     byId("featureAuditVerifyBtn")?.addEventListener("click", () => verifyAudit());
+    byId("botDeeSettingsSave")?.addEventListener("click", () => saveBotDeeSettings());
+    byId("botDeeSettingsReload")?.addEventListener("click", () => loadBotDeeSettings());
     if (typeof window.matchMedia === "function") {
       const mq = window.matchMedia("(max-width: 1024px)");
       const onMq = () => syncInviteFeaturesVisibility();
@@ -773,6 +780,96 @@
     }
   }
 
+  function clampIdleSeconds(raw) {
+    const n = Math.round(Number(raw));
+    if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
+    return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
+  }
+
+  function renderBotDeeMeta(row) {
+    const meta = byId("botDeeSettingsMeta");
+    if (!meta) return;
+    if (!row || !row.updatedAtMs) {
+      meta.textContent = "Using packaged default (60 seconds) until you save.";
+      return;
+    }
+    const when = formatWhen(row.updatedAtMs);
+    const who = row.updatedByEmail || "—";
+    const rev = row.revision != null ? ` · revision ${row.revision}` : "";
+    meta.textContent = `Last saved ${when} UTC by ${who}${rev}`;
+  }
+
+  async function loadBotDeeSettings() {
+    if (!isUnlocked()) {
+      setStatus("botDeeSettingsStatus", "Unlock with SOS2FA to manage BOT DEE.");
+      return;
+    }
+    setStatus("botDeeSettingsStatus", "Loading BOT DEE settings…");
+    try {
+      const snap = await db().doc(BOT_DEE_SETTINGS_DOC).get();
+      const data = snap.exists ? snap.data() || {} : {};
+      const idle = clampIdleSeconds(
+        data.conversationIdleSeconds != null ? data.conversationIdleSeconds : DEFAULT_IDLE_SECONDS
+      );
+      const input = byId("botDeeIdleSeconds");
+      if (input) input.value = String(idle);
+      renderBotDeeMeta(snap.exists ? data : null);
+      setStatus("botDeeSettingsStatus", "");
+    } catch (error) {
+      setStatus("botDeeSettingsStatus", errorText(error));
+    }
+  }
+
+  async function saveBotDeeSettings() {
+    if (!isUnlocked()) {
+      setStatus("botDeeSettingsStatus", "Unlock with SOS2FA to manage BOT DEE.");
+      return;
+    }
+    const input = byId("botDeeIdleSeconds");
+    const nextIdle = clampIdleSeconds(input?.value);
+    if (input) input.value = String(nextIdle);
+
+    let currentIdle = DEFAULT_IDLE_SECONDS;
+    try {
+      const snap = await db().doc(BOT_DEE_SETTINGS_DOC).get();
+      if (snap.exists) {
+        currentIdle = clampIdleSeconds(snap.data()?.conversationIdleSeconds);
+      }
+    } catch (_) {}
+    if (currentIdle === nextIdle) {
+      setStatus("botDeeSettingsStatus", "Nothing changed.");
+      return;
+    }
+
+    const promptApi = root.FLOQRReasonPrompt;
+    if (!promptApi?.ask) {
+      setStatus("botDeeSettingsStatus", "Reason prompt is unavailable — nothing was saved.");
+      return;
+    }
+    const reason = await promptApi.ask({
+      summary: `BOT DEE idle pause: ${currentIdle}s → ${nextIdle}s`,
+      minLength: REASON_MIN
+    });
+    if (reason === null) {
+      setStatus("botDeeSettingsStatus", "Cancelled — nothing was saved.");
+      return;
+    }
+
+    setStatus("botDeeSettingsStatus", "Saving…");
+    try {
+      const data = await call("setBotDeeSettings", {
+        conversationIdleSeconds: nextIdle,
+        reason
+      });
+      const settings = data.settings || {conversationIdleSeconds: nextIdle};
+      if (input) input.value = String(clampIdleSeconds(settings.conversationIdleSeconds));
+      renderBotDeeMeta(data.after || settings);
+      setStatus("botDeeSettingsStatus", `Saved — idle pause ${clampIdleSeconds(settings.conversationIdleSeconds)}s.`);
+    } catch (error) {
+      setStatus("botDeeSettingsStatus", errorText(error));
+    }
+  }
+
   /** Mount only the active Features Mgmt sub-tab (isolates load time). */
   function mount(panelId) {
     bindOnce();
@@ -780,6 +877,7 @@
     activePanelId = id;
     if (id === "featuresReleaseControl") return loadReleaseControl();
     if (id === "featuresBetaTesting") return loadBetaTesting();
+    if (id === "featuresBotDee") return loadBotDeeSettings();
     if (id === "featuresAuditTrail") return loadAuditTrail();
   }
 

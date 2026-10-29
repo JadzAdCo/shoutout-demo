@@ -32,12 +32,46 @@ test("consentChecksComplete requires the single Terms acceptance", () => {
   assert.equal(expanded.marketing, true);
 });
 
-test("beta catalog covers Decades, Lima Twist, and Aurelia bookable sections", () => {
+test("beta catalog covers Decades, Lima Twist, Aurelia, and Shôko bookable sections", () => {
   assert.ok(catalog["decades-washington-dc"].sections.length >= 10);
   assert.ok(catalog["lima-twist-washington-dc"].sections.length >= 20);
   assert.ok(catalog["temp-democlub-1"].sections.length >= 20);
   assert.equal(catalog["temp-democlub-1"].planFile, "aurelia.json");
   assert.equal(core.BETA_VENUES.find(v => v.id === "temp-democlub-1")?.pending, false);
+  assert.ok(catalog["shoko-barcelona-spain"].sections.length >= 50);
+  assert.equal(catalog["shoko-barcelona-spain"].planFile, "shoko-barcelona.json");
+  assert.equal(catalog["shoko-barcelona-spain"].currency, "EUR");
+  assert.ok(catalog["shoko-barcelona-spain"].nightPricing["2026-12-31"]);
+  assert.equal(core.BETA_VENUES.find(v => v.id === "shoko-barcelona-spain")?.pending, false);
+});
+
+test("Shôko standard = NYE/4; deposits 25% regular / 50% NYE", () => {
+  const section = catalog["shoko-barcelona-spain"].sections.find(s => s.id === "shoko-sv1");
+  assert.ok(section, "SUPER VIP 1 section");
+  const override = core.nightPriceOverride(
+    catalog["shoko-barcelona-spain"].nightPricing,
+    "2026-12-31",
+    section.id
+  );
+  assert.equal(override.listPriceEur, 20000);
+  const nye = core.computePartyAmounts(section, 15, {nightOverride: override});
+  assert.equal(nye.currency, "EUR");
+  assert.equal(nye.minimumAmountCents, 2000000); // full NYE list
+  assert.equal(nye.depositCents, 1000000); // 50% of NYE
+  assert.equal(nye.chargedCents, 1000000);
+  const regular = core.computePartyAmounts(section, 15);
+  assert.equal(regular.currency, "EUR");
+  assert.equal(regular.minimumAmountCents, 500000); // standard = NYE/4
+  assert.equal(regular.depositCents, 125000); // 25% of standard
+  assert.equal(regular.chargedCents, 125000);
+});
+
+test("mergeExtraBookableNights keeps NYE beyond rolling horizon", () => {
+  const from = new Date(2026, 9, 28, 12, 0, 0); // Oct 28 2026
+  const base = core.bookableNightsFromClub({}, {count: 14, horizonDays: 60, fromDate: from});
+  const merged = core.mergeExtraBookableNights(base, ["2026-12-31"], from);
+  assert.ok(merged.some(n => n.night === "2026-12-31"));
+  assert.ok(merged.find(n => n.night === "2026-12-31").source === "event");
 });
 
 test("hold expiry is 30 minutes", () => {

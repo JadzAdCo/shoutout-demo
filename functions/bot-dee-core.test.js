@@ -58,6 +58,58 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   }
 });
 
+test("cool / ok acknowledgments stay conversational — not a greeting restart or search", () => {
+  for (const prompt of ["cool", "Cool!", "ok", "okay", "thanks", "got it", "sounds good", "that's cool", "awesome"]) {
+    assert.equal(bot.isAckPrompt(prompt), true, prompt);
+    assert.equal(bot.isChitchatPrompt(prompt), true, prompt);
+  }
+  assert.equal(bot.isAckPrompt("hey"), false);
+  assert.equal(bot.isAckPrompt("throw a shoutout"), false);
+
+  const ack = bot.ackReply("patron", "cool");
+  assert.match(ack, /Cool/i);
+  assert.doesNotMatch(ack, /keep going|Want to|ShoutOut|VIP|floqCast/i);
+  assert.doesNotMatch(ack, /BOT DEE here/i);
+  assert.doesNotMatch(ack, /Here is what I found/i);
+  assert.match(bot.ackReply("patron", "thanks"), /welcome/i);
+  assert.match(bot.ackReply("patron", "bye"), /hi when you want|Take care/i);
+  assert.equal(bot.isFarewellPrompt("bye"), true);
+  assert.equal(bot.isFarewellPrompt("cool"), false);
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("patron", "cool");
+  assert.equal(local.provider, "local-chitchat");
+  assert.equal(local.model, "ack");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /Cool/i);
+  assert.doesNotMatch(local.reply, /BOT DEE here/i);
+  assert.doesNotMatch(local.reply, /Want to keep going/i);
+});
+
+test("idle settings clamp + soft mid-chat copy helpers", () => {
+  assert.equal(bot.DEFAULT_IDLE_SECONDS, 60);
+  assert.equal(bot.clampIdleSeconds(60), 60);
+  assert.equal(bot.clampIdleSeconds(5), bot.MIN_IDLE_SECONDS);
+  assert.equal(bot.clampIdleSeconds(9999), bot.MAX_IDLE_SECONDS);
+  assert.equal(bot.normalizeBotDeeSettings(null).conversationIdleSeconds, 60);
+  assert.equal(bot.normalizeBotDeeSettings({conversationIdleSeconds: 90}).conversationIdleSeconds, 90);
+  assert.match(bot.stillHereReply(), /still here/i);
+  assert.match(bot.idleEndedReply(), /pause|Say hi/i);
+  assert.match(bot.resumeReply("patron"), /What do you want to do/i);
+  assert.doesNotMatch(bot.identityReply(), /What do you want to do/i);
+  assert.match(bot.systemInstruction("patron"), /ONLY on the first turn/i);
+});
+
+test("setBotDeeSettings callable is exported", () => {
+  assert.match(read("functions/bot-dee-functions.js"), /exports\.setBotDeeSettings/);
+  assert.match(read("functions/index.js"), /setBotDeeSettings:\s*require\("\.\/bot-dee-functions"\)\.setBotDeeSettings/);
+  assert.match(read("bot-dee-chat.js"), /botDeeSettings\/default/);
+  assert.match(read("bot-dee-chat.js"), /endConversation|chatIdleEnded|chatResume|chatStillHere/);
+  assert.match(read("master-admin.html"), /id="featuresBotDee"/);
+  assert.match(read("master-feature-services.js"), /setBotDeeSettings/);
+  assert.match(read("firestore.rules"), /match \/botDeeSettings\/\{docId\}/);
+});
+
 test("Name / pronunciation is identity — not a search dump", () => {
   assert.equal(bot.isIdentityPrompt("how is your name pronounced?"), true);
   assert.equal(bot.isIdentityPrompt("How do you pronounce BOT DEE"), true);
@@ -69,6 +121,7 @@ test("Name / pronunciation is identity — not a search dump", () => {
   assert.match(reply, /BOT DEE/i);
   assert.match(reply, /dee/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
+  assert.doesNotMatch(reply, /What do you want to do/i);
 
   const fns = require("./bot-dee-functions");
   const local = fns.__botDeeHelpers.localSession("master", "how is your name pronounced?");

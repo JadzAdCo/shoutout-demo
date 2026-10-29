@@ -293,10 +293,18 @@
    * Filter + rank venues. Empty query → nearest NEARBY_TOP (default 4).
    * Typed query → all matches, still nearest-first.
    */
+  /** Fold accents so "shoko" matches "Shôko", "cafe" matches "café". */
+  function foldSearch(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
   function filterAndRank(rows, {query = "", locationContext = null, nearbyTop = NEARBY_TOP, haystackOf = venueHaystack} = {}) {
-    const q = String(query || "").trim().toLowerCase();
+    const q = foldSearch(String(query || "").trim());
     let list = Array.isArray(rows) ? rows.slice() : [];
-    if (q) list = list.filter((r) => String(haystackOf(r) || "").includes(q));
+    if (q) list = list.filter((r) => foldSearch(haystackOf(r)).includes(q));
     list = sortNearest(list, locationContext);
     if (!q && nearbyTop > 0) return list.slice(0, nearbyTop);
     return list;
@@ -413,6 +421,7 @@
     normalizeVenue,
     factsForFeature,
     venueHaystack,
+    foldSearch,
     sortNearest,
     filterAndRank,
     statusLine,

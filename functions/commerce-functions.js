@@ -994,9 +994,11 @@ exports.createFloqrConnectOnboardingLink = onCall({
       venueShareCents = charged;
       collectorLabel = "Club Stripe";
     }
+    const currency = String(hold.amounts?.currency || "usd").trim().toLowerCase() || "usd";
     return {
       amountCents: charged,
       unitAmountCents: charged,
+      currency,
       quantity: 1,
       itemName: `Table ${label} deposit — ${club}, ${night}`,
       description: `VIP reserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. Collector: ${collectorLabel}.`,
@@ -1027,7 +1029,7 @@ function stripeLineItem(order) {
     productData.images = [order.productSnapshot.imageUrl];
   }
   return {
-    price_data:{currency:"usd", unit_amount:order.unitAmountCents || order.amountCents, product_data:productData},
+    price_data:{currency: String(order.currency || "usd").toLowerCase() || "usd", unit_amount:order.unitAmountCents || order.amountCents, product_data:productData},
     quantity:order.quantity || 1
   };
 }
@@ -1199,7 +1201,7 @@ async function runCreateFloqrCheckoutSession(request) {
       ipSource:"checkout-callable",
       status:"checkout-created",
       paymentStatus:"unpaid",
-      currency:"usd",
+      currency: String(summary.currency || "usd").toLowerCase() || "usd",
       ...summary,
       ...testFields,
       payload,

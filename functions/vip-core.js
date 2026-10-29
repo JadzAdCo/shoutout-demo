@@ -49,6 +49,15 @@ const BETA_VENUES = Object.freeze([
     pending: false,
     clubCode: "AUR",
     explore3dUrl: "./reports/vip-aurelia-demo/"
+  },
+  {
+    id: "shoko-barcelona-spain",
+    name: "Shôko Barcelona",
+    planFile: "shoko-barcelona.json",
+    city: "Barcelona",
+    pending: false,
+    clubCode: "SHO",
+    currency: "EUR"
   }
 ]);
 
@@ -91,28 +100,56 @@ function isTableBookedValue(value) {
   return normalizeIsBooked(value) === "1";
 }
 
+/**
+ * Night-scoped price row from catalog/plan `nightPricing[YYYY-MM-DD].sections[sectionId]`.
+ * Used for event packages (e.g. Shôko NYE'27) while regular nights stay placeholders.
+ */
+function nightPriceOverride(nightPricing, night, sectionId) {
+  const n = validateNight(night);
+  const sid = text(sectionId, 80);
+  if (!n || !sid || !nightPricing || typeof nightPricing !== "object") return null;
+  const block = nightPricing[n];
+  if (!block || typeof block !== "object") return null;
+  const row = (block.sections || {})[sid];
+  if (!row || typeof row !== "object") return null;
+  return row;
+}
+
 /** Demo pricing until Club Admin publishes real minimums/deposits (plan JSON placeholders). */
-function demoPricesForSection(section = {}) {
+function demoPricesForSection(section = {}, opts = {}) {
   const type = text(section.type, 40);
   const maxCapacity = Math.max(1, Math.floor(Number(section.maxCapacity || 4)));
   const includedGuests = Math.max(1, Math.min(maxCapacity, Math.floor(Number(section.includedGuests || maxCapacity))));
+  const override = opts.nightOverride && typeof opts.nightOverride === "object" ? opts.nightOverride : null;
+  if (override) {
+    const oMax = Math.max(1, Math.floor(Number(override.maxCapacity || maxCapacity)));
+    const oInc = Math.max(1, Math.min(oMax, Math.floor(Number(override.includedGuests || includedGuests))));
+    const minimumAmountCents = Math.max(0, Math.round(Number(override.minimumAmountCents || 0)));
+    const depositCents = Math.max(0, Math.round(Number(
+      override.depositCents != null ? override.depositCents : minimumAmountCents
+    )));
+    const extraGuestFeeCents = Math.max(0, Math.round(Number(override.extraGuestFeeCents || 0)));
+    const currency = text(override.currency || opts.currency || "USD", 8).toUpperCase() || "USD";
+    return {minimumAmountCents, extraGuestFeeCents, depositCents, includedGuests: oInc, maxCapacity: oMax, currency};
+  }
   const fromPlanMin = Number(section.minimumAmount?.amountCents);
   const fromPlanExtra = Number(section.extraGuestFee?.amountCents);
   const fromPlanDeposit = Number(section.deposit?.amountCents);
+  const planCurrency = text(section.minimumAmount?.currency || section.deposit?.currency || opts.currency || "USD", 8).toUpperCase() || "USD";
   const minimumAmountCents = Number.isFinite(fromPlanMin) && fromPlanMin > 0
     ? Math.round(fromPlanMin)
-    : (type === "vipTable" ? 100000 : maxCapacity >= 6 ? 50000 : maxCapacity >= 4 ? 30000 : 15000);
+    : (type === "vipTable" || type === "vipArea" ? 100000 : maxCapacity >= 6 ? 50000 : maxCapacity >= 4 ? 30000 : 15000);
   const extraGuestFeeCents = Number.isFinite(fromPlanExtra) && fromPlanExtra >= 0
     ? Math.round(fromPlanExtra)
-    : (section.extraGuestFee ? (type === "vipTable" ? 5000 : 4000) : 0);
+    : (section.extraGuestFee ? (type === "vipTable" || type === "vipArea" ? 5000 : 4000) : 0);
   const depositCents = Number.isFinite(fromPlanDeposit) && fromPlanDeposit > 0
     ? Math.round(fromPlanDeposit)
     : Math.round(minimumAmountCents * 0.25);
-  return {minimumAmountCents, extraGuestFeeCents, depositCents, includedGuests, maxCapacity};
+  return {minimumAmountCents, extraGuestFeeCents, depositCents, includedGuests, maxCapacity, currency: planCurrency};
 }
 
-function computePartyAmounts(section, partySize) {
-  const prices = demoPricesForSection(section);
+function computePartyAmounts(section, partySize, opts = {}) {
+  const prices = demoPricesForSection(section, opts);
   const party = Math.max(1, Math.min(prices.maxCapacity, Math.floor(Number(partySize) || 1)));
   const extraGuests = Math.max(0, party - prices.includedGuests);
   const extraGuestFeeTotalCents = extraGuests * prices.extraGuestFeeCents;
@@ -123,8 +160,27 @@ function computePartyAmounts(section, partySize) {
     extraGuests,
     extraGuestFeeTotalCents,
     chargedCents,
-    currency: "USD"
+    currency: prices.currency || "USD"
   };
+}
+
+/** Merge event / catalog extra nights (e.g. NYE beyond the rolling horizon). */
+function mergeExtraBookableNights(bookable = [], extraNights = [], fromDate = new Date()) {
+  const out = Array.isArray(bookable) ? bookable.slice() : [];
+  const have = new Set(out.map(row => text(row.night || row, 20)));
+  const today = localYmd(fromDate);
+  (Array.isArray(extraNights) ? extraNights : []).forEach(raw => {
+    const night = validateNight(raw);
+    if (!night || have.has(night) || night < today) return;
+    const d = parseYmdLocal(night);
+    const weekday = d
+      ? d.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"})
+      : night;
+    out.push({night, open: "", close: "", source: "event", label: `${weekday} · event`});
+    have.add(night);
+  });
+  out.sort((a, b) => String(a.night).localeCompare(String(b.night)));
+  return out;
 }
 
 /**
@@ -374,7 +430,9 @@ module.exports = {
   normalizeIsBooked,
   isTableBookedValue,
   demoPricesForSection,
+  nightPriceOverride,
   computePartyAmounts,
+  mergeExtraBookableNights,
   normalizeVipSettings,
   resolveDepositRequired,
   canMarkTableBooked,
