@@ -29,10 +29,11 @@ const TOOL_DEFS = [
   },
   {
     name: "listShoutOutTemplates",
-    description: "List ShoutOut templates available at a club (or return compose link). Re-validates shoutOut access.",
+    description: "List ShoutOut templates available at a club (or return compose link). Accepts a venue slug OR a display name (e.g. Aurelia → temp-democlub-1). Re-validates shoutOut access.",
     parameters: obj({
-      clubLocationId: str("Club location id when known."),
-      locationId: str("Alias for clubLocationId.")
+      clubLocationId: str("Venue slug or display name (e.g. Aurelia, temp-democlub-1)."),
+      locationId: str("Alias for clubLocationId."),
+      locationName: str("Optional venue display name (e.g. Aurelia).")
     })
   },
   {
@@ -257,6 +258,7 @@ function systemInstruction(role) {
     "Greetings and small talk (hi, hey, thanks, how are you): reply in 1–2 short sentences, ask what they want to do, and do NOT call any tools.",
     "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D).",
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
+    "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
