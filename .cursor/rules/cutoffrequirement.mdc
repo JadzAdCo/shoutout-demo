@@ -7,7 +7,8 @@ alwaysApply: true
 
 Resume: `@cutover$` / `$floqr-app$` (old tag `$floqr-com$` still resumes this file).
 
-**Canonical production origin (owner decision Oct 29 2026, whole product):** `https://www.floqr.app`  
+**Chosen FUTURE canonical production origin (owner decision Oct 29 2026, whole product):** `https://www.floqr.app`  
+**Not switched yet — PLANNING ONLY.** Owner, Oct 29 2026: "I am not ready to switch to the floqr.app domain." GitHub Pages (`https://jadzadco.github.io/shoutout-demo`) stays the live origin until the owner says go. Until then do **not** change served code, Functions, link builders, `FLOQRCanonical` constants, preview-email bases, or OAuth / App Check config toward floqr.app.  
 **Apex redirect (required at cutover):** `https://floqr.app` → `https://www.floqr.app` (301).  
 **Not canonical:** `www.floqr.com` / `floqr.com` (previous choice, superseded Oct 29 2026 — may 301 to `www.floqr.app` if the owner keeps the domain), `floq.ai`, `floqr.ai`, GitHub Pages `https://jadzadco.github.io/shoutout-demo` (staging / demo only until cutover).
 
@@ -33,7 +34,7 @@ Until the DNS / hosting flip, patrons keep using GitHub Pages; account-level pre
 
 ## Agent rules (every change)
 
-1. **Do not** invent a second production brand origin. New links, emails, Store listings, VIP booking/embed/API links, and privacy copy use `https://www.floqr.app` (or relative paths resolved via `FLOQRCanonical`).
+1. **Do not** invent a second production brand origin. New links, emails, VIP booking/embed/API links, and privacy copy use relative paths or `FLOQRCanonical` / `FLOQRNav` (which keep resolving to the live Pages origin until go). Write `https://www.floqr.app` only in planning docs, cutover checklists, and the accounts profile until the owner says go.
 2. **Do not** hardcode `jadzadco.github.io/shoutout-demo` in new features. Use `FLOQRNav` / `FLOQRCanonical` with the staging override for Pages. Pages stays staging until cutover — do not change github.io behavior early.
 3. **Display / Xibo URLs** stay `display.html?location=` / `display2.html?location=` with **no** `?v=` — only the **host** changes at cutover (`https://www.floqr.app/display.html?location=…`).
 4. Page links never carry `?v=` (owner decision Oct 10 2026) — on Pages or on the new host. Only asset tags (`<script src>` / `<link href>`) are cache-busted, by the bump script. Old `?v=` URLs keep working (ignored).
@@ -43,9 +44,9 @@ Until the DNS / hosting flip, patrons keep using GitHub Pages; account-level pre
 8. Admin / Master / staging subdomains (if the admin fork ships): `admin.floqr.app`, `master.floqr.app`, `staging.floqr.app` — same registrable domain, listed in the accounts profile DNS section.
 9. Mail sender addresses (`login@floqr.com` in Functions) are a **SendGrid sender-domain** decision, not the web origin. Move them to `floqr.app` only after that domain is authenticated in SendGrid (accounts profile `sendgrid.senderDomain`).
 
-## Code still on www.floqr.com (switch together, on `main` + workspace in one change)
+## Code still on www.floqr.com (switch only when the owner says go — not before)
 
-`floqr-canonical.js` (`PRODUCTION_ORIGIN`; `isProductionHost` should accept `.app` and legacy `.com` during transition), `privacy.html` (3 strings), `ai-diagnostics-service.js` (privacy check `includes` + release note), `functions/privacy-compliance.test.js` (asserts the constant), `functions/ad-functions.js` `RETURN_ORIGINS` (add `https://www.floqr.app`). The `functions/` files must land on `origin/main` together with the workspace copy (`check-functions-sync.js`), then a Pages publish.
+Leave these untouched while planning. On go, change them together on `main` + workspace in one change: `floqr-canonical.js` (`PRODUCTION_ORIGIN`; `isProductionHost` should accept `.app` and legacy `.com` during transition), `privacy.html` (3 strings), `ai-diagnostics-service.js` (privacy check `includes` + release note), `functions/privacy-compliance.test.js` (asserts the constant), `functions/ad-functions.js` `RETURN_ORIGINS` (add `https://www.floqr.app`). The `functions/` files must land on `origin/main` together with the workspace copy (`check-functions-sync.js`), then a Pages publish.
 
 ## Pre-cutoff checklist (do early)
 
@@ -94,5 +95,5 @@ Until the DNS / hosting flip, patrons keep using GitHub Pages; account-level pre
 ## FIX PROMPT
 
 ```
-Cutover memory: canonical production is https://www.floqr.app for the whole product (owner decision Oct 29 2026; apex floqr.app 301 → www; www.floqr.com superseded, may 301 to .app). VIP booking/embed/API links use the same host. Domain may be wired into Firebase Auth / OAuth / reCAPTCHA / Stripe / POS redirects / privacy URLs before the DNS flip; Pages stays staging until cutover. Privacy policy https://www.floqr.app/privacy.html. Do not hardcode github.io in new work; Display URLs change host only. Accounts via the accounts profile seed. Resume: @cutover$
+Cutover memory: chosen FUTURE canonical production origin is https://www.floqr.app for the whole product — NOT switched yet, planning only; GitHub Pages stays live until the owner says go; no code/Functions/OAuth/App Check changes toward floqr.app before then (owner decision Oct 29 2026; apex floqr.app 301 → www; www.floqr.com superseded, may 301 to .app). VIP booking/embed/API links use the same host. Domain may be wired into Firebase Auth / OAuth / reCAPTCHA / Stripe / POS redirects / privacy URLs before the DNS flip; Pages stays staging until cutover. Privacy policy https://www.floqr.app/privacy.html. Do not hardcode github.io in new work; Display URLs change host only. Accounts via the accounts profile seed. Resume: @cutover$
 ```
