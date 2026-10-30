@@ -56,3 +56,7 @@ npm-debug.log*
 images/chrome/layers/_src-*
 images/chrome/layers/_spin.gif
 scripts/__pycache__/
+
+# Accounts management profile (real values stay local)
+config/accounts-profile.local.json
+config/*.local.json

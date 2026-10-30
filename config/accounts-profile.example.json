@@ -1,0 +1,733 @@
+{
+  "_readme": [
+    "Copy this file to config/accounts-profile.local.json (gitignored) and fill each value.",
+    "Leave a value empty to skip it — empty values never clear an existing secret.",
+    "Set a manual step to true once you have done it in the Console.",
+    "Dry run: node scripts/seed-accounts-profile.js   Apply: add --apply --confirm-project <projectId>",
+    "Only value / manual entries are read; target, secret, and format come from the script catalog."
+  ],
+  "profileVersion": 1,
+  "projectId": "shoutoutdemo-5b402",
+  "githubRepo": "jadzadco/shoutout-demo",
+  "accounts": {
+    "twilio": {
+      "_label": "Twilio (SMS + WhatsApp)",
+      "fields": {
+        "accountSid": {
+          "value": "",
+          "description": "Account SID",
+          "whereToGet": "Twilio Console → Account → API keys & tokens",
+          "secret": true,
+          "required": true,
+          "format": "AC + 32 hex characters",
+          "target": "Firebase secret TWILIO_ACCOUNT_SID",
+          "readByCodeToday": true
+        },
+        "authToken": {
+          "value": "",
+          "description": "Auth token",
+          "whereToGet": "Twilio Console → Account → API keys & tokens → Auth token",
+          "secret": true,
+          "required": true,
+          "format": "32 hex characters",
+          "target": "Firebase secret TWILIO_AUTH_TOKEN",
+          "readByCodeToday": true
+        },
+        "smsFrom": {
+          "value": "",
+          "description": "SMS sender number",
+          "whereToGet": "Twilio Console → Phone Numbers → Active numbers",
+          "secret": true,
+          "required": true,
+          "format": "E.164 phone, e.g. +12025550100",
+          "target": "Firebase secret TWILIO_FROM_NUMBER",
+          "readByCodeToday": true
+        },
+        "whatsappFrom": {
+          "value": "",
+          "description": "WhatsApp production sender",
+          "whereToGet": "Twilio Console → Messaging → Senders → WhatsApp senders (approved FLOQR number, not the sandbox +14155238886)",
+          "secret": true,
+          "required": true,
+          "format": "whatsapp:+<E.164>, e.g. whatsapp:+12025550100",
+          "target": "Firebase secret TWILIO_WHATSAPP_FROM",
+          "readByCodeToday": true
+        },
+        "whatsappOtpContentSid": {
+          "value": "",
+          "description": "WhatsApp OTP Authentication template SID",
+          "whereToGet": "Twilio Console → Messaging → Content Template Builder → approved WhatsApp Authentication template (HX…)",
+          "secret": false,
+          "required": true,
+          "format": "HX + 32 hex characters (Content Template SID)",
+          "target": "functions/.env TWILIO_WHATSAPP_OTP_CONTENT_SID",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "whatsappSenderRegistered": {
+          "value": false,
+          "description": "Production WhatsApp sender registered with Meta Business verification, display name FLOQR",
+          "target": "Console-only manual step"
+        },
+        "otpTemplateApproved": {
+          "value": false,
+          "description": "Authentication template (copy-code, {{1}} = 6-digit code) approved by Meta for en (+ fr, es, de, pt, it, ar)",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "sendgrid": {
+      "_label": "SendGrid (email OTP, receipts, SOS2FA)",
+      "fields": {
+        "apiKey": {
+          "value": "",
+          "description": "API key (Mail Send)",
+          "whereToGet": "SendGrid → Settings → API Keys → Create (restricted: Mail Send)",
+          "secret": true,
+          "required": true,
+          "format": "SG.<id>.<secret>",
+          "target": "Firebase secret SENDGRID_API_KEY",
+          "readByCodeToday": true
+        },
+        "fromEmail": {
+          "value": "",
+          "description": "OTP / receipt sender address",
+          "whereToGet": "A verified sender on the authenticated domain (e.g. login@floqr.app)",
+          "secret": false,
+          "required": true,
+          "format": "email address",
+          "target": "functions/.env FLOQR_EMAIL_OTP_FROM",
+          "readByCodeToday": true
+        },
+        "receiptFrom": {
+          "value": "",
+          "description": "Ad receipt sender address",
+          "whereToGet": "Same verified domain; defaults to the OTP sender when empty",
+          "secret": false,
+          "required": false,
+          "format": "email address",
+          "target": "functions/.env FLOQR_RECEIPT_FROM",
+          "readByCodeToday": true
+        },
+        "senderDomain": {
+          "value": "",
+          "description": "Authenticated sender domain",
+          "whereToGet": "SendGrid → Settings → Sender Authentication",
+          "secret": false,
+          "required": true,
+          "format": "lower-case host name, e.g. www.floqr.app",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "domainAuthenticated": {
+          "value": false,
+          "description": "Sender domain authenticated (SendGrid CNAMEs added to DNS) and link branding on",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "stripe": {
+      "_label": "Stripe (platform keys, Connect, webhooks)",
+      "fields": {
+        "mode": {
+          "value": "",
+          "description": "Key mode",
+          "whereToGet": "live for production, test for staging",
+          "secret": false,
+          "required": true,
+          "format": "live or test",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "secretKey": {
+          "value": "",
+          "description": "Secret or restricted key",
+          "whereToGet": "Stripe Dashboard → Developers → API keys (prefer a restricted rk_ key)",
+          "secret": true,
+          "required": true,
+          "format": "sk_live_… / rk_live_… (or _test_ in test mode)",
+          "target": "Firebase secret STRIPE_SECRET_KEY",
+          "readByCodeToday": true
+        },
+        "webhookSecret": {
+          "value": "",
+          "description": "Platform webhook signing secret",
+          "whereToGet": "Stripe Dashboard → Developers → Webhooks → endpoint → Signing secret",
+          "secret": true,
+          "required": true,
+          "format": "whsec_…",
+          "target": "Firebase secret STRIPE_WEBHOOK_SECRET",
+          "readByCodeToday": true
+        },
+        "publishableKey": {
+          "value": "",
+          "description": "Publishable key",
+          "whereToGet": "Stripe Dashboard → Developers → API keys",
+          "secret": false,
+          "required": true,
+          "format": "pk_live_… / pk_test_…",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "connectClientId": {
+          "value": "",
+          "description": "Connect client id",
+          "whereToGet": "Stripe Dashboard → Connect → Settings → OAuth (ca_…)",
+          "secret": false,
+          "required": false,
+          "format": "ca_…",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": false
+        },
+        "connectWebhookSecret": {
+          "value": "",
+          "description": "Connect webhook signing secret",
+          "whereToGet": "Stripe Dashboard → Webhooks → Connect endpoint → Signing secret",
+          "secret": true,
+          "required": false,
+          "format": "whsec_…",
+          "target": "Firebase secret STRIPE_CONNECT_WEBHOOK_SECRET",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {
+        "returnUrlsAllowed": {
+          "value": false,
+          "description": "Checkout / Customer Portal return URLs and Connect redirect URIs allow https://www.floqr.app",
+          "target": "Console-only manual step"
+        },
+        "connectPlatformProfile": {
+          "value": false,
+          "description": "Connect platform profile complete (destination charges + on_behalf_of, VIP-B-01)",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "firebaseAuth": {
+      "_label": "Firebase Auth provider settings (Console only)",
+      "fields": {},
+      "manual": {
+        "emailPasswordDisabled": {
+          "value": false,
+          "description": "Authentication → Sign-in method → Email/Password → Disable",
+          "target": "Console-only manual step"
+        },
+        "authorizedDomains": {
+          "value": false,
+          "description": "Authentication → Settings → Authorized domains: www.floqr.app, floqr.app (+ admin / master / staging when used)",
+          "target": "Console-only manual step"
+        },
+        "smsRegionPolicyUsCa": {
+          "value": false,
+          "description": "Authentication → Settings → SMS region policy = Allow US + CA",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "azure": {
+      "_label": "Azure (subscription, Static Web Apps, DNS)",
+      "fields": {
+        "subscriptionId": {
+          "value": "",
+          "description": "Subscription id",
+          "whereToGet": "Azure Portal → Subscriptions",
+          "secret": false,
+          "required": true,
+          "format": "GUID",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "tenantId": {
+          "value": "",
+          "description": "Tenant id",
+          "whereToGet": "Azure Portal → Microsoft Entra ID → Overview",
+          "secret": false,
+          "required": true,
+          "format": "GUID",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "resourceGroup": {
+          "value": "",
+          "description": "Resource group",
+          "whereToGet": "Azure Portal → Resource groups",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "staticWebAppName": {
+          "value": "",
+          "description": "Static Web App name",
+          "whereToGet": "Azure Portal → Static Web Apps",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "staticWebAppDeployToken": {
+          "value": "",
+          "description": "Static Web Apps deployment token",
+          "whereToGet": "Static Web App → Overview → Manage deployment token",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "GitHub Actions secret AZURE_STATIC_WEB_APPS_API_TOKEN",
+          "readByCodeToday": false
+        },
+        "dnsZone": {
+          "value": "",
+          "description": "DNS zone",
+          "whereToGet": "Azure Portal → DNS zones (floqr.app)",
+          "secret": false,
+          "required": true,
+          "format": "lower-case host name, e.g. www.floqr.app",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "customDomains": {
+          "value": false,
+          "description": "Custom domains bound with TLS: www.floqr.app, admin.floqr.app, master.floqr.app, staging.floqr.app",
+          "target": "Console-only manual step"
+        },
+        "apexRedirect": {
+          "value": false,
+          "description": "Apex floqr.app → https://www.floqr.app 301",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "domain": {
+      "_label": "Domain, OAuth redirects, App Check (www.floqr.app)",
+      "fields": {
+        "canonicalOrigin": {
+          "value": "",
+          "description": "Canonical origin",
+          "whereToGet": "Owner decision Oct 29 2026: https://www.floqr.app",
+          "secret": false,
+          "required": true,
+          "format": "https://host with no path or trailing slash",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "adminHost": {
+          "value": "",
+          "description": "Admin host",
+          "whereToGet": "admin.floqr.app (admin fork)",
+          "secret": false,
+          "required": false,
+          "format": "lower-case host name, e.g. www.floqr.app",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "masterHost": {
+          "value": "",
+          "description": "Master Admin host",
+          "whereToGet": "master.floqr.app",
+          "secret": false,
+          "required": false,
+          "format": "lower-case host name, e.g. www.floqr.app",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "stagingHost": {
+          "value": "",
+          "description": "Staging host",
+          "whereToGet": "staging.floqr.app",
+          "secret": false,
+          "required": false,
+          "format": "lower-case host name, e.g. www.floqr.app",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "recaptchaSiteKey": {
+          "value": "",
+          "description": "reCAPTCHA Enterprise / App Check site key",
+          "whereToGet": "Google Cloud → Security → reCAPTCHA → key for www.floqr.app (site keys are public)",
+          "secret": false,
+          "required": true,
+          "format": "reCAPTCHA / App Check site key (public)",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": false
+        },
+        "functionsPublicOrigin": {
+          "value": "",
+          "description": "Functions link origin (cutover only)",
+          "whereToGet": "Leave empty while GitHub Pages is staging; set https://www.floqr.app on cutover day",
+          "secret": false,
+          "required": false,
+          "format": "https://host with no path or trailing slash",
+          "target": "functions/.env FLOQR_PUBLIC_ORIGIN",
+          "readByCodeToday": true
+        },
+        "functionsDisplayBaseUrl": {
+          "value": "",
+          "description": "Display link base (cutover only)",
+          "whereToGet": "Leave empty until cutover; then https://www.floqr.app (Display URLs change host only)",
+          "secret": false,
+          "required": false,
+          "format": "https://host with no path or trailing slash",
+          "target": "functions/.env FLOQR_DISPLAY_BASE_URL",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "oauthRedirects": {
+          "value": false,
+          "description": "Google, Microsoft, Facebook OAuth JS origins + redirect URIs include https://www.floqr.app",
+          "target": "Console-only manual step"
+        },
+        "appCheckRegistered": {
+          "value": false,
+          "description": "App Check: reCAPTCHA Enterprise provider registered for the web app with the www.floqr.app key",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "floqcastTurn": {
+      "_label": "TURN server for floqCast",
+      "fields": {
+        "urls": {
+          "value": "",
+          "description": "TURN URLs",
+          "whereToGet": "TURN provider dashboard (e.g. turns:turn.example.com:443?transport=tcp)",
+          "secret": false,
+          "required": true,
+          "format": "comma list of turn:/turns: URLs",
+          "target": "functions/.env FLOQCAST_TURN_URLS",
+          "readByCodeToday": false
+        },
+        "username": {
+          "value": "",
+          "description": "TURN username",
+          "whereToGet": "TURN provider dashboard",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret FLOQCAST_TURN_USERNAME",
+          "readByCodeToday": false
+        },
+        "credential": {
+          "value": "",
+          "description": "TURN credential",
+          "whereToGet": "TURN provider dashboard",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret FLOQCAST_TURN_CREDENTIAL",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {}
+    },
+    "gcpDisplaySigner": {
+      "_label": "Google Cloud IAM — display token signer",
+      "fields": {
+        "runtimeServiceAccount": {
+          "value": "",
+          "description": "Functions runtime service account",
+          "whereToGet": "Google Cloud → Cloud Run / Functions → service account of getFloqCastDisplaySession",
+          "secret": false,
+          "required": true,
+          "format": "name@project.iam.gserviceaccount.com",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "tokenCreatorGranted": {
+          "value": false,
+          "description": "IAM: grant roles/iam.serviceAccountTokenCreator to the runtime service account on itself (createCustomToken without a key file)",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "squarePos": {
+      "_label": "Square POS partner app",
+      "fields": {
+        "applicationId": {
+          "value": "",
+          "description": "Application id",
+          "whereToGet": "Square Developer → Applications → Credentials",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "functions/.env POS_SQUARE_APP_ID",
+          "readByCodeToday": false
+        },
+        "environment": {
+          "value": "",
+          "description": "Environment",
+          "whereToGet": "sandbox until certified",
+          "secret": false,
+          "required": true,
+          "format": "sandbox or production",
+          "target": "functions/.env POS_SQUARE_ENVIRONMENT",
+          "readByCodeToday": false
+        },
+        "appSecret": {
+          "value": "",
+          "description": "Application secret",
+          "whereToGet": "Square Developer → OAuth → Application secret",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_SQUARE_APP_SECRET",
+          "readByCodeToday": false
+        },
+        "webhookKey": {
+          "value": "",
+          "description": "Webhook signature key",
+          "whereToGet": "Square Developer → Webhooks → subscription → Signature key",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_SQUARE_WEBHOOK_KEY",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {
+        "redirectRegistered": {
+          "value": false,
+          "description": "OAuth redirect URI registered on https://www.floqr.app/… and the current Functions URL",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "toastPos": {
+      "_label": "Toast POS partner",
+      "fields": {
+        "clientId": {
+          "value": "",
+          "description": "Client id",
+          "whereToGet": "Toast partner portal → integration credentials",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "functions/.env POS_TOAST_CLIENT_ID",
+          "readByCodeToday": false
+        },
+        "clientSecret": {
+          "value": "",
+          "description": "Client secret",
+          "whereToGet": "Toast partner portal",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_TOAST_CLIENT_SECRET",
+          "readByCodeToday": false
+        },
+        "webhookSecretOrders": {
+          "value": "",
+          "description": "Orders webhook secret",
+          "whereToGet": "Toast partner portal → webhooks",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_TOAST_WEBHOOK_SECRET_ORDERS",
+          "readByCodeToday": false
+        },
+        "webhookSecretPartners": {
+          "value": "",
+          "description": "Partners webhook secret",
+          "whereToGet": "Toast partner portal → webhooks",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_TOAST_WEBHOOK_SECRET_PARTNERS",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {
+        "partnerApproved": {
+          "value": false,
+          "description": "Toast partner integration approved for the FLOQR app",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "spotonPos": {
+      "_label": "SpotOn POS partner",
+      "fields": {
+        "clientId": {
+          "value": "",
+          "description": "Client id",
+          "whereToGet": "SpotOn partner / developer portal",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "functions/.env POS_SPOTON_CLIENT_ID",
+          "readByCodeToday": false
+        },
+        "clientSecret": {
+          "value": "",
+          "description": "Client secret",
+          "whereToGet": "SpotOn partner / developer portal",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_SPOTON_CLIENT_SECRET",
+          "readByCodeToday": false
+        },
+        "webhookKey": {
+          "value": "",
+          "description": "Webhook key",
+          "whereToGet": "SpotOn partner portal → webhooks",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_SPOTON_WEBHOOK_KEY",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {}
+    },
+    "cloverPos": {
+      "_label": "Clover POS app",
+      "fields": {
+        "appId": {
+          "value": "",
+          "description": "App id",
+          "whereToGet": "Clover Developer Dashboard → Your apps → App settings",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "functions/.env POS_CLOVER_APP_ID",
+          "readByCodeToday": false
+        },
+        "environment": {
+          "value": "",
+          "description": "Environment",
+          "whereToGet": "sandbox until approved",
+          "secret": false,
+          "required": true,
+          "format": "sandbox or production",
+          "target": "functions/.env POS_CLOVER_ENVIRONMENT",
+          "readByCodeToday": false
+        },
+        "appSecret": {
+          "value": "",
+          "description": "App secret",
+          "whereToGet": "Clover Developer Dashboard → App settings",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_CLOVER_APP_SECRET",
+          "readByCodeToday": false
+        },
+        "webhookAuth": {
+          "value": "",
+          "description": "Webhook auth code",
+          "whereToGet": "Clover Developer Dashboard → Webhooks",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret POS_CLOVER_WEBHOOK_AUTH",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {
+        "redirectRegistered": {
+          "value": false,
+          "description": "Site URL / redirect registered on https://www.floqr.app",
+          "target": "Console-only manual step"
+        }
+      }
+    },
+    "tsa": {
+      "_label": "Trusted timestamp authority (VIP signatures)",
+      "fields": {
+        "provider": {
+          "value": "",
+          "description": "Provider",
+          "whereToGet": "VIP-P-04: paid DigiCert or Sectigo",
+          "secret": false,
+          "required": true,
+          "format": "digicert or sectigo (VIP-P-04)",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": false
+        },
+        "url": {
+          "value": "",
+          "description": "RFC 3161 endpoint",
+          "whereToGet": "Provider account → timestamp service URL",
+          "secret": false,
+          "required": true,
+          "format": "https:// URL",
+          "target": "functions/.env VIP_TSA_URL",
+          "readByCodeToday": false
+        },
+        "username": {
+          "value": "",
+          "description": "Account username",
+          "whereToGet": "Provider account (only for authenticated TSA plans)",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret VIP_TSA_USERNAME",
+          "readByCodeToday": false
+        },
+        "password": {
+          "value": "",
+          "description": "Account password / API key",
+          "whereToGet": "Provider account (only for authenticated TSA plans)",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret VIP_TSA_PASSWORD",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {}
+    },
+    "metaBusiness": {
+      "_label": "Meta Business (WhatsApp)",
+      "fields": {
+        "businessId": {
+          "value": "",
+          "description": "Business portfolio id",
+          "whereToGet": "Meta Business Suite → Settings → Business info",
+          "secret": false,
+          "required": true,
+          "format": "numeric id",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "whatsappBusinessAccountId": {
+          "value": "",
+          "description": "WhatsApp Business Account id",
+          "whereToGet": "Meta Business Suite → WhatsApp accounts (or Twilio sender details)",
+          "secret": false,
+          "required": true,
+          "format": "numeric id",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        },
+        "displayName": {
+          "value": "",
+          "description": "WhatsApp display name",
+          "whereToGet": "Approved display name (FLOQR)",
+          "secret": false,
+          "required": true,
+          "format": "single line, up to 200 characters",
+          "target": "Firestore platformAccountsProfile/publicConfig",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {
+        "businessVerified": {
+          "value": false,
+          "description": "Meta Business verification complete",
+          "target": "Console-only manual step"
+        }
+      }
+    }
+  }
+}
