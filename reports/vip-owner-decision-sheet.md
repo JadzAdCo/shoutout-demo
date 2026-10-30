@@ -34,7 +34,7 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 | **VIP-B-03b** | Model B percent is **NOT** a fixed platform default. It is configurable at Master Admin, shared with club admin, and is a **contractual obligation**. No single default % in product — each club/promoter deal has its contracted rate; UI shows the contracted %; Master Admin Features & Services / VIP ReserV management is where % is set/negotiated. | [ ] `help-vip-model-b-percent-contract` — Master Admin sets negotiated %; club admin can view; stored on subscription/legal agreement; changes need SOS2FA + reason + audit |
 | **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | [ ] `help-vip-deposit-settings` — club charge-at-booking / deposit-or-prepay amount in F&S / club VIP settings · [ ] Master Admin F&S **VIP ReserV** management (deposit policy fields) · [ ] Club Admin settings for charge-at-booking |
 | **VIP-B-10** | A — Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). | [ ] `help-vip-model-b-pos` — Model B on POS / pay-at-venue paths; monthly invoice + attestation or POS webhooks |
-| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | [ ] `help-vip-booking-links` / embed & API docs — booking, embed, and API base URLs use `www.floqr.app` · **Open conflict** with `cutoffrequirement.mdc` (`www.floqr.com` main app) — owner reconcile later |
+| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | [ ] `help-vip-booking-links` / embed & API docs — booking, embed, and API base URLs use `www.floqr.app` · **Aligned Oct 29 2026** — owner made `www.floqr.app` canonical for the whole product (`cutoffrequirement.mdc`) |
 | **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand` — Search tile, F&S row label, patron/admin chrome use **VIP ReserV** · protected never-translate |
 | **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | [ ] Master Admin / Club Admin onboarding help — beta venue list · [ ] floor-plan ingest topics for all three |
 
@@ -131,7 +131,7 @@ Standing requirement (owner): **whatever decisions are made here, help is adequa
 
 | ID | Section | Question | Recommended default | Why recommended | Status |
 |---|---|---|---|---|---|
-| VIP-P-13 | Proposal §20 Q14 · cutover rule | Canonical origin for booking / embed / API links: `www.floqr.com` or `www.floqr.app`? | **`https://www.floqr.com`** | Matches cutover canonical origin; single helper | **DECIDED Oct 16 2026** — B: `https://www.floqr.app` (canonical host for VIP booking/embed/API links). **Open conflict** with `cutoffrequirement.mdc` (`www.floqr.com` for main app) — owner to reconcile later if needed. |
+| VIP-P-13 | Proposal §20 Q14 · cutover rule | Canonical origin for booking / embed / API links: `www.floqr.com` or `www.floqr.app`? | **`https://www.floqr.com`** | Matches cutover canonical origin; single helper | **DECIDED Oct 16 2026** — B: `https://www.floqr.app` (canonical host for VIP booking/embed/API links). **Aligned Oct 29 2026:** `https://www.floqr.app` is now the canonical origin for the whole product (`cutoffrequirement.mdc`); no conflict. |
 | VIP-P-14 | Proposal §20 Q19 | Beta venues: Decades + Lima Twist first? Existing `clubLocations` ids? | **Yes those two · confirm/create ids at Phase 1** | Maps already ingested; owner knows both rooms | **DECIDED Oct 16 2026** — D: First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). |
 | VIP-P-15 | Proposal §20 Q21 | Block Live until both translation tiers pass? Which languages get counsel Terms first? | **Block Live until tiers pass · Terms EN first, then FR/ES** | Matches `vip-reservations-translation-incomplete.mdc` | **DECIDED Oct 16 2026** — C: **Allow English-only Live; translate after**. Updates `vip-reservations-translation-incomplete.mdc` (translation still open work; does **not** block Live). Help: [ ] `help-vip-i18n-live` |
 | VIP-P-16 | Proposal §20 Q22 | Product name: “VIP Tables”, “VIP Reservations”, or a protected brand? | **VIP Reservations** (protected brand string) | Matches feature key `vipReservations` and F&S naming | **DECIDED Oct 16 2026** — C: Product brand name **VIP ReserV** (owner spelling). Protected / never-translate. |
@@ -165,6 +165,8 @@ At most 8. Use for AskQuestion immediately. **★** = recommended option.
 ---
 
 ## AskQuestion payload (Batch 1)
+
+Historical payload as asked on Oct 16 2026 (the `floqr_com` recommendation was superseded: owner chose `floqr_app`, and on Oct 29 2026 made it the whole-product origin).
 
 ```json
 [
@@ -547,3 +549,75 @@ Help when decided: [ ] `help-vip-360-capture`
 - **D** — Wipe placeholders — every section starts empty until the club fills capacity
 
 Help when decided: [ ] `help-vip-capacity-placeholders`
+
+---
+
+## Batch 4 (presented Oct 29 2026) — promoters / accounting / Live gate / retention / pre-ship fixes
+
+**Status:** all six were already **DECIDED Oct 16 2026** (see "Batch 4 (DECIDED Oct 16 2026)" above). They are re-presented here in Batch 3 style so the owner can review the options. Reply only to **change** an answer (`B-20 A`, …). Sheet IDs stay **0 OPEN**. The Oct 16 option wording was not saved in this sheet, so options are reconstructed from the recorded decision letter (it keeps its letter) and the recommended default (★, always A). **Decided** = the recorded answer.
+
+### VIP-B-20 — Do promoters pay a monthly platform subscription?
+
+**Clarify:** Clubs on Model A pay $20/month. Promoter payouts are by corporate check (already decided); this is only the promoter's own subscription price.
+
+- **A ★** — Yes — $20/month, same as clubs
+- **B** — Yes, but a different monthly price (say the amount)
+- **C** — Free for promoters in beta; price configurable in production (Master Admin / VIP ReserV management) — **Decided**
+- **D** — No subscription ever; promoters only earn through bookings
+
+Help when decided: [ ] `help-vip-promoter-subscription`
+
+### VIP-B-21 — Which accounting system receives VIP revenue, and how often is subscription revenue recognized?
+
+**Clarify:** Receipts, invoices, and statements already exist in the VIP ledger. This picks where they are exported for the books.
+
+- **A ★** — QuickBooks Online · monthly recognition · map the chart of accounts at Phase 6
+- **B** — Xero · monthly recognition · map at Phase 6
+- **C** — CSV export only in beta; pick QuickBooks Online or Xero later — **Decided**
+- **D** — QuickBooks Online with daily recognition
+
+Help when decided: [ ] `help-vip-ledger-csv-export`
+
+### VIP-B-22 — How is each club's short code (used in receipt / invoice / statement numbers) chosen?
+
+**Clarify:** Numbers look like `FLOQR-DEC-000123`. The code must stay stable once documents are issued.
+
+- **A ★** — Master Admin sets a 3–5 letter code at certification (e.g. `DEC`, `LIMA`)
+- **B** — Auto from the venue slug (truncated location id / brand slug) — **Decided**
+- **C** — The club picks its own code during onboarding
+- **D** — No club code; one global number sequence
+
+Help when decided: [ ] `help-vip-club-code`
+
+### VIP-P-15 — Must VIP ReserV be fully translated before it goes Live?
+
+**Clarify:** Two translation tiers: app chrome / help, and counsel-approved Terms. FLOQR supports 11 languages.
+
+- **A ★** — Block Live until both tiers pass · Terms in English first, then French / Spanish
+- **B** — Block Live until app chrome passes; Terms in English only
+- **C** — Allow English-only Live; translate after (translation stays open work, does not block Live) — **Decided**
+- **D** — Block Live until all 11 languages, Terms included
+
+Help when decided: [ ] `help-vip-i18n-live`
+
+### VIP-B-23 — How long are VIP records kept?
+
+**Clarify:** Proposal default: 7 years for receipts / invoices / ledger / statements; 13 months for notification delivery logs.
+
+- **A ★** — Confirm as written (7 years finance records · 13 months delivery logs)
+- **B** — 7 years finance records · 24 months delivery logs
+- **C** — 10 years finance records · 13 months delivery logs
+- **D** — Counsel sets retention before Live (leave TBD until counsel) — **Decided**
+
+Help when decided: [ ] `help-vip-retention`
+
+### VIP-B-24 — Fix two known messaging issues before VIP Functions ship?
+
+**Clarify:** (1) VIP receipt SMS must go through the shared Twilio sender (`sendTwilioMessagesApi`) so compliance logs are written. (2) The log redactor currently masks `FLOQR-…` invoice numbers, which hides them from support.
+
+- **A ★** — Yes — schedule both fixes before VIP Functions ship — **Decided**
+- **B** — Only the receipt SMS sender fix before ship
+- **C** — Only the invoice-number redactor fix before ship
+- **D** — Ship VIP first; fix both after Live
+
+Help when decided: [ ] `help-vip-receipt-sms-redaction-fixes`

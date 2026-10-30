@@ -178,7 +178,7 @@ Goal: admins and patrons stop sharing one login path and one origin. Patrons kee
 
 | | Patron app (current) | Admin app (new) |
 |---|---|---|
-| Origin | `https://www.floqr.com` (cutover) | `https://admin.floqr.com` (separate Firebase Hosting **site** in the same project; not GitHub Pages) |
+| Origin | `https://www.floqr.app` (cutover) | `https://admin.floqr.app` (separate Firebase Hosting **site** in the same project; not GitHub Pages) |
 | Pages | Search, My Profile, satellites, Display | `master-admin.html`, Club Admin console (`admin.html`), promoter admin, diagnostics, seed/onboarding tools |
 | Sign-in | Google / Microsoft / Facebook / Email / SMS (US+CA) / WhatsApp | **Workforce only:** Google Workspace or Microsoft Entra SSO (OIDC/SAML) **plus** a passkey / security key (WebAuthn) — no SMS, no WhatsApp, no Facebook |
 | Auth tenant | Identity Platform tenant `patrons` (or default) | Identity Platform tenant `admins` (multi-tenancy) — a patron account literally cannot sign in here |
@@ -197,15 +197,15 @@ Goal: admins and patrons stop sharing one login path and one origin. Patrons kee
 
 1. **Claims first (no UX change):** a `syncRoleClaims` callable/trigger writes claims from today’s sources (admin lists, `users.superAdmin`, `betaTesters.features`, club admin designations). Rules + callables accept claim **or** legacy check. Force token refresh after changes.
 2. **Rules on claims only:** remove email lists from `firestore.rules`, `sos2fa`, `PRIVILEGED_EMAILS`; restrict `users` + `inboxNotifications` reads (open findings 1–2).
-3. **Admin Hosting site:** `firebase.json` gets a second `hosting` target (`admin`) serving only admin pages; add `admin.floqr.com` to Auth authorized domains, OAuth clients, App Check. Keep the old paths on Pages redirecting to the admin origin.
+3. **Admin Hosting site:** `firebase.json` gets a second `hosting` target (`admin`) serving only admin pages; add `admin.floqr.app` to Auth authorized domains, OAuth clients, App Check. Keep the old paths on Pages redirecting to the admin origin.
 4. **Admin tenant + SSO + passkeys:** create the `admins` tenant, move admin accounts, admin login page offers SSO + passkey only. SOS2FA remains as step-up.
 5. **Split bundles:** patron bundle drops admin JS entirely (no `master-admin-app.js` on www); admin bundle drops patron satellites. Shared code (`shared-data.js`, i18n, help) published as versioned modules both sides load.
 6. **Retire the shared path:** admin pages removed from the patron origin; `profile-access-guard.js` on www no longer knows about admin roles.
 
-Risks / notes: two authorized domains to maintain; Club Admins who are also patrons need **two accounts** (one per tenant) — document it in Club Admin help; Xibo Display URLs are unaffected (they stay on the patron/display origin, no `?v=`); deep links in admin emails must point at `admin.floqr.com`.
+Risks / notes: two authorized domains to maintain; Club Admins who are also patrons need **two accounts** (one per tenant) — document it in Club Admin help; Xibo Display URLs are unaffected (they stay on the patron/display origin, no `?v=`); deep links in admin emails must point at `admin.floqr.app`.
 
 ## FIX PROMPT
 
 ```
-Features & Services (s3.0.110): state = IsFeatureEnabled!=1 ? off : (IsTestFeature==1 ? test : live). Off = nobody (Master Admins too). Test = Search tile only for beta testers granted that feature (betaTesters.features[key]==1); Master Admins open it from the F&S link, never from Search; pages + server allow master || granted tester. Live = everyone. Master Admins can never be beta testers (invite/accept refuse, viewerFor forces false). setBetaTesterFeatures + logFeatureAccessAttempt (throttled, unchained denials). Signed-out satellite visitors → FLOQRSessionShell.redirectToLogin() → ./?profileRequired=sign-in&returnTo=… (never Google-only; iframes/public pages exempt). Admin writes via SOS2FA callables, reason ≥ 8, chained audit. Fork proposal: admin.floqr.com + admins tenant + custom claims. Design notes: design-notes-feature-services.mdc
+Features & Services (s3.0.110): state = IsFeatureEnabled!=1 ? off : (IsTestFeature==1 ? test : live). Off = nobody (Master Admins too). Test = Search tile only for beta testers granted that feature (betaTesters.features[key]==1); Master Admins open it from the F&S link, never from Search; pages + server allow master || granted tester. Live = everyone. Master Admins can never be beta testers (invite/accept refuse, viewerFor forces false). setBetaTesterFeatures + logFeatureAccessAttempt (throttled, unchained denials). Signed-out satellite visitors → FLOQRSessionShell.redirectToLogin() → ./?profileRequired=sign-in&returnTo=… (never Google-only; iframes/public pages exempt). Admin writes via SOS2FA callables, reason ≥ 8, chained audit. Fork proposal: admin.floqr.app + admins tenant + custom claims. Design notes: design-notes-feature-services.mdc
 ```

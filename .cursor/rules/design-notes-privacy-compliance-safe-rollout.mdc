@@ -2,7 +2,7 @@
 
 Design notes only. Resume: `@privacy-compliance$`.
 
-**Production host (cutover):** see `.cursor/rules/cutoffrequirement.mdc` — canonical origin is `https://www.floqr.com` (may be prepared before DNS flip).
+**Production host (cutover):** see `.cursor/rules/cutoffrequirement.mdc` — canonical origin is `https://www.floqr.app` (owner decision Oct 29 2026; may be prepared before DNS flip).
 
 Not legal advice. Goal: raise GDPR / CCPA / Consent Mode posture **without breaking** signed-in product flows (Mingl, Search, ShoutOut, scheduling, ads rotation, SOS2FA).
 
@@ -83,15 +83,15 @@ Region detection: profile `country` / `uiLanguage` + IP country **only as hint**
 | When | What |
 |---|---|
 | **Now (demo on Pages)** | Ship Phases A–C: policy page, DNS/GPC, marketing grandfather gate, ad personalization soften, real DSAR export/delete, tighten `privacyConsents`. Fixes fake delete + open consents without breaking Mingl/Search. |
-| **Before floqr.com cutover** | Counsel-ready controller contact on `privacy.html`; optional `privacyPolicyVersionAccepted` re-ack; App Check / OAuth host allowlists for www. |
-| **At cutover** | Flip DNS; policy live at `https://www.floqr.com/privacy.html`; preview-email bases → www. |
+| **Before floqr.app cutover** | Counsel-ready controller contact on `privacy.html`; optional `privacyPolicyVersionAccepted` re-ack; App Check / OAuth host allowlists for www. |
+| **At cutover** | Flip DNS; policy live at `https://www.floqr.app/privacy.html`; preview-email bases → www. |
 | **After publicProfiles (Phase D)** | Lock `users` reads. Do **not** tighten peer `users` reads in the safe slice. |
 
 ## Shipped in s3.0.103 (Phases A–C)
 
 | Piece | Status |
 |---|---|
-| `privacy.html` + `FLOQRCanonical` | Live on Pages package; canonical host www.floqr.com |
+| `privacy.html` + `FLOQRCanonical` | Live on Pages package; code still says www.floqr.com — switches to www.floqr.app with the canonical code change listed in `cutoffrequirement.mdc` |
 | My Privacy DNS + GPC + policy links | `patron-portal` + `floqr-privacy-prefs.js` |
 | Consent Mode stub | `floqr-consent-mode.js` (no-op until gtag exists) |
 | Ad personalization gate | `ad-campaigns.js` `allowsPersonalizedAds` |
@@ -105,7 +105,7 @@ Page links carry no version (s3.1.37); asset tags are cache-busted by the bump s
 
 ### 1. Privacy Policy
 - Open: `https://jadzadco.github.io/shoutout-demo/privacy.html`
-- Expect: Do Not Sell section (`#do-not-sell`), processors list, production host wording `https://www.floqr.com`.
+- Expect: Do Not Sell section (`#do-not-sell`), processors list, production host wording `https://www.floqr.app` (still `www.floqr.com` until the canonical code change ships).
 
 ### 2. My Privacy (main path)
 1. Sign in → `https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=privacy`

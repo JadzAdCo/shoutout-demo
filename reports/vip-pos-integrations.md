@@ -279,7 +279,7 @@ Rules:
 | `apiAccount` | Simphony, Toast **custom integration** | Club's POS admin creates the API account / custom credentials, then types them into a FLOQR form (never email) | Form posts straight to `saveVipPosApiAccount` → KMS encrypt → Test connection → `connected` |
 | `none` | Generic | Choose CSV / manual / webhook options | Per-club webhook secret generated (shown once) |
 
-The OAuth redirect URI must be registered on **both** the current Functions URL and the future canonical host (`https://www.floqr.com/…` via a Hosting rewrite) per the cutover rule. The return page link is built with the single canonical-origin helper (`admin.html?tab=vip&sub=integrations`, no `v`).
+The OAuth redirect URI must be registered on **both** the current Functions URL and the future canonical host (`https://www.floqr.app/…` via a Hosting rewrite) per the cutover rule. The return page link is built with the single canonical-origin helper (`admin.html?tab=vip&sub=integrations`, no `v`).
 
 ### B2.5 Secrets and tokens
 

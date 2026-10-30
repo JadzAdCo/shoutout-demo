@@ -1,85 +1,98 @@
 ---
-description: Production cutover requirements — canonical domain www.floqr.com, pre-cutoff domain prep, auth/privacy/DNS checklist
+description: Production cutover requirements — canonical domain www.floqr.app (owner decision Oct 29 2026), pre-cutoff domain prep, auth/privacy/DNS checklist
 alwaysApply: true
 ---
 
 # FLOQR production cutover requirements
 
-Resume: `@cutover$` / `$floqr-com$`.
+Resume: `@cutover$` / `$floqr-app$` (old tag `$floqr-com$` still resumes this file).
 
-**Canonical production origin (chosen):** `https://www.floqr.com`  
-**Apex redirect (required at cutover):** `https://floqr.com` → `https://www.floqr.com` (301).  
-**Not canonical:** `floq.ai`, `floqr.ai`, GitHub Pages `https://jadzadco.github.io/shoutout-demo` (staging / demo only until cutover).
+**Canonical production origin (owner decision Oct 29 2026, whole product):** `https://www.floqr.app`  
+**Apex redirect (required at cutover):** `https://floqr.app` → `https://www.floqr.app` (301).  
+**Not canonical:** `www.floqr.com` / `floqr.com` (previous choice, superseded Oct 29 2026 — may 301 to `www.floqr.app` if the owner keeps the domain), `floq.ai`, `floqr.ai`, GitHub Pages `https://jadzadco.github.io/shoutout-demo` (staging / demo only until cutover).
 
-This file is persistent agent memory for any work that hardcodes origins, OAuth redirects, privacy links, preview emails, App Check, or hybrid deep links.
+This file is persistent agent memory for any work that hardcodes origins, OAuth redirects, privacy links, preview emails, App Check, or hybrid deep links. VIP booking / embed / API links (VIP-P-13) use the same host — there is no separate VIP origin.
 
-## Can the domain be chosen / prepared before cutoff?
+Accounts, keys, and DNS records for this host are configured through the accounts management profile (`config/accounts-profile.local.json` → `scripts/seed-accounts-profile.js`). See `design-notes-accounts-profile.mdc`.
 
-**Yes — and it should be.** Choosing `www.floqr.com` before cutover does **not** require flipping live traffic yet.
+## Can the domain be prepared before cutoff?
+
+**Yes — and it should be.** Preparing `www.floqr.app` before cutover does **not** flip live traffic.
 
 | Before cutoff (safe) | At cutoff (traffic flip) |
 |---|---|
-| Register / renew `floqr.com` | Point DNS A/AAAA or CNAME at production host |
-| Add `www.floqr.com` (+ apex) to Firebase **Authorized domains** | Make www the live Pages/hosting target (or CDN in front) |
-| Register OAuth redirect URIs for Google / Microsoft on the new host | Disable or leave Pages as backup only if needed |
-| Create reCAPTCHA / App Check keys for `www.floqr.com` | Swap client config / secrets to prod keys if separate |
-| Code: single `canonicalOrigin` config (no hardcoded github.io in new work) | Update SendGrid/Stripe/Twilio callback + link bases |
-| Draft Privacy Policy / DNS URLs as `https://www.floqr.com/privacy.html` | Publish policy live on that host |
-| Hybrid: Associated Domains / App Links for `www.floqr.com` | Ship store builds pointing at prod |
+| Register / renew `floqr.app` (`.app` is HSTS-preloaded — HTTPS only, certificate required from day one) | Point DNS (Azure DNS or registrar) at the production host |
+| Add `www.floqr.app` (+ apex) to Firebase **Authorized domains** | Make www the live hosting target (Azure Static Web Apps or Firebase Hosting) |
+| Register OAuth redirect URIs for Google / Microsoft / Facebook on the new host | Leave Pages as staging / backup only |
+| Create reCAPTCHA / App Check keys for `www.floqr.app` | Swap client config / secrets to prod keys if separate |
+| Code: single `FLOQRCanonical` helper (no hardcoded github.io in new work) | Update SendGrid / Stripe / Twilio callback + link bases |
+| Draft Privacy Policy / DNS URLs as `https://www.floqr.app/privacy.html` | Publish policy live on that host |
+| Hybrid: Associated Domains / App Links for `www.floqr.app` | Ship store builds pointing at prod |
 
-Until DNS/hosting flip, patrons keep using GitHub Pages; account-level prefs in Firestore already travel with the user. Browser CMP cookies will **not** — plan a one-time privacy re-ack or rely on `privacyPolicyVersionAccepted` on `users`.
+Until the DNS / hosting flip, patrons keep using GitHub Pages; account-level prefs in Firestore travel with the user. Browser CMP cookies will **not** — plan a one-time privacy re-ack or rely on `privacyPolicyVersionAccepted` on `users`.
 
 ## Agent rules (every change)
 
-1. **Do not** invent a second production brand origin. New links, emails, Store listings, and privacy copy use `https://www.floqr.com` (or relative paths resolved via canonical config).
-2. **Do not** hardcode `jadzadco.github.io/shoutout-demo` in new features. Prefer `FLOQRNav` / a single `FLOQR_CANONICAL_ORIGIN` (or equivalent) with staging override for Pages.
-3. **Display / Xibo URLs** stay `display.html?location=` / `display2.html?location=` with **no** `?v=` — only the **host** changes at cutover (`https://www.floqr.com/display.html?location=…`).
+1. **Do not** invent a second production brand origin. New links, emails, Store listings, VIP booking/embed/API links, and privacy copy use `https://www.floqr.app` (or relative paths resolved via `FLOQRCanonical`).
+2. **Do not** hardcode `jadzadco.github.io/shoutout-demo` in new features. Use `FLOQRNav` / `FLOQRCanonical` with the staging override for Pages. Pages stays staging until cutover — do not change github.io behavior early.
+3. **Display / Xibo URLs** stay `display.html?location=` / `display2.html?location=` with **no** `?v=` — only the **host** changes at cutover (`https://www.floqr.app/display.html?location=…`).
 4. Page links never carry `?v=` (owner decision Oct 10 2026) — on Pages or on the new host. Only asset tags (`<script src>` / `<link href>`) are cache-busted, by the bump script. Old `?v=` URLs keep working (ignored).
-5. Privacy / CCPA / Consent Mode work must assume final policy URL: `https://www.floqr.com/privacy.html` (path may adjust; **host must be floqr.com**).
-6. Preview-email / diagnostics defaults that still point at github.io are **staging**; at cutover they must switch to `www.floqr.com`.
-7. Hybrid native: deep links and universal links target `www.floqr.com`, not Pages.
+5. Privacy / CCPA / Consent Mode work assumes the final policy URL `https://www.floqr.app/privacy.html` (path may adjust; **host must be www.floqr.app**).
+6. Preview-email / diagnostics defaults that still point at github.io are **staging**; at cutover they switch to `www.floqr.app`.
+7. Hybrid native: deep links and universal links target `www.floqr.app`, not Pages.
+8. Admin / Master / staging subdomains (if the admin fork ships): `admin.floqr.app`, `master.floqr.app`, `staging.floqr.app` — same registrable domain, listed in the accounts profile DNS section.
+9. Mail sender addresses (`login@floqr.com` in Functions) are a **SendGrid sender-domain** decision, not the web origin. Move them to `floqr.app` only after that domain is authenticated in SendGrid (accounts profile `sendgrid.senderDomain`).
+
+## Code still on www.floqr.com (switch together, on `main` + workspace in one change)
+
+`floqr-canonical.js` (`PRODUCTION_ORIGIN`; `isProductionHost` should accept `.app` and legacy `.com` during transition), `privacy.html` (3 strings), `ai-diagnostics-service.js` (privacy check `includes` + release note), `functions/privacy-compliance.test.js` (asserts the constant), `functions/ad-functions.js` `RETURN_ORIGINS` (add `https://www.floqr.app`). The `functions/` files must land on `origin/main` together with the workspace copy (`check-functions-sync.js`), then a Pages publish.
 
 ## Pre-cutoff checklist (do early)
 
-- [ ] Domain registrar: `floqr.com` owned; www + apex plan documented
-- [ ] TLS certificate ready for www (and apex if serving redirect)
-- [ ] Firebase Auth → Authorized domains: `www.floqr.com`, `floqr.com`
-- [ ] Google Cloud OAuth client: JS origins + redirect URIs for `https://www.floqr.com`
-- [ ] Microsoft (and any other) IdP redirect URIs updated
-- [ ] reCAPTCHA Enterprise / App Check site allowlist includes `www.floqr.com`
-- [ ] Stripe Customer Portal / Checkout return URLs allow `www.floqr.com`
-- [ ] SendGrid link branding / inbound parse (if any) aware of new host
-- [ ] Twilio status callbacks / messaging links use new host where applicable
-- [ ] Codebase: one canonical-origin helper; grep clean of new github.io hardcodes
-- [ ] Privacy Policy + Do Not Sell URLs written for `www.floqr.com`
-- [ ] iOS Associated Domains + Android App Links files planned for `www.floqr.com`
+- [ ] Domain registrar: `floqr.app` owned; www + apex plan documented (Azure DNS zone or registrar DNS)
+- [ ] TLS certificate ready for www and apex (`.app` requires HTTPS)
+- [ ] Firebase Auth → Authorized domains: `www.floqr.app`, `floqr.app`
+- [ ] Google Cloud OAuth client: JS origins + redirect URIs for `https://www.floqr.app`
+- [ ] Microsoft / Facebook (and any other) IdP redirect URIs updated
+- [ ] reCAPTCHA Enterprise / App Check site allowlist includes `www.floqr.app`
+- [ ] Stripe Customer Portal / Checkout return URLs allow `www.floqr.app`; Connect redirect URIs registered
+- [ ] SendGrid link branding / sender domain decided (`floqr.app`, or keep `floqr.com` for mail only)
+- [ ] Twilio status callbacks / messaging links use the new host where applicable
+- [ ] POS partner OAuth redirect URIs (Square / Toast / SpotOn / Clover) registered on `https://www.floqr.app/…`
+- [ ] Codebase: `FLOQRCanonical.PRODUCTION_ORIGIN` = `https://www.floqr.app`; grep clean of new github.io hardcodes
+- [ ] Privacy Policy + Do Not Sell URLs written for `www.floqr.app`
+- [ ] iOS Associated Domains + Android App Links files planned for `www.floqr.app`
+- [ ] Accounts profile seeded (`node scripts/seed-accounts-profile.js --apply`) and its manual checklist ticked
 
 ## Cutover day checklist
 
-- [ ] DNS live; `https://www.floqr.com` serves the app
-- [ ] Apex `floqr.com` → www 301
-- [ ] Smoke: email/phone/Google/Microsoft sign-in on www
-- [ ] Smoke: SOS2FA, Stripe return, preview links, Club Admin, Display boards (host only)
+- [ ] DNS live; `https://www.floqr.app` serves the app
+- [ ] Apex `floqr.app` → www 301 (and `floqr.com` / `www.floqr.com` → `www.floqr.app` 301 if kept)
+- [ ] Smoke: email / phone / WhatsApp / Google / Microsoft sign-in on www
+- [ ] Smoke: SOS2FA, Stripe return, VIP booking link, preview links, Club Admin, Display boards (host only)
 - [ ] Update Functions defaults: preview email base, any absolute URL builders
-- [ ] Master Admin / diagnostics “live test URL” lines → www.floqr.com
+- [ ] Master Admin / diagnostics "live test URL" lines → www.floqr.app
+- [ ] Club website iframes: tell clubs to re-copy the embed (host changed)
 - [ ] Optional: privacy policy version bump → force re-ack once
 - [ ] Monitor Auth unauthorized-domain errors for 24–48h
 
 ## Post-cutoff
 
-- [ ] README / STANDARD-AFTER-DEPLOYMENT live URLs → `https://www.floqr.com`
+- [ ] README / STANDARD-AFTER-DEPLOYMENT live URLs → `https://www.floqr.app`
 - [ ] Deprecate GitHub Pages as production (keep as emergency staging only if desired)
-- [ ] App Store / Play listings + privacy nutrition labels use `https://www.floqr.com`
-- [ ] Counsel: Privacy Policy controller contact matches floqr.com brand entity
+- [ ] App Store / Play listings + privacy nutrition labels use `https://www.floqr.app`
+- [ ] Counsel: Privacy Policy controller contact matches the floqr.app brand entity
 
 ## Related notes
 
+- Accounts / keys / DNS seeding: `.cursor/rules/design-notes-accounts-profile.mdc` (`@accounts$`)
 - Privacy safe rollout: `.cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc` (`@privacy-compliance$` / `$privacy-test$`) — includes **Manual test process (demo / Pages)**
-- **Demo timing:** ship DNS/GPC/DSAR/`privacyConsents` on Pages **before** cutover (s3.0.103+). Publish counsel-ready policy contact and force re-ack on `www.floqr.com` at cutover — not blocked on DNS flip.
+- VIP booking links: `.cursor/rules/design-notes-vip-reservations.mdc` (VIP-P-13 = same host)
+- **Demo timing:** DNS/GPC/DSAR/`privacyConsents` already ship on Pages (s3.0.103+). Publish counsel-ready policy contact and force re-ack on `www.floqr.app` at cutover — not blocked on DNS flip.
 - Versioning / no `?v=` on Display: `.cursor/rules/floqr-versioning.mdc`, `.cursor/rules/screen-datapoints.mdc`
 
 ## FIX PROMPT
 
 ```
-Cutover memory: canonical production is https://www.floqr.com (apex redirects to www). Domain may be registered and wired into Firebase/OAuth/reCAPTCHA/privacy URLs before DNS flip. Privacy Phases A–C ship on demo first (s3.0.103); re-ack + counsel contact at cutover. Do not hardcode github.io in new work; Display URLs change host only. Resume: @cutover$
+Cutover memory: canonical production is https://www.floqr.app for the whole product (owner decision Oct 29 2026; apex floqr.app 301 → www; www.floqr.com superseded, may 301 to .app). VIP booking/embed/API links use the same host. Domain may be wired into Firebase Auth / OAuth / reCAPTCHA / Stripe / POS redirects / privacy URLs before the DNS flip; Pages stays staging until cutover. Privacy policy https://www.floqr.app/privacy.html. Do not hardcode github.io in new work; Display URLs change host only. Accounts via the accounts profile seed. Resume: @cutover$
 ```

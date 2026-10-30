@@ -154,7 +154,7 @@ Templates live with the existing ones in `clubNotificationSettings.messageTempla
 - **PII by channel:**
   - Inbox and email may use `{guest}` as the lead guest's full name.
   - SMS and WhatsApp render `{guest}` as **first name + last initial**, and never include phone, email or amounts beyond `{amount}`.
-- **Rendering:** values are HTML-escaped for email/Inbox and stripped of control characters for SMS. SMS is capped at 320 characters (2 segments). Links always come from the canonical-origin helper, so they are `https://www.floqr.com/...` after cutover and never carry `v=`.
+- **Rendering:** values are HTML-escaped for email/Inbox and stripped of control characters for SMS. SMS is capped at 320 characters (2 segments). Links always come from the canonical-origin helper, so they are `https://www.floqr.app/...` after cutover and never carry `v=`.
 - **Brand chrome:** "ShoutOut" and "FloqR" are never translated. Templates are English until Tier B translation, and the body language follows the recipient's `uiLanguage` once packs exist.
 - **Test send:** a "Send test to me" button sends only to the signed-in admin's own verified contacts.
 
@@ -284,7 +284,7 @@ The header shows:
 | Balance due at venue | "Minimum $1,000.00 − deposit $250.00 = $750.00 before tax and gratuity" | Informational |
 | Payment | Visa ···· 4242 · Stripe / Square / Cash | Only brand + last 4 from the processor (PCI DSS allows it). Never the PAN |
 | Refunds to date | −$0.00 | On credit receipts: the original receipt number |
-| Policy footer | Terms version + short SHA-256, cancellation window summary, how to dispute ("contact the venue first") | Links to the published Terms and the Privacy Policy `https://www.floqr.com/privacy.html` (cutover rule) |
+| Policy footer | Terms version + short SHA-256, cancellation window summary, how to dispute ("contact the venue first") | Links to the published Terms and the Privacy Policy `https://www.floqr.app/privacy.html` (cutover rule) |
 
 The receipt never shows the door **QR pass** (that is a separate page), and never shows patron phone / email to the promoter.
 
@@ -988,7 +988,7 @@ Cross-ref: `reports/vip-owner-decision-sheet.md` (IDs VIP-B-* / VIP-P-*). Standi
 | **VIP-B-03b** | Model B percent is **NOT** a fixed platform default. Configurable at Master Admin, shared with club admin, contractual obligation. No single default % — each club/promoter deal has its contracted rate; UI shows contracted %; set/negotiated in Master Admin F&S / VIP ReserV management. | [ ] `help-vip-model-b-percent-contract` — Master Admin sets negotiated %; club admin can view; stored on subscription/legal agreement; changes need SOS2FA + reason + audit |
 | **VIP-B-05** | D — Club sets deposit/prepay amount using settings in Services & Features (feature management) for this feature. NOT a fixed platform default. | [ ] `help-vip-deposit-settings`; Master Admin F&S **VIP ReserV** management; club charge-at-booking settings |
 | **VIP-B-10** | A — Allow Model B for POS and pay-at-venue (monthly invoice + attestation or POS webhooks). | [ ] `help-vip-model-b-pos` |
-| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | Booking / embed / API / receipt deep links use `www.floqr.app`. **Open conflict** with cutover `www.floqr.com` — owner reconcile later |
+| **VIP-P-13** | B — `https://www.floqr.app` (canonical host for VIP booking/embed/API links). | Booking / embed / API / receipt deep links use `www.floqr.app`. **Aligned Oct 29 2026** — `www.floqr.app` is the whole-product cutover origin |
 | **VIP-P-16** | C — Product brand name **VIP ReserV** (owner spelling). | [ ] `help-vip-reserv-brand`; protected never-translate |
 | **VIP-P-14** | D — First beta venues: Decades, Lima Twist Club, Aurelia (`temp-democlub-1`). | Club codes / onboarding / invoice prefixes for these three |
 

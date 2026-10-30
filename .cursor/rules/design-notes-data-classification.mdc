@@ -269,7 +269,7 @@ Pending (owner action): floqCast board identity via a display-token-derived cust
 | 2 | Open mail relay | Deferred by owner — raise at the next security review (signed-in caller + internal recipients only). |
 | 2 | Storage signed-in reads | `shoutouts/`, `template-backgrounds/`, `profileMedia/` readable by any signed-in user; scope to owner / venue / public-approved media. |
 | 2 | Custom claims | `masterAdmin` / `venueAdmin` / `betaFeatures` claims replace email lists entirely (see Features & Services fork proposal). |
-| 3 | App Check rollout | reCAPTCHA Enterprise key for Pages + `www.floqr.com`; monitor, then `enforceAppCheck` on admin and paid callables. |
-| 3 | Security headers at cutover | CSP, HSTS, X-Frame-Options/frame-ancestors, Referrer-Policy on `www.floqr.com` hosting (GitHub Pages cannot set headers). |
+| 3 | App Check rollout | reCAPTCHA Enterprise key for Pages + `www.floqr.app`; monitor, then `enforceAppCheck` on admin and paid callables. |
+| 3 | Security headers at cutover | CSP, HSTS, X-Frame-Options/frame-ancestors, Referrer-Policy on `www.floqr.app` hosting (GitHub Pages cannot set headers). |
 
 **clubMedia storage** (`storage.rules` `s3.1.25-club-media-admins`): read stays public (Display, Search, club profile). Create / update / delete under `clubMedia/{clubLocationId}/...` = Master Admin (token claim or the same email list as `firestore.rules` `isMasterAdmin`) **or** a Club Admin of that club — `clubLocations/{id}.adminUids | masterAdminUids | adminEmails`, or `clubAdminAssignments/{id}_{uid}.status == "active"` (same sources as `isClubManager`). Images/videos only, < 60 MB. Storage rules may read at most **2** Firestore docs per request; the helper reads exactly `clubLocations/{id}` + the assignment doc — do not add a third lookup. Demo Club Admin emails that `admin-app.js` maps to `temp-democlub-N` without a roster entry cannot upload (they already could not write the `clubMedia` Firestore docs).

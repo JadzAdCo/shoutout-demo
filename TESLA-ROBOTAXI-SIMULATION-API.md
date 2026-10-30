@@ -19,7 +19,7 @@ The production integration is designed as a provider adapter. FLOQR can replace 
 
 ## Proposed REST API
 
-Base URL: `https://api.floqr.com/pickup/v1`
+Base URL: `https://api.floqr.app/pickup/v1`
 
 Authentication: OAuth 2.0 bearer token plus `Idempotency-Key` for every create, pay, cancel, or update operation. Suggested scopes are `pickup.quotes:read`, `pickup.rides:write`, `pickup.rides:read`, and `pickup.webhooks:write`.
 

@@ -57,7 +57,7 @@ Chrome `websiteFeed.*` (16) + `page.clubEmbed.*` (13) × 11 packs. Help `help-cl
 
 ## Cutover
 
-`DEFAULT_ORIGIN` (github.io) builds `clubIframe` + `publicPageUrl`. At cutover switch to `https://www.floqr.com` (see `cutoffrequirement.mdc`); existing iframes on club sites keep working only while Pages stays up — tell clubs to re-copy the iframe after cutover. API host (cloudfunctions) is unaffected.
+`DEFAULT_ORIGIN` (github.io) builds `clubIframe` + `publicPageUrl`. At cutover switch to `https://www.floqr.app` (see `cutoffrequirement.mdc`); existing iframes on club sites keep working only while Pages stays up — tell clubs to re-copy the iframe after cutover. API host (cloudfunctions) is unaffected.
 
 ## Next (not built)
 

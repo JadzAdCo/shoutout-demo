@@ -42,7 +42,7 @@ Companion files: `reports/vip-floorplans/` (floor-plan JSON + overlay preview), 
 
 **Effort.** ~13–18 engineering weeks in 6 phases, beta with 2 DC venues after Phase 2 (~6–7 weeks). Translation is last (two tiers), tracked by an always-on INCOMPLETE rule.
 
-**Biggest owner decisions** (full list §20): finish principle 14; merchant of record + Connect for Model A; what "% of collected fees" covers (deposits only vs in-venue spend); deposit vs full prepay default; e-sign provider budget; Master Admin read access to patron PII; `floqr.com` vs `floqr.app` origin for booking links.
+**Biggest owner decisions** (full list §20): finish principle 14; merchant of record + Connect for Model A; what "% of collected fees" covers (deposits only vs in-venue spend); deposit vs full prepay default; e-sign provider budget; Master Admin read access to patron PII; origin for booking links (decided: `www.floqr.app` for the whole product).
 
 ---
 
@@ -970,7 +970,7 @@ Per owner principle 19 and `floqr-translation.mdc`: beta ships **English only be
 | 12 | Chargebacks | Patron should contact the venue first; evidence the venue may submit |
 | 13 | Force majeure & event changes | Closures, artist changes, government orders — refund or credit |
 | 14 | Promoter bookings | Promoter acts for the guest; guest's own acceptance required |
-| 15 | Privacy | Link to FLOQR Privacy Policy (`https://www.floqr.com/privacy.html` per cutover rule) + venue privacy notice; what the venue receives; marketing opt-in separate |
+| 15 | Privacy | Link to FLOQR Privacy Policy (`https://www.floqr.app/privacy.html` per cutover rule) + venue privacy notice; what the venue receives; marketing opt-in separate |
 | 16 | Photos / filming | Venue photography; Display board ShoutOut consent if bundled |
 | 17 | Accessibility | Accessible seating requests; ADA Title III |
 | 18 | Liability limits & disputes | Limitation of liability, governing law, venue for disputes, arbitration (consumer arbitration needs careful drafting) |
@@ -1068,7 +1068,7 @@ Total ≈ **13–18 weeks** plus translation. Publishing, Functions deploys and 
 11. **TSA provider** — paid (DigiCert / GlobalSign / Sectigo) vs free (not recommended for evidence).
 12. **Signer geolocation** — capture opt-in browser location for counsel signatures at all? (Recommend IP + passkey + bar verification, geolocation optional.)
 13. **EU / non-US clubs in scope?** (eIDAS AdES/QES, GDPR as controller, SCA for off-session charges.)
-14. **Canonical origin for booking links** — `www.floqr.com` (cutover rule) or `www.floqr.app` (`reports/azure-floqr-app-plan.md`)? The API and embed must use one helper either way.
+14. **Canonical origin for booking links** — DECIDED: `https://www.floqr.app` (VIP-P-13, Oct 16 2026), and since Oct 29 2026 the canonical origin for the whole product (`cutoffrequirement.mdc`). The API and embed use the one `FLOQRCanonical` helper.
 15. ~~**Lima Twist Club** spelling / bars / full plan~~ — **answered Oct 15 2026:**
     - The name is "Lima Twist Club" (Washington DC).
     - BAR1, BAR2 and the Decades BAR are not bookable.
@@ -1107,7 +1107,7 @@ Total ≈ **13–18 weeks** plus translation. Publishing, Functions deploys and 
 | Signature evidence challenged | Contract dispute | Passkey + TSA + provider option + bar verification |
 | Translation lag | Non-English patrons blocked from Live | Two-tier plan + always-on INCOMPLETE rule |
 | Scope creep (24 principles) | Delay | Must/Should/Could; beta after Phase 2 |
-| Origin decision (floqr.com vs floqr.app) | Broken embeds / API links at cutover | Single canonical-origin helper; re-copy embeds after cutover |
+| Origin (decided `www.floqr.app`, Oct 29 2026) | Broken embeds / API links at cutover | Single canonical-origin helper; re-copy embeds after cutover |
 
 ---
 
