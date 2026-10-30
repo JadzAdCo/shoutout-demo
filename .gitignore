@@ -29,6 +29,8 @@ storage-debug.log
 *.pem
 service-account*.json
 *-service-account.json
+config/accounts-profile.local.json
+config/*.local.json
 
 # OS / editor
 .DS_Store
