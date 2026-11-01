@@ -170,6 +170,51 @@ test("every Throw a ShoutOut entry point goes through FLOQRNav.shoutoutLink / sh
   assert.match(read("admin-app.js"), /FLOQRNav\?\.shoutoutUrl\?\.\(\{locationId\}\)/);
 });
 
+test("club public page chrome: Back present, no Copy link, current FloqR icons, Site chrome", () => {
+  const html = read("club-profile.html");
+  const app = read("club-profile-app.js");
+  const back = html.match(/<a id="floqrGlobalBack"[^>]*>/)?.[0] || "";
+  assert.ok(back, "club-profile.html has the shared Back pill");
+  assert.match(back, /class="global-back-btn buttonlike"/);
+  assert.match(back, /href="\.\/\?start=search"/);
+  assert.match(back, /data-floqr-back-history="same-origin"/);
+  assert.doesNotMatch(back, /admin\.html|[?&]v=/);
+
+  assert.doesNotMatch(html, /clubProfileShareBtn|Copy Link|page\.clubProfile\.share/i);
+  assert.doesNotMatch(app, /clubProfileShareBtn|clipboard/);
+  const i18n = read("floqr-i18n.js");
+  assert.doesNotMatch(i18n, /"page\.clubProfile\.share":/);
+  assert.ok((i18n.match(/"nav\.backShort":/g) || []).length >= 11, "Back label in every chrome pack");
+
+  assert.doesNotMatch(html, /images\/floqr-color\.png/, "old tile mark is gone from the club page");
+  assert.match(html, /<img class="product-parent-logo" data-floqr-brand-logo src="\.\/images\/chrome\/floqr-script\/floqr-hero-nightlife-white-glow\.png\?v=/);
+  assert.match(html, /<link rel="icon" type="image\/png" href="\.\/images\/chrome\/floqr-script\/floqr-icon-nightlife-white-glow\.png\?v=/);
+  assert.match(html, /<link rel="apple-touch-icon" href="\.\/images\/chrome\/floqr-script\/floqr-icon-nightlife-white-glow\.png\?v=/);
+  for (const asset of ["floqr-hero-nightlife-white-glow.png", "floqr-icon-nightlife-white-glow.png"]) {
+    assert.ok(fs.existsSync(path.join(root, "images/chrome/floqr-script", asset)), `${asset} ships`);
+  }
+
+  assert.ok(html.indexOf('setAttribute("data-floqr-chrome"') > 0 && html.indexOf('setAttribute("data-floqr-chrome"') < html.indexOf("styles.css"), "Site chrome painted before CSS");
+  const scheme = html.indexOf("floqr-chrome-scheme.js");
+  assert.ok(scheme > 0 && scheme < html.indexOf("club-profile-app.js"));
+  const css = read("styles.css");
+  const clubCss = css.slice(css.indexOf(".club-profile-body{"), css.indexOf(".floqr-profile-access-blocker{"));
+  assert.doesNotMatch(clubCss, /\.club-profile-body\{[^}]*background:#/, "body background comes from the Site chrome");
+  assert.match(clubCss, /html\[data-floqr-chrome="whiteBlack"\] \.club-profile-body\{/);
+  assert.match(clubCss, /\.club-profile-nav-actions \.buttonlike:not\(\.global-back-btn\)\{display:none\}/, "phone keeps Back visible");
+});
+
+test("FLOQRNav same-origin Back: history only when the previous page was FLOQR", () => {
+  const nav = loadNav(`${PAGES}club-profile.html?location=temp-democlub-1`);
+  assert.equal(nav.cameFromFloqr(`${PAGES}?start=search`), true);
+  assert.equal(nav.cameFromFloqr(`${PAGES}patron-portal.html?tab=inbox`), true);
+  assert.equal(nav.cameFromFloqr(""), false);
+  assert.equal(nav.cameFromFloqr("https://www.instagram.com/aurelia"), false);
+  assert.equal(nav.cameFromFloqr("https://jadzadco.github.io/other-repo/"), false, "same host, different app folder");
+  assert.equal(nav.cameFromFloqr(`${PAGES}club-profile.html?location=temp-democlub-1`), false, "reload is not a FLOQR referrer");
+  assert.match(read("floqr-nav.js"), /floqrBackHistory === "same-origin" && !cameFromFloqr\(\)\) return;/);
+});
+
 test("deep-link unavailable status is translated in all 11 chrome packs", () => {
   const i18n = read("floqr-i18n.js");
   assert.equal((i18n.match(/"app\.directShoutoutUnavailable":/g) || []).length, 11);

@@ -352,11 +352,6 @@
     byId("clubProfileContent").classList.remove("hidden");
   }
 
-  byId("clubProfileShareBtn")?.addEventListener("click", () => {
-    navigator.clipboard?.writeText(window.location.href);
-    window.FLOQRActionFeedback?.show("Club link copied", "Share this FLOQR club profile with another patron.", {status:"success"});
-    window.FLOQRActionFeedback?.hide(2200);
-  });
   byId("clubFollowBtn")?.addEventListener("click", toggleClubFollow);
   byId("clubPersonCloseBtn")?.addEventListener("click", closePerson);
   byId("clubPersonCloseWindowBtn")?.addEventListener("click", closePerson);

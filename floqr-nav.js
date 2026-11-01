@@ -49,6 +49,21 @@
     return APP_V;
   }
 
+  /** True when the previous page was a FLOQR page on this origin (same app folder). */
+  function cameFromFloqr(referrer) {
+    try {
+      const ref = String(referrer ?? global.document?.referrer ?? "");
+      if (!ref) return false;
+      const prev = new URL(ref);
+      const here = new URL(global.location.href);
+      if (prev.origin !== here.origin) return false;
+      const base = here.pathname.replace(/[^/]*$/, "");
+      return prev.pathname.startsWith(base) && prev.href !== here.href;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function isDisplayFile(path) {
     const file = String(path || "").split("?")[0].split("/").pop() || "";
     return file === "display.html" || file === "display2.html";
@@ -57,6 +72,7 @@
   const FLOQRNav = {
     appVersion: APP_V,
     currentVersion,
+    cameFromFloqr,
     portalHome(extra = {}) {
       return buildUrl("./patron-portal.html", extra);
     },
@@ -216,6 +232,8 @@
           if (next.stay && (pageName() === "admin.html" || pageName() === "master-admin.html") && !qs("from")) {
             return;
           }
+          // data-floqr-back-history="same-origin": shared / forwarded links fall through to href.
+          if (anchor.dataset.floqrBackHistory === "same-origin" && !cameFromFloqr()) return;
           try {
             if (global.history && global.history.length > 1) {
               event.preventDefault();

@@ -1,0 +1,35 @@
+---
+description: Club public FloqR page (club-profile.html) chrome — shared Back pill with same-origin history, Copy link removed (owner decision Oct 29 2026), current FloqR script mark + favicon, Site chrome theme tokens
+alwaysApply: false
+---
+# Club public page chrome (Oct 29 2026)
+
+Resume: `@club-page$` / `$club-chrome$`.
+
+Owner (Oct 29 2026): "There is no back button from the club public FloqR page. I do not even know why there is a 'Copy link' button on these pages... remove. Also ensure that the newest FloqR icons are used and these pages follow the color themes."
+
+Scope: `club-profile.html` + `club-profile-app.js` (events render as cards on this page; there is no separate event public page). `club-embed.html` (club websites) had no Copy link and keeps its own chrome.
+
+## Back
+
+- Shared pill `#floqrGlobalBack.global-back-btn.buttonlike`, left of the FloqR mark, wired by `FLOQRNav.applyGlobalBack` (same as every satellite). Label `nav.backShort`.
+- `href` = `./?start=search` (Search, `FLOQRNav.searchHome`), `data-from="search"`; `?from=admin|club` still resolves to the Venue Command Center. No `v=`.
+- `data-floqr-back-history="same-origin"`: the click uses `history.back()` only when `FLOQRNav.cameFromFloqr()` (referrer on this origin and app folder, not the same URL). Forwarded / Instagram / bookmarked links follow the href to Search.
+- Bug it fixed: the ≤640px rule `.club-profile-nav-actions .buttonlike{display:none}` hid Back on phones; it is now `:not(.global-back-btn)` and Back lives in `.club-profile-nav-start`.
+- "Throw a ShoutOut" stays `FLOQRNav.shoutoutLink` (`./?start=shoutout&location=…`).
+
+## Copy link removed (owner decision Oct 29 2026)
+
+`#clubProfileShareBtn`, its clipboard handler and `page.clubProfile.share` (all 11 chrome packs + `scripts/_chrome-*.json`) are gone. Do not bring back a page-level Copy link; sharing is the browser / OS share sheet.
+
+## Icons
+
+- Header mark: `img.product-parent-logo[data-floqr-brand-logo]`, packaged src `images/chrome/floqr-script/floqr-hero-nightlife-white-glow.png`; `FLOQRChromeScheme.applyBrandLogos` swaps it per Site chrome (`BRAND_LOGOS`). The old `images/floqr-color.png` tile mark is not used here.
+- Favicon + apple-touch-icon: `images/chrome/floqr-script/floqr-icon-nightlife-white-glow.png` (128×128).
+
+## Theme
+
+- Inline paint script (same as Search / VIP) sets `html[data-floqr-chrome]` from `floqr.isSiteChrome` before CSS; `floqr-chrome-scheme.js` + `floqr-chrome-audit.js` load before `floqr-nav.js`.
+- Body background / text come from the Site chrome (`html[data-floqr-chrome] body`, `:root` vars). `.club-profile-body` defines `--club-surface / --club-border / --club-bar-bg / --club-modal-bg / --club-soft-text / --club-grid-*`; `whiteBlack` overrides them. The hero stays dark (photo + shade) with white type in every chrome.
+
+QA: `node reports/club-page-chrome/qa.mjs before|after` (headless Chrome, stubbed signed-in Firebase, Aurelia + Zebbies, 1280 / 820 / 390, Nightlife / White-Black / Black & Dark Green). Tests: `functions/venue-shoutout-deeplink.test.js`.
