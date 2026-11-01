@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.70 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.71 (stable)
+
+- s3.2.71: Classic Halloween seasonal ShoutOut — $15, emoji classic board, graveyard art + ghost/Reaper/bat finale, rules block free create.
+- s3.2.70: BOT DEE idle end (~60s) + offer-help only on start/resume; Master Admin Features Mgmt → BOT DEE idle setting.
+- s3.2.69: BOT DEE cool/ok acknowledgments stay conversational.
 
 - s3.2.70: BOT DEE Gemini AUTO fix (no allowedFunctionNames), identity/name replies, help popouts stay in viewport, robot-head chat avatar.
 - s3.2.66: BOT DEE chat bubbles show avatar + speech-origin tip.

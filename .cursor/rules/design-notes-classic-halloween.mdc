@@ -5,7 +5,7 @@ alwaysApply: false
 
 # Classic Halloween — design notes
 
-Resume: `@halloween$` / `$halloween$`. Template id **`classicHalloween`**, name **Classic Halloween** (template title is not translated). Branch `feat/classic-halloween` (not published, not deployed).
+Resume: `@halloween$` / `$halloween$`. Template id **`classicHalloween`**, name **Classic Halloween** (template title is not translated). Package **s3.2.71** on `main` (Pages + rules + commerce Functions).
 
 ## Spec (owner)
 

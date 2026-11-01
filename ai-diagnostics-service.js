@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.70";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.70";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.71";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.71";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,24 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.71",
+      title: "s3.2.71 — Classic Halloween seasonal ShoutOut ($15)",
+      checks: [
+        {label:"Catalog classicHalloween", file:"shared-data.js", includes:["classicHalloween", "halloweenFinale", "priceCents:1500", "classic-halloween-2x1.svg"]},
+        {label:"Standard ids", file:"shared-data.js", includes:["'classicHalloween'"]},
+        {label:"Display finale", file:"display-app.js", includes:["syncHalloweenFinale", "halloween-finale", "HALLOWEEN_"]},
+        {label:"Display CSS", file:"display.css", includes:["classic-halloween", "halloween-finale"]},
+        {label:"Art 2x1", file:"images/halloween/classic-halloween-2x1.svg", includes:["svg"]},
+        {label:"Art 4x3", file:"images/halloween/classic-halloween-4x3.svg", includes:["svg"]},
+        {label:"Checkout $15", file:"functions/commerce-functions.js", includes:["CLASSIC_HALLOWEEN_TEMPLATE_ID", "CLASSIC_HALLOWEEN_PRICE_CENTS = 1500"]},
+        {label:"Rules refuse free", file:"firestore.rules", includes:["classicHalloween"]},
+        {label:"Help + intent", file:"floqai-help-repository.js", includes:["help-classic-halloween"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-71-classic-halloween"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.71\""]},
+        {label:"shared-data cache-bust", file:"index.html", includes:["shared-data.js?v=s3.2.71"]}
+      ]
+    },
     {
       version: "s3.2.70",
       title: "s3.2.70 — BOT DEE idle end + offer-help only on start/resume",
@@ -2567,6 +2585,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-71-classic-halloween",
+      area:"ShoutOut / Templates",
+      feature:"Classic Halloween seasonal template ($15) + LED finale",
+      changed:"New packaged template classicHalloween: classic 3-line board + emoji, moonlit graveyard SVG, FLOQRFrameLoop halloween-finale (ghosts/Reaper/bats), all venues + all LED sizes, server price 1500¢, firestore.rules blocks free direct create. Package s3.2.71. Needs Pages + firestore.rules + commerce Functions deploy.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.71). 2) Throw a ShoutOut → Seasonal → Classic Halloween (all venues). 3) Composer shows graveyard art; emoji OK on lines. 4) Checkout total $15.00 (not free). 5) After pay/approve, open display.html?location=<id> (no ?v=) — 3 board phases then ghost/Reaper/bat finale (~6s each). 6) BOT DEE / FloqAi: classic halloween → help-classic-halloween. 7) Mark Succeed/Failed in Diagnostics → Manual Feature Tests.",
+      expected:"Template listed under Seasonal everywhere; $15 Stripe; LED plays board then finale; free client create of classicHalloween refused by rules.",
+      troubleshoot:"Missing template → hard refresh shared-data.js ?v=s3.2.71. Wrong price → Functions deploy createFloqrCheckoutSession (CLASSIC_HALLOWEEN_PRICE_CENTS). Blank art → SVG XML valid on Pages images/halloween/. No finale → display-app.js + display.css cache-bust; FLOQRFrameLoop.cycle halloween-finale. Free create succeeds → firestore.rules deploy (classicHalloween exclusion)."
+    },
     {
       id:"s3-2-70-botdee-idle-resume",
       area:"BOT DEE / FloqAi",
