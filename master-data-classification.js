@@ -113,6 +113,8 @@
     const snap = await root.firebase.firestore().collection(DC().COLLECTION).get();
     const saved = {};
     snap.forEach(doc => { saved[DC().collectionFromDocId(doc.id)] = doc.data(); });
+    botDeeSaved = saved[DC().BOT_DEE_CONFIG_DOC] || null;
+    botDeeDraft = {};
     rows = DC().COLLECTIONS.map(collection => ({...DC().normalize(collection, saved[collection] || null), saved: !!saved[collection]}));
     drafts = {};
     return snap.size;
@@ -214,6 +216,58 @@
     }).join("");
   }
 
+  // BOT DEE own-user context switches. Design notes: .cursor/rules/design-notes-bot-dee-user-context.mdc
+  let botDeeSaved = null;
+  let botDeeDraft = {};
+
+  function botDeePolicy() {
+    return DC().botDeeFieldPolicy(botDeeSaved).map(row => (
+      Object.prototype.hasOwnProperty.call(botDeeDraft, row.field) ? {...row, botDeeAllowed: botDeeDraft[row.field]} : row
+    ));
+  }
+
+  function renderBotDee() {
+    const tbody = byId("dataClassBotDeeRows");
+    if (!tbody || !DC().botDeeFieldPolicy) return;
+    const yes = t("dataClass.access.yes", "Yes");
+    const no = t("dataClass.access.no", "No");
+    tbody.innerHTML = botDeePolicy().map(row => `<tr>
+      <td><strong>${esc(row.collection)}</strong><br/><small>${esc(row.description)}</small></td>
+      <td>${esc(levelLabel(row.classificationLevel))}</td>
+      <td style="text-align:center">${esc(row.needsConsent ? yes : no)}</td>
+      <td style="text-align:center"><input type="checkbox" data-dc-botdee="${esc(row.field)}"${row.botDeeAllowed ? " checked" : ""}${row.botDeeEligible ? "" : " disabled"} aria-label="${esc(row.field)}"/></td>
+    </tr>`).join("");
+  }
+
+  async function saveBotDee() {
+    const fields = {};
+    const before = Object.fromEntries(DC().botDeeFieldPolicy(botDeeSaved).map(row => [row.field, row.botDeeAllowed]));
+    Object.entries(botDeeDraft).forEach(([field, value]) => { if (before[field] !== value) fields[field] = value; });
+    if (!Object.keys(fields).length) {
+      setStatus("dataClassBotDeeStatus", t("dataClass.botDeeNothing", "Nothing changed."));
+      return;
+    }
+    if (!root.FLOQRReasonPrompt?.ask) {
+      setStatus("dataClassBotDeeStatus", t("dataClass.botDeeNoPrompt", "The reason prompt did not load. Reload the page and try again."));
+      return;
+    }
+    const summary = Object.entries(fields).map(([field, value]) => `BOT DEE: users.${field} ${before[field]} → ${value}`).join(" · ");
+    const reason = await root.FLOQRReasonPrompt.ask({summary, minLength: 8});
+    if (reason === null) {
+      setStatus("dataClassBotDeeStatus", t("dataClass.botDeeCancelled", "Cancelled — nothing was saved."));
+      return;
+    }
+    setStatus("dataClassBotDeeStatus", t("dataClass.loading", "Loading…"));
+    try {
+      await call("setBotDeeFieldAccess", {fields, reason});
+      await loadRows();
+      renderAll();
+      setStatus("dataClassBotDeeStatus", t("dataClass.botDeeSaved", "BOT DEE fields saved."));
+    } catch (error) {
+      setStatus("dataClassBotDeeStatus", errorText(error));
+    }
+  }
+
   function renderSimRoles() {
     const select = byId("dataClassSimRole");
     if (!select || select.options.length) return;
@@ -270,6 +324,7 @@
     renderSummary();
     renderRows();
     renderFields();
+    renderBotDee();
     renderSimRoles();
     renderSim();
     renderExposure();
@@ -398,6 +453,11 @@
       const collection = event.target?.dataset?.dcCollection;
       if (collection) onEdit(collection);
     });
+    byId("dataClassBotDeeRows")?.addEventListener("change", event => {
+      const field = event.target?.dataset?.dcBotdee;
+      if (field) botDeeDraft[field] = event.target.checked ? 1 : 0;
+    });
+    byId("dataClassBotDeeSaveBtn")?.addEventListener("click", () => saveBotDee());
     byId("dataClassSaveAllBtn")?.addEventListener("click", () => saveAll());
     byId("dataClassReloadBtn")?.addEventListener("click", () => refresh());
     byId("dataClassExportBtn")?.addEventListener("click", () => exportCsv());

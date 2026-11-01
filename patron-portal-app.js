@@ -2052,6 +2052,7 @@
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
     if (byId("privacyDoNotSell")) byId("privacyDoNotSell").checked = !!profile.doNotSellOrShare;
+    if (byId("privacyBotDeeProfile")) byId("privacyBotDeeProfile").checked = profile.botDeeProfileConsent === true;
     const gpcNotice = byId("privacyGpcNotice");
     if (gpcNotice) {
       const gpcOn = !!window.FLOQRPrivacyPrefs?.detectGpc?.();
@@ -2423,6 +2424,43 @@
     setText("portalStatus", "Privacy preferences saved.");
     await loadPortal(user);
     });
+  }
+
+  // Design notes: .cursor/rules/design-notes-bot-dee-user-context.mdc
+  const BOT_DEE_CONSENT_VERSION = "bdc-2026-10";
+
+  async function saveBotDeeConsent() {
+    const user = auth.currentUser;
+    const box = byId("privacyBotDeeProfile");
+    if (!user || !box) return;
+    const enabled = !!box.checked;
+    const tr = (key, fallback) => {
+      const value = window.FLOQRI18n?.t?.(key);
+      return value && value !== key ? value : fallback;
+    };
+    box.disabled = true;
+    try {
+      const stamp = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("users").doc(user.uid).set({
+        botDeeProfileConsent: enabled,
+        botDeeProfileConsentUpdatedAt: stamp,
+        botDeeProfileConsentVersion: BOT_DEE_CONSENT_VERSION
+      }, {merge:true});
+      await db.collection("privacyConsents").add({
+        uid:user.uid,
+        botDeeProfileConsent: enabled,
+        botDeeProfileConsentVersion: BOT_DEE_CONSENT_VERSION,
+        source:"patron-portal.privacy",
+        createdAt: stamp
+      }).catch(() => null);
+      setText("privacyBotDeeStatus", tr("portal.botDeeConsentSaved", "BOT DEE personalization saved."));
+    } catch (error) {
+      box.checked = !enabled;
+      setText("privacyBotDeeStatus", tr("portal.botDeeConsentFailed", "Could not save BOT DEE personalization. Try again."));
+      console.warn("BOT DEE consent save failed", error?.code || error?.message || error);
+    } finally {
+      box.disabled = false;
+    }
   }
 
   async function downloadData() {
@@ -5060,6 +5098,7 @@
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
+    byId("privacyBotDeeProfile")?.addEventListener("change", saveBotDeeConsent);
     bind("saveLanguageSettingsBtn", saveLanguageSettings);
     bind("saveUiAppLanguageBtn", saveUiAppLanguage);
     byId("uiAppLanguage")?.addEventListener("change", renderUiLanguagePreview);

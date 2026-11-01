@@ -103,6 +103,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
+    ["botDeeContextThrottle", "secret", 0, "BOT DEE profile-context fetch rate limits"],
     ["floqAiAccessThrottle", "secret", 0, "FloqAi access-denial log rate limits"],
     ["floqrAdmins", "master", 1, "Assigned FloqR Admins (template catalog access)"],
     ["friendRequests", "ownMaster", 0, "Friend requests"],
@@ -542,7 +543,8 @@
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
     dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]},
     peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
-    shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]}
+    shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]},
+    botDeeUserContext: {purpose: "Give BOT DEE the signed-in patron's own allowlisted profile fields (consent-gated), never anyone else's", collections: ["users", "dataClassification", "botDeeContextThrottle"]}
   };
 
   function systemJob(job, collection) {
@@ -575,6 +577,87 @@
     if (adminClubs.size) return {role: "clubAdmin", clubIds: [...adminClubs]};
     if (staffClubs.size) return {role: privileged ? "privileged" : "regular", clubIds: [...staffClubs]};
     return {role: "patron", clubIds: []};
+  }
+
+  // ---- BOT DEE own-user context: which users/{uid} fields BOT DEE may see for that same patron. ----
+  // Design notes: .cursor/rules/design-notes-bot-dee-user-context.mdc
+
+  // [users field, classificationLevel, containsPII, needsConsent, botDeeAllowed default, description]
+  const BOT_DEE_FIELD_ROWS = [
+    ["preferredLanguage", "internal", 0, 0, 1, "Preferred language"],
+    ["uiLanguage", "internal", 0, 0, 1, "App language"],
+    ["username", "internal", 1, 1, 1, "FloqR / Mingl username"],
+    ["floqrHandle", "internal", 1, 1, 1, "FloqR / Mingl @handle"],
+    ["displayName", "internal", 1, 1, 1, "Display name"],
+    ["firstName", "internal", 1, 1, 1, "First name"],
+    ["height", "internal", 1, 1, 1, "Height"],
+    ["heightUnit", "internal", 0, 1, 1, "Height unit"],
+    ["city", "internal", 1, 1, 1, "Home city (coarse location)"],
+    ["country", "internal", 0, 1, 1, "Home country"],
+    ["musicInterests", "internal", 0, 1, 1, "Music interests"],
+    ["lastName", "restricted", 1, 1, 0, "Last name"],
+    ["fullName", "restricted", 1, 1, 0, "Full legal-style name"],
+    ["email", "restricted", 1, 1, 0, "Account email"],
+    ["phone", "restricted", 1, 1, 0, "Account phone number"],
+    ["birthMonth", "restricted", 1, 1, 0, "Birth month (date of birth)"],
+    ["birthDay", "restricted", 1, 1, 0, "Birth day (date of birth)"],
+    ["gender", "restricted", 1, 1, 0, "Gender"],
+    ["taxiPickupAddress", "restricted", 1, 1, 0, "RydR pickup address (precise location)"],
+    ["stripeConnectAccountId", "secret", 0, 1, 0, "Payment account id"]
+  ];
+  /** Classification levels BOT DEE may ever see for the caller's own record. Restricted / secret never. */
+  const BOT_DEE_LEVELS = ["public", "internal"];
+  /** Defense in depth: names that are contact, identity, payment, credential or precise-location data never qualify. */
+  const BOT_DEE_NEVER = /(e-?mail|phone|lastname|fullname|surname|birth|dob|address|street|postal|zip|latitude|longitude|coord|geo|ipaddr|token|secret|password|stripe|payment|card|iban|ssn|passport|sos2fa|otp|gender|uid$)/i;
+  /** Master Admin overrides: dataClassification/botDeeUserContext → {fields: {name: 0|1}}. */
+  const BOT_DEE_CONFIG_DOC = "botDeeUserContext";
+
+  function botDeeEligible(field, level) {
+    return BOT_DEE_LEVELS.includes(level) && !BOT_DEE_NEVER.test(String(field || ""));
+  }
+
+  const BOT_DEE_FIELDS = BOT_DEE_FIELD_ROWS.map(([field, level, pii, needsConsent, allowed, description]) => {
+    const eligible = botDeeEligible(field, level);
+    return {
+      field,
+      collection: `users.${field}`,
+      classificationLevel: level,
+      containsPII: pii ? 1 : 0,
+      needsConsent: needsConsent || pii ? 1 : 0,
+      botDeeEligible: eligible ? 1 : 0,
+      botDeeAllowed: eligible && allowed ? 1 : 0,
+      description
+    };
+  });
+  const BOT_DEE_BY_FIELD = Object.fromEntries(BOT_DEE_FIELDS.map(row => [row.field, row]));
+
+  /** Effective policy: packaged rows + saved Master Admin toggles. Ineligible fields stay 0; unknown names are ignored. */
+  function botDeeFieldPolicy(saved) {
+    const overrides = saved && typeof saved.fields === "object" && saved.fields ? saved.fields : {};
+    return BOT_DEE_FIELDS.map(row => {
+      const has = Object.prototype.hasOwnProperty.call(overrides, row.field);
+      const allowed = row.botDeeEligible ? (has ? flag(overrides[row.field]) : row.botDeeAllowed) : 0;
+      return {...row, botDeeAllowed: allowed, overridden: has ? 1 : 0};
+    });
+  }
+
+  /** Master Admin edit of the BOT DEE column. Returns {fields, reason}; refuses unknown or ineligible fields. */
+  function validateBotDeeFieldChange(data) {
+    const reason = String(data?.reason || "").trim();
+    if (reason.length < 8) throw invalid("Enter a reason of at least 8 characters.");
+    if (reason.length > 500) throw invalid("Keep the reason under 500 characters.");
+    const raw = data?.fields && typeof data.fields === "object" ? data.fields : null;
+    if (!raw || Array.isArray(raw)) throw invalid("Send the BOT DEE field switches.");
+    const fields = {};
+    Object.keys(raw).slice(0, 60).forEach(name => {
+      const row = BOT_DEE_BY_FIELD[name];
+      if (!row) throw invalid(`Unknown field: ${String(name).slice(0, 40)}`);
+      const value = flag(raw[name]);
+      if (value && !row.botDeeEligible) throw invalid(`${name} is ${row.classificationLevel} data. BOT DEE can never read it.`);
+      fields[name] = value;
+    });
+    if (!Object.keys(fields).length) throw invalid("Send the BOT DEE field switches.");
+    return {fields, reason};
   }
 
   // ---- FloqAi content (help entries, intents). Translations inherit the source id's class. ----
@@ -661,6 +744,7 @@
     MAX_TX_WRITES, validateSaveAll, planSaveAll, REVIEW_RECOMMENDATIONS, reviewNotes, rowStatus, FIX_GROUPS, fixGroupFor, fixList,
     access, simulate, exprBreadth, parseRulesAccess, exposureReport, toCsv,
     systemJob, resolveViewerRole, classifyAudiences, contentRow, filterContent,
-    MAX_CONTENT_IDS, sanitizeSourceIds, denialsToLog
+    MAX_CONTENT_IDS, sanitizeSourceIds, denialsToLog,
+    BOT_DEE_FIELDS, BOT_DEE_LEVELS, BOT_DEE_NEVER, BOT_DEE_CONFIG_DOC, botDeeEligible, botDeeFieldPolicy, validateBotDeeFieldChange
   };
 });

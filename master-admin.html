@@ -445,6 +445,26 @@
         </div>
 
         <div class="card">
+          <h2 data-i18n="dataClass.botDeeTitle">BOT DEE profile context</h2>
+          <p class="sub small" data-i18n="dataClass.botDeeIntro">Fields BOT DEE may read from a patron's own profile, only after that patron allows it in My Privacy. Restricted and secret fields can never be turned on.</p>
+          <div class="report-block" style="overflow:auto">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th data-i18n="dataClass.botDeeColField">Field</th>
+                  <th data-i18n="dataClass.botDeeColLevel">Level</th>
+                  <th data-i18n="dataClass.botDeeColConsent">Needs patron consent</th>
+                  <th data-i18n="dataClass.botDeeColAllowed">BOT DEE may read</th>
+                </tr>
+              </thead>
+              <tbody id="dataClassBotDeeRows"></tbody>
+            </table>
+          </div>
+          <button id="dataClassBotDeeSaveBtn" class="primary" type="button" data-i18n="dataClass.botDeeSave">Save BOT DEE fields</button>
+          <p id="dataClassBotDeeStatus" class="sub small" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="card">
           <h2 data-i18n="dataClass.simTitle">Who can read what</h2>
           <p class="sub small" data-i18n="dataClass.simIntro">Pick a role to see what it may read.</p>
           <div class="profile-grid" style="align-items:end">

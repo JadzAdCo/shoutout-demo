@@ -181,6 +181,28 @@ service cloud.firestore {
  && data.marketingMediaConsent.get("accepted", 0) == 1;
  }
 
+ // Design notes: .cursor/rules/design-notes-bot-dee-user-context.mdc
+ // Patron opt-in for BOT DEE own-profile context: boolean + server-time stamp + version string.
+ function botDeeConsentShapeOk() {
+ return request.resource.data.get("botDeeProfileConsent", false) is bool
+ && request.resource.data.get("botDeeProfileConsentUpdatedAt", null) == request.time
+ && request.resource.data.get("botDeeProfileConsentVersion", "") is string
+ && request.resource.data.get("botDeeProfileConsentVersion", "").size() > 0
+ && request.resource.data.get("botDeeProfileConsentVersion", "").size() <= 32;
+ }
+
+ function botDeeConsentCreateOk() {
+ return !request.resource.data.keys().hasAny([
+ "botDeeProfileConsent", "botDeeProfileConsentUpdatedAt", "botDeeProfileConsentVersion"
+ ]) || botDeeConsentShapeOk();
+ }
+
+ function botDeeConsentUpdateOk() {
+ return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+ "botDeeProfileConsent", "botDeeProfileConsentUpdatedAt", "botDeeProfileConsentVersion"
+ ]) || botDeeConsentShapeOk();
+ }
+
  function isServiceMemberFlag(data) {
  return data.get("IsServiceMember", 0) in [1, "1", true, "true", "yes"];
  }
@@ -640,12 +662,14 @@ service cloud.firestore {
  match /users/{userId} {
  allow create: if isSelf(userId)
  && !hasBackendOnlyIdentityFields(request.resource.data)
- && !createsServiceMemberWithoutConsent();
+ && !createsServiceMemberWithoutConsent()
+ && botDeeConsentCreateOk();
  // Other patrons' profiles come from the getPeopleDirectory callable (private fields stripped).
  allow read: if isSelf(userId) || isMasterAdmin();
  allow update: if isSelf(userId)
  && preservesBackendOnlyIdentityFields()
- && !startsServiceMembershipWithoutConsent();
+ && !startsServiceMembershipWithoutConsent()
+ && botDeeConsentUpdateOk();
  allow delete: if isParticipant()
  && isDiagnosticResource();
  }
@@ -716,6 +740,10 @@ service cloud.firestore {
  }
 
  match /floqAiAccessThrottle/{uid} {
+ allow read, write: if false;
+ }
+
+ match /botDeeContextThrottle/{uid} {
  allow read, write: if false;
  }
 

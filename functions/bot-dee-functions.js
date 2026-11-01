@@ -13,6 +13,8 @@ const {__featureServiceHelpers: audit} = require("./feature-services-functions")
 const {__floqAiHelpers} = require("./data-classification-functions");
 const {assertSos2faSession} = require("./sos2fa-functions");
 const {isServerAdminAuth} = require("./admin-trust");
+const ctxCore = require("./bot-dee-user-context-core");
+const {__botDeeUserContextHelpers: userContextFns} = require("./bot-dee-user-context-functions");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -62,7 +64,7 @@ function functionResponsePart(call, result) {
   };
 }
 
-async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
+async function runGeminiSession({apiKey, role, history, userPrompt, session, userContext}) {
   const ai = new GoogleGenAI({apiKey});
   const contents = bot.historyToContents(history, userPrompt);
   const tools = [{functionDeclarations: bot.toolDeclarations()}];
@@ -76,7 +78,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       model: bot.TEXT_MODEL,
       contents,
       config: {
-        systemInstruction: bot.systemInstruction(role),
+        systemInstruction: bot.systemInstruction(role, ctxCore.promptBlock(userContext)),
         tools,
         // AUTO must NOT set allowedFunctionNames — Gemini 400s with
         // "Please set allowed_function_names only when function calling mode is ANY"
@@ -189,12 +191,30 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     const apiKey = geminiKey();
     let outcome;
+    const isSmallTalk = bot.isChitchatPrompt(userPrompt) || bot.isIdentityPrompt(userPrompt);
+    let userContext = null;
+    if (!isSmallTalk) {
+      // Own users/{uid} only, classification + consent filtered server-side; the client cannot inject profile data.
+      userContext = await userContextFns.loadOwnUserContext(request.auth.uid, role).catch(error => {
+        console.warn("BOT DEE user context unavailable", error?.message || error);
+        return null;
+      });
+    }
+    const profileTopic = isSmallTalk ? null : ctxCore.ownProfileTopic(userPrompt);
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
-    if (bot.isChitchatPrompt(userPrompt) || bot.isIdentityPrompt(userPrompt)) {
+    if (isSmallTalk) {
       outcome = localSession(role, userPrompt);
+    } else if (profileTopic && userContext) {
+      outcome = {
+        reply: ctxCore.ownProfileAnswer(profileTopic, userContext),
+        results: [],
+        provider: "local-profile",
+        model: "ownProfile",
+        toolRounds: 0
+      };
     } else if (apiKey) {
       try {
-        outcome = await runGeminiSession({apiKey, role, history, userPrompt, session});
+        outcome = await runGeminiSession({apiKey, role, history, userPrompt, session, userContext});
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
         outcome = localSession(role, userPrompt);
@@ -210,7 +230,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       role,
       provider: outcome.provider,
       results: (outcome.results || []).length,
-      toolRounds: outcome.toolRounds || 0
+      toolRounds: outcome.toolRounds || 0,
+      userContext: userContext ? ctxCore.auditDetail(userContext) : null
     }));
 
     return {

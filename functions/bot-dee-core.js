@@ -318,7 +318,8 @@ function toolDeclarations() {
   return TOOL_DEFS;
 }
 
-function systemInstruction(role) {
+/** userContextBlock: server-assembled own-profile block (bot-dee-user-context-core promptBlock), never client text. */
+function systemInstruction(role, userContextBlock = "") {
   return [
     "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
     "Ask \"what do you want to do\" / list products (ShoutOut, VIP, floqCast, scheduling) ONLY on the first turn of a conversation or when the patron clearly restarts after a pause — never every reply.",
@@ -333,8 +334,10 @@ function systemInstruction(role) {
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
-    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, BOT DEE, VIP reserV."
-  ].join(" ");
+    "Never look up, list or describe other members' profiles; you only know the signed-in patron's own profile block below, if any.",
+    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqAi, FloqCAST, BOT DEE, VIP reserV.",
+    String(userContextBlock || "")
+  ].filter(Boolean).join(" ");
 }
 
 function historyToContents(history, userPrompt) {

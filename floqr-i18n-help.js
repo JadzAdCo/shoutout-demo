@@ -206,6 +206,10 @@
         title: "Не продавать и не передавать",
         body: "Включите, чтобы отказаться от персонализации по тегам профиля. Реклама для всех / house может остаться. Global Privacy Control (GPC) включает этот флаг автоматически. Политика конфиденциальности — детали CCPA / CPRA."
       },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE и ваш профиль",
+        body: "Включите «Разрешить BOT DEE использовать данные моего профиля» в Мой профиль → Моя конфиденциальность, чтобы BOT DEE отвечал на вопросы о вас — например, ваш рост в профиле или клубы рядом с вашим городом. BOT DEE видит только ваши имя пользователя, отображаемое имя или имя, рост, город и страну, язык и музыкальные интересы. Никогда email, телефон, день рождения, адрес или платёжные данные и никогда профили других участников. Отключите в любой момент — BOT DEE сразу перестанет их использовать."
+      },
       "help-app-language": {
         title: "Язык приложения",
         body: "При первом запуске FloqR читает язык браузера (например nl-NL → Dutch / Nederlands) и переключает интерфейс и меню, если язык поддерживается — категории Search, вкладки My Profile, Club Admin и Master Admin. Неподдерживаемые языки остаются на английском. После этого побеждают My Profile → App language и сохранённый язык профиля. Сохранение App language переводит каждую страницу с FLOQRI18n, не только эту карточку."
@@ -523,6 +527,10 @@
       "help-do-not-sell": {
         title: "Niet verkopen of delen",
         body: "Zet dit aan om personalisatie op basis van profieltags uit te schakelen. House- en alle-publiek-creatives kunnen blijven. Global Privacy Control (GPC) zet dit automatisch aan. Zie het Privacybeleid voor CCPA / CPRA."
+      },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE en je profiel",
+        body: "Zet „BOT DEE mag mijn profielgegevens gebruiken” aan in Mijn profiel → Mijn privacy, zodat BOT DEE vragen over jou kan beantwoorden, zoals je lengte of clubs bij je woonplaats. BOT DEE ziet alleen je eigen gebruikersnaam, weergave- of voornaam, lengte, woonplaats en land, taal en muziekinteresses. Nooit je e-mail, telefoon, verjaardag, adres of betaalgegevens en nooit profielen van andere leden. Zet het altijd uit; BOT DEE stopt dan meteen met het gebruik ervan."
       },
       "help-app-language": {
         title: "App-taal",
@@ -842,6 +850,10 @@
         title: "Ne pas vendre ni partager",
         body: "Activez pour refuser la personnalisation par tags de profil. Les creatives house / tous publics peuvent rester. Global Privacy Control (GPC) active ceci automatiquement. Voir la Politique de confidentialite pour CCPA / CPRA."
       },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE et votre profil",
+        body: "Activez « Autoriser BOT DEE à utiliser les détails de mon profil » dans Mon profil → Ma confidentialité pour que BOT DEE réponde à vos questions sur vous, comme votre taille enregistrée ou les clubs près de votre ville. BOT DEE ne voit que votre nom d’utilisateur, nom affiché ou prénom, taille, ville et pays, langue et goûts musicaux. Jamais votre e-mail, téléphone, date de naissance, adresse ou paiement, ni les profils des autres membres. Désactivez à tout moment : BOT DEE cesse aussitôt de les utiliser."
+      },
       "help-app-language": {
         title: "Langue de l'application",
         body: "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
@@ -1159,6 +1171,10 @@
       "help-do-not-sell": {
         title: "Nicht verkaufen oder teilen",
         body: "Aktivieren Sie dies, um personalisierte Anzeigen anhand von Profil-Tags abzulehnen. House- und All-Audience-Creatives konnen weiterhin erscheinen. Global Privacy Control (GPC) setzt dies automatisch. Details in der Datenschutzrichtlinie (CCPA / CPRA)."
+      },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE und dein Profil",
+        body: "Aktiviere „BOT DEE darf meine Profildaten nutzen“ unter Mein Profil → Meine Privatsphäre, damit BOT DEE Fragen zu dir beantworten kann, etwa deine gespeicherte Größe oder Clubs in der Nähe deines Wohnorts. BOT DEE sieht nur deinen eigenen Benutzernamen, Anzeige- oder Vornamen, Größe, Wohnort und Land, Sprache und Musikinteressen. Niemals E-Mail, Telefon, Geburtstag, Adresse oder Zahlungsdaten und nie die Profile anderer Mitglieder. Jederzeit abschaltbar – BOT DEE nutzt die Daten dann sofort nicht mehr."
       },
       "help-app-language": {
         title: "App-Sprache",
@@ -1478,6 +1494,10 @@
         title: "No vender ni compartir",
         body: "Activalo para optar por no personalizacion con etiquetas de perfil. Creatividades house / para todos pueden seguir. Global Privacy Control (GPC) lo activa automaticamente. Consulta la Politica de privacidad (CCPA / CPRA)."
       },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE y tu perfil",
+        body: "Activa «Permitir que BOT DEE use los datos de mi perfil» en Mi perfil → Mi privacidad para que BOT DEE responda preguntas sobre ti, como tu estatura registrada o clubs cerca de tu ciudad. BOT DEE solo ve tu nombre de usuario, nombre visible o nombre, estatura, ciudad y país, idioma e intereses musicales. Nunca tu email, teléfono, cumpleaños, dirección ni datos de pago, ni perfiles de otros miembros. Desactívalo cuando quieras y BOT DEE dejará de usarlos al instante."
+      },
       "help-app-language": {
         title: "Idioma de la aplicación",
         body: "En el primer uso, FloqR lee el idioma del navegador (por ejemplo, nl-NL → Holandés/Nederlands) y cambia Chrome y los menús a ese idioma cuando sea compatible: categorías de búsqueda, pestañas Mi perfil, pestañas Club Admin y pestañas Master Admin. Los idiomas no admitidos permanecen en inglés. Después de eso, ganan Mi perfil → Idioma de la aplicación y el idioma del perfil guardado. Al guardar el idioma de la aplicación, se vuelve a traducir cada página que se carga FLOQRI18n, no solo esta tarjeta."
@@ -1795,6 +1815,10 @@
       "help-do-not-sell": {
         title: "Non vendere ne condividere",
         body: "Attivalo per escludere la personalizzazione con tag del profilo. Le creative house / per tutti possono restare. Global Privacy Control (GPC) lo attiva automaticamente. Vedi l Informativa sulla privacy (CCPA / CPRA)."
+      },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE e il tuo profilo",
+        body: "Attiva «Consenti a BOT DEE di usare i dati del mio profilo» in Il mio profilo → La mia privacy perché BOT DEE risponda a domande su di te, come la tua altezza registrata o i club vicino alla tua città. BOT DEE vede solo il tuo nome utente, nome visualizzato o nome, altezza, città e paese, lingua e gusti musicali. Mai email, telefono, compleanno, indirizzo o dati di pagamento, né i profili di altri membri. Disattivalo quando vuoi e BOT DEE smette subito di usarli."
       },
       "help-app-language": {
         title: "Lingua dell'app",
@@ -2114,6 +2138,10 @@
         title: "Nao vender nem partilhar",
         body: "Ative para optar por nao personalizacao com tags de perfil. Creatives house / para todos podem permanecer. Global Privacy Control (GPC) ativa isto automaticamente. Veja a Politica de Privacidade (CCPA / CPRA)."
       },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE e o seu perfil",
+        body: "Ative «Permitir que o BOT DEE use os dados do meu perfil» em Meu perfil → Minha privacidade para o BOT DEE responder a perguntas sobre si, como a sua altura registada ou clubes perto da sua cidade. O BOT DEE só vê o seu nome de utilizador, nome de exibição ou primeiro nome, altura, cidade e país, idioma e interesses musicais. Nunca o seu email, telefone, aniversário, morada ou dados de pagamento, nem perfis de outros membros. Desligue quando quiser e o BOT DEE deixa de os usar de imediato."
+      },
       "help-app-language": {
         title: "Idioma do aplicativo",
         body: "Na primeira utilização, FloqR lê o idioma do navegador (por exemplo, nl-NL → Holandês / Nederlands) e alterna o cromo e os menus para esse idioma quando é suportado – categorias de pesquisa, guias Meu perfil, guias Club Admin e guias Master Admin. Os idiomas não suportados permanecem em inglês. Depois disso, Meu Perfil → Idioma do aplicativo e o idioma do perfil salvo vencem. Salvar o idioma do aplicativo traduz novamente todas as páginas que carregam FLOQRI18n, não apenas este cartão."
@@ -2431,6 +2459,10 @@
       "help-do-not-sell": {
         title: "Μην πουλατε η κοινοποιειτε",
         body: "Ενεργοποιηστε το για να εξαιρεθειτε απο προσωποποιημενες διαφημισεις με tags προφιλ. House / ολοι μπορουν να εμφανιζονται. Το Global Privacy Control (GPC) το θετει αυτοματα. Δειτε την Πολιτικη Απορρητου (CCPA / CPRA)."
+      },
+      "help-bot-dee-profile-context": {
+        title: "Ο BOT DEE και το προφίλ σου",
+        body: "Ενεργοποίησε το «Να χρησιμοποιεί ο BOT DEE τα στοιχεία του προφίλ μου» στο Το προφίλ μου → Το απόρρητό μου, ώστε ο BOT DEE να απαντά σε ερωτήσεις για σένα, όπως το ύψος σου ή clubs κοντά στην πόλη σου. Ο BOT DEE βλέπει μόνο το δικό σου όνομα χρήστη, εμφανιζόμενο ή μικρό όνομα, ύψος, πόλη και χώρα, γλώσσα και μουσικά ενδιαφέροντα. Ποτέ email, τηλέφωνο, γενέθλια, διεύθυνση ή στοιχεία πληρωμής και ποτέ προφίλ άλλων μελών. Απενεργοποίησέ το όποτε θέλεις και ο BOT DEE σταματά αμέσως να τα χρησιμοποιεί."
       },
       "help-app-language": {
         title: "Γλώσσα εφαρμογής",
@@ -2750,6 +2782,10 @@
         title: "Nie sprzedawaj ani nie udostepniaj",
         body: "Wlacz, aby zrezygnowac z personalizacji po tagach profilu. Creatives house / dla wszystkich moga zostac. Global Privacy Control (GPC) ustawia to automatycznie. Zobacz Polityke prywatnosci (CCPA / CPRA)."
       },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE i Twój profil",
+        body: "Włącz „Pozwól BOT DEE używać danych z mojego profilu” w Mój profil → Moja prywatność, aby BOT DEE odpowiadał na pytania o Ciebie, np. o zapisany wzrost lub kluby blisko Twojego miasta. BOT DEE widzi tylko Twoją nazwę użytkownika, nazwę wyświetlaną lub imię, wzrost, miasto i kraj, język oraz zainteresowania muzyczne. Nigdy e-mail, telefon, datę urodzenia, adres ani dane płatnicze i nigdy profile innych członków. Wyłącz w każdej chwili — BOT DEE od razu przestanie ich używać."
+      },
       "help-app-language": {
         title: "Język aplikacji",
         body: "Przy pierwszym użyciu, FloqR odczytuje język przeglądarki (na przykład nl-NL → holenderski / Nederlands) i zmienia język Chrome i menu na ten język, jeśli jest obsługiwany — Kategorie wyszukiwania, zakładki Mój profil, zakładki Club Admin i zakładki Master Admin. Języki nieobsługiwane pozostają w języku angielskim. Następnie Mój profil → Język aplikacji i zapisany język profilu mają pierwszeństwo. Zapisanie języka aplikacji powoduje ponowne tłumaczenie każdej wczytywanej strony FLOQRI18n, nie tylko tej karty."
@@ -3067,6 +3103,10 @@
       "help-do-not-sell": {
         title: "عدم البيع أو المشاركة",
         body: "فعّل هذا لإيقاف التخصيص عبر وسوم الملف. إعلانات عامة/منزلية قد تظهر. Global Privacy Control (GPC) يفعّل هذا تلقائياً. راجع سياسة الخصوصية (CCPA / CPRA)."
+      },
+      "help-bot-dee-profile-context": {
+        title: "BOT DEE وملفك الشخصي",
+        body: "فعّل «السماح لـ BOT DEE باستخدام بيانات ملفي الشخصي» في ملفي الشخصي → خصوصيتي ليجيب BOT DEE عن أسئلة تخصك، مثل طولك المسجل أو النوادي القريبة من مدينتك. لا يرى BOT DEE إلا اسم المستخدم الخاص بك، أو الاسم المعروض أو الاسم الأول، والطول، والمدينة والدولة، واللغة، والاهتمامات الموسيقية. لا يرى أبداً البريد الإلكتروني أو الهاتف أو تاريخ الميلاد أو العنوان أو بيانات الدفع، ولا ملفات الأعضاء الآخرين. أوقفه في أي وقت وسيتوقف BOT DEE عن استخدامها فوراً."
       },
       "help-app-language": {
         title: "لغة التطبيق",

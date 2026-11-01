@@ -419,6 +419,22 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
 | Page title size | Shared schema: `.floqr-page-title` / `.floqr-page-title-row` + feature `.feature-landing-title-row`. Size = Appearance `h2` via `--floqr-page-title-size` (= `--floqr-title-size`). All title text (`.help-label-text`) inherits; `?` stays 11px badge. Profile & Settings one line (`admin.css` / `floqr-feature-landing.css`). |
 
+## BOT DEE own-user context (`getBotDeeUserContext`)
+
+**Purpose:** BOT DEE can answer the signed-in patron about **their own** profile (username, name, height, home city / country, language, music interests) after the patron opts in. Never other members, never a directory. Design notes: `.cursor/rules/design-notes-bot-dee-user-context.mdc`.
+
+| Layer | Wiring |
+|---|---|
+| Patron consent | My Profile → My Privacy → **BOT DEE personalization** checkbox `#privacyBotDeeProfile` (default off). `patron-portal-app.js` `saveBotDeeConsent` writes `users/{uid}.botDeeProfileConsent` (bool) + `botDeeProfileConsentUpdatedAt` (server time) + `botDeeProfileConsentVersion` (`bdc-2026-10`), and appends a `privacyConsents` row |
+| Client | `bot-dee-chat.js` `loadUserContext` → callable `getBotDeeUserContext` once per page session per uid (memory only — never local/session storage). Own-profile questions (`ownProfileTopic`, mirrored server-side) answer locally via `localProfileReply` (i18n `floqai.chatProfile*`) |
+| Backend | `functions/bot-dee-user-context-functions.js`: `getBotDeeUserContext` (auth + `floqAi` gate + throttle 30 / 10 min + unchained audit `botDee.user_context`), `setBotDeeFieldAccess` (Master Admin SOS2FA + reason, chained `dataClass.botDeeFieldsChanged`). Pure core `bot-dee-user-context-core.js`. `executeBotSession` loads the same context server-side (`loadOwnUserContext`) and puts `promptBlock` (redacted via `secret-redaction.js`) into the Gemini system instruction; session log carries field **names** only |
+| Classification | `data-classification-core.js` `BOT_DEE_FIELDS` (per `users` field: level, PII, needsConsent, `botDeeEligible`, `botDeeAllowed`); only `public` / `internal` rows not matching `BOT_DEE_NEVER` can be on. Overrides in `dataClassification/botDeeUserContext {fields}`. Master Admin → Data Classification → **BOT DEE profile context** card (`master-data-classification.js` `renderBotDee` / `saveBotDee`) |
+| Data | `users/{uid}.botDeeProfileConsent*` (O, self-write boolean shape only); `botDeeContextThrottle/{uid}` (S, Functions-only); `dataClassification/botDeeUserContext` (M); system job `botDeeUserContext` → `users`, `dataClassification`, `botDeeContextThrottle` |
+| Rules | `firestore.rules` `botDeeConsentShapeOk` / `botDeeConsentCreateOk` / `botDeeConsentUpdateOk` on `users/{userId}`; `botDeeContextThrottle` read/write false |
+| Tests | `functions/bot-dee-user-context.test.js`; emulator `rules-tests/firestore-users.test.js` (BOT DEE consent block) |
+| Help | `help-bot-dee-profile-context` (patron; 11 langs) |
+| Deploy | Functions `getBotDeeUserContext`, `setBotDeeFieldAccess`, `executeBotSession`; Firestore rules |
+
 ---
 
 ## VIP / Table reservations + Hail a Waitress (planned)

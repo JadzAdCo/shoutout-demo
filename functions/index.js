@@ -16,6 +16,8 @@ module.exports = {
   ...require("./data-classification-functions"),
   executeBotSession: require("./bot-dee-functions").executeBotSession,
   setBotDeeSettings: require("./bot-dee-functions").setBotDeeSettings,
+  getBotDeeUserContext: require("./bot-dee-user-context-functions").getBotDeeUserContext,
+  setBotDeeFieldAccess: require("./bot-dee-user-context-functions").setBotDeeFieldAccess,
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),

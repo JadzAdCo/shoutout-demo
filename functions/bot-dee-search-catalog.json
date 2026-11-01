@@ -285,6 +285,30 @@
       ]
     },
     {
+      "sourceId": "help:help-bot-dee-profile-context",
+      "id": "help-bot-dee-profile-context",
+      "kind": "help",
+      "label": "BOT DEE and your profile",
+      "blurb": "Turn on \"Let BOT DEE use my profile details\" in My Profile → My Privacy to let BOT DEE answer questions about you, like your height on file or clubs near your home city. BOT DEE only sees your own username, display or first name, height, home city and country, language and music ",
+      "href": "./patron-portal.html?from=floqai&tab=privacy",
+      "phrases": [
+        "bot dee and your profile",
+        "turn on let bot dee use my profile details in my profile my privacy to let bot dee answer questions about you like your height on file or clubs near your home c",
+        "bot dee profile",
+        "bot dee personalize",
+        "personalize bot dee",
+        "bot dee my height",
+        "bot dee my city",
+        "what does bot dee know about me",
+        "let bot dee use my profile",
+        "bot dee privacy",
+        "my height on file",
+        "my privacy",
+        "bot dee",
+        "help-bot-dee-profile-context"
+      ]
+    },
+    {
       "sourceId": "help:help-chrome-audit",
       "id": "help-chrome-audit",
       "kind": "help",

@@ -1186,6 +1186,22 @@
       page: "patron-portal.html#portalPrivacy"
     },
     {
+      id: "help-bot-dee-profile-context",
+      title: "BOT DEE and your profile",
+      body: "Turn on \"Let BOT DEE use my profile details\" in My Profile → My Privacy to let BOT DEE answer questions about you, like your height on file or clubs near your home city. BOT DEE only sees your own username, display or first name, height, home city and country, language and music interests. Never your email, phone, birthday, address or payment details, and never other members' profiles. Turn it off anytime and BOT DEE stops using those details right away.",
+      searchPhrases: [
+        "bot dee profile", "bot dee personalize", "personalize bot dee", "bot dee my height", "bot dee my city",
+        "what does bot dee know about me", "let bot dee use my profile", "bot dee privacy", "my height on file"
+      ],
+      links: [
+        {label: "My Privacy", href: pageUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "BOT DEE", href: pageUrl("./floqai.html", {from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPrivacy"
+    },
+    {
       id: "help-welcome",
       title: "Welcome to FLOQR",
       body: "Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",

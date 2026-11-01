@@ -39,6 +39,9 @@
     "help-bot-dee-mgmt": [
       "masterAdmin"
     ],
+    "help-bot-dee-profile-context": [
+      "patron"
+    ],
     "help-chrome-audit": [
       "masterAdmin"
     ],

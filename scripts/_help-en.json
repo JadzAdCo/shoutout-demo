@@ -314,5 +314,9 @@
   "help-search-settings-appearance": {
     "title": "Settings on Search",
     "body": "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks."
+  },
+  "help-bot-dee-profile-context": {
+    "title": "BOT DEE and your profile",
+    "body": "Turn on \"Let BOT DEE use my profile details\" in My Profile → My Privacy to let BOT DEE answer questions about you, like your height on file or clubs near your home city. BOT DEE only sees your own username, display or first name, height, home city and country, language and music interests. Never your email, phone, birthday, address or payment details, and never other members' profiles. Turn it off anytime and BOT DEE stops using those details right away."
   }
 }

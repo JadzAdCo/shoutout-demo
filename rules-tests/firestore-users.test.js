@@ -2,7 +2,7 @@
 
 const { describe, test, before, after, beforeEach } = require("node:test");
 const { assertFails, assertSucceeds } = require("@firebase/rules-unit-testing");
-const { doc, getDoc, setDoc, updateDoc, deleteField } = require("firebase/firestore");
+const { doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp } = require("firebase/firestore");
 const { createEnv, contexts, seed } = require("./helpers");
 
 let env;
@@ -99,5 +99,49 @@ describe("users/{uid} — existing server-granted approvedRoles", () => {
 
   test("alice cannot change approvedRoles", async () => {
     await assertFails(updateDoc(aliceDoc(), { approvedRoles: ["Barman", "clubAdmin"] }));
+  });
+});
+
+describe("users/{uid} — BOT DEE profile consent (self, boolean + server time)", () => {
+  beforeEach(async () => {
+    await seed(env, { "users/alice": { displayName: "Alice", uiLanguage: "en" } });
+  });
+
+  const consent = (value, extra = {}) => ({
+    botDeeProfileConsent: value,
+    botDeeProfileConsentUpdatedAt: serverTimestamp(),
+    botDeeProfileConsentVersion: "bdc-2026-10",
+    ...extra
+  });
+
+  test("alice turns BOT DEE consent on and off", async () => {
+    await assertSucceeds(setDoc(aliceDoc(), consent(true), { merge: true }));
+    await assertSucceeds(setDoc(aliceDoc(), consent(false), { merge: true }));
+  });
+
+  test("alice cannot store a non-boolean consent", async () => {
+    await assertFails(setDoc(aliceDoc(), consent("yes"), { merge: true }));
+    await assertFails(setDoc(aliceDoc(), consent(1), { merge: true }));
+  });
+
+  test("alice cannot backdate the consent stamp", async () => {
+    await assertFails(setDoc(aliceDoc(), consent(true, { botDeeProfileConsentUpdatedAt: new Date(0) }), { merge: true }));
+  });
+
+  test("alice cannot set consent without a version", async () => {
+    await assertFails(setDoc(aliceDoc(), consent(true, { botDeeProfileConsentVersion: "" }), { merge: true }));
+  });
+
+  test("bob cannot set alice's BOT DEE consent", async () => {
+    await assertFails(setDoc(doc(who.bob.firestore(), "users/alice"), consent(true), { merge: true }));
+  });
+
+  test("profile edits that do not touch consent still work", async () => {
+    await assertSucceeds(updateDoc(aliceDoc(), { displayName: "Alice C" }));
+  });
+
+  test("botDeeContextThrottle is closed to clients", async () => {
+    await assertFails(getDoc(doc(who.alice.firestore(), "botDeeContextThrottle/alice")));
+    await assertFails(setDoc(doc(who.alice.firestore(), "botDeeContextThrottle/alice"), { count: 0 }));
   });
 });

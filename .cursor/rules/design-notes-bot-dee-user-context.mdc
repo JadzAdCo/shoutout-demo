@@ -1,0 +1,56 @@
+---
+description: BOT DEE own-user context — getBotDeeUserContext callable, per-field botDeeAllowed in data classification, patron consent toggle, names-only audit, 30/10 min throttle
+alwaysApply: true
+---
+
+# BOT DEE own-user context (always)
+
+Resume: `@botdee-ctx$` / `$botdee-profile$`. Owner request Oct 29 2026: BOT DEE may use the signed-in patron's **own** username, height, location etc. — never the whole `users` table — with data classification and access rights enforced. Names stay as they are (BOT DEE brand, `floqAi` key, `floqai.html`); do not rename.
+
+## Flow
+
+```
+My Privacy toggle (default OFF) → users/{uid}.botDeeProfileConsent = true (+ server-time stamp + version)
+floqai.html → bot-dee-chat.js loadUserContext() → getBotDeeUserContext({})   (once per page session, memory only)
+   server: auth → assertFeatureAccess(floqAi) → throttle 30/10 min → users/{request.auth.uid} only
+           → botDeeFieldPolicy(dataClassification/botDeeUserContext) → buildUserContext → audit (names only)
+own-profile question ("how tall am I") → answered locally from that context (client) / ownProfileAnswer (server)
+anything else → executeBotSession → loadOwnUserContext(server) → promptBlock (redactSecrets) in Gemini system instruction
+```
+
+- **Never** a uid parameter, a collection query, `listDocuments`, or a directory lookup. `request.data` is ignored.
+- The client never sends profile text to Gemini; the prompt block is assembled server-side from the same policy.
+- Context lives in a JS variable keyed by uid; it is re-fetched after a uid change or page reload. Never `localStorage` / `sessionStorage` / IndexedDB.
+
+## Tiers (`functions/data-classification-core.js` `BOT_DEE_FIELDS`, mirrored in `floqr-data-classification.js`)
+
+| Tier | Fields | Returned when |
+|---|---|---|
+| No consent needed (non-PII) | `preferredLanguage`, `uiLanguage` + `audience` (viewer role) | always |
+| Consent (internal) | `username`, `floqrHandle`, `displayName`, `firstName`, `height`, `heightUnit`, `city`, `country`, `musicInterests` | `botDeeProfileConsent === true` **and** Master Admin switch on |
+| Never (restricted / secret) | `lastName`, `fullName`, `email`, `phone`, `birthMonth`, `birthDay`, `gender`, `taxiPickupAddress`, `stripeConnectAccountId` | never — `botDeeEligible = 0`, switch disabled, server refuses |
+| Unknown | any other `users` field | never (builder walks the policy, not the doc) |
+
+- Eligible = level in `public` / `internal` **and** name not matching `BOT_DEE_NEVER` (email, phone, birth, address, geo, token, stripe, payment, gender, …). A forged policy row cannot open a restricted field.
+- Values are scrubbed (`sanitizeValue`): email-like, coordinates, ≥ 7 digits, street numbers in city/country are dropped; lists capped.
+- Master Admin → Data Classification → **BOT DEE profile context** card toggles eligible fields → `setBotDeeFieldAccess` (SOS2FA + `FLOQRReasonPrompt` ≥ 8 + chained audit `dataClass.botDeeFieldsChanged`, "Nothing changed" guard). Saved in `dataClassification/botDeeUserContext {fields: {name: 0|1}, revision}`.
+
+## Consent
+
+- Field `users/{uid}.botDeeProfileConsent` (bool, strict `=== true`), `botDeeProfileConsentUpdatedAt` (`request.time`), `botDeeProfileConsentVersion` (`bdc-2026-10`). Rules: self only, boolean shape, server-time stamp, non-empty version ≤ 32. A `privacyConsents` row is appended for history.
+- Withdraw = untick; the next fetch returns only the non-PII tier. Off-state reply points to My Profile → My Privacy (`floqai.chatProfileConsentOff`).
+
+## Audit / throttle / logs
+
+- Every `getBotDeeUserContext` call → unchained `featureServiceAuditLogs` row `botDee.user_context` (uid, role, `fieldNames`, `fieldCount`, consent, version, time). **Never values.**
+- `executeBotSession` logs `userContext: auditDetail(...)` (names only). Throttle `botDeeContextThrottle/{uid}` 30 / 10 min (secret, Functions-only) → `resource-exhausted`, no read, no audit row.
+
+## Files
+
+`functions/bot-dee-user-context-core.js` · `functions/bot-dee-user-context-functions.js` · `functions/bot-dee-functions.js` · `functions/bot-dee-core.js` (`systemInstruction(role, block)`) · `functions/data-classification-core.js` · `floqr-data-classification.js` · `master-data-classification.js` · `master-admin.html` · `bot-dee-chat.js` · `patron-portal.html` / `patron-portal-app.js` · `firestore.rules` · help `help-bot-dee-profile-context` · tests `functions/bot-dee-user-context.test.js`, `rules-tests/firestore-users.test.js`.
+
+## FIX PROMPT
+
+```
+BOT DEE own-user context: getBotDeeUserContext (us-central1) reads ONLY users/{request.auth.uid}; policy = BOT_DEE_FIELDS + dataClassification/botDeeUserContext (Master Admin setBotDeeFieldAccess, SOS2FA + reason). Consent users.botDeeProfileConsent===true (self-set bool + request.time stamp); off → language + audience only. Restricted/secret/unknown never. Client: one in-memory fetch per session; Gemini block assembled server-side + redactSecrets. Audit botDee.user_context names only; throttle 30/10 min. Design notes: design-notes-bot-dee-user-context.mdc
+```

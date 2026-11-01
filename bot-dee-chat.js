@@ -120,13 +120,108 @@
     );
   }
 
-  function callable() {
+  function callable(name = "executeBotSession") {
     try {
       if (!global.firebase?.functions || !global.firebase.apps?.length) return null;
-      return global.firebase.app().functions("us-central1").httpsCallable("executeBotSession");
+      return global.firebase.app().functions("us-central1").httpsCallable(name);
     } catch (_) {
       return null;
     }
+  }
+
+  // Own-user context: fetched once per page session from getBotDeeUserContext, kept in memory only (never browser storage).
+  // Design notes: .cursor/rules/design-notes-bot-dee-user-context.mdc
+  let userContext = {uid: "", promise: null};
+
+  function loadUserContext() {
+    const uid = global.firebase?.apps?.length ? global.firebase.auth?.().currentUser?.uid || "" : "";
+    if (!uid) return Promise.resolve(null);
+    if (userContext.uid === uid && userContext.promise) return userContext.promise;
+    const fn = callable("getBotDeeUserContext");
+    const promise = fn
+      ? fn({}).then(result => result?.data || null).catch(error => {
+        console.warn("BOT DEE profile context unavailable", error?.code || error?.message || error);
+        return null;
+      })
+      : Promise.resolve(null);
+    userContext = {uid, promise};
+    return promise;
+  }
+
+  /** Mirror of functions/bot-dee-user-context-core.js ownProfileTopic. */
+  const OWN_PROFILE_PATTERNS = [
+    ["height", /\b(?:my height|how tall am i|how tall i am)\b/],
+    ["username", /\bmy (?:user ?name|handle|floqr handle|mingl handle)\b/],
+    ["city", /\b(?:my (?:home )?city|my location|where do i live|where i live)\b/],
+    ["country", /\bmy (?:home )?country\b/],
+    ["language", /\bmy (?:preferred |app )?language\b/],
+    ["musicInterests", /\bmy music(?: interests| taste)?\b/],
+    ["name", /\b(?:my (?:first |display )?name|what s my name|whats my name|who am i)\b/],
+    ["all", /\bwhat do you know about me\b|\bmy profile (?:details|info)\b/]
+  ];
+  const TOPIC_FIELDS = {
+    height: ["height"],
+    username: ["username", "floqrHandle"],
+    city: ["city"],
+    country: ["country"],
+    language: ["preferredLanguage", "uiLanguage"],
+    musicInterests: ["musicInterests"],
+    name: ["firstName", "displayName"]
+  };
+  const FIELD_LABEL_KEYS = {
+    username: ["floqai.profileField.username", "username"],
+    floqrHandle: ["floqai.profileField.username", "username"],
+    displayName: ["floqai.profileField.displayName", "display name"],
+    firstName: ["floqai.profileField.firstName", "first name"],
+    height: ["floqai.profileField.height", "height"],
+    heightUnit: ["floqai.profileField.height", "height"],
+    city: ["floqai.profileField.city", "home city"],
+    country: ["floqai.profileField.country", "home country"],
+    preferredLanguage: ["floqai.profileField.language", "language"],
+    uiLanguage: ["floqai.profileField.language", "language"],
+    musicInterests: ["floqai.profileField.musicInterests", "music interests"]
+  };
+
+  function ownProfileTopic(raw) {
+    const q = String(raw || "").toLowerCase().replace(/[^a-z0-9'\s]+/g, " ").replace(/\s+/g, " ").trim();
+    if (!q || q.length > 140) return null;
+    if (/\b(?:near|suggest|recommend|find|book|show me)\b/.test(q)) return null;
+    const hit = OWN_PROFILE_PATTERNS.find(([, re]) => re.test(q));
+    return hit ? hit[0] : null;
+  }
+
+  function fieldLabel(field) {
+    const [key, fallback] = FIELD_LABEL_KEYS[field] || ["", field];
+    return key ? t(key, fallback) : fallback;
+  }
+
+  function fill(template, values) {
+    return String(template).replace(/\{(\w+)\}/g, (match, key) => (key in values ? values[key] : match));
+  }
+
+  function shownValue(value) {
+    return Array.isArray(value) ? value.join(", ") : String(value);
+  }
+
+  function localProfileReply(topic, ctx) {
+    if (!ctx.consent) {
+      return t("floqai.chatProfileConsentOff", "I can't see your profile details yet. Turn on \"Let BOT DEE use my profile details\" in My Profile → My Privacy, then ask again.");
+    }
+    const fields = ctx.fields || {};
+    if (topic === "all") {
+      const names = (ctx.fieldNames || []).filter(name => name !== "heightUnit");
+      if (!names.length) return t("floqai.chatProfileNone", "I don't see any profile details I can use yet. You can add them in My Profile.");
+      const lines = names.map(name => `${fieldLabel(name)}: ${shownValue(fields[name])}`);
+      return `${t("floqai.chatProfileSummary", "Here is what I can use from your profile:")} ${lines.join("; ")}.`;
+    }
+    const keys = TOPIC_FIELDS[topic] || [];
+    const field = keys.find(key => fields[key] != null);
+    if (!field) {
+      return fill(t("floqai.chatProfileMissing", "I don't see your {field} in My Profile yet. You can add it under My Profile → Edit profile."), {field: fieldLabel(keys[0])});
+    }
+    let value = shownValue(fields[field]);
+    if (field === "height" && fields.heightUnit && !/[a-z'"]/i.test(value)) value = `${value} ${fields.heightUnit}`;
+    return fill(t("floqai.chatProfileValue", "Your {field} on file: {value}"), {field: fieldLabel(field), value});
   }
 
   function esc(value) {
@@ -313,6 +408,21 @@
     setBusy(true);
     setStatus(t("floqai.chatThinking", "BOT DEE is thinking…"));
 
+    const profileTopic = ownProfileTopic(text);
+    if (profileTopic) {
+      const ctx = await loadUserContext();
+      if (ctx) {
+        const reply = localProfileReply(profileTopic, ctx);
+        appendBubble("bot", reply);
+        pushHistory("model", reply);
+        setStatus("");
+        setBusy(false);
+        armIdleTimer();
+        input?.focus();
+        return;
+      }
+    }
+
     const fn = callable();
     if (!fn) {
       setBusy(false);
@@ -402,6 +512,9 @@
     bind,
     sendMessage,
     openIntentFallback,
+    loadUserContext,
+    ownProfileTopic,
+    localProfileReply,
     DEFAULT_IDLE_SECONDS,
     clampIdleSeconds
   };
