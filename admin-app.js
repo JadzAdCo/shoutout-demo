@@ -3008,9 +3008,35 @@
     };
   }
 
-  function fitAdminShoutoutText(value = "", caps = {}, type = "main") {
+  function adminGraphemes(value = "") {
+    const text = String(value || "");
+    if (typeof Intl !== "undefined" && Intl.Segmenter) return Array.from(new Intl.Segmenter(undefined, {granularity: "grapheme"}).segment(text), part => part.segment);
+    return Array.from(text);
+  }
+
+  // Emoji templates (Classic Halloween): count graphemes so an emoji is one glyph and is never split.
+  function fitAdminEmojiText(cleaned, caps, type, limit) {
+    if (type === "sub" || caps.lineCount <= 1) return adminGraphemes(cleaned).slice(0, limit).join("");
+    const perLine = Math.max(1, Number(caps.perLine || limit));
+    const rows = [];
+    let row = [];
+    adminGraphemes(cleaned).slice(0, limit + caps.lineCount - 1).join("").split(/\s+/).filter(Boolean).forEach(word => {
+      const glyphs = adminGraphemes(word);
+      for (let index = 0; index < glyphs.length; index += perLine) {
+        const chunk = glyphs.slice(index, index + perLine);
+        const next = row.length ? [...row, " ", ...chunk] : chunk;
+        if (next.length <= perLine) row = next;
+        else if (rows.length < caps.lineCount) { rows.push(row.join("")); row = chunk; }
+      }
+    });
+    if (row.length && rows.length < caps.lineCount) rows.push(row.join(""));
+    return rows.slice(0, caps.lineCount).join("\n");
+  }
+
+  function fitAdminShoutoutText(value = "", caps = {}, type = "main", template = {}) {
     const limit = Math.max(0, Number(type === "sub" ? caps.sub : caps.main));
     const cleaned = String(value || "").replace(/\s+/g, " ").trim();
+    if (template?.allowEmoji === true) return fitAdminEmojiText(cleaned, caps, type, limit);
     if (type === "sub" || caps.lineCount <= 1) return cleaned.slice(0, limit);
     const rows = [];
     let row = "";
@@ -3061,8 +3087,8 @@
       // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
       mainText: isNflDual
         ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
-        : fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
-      subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub"),
+        : fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main", packaged),
+      subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub", packaged),
       attribution: String(item.attribution || "").trim(),
       includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
       attributionChoice: item.attributionChoice || "",

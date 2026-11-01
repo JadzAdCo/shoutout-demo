@@ -45,6 +45,9 @@
     "help-chrome-scheme": [
       "patron"
     ],
+    "help-classic-halloween": [
+      "patron"
+    ],
     "help-club-admin-affiliation": [
       "masterAdmin"
     ],
@@ -365,6 +368,9 @@
       "patron"
     ],
     "bartr": [
+      "patron"
+    ],
+    "classic-halloween": [
       "patron"
     ],
     "clubs": [

@@ -800,6 +800,79 @@
     scheduleMoneyRain(canvas, layer, moneyRainDelaySeconds(template));
   }
 
+  /**
+   * Classic Halloween finale: the board holds HALLOWEEN_BOARD_PHASES × 6s, then ghosts / Reaper / bats play for one 6s phase.
+   * Runs on FLOQRFrameLoop.cycle (no template timer). Design notes: .cursor/rules/design-notes-classic-halloween.mdc
+   */
+  const HALLOWEEN_FINALE_CYCLE = "halloween-finale";
+  const HALLOWEEN_BOARD_PHASES = 3;
+  const HALLOWEEN_GHOSTS = [
+    {gx: "-34vw", d: ".55s", s: "1"}, {gx: "26vw", d: ".9s", s: ".9"}, {gx: "-8vw", d: "1.25s", s: "1.15"},
+    {gx: "38vw", d: "1.6s", s: ".85"}, {gx: "-22vw", d: "1.95s", s: "1"}, {gx: "10vw", d: "2.3s", s: "1.2"}
+  ];
+  const HALLOWEEN_BATS = [
+    {bx: "-46vw", by: "-38vh", d: ".2s"}, {bx: "44vw", by: "-42vh", d: ".35s"}, {bx: "-30vw", by: "-50vh", d: ".5s"},
+    {bx: "36vw", by: "-24vh", d: ".65s"}, {bx: "-50vw", by: "-14vh", d: ".8s"}, {bx: "20vw", by: "-54vh", d: ".95s"}
+  ];
+  let halloweenFinaleKey = "";
+
+  function halloweenFinaleMarkup() {
+    const ghosts = HALLOWEEN_GHOSTS.map(g => `<svg class="hw-ghost" style="--gx:${g.gx};--d:${g.d};--s:${g.s}" viewBox="0 0 100 124"><use href="#hwGhostShape"/></svg>`).join("");
+    const bats = HALLOWEEN_BATS.map(b => `<svg class="hw-bat" style="--bx:${b.bx};--by:${b.by};--d:${b.d}" viewBox="0 0 60 30"><use href="#hwBatShape"/></svg>`).join("");
+    return `<svg class="hw-defs" width="0" height="0" focusable="false"><defs>
+<radialGradient id="hwGhostFill" cx="42%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".62" stop-color="#f1f4fa"/><stop offset="1" stop-color="#c9d2e2"/></radialGradient>
+<radialGradient id="hwPitGlow" cx="50%" cy="60%" r="50%"><stop offset="0" stop-color="#e9fff4" stop-opacity=".95"/><stop offset=".5" stop-color="#9dffc9" stop-opacity=".45"/><stop offset="1" stop-color="#4dff9a" stop-opacity="0"/></radialGradient>
+<g id="hwGhostShape"><path fill="url(#hwGhostFill)" d="M50 4C25 4 12 24 12 50v56c6-8 12-8 16 2 5 10 10 10 14-1 4-10 12-10 16 0 4 11 9 11 14 1 4-10 10-10 16-2V50C88 24 75 4 50 4z"/><path fill="url(#hwGhostFill)" d="M14 58C4 60 0 70 3 78c5-2 9-6 12-10zM86 58c10 2 14 12 11 20-5-2-9-6-12-10z"/><ellipse cx="37" cy="46" rx="7" ry="10" fill="#0d0d12"/><ellipse cx="63" cy="46" rx="7" ry="10" fill="#0d0d12"/><ellipse cx="50" cy="71" rx="8" ry="11" fill="#16161d"/></g>
+<path id="hwBatShape" fill="#07040b" d="M30 10c-2-6-6-6-8-2-8-6-16-4-20-2 8 4 6 10 6 12 6-4 10-2 12 0 4-4 8-2 10 4 2-6 6-8 10-4 2-2 6-4 12 0 0-2-2-8 6-12-4-2-12-4-20 2-2-4-6-4-8 2z"/>
+</defs></svg>
+<svg class="hw-reaper" viewBox="0 0 130 210"><path fill="#09060f" stroke="#3d3050" stroke-width="2" d="M62 8C38 8 28 30 28 54l-6 70-12 82h104l-12-82-6-70C96 30 86 8 62 8z"/><ellipse cx="62" cy="54" rx="18" ry="23" fill="#000"/><circle class="hw-reaper-eye" cx="55" cy="52" r="3.2" fill="#ff5a1f"/><circle class="hw-reaper-eye" cx="69" cy="52" r="3.2" fill="#ff5a1f"/><path fill="none" stroke="#09060f" stroke-width="10" stroke-linecap="round" d="M92 96q16 4 18 18"/><path stroke="#6b5a45" stroke-width="4.5" stroke-linecap="round" d="M110 22l4 186"/><path fill="#d3d8e2" d="M110 24C82 4 44 10 18 36c30-14 62-14 92 2z"/><path fill="#ece9f6" opacity=".45" d="M106 26C82 14 52 16 30 32c26-10 52-10 76 0z"/></svg>
+<div class="hw-bats">${bats}</div>
+<div class="hw-ghosts">${ghosts}</div>
+<svg class="hw-grave" viewBox="0 0 220 130"><ellipse cx="110" cy="104" rx="104" ry="24" fill="#2b1a12"/><ellipse cx="110" cy="100" rx="96" ry="18" fill="#3b2617"/><path fill="#3a3346" stroke="#625872" stroke-width="3" d="M76 82V34c0-20 15-30 34-30s34 10 34 30v48z"/><text x="110" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#9d93ad">RIP</text><path fill="#241c2e" d="M86 70h48v4H86z"/><ellipse class="hw-pit-glow" cx="110" cy="102" rx="78" ry="26" fill="url(#hwPitGlow)"/><ellipse cx="110" cy="104" rx="56" ry="9" fill="#050305"/><path fill="#1c120c" d="M20 108c18-8 34-6 46 2-14 6-32 6-46-2zM154 110c14-8 30-8 46 0-16 6-32 6-46 0z"/></svg>`;
+  }
+
+  function stopHalloweenFinale() {
+    frameLoop()?.stopCycle?.(HALLOWEEN_FINALE_CYCLE);
+    halloweenFinaleKey = "";
+    byId("displayHalloweenFinale")?.remove();
+    byId("displayCanvas")?.classList.remove("halloween-finale-on");
+  }
+
+  function syncHalloweenFinale(canvas, enabled, data = {}) {
+    const loop = frameLoop();
+    if (!enabled || !canvas || typeof loop?.cycle !== "function") {
+      stopHalloweenFinale();
+      return;
+    }
+    let layer = byId("displayHalloweenFinale");
+    const key = livePlaybackKey(data);
+    if (layer && key === halloweenFinaleKey) {
+      canvas.classList.toggle("halloween-finale-on", layer.classList.contains("is-playing"));
+      return;
+    }
+    stopHalloweenFinale();
+    halloweenFinaleKey = key;
+    layer = document.createElement("div");
+    layer.id = "displayHalloweenFinale";
+    layer.className = "halloween-finale";
+    layer.setAttribute("aria-hidden", "true");
+    layer.innerHTML = halloweenFinaleMarkup();
+    canvas.appendChild(layer);
+    loop.cycle(HALLOWEEN_FINALE_CYCLE, {
+      count: HALLOWEEN_BOARD_PHASES + 1,
+      onAdvance: index => {
+        const host = byId("displayCanvas");
+        if (!host || !layer.isConnected) {
+          loop.stopCycle(HALLOWEEN_FINALE_CYCLE);
+          return;
+        }
+        const playing = index === HALLOWEEN_BOARD_PHASES;
+        layer.classList.toggle("is-playing", playing);
+        host.classList.toggle("halloween-finale-on", playing);
+      }
+    });
+  }
+
   function resetBackgroundLayer(bgEl) {
     if (!bgEl) return;
     bgEl.className = "display-background";
@@ -1600,6 +1673,7 @@
     byId("displayNflShoutPanel")?.remove();
     if (isFloqCastIdlePayload(data)) {
       stopSplitMediaLoop();
+      stopHalloweenFinale();
       renderFloqCastIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
     }
@@ -1687,6 +1761,7 @@
     const frameUrl = resolveFrameOverlayUrl(t, data);
     const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);
     syncMoneyRain(canvas, !isIdleCta && (t.moneyRain === true || templateId === "heistVaultDollars" || rawTemplateId === "heistRedLux"), data, t);
+    syncHalloweenFinale(canvas, !isIdleCta && isClassicBoard && t.halloweenFinale === true, data);
     canvas.classList.toggle("frame-overlay-template", hasFrameOverlay);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
@@ -1719,6 +1794,8 @@
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
       : isClassicBoard && isIdleCta && !isTextOverlay
       ? mainSource
+      : isClassicBoard && t.allowEmoji === true
+      ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
       : isClassicBoard
       ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
       // Soft composer caps guide writing; display packs all words then shrinks type (no drop).

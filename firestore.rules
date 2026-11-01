@@ -937,6 +937,7 @@ service cloud.firestore {
  && request.resource.data.template != 'heistNeonMask'
  && request.resource.data.template != 'heistDupontUnder'
  && request.resource.data.template != 'heistRedLux'
+ && request.resource.data.template != 'classicHalloween'
  && request.resource.data.submittedByUid == request.auth.uid
  && request.resource.data.mainText is string
  && request.resource.data.mainText.size() <= 120;

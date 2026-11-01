@@ -2017,3 +2017,64 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.shiloh-cat #displaySub:empty{display:none}
 .display-canvas.shiloh-cat[data-screen-format-id="led-64x48"] .display-center{left:50%;right:3%;top:10%;bottom:10%}
 .display-canvas.shiloh-cat[data-screen-format-id="led-64x32"] .display-center{left:47%;right:2.5%;top:6%;bottom:6%}
+
+/* Classic Halloween (all venues, all sizes). Design notes: .cursor/rules/design-notes-classic-halloween.mdc */
+.display-canvas.classic-halloween{background:#05030a!important}
+.display-canvas.classic-halloween .display-background{background-size:cover!important;background-position:center bottom!important}
+.display-canvas.classic-halloween[data-screen-format-id="led-64x48"] .display-background{background-image:url("images/halloween/classic-halloween-4x3.svg")!important}
+.display-canvas.classic-halloween .display-center{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+.display-canvas.classic-halloween.classic-board-template .display-center:before{border-color:#ff7a18!important;box-shadow:0 0 14px rgba(255,122,24,.75),0 0 30px rgba(140,60,255,.35),0 0 0 2px rgba(255,214,150,.45) inset!important}
+.display-canvas.classic-halloween.classic-board-template .display-center:after{background:linear-gradient(180deg,rgba(16,8,26,.88),rgba(7,3,12,.92))!important;border-color:#ff7a18!important;box-shadow:0 0 18px rgba(255,122,24,.45),inset 0 0 26px rgba(120,50,200,.28)!important}
+.display-canvas.classic-halloween #displayMain.classic-bw-board{color:#fff3e0!important;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(100% / var(--board-lines,3) - 2px),rgba(150,90,220,.22) calc(100% / var(--board-lines,3) - 2px),rgba(150,90,220,.22) calc(100% / var(--board-lines,3) + 2px))!important}
+.display-canvas.classic-halloween.classic-board-template .classic-board-lines b{color:#fff3e0!important;font-family:Impact,"Arial Black","Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",Arial,sans-serif!important;text-shadow:0 2px 0 #3a1600,0 0 .18em rgba(255,122,24,.6),0 4px 10px rgba(0,0,0,.6)!important;filter:none!important}
+.display-canvas.classic-halloween .classic-identity-shell{border-color:#ffe2b8!important;background:linear-gradient(90deg,#050505 0 18%,#e85a00 18% 82%,#050505 82% 100%)!important;box-shadow:0 0 0 clamp(2px,.35vw,5px) #ff7a18,0 0 clamp(12px,2vw,30px) rgba(255,122,24,.65)!important}
+
+.halloween-finale{position:absolute;inset:0;z-index:60;pointer-events:none;overflow:hidden;opacity:0;visibility:hidden}
+.halloween-finale .hw-defs{position:absolute;width:0;height:0;overflow:hidden}
+.halloween-finale.is-playing{visibility:visible;animation:hwLayer 6s linear forwards}
+.halloween-finale .hw-grave{position:absolute;left:50%;bottom:-1%;width:30%;transform:translate(-50%,105%)}
+.halloween-finale .hw-ghost{position:absolute;left:50%;bottom:9%;width:10%;opacity:0;transform-origin:50% 60%;filter:drop-shadow(0 0 .6vh rgba(255,255,255,.85)) drop-shadow(0 0 1.6vh rgba(170,255,220,.35))}
+.halloween-finale .hw-reaper{position:absolute;right:4%;bottom:0;height:76%;opacity:0;transform:translateY(100%);transform-origin:50% 100%;filter:drop-shadow(0 0 1.2vh rgba(140,60,255,.55))}
+.halloween-finale .hw-bat{position:absolute;left:50%;top:62%;width:6%;opacity:0}
+.halloween-finale.is-playing .hw-grave{animation:hwGraveRise .7s cubic-bezier(.2,.8,.3,1) forwards,hwGraveSink .5s ease-in 5.3s forwards}
+.halloween-finale.is-playing .hw-pit-glow{animation:hwPitPulse .5s ease-in-out .5s 6 alternate}
+.halloween-finale.is-playing .hw-ghost{animation:hwGhostRush 3.1s cubic-bezier(.45,0,.85,.55) var(--d) forwards}
+.halloween-finale.is-playing .hw-reaper{animation:hwReaper 4.6s ease-in-out .8s forwards}
+.halloween-finale.is-playing .hw-reaper-eye{animation:hwEyes .4s ease-in-out 1.4s 8 alternate}
+.halloween-finale.is-playing .hw-bat{animation:hwBat 2.4s ease-out var(--d) forwards,hwFlap .18s linear var(--d) 13 alternate}
+.display-canvas.halloween-finale-on .display-text-overlay{animation:hwBoardDim 6s ease-in-out forwards}
+@keyframes hwLayer{0%{opacity:0}6%{opacity:1}92%{opacity:1}100%{opacity:0}}
+@keyframes hwBoardDim{0%{filter:none}10%{filter:brightness(.55) saturate(.8)}85%{filter:brightness(.55) saturate(.8)}100%{filter:none}}
+@keyframes hwGraveRise{to{transform:translate(-50%,0)}}
+@keyframes hwGraveSink{from{transform:translate(-50%,0)}to{transform:translate(-50%,105%)}}
+@keyframes hwPitPulse{from{opacity:.55}to{opacity:1}}
+@keyframes hwGhostRush{
+  0%{opacity:0;transform:translate(-50%,10%) scale(calc(.18 * var(--s,1))) rotate(0)}
+  14%{opacity:1;transform:translate(calc(-50% + var(--gx) * .08),-60%) scale(calc(.42 * var(--s,1))) rotate(-7deg)}
+  34%{opacity:1;transform:translate(calc(-50% + var(--gx) * .25),-150%) scale(calc(.7 * var(--s,1))) rotate(7deg)}
+  58%{opacity:1;transform:translate(calc(-50% + var(--gx) * .55),-175%) scale(calc(1.5 * var(--s,1))) rotate(-5deg)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--gx)),-120%) scale(calc(6 * var(--s,1))) rotate(4deg)}
+}
+@keyframes hwReaper{
+  0%{opacity:0;transform:translateY(100%) scale(.9)}
+  22%{opacity:1;transform:translateY(0) scale(1)}
+  62%{opacity:1;transform:translateY(-2%) scale(1.04)}
+  82%{opacity:1;transform:translate(-30%,-4%) scale(1.55)}
+  100%{opacity:0;transform:translate(-45%,-4%) scale(1.9)}
+}
+@keyframes hwEyes{from{opacity:.45}to{opacity:1}}
+@keyframes hwBat{
+  0%{opacity:0;transform:translate(-50%,0) scale(.3)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--bx)),var(--by)) scale(1.6)}
+}
+@keyframes hwFlap{from{scale:1 1}to{scale:1 .45}}
+@media (prefers-reduced-motion: reduce){
+  .halloween-finale.is-playing{animation:hwLayer 6s linear forwards}
+  .halloween-finale.is-playing *{animation:none!important}
+  .halloween-finale.is-playing .hw-grave{transform:translate(-50%,0)}
+  .halloween-finale.is-playing .hw-ghost{opacity:.92;transform:translate(calc(-50% + var(--gx) * .45),-150%) scale(calc(.75 * var(--s,1)))}
+  .halloween-finale.is-playing .hw-reaper{opacity:1;transform:none}
+  .halloween-finale.is-playing .hw-bat{display:none}
+  .display-canvas.halloween-finale-on .display-text-overlay{animation:none;filter:brightness(.6)}
+}

@@ -199,6 +199,10 @@
     "title": "Shiloh",
     "body": "$30 Aurelia exclusive. Shiloh the cat sits on the left of the board and your ShoutOut glows in white on the dark side beside her. Emoji are welcome. Type “Shiloh” in Search, write up to three short lines, and add your @handle if you like. Plays on the board sizes Aurelia has."
   },
+  "help-classic-halloween": {
+    "title": "Classic Halloween",
+    "body": "$15 Classic Halloween, at every club. The classic three-line ShoutOut board on a moonlit graveyard with jack-o'-lanterns, and emoji are welcome. At the end of each cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. Type “Halloween” in Search, write up to three short lines, and add your @handle if you like. Plays on 96×48, 64×48 and 64×32 boards."
+  },
   "help-display-idle-default": {
     "title": "Idle board: Use ShoutOut @ venue",
     "body": "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away."

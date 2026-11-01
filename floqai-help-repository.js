@@ -1719,6 +1719,16 @@
       page: "index.html#templates"
     },
     {
+      id: "help-classic-halloween",
+      title: "Classic Halloween",
+      body: "$15 Classic Halloween, at every club. The classic three-line ShoutOut board on a moonlit graveyard with jack-o'-lanterns, and emoji are welcome. At the end of each cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. Type “Halloween” in Search, write up to three short lines, and add your @handle if you like. Plays on 96×48, 64×48 and 64×32 boards.",
+      searchPhrases: ["classic halloween", "halloween", "halloween shoutout", "halloween template", "spooky shoutout", "ghost shoutout", "ghosts", "graveyard", "jack o lantern", "pumpkin shoutout", "reaper", "bats"],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
       id: "help-club-template-repository",
       title: "Your club's templates",
       body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",

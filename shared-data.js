@@ -1237,6 +1237,37 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:'Aurelia exclusive: Shiloh the cat sits on the left of the board while your ShoutOut glows in white on the dark side beside her. Emoji welcome. Sizes: 96×48, 64×48, 64×32 (the venue shows the sizes its boards support).',
     tags:["shiloh","cat","kitty","aurelia","pet","cute","club exclusive","photo background","emoji","$30","96x48","64x48","64x32"]
   },
+  // Design notes: .cursor/rules/design-notes-classic-halloween.mdc
+  classicHalloween: {
+    id:'classicHalloween',
+    name:'Classic Halloween',
+    searchAliases:['classic halloween','halloween','halloween shoutout','spooky','ghost shoutout'],
+    scope:'Shared',
+    seasonal:true,
+    className:'classic-bw classic-halloween',
+    category:'Seasonal',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    allowEmoji:true,
+    halloweenFinale:true,
+    defaultBackgroundUrl:'./images/halloween/classic-halloween-2x1.svg',
+    priceCents:1500,
+    priceLabel:'$15',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'HAPPY HALLOWEEN 🎃',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:16,
+    maxMainCharacters:48,
+    maxSubCharacters:20,
+    identityRail:true,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
+    description:'The classic three-line ShoutOut board on a moonlit graveyard with jack-o\'-lanterns. Emoji welcome. At the end of every message cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. $15. Sizes: 96×48, 64×48, 64×32.',
+    tags:["halloween","classic halloween","spooky","ghost","ghosts","graveyard","pumpkin","jack-o-lantern","reaper","bats","seasonal","classic","3 lines","emoji","$15","96x48","64x48","64x32"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {
@@ -1474,7 +1505,7 @@ window.FLOQRTemplateCopy = window.FLOQRTemplateCopy || {
   }
 };
 
-window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey'];
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween'];
 
 window.FLOQR_DISPLAY_FORMATS = {
   "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},

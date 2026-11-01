@@ -52,6 +52,8 @@ const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
   "soccerJersey", "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
 ]);
 const SOCCER_JERSEY_PRICE_CENTS = 3000;
+const CLASSIC_HALLOWEEN_TEMPLATE_ID = "classicHalloween";
+const CLASSIC_HALLOWEEN_PRICE_CENTS = 1500;
 function isSportsJerseyTemplateId(templateId = "") {
   const id = String(templateId || "");
   if (id === "soccerJersey" || SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
@@ -63,7 +65,7 @@ function isNflDualJerseyTemplateId(templateId = "") {
 }
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", CLASSIC_HALLOWEEN_TEMPLATE_ID, "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,10,30,16]
@@ -391,6 +393,16 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
       }
     };
   }
+  if (templateId === CLASSIC_HALLOWEEN_TEMPLATE_ID) {
+    return {
+      ...rawPayload,
+      shoutout:{
+        ...shoutout,
+        priceCents:CLASSIC_HALLOWEEN_PRICE_CENTS,
+        priceLabel:"$15"
+      }
+    };
+  }
   if (HEIST_ART_TEMPLATE_IDS.has(templateId)) {
     const heistClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
     if (heistClubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
@@ -707,13 +719,16 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
     const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
     const soccerJersey = isSportsJerseyTemplateId(templateId);
+    const classicHalloween = templateId === CLASSIC_HALLOWEEN_TEMPLATE_ID;
     const pricedAmountCents = footballTeamIntro
       ? 3000
       : heistArt
         ? HEIST_ART_PRICE_CENTS
         : soccerJersey
           ? SOCCER_JERSEY_PRICE_CENTS
-          : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+          : classicHalloween
+            ? CLASSIC_HALLOWEEN_PRICE_CENTS
+            : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }
@@ -728,7 +743,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
       ? "Football Intro"
       : heistArt
         ? "Heist Art"
-        : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
+        : classicHalloween
+          ? "Classic Halloween"
+          : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
     const itemName = shoutoutReceiptTitle({
       templateName,
       locationName: venueName,
@@ -2832,7 +2849,7 @@ exports.sendTestPaidShoutoutReceipt = onCall({
   };
 });
 
-exports.__checkoutHelpers = {runCreateFloqrCheckoutSession};
+exports.__checkoutHelpers = {runCreateFloqrCheckoutSession, normalizeCheckoutPayload, describeOrder};
 exports.__receiptHelpers = {
   buildTempShoutoutReceipt,
   promoteShoutoutReceipt,

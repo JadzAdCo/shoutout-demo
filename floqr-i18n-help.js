@@ -250,6 +250,10 @@
         title: "Shiloh",
         body: "Эксклюзив Aurelia за $30. Кошка Shiloh сидит в левой части экрана, а ваш ShoutOut светится белым на тёмной стороне рядом с ней. Эмодзи приветствуются. Введите в поиске «Shiloh», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах тех размеров, которые есть в Aurelia."
       },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween за $15 — в любом клубе. Классическое трёхстрочное табло ShoutOut на фоне кладбища под луной с тыквами-фонарями; эмодзи приветствуются. В конце каждого цикла белые призраки вылетают из могилы и мчатся на зрителей, а Смерть с косой поднимается и кружат летучие мыши. Введите в поиске «Halloween», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах 96×48, 64×48 и 64×32."
+      },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
         body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
@@ -567,6 +571,10 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusief bij Aurelia voor $30. De kat Shiloh zit links op het scherm en je ShoutOut gloeit wit aan de donkere kant naast haar. Emoji zijn welkom. Typ ‘Shiloh’ in Zoeken, schrijf maximaal drie korte regels en voeg desgewenst je @handle toe. Speelt op de schermformaten die Aurelia heeft."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween voor $15, in elke club. Het klassieke ShoutOut-bord met drie regels op een maanverlichte begraafplaats met pompoenlantaarns; emoji zijn welkom. Aan het eind van elke cyclus stijgen witte spoken op uit een graf en stormen op het publiek af, terwijl Magere Hein opdoemt en vleermuizen rondfladderen. Typ “Halloween” in Zoeken, schrijf tot drie korte regels en voeg desgewenst je @handle toe. Speelt op borden van 96×48, 64×48 en 64×32."
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
@@ -886,6 +894,10 @@
         title: "Shiloh",
         body: "Exclusivité Aurelia à 30 $. Le chat Shiloh est assis à gauche de l’écran et votre ShoutOut brille en blanc sur le côté sombre, juste à côté. Les emoji sont les bienvenus. Tapez « Shiloh » dans Recherche, écrivez jusqu’à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S’affiche sur les tailles d’écran dont dispose Aurelia."
       },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween à $15, dans tous les clubs. Le tableau ShoutOut classique sur trois lignes, dans un cimetière au clair de lune avec des citrouilles d'Halloween — les émojis sont les bienvenus. À la fin de chaque cycle, des fantômes blancs jaillissent d'une tombe et foncent vers le public, pendant que la Faucheuse se dresse et que des chauves-souris tourbillonnent. Tapez « Halloween » dans la recherche, écrivez jusqu'à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S'affiche sur les écrans 96×48, 64×48 et 64×32."
+      },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
         body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
@@ -1203,6 +1215,10 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exklusiv bei Aurelia für 30 $. Die Katze Shiloh sitzt links auf der Anzeige, und dein ShoutOut leuchtet weiß auf der dunklen Seite neben ihr. Emojis sind willkommen. Gib „Shiloh“ in der Suche ein, schreib bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf den Displaygrößen, die Aurelia hat."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween für $15, in jedem Club. Die klassische dreizeilige ShoutOut-Anzeige auf einem mondbeschienenen Friedhof mit Kürbislaternen – Emojis sind willkommen. Am Ende jedes Durchlaufs steigen weiße Geister aus einem Grab und stürmen auf das Publikum zu, während der Sensenmann auftaucht und Fledermäuse schwärmen. Gib „Halloween“ in die Suche ein, schreibe bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf Anzeigen in 96×48, 64×48 und 64×32."
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
@@ -1522,6 +1538,10 @@
         title: "Shiloh",
         body: "Exclusivo de Aurelia por $30. La gata Shiloh aparece a la izquierda de la pantalla y tu ShoutOut brilla en blanco en el lado oscuro, a su lado. Los emojis son bienvenidos. Escribe «Shiloh» en Buscar, escribe hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en los tamaños de pantalla que tiene Aurelia."
       },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween por $15, en todos los clubes. El clásico tablero ShoutOut de tres líneas sobre un cementerio a la luz de la luna con calabazas de Halloween; los emojis son bienvenidos. Al final de cada ciclo, fantasmas blancos salen de una tumba y se lanzan hacia el público mientras se alza la Parca y vuelan murciélagos. Escribe «Halloween» en la búsqueda, redacta hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en pantallas de 96×48, 64×48 y 64×32."
+      },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
         body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
@@ -1839,6 +1859,10 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Esclusiva Aurelia a 30 $. La gatta Shiloh è seduta a sinistra dello schermo e il tuo ShoutOut brilla in bianco sul lato scuro accanto a lei. Le emoji sono benvenute. Scrivi «Shiloh» in Cerca, scrivi fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sulle dimensioni di schermo che ha Aurelia."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween a $15, in tutti i club. Il classico tabellone ShoutOut a tre righe su un cimitero al chiaro di luna con zucche di Halloween; le emoji sono benvenute. Alla fine di ogni ciclo, fantasmi bianchi escono da una tomba e si lanciano verso il pubblico mentre la Morte si alza e volano i pipistrelli. Scrivi «Halloween» nella ricerca, inserisci fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sugli schermi 96×48, 64×48 e 64×32."
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
@@ -2158,6 +2182,10 @@
         title: "Shiloh",
         body: "Exclusivo do Aurelia por US$ 30. A gata Shiloh fica à esquerda da tela e o seu ShoutOut brilha em branco no lado escuro, ao lado dela. Emojis são bem-vindos. Digite «Shiloh» na Busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Aparece nos tamanhos de tela que o Aurelia tem."
       },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween por $15, em todos os clubes. O clássico painel ShoutOut de três linhas num cemitério ao luar com abóboras de Halloween; emojis são bem-vindos. No fim de cada ciclo, fantasmas brancos saem de um túmulo e avançam em direção ao público enquanto a Morte surge e morcegos revoam. Digite “Halloween” na busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Passa em painéis 96×48, 64×48 e 64×32."
+      },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
         body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
@@ -2475,6 +2503,10 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Αποκλειστικό του Aurelia στα 30 $. Η γάτα Shiloh κάθεται στα αριστερά της οθόνης και το ShoutOut σας λάμπει λευκό στη σκοτεινή πλευρά δίπλα της. Τα emoji είναι ευπρόσδεκτα. Πληκτρολογήστε «Shiloh» στην Αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει στα μεγέθη οθόνης που έχει το Aurelia."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween με $15, σε κάθε club. Ο κλασικός πίνακας ShoutOut τριών γραμμών σε ένα φεγγαρόλουστο νεκροταφείο με φαναράκια-κολοκύθες· τα emoji είναι ευπρόσδεκτα. Στο τέλος κάθε κύκλου, λευκά φαντάσματα βγαίνουν από έναν τάφο και ορμούν προς το κοινό, ενώ ο Χάρος υψώνεται και νυχτερίδες πετούν. Πληκτρολογήστε «Halloween» στην αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει σε οθόνες 96×48, 64×48 και 64×32."
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
@@ -2794,6 +2826,10 @@
         title: "Shiloh",
         body: "Wyłącznie w Aurelia za 30 $. Kotka Shiloh siedzi po lewej stronie ekranu, a Twój ShoutOut świeci na biało po ciemnej stronie obok niej. Emoji są mile widziane. Wpisz „Shiloh” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach w rozmiarach, które ma Aurelia."
       },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween za $15, w każdym klubie. Klasyczna trzywierszowa tablica ShoutOut na tle cmentarza w świetle księżyca z dyniowymi lampionami; emoji są mile widziane. Na końcu każdego cyklu białe duchy wylatują z grobu i pędzą w stronę publiczności, a Kostucha się podnosi i krążą nietoperze. Wpisz „Halloween” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach 96×48, 64×48 i 64×32."
+      },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
         body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
@@ -3111,6 +3147,10 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "حصري في Aurelia مقابل 30 $. تجلس القطة Shiloh على يسار الشاشة ويتوهّج ShoutOut الخاص بك باللون الأبيض على الجانب الداكن بجانبها. الرموز التعبيرية مرحّب بها. اكتب «Shiloh» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @اسمك إن أردت. يُعرض على أحجام الشاشات المتوفرة في Aurelia."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween مقابل $15، في كل النوادي. لوحة ShoutOut الكلاسيكية بثلاثة أسطر على مقبرة مضاءة بالقمر مع فوانيس اليقطين، والرموز التعبيرية مرحّب بها. في نهاية كل دورة، تنطلق أشباح بيضاء من قبر وتندفع نحو الجمهور بينما يظهر حاصد الأرواح وتحلّق الخفافيش. اكتب «Halloween» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @معرّفك إن أردت. تُعرض على لوحات 96×48 و64×48 و64×32."
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",

@@ -2376,6 +2376,7 @@
   async function startTemplateShoutout(templateOrId) {
     const template = typeof templateOrId === "string" ? window.SHOUTOUT_TEMPLATES?.[templateOrId] : templateOrId;
     if (!template?.venueIds?.length) {
+      if (template?.name && template.seasonal === true) pendingTemplateQuery = template.name;
       showShoutoutLanding();
       return;
     }
@@ -3819,7 +3820,7 @@
     const location = getLocation() || {};
     const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
     const standardTemplateIds = location.restrictTemplatesToLocationSet
-      ? (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []).filter(id => String(id).startsWith("soccer"))
+      ? (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []).filter(id => String(id).startsWith("soccer") || getTemplate(id)?.seasonal === true)
       : (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []);
     const alwaysInclude = location.restrictTemplatesToLocationSet ? [] : ["blackwhite"];
     const ids = Array.from(new Set([...alwaysInclude, ...(location.templates || []), ...venueSpecificIds, ...standardTemplateIds]))
@@ -3861,6 +3862,7 @@
     if (!discoveryQuery) {
       const defaultRecord = official.find(record => record.id === "blackwhite") || official.find(record => !record.data.priceCents) || official[0];
       const exclusiveRecords = official.filter(record => record !== defaultRecord && (record.data.venueIds || []).includes(locationId()));
+      const seasonalRecords = official.filter(record => record !== defaultRecord && record.data.seasonal === true && !exclusiveRecords.includes(record));
       const venueName = location.brandName || location.locationName || "";
       grid.innerHTML = `
         <section class="template-section template-section-default">
@@ -3872,6 +3874,10 @@
         ${exclusiveRecords.length ? `<section class="template-section template-section-exclusive">
           <h3>${esc(tt("template.venueExclusive", {venue: venueName}, `Exclusive at ${venueName}`))}</h3>
           <div class="template-grid template-select-grid">${exclusiveRecords.map(record => templateCard(record.data)).join("")}</div>
+        </section>` : ""}
+        ${seasonalRecords.length ? `<section class="template-section template-section-seasonal">
+          <h3>${esc(tt("template.seasonalSection", {}, "Seasonal"))}</h3>
+          <div class="template-grid template-select-grid">${seasonalRecords.map(record => templateCard(record.data)).join("")}</div>
         </section>` : ""}
         ${club.length ? `<section class="template-section"><h3>${esc(tt("template.clubApproved", {}, "Club-Approved Backgrounds"))}</h3><p class="sub small" data-keep-visible="true">${esc(tt("template.clubApprovedHint", {}, "Customized by this club's admins."))}</p><div class="template-grid template-select-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicy", {}, "This club has disabled patron background customization. Original and club-approved templates remain available."))}</p>`}`;
@@ -4253,10 +4259,16 @@
       .trim();
   }
 
+  // Classic board look with emoji kept (e.g. Classic Halloween): uppercase letters, grapheme caps.
+  function isEmojiClassicBoardTemplate(template = getTemplate()) {
+    return template?.allowEmoji === true && window.FLOQRTextLayout?.profileId?.(template) === "classicBoard";
+  }
+
   function fitTemplateText(value = "", type = "main") {
     const caps = templateDisplayCaps();
     const limit = Number(type === "sub" ? caps.sub : caps.main);
-    const cleaned = cleanRecommendationText(value);
+    const recommended = cleanRecommendationText(value);
+    const cleaned = type === "main" && isEmojiClassicBoardTemplate() ? normalizeClassicBoardText(recommended) : recommended;
     if (caps.supported === false || limit <= 0) return "";
     if (isSoccerJerseyTemplate() && type === "sub") {
       // Soccer jersey mark: keep any characters, hard-cap at 2 glyphs.
@@ -4888,7 +4900,9 @@
     const mainInput = byId("mainText");
     const caps = templateDisplayCaps(t);
     if (mainInput) {
-      mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
+      // HTML maxlength counts UTF-16 units and blocks emoji; emoji boards rely on the grapheme cap in fitTemplateText.
+      if (isEmojiClassicBoardTemplate(t)) mainInput.removeAttribute("maxlength");
+      else mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
       mainInput.rows = Math.max(2, caps.lineCount || 2);
       mainInput.placeholder = caps.supported === false ? "Choose a supported display size" : `Enter ShoutOut Here - maximum ${caps.main} visible characters`;
       if (footballIntro && !mainInput.value.trim()) mainInput.value = footballIntroDefaultMain();

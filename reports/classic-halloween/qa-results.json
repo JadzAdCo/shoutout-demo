@@ -1,0 +1,29 @@
+[
+  {
+    "format": "led-96x48",
+    "probe": {
+      "classes": "display-canvas classic-bw classic-halloween classic-board-template custom-background-active has-background-layer",
+      "format": "led-96x48",
+      "rows": [
+        "HAPPY HALLOWEEN",
+        "🎃👻 NYX"
+      ],
+      "layers": [
+        "#displayBackground bg=rgb(5, 5, 7) img=:8791/images/halloween/classic-halloween-2x1.svg\") z=0 op=1 disp=block filter=none rect=624x312",
+        ".display-text-overlay bg=rgba(0, 0, 0, 0) img=none z=1 op=1 disp=flex filter=none rect=624x312",
+        ".display-compose-slot bg=rgba(0, 0, 0, 0) img=none z=auto op=1 disp=block filter=none rect=655x330",
+        ".display-center bg=rgba(0, 0, 0, 0) img=none z=auto op=1 disp=block filter=none rect=655x330"
+      ],
+      "finaleLayer": true,
+      "card": "PRESENTED BYFLOQMEDIA"
+    },
+    "finaleStartedAtMs": 15790,
+    "finaleClassAfterShots": "halloween-finale",
+    "files": [
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-board-t1s.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-finale-a.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-finale-b.png"
+    ],
+    "consoleErrors": []
+  }
+]

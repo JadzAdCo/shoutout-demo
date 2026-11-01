@@ -87,6 +87,17 @@
       patterns: [/shiloh/, /\bcat\s*(shout|template|background)/, /\bkitty\s*(shout|template)/, /aurelia\s*cat/]
     },
     {
+      id: "classic-halloween",
+      kind: "product",
+      label: "Classic Halloween",
+      blurb: "$15 at every club — the classic three-line board on a moonlit graveyard, emoji welcome; ghosts burst from a grave and rush the crowd at the end of each cycle.",
+      href: pageUrl("./", {start: "search"}),
+      action: "template",
+      templateId: "classicHalloween",
+      searchPhrases: ["classic halloween", "halloween", "halloween shoutout", "spooky shoutout", "ghost shoutout", "graveyard", "jack o lantern"],
+      patterns: [/hall?owe+n/, /\bspooky\b/, /\bghosts?\s*(shout|template)/, /grave\s*yard/, /jack.?o.?lantern/]
+    },
+    {
       id: "floqcast",
       kind: "product",
       featureKey: "floqCast",
@@ -899,7 +910,7 @@
   const INTENT_AUDIENCES = Object.freeze({
     "venue-search": ["public"],
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
-    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], floqcast: ["patron"], clubs: ["patron"],
+    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

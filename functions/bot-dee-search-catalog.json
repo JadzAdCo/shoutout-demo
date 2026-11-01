@@ -339,6 +339,31 @@
       ]
     },
     {
+      "sourceId": "help:help-classic-halloween",
+      "id": "help-classic-halloween",
+      "kind": "help",
+      "label": "Classic Halloween",
+      "blurb": "$15 Classic Halloween, at every club. The classic three-line ShoutOut board on a moonlit graveyard with jack-o'-lanterns, and emoji are welcome. At the end of each cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. Type “Hall",
+      "href": "./?start=search",
+      "phrases": [
+        "classic halloween",
+        "15 classic halloween at every club. the classic three-line shoutout board on a moonlit graveyard with jack-o -lanterns and emoji are welcome. at the end of each",
+        "halloween",
+        "halloween shoutout",
+        "halloween template",
+        "spooky shoutout",
+        "ghost shoutout",
+        "ghosts",
+        "graveyard",
+        "jack o lantern",
+        "pumpkin shoutout",
+        "reaper",
+        "bats",
+        "throw a shoutout",
+        "help-classic-halloween"
+      ]
+    },
+    {
       "sourceId": "help:help-club-admin-affiliation",
       "id": "help-club-admin-affiliation",
       "kind": "help",
@@ -2517,6 +2542,25 @@
         "trade by bartr",
         "marketplace barter and swag.",
         "bartr"
+      ]
+    },
+    {
+      "sourceId": "intent:classic-halloween",
+      "id": "classic-halloween",
+      "kind": "product",
+      "label": "Classic Halloween",
+      "blurb": "$15 at every club — the classic three-line board on a moonlit graveyard, emoji welcome; ghosts burst from a grave and rush the crowd at the end of each cycle.",
+      "href": "./?start=search",
+      "phrases": [
+        "classic halloween",
+        "15 at every club the classic three-line board on a moonlit graveyard emoji welcome ghosts burst from a grave and rush the crowd at the end of each cycle.",
+        "halloween",
+        "halloween shoutout",
+        "spooky shoutout",
+        "ghost shoutout",
+        "graveyard",
+        "jack o lantern",
+        "classic-halloween"
       ]
     },
     {
