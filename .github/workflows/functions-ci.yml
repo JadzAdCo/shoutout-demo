@@ -98,13 +98,16 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy Functions, Firestore rules/indexes, Storage rules
+      - name: Deploy Functions, Firestore rules, Storage rules
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
           FUNCTIONS_DISCOVERY_TIMEOUT: "120"
         run: |
+          # firestore:rules only — full `firestore` also deploys indexes and fails
+          # non-interactive when live has indexes missing from firestore.indexes.json
+          # (would need --force, which can delete those live indexes).
           firebase deploy \
-            --only functions,firestore,storage \
+            --only functions,firestore:rules,storage \
             --project shoutoutdemo-5b402 \
             --non-interactive
