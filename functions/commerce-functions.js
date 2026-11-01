@@ -52,6 +52,7 @@ const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
   "soccerJersey", "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
 ]);
 const SOCCER_JERSEY_PRICE_CENTS = 3000;
+/* s3.2.71 CI deploy marker — keep FIREBASE_TOKEN Actions secret set */
 const CLASSIC_HALLOWEEN_TEMPLATE_ID = "classicHalloween";
 const CLASSIC_HALLOWEEN_PRICE_CENTS = 1500;
 function isSportsJerseyTemplateId(templateId = "") {
