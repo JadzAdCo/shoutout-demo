@@ -98,16 +98,62 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy Functions, Firestore rules, Storage rules
+      - name: Deploy Firestore rules + Storage rules
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
-          FUNCTIONS_DISCOVERY_TIMEOUT: "120"
         run: |
           # firestore:rules only — full `firestore` also deploys indexes and fails
           # non-interactive when live has indexes missing from firestore.indexes.json
           # (would need --force, which can delete those live indexes).
           firebase deploy \
-            --only functions,firestore:rules,storage \
+            --only firestore:rules,storage \
             --project shoutoutdemo-5b402 \
             --non-interactive
+
+      - name: Deploy Functions in batches
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+          FUNCTIONS_DISCOVERY_TIMEOUT: "300"
+        run: |
+          # Full `firebase deploy --only functions` updates ~200 Gen2 services at once
+          # and hits Cloud Run CPU + Cloud Functions mutation/minute quotas.
+          # Batch like deploy-reconcile.ps1 (size 20, cool-down, 3 retries).
+          set -euo pipefail
+          mapfile -t FNS < <(
+            firebase functions:list --project shoutoutdemo-5b402 --json \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{
+                  const j=JSON.parse(s); const rows=j.result||j;
+                  const ids=[...new Set((rows||[]).map(r=>r.id||r.entryPoint).filter(Boolean))].sort();
+                  if(!ids.length){console.error("no functions listed"); process.exit(1);}
+                  process.stdout.write(ids.join("\n")+"\n");
+                });'
+          )
+          echo "Deploying ${#FNS[@]} functions in batches of 20"
+          BATCH=20
+          SLEEP_BETWEEN=75
+          for ((i=0; i<${#FNS[@]}; i+=BATCH)); do
+            slice=("${FNS[@]:i:BATCH}")
+            only=$(printf 'functions:%s,' "${slice[@]}" | sed 's/,$//')
+            echo "::group::Batch $((i/BATCH+1)) (${#slice[@]}): ${slice[*]}"
+            ok=0
+            for attempt in 1 2 3; do
+              if firebase deploy --only "$only" --project shoutoutdemo-5b402 --non-interactive; then
+                ok=1
+                break
+              fi
+              echo "Batch failed attempt $attempt — waiting ${SLEEP_BETWEEN}s (quota cool-down)"
+              sleep "$SLEEP_BETWEEN"
+            done
+            echo "::endgroup::"
+            if [ "$ok" != "1" ]; then
+              echo "Deploy failed for: ${slice[*]}"
+              exit 1
+            fi
+            if (( i + BATCH < ${#FNS[@]} )); then
+              echo "Cool-down ${SLEEP_BETWEEN}s before next batch…"
+              sleep "$SLEEP_BETWEEN"
+            fi
+          done
+          echo "All ${#FNS[@]} functions deployed."
