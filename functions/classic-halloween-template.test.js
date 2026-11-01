@@ -130,6 +130,7 @@ test("Halloween backgrounds are safe, small SVGs", () => {
     assert.ok(fs.existsSync(path.join(root, file)), `${file} in the repo`);
     const svg = read(file);
     assert.match(svg.trimStart(), /^(<\?xml[^>]*>\s*)?<svg\b/);
+    assert.doesNotMatch(svg, /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/, "no XML-invalid control characters (the board would show no background)");
     assert.doesNotMatch(svg, /<script|<foreignObject|\son[a-z]+=|xlink:href="http|href="http/i, "no script / handlers / external refs");
     assert.ok(Buffer.byteLength(svg) < 200 * 1024, "small for LED players");
   });

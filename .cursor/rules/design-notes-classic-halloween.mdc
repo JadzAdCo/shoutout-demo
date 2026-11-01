@@ -1,0 +1,49 @@
+---
+description: Classic Halloween seasonal ShoutOut template (classicHalloween) — classic three-line board + emoji, graveyard art, ghost/Reaper/bat finale on FLOQRFrameLoop, $15 server price, all venues and sizes
+alwaysApply: false
+---
+
+# Classic Halloween — design notes
+
+Resume: `@halloween$` / `$halloween$`. Template id **`classicHalloween`**, name **Classic Halloween** (template title is not translated). Branch `feat/classic-halloween` (not published, not deployed).
+
+## Spec (owner)
+
+| Item | Decision |
+|---|---|
+| Board | Same classic three-line board as `blackwhite` (`profileId` = `classicBoard`, `identityRail`, `identity-loop` FloqR identity card). **`blackwhite` itself is unchanged.** |
+| Emoji | Allowed (`allowEmoji: true`). Letters are uppercased, emoji kept; caps count graphemes so an emoji is one glyph and never split. |
+| Background | Dark LED-friendly moonlit graveyard + jack-o'-lanterns: `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32), `-4x3.svg` (64×48 via CSS). Not patron-editable (`backgroundEditable: false`). |
+| Finale | At the end of each ShoutOut cycle: a grave rises, several white ghosts burst out and rush toward the viewer, the Reaper rises, bats swarm. |
+| Timing | `FLOQRFrameLoop.cycle("halloween-finale", {count: 4})` — 3 board phases + 1 finale phase × 6 s. **No per-template `setInterval` / `setTimeout`.** |
+| Reduced motion | `@media (prefers-reduced-motion: reduce)`: animations off, static ghost line-up + Reaper, no bats, board dimmed. |
+| Venues / sizes | All clubs (`scope: 'Shared'`, in `SHOUTOUT_STANDARD_TEMPLATE_IDS`, `seasonal: true` so restricted venues still list it). `Is96x48 = Is64x48 = Is64x32 = 1`. |
+| Price | **$15.00 = 1500 cents, server-authoritative** (`CLASSIC_HALLOWEEN_PRICE_CENTS` in `functions/commerce-functions.js`). |
+
+## Files
+
+| Area | File |
+|---|---|
+| Catalog | `shared-data.js` `SHOUTOUT_TEMPLATES.classicHalloween`, `SHOUTOUT_STANDARD_TEMPLATE_IDS` |
+| Composer | `patron-app.js` Seasonal section (`template.seasonalSection`, 11 langs in `floqr-i18n.js`), `isEmojiClassicBoardTemplate`, `startTemplateShoutout` seasonal search |
+| Admin writes | `admin-app.js` `adminGraphemes` / `fitAdminEmojiText` |
+| Display | `display-app.js` `HALLOWEEN_*`, `halloweenFinaleMarkup`, `syncHalloweenFinale`, `stopHalloweenFinale`; `display.css` `.classic-halloween`, `.halloween-finale`, `hw*` keyframes |
+| Checkout | `functions/commerce-functions.js` `normalizeCheckoutPayload`, `describeOrder`, `CLASSIC_BOARD_TEMPLATE_IDS` |
+| Rules | `firestore.rules` `validFreePatronShoutoutCreate` excludes `classicHalloween` (paid template cannot be created free) |
+| Help | `help-classic-halloween` (patron): `floqai-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js`; intent `classic-halloween` in `intent-search.js`; regenerate `node scripts/build-floqai-content-classes.js` + `node scripts/build-bot-dee-search-catalog.js` |
+| Tests | `functions/classic-halloween-template.test.js` (in `npm test`), counts in `i18n-coverage.test.js`, locked-art list in `recommendation-library.test.js` |
+| QA | `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/led-*-board-t1s.png`, `-finale-a/b.png`, reduced-motion shots, `qa-results.json` |
+
+No Firestore `templates/classicHalloween` doc is required: Search uses the packaged catalog and `display-app.js` merges Firestore rows over it.
+
+## Pitfalls
+
+- SVG art must stay valid XML — a stray control character (e.g. U+0014 instead of an em dash) makes the background silently disappear. The test checks for this.
+- Do not use `.slice` / HTML `maxlength` on emoji copy (UTF-16 splits emoji); use grapheme helpers.
+- Do not give the finale its own timer; it rides `FLOQRFrameLoop`.
+
+## FIX PROMPT
+
+```
+Classic Halloween (classicHalloween): classic 3-line board like blackwhite (do not touch blackwhite) + emoji (grapheme caps), graveyard SVG art (valid XML), finale ghosts + Reaper + bats via FLOQRFrameLoop.cycle("halloween-finale") 3 board + 1 finale phase (no setInterval), reduced-motion fallback, all venues + Is96x48/Is64x48/Is64x32=1, $15 = 1500 cents server price, FloqR identity card kept, rules refuse free direct create. Help help-classic-halloween in 11 langs + intent classic-halloween. Tests functions/classic-halloween-template.test.js; QA reports/classic-halloween/halloween-qa.mjs. Design notes: .cursor/rules/design-notes-classic-halloween.mdc. Resume @halloween$
+```

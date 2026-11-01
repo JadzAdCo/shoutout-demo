@@ -618,3 +618,16 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
+
+## Classic Halloween (`classicHalloween`) — seasonal ShoutOut template
+
+| Piece | Where |
+|---|---|
+| **Design notes** | `.cursor/rules/design-notes-classic-halloween.mdc` (resume `@halloween$`) |
+| **Catalog** | `shared-data.js` `SHOUTOUT_TEMPLATES.classicHalloween` (`scope:'Shared'`, `seasonal`, `allowEmoji`, `halloweenFinale`, `Is96x48/Is64x48/Is64x32 = 1`, `priceCents:1500`) + `SHOUTOUT_STANDARD_TEMPLATE_IDS`. Packaged only — no Firestore `templates` doc needed |
+| **Composer** | `patron-app.js` Seasonal section (`template.seasonalSection`), seasonal kept on `restrictTemplatesToLocationSet` venues, `isEmojiClassicBoardTemplate` (uppercase + grapheme caps, no HTML `maxlength`). `admin-app.js` `fitAdminEmojiText` for admin board writes |
+| **Display** | `display-app.js` `syncHalloweenFinale` / `stopHalloweenFinale` on `FLOQRFrameLoop.cycle("halloween-finale")` (3 board phases + 1 finale phase × 6 s; no template timer); emoji branch `glyphSlice(cleanDisplayText(...))`. `display.css` `.classic-halloween` + `.halloween-finale` + reduced-motion block. Art `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32) / `-4x3.svg` (64×48) |
+| **Checkout** | `functions/commerce-functions.js` `CLASSIC_HALLOWEEN_PRICE_CENTS = 1500` in `normalizeCheckoutPayload` + `describeOrder` (server price wins); classic board text caps via `CLASSIC_BOARD_TEMPLATE_IDS` |
+| **Rules** | `firestore.rules` `validFreePatronShoutoutCreate` refuses `template == 'classicHalloween'` (no free direct create of the paid template) — needs a rules deploy |
+| **Help** | `help-classic-halloween` (patron) in `floqai-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js` (10 langs); FloqAi intent `classic-halloween` in `intent-search.js`; regenerated `functions/floqai-content-classes.json` + `functions/bot-dee-search-catalog.json` |
+| **Tests / QA** | `functions/classic-halloween-template.test.js`; visual QA `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/*.png` + `qa-results.json` |

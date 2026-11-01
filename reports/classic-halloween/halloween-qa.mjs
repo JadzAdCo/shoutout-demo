@@ -86,7 +86,13 @@ for (const reduced of [false, true]) {
     const qs = new URLSearchParams({location: "zebbies-garden-washington-dc", template: "classicHalloween", main: MAIN, screen: f.id, attribution: "@nyx", includeAttribution: "1", attributionChoice: "instagram", preview: "1"});
     const before = errors.length;
     await send("Page.navigate", {url: `http://localhost:${PORT}/display.html?${qs}`});
-    await sleep(1200);
+    const loadStart = Date.now();
+    while (Date.now() - loadStart < 15000) {
+      const ready = await send("Runtime.evaluate", {returnByValue: true, expression: `document.querySelectorAll("#displayMain .classic-board-lines b").length > 0 && !!document.getElementById("displayHalloweenFinale")`});
+      if (ready.result?.result?.value) break;
+      await sleep(150);
+    }
+    await sleep(1000);
     const tag = reduced ? `${f.id}-reduced-motion` : f.id;
     const files = [await shot(`${tag}-board-t1s.png`)];
     const probe = await send("Runtime.evaluate", {returnByValue: true, expression: `(() => {
