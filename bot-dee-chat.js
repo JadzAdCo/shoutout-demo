@@ -148,6 +148,29 @@
     return promise;
   }
 
+  /** After sign-in: read the patron's own consent flag; fetch the context once only when it is ON. */
+  function prefetchUserContext() {
+    const auth = global.firebase?.apps?.length ? global.firebase.auth?.() : null;
+    if (!auth?.onAuthStateChanged) return;
+    auth.onAuthStateChanged(user => {
+      if (!user?.uid) {
+        userContext = {uid: "", promise: null};
+        return;
+      }
+      if (userContext.uid === user.uid && userContext.promise) return;
+      const firestore = global.firebase.firestore ? global.firebase.firestore() : null;
+      if (!firestore) return;
+      firestore.collection("users").doc(user.uid).get().then(snap => {
+        if (auth.currentUser?.uid !== user.uid) return;
+        if (snap.exists && snap.get("botDeeProfileConsent") === true) {
+          loadUserContext();
+        } else if (!(userContext.uid === user.uid && userContext.promise)) {
+          userContext = {uid: user.uid, promise: Promise.resolve({consent: false, fields: {}, fieldNames: []})};
+        }
+      }).catch(() => {});
+    });
+  }
+
   /** Mirror of functions/bot-dee-user-context-core.js ownProfileTopic. */
   const OWN_PROFILE_PATTERNS = [
     ["height", /\b(?:my height|how tall am i|how tall i am)\b/],
@@ -494,6 +517,7 @@
 
   function bind(opts = {}) {
     bindForm();
+    prefetchUserContext();
     loadIdleSettings().finally(() => {
       welcome();
       // Re-arm with loaded idle seconds if welcome already painted.

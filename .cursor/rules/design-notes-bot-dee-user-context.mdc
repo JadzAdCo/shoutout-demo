@@ -11,7 +11,9 @@ Resume: `@botdee-ctx$` / `$botdee-profile$`. Owner request Oct 29 2026: BOT DEE 
 
 ```
 My Privacy toggle (default OFF) → users/{uid}.botDeeProfileConsent = true (+ server-time stamp + version)
-floqai.html → bot-dee-chat.js loadUserContext() → getBotDeeUserContext({})   (once per page session, memory only)
+floqai.html → bot-dee-chat.js bind() → prefetchUserContext(): after sign-in read own users/{uid}.botDeeProfileConsent
+   ON  → loadUserContext() → getBotDeeUserContext({})   (once per page session, memory only)
+   OFF → no callable; own-profile questions get the "turn on the toggle" reply locally
    server: auth → assertFeatureAccess(floqAi) → throttle 30/10 min → users/{request.auth.uid} only
            → botDeeFieldPolicy(dataClassification/botDeeUserContext) → buildUserContext → audit (names only)
 own-profile question ("how tall am I") → answered locally from that context (client) / ownProfileAnswer (server)
@@ -21,6 +23,15 @@ anything else → executeBotSession → loadOwnUserContext(server) → promptBlo
 - **Never** a uid parameter, a collection query, `listDocuments`, or a directory lookup. `request.data` is ignored.
 - The client never sends profile text to Gemini; the prompt block is assembled server-side from the same policy.
 - Context lives in a JS variable keyed by uid; it is re-fetched after a uid change or page reload. Never `localStorage` / `sessionStorage` / IndexedDB.
+- An already-open FloqAi tab keeps its in-memory copy until reload; Gemini answers stop using profile data on the next message because `executeBotSession` re-reads consent server-side every call.
+
+## Deploy
+
+Functions: `getBotDeeUserContext`, `setBotDeeFieldAccess` (new), `executeBotSession` (changed). Firestore rules (users consent shape + `botDeeContextThrottle` deny-all). Pages: `bot-dee-chat.js`, `patron-portal*`, `master-admin.html`, `master-data-classification.js`, `floqr-data-classification.js`, i18n packs (cache-bust `?v=` with the release bump).
+
+## i18n
+
+Chrome keys `portal.botDee*`, `floqai.chatProfile*`, `floqai.profileField.*`, `dataClass.botDee*` live in `floqr-i18n.js` (all 11 langs). Help `help-bot-dee-profile-context`: `floqai-help-repository.js` + `scripts/_help-en.json` + `floqr-i18n-help.js` (10 langs). `scripts/_chrome-*.json` and non-English `scripts/_help-*.json` are stale build inputs — do not rebuild packs from them.
 
 ## Tiers (`functions/data-classification-core.js` `BOT_DEE_FIELDS`, mirrored in `floqr-data-classification.js`)
 
