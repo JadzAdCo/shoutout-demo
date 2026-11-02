@@ -373,8 +373,8 @@
     {
       id: "help-floqai-page",
       title: "BOT DEE",
-      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
-      searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee"],
+      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee", "enter to send", "shift enter", "how are you bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",

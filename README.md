@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.72 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.73 (stable)
 
+- s3.2.73: BOT DEE `?` help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
 - s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
 - s3.2.71: Classic Halloween seasonal ShoutOut — $15, emoji classic board, graveyard art + ghost/Reaper/bat finale.
 - s3.2.70: BOT DEE idle end (~60s) + offer-help only on start/resume.

@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.72";
+  const VERSION = "s3.2.73";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -1462,6 +1462,7 @@
       "page.clubEmbed.poweredBy": "Powered by FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Ask BOT DEE anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.",
+      "floqai.helpComposer": "Press Enter to send a message. Shift+Enter starts a new line. BOT DEE chats like a person — try “How are you?” — and only looks things up when you ask how to do something in FLOQR.",
       "floqai.helpScope": "Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
       "floqai.prompt": "Tell me what you want to do",
       "floqai.placeholder": "Clubs near me · Create a schedule · Club website feed · ShoutOut",
@@ -2773,6 +2774,7 @@
       "page.clubEmbed.poweredBy": "Propulsé par FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Demandez à BOT DEE tout ce qui concerne FLOQR, avec vos mots : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin.",
+      "floqai.helpComposer": "Appuyez sur Entrée pour envoyer. Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne — essayez « How are you? » — et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR.",
       "floqai.helpScope": "Les résultats ne montrent que ce que votre compte peut utiliser. Clients, personnel, Club Admins et Master Admins voient chacun leurs propres réponses.",
       "floqai.prompt": "Dites-moi ce que vous voulez faire",
       "floqai.placeholder": "Clubs près de moi · Créer un planning · Flux du site du club · ShoutOut",
@@ -4084,6 +4086,7 @@
       "page.clubEmbed.poweredBy": "Bereitgestellt von FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Frag BOT DEE alles über FLOQR in deinen eigenen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge.",
+      "floqai.helpComposer": "Enter sendet die Nachricht. Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch — versuch „How are you?“ — und sucht nur, wenn du fragst, wie man etwas in FLOQR macht.",
       "floqai.helpScope": "Die Ergebnisse zeigen nur, was dein Konto nutzen darf. Gäste, Personal, Club Admins und Master Admins sehen jeweils ihre eigenen Antworten.",
       "floqai.prompt": "Sag mir, was du tun möchtest",
       "floqai.placeholder": "Clubs in meiner Nähe · Plan erstellen · Feed für die Club-Website · ShoutOut",
@@ -5395,6 +5398,7 @@
       "page.clubEmbed.poweredBy": "Con la tecnología de FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Pregunta a BOT DEE lo que quieras sobre FLOQR con tus palabras: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin.",
+      "floqai.helpComposer": "Pulsa Intro para enviar. Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona — prueba “How are you?” — y solo busca cuando preguntas cómo hacer algo en FLOQR.",
       "floqai.helpScope": "Los resultados solo incluyen lo que tu cuenta puede usar. Clientes, personal, Club Admins y Master Admins ven cada uno sus propias respuestas.",
       "floqai.prompt": "Dime qué quieres hacer",
       "floqai.placeholder": "Clubs cerca de mí · Crear un horario · Feed para la web del club · ShoutOut",
@@ -6706,6 +6710,7 @@
       "page.clubEmbed.poweredBy": "Mogelijk gemaakt door FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Vraag BOT DEE alles over FLOQR in je eigen woorden: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools.",
+      "floqai.helpComposer": "Druk op Enter om te versturen. Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon — probeer “How are you?” — en zoekt alleen als je vraagt hoe je iets in FLOQR doet.",
       "floqai.helpScope": "De resultaten tonen alleen wat jouw account mag gebruiken. Bezoekers, personeel, Club Admins en Master Admins zien elk hun eigen antwoorden.",
       "floqai.prompt": "Vertel me wat je wilt doen",
       "floqai.placeholder": "Clubs bij mij in de buurt · Rooster maken · Feed voor de clubwebsite · ShoutOut",
@@ -8017,6 +8022,7 @@
       "page.clubEmbed.poweredBy": "Работает на FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Спросите BOT DEE о чём угодно в FLOQR своими словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin.",
+      "floqai.helpComposer": "Нажмите Enter, чтобы отправить. Shift+Enter — новая строка. BOT DEE общается как человек — попробуйте «How are you?» — и ищет только когда вы спрашиваете, как сделать что-то в FLOQR.",
       "floqai.helpScope": "В результатах только то, что доступно вашему аккаунту. Гости, персонал, Club Admins и Master Admins видят свои ответы.",
       "floqai.prompt": "Расскажите, что вы хотите сделать",
       "floqai.placeholder": "Клубы рядом · Создать расписание · Фид для сайта клуба · ShoutOut",
@@ -9328,6 +9334,7 @@
       "page.clubEmbed.poweredBy": "Realizzato con FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Chiedi a BOT DEE qualsiasi cosa su FLOQR con parole tue: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin.",
+      "floqai.helpComposer": "Premi Invio per inviare. Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona — prova “How are you?” — e cerca solo quando chiedi come fare qualcosa in FLOQR.",
       "floqai.helpScope": "I risultati includono solo ciò che il tuo account può usare. Clienti, personale, Club Admin e Master Admin vedono ognuno le proprie risposte.",
       "floqai.prompt": "Dimmi cosa vuoi fare",
       "floqai.placeholder": "Club vicino a me · Crea un orario · Feed per il sito del club · ShoutOut",
@@ -10639,6 +10646,7 @@
       "page.clubEmbed.poweredBy": "Desenvolvido com FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Pergunte ao BOT DEE qualquer coisa sobre o FLOQR com suas palavras: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin.",
+      "floqai.helpComposer": "Pressione Enter para enviar. Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa — experimente “How are you?” — e só pesquisa quando você pergunta como fazer algo no FLOQR.",
       "floqai.helpScope": "Os resultados mostram só o que sua conta pode usar. Clientes, equipe, Club Admins e Master Admins veem cada um as próprias respostas.",
       "floqai.prompt": "Diga o que você quer fazer",
       "floqai.placeholder": "Clubes perto de mim · Criar escala · Feed para o site do clube · ShoutOut",
@@ -11950,6 +11958,7 @@
       "page.clubEmbed.poweredBy": "Με την υποστήριξη του FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Ρωτήστε το BOT DEE οτιδήποτε για το FLOQR με δικά σας λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin.",
+      "floqai.helpComposer": "Πατήστε Enter για αποστολή. Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος — δοκιμάστε «How are you?» — και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR.",
       "floqai.helpScope": "Τα αποτελέσματα περιλαμβάνουν μόνο ό,τι μπορεί να χρησιμοποιήσει ο λογαριασμός σας. Θαμώνες, προσωπικό, Club Admins και Master Admins βλέπουν ο καθένας τις δικές του απαντήσεις.",
       "floqai.prompt": "Πείτε μου τι θέλετε να κάνετε",
       "floqai.placeholder": "Κλαμπ κοντά μου · Δημιουργία προγράμματος · Ροή για τον ιστότοπο του κλαμπ · ShoutOut",
@@ -13261,6 +13270,7 @@
       "page.clubEmbed.poweredBy": "Działa dzięki FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "Zapytaj BOT DEE o wszystko w FLOQR własnymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin.",
+      "floqai.helpComposer": "Naciśnij Enter, aby wysłać. Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek — spróbuj „How are you?” — i szuka tylko gdy pytasz, jak coś zrobić w FLOQR.",
       "floqai.helpScope": "Wyniki obejmują tylko to, z czego może korzystać Twoje konto. Goście, personel, Club Admini i Master Admini widzą własne odpowiedzi.",
       "floqai.prompt": "Powiedz, co chcesz zrobić",
       "floqai.placeholder": "Kluby w pobliżu · Utwórz grafik · Kanał dla strony klubu · ShoutOut",
@@ -14572,6 +14582,7 @@
       "page.clubEmbed.poweredBy": "مدعوم من FLOQR",
       "page.floqai.title": "BOT DEE",
       "floqai.helpIntro": "اسأل BOT DEE عن أي شيء في FLOQR بكلماتك: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin.",
+      "floqai.helpComposer": "اضغط Enter للإرسال. Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص — جرّب «How are you?» — ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR.",
       "floqai.helpScope": "تتضمن النتائج فقط ما يمكن لحسابك استخدامه. يرى الرواد والطاقم ومسؤولو النوادي ومسؤولو المنصة كلٌّ إجاباته الخاصة.",
       "floqai.prompt": "أخبرني بما تريد فعله",
       "floqai.placeholder": "نوادٍ قريبة مني · إنشاء جدول · موجز موقع النادي · ShoutOut",

@@ -399,7 +399,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getBOT DEEAccess` still gate intent cards |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession` + `setBotDeeSettings`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
-| Composer keys (s3.2.72) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. |
+| Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-floqai-page` + `floqai.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
 | Conversation idle (s3.2.70) | Client ends chat after `conversationIdleSeconds` (default **60**) with no message → `chatIdleEnded`; history cleared; next message resumes. Config: Firestore `botDeeSettings/default` (signed-in read; Functions-write). Master Admin → Features Mgmt → **BOT DEE** → Save via callable `setBotDeeSettings` (SOS2FA + reason ≥ 8). Clamp 15–600s. |
 | Data / security | `botDeeSettings/{docId}`: P ops setting (idle seconds, revision, actor email, reason); not patron PII. Rules: signed-in read, write false. Callable re-checks Master Admin + SOS2FA. |
 | Tools | `contextualSearch`; `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates (`functions/bot-dee-tools.js`) |
@@ -407,7 +407,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
 | Gate | `assertFeatureAccess(..., "floqAi")` on session; packaged seed `floqAi` **Beta** (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
 | Tests | `functions/bot-dee-core.test.js`, `functions/floqai-page.test.js` |
-| Help | `help-floqai-page` (BOT DEE chat + intent fallback phrases) |
+| Help | `help-floqai-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `floqai.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **BOT DEE**) |
 | BOT DEE verbiage (s3.2.60) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi` / `floqai.html`. |

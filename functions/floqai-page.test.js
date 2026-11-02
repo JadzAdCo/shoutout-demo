@@ -83,13 +83,17 @@ test("floating FloqAi agent is not shown on template select", () => {
 
 test("FloqAi page chrome is localized", () => {
   const html = read("floqai.html");
-  ["page.floqai.title", "floqai.helpIntro", "floqai.helpScope", "floqai.prompt", "floqai.hint", "floqai.intentFallback", "floqai.chatSend"]
+  ["page.floqai.title", "floqai.helpIntro", "floqai.helpComposer", "floqai.helpScope", "floqai.prompt", "floqai.hint", "floqai.intentFallback", "floqai.chatSend"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.match(html, /data-i18n-placeholder="floqai\.placeholder"/);
   assert.match(html, /data-i18n-placeholder="floqai\.chatPlaceholder"/);
   const search = read("intent-search.js");
   assert.match(search, /tr\("floqai\.noMatch"/);
   assert.match(search, /tr\("floqai\.wantTo"/);
-  assert.match(read("floqai-help-repository.js"), /id: "help-floqai-page"/);
+  const helpRepo = read("floqai-help-repository.js");
+  assert.match(helpRepo, /id: "help-floqai-page"/);
+  assert.match(helpRepo, /Press Enter to send a message/);
+  assert.match(helpRepo, /Shift\+Enter starts a new line/);
   assert.match(read("floqr-i18n.js"), /"floqai\.chatWelcome"/);
+  assert.match(read("floqr-i18n.js"), /"floqai\.helpComposer"/);
 });
