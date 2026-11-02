@@ -897,11 +897,11 @@
       "id": "help-floqai-page",
       "kind": "help",
       "label": "BOT DEE",
-      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat rep",
+      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
       "href": "./floqai.html",
       "phrases": [
         "bot dee",
-        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. bot d",
+        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. press",
         "floqai",
         "floqai page",
         "ask floqai",
@@ -910,6 +910,9 @@
         "search everything",
         "what can i search",
         "chat with bot dee",
+        "enter to send",
+        "shift enter",
+        "how are you bot dee",
         "open bot dee",
         "help-floqai-page"
       ]
