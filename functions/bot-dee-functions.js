@@ -139,6 +139,15 @@ function localSession(role, userPrompt) {
       toolRounds: 0
     };
   }
+  if (bot.isMoodPrompt(userPrompt)) {
+    return {
+      reply: bot.moodReply(),
+      results: [],
+      provider: "local-chitchat",
+      model: "mood",
+      toolRounds: 0
+    };
+  }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
       reply: bot.chitchatReply(role),

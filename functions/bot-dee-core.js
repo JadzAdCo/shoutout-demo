@@ -140,6 +140,24 @@ function isAckPrompt(raw) {
 }
 
 /**
+ * Mood / "how are you" small talk — answer like a person, never dump search hits.
+ * Keep in sync with bot-dee-chat.js.
+ */
+function isMoodPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 100) return false;
+  const moodCore =
+    "(?:how are you|how re you|how r you|hows it going|how s it going|how is it going|" +
+    "how you doing|how are things|how have you been|hows your day|how s your day|how is your day|" +
+    "how was your day|what s new|whats new|how do you feel|you good|you okay|you ok|" +
+    "how goes it|hows everything|how s everything|how is everything)";
+  if (new RegExp(`^(?:(?:hey|hi|hello|howdy|yo)\\s+)?${moodCore}(?:\\s+today)?${CHITCHAT_TAIL}$`).test(q)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Greetings / small talk — reply as a chatbot, never dump search hits.
  * Keep in sync with bot-dee-chat.js client mirror (Pages can greet before Functions deploy).
  */
@@ -147,10 +165,10 @@ function isChitchatPrompt(raw) {
   const q = normalize(raw);
   if (!q || q.length > 100) return false;
   if (isAckPrompt(q)) return true;
-  // hi / hello / hey (+ optional name) — also "hello how are you"
+  if (isMoodPrompt(q)) return true;
+  // hi / hello / hey (+ optional name)
   if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
-  if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
-  if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
+  if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
   return false;
 }
 
@@ -203,6 +221,11 @@ function chitchatReply(role) {
     ? ` I can see you as ${role}.`
     : "";
   return `Hey — BOT DEE here.${roleHint} What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words.`;
+}
+
+/** Friendly mood reply — chat first, light invite to keep going (not a search dump). */
+function moodReply() {
+  return "I'm doing great — thanks for asking! What can I help you with in FLOQR?";
 }
 
 /** Soft mid-chat ack — no product pitch, no re-intro. */
@@ -320,10 +343,12 @@ function toolDeclarations() {
 
 function systemInstruction(role) {
   return [
-    "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful person, not a search engine. Introduce yourself as BOT DEE.",
+    "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful friend first — warm, brief, human. You are not a search box and not a FAQ dump. Introduce yourself as BOT DEE when useful.",
+    "Prefer conversation: answer the person, then (only if useful) offer one next step. Do NOT open with \"Here is what I found\" or a link list unless they clearly asked how to do something in FLOQR.",
     "Ask \"what do you want to do\" / list products (ShoutOut, VIP, floqCast, scheduling) ONLY on the first turn of a conversation or when the patron clearly restarts after a pause — never every reply.",
     "Greetings on a fresh/restarted chat: reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
     "Greetings mid-chat while already talking: one short line (e.g. \"Hey — still here.\") — do NOT re-list products, do NOT call tools.",
+    "Mood / how-are-you / how's it going / how's your day / what's new: answer as a person in 1–2 friendly sentences (e.g. you're doing great, thanks for asking), optionally invite what they need in FLOQR — do NOT call any tools, do NOT dump search results.",
     "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah): one short line only (Cool. / You're welcome.) — do NOT re-introduce yourself, do NOT ask what they want to do, do NOT dump search results, do NOT call any tools.",
     "Farewells (bye, goodbye, later): short goodbye — do NOT call tools.",
     "Identity questions (your name, how to pronounce BOT DEE / FloqAi / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
@@ -402,11 +427,13 @@ module.exports = {
   sanitizeUserPrompt,
   sanitizeHistory,
   isChitchatPrompt,
+  isMoodPrompt,
   isIdentityPrompt,
   isAckPrompt,
   isFarewellPrompt,
   identityReply,
   chitchatReply,
+  moodReply,
   ackReply,
   stillHereReply,
   resumeReply,

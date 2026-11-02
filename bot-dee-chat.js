@@ -48,13 +48,24 @@
     return new RegExp(`^(?:bye|goodbye|see ya|see you|later|peace)${CHITCHAT_TAIL}$`).test(q);
   }
 
+  function isMoodPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 100) return false;
+    const moodCore =
+      "(?:how are you|how re you|how r you|hows it going|how s it going|how is it going|" +
+      "how you doing|how are things|how have you been|hows your day|how s your day|how is your day|" +
+      "how was your day|what s new|whats new|how do you feel|you good|you okay|you ok|" +
+      "how goes it|hows everything|how s everything|how is everything)";
+    return new RegExp(`^(?:(?:hey|hi|hello|howdy|yo)\\s+)?${moodCore}(?:\\s+today)?${CHITCHAT_TAIL}$`).test(q);
+  }
+
   function isChitchatPrompt(raw) {
     const q = normalizeChat(raw);
     if (!q || q.length > 100) return false;
     if (isAckPrompt(q)) return true;
+    if (isMoodPrompt(q)) return true;
     if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${CHITCHAT_TAIL}$`).test(q)) return true;
-    if (new RegExp(`^(?:hey|hi|hello|howdy) how are you${CHITCHAT_TAIL}$`).test(q)) return true;
-    if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|how are you|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
+    if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|what s up|whats up|what up)${CHITCHAT_TAIL}$`).test(q)) return true;
     return false;
   }
 
@@ -93,6 +104,14 @@
       return t("floqai.chatThanks", "You're welcome.");
     }
     return t("floqai.chatAck", "Cool.");
+  }
+
+  /** Friendly mood reply — chatable, not a search dump. */
+  function moodReply() {
+    return t(
+      "floqai.chatMood",
+      "I'm doing great — thanks for asking! What can I help you with in FLOQR?"
+    );
   }
 
   function identityReply() {
@@ -264,6 +283,7 @@
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
     if (isAckPrompt(text)) return ackReply(text);
+    if (isMoodPrompt(text)) return moodReply();
     if (isChitchatPrompt(text)) {
       // Offer-help only after an idle/farewell resume — welcome already asked once.
       if (resuming) return resumeReply();
@@ -273,7 +293,13 @@
   }
 
   async function sendMessage(raw) {
-    const text = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 2000);
+    // Keep intentional Shift+Enter newlines; collapse runs of spaces/tabs only.
+    const text = String(raw || "")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim()
+      .slice(0, 2000);
     if (!text) return;
     const input = byId("botDeeChatInput");
     if (input) input.value = "";
@@ -364,9 +390,18 @@
 
   function bindForm() {
     const form = byId("botDeeChatForm");
+    const input = byId("botDeeChatInput");
     form?.addEventListener("submit", event => {
       event.preventDefault();
-      sendMessage(byId("botDeeChatInput")?.value);
+      sendMessage(input?.value);
+    });
+    // Enter = Send · Shift+Enter = new line (chat UX, not a multiline notepad).
+    input?.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.keyCode !== 13) return;
+      if (event.shiftKey || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      if (form?.getAttribute("aria-busy") === "true") return;
+      form?.requestSubmit ? form.requestSubmit() : form?.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     });
   }
 

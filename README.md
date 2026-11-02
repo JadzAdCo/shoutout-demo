@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.71 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.72 (stable)
+
+- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
+- s3.2.71: Classic Halloween seasonal ShoutOut — $15, emoji classic board, graveyard art + ghost/Reaper/bat finale.
+- s3.2.70: BOT DEE idle end (~60s) + offer-help only on start/resume.
 
 - s3.2.71: Classic Halloween seasonal ShoutOut — $15, emoji classic board, graveyard art + ghost/Reaper/bat finale, rules block free create.
 - s3.2.70: BOT DEE idle end (~60s) + offer-help only on start/resume; Master Admin Features Mgmt → BOT DEE idle setting.

@@ -52,8 +52,13 @@ test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", (
   assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
   assert.match(read("bot-dee-chat.js"), /isChitchatPrompt/);
+  assert.match(read("bot-dee-chat.js"), /isMoodPrompt/);
   assert.match(read("bot-dee-chat.js"), /floqai\.chatHello/);
+  assert.match(read("bot-dee-chat.js"), /floqai\.chatMood/);
   assert.match(read("bot-dee-chat.js"), /Chatbot first/);
+  assert.match(read("bot-dee-chat.js"), /Shift\+Enter|shiftKey/);
+  assert.match(read("bot-dee-chat.js"), /event\.key !== "Enter"/);
+  assert.match(read("floqai.html"), /Enter sends/);
   assert.match(read("bot-dee-chat.js"), /botdee-msg-avatar/);
   assert.match(read("bot-dee-chat.js"), /botdee-bubble-tail/);
   assert.match(read("bot-dee-chat.js"), /botdee-chat-avatar\.png/);

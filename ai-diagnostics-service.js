@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.71";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.71";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.72";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.72";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.72",
+      title: "s3.2.72 — BOT DEE Enter=Send + conversational mood replies",
+      checks: [
+        {label:"Enter sends", file:"bot-dee-chat.js", includes:["shiftKey", "Enter", "requestSubmit"]},
+        {label:"Mood prompt", file:"functions/bot-dee-core.js", includes:["isMoodPrompt", "moodReply"]},
+        {label:"Client mood", file:"bot-dee-chat.js", includes:["isMoodPrompt", "floqai.chatMood"]},
+        {label:"Chrome mood key", file:"floqr-i18n.js", includes:["floqai.chatMood", "Enter sends", "VERSION = \"s3.2.72\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-72-botdee-enter-mood"]},
+        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.72"]}
+      ]
+    },
     {
       version: "s3.2.71",
       title: "s3.2.71 — Classic Halloween seasonal ShoutOut ($15)",
@@ -2585,6 +2597,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-72-botdee-enter-mood",
+      area:"BOT DEE / FloqAi",
+      feature:"Enter sends · Shift+Enter newline · how-are-you stays chat",
+      changed:"Composer Enter = Send (Shift+Enter = new line). Mood/how-are-you gets a friendly reply (not search / not bare still-here). Gemini systemInstruction pushes chat-first. Package s3.2.72. Functions deploy executeBotSession for server path.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.72) with floqAi. 2) Type How are you? and press Enter (not the Send button) → message sends; reply thanks for asking / doing great — NOT Here is what I found. 3) Type a longer note, Shift+Enter for a second line, then Enter to send. 4) Mid-chat hey → Hey — still here. 5) Mark Succeed/Failed.",
+      expected:"Enter submits; Shift+Enter inserts a newline; how-are-you is conversational with no search dump.",
+      troubleshoot:"Enter still newlines → hard refresh bot-dee-chat.js ?v=s3.2.72. Mood still search → Functions deploy executeBotSession (isMoodPrompt/moodReply). Client-only mood works without redeploy for exact how-are-you prompts."
+    },
     {
       id:"s3-2-71-classic-halloween",
       area:"ShoutOut / Templates",

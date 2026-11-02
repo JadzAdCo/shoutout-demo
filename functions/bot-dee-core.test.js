@@ -35,6 +35,10 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isChitchatPrompt("hello!"), true);
   assert.equal(bot.isChitchatPrompt("Hi BOT DEE"), true);
   assert.equal(bot.isChitchatPrompt("hello how are you"), true);
+  assert.equal(bot.isMoodPrompt("How are you?"), true);
+  assert.equal(bot.isMoodPrompt("hello how are you"), true);
+  assert.equal(bot.isMoodPrompt("how's it going"), true);
+  assert.equal(bot.isMoodPrompt("Hey"), false);
   assert.equal(bot.isChitchatPrompt("thanks"), true);
   assert.equal(bot.isChitchatPrompt("throw a shoutout"), false);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
@@ -48,13 +52,23 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.doesNotMatch(reply, /FloqAi here/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
+  assert.match(bot.moodReply(), /thanks for asking|doing great/i);
+  assert.doesNotMatch(bot.moodReply(), /Here is what I found/i);
 
   const fns = require("./bot-dee-functions");
-  for (const prompt of ["Hey", "Hello", "hello how are you"]) {
+  for (const prompt of ["Hey", "Hello"]) {
     const local = fns.__botDeeHelpers.localSession("master", prompt);
     assert.equal(local.provider, "local-chitchat", prompt);
     assert.equal(local.results.length, 0, prompt);
     assert.match(local.reply, /What do you want to do/i);
+  }
+  for (const prompt of ["How are you?", "hello how are you", "how's it going"]) {
+    const local = fns.__botDeeHelpers.localSession("master", prompt);
+    assert.equal(local.provider, "local-chitchat", prompt);
+    assert.equal(local.model, "mood", prompt);
+    assert.equal(local.results.length, 0, prompt);
+    assert.match(local.reply, /thanks for asking|doing great|help you/i, prompt);
+    assert.doesNotMatch(local.reply, /Here is what I found/i, prompt);
   }
 });
 
@@ -98,6 +112,7 @@ test("idle settings clamp + soft mid-chat copy helpers", () => {
   assert.match(bot.resumeReply("patron"), /What do you want to do/i);
   assert.doesNotMatch(bot.identityReply(), /What do you want to do/i);
   assert.match(bot.systemInstruction("patron"), /ONLY on the first turn/i);
+  assert.match(bot.systemInstruction("patron"), /Mood \/ how-are-you|helpful friend/i);
 });
 
 test("setBotDeeSettings callable is exported", () => {
