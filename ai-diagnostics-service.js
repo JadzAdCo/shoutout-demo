@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.76";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.76";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.77";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.77";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.77",
+      title: "s3.2.77 — help/i18n BOT DEE verbiage (no FloqAi)",
+      checks: [
+        {label:"Help page title BOT DEE", file:"botdee-help-repository.js", includes:["title: \"BOT DEE\"", "Ask FloqR with BOT DEE"], notIncludes:["FloqAi"]},
+        {label:"Help packs no FloqAi", file:"floqr-i18n-help.js", notIncludes:["FloqAi"]},
+        {label:"Chrome welcome BOT DEE", file:"floqr-i18n.js", includes:["Hi, I am BOT DEE"], notIncludes:["Hi, I am FloqAi"]},
+        {label:"from=botdee links", file:"botdee-help-repository.js", includes:["from: \"botdee\""], notIncludes:["from: \"floqai\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-77-botdee-help-verbiage"]}
+      ]
+    },
     {
       version: "s3.2.76",
       title: "s3.2.76 — technical rename floqAi → botDee",
@@ -2643,6 +2654,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-77-botdee-help-verbiage",
+      area:"BOT DEE",
+      feature:"Help + translations say BOT DEE (not FloqAi)",
+      changed:"Chrome packs, help locale packs, and botdee-help-repository titles/bodies use BOT DEE only. Help links use from=botdee. Legacy floqai kept only as search aliases. Package s3.2.77.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.77). 2) Open ? — title/body say BOT DEE, never FloqAi. 3) Switch UI language (fr/de/ar) — help still BOT DEE. 4) Search FloqAi in BOT DEE still finds help via alias. 5) Mark Succeed/Failed.",
+      expected:"Every visible help string says BOT DEE; FloqAi typing still finds the same help.",
+      troubleshoot:"Old FloqAi copy → hard refresh floqr-i18n.js + floqr-i18n-help.js + botdee-help-repository.js ?v=s3.2.77."
+    },
     {
       id:"s3-2-76-botdee-technical-rename",
       area:"BOT DEE",

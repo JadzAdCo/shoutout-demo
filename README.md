@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.76 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.77 (stable)
+
+- s3.2.77: Help/i18n verbiage BOT DEE only (no FloqAi in titles/bodies); from=botdee; search aliases keep floqai.
+- s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
+- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
 
 - s3.2.76: Technical rename floqAi→botDee (modules botdee-*, dual-read alias, getBotDeeAccess).
 - s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).

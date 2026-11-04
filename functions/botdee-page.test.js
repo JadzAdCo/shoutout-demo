@@ -99,9 +99,16 @@ test("BOT DEE page chrome is localized", () => {
   assert.match(helpRepo, /Press Enter to send a message/);
   assert.match(helpRepo, /Shift\+Enter starts a new line/);
   assert.doesNotMatch(helpRepo, /FloqAi/);
+  assert.match(helpRepo, /title: "BOT DEE"/);
+  assert.match(helpRepo, /Ask FloqR with BOT DEE/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatWelcome"/);
   assert.match(read("floqr-i18n.js"), /"botdee\.helpComposer"/);
   assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
+  // Patron-facing chrome + help title/body values never say FloqAi (legacy search aliases OK).
+  const chromeVals = [...read("floqr-i18n.js").matchAll(/:\s*"([^"]*)"/g)].map(m => m[1]);
+  assert.ok(chromeVals.every(v => !/\bFloqAi\b/.test(v)), "chrome pack values must say BOT DEE, not FloqAi");
+  const helpBodies = [...read("floqr-i18n-help.js").matchAll(/\b(?:title|body):\s*"([^"]*)"/g)].map(m => m[1]);
+  assert.ok(helpBodies.every(v => !/\bFloqAi\b/.test(v)), "help title/body packs must say BOT DEE, not FloqAi");
   assert.match(read("botdee-search.js"), /Hi, I am BOT DEE/);
   assert.doesNotMatch(read("botdee-search.js"), /Hi, I am FloqAi/);
   assert.doesNotMatch(read("floqr-auth-gate.js"), /floqai-search\.html/);

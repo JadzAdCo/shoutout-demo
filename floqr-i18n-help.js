@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.76";
+  const VERSION = "s3.2.77";
 
   const packs = {
     "ru": {
@@ -3269,8 +3269,9 @@
       const id = String(
         node.dataset?.helpId
         || node.getAttribute?.("data-help-id")
-        || node.dataset?.floqaiHelpId
+        || node.dataset?.botdeeHelpId || node.dataset?.floqaiHelpId
         || node.getAttribute?.("data-botdee-help-id")
+        || node.getAttribute?.("data-floqai-help-id")
         || ""
       ).trim();
       if (!id) return;

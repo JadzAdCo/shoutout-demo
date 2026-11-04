@@ -59,6 +59,8 @@ Chrome keys: `floqai.*` / `page.floqai.*` / `cat.floqai*` / `template.floqai*` �
 
 Help ids: `help-floqai-page` → `help-botdee-page`; `help-floqai-template-search` → `help-botdee-template-search`; `floqai-ask-floqr` → `botdee-ask-floqr`; `help-floqai-audience-sections` → `help-botdee-audience-sections`.
 
+**Patron-facing copy:** every chrome value and every help `title`/`body` (all 11 langs + English seed in `botdee-help-repository.js`) says **BOT DEE**, never FloqAi. Legacy words like `floqai` may remain only in **search phrases** / chat regex so old typing still finds help. Help link provenance uses `from=botdee` (was `from=floqai`).
+
 ### DOM / CSS
 
 Ids such as `categoryFloqAi*` / `floqAiAgent` / `floqAiSearchPanel` → `categoryBotDee*` / `botDeeAgent` / `botDeeSearchPanel`. CSS class prefix `.floqai-` → `.botdee-` (pages already carried many `botdee-*` classes).
