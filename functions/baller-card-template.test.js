@@ -64,29 +64,33 @@ test("Amex twins are Master Admin + Aurelia only (not STANDARD)", () => {
   assert.equal(sandbox.SHOUTOUT_CLUB_LOCATIONS[AURELIA].brandName, "Aurelia");
 });
 
-test("baller SVG assets are safe and branded correctly", () => {
+test("baller photoreal PNG assets are exact Centurion-frame replicas", () => {
   const files = [
-    ["images/baller/black-card-2x1.svg", "BALLER'S EXPRESS", false],
-    ["images/baller/black-card-4x3.svg", "BALLER'S EXPRESS", false],
-    ["images/baller/ballers-alert-2x1.svg", "BALLER'S EXPRESS", true],
-    ["images/baller/ballers-alert-4x3.svg", "BALLER'S EXPRESS", true],
-    ["images/baller/black-card-amex-2x1.svg", "AMERICAN EXPRESS", false],
-    ["images/baller/ballers-alert-amex-2x1.svg", "AMERICAN EXPRESS", true]
+    "images/baller/black-card-2x1.png",
+    "images/baller/black-card-4x3.png",
+    "images/baller/ballers-alert-2x1.png",
+    "images/baller/ballers-alert-4x3.png",
+    "images/baller/black-card-amex-2x1.png",
+    "images/baller/black-card-amex-4x3.png",
+    "images/baller/ballers-alert-amex-2x1.png",
+    "images/baller/ballers-alert-amex-4x3.png"
   ];
-  files.forEach(([file, brand, isAlert]) => {
-    assert.ok(fs.existsSync(path.join(root, file)), file);
-    const svg = read(file);
-    assert.match(svg.trimStart(), /^(<\?xml[^>]*>\s*)?<svg\b/);
-    assert.match(svg, new RegExp(brand.replace(/'/g, "['’]?")), brand);
-    assert.doesNotMatch(svg, /<script|<foreignObject|\son[a-z]+=|xlink:href="http|href="http/i);
-    assert.match(svg, /id="gold"/);
-    assert.match(svg, /id="filigree"|filigree/);
-    assert.ok(Buffer.byteLength(svg) < 200 * 1024);
-    if (isAlert) {
-      assert.match(svg, /02\/50/);
-      assert.match(svg, /baller-face-hole|FACE/);
-    }
+  files.forEach(file => {
+    const abs = path.join(root, file);
+    assert.ok(fs.existsSync(abs), file);
+    const buf = fs.readFileSync(abs);
+    assert.equal(buf[0], 0x89);
+    assert.equal(buf[1], 0x50); // P
+    assert.equal(buf[2], 0x4e); // N
+    assert.equal(buf[3], 0x47); // G
+    assert.ok(buf.length > 80 * 1024, `${file} too small for photoreal card`);
+    assert.ok(buf.length < 4 * 1024 * 1024, `${file} unexpectedly large`);
   });
+  const shared = read("shared-data.js");
+  assert.match(shared, /black-card-2x1\.png/);
+  assert.match(shared, /black-card-amex-2x1\.png/);
+  assert.match(shared, /ballers-alert-2x1\.png/);
+  assert.doesNotMatch(shared, /black-card-2x1\.svg/);
 });
 
 test("server prices and Amex gate are enforced", () => {

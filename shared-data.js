@@ -1283,11 +1283,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     ballerCard:true,
     ballerBrand:'ballers',
-    defaultBackgroundUrl:'./images/baller/black-card-2x1.svg',
+    defaultBackgroundUrl:'./images/baller/black-card-2x1.png',
     backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/black-card-2x1.svg',
-      'led-64x32':'./images/baller/black-card-2x1.svg',
-      'led-64x48':'./images/baller/black-card-4x3.svg'
+      'led-96x48':'./images/baller/black-card-2x1.png',
+      'led-64x32':'./images/baller/black-card-2x1.png',
+      'led-64x48':'./images/baller/black-card-4x3.png'
     },
     priceCents:7500,
     priceLabel:'$75',
@@ -1300,7 +1300,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:28,
     maxSubCharacters:28,
     textProfileId:'ballerCard',
-    description:"Photoreal Baller's Express BUSINESS metal card. Name from your FloqR display name, @handle, or a custom name. Company: We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom. $75. All LED sizes.",
+    description:"Photoreal Centurion-frame Baller's Express BUSINESS metal card (exact ornate border from reference). Name from your FloqR display name, @handle, or a custom name. Company: We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom. $75. All LED sizes.",
     howItWorks:"Pick Black Card → choose how your name appears and a company line → preview the metal card → pay $75. The LED shows the card with your name and company embossed.",
     tags:["black card","baller's express","metal card","vip","business","$75","96x48","64x48","64x32"]
   },
@@ -1319,11 +1319,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     ballerAlert:true,
     ballerBrand:'ballers',
     requiresFacePhoto:true,
-    defaultBackgroundUrl:'./images/baller/ballers-alert-2x1.svg',
+    defaultBackgroundUrl:'./images/baller/ballers-alert-2x1.png',
     backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/ballers-alert-2x1.svg',
-      'led-64x32':'./images/baller/ballers-alert-2x1.svg',
-      'led-64x48':'./images/baller/ballers-alert-4x3.svg'
+      'led-96x48':'./images/baller/ballers-alert-2x1.png',
+      'led-64x32':'./images/baller/ballers-alert-2x1.png',
+      'led-64x48':'./images/baller/ballers-alert-4x3.png'
     },
     priceCents:10000,
     priceLabel:'$100',
@@ -1355,11 +1355,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     ballerCard:true,
     ballerBrand:'amex',
-    defaultBackgroundUrl:'./images/baller/black-card-amex-2x1.svg',
+    defaultBackgroundUrl:'./images/baller/black-card-amex-2x1.png',
     backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/black-card-amex-2x1.svg',
-      'led-64x32':'./images/baller/black-card-amex-2x1.svg',
-      'led-64x48':'./images/baller/black-card-amex-4x3.svg'
+      'led-96x48':'./images/baller/black-card-amex-2x1.png',
+      'led-64x32':'./images/baller/black-card-amex-2x1.png',
+      'led-64x48':'./images/baller/black-card-amex-4x3.png'
     },
     priceCents:7500,
     priceLabel:'$75',
@@ -1392,11 +1392,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     ballerAlert:true,
     ballerBrand:'amex',
     requiresFacePhoto:true,
-    defaultBackgroundUrl:'./images/baller/ballers-alert-amex-2x1.svg',
+    defaultBackgroundUrl:'./images/baller/ballers-alert-amex-2x1.png',
     backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/ballers-alert-amex-2x1.svg',
-      'led-64x32':'./images/baller/ballers-alert-amex-2x1.svg',
-      'led-64x48':'./images/baller/ballers-alert-amex-4x3.svg'
+      'led-96x48':'./images/baller/ballers-alert-amex-2x1.png',
+      'led-64x32':'./images/baller/ballers-alert-amex-2x1.png',
+      'led-64x48':'./images/baller/ballers-alert-amex-4x3.png'
     },
     priceCents:10000,
     priceLabel:'$100',
