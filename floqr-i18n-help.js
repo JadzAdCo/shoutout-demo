@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.75";
+  const VERSION = "s3.2.76";
 
   const packs = {
     "ru": {
@@ -14,7 +14,7 @@
         title: "Согласие персонала на маркетинг",
         body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Ответы учитывают классификацию вашего аккаунта. Быстрый поиск намерений остаётся доступен как быстрый путь к карточкам продуктов без чата."
       },
@@ -78,7 +78,7 @@
         title: "Архивные ShoutOuts",
         body: "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Спросите FloqR через BOT DEE",
         body: "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
       },
@@ -234,7 +234,7 @@
         title: "Шаблон по умолчанию",
         body: "Бесплатный классический чёрно-белый Traditional. Карточка показывает настоящее LED-превью в основном размере экрана площадки (имя и размер сверху; описание и теги снизу). Нажмите «Использовать», чтобы открыть редактор. Ищите выше публичные, клубные и личные шаблоны по имени, описанию, тегам или популярности."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Поиск шаблонов",
         body: "Используйте поле с лупой (тот же дизайн, что у Search), чтобы найти шаблоны по имени, описанию, тегам, спорту, VIP, медиа или популярности. В результатах — официальные шаблоны FLOQR, клубные фоны и ваши личные. Каждая карточка — настоящее LED-превью основного размера; «Использовать» — единственное действие."
       },
@@ -336,7 +336,7 @@
         title: "Marketingtoestemming voor personeel",
         body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Antwoorden gebruiken de classificatie van jouw account. Snelle intent-zoekactie blijft beschikbaar als snel pad naar productkaarten zonder chat."
       },
@@ -400,7 +400,7 @@
         title: "Gearchiveerde ShoutOuts",
         body: "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Vraag FloqR met BOT DEE",
         body: "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
       },
@@ -556,7 +556,7 @@
         title: "Standaardsjabloon",
         body: "Gratis Traditional zwart-wit klassiek. De kaart toont een echte LED-voorbeeldweergave op het primaire schermformaat van de locatie (naam en afmeting boven; beschrijving en tags onder). Tik op Gebruiken voor de editor. Zoek hierboven naar openbare, club-goedgekeurde en persoonlijke sjablonen op naam, beschrijving, tags of populariteit."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Sjabloonzoeken",
         body: "Gebruik het zoekveld met lens (zelfde ontwerp als Search) om sjablonen te vinden op naam, beschrijving, tags, sport, VIP, media of populariteit. Resultaten omvatten officiële FLOQR-sjablonen, club-goedgekeurde achtergronden en je persoonlijke. Elke kaart is een echte LED-voorbeeld op het primaire formaat — Gebruiken is de enige actie."
       },
@@ -658,7 +658,7 @@
         title: "Consentement marketing du personnel",
         body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Les réponses respectent la classification de votre compte. La recherche d’intention rapide reste disponible pour les cartes produit sans chat."
       },
@@ -722,7 +722,7 @@
         title: "ShoutOuts archivés",
         body: "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Demandez FloqR avec BOT DEE",
         body: "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
       },
@@ -878,7 +878,7 @@
         title: "Modèle par défaut",
         body: "Classique noir et blanc Traditionnel gratuit. La carte montre un vrai aperçu LED à la taille d’écran principale du lieu (nom et dimension en haut ; description et tags en bas). Touchez Utiliser pour ouvrir l’éditeur. Cherchez ci-dessus les modèles publics, approuvés par le club et personnels par nom, description, tags ou popularité."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Recherche de modèles",
         body: "Utilisez le champ loupe (même design que Search) pour trouver des modèles par nom, description, tags, sports, VIP, média ou popularité. Les résultats incluent les modèles FLOQR officiels, les fonds approuvés par le club et vos fonds personnels. Chaque carte est un vrai aperçu LED à la taille principale du lieu — Utiliser est la seule action."
       },
@@ -980,7 +980,7 @@
         title: "Marketing-Einwilligung für Personal",
         body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Antworten nutzen die Klassifizierung deines Kontos. Die schnelle Intent-Suche bleibt als schneller Weg zu Produktkarten ohne Chat verfügbar."
       },
@@ -1044,7 +1044,7 @@
         title: "Archivierte ShoutOuts",
         body: "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Fragen Sie FloqR mit BOT DEE",
         body: "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
       },
@@ -1200,7 +1200,7 @@
         title: "Standardvorlage",
         body: "Kostenloses klassisches Schwarz-Weiß Traditional. Die Karte zeigt eine echte LED-Vorschau in der primären Displaygröße des Ortes (Name und Maß oben; Beschreibung und Tags unten). Tippe auf Verwenden für den Editor. Suche oben nach öffentlichen, club-freigegebenen und persönlichen Vorlagen nach Name, Beschreibung, Tags oder Beliebtheit."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Vorlagensuche",
         body: "Nutze das Suchlinsen-Feld (gleiches Design wie Search), um Vorlagen nach Name, Beschreibung, Tags, Sport, VIP, Medien oder Beliebtheit zu finden. Ergebnisse umfassen offizielle FLOQR-Vorlagen, club-freigegebene Hintergründe und deine persönlichen. Jede Karte ist eine echte LED-Vorschau in der primären Größe — Verwenden ist die einzige Aktion."
       },
@@ -1302,7 +1302,7 @@
         title: "Consentimiento de marketing del personal",
         body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Las respuestas usan la clasificación de tu cuenta. La búsqueda rápida de intención sigue disponible como atajo a tarjetas de producto sin chat."
       },
@@ -1366,7 +1366,7 @@
         title: "ShoutOuts archivados",
         body: "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Pregunta FloqR con BOT DEE",
         body: "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
       },
@@ -1522,7 +1522,7 @@
         title: "Plantilla predeterminada",
         body: "Clásico blanco y negro Traditional gratis. La tarjeta muestra una vista previa LED real al tamaño de pantalla principal del local (nombre y dimensión arriba; descripción y etiquetas abajo). Toca Usar para abrir el editor. Busca arriba plantillas públicas, aprobadas por el club y personales por nombre, descripción, etiquetas o popularidad."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Búsqueda de plantillas",
         body: "Usa el campo con lupa (mismo diseño que Search) para encontrar plantillas por nombre, descripción, etiquetas, deportes, VIP, medios o popularidad. Los resultados incluyen plantillas oficiales FLOQR, fondos aprobados por el club y tus fondos personales. Cada tarjeta es una vista previa LED real al tamaño principal — Usar es la única acción."
       },
@@ -1624,7 +1624,7 @@
         title: "Consenso marketing del personale",
         body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Le risposte usano la classificazione del tuo account. La ricerca rapida di intent resta disponibile come percorso veloce alle schede prodotto senza chat."
       },
@@ -1688,7 +1688,7 @@
         title: "ShoutOut archiviati",
         body: "Archive memorizza una copia compressa del testo e dei media dello ShoutOut completato (se presenti) in storage Firebase economico e lo rimuove da Completati. Apri Archive quando vuoi. Riusa funziona anche da Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Chiedi FloqR con BOT DEE",
         body: "Chiedi FloqR con BOT DEE: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
       },
@@ -1844,7 +1844,7 @@
         title: "Modello predefinito",
         body: "Classico bianco e nero Traditional gratuito. La scheda mostra un’anteprima LED reale alla dimensione display principale del locale (nome e dimensione in alto; descrizione e tag in basso). Tocca Usa per aprire l’editor. Cerca sopra modelli pubblici, approvati dal club e personali per nome, descrizione, tag o popolarità."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Ricerca modelli",
         body: "Usa il campo lente (stesso design di Search) per trovare modelli per nome, descrizione, tag, sport, VIP, media o popolarità. I risultati includono modelli FLOQR ufficiali, sfondi approvati dal club e i tuoi personali. Ogni scheda è un’anteprima LED reale alla dimensione principale — Usa è l’unica azione."
       },
@@ -1946,7 +1946,7 @@
         title: "Consentimento de marketing da equipe",
         body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. As respostas usam a classificação da sua conta. A pesquisa rápida de intenção continua disponível como atalho para cartões de produto sem chat."
       },
@@ -2010,7 +2010,7 @@
         title: "ShoutOuts arquivados",
         body: "Archive guarda uma cópia comprimida do texto e da mídia do seu ShoutOut concluído (se o original tinha mídia) em armazenamento Firebase econômico e remove de Concluídos. Abra Archive a qualquer momento. Reutilizar também funciona a partir de Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Pergunte FloqR com BOT DEE",
         body: "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
       },
@@ -2166,7 +2166,7 @@
         title: "Modelo predefinido",
         body: "Clássico preto e branco Traditional gratuito. O cartão mostra uma pré-visualização LED real no tamanho de ecrã principal do local (nome e dimensão em cima; descrição e tags em baixo). Toque em Usar para abrir o editor. Pesquise acima modelos públicos, aprovados pelo clube e pessoais por nome, descrição, tags ou popularidade."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Pesquisa de modelos",
         body: "Use o campo com lente (mesmo design da Search) para encontrar modelos por nome, descrição, tags, desporto, VIP, média ou popularidade. Os resultados incluem modelos oficiais FLOQR, fundos aprovados pelo clube e os seus pessoais. Cada cartão é uma pré-visualização LED real no tamanho principal — Usar é a única ação."
       },
@@ -2268,7 +2268,7 @@
         title: "Συγκατάθεση μάρκετινγκ προσωπικού",
         body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Η γρήγορη αναζήτηση πρόθεσης παραμένει διαθέσιμη ως γρήγορη διαδρομή σε κάρτες προϊόντων χωρίς συνομιλία."
       },
@@ -2332,7 +2332,7 @@
         title: "Αρχειοθετημένα ShoutOuts",
         body: "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Ρωτήστε το FloqR με το BOT DEE",
         body: "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
       },
@@ -2488,7 +2488,7 @@
         title: "Προεπιλεγμένο πρότυπο",
         body: "Δωρεάν κλασικό ασπρόμαυρο Traditional. Η κάρτα δείχνει πραγματική προεπισκόπηση LED στο κύριο μέγεθος οθόνης του χώρου (όνομα και διάσταση πάνω· περιγραφή και ετικέτες κάτω). Πατήστε Χρήση για τον επεξεργαστή. Αναζητήστε πάνω δημόσια, εγκεκριμένα από club και προσωπικά πρότυπα με όνομα, περιγραφή, ετικέτες ή δημοφιλία."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Αναζήτηση προτύπων",
         body: "Χρησιμοποιήστε το πεδίο με φακό (ίδιο σχέδιο με το Search) για πρότυπα με όνομα, περιγραφή, ετικέτες, sports, VIP, μέσα ή δημοφιλία. Τα αποτελέσματα περιλαμβάνουν επίσημα πρότυπα FLOQR, εγκεκριμένα φόντα club και τα προσωπικά σας. Κάθε κάρτα είναι πραγματική προεπισκόπηση LED στο κύριο μέγεθος — η Χρήση είναι η μόνη ενέργεια."
       },
@@ -2590,7 +2590,7 @@
         title: "Zgoda marketingowa personelu",
         body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Odpowiedzi używają klasyfikacji Twojego konta. Szybkie wyszukiwanie intencji pozostaje dostępne jako szybka ścieżka do kart produktów bez czatu."
       },
@@ -2654,7 +2654,7 @@
         title: "Zarchiwizowane ShoutOuts",
         body: "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "Zapytaj FloqR z BOT DEE",
         body: "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
       },
@@ -2810,7 +2810,7 @@
         title: "Domyślny szablon",
         body: "Bezpłatny klasyczny czarno-biały Traditional. Karta pokazuje prawdziwy podgląd LED w głównym rozmiarze ekranu lokalu (nazwa i wymiar u góry; opis i tagi u dołu). Dotknij Użyj, aby otworzyć edytor. Szukaj powyżej publicznych, zatwierdzonych przez klub i osobistych szablonów po nazwie, opisie, tagach lub popularności."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Wyszukiwanie szablonów",
         body: "Użyj pola z lupą (ten sam wygląd co Search), aby znaleźć szablony po nazwie, opisie, tagach, sporcie, VIP, mediach lub popularności. Wyniki obejmują oficjalne szablony FLOQR, tła zatwierdzone przez klub i Twoje osobiste. Każda karta to prawdziwy podgląd LED w głównym rozmiarze — Użyj to jedyna akcja."
       },
@@ -2912,7 +2912,7 @@
         title: "موافقة الطاقم على التسويق",
         body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."
       },
-      "help-floqai-page": {
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. تستخدم الإجابات تصنيف حسابك. يبقى البحث السريع عن النية متاحًا كمسار سريع لبطاقات المنتجات دون دردشة."
       },
@@ -2976,7 +2976,7 @@
         title: "ShoutOuts المؤرشفة",
         body: "يخزّن Archive نسخة مضغوطة من نص ووسائط ShoutOut المكتمل (إن وُجدت وسائط) في تخزين Firebase منخفض التكلفة ويزيله من المكتملة. افتح Archive في أي وقت. تعمل إعادة الاستخدام أيضاً من Archive."
       },
-      "floqai-ask-floqr": {
+      "botdee-ask-floqr": {
         title: "اسأل FloqR مع BOT DEE",
         body: "اسأل FloqR مع BOT DEE — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
       },
@@ -3132,7 +3132,7 @@
         title: "القالب الافتراضي",
         body: "كلاسيكي أسود وأبيض Traditional مجاني. تُظهر البطاقة معاينة LED حقيقية بحجم الشاشة الأساسي للمكان (الاسم والأبعاد في الأعلى؛ الوصف والوسوم في الأسفل). اضغط استخدام لفتح المحرر. ابحث أعلاه عن القوالب العامة والمعتمدة من النادي والشخصية بالاسم أو الوصف أو الوسوم أو الشهرة."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "بحث القوالب",
         body: "استخدم حقل العدسة (نفس تصميم Search) للعثور على القوالب بالاسم أو الوصف أو الوسوم أو الرياضة أو VIP أو الوسائط أو الشهرة. تشمل النتائج قوالب FLOQR الرسمية وخلفيات النادي المعتمدة وخلفياتك الشخصية. كل بطاقة معاينة LED حقيقية بالحجم الأساسي — استخدام هو الإجراء الوحيد."
       },
@@ -3270,7 +3270,7 @@
         node.dataset?.helpId
         || node.getAttribute?.("data-help-id")
         || node.dataset?.floqaiHelpId
-        || node.getAttribute?.("data-floqai-help-id")
+        || node.getAttribute?.("data-botdee-help-id")
         || ""
       ).trim();
       if (!id) return;
@@ -3283,7 +3283,7 @@
       } catch (_) {}
       if (!entry) {
         const summary = node.querySelector?.("summary");
-        const bodyEl = node.querySelector?.(".help-popout-body, .floqai-help-body, div:not(summary)");
+        const bodyEl = node.querySelector?.(".help-popout-body, .botdee-help-body, div:not(summary)");
         entry = {
           id,
           title: String(summary?.getAttribute("aria-label") || "").replace(/^Help:\s*/i, "") || id,
@@ -3297,7 +3297,7 @@
       const body = localized.body || entry.body;
       const summary = node.querySelector?.("summary");
       if (summary) summary.setAttribute("aria-label", title ? `Help: ${title}` : "Help");
-      const bodyEl = node.querySelector?.(".help-popout-body, .floqai-help-body");
+      const bodyEl = node.querySelector?.(".help-popout-body, .botdee-help-body");
       if (bodyEl && body != null && body !== "") {
         if (!bodyEl.querySelector?.("a,button,ul,ol")) bodyEl.textContent = body;
       }

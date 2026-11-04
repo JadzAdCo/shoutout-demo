@@ -237,7 +237,7 @@ test("i18n: 20 staffConsent keys in all 11 packs, brands untranslated, help in e
     assert.ok(packs[lang][id].body.includes("TikTok"), `help ${lang} keeps brands`);
   }
   assert.equal(JSON.parse(read("scripts/_help-en.json"))[id].body, client.HELP.body);
-  const repo = read("floqai-help-repository.js");
+  const repo = read("botdee-help-repository.js");
   const entry = repo.slice(repo.indexOf(`id: "${id}"`), repo.indexOf("page:", repo.indexOf(`id: "${id}"`)));
   assert.ok(entry.includes(JSON.stringify(client.HELP.body)), "repository body matches");
   assert.match(entry, /audiences: \["patron", "serviceMember", "venueAdmin"\]/);

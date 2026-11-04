@@ -10,16 +10,16 @@ const q = s => JSON.stringify(s);
 const CHROME_ORDER = ["en", "fr", "de", "es", "nl", "ru", "it", "pt", "el", "pl", "ar"];
 
 const KEYS = [
-  "floqai.chatWelcome",
-  "floqai.chatPlaceholder",
-  "floqai.chatSend",
-  "floqai.chatThinking",
-  "floqai.chatOffline",
-  "floqai.chatEmpty",
-  "floqai.chatError",
-  "floqai.chatSignIn",
-  "floqai.chatFeatureOff",
-  "floqai.intentFallback"
+  "botdee.chatWelcome",
+  "botdee.chatPlaceholder",
+  "botdee.chatSend",
+  "botdee.chatThinking",
+  "botdee.chatOffline",
+  "botdee.chatEmpty",
+  "botdee.chatError",
+  "botdee.chatSignIn",
+  "botdee.chatFeatureOff",
+  "botdee.intentFallback"
 ];
 
 const T = {
@@ -161,8 +161,8 @@ function injectPack(src, lang, pairs) {
   const marker = new RegExp(`(\\n\\s*${lang}:\\s*\\{)`);
   if (!marker.test(src)) throw new Error(`Missing pack ${lang}`);
   const block = pairs.map(([k, v]) => `      ${q(k)}: ${q(v)},`).join("\n");
-  // Insert after floqai.scopePublic if present, else after pack open
-  const afterKey = `"floqai.scopePublic"`;
+  // Insert after botdee.scopePublic if present, else after pack open
+  const afterKey = `"botdee.scopePublic"`;
   const idx = src.indexOf(`${lang}:`);
   const nextPack = CHROME_ORDER[CHROME_ORDER.indexOf(lang) + 1];
   const end = nextPack ? src.indexOf(`\n  ${nextPack}:`, idx) : src.indexOf("\n};", idx);
@@ -185,8 +185,8 @@ CHROME_ORDER.forEach(lang => {
   src = injectPack(src, lang, pairs);
 });
 
-// Title stays FloqAi in packs historically; Search tile uses cat.floqai = BOT DEE.
-// Keep page.floqai.title as FloqAi for chrome parity unless product asks to rename.
+// Title stays BOT DEE in packs historically; Search tile uses cat.botdee = BOT DEE.
+// Keep page.botdee.title as BOT DEE for chrome parity unless product asks to rename.
 
 fs.writeFileSync(file, src);
 console.log("Added BOT DEE chat i18n keys to", KEYS.length, "×", CHROME_ORDER.length, "packs");

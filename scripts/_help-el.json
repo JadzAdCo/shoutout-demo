@@ -11,7 +11,7 @@
     "title": "Αρχειοθετημένα ShoutOuts",
     "body": "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
   },
-  "floqai-ask-floqr": {
+  "botdee-ask-floqr": {
     "title": "Ρωτήστε το FloqR με το BOT DEE",
     "body": "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
   },
@@ -135,7 +135,7 @@
     "title": "Προεπιλεγμένο πρότυπο",
     "body": "Δωρεάν Παραδοσιακό Ασπρόμαυρο Κλασικό. Χρησιμοποιήστε το BOT DEE παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
   },
-  "help-floqai-template-search": {
+  "help-botdee-template-search": {
     "title": "BOT DEE αναζήτηση προτύπου",
     "body": "Αγγίξτε την κινούμενη ένδειξη BOT DEE (ή περιμένετε τα συννεφάκια ομιλίας του), μετά ζητήστε Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures ή Ballers."
   },

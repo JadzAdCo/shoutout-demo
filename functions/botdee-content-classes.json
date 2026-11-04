@@ -1,6 +1,6 @@
 {
   "help": {
-    "floqai-ask-floqr": [
+    "botdee-ask-floqr": [
       "venueAdmin"
     ],
     "help-ad-campaign-mgmt": [
@@ -38,6 +38,18 @@
     ],
     "help-bot-dee-mgmt": [
       "masterAdmin"
+    ],
+    "help-botdee-audience-sections": [
+      "masterAdmin"
+    ],
+    "help-botdee-page": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-template-search": [
+      "patron"
     ],
     "help-chrome-audit": [
       "masterAdmin"
@@ -113,18 +125,6 @@
     ],
     "help-features-services": [
       "masterAdmin"
-    ],
-    "help-floqai-audience-sections": [
-      "masterAdmin"
-    ],
-    "help-floqai-page": [
-      "masterAdmin",
-      "patron",
-      "serviceMember",
-      "venueAdmin"
-    ],
-    "help-floqai-template-search": [
-      "patron"
     ],
     "help-floqcast": [
       "patron"

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-/* Builds functions/floqai-content-classes.json — the classification of every FloqAi source
-   (help repository entries + curated intents) that getFloqAiAccess enforces server-side.
-   Usage: node scripts/build-floqai-content-classes.js [--check]
+/* Builds functions/botdee-content-classes.json — the classification of every BOT DEE source
+   (help repository entries + curated intents) that getBotDeeAccess enforces server-side.
+   Usage: node scripts/build-botdee-content-classes.js [--check]
    Design notes: .cursor/rules/design-notes-data-classification.mdc */
 "use strict";
 
@@ -10,7 +10,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.resolve(__dirname, "..");
-const OUT = path.join(ROOT, "functions", "floqai-content-classes.json");
+const OUT = path.join(ROOT, "functions", "botdee-content-classes.json");
 
 function loadBrowserModules(root = ROOT) {
   const win = {
@@ -27,7 +27,7 @@ function loadBrowserModules(root = ROOT) {
   };
   win.window = win;
   const ctx = vm.createContext(win);
-  vm.runInContext(fs.readFileSync(path.join(root, "floqai-help-repository.js"), "utf8"), ctx, {filename: "floqai-help-repository.js"});
+  vm.runInContext(fs.readFileSync(path.join(root, "botdee-help-repository.js"), "utf8"), ctx, {filename: "botdee-help-repository.js"});
   vm.runInContext(fs.readFileSync(path.join(root, "intent-search.js"), "utf8"), ctx, {filename: "intent-search.js"});
   return {repo: win.FLOQRHelpRepository, intents: win.FLOQRIntentSearch};
 }
@@ -54,10 +54,10 @@ if (require.main === module) {
   if (process.argv.includes("--check")) {
     const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8").replace(/\r\n/g, "\n") : "";
     if (current !== next) {
-      console.error("functions/floqai-content-classes.json is stale. Run: node scripts/build-floqai-content-classes.js");
+      console.error("functions/botdee-content-classes.json is stale. Run: node scripts/build-botdee-content-classes.js");
       process.exit(1);
     }
-    console.log("FloqAi content classes are up to date.");
+    console.log("BOT DEE content classes are up to date.");
   } else {
     fs.writeFileSync(OUT, next);
     const parsed = JSON.parse(next);

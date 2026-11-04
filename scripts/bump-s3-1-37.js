@@ -61,7 +61,7 @@ function run(root) {
     if (!head.test(src)) throw new Error("README head");
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
-    const note = `- ${NEXT}: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, FloqAi, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.`;
+    const note = `- ${NEXT}: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, BOT DEE, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.`;
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
   });
 

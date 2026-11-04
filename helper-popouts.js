@@ -157,7 +157,7 @@
           convertAll(node);
           window.FLOQRHelpAttach?.mountAll?.(node);
           window.FLOQRHelpAttach?.glueOrphanPopouts?.(node);
-          if (node.matches?.("details.help-popout, .floqai-help-popout, [data-floqai-help-entry]") || node.querySelector?.("details.help-popout, .floqai-help-popout")) {
+          if (node.matches?.("details.help-popout, .botdee-help-popout, [data-botdee-help-entry]") || node.querySelector?.("details.help-popout, .botdee-help-popout")) {
             window.FLOQRHelpRepository?.registerDomHelpPopouts?.(node);
           }
         });

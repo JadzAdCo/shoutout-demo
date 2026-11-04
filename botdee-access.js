@@ -1,4 +1,4 @@
-/* FloqAi server access gate — asks getFloqAiAccess which FloqAi results this account may see.
+/* BOT DEE server access gate — asks getBotDeeAccess which BOT DEE results this account may see.
    Without the callable, intent-search.js falls back to the packaged classification (still fail closed).
    Design notes: .cursor/rules/design-notes-data-classification.mdc */
 (function (global) {
@@ -17,7 +17,7 @@
   function callable() {
     try {
       if (!global.firebase?.functions || !global.firebase.apps?.length) return null;
-      return global.firebase.app().functions("us-central1").httpsCallable("getFloqAiAccess");
+      return global.firebase.app().functions("us-central1").httpsCallable("getBotDeeAccess");
     } catch (_) {
       return null;
     }
@@ -77,7 +77,7 @@
         mode = "denied";
       } else {
         mode = "local";
-        console.warn("FloqAi access check unavailable; using packaged classification", error?.code || error?.message || error);
+        console.warn("BOT DEE access check unavailable; using packaged classification", error?.code || error?.message || error);
       }
     } finally {
       inFlight -= 1;
@@ -109,7 +109,7 @@
     return () => listeners.delete(cb);
   }
 
-  global.FLOQRFloqAiAccess = {
+  global.FLOQRBotDeeAccess = {
     activate,
     isActive,
     verdict,
@@ -120,4 +120,6 @@
     mode: () => mode,
     role: () => role
   };
+  // One-release alias for pages still referencing FLOQRFloqAiAccess.
+  global.FLOQRFloqAiAccess = global.FLOQRBotDeeAccess;
 })(window);

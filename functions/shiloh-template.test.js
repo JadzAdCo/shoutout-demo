@@ -83,8 +83,8 @@ test("checkout treats Shiloh as a plain full-profile paid ShoutOut (no Heist gat
   assert.equal(loadSharedData().SHOUTOUT_TEMPLATES.shiloh.priceCents, 3000);
 });
 
-test("Shiloh has patron help in every language and a FloqAi template intent", () => {
-  const repo = read("floqai-help-repository.js");
+test("Shiloh has patron help in every language and a BOT DEE template intent", () => {
+  const repo = read("botdee-help-repository.js");
   assert.match(repo, /id: "help-shiloh",\s*title: "Shiloh",/);
   const helpPacks = read("floqr-i18n-help.js");
   const blocks = helpPacks.match(/"help-shiloh": \{\s*title: "Shiloh",\s*body: "[^"]+"/g) || [];
@@ -93,7 +93,7 @@ test("Shiloh has patron help in every language and a FloqAi template intent", ()
   const intents = read("intent-search.js");
   assert.match(intents, /id: "shiloh",[\s\S]{0,400}action: "template",\s*templateId: "shiloh"/);
   assert.match(intents, /shiloh: \["patron"\]/);
-  const classes = JSON.parse(read("functions/floqai-content-classes.json"));
+  const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help["help-shiloh"], ["patron"]);
   assert.deepEqual(classes.intents.shiloh, ["patron"]);
 });

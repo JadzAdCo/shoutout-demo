@@ -715,7 +715,12 @@ service cloud.firestore {
  allow write: if false;
  }
 
+ // Legacy throttle collection id (pre-botDee rename); keep deny-all.
  match /floqAiAccessThrottle/{uid} {
+ allow read, write: if false;
+ }
+
+ match /botDeeAccessThrottle/{uid} {
  allow read, write: if false;
  }
 

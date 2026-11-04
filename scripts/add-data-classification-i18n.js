@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Data classification (Master Admin → Security) + FloqAi access-check status — chrome keys in all 11 packs.
+/* Data classification (Master Admin → Security) + BOT DEE access-check status — chrome keys in all 11 packs.
    Reads floqr-i18n.js fresh and writes it immediately (other agents may edit the same file). */
 "use strict";
 
@@ -22,7 +22,7 @@ const KEYS = [
   "dataClass.unlock", "dataClass.loading", "dataClass.saved", "dataClass.level.public", "dataClass.level.internal",
   "dataClass.level.clubConfidential", "dataClass.level.restricted", "dataClass.level.secret", "dataClass.role.anonymous", "dataClass.role.system",
   "dataClass.access.yes", "dataClass.access.own", "dataClass.access.no", "dataClass.retentionHint",
-  "floqai.checkingAccess", "floqai.scopePublic"
+  "botdee.checkingAccess", "botdee.scopePublic"
 ];
 
 const T = {

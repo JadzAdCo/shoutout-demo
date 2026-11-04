@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title data-i18n="page.floqai.title">BOT DEE</title>
+  <title data-i18n="page.botdee.title">BOT DEE</title>
   <script>
     /* Paint Site chrome before CSS so BOT DEE is not stuck on Nightlife. */
     try{
@@ -23,29 +23,29 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.2.75"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.2.75"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=s3.2.75"/>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.2.75"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.2.76"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.2.76"/>
+  <link rel="stylesheet" href="./botdee-search.css?v=s3.2.76"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.2.76"/>
 </head>
-<body class="floqai-standalone botdee-page" data-floqr-feature="floqAi">
-<main class="floqai-standalone-main botdee-shell">
+<body class="botdee-standalone botdee-page" data-floqr-feature="botDee">
+<main class="botdee-standalone-main botdee-shell">
   <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&lt; Back</a>
 
   <section id="botDeeChatPage" class="page botdee-chat-page active" aria-label="BOT DEE chat">
     <header class="botdee-chat-header">
-      <img data-floqr-chrome-icon="floqAi" src="./images/chrome/botdee-nightlife.jpg" alt="" class="botdee-chat-icon" width="56" height="56"/>
+      <img data-floqr-chrome-icon="botDee" src="./images/chrome/botdee-nightlife.jpg" alt="" class="botdee-chat-icon" width="56" height="56"/>
       <div class="botdee-chat-heading">
-        <h1 class="botdee-chat-title" data-i18n="page.floqai.title">BOT DEE</h1>
-        <p id="floqAiScopeNote" class="sub small floqai-scope-note botdee-scope-note" role="status"></p>
+        <h1 class="botdee-chat-title" data-i18n="page.botdee.title">BOT DEE</h1>
+        <p id="botDeeScopeNote" class="sub small botdee-scope-note botdee-scope-note" role="status"></p>
       </div>
-      <details class="help-popout botdee-help-popout" data-floqr-help-id="help-floqai-page">
+      <details class="help-popout botdee-help-popout" data-floqr-help-id="help-botdee-page">
         <summary aria-label="Help" title="BOT DEE help">?</summary>
           <div class="help-popout-body">
-          <strong data-i18n="page.floqai.title">BOT DEE</strong>
-          <p data-i18n="floqai.helpIntro">Ask BOT DEE anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.</p>
-          <p data-i18n="floqai.helpComposer">Press Enter to send a message. Shift+Enter starts a new line. BOT DEE chats like a person — try “How are you?” — and only looks things up when you ask how to do something in FLOQR.</p>
-          <p class="sub small" data-i18n="floqai.helpScope">Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.</p>
+          <strong data-i18n="page.botdee.title">BOT DEE</strong>
+          <p data-i18n="botdee.helpIntro">Ask BOT DEE anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.</p>
+          <p data-i18n="botdee.helpComposer">Press Enter to send a message. Shift+Enter starts a new line. BOT DEE chats like a person — try “How are you?” — and only looks things up when you ask how to do something in FLOQR.</p>
+          <p class="sub small" data-i18n="botdee.helpScope">Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.</p>
         </div>
       </details>
     </header>
@@ -55,25 +55,25 @@
 
     <form id="botDeeChatForm" class="botdee-chat-form" autocomplete="off">
       <label class="botdee-chat-label" for="botDeeChatInput">
-        <span class="visually-hidden" data-i18n="floqai.prompt">Tell me what you want to do</span>
-        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="floqai.chatPlaceholder" placeholder="Ask BOT DEE… Enter sends · Shift+Enter new line" aria-describedby="botDeeChatStatus" title="Enter sends · Shift+Enter new line"></textarea>
+        <span class="visually-hidden" data-i18n="botdee.prompt">Tell me what you want to do</span>
+        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="botdee.chatPlaceholder" placeholder="Ask BOT DEE… Enter sends · Shift+Enter new line" aria-describedby="botDeeChatStatus" title="Enter sends · Shift+Enter new line"></textarea>
       </label>
-      <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="floqai.chatSend">Send</button>
+      <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="botdee.chatSend">Send</button>
     </form>
   </section>
 
   <!-- Intent search stays as a fast path / feature-optimized fallback -->
   <details id="botDeeIntentFallback" class="botdee-intent-fallback">
-    <summary data-i18n="floqai.intentFallback">Quick intent search</summary>
-    <section id="intentSearchPage" class="page intent-search-page floqai-intent-page">
-      <div class="intent-search-shell floqai-top-stack">
-        <div class="floqai-search-main intent-search-main">
-          <div id="floqAiSearchPanel" class="floqai-search-panel open" aria-hidden="false">
+    <summary data-i18n="botdee.intentFallback">Quick intent search</summary>
+    <section id="intentSearchPage" class="page intent-search-page botdee-intent-page">
+      <div class="intent-search-shell botdee-top-stack">
+        <div class="botdee-search-main intent-search-main">
+          <div id="botDeeSearchPanel" class="botdee-search-panel open" aria-hidden="false">
             <label class="intent-search-label" for="intentSearchInput">
-              <span id="floqAiHelpText" class="intent-help" data-i18n="floqai.prompt">Tell me what you want to do</span>
-              <input id="intentSearchInput" type="search" autocomplete="off" data-i18n-placeholder="floqai.placeholder" placeholder="Clubs near me · Create a schedule · Club website feed · ShoutOut" aria-describedby="intentSearchHint"/>
+              <span id="botDeeHelpText" class="intent-help" data-i18n="botdee.prompt">Tell me what you want to do</span>
+              <input id="intentSearchInput" type="search" autocomplete="off" data-i18n-placeholder="botdee.placeholder" placeholder="Clubs near me · Create a schedule · Club website feed · ShoutOut" aria-describedby="intentSearchHint"/>
             </label>
-            <p id="intentSearchHint" class="sub small intent-hint" data-i18n="floqai.hint">Try: clubs near me · create a schedule · club website feed · make me a superstar · I want to be a Club Admin</p>
+            <p id="intentSearchHint" class="sub small intent-hint" data-i18n="botdee.hint">Try: clubs near me · create a schedule · club website feed · make me a superstar · I want to be a Club Admin</p>
             <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
           </div>
         </div>
@@ -81,13 +81,13 @@
     </section>
   </details>
 
-  <button id="floqAiAgent" class="floqai-agent hidden" type="button" aria-label="BOT DEE - open contextual search" title="BOT DEE">
-    <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
-      <img class="floqai-mark-img" data-floqr-chrome-icon="floqAi" src="./images/chrome/botdee-nightlife.jpg" alt="" width="96" height="96"/>
+  <button id="botDeeAgent" class="botdee-agent hidden" type="button" aria-label="BOT DEE - open contextual search" title="BOT DEE">
+    <span id="botDeeMark" class="botdee-mark" aria-hidden="true">
+      <img class="botdee-mark-img" data-floqr-chrome-icon="botDee" src="./images/chrome/botdee-nightlife.jpg" alt="" width="96" height="96"/>
     </span>
   </button>
-  <div id="floqAiSpeech" class="floqai-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
-    <span id="floqAiSpeechText"></span>
+  <div id="botDeeSpeech" class="botdee-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
+    <span id="botDeeSpeechText"></span>
   </div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -95,24 +95,24 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.2.75"></script>
-<script src="./floqr-app-check.js?v=s3.2.75"></script>
-<script src="./floqr-session-shell.js?v=s3.2.75"></script>
-<script src="./floqr-nav.js?v=s3.2.75"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.75"></script>
-<script src="./floqr-i18n.js?v=s3.2.75"></script>
-<script src="./floqr-place-i18n.js?v=s3.2.75"></script>
-<script src="./floqai-help-repository.js?v=s3.2.75"></script>
-<script src="./floqr-i18n-help.js?v=s3.2.75"></script>
-<script src="./floqr-venue-query.js?v=s3.2.75"></script>
-<script src="./floqr-data-classification.js?v=s3.2.75"></script>
-<script src="./floqai-access.js?v=s3.2.75"></script>
-<script src="./intent-search.js?v=s3.2.75"></script>
-<script src="./floqai-search.js?v=s3.2.75"></script>
-<script src="./feature-gates.js?v=s3.2.75"></script>
-<script src="./floqr-feature-services.js?v=s3.2.75"></script>
-<script src="./helper-popouts.js?v=s3.2.75"></script>
-<script src="./bot-dee-chat.js?v=s3.2.75"></script>
-<script src="./floqai-page.js?v=s3.2.75"></script>
+<script src="./firebase-config.js?v=s3.2.76"></script>
+<script src="./floqr-app-check.js?v=s3.2.76"></script>
+<script src="./floqr-session-shell.js?v=s3.2.76"></script>
+<script src="./floqr-nav.js?v=s3.2.76"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.76"></script>
+<script src="./floqr-i18n.js?v=s3.2.76"></script>
+<script src="./floqr-place-i18n.js?v=s3.2.76"></script>
+<script src="./botdee-help-repository.js?v=s3.2.76"></script>
+<script src="./floqr-i18n-help.js?v=s3.2.76"></script>
+<script src="./floqr-venue-query.js?v=s3.2.76"></script>
+<script src="./floqr-data-classification.js?v=s3.2.76"></script>
+<script src="./botdee-access.js?v=s3.2.76"></script>
+<script src="./intent-search.js?v=s3.2.76"></script>
+<script src="./botdee-search.js?v=s3.2.76"></script>
+<script src="./feature-gates.js?v=s3.2.76"></script>
+<script src="./floqr-feature-services.js?v=s3.2.76"></script>
+<script src="./helper-popouts.js?v=s3.2.76"></script>
+<script src="./bot-dee-chat.js?v=s3.2.76"></script>
+<script src="./botdee-page.js?v=s3.2.76"></script>
 </body>
 </html>

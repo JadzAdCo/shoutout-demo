@@ -58,7 +58,7 @@ Same Site chrome tokens as Search (`FLOQRChromeScheme` / `isSiteChrome`). Load `
 - [ ] Body wash follows selected Site chrome (not Nightlife-locked)
 - [ ] Empty list = nearest 4; status line shows place/source
 - [ ] Cards show feature-specific facts + Select venue
-- [ ] `?` mirrored in `floqai-help-repository.js` + i18n help packs
+- [ ] `?` mirrored in `botdee-help-repository.js` + i18n help packs
 - [ ] No hardcoded `?v=` in nav links
 - [ ] Update `docs/FEATURE-WIRING.md`
 

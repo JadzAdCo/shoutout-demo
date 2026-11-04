@@ -1,0 +1,81 @@
+---
+description: BOT DEE rename — floqai.html removed; technical floqAi → botDee dual-read (s3.2.74–76). Resume @botdee$ / @floqai-page$
+alwaysApply: false
+---
+
+# BOT DEE rename (from FloqAi / floqai.*)
+
+Resume: `@botdee$` / `@floqai-page$`.
+
+Patron product name is **BOT DEE** (protected brand). This note records how the rename was done so later agents do not reintroduce `floqai.html` or treat `floqAi` as the live catalog key.
+
+## Phase A — page URL (s3.2.74 → s3.2.75) — DONE
+
+| Step | What |
+|---|---|
+| A1 | Canonical chat page became `botdee.html` (was `floqai.html`). Nav `intentSearchHome()`, Search tile, feature `route`, help links, intent cards all target `./botdee.html`. |
+| A2 | s3.2.74 briefly kept `floqai.html` + `floqai-search.html` as **redirect stubs** to `botdee.html`. |
+| A3 | s3.2.75 **deleted** both stubs (404, no redirect). Owner decision: do not keep a FloqAi URL. |
+| A4 | Patron-facing copy already said BOT DEE (chrome / help packs). Floating agent speech fixed to `Hi, I am BOT DEE` (`botdee-search.js`). Auth gate no longer lists `floqai-search.html` as public. |
+
+## Phase B — technical ids (s3.2.76) — DONE
+
+Same pattern as floqCast ← `supRstar` (one-release dual-read).
+
+### Catalog / Features & Services
+
+| Before | After | Dual-read |
+|---|---|---|
+| `featureServices/floqAi` | `featureServices/botDee` | `canonicalizeFeatureKey("floqAi") → "botDee"`; `loadFeature` falls back to legacy `floqAi` doc; `seedFeatureServices` copies flags from `floqAi` when creating `botDee` |
+| `data-feature-key="floqAi"` / `data-floqr-feature="floqAi"` | `botDee` | Alias still accepted via canonicalize |
+| Chrome pack key `floqAi` | `botDee` | `data-floqr-chrome-icon` dual-read: `floqAi` → `botDee` assets |
+
+### Modules (file renames)
+
+| Before | After |
+|---|---|
+| `floqai-access.js` | `botdee-access.js` |
+| `floqai-help-repository.js` | `botdee-help-repository.js` |
+| `floqai-page.js` | `botdee-page.js` |
+| `floqai-search.js` / `.css` | `botdee-search.js` / `.css` |
+| `functions/floqai-content-classes.json` | `functions/botdee-content-classes.json` |
+| `functions/floqai-page.test.js` | `functions/botdee-page.test.js` |
+| `functions/floqai-help-access.test.js` | `functions/botdee-help-access.test.js` |
+| `scripts/build-floqai-content-classes.js` | `scripts/build-botdee-content-classes.js` |
+
+Script that applied bulk renames: `scripts/rename-floqai-to-botdee.js`.
+
+### Callables / globals (aliases one release)
+
+| Canonical | Legacy alias (keep until next Functions deploy cycle cleans up) |
+|---|---|
+| `getBotDeeAccess` | `getFloqAiAccess` |
+| `window.FLOQRBotDeeAccess` | `window.FLOQRFloqAiAccess` |
+| `window.FLOQRBotDee` / `bindBotDee` | `FLOQRFloqAi` / `bindFloqAi` |
+
+### i18n / help ids
+
+Chrome keys: `floqai.*` / `page.floqai.*` / `cat.floqai*` / `template.floqai*` → `botdee.*` / `page.botdee.*` / `cat.botdee*` / `template.botdee*` (all 11 langs, same change).
+
+Help ids: `help-floqai-page` → `help-botdee-page`; `help-floqai-template-search` → `help-botdee-template-search`; `floqai-ask-floqr` → `botdee-ask-floqr`; `help-floqai-audience-sections` → `help-botdee-audience-sections`.
+
+### DOM / CSS
+
+Ids such as `categoryFloqAi*` / `floqAiAgent` / `floqAiSearchPanel` → `categoryBotDee*` / `botDeeAgent` / `botDeeSearchPanel`. CSS class prefix `.floqai-` → `.botdee-` (pages already carried many `botdee-*` classes).
+
+### Storage note
+
+Firestore collection `floqAiAccessThrottle` (and related audit wording) may still exist historically; new writes use `botDeeAccessThrottle` when the access callable was updated. Prefer dual-read on throttle if both can appear during the alias window.
+
+## Do not
+
+- Do not recreate `floqai.html` or a redirect page.
+- Do not show **FloqAi** in patron/admin UI chrome (label is **BOT DEE**).
+- Do not invent a second chat page — only `botdee.html`.
+- Do not drop `canonicalizeFeatureKey("floqAi")` until Master Admin has seeded `featureServices/botDee` and beta `features.botDee` maps are backfilled / dual-read proven.
+
+## FIX PROMPT
+
+```
+BOT DEE rename: page=botdee.html only (floqai.html deleted s3.2.75). Catalog key botDee with floqAi alias dual-read; modules botdee-*.js; getBotDeeAccess←getFloqAiAccess; chrome icon botDee; i18n botdee.*; help-botdee-page. Script scripts/rename-floqai-to-botdee.js. Design: design-notes-botdee-rename.mdc. Resume @botdee$
+```

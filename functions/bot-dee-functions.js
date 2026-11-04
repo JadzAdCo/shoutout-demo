@@ -1,4 +1,4 @@
-/* BOT DEE — executeBotSession callable (Auth + floqAi gate + classification → Gemini + tools).
+/* BOT DEE — executeBotSession callable (Auth + botDee gate + classification → Gemini + tools).
    Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role).
    Master Admin: setBotDeeSettings (idle pause) under SOS2FA. */
 "use strict";
@@ -10,7 +10,7 @@ const {GoogleGenAI, FunctionCallingConfigMode} = require("@google/genai");
 const core = require("./data-classification-core");
 const bot = require("./bot-dee-core");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
-const {__floqAiHelpers} = require("./data-classification-functions");
+const {__botDeeHelpers} = require("./data-classification-functions");
 const {assertSos2faSession} = require("./sos2fa-functions");
 const {isServerAdminAuth} = require("./admin-trust");
 
@@ -181,13 +181,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     if (!request.auth?.uid) {
       throw new HttpsError("unauthenticated", "Sign in to chat with BOT DEE.");
     }
-    await audit.assertFeatureAccess(request.auth, "floqAi", request);
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
 
     const userPrompt = bot.sanitizeUserPrompt(request.data?.message || request.data?.prompt || "");
     if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for BOT DEE.");
 
     const history = bot.sanitizeHistory(request.data?.history);
-    const facts = await __floqAiHelpers.roleFactsFor(request.auth);
+    const facts = await __botDeeHelpers.roleFactsFor(request.auth);
     const {role} = core.resolveViewerRole(facts);
     const session = Object.freeze({
       userId: request.auth.uid,

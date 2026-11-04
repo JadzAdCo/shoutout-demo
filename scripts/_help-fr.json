@@ -11,7 +11,7 @@
     "title": "ShoutOuts archivés",
     "body": "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
   },
-  "floqai-ask-floqr": {
+  "botdee-ask-floqr": {
     "title": "Demandez FloqR avec BOT DEE",
     "body": "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
   },
@@ -135,7 +135,7 @@
     "title": "Modèle par défaut",
     "body": "Classique traditionnel noir et blanc gratuit. Utilisez BOT DEE ci-dessous pour les modèles Sports, Jersey, VIP, Humour, Voitures, Vidéo, Images et Ballers."
   },
-  "help-floqai-template-search": {
+  "help-botdee-template-search": {
     "title": "BOT DEE recherche de modèles",
     "body": "Appuyez sur la marque BOT DEE en mouvement (ou attendez ses bulles), puis demandez Sports, Jersey, NBA, NFL, Cars, Humour, VIP, Video, Pictures ou Ballers."
   },

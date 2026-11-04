@@ -1,6 +1,6 @@
 /**
  * Venue geocoding contract: which clubLocations need Google coordinates and how results are stored.
- * Design notes: .cursor/rules/design-notes-floqai-venue-search.mdc
+ * Design notes: .cursor/rules/design-notes-botdee-venue-search.mdc
  */
 "use strict";
 

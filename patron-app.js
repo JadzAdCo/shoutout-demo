@@ -704,13 +704,13 @@
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
     if (id === "templateSelectPage") {
-      window.FLOQRFloqAi?.setMode?.("templates");
-      window.FLOQRFloqAi?.ensureTemplateMode?.();
+      window.FLOQRBotDee?.setMode?.("templates");
+      window.FLOQRBotDee?.ensureTemplateMode?.();
     } else if (id === "intentSearchPage") {
-      window.FLOQRFloqAi?.setMode?.("intent");
-      window.FLOQRFloqAi?.syncVisibility?.();
+      window.FLOQRBotDee?.setMode?.("intent");
+      window.FLOQRBotDee?.syncVisibility?.();
     } else {
-      window.FLOQRFloqAi?.syncVisibility?.();
+      window.FLOQRBotDee?.syncVisibility?.();
     }
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -1364,7 +1364,7 @@
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
     if (byId("minglLandingPage")?.classList.contains("active") && !featureServiceAllows("mingl")) showPage("categoryPage");
-    if (byId("intentSearchPage")?.classList.contains("active") && !featureServiceAllows("floqAi")) showPage("categoryPage");
+    if (byId("intentSearchPage")?.classList.contains("active") && !featureServiceAllows("botDee")) showPage("categoryPage");
     if (pendingDirectLocation || pendingDirectEvent) {
       await openDirectVenueShoutout();
       return;
@@ -1381,9 +1381,9 @@
   }
 
   const VENUE_LISTING_TYPES = ["events", "clubs", "lounges", "lounge-club", "beach-clubs"];
-  /* Search placeholder carries the prompt (cat.floqaiPlaceholder); speech bubble retired. */
-  const CATEGORY_FLOQAI_DIALOG = [];
-  const CATEGORY_FLOQAI_DIALOG_MS = 5000;
+  /* Search placeholder carries the prompt (cat.botdeePlaceholder); speech bubble retired. */
+  const CATEGORY_BOTDEE_DIALOG = [];
+  const CATEGORY_BOTDEE_DIALOG_MS = 5000;
 
   function venueTypeLabel(type) {
     return window.FLOQRVenueQuery?.typeLabel?.(type, key => tt(key, {}, key)) || type;
@@ -1410,13 +1410,13 @@
   function describeVenueQuery(parsed) {
     const Place = window.FLOQRPlaceI18n;
     const typeLabel = venueTypeLabel(parsed.type);
-    const parts = [tt("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`)];
+    const parts = [tt("cat.botdeeSearching", {type: typeLabel}, `Searching ${typeLabel}`)];
     parsed.genres.forEach(genre => parts.push(Place?.optionLabel?.("genre", genre) || genre));
     if (parsed.place) {
       const place = parsed.place.label;
-      parts.push(tt("cat.floqaiIn", {place}, `in ${place}`));
+      parts.push(tt("cat.botdeeIn", {place}, `in ${place}`));
     } else if (parsed.nearMe) {
-      parts.push(tt("cat.floqaiNearYou", {}, "near you"));
+      parts.push(tt("cat.botdeeNearYou", {}, "near you"));
     }
     return parts.join(" · ");
   }
@@ -1448,18 +1448,18 @@
     if (!q || !byId("categoryPage")?.classList.contains("active")) return;
     url.searchParams.delete("q");
     try { history.replaceState(null, "", url.toString()); } catch (_) {}
-    const input = byId("categoryFloqAiInput");
+    const input = byId("categoryBotDeeInput");
     if (input) input.value = q;
     submitCategoryVenueQuery(q);
   }
 
-  function bindCategoryFloqAi() {
-    const form = byId("categoryFloqAiForm");
-    const input = byId("categoryFloqAiInput");
+  function bindCategoryBotDee() {
+    const form = byId("categoryBotDeeForm");
+    const input = byId("categoryBotDeeInput");
     if (!form || !input || form.dataset.bound === "1") return;
     form.dataset.bound = "1";
 
-    const shell = byId("categoryFloqAiSearch");
+    const shell = byId("categoryBotDeeSearch");
     input.addEventListener("input", () => {
       shell?.classList.toggle("is-listening", !!input.value.trim());
     });
@@ -3546,7 +3546,7 @@
     return null;
   }
 
-  /** Club / event public page, club website and FloqAi links: the same path as picking that venue on Search. */
+  /** Club / event public page, club website and BOT DEE links: the same path as picking that venue on Search. */
   async function openDirectVenueShoutout() {
     if (directVenueShoutoutOpened) return;
     directVenueShoutoutOpened = true;
@@ -3881,7 +3881,7 @@
         </section>` : ""}
         ${club.length ? `<section class="template-section"><h3>${esc(tt("template.clubApproved", {}, "Club-Approved Backgrounds"))}</h3><p class="sub small" data-keep-visible="true">${esc(tt("template.clubApprovedHint", {}, "Customized by this club's admins."))}</p><div class="template-grid template-select-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicy", {}, "This club has disabled patron background customization. Original and club-approved templates remain available."))}</p>`}`;
-      window.FLOQRFloqAi?.ensureTemplateMode?.();
+      window.FLOQRBotDee?.ensureTemplateMode?.();
     } else {
       const [officialRecords, clubRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
         window.floqrSearch(discoveryQuery, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
@@ -5060,7 +5060,7 @@
       ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
       ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "floqCast")],
       ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
-      ["floqAi", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.floqai", {}, "dj BOT")]
+      ["botDee", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.botdee", {}, "dj BOT")]
     ];
     featureItems.forEach(([key, href, label]) => {
       const el = upsert(`feature-${key}`, "a", "profile-menu-link");
@@ -5217,7 +5217,7 @@
       await afterLogin();
         applyMenuFeatureLinks(currentUser);
     });
-    bindCategoryFloqAi();
+    bindCategoryBotDee();
     window.addEventListener("floqr:location-updated", () => {
       resetUserLocationContext();
       if (byId("listingPage")?.classList.contains("active")) renderGrid();
@@ -5346,34 +5346,34 @@
       onShoutout: () => showShoutoutLanding(),
       onMingl: () => showMinglLanding()
     });
-    const floqAiPanel = byId("floqAiSearchPanel");
-    const floqAiHelpBtn = byId("floqAiHelpBtn");
-    const floqAiHelpPop = byId("floqAiHelpPopout");
-    const floqAiHelpClose = byId("floqAiHelpClose");
-    function setFloqAiHelpOpen(open) {
-      if (!floqAiHelpPop || !floqAiHelpBtn) return;
-      floqAiHelpPop.classList.toggle("hidden", !open);
-      floqAiHelpPop.setAttribute("aria-hidden", open ? "false" : "true");
-      floqAiHelpBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    const botDeePanel = byId("botDeeSearchPanel");
+    const botDeeHelpBtn = byId("botDeeHelpBtn");
+    const botDeeHelpPop = byId("botDeeHelpPopout");
+    const botDeeHelpClose = byId("botDeeHelpClose");
+    function setBotDeeHelpOpen(open) {
+      if (!botDeeHelpPop || !botDeeHelpBtn) return;
+      botDeeHelpPop.classList.toggle("hidden", !open);
+      botDeeHelpPop.setAttribute("aria-hidden", open ? "false" : "true");
+      botDeeHelpBtn.setAttribute("aria-expanded", open ? "true" : "false");
     }
-    floqAiHelpBtn?.addEventListener("click", event => {
+    botDeeHelpBtn?.addEventListener("click", event => {
       event.stopPropagation();
-      setFloqAiHelpOpen(floqAiHelpPop?.classList.contains("hidden"));
+      setBotDeeHelpOpen(botDeeHelpPop?.classList.contains("hidden"));
     });
-    floqAiHelpClose?.addEventListener("click", () => setFloqAiHelpOpen(false));
+    botDeeHelpClose?.addEventListener("click", () => setBotDeeHelpOpen(false));
     document.addEventListener("click", event => {
-      if (!floqAiHelpPop || floqAiHelpPop.classList.contains("hidden")) return;
-      if (floqAiHelpPop.contains(event.target) || floqAiHelpBtn?.contains(event.target)) return;
-      setFloqAiHelpOpen(false);
+      if (!botDeeHelpPop || botDeeHelpPop.classList.contains("hidden")) return;
+      if (botDeeHelpPop.contains(event.target) || botDeeHelpBtn?.contains(event.target)) return;
+      setBotDeeHelpOpen(false);
     });
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") setFloqAiHelpOpen(false);
+      if (event.key === "Escape") setBotDeeHelpOpen(false);
     });
-    window.FLOQRFloqAi?.bindFloqAi({
+    window.FLOQRBotDee?.bindBotDee({
       onOpenSearch() {
-        if (floqAiPanel) {
-          floqAiPanel.classList.add("open");
-          floqAiPanel.setAttribute("aria-hidden", "false");
+        if (botDeePanel) {
+          botDeePanel.classList.add("open");
+          botDeePanel.setAttribute("aria-hidden", "false");
         }
       }
     });

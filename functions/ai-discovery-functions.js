@@ -2571,7 +2571,7 @@ function defaultFloqrPreviewLinks(v = "s3.0.102") {
     ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
     ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
-    ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+    ["Search / BOT DEE", `${base}/?v=${v}&start=intent`],
     ["Aurelia display board", `${base}/display.html?location=temp-democlub-1`]
   ];
 }

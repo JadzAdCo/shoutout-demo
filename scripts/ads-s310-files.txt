@@ -11,7 +11,7 @@ admin-spot-ads.js
 admin.html
 ai-diagnostics-service.js
 firestore.rules
-floqai-help-repository.js
+botdee-help-repository.js
 floqr-ad-composer.js
 floqr-ad-pricing.js
 floqr-ad-tracking.js

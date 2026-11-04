@@ -1,17 +1,17 @@
 ---
-description: VIP reserV (beta) — BUILDING Phase 2 (owner go-ahead Oct 16 2026). Feature key vipReservations, brand VIP reserV, holds/consent/Checkout deposits/door. Batches 1–4 decided. Every owner decision ships with FloqAi/help mirror before that surface goes Live.
+description: VIP reserV (beta) — BUILDING Phase 2 (owner go-ahead Oct 16 2026). Feature key vipReservations, brand VIP reserV, holds/consent/Checkout deposits/door. Batches 1–4 decided. Every owner decision ships with BOT DEE/help mirror before that surface goes Live.
 alwaysApply: true
 ---
 
 # VIP reserV — design notes
 
-Resume: `@vip$` / `$vip-tables$` / `$vip-reserv$`. Status: **BUILDING — Phase 2 booking MVP (owner go-ahead Oct 16 2026).** Product brand: **VIP reserV** (protected / never-translate). Feature key `vipReservations` (`IsFeatureEnabled=0`, `IsTestFeature=1` until Master Admin seeds/enables). Surfaces: `vip.html`, `vip-door.html`, portal Reservations, Search tile `vipReservBtnCard`, FloqAi intent `vip-reserv`, plans in `vip-plans/`. Full proposal: `reports/vip-reservations-proposal.md`. Owner sheet: `reports/vip-owner-decision-sheet.md`. Translation: `vip-reservations-translation-incomplete.mdc` (does **not** block Live per VIP-P-15 C).
+Resume: `@vip$` / `$vip-tables$` / `$vip-reserv$`. Status: **BUILDING — Phase 2 booking MVP (owner go-ahead Oct 16 2026).** Product brand: **VIP reserV** (protected / never-translate). Feature key `vipReservations` (`IsFeatureEnabled=0`, `IsTestFeature=1` until Master Admin seeds/enables). Surfaces: `vip.html`, `vip-door.html`, portal Reservations, Search tile `vipReservBtnCard`, BOT DEE intent `vip-reserv`, plans in `vip-plans/`. Full proposal: `reports/vip-reservations-proposal.md`. Owner sheet: `reports/vip-owner-decision-sheet.md`. Translation: `vip-reservations-translation-incomplete.mdc` (does **not** block Live per VIP-P-15 C).
 
 **Phase 2 shipped (this iteration):** inventory holds (30 min), Terms consent, FloqR Stripe deposit checkout (`orderType: vipReservation`), My Profile Reservations + pass, `vip-door.html` check-in/no-show, VIP-B-24 receipt SMS + invoice redactor, **Club Admin VIP reserV tab** (`panelVipReserv`) + **paid-before-booked** (`vipSettings.depositRequired` — hold never sets `isReserved=1`). **Aurelia:** 2D plan `vip-plans/aurelia.json` bookable; interactive 3D at `reports/vip-aurelia-demo/` (Explore 3D on `vip.html`). Product chrome matches ShoutOut (`design-notes-product-chrome.mdc`). **Club POS path (s3.1.80):** collectors clubPos/clubStripe/floqrStripe/manualCsv; Toast/SpotOn preferred for open-tab. Connect workflow + CSV + billing lists on Club/Master Admin. Live OAuth/webhooks pending partner credentials. **Still later:** live POS adapters, promoter path, counsel Live Terms, Model B invoicing automation. Sheet IDs: **0 OPEN**. Counsel-adjacent still open: self-billing · stale check · 1099/W-9.
 
 ## Help mirror (always — every owner decision)
 
-**Standing requirement:** whatever decisions are made for VIP reserV, help must be adequately documented. Every owner decision that creates or changes a user-facing surface must ship with a FloqAi / help mirror (`floqai-help-repository.js` + `floqr-i18n-help.js` when translated) **before that surface goes Live**. Beta English-only help is OK while `vip-reservations-translation-incomplete.mdc` is open. Decision sheet rows carry concrete help ids (e.g. `help-vip-deposit-settings`, `help-vip-reserv-brand`).
+**Standing requirement:** whatever decisions are made for VIP reserV, help must be adequately documented. Every owner decision that creates or changes a user-facing surface must ship with a BOT DEE / help mirror (`botdee-help-repository.js` + `floqr-i18n-help.js` when translated) **before that surface goes Live**. Beta English-only help is OK while `vip-reservations-translation-incomplete.mdc` is open. Decision sheet rows carry concrete help ids (e.g. `help-vip-deposit-settings`, `help-vip-reserv-brand`).
 
 ## Owner decisions Batch 1 (Oct 16 2026)
 
@@ -152,5 +152,5 @@ Related documents: `reports/vip-notifications-billing.md` (notifications, receip
 ## FIX PROMPT
 
 ```
-VIP reserV (BUILDING Phase 2): owner go-ahead Oct 16 2026. Feature key vipReservations (beta), brand VIP reserV, holds/consent/Checkout deposits, portal Reservations, vip-door.html, VIP-B-24. English-only Live OK (P-15 C). Every decision ships FloqAi/help before Live. Design notes: design-notes-vip-reservations.mdc · sheet: reports/vip-owner-decision-sheet.md · wiring: docs/FEATURE-WIRING.md#vip-reserv
+VIP reserV (BUILDING Phase 2): owner go-ahead Oct 16 2026. Feature key vipReservations (beta), brand VIP reserV, holds/consent/Checkout deposits, portal Reservations, vip-door.html, VIP-B-24. English-only Live OK (P-15 C). Every decision ships BOT DEE/help before Live. Design notes: design-notes-vip-reservations.mdc · sheet: reports/vip-owner-decision-sheet.md · wiring: docs/FEATURE-WIRING.md#vip-reserv
 ```

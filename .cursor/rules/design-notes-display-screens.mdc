@@ -10,7 +10,7 @@ Resume: `@display$` / `$screen$`.
 
 ## What an `.mdc` file is
 
-Cursor **rules** live under `.cursor/rules/*.mdc`. They are Markdown with a small YAML frontmatter block (`description`, `globs`, `alwaysApply`). Agents load them as durable product/engineering contracts so help UI and FloqAi stay patron-facing while routing and size rules stay here.
+Cursor **rules** live under `.cursor/rules/*.mdc`. They are Markdown with a small YAML frontmatter block (`description`, `globs`, `alwaysApply`). Agents load them as durable product/engineering contracts so help UI and BOT DEE stay patron-facing while routing and size rules stay here.
 
 ## Physical boards (only three)
 
@@ -55,4 +55,4 @@ Size comes from Firebase (`clubLocations` + template `Is*` + shoutout `screenFor
 - Inventing extra screen sizes in the UI
 - Driving Xibo layout from `?screen=`
 - Truncating visible shoutout words when font can still shrink
-- Putting design-note paragraphs into FloqAi / `?` help bodies
+- Putting design-note paragraphs into BOT DEE / `?` help bodies

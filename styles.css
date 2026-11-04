@@ -153,10 +153,10 @@ html:not([data-floqr-chrome]) .user-menu-btn{
   backdrop-filter:blur(14px)!important
 }
 /* Retired Search speech bubble + green OR — hide even if stale HTML is cached */
-.category-floqai-intro,
-.category-floqai-speech,
-.category-floqai-mark,
-.category-floqai-mark-halo,
+.category-botdee-intro,
+.category-botdee-speech,
+.category-botdee-mark,
+.category-botdee-mark-halo,
 .category-or{display:none!important}
 .user-photo,.dropdown-user-photo{width:30px!important;height:30px!important;border-radius:999px!important;object-fit:cover!important}
 .user-initials{width:30px!important;height:30px!important;border-radius:999px!important;display:grid!important;place-items:center!important;background:var(--floqr-profile-initials-bg)!important;color:var(--floqr-profile-initials-color)!important;font-size:13px!important;font-weight:1000!important}
@@ -308,25 +308,25 @@ html:not([data-floqr-chrome]) .search-chrome-btn[aria-pressed="true"]{border-col
 .search-chrome-active{opacity:.8}
 .chrome-photo-face{justify-content:center!important;padding:8px!important;gap:0!important}
 /* Square chrome corner = SQ_CORNER/S (88/1024). Never use 50% — it circular-crops the painted square ring. */
-.chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .floqai-tile-mark,.chrome-photo-face .vip-tile-mark,.chrome-photo-face .shoutout-tile-mark,.chrome-photo-face .settings-tile-mark{width:92%!important;max-height:92%!important;object-fit:cover;border-radius:8.6%;filter:none}
+.chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .botdee-tile-mark,.chrome-photo-face .vip-tile-mark,.chrome-photo-face .shoutout-tile-mark,.chrome-photo-face .settings-tile-mark{width:92%!important;max-height:92%!important;object-fit:cover;border-radius:8.6%;filter:none}
 .chrome-photo-face .floqcast-tile-mark,.chrome-photo-face .vip-tile-mark,.chrome-photo-face .shoutout-tile-mark,.chrome-photo-face .settings-tile-mark{object-fit:contain;filter:none}
 .search-icon-row{grid-column:1/-1;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;gap:12px;width:100%;overflow:visible;padding-top:10px}
 .search-icon-row > .category-card{flex:0 0 auto;min-width:0;min-height:132px;max-width:132px;font-size:16px;padding:12px 8px}
-/* FloqAi / floqCast / ShoutOut / VIP / Settings — rounded-square face; soft tile-palette halo */
-.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:132px;height:132px;border-radius:8.6%;background:transparent;border:0;box-shadow:0 0 0 1px rgba(120,120,120,.2),0 0 12px rgba(0,200,255,.28),0 0 22px rgba(255,46,184,.2),0 0 28px rgba(90,90,90,.14);overflow:visible;padding:8px;box-sizing:border-box}
-.floqai-icon-face .floqai-tile-mark,.floqai-icon-face .category-floqai-mark.floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark,.settings-icon-face .settings-tile-mark{width:92%!important;height:auto!important;aspect-ratio:1;max-height:92%!important;flex:0 0 auto;margin:0 auto;animation:none!important;position:relative;border-radius:8.6%}
-.floqai-icon-face .floqai-tile-mark .category-floqai-mark-halo{display:none!important}
-/* FloqAi nests an <img> inside .floqai-tile-mark; floqCast/ShoutOut/VIP marks ARE the <img> — do not force height:100% on them (collapses when face height is auto). */
-.floqai-icon-face .floqai-tile-mark img{width:100%!important;height:100%!important;display:block;object-fit:contain;border-radius:8.6%}
+/* BOT DEE / floqCast / ShoutOut / VIP / Settings — rounded-square face; soft tile-palette halo */
+.botdee-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:132px;height:132px;border-radius:8.6%;background:transparent;border:0;box-shadow:0 0 0 1px rgba(120,120,120,.2),0 0 12px rgba(0,200,255,.28),0 0 22px rgba(255,46,184,.2),0 0 28px rgba(90,90,90,.14);overflow:visible;padding:8px;box-sizing:border-box}
+.botdee-icon-face .botdee-tile-mark,.botdee-icon-face .category-botdee-mark.botdee-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark,.settings-icon-face .settings-tile-mark{width:92%!important;height:auto!important;aspect-ratio:1;max-height:92%!important;flex:0 0 auto;margin:0 auto;animation:none!important;position:relative;border-radius:8.6%}
+.botdee-icon-face .botdee-tile-mark .category-botdee-mark-halo{display:none!important}
+/* BOT DEE nests an <img> inside .botdee-tile-mark; floqCast/ShoutOut/VIP marks ARE the <img> — do not force height:100% on them (collapses when face height is auto). */
+.botdee-icon-face .botdee-tile-mark img{width:100%!important;height:100%!important;display:block;object-fit:contain;border-radius:8.6%}
 .floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark,.settings-icon-face .settings-tile-mark{display:block;object-fit:contain;border-radius:8.6%;filter:drop-shadow(0 1px 2px rgba(0,0,0,.12))}
-.floqai-icon-word,.floqcast-icon-word,.vip-icon-word{flex:0 0 auto;color:#fff;font-size:clamp(11px,2.8vw,14px);font-weight:1000;letter-spacing:.02em;line-height:1.05;white-space:nowrap;text-align:center;max-width:100%;text-shadow:0 0 12px rgba(0,200,255,.55),0 0 18px rgba(255,46,184,.35)}
+.botdee-icon-word,.floqcast-icon-word,.vip-icon-word{flex:0 0 auto;color:#fff;font-size:clamp(11px,2.8vw,14px);font-weight:1000;letter-spacing:.02em;line-height:1.05;white-space:nowrap;text-align:center;max-width:100%;text-shadow:0 0 12px rgba(0,200,255,.55),0 0 18px rgba(255,46,184,.35)}
 .floqcast-icon-word{font-size:clamp(10px,2.6vw,13px)}
 .vip-icon-word{font-size:clamp(9px,2.3vw,12px);letter-spacing:.01em}
 /* VIP / ShoutOut marks fill the face (wordmark is inside the art) */
 .vip-icon-face.vip-icon-face--mark-only,.shoutout-icon-face.chrome-photo-face{justify-content:center;padding:8px;gap:0}
 .vip-icon-face.vip-icon-face--mark-only .vip-tile-mark,.shoutout-icon-face .shoutout-tile-mark{width:92%!important;max-height:92%!important}
 html[data-floqr-chrome="whiteBlack"] .settings-icon-face,
-html[data-floqr-chrome="whiteBlack"] .floqai-icon-face,
+html[data-floqr-chrome="whiteBlack"] .botdee-icon-face,
 html[data-floqr-chrome="whiteBlack"] .floqcast-icon-face,
 html[data-floqr-chrome="whiteBlack"] .shoutout-icon-face,
 html[data-floqr-chrome="whiteBlack"] .vip-icon-face{box-shadow:0 0 0 1px rgba(90,90,90,.28),0 0 12px rgba(80,80,80,.32),0 0 24px rgba(70,70,70,.16)}
@@ -335,22 +335,22 @@ html[data-floqr-chrome="whiteBlack"] .vip-icon-face{box-shadow:0 0 0 1px rgba(90
   .search-icon-row > .shoutout-icon-card,
   .search-icon-row > .category-card{flex:0 0 calc((100% - 20px) / 3);max-width:calc((100% - 20px) / 3);justify-items:center}
   .search-icon-row .shoutout-icon-img,
-  .search-icon-row .floqai-icon-face,
+  .search-icon-row .botdee-icon-face,
   .search-icon-row .floqcast-icon-face,
   .search-icon-row .shoutout-icon-face,
   .search-icon-row .vip-icon-face,
   .search-icon-row .settings-icon-face{width:min(110px,100%);height:auto;aspect-ratio:1;max-width:110px}
-  .search-icon-row .floqai-icon-face,
+  .search-icon-row .botdee-icon-face,
   .search-icon-row .floqcast-icon-face,
   .search-icon-row .shoutout-icon-face,
   .search-icon-row .vip-icon-face,
   .search-icon-row .settings-icon-face{border-radius:8.6%;gap:0;padding:6px;flex-direction:column;justify-content:center}
-  .search-icon-row .floqai-icon-face .floqai-tile-mark,
+  .search-icon-row .botdee-icon-face .botdee-tile-mark,
   .search-icon-row .floqcast-icon-face .floqcast-tile-mark,
   .search-icon-row .shoutout-icon-face .shoutout-tile-mark,
   .search-icon-row .vip-icon-face .vip-tile-mark,
   .search-icon-row .settings-icon-face .settings-tile-mark{width:80%;height:auto;aspect-ratio:1;max-height:80%}
-  .search-icon-row .floqai-icon-word{font-size:11px}
+  .search-icon-row .botdee-icon-word{font-size:11px}
   .search-icon-row .floqcast-icon-word{font-size:10px}
   .search-icon-row .vip-icon-word{font-size:9px}
   .search-icon-row > .category-card{min-height:0;max-width:none;aspect-ratio:1;display:grid;place-items:center;font-size:13px;padding:8px 4px}
@@ -456,7 +456,7 @@ html.floqr-tablet-browser #categoryPage.page.active .search-icon-row{
     align-content:flex-start;
   }
 }
-@media(max-width:520px){.category-brand-stack{margin-top:4px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{width:116px;height:116px}.floqai-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{border-radius:8.6%;gap:0;padding:6px}.floqai-icon-face .floqai-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark,.settings-icon-face .settings-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.floqai-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
+@media(max-width:520px){.category-brand-stack{margin-top:4px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img,.botdee-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{width:116px;height:116px}.botdee-icon-face,.floqcast-icon-face,.shoutout-icon-face,.vip-icon-face,.settings-icon-face{border-radius:8.6%;gap:0;padding:6px}.botdee-icon-face .botdee-tile-mark,.floqcast-icon-face .floqcast-tile-mark,.shoutout-icon-face .shoutout-tile-mark,.vip-icon-face .vip-tile-mark,.settings-icon-face .settings-tile-mark{width:92%;height:auto;aspect-ratio:1;max-height:92%}.botdee-icon-word{font-size:11px}.floqcast-icon-word{font-size:10px}.vip-icon-word{font-size:9px}}
 .ad-submit-shell form label,.ad-submit-grid label{display:grid;gap:4px;margin:8px 0}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .ad-submit-preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#050819}
@@ -996,13 +996,13 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 .template-heading-row{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:nowrap;margin:0 0 10px}
 .template-heading-row h3{margin:0}
 .template-heading-row .help-popout{justify-self:auto;margin:0;flex:0 0 auto}
-.template-floqai-search-panel,.template-select-search-panel{margin:0 0 16px;padding:0;border:0;background:transparent;box-shadow:none}
-.template-select-search-panel.category-floqai-search{width:100%}
-.template-select-search-panel .category-floqai-form{width:100%;margin:0}
-.template-select-search-panel .category-floqai-field input.search{margin-top:0}
-.template-floqai-search-panel .intent-help{display:block;margin:0 0 8px;font-size:clamp(16px,3.2vw,22px);font-weight:900;color:#fff}
-.template-floqai-search-panel .search{margin:0}
-.template-floqai-mount .floqai-template-hint{margin:0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.35}
+.template-botdee-search-panel,.template-select-search-panel{margin:0 0 16px;padding:0;border:0;background:transparent;box-shadow:none}
+.template-select-search-panel.category-botdee-search{width:100%}
+.template-select-search-panel .category-botdee-form{width:100%;margin:0}
+.template-select-search-panel .category-botdee-field input.search{margin-top:0}
+.template-botdee-search-panel .intent-help{display:block;margin:0 0 8px;font-size:clamp(16px,3.2vw,22px);font-weight:900;color:#fff}
+.template-botdee-search-panel .search{margin:0}
+.template-botdee-mount .botdee-template-hint{margin:0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.35}
 /* Template select — LED-true card: name+dim top, board preview, desc/tags, Use only */
 .template-select-grid{grid-template-columns:minmax(0,1fr)!important;gap:18px}
 .template-section-default .template-select-grid{grid-template-columns:minmax(0,420px)!important}
@@ -1020,7 +1020,7 @@ html[data-floqr-chrome="whiteBlack"] .template-select-dim{border-color:rgba(40,4
 .template-select-meta{margin-top:0}
 .template-select-card .template-card-actions{margin-top:4px}
 .template-select-card .template-card-actions .primary{width:100%;min-height:48px}
-.floqai-agent.hidden{display:none!important}
+.botdee-agent.hidden{display:none!important}
 .media-upload-card{margin:16px 0}
 .media-upload-card label{margin-bottom:10px}
 .template-media-unavailable .ai-media-panel{display:none!important}
@@ -1766,7 +1766,7 @@ html[data-floqr-chrome="traditional"] .highlight-item{
   border-color:var(--floqr-tile-cyan)!important;
   box-shadow:0 0 0 2px rgba(0,200,255,.22);
 }
-html[data-floqr-chrome="traditional"] .floqai-icon-face,
+html[data-floqr-chrome="traditional"] .botdee-icon-face,
 html[data-floqr-chrome="traditional"] .floqcast-icon-face,
 html[data-floqr-chrome="traditional"] .shoutout-icon-face,
 html[data-floqr-chrome="traditional"] .vip-icon-face{
@@ -1896,7 +1896,7 @@ html[data-floqr-chrome="blackTiffany"] .highlight-item{
   border-color:var(--floqr-tile-cyan)!important;
   box-shadow:0 0 0 2px rgba(0,200,255,.28);
 }
-html[data-floqr-chrome="blackTiffany"] .floqai-icon-face,
+html[data-floqr-chrome="blackTiffany"] .botdee-icon-face,
 html[data-floqr-chrome="blackTiffany"] .floqcast-icon-face,
 html[data-floqr-chrome="blackTiffany"] .shoutout-icon-face,
 html[data-floqr-chrome="blackTiffany"] .vip-icon-face{
@@ -2026,7 +2026,7 @@ html[data-floqr-chrome="purpleWhite"] .highlight-item{
   border-color:var(--floqr-tile-violet)!important;
   box-shadow:0 0 0 2px rgba(91,45,255,.3);
 }
-html[data-floqr-chrome="purpleWhite"] .floqai-icon-face,
+html[data-floqr-chrome="purpleWhite"] .botdee-icon-face,
 html[data-floqr-chrome="purpleWhite"] .floqcast-icon-face,
 html[data-floqr-chrome="purpleWhite"] .shoutout-icon-face,
 html[data-floqr-chrome="purpleWhite"] .vip-icon-face{
@@ -2157,7 +2157,7 @@ html[data-floqr-chrome="blackDarkGreen"] .highlight-item{
   border-color:#5ac783!important;
   box-shadow:0 0 0 2px rgba(90,199,131,.28);
 }
-html[data-floqr-chrome="blackDarkGreen"] .floqai-icon-face,
+html[data-floqr-chrome="blackDarkGreen"] .botdee-icon-face,
 html[data-floqr-chrome="blackDarkGreen"] .floqcast-icon-face,
 html[data-floqr-chrome="blackDarkGreen"] .shoutout-icon-face,
 html[data-floqr-chrome="blackDarkGreen"] .vip-icon-face{

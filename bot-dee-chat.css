@@ -1,7 +1,7 @@
 /* BOT DEE chat shell on botdee.html — chrome icon left, compact Back, max transcript space. */
 
 body.botdee-page,
-body.floqai-standalone.botdee-page {
+body.botdee-standalone.botdee-page {
   min-height: 100vh;
   color: var(--text);
 }
@@ -324,7 +324,7 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   padding: 8px 0 0;
 }
 
-.botdee-intent-fallback .floqai-search-panel {
+.botdee-intent-fallback .botdee-search-panel {
   display: block;
   opacity: 1;
   transform: none;

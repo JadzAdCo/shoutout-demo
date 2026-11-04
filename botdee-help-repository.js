@@ -77,7 +77,7 @@
   }
 
   /**
-   * Partition access — design notes: .cursor/rules/design-notes-floqai-partitions.mdc
+   * Partition access — design notes: .cursor/rules/design-notes-botdee-partitions.mdc
    */
   function canAccessPartition(audienceKey, flags = viewerAccessFlags) {
     const f = flags || {};
@@ -167,7 +167,7 @@
     if (!node || node.nodeType !== 1) return null;
     if (node.dataset?.floqaiHelpRegistered === "1") return byId.get(node.dataset.floqaiHelpId || "") || null;
     const title = normalize(meta.title || node.getAttribute("aria-label") || node.querySelector?.("summary")?.getAttribute("aria-label") || "Help");
-    const bodyRoot = node.querySelector?.(".floqai-help-body, .help-popout-body, div:not(summary)") || node;
+    const bodyRoot = node.querySelector?.(".botdee-help-body, .help-popout-body, div:not(summary)") || node;
     const body = normalize(meta.body || bodyRoot?.innerText || node.innerText || "");
     const links = [...(node.querySelectorAll?.("a[href]") || [])].map(anchor => ({
       label: normalize(anchor.textContent),
@@ -210,10 +210,10 @@
   function registerDomHelpPopouts(root = global.document) {
     if (!root || typeof root.querySelectorAll !== "function") return [];
     const nodes = [
-      ...root.querySelectorAll("#floqAiHelpPopout"),
+      ...root.querySelectorAll("#botDeeHelpPopout"),
       ...root.querySelectorAll("details.help-popout"),
-      ...root.querySelectorAll(".floqai-help-popout"),
-      ...root.querySelectorAll("[data-floqai-help-entry]")
+      ...root.querySelectorAll(".botdee-help-popout"),
+      ...root.querySelectorAll("[data-botdee-help-entry]")
     ];
     return nodes.map(node => registerFromHelpNode(node, {
       title: node.getAttribute("aria-label") || node.querySelector("summary")?.getAttribute("aria-label") || node.querySelector(".eyebrow")?.textContent || "Help",
@@ -349,7 +349,7 @@
   /* Seed: BOT DEE "?" popout + core onboarding / role help (must stay in sync with UI). */
   registerMany([
     {
-      id: "floqai-ask-floqr",
+      id: "botdee-ask-floqr",
       title: "Ask FloqR with BOT DEE",
       body: "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
@@ -358,7 +358,7 @@
         {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
-      page: "index.html#floqAiHelpPopout"
+      page: "index.html#botDeeHelpPopout"
     },
     {
       id: "help-search-settings-appearance",
@@ -371,7 +371,7 @@
       page: "index.html#settingsBtnCard"
     },
     {
-      id: "help-floqai-page",
+      id: "help-botdee-page",
       title: "BOT DEE",
       body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee", "enter to send", "shift enter", "how are you bot dee"],
@@ -907,7 +907,7 @@
       page: "master-admin.html"
     },
     {
-      id: "help-floqai-audience-sections",
+      id: "help-botdee-audience-sections",
       title: "BOT DEE help audiences",
       body: "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
       searchPhrases: [
@@ -916,7 +916,7 @@
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
-      page: "index.html#floqAiHelpPopout"
+      page: "index.html#botDeeHelpPopout"
     },
     {
       id: "help-data-classification",
@@ -1680,7 +1680,7 @@
       page: "index.html#templates"
     },
     {
-      id: "help-floqai-template-search",
+      id: "help-botdee-template-search",
       title: "Template search",
       body: "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venue primary size — Use is the only action.",
       searchPhrases: ["floqai template", "template search", "sports jersey", "nba nfl cars humor", "search templates", "led preview"],

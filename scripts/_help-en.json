@@ -11,7 +11,7 @@
     "title": "Archived ShoutOuts",
     "body": "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive."
   },
-  "floqai-ask-floqr": {
+  "botdee-ask-floqr": {
     "title": "Ask FloqR with BOT DEE",
     "body": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
   },
@@ -139,7 +139,7 @@
     "title": "Default Template",
     "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use BOT DEE below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
   },
-  "help-floqai-template-search": {
+  "help-botdee-template-search": {
     "title": "BOT DEE template search",
     "body": "Tap the moving BOT DEE mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
   },
@@ -251,7 +251,7 @@
     "title": "Club website feed",
     "body": "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links."
   },
-  "help-floqai-page": {
+  "help-botdee-page": {
     "title": "BOT DEE",
     "body": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. Results only include what your account can use. Quick intent search stays available as a fast path when you want product cards without chat."
   },

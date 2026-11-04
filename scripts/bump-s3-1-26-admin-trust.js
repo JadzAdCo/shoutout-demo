@@ -9,7 +9,7 @@ const path = require("path");
 const root = path.resolve(process.argv[2] || path.join(__dirname, ".."));
 const pages = [
   "admin.html", "index.html", "master-admin.html", "patron-portal.html", "commerce.html", "mingl-chat.html",
-  "mingl-gist.html", "floqai.html", "club-profile.html", "role-request.html", "promoter-admin.html",
+  "mingl-gist.html", "botdee.html", "club-profile.html", "role-request.html", "promoter-admin.html",
   "template-tags.html", "guest-list.html", "seed-v29-09-14.html", "onboard-dc-venues.html",
   "beta-invite.html", "pickup.html", "rydr.html", "suprstar-preview.html", "suprstr-search.html"
 ];

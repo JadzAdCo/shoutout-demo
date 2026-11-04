@@ -17,7 +17,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   const page = section(read("index.html"), "categoryPage");
   assert.match(page, /id="backToWelcomeBtn"[^>]*class="floqr-back-btn"[^>]*data-i18n="nav\.backShort"/);
   assert.match(page, /class="category-brand-stack">\s*<a href="\.\/\?start=search" class="floqr-home-link"[\s\S]*?<img src="\.\/images\/floqr-color\.png\?v=s3\.\d+\.\d+" alt="FloqR" class="product-parent-logo"/);
-  assert.ok(page.indexOf("category-brand-stack") < page.indexOf('id="categoryFloqAiSearch"'), "logo sits above FloqAi");
+  assert.ok(page.indexOf("category-brand-stack") < page.indexOf('id="categoryBotDeeSearch"'), "logo sits above BOT DEE");
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
@@ -29,16 +29,16 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*floqcast-nightlife\.jpg/);
   assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
-  assert.match(page, /id="intentSearchBtnCard"[^>]*floqai-icon-card[\s\S]*botdee-nightlife\.jpg/);
+  assert.match(page, /id="intentSearchBtnCard"[^>]*botdee-icon-card[\s\S]*botdee-nightlife\.jpg/);
   assert.match(page, /id="settingsBtnCard"[^>]*href="\.\/patron-portal\.html\?from=search&tab=appearance"/);
   assert.match(page, /data-floqr-chrome-icon="settings"/);
   assert.match(page, /settings-nightlife\.jpg/);
-  assert.match(page, /data-i18n-aria="cat.floqai"[^>]*aria-label="BOT DEE"/);
+  assert.match(page, /data-i18n-aria="cat.botdee"[^>]*aria-label="BOT DEE"/);
   assert.doesNotMatch(page, /Welcome, type below to search for Events/);
   assert.match(page, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
-  assert.match(page, /id="categoryFloqAiGo"[^>]*class="category-floqai-lens"[^>]*type="submit"/);
-  assert.match(page, /class="category-floqai-field"/);
-  assert.doesNotMatch(page, /id="categoryFloqAiGo"[^>]*class="primary"/);
+  assert.match(page, /id="categoryBotDeeGo"[^>]*class="category-botdee-lens"[^>]*type="submit"/);
+  assert.match(page, /class="category-botdee-field"/);
+  assert.doesNotMatch(page, /id="categoryBotDeeGo"[^>]*class="primary"/);
   const css = read("styles.css");
   // Tighter brand stack under centered Image-2 Back pill (was 44px before unified Back)
   assert.match(css, /\.category-brand-stack\{display:grid;justify-items:center;margin:8px 0 12px\}/);
@@ -46,26 +46,26 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.floqr-back-btn,/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
-  assert.match(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*rgba\(0,200,255/);
+  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
+  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*rgba\(0,200,255/);
   assert.match(css, /--floqr-tile-cyan:#00c8ff/);
   assert.match(css, /--floqr-brand-gradient-h:linear-gradient/);
   assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
   assert.match(css, /html\[data-floqr-chrome="whiteBlack"\] \.primary/);
   assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
   assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#5ac783/);
-  assert.doesNotMatch(css, /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face(?:,\.settings-icon-face)?\{[^}]*background:#000/);
+  assert.doesNotMatch(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face(?:,\.settings-icon-face)?\{[^}]*background:#000/);
   assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /max-width:1180px\)[\s\S]*#categoryPage\.page\.active[\s\S]*margin-top:auto!important/, "phones/tablets pin Search icon row to viewport bottom");
   assert.match(css, /min-width:1181px\)[\s\S]*#categoryPage\.page\.active \.category-grid\.compact-category-grid:has\(\.search-icon-row\)\{[\s\S]*margin-top:28px!important/, "wide desktop keeps icons under Search");
   assert.match(css, /\.shoutout-icon-card\.feature-beta::after\{[^}]*content:attr\(data-beta-label\)/, "Beta pill on shoutout-icon-card tiles");
-  const searchCss = read("floqai-search.css");
-  assert.match(searchCss, /\.category-floqai-lens\{/);
+  const searchCss = read("botdee-search.css");
+  assert.match(searchCss, /\.category-botdee-lens\{/);
   assert.match(searchCss, /background:transparent!important/);
   assert.match(
     searchCss,
-    /\.category-floqai-search\{[^}]*margin:0 auto 18px/,
+    /\.category-botdee-search\{[^}]*margin:0 auto 18px/,
     "desktop Search bar centered under FloqR logo"
   );
   const chrome = read("floqr-chrome-scheme.js");

@@ -1,6 +1,6 @@
 # Twilio logging & marketing SMS delivery (follow-up)
 
-Design notes only (not FloqAi help). Resume: `@twilio-log$` / `@ad-pay$`.
+Design notes only (not BOT DEE help). Resume: `@twilio-log$` / `@ad-pay$`.
 
 ## Why Club Admin “Send test” showed sent but no SMS
 
@@ -43,4 +43,4 @@ Advertising → Messaging logs shows SMS + WhatsApp filtered by `clubLocationId`
 
 - Do not treat dry-run as delivered success for marketing tests
 - Do not put Auth Token or full Account SID in Firestore logs
-- Do not put these design notes in FloqAi help bodies
+- Do not put these design notes in BOT DEE help bodies

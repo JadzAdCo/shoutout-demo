@@ -35,8 +35,8 @@ test("recommendation status paragraphs opt out of helper-popout conversion", () 
   }
 });
 
-test("recommendation help is registered for FloqAi and localized", () => {
-  const repo = read("floqai-help-repository.js");
+test("recommendation help is registered for BOT DEE and localized", () => {
+  const repo = read("botdee-help-repository.js");
   const packs = read("floqr-i18n-help.js");
   for (const id of IDS) {
     assert.match(repo, new RegExp(`id: "${id}"`), `repository ${id}`);

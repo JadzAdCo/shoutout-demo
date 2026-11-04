@@ -4,7 +4,7 @@
 
 const {Type} = require("@google/genai");
 const classification = require("./data-classification-core");
-const FLOQAI_CONTENT = require("./floqai-content-classes.json");
+const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 
 const MAX_HISTORY = 12;
@@ -302,7 +302,7 @@ function contextualSearch(query, viewerRole) {
   const strong = scored.filter(row => row.points >= MIN_SEARCH_SCORE);
   strong.sort((a, b) => b.points - a.points || a.entry.sourceId.localeCompare(b.entry.sourceId));
   const candidates = strong.slice(0, 40).map(row => row.entry.sourceId);
-  const {allowed, denied} = classification.filterContent(candidates, FLOQAI_CONTENT, {role});
+  const {allowed, denied} = classification.filterContent(candidates, BOTDEE_CONTENT, {role});
   const allowedSet = new Set(allowed);
   const results = strong
     .filter(row => allowedSet.has(row.entry.sourceId))
@@ -448,6 +448,6 @@ module.exports = {
   formatSearchFallback,
   resultsForClient,
   linksFromToolResult,
-  FLOQAI_CONTENT,
+  BOTDEE_CONTENT,
   SEARCH_CATALOG
 };

@@ -72,7 +72,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.`,
+      `- ${NEXT}: Patron verbiage is BOT DEE (not BOT DEE); FloqCast CTA “Go live, start a cast”.`,
       `- s3.2.59: FloqCast CTA “Go live, start a cast”; chat chitchat for greetings.`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);

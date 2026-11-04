@@ -1,5 +1,5 @@
 /* BOT DEE standalone page — chat via executeBotSession + intent-search fallback.
-   Design notes: .cursor/rules/design-notes-floqai-page.mdc */
+   Design notes: .cursor/rules/design-notes-botdee-page.mdc */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -16,14 +16,14 @@
   };
 
   const SCOPE_KEYS = {
-    masterAdmin: ["floqai.scopeMasterAdmin", "Showing answers for Master Admin (all areas)."],
-    venueAdmin: ["floqai.scopeVenueAdmin", "Showing answers for Club Admin, staff, and patrons."],
-    serviceMember: ["floqai.scopeServiceMember", "Showing answers for staff and patrons."],
-    patron: ["floqai.scopePatron", "Showing answers for patrons."],
-    anonymous: ["floqai.scopePublic", "Showing public answers. Sign in to see answers for your account."]
+    masterAdmin: ["botdee.scopeMasterAdmin", "Showing answers for Master Admin (all areas)."],
+    venueAdmin: ["botdee.scopeVenueAdmin", "Showing answers for Club Admin, staff, and patrons."],
+    serviceMember: ["botdee.scopeServiceMember", "Showing answers for staff and patrons."],
+    patron: ["botdee.scopePatron", "Showing answers for patrons."],
+    anonymous: ["botdee.scopePublic", "Showing public answers. Sign in to see answers for your account."]
   };
   const SERVER_ROLE_SCOPE = {master: "masterAdmin", clubAdmin: "venueAdmin", privileged: "serviceMember", regular: "serviceMember", patron: "patron", anonymous: "anonymous"};
-  const access = () => window.FLOQRFloqAiAccess;
+  const access = () => window.FLOQRBotDeeAccess;
 
   function ensureFirebase() {
     try {
@@ -36,7 +36,7 @@
   function showScope() {
     const audience = SERVER_ROLE_SCOPE[access()?.role?.()] || window.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
     const [key, fallback] = SCOPE_KEYS[audience] || SCOPE_KEYS.patron;
-    const el = byId("floqAiScopeNote");
+    const el = byId("botDeeScopeNote");
     if (el) el.textContent = t(key, fallback);
   }
 
@@ -56,7 +56,7 @@
       onShoutout: () => window.showShoutoutLanding(),
       onMingl: () => { location.href = href("./", {start: "mingl"}); }
     });
-    window.FLOQRFloqAi?.bindFloqAi({
+    window.FLOQRBotDee?.bindBotDee({
       mode: "intent",
       onOpenSearch() { byId("intentSearchInput")?.focus(); }
     });

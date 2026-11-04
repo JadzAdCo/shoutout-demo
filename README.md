@@ -1,10 +1,14 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.75 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.76 (stable)
 
-- s3.2.75: Remove floqai.html / floqai-search.html (404); BOT DEE speech; no FloqAi patron copy.
+- s3.2.76: Technical rename floqAi→botDee (modules botdee-*, dual-read alias, getBotDeeAccess).
 - s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
 - s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
 
-- s3.2.74: Rename floqai.html → botdee.html; FloqAi→BOT DEE help/labels (technical floqAi ids kept).
+- s3.2.75: Remove botdee.html / botdee-search.html (404); BOT DEE speech; no BOT DEE patron copy.
+- s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
+- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
+
+- s3.2.74: Rename botdee.html → botdee.html; BOT DEE→BOT DEE help/labels (technical floqAi ids kept).
 - s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
 - s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
 
@@ -39,9 +43,9 @@
 - s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.
 
 - s3.2.61: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.
-- s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.
+- s3.2.60: Patron verbiage is BOT DEE (not BOT DEE); FloqCast CTA “Go live, start a cast”.
 
-- s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.
+- s3.2.60: Patron verbiage is BOT DEE (not BOT DEE); FloqCast CTA “Go live, start a cast”.
 - s3.2.59: FloqCast CTA “Go live, start a cast”; chat chitchat for greetings.
 - s3.2.58: Black & Dark Green Search icons use Settings tings green #5ac783; Search icon order live on main.
 
@@ -90,7 +94,7 @@
 
 - s3.1.87: floqCast Search mark SVG encoding fix (invalid 0x97 broke <img>); restore live duration arm after ICE; repair no longer counts ended sessions.
 
-- s3.1.86: Master Admin Search shows test/Beta tiles (floqCast / VIP / FloqAi); mark CSS no longer collapses icons.
+- s3.1.86: Master Admin Search shows test/Beta tiles (floqCast / VIP / BOT DEE); mark CSS no longer collapses icons.
 
 - s3.1.85: Google/Facebook/Microsoft Welcome sign-in — no redirect on popup-closed (fixes stuck Redirecting… on GitHub Pages).
 
@@ -100,7 +104,7 @@
 
 - s3.1.82: VIP per-table Firestore status (tableNumber key, isBooked "1"/"yes" after booking).
 
-- s3.1.82: Aurelia demo VIP default = FloqMedia Stripe; FloqAi + i18n setup guide (Master/Club Admin).
+- s3.1.82: Aurelia demo VIP default = FloqMedia Stripe; BOT DEE + i18n setup guide (Master/Club Admin).
 
 - s3.1.82: VIP Club POS–first payment collectors (Toast/SpotOn preferred); Club/Master Admin connect + CSV + billing.
 
@@ -120,15 +124,15 @@
 
 - s3.1.69: Ship Priya Shah Search profile/inbox reconcile (TW→PS, soft-delete inbox counts) onto live Pages.
 
-- s3.1.68: Restore Beta pill on Search shoutout-icon-card tiles (FloqAi / floqCast / VIP) — CSS had only covered category-card.
+- s3.1.68: Restore Beta pill on Search shoutout-icon-card tiles (BOT DEE / floqCast / VIP) — CSS had only covered category-card.
 
-- s3.1.67: Search FloqAi/floqCast/VIP tiles — marks ~80% of black face, wordmarks stacked at bottom inside the button (ShoutOut visual weight).
+- s3.1.67: Search BOT DEE/floqCast/VIP tiles — marks ~80% of black face, wordmarks stacked at bottom inside the button (ShoutOut visual weight).
 
 - s3.1.66: VIP reserV no longer stuck on Restoring — catalog loads only VIP candidates (not ~590 club docs); Search tiles from s3.1.65 stay live.
 
-- s3.1.65: Search tiles standardized — FloqAi/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.
+- s3.1.65: Search tiles standardized — BOT DEE/floqCast/VIP wordmarks inside black faces; no Throw a ShoutOut / VIP reserV captions; floqCast cast-to-LED icon; 3-across mobile/tablet, one line on PC.
 
-- s3.1.64: FloqAi Search tile matches ShoutOut box — black face, same FloqAi tiles mark, white FloqAi label.
+- s3.1.64: BOT DEE Search tile matches ShoutOut box — black face, same BOT DEE tiles mark, white BOT DEE label.
 
 - s3.1.63: Beta-invite profile card uses signed-in session; Active beta testers compact table (≤3 lines).
 
@@ -167,7 +171,7 @@
 
 - s3.1.44: Rename product brand supRstar / SupRstR / suprstr to floqCast (feature key floqCast with legacy supRstar dual-read; pages floqcast-*.html; Firestore collection ids suprstrLive / suprstrSessions / suprstarRequests kept as storage ids).
 
-- s3.1.43: Throw a ShoutOut from a club or event page goes straight to that club. The Throw a ShoutOut button on a Club Public Profile (and the new one on each upcoming event there) used to show a generic ad and then drop the patron back on Search. Now it shows the in-app ad for that club and then opens template selection for that club (the event name and date show under the club name). Signed-out patrons sign in first and land in the same place. The same link is used by the club website embed (new Throw a ShoutOut button and per-event link), FloqAi assistant venue and event results, Master Admin Venue Links (new "ShoutOut link") and the Club Admin public profile report. If the venue is not available the patron lands on Search with a short message. Search itself is unchanged.
+- s3.1.43: Throw a ShoutOut from a club or event page goes straight to that club. The Throw a ShoutOut button on a Club Public Profile (and the new one on each upcoming event there) used to show a generic ad and then drop the patron back on Search. Now it shows the in-app ad for that club and then opens template selection for that club (the event name and date show under the club name). Signed-out patrons sign in first and land in the same place. The same link is used by the club website embed (new Throw a ShoutOut button and per-event link), BOT DEE assistant venue and event results, Master Admin Venue Links (new "ShoutOut link") and the Club Admin public profile report. If the venue is not available the patron lands on Search with a short message. Search itself is unchanged.
 
 - s3.1.42: Heist FloqR card. On every Heist ShoutOut the card now plays "Caught in a HEIST", then "Presented by FloqMedia", then "Powered by FloqR Social OS", then "From @handle" when the patron shares a handle - 6 seconds each, then repeats. Without a handle it plays the first three. The card never disappears, and the Heist message stays on screen long enough for every line before the HEIST logo slide. Every other template is unchanged.
 
@@ -177,21 +181,21 @@
 
 - s3.1.39: Security fix for the LED boards. A crafted Display preview link (or a ShoutOut with a crafted background / photo link) could slip page code into the board and the Club Admin preview. Boards, template previews, the ShoutOut composer and Club Admin approve now only accept normal web image links (https or FLOQR's own images), plain colors and simple gradients, and escape everything else. Firestore rules refuse unsafe links and colors on ShoutOuts and on the live board record. Nothing changes for patrons or venues using normal ShoutOuts.
 
-- s3.1.38: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and FloqAi search ("Shiloh", "cat template") in all 11 languages.
+- s3.1.38: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and BOT DEE search ("Shiloh", "cat template") in all 11 languages.
 
-- s3.1.37: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, FloqAi, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.
+- s3.1.37: Page links never carry a version number any more (owner decision Oct 10 2026). Search, My Profile, Club Admin, BOT DEE, Inbox / email / SMS notification links, Back buttons, sign-in return links and the My Profile Work Calendar frame all open plain URLs, so a saved or shared link always gets the current release. Old links that still have ?v= keep working (the value is ignored and not passed on). Only script / stylesheet / image tags keep ?v= for cache-busting, re-stamped by the bump script on every release.
 
-- s3.1.36: FloqAi links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.
+- s3.1.36: BOT DEE links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.
 
-- s3.1.35: FloqAi and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.
+- s3.1.35: BOT DEE and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (BOT DEE, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.
 
 - s3.1.34: Staff Scheduling (scheduling.html) finishes signing in again: the page app now starts Firebase itself, so a signed-in patron, Club Admin or Master Admin no longer sees "Restoring your FLOQR session…" forever. The free-text "Owner id" box is replaced by a Schedule for picker (My DJ schedule / Club / Promoting company) that lists only the clubs and companies you may manage (Master Admins get every club with search). Stored owner ids are unchanged. The Subscription card stays visible after sign-in, and choosing a club no longer writes to the club record.
 
 - s3.1.33: Security patch. SMS and WhatsApp logs (Twilio SMS / WhatsApp / feature / compliance logs, club message deliveries and inbound replies, Twilio debugger events) never store the club daily code, sign-in codes, passcodes or recovery codes; they are masked before the row is written. Stored Twilio request paths no longer show the full Account SID.
 
-- s3.1.32: In-app links (Venue Links, FloqAi, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.
+- s3.1.32: In-app links (Venue Links, BOT DEE, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.
 
-- s3.1.30: Features & Services links. Every place that links to Mingl, BartR, RydR, floqCast or FloqAi (Search tiles, the profile menu, My Profile tabs and links, FloqAi results) now follows the same Features & Services switches, and test features carry a Beta pill. Each feature stores two read-only datapoints, `enableFeatureLink` and `enableBetaFeatureLink`, kept in step with the switches by the server. Master Admin → Features & Services reads "Enable Feature" / "Enable Beta Feature" and "Revision N", the open link sits under the feature name, and the reason for a change is asked in a short prompt after Save (a bottom sheet on phones) instead of a box that was always on screen.
+- s3.1.30: Features & Services links. Every place that links to Mingl, BartR, RydR, floqCast or BOT DEE (Search tiles, the profile menu, My Profile tabs and links, BOT DEE results) now follows the same Features & Services switches, and test features carry a Beta pill. Each feature stores two read-only datapoints, `enableFeatureLink` and `enableBetaFeatureLink`, kept in step with the switches by the server. Master Admin → Features & Services reads "Enable Feature" / "Enable Beta Feature" and "Revision N", the open link sits under the feature name, and the reason for a change is asked in a short prompt after Save (a bottom sheet on phones) instead of a box that was always on screen.
 
 - s3.1.29: Master Admin layout. Features & Services → Feature & beta activity reads as a proper table on PC and as label / value cards on tablet and phone (long emails, IPs and hashes are shortened with the full value on hover; before / after changes open on demand). Tables inside Master Admin report boxes no longer squeeze columns to one letter per line. The stray ? beside the Network Intelligence Center title is gone; its help now sits on the All Locations card and explains what the network numbers mean and how to open one venue. Help popouts inside big headings use normal readable text.
 
@@ -207,13 +211,13 @@
 
 - s3.1.22: Data classification explains what to do at the top, saves every row with one **Save all classifications** button (SOS2FA + reason, one audit record), shows each row as Saved / Default / Edited / Needs review with a recommendation, filters to rows that need review, and lists what needs fixing in the live security rules. The retention column is now **Delete after (days)**.
 
-- s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. FloqAi now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.
+- s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. BOT DEE now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.
 
-- s3.1.20: Club Admin → Club Public Profile → **Website feed** generates a private link for the club's official website: an iframe, a JSON feed, and an events RSS feed with upcoming events, featured DJs, featured staff, and gallery photos (only sections shown on the public profile). Featured staff photos now need a consent confirmation before they publish. FloqAi opens on its own page (`floqai.html`) instead of bouncing to event search.
+- s3.1.20: Club Admin → Club Public Profile → **Website feed** generates a private link for the club's official website: an iframe, a JSON feed, and an events RSS feed with upcoming events, featured DJs, featured staff, and gallery photos (only sections shown on the public profile). Featured staff photos now need a consent confirmation before they publish. BOT DEE opens on its own page (`botdee.html`) instead of bouncing to event search.
 
 - s3.1.19: Club Admin → Club Public Profile → **Featured service staff** is now a checkbox list instead of a "Name | Role | Bio | Photo URL" text box. It lists everyone already featured plus the club's staff from Employee / Worker Network. Tick who appears on the public club page, adjust the role shown under the name, and pick the photo: one of the person's own FLOQR pictures, or **Upload from computer** (saved to the club's media). No photo URLs. The public page logic is unchanged (it still shows the saved `featuredStaff` list). Labels and help are translated into all 11 languages.
 
-- s3.1.18: ShoutOut composer → ShoutOut Recommendations shows a single **?** beside each heading (ShoutOut Recommendations, AI Recommendations, Trending ShoutOuts, Generic ShoutOuts). The old under-heading info popouts are gone, and the "Type a message…" / "Building personalized ShoutOut ideas…" status lines stay visible instead of turning into a second **?**. The four help topics are in FloqAi search and translated into every supported language. AI Recommendations call Gemini through `aiSuggestShoutOut`; until Gemini API credits are topped up the server returns local fallback ideas.
+- s3.1.18: ShoutOut composer → ShoutOut Recommendations shows a single **?** beside each heading (ShoutOut Recommendations, AI Recommendations, Trending ShoutOuts, Generic ShoutOuts). The old under-heading info popouts are gone, and the "Type a message…" / "Building personalized ShoutOut ideas…" status lines stay visible instead of turning into a second **?**. The four help topics are in BOT DEE search and translated into every supported language. AI Recommendations call Gemini through `aiSuggestShoutOut`; until Gemini API credits are topped up the server returns local fallback ideas.
 
 - s3.1.17: Master Admin → Entity Management → Manage selected (club): Open Club Admin, Display 1, Display 2, Public profile and the new **Xibo Diag** button no longer navigate. Each shows a link panel with the full URL, **Copy**, and Open in new tab, laid out for PC, tablet and phone. Xibo Diag lists the Display 1 and Display 2 fallback URLs (`display-error.html?location=…&board=1|2&reason=xibo_page_load_error`) to paste into each board's Xibo error layout. "Allow application access" now explains itself (venue master switch: Club Admin locked, hidden from Search, venue features refused by the server; reversible, unlike Offboard). Phone and email links have no underline on any page and still dial / open mail. The club profile labels the FloqR handle button "Mingl". New gallery photos: "BusBoy - Papi's ClubTech Led 64x48 Mobile display" (BAD BOYS / BAD BOYS / NITE OUT) and the VIP Maya room with guests plus a busboy carrying the 64x48 "Go Maya" photo ShoutOut.
 - s3.1.16: The Aurelia demo club (`temp-democlub-1`) is now "Aurelia (Demo Club)" in New York (1001 6th Ave, New York, NY 10018). The other nine temp demo clubs stay in Washington DC. Firestore club record, staff rows and the two workers' already-requested venue lists were updated to the new name; Google re-geocoded the club to New York for nearest-first search. Display URLs are unchanged: `display.html?location=temp-democlub-1`.
@@ -227,9 +231,9 @@
 
 - s3.1.9: Fix — a ShoutOut approved after a board's 10-minute reset stayed hidden behind "Use ShoutOut @ {club}". The board now always plays an approved ShoutOut, and Club Admin / SMS / WhatsApp approval clears the leftover idle marker.
 
-- s3.1.8: Heist templates are easy to find for Club Admins and patrons. Club Admin → Customize a Template lists the club's own templates first, tagged "Exclusive at Heist", with one card per template (no duplicate Tengo card). Template search in Club Admin, the patron picker, Search and FloqAi now forgives missing accents, a missing plural "s" and a small typo, so "Tendo mucho dolares" finds Tengo muchos dólares. Heist keeps every Heist template assigned (Vault Night, Police Car, Interrogation, Tengo muchos dólares, Zebbies All-Stars Football Intro).
+- s3.1.8: Heist templates are easy to find for Club Admins and patrons. Club Admin → Customize a Template lists the club's own templates first, tagged "Exclusive at Heist", with one card per template (no duplicate Tengo card). Template search in Club Admin, the patron picker, Search and BOT DEE now forgives missing accents, a missing plural "s" and a small typo, so "Tendo mucho dolares" finds Tengo muchos dólares. Heist keeps every Heist template assigned (Vault Night, Police Car, Interrogation, Tengo muchos dólares, Zebbies All-Stars Football Intro).
 
-- s3.1.7: Venue-only templates are easy to find. The template picker lists them under "Exclusive at {venue}" right below the Default Template, and typing a template name ("Football Intro", "Zebbies All-Stars", "Tengo muchos dólares") in Search or FloqAi jumps to the venues that offer it. Zebbies All-Stars Football Intro is offered at Zebbies, Heist and Aurelia. Tengo muchos dólares starts like a normal ShoutOut; about 40 seconds in, the vault door blows open, big green $100 bills flood the whole board, then a smaller splash keeps going behind the text (the text always stays on top). Every club's idle board is "Use ShoutOut @ {club}"; a ShoutOut that ends (10-minute reset or Club Admin reset) returns the board to that message instead of leaving the last template up.
+- s3.1.7: Venue-only templates are easy to find. The template picker lists them under "Exclusive at {venue}" right below the Default Template, and typing a template name ("Football Intro", "Zebbies All-Stars", "Tengo muchos dólares") in Search or BOT DEE jumps to the venues that offer it. Zebbies All-Stars Football Intro is offered at Zebbies, Heist and Aurelia. Tengo muchos dólares starts like a normal ShoutOut; about 40 seconds in, the vault door blows open, big green $100 bills flood the whole board, then a smaller splash keeps going behind the text (the text always stays on top). Every club's idle board is "Use ShoutOut @ {club}"; a ShoutOut that ends (10-minute reset or Club Admin reset) returns the board to that message instead of leaving the last template up.
 
 - s3.1.6: Search page content drops below the profile card and opens with the FLOQR logo (same unframed logo as the ShoutOut page). The "Throw a ShoutOut" button is now the ShoutOut icon with the title underneath; tapping either goes straight to choosing a venue — the old ShoutOut landing page ("Start ShoutOut" / "Back to Search") is skipped (markup kept until removal is approved). Ad splash FLOQR logo is unframed; FloqMedia contact links are no longer underlined.
 
@@ -247,15 +251,15 @@
 
 - s3.0.111: Welcome sign-in buttons show the icon and label left-aligned (panel Send / Verify buttons stay centered).
 
-- s3.0.110: Features & Services access matrix — `IsFeatureEnabled=0` is off for everyone (Master Admins included); `IsFeatureEnabled=1` + `IsTestFeature=1` shows the Search button only to beta testers granted that feature (`betaTesters.features`), Master Admins open it from Features & Services; Master Admins cannot be beta testers. New callables `setBetaTesterFeatures` and `logFeatureAccessAttempt` (throttled, unchained denials). Signed-out visits to any satellite page redirect to the general FLOQR sign-in (`?profileRequired=sign-in&returnTo=`), not a Google-only card. Welcome buttons share the FloqAi blue-to-purple gradient with white text and same-size email / SMS / WhatsApp icons; SMS OTP is US & Canada; WhatsApp is last.
+- s3.0.110: Features & Services access matrix — `IsFeatureEnabled=0` is off for everyone (Master Admins included); `IsFeatureEnabled=1` + `IsTestFeature=1` shows the Search button only to beta testers granted that feature (`betaTesters.features`), Master Admins open it from Features & Services; Master Admins cannot be beta testers. New callables `setBetaTesterFeatures` and `logFeatureAccessAttempt` (throttled, unchained denials). Signed-out visits to any satellite page redirect to the general FLOQR sign-in (`?profileRequired=sign-in&returnTo=`), not a Google-only card. Welcome buttons share the BOT DEE blue-to-purple gradient with white text and same-size email / SMS / WhatsApp icons; SMS OTP is US & Canada; WhatsApp is last.
 
 - s3.0.109: Test-feature page guard starts Firebase itself when the page has no app script (RydR stayed blank) and denies cleanly on errors.
 
 - s3.0.108: Master Admin → Features & Services — per-feature `IsFeatureEnabled` / `IsTestFeature` (Firestore `featureServices`), only ShoutOut live by default; test features visible to Master Admins + beta testers (Beta pill) and blocked on satellite pages for regular patrons; beta tester invites (Inbox link, account-bound, 7-day expiry) and revoke; test → live promotion log + GitHub `promote-test-to-main` workflow and `test` branch; hash-chained audit trail (ISO 27001 A.8.15 / NIST 800-53r5 AU) with integrity verify; `superAdmin` protected from self-write. In-app ad splash shows "…loading your search" for 5 seconds with no countdown or Skip.
 
 - s3.0.107: WhatsApp OTP sign-in (Worldwide) via Twilio (`requestWhatsAppOtp`, `verifyWhatsAppOtp`) with forced compliance rows for every send / delivery status / verify; SMS OTP limited to US (+1); OTP divider removed; Privacy Policy · Do Not Sell links moved below the sign-in buttons in white; Welcome `?` explains OTP in 11 languages.
-- s3.0.106: Location-aware search — nearest first then by name (GPS, then IP estimate, then profile city); "near me" in 11 languages; Google venue geocoding trigger + backfill (`onClubLocationGeocode`, `scheduledVenueGeocodeBackfill`); animated borderless FloqAi dialog; Search for heading and venue tiles removed.
-- s3.0.105: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs + genre + city word lists); Welcome `?` help; signed-in users skip the Continue interstitial.
+- s3.0.106: Location-aware search — nearest first then by name (GPS, then IP estimate, then profile city); "near me" in 11 languages; Google venue geocoding trigger + backfill (`onClubLocationGeocode`, `scheduledVenueGeocodeBackfill`); animated borderless BOT DEE dialog; Search for heading and venue tiles removed.
+- s3.0.105: BOT DEE venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs + genre + city word lists); Welcome `?` help; signed-in users skip the Continue interstitial.
 - s3.0.104: Publish floqr-ad-pricing.js + patron-ad-campaigns.js to main so Functions CI (ad-campaigns-business tests) passes.
 - s3.0.103: Privacy Policy + Do Not Sell/GPC + DSAR export/delete callables; ad personalization gate; privacyConsents owner rules.
 
@@ -263,7 +267,7 @@
 - s3.0.101: Ad Campaign Mgmt — Preview creative works; human form targeting (no raw JSON editors).
 - s3.0.100: Master Admin Twilio/SendGrid tab labels (SMS Logs, etc.) + Ad Campaign Mgmt rename.
 - s3.0.99: Master Admin header cleanup — remove FLOQR Master Admin / Network View eyebrows; nest portal scope + verified status in ? help.
-- s3.0.98: Master Admin — remove Ops Status (FloqAi help); Completed Log / Retention labels; SOC 2 copy in ? help.
+- s3.0.98: Master Admin — remove Ops Status (BOT DEE help); Completed Log / Retention labels; SOC 2 copy in ? help.
 - s3.0.97: Mass onboard for ready discovery cards + readiness report; lineup/residents page follow for DJ/promoter hints.
 - s3.0.96: Instant Crawl Now on Master Admin — short job-cap run of the saved schedule with contact-lift stats vs prior baselines.
 - s3.0.95: Discovery contact completeness — aggregator brand-domain preferencer, WhatsApp phone harvest, ordered crawl UI reads.
@@ -285,7 +289,7 @@
 
 Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.16&start=search`
 
-s3.0.16: General Notifications copy lives in the `?` help and FloqAi, not as a paragraph on My Privacy. s3.0.15: ShâÃ¢â¬â¤ko Barcelona Cameroon jersey primary screen is 96âÃ¢ÎÃÃ¶48 (64âÃ¢ÎÃÃ¶48 secondary; 64âÃ¢ÎÃÃ¶32 still offered). s3.0.14: Cameroon jersey test at ShâÃ¢â¬â¤ko Barcelona plus 64âÃ¢ÎÃÃ¶32 and 64âÃ¢ÎÃÃ¶48 composer previews for ShâÃ¢â¬â¤ko, Zebbies, and LIMA Twist. s3.0.13: My Privacy General Notifications copy now covers patron user-record flags and paid Twilio SMS/WhatsApp for venues and independent service members. s3.0.12: Cameroon soccer jersey test also at Zebbies Garden DC and LIMA Twist (same Cameroon-only picker as Heist). s3.0.11: SOS2FA idle copy removed; Request Code `?` points at My Privacy Email/SMS. Profile Template Guide moved under Services & Service Members (gated by IsPatron / IsServiceMember). Member Type rename. s3.0.10: Cameroon jersey country name is baked into the PNG; patron name/number stay CSS. Heist DC soccer picker is Cameroon-only for live LED test. Composer/URL preview paints without Display Security. s3.0.9: Tanzania LED overlay (wordmark at collar, name/number up +7%, numbers center-justified) on every soccer photo kit. Composer cards show the real kit PNG tagged Soccer âÃ©â¬â Jersey âÃ©â¬â Country/Club, with 96âÃ¢ÎÃÃ¶48 / 64âÃ¢ÎÃÃ¶48 / 64âÃ¢ÎÃÃ¶32. s3.0.8: Soccer photo jerseys use one Cameroon/Morocco silhouette, team colors only, solid black LED backdrop. A named PNG always beats the CSS hanger (ignore jerseyCssBack=1). Proposed Tanzania, Ethiopia, Zambia, Ivory Coast, and South Africa kits are the live named files. s3.0.7: Master Admin Diagnostics âÃ³ÎÃÃ¡ÎÃÃ Mail Logging records every system-generated SendGrid email (success, failure, headers, body, TLS 1.3, delivery). s3.0.6: Search profile menu stays inside the dropdown (no leak over Clubs). Help `?` sits beside its label on phones. Remaining Search chrome follows App language (Back to welcome, Beach Clubs, Clubs, Lounges). s3.0.5: App language covers Language Settings report values, satellite page chrome, and the profile status menu. From Club Admin / Master Admin, patron links open in a new tab and show an in-app hold notice so the admin portal stays on this session. s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
+s3.0.16: General Notifications copy lives in the `?` help and BOT DEE, not as a paragraph on My Privacy. s3.0.15: ShâÃ¢â¬â¤ko Barcelona Cameroon jersey primary screen is 96âÃ¢ÎÃÃ¶48 (64âÃ¢ÎÃÃ¶48 secondary; 64âÃ¢ÎÃÃ¶32 still offered). s3.0.14: Cameroon jersey test at ShâÃ¢â¬â¤ko Barcelona plus 64âÃ¢ÎÃÃ¶32 and 64âÃ¢ÎÃÃ¶48 composer previews for ShâÃ¢â¬â¤ko, Zebbies, and LIMA Twist. s3.0.13: My Privacy General Notifications copy now covers patron user-record flags and paid Twilio SMS/WhatsApp for venues and independent service members. s3.0.12: Cameroon soccer jersey test also at Zebbies Garden DC and LIMA Twist (same Cameroon-only picker as Heist). s3.0.11: SOS2FA idle copy removed; Request Code `?` points at My Privacy Email/SMS. Profile Template Guide moved under Services & Service Members (gated by IsPatron / IsServiceMember). Member Type rename. s3.0.10: Cameroon jersey country name is baked into the PNG; patron name/number stay CSS. Heist DC soccer picker is Cameroon-only for live LED test. Composer/URL preview paints without Display Security. s3.0.9: Tanzania LED overlay (wordmark at collar, name/number up +7%, numbers center-justified) on every soccer photo kit. Composer cards show the real kit PNG tagged Soccer âÃ©â¬â Jersey âÃ©â¬â Country/Club, with 96âÃ¢ÎÃÃ¶48 / 64âÃ¢ÎÃÃ¶48 / 64âÃ¢ÎÃÃ¶32. s3.0.8: Soccer photo jerseys use one Cameroon/Morocco silhouette, team colors only, solid black LED backdrop. A named PNG always beats the CSS hanger (ignore jerseyCssBack=1). Proposed Tanzania, Ethiopia, Zambia, Ivory Coast, and South Africa kits are the live named files. s3.0.7: Master Admin Diagnostics âÃ³ÎÃÃ¡ÎÃÃ Mail Logging records every system-generated SendGrid email (success, failure, headers, body, TLS 1.3, delivery). s3.0.6: Search profile menu stays inside the dropdown (no leak over Clubs). Help `?` sits beside its label on phones. Remaining Search chrome follows App language (Back to welcome, Beach Clubs, Clubs, Lounges). s3.0.5: App language covers Language Settings report values, satellite page chrome, and the profile status menu. From Club Admin / Master Admin, patron links open in a new tab and show an in-app hold notice so the admin portal stays on this session. s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
 
 ## UI media input convention (required)
 

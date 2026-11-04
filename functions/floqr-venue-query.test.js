@@ -1,5 +1,5 @@
 /**
- * FloqAi venue / activity search: word list, entry context, genre + place filters.
+ * BOT DEE venue / activity search: word list, entry context, genre + place filters.
  */
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -146,11 +146,11 @@ test("word list covers every Search-for category", () => {
   VQ.wordList().types.forEach(t => assert.ok(t.words.length >= 6, t.id));
 });
 
-test("index.html wires the stationary FloqAi category search", () => {
+test("index.html wires the stationary BOT DEE category search", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  assert.match(html, /id="categoryFloqAiSearch"/);
-  assert.match(html, /id="categoryFloqAiInput"/);
-  assert.match(html, /id="categoryFloqAiGo"[^>]*class="category-floqai-lens"/);
+  assert.match(html, /id="categoryBotDeeSearch"/);
+  assert.match(html, /id="categoryBotDeeInput"/);
+  assert.match(html, /id="categoryBotDeeGo"[^>]*class="category-botdee-lens"/);
   assert.match(html, /data-i18n-placeholder="cat\.floqaiPlaceholder"/);
   assert.match(html, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(html, /floqr-venue-query\.js\?v=s3\.\d+\.\d+/);
@@ -169,7 +169,7 @@ test("category page has no Search for heading and no venue-type tiles", () => {
   ["eventsBtnCard", "clubsBtnCard", "beachClubsBtnCard", "loungesBtnCard", "loungeClubBtnCard"].forEach(id =>
     assert.doesNotMatch(page, new RegExp(`id="${id}"`), id));
   assert.match(page, /id="shoutoutBtnCard"/);
-  assert.doesNotMatch(page, /class="category-floqai-mark-halo"/);
+  assert.doesNotMatch(page, /class="category-botdee-mark-halo"/);
   assert.doesNotMatch(page, /Welcome, type below to search for Events/);
 });
 
@@ -196,7 +196,7 @@ test("an explicit place wins over near me; Monaco is a known place", () => {
   assert.equal(VQ.parse("Monte Carlo lounges").place.id, "monaco");
 });
 
-test("chrome pack carries the FloqAi category dialog copy", () => {
+test("chrome pack carries the BOT DEE category dialog copy", () => {
   const src = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   assert.match(src, /"cat\.floqaiPlaceholder": "Search for Clubs, Lounge, Events, etc\."/);
   assert.doesNotMatch(src, /"cat\.floqaiPlaceholder": "You may also search for: Clubs or Lounges"/);

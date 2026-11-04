@@ -51,7 +51,7 @@ edit("README.md", src => {
   if (!head.test(src)) throw new Error("README head");
   if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = `- ${NEXT}: In-app links (Venue Links, FloqAi, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.`;
+  const note = `- ${NEXT}: In-app links (Venue Links, BOT DEE, Inbox, Back) now carry the current package instead of s3.1.26. System mail logs never store sign-in or SOS2FA codes: the body of a code email is not kept (only its template and a masked preview), and any code in other mail subjects or bodies is masked.`;
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
 });
 

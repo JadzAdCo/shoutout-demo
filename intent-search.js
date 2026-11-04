@@ -953,9 +953,9 @@
     });
   }
 
-  /** Server verdict hook (floqai-access.js). Without it, the local classification decides. */
+  /** Server verdict hook (botdee-access.js). Without it, the local classification decides. */
   function serverAllows(sourceId) {
-    const gate = global.FLOQRFloqAiAccess;
+    const gate = global.FLOQRBotDeeAccess;
     if (!gate?.isActive?.()) return true;
     return gate.verdict(sourceId) === "allow";
   }
@@ -1059,13 +1059,13 @@
     };
     const typeLabel = VQ.typeLabel(parsed.type, key => t(key, {}, key));
     const details = [...parsed.genres];
-    if (parsed.place) details.push(t("cat.floqaiIn", {place: parsed.place.label}, `in ${parsed.place.label}`));
+    if (parsed.place) details.push(t("cat.botdeeIn", {place: parsed.place.label}, `in ${parsed.place.label}`));
     return {
       id: "venue-search",
       sourceId: "intent:venue-search",
       audiences: INTENT_AUDIENCES["venue-search"],
       kind: "product",
-      label: t("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`),
+      label: t("cat.botdeeSearching", {type: typeLabel}, `Searching ${typeLabel}`),
       blurb: details.length ? details.join(" · ") : String(raw).trim(),
       href: pageUrl("./", {start: "search", q: String(raw).trim()}),
       patterns: []
@@ -1087,7 +1087,7 @@
 
   /** Shows only results the server cleared; asks it about the rest (the page re-runs the search when verdicts land). */
   function enforceServerVerdicts(list) {
-    const gate = global.FLOQRFloqAiAccess;
+    const gate = global.FLOQRBotDeeAccess;
     if (!gate?.isActive?.()) return list;
     const unknown = list.map(intent => intent.sourceId).filter(id => id && gate.verdict(id) === undefined);
     if (unknown.length) gate.request(unknown);
@@ -1160,11 +1160,11 @@
     ).join("");
     return `
       <article class="card intent-result-card intent-help-card" data-intent="${esc(intent.id)}" data-kind="help">
-        <p class="eyebrow">${esc(tr("floqai.wantTo", "I want to be able to…"))}</p>
+        <p class="eyebrow">${esc(tr("botdee.wantTo", "I want to be able to…"))}</p>
         <strong>${esc(intent.label)}</strong>
         <span>${esc(intent.blurb)}</span>
         ${steps ? `<ol class="intent-help-steps">${steps}</ol>` : ""}
-        <div class="floqai-help-links intent-help-link-row">${links}</div>
+        <div class="botdee-help-links intent-help-link-row">${links}</div>
       </article>`;
   }
 
@@ -1185,12 +1185,12 @@
       container.innerHTML = "";
       return;
     }
-    if (!intents.length && global.FLOQRFloqAiAccess?.hasPending?.()) {
-      container.innerHTML = `<div class="card intent-result-empty" role="status"><p class="sub small">${esc(tr("floqai.checkingAccess", "Checking what your account can see…"))}</p></div>`;
+    if (!intents.length && global.FLOQRBotDeeAccess?.hasPending?.()) {
+      container.innerHTML = `<div class="card intent-result-empty" role="status"><p class="sub small">${esc(tr("botdee.checkingAccess", "Checking what your account can see…"))}</p></div>`;
       return;
     }
     if (!intents.length) {
-      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${pageUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="${esc(pageUrl("./", {start: "search"}))}">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
+      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("botdee.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("botdee.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="botdee-help-links"><a href="${pageUrl("./role-request.html", {from: "floqai"})}">${esc(tr("botdee.onboardingLink", "Onboarding / role access"))}</a><a href="${esc(pageUrl("./", {start: "search"}))}">${esc(tr("botdee.classicSearch", "Open classic Search"))}</a></div></div>`;
       return;
     }
     container.innerHTML = intents.map(intent =>

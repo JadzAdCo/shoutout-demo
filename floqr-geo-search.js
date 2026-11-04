@@ -1,5 +1,5 @@
 /* FLOQR location-aware search order: GPS first, then IP estimate, then profile city; nearest first, then name. */
-// Design notes: .cursor/rules/design-notes-floqai-venue-search.mdc
+// Design notes: .cursor/rules/design-notes-botdee-venue-search.mdc
 (function (root, factory) {
   const api = factory(root);
   if (typeof module === "object" && module.exports) module.exports = api;

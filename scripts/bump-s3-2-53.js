@@ -72,7 +72,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: BOT DEE Phase 1 — floqai.html chat + executeBotSession contextualSearch; intent search fallback.`,
+      `- ${NEXT}: BOT DEE Phase 1 — botdee.html chat + executeBotSession contextualSearch; intent search fallback.`,
       `- s3.2.52: WB active tabs = white + Tiffany border; site-wide compact left Back.`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);

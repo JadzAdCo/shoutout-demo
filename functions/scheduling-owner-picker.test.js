@@ -138,11 +138,11 @@ test("scheduling-portal.js starts Firebase itself before firebase.auth() and nev
   assert.deepEqual(calls, [["init", "shoutoutdemo-5b402"], ["auth"]]);
 });
 
-test("Schedule for help is in the repository, every help locale, and the FloqAi content classes", () => {
-  assert.match(read("floqai-help-repository.js"), /id: "help-scheduling-schedule-for"/);
+test("Schedule for help is in the repository, every help locale, and the BOT DEE content classes", () => {
+  assert.match(read("botdee-help-repository.js"), /id: "help-scheduling-schedule-for"/);
   const help = read("floqr-i18n-help.js");
   assert.equal((help.match(/"help-scheduling-schedule-for": \{/g) || []).length, 10);
-  const classes = JSON.parse(read("functions/floqai-content-classes.json"));
+  const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help["help-scheduling-schedule-for"], ["serviceMember", "venueAdmin"]);
   const chrome = read("floqr-i18n.js");
   assert.equal((chrome.match(/"sched\.scheduleFor":/g) || []).length, 11);

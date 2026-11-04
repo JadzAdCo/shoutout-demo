@@ -70,7 +70,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: Template select hides floating FloqAi (lens Search only).`,
+      `- ${NEXT}: Template select hides floating BOT DEE (lens Search only).`,
       `- s3.2.25: Search product icons sit at viewport bottom on phone/tablet; desktop keeps under-Search layout.`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);

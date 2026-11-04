@@ -49,7 +49,7 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
 
   const reply = bot.chitchatReply("master");
   assert.match(reply, /BOT DEE here/i);
-  assert.doesNotMatch(reply, /FloqAi here/i);
+  assert.doesNotMatch(reply, /BOT DEE here/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
   assert.match(bot.moodReply(), /thanks for asking|doing great/i);
@@ -171,7 +171,7 @@ test("sanitizeHistory keeps bounded user/model turns", () => {
 test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST checkout", () => {
   const src = read("functions/bot-dee-functions.js");
   assert.match(src, /exports\.executeBotSession/);
-  assert.match(src, /assertFeatureAccess\(request\.auth, "floqAi"/);
+  assert.match(src, /assertFeatureAccess\(request\.auth, "botDee"/);
   assert.match(src, /@google\/genai/);
   assert.match(src, /contextualSearch/);
   assert.doesNotMatch(src, /purchaseVIPReservation/);

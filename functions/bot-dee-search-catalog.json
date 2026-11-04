@@ -2,8 +2,8 @@
   "version": 1,
   "entries": [
     {
-      "sourceId": "help:floqai-ask-floqr",
-      "id": "floqai-ask-floqr",
+      "sourceId": "help:botdee-ask-floqr",
+      "id": "botdee-ask-floqr",
       "kind": "help",
       "label": "Ask FloqR with BOT DEE",
       "blurb": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and",
@@ -19,7 +19,7 @@
         "make me a superstar",
         "open bot dee",
         "open floqcast",
-        "floqai-ask-floqr"
+        "botdee-ask-floqr"
       ]
     },
     {
@@ -872,8 +872,8 @@
       ]
     },
     {
-      "sourceId": "help:help-floqai-audience-sections",
-      "id": "help-floqai-audience-sections",
+      "sourceId": "help:help-botdee-audience-sections",
+      "id": "help-botdee-audience-sections",
       "kind": "help",
       "label": "BOT DEE help audiences",
       "blurb": "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
@@ -889,12 +889,12 @@
         "patron help",
         "help security",
         "blank floqai answer",
-        "help-floqai-audience-sections"
+        "help-botdee-audience-sections"
       ]
     },
     {
-      "sourceId": "help:help-floqai-page",
-      "id": "help-floqai-page",
+      "sourceId": "help:help-botdee-page",
+      "id": "help-botdee-page",
       "kind": "help",
       "label": "BOT DEE",
       "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
@@ -914,12 +914,12 @@
         "shift enter",
         "how are you bot dee",
         "open bot dee",
-        "help-floqai-page"
+        "help-botdee-page"
       ]
     },
     {
-      "sourceId": "help:help-floqai-template-search",
-      "id": "help-floqai-template-search",
+      "sourceId": "help:help-botdee-template-search",
+      "id": "help-botdee-template-search",
       "kind": "help",
       "label": "Template search",
       "blurb": "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venu",
@@ -933,7 +933,7 @@
         "search templates",
         "led preview",
         "throw a shoutout",
-        "help-floqai-template-search"
+        "help-botdee-template-search"
       ]
     },
     {

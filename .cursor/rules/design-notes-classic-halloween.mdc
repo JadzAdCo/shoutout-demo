@@ -30,7 +30,7 @@ Resume: `@halloween$` / `$halloween$`. Template id **`classicHalloween`**, name 
 | Display | `display-app.js` `HALLOWEEN_*`, `halloweenFinaleMarkup`, `syncHalloweenFinale`, `stopHalloweenFinale`; `display.css` `.classic-halloween`, `.halloween-finale`, `hw*` keyframes |
 | Checkout | `functions/commerce-functions.js` `normalizeCheckoutPayload`, `describeOrder`, `CLASSIC_BOARD_TEMPLATE_IDS` |
 | Rules | `firestore.rules` `validFreePatronShoutoutCreate` excludes `classicHalloween` (paid template cannot be created free) |
-| Help | `help-classic-halloween` (patron): `floqai-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js`; intent `classic-halloween` in `intent-search.js`; regenerate `node scripts/build-floqai-content-classes.js` + `node scripts/build-bot-dee-search-catalog.js` |
+| Help | `help-classic-halloween` (patron): `botdee-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js`; intent `classic-halloween` in `intent-search.js`; regenerate `node scripts/build-botdee-content-classes.js` + `node scripts/build-bot-dee-search-catalog.js` |
 | Tests | `functions/classic-halloween-template.test.js` (in `npm test`), counts in `i18n-coverage.test.js`, locked-art list in `recommendation-library.test.js` |
 | QA | `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/led-*-board-t1s.png`, `-finale-a/b.png`, reduced-motion shots, `qa-results.json` |
 

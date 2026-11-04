@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* s3.1.31 Master Admin → Entity Management → Demo Svc / Emp Mgmt tab: anchored, idempotent edits to files
    other work also touches (master-admin.html, master-admin-app.js, sos2fa.js, floqr-i18n.js,
-   floqai-help-repository.js, functions/i18n-coverage.test.js). Applied to the workspace, to a HEAD export
+   botdee-help-repository.js, functions/i18n-coverage.test.js). Applied to the workspace, to a HEAD export
    for the commit, and to the staged main tree when publishing — never a whole-file copy.
    Usage: node scripts/apply-s3-1-31-demo-employees-tab.js [rootDir]
    Design notes: .cursor/rules/design-notes-demo-signin.mdc */
@@ -125,7 +125,7 @@ const HELP_PHRASES = `      searchPhrases: [
 
 function editHelp(src) {
   const start = src.indexOf(`      id: "help-master-demo-signin",`);
-  if (start < 0) throw new Error("floqai-help-repository.js: help-master-demo-signin entry missing (apply the s3.1.31 demo sign-in edits first)");
+  if (start < 0) throw new Error("botdee-help-repository.js: help-master-demo-signin entry missing (apply the s3.1.31 demo sign-in edits first)");
   const end = src.indexOf("\n    },", start);
   const entry = src.slice(start, end);
   if (entry.includes(`#${PANEL}`)) return src;
@@ -173,7 +173,7 @@ const EDITS = {
     if (out.slice(at, next).includes(TAB_KEY)) return out;
     return out.slice(0, at + anchor.length) + `\n      "${TAB_KEY}": ${JSON.stringify(label)},` + out.slice(at + anchor.length);
   }, src),
-  "floqai-help-repository.js": editHelp,
+  "botdee-help-repository.js": editHelp,
   /* Exact ?v= pins break on every cache-bust; these keep "this release or newer". */
   "functions/sos2fa-master-admin.test.js": src => replaceOnce(src,
     `  assert.match(read("master-admin.html"), /sos2fa\\.js\\?v=s3\\.1\\.28/);`,
@@ -198,7 +198,7 @@ function editMasterAdminAssets(src) {
     if (!anchor) throw new Error("master-admin.html does not load master-feature-services.js");
     out = insertAfter(out, anchor[0], `\n<script src="./master-demo-employees.js?v=${V}"></script>`, "master-demo-employees.js");
   }
-  for (const file of ["floqr-i18n.js", "sos2fa.js", "floqai-help-repository.js", "master-admin-app.js"]) out = bumpAsset(out, file);
+  for (const file of ["floqr-i18n.js", "sos2fa.js", "botdee-help-repository.js", "master-admin-app.js"]) out = bumpAsset(out, file);
   return out;
 }
 

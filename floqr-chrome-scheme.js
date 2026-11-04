@@ -43,7 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.75";
+  const ICON_V = "s3.2.76";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
@@ -51,7 +51,7 @@
     floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-nightlife.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
@@ -60,7 +60,7 @@
     floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-traditional.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
@@ -69,7 +69,7 @@
     floqCast: "./images/chrome/floqcast-blacktiffany.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-blacktiffany.jpg?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-blacktiffany.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-blacktiffany.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-blacktiffany.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-blacktiffany.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-blacktiffany.jpg?v=" + ICON_V
@@ -78,7 +78,7 @@
     floqCast: "./images/chrome/floqcast-purplewhite.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-purplewhite.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-purplewhite.jpg?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-purplewhite.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-purplewhite.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-purplewhite.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-purplewhite.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-purplewhite.jpg?v=" + ICON_V
@@ -88,7 +88,7 @@
     floqCast: "./images/chrome/floqcast-blackdarkgreen.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-blackdarkgreen.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-blackdarkgreen.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-blackdarkgreen.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-blackdarkgreen.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-blackdarkgreen.png?v=" + ICON_V
@@ -97,7 +97,7 @@
     floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
     settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V
@@ -144,7 +144,7 @@
     "img.floqr-hero-logo",
     "img.product-parent-logo",
     "img.intent-floqr-logo",
-    "img.floqai-hero-logo",
+    "img.botdee-hero-logo",
     "img.splash-logo",
     "img[data-floqr-brand-logo]",
     "[data-floqr-brand-logo] img"
@@ -375,7 +375,9 @@
 
   function iconUrl(featureKey, scheme) {
     const pack = ICON_PACK[normalizeScheme(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
-    return pack[featureKey] || null;
+    // One-release dual-read: legacy data-floqr-chrome-icon="floqAi" → botDee pack slot.
+    const key = featureKey === "floqAi" ? "botDee" : featureKey;
+    return pack[key] || null;
   }
 
   function brandLogoUrl(scheme) {
@@ -411,7 +413,7 @@
         img.classList.contains("floqr-hero-logo") ||
         img.classList.contains("product-parent-logo") ||
         img.classList.contains("intent-floqr-logo") ||
-        img.classList.contains("floqai-hero-logo") ||
+        img.classList.contains("botdee-hero-logo") ||
         img.classList.contains("splash-logo") ||
         img.hasAttribute("data-floqr-brand-logo") ||
         /floqr/i.test(alt) ||

@@ -11,7 +11,7 @@
     "title": "Архивные ShoutOuts",
     "body": "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
   },
-  "floqai-ask-floqr": {
+  "botdee-ask-floqr": {
     "title": "Спросите FloqR через BOT DEE",
     "body": "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
   },
@@ -135,7 +135,7 @@
     "title": "Шаблон по умолчанию",
     "body": "Бесплатный Traditional Black and White Classic. Ниже через BOT DEE — шаблоны Sports, Jersey, VIP, Humor, Cars, Video, Pictures и Ballers."
   },
-  "help-floqai-template-search": {
+  "help-botdee-template-search": {
     "title": "Поиск шаблонов BOT DEE",
     "body": "Нажмите движущийся знак BOT DEE (или дождитесь речевых пузырей) и попросите Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures или Ballers."
   },

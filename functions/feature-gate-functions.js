@@ -13,7 +13,7 @@ const db = admin.firestore();
 const MASTER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 const SUPER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 
-const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, floqAi:true, shoutOut:true};
+const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, botDee:true, shoutOut:true};
 /* Keep in sync with feature-gates.js DEFAULT_VENUE_GATES (client).
  * vipReservations + passes are opt-in (default false). Older server catalogs
  * omitted them, so setVenueFeatureGates silently dropped VIP / Passes ticks. */
@@ -50,6 +50,11 @@ function normalizePatronGates(raw = {}) {
   Object.keys(DEFAULT_PATRON_GATES).forEach(key => {
     if (Object.prototype.hasOwnProperty.call(raw || {}, key)) out[key] = raw[key] !== false;
   });
+  // Legacy patronFeatureGates.floqAi → botDee for one release.
+  if (Object.prototype.hasOwnProperty.call(raw || {}, "floqAi")
+    && !Object.prototype.hasOwnProperty.call(raw || {}, "botDee")) {
+    out.botDee = raw.floqAi !== false;
+  }
   return out;
 }
 
