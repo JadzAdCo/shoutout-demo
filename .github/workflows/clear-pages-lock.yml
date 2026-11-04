@@ -1,0 +1,60 @@
+# One-shot helper: clear a stuck GitHub Pages deployment lock, then exit.
+# Safe to leave; only runs when commit message contains [clear-pages-lock].
+name: Clear Pages lock
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: write
+  pages: write
+  actions: write
+
+concurrency:
+  group: clear-pages-lock
+  cancel-in-progress: true
+
+jobs:
+  clear:
+    if: contains(github.event.head_commit.message, '[clear-pages-lock]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark stuck github-pages deployments inactive
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const { data: deployments } = await github.rest.repos.listDeployments({
+              owner, repo, environment: "github-pages", per_page: 20
+            });
+            for (const d of deployments) {
+              const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                owner, repo, deployment_id: d.id, per_page: 5
+              });
+              const latest = statuses[0]?.state || "none";
+              core.info(`${d.sha.slice(0,7)} id=${d.id} latest=${latest}`);
+              if (["in_progress", "queued", "pending", "waiting"].includes(latest) || latest === "none") {
+                try {
+                  await github.rest.repos.createDeploymentStatus({
+                    owner, repo, deployment_id: d.id,
+                    state: "inactive",
+                    description: "Cleared stuck Pages lock by clear-pages-lock workflow"
+                  });
+                  core.info(`→ marked inactive`);
+                } catch (e) {
+                  core.warning(`could not inactive ${d.id}: ${e.message}`);
+                }
+              }
+              // Also try delete when already terminal-but-locking
+              if (["failure", "error", "inactive"].includes(latest) || d.sha.startsWith("5052491")) {
+                try {
+                  await github.rest.repos.deleteDeployment({ owner, repo, deployment_id: d.id });
+                  core.info(`→ deleted deployment ${d.id}`);
+                } catch (e) {
+                  core.warning(`could not delete ${d.id}: ${e.message}`);
+                }
+              }
+            }
