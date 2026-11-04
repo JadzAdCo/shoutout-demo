@@ -59,7 +59,7 @@
   function setMode(mode) {
     activeMode = mode === "templates" ? "templates" : "intent";
     templateIntroStep = 0;
-    document.body.classList.toggle("floqai-template-mode", activeMode === "templates");
+    document.body.classList.toggle("botdee-template-mode", activeMode === "templates");
   }
 
   function syncAgentVisibility(agent, speech) {
@@ -75,15 +75,15 @@
     return show;
   }
 
-  function bindFloqAi(opts = {}) {
-    const agent = document.getElementById("floqAiAgent");
-    const mark = document.getElementById("floqAiMark");
-    const speech = document.getElementById("floqAiSpeech");
-    const speechText = document.getElementById("floqAiSpeechText") || speech;
-    const panel = document.getElementById("floqAiSearchPanel");
+  function bindBotDee(opts = {}) {
+    const agent = document.getElementById("botDeeAgent");
+    const mark = document.getElementById("botDeeMark");
+    const speech = document.getElementById("botDeeSpeech");
+    const speechText = document.getElementById("botDeeSpeechText") || speech;
+    const panel = document.getElementById("botDeeSearchPanel");
     const input = document.getElementById("intentSearchInput") || document.getElementById("templateSearch");
-    const helpEl = document.getElementById("floqAiHelpText");
-    const logo = document.querySelector(".floqai-hero-logo") || document.querySelector(".intent-floqr-logo");
+    const helpEl = document.getElementById("botDeeHelpText");
+    const logo = document.querySelector(".botdee-hero-logo") || document.querySelector(".intent-floqr-logo");
     if (!agent || !mark) return null;
 
     let speechTimer = null;
@@ -389,17 +389,17 @@
 
   function ensureTemplateMode() {
     setMode("templates");
-    if (!boundController) boundController = bindFloqAi({mode: "templates"});
+    if (!boundController) boundController = bindBotDee({mode: "templates"});
     else boundController.setMode?.("templates");
     document.getElementById("templateSearchPanel")?.classList.remove("hidden");
-    const agent = document.getElementById("floqAiAgent");
+    const agent = document.getElementById("botDeeAgent");
     agent?.classList.add("is-idle");
     boundController?.syncVisibility?.();
   }
 
-  global.FLOQRFloqAi = {
-    bindFloqAi(opts) {
-      boundController = bindFloqAi(opts);
+  global.FLOQRBotDee = {
+    bindBotDee(opts) {
+      boundController = bindBotDee(opts);
       return boundController;
     },
     ensureTemplateMode,
@@ -427,4 +427,7 @@
       INTENT_RANDOM_LINES
     }
   };
+  // One-release aliases for pages still referencing FLOQRFloqAi / bindFloqAi.
+  global.FLOQRFloqAi = global.FLOQRBotDee;
+  global.FLOQRBotDee.bindFloqAi = global.FLOQRBotDee.bindBotDee;
 })(window);

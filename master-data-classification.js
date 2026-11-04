@@ -36,7 +36,7 @@
     guestListRequests: "Keep as is, or untick Regular employee if only door staff and managers should see guest names and phone numbers.",
     clubEmployeeDesignations: "Keep as is. Staff email and phone are already stricter (Club Admin only) under Sensitive fields.",
     featureServices: "Keep as is: Search must know which features are switched on for a signed-in patron.",
-    aiIndex: "Tick Public if signed-out visitors should find venues with FloqAi. Leave it if venue search is for signed-in patrons only.",
+    aiIndex: "Tick Public if signed-out visitors should find venues with BOT DEE. Leave it if venue search is for signed-in patrons only.",
     paymentLedger: "Keep Club Admin. Set Delete after to 2555 days (7 years) to match tax-record rules."
   };
   const FIX_TEXT = {

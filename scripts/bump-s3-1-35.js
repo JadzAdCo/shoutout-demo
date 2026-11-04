@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* s3.1.34 → s3.1.35 stamp bump: FloqAi links always carry the current package (no stale fallback), static hub
+/* s3.1.34 → s3.1.35 stamp bump: BOT DEE links always carry the current package (no stale fallback), static hub
  * links follow the package, Staff Scheduling gets an "Assign to" name picker and full localization.
  * Usage: node scripts/bump-s3-1-35.js [repoRoot]  (idempotent; runs on main's own copies from the publish script).
  * Xibo URLs (display.html?location=) never carry ?v=. */
@@ -12,7 +12,7 @@ const NEXT = "s3.1.35";
 const NEXT_NUM = NEXT.slice(1);
 const NEW_TESTS = ["scheduling-assignee-picker.test.js"];
 const CHANGED_ASSETS = [
-  "floqai-help-repository.js",
+  "botdee-help-repository.js",
   "intent-search.js",
   "assignment-card.js",
   "worker-confirm.js",
@@ -71,7 +71,7 @@ edit("README.md", src => {
   if (!head.test(src)) throw new Error("README head");
   if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = `- ${NEXT}: FloqAi and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.`;
+  const note = `- ${NEXT}: BOT DEE and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (BOT DEE, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.`;
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
 });
 

@@ -1,5 +1,5 @@
 /* FLOQR venue / activity query parser — "Hip Hop Clubs in DC", "EDM Events in New York". */
-// Design notes: .cursor/rules/design-notes-floqai-venue-search.mdc
+// Design notes: .cursor/rules/design-notes-botdee-venue-search.mdc
 (function (root, factory) {
   "use strict";
   const api = factory();

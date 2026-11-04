@@ -89,7 +89,7 @@
   /** Offer-help — start / idle-resume greetings only. */
   function chitchatReply() {
     return t(
-      "floqai.chatHello",
+      "botdee.chatHello",
       "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
     );
   }
@@ -98,43 +98,43 @@
   function ackReply(raw) {
     const q = normalizeChat(raw);
     if (isFarewellPrompt(q)) {
-      return t("floqai.chatBye", "Take care — say hi when you want to pick up again.");
+      return t("botdee.chatBye", "Take care — say hi when you want to pick up again.");
     }
     if (/^(?:thanks|thank you|thx|ty)\b/.test(q)) {
-      return t("floqai.chatThanks", "You're welcome.");
+      return t("botdee.chatThanks", "You're welcome.");
     }
-    return t("floqai.chatAck", "Cool.");
+    return t("botdee.chatAck", "Cool.");
   }
 
   /** Friendly mood reply — chatable, not a search dump. */
   function moodReply() {
     return t(
-      "floqai.chatMood",
+      "botdee.chatMood",
       "I'm doing great — thanks for asking! What can I help you with in FLOQR?"
     );
   }
 
   function identityReply() {
     return t(
-      "floqai.chatIdentity",
+      "botdee.chatIdentity",
       "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper."
     );
   }
 
   function stillHereReply() {
-    return t("floqai.chatStillHere", "Hey — still here.");
+    return t("botdee.chatStillHere", "Hey — still here.");
   }
 
   function idleEndedReply() {
     return t(
-      "floqai.chatIdleEnded",
+      "botdee.chatIdleEnded",
       "I'll pause here for now. Say hi when you want to pick up again."
     );
   }
 
   function resumeReply() {
     return t(
-      "floqai.chatResume",
+      "botdee.chatResume",
       "Welcome back. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
     );
   }
@@ -337,13 +337,13 @@
 
     markActive();
     setBusy(true);
-    setStatus(t("floqai.chatThinking", "BOT DEE is thinking…"));
+    setStatus(t("botdee.chatThinking", "BOT DEE is thinking…"));
 
     const fn = callable();
     if (!fn) {
       setBusy(false);
       setStatus("");
-      const fallback = t("floqai.chatOffline", "Chat is unavailable right now. Use quick intent search below.");
+      const fallback = t("botdee.chatOffline", "Chat is unavailable right now. Use quick intent search below.");
       appendBubble("bot", fallback);
       openIntentFallback();
       return;
@@ -358,7 +358,7 @@
       let reply = String(data.reply || "").trim();
       // Stale Functions may still search-miss a greeting-shaped reply — never show that.
       if (!reply || /could not find a clear match/i.test(reply)) {
-        reply = t("floqai.chatEmpty", "No answer yet — try quick intent search.");
+        reply = t("botdee.chatEmpty", "No answer yet — try quick intent search.");
       }
       appendBubble("bot", reply, data.results);
       pushHistory("model", reply);
@@ -366,11 +366,11 @@
       armIdleTimer();
     } catch (error) {
       const code = String(error?.code || "");
-      let msg = t("floqai.chatError", "BOT DEE could not answer. Try quick intent search.");
+      let msg = t("botdee.chatError", "BOT DEE could not answer. Try quick intent search.");
       if (code.includes("unauthenticated")) {
-        msg = t("floqai.chatSignIn", "Sign in to chat with BOT DEE.");
+        msg = t("botdee.chatSignIn", "Sign in to chat with BOT DEE.");
       } else if (code.includes("failed-precondition")) {
-        msg = t("floqai.chatFeatureOff", "BOT DEE is not available on your account yet.");
+        msg = t("botdee.chatFeatureOff", "BOT DEE is not available on your account yet.");
       }
       appendBubble("bot", msg);
       setStatus("");
@@ -409,7 +409,7 @@
     const log = byId("botDeeTranscript");
     if (!log || log.childElementCount) return;
     appendBubble("bot", t(
-      "floqai.chatWelcome",
+      "botdee.chatWelcome",
       "Hi, I am BOT DEE. How can I help you?"
     ));
     phase = "fresh";

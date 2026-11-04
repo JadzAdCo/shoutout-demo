@@ -145,17 +145,17 @@ exports.saveAllDataClassifications = onCall(CALL_OPTS, async request => {
   }
 });
 
-// ---- FloqAi enforcement: the caller's tier is resolved here, never taken from the request. ----
+// ---- BOT DEE enforcement: the caller's tier is resolved here, never taken from the request. ----
 
-const FLOQAI_CONTENT = require("./floqai-content-classes.json");
-const FLOQAI_JOB = "floqAiAccess";
+const BOTDEE_CONTENT = require("./botdee-content-classes.json");
+const BOTDEE_JOB = "botDeeAccess";
 const DENY_LOG_WINDOW_MS = 10 * 60 * 1000;
 const DENY_LOG_MAX = 20;
-const FLOQAI_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
+const BOTDEE_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
 
 /** System reads are allowlisted per job (least privilege); systemJob throws for anything else. */
 function systemCollection(collection) {
-  core.systemJob(FLOQAI_JOB, collection);
+  core.systemJob(BOTDEE_JOB, collection);
   return db.collection(collection);
 }
 
@@ -192,7 +192,7 @@ async function roleFactsFor(auth) {
 }
 
 async function denialLogAllowed(throttleKey, nowMs) {
-  const throttleRef = systemCollection("floqAiAccessThrottle").doc(throttleKey);
+  const throttleRef = systemCollection("botDeeAccessThrottle").doc(throttleKey);
   return db.runTransaction(async tx => {
     const snap = await tx.get(throttleRef);
     const row = snap.exists ? snap.data() || {} : {};
@@ -209,17 +209,17 @@ function anonymousThrottleKey(request) {
   return `anon_${require("crypto").createHash("sha256").update(ip || "unknown").digest("hex").slice(0, 32)}`;
 }
 
-/** Shared by BOT DEE executeBotSession — same tier facts as getFloqAiAccess. */
-exports.__floqAiHelpers = {roleFactsFor, FLOQAI_CONTENT, FLOQAI_OPTS};
+/** Shared by BOT DEE executeBotSession — same tier facts as getBotDeeAccess. */
+exports.__botDeeHelpers = {roleFactsFor, BOTDEE_CONTENT, BOTDEE_OPTS};
 
-exports.getFloqAiAccess = onCall(FLOQAI_OPTS, async request => {
+exports.getBotDeeAccess = onCall(BOTDEE_OPTS, async request => {
   const sourceIds = core.sanitizeSourceIds(request.data?.sourceIds);
-  await audit.assertFeatureAccess(request.auth || null, "floqAi", request);
+  await audit.assertFeatureAccess(request.auth || null, "botDee", request);
   try {
     const {role, clubIds} = core.resolveViewerRole(await roleFactsFor(request.auth));
-    const {allowed, denied} = core.filterContent(sourceIds, FLOQAI_CONTENT, {role});
+    const {allowed, denied} = core.filterContent(sourceIds, BOTDEE_CONTENT, {role});
     const appCheck = request.app ? "verified" : "missing";
-    console.info(JSON.stringify({event: "floqai.access", job: FLOQAI_JOB, purpose: core.SYSTEM_JOBS[FLOQAI_JOB].purpose, role, requested: sourceIds.length, denied: denied.length, appCheck}));
+    console.info(JSON.stringify({event: "botdee.access", job: BOTDEE_JOB, purpose: core.SYSTEM_JOBS[BOTDEE_JOB].purpose, role, requested: sourceIds.length, denied: denied.length, appCheck}));
     const toLog = core.denialsToLog(denied);
     if (toLog.length) {
       const nowMs = Date.now();
@@ -227,9 +227,9 @@ exports.getFloqAiAccess = onCall(FLOQAI_OPTS, async request => {
       if (await denialLogAllowed(key, nowMs)) {
         await audit.writeUnchainedAudit(audit.auditRecord(request, {
           role,
-          eventType: "floqai.content_denied",
+          eventType: "botdee.content_denied",
           outcome: "denied",
-          target: {type: "floqAiContent", id: toLog[0].id},
+          target: {type: "botDeeContent", id: toLog[0].id},
           detail: {denied: toLog.slice(0, 20), deniedCount: toLog.length, requested: sourceIds.length, appCheck, surface: "server"},
           nowMs
         }));
@@ -240,6 +240,11 @@ exports.getFloqAiAccess = onCall(FLOQAI_OPTS, async request => {
     throw asHttps(error);
   }
 });
+
+/** One-release alias — clients still calling getFloqAiAccess until Pages catch up. */
+exports.getFloqAiAccess = exports.getBotDeeAccess;
+/** One-release alias for executeBotSession helper require. */
+exports.__floqAiHelpers = exports.__botDeeHelpers;
 
 exports.logDataClassificationExport = onCall(CALL_OPTS, async request => {
   const {sessionId} = await audit.assertAdmin(request, "dataClass.export");

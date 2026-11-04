@@ -80,7 +80,7 @@ for (const id of Object.keys(EN)) {
 }
 fs.writeFileSync(helpFile, help);
 
-const repoFile = path.join(root, "floqai-help-repository.js");
+const repoFile = path.join(root, "botdee-help-repository.js");
 let repo = fs.readFileSync(repoFile, "utf8");
 for (const id of Object.keys(EN)) repo = replaceBodyAfter(repo, `id: "${id}",`, 0, EN[id]).src;
 fs.writeFileSync(repoFile, repo);

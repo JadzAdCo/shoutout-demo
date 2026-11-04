@@ -1268,6 +1268,150 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:'The classic three-line ShoutOut board on a moonlit graveyard with jack-o\'-lanterns. Emoji welcome. At the end of every message cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. $15. Sizes: 96×48, 64×48, 64×32.',
     tags:["halloween","classic halloween","spooky","ghost","ghosts","graveyard","pumpkin","jack-o-lantern","reaper","bats","seasonal","classic","3 lines","emoji","$15","96x48","64x48","64x32"]
   },
+
+  // Design notes: .cursor/rules/design-notes-baller-cards.mdc
+  // Public Baller's Express branding (copyright-safe). Amex twins are Master Admin + Aurelia only.
+  blackCard: {
+    id:'blackCard',
+    name:'Black Card',
+    searchAliases:['black card','ballers express','baller card','metal card','business card shoutout'],
+    scope:'Shared',
+    className:'baller-card',
+    category:'VIP',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerBrand:'ballers',
+    defaultBackgroundUrl:'./images/baller/black-card-2x1.svg',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/black-card-2x1.svg',
+      'led-64x32':'./images/baller/black-card-2x1.svg',
+      'led-64x48':'./images/baller/black-card-4x3.svg'
+    },
+    priceCents:7500,
+    priceLabel:'$75',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:28,
+    textProfileId:'ballerCard',
+    description:"Photoreal Baller's Express BUSINESS metal card. Name from your FloqR display name, @handle, or a custom name. Company: We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom. $75. All LED sizes.",
+    howItWorks:"Pick Black Card → choose how your name appears and a company line → preview the metal card → pay $75. The LED shows the card with your name and company embossed.",
+    tags:["black card","baller's express","metal card","vip","business","$75","96x48","64x48","64x32"]
+  },
+  ballersAlert: {
+    id:'ballersAlert',
+    name:"Baller's Alert",
+    searchAliases:['ballers alert',"baller's alert",'baller alert','face card','black card photo'],
+    scope:'Shared',
+    className:'baller-card baller-alert',
+    category:'VIP',
+    mediaMode:'Face photo required',
+    supportsMedia:true,
+    supportsImage:true,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerAlert:true,
+    ballerBrand:'ballers',
+    requiresFacePhoto:true,
+    defaultBackgroundUrl:'./images/baller/ballers-alert-2x1.svg',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/ballers-alert-2x1.svg',
+      'led-64x32':'./images/baller/ballers-alert-2x1.svg',
+      'led-64x48':'./images/baller/ballers-alert-4x3.svg'
+    },
+    priceCents:10000,
+    priceLabel:'$100',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:28,
+    textProfileId:'ballerCard',
+    description:"Baller's Express BUSINESS card with your face in the upper-left medallion (about one-third of the upper half). Valid Thru year shows 50. Gemini AI Studio can retrofit your face onto the card after upload. $100. All LED sizes.",
+    howItWorks:"Upload a clear face photo (required). FLOQR may run a background Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the medallion. Choose name + company, then pay $100.",
+    tags:["baller's alert","black card","face","photo","gemini","ai","vip","$100","96x48","64x48","64x32"]
+  },
+  // Private Amex-branded twins — Master Admin only, Aurelia (temp-democlub-1) only. Pending Amex consent.
+  blackCardAmex: {
+    id:'blackCardAmex',
+    name:'Black Card (Amex)',
+    searchAliases:['amex black card','american express black card','amex private'],
+    scope:'Club',
+    venueIds:['temp-democlub-1'],
+    masterAdminOnly:true,
+    className:'baller-card',
+    category:'Aurelia Private',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerBrand:'amex',
+    defaultBackgroundUrl:'./images/baller/black-card-amex-2x1.svg',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/black-card-amex-2x1.svg',
+      'led-64x32':'./images/baller/black-card-amex-2x1.svg',
+      'led-64x48':'./images/baller/black-card-amex-4x3.svg'
+    },
+    priceCents:7500,
+    priceLabel:'$75',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:28,
+    textProfileId:'ballerCard',
+    description:'PRIVATE — Master Admin + Aurelia only. American Express BUSINESS black metal card layout for consent/marketing preview. Not listed for patrons. $75.',
+    tags:["amex","american express","black card","private","master admin","aurelia","$75"]
+  },
+  ballersAlertAmex: {
+    id:'ballersAlertAmex',
+    name:"Baller's Alert (Amex)",
+    searchAliases:['amex ballers alert','american express face card'],
+    scope:'Club',
+    venueIds:['temp-democlub-1'],
+    masterAdminOnly:true,
+    className:'baller-card baller-alert',
+    category:'Aurelia Private',
+    mediaMode:'Face photo required',
+    supportsMedia:true,
+    supportsImage:true,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerAlert:true,
+    ballerBrand:'amex',
+    requiresFacePhoto:true,
+    defaultBackgroundUrl:'./images/baller/ballers-alert-amex-2x1.svg',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/ballers-alert-amex-2x1.svg',
+      'led-64x32':'./images/baller/ballers-alert-amex-2x1.svg',
+      'led-64x48':'./images/baller/ballers-alert-amex-4x3.svg'
+    },
+    priceCents:10000,
+    priceLabel:'$100',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:28,
+    textProfileId:'ballerCard',
+    description:"PRIVATE — Master Admin + Aurelia only. American Express BUSINESS card with face medallion and Valid Thru …/50. Pending Amex consent. $100.",
+    tags:["amex","american express","baller's alert","private","master admin","aurelia","face","$100"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {
@@ -1505,7 +1649,7 @@ window.FLOQRTemplateCopy = window.FLOQRTemplateCopy || {
   }
 };
 
-window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween'];
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween','blackCard','ballersAlert'];
 
 window.FLOQR_DISPLAY_FORMATS = {
   "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},
@@ -1587,6 +1731,14 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:30,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:26,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2}
+    }
+  },
+  ballerCard: {
+    label:"Baller's Express metal card — name + company",
+    formats:{
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:22,maxMainCharacters:28,maxSubCharacters:28,minimumFontPixels:36,mainTextSizePercent:5.2,subTextSizePercent:3.6},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:18,maxMainCharacters:22,maxSubCharacters:22,minimumFontPixels:32,mainTextSizePercent:4.8,subTextSizePercent:3.4},
+      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:18,maxMainCharacters:22,maxSubCharacters:22,minimumFontPixels:28,mainTextSizePercent:5.0,subTextSizePercent:3.5}
     }
   }
 };

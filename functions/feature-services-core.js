@@ -10,7 +10,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "bartr", label: "Trade by BartR", patronGate: "bartr", route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "floqAi", label: "BOT DEE", patronGate: "floqAi", route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
+  {key: "botDee", label: "BOT DEE", patronGate: "botDee", route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
   {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
   // Live: Club Admin Passes + patron door QR (VIP Show pass still uses vipReservations).
   {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
@@ -23,6 +23,7 @@ const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));
 /** One-release aliases: legacy featureServices / betaTesters.features keys → catalog key. */
 const FEATURE_KEY_ALIASES = Object.freeze({
   supRstar: "floqCast",
+  floqAi: "botDee",
   traditionalTheme: "siteChrome"
 });
 
@@ -212,6 +213,8 @@ function betaGrantsFrom(row) {
   const merged = {...raw};
   // Legacy betaTesters.features.supRstar → floqCast for one release.
   if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+  // Legacy betaTesters.features.floqAi → botDee for one release.
+  if (flag(raw.floqAi) === 1 && flag(merged.botDee) !== 1) merged.botDee = 1;
   if (flag(raw.traditionalTheme) === 1 && flag(merged.siteChrome) !== 1) merged.siteChrome = 1;
   return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
 }

@@ -118,7 +118,7 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
 test("Welcome ? explains OTP in every supported language", () => {
   const html = read("index.html");
   assert.match(html, /data-floqr-help-body="[^"]*One Time Password \(OTP\)/);
-  const repo = read("floqai-help-repository.js");
+  const repo = read("botdee-help-repository.js");
   assert.match(repo, /id: "help-welcome"[\s\S]{0,900}One Time Password \(OTP\)/);
   assert.match(repo, /"whatsapp otp"/);
   const help = read("floqr-i18n-help.js");

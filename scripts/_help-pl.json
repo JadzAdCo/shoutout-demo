@@ -11,7 +11,7 @@
     "title": "Zarchiwizowane ShoutOuts",
     "body": "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
   },
-  "floqai-ask-floqr": {
+  "botdee-ask-floqr": {
     "title": "Zapytaj FloqR z BOT DEE",
     "body": "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
   },
@@ -135,7 +135,7 @@
     "title": "Domyślny szablon",
     "body": "Darmowy tradycyjny czarno-biały klasyk. Użyj BOT DEE poniżej do szablonów Sport, Koszulka, VIP, Humor, Samochody, Wideo, Zdjęcia i Ballers."
   },
-  "help-floqai-template-search": {
+  "help-botdee-template-search": {
     "title": "Wyszukiwanie szablonów BOT DEE",
     "body": "Stuknij w poruszający się znak BOT DEE (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
   },
@@ -162,5 +162,13 @@
   "help-public-media-sharing": {
     "title": "Udostępnianie mediów publicznych i danych",
     "body": "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
+  },
+  "help-black-card": {
+    "title": "Black Card",
+    "body": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
   }
 }

@@ -1695,6 +1695,8 @@
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true || t.loopMediaWithText === true;
+    const isBallerCard = t.ballerCard === true || /\bballer-card\b/.test(String(t.className || "")) || ["blackCard","ballersAlert","blackCardAmex","ballersAlertAmex"].includes(templateId);
+    const isBallerAlert = isBallerCard && (t.ballerAlert === true || /\bballer-alert\b/.test(String(t.className || "")) || templateId === "ballersAlert" || templateId === "ballersAlertAmex");
     // Preserve media↔copy phase across live re-renders for Christine / split-media / NFL rotate.
     const keepFrameLoop = isChristine
       || t.layout === "split-media"
@@ -1749,7 +1751,8 @@
     canvas.dataset.is64x48 = isChristine ? "1" : (screenFlags.is64x48 || "0");
     canvas.dataset.is64x32 = isChristine ? "0" : (screenFlags.is64x32 || "0");
     canvas.dataset.textProfile = textCaps.profileId || "custom";
-    const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
+    const formatBackgroundUrl = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[screenFormatId] || t.backgroundUrlByFormat[String(screenFormatId || "").replace(/^p125-/, "led-")])) || "";
+    const backgroundUrl = data.backgroundUrl || formatBackgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
     const backgroundGradient = data.backgroundGradient || "";
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
@@ -1840,7 +1843,7 @@
     }
     const mediaUrl = safeMediaUrl(data.mediaUrl);
     const mediaType = data.mediaType || "";
-    const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
+    const usesSplitMedia = !isBallerCard && (t.layout === "split-media" || (t.supportsMedia && mediaUrl));
     byId("displayMain").style.setProperty("font-size", `${usesSplitMedia ? mainSize * .78 : mainSize}vh`, "important");
     byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
     if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
@@ -1863,9 +1866,49 @@
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
+    } else if (isBallerAlert) {
+      mediaSlot.classList.remove("hidden");
+      mediaSlot.dataset.ballerFace = "baller-face-medallion-slot";
+      if (mediaUrl) {
+        const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
+        mediaSlot.innerHTML = isVideo
+          ? "<video src=\"" + esc(mediaUrl) + "\" autoplay muted loop playsinline></video>"
+          : "<img src=\"" + esc(mediaUrl) + "\" alt=\"Cardholder face\">";
+        const mediaElement = mediaSlot.querySelector("img,video");
+        if (mediaElement) {
+          mediaElement.style.objectFit = "cover";
+          mediaElement.style.objectPosition = "center 18%";
+        }
+      } else {
+        mediaSlot.innerHTML = '<div class="media-placeholder">FACE</div>';
+      }
     } else {
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+    }
+    if (isBallerCard) {
+      stopHeistIdentityCycle();
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
+      canvas.classList.add("baller-card");
+      if (isBallerAlert) canvas.classList.add("baller-alert");
+      if (center) {
+        center.classList.remove("split-media-layout");
+        center.classList.add("baller-card-center");
+      }
+      byId("displayMain").className = "baller-cardholder-name";
+      byId("displaySub").className = "baller-company-name";
+      byId("displayMain").textContent = glyphSlice(cleanDisplayText(mainText || data.mainText || ""), 0, mainLimit).toUpperCase();
+      byId("displaySub").textContent = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || ""), 0, subLimit).toUpperCase();
+      byId("displayMain").style.setProperty("font-size", Math.min(7, Math.max(3.2, mainSize)) + "vh", "important");
+      byId("displaySub").style.setProperty("font-size", Math.min(5, Math.max(2.4, subSize)) + "vh", "important");
+      const rail = byId("displayIdentityRail");
+      if (rail) {
+        rail.className = "display-identity-rail hidden";
+        rail.innerHTML = "";
+      }
+      markDisplayReady();
+      return;
     }
     if (isSoccerJersey) {
       stopHeistIdentityCycle();

@@ -24,7 +24,7 @@ This failed in production as: parent `patron-portal.html` signed in, child ifram
 |---|---|
 | `staff-worksheet.html` | Portal Work Calendar iframe + Inbox confirm |
 | `scheduling.html` | Manager portal; worker notify must redirect to Work Calendar |
-| `role-request.html` | Service Members / FloqAi |
+| `role-request.html` | Service Members / BOT DEE |
 | `commerce.html` / BartR | Portal store / Search tile |
 | `guest-list.html` | Club / Search |
 | `mingl-chat.html` / `mingl-gist.html` | Portal / Inbox |

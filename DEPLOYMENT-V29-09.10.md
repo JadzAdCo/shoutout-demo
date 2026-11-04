@@ -4,17 +4,17 @@
 
 - **Club SMS / WhatsApp ops messaging** (additive): pending ShoutOut alerts, daily club auth codes, test send, inbound APPROVE/REJECT webhook
 - Paid SMS `$10` checkout path in `admin-rep-extension` / `commerce-functions` **unchanged**
-- FloqAi Search preview page banner clarified (`floqai-search.html`)
+- BOT DEE Search preview page banner clarified (`botdee-search.html`)
 - Firestore rules: `clubDailyAuthCodes`, `clubMessageDeliveries`, `clubMessageInbound`
 - Cache-bust: `admin-rep-extension.js?v=29.09.10`
 
-## FloqAi preview URL
+## BOT DEE preview URL
 
 Local / package preview (not production Search default):
 
-`https://jadzadco.github.io/shoutout-demo/floqai-search.html?v=29.09.10-floqai1`
+`https://jadzadco.github.io/shoutout-demo/botdee-search.html?v=29.09.10-floqai1`
 
-Or open `./floqai-search.html` from the package.
+Or open `./botdee-search.html` from the package.
 
 ## Messaging secrets (Firebase Functions)
 
@@ -42,7 +42,7 @@ npm.cmd test --prefix .\functions
 
 ```powershell
 firebase.cmd deploy --only functions:getClubDailyAuthCode,functions:sendClubTestMessage,functions:onShoutoutCreatedNotifyClub,functions:rotateClubDailyAuthCodes,functions:messagingInboundWebhook,firestore:rules --project shoutoutdemo-5b402
-# Then publish static package (admin + floqai-search) to GitHub Pages
+# Then publish static package (admin + botdee-search) to GitHub Pages
 ```
 
 Do **not** omit commerce functions when redeploying the whole `functions` bundle; messaging is additive.

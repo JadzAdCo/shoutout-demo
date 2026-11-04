@@ -1,6 +1,6 @@
 ---
 description: Master Admin Entity Management hashes, default tab, auth then SOS2FA resume, venue link output panel (Xibo Diag), Application access switch
-globs: master-admin.html,master-admin-app.js,entity-management.js,admin.css,sos2fa.js,floqai-help-repository.js
+globs: master-admin.html,master-admin-app.js,entity-management.js,admin.css,sos2fa.js,botdee-help-repository.js
 alwaysApply: false
 ---
 

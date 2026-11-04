@@ -152,8 +152,8 @@ test("server price is 1500 cents whatever the client sends", () => {
   assert.match(rules, /request\.resource\.data\.template != 'classicHalloween'/, "no free direct create of the paid template");
 });
 
-test("Classic Halloween has patron help in every language and a FloqAi intent", () => {
-  const repo = read("floqai-help-repository.js");
+test("Classic Halloween has patron help in every language and a BOT DEE intent", () => {
+  const repo = read("botdee-help-repository.js");
   assert.match(repo, /id: "help-classic-halloween",\s*title: "Classic Halloween",/);
   const helpPacks = read("floqr-i18n-help.js");
   const blocks = helpPacks.match(/"help-classic-halloween": \{\s*title: "Classic Halloween",\s*body: "[^"]+"/g) || [];
@@ -162,7 +162,7 @@ test("Classic Halloween has patron help in every language and a FloqAi intent", 
   const intents = read("intent-search.js");
   assert.match(intents, /id: "classic-halloween",[\s\S]{0,400}action: "template",\s*templateId: "classicHalloween"/);
   assert.match(intents, /"classic-halloween": \["patron"\]/);
-  const classes = JSON.parse(read("functions/floqai-content-classes.json"));
+  const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help["help-classic-halloween"], ["patron"]);
   assert.deepEqual(classes.intents["classic-halloween"], ["patron"]);
   const chrome = read("floqr-i18n.js");

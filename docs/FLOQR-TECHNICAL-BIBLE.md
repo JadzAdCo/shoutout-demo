@@ -974,7 +974,7 @@ Firebase Hosting or Cloud CDN origin → App Check on sensitive calls → preser
 ## 8.3 Recommendation / NLU / generation / moderation
 
 - **Recommendations:** hybrid rules + model; features from venue, music, graph, spend, time, geo.
-- **FloqAi NLU:** intent → whitelisted tools (Mingl, RydR, BartR, ShoutOut, clubs); no arbitrary code execution.
+- **BOT DEE NLU:** intent → whitelisted tools (Mingl, RydR, BartR, ShoutOut, clubs); no arbitrary code execution.
 - **Image/video gen:** template/campaign creatives; prompt history retained (`aiTemplatePromptHistory`).
 - **Moderation:** toxicity/NSFW pre-check + human queue.
 - **Semantic search / knowledge graph:** embeddings + future property graph (Patron—Interest—Venue—Event—Artist).

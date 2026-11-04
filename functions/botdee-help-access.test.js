@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * FloqAi help partition access contract (mirrors floqai-help-repository.js).
+ * BOT DEE help partition access contract (mirrors botdee-help-repository.js).
  * patronHelpverbiage / serviceMemberHelpverbiage / venueAdminHelpverbiage / masterAdminHelpverbiage
  */
 const test = require("node:test");

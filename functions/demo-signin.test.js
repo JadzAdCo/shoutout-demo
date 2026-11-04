@@ -176,7 +176,7 @@ test("Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help 
   }
   assert.doesNotMatch(section, /id="demoReason"|placeholder="Why/, "reason is asked after Generate, never a standing input");
   assert.match(html, /href="\.\/master-demo-employees\.css\?v=s3\.\d+\.\d+"/);
-  const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "floqai-help-repository.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
+  const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "botdee-help-repository.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
     .map(file => html.indexOf(`src="./${file}?v=`));
   order.forEach((at, i) => assert.ok(at > 0 && (i === 0 || at > order[i - 1]), `script order ${i}`));
   for (const file of ["sos2fa.js", "master-admin-app.js"]) {
@@ -237,16 +237,16 @@ test("old demo-signin.html redirects to the Master Admin tab", () => {
   assert.ok(!fs.existsSync(path.join(root, "demo-signin.js")));
 });
 
-test("FloqAi help entry is Master Admin only and classified", () => {
+test("BOT DEE help entry is Master Admin only and classified", () => {
   const win = {FLOQRNav: {appVersion: "t"}, location: {href: "https://x/", pathname: "/"}, localStorage: {getItem() { return null; }, setItem() {}}, navigator: {language: "en"}, addEventListener() {}, document: null, URLSearchParams, URL, console, setTimeout};
   win.window = win;
-  vm.runInContext(read("floqai-help-repository.js"), vm.createContext(win));
+  vm.runInContext(read("botdee-help-repository.js"), vm.createContext(win));
   const entry = win.FLOQRHelpRepository.entries().find(row => row.id === "help-master-demo-signin");
   assert.ok(entry);
   assert.deepEqual([...entry.audiences], ["masterAdmin"]);
   for (const phrase of ["demo employee code", "temp code", "demo sign in", "sign in as demo"]) assert.ok(entry.searchPhrases.includes(phrase), phrase);
   assert.match(entry.links[0].href, /master-admin\.html\?.*#demoEmployees$/);
   assert.doesNotMatch(entry.body, /sha256|challenge|EMAIL_OTP_PEPPER|design note/i);
-  const classes = JSON.parse(read("functions/floqai-content-classes.json"));
+  const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help["help-master-demo-signin"], ["masterAdmin"]);
 });

@@ -1,44 +1,14 @@
 ---
-description: BOT DEE page botdee.html — chat via executeBotSession + intent-search fast path; feature-guarded; audience-filtered
+description: RETIRED — FloqAi page renamed to BOT DEE. See design-notes-botdee-page.mdc + design-notes-botdee-rename.mdc. Resume @botdee$
 alwaysApply: false
 ---
 
-# BOT DEE page (`botdee.html`)
+# RETIRED — FloqAi page
 
-Resume: `@floqai-page$` / `@botdee$`.
+`floqai.html` was deleted (s3.2.75). Canonical page is **`botdee.html`**. Catalog key is **`botDee`** with one-release dual-read from legacy `floqAi`.
 
-## Product shape (Phase 1)
+Resume: `@botdee$` / `$botdee$`.
 
-`botdee.html` is the **BOT DEE** chat shell wired to Cloud Function `executeBotSession`, with **Quick intent search** kept as a collapsible fast path / fallback (same `intent-search.js` used in feature searches). Feature key / chrome icon id stay `floqAi` (storage / catalog). There is **no** `floqai.html` or `floqai-search.html` — those paths are removed (404).
-
-| Piece | Role |
-|---|---|
-| Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `floqAi` gate + classification → Gemini + `contextualSearch`) |
-| Intent fallback | `#botDeeIntentFallback` + `#intentSearchPage` — feature-optimized router cards |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="floqAi"`); compact left Back; no FloqR parent logo |
-
-## Routing
-
-| Entry | Target |
-|---|---|
-| Profile card BOT DEE (`FLOQRNav.intentSearchHome()`) | `./botdee.html` |
-| Search tile `#intentSearchBtnCard` | `./botdee.html?from=search` |
-| Feature catalog route | `./botdee.html` |
-| Old `./?start=intent|ask|wish[&q=]` | `location.replace(./botdee.html[?q=])` |
-| `floqai.html` / `floqai-search.html` | **removed** (404) |
-
-## Access
-
-`<body data-floqr-feature="floqAi">` — off / not granted → not-available card + Back. Satellite session shell. Chat callable requires signed-in + feature gate. Intent cards still use `getFloqAiAccess` / packaged classification.
-
-## Backend (Phase 1)
-
-- `functions/bot-dee-functions.js` — `executeBotSession`
-- `functions/bot-dee-core.js` — tools, scoring, sanitization
-- Catalog: `node scripts/build-bot-dee-search-catalog.js`
-
-## Owner action
-
-BOT DEE stays invisible until Master Admin → Features & Services sets **floqAi** Live/Test (UI label **BOT DEE**). Deploy Functions for `executeBotSession` + `GEMINI_API_KEY` before chat answers via Gemini.
-
-Tests: `functions/floqai-page.test.js`, `functions/bot-dee-core.test.js`.
+- Page + product chrome: `.cursor/rules/design-notes-botdee-page.mdc`
+- Rename procedure (how we did it): `.cursor/rules/design-notes-botdee-rename.mdc`
+- Script: `scripts/rename-floqai-to-botdee.js`

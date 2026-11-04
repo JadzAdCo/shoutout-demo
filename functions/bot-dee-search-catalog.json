@@ -2,8 +2,8 @@
   "version": 1,
   "entries": [
     {
-      "sourceId": "help:floqai-ask-floqr",
-      "id": "floqai-ask-floqr",
+      "sourceId": "help:botdee-ask-floqr",
+      "id": "botdee-ask-floqr",
       "kind": "help",
       "label": "Ask FloqR with BOT DEE",
       "blurb": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and",
@@ -12,14 +12,17 @@
         "ask floqr with bot dee",
         "ask floqr with bot dee tap the animated mark or wait for the prompt then type what you want in plain words. products mingl rydr bartr shoutout floqcast supersta",
         "ask floqr",
-        "floqai",
+        "bot dee",
+        "botdee",
+        "ask bot dee",
         "plain words",
         "i want to be able to",
         "help",
         "make me a superstar",
+        "floqai",
         "open bot dee",
         "open floqcast",
-        "floqai-ask-floqr"
+        "botdee-ask-floqr"
       ]
     },
     {
@@ -28,7 +31,7 @@
       "kind": "help",
       "label": "Ad Management",
       "blurb": "Master Admin → Ad Management. Approval queue: approve, waive payment with a reason, mark an invoice paid, or reject with an optional refund. Live & scheduled: pause, resume, end, edit audience and dates. Ad stats: measured impressions, clicks and click rate, with Clear for one ad",
-      "href": "./master-admin.html?from=floqai#adApprovalQueue",
+      "href": "./master-admin.html?from=botdee#adApprovalQueue",
       "phrases": [
         "ad management",
         "master admin ad management. approval queue approve waive payment with a reason mark an invoice paid or reject with an optional refund. live scheduled pause resu",
@@ -53,7 +56,7 @@
       "kind": "help",
       "label": "Ad campaign Status and Shows on",
       "blurb": "On each Ad Campaign Mgmt card, Status tells whether the creative is Live, Demo (not live), Awaiting approval, Needs verification, or Rejected. Shows on names the paid package (Inline or Mingl Gist) or the first feature path for packaged demos (for example ShoutOut path). Demo (no",
-      "href": "./master-admin.html?from=floqai#adCampaignManagement",
+      "href": "./master-admin.html?from=botdee#adCampaignManagement",
       "phrases": [
         "ad campaign status and shows on",
         "on each ad campaign mgmt card status tells whether the creative is live demo not live awaiting approval needs verification or rejected. shows on names the paid ",
@@ -74,7 +77,7 @@
       "kind": "help",
       "label": "Ad Campaigns",
       "blurb": "Post a flyer image or a video of 30 seconds or less for your business, club, promotion group or service (DJ, photographer, promoter, FloqQ). Choose Inline ($45 / 7 days — Search loading splash and feature screens) or Mingl Gist ($25 / 7 days — story scroll), the run length and wh",
-      "href": "./patron-portal.html?from=floqai&tab=profile",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
       "phrases": [
         "ad campaigns",
         "post a flyer image or a video of 30 seconds or less for your business club promotion group or service dj photographer promoter floqq . choose inline 45 / 7 days",
@@ -97,7 +100,7 @@
       "kind": "help",
       "label": "AI Recommendations",
       "blurb": "Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it.",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "ai recommendations",
         "ideas written for you from the venue the event type your draft and your profile. every idea already fits the lines and characters your chosen display allows. ta",
@@ -115,7 +118,7 @@
       "kind": "help",
       "label": "App language / FloqR webapp language",
       "blurb": "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it anytime under My Profile → Language Settings → FloqR webapp language (saved on this device and on your profile). FLOQR does not choose language from IP address or country. To fix AI-s",
-      "href": "./patron-portal.html?from=floqai&tab=language",
+      "href": "./patron-portal.html?from=botdee&tab=language",
       "phrases": [
         "app language / floqr webapp language",
         "first visit can follow the browser language when floqr supports it. otherwise english. change it anytime under my profile language settings floqr webapp languag",
@@ -145,7 +148,7 @@
       "kind": "help",
       "label": "Archived ShoutOuts",
       "blurb": "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive.",
-      "href": "./patron-portal.html?from=floqai&tab=shoutouts&sub=archive",
+      "href": "./patron-portal.html?from=botdee&tab=shoutouts&sub=archive",
       "phrases": [
         "archived shoutouts",
         "archive stores a compressed copy of your completed shoutout text and media when the original included media in low-cost firebase storage and removes it from com",
@@ -158,12 +161,32 @@
       ]
     },
     {
+      "sourceId": "help:help-ballers-alert",
+      "id": "help-ballers-alert",
+      "kind": "help",
+      "label": "Baller's Alert",
+      "blurb": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your phot",
+      "href": "./?start=search",
+      "phrases": [
+        "baller s alert",
+        "100 baller s alert the baller s express business metal card with your face in the upper-left medallion about one-third of the upper half . a face photo is requi",
+        "ballers alert",
+        "baller alert",
+        "face card",
+        "black card photo",
+        "face medallion",
+        "100 shoutout",
+        "throw a shoutout",
+        "help-ballers-alert"
+      ]
+    },
+    {
       "sourceId": "help:help-become-club-admin",
       "id": "help-become-club-admin",
       "kind": "help",
       "label": "Become a Club Admin",
       "blurb": "Request Club Admin access, then get venue approval.",
-      "href": "./role-request.html?from=floqai&type=clubAdmin",
+      "href": "./role-request.html?from=botdee&type=clubAdmin",
       "phrases": [
         "become a club admin",
         "request club admin access then get venue approval.",
@@ -180,7 +203,7 @@
       "kind": "help",
       "label": "Become a DJ",
       "blurb": "Elect DJ as your service role and associate with clubs.",
-      "href": "./role-request.html?from=floqai&type=dj",
+      "href": "./role-request.html?from=botdee&type=dj",
       "phrases": [
         "become a dj",
         "elect dj as your service role and associate with clubs.",
@@ -197,7 +220,7 @@
       "kind": "help",
       "label": "Become a Promoter",
       "blurb": "Request Promoter access for guest lists and campaigns.",
-      "href": "./role-request.html?from=floqai&type=promoter",
+      "href": "./role-request.html?from=botdee&type=promoter",
       "phrases": [
         "become a promoter",
         "request promoter access for guest lists and campaigns.",
@@ -213,7 +236,7 @@
       "kind": "help",
       "label": "Booking Transaction Disclaimer",
       "blurb": "As a FloqR beta tester, you accept that reversing payments is difficult during beta. Ticket sales, table reservations, VIP entry, and other payments on beta features are final and non-refundable by FloqMedia. You participate at your own risk. Disputes about venue entry or payment",
-      "href": "./beta-invite.html?from=floqai",
+      "href": "./beta-invite.html?from=botdee",
       "phrases": [
         "booking transaction disclaimer",
         "as a floqr beta tester you accept that reversing payments is difficult during beta. ticket sales table reservations vip entry and other payments on beta feature",
@@ -236,7 +259,7 @@
       "kind": "help",
       "label": "Beta testing",
       "blurb": "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox (and may be emailed). Open the link — if email opened a private browser without your FLOQR login, tap Sign in to accept this invite; after OTP/Google you return with the invite token. ",
-      "href": "./patron-portal.html?tab=inbox&from=floqai",
+      "href": "./patron-portal.html?tab=inbox&from=botdee",
       "phrases": [
         "beta testing",
         "floqr sometimes invites patrons to try new features early. the invitation arrives in your inbox and may be emailed . open the link if email opened a private bro",
@@ -265,12 +288,32 @@
       ]
     },
     {
+      "sourceId": "help:help-black-card",
+      "id": "help-black-card",
+      "kind": "help",
+      "label": "Black Card",
+      "blurb": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embos",
+      "href": "./?start=search",
+      "phrases": [
+        "black card",
+        "75 black card a photoreal baller s express business metal card on every led size. choose how your name appears floqr display name @handle or custom and a compan",
+        "ballers express",
+        "baller s express",
+        "metal card",
+        "business card shoutout",
+        "black metal card",
+        "75 shoutout",
+        "throw a shoutout",
+        "help-black-card"
+      ]
+    },
+    {
       "sourceId": "help:help-bot-dee-mgmt",
       "id": "help-bot-dee-mgmt",
       "kind": "help",
       "label": "BOT DEE conversation pause",
       "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat cool/ok/thanks stay short and do not repeat th",
-      "href": "./master-admin.html?from=floqai#featuresBotDee",
+      "href": "./master-admin.html?from=botdee#featuresBotDee",
       "phrases": [
         "bot dee conversation pause",
         "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the chat default 60 . after the pause the next message starts a f",
@@ -285,12 +328,82 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-audience-sections",
+      "id": "help-botdee-audience-sections",
+      "kind": "help",
+      "label": "BOT DEE help audiences",
+      "blurb": "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee help audiences",
+        "bot dee shows help that matches your role patron service member venue admin or master admin. master admins can search across those audiences. if nothing appears",
+        "bot dee audience",
+        "floqai audience",
+        "help sections",
+        "master admin help",
+        "venue admin help",
+        "service member help",
+        "patron help",
+        "help security",
+        "blank bot dee answer",
+        "blank floqai answer",
+        "help-botdee-audience-sections"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-page",
+      "id": "help-botdee-page",
+      "kind": "help",
+      "label": "BOT DEE",
+      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee",
+        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. press",
+        "botdee",
+        "ask bot dee",
+        "bot dee page",
+        "chat with bot dee",
+        "general search",
+        "search everything",
+        "what can i search",
+        "enter to send",
+        "shift enter",
+        "how are you bot dee",
+        "floqai",
+        "floqai page",
+        "ask floqai",
+        "open bot dee",
+        "help-botdee-page"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-template-search",
+      "id": "help-botdee-template-search",
+      "kind": "help",
+      "label": "Template search",
+      "blurb": "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venu",
+      "href": "./?start=search",
+      "phrases": [
+        "template search",
+        "use the search lens field same design as search to find templates by name description tags sports vip media or popularity. results include official floqr templa",
+        "bot dee template",
+        "floqai template",
+        "sports jersey",
+        "nba nfl cars humor",
+        "search templates",
+        "led preview",
+        "throw a shoutout",
+        "help-botdee-template-search"
+      ]
+    },
+    {
       "sourceId": "help:help-chrome-audit",
       "id": "help-chrome-audit",
       "kind": "help",
       "label": "Site chrome audit",
       "blurb": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrom",
-      "href": "./master-admin.html?from=floqai",
+      "href": "./master-admin.html?from=botdee",
       "phrases": [
         "site chrome audit",
         "master admin only. after you switch site chrome under my profile appearance floqr records each page you open and checks whether html data-floqr-chrome matches y",
@@ -310,7 +423,7 @@
       "kind": "help",
       "label": "Site chrome",
       "blurb": "Beta: pick one Site chrome for the whole FloqR site. Nightlife (white script mark with neon cyan–magenta border halo), Traditional (charcoal / white + script FloqR mark), Black Tiffany (true black + Tiffany blue script mark), White/Black (white background, charcoal text, black sc",
-      "href": "./patron-portal.html?from=floqai&tab=appearance",
+      "href": "./patron-portal.html?from=botdee&tab=appearance",
       "phrases": [
         "site chrome",
         "beta pick one site chrome for the whole floqr site. nightlife white script mark with neon cyan magenta border halo traditional charcoal / white script floqr mar",
@@ -369,7 +482,7 @@
       "kind": "help",
       "label": "Club Admin venue assignment",
       "blurb": "Club Admins only open the Venue Command Center for a club they are assigned to. Opening admin.html without a venue no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N. Unassigned admins request assignment from Master Admin.",
-      "href": "./role-request.html?from=floqai&type=clubAdmin",
+      "href": "./role-request.html?from=botdee&type=clubAdmin",
       "phrases": [
         "club admin venue assignment",
         "club admins only open the venue command center for a club they are assigned to. opening admin.html without a venue no longer defaults to zebbies. demo accounts ",
@@ -391,7 +504,7 @@
       "kind": "help",
       "label": "FLOQR display screens",
       "blurb": "Firebase clubLocations stores VenueSupports96x48, VenueSupports64x48, and VenueSupports64x32 as 0 or 1. templates stores Is96x48, Is64x48, and Is64x32 the same way. A venue only lists a template when at least one pair is 1. Xibo URLs stay display.html?location=id and display2.htm",
-      "href": "./admin.html?from=floqai&tab=public-profile",
+      "href": "./admin.html?from=botdee&tab=public-profile",
       "phrases": [
         "floqr display screens",
         "firebase clublocations stores venuesupports96x48 venuesupports64x48 and venuesupports64x32 as 0 or 1. templates stores is96x48 is64x48 and is64x32 the same way.",
@@ -417,7 +530,7 @@
       "kind": "help",
       "label": "In-app marketing",
       "blurb": "Post a flyer or a video of 30 seconds or less as your club. Once it is paid and approved by FLOQR it shows on the Search loading splash, Mingl, RydR and other FLOQR screens. Club ad posters lets a team member post ads for the club (Club Ad Poster role). No SMS credits required.",
-      "href": "./admin.html?from=floqai#panelInAppMarketing",
+      "href": "./admin.html?from=botdee#panelInAppMarketing",
       "phrases": [
         "in-app marketing",
         "post a flyer or a video of 30 seconds or less as your club. once it is paid and approved by floqr it shows on the search loading splash mingl rydr and other flo",
@@ -435,7 +548,7 @@
       "kind": "help",
       "label": "Marketing campaigns",
       "blurb": "Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS or WhatsApp credits from Messaging Credit.",
-      "href": "./admin.html?from=floqai#panelMarketingCampaigns",
+      "href": "./admin.html?from=botdee#panelMarketingCampaigns",
       "phrases": [
         "marketing campaigns",
         "pick an industry template load background and extra images edit copy then save or send. sending debits sms or whatsapp credits from messaging credit.",
@@ -453,7 +566,7 @@
       "kind": "help",
       "label": "SMS & WhatsApp Credit",
       "blurb": "Each $10 pack funds $7.00 of Twilio delivery capacity; FloqR keeps $3.00 as platform profit on the pack. SMS pack → 466 messages (≈ $0.015 all-in US SMS). WhatsApp pack → 233 messages (≈ $0.030 Twilio + Meta marketing). When balance reaches 0, buy another $10 messaging bundle bef",
-      "href": "./admin.html?from=floqai#panelMessagingCredit",
+      "href": "./admin.html?from=botdee#panelMessagingCredit",
       "phrases": [
         "sms whatsapp credit",
         "each 10 pack funds 7.00 of twilio delivery capacity floqr keeps 3.00 as platform profit on the pack. sms pack 466 messages 0.015 all-in us sms . whatsapp pack 2",
@@ -472,7 +585,7 @@
       "kind": "help",
       "label": "SMS & WhatsApp delivery logs",
       "blurb": "Club Admin → Marketing → SMS & WhatsApp Logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones ",
-      "href": "./admin.html?tab=marketing&from=floqai",
+      "href": "./admin.html?tab=marketing&from=botdee",
       "phrases": [
         "sms whatsapp delivery logs",
         "club admin marketing sms whatsapp logs shows twilio sms and whatsapp for this venue marketing send test club alerts . the same rows appear under master admin tw",
@@ -494,7 +607,7 @@
       "kind": "help",
       "label": "Club SMS and WhatsApp notification subscriptions",
       "blurb": "Club Admin → Notifications: Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Green pill = Firebase subscription 1",
-      "href": "./admin.html?from=floqai&tab=notifications",
+      "href": "./admin.html?from=botdee&tab=notifications",
       "phrases": [
         "club sms and whatsapp notification subscriptions",
         "club admin notifications send test alert uses the boxes currently checked. in-app and push writes a system message in floqr inbox. email uses club admin address",
@@ -527,7 +640,7 @@
       "kind": "help",
       "label": "SMS notification subscription",
       "blurb": "The SMS pill is green when Firebase smsSubscribed is 1 (prepaid $10 pack, 466 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck SMS and Save to pause alerts without losing the paid ",
-      "href": "./admin.html?from=floqai&tab=notifications",
+      "href": "./admin.html?from=botdee&tab=notifications",
       "phrases": [
         "sms notification subscription",
         "the sms pill is green when firebase smssubscribed is 1 prepaid 10 pack 466 credits not monthly or yearly . red/flashing means 0 open and tap subscribe 10. credi",
@@ -546,7 +659,7 @@
       "kind": "help",
       "label": "Your club's templates",
       "blurb": "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "your club s templates",
         "templates made only for your club are listed first and marked exclusive at your venue name. assigned templates are the ones patrons can pick at your club use as",
@@ -566,7 +679,7 @@
       "kind": "help",
       "label": "Club website feed",
       "blurb": "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, follo",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "club website feed",
         "show your published floqr club page on your own website. press generate feed key and links then paste the iframe code into your website or give your web admin t",
@@ -588,7 +701,7 @@
       "kind": "help",
       "label": "WhatsApp notification subscription",
       "blurb": "The WhatsApp pill is green when Firebase whatsappSubscribed is 1 (prepaid $10 pack, 233 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck WhatsApp and Save to pause alerts without l",
-      "href": "./admin.html?from=floqai&tab=notifications",
+      "href": "./admin.html?from=botdee&tab=notifications",
       "phrases": [
         "whatsapp notification subscription",
         "the whatsapp pill is green when firebase whatsappsubscribed is 1 prepaid 10 pack 233 credits not monthly or yearly . red/flashing means 0 open and tap subscribe",
@@ -607,7 +720,7 @@
       "kind": "help",
       "label": "Completed ShoutOuts",
       "blurb": "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template",
-      "href": "./patron-portal.html?from=floqai&tab=shoutouts",
+      "href": "./patron-portal.html?from=botdee&tab=shoutouts",
       "phrases": [
         "completed shoutouts",
         "completed shoutouts are club-approved and finished shoutouts kept for your records. archive moves a shoutout out of completed into archive with compressed text ",
@@ -637,7 +750,7 @@
       "kind": "help",
       "label": "Create and publish a staff schedule",
       "blurb": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff.",
-      "href": "./admin.html?from=floqai&tab=scheduling",
+      "href": "./admin.html?from=botdee&tab=scheduling",
       "phrases": [
         "create and publish a staff schedule",
         "add draft shifts on the people days grid review chips then publish schedule. workers must confirm before a shift becomes confirmed. bot dee create a schedule pu",
@@ -674,6 +787,7 @@
         "exposure report",
         "system access",
         "security tab",
+        "bot dee access",
         "floqai access",
         "save all classifications",
         "needs review",
@@ -711,7 +825,7 @@
       "kind": "help",
       "label": "Idle board: Use ShoutOut @ venue",
       "blurb": "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away.",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "idle board use shoutout @ venue",
         "when no shoutout is playing display 1 shows use shoutout @ followed by your venue name. each approved shoutout plays for 10 minutes then the board returns to th",
@@ -730,7 +844,7 @@
       "kind": "help",
       "label": "Do Not Sell or Share",
       "blurb": "Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically. Open the Privacy Policy for CCPA / CPRA de",
-      "href": "./patron-portal.html?from=floqai&tab=privacy",
+      "href": "./patron-portal.html?from=botdee&tab=privacy",
       "phrases": [
         "do not sell or share",
         "turn this on to opt out of sale/share-style personalization. floqr will not score ads with your profile tags. house and all-audience creatives may still show. i",
@@ -755,7 +869,7 @@
       "kind": "help",
       "label": "DonPapi ShoutOut LED wall",
       "blurb": "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other for",
-      "href": "./club-profile.html?from=floqai&location=temp-democlub-1",
+      "href": "./club-profile.html?from=botdee&location=temp-democlub-1",
       "phrases": [
         "donpapi shoutout led wall",
         "vip shoutouts are carried by busboys on the handheld donpapi led wall held in the air in front of patrons with the shoutout message on the center screen club na",
@@ -780,7 +894,7 @@
       "kind": "help",
       "label": "Employee / Worker Network",
       "blurb": "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap El",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "employee / worker network",
         "only people linked to this club are listed staff elected or approved here club admins and staff affiliated with this club. to give someone a role type their nam",
@@ -804,7 +918,7 @@
       "kind": "help",
       "label": "Test → live",
       "blurb": "Promote test code to live. Records who promoted what and why, then opens the GitHub workflow that merges the test branch into main after tests pass. Turn the feature Live in the Release Control table once the promotion is published.",
-      "href": "./master-admin.html?from=floqai#featuresReleaseControl",
+      "href": "./master-admin.html?from=botdee#featuresReleaseControl",
       "phrases": [
         "test live",
         "promote test code to live. records who promoted what and why then opens the github workflow that merges the test branch into main after tests pass. turn the fea",
@@ -823,7 +937,7 @@
       "kind": "help",
       "label": "Featured service staff",
       "blurb": "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes. Before publishing photos, get each person's agreemen",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "featured service staff",
         "tick the staff you want on your public club page. for each person tap one of their floqr photos or choose upload from computer. you can change the role shown un",
@@ -843,7 +957,7 @@
       "kind": "help",
       "label": "Release Control",
       "blurb": "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes",
-      "href": "./master-admin.html?from=floqai#featuresReleaseControl",
+      "href": "./master-admin.html?from=botdee#featuresReleaseControl",
       "phrases": [
         "release control",
         "release control lists every features services row with enable feature isfeatureenabled and enable beta feature istestfeature switches. only shoutout is live by ",
@@ -872,77 +986,12 @@
       ]
     },
     {
-      "sourceId": "help:help-floqai-audience-sections",
-      "id": "help-floqai-audience-sections",
-      "kind": "help",
-      "label": "BOT DEE help audiences",
-      "blurb": "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
-      "href": "./botdee.html",
-      "phrases": [
-        "bot dee help audiences",
-        "bot dee shows help that matches your role patron service member venue admin or master admin. master admins can search across those audiences. if nothing appears",
-        "floqai audience",
-        "help sections",
-        "master admin help",
-        "venue admin help",
-        "service member help",
-        "patron help",
-        "help security",
-        "blank floqai answer",
-        "help-floqai-audience-sections"
-      ]
-    },
-    {
-      "sourceId": "help:help-floqai-page",
-      "id": "help-floqai-page",
-      "kind": "help",
-      "label": "BOT DEE",
-      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
-      "href": "./botdee.html",
-      "phrases": [
-        "bot dee",
-        "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. press",
-        "floqai",
-        "floqai page",
-        "ask floqai",
-        "botdee",
-        "general search",
-        "search everything",
-        "what can i search",
-        "chat with bot dee",
-        "enter to send",
-        "shift enter",
-        "how are you bot dee",
-        "open bot dee",
-        "help-floqai-page"
-      ]
-    },
-    {
-      "sourceId": "help:help-floqai-template-search",
-      "id": "help-floqai-template-search",
-      "kind": "help",
-      "label": "Template search",
-      "blurb": "Use the Search lens field (same design as Search) to find templates by name, description, tags, sports, VIP, media, or popularity. Results include official FLOQR templates, club-approved backgrounds, and your personal saved backgrounds. Each card is a true LED preview at the venu",
-      "href": "./?start=search",
-      "phrases": [
-        "template search",
-        "use the search lens field same design as search to find templates by name description tags sports vip media or popularity. results include official floqr templa",
-        "floqai template",
-        "sports jersey",
-        "nba nfl cars humor",
-        "search templates",
-        "led preview",
-        "throw a shoutout",
-        "help-floqai-template-search"
-      ]
-    },
-    {
       "sourceId": "help:help-floqcast",
       "id": "help-floqcast",
       "kind": "help",
       "label": "Make me a floqCast / superstar",
       "blurb": "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the floqCast Queue → Go live on the floqCast board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
-      "href": "./floqcast-search.html?from=floqai",
+      "href": "./floqcast-search.html?from=botdee",
       "phrases": [
         "make me a floqcast / superstar",
         "pick a venue private camera preview pay 20 stripe pop-out club admin approves in the floqcast queue go live on the floqcast board. like a shoutout but live vide",
@@ -976,7 +1025,7 @@
       "kind": "help",
       "label": "Choose a floqCast venue",
       "blurb": "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here.",
-      "href": "./floqcast-search.html?from=floqai",
+      "href": "./floqcast-search.html?from=botdee",
       "phrases": [
         "choose a floqcast venue",
         "search or choose a venue. the first four clubs are the nearest floqcast venues gps / localization . cards show screen size and whether sound is supported. type ",
@@ -998,7 +1047,7 @@
       "kind": "help",
       "label": "FloqR Inbox",
       "blurb": "FloqR Inbox holds System Messages and internal support messages. The list loads first so your messages appear quickly. Tap the floating New Message button to compose — type a name or @username to find an allowed recipient (Club Admin, CSR, or approved staff). Patron-to-patron cha",
-      "href": "./patron-portal.html?tab=inbox&from=floqai",
+      "href": "./patron-portal.html?tab=inbox&from=botdee",
       "phrases": [
         "floqr inbox",
         "floqr inbox holds system messages and internal support messages. the list loads first so your messages appear quickly. tap the floating new message button to co",
@@ -1040,7 +1089,7 @@
       "kind": "help",
       "label": "General Notifications",
       "blurb": "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
-      "href": "./patron-portal.html?from=floqai&tab=privacy",
+      "href": "./patron-portal.html?from=botdee&tab=privacy",
       "phrases": [
         "general notifications",
         "sos2fa and other floqr system messages follow these flags as set in a patrons your user record. venues or specific independent service members need to subscribe",
@@ -1065,7 +1114,7 @@
       "kind": "help",
       "label": "Generic ShoutOuts",
       "blurb": "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own.",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "generic shoutouts",
         "ready-made ideas for common moments such as birthdays and celebrations. tap one to use it then make it your own.",
@@ -1082,7 +1131,7 @@
       "kind": "help",
       "label": "Enable 64×48 display choice at Heist",
       "blurb": "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: open Club Public Profile (or Master Admin for that club) → FLOQR display screens → tick 64 x 48 cm (keep 64×32 if that board stays live) → Save. Only set primary display to 64×48 if that board is the main Display",
-      "href": "./admin.html?from=floqai&tab=public-profile&location=heist-washington-dc",
+      "href": "./admin.html?from=botdee&tab=public-profile&location=heist-washington-dc",
       "phrases": [
         "enable 64 48 display choice at heist",
         "to offer 64 48 cm as a shoutout screen size at heist washington dc open club public profile or master admin for that club floqr display screens tick 64 x 48 cm ",
@@ -1103,7 +1152,7 @@
       "kind": "help",
       "label": "Location-aware search",
       "blurb": "FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there s",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "location-aware search",
         "floqr lists events and clubs closest to you first then by name. when you allow it floqr uses your phone or browser location gps otherwise it estimates your city",
@@ -1131,7 +1180,7 @@
       "kind": "help",
       "label": "SendGrid Mail Logs",
       "blurb": "Master Admin → Twilio / SendGrid Mgmt → SendGrid Mail Logs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by s",
-      "href": "./master-admin.html?from=floqai#twilio_sendgridMailLogs",
+      "href": "./master-admin.html?from=botdee#twilio_sendgridMailLogs",
       "phrases": [
         "sendgrid mail logs",
         "master admin twilio / sendgrid mgmt sendgrid mail logs. every floqr system-generated sendgrid email is logged here queued accepted failed and later delivery del",
@@ -1154,7 +1203,7 @@
       "kind": "help",
       "label": "Ad approval queue",
       "blurb": "Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the ",
-      "href": "./master-admin.html?from=floqai#adApprovalQueue",
+      "href": "./master-admin.html?from=botdee#adApprovalQueue",
       "phrases": [
         "ad approval queue",
         "every paid ad lands here before it can show to patrons. check the flyer or video the audience and who posted it then approve and schedule. ads still awaiting pa",
@@ -1175,7 +1224,7 @@
       "kind": "help",
       "label": "SMS and WhatsApp ad intake",
       "blurb": "Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here.",
-      "href": "./master-admin.html?from=floqai#adIntakePanel",
+      "href": "./master-admin.html?from=botdee#adIntakePanel",
       "phrases": [
         "sms and whatsapp ad intake",
         "anyone can text or whatsapp a flyer or a video of 30 seconds or less to the floqr advertising number. they get a private link to choose dates and audience and p",
@@ -1196,7 +1245,7 @@
       "kind": "help",
       "label": "Live and scheduled ads",
       "blurb": "Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log.",
-      "href": "./master-admin.html?from=floqai#adLiveCampaigns",
+      "href": "./master-admin.html?from=botdee#adLiveCampaigns",
       "phrases": [
         "live and scheduled ads",
         "ads that are approved and in rotation or paused . each card shows measured impressions clicks and click rate. pause resume or end an ad early edit its audience ",
@@ -1217,7 +1266,7 @@
       "kind": "help",
       "label": "Ad settings and billing",
       "blurb": "Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad d",
-      "href": "./master-admin.html?from=floqai#adSettingsPanel",
+      "href": "./master-admin.html?from=botdee#adSettingsPanel",
       "phrases": [
         "ad settings and billing",
         "turn splash ads on or off set how long the search splash shows choose whether house and demo ads fill in when no paid ad matches and pause sms / whatsapp intake",
@@ -1239,7 +1288,7 @@
       "kind": "help",
       "label": "Ad stats",
       "blurb": "Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged.",
-      "href": "./master-admin.html?from=floqai#adStatsPanel",
+      "href": "./master-admin.html?from=botdee#adStatsPanel",
       "phrases": [
         "ad stats",
         "real impressions and clicks recorded when patrons see or tap an ad on the search splash mingl mingl gist and rydr. repeat views from the same person within 30 m",
@@ -1259,7 +1308,7 @@
       "kind": "help",
       "label": "Completed Log",
       "blurb": "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutA",
-      "href": "./master-admin.html?from=floqai#shoutoutCompletedLog",
+      "href": "./master-admin.html?from=botdee#shoutoutCompletedLog",
       "phrases": [
         "completed log",
         "master admin shoutout mgmt completed log. network log of submitted rejected paid and completed shoutouts. soc 2 / iso 27001 / nist-aligned audit metadata is ret",
@@ -1283,7 +1332,7 @@
       "kind": "help",
       "label": "Demo sign-in code",
       "blurb": "Master Admin → Entity Management → Demo Svc / Emp Mgmt. Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Unlock SOS2FA, search or pick the demo employee, press Generate code and give a reason. The code is sho",
-      "href": "./master-admin.html?from=floqai#demoEmployees",
+      "href": "./master-admin.html?from=botdee#demoEmployees",
       "phrases": [
         "demo sign-in code",
         "master admin entity management demo svc / emp mgmt. use this when email codes are not arriving and you need to sign in as a demo employee temp_role_number@floqr",
@@ -1315,7 +1364,7 @@
       "kind": "help",
       "label": "All Locations",
       "blurb": "This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOut",
-      "href": "./master-admin.html?from=floqai#networkDashboard",
+      "href": "./master-admin.html?from=botdee#networkDashboard",
       "phrases": [
         "all locations",
         "this card means you are looking at the whole floqr network not one venue. the network dashboard numbers below cover every location total locations counts live v",
@@ -1346,7 +1395,7 @@
       "kind": "help",
       "label": "Master Admin security and action status",
       "blurb": "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status bann",
-      "href": "./master-admin.html?from=floqai",
+      "href": "./master-admin.html?from=botdee",
       "phrases": [
         "master admin security and action status",
         "privileged master admin panels entity management and similar stay locked until privilege admin access sos2fa succeeds. after unlock security status shows whethe",
@@ -1370,7 +1419,7 @@
       "kind": "help",
       "label": "Retention",
       "blurb": "Master Admin → ShoutOut Mgmt → Retention. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Completed Log default search window is 60 days (expand dates for older retained rows). No forever media archive for compliance",
-      "href": "./master-admin.html?from=floqai#shoutoutRetention",
+      "href": "./master-admin.html?from=botdee#shoutoutRetention",
       "phrases": [
         "retention",
         "master admin shoutout mgmt retention. audit metadata keep 7 years then anonymize do not delete at 60 days. media delete 90 days after completion. completed log ",
@@ -1427,7 +1476,7 @@
       "kind": "help",
       "label": "Delete multiple scheduled or draft shifts",
       "blurb": "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
-      "href": "./admin.html?from=floqai&tab=scheduling",
+      "href": "./admin.html?from=botdee&tab=scheduling",
       "phrases": [
         "delete multiple scheduled or draft shifts",
         "select shifts mix day headers and chips then delete selected. example all wednesday drafts plus one thursday confirmed shift.",
@@ -1451,7 +1500,7 @@
       "kind": "help",
       "label": "Profile & Settings",
       "blurb": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options.",
-      "href": "./patron-portal.html?from=floqai",
+      "href": "./patron-portal.html?from=botdee",
       "phrases": [
         "profile settings",
         "manage your profile my privacy ai notifications shoutout templates public media shoutouts guest lists floqr inbox and mingl. open profile settings for roles sel",
@@ -1473,7 +1522,7 @@
       "kind": "help",
       "label": "Network Promoter Data",
       "blurb": "Master Admin → Promoters shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub Temp Promoter N Collective cards), and promoter onboarding records. Empty referrals does not mean there are no club promoters.",
-      "href": "./master-admin.html?from=floqai",
+      "href": "./master-admin.html?from=botdee",
       "phrases": [
         "network promoter data",
         "master admin promoters shows guest-list referral volume by promoter club public profile promotion groups including qa temp-democlub temp promoter n collective c",
@@ -1492,7 +1541,7 @@
       "kind": "help",
       "label": "Onboarding",
       "blurb": "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues.",
-      "href": "./role-request.html?from=floqai",
+      "href": "./role-request.html?from=botdee",
       "phrases": [
         "onboarding",
         "patron / service-member onboarding request club admin dj promoter or hospitality access. master admins can also onboard venues.",
@@ -1514,7 +1563,7 @@
       "kind": "help",
       "label": "Public Media and Data Sharing",
       "blurb": "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.",
-      "href": "./patron-portal.html?from=floqai&tab=public-profile",
+      "href": "./patron-portal.html?from=botdee&tab=public-profile",
       "phrases": [
         "public media and data sharing",
         "choose several images or short videos at once then arrange their public-profile order. profiles support up to 8 images and 2 short videos.",
@@ -1535,7 +1584,7 @@
       "kind": "help",
       "label": "Role profiles overview",
       "blurb": "See how Club Admin, DJ, Promoter, and hospitality roles work.",
-      "href": "./role-profiles.html?from=floqai",
+      "href": "./role-profiles.html?from=botdee",
       "phrases": [
         "role profiles overview",
         "see how club admin dj promoter and hospitality roles work.",
@@ -1551,7 +1600,7 @@
       "kind": "help",
       "label": "Confirm assigned shifts",
       "blurb": "Inbox / Email / SMS links open Work Calendar. Look at each pending assignment, tick it (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve — Club Admin cannot confirm on their behalf.",
-      "href": "./patron-portal.html?from=floqai&tab=work-calendar",
+      "href": "./patron-portal.html?from=botdee&tab=work-calendar",
       "phrases": [
         "confirm assigned shifts",
         "inbox / email / sms links open work calendar. look at each pending assignment tick it or select all then approve selected. opening the link does not confirm. on",
@@ -1574,7 +1623,7 @@
       "kind": "help",
       "label": "Schedule message templates",
       "blurb": "Club Admin → Notifications → Message templates. These are System Messages (Inbox / Email / SMS / WhatsApp), not ShoutOuts. Edit title and body for New shift needs confirmation, Schedule update, Shift confirmed, and Shift declined. Placeholders: {club} {role} {when} {link} {worker",
-      "href": "./admin.html?from=floqai&tab=notifications&notify=templates",
+      "href": "./admin.html?from=botdee&tab=notifications&notify=templates",
       "phrases": [
         "schedule message templates",
         "club admin notifications message templates. these are system messages inbox / email / sms / whatsapp not shoutouts. edit title and body for new shift needs conf",
@@ -1598,7 +1647,7 @@
       "kind": "help",
       "label": "Staff Scheduling",
       "blurb": "Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each ",
-      "href": "./scheduling.html?from=floqai",
+      "href": "./scheduling.html?from=botdee",
       "phrases": [
         "staff scheduling",
         "plan shifts and bookings then notify each person by inbox email sms or whatsapp. under schedule for choose whose calendar you are working on my dj schedule is y",
@@ -1641,7 +1690,7 @@
       "kind": "help",
       "label": "Services & Service Members",
       "blurb": "Everyone starts as a FLOQR patron. On My Profile & Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit at the bottom of this page. Profile template guide —",
-      "href": "./patron-portal.html?from=floqai&tab=service-members",
+      "href": "./patron-portal.html?from=botdee&tab=service-members",
       "phrases": [
         "services service members",
         "everyone starts as a floqr patron. on my profile settings tap elect to become a service member to unlock this tab. choose your service role waitress dj promoter",
@@ -1693,7 +1742,7 @@
       "kind": "help",
       "label": "Choose a ShoutOut venue",
       "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates.",
-      "href": "./shoutout-search.html?from=floqai",
+      "href": "./shoutout-search.html?from=botdee",
       "phrases": [
         "choose a shoutout venue",
         "search or choose a floqr club for your shoutout. the first four are nearest gps . cards show led display sizes supported and whether patrons can create custom s",
@@ -1714,7 +1763,7 @@
       "kind": "help",
       "label": "ShoutOut Recommendations",
       "blurb": "Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages.",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "shoutout recommendations",
         "pick a style and an event type then tap improve my shoutout for ideas that fit your template and display size. tap any idea to put it in your message then edit ",
@@ -1755,7 +1804,7 @@
       "kind": "help",
       "label": "Privilege Admin Access",
       "blurb": "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
-      "href": "./patron-portal.html?from=floqai&tab=privacy",
+      "href": "./patron-portal.html?from=botdee&tab=privacy",
       "phrases": [
         "privilege admin access",
         "entity management is protected by social os - 2fa sos2fa . request sos2fa code sends a one-time code using your floqr notification channels email and/or sms. en",
@@ -1778,7 +1827,7 @@
       "kind": "help",
       "label": "Request SOS2FA Code",
       "blurb": "Request is sent using your general Notifications settings",
-      "href": "./patron-portal.html?from=floqai&tab=privacy",
+      "href": "./patron-portal.html?from=botdee&tab=privacy",
       "phrases": [
         "request sos2fa code",
         "request is sent using your general notifications settings",
@@ -1800,7 +1849,7 @@
       "kind": "help",
       "label": "Staff marketing consent",
       "blurb": "When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, Y",
-      "href": "./patron-portal.html?from=floqai&tab=service-members",
+      "href": "./patron-portal.html?from=botdee&tab=service-members",
       "phrases": [
         "staff marketing consent",
         "when you join a venue or event team you must tick the marketing consent box. it lets that venue or event organizer and its admins and managers use your floqr na",
@@ -1822,7 +1871,7 @@
       "kind": "help",
       "label": "Staff Scheduling User Guide",
       "blurb": "Open the ? beside Scheduler on Club Admin Scheduling. Create draft shifts, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip.",
-      "href": "./admin.html?from=floqai&tab=scheduling",
+      "href": "./admin.html?from=botdee&tab=scheduling",
       "phrases": [
         "staff scheduling user guide",
         "open the beside scheduler on club admin scheduling. create draft shifts publish schedule so workers confirm pending confirmed then select shifts to delete sever",
@@ -1847,7 +1896,7 @@
       "kind": "help",
       "label": "Calendar & Scheduler",
       "blurb": "Club Admin Calendar shows Draft (purple), Pending (amber), Confirmed (green), and Open/unfilled cards — each with a written status, not color alone. Scheduler is the people × days draft/publish grid. Website ingest / publicVenueCalendar returns Confirmed assignments only. A green",
-      "href": "./scheduling.html?from=floqai",
+      "href": "./scheduling.html?from=botdee",
       "phrases": [
         "calendar scheduler",
         "club admin calendar shows draft purple pending amber confirmed green and open/unfilled cards each with a written status not color alone. scheduler is the people",
@@ -1881,7 +1930,7 @@
       "kind": "help",
       "label": "Scheduler",
       "blurb": "Club Admin Scheduler is a people × days week grid. Save shift closes the editor with Schedule card successfully saved. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club",
-      "href": "./admin.html?from=floqai&tab=scheduling",
+      "href": "./admin.html?from=botdee&tab=scheduling",
       "phrases": [
         "scheduler",
         "club admin scheduler is a people days week grid. save shift closes the editor with schedule card successfully saved. create drafts publish schedule so workers c",
@@ -1915,7 +1964,7 @@
       "kind": "help",
       "label": "Work Sheet - Weekly Staff Calendar",
       "blurb": "Elected service members open Work Calendar in Settings. Inbox / Email / SMS confirmation links land here. Review pending assignments, tick each shift (or Select all), then Approve selected — opening the message does not confirm. The week grid shows published colleague shifts. Dra",
-      "href": "./patron-portal.html?from=floqai&tab=work-calendar",
+      "href": "./patron-portal.html?from=botdee&tab=work-calendar",
       "phrases": [
         "work sheet - weekly staff calendar",
         "elected service members open work calendar in settings. inbox / email / sms confirmation links land here. review pending assignments tick each shift or select a",
@@ -1940,7 +1989,7 @@
       "kind": "help",
       "label": "Template catalog report",
       "blurb": "Lists every ShoutOut template type and which LED sizes it supports (Is96x48, Is64x48, Is64x32). A venue only offers a template when at least one of those flags is 1 and the matching VenueSupports* flag is 1. Birthday / split-media templates are 1 on 96×48, 64×48, and 64×32. 96×48",
-      "href": "./admin.html?from=floqai&tab=reports",
+      "href": "./admin.html?from=botdee&tab=reports",
       "phrases": [
         "template catalog report",
         "lists every shoutout template type and which led sizes it supports is96x48 is64x48 is64x32 . a venue only offers a template when at least one of those flags is ",
@@ -1982,7 +2031,7 @@
       "kind": "help",
       "label": "Template tags",
       "blurb": "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",
-      "href": "./admin.html?from=floqai",
+      "href": "./admin.html?from=botdee",
       "phrases": [
         "template tags",
         "add words patrons might type when they look for a template at your venue such as game night or birthday. template managers can add tags. template administrators",
@@ -2028,7 +2077,7 @@
       "kind": "help",
       "label": "Translation Overrides",
       "blurb": "Master Admin → Translation Overrides. Choose German or Arabic, search a UI string key, edit the wording, then Save language. Patrons see the fix on the next page load — overrides win over the packaged translation. German and Arabic ship first. FLOQR does not pick language from IP",
-      "href": "./master-admin.html?from=floqai#translationOverrides",
+      "href": "./master-admin.html?from=botdee#translationOverrides",
       "phrases": [
         "translation overrides",
         "master admin translation overrides. choose german or arabic search a ui string key edit the wording then save language. patrons see the fix on the next page loa",
@@ -2051,7 +2100,7 @@
       "kind": "help",
       "label": "Trending ShoutOuts",
       "blurb": "Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it.",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "trending shoutouts",
         "popular shoutouts approved by floqr with picks that suit this venue s music first. tap one to use it.",
@@ -2068,7 +2117,7 @@
       "kind": "help",
       "label": "Compliance Logs",
       "blurb": "Master Admin → Twilio / SendGrid Mgmt → Compliance Logs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in th",
-      "href": "./master-admin.html?from=floqai#twilioComplianceLogs",
+      "href": "./master-admin.html?from=botdee#twilioComplianceLogs",
       "phrases": [
         "compliance logs",
         "master admin twilio / sendgrid mgmt compliance logs lists security-relevant twilio outcomes dry-run auth failure blocked or filtered for grc review. same soc 2 ",
@@ -2085,7 +2134,7 @@
       "kind": "help",
       "label": "SMS Logs",
       "blurb": "Master Admin → Twilio / SendGrid Mgmt → SMS Logs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → Compliance Logs. SendGrid email",
-      "href": "./master-admin.html?from=floqai#twilioSmsLogs",
+      "href": "./master-admin.html?from=botdee#twilioSmsLogs",
       "phrases": [
         "sms logs",
         "master admin twilio / sendgrid mgmt sms logs shows outbound sms for the network. club admin advertising messaging logs shows the same rows for that venue only. ",
@@ -2107,7 +2156,7 @@
       "kind": "help",
       "label": "AI crawl venue datapoints",
       "blurb": "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Crawls also check venue website footers and contact pages for social handles. Each card shows",
-      "href": "./master-admin.html?from=floqai",
+      "href": "./master-admin.html?from=botdee",
       "phrases": [
         "ai crawl venue datapoints",
         "on master admin ai crawling floqr searches public pages and google places then shows review cards with name genre djs promoters address phone email instagram ho",
@@ -2130,7 +2179,7 @@
       "kind": "help",
       "label": "Venue opening hours",
       "blurb": "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. The public club page shows a Sun–Sat week grid with the date range (e.g. Sun 9 – Sat 15, Aug 2026) and calendar coloring. Upcoming public holi",
-      "href": "./admin.html?from=floqai&tab=publicProfile",
+      "href": "./admin.html?from=botdee&tab=publicProfile",
       "phrases": [
         "venue opening hours",
         "on club public profile set the default weekly open/closed hours then add period overrides for special weeks without losing the default. the public club page sho",
@@ -2152,7 +2201,7 @@
       "kind": "help",
       "label": "Venue Links",
       "blurb": "Venue Admin Portal URLs are generated when you search. Page links never carry a version number, so a saved or shared link always opens the current FLOQR release, and an old bookmark that still has ?v= in it just ignores it. Display board URLs stay location-only.",
-      "href": "./master-admin.html?from=floqai",
+      "href": "./master-admin.html?from=botdee",
       "phrases": [
         "venue links",
         "venue admin portal urls are generated when you search. page links never carry a version number so a saved or shared link always opens the current floqr release ",
@@ -2171,7 +2220,7 @@
       "kind": "help",
       "label": "Venue onboarding (Master Admin)",
       "blurb": "Master Admin venue onboarding — push crawled club profiles into Firestore.",
-      "href": "./onboard-dc-venues.html?from=floqai",
+      "href": "./onboard-dc-venues.html?from=botdee",
       "phrases": [
         "venue onboarding master admin",
         "master admin venue onboarding push crawled club profiles into firestore.",
@@ -2190,7 +2239,7 @@
       "kind": "help",
       "label": "Club website ingest (API, RSS, iframe)",
       "blurb": "Club Admin → Scheduling → Website ingest. Generate a secret (shown once; only a hash is stored). Pull published staff shifts onto the official club website with JSON (?format=json&dataset=schedule|hours|profile|all), RSS, or an iframe snippet. Drafts, worker email, and phone are ",
-      "href": "./admin.html?from=floqai&tab=scheduling#schedWebsiteIngest",
+      "href": "./admin.html?from=botdee&tab=scheduling#schedWebsiteIngest",
       "phrases": [
         "club website ingest api rss iframe",
         "club admin scheduling website ingest. generate a secret shown once only a hash is stored . pull published staff shifts onto the official club website with json ",
@@ -2213,7 +2262,7 @@
       "kind": "help",
       "label": "Book a VIP table (VIP reserV)",
       "blurb": "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open",
-      "href": "./vip.html?from=floqai",
+      "href": "./vip.html?from=botdee",
       "phrases": [
         "book a vip table vip reserv",
         "search a vip reserv club pick a night on the floor map hold a table accept terms and pay the deposit when the club requires one. open vip reserv from search whe",
@@ -2247,7 +2296,7 @@
       "kind": "help",
       "label": "Choose a VIP reserV venue",
       "blurb": "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker.",
-      "href": "./vip.html?from=floqai",
+      "href": "./vip.html?from=botdee",
       "phrases": [
         "choose a vip reserv venue",
         "only clubs subscribed to vip reserv appear here. the first four are nearest gps . cards show open days minimum deposit dress code and age. search by name city o",
@@ -2270,7 +2319,7 @@
       "kind": "help",
       "label": "Club Admin VIP reserV management",
       "blurb": "Club Admin → Feature Mgmt → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Feature Mgmt also holds ShoutOut (Queue / Display / Template Mgmt) and floqCast. Firestore isBooked controls map booked status — set to 1 on",
-      "href": "./admin.html?from=floqai&tab=panelVipReserv",
+      "href": "./admin.html?from=botdee&tab=panelVipReserv",
       "phrases": [
         "club admin vip reserv management",
         "club admin feature mgmt vip reserv manages tonight s reservations check in no-show cancel block/unblock sections and walk-in book. feature mgmt also holds shout",
@@ -2297,7 +2346,7 @@
       "kind": "help",
       "label": "VIP reserV deposit before booked",
       "blurb": "Clubs set Require deposit before table is marked booked in Club Admin → VIP reserV. When required, holding a table only shows amber; the floor map turns red (booked/unavailable) after FloqR Stripe deposit payment — or after Club Admin records payment on a walk-in. If deposit is n",
-      "href": "./admin.html?from=floqai&tab=panelVipReserv",
+      "href": "./admin.html?from=botdee&tab=panelVipReserv",
       "phrases": [
         "vip reserv deposit before booked",
         "clubs set require deposit before table is marked booked in club admin vip reserv. when required holding a table only shows amber the floor map turns red booked/",
@@ -2317,7 +2366,7 @@
       "kind": "help",
       "label": "VIP reserV door check-in",
       "blurb": "VIP Managers open VIP reserV Door for tonight’s list. Scan or paste a pass token, confirm ID 21+, then check in. Mark no-show only after grace. Opening a notify link never changes reservation status. Club Admin → Feature Mgmt → Passes issues guest/promoter QR passes, lists tonigh",
-      "href": "./vip-door.html?from=floqai",
+      "href": "./vip-door.html?from=botdee",
       "phrases": [
         "vip reserv door check-in",
         "vip managers open vip reserv door for tonight s list. scan or paste a pass token confirm id 21 then check in. mark no-show only after grace. opening a notify li",
@@ -2340,7 +2389,7 @@
       "kind": "help",
       "label": "VIP reserV door pass",
       "blurb": "After your deposit confirms, open My Profile → Guest List & reserV (or ?tab=passes) and tap Show pass for a one-time QR. Open full pass opens pass.html. Bring ID 21+. Door staff use VIP reserV Door to check you in.",
-      "href": "./patron-portal.html?from=floqai&tab=passes",
+      "href": "./patron-portal.html?from=botdee&tab=passes",
       "phrases": [
         "vip reserv door pass",
         "after your deposit confirms open my profile guest list reserv or tab passes and tap show pass for a one-time qr. open full pass opens pass.html. bring id 21 . d",
@@ -2362,7 +2411,7 @@
       "kind": "help",
       "label": "VIP reserV floor map",
       "blurb": "Green = available, amber = held (30 min), red = booked (only after deposit paid when required — or after confirm when the club does not require a deposit), grey = not bookable / blocked, blue = DJ booth. On phones the map opens on one area with chips to jump; pinch and pan; targe",
-      "href": "./vip.html?from=floqai",
+      "href": "./vip.html?from=botdee",
       "phrases": [
         "vip reserv floor map",
         "green available amber held 30 min red booked only after deposit paid when required or after confirm when the club does not require a deposit grey not bookable /",
@@ -2383,7 +2432,7 @@
       "kind": "help",
       "label": "Set FloqMedia Stripe for Aurelia (Demo Club)",
       "blurb": "Aurelia (temp-democlub-1) uses FloqMedia Stripe (FloqR Checkout) as the default VIP deposit collector — patrons pay on FloqR’s platform Stripe, then the table marks booked. Master Admin steps: 1) Open Master Admin → Features Mgmt → VIP reserV Payments. 2) Confirm VIP Reservations",
-      "href": "./admin.html?from=floqai&location=temp-democlub-1&tab=panelVipReserv",
+      "href": "./admin.html?from=botdee&location=temp-democlub-1&tab=panelVipReserv",
       "phrases": [
         "set floqmedia stripe for aurelia demo club",
         "aurelia temp-democlub-1 uses floqmedia stripe floqr checkout as the default vip deposit collector patrons pay on floqr s platform stripe then the table marks bo",
@@ -2409,7 +2458,7 @@
       "kind": "help",
       "label": "VIP reserV payment collector & Club POS",
       "blurb": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to Floq",
-      "href": "./admin.html?from=floqai&location=temp-democlub-1&tab=panelVipReserv",
+      "href": "./admin.html?from=botdee&location=temp-democlub-1&tab=panelVipReserv",
       "phrases": [
         "vip reserv payment collector club pos",
         "preferred for live clubs with toast/spoton club pos floqr books holds and maps the table the pos owns deposit open tab and spend. alternatives club stripe venue",
@@ -2452,7 +2501,7 @@
       "kind": "help",
       "label": "VIP table isBooked status in Firestore",
       "blurb": "Every VIP-onboarded club keeps one Firestore doc per table number for each night: clubLocations/{locationId}/vipNights/{YYYY-MM-DD}/tables/{tableNumber}. Doc id is the printed table number (e.g. T1, B3). getVipAvailability treats isBooked as the booking-status control for the flo",
-      "href": "./admin.html?from=floqai&location=temp-democlub-1&tab=panelVipReserv",
+      "href": "./admin.html?from=botdee&location=temp-democlub-1&tab=panelVipReserv",
       "phrases": [
         "vip table isbooked status in firestore",
         "every vip-onboarded club keeps one firestore doc per table number for each night clublocations/ locationid /vipnights/ yyyy-mm-dd /tables/ tablenumber . doc id ",
@@ -2477,7 +2526,7 @@
       "kind": "help",
       "label": "VIP reserV Terms & consent",
       "blurb": "After you hold a table, VIP reserV opens a separate Terms page with the full venue Terms text. Accept once (covers refund, no-show, age 21+, and minimum spend). Optional marketing is separate. Consent is stored with the Terms version hash before FloqR Stripe Checkout — then recei",
-      "href": "./vip.html?from=floqai",
+      "href": "./vip.html?from=botdee",
       "phrases": [
         "vip reserv terms consent",
         "after you hold a table vip reserv opens a separate terms page with the full venue terms text. accept once covers refund no-show age 21 and minimum spend . optio",
@@ -2498,7 +2547,7 @@
       "kind": "help",
       "label": "Welcome to FLOQR",
       "blurb": "Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works on",
-      "href": "./?start=search&from=floqai",
+      "href": "./?start=search&from=botdee",
       "phrases": [
         "welcome to floqr",
         "sign in with google microsoft facebook or a one time password otp . an otp is a short code floqr sends to your email by sms us and canadian numbers only or to w",
@@ -2535,6 +2584,23 @@
       ]
     },
     {
+      "sourceId": "intent:ballers-alert",
+      "id": "ballers-alert",
+      "kind": "product",
+      "label": "Baller's Alert",
+      "blurb": "$100 Baller's Express card with your face in the upper-left medallion. Face photo required; Valid Thru year 50.",
+      "href": "./?start=search",
+      "phrases": [
+        "baller s alert",
+        "100 baller s express card with your face in the upper-left medallion. face photo required valid thru year 50.",
+        "ballers alert",
+        "baller alert",
+        "face card",
+        "black card photo",
+        "ballers-alert"
+      ]
+    },
+    {
       "sourceId": "intent:bartr",
       "id": "bartr",
       "kind": "product",
@@ -2545,6 +2611,23 @@
         "trade by bartr",
         "marketplace barter and swag.",
         "bartr"
+      ]
+    },
+    {
+      "sourceId": "intent:black-card",
+      "id": "black-card",
+      "kind": "product",
+      "label": "Black Card",
+      "blurb": "$75 Baller's Express BUSINESS metal card — your name and company embossed on every LED size.",
+      "href": "./?start=search",
+      "phrases": [
+        "black card",
+        "75 baller s express business metal card your name and company embossed on every led size.",
+        "ballers express",
+        "baller s express",
+        "metal card",
+        "business card shoutout",
+        "black-card"
       ]
     },
     {
@@ -2599,7 +2682,7 @@
       "kind": "product",
       "label": "floqCast — go live / be a superstar",
       "blurb": "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the floqCast board.",
-      "href": "./floqcast-search.html?from=floqai",
+      "href": "./floqcast-search.html?from=botdee",
       "phrases": [
         "floqcast go live / be a superstar",
         "pick a venue privately preview your camera pay 20 get club admin approval then go live on the floqcast board.",
@@ -2834,8 +2917,10 @@
         "what can bot dee help with",
         "say what you want in plain words products mingl rydr bartr shoutout goals like i want to be a club admin or help-popout phrases like onboarding.",
         "ask floqr",
-        "floqai help",
+        "bot dee help",
         "help popout",
+        "what can bot dee",
+        "floqai help",
         "what can floqai",
         "help-general"
       ]
@@ -3432,7 +3517,7 @@
       "kind": "product",
       "label": "VIP reserV — book a VIP table",
       "blurb": "Explore a club floor map and reserve a VIP table. Beta: Decades, Lima Twist Club, Aurelia.",
-      "href": "./vip.html?from=floqai",
+      "href": "./vip.html?from=botdee",
       "phrases": [
         "vip reserv book a vip table",
         "explore a club floor map and reserve a vip table. beta decades lima twist club aurelia.",

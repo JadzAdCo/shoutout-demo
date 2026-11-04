@@ -72,7 +72,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: Rename floqai.html → botdee.html; FloqAi→BOT DEE help/labels (technical floqAi ids kept).`,
+      `- ${NEXT}: Rename botdee.html → botdee.html; BOT DEE→BOT DEE help/labels (technical floqAi ids kept).`,
       `- s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).`,
       `- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).`
     ].join(eol);

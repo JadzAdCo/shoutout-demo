@@ -1361,6 +1361,16 @@ function safeEnhancementPrompt(prompt = "", enhancementType = "") {
       `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
     ].join("\n");
   }
+  if (type === "baller-face-medallion") {
+    return [
+      "Crop and center the subject's face for a circular metal credit-card medallion on a nightlife LED display.",
+      "Preserve the person's recognizable face and natural identity exactly — no beauty filters, no age change, no identity swap.",
+      "Tight head-and-shoulders framing, high contrast, soft studio lighting, dark metallic background.",
+      "Do not add text, logos, watermarks, card numbers, brand marks, or American Express / Baller's Express branding.",
+      "Return a single still portrait suitable for a round clip (~1/3 of the upper half of a business metal card).",
+      `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
+    ].join("\n");
+  }
   const requested = String(prompt || enhancementType || "Improve this ShoutOut media for a nightlife LED display.").slice(0, 600);
   return [
     "Edit only the uploaded ShoutOut media image. Do not add text, logos, watermarks, QR codes, or HTML/CSS/JavaScript.",
@@ -2571,7 +2581,7 @@ function defaultFloqrPreviewLinks(v = "s3.0.102") {
     ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
     ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
-    ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+    ["Search / BOT DEE", `${base}/?v=${v}&start=intent`],
     ["Aurelia display board", `${base}/display.html?location=temp-democlub-1`]
   ];
 }

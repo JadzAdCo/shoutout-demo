@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* One-off s3.1.20 → s3.1.21 stamp bump (data classification, System tier, FloqAi enforcement, staff marketing consent). */
+/* One-off s3.1.20 → s3.1.21 stamp bump (data classification, System tier, BOT DEE enforcement, staff marketing consent). */
 "use strict";
 
 const fs = require("fs");
@@ -11,7 +11,7 @@ const edit = (file, fn) => fs.writeFileSync(at(file), fn(fs.readFileSync(at(file
 const FEATURE_STAMP = "floqr-feature-services.js?v=s3.1.20";
 
 const versioned = [
-  "club-embed.html", "club-profile.html", "display.html", "admin.html", "display2.html", "floqai.html", "floqai-search.html",
+  "club-embed.html", "club-profile.html", "display.html", "admin.html", "display2.html", "botdee.html", "botdee-search.html",
   "floqr-nav.js", "guest-list.html", "index.html", "master-admin.html", "patron-portal.html", "role-request.html", "template-tags.html"
 ];
 for (const file of versioned) {
@@ -36,12 +36,12 @@ edit("ai-diagnostics-service.js", src => {
   const entry = [
     "    {",
     "      version: \"s3.1.21-data-classification\",",
-    "      title: \"Data classification register with a Master Admin Security tab, server-only System tier, FloqAi results filtered by classification on the server, and staff marketing media consent\",",
+    "      title: \"Data classification register with a Master Admin Security tab, server-only System tier, BOT DEE results filtered by classification on the server, and staff marketing media consent\",",
     "      checks: [",
     "        {label:\"Classification core\", file:\"floqr-data-classification.js\", includes:[\"function filterContent(\", \"SYSTEM_JOBS\"]},",
     "        {label:\"Security tab\", file:\"master-admin.html\", includes:[\"id=\\\"dataClassification\\\"\"]},",
-    "        {label:\"FloqAi access gate\", file:\"floqai-access.js\", includes:[\"getFloqAiAccess\"]},",
-    "        {label:\"FloqAi classified intents\", file:\"intent-search.js\", includes:[\"INTENT_AUDIENCES\"]},",
+    "        {label:\"BOT DEE access gate\", file:\"botdee-access.js\", includes:[\"getBotDeeAccess\"]},",
+    "        {label:\"BOT DEE classified intents\", file:\"intent-search.js\", includes:[\"INTENT_AUDIENCES\"]},",
     "        {label:\"Preview links package\", file:\"ai-diagnostics-service.js\", includes:[\"PREVIEW_LINKS_PACKAGE = \\\"s3.1.21\\\"\"]}",
     "      ]",
     "    },",
@@ -58,13 +58,13 @@ edit("functions/package.json", src => {
   return src.replace(`"version": "3.1.20"`, `"version": "3.1.21"`);
 });
 
-edit("functions/floqai-page.test.js", src => src.split("floqai\\.html\\?v=s3\\.1\\.20").join("floqai\\.html\\?v=s3\\.1\\.\\d+"));
+edit("functions/botdee-page.test.js", src => src.split("floqai\\.html\\?v=s3\\.1\\.20").join("floqai\\.html\\?v=s3\\.1\\.\\d+"));
 
 edit("README.md", src => {
   const head = "# CURRENT PACKAGE: FLOQR ShoutOut s3.1.20 (stable)";
   if (!src.includes(head)) throw new Error("README head");
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = "- s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. FloqAi now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.";
+  const note = "- s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. BOT DEE now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.";
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut s3.1.21 (stable)${eol}${eol}${note}`);
 });
 

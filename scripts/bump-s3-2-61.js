@@ -73,7 +73,7 @@ function run(root) {
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
       `- ${NEXT}: Live Site chrome resync (no manual refresh) + profile card closes on nav / empty-box guard.`,
-      `- s3.2.60: Patron verbiage is BOT DEE (not FloqAi); FloqCast CTA “Go live, start a cast”.`
+      `- s3.2.60: Patron verbiage is BOT DEE (not BOT DEE); FloqCast CTA “Go live, start a cast”.`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
   });

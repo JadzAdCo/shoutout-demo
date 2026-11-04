@@ -117,4 +117,4 @@ A booking stores `partySize ≤ maxCapacity`, `extraGuests = max(0, partySize �
 - Do not invent prices or capacities. Use placeholders and ask.
 - Do not publish without club review and a Master Admin load.
 - Do not use patron photos with identifiable faces, or copy photos from venue websites without the club's rights.
-- Do not put this procedure into FloqAi help bodies. Help gets the short Master Admin topic only (proposal §15, `help-vip-floorplan-ingest`).
+- Do not put this procedure into BOT DEE help bodies. Help gets the short Master Admin topic only (proposal §15, `help-vip-floorplan-ingest`).

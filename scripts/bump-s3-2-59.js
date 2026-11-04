@@ -72,7 +72,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: FloqAi chat brand (replaces BOT DEE UI copy); FloqCast CTA “Go live, start a cast”.`,
+      `- ${NEXT}: BOT DEE chat brand (replaces BOT DEE UI copy); FloqCast CTA “Go live, start a cast”.`,
       `- s3.2.58: Black & Dark Green Search icons use Settings tings green #5ac783; Search icon order live on main.`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);

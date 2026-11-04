@@ -65,7 +65,7 @@ test("scheduling.html: Assign to picker replaces the Assignee uid box; scripts l
   const html = read("scheduling.html");
   assert.doesNotMatch(html, /portalAssigneeUid|Assignee uid|portalAssigneeName/);
   assert.match(html, /<select id="portalAssignee"><\/select>/);
-  const order = ["floqr-i18n.js", "floqr-nav.js", "floqai-help-repository.js", "scheduling-owner-picker.js", "scheduling-assignee-picker.js", "scheduling-portal.js"]
+  const order = ["floqr-i18n.js", "floqr-nav.js", "botdee-help-repository.js", "scheduling-owner-picker.js", "scheduling-assignee-picker.js", "scheduling-portal.js"]
     .map(file => html.indexOf(`./${file}?v=`));
   order.forEach(index => assert.ok(index > 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order, "script order");

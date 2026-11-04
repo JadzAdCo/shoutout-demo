@@ -1,6 +1,6 @@
 {
   "help": {
-    "floqai-ask-floqr": [
+    "botdee-ask-floqr": [
       "venueAdmin"
     ],
     "help-ad-campaign-mgmt": [
@@ -21,6 +21,9 @@
     "help-archived-shoutouts": [
       "patron"
     ],
+    "help-ballers-alert": [
+      "patron"
+    ],
     "help-become-club-admin": [
       "venueAdmin"
     ],
@@ -36,8 +39,23 @@
     "help-beta-tester": [
       "patron"
     ],
+    "help-black-card": [
+      "patron"
+    ],
     "help-bot-dee-mgmt": [
       "masterAdmin"
+    ],
+    "help-botdee-audience-sections": [
+      "masterAdmin"
+    ],
+    "help-botdee-page": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-template-search": [
+      "patron"
     ],
     "help-chrome-audit": [
       "masterAdmin"
@@ -113,18 +131,6 @@
     ],
     "help-features-services": [
       "masterAdmin"
-    ],
-    "help-floqai-audience-sections": [
-      "masterAdmin"
-    ],
-    "help-floqai-page": [
-      "masterAdmin",
-      "patron",
-      "serviceMember",
-      "venueAdmin"
-    ],
-    "help-floqai-template-search": [
-      "patron"
     ],
     "help-floqcast": [
       "patron"
@@ -367,7 +373,13 @@
     "ad-campaigns": [
       "patron"
     ],
+    "ballers-alert": [
+      "patron"
+    ],
     "bartr": [
+      "patron"
+    ],
+    "black-card": [
       "patron"
     ],
     "classic-halloween": [

@@ -15,7 +15,7 @@
     {key: "bartr", label: "Trade by BartR", patronGate: "bartr", buttonIds: ["bartrBtnCard", "confirmGoBartrBtn"], route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "floqAi", label: "BOT DEE", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
+    {key: "botDee", label: "BOT DEE", patronGate: "botDee", buttonIds: ["intentSearchBtnCard"], route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
     {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "passes", label: "Passes", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
     // No Search tile — Site chrome toggle lives in My Profile → Appearance.
@@ -23,7 +23,7 @@
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));
-  const FEATURE_KEY_ALIASES = Object.freeze({supRstar: "floqCast", traditionalTheme: "siteChrome"});
+  const FEATURE_KEY_ALIASES = Object.freeze({supRstar: "floqCast", floqAi: "botDee", traditionalTheme: "siteChrome"});
 
   let features = defaults();
   let viewer = {uid: "", isMasterAdmin: false, isBetaTester: false, betaFeatures: {}};
@@ -157,6 +157,7 @@
     const raw = row.features || {};
     const merged = {...raw};
     if (flag(raw.supRstar) === 1 && flag(merged.floqCast) !== 1) merged.floqCast = 1;
+    if (flag(raw.floqAi) === 1 && flag(merged.botDee) !== 1) merged.botDee = 1;
     if (flag(raw.traditionalTheme) === 1 && flag(merged.siteChrome) !== 1) merged.siteChrome = 1;
     return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(merged[key]) === 1).map(key => [key, 1]));
   }
@@ -192,6 +193,8 @@
         if (!row) return;
         // Prefer a real floqCast doc over a legacy featureServices/supRstar row.
         if (doc.id === "supRstar" && next.floqCast && next.floqCast.persisted) return;
+        // Prefer a real botDee doc over a legacy featureServices/floqAi row.
+        if (doc.id === "floqAi" && next.botDee && next.botDee.persisted) return;
         // Prefer siteChrome doc over legacy traditionalTheme alias row.
         if (doc.id === "traditionalTheme" && next.siteChrome && next.siteChrome.persisted) return;
         next[canon] = row;

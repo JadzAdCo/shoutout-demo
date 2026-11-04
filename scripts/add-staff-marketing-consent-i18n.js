@@ -308,10 +308,10 @@ for (const [lang, rows] of Object.entries(T)) {
   console.log(`help packs: ${langs.length}`);
 })();
 
-// 3) English help: FloqAi repository + canonical _help-en.json.
+// 3) English help: BOT DEE repository + canonical _help-en.json.
 (function englishHelp() {
-  let repo = read("floqai-help-repository.js");
-  if (repo.includes(`"${HELP_ID}"`)) throw new Error("help id already in floqai-help-repository.js");
+  let repo = read("botdee-help-repository.js");
+  if (repo.includes(`"${HELP_ID}"`)) throw new Error("help id already in botdee-help-repository.js");
   const eol = eolOf(repo);
   const anchor = /^ {4}\{\r?\n {6}id: "help-featured-staff",/m;
   const m = repo.match(anchor);
@@ -332,7 +332,7 @@ for (const [lang, rows] of Object.entries(T)) {
     "    },"
   ].join(eol) + eol;
   repo = repo.slice(0, m.index) + entry + repo.slice(m.index);
-  write("floqai-help-repository.js", repo);
+  write("botdee-help-repository.js", repo);
 
   let json = read("scripts/_help-en.json");
   if (json.includes(`"${HELP_ID}"`)) throw new Error("help id already in _help-en.json");

@@ -72,7 +72,7 @@ function run(root) {
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
-      `- ${NEXT}: Remove floqai.html / floqai-search.html (404); BOT DEE speech; no FloqAi patron copy.`,
+      `- ${NEXT}: Remove botdee.html / botdee-search.html (404); BOT DEE speech; no BOT DEE patron copy.`,
       `- s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).`,
       `- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).`
     ].join(eol);

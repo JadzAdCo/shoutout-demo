@@ -36,13 +36,13 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 | Layer | Wiring |
 |---|---|
-| Surface | `index.html` `#templateSelectPage` — `#templateSearchForm` / `#templateSearch` + `#templateSearchGo.category-floqai-lens` (always visible) |
+| Surface | `index.html` `#templateSelectPage` — `#templateSearchForm` / `#templateSearch` + `#templateSearchGo.category-botdee-lens` (always visible) |
 | Client | `patron-app.js` — `templateLedPreviewHtml`, `mountTemplateLedPreviews`, `primaryTemplateFormat`; cards Use-only |
 | Preview | `floqr-template-preview.js` `previewUrl` + `sampleFor` stock text/media; `floqr-board-frame.js` mounts native aspect |
 | Format | Venue `primaryDisplayScreenFormatId` (fallback overlapping formats); label on card head with template name |
 | Search scope | Official / club-approved / personal / community via `floqrSearch` + tags/description/popularity ranking |
-| CSS | `styles.css` `.template-select-*`; reuses `floqai-search.css` lens field |
-| Help | `help-default-template`, `help-floqai-template-search` |
+| CSS | `styles.css` `.template-select-*`; reuses `botdee-search.css` lens field |
+| Help | `help-default-template`, `help-botdee-template-search` |
 | Diagnostics | Manual test `s3-2-21-template-select-led-search` |
 
 ---
@@ -78,8 +78,8 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Back | Site-wide compact left-justified pill: `.global-back-btn` / `.floqr-back-btn` + `nav.backShort` (`< Back`) via `applyGlobalBack`. **Never** full-bleed (`width:auto!important`; excluded from mobile `.buttonlike{width:100%}`). Follows Site chrome (WB: white fill + shiny black text + black outline). Click prefers `history.back()` with `resolveBack` href fallback. Headers: Back (left) → centered FloqR mark → page title |
 | White/Black active controls (s3.2.52) | Active tabs/buttons stay **white fill + shiny black text** with thin **Tiffany** border (`--floqr-tiffany` / `#00d4fe` — FloqCAST T / BOT DEE). Never grey/black fill (was `--hot/--accent` both `#111` on `.admin-tab.active`). |
 | Welcome OAuth | `patron-app.js` `signInProvider`: **popup first on every device** (user tap). Never redirect-first on mobile — GitHub Pages ↔ `*.firebaseapp.com` redirect often returns null under ITP (s3.2.35 regression: “full-page sign-in did not finish”). `auth/popup-blocked` → redirect last resort; never redirect on popup-closed. Failed redirect sets `floqr.authPreferPopup` and tells the patron to allow the popup or use Email/SMS OTP. `getRedirectResult` waits briefly for `onAuthStateChanged`. Portal Google (`patron-portal-app.js`) matches: popup first. |
-| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). `.category-floqai-search` is `max-width:720px; margin:0 auto` so the desktop bar centers under the FloqR logo. Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
-| Template BOT DEE | Floating `#floqAiAgent` / speech **off** on `#templateSelectPage` (`floqai-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
+| Search | `#categoryBotDeeInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryBotDeeGo.category-botdee-lens` inside `.category-botdee-field` (no full-width Search button). `.category-botdee-search` is `max-width:720px; margin:0 auto` so the desktop bar centers under the FloqR logo. Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryBotDeeSpeech` (removed) + green `.category-or` removed |
+| Template BOT DEE | Floating `#botDeeAgent` / speech **off** on `#templateSelectPage` (`botdee-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
 | Search icon position | Phone/tablet (`max-width:1180px` + `floqr-mobile-browser` / `floqr-tablet-browser`): `#categoryPage` flex column, `.category-grid:has(.search-icon-row)` `margin-top:auto` so FloqCAST / ShoutOut / reserVIP / BOT DEE sit at the bottom of the viewport (safe-area aware). Wide desktop (`min-width:1181px`): icons stay under Search with centered max-width row — viewport width wins over `floqr-desktop-browser` so iPad “desktop site” still pins |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
@@ -233,7 +233,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | URL contract | Display 1: `display.html?location={id}&k={token}` — **no `?v=`**. Display 2: `display2.html?location={id}&k={token}`. Token lock default ON unless `displayTokenRequired === false`. |
 | Gate logic | **OR:** allowlisted IP unlocks **or** valid `?k=` unlocks. Deny only when every configured gate fails. Reasons include `ip_or_token_ok`, `token_missing`, `token_denied`, `token_not_configured`, `ip_denied`, `restriction_enabled_empty_allowlist`, combined `ip_denied+token_missing`. |
 | Token compare | Access logs + Security System Messages record **last 5** of provided `?k=` vs expected secret, plus redacted `pageUrl` (`k=…xxxxx`). Full secrets never logged. |
-| Help | `help-display-security-setting` in `floqai-help-repository.js` |
+| Help | `help-display-security-setting` in `botdee-help-repository.js` |
 
 **Ops notes**
 
@@ -384,35 +384,35 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 |---|---|
 | UI | Search / BOT DEE (`index.html` intent panel); `botdee.html` collapsible **Quick intent search** |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
-| Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
+| Help seed | `botdee-help-repository.js` (loaded before `intent-search.js`) |
 | Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
 
 ---
 
 ## BOT DEE chat (Phase 1 — `executeBotSession`)
 
-**Purpose:** Headless BOT DEE agent: Auth + `floqAi` feature gate + data classification → Gemini (`@google/genai`) + tools. Tools re-validate product gates and wrap existing VIP / ShoutOut / FloqCAST / checkout runners. Chat never collects card data.
+**Purpose:** Headless BOT DEE agent: Auth + `botDee` feature gate + data classification → Gemini (`@google/genai`) + tools. Tools re-validate product gates and wrap existing VIP / ShoutOut / FloqCAST / checkout runners. Chat never collects card data.
 
 | Layer | Wiring |
 |---|---|
 | UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
-| Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getBOT DEEAccess` still gate intent cards |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat + intent fallback; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) gate intent cards |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession` + `setBotDeeSettings`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
-| Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-floqai-page` + `floqai.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
+| Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
 | Conversation idle (s3.2.70) | Client ends chat after `conversationIdleSeconds` (default **60**) with no message → `chatIdleEnded`; history cleared; next message resumes. Config: Firestore `botDeeSettings/default` (signed-in read; Functions-write). Master Admin → Features Mgmt → **BOT DEE** → Save via callable `setBotDeeSettings` (SOS2FA + reason ≥ 8). Clamp 15–600s. |
 | Data / security | `botDeeSettings/{docId}`: P ops setting (idle seconds, revision, actor email, reason); not patron PII. Rules: signed-in read, write false. Callable re-checks Master Admin + SOS2FA. |
 | Tools | `contextualSearch`; `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates (`functions/bot-dee-tools.js`) |
 | VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
-| Gate | `assertFeatureAccess(..., "floqAi")` on session; packaged seed `floqAi` **Beta** (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
-| Tests | `functions/bot-dee-core.test.js`, `functions/floqai-page.test.js` |
-| Help | `help-floqai-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `floqai.helpComposer` |
+| Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
+| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` |
+| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `botdee.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
-| Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **BOT DEE**) |
-| BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi`; page file is `botdee.html`. `floqai.html` removed (s3.2.75). |
-| BOT DEE welcome (s3.2.65) | `floqai.chatWelcome` = **Hi, I am BOT DEE. How can I help you?** (all langs). |
-| BOT DEE bubble chrome (s3.2.66–67) | Bot replies: CSS speech-origin tip (`.botdee-bubble-tail`) + **robot-head** avatar `images/botdee-chat-avatar.png` (s3.2.67 — not Site-chrome pack JPG). Header mark stays `data-floqr-chrome-icon="floqAi"`. |
+| Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |
+| BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (never FloqAi). Catalog key `botDee` with one-release dual-read from `floqAi`. Page file is `botdee.html`. Legacy `floqai.html` removed (s3.2.75). See `design-notes-botdee-rename.mdc`. |
+| BOT DEE welcome (s3.2.65) | `botdee.chatWelcome` = **Hi, I am BOT DEE. How can I help you?** (all langs). |
+| BOT DEE bubble chrome (s3.2.66–67) | Bot replies: CSS speech-origin tip (`.botdee-bubble-tail`) + **robot-head** avatar `images/botdee-chat-avatar.png` (s3.2.67 — not Site-chrome pack JPG). Header mark stays `data-floqr-chrome-icon="botDee"`. |
 | BOT DEE club names | Tools resolve display names → slugs (`Aurelia` → `temp-democlub-1`) via `resolveClubLocationId` in `bot-dee-tools.js` before Firestore lookup. |
 | BOT DEE Gemini (s3.2.67) | `executeBotSession` toolConfig = `FunctionCallingConfigMode.AUTO` **without** `allowedFunctionNames` (AUTO+names → Gemini 400 → silent `contextualSearch` fallback). Identity prompts (`isIdentityPrompt` / name pronunciation) answer locally. Help `?` panels: `fitHelpPopoutInViewport` in `helper-popouts.js` + `styles.css` `data-help-align`. |
 | FloqCast Go live CTA (s3.2.59) | Venue button + sticky: **Go live, start a cast** (`page.floqcast.goLiveCta` / `floqcast-search.js`). |
@@ -509,9 +509,9 @@ When adding a section, use this skeleton:
 | **Beta invite email handoff (s3.1.61–62)** | Email/private browsers have no Firebase session — landing no longer sticks on Restoring/Checking. `ensureAuth()` initializes Firebase before `auth()`; stashes invite `t` in `FLOQR_BETA_INVITE_TOKEN`; **Sign in to accept this invite** → home OTP with `returnTo` keeping `t`. `createBetaInvite` Inbox `link` is absolute Pages URL. |
 | **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
-| **BOT DEE Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white BOT DEE word beside mark. |
-| **Search icon tiles** | `#categoryPage .search-icon-row` order: **ShoutOut → BOT DEE → VIP reserV → Settings → floqCast** (BOT DEE key `floqAi`). Chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK`. Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
-| **Search BOT DEE box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
+| **BOT DEE Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.botdee-icon-face`, reuses Search `.category-botdee-mark` + `floqr-tiles-transparent.png`, white BOT DEE word beside mark. |
+| **Search icon tiles** | `#categoryPage .search-icon-row` order: **ShoutOut → BOT DEE → VIP reserV → Settings → floqCast** (BOT DEE key `botDee`). Chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK`. Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
+| **Search BOT DEE box (s3.2.18)** | No speech bubble. Input placeholder (`cat.botdeePlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
@@ -602,7 +602,7 @@ When adding a section, use this skeleton:
 
 ## Search category icon row (spots)
 
-Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `floqAi`). Hidden: Mingl / BartR / RydR.
+Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `botDee`). Hidden: Mingl / BartR / RydR.
 
 ## Chrome icon drafts (nightlife / traditional review)
 
@@ -613,12 +613,28 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
 | **FloqCAST** | Image 2 / V4 full mark: `images/chrome/floqcast-nightlife.jpg` (+ traditional / traditional-green). White/Black Search uses `floqcast-whiteblack.png`: **Image-2 geometry** on white (full-width FloqCAST via `place_floqcast_q_kiss`, ring `R=490`, dark ink + Tiffany T + tip halo) — same proportions as Nightlife chrome, WB palette only. Review SVGs: `images/review/floqcast-icon-{nightlife,traditional,whiteblack}.svg`. Search: `data-floqr-chrome-icon="floqCast"` → ICON_PACK (`ICON_V` s3.2.50). Display2 idle: `FLOQCAST_LOGO` → nightlife JPG (no `?v=`). |
-| **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="floqAi"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
+| **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="botDee"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` (mirrors BOT DEE face) |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
+
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.78
+
+Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`.
+
+| Piece | Where |
+|---|---|
+| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) Baller's Express in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, `venueIds:['temp-democlub-1']`, not STANDARD). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'` |
+| **Art** | `images/baller/*-{2x1,4x3}.svg` (+ `-amex-`); builder `scripts/build-baller-card-svgs.js`. Reference photo stays under `reports/baller-cards/` (not shipped to Pages) |
+| **Composer** | `index.html` `#ballerCardFields` (name source + company presets/custom); `patron-app.js` `syncBallerCardFields` / `ballerCardPayloadFields` / face-required gate / optional Gemini `baller-face-medallion`. Hides Amex twins unless Master Admin |
+| **Display** | `display-app.js` baller early path + `backgroundUrlByFormat`; `display.css` `.baller-card` / `.baller-alert` medallion `media-slot` |
+| **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps |
+| **Rules** | `firestore.rules` free-create excludes all four ids |
+| **AI** | `functions/ai-discovery-functions.js` `safeEnhancementPrompt` type `baller-face-medallion` |
+| **Help** | `help-black-card`, `help-ballers-alert`; intents `black-card`, `ballers-alert` |
+| **Tests** | `functions/baller-card-template.test.js` |
 
 ## Classic Halloween (`classicHalloween`) — seasonal ShoutOut template
 
@@ -632,6 +648,6 @@ Live package **s3.2.71**. Resume `@halloween$`.
 | **Display** | `display-app.js` `syncHalloweenFinale` / `stopHalloweenFinale` on `FLOQRFrameLoop.cycle("halloween-finale")` (3 board phases + 1 finale phase × 6 s; no template timer); emoji branch `glyphSlice(cleanDisplayText(...))`. `display.css` `.classic-halloween` + `.halloween-finale` + reduced-motion block. Art `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32) / `-4x3.svg` (64×48) |
 | **Checkout** | `functions/commerce-functions.js` `CLASSIC_HALLOWEEN_PRICE_CENTS = 1500` in `normalizeCheckoutPayload` + `describeOrder` (server price wins); classic board text caps via `CLASSIC_BOARD_TEMPLATE_IDS` |
 | **Rules** | `firestore.rules` `validFreePatronShoutoutCreate` refuses `template == 'classicHalloween'` (no free direct create of the paid template) |
-| **Help** | `help-classic-halloween` (patron) in `floqai-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js` (10 langs); FloqAi intent `classic-halloween` in `intent-search.js`; regenerated `functions/floqai-content-classes.json` + `functions/bot-dee-search-catalog.json` |
+| **Help** | `help-classic-halloween` (patron) in `botdee-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js` (10 langs); BOT DEE intent `classic-halloween` in `intent-search.js`; regenerated `functions/botdee-content-classes.json` + `functions/bot-dee-search-catalog.json` |
 | **Diagnostics** | Manual Feature Test `s3-2-71-classic-halloween`; package install checks `s3.2.71` |
 | **Tests / QA** | `functions/classic-halloween-template.test.js`; visual QA `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/*.png` + `qa-results.json` |

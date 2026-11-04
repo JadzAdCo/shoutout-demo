@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-/* Builds functions/bot-dee-search-catalog.json — searchable FloqAi help + intent rows
+/* Builds functions/bot-dee-search-catalog.json — searchable BOT DEE help + intent rows
    for executeBotSession contextualSearch (filtered server-side by classification).
    Usage: node scripts/build-bot-dee-search-catalog.js [--check] */
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
-const {loadBrowserModules} = require("./build-floqai-content-classes");
+const {loadBrowserModules} = require("./build-botdee-content-classes");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "functions", "bot-dee-search-catalog.json");
