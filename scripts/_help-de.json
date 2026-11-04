@@ -12,8 +12,8 @@
     "body": "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
   },
   "floqai-ask-floqr": {
-    "title": "Fragen Sie FloqR mit FloqAi",
-    "body": "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
+    "title": "Fragen Sie FloqR mit BOT DEE",
+    "body": "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
   },
   "help-soccer-jersey": {
     "title": "Fußballtrikot ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Erstellen und veröffentlichen Sie einen Personalplan",
-    "body": "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Löschen Sie mehrere geplante oder Entwurfsschichten",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Standardvorlage",
-    "body": "Kostenloser traditioneller Schwarz-Weiß-Klassiker. Verwenden Sie FloqAi unten für die Vorlagen „Sport“, „Trikot“, „VIP“, „Humor“, „Autos“, „Video“, „Bilder“ und „Baller“."
+    "body": "Kostenloser traditioneller Schwarz-Weiß-Klassiker. Verwenden Sie BOT DEE unten für die Vorlagen „Sport“, „Trikot“, „VIP“, „Humor“, „Autos“, „Video“, „Bilder“ und „Baller“."
   },
   "help-floqai-template-search": {
-    "title": "FloqAi Vorlagensuche",
-    "body": "Tippen Sie auf die bewegliche FloqAi-Marke (oder warten Sie auf die Sprechblasen) und fragen Sie dann nach „Sport“, „Trikot“, „NBA“, „NFL“, „Autos“, „Humor“, „VIP“, „Video“, „Bilder“ oder „Ballspieler“."
+    "title": "BOT DEE Vorlagensuche",
+    "body": "Tippen Sie auf die bewegliche BOT DEE-Marke (oder warten Sie auf die Sprechblasen) und fragen Sie dann nach „Sport“, „Trikot“, „NBA“, „NFL“, „Autos“, „Humor“, „VIP“, „Video“, „Bilder“ oder „Ballspieler“."
   },
   "help-mingl-requests": {
     "title": "Ungefähr Mingl Anfragen",

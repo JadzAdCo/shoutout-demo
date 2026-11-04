@@ -8,21 +8,24 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 
-test("FloqAi has its own page and every entry point goes there", () => {
+test("BOT DEE page is botdee.html and every entry point goes there", () => {
   const nav = read("floqr-nav.js");
-  assert.match(nav, /intentSearchHome\(\) \{\s*return buildUrl\("\.\/floqai\.html"\);/);
-  assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/floqai\.html"/, "old ?start=intent links redirect");
-  assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*floqai-icon-card[^"]*"[^>]*href="\.\/floqai\.html\?from=search"/);
+  assert.match(nav, /intentSearchHome\(\) \{\s*return buildUrl\("\.\/botdee\.html"\);/);
+  assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/botdee\.html"/, "old ?start=intent links redirect");
+  assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*floqai-icon-card[^"]*"[^>]*href="\.\/botdee\.html\?from=search"/);
   assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?botdee-(?:nightlife|traditional|whiteblack)\.jpg/);
   assert.match(read("styles.css"), /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
-  assert.match(read("floqai-search.html"), /location\.replace\("\.\/floqai\.html/);
-  assert.match(read("floqr-feature-services.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
-  assert.match(read("functions/feature-services-core.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
+  assert.match(read("floqai-search.html"), /location\.replace\("\.\/botdee\.html/);
+  assert.match(read("floqai.html"), /location\.replace\("\.\/botdee\.html/);
+  assert.match(read("floqr-feature-services.js"), /key: "floqAi"[^}]*route: "\.\/botdee\.html"/);
+  assert.match(read("functions/feature-services-core.js"), /key: "floqAi"[^}]*route: "\.\/botdee\.html"/);
+  assert.match(read("floqr-feature-services.js"), /label: "BOT DEE"/);
+  assert.match(read("functions/feature-services-core.js"), /label: "BOT DEE"/);
   assert.match(read("global-profile-status.js"), /intentSearchHome/);
 });
 
-test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", () => {
-  const html = read("floqai.html");
+test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
+  const html = read("botdee.html");
   assert.match(html, /<body class="floqai-standalone botdee-page" data-floqr-feature="floqAi">/, "off/test feature shows the not-available card, no bounce to event search");
   assert.doesNotMatch(html, /data-floqr-public/);
   assert.match(html, /data-floqr-chrome/);
@@ -58,7 +61,7 @@ test("FloqAi page is a guarded satellite with BOT DEE chat + intent fallback", (
   assert.match(read("bot-dee-chat.js"), /Chatbot first/);
   assert.match(read("bot-dee-chat.js"), /Shift\+Enter|shiftKey/);
   assert.match(read("bot-dee-chat.js"), /event\.key !== "Enter"/);
-  assert.match(read("floqai.html"), /Enter sends/);
+  assert.match(read("botdee.html"), /Enter sends/);
   assert.match(read("bot-dee-chat.js"), /botdee-msg-avatar/);
   assert.match(read("bot-dee-chat.js"), /botdee-bubble-tail/);
   assert.match(read("bot-dee-chat.js"), /botdee-chat-avatar\.png/);
@@ -81,8 +84,8 @@ test("floating FloqAi agent is not shown on template select", () => {
   assert.match(search, /const show = !!onIntent;/);
 });
 
-test("FloqAi page chrome is localized", () => {
-  const html = read("floqai.html");
+test("BOT DEE page chrome is localized", () => {
+  const html = read("botdee.html");
   ["page.floqai.title", "floqai.helpIntro", "floqai.helpComposer", "floqai.helpScope", "floqai.prompt", "floqai.hint", "floqai.intentFallback", "floqai.chatSend"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.match(html, /data-i18n-placeholder="floqai\.placeholder"/);
@@ -94,6 +97,8 @@ test("FloqAi page chrome is localized", () => {
   assert.match(helpRepo, /id: "help-floqai-page"/);
   assert.match(helpRepo, /Press Enter to send a message/);
   assert.match(helpRepo, /Shift\+Enter starts a new line/);
+  assert.doesNotMatch(helpRepo, /FloqAi/);
   assert.match(read("floqr-i18n.js"), /"floqai\.chatWelcome"/);
   assert.match(read("floqr-i18n.js"), /"floqai\.helpComposer"/);
+  assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
 });

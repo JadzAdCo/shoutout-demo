@@ -194,7 +194,7 @@
       bartr: "BartR",
       rydr: "RydR",
       floqCast: "floqCast",
-      floqAi: "FloqAi",
+      floqAi: "BOT DEE",
       vipReservations: "VIP",
       siteChrome: "Chrome",
       traditionalTheme: "Chrome"

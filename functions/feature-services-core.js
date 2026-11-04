@@ -10,7 +10,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "bartr", label: "Trade by BartR", patronGate: "bartr", route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "floqCast", label: "floqCast", patronGate: "", route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
+  {key: "floqAi", label: "BOT DEE", patronGate: "floqAi", route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
   {key: "vipReservations", label: "VIP reserV", patronGate: "", route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
   // Live: Club Admin Passes + patron door QR (VIP Show pass still uses vipReservations).
   {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
@@ -67,7 +67,7 @@ const BETA_AGREEMENT_CANONICAL = [
   "Limited License: The Company grants you a personal, non-exclusive, non-transferable, revocable, and limited license to access and test the Beta Product solely for evaluation purposes.",
   "",
   "3. Absolute Confidentiality",
-  "Confidential Information: The Beta Product, its underlying features, design interface (including sub-features like Mingl, RydR, BartR, ShoutOut, floqCast, and FloqAi), performance metrics, screenshots, videos of usage, and any documented bugs are the strictest proprietary secrets of FloqMedia.",
+  "Confidential Information: The Beta Product, its underlying features, design interface (including sub-features like Mingl, RydR, BartR, ShoutOut, floqCast, and BOT DEE), performance metrics, screenshots, videos of usage, and any documented bugs are the strictest proprietary secrets of FloqMedia.",
   "Non-Disclosure: You agree not to disclose, share, publish, tweet, or blog about your experiences or any aspect of the Beta Product to any third party, public forum, or competitor.",
   "Media & Streaming: You are strictly prohibited from sharing screenshots or live-streaming the Beta Product unless explicitly authorized in writing by FloqMedia.",
   "",
@@ -76,7 +76,7 @@ const BETA_AGREEMENT_CANONICAL = [
   "Ownership of Feedback: You agree that all comments, suggestions, ideas, or feedback you provide become the sole and exclusive property of FloqMedia. You assign all rights, titles, and interests in such feedback to the Company without any expectation of compensation or royalties.",
   "",
   "5. Data Collection, AI, & Transaction Terms",
-  "Analytics Usage: You agree that FloqMedia may monitor and collect data regarding your activity within the Beta Product. This data will be used in aggregate analytics to optimize venue insights, AI processing via FloqAi, and advertising performance.",
+  "Analytics Usage: You agree that FloqMedia may monitor and collect data regarding your activity within the Beta Product. This data will be used in aggregate analytics to optimize venue insights, AI processing via BOT DEE, and advertising performance.",
   "Media Uploads: If you test customized marketing display features (such as \"ShoutOut\" media or promotional cards), you represent that you possess all legal permissions and intellectual property rights for any photos, names, or @handles you upload to the application.",
   "Prerelease Transactions & Booking Disclaimer: The Beta Product features live integration modules allowing users to reserve tables, join guest lists, and pay for VIP, Event, or Standard venue entries. You acknowledge that because the application is in a QA testing phase, technical glitches may cause transaction failures, double-bookings, incorrect pricing, or communication failures with local venues. FloqMedia is not responsible or liable for any financial discrepancies, canceled bookings, or denied entries at participating nightlife venues.",
   "Refund Policy: As a beta tester, you accept that reversing payments is difficult during a beta testing phase. Ticket sales, table reservations, VIP entry, and other payments performed on beta features are final and non-refundable by FloqMedia. Any disputes regarding venue bookings, entry denial, or payment errors must be resolved directly with the physical venue or the third-party merchant processor (e.g., Stripe, Papi, or Social OS).",
@@ -193,7 +193,7 @@ function canAccessFeature(feature, viewer = {}) {
 /**
  * Search tile visibility.
  * Live → everyone. Test → Master Admin (QA / Beta pill) OR granted beta tester.
- * Master Admins must see enabled test tiles on Search so floqCast / VIP / FloqAi marks are QA-able.
+ * Master Admins must see enabled test tiles on Search so floqCast / VIP / BOT DEE marks are QA-able.
  */
 function searchTileVisible(feature, viewer = {}) {
   const state = featureState(feature);

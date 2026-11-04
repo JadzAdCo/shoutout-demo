@@ -1,15 +1,15 @@
 ---
-description: FloqAi / BOT DEE page floqai.html — chat via executeBotSession + intent-search fast path; feature-guarded; audience-filtered
+description: BOT DEE page botdee.html (legacy floqai.html redirect) — chat via executeBotSession + intent-search fast path; feature-guarded; audience-filtered
 alwaysApply: false
 ---
 
-# FloqAi / BOT DEE page
+# BOT DEE page (`botdee.html`)
 
 Resume: `@floqai-page$` / `@botdee$`.
 
 ## Product shape (Phase 1)
 
-`floqai.html` is a **chat shell** (BOT DEE) wired to Cloud Function `executeBotSession`, with **Quick intent search** kept as a collapsible fast path / fallback (same `intent-search.js` used in feature searches).
+`botdee.html` is the **BOT DEE** chat shell wired to Cloud Function `executeBotSession`, with **Quick intent search** kept as a collapsible fast path / fallback (same `intent-search.js` used in feature searches). Feature key / chrome icon id stay `floqAi`. Legacy `floqai.html` and `floqai-search.html` redirect here.
 
 | Piece | Role |
 |---|---|
@@ -21,11 +21,11 @@ Resume: `@floqai-page$` / `@botdee$`.
 
 | Entry | Target |
 |---|---|
-| Profile card FloqAi (`FLOQRNav.intentSearchHome()`) | `./floqai.html` |
-| Search tile `#intentSearchBtnCard` | `./floqai.html?from=search` |
-| Feature catalog route | `./floqai.html` |
-| Old `./?start=intent|ask|wish[&q=]` | `location.replace(./floqai.html[?q=])` |
-| `floqai-search.html` | redirect to `floqai.html` |
+| Profile card BOT DEE (`FLOQRNav.intentSearchHome()`) | `./botdee.html` |
+| Search tile `#intentSearchBtnCard` | `./botdee.html?from=search` |
+| Feature catalog route | `./botdee.html` |
+| Old `./?start=intent|ask|wish[&q=]` | `location.replace(./botdee.html[?q=])` |
+| `floqai.html` / `floqai-search.html` | redirect to `botdee.html` |
 
 ## Access
 
@@ -40,6 +40,6 @@ Resume: `@floqai-page$` / `@botdee$`.
 
 ## Owner action
 
-FloqAi stays invisible until Master Admin → Features & Services sets **FloqAi** Live/Test. Deploy Functions for `executeBotSession` + `GEMINI_API_KEY` before chat answers via Gemini (local `contextualSearch` fallback works without Gemini).
+BOT DEE stays invisible until Master Admin → Features & Services sets **floqAi** Live/Test (UI label **BOT DEE**). Deploy Functions for `executeBotSession` + `GEMINI_API_KEY` before chat answers via Gemini (local `contextualSearch` fallback works without Gemini).
 
 Tests: `functions/floqai-page.test.js`, `functions/bot-dee-core.test.js`.

@@ -15,7 +15,7 @@
     {key: "bartr", label: "Trade by BartR", patronGate: "bartr", buttonIds: ["bartrBtnCard", "confirmGoBartrBtn"], route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "rydr", label: "RydR", patronGate: "rydr", buttonIds: ["rydrBtnCard"], route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "floqCast", label: "floqCast", patronGate: "", buttonIds: ["floqcastBtnCard"], route: "./floqcast-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-    {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
+    {key: "floqAi", label: "BOT DEE", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./botdee.html", sortOrder: 60, IsFeatureEnabled: 1, IsTestFeature: 1},
     {key: "vipReservations", label: "VIP reserV", patronGate: "", buttonIds: ["vipReservBtnCard"], route: "./vip.html?from=search", sortOrder: 70, IsFeatureEnabled: 0, IsTestFeature: 1},
     {key: "passes", label: "Passes", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
     // No Search tile — Site chrome toggle lives in My Profile → Appearance.
@@ -134,7 +134,7 @@
   }
 
   /**
-   * The one rule every feature link uses (Search tiles, profile menus, My Profile tabs, FloqAi results).
+   * The one rule every feature link uses (Search tiles, profile menus, My Profile tabs, BOT DEE results).
    * show = enableFeatureLink==1 AND the access rule. beta = shown AND enableBetaFeatureLink==1 (render the Beta pill).
    * surface "search": test features for Master Admins (QA) and granted beta testers.
    * Any other surface: Master Admins also see test features via canAccess.

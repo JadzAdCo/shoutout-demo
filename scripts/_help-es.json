@@ -12,8 +12,8 @@
     "body": "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
   },
   "floqai-ask-floqr": {
-    "title": "Pregunta FloqR con FloqAi",
-    "body": "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
+    "title": "Pregunta FloqR con BOT DEE",
+    "body": "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
   },
   "help-soccer-jersey": {
     "title": "Camiseta de fútbol ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Crear y publicar un horario de personal",
-    "body": "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Eliminar múltiples turnos programados o borradores",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Plantilla predeterminada",
-    "body": "Clásico tradicional en blanco y negro gratuito. Utilice FloqAi a continuación para plantillas de Deportes, Jersey, VIP, Humor, Autos, Vídeo, Imágenes y Jugadores."
+    "body": "Clásico tradicional en blanco y negro gratuito. Utilice BOT DEE a continuación para plantillas de Deportes, Jersey, VIP, Humor, Autos, Vídeo, Imágenes y Jugadores."
   },
   "help-floqai-template-search": {
-    "title": "FloqAi búsqueda de plantillas",
-    "body": "Toque la marca FloqAi en movimiento (o espere a que aparezcan los globos de diálogo) y luego pregunte por Deportes, Jersey, NBA, NFL, Autos, Humor, VIP, Video, Imágenes o Jugadores de béisbol."
+    "title": "BOT DEE búsqueda de plantillas",
+    "body": "Toque la marca BOT DEE en movimiento (o espere a que aparezcan los globos de diálogo) y luego pregunte por Deportes, Jersey, NBA, NFL, Autos, Humor, VIP, Video, Imágenes o Jugadores de béisbol."
   },
   "help-mingl-requests": {
     "title": "Acerca de Mingl Solicitudes",

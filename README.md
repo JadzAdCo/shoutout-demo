@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.73 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.74 (stable)
+
+- s3.2.74: Rename floqai.html → botdee.html; FloqAi→BOT DEE help/labels (technical floqAi ids kept).
+- s3.2.73: BOT DEE ? help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
+- s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).
 
 - s3.2.73: BOT DEE `?` help documents Enter=Send / Shift+Enter=newline + chatable mood tip (all langs).
 - s3.2.72: BOT DEE Enter=Send / Shift+Enter=newline; mood/"how are you" stays conversational (not search).

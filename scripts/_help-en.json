@@ -12,8 +12,8 @@
     "body": "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive."
   },
   "floqai-ask-floqr": {
-    "title": "Ask FloqR with FloqAi",
-    "body": "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
+    "title": "Ask FloqR with BOT DEE",
+    "body": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
   },
   "help-soccer-jersey": {
     "title": "Soccer jersey ShoutOut",
@@ -89,7 +89,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Create and publish a staff schedule",
-    "body": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Delete multiple scheduled or draft shifts",
@@ -137,11 +137,11 @@
   },
   "help-default-template": {
     "title": "Default Template",
-    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
+    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use BOT DEE below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
   },
   "help-floqai-template-search": {
-    "title": "FloqAi template search",
-    "body": "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
+    "title": "BOT DEE template search",
+    "body": "Tap the moving BOT DEE mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
   },
   "help-mingl-requests": {
     "title": "About Mingl Requests",
@@ -297,7 +297,7 @@
   },
   "help-vip-payment-collector": {
     "title": "VIP reserV payment collector & Club POS",
-    "body": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps."
+    "body": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask BOT DEE how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps."
   },
   "help-vip-table-isbooked": {
     "title": "VIP table isBooked status in Firestore",

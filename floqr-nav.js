@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.2.73";
+  const APP_V = "s3.2.74";
 
   function navT(key, fallback) {
     try {
@@ -264,13 +264,13 @@
       const start = String(qs("start") || "").toLowerCase();
       if (start === "intent" || start === "ask" || start === "wish") {
         const q = qs("q");
-        global.location.replace(buildUrl("./floqai.html", q ? { q } : {}));
+        global.location.replace(buildUrl("./botdee.html", q ? { q } : {}));
       }
       else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
       else if (start === "mingl") showPage("minglLandingPage");
     },
     intentSearchHome() {
-      return buildUrl("./floqai.html");
+      return buildUrl("./botdee.html");
     }
   };
 

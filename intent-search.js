@@ -784,7 +784,7 @@
       blurb: "Pick a club, choose a template (free Black & White Classic, or BOT DEE for paid themes), pay if needed, and send to the live display.",
       links: [
         {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
-        {label: "Ask BOT DEE for templates", href: pageUrl("./floqai.html")}
+        {label: "Ask BOT DEE for templates", href: pageUrl("./botdee.html")}
       ],
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
@@ -806,7 +806,7 @@
       blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
       links: [
         {label: "Start ShoutOut", href: pageUrl("./", {start: "search"})},
-        {label: "Ask BOT DEE for jersey templates", href: pageUrl("./floqai.html")}
+        {label: "Ask BOT DEE for jersey templates", href: pageUrl("./botdee.html")}
       ],
       patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
     },

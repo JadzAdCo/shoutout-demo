@@ -225,9 +225,10 @@ test("Master Admin Security → Data classification panel is wired and SOS2FA-ga
   assert.ok(/floqr-data-classification\.js[\s\S]*master-data-classification\.js/.test(html));
   assert.ok(/"dataClassification"/.test(read("sos2fa.js")));
   assert.ok(read("master-admin-app.js").includes("FLOQRMasterDataClassification"));
-  const floqai = read("floqai.html");
-  assert.ok(/floqr-data-classification\.js[\s\S]*floqai-access\.js[\s\S]*intent-search\.js/.test(floqai));
-  assert.ok(floqai.includes('data-floqr-feature="floqAi"'));
+  const botdee = read("botdee.html");
+  assert.ok(/floqr-data-classification\.js[\s\S]*floqai-access\.js[\s\S]*intent-search\.js/.test(botdee));
+  assert.ok(botdee.includes('data-floqr-feature="floqAi"'));
+  assert.match(read("floqai.html"), /location\.replace\("\.\/botdee\.html/);
 });
 
 test("Save all validates every row and needs a reason", () => {

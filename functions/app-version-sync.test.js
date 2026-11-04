@@ -58,16 +58,16 @@ test("FLOQRNav never puts v= on a link and drops an incoming v from old bookmark
     nav.portalLink("./mingl-chat.html?v=29.09.8", {room: "r1"}),
     nav.adminLink("./club-profile.html"),
     nav.masterLink("./floqcast-search.html"),
-    nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"),
+    nav.stampCurrentVersion("./botdee.html?v=s3.1.20&q=hi"),
     nav.intentSearchHome(),
     nav.resolveBack("mingl").href,
     nav.resolveBack("bartr").href,
     nav.resolveBack("portal").href
   ];
   assert.deepEqual(hrefs.filter((href) => /[?&]v=/.test(href)), []);
-  assert.equal(nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"), "./floqai.html?q=hi");
+  assert.equal(nav.stampCurrentVersion("./botdee.html?v=s3.1.20&q=hi"), "./botdee.html?q=hi");
   assert.equal(nav.adminPortalUrl("zebbies"), "./admin.html?location=zebbies&from=master");
-  assert.equal(nav.intentSearchHome(), "./floqai.html");
+  assert.equal(nav.intentSearchHome(), "./botdee.html");
   assert.equal(nav.stableDisplayUrl("zebbies"), "./display.html?location=zebbies");
   assert.equal(nav.stampCurrentVersion("./display2.html?location=zebbies&v=s3.0.1&screen=led-64x32"), "./display2.html?location=zebbies");
 });

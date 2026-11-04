@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.73";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.73";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.74";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.74";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,13 +223,26 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.74",
+      title: "s3.2.74 — botdee.html page rename + FloqAi→BOT DEE help scrub",
+      checks: [
+        {label:"Page file", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "data-floqr-feature=\"floqAi\"", "floqai.helpComposer"]},
+        {label:"Legacy redirect", file:"floqai.html", includes:["location.replace(\"./botdee.html\")"]},
+        {label:"Nav home", file:"floqr-nav.js", includes:["buildUrl(\"./botdee.html\")"]},
+        {label:"Feature label", file:"floqr-feature-services.js", includes:["label: \"BOT DEE\"", "route: \"./botdee.html\""]},
+        {label:"Help repo links", file:"floqai-help-repository.js", includes:["Open BOT DEE", "./botdee.html"]},
+        {label:"No FloqAi in help packs", file:"floqr-i18n-help.js", notIncludes:["FloqAi"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-74-botdee-page-rename"]}
+      ]
+    },
+    {
       version: "s3.2.73",
       title: "s3.2.73 — BOT DEE ? help documents Enter/Shift+Enter + chat tip",
       checks: [
         {label:"Help composer chrome", file:"floqr-i18n.js", includes:["floqai.helpComposer", "Press Enter to send", "VERSION = \"s3.2.73\""]},
         {label:"Help repo Enter", file:"floqai-help-repository.js", includes:["Press Enter to send a message", "Shift+Enter"]},
         {label:"Help locale packs", file:"floqr-i18n-help.js", includes:["help-floqai-page", "Shift+Enter", "VERSION = \"s3.2.73\""]},
-        {label:"Page popout", file:"floqai.html", includes:["floqai.helpComposer", "floqr-i18n-help.js?v=s3.2.73"]},
+        {label:"Page popout", file:"botdee.html", includes:["floqai.helpComposer", "floqr-i18n-help.js?v=s3.2.73"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-73-botdee-help-composer"]}
       ]
     },
@@ -242,7 +255,7 @@
         {label:"Client mood", file:"bot-dee-chat.js", includes:["isMoodPrompt", "floqai.chatMood"]},
         {label:"Chrome mood key", file:"floqr-i18n.js", includes:["floqai.chatMood", "Enter sends", "VERSION = \"s3.2.73\""]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-72-botdee-enter-mood"]},
-        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.73"]}
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.73"]}
       ]
     },
     {
@@ -276,7 +289,7 @@
         {label:"Rules", file:"firestore.rules", includes:["match /botDeeSettings/{docId}"]},
         {label:"Chrome keys", file:"floqr-i18n.js", includes:["floqai.chatResume", "master.featuresBotDee", "VERSION = \"s3.2.70\""]},
         {label:"Manual test idle", file:"ai-diagnostics-service.js", includes:["s3-2-70-botdee-idle-resume"]},
-        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
       ]
     },
     {
@@ -287,7 +300,7 @@
         {label:"Client ack mirror", file:"bot-dee-chat.js", includes:["isAckPrompt", "ackReply", "floqai.chatAck"]},
         {label:"Chrome ack key", file:"floqr-i18n.js", includes:["floqai.chatAck", "VERSION = \"s3.2.70\""]},
         {label:"Manual test cool ack", file:"ai-diagnostics-service.js", includes:["s3-2-69-botdee-cool-ack"]},
-        {label:"floqai cache-bust", file:"floqai.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
       ]
     },
     {
@@ -477,7 +490,7 @@
       title: "s3.2.53 — BOT DEE Phase 1 chat + executeBotSession",
       checks: [
         {label:"Package version s3.2.53", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.53\""]},
-        {label:"BOT DEE chat shell", file:"floqai.html", includes:["id=\"botDeeChatPage\"", "bot-dee-chat.js", "botDeeIntentFallback"]},
+        {label:"BOT DEE chat shell", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "bot-dee-chat.js", "botDeeIntentFallback"]},
         {label:"executeBotSession export", file:"functions/index.js", includes:["executeBotSession"]},
         {label:"contextualSearch tool", file:"functions/bot-dee-core.js", includes:["contextualSearch"]},
         {label:"Manual test s3.2.53", file:"ai-diagnostics-service.js", includes:["s3-2-53-bot-dee-phase1-chat"]},
@@ -2482,7 +2495,7 @@
         {label:"Club feed datasets", file:"functions/club-public-feed-core.js", includes:["function staffView(", "function buildEventsRss("]},
         {label:"Website feed card", file:"admin.html", includes:["id=\"websiteFeedGenerateBtn\""]},
         {label:"Club website iframe", file:"club-embed.js", includes:["dataset"]},
-        {label:"BOT DEE page", file:"floqai.html", includes:["data-floqr-feature=\"floqAi\""]}
+        {label:"BOT DEE page", file:"botdee.html", includes:["data-floqr-feature=\"floqAi\""]}
       ]
     },
     {
@@ -2609,20 +2622,29 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-74-botdee-page-rename",
+      area:"BOT DEE",
+      feature:"botdee.html page + FloqAi→BOT DEE help",
+      changed:"Canonical BOT DEE URL is botdee.html. Legacy floqai.html / floqai-search.html redirect. Feature catalog label BOT DEE. Help repository + locale packs + admin fallback copy say BOT DEE (not FloqAi). Technical ids stay floqAi. Package s3.2.74 (Pages).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.74) with floqAi. 2) Open ? → BOT DEE copy, no FloqAi. 3) Open https://jadzadco.github.io/shoutout-demo/floqai.html → lands on botdee.html. 4) Search tile opens botdee.html. 5) Master Admin Features Mgmt shows BOT DEE label. 6) Mark Succeed/Failed.",
+      expected:"Canonical URL botdee.html; redirects work; UI/help say BOT DEE only.",
+      troubleshoot:"Old floqai.html chat → Pages publish s3.2.74. Still FloqAi in ? → hard refresh floqr-i18n-help.js / floqai-help-repository.js. Tile still floqai.html → floqr-nav.js + index.html cache-bust."
+    },
+    {
       id:"s3-2-73-botdee-help-composer",
-      area:"BOT DEE / FloqAi",
+      area:"BOT DEE",
       feature:"? help documents Enter=Send · Shift+Enter newline · chatable mood",
       changed:"BOT DEE page ? popout adds floqai.helpComposer; help-floqai-page body + all 10 help locale packs + FloqAi search phrases cover Enter/Shift+Enter and How are you? chat tip. Package s3.2.73 (Pages only).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.73) with floqAi. 2) Open the header ? → body mentions Enter to send, Shift+Enter new line, and chatting like a person / How are you?. 3) Switch UI language (e.g. fr/de) → same facts still present. 4) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.73) with floqAi. 2) Open the header ? → body mentions Enter to send, Shift+Enter new line, and chatting like a person / How are you?. 3) Switch UI language (e.g. fr/de) → same facts still present. 4) Mark Succeed/Failed.",
       expected:"? help states Enter=Send, Shift+Enter=newline, and that mood/how-are-you stays conversational.",
-      troubleshoot:"Old help → hard refresh floqai.html + floqr-i18n.js + floqr-i18n-help.js ?v=s3.2.73. Missing composer paragraph → confirm floqai.helpComposer in chrome pack. FloqAi search miss → floqai-help-repository.js searchPhrases enter to send."
+      troubleshoot:"Old help → hard refresh botdee.html + floqr-i18n.js + floqr-i18n-help.js ?v=s3.2.73. Missing composer paragraph → confirm floqai.helpComposer in chrome pack. FloqAi search miss → floqai-help-repository.js searchPhrases enter to send."
     },
     {
       id:"s3-2-72-botdee-enter-mood",
-      area:"BOT DEE / FloqAi",
+      area:"BOT DEE",
       feature:"Enter sends · Shift+Enter newline · how-are-you stays chat",
       changed:"Composer Enter = Send (Shift+Enter = new line). Mood/how-are-you gets a friendly reply (not search / not bare still-here). Gemini systemInstruction pushes chat-first. Package s3.2.72. Functions deploy executeBotSession for server path.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.73) with floqAi. 2) Type How are you? and press Enter (not the Send button) → message sends; reply thanks for asking / doing great — NOT Here is what I found. 3) Type a longer note, Shift+Enter for a second line, then Enter to send. 4) Mid-chat hey → Hey — still here. 5) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.73) with floqAi. 2) Type How are you? and press Enter (not the Send button) → message sends; reply thanks for asking / doing great — NOT Here is what I found. 3) Type a longer note, Shift+Enter for a second line, then Enter to send. 4) Mid-chat hey → Hey — still here. 5) Mark Succeed/Failed.",
       expected:"Enter submits; Shift+Enter inserts a newline; how-are-you is conversational with no search dump.",
       troubleshoot:"Enter still newlines → hard refresh bot-dee-chat.js ?v=s3.2.73. Mood still search → Functions deploy executeBotSession (isMoodPrompt/moodReply). Client-only mood works without redeploy for exact how-are-you prompts."
     },
@@ -2637,21 +2659,21 @@
     },
     {
       id:"s3-2-70-botdee-idle-resume",
-      area:"BOT DEE / FloqAi",
+      area:"BOT DEE",
       feature:"Offer-help once + idle end (~60s) + Master Admin idle setting",
       changed:"Mid-chat cool/ok/thanks → short Cool./You're welcome. (no product pitch). Offer-help only on welcome and after idle resume. Idle timer (default 60s, botDeeSettings/default) ends the chat. Master Admin → Features Mgmt → BOT DEE sets conversationIdleSeconds via setBotDeeSettings (SOS2FA + reason). Package s3.2.70.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.70) with floqAi. 2) Welcome asks how it can help once. 3) Say cool → Cool. only — no Want to keep going / product list. 4) Say hey mid-chat → Hey — still here. 5) Wait ~60s idle → pause message; next hi gets Welcome back + offer-help. 6) Master Admin → Features Mgmt → BOT DEE → set idle seconds → Save with reason (SOS2FA).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.70) with floqAi. 2) Welcome asks how it can help once. 3) Say cool → Cool. only — no Want to keep going / product list. 4) Say hey mid-chat → Hey — still here. 5) Wait ~60s idle → pause message; next hi gets Welcome back + offer-help. 6) Master Admin → Features Mgmt → BOT DEE → set idle seconds → Save with reason (SOS2FA).",
       expected:"No repetitive offer-help mid-chat; idle ends conversation; resume asks once; Master Admin can change idle seconds.",
       troubleshoot:"Still repeating pitch → hard refresh bot-dee-chat.js ?v=s3.2.70. Idle never ends → check botDeeSettings/default read + console. Save fails → Functions deploy setBotDeeSettings + SOS2FA unlock. Panel missing → master-admin.html #featuresBotDee."
     },
     {
       id:"s3-2-69-botdee-cool-ack",
-      area:"BOT DEE / FloqAi",
+      area:"BOT DEE",
       feature:"Acknowledgments (cool / ok / thanks) stay conversational",
       changed:"isAckPrompt + ackReply — mid-chat cool/ok/thanks get a short continue reply, not a Hey BOT DEE restart and not search. Client mirror in bot-dee-chat.js; Gemini systemInstruction forbids tools on acks. Softened further in s3.2.70 (no product pitch on ack).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (s3.2.70) signed in with floqAi. 2) Say hello. 3) Say cool → Cool. — NOT Here is what I found and NOT Hey — BOT DEE here. 4) Say thanks → You're welcome.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.70) signed in with floqAi. 2) Say hello. 3) Say cool → Cool. — NOT Here is what I found and NOT Hey — BOT DEE here. 4) Say thanks → You're welcome.",
       expected:"cool stays chat mode; short ack; no search dump; no full re-intro.",
-      troubleshoot:"Still greeting restart → hard refresh bot-dee-chat.js ?v=s3.2.70. Still search → Functions deploy executeBotSession (bot-dee-core isAckPrompt). Old Pages cache → confirm floqai.html script ?v=."
+      troubleshoot:"Still greeting restart → hard refresh bot-dee-chat.js ?v=s3.2.70. Still search → Functions deploy executeBotSession (bot-dee-core isAckPrompt). Old Pages cache → confirm botdee.html script ?v=."
     },
     {
       id:"s3-2-68-shoko-vip-nye",
@@ -2664,10 +2686,10 @@
     },
       {
         id:"s3-2-67-botdee-gemini-name",
-        area:"BOT DEE / FloqAi",
+        area:"BOT DEE",
         feature:"Gemini answers name pronunciation (not search dump)",
         changed:"Root cause: Gemini 400 when AUTO + allowedFunctionNames — every non-greeting silently fell back to contextualSearch (Here is what I found…). Fixed toolConfig; identity prompts (how is your name pronounced) answered locally as BOT DEE. Functions redeploy required. Package s3.2.67.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.67) signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.67) signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
         expected:"Identity/name questions get a conversational BOT DEE reply; product how-tos still search/tool.",
         troubleshoot:"Still search dump → confirm Functions executeBotSession redeployed from main with GEMINI_API_KEY secret; check Cloud Logs for botdee.session provider=gemini (not local-fallback). Client-only identity path works without redeploy for the exact name prompt."
       },
@@ -2682,16 +2704,16 @@
       },
       {
         id:"s3-2-67-botdee-robot-avatar",
-        area:"BOT DEE / FloqAi",
+        area:"BOT DEE",
         feature:"Robot-head avatar on bot chat bubbles",
         changed:"Bot bubbles use images/botdee-chat-avatar.png (cyan-eye robot head) + speech tip. Not the full Site-chrome BOT DEE JPG. Package s3.2.67.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.67) signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.67) signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
         expected:"Bubble origin = robot-head avatar; tip points at it.",
         troubleshoot:"Still full chrome face in bubbles → hard refresh bot-dee-chat.js + botdee-chat-avatar.png (s3.2.67). 404 on avatar → confirm images/botdee-chat-avatar.png on Pages main."
       },
       {
         id:"s3-2-66-botdee-bubble-avatar",
-        area:"BOT DEE / FloqAi",
+        area:"BOT DEE",
         feature:"Bot bubble avatar + speech tip (superseded by s3.2.67 robot head)",
         changed:"s3.2.66 added bubble avatar + .botdee-bubble-tail. s3.2.67 swaps avatar to robot-head PNG.",
         howToTest:"Prefer s3-2-67-botdee-robot-avatar. Confirm tip still present on bot bubbles.",
@@ -2700,21 +2722,21 @@
       },
       {
         id:"s3-2-65-botdee-welcome",
-        area:"BOT DEE / FloqAi",
+        area:"BOT DEE",
         feature:"Welcome — How can I help you?",
         changed:"floqai.chatWelcome is now Hi, I am BOT DEE. How can I help you? (all langs). Package s3.2.65.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.65). 2) Opening bubble is Hi, I am BOT DEE. How can I help you? — no Quick intent search line in the greeting. 3) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.65). 2) Opening bubble is Hi, I am BOT DEE. How can I help you? — no Quick intent search line in the greeting. 3) Mark Succeed/Failed.",
         expected:"Short welcome only.",
         troubleshoot:"Old long greeting → hard refresh floqr-i18n.js + bot-dee-chat.js (s3.2.65)."
       },
       {
         id:"s3-2-64-botdee-hello-chitchat",
-        area:"BOT DEE / FloqAi",
+        area:"BOT DEE",
         feature:"Hello greets like a chatbot (not a search miss)",
         changed:"bot-dee-chat.js answers greetings locally before executeBotSession; server isChitchatPrompt widened (hello / hello how are you). Package s3.2.64. Functions deploy still needed for server path parity.",
-        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/floqai.html (package s3.2.64) signed in with floqAi access. 2) Type hello (or Hi / Hey) → BOT DEE replies Hey — BOT DEE here… (not a clear-match / search-miss message). 3) Type throw a shoutout → product help / results (search path still works). 4) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.64) signed in with floqAi access. 2) Type hello (or Hi / Hey) → BOT DEE replies Hey — BOT DEE here… (not a clear-match / search-miss message). 3) Type throw a shoutout → product help / results (search path still works). 4) Mark Succeed/Failed.",
         expected:"Greetings get a conversational reply; how-to questions still search/tool.",
-        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on floqai.html; confirm you are on floqai.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
+        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on floqai.html; confirm you are on botdee.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
       },
       {
         id:"s3-2-63-settings-square-chrome",
@@ -2750,7 +2772,7 @@
         changed:"Patron-facing FloqAi labels are BOT DEE. FloqCast CTA “Go live, start a cast”. Package s3.2.60.",
         howToTest:"1) Hard-refresh Search — tile is BOT DEE. 2) Open chat — welcome BOT DEE. 3) Send Hey — greeting, no hits. 4) floqCast — Go live, start a cast. 5) Mark Succeed/Failed.",
         expected:"Patron chrome says BOT DEE; FloqCast CTA matches.",
-        troubleshoot:"Still FloqAi → hard refresh floqr-i18n.js + floqai.html + bot-dee-chat.js."
+        troubleshoot:"Still FloqAi → hard refresh floqr-i18n.js + botdee.html + bot-dee-chat.js."
       },
       {
         id:"s3-2-59-floqai-brand-golive-cast",
@@ -2759,14 +2781,14 @@
         changed:"Patron-facing FloqAi labels are BOT DEE (chat title, welcome, Search tile, help). FloqCast venue CTA is “Go live, start a cast” (all langs). Package s3.2.59+; technical ids stay floqAi.",
         howToTest:"1) Hard-refresh Search — tile aria/label is BOT DEE. 2) Open chat page — title + welcome + placeholder say BOT DEE (not FloqAi). 3) Send Hey — BOT DEE greets, no hit list. 4) floqCast search — venue button reads Go live, start a cast. 5) Mark Succeed/Failed.",
         expected:"Patron chrome says BOT DEE; FloqCast CTA grammar matches; Hey stays conversational.",
-        troubleshoot:"Still FloqAi → hard refresh floqr-i18n.js + floqai.html + bot-dee-chat.js. Old CTA → floqcast-search.js + i18n goLiveCta. Hey hits → Functions deploy executeBotSession."
+        troubleshoot:"Still FloqAi → hard refresh floqr-i18n.js + botdee.html + bot-dee-chat.js. Old CTA → floqcast-search.js + i18n goLiveCta. Hey hits → Functions deploy executeBotSession."
       },
       {
         id:"s3-2-58-botdee-chitchat-not-hits",
         area:"BOT DEE",
         feature:"BOT DEE greets like a chatbot (Hey ≠ search hits)",
         changed:"executeBotSession short-circuits greetings/small talk (hi/hey/thanks) to a conversational reply with zero contextualSearch results. Search token match is word-boundary (hey≠they); min score 3. Functions deploy bot-dee-core + bot-dee-functions.",
-        howToTest:"1) Open BOT DEE (floqai.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
+        howToTest:"1) Open BOT DEE (botdee.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
         expected:"Hey → chat greeting; real intents still searchable; no hit-list dump for small talk.",
         troubleshoot:"Still hit list → Functions deploy executeBotSession (bot-dee-functions + bot-dee-core) not Pages-only; confirm provider local-chitchat in function logs for Hey. Gemini path should not run for isChitchatPrompt."
       },
@@ -2819,10 +2841,10 @@
         id:"s3-2-53-bot-dee-phase1-chat",
         area:"BOT DEE / BOT DEE",
         feature:"BOT DEE Phase 1 — chat shell + executeBotSession contextualSearch",
-        changed:"floqai.html is a chrome chat window (left BOT DEE icon, compact Back, transcript + Send) wired to executeBotSession. Phase 1 tool: classification-gated contextualSearch. Quick intent search stays a collapsible fast path. Package s3.2.53. Requires Functions deploy of executeBotSession + GEMINI_API_KEY for Gemini replies (local search fallback without Gemini).",
-        howToTest:"1) Hard-refresh Search tile BOT DEE → floqai.html (package s3.2.53) while signed in with floqAi access. 2) Confirm chat header icon + Back left; type “throw a shoutout” and Send. 3) Expect a BOT DEE reply and/or result links filtered to your role. 4) Open Quick intent search — cards still appear for the same query. 5) Sign out / no floqAi grant → feature not-available or chat sign-in error, not a silent bounce to Event search.",
+        changed:"botdee.html is a chrome chat window (left BOT DEE icon, compact Back, transcript + Send) wired to executeBotSession. Phase 1 tool: classification-gated contextualSearch. Quick intent search stays a collapsible fast path. Package s3.2.53. Requires Functions deploy of executeBotSession + GEMINI_API_KEY for Gemini replies (local search fallback without Gemini).",
+        howToTest:"1) Hard-refresh Search tile BOT DEE → botdee.html (package s3.2.53) while signed in with floqAi access. 2) Confirm chat header icon + Back left; type “throw a shoutout” and Send. 3) Expect a BOT DEE reply and/or result links filtered to your role. 4) Open Quick intent search — cards still appear for the same query. 5) Sign out / no floqAi grant → feature not-available or chat sign-in error, not a silent bounce to Event search.",
         expected:"Chat UI primary; intent fallback works; answers respect classification; no VIP/pay tools yet.",
-        troubleshoot:"No chat UI → hard refresh floqai.html + bot-dee-chat.js?v=s3.2.53. Callable missing → deploy Functions executeBotSession. Gemini errors but links appear → local contextualSearch fallback OK. Empty results for patron-only topics while Master Admin → check roleFactsFor / floqai-content-classes."
+        troubleshoot:"No chat UI → hard refresh botdee.html + bot-dee-chat.js?v=s3.2.53. Callable missing → deploy Functions executeBotSession. Gemini errors but links appear → local contextualSearch fallback OK. Empty results for patron-only topics while Master Admin → check roleFactsFor / floqai-content-classes."
       },
       {
         id:"s3-2-52-wb-active-tiffany-back",
@@ -2982,7 +3004,7 @@
       area:"ShoutOut / Templates",
       feature:"No floating BOT DEE on template select",
       changed:"Template select (club ShoutOut templates) no longer shows the floating BOT DEE tile/speech. Lens Search field remains. Floating agent stays on Ask FloqR / intent only. Package s3.2.26.",
-      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → pick a club → template select. 2) Confirm no floating colored-tile BOT DEE mark wanders the page. 3) Template search lens still works. 4) Open Ask FloqR / floqai.html — floating BOT DEE may still appear there.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → pick a club → template select. 2) Confirm no floating colored-tile BOT DEE mark wanders the page. 3) Template search lens still works. 4) Open Ask FloqR / botdee.html — floating BOT DEE may still appear there.",
       expected:"Template select clean; no float. Intent page unchanged.",
       troubleshoot:"Still floating → hard refresh floqai-search.js s3.2.26; syncAgentVisibility must use show=!!onIntent only."
     },
@@ -3567,7 +3589,7 @@
       area:"Search / Product tiles",
       feature:"Standardized ShoutOut / floqCast / VIP / BOT DEE icon tiles",
       changed:"Search tiles use black faces with in-tile wordmarks (BOT DEE, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.69.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with BOT DEE/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) BOT DEE / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; BOT DEE → floqai.html.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with BOT DEE/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) BOT DEE / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; BOT DEE → botdee.html.",
       expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
       troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."
     },
@@ -3576,7 +3598,7 @@
       area:"Search / BOT DEE",
       feature:"BOT DEE tile matches ShoutOut card",
       changed:"Search BOT DEE control uses shoutout-icon-card size with black face, reuses the Search BOT DEE tiles mark (floqr-tiles-transparent), white BOT DEE word beside the icon. Package s3.1.64.",
-      howToTest:"1) As beta tester with BOT DEE grant, hard-refresh Search. 2) BOT DEE tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white BOT DEE text beside it. 4) Tap opens floqai.html.",
+      howToTest:"1) As beta tester with BOT DEE grant, hard-refresh Search. 2) BOT DEE tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white BOT DEE text beside it. 4) Tap opens botdee.html.",
       expected:"BOT DEE and ShoutOut tiles match box size; BOT DEE uses existing Search mark asset.",
       troubleshoot:"Wide beige tile → hard refresh index.html + styles.css. Wrong icon → must use category-floqai-mark + floqr-tiles-transparent.png."
     },

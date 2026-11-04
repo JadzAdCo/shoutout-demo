@@ -7,7 +7,7 @@
       "kind": "help",
       "label": "Ask FloqR with BOT DEE",
       "blurb": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "ask floqr with bot dee",
         "ask floqr with bot dee tap the animated mark or wait for the prompt then type what you want in plain words. products mingl rydr bartr shoutout floqcast supersta",
@@ -877,7 +877,7 @@
       "kind": "help",
       "label": "BOT DEE help audiences",
       "blurb": "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "bot dee help audiences",
         "bot dee shows help that matches your role patron service member venue admin or master admin. master admins can search across those audiences. if nothing appears",
@@ -898,7 +898,7 @@
       "kind": "help",
       "label": "BOT DEE",
       "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "bot dee",
         "chat with bot dee on the bot dee page in plain words events and clubs shoutout mingl rydr bartr floqcast your profile staff schedules or club admin tools. press",
@@ -2434,7 +2434,7 @@
       "kind": "help",
       "label": "VIP receipt SMS & invoice redaction",
       "blurb": "Paid receipts send SMS only through the logged Twilio Messages API path. FLOQR-YYYYMMDD-… and VR-… invoice numbers stay readable in mail/SMS logs (they are not treated as OTP codes).",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "vip receipt sms invoice redaction",
         "paid receipts send sms only through the logged twilio messages api path. floqr-yyyymmdd- and vr- invoice numbers stay readable in mail/sms logs they are not tre",
@@ -2629,7 +2629,7 @@
       "kind": "help",
       "label": "App language / FloqR webapp language",
       "blurb": "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it under My Profile → Language Settings. Not based on IP or country.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "app language / floqr webapp language",
         "first visit can follow the browser language when floqr supports it. otherwise english. change it under my profile language settings. not based on ip or country.",
@@ -2655,7 +2655,7 @@
       "kind": "help",
       "label": "Become a Club Admin",
       "blurb": "Club Admins only open the Venue Command Center for a venue they are assigned to. admin.html no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com go to temp-democlub-N. Unassigned admins request Master Admin assignment.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "become a club admin",
         "club admins only open the venue command center for a venue they are assigned to. admin.html no longer defaults to zebbies. demo accounts temp_clubadmin_n@floqr-",
@@ -2671,7 +2671,7 @@
       "kind": "help",
       "label": "FLOQR display screens / LED sizes",
       "blurb": "Club Public Profile stores VenueSupports96x48 / 64x48 / 64x32 on clubLocations. Templates store Is96x48 / Is64x48 / Is64x32. A club only offers templates that share a 1. Xibo stays display.html?location=id — never ?screen=.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "floqr display screens / led sizes",
         "club public profile stores venuesupports96x48 / 64x48 / 64x32 on clublocations. templates store is96x48 / is64x48 / is64x32. a club only offers templates that s",
@@ -2694,7 +2694,7 @@
       "kind": "help",
       "label": "Club SMS and WhatsApp notification subscriptions",
       "blurb": "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "club sms and whatsapp notification subscriptions",
         "sms and whatsapp pills turn green when firebase subscription is 1 prepaid 10 pack and red when 0. payment credits remaining and subscribe live in the channel . ",
@@ -2718,7 +2718,7 @@
       "kind": "help",
       "label": "Create and publish a staff schedule",
       "blurb": "Add draft shifts on the week grid, then Publish schedule. Workers confirm pending shifts before they become confirmed.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "create and publish a staff schedule",
         "add draft shifts on the week grid then publish schedule. workers confirm pending shifts before they become confirmed.",
@@ -2738,7 +2738,7 @@
       "kind": "help",
       "label": "Become a DJ on FLOQR",
       "blurb": "Elect DJ as your service role, associate with clubs, and optionally subscribe to Staff Scheduling ($20/mo) for bookings.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "become a dj on floqr",
         "elect dj as your service role associate with clubs and optionally subscribe to staff scheduling 20/mo for bookings.",
@@ -2751,7 +2751,7 @@
       "kind": "help",
       "label": "Do Not Sell or Share",
       "blurb": "Opt out of personalized profile-tag ads. GPC browsers are opted out automatically. Download or delete your data from My Privacy.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "do not sell or share",
         "opt out of personalized profile-tag ads. gpc browsers are opted out automatically. download or delete your data from my privacy.",
@@ -2774,7 +2774,7 @@
       "kind": "help",
       "label": "DonPapi ShoutOut LED wall",
       "blurb": "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "donpapi shoutout led wall",
         "vip shoutouts are carried by busboys on the handheld donpapi led wall held in the air in front of patrons with the shoutout message on the center screen.",
@@ -2795,7 +2795,7 @@
       "kind": "help",
       "label": "Make me a floqCast / superstar",
       "blurb": "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the floqCast Queue → Go live on the floqCast board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "make me a floqcast / superstar",
         "like a shoutout for video pick a venue private camera preview pay 20 in a stripe pop-out club admin approves in the floqcast queue go live on the floqcast board",
@@ -2829,7 +2829,7 @@
       "kind": "help",
       "label": "What can BOT DEE help with?",
       "blurb": "Say what you want in plain words — products (Mingl, RydR, BartR, ShoutOut), goals like “I want to be a Club Admin,” or help-popout phrases like “Onboarding.”",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "what can bot dee help with",
         "say what you want in plain words products mingl rydr bartr shoutout goals like i want to be a club admin or help-popout phrases like onboarding.",
@@ -2846,7 +2846,7 @@
       "kind": "help",
       "label": "General Notifications (Email / SMS)",
       "blurb": "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "general notifications email / sms",
         "sos2fa and other floqr system messages follow these flags as set in a patrons your user record. venues or specific independent service members need to subscribe",
@@ -2868,7 +2868,7 @@
       "kind": "help",
       "label": "Get on a guest list",
       "blurb": "Join a venue guest list from Search or the dedicated guest-list page for that club.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "get on a guest list",
         "join a venue guest list from search or the dedicated guest-list page for that club.",
@@ -2881,7 +2881,7 @@
       "kind": "help",
       "label": "Join hospitality / bottle service staff",
       "blurb": "Waiters, waitresses, bottle girls, and related roles request worker association; club admins approve and can designate CSR.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "join hospitality / bottle service staff",
         "waiters waitresses bottle girls and related roles request worker association club admins approve and can designate csr.",
@@ -2894,7 +2894,7 @@
       "kind": "help",
       "label": "Mail Logging",
       "blurb": "Master Admin Diagnostics → Mail Logging lists every system-generated SendGrid email (accepted, failed, delivered). Search status, kind, address, subject. Open a row for headers, body, TLS 1.3, and delivery events.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "mail logging",
         "master admin diagnostics mail logging lists every system-generated sendgrid email accepted failed delivered . search status kind address subject. open a row for",
@@ -2914,7 +2914,7 @@
       "kind": "help",
       "label": "Join as videographer / media creator",
       "blurb": "Camera and media roles associate with clubs the same way other service members do.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "join as videographer / media creator",
         "camera and media roles associate with clubs the same way other service members do.",
@@ -2927,7 +2927,7 @@
       "kind": "help",
       "label": "Delete multiple scheduled or draft shifts",
       "blurb": "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "delete multiple scheduled or draft shifts",
         "select shifts mix day headers and chips then delete selected. example all wednesday drafts plus one thursday confirmed shift.",
@@ -2947,7 +2947,7 @@
       "kind": "help",
       "label": "My Profile & Settings",
       "blurb": "Account, identity, seller tools, and links into role / service onboarding.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "my profile settings",
         "account identity seller tools and links into role / service onboarding.",
@@ -2964,7 +2964,7 @@
       "kind": "help",
       "label": "NFL jersey ShoutOut",
       "blurb": "Search NFL, 49ers, or ScammerVille. Photo LED backs use the bulky NFL yoke cut with a side helmet — no hanger. Enter patron name (up to 8 characters) and a 2-character mark.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "nfl jersey shoutout",
         "search nfl 49ers or scammerville. photo led backs use the bulky nfl yoke cut with a side helmet no hanger. enter patron name up to 8 characters and a 2-characte",
@@ -2977,7 +2977,7 @@
       "kind": "help",
       "label": "Onboarding",
       "blurb": "Patrons start here, then request service roles. Master Admins can also onboard crawled venues into Firestore.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "onboarding",
         "patrons start here then request service roles. master admins can also onboard crawled venues into firestore.",
@@ -3000,7 +3000,7 @@
       "kind": "help",
       "label": "Post an ad on FLOQR",
       "blurb": "Flyer image or a video up to 30 seconds. Inline $45 / 7 days or Mingl Gist $25 / 7 days. Pay, FLOQR approves, then it rotates on the Search loading splash, Mingl, Mingl Gist and RydR.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "post an ad on floqr",
         "flyer image or a video up to 30 seconds. inline 45 / 7 days or mingl gist 25 / 7 days. pay floqr approves then it rotates on the search loading splash mingl min",
@@ -3029,7 +3029,7 @@
       "kind": "help",
       "label": "Become a Promoter",
       "blurb": "Independent or company-affiliated promoters request association, then drive guest lists and campaigns.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "become a promoter",
         "independent or company-affiliated promoters request association then drive guest lists and campaigns.",
@@ -3042,7 +3042,7 @@
       "kind": "help",
       "label": "Role profiles overview",
       "blurb": "How Club Admin, DJ, Promoter, hospitality, CSR, and scheduling roles fit together.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "role profiles overview",
         "how club admin dj promoter hospitality csr and scheduling roles fit together.",
@@ -3058,7 +3058,7 @@
       "kind": "help",
       "label": "Confirm assigned shifts",
       "blurb": "Inbox links open Work Calendar. Tick pending shifts (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "confirm assigned shifts",
         "inbox links open work calendar. tick pending shifts or select all then approve selected. opening the link does not confirm. only the assigned service member can",
@@ -3077,7 +3077,7 @@
       "kind": "help",
       "label": "Schedule message templates",
       "blurb": "Club Admin → Notifications → Message templates. Edit System Messages for shift invite, update, confirmed, and declined. They are not ShoutOuts. Placeholders: {club} {role} {when} {link} {worker}.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "schedule message templates",
         "club admin notifications message templates. edit system messages for shift invite update confirmed and declined. they are not shoutouts. placeholders club role ",
@@ -3097,7 +3097,7 @@
       "kind": "help",
       "label": "Staff Scheduling help",
       "blurb": "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed on Work Calendar), Select shift",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "staff scheduling help",
         "clubs promoting companies and djs unlock staff scheduling when staffschedulingpaid 1 demo venues or 20/mo stripe . unpaid 0 shows subscribe paid shows the calen",
@@ -3110,7 +3110,7 @@
       "kind": "help",
       "label": "Sell on BartR",
       "blurb": "U.S. patrons and service members can manage a seller store from My Profile; shoppers buy on BartR / commerce.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "sell on bartr",
         "u.s. patrons and service members can manage a seller store from my profile shoppers buy on bartr / commerce.",
@@ -3123,7 +3123,7 @@
       "kind": "help",
       "label": "Become a service member",
       "blurb": "Everyone starts as a FLOQR patron. Elect from My Profile to unlock Services & Service Members, then pick your service role, select clubs, and submit for Club Admin approval.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "become a service member",
         "everyone starts as a floqr patron. elect from my profile to unlock services service members then pick your service role select clubs and submit for club admin a",
@@ -3136,7 +3136,7 @@
       "kind": "help",
       "label": "How to throw a ShoutOut",
       "blurb": "Pick a club, choose a template (free Black & White Classic, or BOT DEE for paid themes), pay if needed, and send to the live display.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "how to throw a shoutout",
         "pick a club choose a template free black white classic or bot dee for paid themes pay if needed and send to the live display.",
@@ -3149,7 +3149,7 @@
       "kind": "help",
       "label": "Soccer jersey ShoutOut",
       "blurb": "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "soccer jersey shoutout",
         "search soccer jersey or a country/club name tanzania chelsea . cards show the real led kit. pick name 2-character mark. boards 96 48 64 48 64 32.",
@@ -3162,7 +3162,7 @@
       "kind": "help",
       "label": "Scheduler / Round Robin",
       "blurb": "Club Admin → Scheduling → Scheduler. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Select shifts to multi-delete. Website ingest publishes JSON / RSS / iframe. Round Robin fills days fairly.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "scheduler / round robin",
         "club admin scheduling scheduler. published shifts stay pending until the worker confirms via inbox / email / sms / whatsapp. select shifts to multi-delete. webs",
@@ -3191,7 +3191,7 @@
       "kind": "help",
       "label": "Staff Scheduling User Guide",
       "blurb": "Open the ? beside Scheduler: create drafts, publish so workers confirm, then select and delete several shifts (for example all Wednesday drafts plus a Thursday confirmed chip).",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "staff scheduling user guide",
         "open the beside scheduler create drafts publish so workers confirm then select and delete several shifts for example all wednesday drafts plus a thursday confir",
@@ -3209,7 +3209,7 @@
       "kind": "help",
       "label": "Work Sheet - Weekly Staff Calendar",
       "blurb": "Elected staff open Work Calendar for pending assignments (tick / Select all / Approve selected) plus a people × days grid of published colleague shifts.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "work sheet - weekly staff calendar",
         "elected staff open work calendar for pending assignments tick / select all / approve selected plus a people days grid of published colleague shifts.",
@@ -3230,7 +3230,7 @@
       "kind": "help",
       "label": "Template catalog / which templates fit which LED",
       "blurb": "Reports → Template catalog lists template types and Is96x48 / Is64x48 / Is64x32. Split-media birthday templates are offered on 64×32 as a photo/shoutout loop. A club only shows templates that overlap its VenueSupports* flags.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "template catalog / which templates fit which led",
         "reports template catalog lists template types and is96x48 / is64x48 / is64x32. split-media birthday templates are offered on 64 32 as a photo/shoutout loop. a c",
@@ -3250,7 +3250,7 @@
       "kind": "help",
       "label": "Edit German / Arabic translations (Translation Overrides)",
       "blurb": "Master Admin → Translation Overrides. Fix AI-sounding German or Arabic UI wording; Save language so patrons see it on the next load.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "edit german / arabic translations translation overrides",
         "master admin translation overrides. fix ai-sounding german or arabic ui wording save language so patrons see it on the next load.",
@@ -3272,7 +3272,7 @@
       "kind": "help",
       "label": "AI crawl venue datapoints",
       "blurb": "Discovery crawl parses Club Public Profile fields: contact, socials, genres/DJs/promoters, amenities, dress/age, hoursStructured + timeZone, media, and display formats before approval.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "ai crawl venue datapoints",
         "discovery crawl parses club public profile fields contact socials genres/djs/promoters amenities dress/age hoursstructured timezone media and display formats be",
@@ -3292,7 +3292,7 @@
       "kind": "help",
       "label": "Venue opening hours / public holidays",
       "blurb": "Club Public Profile shows a Sun–Sat week grid with the covered dates. Upcoming holidays list open/close hours, especially when they differ from the usual weekday.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "venue opening hours / public holidays",
         "club public profile shows a sun sat week grid with the covered dates. upcoming holidays list open/close hours especially when they differ from the usual weekday",
@@ -3310,7 +3310,7 @@
       "kind": "help",
       "label": "Club website ingest (API, RSS, iframe)",
       "blurb": "Generate a venue secret in Club Admin Scheduling, then pull Confirmed assignments onto the official website with JSON, RSS, or an iframe. Draft, Pending, Open, cancelled, and staffing requirements never appear.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "club website ingest api rss iframe",
         "generate a venue secret in club admin scheduling then pull confirmed assignments onto the official website with json rss or an iframe. draft pending open cancel",
@@ -3331,7 +3331,7 @@
       "kind": "help",
       "label": "VIP / bottle / table help",
       "blurb": "VIP and bottle flows are venue-scoped. Find the club, then use VIP / guest-list / venue links from the club profile.",
-      "href": "./floqai.html",
+      "href": "./botdee.html",
       "phrases": [
         "vip / bottle / table help",
         "vip and bottle flows are venue-scoped. find the club then use vip / guest-list / venue links from the club profile.",

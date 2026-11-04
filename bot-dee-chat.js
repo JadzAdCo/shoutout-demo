@@ -1,4 +1,4 @@
-/* BOT DEE chat client — wires floqai.html transcript to executeBotSession.
+/* BOT DEE chat client — wires botdee.html transcript to executeBotSession.
    Intent search stays available as a collapsible fast path / fallback.
    Greetings / acks are answered locally (chatbot) so a stale Functions deploy cannot
    turn "hello"/"cool" into a contextual-search miss.

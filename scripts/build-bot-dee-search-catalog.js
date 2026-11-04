@@ -41,7 +41,7 @@ function buildCatalog(root = ROOT) {
       kind: intent.kind || "product",
       label: String(intent.label || id).slice(0, 120),
       blurb: String(intent.blurb || "").slice(0, 280),
-      href: String(intent.href || "./floqai.html").slice(0, 240),
+      href: String(intent.href || "./botdee.html").slice(0, 240),
       phrases: uniquePhrases([intent.label, intent.blurb, ...(intent.searchPhrases || []), id])
     });
   });
@@ -59,7 +59,7 @@ function buildCatalog(root = ROOT) {
   (repo.entries() || []).forEach(entry => {
     const id = String(entry.id || "").trim();
     if (!id) return;
-    const link = (entry.links && entry.links[0] && entry.links[0].href) || "./floqai.html";
+    const link = (entry.links && entry.links[0] && entry.links[0].href) || "./botdee.html";
     rows.push({
       sourceId: `help:${id}`,
       id,

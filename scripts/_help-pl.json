@@ -12,8 +12,8 @@
     "body": "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
   },
   "floqai-ask-floqr": {
-    "title": "Zapytaj FloqR z FloqAi",
-    "body": "Zapytaj FloqR z FloqAi — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
+    "title": "Zapytaj FloqR z BOT DEE",
+    "body": "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
   },
   "help-soccer-jersey": {
     "title": "Koszulka piłkarska ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Tworzenie i publikowanie harmonogramu pracy personelu",
-    "body": "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Usuń wiele zaplanowanych lub roboczych zmian",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Domyślny szablon",
-    "body": "Darmowy tradycyjny czarno-biały klasyk. Użyj FloqAi poniżej do szablonów Sport, Koszulka, VIP, Humor, Samochody, Wideo, Zdjęcia i Ballers."
+    "body": "Darmowy tradycyjny czarno-biały klasyk. Użyj BOT DEE poniżej do szablonów Sport, Koszulka, VIP, Humor, Samochody, Wideo, Zdjęcia i Ballers."
   },
   "help-floqai-template-search": {
-    "title": "Wyszukiwanie szablonów FloqAi",
-    "body": "Stuknij w poruszający się znak FloqAi (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
+    "title": "Wyszukiwanie szablonów BOT DEE",
+    "body": "Stuknij w poruszający się znak BOT DEE (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
   },
   "help-mingl-requests": {
     "title": "O żądaniach Mingl",

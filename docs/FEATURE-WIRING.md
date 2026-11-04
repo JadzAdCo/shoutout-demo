@@ -382,10 +382,10 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / BOT DEE (`index.html` intent panel); `floqai.html` collapsible **Quick intent search** |
+| UI | Search / BOT DEE (`index.html` intent panel); `botdee.html` collapsible **Quick intent search** |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
 | Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
-| Cache bust | `intent-search.js?v=` on `index.html` / `floqai.html` |
+| Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
 
 ---
 
@@ -395,7 +395,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 | Layer | Wiring |
 |---|---|
-| UI | `floqai.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint |
+| UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` redirect here. |
 | Client | `bot-dee-chat.js` → callable `executeBotSession`; `floqai-page.js` binds chat + intent fallback; `floqai-access.js` / `getBOT DEEAccess` still gate intent cards |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession` + `setBotDeeSettings`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
@@ -410,7 +410,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Help | `help-floqai-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `floqai.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.floqai` = **BOT DEE**) |
-| BOT DEE verbiage (s3.2.60) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi` / `floqai.html`. |
+| BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (not FloqAi). Technical ids stay `floqAi`; page file is `botdee.html` (s3.2.74). |
 | BOT DEE welcome (s3.2.65) | `floqai.chatWelcome` = **Hi, I am BOT DEE. How can I help you?** (all langs). |
 | BOT DEE bubble chrome (s3.2.66–67) | Bot replies: CSS speech-origin tip (`.botdee-bubble-tail`) + **robot-head** avatar `images/botdee-chat-avatar.png` (s3.2.67 — not Site-chrome pack JPG). Header mark stays `data-floqr-chrome-icon="floqAi"`. |
 | BOT DEE club names | Tools resolve display names → slugs (`Aurelia` → `temp-democlub-1`) via `resolveClubLocationId` in `bot-dee-tools.js` before Firestore lookup. |

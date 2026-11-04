@@ -339,7 +339,7 @@
         helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
         links: (entry.links || []).length
           ? entry.links
-          : [{label: localized.title || entry.title, href: pageUrl("./floqai.html")}],
+          : [{label: localized.title || entry.title, href: pageUrl("./botdee.html")}],
         searchPhrases,
         patterns: []
       };
@@ -354,7 +354,7 @@
       body: "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open BOT DEE", href: pageUrl("./floqai.html")},
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
@@ -375,10 +375,10 @@
       title: "BOT DEE",
       body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "bot dee", "botdee", "general search", "search everything", "what can i search", "chat with bot dee", "enter to send", "shift enter", "how are you bot dee"],
-      links: [{label: "Open BOT DEE", href: pageUrl("./floqai.html")}],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
-      page: "floqai.html#botDeeChatPage"
+      page: "botdee.html#botDeeChatPage"
     },
     {
       id: "help-bot-dee-mgmt",

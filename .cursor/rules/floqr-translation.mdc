@@ -22,7 +22,7 @@ English-only help for a French (or any supported) speaker is a **product bug**. 
 
 | Audience | Datapoint | Must translate |
 |---|---|---|
-| Patron | `IsPatron=1` | Search + My Profile chrome, satellite titles, patron `?` / FloqAi help |
+| Patron | `IsPatron=1` | Search + My Profile chrome, satellite titles, patron `?` / BOT DEE help |
 | Service member | `IsServiceMember=1` | Work Calendar / role help |
 | Venue admin | `IsVenueAdmin=1` (legacy `IsClubAdmin` / `isClubAdmin` alias into this) | Club Admin chrome + venueAdmin help |
 
@@ -49,4 +49,4 @@ Language is **not** path-based (`/de/`, `/fr/`). It is `profile.uiLanguage` + `l
 
 ## Protected brands (never translate)
 
-ShoutOut, Mingl, BartR, RydR, FloqAi, dj BOT, djBOT, FloqR, FloqCAST, floqCast, VIP reserV, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.
+ShoutOut, Mingl, BartR, RydR, BOT DEE, FloqAi, dj BOT, djBOT, FloqR, FloqCAST, floqCast, VIP reserV, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.
