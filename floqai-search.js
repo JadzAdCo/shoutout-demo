@@ -1,9 +1,9 @@
-/* FloqAi idle float + speech bubbles + open contextual search */
+/* BOT DEE idle float + speech bubbles + open contextual search */
 (function (global) {
   "use strict";
 
   const HELP = "Tell me what you want to do — or say “I want to be able to…”";
-  const LINE_HI = "Hi, I am FloqAi";
+  const LINE_HI = "Hi, I am BOT DEE";
   const LINE_LOOK = "Tell me, what are you looking for?";
   const LINE_FEATURE = "Need to learn about a feature or do something else?";
   const LINE_WANT = 'Say “I want to be able to…” — for example, become a Club Admin';
@@ -63,7 +63,7 @@
   }
 
   function syncAgentVisibility(agent, speech) {
-    // Floating FloqAi mark + speech: Ask FloqR / intent only.
+    // Floating BOT DEE mark + speech: Ask FloqR / intent only.
     // Template select already has the lens Search field — no float there.
     const onIntent = document.getElementById("intentSearchPage")?.classList.contains("active");
     const show = !!onIntent;
@@ -130,7 +130,7 @@
       const padBottom = mobile ? 16 : 24;
       const userMenu = document.getElementById("userMenu") || document.querySelector(".user-menu");
       const menuBottom = userMenu ? Math.ceil(userMenu.getBoundingClientRect().bottom + 10) : 0;
-      // Keep roam area inside the first phone viewport (no scroll required to see FloqAi).
+      // Keep roam area inside the first phone viewport (no scroll required to see BOT DEE).
       const visibleBottom = mobile
         ? Math.min(window.innerHeight, Math.round(window.visualViewport?.height || window.innerHeight))
         : window.innerHeight;

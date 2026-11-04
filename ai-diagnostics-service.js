@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.74";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.74";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.75";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.75";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,11 +223,20 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.75",
+      title: "s3.2.75 — remove floqai.html (botdee.html only)",
+      checks: [
+        {label:"Page file", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "floqai.helpComposer"]},
+        {label:"Agent speech BOT DEE", file:"floqai-search.js", includes:["Hi, I am BOT DEE"], notIncludes:["Hi, I am FloqAi"]},
+        {label:"Auth gate no floqai-search", file:"floqr-auth-gate.js", notIncludes:["floqai-search.html"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-75-botdee-no-floqai-html", "floqai.html → 404"]}
+      ]
+    },
+    {
       version: "s3.2.74",
       title: "s3.2.74 — botdee.html page rename + FloqAi→BOT DEE help scrub",
       checks: [
         {label:"Page file", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "data-floqr-feature=\"floqAi\"", "floqai.helpComposer"]},
-        {label:"Legacy redirect", file:"floqai.html", includes:["location.replace(\"./botdee.html\")"]},
         {label:"Nav home", file:"floqr-nav.js", includes:["buildUrl(\"./botdee.html\")"]},
         {label:"Feature label", file:"floqr-feature-services.js", includes:["label: \"BOT DEE\"", "route: \"./botdee.html\""]},
         {label:"Help repo links", file:"floqai-help-repository.js", includes:["Open BOT DEE", "./botdee.html"]},
@@ -2622,13 +2631,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-75-botdee-no-floqai-html",
+      area:"BOT DEE",
+      feature:"floqai.html removed — botdee.html only",
+      changed:"Deleted floqai.html and floqai-search.html (404, no redirect). Floating agent speech is Hi, I am BOT DEE. Help/labels stay BOT DEE. Technical floqAi ids remain. Package s3.2.75 (Pages).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.75). 2) Open ? — BOT DEE only. 3) https://jadzadco.github.io/shoutout-demo/floqai.html → 404. 4) floqai-search.html → 404. 5) Search tile → botdee.html. 6) Mark Succeed/Failed.",
+      expected:"botdee.html works; floqai*.html 404; no FloqAi in patron-facing copy.",
+      troubleshoot:"floqai.html still loads → Pages not on s3.2.75 / CDN cache. Still FloqAi speech → hard refresh floqai-search.js. Tile wrong URL → floqr-nav.js + index.html cache-bust."
+    },
+    {
       id:"s3-2-74-botdee-page-rename",
       area:"BOT DEE",
       feature:"botdee.html page + FloqAi→BOT DEE help",
-      changed:"Canonical BOT DEE URL is botdee.html. Legacy floqai.html / floqai-search.html redirect. Feature catalog label BOT DEE. Help repository + locale packs + admin fallback copy say BOT DEE (not FloqAi). Technical ids stay floqAi. Package s3.2.74 (Pages).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.74) with floqAi. 2) Open ? → BOT DEE copy, no FloqAi. 3) Open https://jadzadco.github.io/shoutout-demo/floqai.html → lands on botdee.html. 4) Search tile opens botdee.html. 5) Master Admin Features Mgmt shows BOT DEE label. 6) Mark Succeed/Failed.",
-      expected:"Canonical URL botdee.html; redirects work; UI/help say BOT DEE only.",
-      troubleshoot:"Old floqai.html chat → Pages publish s3.2.74. Still FloqAi in ? → hard refresh floqr-i18n-help.js / floqai-help-repository.js. Tile still floqai.html → floqr-nav.js + index.html cache-bust."
+      changed:"Canonical BOT DEE URL is botdee.html (s3.2.74). s3.2.75 removes legacy floqai.html entirely.",
+      howToTest:"Superseded by s3-2-75-botdee-no-floqai-html — confirm botdee.html and 404 on floqai.html.",
+      expected:"botdee.html is canonical.",
+      troubleshoot:"See s3-2-75-botdee-no-floqai-html."
     },
     {
       id:"s3-2-73-botdee-help-composer",
@@ -2698,7 +2716,7 @@
         area:"Help / BOT DEE",
         feature:"Help ? panels stay fully in view (PC + mobile)",
         changed:"help-popout-body max-width + overflow-wrap; helper-popouts fitHelpPopoutInViewport flips left/right and nudges on screen. BOT DEE header ? opens leftward. Package s3.2.67.",
-        howToTest:"1) Hard-refresh floqai.html (package s3.2.67) on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
+        howToTest:"1) Hard-refresh botdee.html (package s3.2.67) on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
         expected:"Entire help verbiage readable inside the viewport.",
         troubleshoot:"Still clipped → hard refresh styles.css + helper-popouts.js + bot-dee-chat.css (s3.2.67). Parent overflow:hidden → check botdee-shell overflow:visible."
       },
@@ -2736,7 +2754,7 @@
         changed:"bot-dee-chat.js answers greetings locally before executeBotSession; server isChitchatPrompt widened (hello / hello how are you). Package s3.2.64. Functions deploy still needed for server path parity.",
         howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.64) signed in with floqAi access. 2) Type hello (or Hi / Hey) → BOT DEE replies Hey — BOT DEE here… (not a clear-match / search-miss message). 3) Type throw a shoutout → product help / results (search path still works). 4) Mark Succeed/Failed.",
         expected:"Greetings get a conversational reply; how-to questions still search/tool.",
-        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on floqai.html; confirm you are on botdee.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
+        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on botdee.html; confirm you are on botdee.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
       },
       {
         id:"s3-2-63-settings-square-chrome",

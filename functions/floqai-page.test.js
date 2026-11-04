@@ -15,8 +15,8 @@ test("BOT DEE page is botdee.html and every entry point goes there", () => {
   assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*floqai-icon-card[^"]*"[^>]*href="\.\/botdee\.html\?from=search"/);
   assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?botdee-(?:nightlife|traditional|whiteblack)\.jpg/);
   assert.match(read("styles.css"), /\.floqai-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
-  assert.match(read("floqai-search.html"), /location\.replace\("\.\/botdee\.html/);
-  assert.match(read("floqai.html"), /location\.replace\("\.\/botdee\.html/);
+  assert.equal(fs.existsSync(path.join(root, "floqai.html")), false, "floqai.html removed");
+  assert.equal(fs.existsSync(path.join(root, "floqai-search.html")), false, "floqai-search.html removed");
   assert.match(read("floqr-feature-services.js"), /key: "floqAi"[^}]*route: "\.\/botdee\.html"/);
   assert.match(read("functions/feature-services-core.js"), /key: "floqAi"[^}]*route: "\.\/botdee\.html"/);
   assert.match(read("floqr-feature-services.js"), /label: "BOT DEE"/);
@@ -101,4 +101,7 @@ test("BOT DEE page chrome is localized", () => {
   assert.match(read("floqr-i18n.js"), /"floqai\.chatWelcome"/);
   assert.match(read("floqr-i18n.js"), /"floqai\.helpComposer"/);
   assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
+  assert.match(read("floqai-search.js"), /Hi, I am BOT DEE/);
+  assert.doesNotMatch(read("floqai-search.js"), /Hi, I am FloqAi/);
+  assert.doesNotMatch(read("floqr-auth-gate.js"), /floqai-search\.html/);
 });

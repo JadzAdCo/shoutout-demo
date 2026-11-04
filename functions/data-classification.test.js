@@ -228,7 +228,7 @@ test("Master Admin Security → Data classification panel is wired and SOS2FA-ga
   const botdee = read("botdee.html");
   assert.ok(/floqr-data-classification\.js[\s\S]*floqai-access\.js[\s\S]*intent-search\.js/.test(botdee));
   assert.ok(botdee.includes('data-floqr-feature="floqAi"'));
-  assert.match(read("floqai.html"), /location\.replace\("\.\/botdee\.html/);
+  assert.equal(fs.existsSync(path.join(ROOT, "floqai.html")), false, "floqai.html removed");
 });
 
 test("Save all validates every row and needs a reason", () => {
