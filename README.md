@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.78 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.79 (stable)
+
+- s3.2.79: Black Card ($75) + Baller's Alert ($100) Baller's Express public; Amex twins Master Admin + Aurelia only.
+- s3.2.77: Help/i18n verbiage BOT DEE only (no FloqAi in titles/bodies); from=botdee; search aliases keep floqai.
+- s3.2.76: technical rename floqAi → botDee with dual-read.
 
 - s3.2.78: Black Card ($75) + Baller's Alert ($100) Baller's Express public; Amex twins Master Admin + Aurelia only.
 - s3.2.77: Help/i18n verbiage BOT DEE only (no FloqAi in titles/bodies); from=botdee; search aliases keep floqai.

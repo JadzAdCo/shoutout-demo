@@ -21,7 +21,7 @@ Owner (Nov 4 2026): public face uses **Baller's Express** (copyright-safe). Amex
 
 ## Display
 
-- Art: `images/baller/*-{2x1,4x3}.svg` (+ `-amex-` twins). Builder: `scripts/build-baller-card-svgs.js`.
+- Art: `images/baller/*-{2x1,4x3}.svg` (+ `-amex-` twins). Builder: `scripts/build-baller-card-svgs.js`. **Gold ornate filigree perimeter** (Centurion-style frame + corner flourishes) — do not strip to plain silver stroke.
 - Class: `baller-card` (+ `baller-alert`). Name/company embossed at lower left. Alert face = circular `media-slot` (~left 17%, upper third).
 - Valid Thru year **50** on Alert; Black Card keeps **28**.
 - `backgroundUrlByFormat` picks 2:1 vs 4:3 SVG per LED size.

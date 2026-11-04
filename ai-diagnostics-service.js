@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.78";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.78";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.79";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.79";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,12 +223,12 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.2.78",
-      title: "s3.2.78 — Black Card + Baller's Alert (Baller's Express public; Amex private)",
+      version: "s3.2.79",
+      title: "s3.2.79 — Black Card + Baller's Alert (Baller's Express public; Amex private)",
       checks: [
         {label:"Catalog public + Amex", file:"shared-data.js", includes:["blackCard:", "ballersAlert:", "blackCardAmex:", "ballersAlertAmex:", "masterAdminOnly:true", "priceCents:7500", "priceCents:10000"]},
         {label:"STANDARD public only", file:"shared-data.js", includes:["'blackCard','ballersAlert'"], notIncludes:["'blackCardAmex'"]},
-        {label:"Art Baller's", file:"images/baller/black-card-2x1.svg", includes:["BALLER'S EXPRESS"]},
+        {label:"Art Baller's + gold frame", file:"images/baller/black-card-2x1.svg", includes:["BALLER'S EXPRESS", "id=\"gold\"", "id=\"filigree\""]},
         {label:"Art Amex private", file:"images/baller/black-card-amex-2x1.svg", includes:["AMERICAN EXPRESS"]},
         {label:"Display baller", file:"display-app.js", includes:["isBallerCard", "baller-face-medallion-slot"]},
         {label:"Display CSS", file:"display.css", includes:["baller-card", "baller-alert"]},
@@ -237,7 +237,7 @@
         {label:"Rules refuse free", file:"firestore.rules", includes:["blackCard", "ballersAlert", "blackCardAmex"]},
         {label:"Help + intents", file:"botdee-help-repository.js", includes:["help-black-card", "help-ballers-alert"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-78-baller-cards"]},
-        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.78\""]}
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.79\""]}
       ]
     },
     {
@@ -2676,10 +2676,10 @@
       id:"s3-2-78-baller-cards",
       area:"ShoutOut / Templates",
       feature:"Black Card ($75) + Baller's Alert ($100) — Baller's Express public; Amex Master Admin + Aurelia only",
-      changed:"Public Baller's Express metal-card templates (name source + company presets; Alert requires face photo + optional Gemini medallion). Private Amex twins gated masterAdminOnly + Aurelia. Package s3.2.78. Needs Pages + firestore.rules + commerce Functions (+ aiEnhanceShoutOutMedia for face bake).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.78). 2) Throw ShoutOut → Black Card — set name + company → checkout $75. 3) Baller's Alert — upload face → checkout $100; preview shows face medallion + Valid Thru …/50. 4) As non-Master Admin at Aurelia, Amex twins must NOT list. 5) As Master Admin at Aurelia, Amex twins list with AMERICAN EXPRESS art. 6) BOT DEE: black card / baller's alert → help. 7) Mark Succeed/Failed.",
+      changed:"Public Baller's Express metal-card templates (name source + company presets; Alert requires face photo + optional Gemini medallion). Private Amex twins gated masterAdminOnly + Aurelia. Package s3.2.79. Needs Pages + firestore.rules + commerce Functions (+ aiEnhanceShoutOutMedia for face bake).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.79). 2) Throw ShoutOut → Black Card — set name + company → checkout $75. 3) Baller's Alert — upload face → checkout $100; preview shows face medallion + Valid Thru …/50. 4) As non-Master Admin at Aurelia, Amex twins must NOT list. 5) As Master Admin at Aurelia, Amex twins list with AMERICAN EXPRESS art. 6) BOT DEE: black card / baller's alert → help. 7) Mark Succeed/Failed.",
       expected:"Public pair everywhere at $75/$100 with Baller's Express art; Amex only for Master Admin on Aurelia; free create refused by rules.",
-      troubleshoot:"Missing templates → hard refresh shared-data.js ?v=s3.2.78. Wrong price → Functions deploy createFloqrCheckoutSession (BALLER_CARD_PRICE_CENTS). Amex visible to patrons → patron-app masterAdminOnly filter + commerce Amex gate. Face not circular → display.css baller-alert + display-app.js. Gemini skip OK — medallion still shows original photo."
+      troubleshoot:"Missing templates → hard refresh shared-data.js ?v=s3.2.79. Wrong price → Functions deploy createFloqrCheckoutSession (BALLER_CARD_PRICE_CENTS). Amex visible to patrons → patron-app masterAdminOnly filter + commerce Amex gate. Gold frame missing → rebuild scripts/build-baller-card-svgs.js + hard refresh SVG. Face not circular → display.css baller-alert + display-app.js. Gemini skip OK — medallion still shows original photo."
     },
     {
       id:"s3-2-77-botdee-help-verbiage",

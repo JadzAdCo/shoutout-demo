@@ -79,6 +79,8 @@ test("baller SVG assets are safe and branded correctly", () => {
     assert.match(svg.trimStart(), /^(<\?xml[^>]*>\s*)?<svg\b/);
     assert.match(svg, new RegExp(brand.replace(/'/g, "['’]?")), brand);
     assert.doesNotMatch(svg, /<script|<foreignObject|\son[a-z]+=|xlink:href="http|href="http/i);
+    assert.match(svg, /id="gold"/);
+    assert.match(svg, /id="filigree"|filigree/);
     assert.ok(Buffer.byteLength(svg) < 200 * 1024);
     if (isAlert) {
       assert.match(svg, /02\/50/);
