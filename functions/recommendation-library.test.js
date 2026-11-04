@@ -40,7 +40,8 @@ test("every published template allows patron background changes", () => {
       || String(template.id || "").startsWith("soccer")
       || template.id === "christine"
       || template.id === "shiloh"
-      || template.id === "classicHalloween") {
+      || template.id === "classicHalloween"
+      || template.ballerCard === true) {
       assert.equal(template.backgroundEditable, false, `${template.id} art background must stay locked`);
       assert.equal(template.IsModifiable, 0, `${template.id} must expose IsModifiable=0`);
       return;

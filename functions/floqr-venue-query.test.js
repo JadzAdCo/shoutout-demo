@@ -151,7 +151,7 @@ test("index.html wires the stationary BOT DEE category search", () => {
   assert.match(html, /id="categoryBotDeeSearch"/);
   assert.match(html, /id="categoryBotDeeInput"/);
   assert.match(html, /id="categoryBotDeeGo"[^>]*class="category-botdee-lens"/);
-  assert.match(html, /data-i18n-placeholder="cat\.floqaiPlaceholder"/);
+  assert.match(html, /data-i18n-placeholder="cat\.botdeePlaceholder"/);
   assert.match(html, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(html, /floqr-venue-query\.js\?v=s3\.\d+\.\d+/);
   assert.doesNotMatch(html, /id="categoryFloqAiSpeech"/);
@@ -198,6 +198,6 @@ test("an explicit place wins over near me; Monaco is a known place", () => {
 
 test("chrome pack carries the BOT DEE category dialog copy", () => {
   const src = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
-  assert.match(src, /"cat\.floqaiPlaceholder": "Search for Clubs, Lounge, Events, etc\."/);
-  assert.doesNotMatch(src, /"cat\.floqaiPlaceholder": "You may also search for: Clubs or Lounges"/);
+  assert.match(src, /"cat\.botdeePlaceholder": "Search for Clubs, Lounge, Events, etc\."/);
+  assert.doesNotMatch(src, /"cat\.botdeePlaceholder": "You may also search for: Clubs or Lounges"/);
 });

@@ -49,7 +49,6 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
 
   const reply = bot.chitchatReply("master");
   assert.match(reply, /BOT DEE here/i);
-  assert.doesNotMatch(reply, /BOT DEE here/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
   assert.match(bot.moodReply(), /thanks for asking|doing great/i);

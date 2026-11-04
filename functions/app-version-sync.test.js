@@ -89,7 +89,7 @@ test("BOT DEE links carry no version and no dangling ? / ?& whatever FLOQRNav sa
     assert.ok(hrefs.length > 50, `found ${hrefs.length} links`);
     const bad = hrefs.filter((href) => /[?&]v=|\?&|\?(?:#|$)/.test(href));
     assert.deepEqual(bad, [], `appVersion=${JSON.stringify(version)}`);
-    assert.ok(hrefs.includes("./scheduling.html?from=floqai"));
+    assert.ok(hrefs.includes("./scheduling.html?from=botdee"));
   }
 });
 

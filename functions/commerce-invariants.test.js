@@ -168,6 +168,10 @@ test("all published templates have display-aware text contracts", () => {
         assert.ok(rule.subTextSizePercent >= 50 && rule.subTextSizePercent <= 70, `${template.id} soccer mark size`);
         assert.equal(rule.sub, 2, `${template.id} soccer mark must be exactly 2 characters`);
         assert.ok(rule.main <= rule.lineCount * rule.perLine, `${template.id} soccer main ceiling`);
+      } else if (rule.profileId === "ballerCard" || rule.profileId === "nflJersey") {
+        assert.ok(rule.mainTextSizePercent > 0 && rule.mainTextSizePercent < 20.8, `${template.id} embossed/jersey size`);
+        assert.ok(rule.subTextSizePercent > 0, `${template.id} sub size`);
+        assert.ok(rule.main >= 1 && rule.perLine >= 1, `${template.id} caps`);
       } else {
         assert.equal(rule.mainTextSizePercent, 20.8);
         assert.equal(rule.subTextSizePercent, 7.8);
