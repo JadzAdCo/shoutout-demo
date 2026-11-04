@@ -1,0 +1,46 @@
+# Baller metal cards — Black Card + Baller's Alert
+
+Resume: `@baller$` / `$black-card$` / `$ballers-alert$`.
+
+## Product
+
+| Template id | Name | Price | Brand on face | Audience |
+|---|---|---|---|---|
+| `blackCard` | **Black Card** | $75 (`7500`) | Baller's Express BUSINESS | Shared / every venue (STANDARD) |
+| `ballersAlert` | **Baller's Alert** | $100 (`10000`) | Baller's Express BUSINESS + face | Shared / every venue (STANDARD) |
+| `blackCardAmex` | Black Card (Amex) | $75 | American Express BUSINESS | **Master Admin + Aurelia only** |
+| `ballersAlertAmex` | Baller's Alert (Amex) | $100 | American Express BUSINESS + face | **Master Admin + Aurelia only** |
+
+Owner (Nov 4 2026): public face uses **Baller's Express** (copyright-safe). Amex twins ("option B") stay **explicitly private** — Master Admin only, Aurelia (`temp-democlub-1`) only — while the owner seeks Amex consent for marketing/advertising use.
+
+## Composer
+
+- **Name source:** FloqR display name · FloqR/@Mingl handle · Instagram · custom name → `mainText` (cardholder).
+- **Company:** presets `We're Outside LLC` · `Bad Boy Inc.` · `BaddB$ches Only Corp` · custom → `subText`.
+- **Baller's Alert:** face photo **required** (`requiresFacePhoto`). Display CSS medallion fallback; optional Gemini `baller-face-medallion` bake via `aiEnhanceShoutOutMedia` (soft-fail to original).
+
+## Display
+
+- Art: `images/baller/*-{2x1,4x3}.svg` (+ `-amex-` twins). Builder: `scripts/build-baller-card-svgs.js`.
+- Class: `baller-card` (+ `baller-alert`). Name/company embossed at lower left. Alert face = circular `media-slot` (~left 17%, upper third).
+- Valid Thru year **50** on Alert; Black Card keeps **28**.
+- `backgroundUrlByFormat` picks 2:1 vs 4:3 SVG per LED size.
+
+## Gates
+
+- Catalog: public pair in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; Amex twins `venueIds:['temp-democlub-1']` + `masterAdminOnly:true` (not STANDARD).
+- Client: `renderTemplates` hides `masterAdminOnly` unless Master Admin.
+- Server: `commerce-functions` forces price; Amex requires `isServerAdminAuth` + Aurelia club id.
+- Rules: `validFreePatronShoutoutCreate` excludes all four ids (paid checkout only).
+
+## Do not
+
+- Do not list Amex twins for patrons or non-Aurelia venues.
+- Do not put Amex art on the public STANDARD catalog while consent is pending.
+- Do not invent real payment BINs; art numbers stay fictional.
+
+## FIX PROMPT
+
+```
+Baller cards: public blackCard ($75) + ballersAlert ($100) Baller's Express; private Amex twins Master Admin + Aurelia only. Name source + company presets; Alert face photo + optional Gemini baller-face-medallion. Design notes: design-notes-baller-cards.mdc
+```

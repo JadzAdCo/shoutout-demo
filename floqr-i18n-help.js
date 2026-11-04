@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.77";
+  const VERSION = "s3.2.78";
 
   const packs = {
     "ru": {
@@ -249,6 +249,14 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Эксклюзив Aurelia за $30. Кошка Shiloh сидит в левой части экрана, а ваш ShoutOut светится белым на тёмной стороне рядом с ней. Эмодзи приветствуются. Введите в поиске «Shiloh», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах тех размеров, которые есть в Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -572,6 +580,14 @@
         title: "Shiloh",
         body: "Exclusief bij Aurelia voor $30. De kat Shiloh zit links op het scherm en je ShoutOut gloeit wit aan de donkere kant naast haar. Emoji zijn welkom. Typ ‘Shiloh’ in Zoeken, schrijf maximaal drie korte regels en voeg desgewenst je @handle toe. Speelt op de schermformaten die Aurelia heeft."
       },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+      },
       "help-classic-halloween": {
         title: "Classic Halloween",
         body: "Classic Halloween voor $15, in elke club. Het klassieke ShoutOut-bord met drie regels op een maanverlichte begraafplaats met pompoenlantaarns; emoji zijn welkom. Aan het eind van elke cyclus stijgen witte spoken op uit een graf en stormen op het publiek af, terwijl Magere Hein opdoemt en vleermuizen rondfladderen. Typ “Halloween” in Zoeken, schrijf tot drie korte regels en voeg desgewenst je @handle toe. Speelt op borden van 96×48, 64×48 en 64×32."
@@ -893,6 +909,14 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivité Aurelia à 30 $. Le chat Shiloh est assis à gauche de l’écran et votre ShoutOut brille en blanc sur le côté sombre, juste à côté. Les emoji sont les bienvenus. Tapez « Shiloh » dans Recherche, écrivez jusqu’à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S’affiche sur les tailles d’écran dont dispose Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1216,6 +1240,14 @@
         title: "Shiloh",
         body: "Exklusiv bei Aurelia für 30 $. Die Katze Shiloh sitzt links auf der Anzeige, und dein ShoutOut leuchtet weiß auf der dunklen Seite neben ihr. Emojis sind willkommen. Gib „Shiloh“ in der Suche ein, schreib bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf den Displaygrößen, die Aurelia hat."
       },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+      },
       "help-classic-halloween": {
         title: "Classic Halloween",
         body: "Classic Halloween für $15, in jedem Club. Die klassische dreizeilige ShoutOut-Anzeige auf einem mondbeschienenen Friedhof mit Kürbislaternen – Emojis sind willkommen. Am Ende jedes Durchlaufs steigen weiße Geister aus einem Grab und stürmen auf das Publikum zu, während der Sensenmann auftaucht und Fledermäuse schwärmen. Gib „Halloween“ in die Suche ein, schreibe bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf Anzeigen in 96×48, 64×48 und 64×32."
@@ -1537,6 +1569,14 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivo de Aurelia por $30. La gata Shiloh aparece a la izquierda de la pantalla y tu ShoutOut brilla en blanco en el lado oscuro, a su lado. Los emojis son bienvenidos. Escribe «Shiloh» en Buscar, escribe hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en los tamaños de pantalla que tiene Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1860,6 +1900,14 @@
         title: "Shiloh",
         body: "Esclusiva Aurelia a 30 $. La gatta Shiloh è seduta a sinistra dello schermo e il tuo ShoutOut brilla in bianco sul lato scuro accanto a lei. Le emoji sono benvenute. Scrivi «Shiloh» in Cerca, scrivi fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sulle dimensioni di schermo che ha Aurelia."
       },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+      },
       "help-classic-halloween": {
         title: "Classic Halloween",
         body: "Classic Halloween a $15, in tutti i club. Il classico tabellone ShoutOut a tre righe su un cimitero al chiaro di luna con zucche di Halloween; le emoji sono benvenute. Alla fine di ogni ciclo, fantasmi bianchi escono da una tomba e si lanciano verso il pubblico mentre la Morte si alza e volano i pipistrelli. Scrivi «Halloween» nella ricerca, inserisci fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sugli schermi 96×48, 64×48 e 64×32."
@@ -2181,6 +2229,14 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivo do Aurelia por US$ 30. A gata Shiloh fica à esquerda da tela e o seu ShoutOut brilha em branco no lado escuro, ao lado dela. Emojis são bem-vindos. Digite «Shiloh» na Busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Aparece nos tamanhos de tela que o Aurelia tem."
+      },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2504,6 +2560,14 @@
         title: "Shiloh",
         body: "Αποκλειστικό του Aurelia στα 30 $. Η γάτα Shiloh κάθεται στα αριστερά της οθόνης και το ShoutOut σας λάμπει λευκό στη σκοτεινή πλευρά δίπλα της. Τα emoji είναι ευπρόσδεκτα. Πληκτρολογήστε «Shiloh» στην Αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει στα μεγέθη οθόνης που έχει το Aurelia."
       },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+      },
       "help-classic-halloween": {
         title: "Classic Halloween",
         body: "Classic Halloween με $15, σε κάθε club. Ο κλασικός πίνακας ShoutOut τριών γραμμών σε ένα φεγγαρόλουστο νεκροταφείο με φαναράκια-κολοκύθες· τα emoji είναι ευπρόσδεκτα. Στο τέλος κάθε κύκλου, λευκά φαντάσματα βγαίνουν από έναν τάφο και ορμούν προς το κοινό, ενώ ο Χάρος υψώνεται και νυχτερίδες πετούν. Πληκτρολογήστε «Halloween» στην αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει σε οθόνες 96×48, 64×48 και 64×32."
@@ -2826,6 +2890,14 @@
         title: "Shiloh",
         body: "Wyłącznie w Aurelia za 30 $. Kotka Shiloh siedzi po lewej stronie ekranu, a Twój ShoutOut świeci na biało po ciemnej stronie obok niej. Emoji są mile widziane. Wpisz „Shiloh” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach w rozmiarach, które ma Aurelia."
       },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+      },
       "help-classic-halloween": {
         title: "Classic Halloween",
         body: "Classic Halloween za $15, w każdym klubie. Klasyczna trzywierszowa tablica ShoutOut na tle cmentarza w świetle księżyca z dyniowymi lampionami; emoji są mile widziane. Na końcu każdego cyklu białe duchy wylatują z grobu i pędzą w stronę publiczności, a Kostucha się podnosi i krążą nietoperze. Wpisz „Halloween” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach 96×48, 64×48 i 64×32."
@@ -3147,6 +3219,14 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "حصري في Aurelia مقابل 30 $. تجلس القطة Shiloh على يسار الشاشة ويتوهّج ShoutOut الخاص بك باللون الأبيض على الجانب الداكن بجانبها. الرموز التعبيرية مرحّب بها. اكتب «Shiloh» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @اسمك إن أردت. يُعرض على أحجام الشاشات المتوفرة في Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card",
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",

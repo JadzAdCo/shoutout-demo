@@ -1565,6 +1565,9 @@ html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
 .listing-section{grid-column:1/-1}
 .listing-section>h3{margin:8px 0 0;font-size:22px;color:var(--lime)}
 .name-shoutout-fields{display:grid;gap:6px;margin:4px 0 10px}
+.baller-card-fields{display:grid;gap:8px;margin:6px 0 12px}
+.baller-card-fields label{display:grid;gap:4px}
+
 .name-shoutout-combo{position:relative}
 .name-shoutout-combo input{width:100%;font-size:1.1rem;font-weight:700}
 .name-shoutout-suggestions{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;max-height:280px;overflow:auto;background:#12141c;border:1px solid rgba(255,226,122,.45);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45)}

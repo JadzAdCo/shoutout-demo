@@ -1721,6 +1721,26 @@
       page: "index.html#templates"
     },
     {
+      id: "help-black-card",
+      title: "Black Card",
+      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
+      searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout", "black metal card", "$75 shoutout"],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-ballers-alert",
+      title: "Baller's Alert",
+      body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card.",
+      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo", "face medallion", "$100 shoutout"],
+      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
       id: "help-classic-halloween",
       title: "Classic Halloween",
       body: "$15 Classic Halloween, at every club. The classic three-line ShoutOut board on a moonlit graveyard with jack-o'-lanterns, and emoji are welcome. At the end of each cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. Type “Halloween” in Search, write up to three short lines, and add your @handle if you like. Plays on 96×48, 64×48 and 64×32 boards.",

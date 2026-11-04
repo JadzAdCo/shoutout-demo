@@ -134,7 +134,144 @@
     const brand = String(loc.brandName || loc.locationName || "Zebbies").trim().toUpperCase();
     return `${brand} FOOTBALL INTRO`;
   }
-  function isSoccerJerseyTemplate(templateId = selectedTemplate) {
+  const BALLER_COMPANY_PRESETS = {
+    "were-outside": "We're Outside LLC",
+    "bad-boy": "Bad Boy Inc.",
+    "baddbches": "BaddB$ches Only Corp"
+  };
+  function isBallerCardTemplate(id = selectedTemplate) {
+    const t = getTemplate(id);
+    if (t?.ballerCard === true) return true;
+    return ["blackCard", "ballersAlert", "blackCardAmex", "ballersAlertAmex"].includes(String(id || t?.id || ""));
+  }
+  function isBallerAlertTemplate(id = selectedTemplate) {
+    const t = getTemplate(id);
+    if (!isBallerCardTemplate(id)) return false;
+    return t?.ballerAlert === true || t?.requiresFacePhoto === true || String(id || t?.id || "") === "ballersAlert" || String(id || t?.id || "") === "ballersAlertAmex";
+  }
+  function isMasterAdminViewer() {
+    const services = window.FLOQRFeatureServices;
+    if (services?.getViewer?.()?.isMasterAdmin === true) return true;
+    const g = window.FLOQRFeatureGates;
+    if (g?.isMasterAdminEmail?.(currentUser) || g?.isSuperAdmin?.(currentUser, cachedUserProfile)) return true;
+    return false;
+  }
+  function ballerNameFromSource() {
+    const source = byId("ballerNameSource")?.value || "displayName";
+    const profile = cachedUserProfile || {};
+    const emailName = String(currentUser?.email || "").split("@")[0] || "";
+    const username = profile.username || emailName || currentUser?.displayName || "patron";
+    if (source === "manual") return String(byId("ballerManualName")?.value || "").trim();
+    if (source === "floqrHandle") return String(username).replace(/^@/, "").trim();
+    if (source === "instagram") {
+      const ig = String(profile.instagramHandle || profile.socialMediaHandles?.instagram || "").replace(/^@/, "").trim();
+      return ig || String(username).replace(/^@/, "").trim();
+    }
+    return String(profile.displayName || currentUser?.displayName || username).trim();
+  }
+  function ballerCompanyFromFields() {
+    const preset = byId("ballerCompanyPreset")?.value || "were-outside";
+    if (preset === "custom") return String(byId("ballerCustomCompany")?.value || "").trim();
+    return BALLER_COMPANY_PRESETS[preset] || BALLER_COMPANY_PRESETS["were-outside"];
+  }
+  function ballerCardPayloadFields() {
+    if (!isBallerCardTemplate()) return {};
+    const t = getTemplate();
+    const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || "";
+    const formatBg = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[formatId] || t.backgroundUrlByFormat[String(formatId).replace(/^p125-/, "led-")])) || "";
+    const name = ballerNameFromSource();
+    const company = ballerCompanyFromFields();
+    return {
+      ballerCard: true,
+      ballerAlert: isBallerAlertTemplate(),
+      ballerBrand: t.ballerBrand || (String(t.id || "").includes("Amex") ? "amex" : "ballers"),
+      ballerNameSource: byId("ballerNameSource")?.value || "displayName",
+      ballerCompanyPreset: byId("ballerCompanyPreset")?.value || "were-outside",
+      ballerCompany: company,
+      backgroundUrl: formatBg || t.defaultBackgroundUrl || "",
+      mainText: name,
+      subText: company
+    };
+  }
+  function syncBallerCardFields() {
+    const baller = isBallerCardTemplate();
+    const alert = isBallerAlertTemplate();
+    byId("ballerCardFields")?.classList.toggle("hidden", !baller);
+    byId("ballerFaceHint")?.classList.toggle("hidden", !alert);
+    if (baller) {
+      byId("mainText")?.closest("label")?.classList.add("hidden");
+      document.querySelector(".attribution-controls")?.classList.add("hidden");
+    }
+    const source = byId("ballerNameSource")?.value || "displayName";
+    byId("ballerManualNameWrap")?.classList.toggle("hidden", !baller || source !== "manual");
+    const preset = byId("ballerCompanyPreset")?.value || "were-outside";
+    byId("ballerCustomCompanyWrap")?.classList.toggle("hidden", !baller || preset !== "custom");
+    if (!baller) return;
+    const caps = templateDisplayCaps();
+    const nameLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 28));
+    const companyLimit = Math.max(1, Number(caps.sub || caps.maxSubCharacters || 28));
+    if (byId("ballerManualName")) byId("ballerManualName").maxLength = nameLimit;
+    if (byId("ballerCustomCompany")) byId("ballerCustomCompany").maxLength = companyLimit;
+    const name = String(ballerNameFromSource() || "").slice(0, nameLimit);
+    const company = String(ballerCompanyFromFields() || "").slice(0, companyLimit);
+    if (byId("mainText")) byId("mainText").value = name;
+    if (byId("subText")) byId("subText").value = company;
+    const mediaCard = byId("shoutoutMediaCard");
+    if (mediaCard && alert) {
+      const note = mediaCard.querySelector(".single-media-upload-note");
+      if (note) note.textContent = "Face photo required — clear head-and-shoulders shot works best for the medallion.";
+      const label = mediaCard.querySelector(".file-upload-label");
+      if (label && label.childNodes[0]) label.childNodes[0].textContent = "Upload face photo ";
+    }
+  }
+  async function maybeEnhanceBallerFace(uploadResult, referenceNumber) {
+    if (!isBallerAlertTemplate() || !uploadResult?.mediaStoragePath) return uploadResult || {};
+    if (!String(uploadResult.mediaType || "").startsWith("image") && uploadResult.mediaType && uploadResult.mediaType !== "image") {
+      return uploadResult;
+    }
+    try {
+      const client = firebase.app().functions(window.FLOQR_AI_FUNCTIONS_REGION || undefined);
+      const callable = client.httpsCallable(window.FLOQR_AI_GEMINI_MEDIA_FUNCTION || "aiEnhanceShoutOutMedia");
+      const result = await Promise.race([
+        callable({
+          mediaStoragePath: uploadResult.mediaStoragePath,
+          referenceNumber,
+          prompt: "Fit this face into a circular metal-card medallion.",
+          enhancementType: "baller-face-medallion"
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Gemini baller face timed out")), 45000))
+      ]);
+      const data = result?.data || {};
+      if (data.status === "enhanced" && data.enhancedMediaUrl) {
+        return {
+          ...uploadResult,
+          mediaUrl: data.enhancedMediaUrl,
+          mediaType: "image",
+          mediaStoragePath: data.enhancedMediaStoragePath || uploadResult.mediaStoragePath,
+          originalMediaUrl: uploadResult.mediaUrl,
+          originalMediaStoragePath: uploadResult.mediaStoragePath,
+          enhancedMediaUrl: data.enhancedMediaUrl,
+          enhancedMediaStoragePath: data.enhancedMediaStoragePath || "",
+          selectedMediaVersion: "enhanced",
+          aiEnhancementApplied: true,
+          aiEnhancementType: "baller-face-medallion",
+          aiEnhancementProvider: data.provider || "gemini",
+          aiEnhancementModel: data.model || "",
+          aiMediaSafetyStatus: data.aiMediaSafetyStatus || "passed",
+          aiMediaSafetyNotes: data.aiMediaSafetyNotes || "Baller face medallion prepared."
+        };
+      }
+    } catch (error) {
+      console.warn("baller face Gemini fallback", error?.message || error);
+    }
+    return {
+      ...uploadResult,
+      aiEnhancementType: "none",
+      aiMediaSafetyStatus: "fallback",
+      aiMediaSafetyNotes: "Original face photo retained for medallion."
+    };
+  }
+    function isSoccerJerseyTemplate(templateId = selectedTemplate) {
     const id = String(templateId || selectedTemplate || "");
     const t = getTemplate(id);
     if (id === "soccerJersey" || t.id === "soccerJersey" || t.requiresTeamSelect === true) return true;
@@ -331,12 +468,16 @@
     return true;
   }
   function syncSoccerJerseyFields() {
+    syncBallerCardFields();
     const soccer = isSoccerJerseyTemplate();
     const nflDual = isNflDualJerseyTemplate();
     byId("soccerJerseyFields")?.classList.toggle("hidden", !soccer);
     // NFL dual: keep ShoutOut main message + FloqR-card attribution controls visible.
-    byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer && !nflDual);
-    document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer && !nflDual);
+    // Baller cards own the main/attribution chrome via syncBallerCardFields (called first).
+    if (!isBallerCardTemplate()) {
+      byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer && !nflDual);
+      document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer && !nflDual);
+    }
     const source = byId("soccerNameSource")?.value || "displayName";
     byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
     const consolidated = isConsolidatedSoccerTemplate();
@@ -3827,7 +3968,8 @@
       .map(id => (/^soccer/i.test(id) && id !== "soccerJersey" ? "soccerJersey" : id));
       const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter((record, index, arr) => arr.findIndex(row => row.id === record.id) === index)
-      .filter(record => String(record.data.status || "active") === "active" && window.FLOQRScreenDatapoints?.templateFitsVenue?.(record.data, location) !== false);
+      .filter(record => String(record.data.status || "active") === "active" && window.FLOQRScreenDatapoints?.templateFitsVenue?.(record.data, location) !== false)
+      .filter(record => record.data?.masterAdminOnly !== true || isMasterAdminViewer());
     const soccerPhotoHits = matchingSoccerPhotoTeams(query || discoveryQuery);
     if (soccerPhotoHits.length) {
       const extra = soccerPhotoHits
@@ -3993,9 +4135,10 @@
     const themePayload = isFootballTeamIntro() ? footballThemePayload() : {};
     const backgroundPayload = isFootballTeamIntro() ? footballBackgroundPayload() : {};
     const jerseyPayload = soccerJerseyPayloadFields();
+    const ballerPayload = ballerCardPayloadFields();
     const previewPayload = {
-      mainText:fitTemplateText(byId("mainText")?.value.trim()||"SHOUTOUT!", "main"),
-      subText:fitTemplateText(byId("subText")?.value.trim()||"", "sub"),
+      mainText:fitTemplateText((ballerPayload.mainText || byId("mainText")?.value.trim()||"SHOUTOUT!"), "main"),
+      subText:fitTemplateText((ballerPayload.subText || byId("subText")?.value.trim()||""), "sub"),
       mediaUrl,
       mediaType,
       mediaFit:byId("shoutoutMediaFit")?.value || "contain",
@@ -4012,7 +4155,7 @@
       maxCharactersPerLine:textCaps.perLine,
       mainTextSizePercent:textCaps.mainTextSizePercent,
       subTextSizePercent:textCaps.subTextSizePercent,
-      backgroundUrl:jerseyPayload.backgroundUrl || (isFootballTeamIntro() ? (backgroundPayload.backgroundUrl || selectedTemplateVariant?.backgroundUrl || "") : (selectedTemplateVariant?.backgroundUrl || "")),
+      backgroundUrl:ballerPayload.backgroundUrl || jerseyPayload.backgroundUrl || (isFootballTeamIntro() ? (backgroundPayload.backgroundUrl || selectedTemplateVariant?.backgroundUrl || "") : (selectedTemplateVariant?.backgroundUrl || "")),
       backgroundFit: jerseyPayload.backgroundUrl
         ? ""
         : ((selectedTemplateVariant?.backgroundUrl || backgroundPayload.backgroundUrl) ? (byId("shoutoutMediaFit")?.value || "contain") : ""),
@@ -4024,7 +4167,8 @@
       skipFinaleLineup:!!textCaps.skipFinaleLineup,
       aiPortraitMotion:!!byId("footballAiTreatment")?.checked,
       ...themePayload,
-      ...jerseyPayload
+      ...jerseyPayload,
+      ...ballerPayload
     };
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
@@ -4696,7 +4840,39 @@
       const footballTeamMembers = footballIntro ? await uploadFootballTeamMembers(referenceNumber) : [];
       const themePayload = footballIntro ? footballThemePayload() : {};
       const backgroundPayload = footballIntro ? footballBackgroundPayload() : {};
-      const uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
+      if (isBallerCardTemplate()) syncBallerCardFields();
+      if (isBallerAlertTemplate() && !saveOnly) {
+        const existingFace = window.FLOQRSafeRender?.safeUrl(byId("shoutoutMediaUrl")?.value || byId("mediaUrl")?.value) || "";
+        const hasFile = !!(byId("shoutoutMediaUpload")?.files?.[0]);
+        if (!existingFace && !hasFile) {
+          status.textContent = "Baller's Alert needs a clear face photo for the medallion.";
+          byId("shoutoutMediaUpload")?.focus?.();
+          return;
+        }
+      }
+      if (isBallerCardTemplate() && !saveOnly) {
+        const nameCheck = ballerNameFromSource();
+        const companyCheck = ballerCompanyFromFields();
+        if (!nameCheck) {
+          status.textContent = "Enter or choose a cardholder name for the metal card.";
+          (byId("ballerManualName") || byId("ballerNameSource"))?.focus?.();
+          return;
+        }
+        if (!companyCheck) {
+          status.textContent = "Choose a company line for the metal card.";
+          (byId("ballerCustomCompany") || byId("ballerCompanyPreset"))?.focus?.();
+          return;
+        }
+        if (getTemplate()?.masterAdminOnly === true && !isMasterAdminViewer()) {
+          status.textContent = "This American Express preview template is Master Admin only.";
+          return;
+        }
+      }
+      let uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
+      if (isBallerAlertTemplate() && uploadedMedia?.mediaStoragePath) {
+        status.textContent = "Preparing face medallion…";
+        uploadedMedia = await maybeEnhanceBallerFace(uploadedMedia, referenceNumber);
+      }
       const existingMediaUrl = window.FLOQRSafeRender?.safeUrl(byId("shoutoutMediaUrl")?.value || byId("mediaUrl")?.value) || "";
       const existingMediaType = byId("shoutoutMediaType")?.value.trim() || "";
       const mediaPayload = footballIntro ? {
@@ -4794,13 +4970,14 @@
           return;
         }
       }
+      const ballerFields = ballerCardPayloadFields();
       const canonicalTemplateId = jerseyFields.template || selectedTemplate;
       const canonicalTemplate = getTemplate(canonicalTemplateId);
       const nflDualSubmit = isNflDualJerseyTemplate();
-      const mainRaw = byId("mainText").value.trim();
+      const mainRaw = (ballerFields.mainText || byId("mainText").value.trim());
       try { await window.FLOQRClientIp?.ensure?.(); } catch (_) {}
       const sessionIp = window.FLOQRClientIp?.current?.() || {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status: saveOnly ? "saved" : "pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), savedAt: saveOnly ? firebase.firestore.FieldValue.serverTimestamp() : null, referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, ...ballerFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(ballerFields.subText || byId("subText").value.trim()||"","sub"), ...mediaPayload, status: saveOnly ? "saved" : "pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), savedAt: saveOnly ? firebase.firestore.FieldValue.serverTimestamp() : null, referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
       if (saveOnly) {
         status.textContent = tt("page.shoutout.savingDraft", null, "Saving ShoutOut draft…");
         const shoutoutRef = await db.collection("shoutouts").add({
@@ -5309,6 +5486,10 @@
     byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("soccerNameSource")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("ballerNameSource")?.addEventListener("change", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("ballerManualName")?.addEventListener("input", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("ballerCompanyPreset")?.addEventListener("change", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("ballerCustomCompany")?.addEventListener("input", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("soccerTeamId")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("soccerJerseyNumber")?.addEventListener("input", event => {

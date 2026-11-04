@@ -87,6 +87,28 @@
       patterns: [/shiloh/, /\bcat\s*(shout|template|background)/, /\bkitty\s*(shout|template)/, /aurelia\s*cat/]
     },
     {
+      id: "black-card",
+      kind: "product",
+      label: "Black Card",
+      blurb: "$75 Baller's Express BUSINESS metal card — your name and company embossed on every LED size.",
+      href: pageUrl("./", {start: "search"}),
+      action: "template",
+      templateId: "blackCard",
+      searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout"],
+      patterns: [/black\s*card/, /baller'?s?\s*express/, /metal\s*card/, /business\s*card\s*shout/]
+    },
+    {
+      id: "ballers-alert",
+      kind: "product",
+      label: "Baller's Alert",
+      blurb: "$100 Baller's Express card with your face in the upper-left medallion. Face photo required; Valid Thru year 50.",
+      href: pageUrl("./", {start: "search"}),
+      action: "template",
+      templateId: "ballersAlert",
+      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo"],
+      patterns: [/baller'?s?\s*alert/, /face\s*card/, /black\s*card\s*photo/]
+    },
+    {
       id: "classic-halloween",
       kind: "product",
       label: "Classic Halloween",
@@ -910,7 +932,7 @@
   const INTENT_AUDIENCES = Object.freeze({
     "venue-search": ["public"],
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
-    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], floqcast: ["patron"], clubs: ["patron"],
+    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

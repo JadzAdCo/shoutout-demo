@@ -55,6 +55,20 @@ const SOCCER_JERSEY_PRICE_CENTS = 3000;
 /* s3.2.71 CI deploy marker — re-trigger after Cloud Run CPU quota [firebase-deploy] */
 const CLASSIC_HALLOWEEN_TEMPLATE_ID = "classicHalloween";
 const CLASSIC_HALLOWEEN_PRICE_CENTS = 1500;
+const BALLER_CARD_PRICE_CENTS = {
+  blackCard: 7500,
+  ballersAlert: 10000,
+  blackCardAmex: 7500,
+  ballersAlertAmex: 10000
+};
+const BALLER_CARD_TEMPLATE_IDS = new Set(Object.keys(BALLER_CARD_PRICE_CENTS));
+const BALLER_AMEX_TEMPLATE_IDS = new Set(["blackCardAmex", "ballersAlertAmex"]);
+const BALLER_CARD_LABELS = {
+  blackCard: "Black Card",
+  ballersAlert: "Baller's Alert",
+  blackCardAmex: "Black Card (Amex)",
+  ballersAlertAmex: "Baller's Alert (Amex)"
+};
 function isSportsJerseyTemplateId(templateId = "") {
   const id = String(templateId || "");
   if (id === "soccerJersey" || SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
@@ -85,6 +99,9 @@ const SHOUTOUT_TEXT_LIMITS = {
   },
   soccerJersey:{
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
+  },
+  ballerCard:{
+    "led-96x48":[2,22,28,28],"led-64x48":[2,18,22,22],"led-64x32":[2,18,22,22]
   },
   // Must match shared-data nflJersey — shoutout copy is NOT the jersey name.
   nflJersey:{
@@ -247,13 +264,15 @@ function checkoutTextCaps(templateId = "", formatId = "") {
       ? "nflJersey"
       : isSportsJerseyTemplateId(templateId)
         ? "soccerJersey"
-        : templateId === "car"
-          ? "car"
-          : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
-            ? "splitMedia"
-            : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
-              ? "classicBoard"
-              : "full";
+        : BALLER_CARD_TEMPLATE_IDS.has(templateId)
+          ? "ballerCard"
+          : templateId === "car"
+            ? "car"
+            : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+              ? "splitMedia"
+              : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+                ? "classicBoard"
+                : "full";
   const canonicalFormatId = canonicalCheckoutFormatId(formatId);
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[canonicalFormatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
@@ -416,6 +435,36 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
         location:HEIST_DC_LOCATION_ID,
         screenFormatId:screenFormatId || "led-64x32",
         priceCents:HEIST_ART_PRICE_CENTS
+      }
+    };
+  }
+  if (BALLER_CARD_TEMPLATE_IDS.has(templateId)) {
+    const clubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
+    if (BALLER_AMEX_TEMPLATE_IDS.has(templateId)) {
+      if (!isServerAdminAuth(authContext)) {
+        throw new HttpsError("permission-denied", "American Express baller cards are Master Admin only while Amex consent is pending.");
+      }
+      if (clubId !== AURELIA_LOCATION_ID) {
+        throw new HttpsError("failed-precondition", "American Express baller cards are available only at Aurelia.");
+      }
+    }
+    const priceCents = BALLER_CARD_PRICE_CENTS[templateId];
+    const priceLabel = priceCents === 10000 ? "$100" : "$75";
+    return {
+      ...rawPayload,
+      clubLocationId: clubId || rawPayload.clubLocationId,
+      shoutout:{
+        ...shoutout,
+        clubLocationId: clubId || shoutout.clubLocationId,
+        location: clubId || shoutout.location,
+        ballerCard: true,
+        ballerAlert: templateId === "ballersAlert" || templateId === "ballersAlertAmex",
+        ballerBrand: BALLER_AMEX_TEMPLATE_IDS.has(templateId) ? "amex" : "ballers",
+        ballerNameSource: text(rawShoutout.ballerNameSource, 40),
+        ballerCompanyPreset: text(rawShoutout.ballerCompanyPreset, 80),
+        priceCents,
+        priceLabel,
+        templateName: BALLER_CARD_LABELS[templateId] || shoutout.templateName
       }
     };
   }
@@ -721,6 +770,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
     const soccerJersey = isSportsJerseyTemplateId(templateId);
     const classicHalloween = templateId === CLASSIC_HALLOWEEN_TEMPLATE_ID;
+    const ballerCard = BALLER_CARD_TEMPLATE_IDS.has(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
       : heistArt
@@ -729,7 +779,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
           ? SOCCER_JERSEY_PRICE_CENTS
           : classicHalloween
             ? CLASSIC_HALLOWEEN_PRICE_CENTS
-            : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+            : ballerCard
+              ? BALLER_CARD_PRICE_CENTS[templateId]
+              : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }
@@ -739,6 +791,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && !FOOTBALL_TEAM_INTRO_LOCATION_IDS.has(clubId)) throw new HttpsError("failed-precondition", FOOTBALL_TEAM_INTRO_VENUE_MESSAGE);
     if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
+    if (ballerCard && BALLER_AMEX_TEMPLATE_IDS.has(templateId)) {
+      if (clubId !== AURELIA_LOCATION_ID) throw new HttpsError("failed-precondition", "American Express baller cards are available only at Aurelia.");
+    }
     const venueName = text(shoutout.locationName || shoutout.clubName || shoutout.brandName || clubId, 80);
     const templateName = footballTeamIntro
       ? "Football Intro"
@@ -746,7 +801,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
         ? "Heist Art"
         : classicHalloween
           ? "Classic Halloween"
-          : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
+          : ballerCard
+            ? (BALLER_CARD_LABELS[templateId] || "Black Card")
+            : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
     const itemName = shoutoutReceiptTitle({
       templateName,
       locationName: venueName,

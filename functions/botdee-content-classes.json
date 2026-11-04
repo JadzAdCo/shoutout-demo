@@ -21,6 +21,9 @@
     "help-archived-shoutouts": [
       "patron"
     ],
+    "help-ballers-alert": [
+      "patron"
+    ],
     "help-become-club-admin": [
       "venueAdmin"
     ],
@@ -34,6 +37,9 @@
       "patron"
     ],
     "help-beta-tester": [
+      "patron"
+    ],
+    "help-black-card": [
       "patron"
     ],
     "help-bot-dee-mgmt": [
@@ -367,7 +373,13 @@
     "ad-campaigns": [
       "patron"
     ],
+    "ballers-alert": [
+      "patron"
+    ],
     "bartr": [
+      "patron"
+    ],
+    "black-card": [
       "patron"
     ],
     "classic-halloween": [
