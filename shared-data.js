@@ -732,6 +732,13 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
       vipReservations: true,
       passes: true
     });
+    // Keep searchable even when showcase script is missing (feature landings used to miss this).
+    if (!aurelia.locationName) aurelia.locationName = "Aurelia (Demo Club)";
+    if (!aurelia.brandName) aurelia.brandName = "Aurelia";
+    aurelia.searchAliases = Array.from(new Set([
+      ...(Array.isArray(aurelia.searchAliases) ? aurelia.searchAliases : []),
+      "aurelia", "demo club", "temp-democlub-1"
+    ]));
   }
   ["decades-washington-dc", "lima-twist-washington-dc"].forEach(id => {
     const row = locations[id];

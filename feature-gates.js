@@ -166,6 +166,15 @@
     }
   }
 
+  /** Packaged catalog row, or Firestore-merged cache after loadVenueRecord. */
+  function getCachedVenue(clubId) {
+    const id = String(clubId || "").trim();
+    if (!id) return null;
+    if (venueGateCache.has(id)) return venueGateCache.get(id);
+    const staticRow = (root.SHOUTOUT_CLUB_LOCATIONS || {})[id];
+    return staticRow ? { id, ...staticRow } : null;
+  }
+
   function invalidateVenueCache(clubId) {
     if (clubId) venueGateCache.delete(String(clubId));
     else venueGateCache.clear();
@@ -214,6 +223,7 @@
     getPatronGates,
     setCachedPatronGates,
     loadVenueRecord,
+    getCachedVenue,
     invalidateVenueCache,
     applyPatronGateUi,
     patronGatesLoaded: () => patronGatesLoaded

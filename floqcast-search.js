@@ -198,7 +198,8 @@
   function buildVenueRowsFromCatalog(map, eventsByLoc, g) {
     const rows = [];
     for (const [id, row] of Object.entries(map || {})) {
-      const club = {id, ...row};
+      // Prefer Firestore-merged cache (demo clubs like Aurelia are empty stubs without showcase).
+      const club = g?.getCachedVenue?.(id) || {id, ...row};
       const enabled = g ? g.venueMayUse("floqCast", club) : true;
       if (!enabled) continue;
       const norm = FL()?.normalizeVenue?.(id, Object.assign({}, club, {eventNames: eventsByLoc[id] || []}))

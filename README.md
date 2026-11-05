@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.85 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.86 (stable)
 
+- s3.2.86: Fix ShoutOut/floqCast venue search — Aurelia (and other Firestore names) after fast catalog paint.
 - s3.2.85: Master Admin Diagnostics → FloqCast connectivity logs tab; ICE/WebRTC appLogs category floqCast.
 - s3.2.84: Baller face on roman + Rewards band; complete chip overlay; name raised; fast venue search.
 - s3.2.83: Baller name/company type +50% same face; face oval −3mm/↓4mm +20%; bottom mark AMEX→Baller.

@@ -97,7 +97,8 @@
   function buildVenueRowsFromCatalog(map, eventsByLoc, g) {
     const rows = [];
     for (const [id, row] of Object.entries(map || {})) {
-      const club = {id, ...row};
+      // Prefer Firestore-merged cache (Aurelia name/gates live there; packaged temp stubs are empty).
+      const club = g?.getCachedVenue?.(id) || {id, ...row};
       const enabled = g ? g.venueMayUse("shoutOut", club) : true;
       if (!enabled) continue;
       if (club.active === false) continue;
@@ -113,6 +114,7 @@
     if (!ids.length) return;
     // Parallel (was sequential — ~39 Firestore reads blocked first paint for many seconds)
     await Promise.all(ids.map((id) => g.loadVenueRecord(db, id).catch(() => null)));
+    // Rebuild from cache so locationName / brandName from Firestore (e.g. Aurelia) enter the haystack.
     const refreshed = buildVenueRowsFromCatalog(map, eventsByLoc, g);
     venueRows = FL().sortNearest(refreshed, locationContext);
     renderVenueGrid();

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.85";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.85";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.86";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.86";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -2711,6 +2711,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-86-aurelia-venue-search",
+      area:"ShoutOut / Feature landing",
+      feature:"ShoutOut venue search finds Aurelia after fast catalog paint",
+      changed:"s3.2.86 — feature landings load temp QA showcase + use Firestore-merged venue cache so Aurelia brand/name enter the search haystack (fast paint no longer leaves empty temp-democlub stubs).",
+      howToTest:"1) Hard-refresh ShoutOut Choose a venue (s3.2.86). 2) Type Aurelia — card appears (Aurelia Demo Club / temp-democlub-1). 3) Empty search still shows nearest 4 quickly. 4) Mark Succeed/Failed.",
+      expected:"Typing Aurelia matches; list paints fast without waiting on sequential Firestore.",
+      troubleshoot:"No Aurelia → confirm floqr-temp-qa-showcase.js before shared-data on shoutout-search.html; feature-gates getCachedVenue after loadVenueRecord; hard refresh."
+    },
     {
       id:"s3-2-85-floqcast-diagnostics-tab",
       area:"Master Admin / Diagnostics",
