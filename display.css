@@ -2113,9 +2113,9 @@ body.floqcast-live-active .heist-brand-slide{
   line-height:1.05;
   text-transform:none; /* preserve entered casing / @handles */
   font-family:"Times New Roman",Times,Georgia,serif;
-  letter-spacing:.06em;
+  letter-spacing:.08em;
   font-weight:700;
-  /* Metallic gold emboss — ivory/gold face, light edge, dark relief */
+  /* Metallic gold emboss — same face for name + company */
   color:#e8d5a3;
   text-shadow:
     0 1px 0 rgba(255,236,190,.55),
@@ -2125,14 +2125,6 @@ body.floqcast-live-active .heist-brand-slide{
   overflow:hidden;
   white-space:nowrap;
   text-overflow:ellipsis;
-}
-.display-canvas.baller-card #displayMain{
-  letter-spacing:.08em;
-}
-.display-canvas.baller-card #displaySub{
-  letter-spacing:.05em;
-  color:#dcc793;
-  opacity:.96;
 }
 .display-canvas.baller-card #displaySub:empty{
   display:none!important;
@@ -2147,11 +2139,11 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-alert > .media-slot,
 .display-canvas.baller-alert .media-slot{
   position:absolute;
-  /* led-96x48 / led-64x32 → 2x1 letterboxed package art */
-  left:20.299%;
-  top:16.281%;
-  width:7.235%;
-  height:17.286%;
+  /* 2x1: face +20% size, −3mm left / +4mm down on card */
+  left:16.832%;
+  top:22.01%;
+  width:8.642%;
+  height:20.704%;
   aspect-ratio:auto;
   min-height:0;
   border-radius:50%;
@@ -2193,8 +2185,8 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .media-slot,
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .media-slot,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .media-slot{
-  left:12.65%;
-  top:21.658%;
-  width:9.108%;
-  height:14.501%;
+  left:8.286%;
+  top:26.464%;
+  width:10.879%;
+  height:17.368%;
 }

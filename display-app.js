@@ -1936,8 +1936,10 @@
       const ballerCompany = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || ""), 0, subLimit);
       byId("displayMain").textContent = ballerName;
       byId("displaySub").textContent = ballerCompany; // empty string → CSS :empty hides the row
-      byId("displayMain").style.setProperty("font-size", Math.min(6.2, Math.max(2.8, mainSize * 0.92)) + "vh", "important");
-      byId("displaySub").style.setProperty("font-size", Math.min(4.6, Math.max(2.2, subSize * 0.92)) + "vh", "important");
+      // Same font face + size for name and company; +50% vs prior baller emboss size
+      const ballerTypeVh = Math.min(9.3, Math.max(4.2, mainSize * 0.92 * 1.5));
+      byId("displayMain").style.setProperty("font-size", ballerTypeVh + "vh", "important");
+      byId("displaySub").style.setProperty("font-size", ballerTypeVh + "vh", "important");
       const rail = byId("displayIdentityRail");
       if (rail) {
         rail.className = "display-identity-rail hidden";
