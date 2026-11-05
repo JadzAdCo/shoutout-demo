@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.83";
+  const VERSION = "s3.2.84";
 
   const packs = {
     "ru": {

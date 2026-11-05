@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.2.83";
+  const VERSION = "s3.2.84";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},

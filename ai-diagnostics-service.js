@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.83";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.83";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.84";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.84";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -2697,6 +2697,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-84-baller-face-chip",
+      area:"ShoutOut / Templates",
+      feature:"Baller face on Rewards band + complete chip overlay",
+      changed:"s3.2.84 — face oval covers roman legion + Rewards/Service/Member/Since. Complete EMV chip PNG overlays at original art position. Name/company raised to clear gold strip. Venue search paints immediately.",
+      howToTest:"1) Hard-refresh display s3.2.84. 2) Baller's Alert with portrait — face covers most of warrior + Rewards text; chip sits on top. 3) Name/company clear gold strip. 4) ShoutOut Choose a venue loads quickly. 5) Mark Succeed/Failed.",
+      expected:"Face right on Rewards band; chip over face; fast venue list.",
+      troubleshoot:"Chip missing → images/baller/baller-emv-chip.png + placeBallerChipOverlay. Face left → display.css face % for 2x1/4x3."
+    },
     {
       id:"s3-2-83-baller-type-face",
       area:"ShoutOut / Templates",
