@@ -1931,10 +1931,13 @@
       }
       byId("displayMain").className = "baller-cardholder-name";
       byId("displaySub").className = "baller-company-name";
-      byId("displayMain").textContent = glyphSlice(cleanDisplayText(mainText || data.mainText || ""), 0, mainLimit).toUpperCase();
-      byId("displaySub").textContent = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || ""), 0, subLimit).toUpperCase();
-      byId("displayMain").style.setProperty("font-size", Math.min(7, Math.max(3.2, mainSize)) + "vh", "important");
-      byId("displaySub").style.setProperty("font-size", Math.min(5, Math.max(2.4, subSize)) + "vh", "important");
+      // Preserve casing / leading @ — package art already has BALLER'S EXPRESS BUSINESS heading.
+      const ballerName = glyphSlice(cleanDisplayText(mainText || data.mainText || data.displayName || ""), 0, mainLimit);
+      const ballerCompany = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || ""), 0, subLimit);
+      byId("displayMain").textContent = ballerName;
+      byId("displaySub").textContent = ballerCompany; // empty string → CSS :empty hides the row
+      byId("displayMain").style.setProperty("font-size", Math.min(6.2, Math.max(2.8, mainSize * 0.92)) + "vh", "important");
+      byId("displaySub").style.setProperty("font-size", Math.min(4.6, Math.max(2.2, subSize * 0.92)) + "vh", "important");
       const rail = byId("displayIdentityRail");
       if (rail) {
         rail.className = "display-identity-rail hidden";

@@ -1363,11 +1363,11 @@ function safeEnhancementPrompt(prompt = "", enhancementType = "") {
   }
   if (type === "baller-face-medallion") {
     return [
-      "Crop and center the subject's face for a circular metal credit-card medallion on a nightlife LED display.",
+      "Crop tightly to the subject's face only for a small oval that sits under a Roman warrior helmet on a Baller's Express metal card.",
       "Preserve the person's recognizable face and natural identity exactly — no beauty filters, no age change, no identity swap.",
-      "Tight head-and-shoulders framing, high contrast, soft studio lighting, dark metallic background.",
-      "Do not add text, logos, watermarks, card numbers, brand marks, or American Express / Baller's Express branding.",
-      "Return a single still portrait suitable for a round clip (~1/3 of the upper half of a business metal card).",
+      "Head/face only (not full shoulders). Warm metallic engraved look is OK; keep the person recognizable.",
+      "Do not add text, logos, watermarks, card numbers, brand marks, helmets, chips, or American Express / Baller's Express branding.",
+      "Do not fill an entire medallion circle — return a face portrait for a small oval that leaves helmet, rim engraving, and chip untouched in the template.",
       `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
     ].join("\n");
   }

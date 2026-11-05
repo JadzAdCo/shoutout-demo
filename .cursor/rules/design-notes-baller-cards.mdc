@@ -8,24 +8,24 @@ Resume: `@baller$` / `$black-card$` / `$ballers-alert$`.
 |---|---|---|---|---|
 | `blackCard` | **Black Card** | $75 (`7500`) | Baller's Express BUSINESS | Shared / every venue (STANDARD) |
 | `ballersAlert` | **Baller's Alert** | $100 (`10000`) | Baller's Express BUSINESS + face | Shared / every venue (STANDARD) |
-| `blackCardAmex` | Black Card (Amex) | $75 | American Express BUSINESS | **Master Admin + Aurelia only** |
-| `ballersAlertAmex` | Baller's Alert (Amex) | $100 | American Express BUSINESS + face | **Master Admin + Aurelia only** |
+| `blackCardAmex` | Black Card (Amex) | $75 | Same package art (private twin) | **Master Admin + Aurelia only** |
+| `ballersAlertAmex` | Baller's Alert (Amex) | $100 | Same package art + face | **Master Admin + Aurelia only** |
 
-Owner (Nov 4 2026): public face uses **Baller's Express** (copyright-safe). Amex twins ("option B") stay **explicitly private** — Master Admin only, Aurelia (`temp-democlub-1`) only — while the owner seeks Amex consent for marketing/advertising use.
+Owner (Nov 4–5 2026): public face uses **Baller's Express**. Package art (`reports/baller-cards/express-package/`) is the canonical base — metallic gold **BALLER'S EXPRESS / BUSINESS**, Valid Thru **12/50**, ornate gold rim, warrior medallion. Legacy AMEX microtext inside the medallion/border may remain; do not treat that as a request to rebrand. Amex twins stay Master Admin + Aurelia only while consent is pending.
 
 ## Composer
 
-- **Name source:** FloqR display name · FloqR/@Mingl handle · Instagram · custom name → `mainText` (cardholder).
-- **Company:** presets `We're Outside LLC` · `Bad Boy Inc.` · `BaddB$ches Only Corp` · custom → `subText`.
-- **Baller's Alert:** face photo **required** (`requiresFacePhoto`). Display CSS medallion fallback; optional Gemini `baller-face-medallion` bake via `aiEnhanceShoutOutMedia` (soft-fail to original).
+- **Name or @handle:** FloqR display name · FloqR/@Mingl handle · Instagram · manual → `mainText` / `displayName`. Preserve casing, accents, Unicode, and a leading `@`. No forced uppercase.
+- **Company (optional):** blank by default · presets `We're Outside LLC` · `Bad Boy Inc.` · `BaddB$ches Only Corp` · custom → `subText` / `companyName`. Blank leaves the finished card row empty (no placeholder).
+- **Baller's Alert:** face photo **required** (`requiresFacePhoto`). Library or camera (`accept="image/*"` + `capture="user"`). Optional Gemini `baller-face-medallion` (face-only crop under helmet; soft-fail to original).
 
 ## Display
 
-- Art: photoreal `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) built from `reports/baller-cards/reference-amex-not-shipped.jpg` via `scripts/build-baller-card-photos.py`. **Exact Centurion Business ornate rim / Centurion (roman hat) medallion / chip / emboss** (rim detail QA: `reports/baller-cards/centurion-rim-detail.jpg`). Amex = photo replica; Baller's = same graphics with Baller's Express wordmark. Alert PNGs **keep** the Centurion — face is a CSS overlay, not a punched hole. 4×3 letterboxes so the left rim + Centurion are never cropped. SVG drafts are non-canonical.
-- Class: `baller-card` (+ `baller-alert`). Name/company embossed at lower left.
-- **Face placement (s3.2.81):** `#mediaSlot` is reparented onto `#displayCanvas` (`placeBallerFaceSlot`) so absolute % is of the card, not the bottom `.display-center` name band (that bug put the face over the cardholder name). CSS: 2×1 (`led-96x48` / `led-64x32`) `left:15.156%; top:11.25%; width:13.438%`; 4×3 (`led-64x48`) `left:6.445%; top:17.708%; width:16.797%`. `resolveBallerBackgroundUrl` forces packaged PNG when Firestore still has a stale SVG.
-- Valid Thru year **50** on Alert; Black Card keeps **28**.
-- `backgroundUrlByFormat` picks 2:1 vs 4:3 PNG per LED size.
+- Art: `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) from `scripts/build-baller-card-photos.py` ← `express-package/ballers-express-business.png`. Letterbox for LED aspect; never crop the ornate rim.
+- Class: `baller-card` (+ `baller-alert`). Name/company metallic gold emboss in the lower-left blank rows (`top:~74%`). Empty company uses `:empty { display:none }`.
+- **Face (s3.2.82):** `#mediaSlot` reparented to canvas; face-only ellipse under the helmet (`2x1`: left 20.299% / top 16.281% / 7.235% × 17.286%; `64x48`: 12.65% / 21.658% / 9.108% × 14.501%). Helmet, rim engraving, and chip stay visible. No portrait → warrior face remains.
+- `resolveBallerBackgroundUrl` forces packaged PNG over stale SVG.
+- Valid Thru **12/50** is burned into the package art (not a separate overlay).
 
 ## Gates
 
@@ -37,11 +37,12 @@ Owner (Nov 4 2026): public face uses **Baller's Express** (copyright-safe). Amex
 ## Do not
 
 - Do not list Amex twins for patrons or non-Aurelia venues.
-- Do not put Amex art on the public STANDARD catalog while consent is pending.
+- Do not paint a second BALLER'S EXPRESS heading over the package art.
+- Do not cover the full medallion / helmet / chip with a rectangular photo.
 - Do not invent real payment BINs; art numbers stay fictional.
 
 ## FIX PROMPT
 
 ```
-Baller cards: public blackCard ($75) + ballersAlert ($100) Baller's Express; private Amex twins Master Admin + Aurelia only. Name source + company presets; Alert face photo + optional Gemini baller-face-medallion. Design notes: design-notes-baller-cards.mdc
+Baller cards (express package): public blackCard ($75) + ballersAlert ($100); private Amex twins Master Admin + Aurelia. Package PNG base; name/@handle casing preserved; optional blank company; Alert face-only under helmet. Design notes: design-notes-baller-cards.mdc
 ```
