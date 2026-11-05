@@ -135,6 +135,7 @@
     return `${brand} FOOTBALL INTRO`;
   }
   const BALLER_COMPANY_PRESETS = {
+    "none": "",
     "were-outside": "We're Outside LLC",
     "bad-boy": "Bad Boy Inc.",
     "baddbches": "BaddB$ches Only Corp"
@@ -156,23 +157,30 @@
     if (g?.isMasterAdminEmail?.(currentUser) || g?.isSuperAdmin?.(currentUser, cachedUserProfile)) return true;
     return false;
   }
+  function ballerWithAt(handle = "") {
+    const raw = String(handle || "").trim();
+    if (!raw) return "";
+    return raw.startsWith("@") ? raw : `@${raw.replace(/^@+/, "")}`;
+  }
   function ballerNameFromSource() {
+    // Preserve casing, accents, Unicode, and a leading @ when the source is a handle.
     const source = byId("ballerNameSource")?.value || "displayName";
     const profile = cachedUserProfile || {};
     const emailName = String(currentUser?.email || "").split("@")[0] || "";
     const username = profile.username || emailName || currentUser?.displayName || "patron";
     if (source === "manual") return String(byId("ballerManualName")?.value || "").trim();
-    if (source === "floqrHandle") return String(username).replace(/^@/, "").trim();
+    if (source === "floqrHandle") return ballerWithAt(username);
     if (source === "instagram") {
-      const ig = String(profile.instagramHandle || profile.socialMediaHandles?.instagram || "").replace(/^@/, "").trim();
-      return ig || String(username).replace(/^@/, "").trim();
+      const ig = String(profile.instagramHandle || profile.socialMediaHandles?.instagram || "").trim();
+      return ballerWithAt(ig || username);
     }
     return String(profile.displayName || currentUser?.displayName || username).trim();
   }
   function ballerCompanyFromFields() {
-    const preset = byId("ballerCompanyPreset")?.value || "were-outside";
+    const preset = byId("ballerCompanyPreset")?.value || "none";
+    if (preset === "none" || preset === "") return "";
     if (preset === "custom") return String(byId("ballerCustomCompany")?.value || "").trim();
-    return BALLER_COMPANY_PRESETS[preset] || BALLER_COMPANY_PRESETS["were-outside"];
+    return BALLER_COMPANY_PRESETS[preset] || "";
   }
   function ballerCardPayloadFields() {
     if (!isBallerCardTemplate()) return {};
@@ -186,8 +194,10 @@
       ballerAlert: isBallerAlertTemplate(),
       ballerBrand: t.ballerBrand || (String(t.id || "").includes("Amex") ? "amex" : "ballers"),
       ballerNameSource: byId("ballerNameSource")?.value || "displayName",
-      ballerCompanyPreset: byId("ballerCompanyPreset")?.value || "were-outside",
+      ballerCompanyPreset: byId("ballerCompanyPreset")?.value || "none",
       ballerCompany: company,
+      displayName: name,
+      companyName: company,
       backgroundUrl: formatBg || t.defaultBackgroundUrl || "",
       mainText: name,
       subText: company
@@ -204,7 +214,7 @@
     }
     const source = byId("ballerNameSource")?.value || "displayName";
     byId("ballerManualNameWrap")?.classList.toggle("hidden", !baller || source !== "manual");
-    const preset = byId("ballerCompanyPreset")?.value || "were-outside";
+    const preset = byId("ballerCompanyPreset")?.value || "none";
     byId("ballerCustomCompanyWrap")?.classList.toggle("hidden", !baller || preset !== "custom");
     if (!baller) return;
     const caps = templateDisplayCaps();
@@ -219,9 +229,14 @@
     const mediaCard = byId("shoutoutMediaCard");
     if (mediaCard && alert) {
       const note = mediaCard.querySelector(".single-media-upload-note");
-      if (note) note.textContent = "Face photo required — clear head-and-shoulders shot works best for the medallion.";
+      if (note) note.textContent = "Face photo required — clear face shot; FLOQR places it under the warrior helmet (helmet & chip stay). Library or camera.";
       const label = mediaCard.querySelector(".file-upload-label");
-      if (label && label.childNodes[0]) label.childNodes[0].textContent = "Upload face photo ";
+      if (label && label.childNodes[0]) label.childNodes[0].textContent = "Upload / take face photo ";
+      const input = byId("shoutoutMediaUpload");
+      if (input) {
+        input.accept = "image/*";
+        input.setAttribute("capture", "user");
+      }
     }
   }
   async function maybeEnhanceBallerFace(uploadResult, referenceNumber) {
@@ -236,7 +251,7 @@
         callable({
           mediaStoragePath: uploadResult.mediaStoragePath,
           referenceNumber,
-          prompt: "Fit this face into a circular metal-card medallion.",
+          prompt: "Crop to the subject's face only for a small oval under a Roman warrior helmet on a metal card — keep identity, no full-medallion fill.",
           enhancementType: "baller-face-medallion"
         }),
         new Promise((_, reject) => setTimeout(() => reject(new Error("Gemini baller face timed out")), 45000))
@@ -4852,19 +4867,20 @@
       }
       if (isBallerCardTemplate() && !saveOnly) {
         const nameCheck = ballerNameFromSource();
-        const companyCheck = ballerCompanyFromFields();
         if (!nameCheck) {
-          status.textContent = "Enter or choose a cardholder name for the metal card.";
+          status.textContent = "Enter a name or @handle for the metal card.";
           (byId("ballerManualName") || byId("ballerNameSource"))?.focus?.();
           return;
         }
-        if (!companyCheck) {
-          status.textContent = "Choose a company line for the metal card.";
-          (byId("ballerCustomCompany") || byId("ballerCompanyPreset"))?.focus?.();
+        // Company may be blank — finished card leaves that row empty (no placeholder).
+        const nameLimit = Math.max(1, Number(templateDisplayCaps().main || 28));
+        if (nameCheck.length > nameLimit) {
+          status.textContent = `Name / @handle is too long for this LED (max ${nameLimit} characters). Shorten it so it stays readable.`;
+          (byId("ballerManualName") || byId("ballerNameSource"))?.focus?.();
           return;
         }
         if (getTemplate()?.masterAdminOnly === true && !isMasterAdminViewer()) {
-          status.textContent = "This American Express preview template is Master Admin only.";
+          status.textContent = "This private Baller's Express preview template is Master Admin only.";
           return;
         }
       }

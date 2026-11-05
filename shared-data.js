@@ -1300,8 +1300,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:28,
     maxSubCharacters:28,
     textProfileId:'ballerCard',
-    description:"Photoreal Centurion-frame Baller's Express BUSINESS metal card (exact ornate border from reference). Name from your FloqR display name, @handle, or a custom name. Company: We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom. $75. All LED sizes.",
-    howItWorks:"Pick Black Card → choose how your name appears and a company line → preview the metal card → pay $75. The LED shows the card with your name and company embossed.",
+    description:"Baller's Express BUSINESS metal card (package art: ornate gold rim, warrior medallion, Valid Thru 12/50). Name or @handle in the lower-left blank row; optional company on the row below. $75. All LED sizes.",
+    howItWorks:"Pick Black Card → choose a name or @handle (casing kept) and optional company → preview → pay $75. The LED embosses your lines on the package artwork.",
     tags:["black card","baller's express","metal card","vip","business","$75","96x48","64x48","64x32"]
   },
   ballersAlert: {
@@ -1336,11 +1336,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:28,
     maxSubCharacters:28,
     textProfileId:'ballerCard',
-    description:"Baller's Express BUSINESS card with your face in the upper-left medallion (about one-third of the upper half). Valid Thru year shows 50. Gemini AI Studio can retrofit your face onto the card after upload. $100. All LED sizes.",
-    howItWorks:"Upload a clear face photo (required). FLOQR may run a background Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the medallion. Choose name + company, then pay $100.",
+    description:"Baller's Express BUSINESS card with your face under the warrior helmet (helmet, rim, and chip stay). Valid Thru 12/50. Name/@handle + optional company. $100. All LED sizes.",
+    howItWorks:"Upload or take a clear face photo (required). Only the face replaces the warrior face; Gemini may refine the crop. Add name or @handle and optional company, then pay $100.",
     tags:["baller's alert","black card","face","photo","gemini","ai","vip","$100","96x48","64x48","64x32"]
   },
-  // Private Amex-branded twins — Master Admin only, Aurelia (temp-democlub-1) only. Pending Amex consent.
+  // Private twins — Master Admin + Aurelia only. Same Baller's Express package art (legacy AMEX microtext may remain in medallion/border).
   blackCardAmex: {
     id:'blackCardAmex',
     name:'Black Card (Amex)',
@@ -1372,7 +1372,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:28,
     maxSubCharacters:28,
     textProfileId:'ballerCard',
-    description:'PRIVATE — Master Admin + Aurelia only. American Express BUSINESS black metal card layout for consent/marketing preview. Not listed for patrons. $75.',
+    description:"PRIVATE — Master Admin + Aurelia only. Same Baller's Express BUSINESS package art as public Black Card (legacy AMEX marks may remain in medallion/border). $75.",
     tags:["amex","american express","black card","private","master admin","aurelia","$75"]
   },
   ballersAlertAmex: {
@@ -1409,7 +1409,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:28,
     maxSubCharacters:28,
     textProfileId:'ballerCard',
-    description:"PRIVATE — Master Admin + Aurelia only. American Express BUSINESS card with face medallion and Valid Thru …/50. Pending Amex consent. $100.",
+    description:"PRIVATE — Master Admin + Aurelia only. Baller's Express BUSINESS package art with face under the warrior helmet; Valid Thru 12/50. $100.",
     tags:["amex","american express","baller's alert","private","master admin","aurelia","face","$100"]
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },

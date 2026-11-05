@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.81";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.81";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.82";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.82";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,14 +223,27 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.82",
+      title: "s3.2.82 — Baller's Express package art (face under helmet, name/@handle, optional company)",
+      checks: [
+        {label:"Package master art", file:"reports/baller-cards/express-package/ballers-express-business.png", includes:[]},
+        {label:"Builder uses package PNG", file:"scripts/build-baller-card-photos.py", includes:["express-package/ballers-express-business.png", "FACE"]},
+        {label:"Face-only ellipse CSS", file:"display.css", includes:["left:20.299%", "top:16.281%", "width:7.235%", "height:17.286%", "text-transform:none"]},
+        {label:"Composer name/@ + blank company", file:"index.html", includes:["Name or social @handle", "value=\"none\"", "Leave blank"]},
+        {label:"Preserve @ casing", file:"patron-app.js", includes:["ballerWithAt", "\"none\": \"\""]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.82\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-82-baller-express-package"]}
+      ]
+    },
+    {
       version: "s3.2.81",
       title: "s3.2.81 — Baller's Alert face on Centurion medallion + identical Amex ornate rim (all LED sizes)",
       checks: [
         {label:"Face reparent to canvas", file:"display-app.js", includes:["placeBallerFaceSlot", "resolveBallerBackgroundUrl", "baller-face-medallion-slot"]},
-        {label:"Face CSS canvas % (2x1 + 4x3)", file:"display.css", includes:["left:15.156%", "top:11.25%", "width:13.438%", "left:6.445%", "top:17.708%", "width:16.797%"]},
+        {label:"Face CSS canvas % (2x1 + 4x3)", file:"display.css", includes:["left:20.299%", "top:16.281%"]},
         {label:"Photoreal PNG not SVG", file:"shared-data.js", includes:["black-card-2x1.png", "ballers-alert-2x1.png", "black-card-amex-2x1.png"], notIncludes:["black-card-2x1.svg"]},
-        {label:"Build keeps Centurion", file:"scripts/build-baller-card-photos.py", includes:["Centurion", "letterbox", "face_css"]},
-        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.81\""]},
+        {label:"Build package art", file:"scripts/build-baller-card-photos.py", includes:["express-package", "fit_led"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.82\""]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-81-baller-face-centurion"]}
       ]
     },
@@ -2685,13 +2698,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-82-baller-express-package",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Express package art — face under helmet; name/@handle; optional company",
+      changed:"s3.2.82 — base art from express-package/ballers-express-business.png (BALLER'S EXPRESS BUSINESS, Valid Thru 12/50, ornate gold rim). Face-only ellipse under warrior helmet. Name/@handle casing preserved; company optional/blank. Pages only (no Functions deploy required for art/CSS; Gemini prompt update needs Functions if AI bake is used).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.82). 2) Black Card — name José @handle, leave company blank → preview shows gold emboss name only, package heading untouched. 3) Baller's Alert — upload/take face → face sits under helmet (helmet+chip visible). 4) Check led-96x48, led-64x48, led-64x32. 5) Master Admin Aurelia still sees Amex twins with same package art. 6) Mark Succeed/Failed.",
+      expected:"One BALLER'S EXPRESS BUSINESS heading; 12/50; blank company row empty; face under helmet only; preview matches LED.",
+      troubleshoot:"Old Centurion photo art → hard refresh images/baller/* ?v=s3.2.82 + rebuild scripts/build-baller-card-photos.py. Face covers helmet → display.css face ellipse %. Forced ALL CAPS → display-app.js must not toUpperCase baller lines. Company required error → company preset none allowed."
+    },
+    {
       id:"s3-2-81-baller-face-centurion",
       area:"ShoutOut / Templates",
       feature:"Baller's Alert face sits in Centurion medallion; ornate Amex rim; LED 96×48 / 64×48 / 64×32",
-      changed:"s3.2.81 — mediaSlot reparented to display canvas so face % is not relative to the bottom name band; CSS calibrated to Centurion circle (2x1 + 4x3 letterbox); Alert PNGs keep roman-hat Centurion; stale SVG backgrounds forced to photoreal PNG. Pages only.",
-      howToTest:"1) Hard-refresh display preview URLs with s3.2.81. 2) Open display.html?preview=1&template=ballersAlert&screenFormatId=led-96x48&mainText=CARDHOLDER&subText=COMPANY&mediaUrl= (any face). 3) Face circle must cover the Centurion medallion top-left — NOT hover over the name. 4) Repeat led-64x48 and led-64x32. 5) Black Card (no face) still shows Centurion + ornate rim identical to the Amex detail photo. 6) Mark Succeed/Failed.",
-      expected:"Face locked to the medallion on all three LED sizes; Centurion + ornate rim visible on Black Card; no SVG triple-line frame.",
-      troubleshoot:"Face still over name → display-app.js placeBallerFaceSlot + display.css ?v=s3.2.81 (mediaSlot must be child of #displayCanvas). Triple gold lines → resolveBallerBackgroundUrl still seeing SVG; hard refresh shared-data PNG URLs. Rim/Centurion missing → rebuild scripts/build-baller-card-photos.py from reference-amex-not-shipped.jpg."
+      changed:"Superseded visually by s3-2-82-baller-express-package (package art). Kept for history.",
+      howToTest:"See s3-2-82-baller-express-package.",
+      expected:"Package art on LED with face under helmet.",
+      troubleshoot:"See s3-2-82-baller-express-package."
     },
     {
       id:"s3-2-78-baller-cards",

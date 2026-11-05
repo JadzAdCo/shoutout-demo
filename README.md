@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.81 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.82 (stable)
 
+- s3.2.82: Baller's Express package art — face under helmet, name/@handle casing, optional blank company.
 - s3.2.81: Baller's Alert face on Centurion medallion; identical Amex ornate rim; LED 96×48 / 64×48 / 64×32.
 - s3.2.80: Black Card ($75) + Baller's Alert ($100) Baller's Express public; Amex twins Master Admin + Aurelia only.
 - s3.2.77: Help/i18n verbiage BOT DEE only (no FloqAi in titles/bodies); from=botdee; search aliases keep floqai.
