@@ -20,8 +20,9 @@ SRC = ROOT / "reports/baller-cards/express-package/ballers-express-business.png"
 OUT = ROOT / "images/baller"
 META_OUT = Path("/tmp/baller-express-face-css.json")
 
-# Calibrated on the 1581×995 package PNG (face under helmet crest, above chip).
-FACE = {"cx": 272, "cy": 248, "rx": 72, "ry": 86}
+# Calibrated on the 1581×995 package PNG (face under helmet).
+# s3.2.83: +20% oval size, −3mm left / +4mm down on ISO card (85.60×53.98 mm).
+FACE = {"cx": 217, "cy": 322, "rx": 86, "ry": 103}
 MEDALLION = {"cx": 248, "cy": 268, "r": 198}
 
 

@@ -22,8 +22,8 @@ Owner (Nov 4–5 2026): public face uses **Baller's Express**. Package art (`rep
 ## Display
 
 - Art: `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) from `scripts/build-baller-card-photos.py` ← `express-package/ballers-express-business.png`. Letterbox for LED aspect; never crop the ornate rim.
-- Class: `baller-card` (+ `baller-alert`). Name/company metallic gold emboss in the lower-left blank rows (`top:~74%`). Empty company uses `:empty { display:none }`.
-- **Face (s3.2.82):** `#mediaSlot` reparented to canvas; face-only ellipse under the helmet (`2x1`: left 20.299% / top 16.281% / 7.235% × 17.286%; `64x48`: 12.65% / 21.658% / 9.108% × 14.501%). Helmet, rim engraving, and chip stay visible. No portrait → warrior face remains.
+- Class: `baller-card` (+ `baller-alert`). Name/company metallic gold emboss in the lower-left blank rows (`top:~74%`) — **same typeface and size** (`ballerTypeVh`, +50% vs s3.2.82). Empty company uses `:empty { display:none }`.
+- **Face (s3.2.83):** `#mediaSlot` reparented to canvas; face oval +20% and nudged −3mm left / +4mm down on card (`2x1`: 16.832% / 22.01% / 8.642% × 20.704%; `64x48`: 8.286% / 26.464% / 10.879% × 17.368%). Bottom gold-strip mark is **Baller** (not AMEX).
 - `resolveBallerBackgroundUrl` forces packaged PNG over stale SVG.
 - Valid Thru **12/50** is burned into the package art (not a separate overlay).
 

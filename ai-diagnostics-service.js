@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.82";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.82";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.83";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.83";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -2697,6 +2697,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-83-baller-type-face",
+      area:"ShoutOut / Templates",
+      feature:"Baller name/company same type +50%; face nudge; AMEX→Baller",
+      changed:"s3.2.83 — name and company share emboss font/size (+50%). Face oval −3mm left / +4mm down, +20% size. Bottom gold-strip AMEX replaced with Baller.",
+      howToTest:"1) Hard-refresh display s3.2.83. 2) Black Card with name+company — same gold type size. 3) Alert face sits slightly left/down, larger. 4) Bottom strip reads Baller not AMEX. 5) Mark Succeed/Failed.",
+      expected:"Matched larger type; shifted larger face; Baller bottom mark.",
+      troubleshoot:"Old AMEX → rebuild scripts/build-baller-card-photos.py from express-package PNG. Type size → display-app.js ballerTypeVh."
+    },
     {
       id:"s3-2-82-baller-express-package",
       area:"ShoutOut / Templates",
