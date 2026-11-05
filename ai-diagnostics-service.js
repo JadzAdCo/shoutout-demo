@@ -2716,7 +2716,7 @@
       area:"Master Admin / Diagnostics",
       feature:"Diagnostics → FloqCast connectivity logs tab",
       changed:"s3.2.85 — new Master Admin Diagnostics subtab FloqCast reads appLogs categories floqCast + legacy suprstar (ICE source, webrtc_status, live_*). Preview/WebRTC write category floqCast.",
-      howToTest:"1) Hard-refresh master-admin.html?v=s3.2.85. 2) Diagnostics → FloqCast tab visible. 3) Go live once signed in on floqcast-preview; Refresh FloqCast logs — ice_servers / webrtc_status rows appear. 4) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh Master Admin (package s3.2.85). 2) Diagnostics → FloqCast tab visible. 3) Go live once signed in on floqcast-preview; Refresh FloqCast logs — ice_servers / webrtc_status rows appear. 4) Mark Succeed/Failed.",
       expected:"FloqCast tab lists connectivity rows; STUN-only shows iceSource stun-only or stun-fallback.",
       troubleshoot:"Empty tab → patron must be signed in (boards cannot write appLogs). Still under Application Logging filter category floqCast/suprstar. ICE missing → floqcast-webrtc.js resolveIceServers FLOQRLog write."
     },

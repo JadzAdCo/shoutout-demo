@@ -182,6 +182,9 @@
     "help-master-demo-signin": [
       "masterAdmin"
     ],
+    "help-master-floqcast-diagnostics": [
+      "masterAdmin"
+    ],
     "help-master-network-intelligence": [
       "masterAdmin"
     ],
