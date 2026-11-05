@@ -891,11 +891,37 @@
     if (!url) return "cover";
     const designed = String(template.defaultBackgroundUrl || "").trim();
     if (designed && url === designed) return "cover";
-    if (template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
+    if (template.ballerCard || template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
       return "cover";
     }
     if (String(data.mediaFit || "").toLowerCase() === "cover") return "cover";
     return "contain";
+  }
+
+  /* Baller's Alert face must sit on the Centurion medallion (% of canvas).
+     #mediaSlot lives under .display-center (bottom name band) in the HTML —
+     absolute % there puts the face over the cardholder name. Reparent for alert. */
+  function placeBallerFaceSlot(canvas, center, mediaSlot, onCanvas) {
+    if (!mediaSlot || !canvas) return;
+    if (onCanvas) {
+      if (mediaSlot.parentElement !== canvas) canvas.appendChild(mediaSlot);
+      return;
+    }
+    if (center && mediaSlot.parentElement !== center) {
+      const before = byId("displayMain") || center.firstChild;
+      center.insertBefore(mediaSlot, before);
+    }
+  }
+
+  function resolveBallerBackgroundUrl(data = {}, template = {}, screenFormatId = "") {
+    const formatKey = String(screenFormatId || "").replace(/^p125-/, "led-");
+    const byFormat = (template.backgroundUrlByFormat && (template.backgroundUrlByFormat[screenFormatId] || template.backgroundUrlByFormat[formatKey])) || "";
+    const packaged = byFormat || template.defaultBackgroundUrl || "";
+    const raw = String(data.backgroundUrl || packaged || "").trim();
+    // Stale Firestore / preview rows may still point at the SVG triple-line draft.
+    if (!raw || /\.svg(\?|$)/i.test(raw) || /baller\/.*\.svg/i.test(raw)) return packaged;
+    if (packaged && /\.png(\?|$)/i.test(packaged) && !/\.png(\?|$)/i.test(raw)) return packaged;
+    return raw || packaged;
   }
 
   function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "", fit = "cover" } = {}) {
@@ -1752,7 +1778,9 @@
     canvas.dataset.is64x32 = isChristine ? "0" : (screenFlags.is64x32 || "0");
     canvas.dataset.textProfile = textCaps.profileId || "custom";
     const formatBackgroundUrl = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[screenFormatId] || t.backgroundUrlByFormat[String(screenFormatId || "").replace(/^p125-/, "led-")])) || "";
-    const backgroundUrl = data.backgroundUrl || formatBackgroundUrl || t.defaultBackgroundUrl || "";
+    const backgroundUrl = isBallerCard
+      ? resolveBallerBackgroundUrl(data, t, screenFormatId)
+      : (data.backgroundUrl || formatBackgroundUrl || t.defaultBackgroundUrl || "");
     const backgroundColor = data.backgroundColor || "";
     const backgroundGradient = data.backgroundGradient || "";
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
@@ -1867,6 +1895,7 @@
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
     } else if (isBallerAlert) {
+      placeBallerFaceSlot(canvas, center, mediaSlot, true);
       mediaSlot.classList.remove("hidden");
       mediaSlot.dataset.ballerFace = "baller-face-medallion-slot";
       if (mediaUrl) {
@@ -1880,11 +1909,14 @@
           mediaElement.style.objectPosition = "center 18%";
         }
       } else {
-        mediaSlot.innerHTML = '<div class="media-placeholder">FACE</div>';
+        // Transparent placeholder — Centurion (roman hat) in the PNG stays visible
+        mediaSlot.innerHTML = "";
       }
     } else {
+      placeBallerFaceSlot(canvas, center, mediaSlot, false);
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+      delete mediaSlot.dataset.ballerFace;
     }
     if (isBallerCard) {
       stopHeistIdentityCycle();
@@ -1892,6 +1924,7 @@
       hideHeistBrandSlide();
       canvas.classList.add("baller-card");
       if (isBallerAlert) canvas.classList.add("baller-alert");
+      else canvas.classList.remove("baller-alert");
       if (center) {
         center.classList.remove("split-media-layout");
         center.classList.add("baller-card-center");

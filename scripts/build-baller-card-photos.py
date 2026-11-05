@@ -2,20 +2,31 @@
 """Build photoreal Baller's / Amex metal-card faces from the Centurion Business reference.
 
 Source: reports/baller-cards/reference-amex-not-shipped.jpg
+         (+ rim detail: reports/baller-cards/centurion-rim-detail.jpg for QA)
 Outputs: images/baller/*-{2x1,4x3}.png (+ -amex- twins)
 
 Amex twins = exact photo graphics (PII name/company wiped for ShoutOut overlay).
-Baller's = same exact ornate frame / centurion / chip / emboss, brand wordmark swapped.
+Baller's = same exact ornate frame / Centurion medallion / chip / emboss, brand swapped.
+
+Alert art keeps the Centurion (roman hat) medallion — the face photo is a CSS overlay
+on the LED, not a punched hole in the PNG. 4x3 letterboxes so the left rim + Centurion
+are never center-cropped away.
 """
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 REF_PATH = ROOT / "reports/baller-cards/reference-amex-not-shipped.jpg"
 OUT = ROOT / "images/baller"
+META_OUT = Path("/tmp/baller-face-css.json")
+
+# Centurion medallion on the 1024×640 reference (circle center + radius in source px)
+SRC_W, SRC_H = 1024, 640
+CX, CY, R = 152, 158, 86
 
 
 def font(size: int, serif: bool = False) -> ImageFont.ImageFont:
@@ -34,10 +45,10 @@ def patch(img: Image.Image, dest, src) -> Image.Image:
   im = img.copy()
   x0, y0, x1, y1 = dest
   dw, dh = x1 - x0, y1 - y0
-  sample = im.crop(src).resize((dw, dh), Image.Resampling.LANCZOS).filter(ImageFilter.GaussianBlur(1.2))
+  sample = im.crop(src).resize((dw, dh), Image.Resampling.LANCZOS).filter(ImageFilter.GaussianBlur(1.1))
   mask = Image.new("L", (dw, dh), 0)
   ImageDraw.Draw(mask).rounded_rectangle((0, 0, dw - 1, dh - 1), radius=3, fill=255)
-  mask = mask.filter(ImageFilter.GaussianBlur(2.5))
+  mask = mask.filter(ImageFilter.GaussianBlur(2.2))
   im.paste(sample, (x0, y0), mask)
   return im
 
@@ -57,34 +68,12 @@ def crush_bright(img: Image.Image, box, thresh: float = 55) -> Image.Image:
   return Image.fromarray(arr.astype(np.uint8))
 
 
-def wipe(img: Image.Image, boxes, src=(90, 220, 340, 340)) -> Image.Image:
+def wipe_pii(img: Image.Image) -> Image.Image:
   out = img
-  for box in boxes:
-    out = patch(out, box, src)
+  for box in [(40, 485, 700, 560), (40, 545, 750, 625)]:
+    out = patch(out, box, (90, 220, 340, 340))
     out = crush_bright(out, box, thresh=55)
   return out
-
-
-def fit(img: Image.Image, tw: int, th: int) -> Image.Image:
-  if abs(tw / th - 1.6) < 0.05:
-    return img.resize((tw, th), Image.Resampling.LANCZOS)
-  scale = th / img.height
-  nw = max(tw, int(img.width * scale))
-  scaled = img.resize((nw, th), Image.Resampling.LANCZOS)
-  left = (nw - tw) // 2
-  return scaled.crop((left, 0, left + tw, th))
-
-
-def face_hole(img: Image.Image) -> Image.Image:
-  im = img.convert("RGBA")
-  w, h = im.size
-  cx, cy = int(0.146 * w), int(0.278 * h)
-  r = int(0.141 * h)
-  ov = Image.new("RGBA", im.size, (0, 0, 0, 0))
-  d = ImageDraw.Draw(ov)
-  d.ellipse((cx - r - 4, cy - r - 4, cx + r + 4, cy + r + 4), outline=(210, 195, 155, 255), width=max(3, int(0.01 * h)))
-  d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(8, 8, 12, 255))
-  return Image.alpha_composite(im, ov).convert("RGB")
 
 
 def hard_wipe(im: Image.Image, box) -> Image.Image:
@@ -96,7 +85,7 @@ def hard_wipe(im: Image.Image, box) -> Image.Image:
   fill = np.percentile(sample.reshape(-1, 3), 20, axis=0)
   arr[y0:y1, x0:x1] = fill
   noise = sample.reshape(-1, 3)
-  rng = np.random.default_rng(42)
+  rng = np.random.default_rng(7)
   picks = noise[rng.integers(0, len(noise), size=(y1 - y0) * (x1 - x0))].reshape((y1 - y0, x1 - x0, 3))
   arr[y0:y1, x0:x1] = arr[y0:y1, x0:x1] * 0.65 + picks * 0.35
   return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
@@ -105,6 +94,7 @@ def hard_wipe(im: Image.Image, box) -> Image.Image:
 def make_ballers(amex: Image.Image) -> Image.Image:
   w, h = amex.size
   im = amex.copy()
+  # Wipe AMERICAN EXPRESS / BUSINESS wordmark band + Amex footer microprint + logo corner
   im = hard_wipe(im, (int(0.38 * w), int(0.06 * h), int(0.98 * w), int(0.34 * h)))
   im = hard_wipe(im, (int(0.36 * w), int(0.93 * h), int(0.66 * w), int(0.995 * h)))
   im = hard_wipe(im, (int(0.93 * w), int(0.91 * h), int(0.995 * w), int(0.99 * h)))
@@ -129,19 +119,58 @@ def make_ballers(amex: Image.Image) -> Image.Image:
   return im
 
 
+def fit_for_led(card: Image.Image, tw: int, th: int, fill=(5, 5, 8)):
+  """Exact aspect → resize. Mismatch → letterbox (never crop Centurion / left rim)."""
+  card_ar = card.width / card.height
+  target_ar = tw / th
+  if abs(card_ar - target_ar) < 0.03:
+    scaled = card.resize((tw, th), Image.Resampling.LANCZOS)
+    return scaled, (0, 0, tw, th)
+  scale = min(tw / card.width, th / card.height)
+  nw, nh = int(round(card.width * scale)), int(round(card.height * scale))
+  scaled = card.resize((nw, nh), Image.Resampling.LANCZOS)
+  canvas = Image.new("RGB", (tw, th), fill)
+  ox, oy = (tw - nw) // 2, (th - nh) // 2
+  canvas.paste(scaled, (ox, oy))
+  return canvas, (ox, oy, nw, nh)
+
+
+def face_css(ox: int, oy: int, nw: int, nh: int, tw: int, th: int) -> dict:
+  scale = nw / SRC_W
+  cx = ox + CX * scale
+  cy = oy + CY * scale
+  r = R * scale
+  return {
+    "left": round((cx - r) / tw * 100, 3),
+    "top": round((cy - r) / th * 100, 3),
+    "width": round(2 * r / tw * 100, 3),
+    "height": round(2 * r / th * 100, 3),
+  }
+
+
 def main() -> None:
   OUT.mkdir(parents=True, exist_ok=True)
   ref = Image.open(REF_PATH).convert("RGB")
-  # Wipe embossed cardholder + company for ShoutOut overlay slots
-  amex_clean = wipe(ref, [(40, 485, 700, 560), (40, 545, 750, 625)])
-  for suffix, tw, th in [("2x1", 1600, 800), ("4x3", 1200, 900)]:
-    amex = fit(amex_clean, tw, th)
-    amex.save(OUT / f"black-card-amex-{suffix}.png", optimize=True)
-    face_hole(amex).save(OUT / f"ballers-alert-amex-{suffix}.png", optimize=True)
-    ballers = make_ballers(amex)
-    ballers.save(OUT / f"black-card-{suffix}.png", optimize=True)
-    face_hole(ballers).save(OUT / f"ballers-alert-{suffix}.png", optimize=True)
-    print("wrote", suffix)
+  if ref.size != (SRC_W, SRC_H):
+    ref = ref.resize((SRC_W, SRC_H), Image.Resampling.LANCZOS)
+  amex_base = wipe_pii(ref)
+  ballers_base = make_ballers(amex_base)
+  meta = {}
+  for brand, base in [("amex", amex_base), ("ballers", ballers_base)]:
+    for suffix, tw, th in [("2x1", 1600, 800), ("4x3", 1200, 900)]:
+      canvas, (ox, oy, nw, nh) = fit_for_led(base, tw, th)
+      key = f"{brand}-{suffix}"
+      meta[key] = face_css(ox, oy, nw, nh, tw, th)
+      # Alert keeps Centurion — face is a display overlay, not a PNG hole
+      if brand == "amex":
+        canvas.save(OUT / f"black-card-amex-{suffix}.png", optimize=True)
+        canvas.save(OUT / f"ballers-alert-amex-{suffix}.png", optimize=True)
+      else:
+        canvas.save(OUT / f"black-card-{suffix}.png", optimize=True)
+        canvas.save(OUT / f"ballers-alert-{suffix}.png", optimize=True)
+      print("wrote", key, meta[key])
+  META_OUT.write_text(json.dumps(meta, indent=2))
+  print("face CSS →", META_OUT)
 
 
 if __name__ == "__main__":
