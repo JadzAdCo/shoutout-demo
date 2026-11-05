@@ -54,11 +54,38 @@
         if (!iceHasTurn(servers)) {
           console.warn("[floqCast] ICE has no TURN — hard NAT may fail intermittently", lastIceSource);
         }
+        try {
+          global.FLOQRLog?.write?.({
+            level: iceHasTurn(servers) ? "info" : "warn",
+            category: "floqCast",
+            action: "ice_servers",
+            message: iceHasTurn(servers)
+              ? `floqCast ICE ready (${lastIceSource})`
+              : `floqCast ICE has no TURN (${lastIceSource}) — connectivity may be intermittent`,
+            details: {
+              iceSource: lastIceSource,
+              serverCount: servers.length,
+              hasTurn: iceHasTurn(servers),
+              ttlMs
+            },
+            source: "floqcast-webrtc"
+          });
+        } catch (_) {}
         return iceServersCache;
       } catch (err) {
         lastIceSource = "stun-fallback";
         console.warn("[floqCast] getFloqCastIceServers failed — STUN only", String(err?.message || err).slice(0, 160));
-        return STUN_SERVERS;
+        try {
+          global.FLOQRLog?.write?.({
+            level: "warn",
+            category: "floqCast",
+            action: "ice_servers",
+            message: `getFloqCastIceServers failed — STUN fallback`,
+            details: {iceSource: lastIceSource, error: String(err?.message || err).slice(0, 160)},
+            source: "floqcast-webrtc"
+          });
+        } catch (_) {}
+        return STUN_SERVERS
       } finally {
         iceServersInflight = null;
       }

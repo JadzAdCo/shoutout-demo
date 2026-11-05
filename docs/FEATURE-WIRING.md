@@ -370,9 +370,9 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Client timer | `suprstar-preview.js` — arms only after **stable ICE/peer `connected`** (2.5s debounce); never on SDP answer alone |
 | WebRTC | `suprstr-webrtc.js` — answer → status `answered`; true `connected` from `connectionState` / ICE |
 | Backend | `startSuprstrLive` sets `liveEndsAtMs:0`; `armSuprstrLiveDuration` sets ends + `liveArmedAtMs` / `liveArmSource` |
-| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `suprstar` (`webrtc_status`, `live_timer_*`, `live_heartbeat`, display `display_*`) |
+| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `floqCast` (legacy dual-read `suprstar`): `webrtc_status`, `ice_servers`, `live_timer_*`, `live_heartbeat`. Master Admin → **Diagnostics → FloqCast** (`#diagnosticsFloqCast`, `master-floqcast-logging.js` / `FLOQRFloqCastDiagnostics`). Application Logging still shows the same rows under the broader filter. Phone must be signed in to write; display2 is anonymous (console-only). |
 | Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
-| Cache bust | Preview scripts `?v=29.09.121` |
+| Cache bust | Preview + Master Admin FloqCast panel scripts `?v=s3.2.85` |
 
 ---
 

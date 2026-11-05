@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.84";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.84";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.85";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.85";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,20 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.85",
+      title: "s3.2.85 — Master Admin Diagnostics FloqCast connectivity tab",
+      checks: [
+        {label:"FloqCast diagnostics module", file:"master-floqcast-logging.js", includes:["FLOQRFloqCastDiagnostics", "floqCast", "ice_servers"]},
+        {label:"Diagnostics FloqCast subtab", file:"master-admin.html", includes:["diagnosticsFloqCast", "master.diagnosticsFloqCast", "master-floqcast-logging.js"]},
+        {label:"Panel mount", file:"master-admin-app.js", includes:["diagnosticsFloqCast", "FLOQRFloqCastDiagnostics"]},
+        {label:"ICE log category floqCast", file:"floqcast-webrtc.js", includes:["category: \"floqCast\"", "action: \"ice_servers\""]},
+        {label:"Preview liveDiag floqCast", file:"floqcast-preview.js", includes:["category: \"floqCast\""]},
+        {label:"i18n tab label", file:"floqr-i18n.js", includes:["master.diagnosticsFloqCast"]},
+        {label:"Help topic", file:"botdee-help-repository.js", includes:["help-master-floqcast-diagnostics"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-85-floqcast-diagnostics-tab"]}
+      ]
+    },
     {
       version: "s3.2.82",
       title: "s3.2.82 — Baller's Express package art (face under helmet, name/@handle, optional company)",
@@ -2697,6 +2711,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-85-floqcast-diagnostics-tab",
+      area:"Master Admin / Diagnostics",
+      feature:"Diagnostics → FloqCast connectivity logs tab",
+      changed:"s3.2.85 — new Master Admin Diagnostics subtab FloqCast reads appLogs categories floqCast + legacy suprstar (ICE source, webrtc_status, live_*). Preview/WebRTC write category floqCast.",
+      howToTest:"1) Hard-refresh master-admin.html?v=s3.2.85. 2) Diagnostics → FloqCast tab visible. 3) Go live once signed in on floqcast-preview; Refresh FloqCast logs — ice_servers / webrtc_status rows appear. 4) Mark Succeed/Failed.",
+      expected:"FloqCast tab lists connectivity rows; STUN-only shows iceSource stun-only or stun-fallback.",
+      troubleshoot:"Empty tab → patron must be signed in (boards cannot write appLogs). Still under Application Logging filter category floqCast/suprstar. ICE missing → floqcast-webrtc.js resolveIceServers FLOQRLog write."
+    },
     {
       id:"s3-2-84-baller-face-chip",
       area:"ShoutOut / Templates",

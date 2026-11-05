@@ -64,9 +64,11 @@
   }
 
   function liveDiag(action, message, details = {}, level = "info") {
+    const iceSource = global.FLOQRFloqCastRtc?.iceSource?.() || details.iceSource || "";
     const payload = {
       level,
-      category: "suprstar",
+      // Canonical category for Master Admin → Diagnostics → FloqCast (legacy suprstar still dual-read).
+      category: "floqCast",
       action: String(action || "live_diag"),
       message: String(message || action || "floqCast live diagnostic"),
       details: {
@@ -76,6 +78,7 @@
         status: requestDoc?.status || "",
         webrtc: lastWebrtcStatus || "",
         webrtcMeta: lastWebrtcMeta || {},
+        iceSource,
         liveTimerArmed,
         liveEndsAtMs,
         liveConnectedAtMs,
@@ -83,6 +86,7 @@
         venueLiveSeconds,
         remainMs: liveEndsAtMs ? Math.max(0, liveEndsAtMs - Date.now()) : null,
         correlationId: liveDiagCorrelationId || "",
+        legacyCategory: "suprstar",
         ...details
       },
       correlationId: liveDiagCorrelationId || "",
