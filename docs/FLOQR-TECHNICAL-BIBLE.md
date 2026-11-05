@@ -1107,6 +1107,23 @@ Versioned REST/gRPC; idempotency keys; signed webhooks; Secret Manager; OpenAPI 
 - No secrets in git.
 - Rollback Hosting/Functions revisions; **never break** `display.html?location=` contract; keep package rollback docs.
 
+## 13.4 Local Cloud Agent copy
+
+The live system stays GitHub Pages plus Firebase project `shoutoutdemo-5b402` (Auth, Firestore, Storage, Functions in `us-central1`). The Cloud Agent machine is a local copy of this repo for editing and tests. It does not replace Pages or Firebase.
+
+| What you are doing | Where |
+|---|---|
+| Open the patron site locally | `http://127.0.0.1:4173/` (welcome) and `http://127.0.0.1:4173/?start=search` (Search) |
+| Edit HTML, CSS, client JS | Same files Pages publishes. Refresh the local URL. Do not put `?v=` on `display.html` or `display2.html`. |
+| Functions tests | `npm test` in `functions/` (Node 22). Dependencies are installed with `npm ci --prefix functions`. |
+| Firestore and Storage rules | `npx --yes firebase-tools@15 emulators:exec --only firestore,storage --project demo-floqr-rules "npm --prefix rules-tests test"` from the repo root. Java 21 is required. `npm ci --prefix rules-tests` installs that package. |
+| Publish the site | Merge to the branch GitHub Pages serves. |
+| Publish Functions or rules | Deploy from `main` only, when asked. |
+
+The browser config in `firebase-config.js` points at the live project. Sign-in, Firestore, Storage, and callables from the local pages go to production. There is no emulator switch in the client. Treat saves, payments, and messages from the local site as live actions.
+
+Cloud Agent install is `npm ci` in `functions/` and `rules-tests/`. On boot, a static server listens on port 4173 and skips startup if that port is already open.
+
 ---
 
 # SECTION 14 — Scalability
