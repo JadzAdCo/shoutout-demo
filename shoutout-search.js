@@ -94,25 +94,44 @@
     location.assign(withFrom);
   }
 
-  async function loadVenues() {
-    const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
-    const g = global.FLOQRFeatureGates;
-    const db = firebase.firestore();
-    const eventsByLoc = eventNamesByLocation();
+  function buildVenueRowsFromCatalog(map, eventsByLoc, g) {
     const rows = [];
-    setVenueStatus(t("page.floqcast.locating", "Finding venues near you…"));
-    for (const [id, row] of Object.entries(map)) {
-      let club = {id, ...row};
-      try {
-        if (g?.loadVenueRecord) club = (await g.loadVenueRecord(db, id)) || club;
-      } catch (_) {}
+    for (const [id, row] of Object.entries(map || {})) {
+      const club = {id, ...row};
       const enabled = g ? g.venueMayUse("shoutOut", club) : true;
       if (!enabled) continue;
       if (club.active === false) continue;
       rows.push(FL().normalizeVenue(id, Object.assign({}, club, {eventNames: eventsByLoc[id] || []})));
     }
+    return rows;
+  }
+
+  async function refreshVenueGatesInBackground(map, eventsByLoc, g) {
+    if (!g?.loadVenueRecord || !global.firebase?.firestore) return;
+    const db = firebase.firestore();
+    const ids = Object.keys(map || {});
+    if (!ids.length) return;
+    // Parallel (was sequential — ~39 Firestore reads blocked first paint for many seconds)
+    await Promise.all(ids.map((id) => g.loadVenueRecord(db, id).catch(() => null)));
+    const refreshed = buildVenueRowsFromCatalog(map, eventsByLoc, g);
+    venueRows = FL().sortNearest(refreshed, locationContext);
+    renderVenueGrid();
+  }
+
+  async function loadVenues() {
+    const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
+    const g = global.FLOQRFeatureGates;
+    const eventsByLoc = eventNamesByLocation();
+    setVenueStatus(t("page.floqcast.locating", "Finding venues near you…"));
+
+    // Paint immediately from packaged catalog — do not await per-venue Firestore.
+    const rows = buildVenueRowsFromCatalog(map, eventsByLoc, g);
+    venueRows = FL().sortNearest(rows, locationContext);
+    renderVenueGrid();
+
     locationContext = await FL().resolvePatronLocation({
       auth: firebase.auth(),
+      gpsWaitMs: 1200,
       onLateGps: (coords) => {
         if (!coords || coords.latitude == null) return;
         locationContext = Object.assign({}, locationContext || {}, {
@@ -127,6 +146,8 @@
     });
     venueRows = FL().sortNearest(rows, locationContext);
     renderVenueGrid();
+
+    refreshVenueGatesInBackground(map, eventsByLoc, g).catch(() => {});
   }
 
   function bindUi() {
