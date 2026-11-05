@@ -2088,13 +2088,13 @@ body.floqcast-live-active .heist-brand-slide{
   background-position:center!important;
   background-repeat:no-repeat!important;
 }
-/* Name + company sit in the blank lower-left rows of the package PNG (below Valid Thru). */
+/* Name + company sit below Valid Thru, raised to clear the bottom gold strip. */
 .display-canvas.baller-card .display-center{
   position:absolute;
   left:16.6%;
   width:35%;
   right:auto;
-  top:74%;
+  top:68.5%;
   bottom:auto;
   height:auto;
   display:flex;
@@ -2102,7 +2102,7 @@ body.floqcast-live-active .heist-brand-slide{
   align-items:flex-start;
   justify-content:flex-start;
   text-align:left;
-  gap:.45vh;
+  gap:.2vh;
   z-index:3;
   pointer-events:none;
 }
@@ -2134,16 +2134,17 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-card .brand{
   display:none!important;
 }
-/* Face-only ellipse on the warrior face (helmet, rim text, chip stay visible).
-   mediaSlot is reparented onto #displayCanvas — % are of the card canvas. */
+/* Face ellipse covers most of the roman face + Rewards/Service/Member/Since band.
+   mediaSlot is reparented onto #displayCanvas — % are of the card canvas.
+   Complete EMV chip overlays the face at original art position (z-index above). */
 .display-canvas.baller-alert > .media-slot,
 .display-canvas.baller-alert .media-slot{
   position:absolute;
-  /* 2x1: face +20% size, −3mm left / +4mm down on card */
-  left:16.832%;
-  top:22.01%;
-  width:8.642%;
-  height:20.704%;
+  /* 2x1: face on legion + Rewards text column */
+  left:16.782%;
+  top:8.442%;
+  width:14.873%;
+  height:33.769%;
   aspect-ratio:auto;
   min-height:0;
   border-radius:50%;
@@ -2163,7 +2164,7 @@ body.floqcast-live-active .heist-brand-slide{
   width:100%;
   height:100%;
   object-fit:cover;
-  object-position:center 22%;
+  object-position:center 28%;
   background:transparent;
   /* Soft engraved warm cast so photo sits in the medallion */
   filter:sepia(.18) contrast(1.05) brightness(.96) saturate(.92);
@@ -2171,22 +2172,54 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-alert .media-slot .media-placeholder{
   display:none!important; /* empty = keep warrior face from base art */
 }
-.display-canvas.baller-card:not(.baller-alert) .media-slot{
+.display-canvas.baller-alert > .baller-chip-overlay,
+.display-canvas.baller-alert .baller-chip-overlay{
+  position:absolute;
+  left:21.153%;
+  top:38.392%;
+  width:8.341%;
+  height:9.749%;
+  z-index:5; /* above face slot */
+  pointer-events:none;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  overflow:visible;
+}
+.display-canvas.baller-alert .baller-chip-overlay img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  object-position:center;
+}
+.display-canvas.baller-card:not(.baller-alert) .media-slot,
+.display-canvas.baller-card:not(.baller-alert) .baller-chip-overlay{
   display:none!important;
 }
 .display-canvas.baller-card[data-screen-format-id="led-64x48"] .display-center,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"] .display-center{
   left:8%;
   width:44%;
-  top:70.1%;
+  top:64.5%;
 }
 /* led-64x48 → 4x3 letterboxed package art */
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert > .media-slot,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .media-slot,
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .media-slot,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .media-slot{
-  left:8.286%;
-  top:26.464%;
-  width:10.879%;
-  height:17.368%;
+  left:8.223%;
+  top:15.082%;
+  width:18.722%;
+  height:28.328%;
+}
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert > .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .baller-chip-overlay{
+  left:13.725%;
+  top:40.207%;
+  width:10.5%;
+  height:8.178%;
 }

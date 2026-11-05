@@ -901,6 +901,8 @@
   /* Baller's Alert face must sit on the Centurion medallion (% of canvas).
      #mediaSlot lives under .display-center (bottom name band) in the HTML —
      absolute % there puts the face over the cardholder name. Reparent for alert. */
+  const BALLER_CHIP_SRC = "./images/baller/baller-emv-chip.png";
+
   function placeBallerFaceSlot(canvas, center, mediaSlot, onCanvas) {
     if (!mediaSlot || !canvas) return;
     if (onCanvas) {
@@ -910,6 +912,30 @@
     if (center && mediaSlot.parentElement !== center) {
       const before = byId("displayMain") || center.firstChild;
       center.insertBefore(mediaSlot, before);
+    }
+  }
+
+  /** Complete EMV chip PNG over the face ellipse at original package-art position. */
+  function placeBallerChipOverlay(canvas, show) {
+    if (!canvas) return;
+    let chip = byId("ballerChipOverlay");
+    if (!chip) {
+      chip = document.createElement("div");
+      chip.id = "ballerChipOverlay";
+      chip.className = "baller-chip-overlay hidden";
+      chip.setAttribute("aria-hidden", "true");
+      chip.innerHTML = `<img src="${BALLER_CHIP_SRC}" alt="" decoding="async">`;
+      canvas.appendChild(chip);
+    } else if (chip.parentElement !== canvas) {
+      canvas.appendChild(chip);
+    }
+    chip.classList.toggle("hidden", !show);
+    // Keep chip after mediaSlot in DOM so paint order matches z-index (image then chip).
+    if (show) {
+      const face = byId("mediaSlot");
+      if (face && face.parentElement === canvas && chip.previousElementSibling !== face) {
+        canvas.appendChild(chip);
+      }
     }
   }
 
@@ -1895,6 +1921,7 @@
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
     } else if (isBallerAlert) {
+      // Image first on the roman face + Rewards text band, then complete chip over it.
       placeBallerFaceSlot(canvas, center, mediaSlot, true);
       mediaSlot.classList.remove("hidden");
       mediaSlot.dataset.ballerFace = "baller-face-medallion-slot";
@@ -1906,17 +1933,20 @@
         const mediaElement = mediaSlot.querySelector("img,video");
         if (mediaElement) {
           mediaElement.style.objectFit = "cover";
-          mediaElement.style.objectPosition = "center 18%";
+          mediaElement.style.objectPosition = "center 28%";
         }
+        placeBallerChipOverlay(canvas, true);
       } else {
-        // Transparent placeholder — Centurion (roman hat) in the PNG stays visible
+        // No portrait — leave warrior face; hide chip overlay (base art already has chip).
         mediaSlot.innerHTML = "";
+        placeBallerChipOverlay(canvas, false);
       }
     } else {
       placeBallerFaceSlot(canvas, center, mediaSlot, false);
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
       delete mediaSlot.dataset.ballerFace;
+      placeBallerChipOverlay(canvas, false);
     }
     if (isBallerCard) {
       stopHeistIdentityCycle();

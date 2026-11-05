@@ -1358,6 +1358,23 @@
       page: "master-admin.html#entityManagement"
     },
     {
+      id: "help-master-floqcast-diagnostics",
+      title: "FloqCast diagnostics",
+      body: "Master Admin → Diagnostics → FloqCast. Shows connectivity rows from appLogs for categories floqCast and legacy suprstar: WebRTC status, ICE/TURN source, live heartbeats, and board wait timeouts. Phone Go live must be signed in for rows to save. Display boards are anonymous so their console-only events do not appear here. Intermittent connects often mean STUN-only (no TURN) — look for iceSource stun-only or stun-fallback.",
+      searchPhrases: [
+        "floqcast diagnostics", "floqcast logs", "floq cast diagnostics", "webrtc logs", "ice servers log",
+        "turn stun floqcast", "suprstar logs", "floqcast connectivity", "why floqcast disconnects",
+        "diagnostics floqcast tab"
+      ],
+      links: [
+        {label: "FloqCast diagnostics", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#diagnosticsFloqCast", search: "floqcast diagnostics"},
+        {label: "Application Logging", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#appLogging", search: "application logging"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsFloqCast"
+    },
+    {
       id: "help-master-ops-status",
       title: "Master Admin security and action status",
       body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask BOT DEE about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",

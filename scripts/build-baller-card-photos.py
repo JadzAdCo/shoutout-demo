@@ -20,9 +20,11 @@ SRC = ROOT / "reports/baller-cards/express-package/ballers-express-business.png"
 OUT = ROOT / "images/baller"
 META_OUT = Path("/tmp/baller-express-face-css.json")
 
-# Calibrated on the 1581×995 package PNG (face under helmet).
-# s3.2.83: +20% oval size, −3mm left / +4mm down on ISO card (85.60×53.98 mm).
-FACE = {"cx": 217, "cy": 322, "rx": 86, "ry": 103}
+# Calibrated on the 1581×995 package PNG.
+# Face covers most of the roman legion profile + Rewards/Service/Member/Since band.
+# Complete EMV chip overlays the face at original art position (display CSS/JS).
+FACE = {"cx": 278, "cy": 252, "rx": 148, "ry": 168}
+CHIP = {"x0": 217, "y0": 382, "x1": 383, "y1": 479}
 MEDALLION = {"cx": 248, "cy": 268, "r": 198}
 
 

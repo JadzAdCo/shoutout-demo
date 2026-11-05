@@ -195,28 +195,54 @@
     });
   }
 
-  async function loadVenues() {
-    const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
-    const g = global.FLOQRFeatureGates;
-    const db = firebase.firestore();
-    const eventsByLoc = eventNamesByLocation();
+  function buildVenueRowsFromCatalog(map, eventsByLoc, g) {
     const rows = [];
-    for (const [id, row] of Object.entries(map)) {
-      let club = {id, ...row};
-      try {
-        if (g?.loadVenueRecord) club = await g.loadVenueRecord(db, id) || club;
-      } catch (_) {}
+    for (const [id, row] of Object.entries(map || {})) {
+      const club = {id, ...row};
       const enabled = g ? g.venueMayUse("floqCast", club) : true;
       if (!enabled) continue;
       const norm = FL()?.normalizeVenue?.(id, Object.assign({}, club, {eventNames: eventsByLoc[id] || []}))
         || {id, name: club.locationName || id, eventNames: eventsByLoc[id] || []};
       rows.push(norm);
     }
+    return rows;
+  }
 
+  async function refreshVenueGatesInBackground(map, eventsByLoc, g) {
+    if (!g?.loadVenueRecord || !global.firebase?.firestore) return;
+    const db = firebase.firestore();
+    const ids = Object.keys(map || {});
+    if (!ids.length) return;
+    await Promise.all(ids.map((id) => g.loadVenueRecord(db, id).catch(() => null)));
+    const refreshed = buildVenueRowsFromCatalog(map, eventsByLoc, g);
+    venueRows = sortVenuesNearest(refreshed);
+    renderVenueGrid();
+  }
+
+  async function loadVenues() {
+    const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
+    const g = global.FLOQRFeatureGates;
+    const eventsByLoc = eventNamesByLocation();
     setVenueStatus(t("page.floqcast.locating", "Finding venues near you…"));
+
+    // Paint from packaged catalog first (avoid sequential Firestore N+1).
+    const rows = buildVenueRowsFromCatalog(map, eventsByLoc, g);
+    venueRows = sortVenuesNearest(rows);
+    if (rows.length) {
+      const deepLink0 = requestedLocationId();
+      const preferred0 = venueRows.find((r) => r.id === deepLink0)
+        || venueRows.find((r) => r.id === selectedVenueId)
+        || venueRows[0];
+      selectedVenueId = preferred0.id;
+      syncSelect();
+      renderVenueGrid();
+      byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = false);
+    }
+
     await resolvePatronLocation();
 
     venueRows = sortVenuesNearest(rows);
+    refreshVenueGatesInBackground(map, eventsByLoc, g).catch(() => {});
     if (!rows.length) {
       selectedVenueId = "";
       syncSelect();

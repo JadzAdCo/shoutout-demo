@@ -1359,6 +1359,29 @@
       ]
     },
     {
+      "sourceId": "help:help-master-floqcast-diagnostics",
+      "id": "help-master-floqcast-diagnostics",
+      "kind": "help",
+      "label": "FloqCast diagnostics",
+      "blurb": "Master Admin → Diagnostics → FloqCast. Shows connectivity rows from appLogs for categories floqCast and legacy suprstar: WebRTC status, ICE/TURN source, live heartbeats, and board wait timeouts. Phone Go live must be signed in for rows to save. Display boards are anonymous so the",
+      "href": "./master-admin.html?from=botdee#diagnosticsFloqCast",
+      "phrases": [
+        "floqcast diagnostics",
+        "master admin diagnostics floqcast. shows connectivity rows from applogs for categories floqcast and legacy suprstar webrtc status ice/turn source live heartbeat",
+        "floqcast logs",
+        "floq cast diagnostics",
+        "webrtc logs",
+        "ice servers log",
+        "turn stun floqcast",
+        "suprstar logs",
+        "floqcast connectivity",
+        "why floqcast disconnects",
+        "diagnostics floqcast tab",
+        "application logging",
+        "help-master-floqcast-diagnostics"
+      ]
+    },
+    {
       "sourceId": "help:help-master-network-intelligence",
       "id": "help-master-network-intelligence",
       "kind": "help",
