@@ -174,6 +174,7 @@
       longitude: row.longitude ?? row.lng,
       coords: Geo?.recordCoordinates?.(row) || null,
       eventNames: listOf(row.eventNames),
+      searchAliases: listOf(row.searchAliases),
       pending: !!row.pending,
       raw: row
     };
@@ -262,9 +263,12 @@
   }
 
   function venueHaystack(v) {
+    const raw = v.raw || {};
+    const aliases = listOf(raw.searchAliases || v.searchAliases);
     return [
       v.name, v.brandName, v.id, v.city, v.region, v.country, v.locationLabel,
       ...(v.genres || []), ...(v.categories || []), ...(v.eventNames || []),
+      ...aliases,
       v.telephone, v.officialWebsite, ...(socialHandles(v))
     ].join(" ").toLowerCase();
   }
