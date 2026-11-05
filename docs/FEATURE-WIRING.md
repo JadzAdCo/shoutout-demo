@@ -620,16 +620,16 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.78
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.81
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`.
 
 | Piece | Where |
 |---|---|
 | **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) Baller's Express in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, `venueIds:['temp-democlub-1']`, not STANDARD). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'` |
-| **Art** | `images/baller/*-{2x1,4x3}.svg` (+ `-amex-`); builder `scripts/build-baller-card-svgs.js`. Reference photo stays under `reports/baller-cards/` (not shipped to Pages) |
+| **Art** | Photoreal `images/baller/*-{2x1,4x3}.png` (+ `-amex-`) from Centurion Business reference; builder `scripts/build-baller-card-photos.py` (letterbox 4×3; Alert keeps Centurion). SVG drafts retired from catalog. Refs under `reports/baller-cards/` |
 | **Composer** | `index.html` `#ballerCardFields` (name source + company presets/custom); `patron-app.js` `syncBallerCardFields` / `ballerCardPayloadFields` / face-required gate / optional Gemini `baller-face-medallion`. Hides Amex twins unless Master Admin |
-| **Display** | `display-app.js` baller early path + `backgroundUrlByFormat`; `display.css` `.baller-card` / `.baller-alert` medallion `media-slot` |
+| **Display** | `display-app.js` baller path + `resolveBallerBackgroundUrl` (force PNG) + `placeBallerFaceSlot` (reparent `#mediaSlot` onto canvas); `display.css` face % on Centurion medallion (`15.156/11.25/13.438` for 2×1; `6.445/17.708/16.797` for 64×48) |
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps |
 | **Rules** | `firestore.rules` free-create excludes all four ids |
 | **AI** | `functions/ai-discovery-functions.js` `safeEnhancementPrompt` type `baller-face-medallion` |

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.80";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.80";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.81";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.81";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,13 +223,25 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.2.81",
+      title: "s3.2.81 — Baller's Alert face on Centurion medallion + identical Amex ornate rim (all LED sizes)",
+      checks: [
+        {label:"Face reparent to canvas", file:"display-app.js", includes:["placeBallerFaceSlot", "resolveBallerBackgroundUrl", "baller-face-medallion-slot"]},
+        {label:"Face CSS canvas % (2x1 + 4x3)", file:"display.css", includes:["left:15.156%", "top:11.25%", "width:13.438%", "left:6.445%", "top:17.708%", "width:16.797%"]},
+        {label:"Photoreal PNG not SVG", file:"shared-data.js", includes:["black-card-2x1.png", "ballers-alert-2x1.png", "black-card-amex-2x1.png"], notIncludes:["black-card-2x1.svg"]},
+        {label:"Build keeps Centurion", file:"scripts/build-baller-card-photos.py", includes:["Centurion", "letterbox", "face_css"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.81\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-81-baller-face-centurion"]}
+      ]
+    },
+    {
       version: "s3.2.80",
       title: "s3.2.80 — Black Card photoreal Centurion frame + Baller's Alert (Baller's Express public; Amex private)",
       checks: [
         {label:"Catalog public + Amex", file:"shared-data.js", includes:["blackCard:", "ballersAlert:", "blackCardAmex:", "ballersAlertAmex:", "masterAdminOnly:true", "priceCents:7500", "priceCents:10000"]},
         {label:"STANDARD public only", file:"shared-data.js", includes:["'blackCard','ballersAlert'"], notIncludes:["'blackCardAmex'"]},
         {label:"Art Baller's photoreal PNG", file:"images/baller/black-card-2x1.png", includes:[]},
-        {label:"Art Amex private", file:"images/baller/black-card-amex-2x1.svg", includes:["AMERICAN EXPRESS"]},
+        {label:"Art Amex private PNG", file:"images/baller/black-card-amex-2x1.png", includes:[]},
         {label:"Display baller", file:"display-app.js", includes:["isBallerCard", "baller-face-medallion-slot"]},
         {label:"Display CSS", file:"display.css", includes:["baller-card", "baller-alert"]},
         {label:"Composer fields", file:"index.html", includes:["ballerCardFields", "ballerNameSource", "ballerCompanyPreset"]},
@@ -237,7 +249,7 @@
         {label:"Rules refuse free", file:"firestore.rules", includes:["blackCard", "ballersAlert", "blackCardAmex"]},
         {label:"Help + intents", file:"botdee-help-repository.js", includes:["help-black-card", "help-ballers-alert"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-78-baller-cards"]},
-        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.79\""]}
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.81\""]}
       ]
     },
     {
@@ -2673,13 +2685,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-81-baller-face-centurion",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Alert face sits in Centurion medallion; ornate Amex rim; LED 96×48 / 64×48 / 64×32",
+      changed:"s3.2.81 — mediaSlot reparented to display canvas so face % is not relative to the bottom name band; CSS calibrated to Centurion circle (2x1 + 4x3 letterbox); Alert PNGs keep roman-hat Centurion; stale SVG backgrounds forced to photoreal PNG. Pages only.",
+      howToTest:"1) Hard-refresh display preview URLs with s3.2.81. 2) Open display.html?preview=1&template=ballersAlert&screenFormatId=led-96x48&mainText=CARDHOLDER&subText=COMPANY&mediaUrl= (any face). 3) Face circle must cover the Centurion medallion top-left — NOT hover over the name. 4) Repeat led-64x48 and led-64x32. 5) Black Card (no face) still shows Centurion + ornate rim identical to the Amex detail photo. 6) Mark Succeed/Failed.",
+      expected:"Face locked to the medallion on all three LED sizes; Centurion + ornate rim visible on Black Card; no SVG triple-line frame.",
+      troubleshoot:"Face still over name → display-app.js placeBallerFaceSlot + display.css ?v=s3.2.81 (mediaSlot must be child of #displayCanvas). Triple gold lines → resolveBallerBackgroundUrl still seeing SVG; hard refresh shared-data PNG URLs. Rim/Centurion missing → rebuild scripts/build-baller-card-photos.py from reference-amex-not-shipped.jpg."
+    },
+    {
       id:"s3-2-78-baller-cards",
       area:"ShoutOut / Templates",
       feature:"Black Card ($75) + Baller's Alert ($100) — Baller's Express public; Amex Master Admin + Aurelia only",
-      changed:"Public Baller's Express metal-card templates (name source + company presets; Alert requires face photo + optional Gemini medallion). Private Amex twins gated masterAdminOnly + Aurelia. Package s3.2.80 — photoreal Centurion-frame PNGs. Needs Pages + firestore.rules + commerce Functions (+ aiEnhanceShoutOutMedia for face bake).",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.80). 2) Throw ShoutOut → Black Card — set name + company → checkout $75. 3) Baller's Alert — upload face → checkout $100; preview shows face medallion + Valid Thru …/50. 4) As non-Master Admin at Aurelia, Amex twins must NOT list. 5) As Master Admin at Aurelia, Amex twins list with AMERICAN EXPRESS art. 6) BOT DEE: black card / baller's alert → help. 7) Mark Succeed/Failed.",
+      changed:"Public Baller's Express metal-card templates (name source + company presets; Alert requires face photo + optional Gemini medallion). Private Amex twins gated masterAdminOnly + Aurelia. Package s3.2.80 — photoreal Centurion-frame PNGs. Follow-up face placement: s3-2-81-baller-face-centurion.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.81). 2) Throw ShoutOut → Black Card — set name + company → checkout $75. 3) Baller's Alert — upload face → checkout $100; face sits in Centurion medallion. 4) As non-Master Admin at Aurelia, Amex twins must NOT list. 5) As Master Admin at Aurelia, Amex twins list with AMERICAN EXPRESS art. 6) BOT DEE: black card / baller's alert → help. 7) Mark Succeed/Failed.",
       expected:"Public pair everywhere at $75/$100 with Baller's Express art; Amex only for Master Admin on Aurelia; free create refused by rules.",
-      troubleshoot:"Missing templates → hard refresh shared-data.js ?v=s3.2.80. Wrong price → Functions deploy createFloqrCheckoutSession (BALLER_CARD_PRICE_CENTS). Amex visible to patrons → patron-app masterAdminOnly filter + commerce Amex gate. Gold frame missing → rebuild scripts/build-baller-card-svgs.js + hard refresh SVG. Face not circular → display.css baller-alert + display-app.js. Gemini skip OK — medallion still shows original photo."
+      troubleshoot:"Missing templates → hard refresh shared-data.js ?v=s3.2.81. Wrong price → Functions deploy createFloqrCheckoutSession (BALLER_CARD_PRICE_CENTS). Amex visible to patrons → patron-app masterAdminOnly filter + commerce Amex gate. Face over name → see s3-2-81-baller-face-centurion. Gemini skip OK — medallion still shows original photo."
     },
     {
       id:"s3-2-77-botdee-help-verbiage",

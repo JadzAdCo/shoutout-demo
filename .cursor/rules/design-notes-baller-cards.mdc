@@ -21,10 +21,11 @@ Owner (Nov 4 2026): public face uses **Baller's Express** (copyright-safe). Amex
 
 ## Display
 
-- Art: photoreal `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) built from `reports/baller-cards/reference-amex-not-shipped.jpg` via `scripts/build-baller-card-photos.py`. **Exact Centurion Business ornate border / medallion / chip / emboss.** Amex = photo replica; Baller's = same graphics with Baller's Express wordmark. SVG drafts are non-canonical.
-- Class: `baller-card` (+ `baller-alert`). Name/company embossed at lower left. Alert face = circular `media-slot` (~left 17%, upper third).
+- Art: photoreal `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) built from `reports/baller-cards/reference-amex-not-shipped.jpg` via `scripts/build-baller-card-photos.py`. **Exact Centurion Business ornate rim / Centurion (roman hat) medallion / chip / emboss** (rim detail QA: `reports/baller-cards/centurion-rim-detail.jpg`). Amex = photo replica; Baller's = same graphics with Baller's Express wordmark. Alert PNGs **keep** the Centurion — face is a CSS overlay, not a punched hole. 4×3 letterboxes so the left rim + Centurion are never cropped. SVG drafts are non-canonical.
+- Class: `baller-card` (+ `baller-alert`). Name/company embossed at lower left.
+- **Face placement (s3.2.81):** `#mediaSlot` is reparented onto `#displayCanvas` (`placeBallerFaceSlot`) so absolute % is of the card, not the bottom `.display-center` name band (that bug put the face over the cardholder name). CSS: 2×1 (`led-96x48` / `led-64x32`) `left:15.156%; top:11.25%; width:13.438%`; 4×3 (`led-64x48`) `left:6.445%; top:17.708%; width:16.797%`. `resolveBallerBackgroundUrl` forces packaged PNG when Firestore still has a stale SVG.
 - Valid Thru year **50** on Alert; Black Card keeps **28**.
-- `backgroundUrlByFormat` picks 2:1 vs 4:3 SVG per LED size.
+- `backgroundUrlByFormat` picks 2:1 vs 4:3 PNG per LED size.
 
 ## Gates
 
