@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.86";
+  const VERSION = "s3.2.87";
 
   const packs = {
     "ru": {
@@ -252,11 +252,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — металлическая карта Baller's Express BUSINESS с лицом под шлемом. Загрузите или сделайте фото. Gemini выделяет человека (грубые края); затем зум/позиция. Шлем, кайма и чип остаются. Компания необязательна (макс. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -582,11 +582,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — metalen Baller's Express BUSINESS-kaart met je gezicht onder de helm. Upload of maak een foto. Gemini isoleert de persoon (grove randen); zoom/positie. Helm, rand en chip blijven. Bedrijf optioneel (max 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -912,11 +912,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — carte métal Baller's Express BUSINESS avec votre visage sous le casque. Téléversez ou prenez une photo. Gemini isole le sujet (contours approximatifs); zoomez/placez le visage. Casque, bordure et puce restent. Société optionnelle (max 25; préréglage WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1242,11 +1242,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — die Baller's Express BUSINESS-Metallkarte mit Ihrem Gesicht unter dem Kriegerhelm. Foto hochladen oder aufnehmen. Gemini trennt Sie vom Hintergrund (grobe Kanten); dann Zoomen/Positionieren. Helm, Rand und Chip bleiben. Firma optional (max. 25 Zeichen; Vorgabe WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1572,11 +1572,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — tarjeta metálica Baller's Express BUSINESS con tu cara bajo el casco. Sube o toma una foto. Gemini aísla el sujeto (bordes aproximados); ajusta zoom/posición. Casco, borde y chip permanecen. Empresa opcional (máx. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1902,11 +1902,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — carta metallica Baller's Express BUSINESS con il volto sotto l'elmo. Carica o scatta una foto. Gemini isola il soggetto (bordi approssimativi); zoom/posizione. Elmo, bordo e chip restano. Azienda opzionale (max 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2232,11 +2232,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — cartão metálico Baller's Express BUSINESS com o rosto sob o capacete. Envie ou tire uma foto. Gemini isola o sujeito (bordas aproximadas); ajuste zoom/posição. Capacete, borda e chip permanecem. Empresa opcional (máx. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2562,11 +2562,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — μεταλλική κάρτα Baller's Express BUSINESS με το πρόσωπο κάτω από το κράνος. Ανεβάστε ή τραβήξτε φωτογραφία. Το Gemini απομονώνει το θέμα (χονδροειδή άκρα)· ζουμ/θέση. Κράνος, πλαίσιο και chip μένουν. Εταιρεία προαιρετική (μέγ. 25· preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2892,11 +2892,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — metalowa karta Baller's Express BUSINESS z twarzą pod hełmem. Prześlij lub zrób zdjęcie. Gemini izoluje osobę (przybliżone krawędzie); zoom/pozycja. Hełm, ramka i chip zostają. Firma opcjonalna (maks. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -3222,11 +3222,11 @@
       },
       "help-black-card": {
         title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+        body: "$100 Baller's Alert — بطاقة Baller's Express BUSINESS المعدنية مع وجهك تحت الخوذة. ارفع صورة أو التقطها. يعزل Gemini الشخص (حواف تقريبية)؛ ثم كبّر/ضع الوجه. الخوذة والإطار والشريحة تبقى. الشركة اختيارية (حد أقصى 25؛ الإعداد WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",

@@ -621,21 +621,21 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.82
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.87
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
 
 | Piece | Where |
 |---|---|
-| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'` |
+| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:25` |
 | **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py`. Heading + Valid Thru 12/50 + ornate rim in the asset |
-| **Composer** | `#ballerCardFields`: name or @handle (casing/`@` kept) + optional blank company; Alert face upload/camera; Gemini `baller-face-medallion` face-only under helmet |
-| **Display** | `placeBallerFaceSlot` + face-only ellipse CSS (`20.299/16.281/7.235×17.286` 2×1; `12.65/21.658/9.108×14.501` 64×48); metallic gold emboss text; no forced uppercase; empty company hidden |
-| **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps |
+| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 25). Alert: **Upload photo** + **Take photo** → same pipeline; cancel keeps prior. Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
+| **Display** | `placeBallerFaceSlot` + face oval; chip overlay; flashing red halo (`baller-red-halo`); cutout uses `ballerFaceScale` / `ballerFaceObjectPositionY`; metallic gold emboss; empty company hidden |
+| **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
 | **Rules** | `firestore.rules` free-create excludes all four ids |
-| **AI** | `functions/ai-discovery-functions.js` `safeEnhancementPrompt` type `baller-face-medallion` |
+| **AI** | `functions/gemini-portrait-mask.js` (Gemini 2.5 Flash segmentation → full-frame alpha PNG) + `aiEnhanceShoutOutMedia` `baller-portrait-mask` (alias `baller-face-medallion` / `removeBallerPortraitBackground`). Client `destination-in` composite; original immutable |
 | **Help** | `help-black-card`, `help-ballers-alert`; intents `black-card`, `ballers-alert` |
-| **Tests** | `functions/baller-card-template.test.js` |
+| **Tests** | `functions/baller-card-template.test.js`, `functions/gemini-portrait-mask.test.js` |
 
 ## Classic Halloween (`classicHalloween`) — seasonal ShoutOut template
 

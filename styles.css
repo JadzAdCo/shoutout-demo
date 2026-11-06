@@ -1567,6 +1567,11 @@ html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
 .name-shoutout-fields{display:grid;gap:6px;margin:4px 0 10px}
 .baller-card-fields{display:grid;gap:8px;margin:6px 0 12px}
 .baller-card-fields label{display:grid;gap:4px}
+.baller-face-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.baller-face-actions .status{flex:1 1 100%;margin:0;font-size:.9em}
+.baller-face-placement{display:grid;gap:8px;margin:6px 0;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
+.baller-face-placement label{display:grid;gap:4px;grid-template-columns:minmax(9rem,auto) 1fr;align-items:center}
+.baller-face-placement input[type="range"]{width:100%}
 
 .name-shoutout-combo{position:relative}
 .name-shoutout-combo input{width:100%;font-size:1.1rem;font-weight:700}

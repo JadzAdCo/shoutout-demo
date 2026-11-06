@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.86 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.87 (stable)
 
+- s3.2.87: Baller's Alert Upload+Take photo, Gemini 2.5 Flash portrait mask cutout, red card halo, company WE'RE OUTSIDE LLC max 25.
 - s3.2.86: Fix ShoutOut/floqCast venue search — Aurelia (and other Firestore names) after fast catalog paint.
 - s3.2.85: Master Admin Diagnostics → FloqCast connectivity logs tab; ICE/WebRTC appLogs category floqCast.
 - s3.2.84: Baller face on roman + Rewards band; complete chip overlay; name raised; fast venue search.

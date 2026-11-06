@@ -39,6 +39,7 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const MAX_GEMINI_IMAGE_BYTES = 8 * 1024 * 1024;
+const portraitMask = require("./gemini-portrait-mask");
 
 const MONTHS = {
   jan: "01", january: "01",
@@ -1361,13 +1362,12 @@ function safeEnhancementPrompt(prompt = "", enhancementType = "") {
       `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
     ].join("\n");
   }
-  if (type === "baller-face-medallion") {
+  if (type === "baller-face-medallion" || type === "baller-portrait-mask") {
+    // Image-edit path is legacy soft-fail only. Prefer baller-portrait-mask (segmentation) —
+    // do not regenerate / beautify the patron's face.
     return [
-      "Crop tightly to the subject's face only for a small oval that sits under a Roman warrior helmet on a Baller's Express metal card.",
-      "Preserve the person's recognizable face and natural identity exactly — no beauty filters, no age change, no identity swap.",
-      "Head/face only (not full shoulders). Warm metallic engraved look is OK; keep the person recognizable.",
-      "Do not add text, logos, watermarks, card numbers, brand marks, helmets, chips, or American Express / Baller's Express branding.",
-      "Do not fill an entire medallion circle — return a face portrait for a small oval that leaves helmet, rim engraving, and chip untouched in the template.",
+      "Do not redraw or beautify this photo. If you must return an image, crop loosely around the primary person's head and shoulders only.",
+      "Preserve identity exactly. No filters, helmets, chips, logos, or card chrome.",
       `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
     ].join("\n");
   }
@@ -1934,6 +1934,70 @@ exports.aiExtractPublicSourceUrl = functions.https.onCall(async (data, context) 
   };
 });
 
+async function runBallerPortraitMask({uid, mediaStoragePath, referenceNumber}) {
+  const original = await downloadOwnedImage(mediaStoragePath, uid);
+  let segmented;
+  try {
+    segmented = await portraitMask.callGeminiPersonSegmentation({
+      apiKey: geminiSecretValue(),
+      buffer: original.buffer,
+      contentType: original.contentType
+    });
+  } catch (error) {
+    const message = String(error?.message || error).slice(0, 400);
+    throw new HttpsError(
+      "failed-precondition",
+      `Portrait background removal failed: ${message}. ${portraitMask.LIMITATION}`
+    );
+  }
+  const maskPath = enhancedPathForOriginal(
+    original.mediaStoragePath,
+    referenceNumber,
+    "image/png"
+  ).replace("/enhanced/", "/masks/").replace(/gemini-/, "mask-");
+  const maskUrl = await uploadEnhancedGeminiImage({
+    bucket: original.bucket,
+    outputPath: maskPath,
+    buffer: segmented.maskPngBuffer,
+    contentType: "image/png"
+  });
+  await db.collection("aiMediaEdits").add({
+    uid,
+    sourceType: "shoutoutMedia",
+    originalMediaStoragePath: original.mediaStoragePath,
+    maskMediaStoragePath: maskPath,
+    enhancementType: "baller-portrait-mask",
+    provider: "gemini",
+    model: segmented.model,
+    maskFormat: segmented.maskFormat,
+    width: segmented.width,
+    height: segmented.height,
+    box2d: segmented.box2d || null,
+    limitations: segmented.limitations,
+    status: "completed",
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  return {
+    status: "masked",
+    provider: "gemini",
+    model: segmented.model,
+    originalMediaUrl: original.mediaUrl || "",
+    originalMediaStoragePath: original.mediaStoragePath,
+    maskMediaUrl: maskUrl,
+    maskMediaStoragePath: maskPath,
+    width: segmented.width,
+    height: segmented.height,
+    box2d: segmented.box2d,
+    boxPixels: segmented.boxPixels,
+    label: segmented.label,
+    maskFormat: segmented.maskFormat,
+    softEdges: segmented.softEdges,
+    limitations: segmented.limitations,
+    aiMediaSafetyStatus: "passed",
+    aiMediaSafetyNotes: segmented.limitations
+  };
+}
+
 exports.aiEnhanceShoutOutMedia = onCall({
   region:"us-central1",
   secrets:[GEMINI_API_KEY],
@@ -1947,14 +2011,36 @@ exports.aiEnhanceShoutOutMedia = onCall({
       status:"configured",
       provider:"gemini",
       model:GEMINI_IMAGE_EDIT_MODEL,
-      capabilities:["authenticated ShoutOut image editing", "Storage owner path enforcement", "diagnostic secret check"],
+      segmentationModel: portraitMask.SEGMENTATION_MODEL,
+      capabilities:[
+        "authenticated ShoutOut image editing",
+        "baller-portrait-mask segmentation (Gemini 2.5 Flash)",
+        "Storage owner path enforcement",
+        "diagnostic secret check"
+      ],
       videoEditing:"Video uploads use FLOQR first-7-second trim; this callable edits images."
     };
   }
   const uid = request.auth.uid;
   const mediaStoragePath = String(request.data?.mediaStoragePath || "").trim();
-  const prompt = safeEnhancementPrompt(request.data?.prompt, request.data?.enhancementType);
+  const enhancementType = String(request.data?.enhancementType || "image-edit").trim();
   if (!mediaStoragePath) throw new HttpsError("invalid-argument", "mediaStoragePath is required.");
+
+  // Baller's Alert: segmentation mask only — never redraw the patron's face.
+  if (enhancementType === "baller-portrait-mask" || enhancementType === "baller-face-medallion") {
+    try {
+      return await runBallerPortraitMask({
+        uid,
+        mediaStoragePath,
+        referenceNumber: request.data?.referenceNumber
+      });
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      throw new HttpsError("failed-precondition", String(error?.message || error).slice(0, 400));
+    }
+  }
+
+  const prompt = safeEnhancementPrompt(request.data?.prompt, enhancementType);
   const original = await downloadOwnedImage(mediaStoragePath, uid);
   const edited = await callGeminiImageEdit({
     buffer:original.buffer,
@@ -1973,7 +2059,7 @@ exports.aiEnhanceShoutOutMedia = onCall({
     sourceType:"shoutoutMedia",
     originalMediaStoragePath:original.mediaStoragePath,
     enhancedMediaStoragePath:outputPath,
-    enhancementType:String(request.data?.enhancementType || "image-edit").slice(0, 80),
+    enhancementType:enhancementType.slice(0, 80),
     prompt:String(request.data?.prompt || "").slice(0, 600),
     provider:"gemini",
     model:GEMINI_IMAGE_EDIT_MODEL,
@@ -1990,6 +2076,9 @@ exports.aiEnhanceShoutOutMedia = onCall({
     aiMediaSafetyNotes:edited.textNotes || "Gemini returned an edited image suitable for ShoutOut review."
   };
 });
+
+/** Alias for Baller's Alert background removal (same callable, clearer name). */
+exports.removeBallerPortraitBackground = exports.aiEnhanceShoutOutMedia;
 
 exports.aiSuggestShoutOut = onCall({
   region:"us-central1",

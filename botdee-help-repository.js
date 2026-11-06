@@ -1740,7 +1740,7 @@
     {
       id: "help-black-card",
       title: "Black Card",
-      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
+      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
       searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout", "black metal card", "$75 shoutout"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
@@ -1750,8 +1750,8 @@
     {
       id: "help-ballers-alert",
       title: "Baller's Alert",
-      body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card.",
-      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo", "face medallion", "$100 shoutout"],
+      body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Upload a photo from your library or take one with the camera. Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only the face sits in the medallion. Helmet, rim, and chip stay. If background removal fails, retry or keep the original. Company is optional (max 25 characters; preset WE'RE OUTSIDE LLC). Valid Thru 12/50.",
+      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo", "face medallion", "upload photo", "take photo", "background removal", "$100 shoutout"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
