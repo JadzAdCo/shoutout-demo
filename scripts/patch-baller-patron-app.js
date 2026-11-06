@@ -14,7 +14,7 @@ if (!s.includes("function isBallerCardTemplate")) {
     const t = getTemplate(id);`;
   mustInclude(needle, "isSoccerJerseyTemplate");
   s = s.replace(needle, `  const BALLER_COMPANY_PRESETS = {
-    "were-outside": "We're Outside LLC",
+    "were-outside": "WE'RE OUTSIDE LLC",
     "bad-boy": "Bad Boy Inc.",
     "baddbches": "BaddB$ches Only Corp"
   };

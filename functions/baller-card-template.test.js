@@ -109,7 +109,7 @@ test("server prices and Amex gate are enforced", () => {
 
     const alert = normalizeCheckoutPayload("shoutout", {
       clubLocationId: AURELIA,
-      shoutout: {template: "ballersAlert", screenFormatId, mainText: "NYX FLOQR", subText: "We're Outside LLC", priceCents: 1, clubLocationId: AURELIA}
+      shoutout: {template: "ballersAlert", screenFormatId, mainText: "NYX FLOQR", subText: "WE'RE OUTSIDE LLC", priceCents: 1, clubLocationId: AURELIA}
     }, patronAuth);
     assert.equal(alert.shoutout.priceCents, 10000);
     assert.equal(alert.shoutout.priceLabel, "$100");

@@ -1740,7 +1740,7 @@
     {
       id: "help-black-card",
       title: "Black Card",
-      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (We're Outside LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
+      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
       searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout", "black metal card", "$75 shoutout"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
