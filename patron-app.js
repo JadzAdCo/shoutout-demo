@@ -136,10 +136,13 @@
   }
   const BALLER_COMPANY_PRESETS = {
     "none": "",
-    "were-outside": "We're Outside LLC",
+    "were-outside": "WE'RE OUTSIDE LLC",
     "bad-boy": "Bad Boy Inc.",
     "baddbches": "BaddB$ches Only Corp"
   };
+  const BALLER_COMPANY_MAX = 25;
+  let lastValidBallerFace = null; // {file, previewUrl, uploadResult} — keep on cancel / API failure
+  let ballerFaceRequestSeq = 0;
   function isBallerCardTemplate(id = selectedTemplate) {
     const t = getTemplate(id);
     if (t?.ballerCard === true) return true;
@@ -188,7 +191,9 @@
     const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || "";
     const formatBg = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[formatId] || t.backgroundUrlByFormat[String(formatId).replace(/^p125-/, "led-")])) || "";
     const name = ballerNameFromSource();
-    const company = ballerCompanyFromFields();
+    const company = String(ballerCompanyFromFields() || "").slice(0, BALLER_COMPANY_MAX);
+    const placement = ballerFacePlacementFields();
+    const prior = lastValidBallerFace?.uploadResult || {};
     return {
       ballerCard: true,
       ballerAlert: isBallerAlertTemplate(),
@@ -200,7 +205,12 @@
       companyName: company,
       backgroundUrl: formatBg || t.defaultBackgroundUrl || "",
       mainText: name,
-      subText: company
+      subText: company,
+      ...placement,
+      maskMediaUrl: prior.maskMediaUrl || "",
+      maskMediaStoragePath: prior.maskMediaStoragePath || "",
+      originalMediaUrl: prior.originalMediaUrl || "",
+      originalMediaStoragePath: prior.originalMediaStoragePath || ""
     };
   }
   function syncBallerCardFields() {
@@ -208,6 +218,8 @@
     const alert = isBallerAlertTemplate();
     byId("ballerCardFields")?.classList.toggle("hidden", !baller);
     byId("ballerFaceHint")?.classList.toggle("hidden", !alert);
+    byId("ballerFaceActions")?.classList.toggle("hidden", !alert);
+    byId("ballerFacePlacement")?.classList.toggle("hidden", !alert);
     if (baller) {
       byId("mainText")?.closest("label")?.classList.add("hidden");
       document.querySelector(".attribution-controls")?.classList.add("hidden");
@@ -219,7 +231,7 @@
     if (!baller) return;
     const caps = templateDisplayCaps();
     const nameLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 28));
-    const companyLimit = Math.max(1, Number(caps.sub || caps.maxSubCharacters || 28));
+    const companyLimit = Math.min(BALLER_COMPANY_MAX, Math.max(1, Number(caps.sub || caps.maxSubCharacters || BALLER_COMPANY_MAX)));
     if (byId("ballerManualName")) byId("ballerManualName").maxLength = nameLimit;
     if (byId("ballerCustomCompany")) byId("ballerCustomCompany").maxLength = companyLimit;
     const name = String(ballerNameFromSource() || "").slice(0, nameLimit);
@@ -229,21 +241,128 @@
     const mediaCard = byId("shoutoutMediaCard");
     if (mediaCard && alert) {
       const note = mediaCard.querySelector(".single-media-upload-note");
-      if (note) note.textContent = "Face photo required — clear face shot; FLOQR places it under the warrior helmet (helmet & chip stay). Library or camera.";
+      if (note) {
+        note.textContent = "Face photo required — Upload photo (library/files) or Take photo (camera). Gemini isolates the person; you place the face under the warrior helmet.";
+      }
       const label = mediaCard.querySelector(".file-upload-label");
-      if (label && label.childNodes[0]) label.childNodes[0].textContent = "Upload / take face photo ";
+      if (label) label.classList.add("hidden"); // dual actions replace the single capture input label
       const input = byId("shoutoutMediaUpload");
       if (input) {
         input.accept = "image/*";
-        input.setAttribute("capture", "user");
+        input.removeAttribute("capture"); // never force camera-only
       }
+      ensureBallerFaceActions(mediaCard);
+    } else if (mediaCard) {
+      byId("ballerFaceActions")?.classList.add("hidden");
+      const label = mediaCard.querySelector(".file-upload-label");
+      if (label) label.classList.remove("hidden");
     }
   }
+
+  function ensureBallerFaceActions(mediaCard) {
+    let actions = byId("ballerFaceActions");
+    if (!actions && mediaCard) {
+      actions = document.createElement("div");
+      actions.id = "ballerFaceActions";
+      actions.className = "baller-face-actions button-row";
+      actions.innerHTML = `
+        <button type="button" id="ballerUploadPhotoBtn" class="primary">Upload photo</button>
+        <button type="button" id="ballerTakePhotoBtn">Take photo</button>
+        <button type="button" id="ballerFaceRetryBtn" class="hidden">Retry background removal</button>
+        <p id="ballerFaceStatus" class="status" aria-live="polite"></p>`;
+      const note = mediaCard.querySelector(".single-media-upload-note");
+      if (note?.nextSibling) mediaCard.insertBefore(actions, note.nextSibling);
+      else mediaCard.appendChild(actions);
+    }
+    const input = byId("shoutoutMediaUpload");
+    if (!input || actions?.dataset.bound === "1") return;
+    actions.dataset.bound = "1";
+    byId("ballerUploadPhotoBtn")?.addEventListener("click", () => {
+      input.accept = "image/*";
+      input.removeAttribute("capture");
+      input.click();
+    });
+    byId("ballerTakePhotoBtn")?.addEventListener("click", () => {
+      input.accept = "image/*";
+      // capture=user when camera is available; if denied, the browser falls back to file picker.
+      input.setAttribute("capture", "user");
+      input.click();
+    });
+    byId("ballerFaceRetryBtn")?.addEventListener("click", () => {
+      if (lastValidBallerFace?.uploadResult?.mediaStoragePath) {
+        retryBallerPortraitMask(lastValidBallerFace.uploadResult).catch(() => {});
+      }
+    });
+  }
+
+  function setBallerFaceStatus(msg, {retry = false} = {}) {
+    const el = byId("ballerFaceStatus");
+    if (el) el.textContent = msg || "";
+    byId("ballerFaceRetryBtn")?.classList.toggle("hidden", !retry);
+  }
+
+  function loadImageElement(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not decode portrait image."));
+      img.src = url;
+    });
+  }
+
+  /** Draw original photo, apply full-frame alpha mask with destination-in (portrait layer only). */
+  async function compositeBallerPortraitCutout(originalUrl, maskUrl) {
+    const [orig, mask] = await Promise.all([loadImageElement(originalUrl), loadImageElement(maskUrl)]);
+    const w = orig.naturalWidth || orig.width;
+    const h = orig.naturalHeight || orig.height;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(orig, 0, 0, w, h);
+
+    const mCanvas = document.createElement("canvas");
+    mCanvas.width = w;
+    mCanvas.height = h;
+    const mctx = mCanvas.getContext("2d");
+    mctx.drawImage(mask, 0, 0, w, h);
+    const imageData = mctx.getImageData(0, 0, w, h);
+    const d = imageData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      // Grayscale coverage → alpha (keep midtones for soft edges). Never feed opaque B/W to destination-in.
+      const coverage = d[i + 3] > 0 ? Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) : d[i];
+      d[i] = 255;
+      d[i + 1] = 255;
+      d[i + 2] = 255;
+      d[i + 3] = coverage;
+    }
+    mctx.putImageData(imageData, 0, 0);
+    ctx.globalCompositeOperation = "destination-in";
+    ctx.drawImage(mCanvas, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("Portrait composite failed.");
+    return blob;
+  }
+
+  async function uploadBallerCutoutBlob(blob, referenceNumber, uid) {
+    if (!storage) throw new Error("Firebase Storage is not initialized.");
+    const path = `shoutouts/${uid}/${referenceNumber || Date.now()}/enhanced/baller-cutout-${Date.now()}.png`;
+    const ref = storage.ref().child(path);
+    const snap = await ref.put(blob, {contentType: "image/png", customMetadata: {uploadedBy: uid, kind: "baller-portrait-cutout"}});
+    const url = await snap.ref.getDownloadURL();
+    return {url, path};
+  }
+
   async function maybeEnhanceBallerFace(uploadResult, referenceNumber) {
     if (!isBallerAlertTemplate() || !uploadResult?.mediaStoragePath) return uploadResult || {};
-    if (!String(uploadResult.mediaType || "").startsWith("image") && uploadResult.mediaType && uploadResult.mediaType !== "image") {
+    if (uploadResult.mediaType && uploadResult.mediaType !== "image" && !String(uploadResult.mediaType).startsWith("image")) {
       return uploadResult;
     }
+    const seq = ++ballerFaceRequestSeq;
+    setBallerFaceStatus("Removing background (Gemini)…");
     try {
       const client = firebase.app().functions(window.FLOQR_AI_FUNCTIONS_REGION || undefined);
       const callable = client.httpsCallable(window.FLOQR_AI_GEMINI_MEDIA_FUNCTION || "aiEnhanceShoutOutMedia");
@@ -251,39 +370,76 @@
         callable({
           mediaStoragePath: uploadResult.mediaStoragePath,
           referenceNumber,
-          prompt: "Crop to the subject's face only for a small oval under a Roman warrior helmet on a metal card — keep identity, no full-medallion fill.",
-          enhancementType: "baller-face-medallion"
+          enhancementType: "baller-portrait-mask",
+          prompt: "Segment primary person for Baller's Alert face oval."
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Gemini baller face timed out")), 45000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Portrait background removal timed out")), 90000))
       ]);
+      if (seq !== ballerFaceRequestSeq) return lastValidBallerFace?.uploadResult || uploadResult;
       const data = result?.data || {};
-      if (data.status === "enhanced" && data.enhancedMediaUrl) {
-        return {
+      if (data.status === "masked" && data.maskMediaUrl) {
+        setBallerFaceStatus("Compositing cutout…");
+        const cutoutBlob = await compositeBallerPortraitCutout(
+          data.originalMediaUrl || uploadResult.mediaUrl,
+          data.maskMediaUrl
+        );
+        if (seq !== ballerFaceRequestSeq) return lastValidBallerFace?.uploadResult || uploadResult;
+        const cutout = await uploadBallerCutoutBlob(cutoutBlob, referenceNumber, currentUser.uid);
+        const next = {
           ...uploadResult,
-          mediaUrl: data.enhancedMediaUrl,
+          mediaUrl: cutout.url,
           mediaType: "image",
-          mediaStoragePath: data.enhancedMediaStoragePath || uploadResult.mediaStoragePath,
+          mediaStoragePath: cutout.path,
           originalMediaUrl: uploadResult.mediaUrl,
           originalMediaStoragePath: uploadResult.mediaStoragePath,
-          enhancedMediaUrl: data.enhancedMediaUrl,
-          enhancedMediaStoragePath: data.enhancedMediaStoragePath || "",
+          maskMediaUrl: data.maskMediaUrl,
+          maskMediaStoragePath: data.maskMediaStoragePath || "",
+          enhancedMediaUrl: cutout.url,
+          enhancedMediaStoragePath: cutout.path,
           selectedMediaVersion: "enhanced",
           aiEnhancementApplied: true,
-          aiEnhancementType: "baller-face-medallion",
+          aiEnhancementType: "baller-portrait-mask",
           aiEnhancementProvider: data.provider || "gemini",
           aiEnhancementModel: data.model || "",
           aiMediaSafetyStatus: data.aiMediaSafetyStatus || "passed",
-          aiMediaSafetyNotes: data.aiMediaSafetyNotes || "Baller face medallion prepared."
+          aiMediaSafetyNotes: data.limitations || data.aiMediaSafetyNotes || "",
+          portraitMaskWidth: data.width || null,
+          portraitMaskHeight: data.height || null
         };
+        lastValidBallerFace = {uploadResult: next, previewUrl: cutout.url};
+        setBallerFaceStatus(data.limitations
+          ? "Background removed (coarse mask — hair edges approximate)."
+          : "Background removed. Adjust face zoom/position if needed.");
+        return next;
       }
+      throw new Error(data.aiMediaSafetyNotes || "Mask response incomplete.");
     } catch (error) {
-      console.warn("baller face Gemini fallback", error?.message || error);
+      console.warn("baller portrait mask fallback", error?.message || error);
+      setBallerFaceStatus(`Background removal failed — original kept. ${String(error?.message || "").slice(0, 160)}`, {retry: true});
+      return {
+        ...uploadResult,
+        aiEnhancementType: "none",
+        aiMediaSafetyStatus: "fallback",
+        aiMediaSafetyNotes: `Original face photo retained. ${String(error?.message || error).slice(0, 220)}`
+      };
     }
+  }
+
+  async function retryBallerPortraitMask(uploadResult) {
+    const referenceNumber = `retry-${Date.now()}`;
+    const next = await maybeEnhanceBallerFace(uploadResult, referenceNumber);
+    if (next?.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = next.mediaUrl;
+    if (typeof window.updatePreview === "function") window.updatePreview();
+    return next;
+  }
+
+  function ballerFacePlacementFields() {
+    if (!isBallerAlertTemplate()) return {};
+    const scale = Number(byId("ballerFaceScale")?.value || 100);
+    const posY = Number(byId("ballerFacePosY")?.value || 28);
     return {
-      ...uploadResult,
-      aiEnhancementType: "none",
-      aiMediaSafetyStatus: "fallback",
-      aiMediaSafetyNotes: "Original face photo retained for medallion."
+      ballerFaceScale: Math.max(100, Math.min(220, scale)) / 100,
+      ballerFaceObjectPositionY: Math.max(0, Math.min(70, posY))
     };
   }
     function isSoccerJerseyTemplate(templateId = selectedTemplate) {
@@ -4879,6 +5035,12 @@
           (byId("ballerManualName") || byId("ballerNameSource"))?.focus?.();
           return;
         }
+        const companyCheck = ballerCompanyFromFields();
+        if (companyCheck.length > BALLER_COMPANY_MAX) {
+          status.textContent = `Company name is too long (max ${BALLER_COMPANY_MAX} characters).`;
+          (byId("ballerCustomCompany") || byId("ballerCompanyPreset"))?.focus?.();
+          return;
+        }
         if (getTemplate()?.masterAdminOnly === true && !isMasterAdminViewer()) {
           status.textContent = "This private Baller's Express preview template is Master Admin only.";
           return;
@@ -4946,6 +5108,8 @@
         originalMediaUploaded: uploadedMedia.originalMediaUploaded !== false,
         aiMediaSafetyStatus: uploadedMedia.aiMediaSafetyStatus || "notChecked",
         aiMediaSafetyNotes: uploadedMedia.aiMediaSafetyNotes || "",
+        maskMediaUrl: uploadedMedia.maskMediaUrl || lastValidBallerFace?.uploadResult?.maskMediaUrl || "",
+        maskMediaStoragePath: uploadedMedia.maskMediaStoragePath || lastValidBallerFace?.uploadResult?.maskMediaStoragePath || "",
         mediaUploadedAt: uploadedMedia.mediaUploadedAt || null
       } : { mediaUrl:"", mediaType:"", mediaFileName:"", mediaStoragePath:"", mediaUploadedAt:null };
       const variantPayload = selectedTemplateVariant ? {
@@ -5505,7 +5669,15 @@
     byId("ballerNameSource")?.addEventListener("change", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("ballerManualName")?.addEventListener("input", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("ballerCompanyPreset")?.addEventListener("change", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
-    byId("ballerCustomCompany")?.addEventListener("input", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("ballerCustomCompany")?.addEventListener("input", () => {
+      const el = byId("ballerCustomCompany");
+      if (el && el.value.length > BALLER_COMPANY_MAX) el.value = el.value.slice(0, BALLER_COMPANY_MAX);
+      syncBallerCardFields();
+      updatePreview();
+      schedulePersonalizedShoutOutRecommendations();
+    });
+    byId("ballerFaceScale")?.addEventListener("input", () => { updatePreview(); });
+    byId("ballerFacePosY")?.addEventListener("input", () => { updatePreview(); });
     byId("soccerTeamId")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("soccerJerseyNumber")?.addEventListener("input", event => {
@@ -5796,6 +5968,9 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     if(input) input.value="";
     if(preview){preview.classList.add("hidden");preview.innerHTML="";}
     ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl","aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id=>{const el=byId(id);if(el){el.value=id==="aiTrimStart"?"0":"";if(id==="shoutoutMediaUrl")delete el.dataset.previewUrl;el.dispatchEvent(new Event("input",{bubbles:true}));}});
+    lastValidBallerFace = null;
+    ballerFaceRequestSeq += 1; // invalidate in-flight mask jobs
+    setBallerFaceStatus("");
     setVideoNotice("");
     const status=byId("uploadStatus"); if(status)status.textContent="Media removed.";
     if(window.FLOQRAIMedia?.resetSelection) window.FLOQRAIMedia.resetSelection();
@@ -5834,10 +6009,16 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
       input=byId("shoutoutMediaUpload");
     }
     if(card) card.classList.remove("hidden");
-    const note=card?.querySelector(".single-media-upload-note");
-    if(note) note.textContent="Add an image or video for this media-capable template. Long videos warn and use only the first 7 seconds.";
-    const label=card?.querySelector(".file-upload-label")||input?.closest("label");
-    if(label&&label.firstChild) label.firstChild.textContent=`${templateUploadLabel()} `;
+    if(!isBallerAlertTemplate()){
+      const note=card?.querySelector(".single-media-upload-note");
+      if(note) note.textContent="Add an image or video for this media-capable template. Long videos warn and use only the first 7 seconds.";
+      const label=card?.querySelector(".file-upload-label")||input?.closest("label");
+      if(label){
+        label.classList.remove("hidden");
+        if(label.firstChild) label.firstChild.textContent=`${templateUploadLabel()} `;
+      }
+      byId("ballerFaceActions")?.classList.add("hidden");
+    }
     if(card&&!byId("removeShoutoutMediaBtn")){
       const row=document.createElement("div");
       row.className="button-row";
@@ -5846,10 +6027,13 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
       card.insertBefore(row, preview||null);
     }
     if(card) placeMediaCard(card);
-    input.accept=templateAcceptsMedia();
+    input.accept=isBallerAlertTemplate() ? "image/*" : templateAcceptsMedia();
+    if(!isBallerAlertTemplate()) input.removeAttribute("capture");
     input.onchange=renderLiveMediaPreview;
     const removeBtn=byId("removeShoutoutMediaBtn");
     if(removeBtn&&!removeBtn.dataset.bound){removeBtn.dataset.bound="1";removeBtn.addEventListener("click",clearSelectedMedia);}
+    // Re-apply Baller's Alert dual Upload/Take actions after the generic uploader refresh.
+    if(isBallerAlertTemplate()) syncBallerCardFields();
   }
   function getCurrentText(){
     const main=findTextInput(), sub=findSubTextInput();
@@ -5859,8 +6043,15 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const input=byId("shoutoutMediaUpload");
     const file=input&&input.files&&input.files[0];
     const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
-    if(!file||!preview)return;
+    // Cancel / empty picker: keep the previous valid portrait (do not clear).
+    if(!file){
+      if(input) input.removeAttribute("capture");
+      return;
+    }
+    if(!preview)return;
     setVideoNotice("");
+    // After Take photo, drop capture so a later native picker is not camera-locked.
+    input.removeAttribute("capture");
     const url=URL.createObjectURL(file);
     const isVideo=file.type.startsWith("video/");
     const text=getCurrentText();

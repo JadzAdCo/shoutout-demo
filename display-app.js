@@ -1932,8 +1932,14 @@
           : "<img src=\"" + esc(mediaUrl) + "\" alt=\"Cardholder face\">";
         const mediaElement = mediaSlot.querySelector("img,video");
         if (mediaElement) {
+          const faceScale = Math.max(1, Math.min(2.2, Number(data.ballerFaceScale || 1) || 1));
+          const facePosY = Math.max(0, Math.min(70, Number(data.ballerFaceObjectPositionY ?? 28)));
+          mediaSlot.style.setProperty("--baller-face-scale", String(faceScale));
+          mediaSlot.style.setProperty("--baller-face-pos-y", `${facePosY}%`);
           mediaElement.style.objectFit = "cover";
-          mediaElement.style.objectPosition = "center 28%";
+          mediaElement.style.objectPosition = `center ${facePosY}%`;
+          mediaElement.style.transform = `scale(${faceScale})`;
+          mediaElement.style.transformOrigin = `center ${facePosY}%`;
         }
         placeBallerChipOverlay(canvas, true);
       } else {

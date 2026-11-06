@@ -101,7 +101,7 @@ const SHOUTOUT_TEXT_LIMITS = {
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
   },
   ballerCard:{
-    "led-96x48":[2,22,28,28],"led-64x48":[2,18,22,22],"led-64x32":[2,18,22,22]
+    "led-96x48":[2,22,28,25],"led-64x48":[2,18,22,25],"led-64x32":[2,18,22,25]
   },
   // Must match shared-data nflJersey — shoutout copy is NOT the jersey name.
   nflJersey:{

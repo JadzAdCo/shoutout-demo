@@ -184,20 +184,38 @@ test("display + composer wire baller cards", () => {
   assert.match(patron, /isBallerCardTemplate/);
   assert.match(patron, /syncBallerCardFields/);
   assert.match(patron, /masterAdminOnly/);
-  assert.match(patron, /baller-face-medallion/);
+  assert.match(patron, /baller-portrait-mask|baller-face-medallion/);
+  assert.match(patron, /compositeBallerPortraitCutout|destination-in/);
+  assert.match(patron, /ballerUploadPhotoBtn/);
+  assert.match(patron, /ballerTakePhotoBtn/);
+  assert.match(patron, /BALLER_COMPANY_MAX/);
+  assert.match(patron, /WE'RE OUTSIDE LLC/);
   assert.match(patron, /ballerWithAt/);
   assert.match(patron, /"none": ""/);
-  assert.match(patron, /We're Outside LLC/);
   assert.match(patron, /BaddB\$ches Only Corp/);
   const html = read("index.html");
   assert.match(html, /id="ballerCardFields"/);
   assert.match(html, /id="ballerNameSource"/);
   assert.match(html, /id="ballerCompanyPreset"/);
+  assert.match(html, /WE'RE OUTSIDE LLC/);
+  assert.match(html, /maxlength="25"/);
+  assert.match(html, /id="ballerFaceScale"/);
+  assert.match(html, /id="ballerFacePosY"/);
   assert.match(html, /value="none"/);
   assert.match(html, /Name or social @handle|Name or @handle/);
+  assert.match(css, /baller-red-halo/);
+  assert.match(display, /ballerFaceScale/);
+  assert.match(display, /ballerFaceObjectPositionY/);
   const ai = read("functions/ai-discovery-functions.js");
-  assert.match(ai, /baller-face-medallion/);
-  assert.match(ai, /under a Roman warrior helmet/);
+  assert.match(ai, /baller-portrait-mask/);
+  assert.match(ai, /runBallerPortraitMask/);
+  const portrait = read("functions/gemini-portrait-mask.js");
+  assert.match(portrait, /gemini-2\.5-flash/);
+  assert.match(portrait, /@google\/genai|GoogleGenAI/);
+  const shared = loadSharedData();
+  ALL_IDS.forEach(id => {
+    assert.equal(shared.SHOUTOUT_TEMPLATES[id].maxSubCharacters, 25, `${id} company max 25`);
+  });
 });
 
 test("Baller help + BOT DEE intents", () => {
