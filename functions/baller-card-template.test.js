@@ -188,6 +188,9 @@ test("display + composer wire baller cards", () => {
   assert.match(patron, /compositeBallerPortraitCutout|destination-in/);
   assert.match(patron, /ballerUploadPhotoBtn/);
   assert.match(patron, /ballerTakePhotoBtn/);
+  assert.match(patron, /processBallerFaceSelection/);
+  assert.match(patron, /showBallerFaceLocalPreview/);
+  assert.match(patron, /window\.processBallerFaceSelection/);
   assert.match(patron, /BALLER_COMPANY_MAX/);
   assert.match(patron, /WE'RE OUTSIDE LLC/);
   assert.match(patron, /ballerWithAt/);

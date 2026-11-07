@@ -1569,6 +1569,25 @@ html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
 .baller-card-fields label{display:grid;gap:4px}
 .baller-face-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 .baller-face-actions .status{flex:1 1 100%;margin:0;font-size:.9em}
+/* Keep file input clickable for Upload/Take — display:none breaks Safari programmatic .click() */
+.file-upload-label.baller-file-input-host{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+.media-preview-stage.baller-face-local-preview{
+  background:#0a0a0e;
+}
+.media-preview-stage.baller-face-local-preview img{
+  object-fit:contain;
+  background:transparent;
+}
 .baller-face-placement{display:grid;gap:8px;margin:6px 0;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
 .baller-face-placement label{display:grid;gap:4px;grid-template-columns:minmax(9rem,auto) 1fr;align-items:center}
 .baller-face-placement input[type="range"]{width:100%}

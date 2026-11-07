@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.88";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.88";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.89";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.89";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.89",
+      title: "s3.2.89 — Baller face immediate preview + Gemini on select",
+      checks: [
+        {label:"Immediate face preview + Gemini on select", file:"patron-app.js", includes:["processBallerFaceSelection", "showBallerFaceLocalPreview", "window.processBallerFaceSelection"]},
+        {label:"Visually-hidden file input host", file:"styles.css", includes:["baller-file-input-host"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-89-baller-face-preview"]}
+      ]
+    },
     {
       version: "s3.2.88",
       title: "s3.2.88 — Baller halo behind card + Gemini access logs + BOT DEE wrap",
@@ -2735,6 +2744,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-89-baller-face-preview",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Alert selected photo previews immediately + Gemini on upload",
+      changed:"s3.2.89 — Upload/Take shows the selected face in the media preview and LED frame right away; Storage upload + Gemini mask run on select (not only Submit). File input uses visually-hidden host (not display:none) so Safari click works.",
+      howToTest:"1) Hard-refresh Search (s3.2.89). 2) Baller's Alert → Upload photo. 3) Confirm thumbnail preview appears under Media Upload and the LED preview shows the face in the medallion. 4) Status moves Upload → Removing background → cutout. 5) Mark Succeed/Failed.",
+      expected:"Selected picture visible immediately; cutout replaces it after Gemini; no white-only/blank preview.",
+      troubleshoot:"No thumbnail → baller-file-input-host + processBallerFaceSelection on change. LED blank → updatePreview uses dataset.previewUrl / lastValidBallerFace.previewUrl. Gemini never starts → signed in + Functions GEMINI_API_KEY."
+    },
     {
       id:"s3-2-88-baller-halo-gemini-logs",
       area:"ShoutOut / Diagnostics / BOT DEE",

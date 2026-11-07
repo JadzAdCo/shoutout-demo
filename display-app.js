@@ -1227,6 +1227,12 @@
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
       stadiumMessage: params.get("stadiumMessage") || "",
+      ballerCard: params.get("ballerCard") === "1",
+      ballerAlert: params.get("ballerAlert") === "1",
+      ballerFaceScale: params.get("ballerFaceScale") ? Number(params.get("ballerFaceScale")) : undefined,
+      ballerFaceObjectPositionY: params.get("ballerFaceObjectPositionY") != null && params.get("ballerFaceObjectPositionY") !== ""
+        ? Number(params.get("ballerFaceObjectPositionY"))
+        : undefined,
       animationDurationSeconds: 20,
       locationName: loc.locationName,
       status: "preview"
