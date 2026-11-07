@@ -259,7 +259,7 @@
       version: "s3.2.87",
       title: "s3.2.87 — Baller portrait mask + Upload/Take + red halo + company max 25",
       checks: [
-        {label:"Gemini portrait mask module", file:"functions/gemini-portrait-mask.js", includes:["gemini-2.5-flash", "callGeminiPersonSegmentation", "GoogleGenAI"]},
+        {label:"Gemini portrait mask module", file:"functions/gemini-portrait-mask.js", includes:["gemini-3.8-flash", "callGeminiPersonSegmentation", "GoogleGenAI"]},
         {label:"Callable baller-portrait-mask", file:"functions/ai-discovery-functions.js", includes:["baller-portrait-mask", "runBallerPortraitMask"]},
         {label:"Upload + Take photo", file:"patron-app.js", includes:["ballerUploadPhotoBtn", "ballerTakePhotoBtn", "compositeBallerPortraitCutout"]},
         {label:"Company WE'RE OUTSIDE LLC + max 25", file:"index.html", includes:["WE'RE OUTSIDE LLC", "maxlength=\"25\"", "ballerFaceScale"]},
@@ -2790,7 +2790,7 @@
       changed:"s3.2.87 — dual Upload photo / Take photo (cancel keeps prior). Server gemini-portrait-mask (Gemini 2.5 Flash segmentation) → full-frame alpha PNG; client destination-in cutout into face oval with editable zoom/position. Flashing red halo on card. Company preset WE'RE OUTSIDE LLC; maxlength 25.",
       howToTest:"1) Hard-refresh Search (s3.2.87). 2) Baller's Alert — Upload photo from library AND Take photo; cancel picker keeps prior face. 3) Wait for background-removal status; Retry on failure. 4) Move Face zoom / vertical position without re-running Gemini. 5) Company preset WE'RE OUTSIDE LLC shows in full (not truncated). 6) Preview matches LED; red halo flashes around black card. 7) Mark Succeed/Failed.",
       expected:"Both photo actions work; cutout face under helmet only; halo flashes; company ≤25; preview=LED.",
-      troubleshoot:"Camera-only → Upload must omit capture=. Mask fail → Functions GEMINI_API_KEY + FLOQR_GEMINI_SEGMENTATION_MODEL=gemini-2.5-flash (not 3.x). Halo missing → display.css baller-red-halo. Truncated company → maxSubCharacters 25 + letter-spacing."
+      troubleshoot:"Camera-only → Upload must omit capture=. Mask fail → Functions GEMINI_API_KEY + FLOQR_GEMINI_SEGMENTATION_MODEL (default gemini-3.8-flash; 2.5 retired for many new keys). Halo missing → display.css baller-red-halo. Truncated company → maxSubCharacters 25 + letter-spacing."
     },
     {
       id:"s3-2-86-aurelia-venue-search",

@@ -5,10 +5,12 @@ const assert = require("node:assert/strict");
 const {PNG} = require("pngjs");
 const mask = require("./gemini-portrait-mask");
 
-test("gemini-portrait-mask exports Gemini 2.5 Flash segmentation (not 3.x)", () => {
-  assert.match(mask.SEGMENTATION_MODEL, /gemini-2\.5-flash/);
+test("gemini-portrait-mask defaults to gemini-3.8-flash (env overrideable)", () => {
+  assert.match(mask.SEGMENTATION_MODEL, /gemini-3\.8-flash/);
   assert.match(mask.LIMITATION, /coarse/i);
   assert.match(mask.LIMITATION, /not professional/i);
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.8-flash"), {thinkingLevel: "MINIMAL"});
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-2.5-flash"), {thinkingBudget: 0});
 });
 
 test("parseSegmentationJson accepts array and wrapped shapes", () => {

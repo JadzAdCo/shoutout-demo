@@ -2,19 +2,27 @@
 
 /**
  * Gemini person-segmentation → full-frame alpha mask (provider-specific).
- * Gemini 3.x does not support image segmentation — use 2.5 Flash with thinking off.
+ * Default: gemini-3.8-flash (2.5 Flash is retired for many new API keys).
+ * Override: FLOQR_GEMINI_SEGMENTATION_MODEL.
  * Docs: aistudio.google.com/docs/image-understanding (Segmentation).
  *
- * Output is a grayscale/alpha PNG aligned to the orientation-corrected source
- * dimensions. Contour quality is coarse (not professional hair matting).
+ * 3.x often returns polygon masks (0–1000); 2.5 may return base64 PNG probability maps.
+ * Contour quality is coarse (not professional hair matting).
  */
 
 const {GoogleGenAI} = require("@google/genai");
 const {PNG} = require("pngjs");
 
-const SEGMENTATION_MODEL = process.env.FLOQR_GEMINI_SEGMENTATION_MODEL || "gemini-2.5-flash";
+const SEGMENTATION_MODEL = process.env.FLOQR_GEMINI_SEGMENTATION_MODEL || "gemini-3.8-flash";
 const LIMITATION =
-  "Gemini 2.5 Flash returns a coarse probability / contour mask. Hair and glasses edges are approximate — not professional soft matting. Original photo pixels are preserved; Gemini only supplies subject boundaries.";
+  "Gemini segmentation returns a coarse probability / contour mask (PNG or polygon). Hair and glasses edges are approximate — not professional soft matting. Original photo pixels are preserved; Gemini only supplies subject boundaries.";
+
+/** Gemini 3.5+ rejects thinkingBudget; 2.5 Flash needs thinking off via budget 0. */
+function thinkingConfigForModel(model = SEGMENTATION_MODEL) {
+  const id = String(model || "").toLowerCase();
+  if (/gemini-2\.5/.test(id)) return {thinkingBudget: 0};
+  return {thinkingLevel: "MINIMAL"};
+}
 
 function readImageSize(buffer, contentType = "") {
   const type = String(contentType || "").toLowerCase();
@@ -188,7 +196,7 @@ async function callGeminiPersonSegmentation({apiKey, buffer, contentType}) {
     "Include head, hair, face, neck, and visible shoulders only (not the full body if cropped).",
     "Output a JSON list of segmentation masks where each entry contains:",
     '- "box_2d": [ymin, xmin, ymax, xmax] normalized to 0-1000',
-    '- "mask": base64-encoded PNG probability map (values 0–255) for the region inside the box',
+    '- "mask": either (a) a base64-encoded PNG probability map (values 0–255) for the region inside the box, or (b) a polygon of [x, y] points normalized to 0–1000',
     '- "label": a short text label (e.g. "person")',
     "Prefer exactly one entry for the most prominent person. Do not redraw or beautify the photo."
   ].join("\n");
@@ -201,8 +209,8 @@ async function callGeminiPersonSegmentation({apiKey, buffer, contentType}) {
     ],
     config: {
       responseMimeType: "application/json",
-      // Thinking off — required for reliable segmentation masks (Gemini 2.5).
-      thinkingConfig: {thinkingBudget: 0}
+      // Minimal / off thinking — required for reliable segmentation masks.
+      thinkingConfig: thinkingConfigForModel(SEGMENTATION_MODEL)
     }
   });
 
@@ -226,7 +234,7 @@ async function callGeminiPersonSegmentation({apiKey, buffer, contentType}) {
   } else {
     throw new Error(
       "Gemini segmentation mask was not a base64 PNG or polygon. " +
-      "Gemini 3.x does not support image segmentation — configure FLOQR_GEMINI_SEGMENTATION_MODEL=gemini-2.5-flash."
+      `Model=${SEGMENTATION_MODEL}. Override with FLOQR_GEMINI_SEGMENTATION_MODEL if needed.`
     );
   }
 
@@ -259,6 +267,7 @@ async function callGeminiPersonSegmentation({apiKey, buffer, contentType}) {
 module.exports = {
   SEGMENTATION_MODEL,
   LIMITATION,
+  thinkingConfigForModel,
   readImageSize,
   parseSegmentationJson,
   pickPrimaryPerson,

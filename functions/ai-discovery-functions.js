@@ -2071,7 +2071,7 @@ exports.aiEnhanceShoutOutMedia = onCall({
       segmentationModel: portraitMask.SEGMENTATION_MODEL,
       capabilities:[
         "authenticated ShoutOut image editing",
-        "baller-portrait-mask segmentation (Gemini 2.5 Flash)",
+        `baller-portrait-mask segmentation (${portraitMask.SEGMENTATION_MODEL})`,
         "Storage owner path enforcement",
         "diagnostic secret check",
         "geminiApiAccessLogs 30-day audit"
