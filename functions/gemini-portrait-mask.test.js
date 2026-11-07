@@ -9,7 +9,9 @@ test("gemini-portrait-mask defaults to gemini-3.8-flash (env overrideable)", () 
   assert.match(mask.SEGMENTATION_MODEL, /gemini-3\.8-flash/);
   assert.match(mask.LIMITATION, /coarse/i);
   assert.match(mask.LIMITATION, /not professional/i);
-  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.8-flash"), {thinkingLevel: "MINIMAL"});
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.8-flash"), {thinkingLevel: "LOW"});
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.7-flash"), {thinkingLevel: "LOW"});
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.5-flash"), {thinkingLevel: "MINIMAL"});
   assert.deepEqual(mask.thinkingConfigForModel("gemini-2.5-flash"), {thinkingBudget: 0});
 });
 

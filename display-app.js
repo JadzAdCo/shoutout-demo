@@ -1978,8 +1978,8 @@
       const ballerCompany = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || ""), 0, subLimit);
       byId("displayMain").textContent = ballerName;
       byId("displaySub").textContent = ballerCompany; // empty string → CSS :empty hides the row
-      // Same font face + size for name and company; +50% vs prior baller emboss size
-      const ballerTypeVh = Math.min(9.3, Math.max(4.2, mainSize * 0.92 * 1.5));
+      // Same font face + size for name and company; prior emboss ×1.5, then +10% (s3.2.91)
+      const ballerTypeVh = Math.min(10.23, Math.max(4.6, mainSize * 0.92 * 1.5 * 1.1));
       byId("displayMain").style.setProperty("font-size", ballerTypeVh + "vh", "important");
       byId("displaySub").style.setProperty("font-size", ballerTypeVh + "vh", "important");
       const rail = byId("displayIdentityRail");
