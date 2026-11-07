@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.89 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.90 (stable)
 
+- s3.2.90: Critical log tab flash standard — Gemini API failures flash Master Admin Diagnostics → Application Logging until Acknowledge (same pattern as Security System Messages).
 - s3.2.89: Baller face select shows immediate preview + runs Gemini mask on upload (not only on Submit).
 - s3.2.88: Baller red halo behind card + transparent face slot; Gemini API access logs (30d, Master/FloqR Admin) + hourly failure inbox; BOT DEE bubble wrap.
 - s3.2.87: Baller's Alert Upload+Take photo, Gemini 2.5 Flash portrait mask cutout, red card halo, company WE'RE OUTSIDE LLC max 25.
