@@ -216,7 +216,8 @@ test("display + composer wire baller cards", () => {
   assert.match(ai, /runBallerPortraitMask/);
   assert.match(ai, /logGeminiApiAccess/);
   const portrait = read("functions/gemini-portrait-mask.js");
-  assert.match(portrait, /gemini-2\.5-flash/);
+  assert.match(portrait, /gemini-3\.8-flash/);
+  assert.match(portrait, /FLOQR_GEMINI_SEGMENTATION_MODEL/);
   assert.match(portrait, /@google\/genai|GoogleGenAI/);
   const shared = loadSharedData();
   ALL_IDS.forEach(id => {
