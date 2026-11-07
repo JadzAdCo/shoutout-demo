@@ -17,10 +17,12 @@ const SEGMENTATION_MODEL = process.env.FLOQR_GEMINI_SEGMENTATION_MODEL || "gemin
 const LIMITATION =
   "Gemini segmentation returns a coarse probability / contour mask (PNG or polygon). Hair and glasses edges are approximate — not professional soft matting. Original photo pixels are preserved; Gemini only supplies subject boundaries.";
 
-/** Gemini 3.5+ rejects thinkingBudget; 2.5 Flash needs thinking off via budget 0. */
+/** Gemini 2.5 uses thinkingBudget; 3.x uses thinkingLevel.
+ * gemini-3.8-flash / 3.7-flash reject MINIMAL (400) — use LOW (lowest supported). */
 function thinkingConfigForModel(model = SEGMENTATION_MODEL) {
   const id = String(model || "").toLowerCase();
   if (/gemini-2\.5/.test(id)) return {thinkingBudget: 0};
+  if (/gemini-3\.(8|7)/.test(id)) return {thinkingLevel: "LOW"};
   return {thinkingLevel: "MINIMAL"};
 }
 
