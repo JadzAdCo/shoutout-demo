@@ -35,6 +35,9 @@ async function logGeminiApiAccess(db, entry = {}) {
     outcome,
     ok: outcome === "success",
     level,
+    // Failures are critical logs — Master Admin Application Logging tab must flash.
+    severity: outcome === "failure" ? "critical" : "info",
+    critical: outcome === "failure",
     category: "gemini",
     operation,
     enhancementType: text(entry.enhancementType || "", 80),
@@ -67,6 +70,8 @@ async function logGeminiApiAccess(db, entry = {}) {
   try {
     await db.collection("appLogs").add({
       level,
+      severity: record.severity,
+      critical: record.critical,
       category: "gemini",
       action: operation,
       message,
@@ -78,13 +83,14 @@ async function logGeminiApiAccess(db, entry = {}) {
         enhancementType: record.enhancementType || undefined,
         mediaStoragePath: record.mediaStoragePath || undefined,
         geminiApiAccessLogId: accessLogId || undefined,
+        severity: record.severity,
         ...(record.details || {})
       },
       uid: record.uid,
       email: record.email,
       source: "functions",
       userAgent: "firebase-functions",
-      appVersion: text(entry.appVersion || "s3.2.88", 40),
+      appVersion: text(entry.appVersion || "s3.2.90", 40),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       createdAtMs: now,
       expireAtMs: now + RETENTION_MS

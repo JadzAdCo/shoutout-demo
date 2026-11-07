@@ -14,9 +14,43 @@
   let unpaidOrders = [];
   let geminiLogs = [];
   let geminiFailuresOnly = false;
+  let geminiCriticalUnsub = null;
+  let bound = false;
+
+  const GEMINI_CRITICAL_SOURCE = "geminiApiAccess";
 
   function setStatus(message) {
     if (byId("appLoggingStatus")) byId("appLoggingStatus").textContent = message;
+  }
+
+  function publishGeminiCriticalBlink(failureRows = []) {
+    const blink = window.FLOQRCriticalLogBlink;
+    if (!blink) return;
+    const summary = blink.summarizeCriticalRows(failureRows, {treatFailureAsCritical: true});
+    if (summary.count > 0) {
+      blink.set(blink.SOURCE_IDS.geminiApiAccess || GEMINI_CRITICAL_SOURCE, {
+        tabId: "appLoggingTab",
+        tabSelector: '[data-panel="appLogging"]',
+        parentGroup: "diagnostics",
+        label: "Application Logging",
+        count: summary.count,
+        newestMs: summary.newestMs
+      });
+    } else {
+      blink.clear(blink.SOURCE_IDS.geminiApiAccess || GEMINI_CRITICAL_SOURCE);
+    }
+  }
+
+  function acknowledgeGeminiCriticalFailures() {
+    const blink = window.FLOQRCriticalLogBlink;
+    if (!blink) return;
+    const fails = geminiLogs.filter(row =>
+      row.severity === "critical" || row.critical === true
+      || row.outcome === "failure" || row.ok === false || row.level === "error"
+    );
+    const newest = fails.reduce((max, row) => Math.max(max, Number(row.createdAtMs || 0)), Date.now());
+    blink.ack(blink.SOURCE_IDS.geminiApiAccess || GEMINI_CRITICAL_SOURCE, newest);
+    setGeminiStatus(`Acknowledged ${fails.length || "0"} critical Gemini failure(s) — tab flash cleared until a newer failure.`);
   }
 
   function ts(value) {
@@ -108,11 +142,51 @@
       const snap = await db.collection("geminiApiAccessLogs").orderBy("createdAtMs", "desc").limit(150).get();
       geminiLogs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderGeminiLogs();
-      const fails = geminiLogs.filter(row => row.outcome === "failure" || row.ok === false).length;
-      setGeminiStatus(`Loaded ${geminiLogs.length} Gemini access row(s); ${fails} failure(s). Retention 30 days.`);
+      const failRows = geminiLogs.filter(row =>
+        row.severity === "critical" || row.critical === true
+        || row.outcome === "failure" || row.ok === false
+      );
+      publishGeminiCriticalBlink(failRows);
+      const unacked = window.FLOQRCriticalLogBlink?.unackedCount?.(GEMINI_CRITICAL_SOURCE) || 0;
+      setGeminiStatus(`Loaded ${geminiLogs.length} Gemini access row(s); ${failRows.length} critical failure(s)${unacked ? ` · ${unacked} flashing` : ""}. Retention 30 days.`);
     } catch (error) {
       setGeminiStatus(error.message || "Could not load Gemini access logs.");
       if (window.FLOQRLog) window.FLOQRLog.fromError(error, { category: "admin", action: "load_gemini_access_logs" });
+    }
+  }
+
+  /** Live watch so Diagnostics → Application Logging flashes before the panel is opened. */
+  function startGeminiCriticalWatch() {
+    if (geminiCriticalUnsub) {
+      try { geminiCriticalUnsub(); } catch (_) {}
+      geminiCriticalUnsub = null;
+    }
+    const user = auth.currentUser;
+    if (!user) {
+      publishGeminiCriticalBlink([]);
+      return;
+    }
+    try {
+      geminiCriticalUnsub = db.collection("geminiApiAccessLogs")
+        .where("outcome", "==", "failure")
+        .orderBy("createdAtMs", "desc")
+        .limit(40)
+        .onSnapshot((snap) => {
+          const rows = snap.docs.map(doc => ({id: doc.id, ...doc.data(), severity: "critical", critical: true}));
+          // Keep the full list in sync when the card is mounted; always drive the tab blink.
+          if (byId("appLogging")?.classList.contains("active")) {
+            // Merge failure rows into geminiLogs without dropping successes from a prior full load.
+            const byIdMap = new Map(geminiLogs.map(row => [row.id, row]));
+            rows.forEach(row => byIdMap.set(row.id, row));
+            geminiLogs = [...byIdMap.values()].sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+            renderGeminiLogs();
+          }
+          publishGeminiCriticalBlink(rows);
+        }, (err) => {
+          console.warn("gemini critical watch failed", err?.message || err);
+        });
+    } catch (err) {
+      console.warn("gemini critical watch start failed", err?.message || err);
     }
   }
 
@@ -217,6 +291,8 @@
   }
 
   function bind() {
+    if (bound) return;
+    bound = true;
     byId("appLogRefreshBtn")?.addEventListener("click", () => { loadLogs(); loadUnpaid(); loadGeminiAccessLogs(); });
     byId("appLogLevelFilter")?.addEventListener("change", renderLogs);
     byId("appLogCategoryFilter")?.addEventListener("input", renderLogs);
@@ -228,6 +304,7 @@
       if (btn) btn.textContent = geminiFailuresOnly ? "Show all" : "Failures only";
       renderGeminiLogs();
     });
+    byId("geminiAccessLogAckBtn")?.addEventListener("click", acknowledgeGeminiCriticalFailures);
     byId("clearUnpaidCheckoutsBtn")?.addEventListener("click", clearAllUnpaid);
     byId("purgeTestPaymentsLoggingBtn")?.addEventListener("click", purgeTestPayments);
     byId("checkZebbiesConnectBtn")?.addEventListener("click", checkZebbiesConnect);
@@ -240,12 +317,25 @@
       loadGeminiAccessLogs();
       loadUnpaid();
       checkZebbiesConnect();
-    }
+      startGeminiCriticalWatch();
+    },
+    startCriticalWatch: startGeminiCriticalWatch,
+    acknowledgeGeminiCriticalFailures
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    bind();
     auth.onAuthStateChanged(user => {
-      if (user && byId("appLogging")?.classList.contains("active")) window.FLOQRAppLogging.mount();
+      if (user) {
+        startGeminiCriticalWatch();
+        if (byId("appLogging")?.classList.contains("active")) window.FLOQRAppLogging.mount();
+      } else {
+        if (geminiCriticalUnsub) {
+          try { geminiCriticalUnsub(); } catch (_) {}
+          geminiCriticalUnsub = null;
+        }
+        publishGeminiCriticalBlink([]);
+      }
     });
   });
 })();

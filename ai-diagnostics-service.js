@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.89";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.89";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.90";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.90";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.90",
+      title: "s3.2.90 — Critical log tab flash standard (Gemini + Security)",
+      checks: [
+        {label:"Shared critical log blink module", file:"floqr-critical-log-blink.js", includes:["FLOQRCriticalLogBlink", "geminiApiAccess", "criticalLogAck"]},
+        {label:"Gemini critical severity + flash", file:"functions/gemini-api-access-log.js", includes:["severity: outcome === \"failure\" ? \"critical\" : \"info\""]},
+        {label:"Application Logging ack + live watch", file:"master-logging-extension.js", includes:["publishGeminiCriticalBlink", "geminiAccessLogAckBtn", "startGeminiCriticalWatch"]},
+        {label:"Master Admin script + tab id", file:"master-admin.html", includes:["floqr-critical-log-blink.js", "appLoggingTab", "geminiAccessLogAckBtn"]},
+        {label:"Critical blink CSS", file:"admin.css", includes:["criticalLogTabBlink"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-90-critical-log-blink"]}
+      ]
+    },
     {
       version: "s3.2.89",
       title: "s3.2.89 — Baller face immediate preview + Gemini on select",
@@ -2744,6 +2756,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-90-critical-log-blink",
+      area:"Master Admin / Diagnostics / Security",
+      feature:"Critical log tab flash standard (Gemini API failures)",
+      changed:"s3.2.90 — Shared FLOQRCriticalLogBlink: recorded critical failures flash the log subtab + parent group (same pattern as Security System Messages). Gemini API access failures are severity critical and flash Diagnostics → Application Logging until Acknowledge critical failures.",
+      howToTest:"1) Hard-refresh Master Admin (s3.2.90). 2) With a geminiApiAccessLogs failure present (or force a Baller's Alert mask failure), confirm Diagnostics parent + Application Logging subtab flash. 3) Open Application Logging → Gemini API Access → Acknowledge critical failures — flash stops. 4) Confirm Security System Messages still flash on unread deny alerts. 5) Mark Succeed/Failed.",
+      expected:"Critical Gemini failures flash Application Logging (+ Diagnostics parent) until acknowledged; Security blink unchanged.",
+      troubleshoot:"No flash → floqr-critical-log-blink.js loaded before logging/security scripts; failure rows need outcome=failure / severity=critical; Functions deploy for new severity stamp. Flash won't clear → Acknowledge button or sessionStorage floqr.criticalLogAck.geminiApiAccess. Parent stays on with other diagnostics critical sources (display load errors)."
+    },
     {
       id:"s3-2-89-baller-face-preview",
       area:"ShoutOut / Templates",

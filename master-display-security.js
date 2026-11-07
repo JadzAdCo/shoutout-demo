@@ -487,25 +487,48 @@
     }
   }
 
-  function setSecurityMessagesBlink(hasUnread) {
+  function setSecurityMessagesBlink(hasUnread, newestMs = 0) {
+    const blink = window.FLOQRCriticalLogBlink;
+    const count = typeof hasUnread === "number"
+      ? Math.max(0, hasUnread)
+      : (hasUnread ? 1 : 0);
+    if (blink) {
+      if (count > 0) {
+        blink.set(blink.SOURCE_IDS.securitySystemMessages, {
+          tabId: "securitySystemMessagesTab",
+          parentGroup: "security",
+          label: "Security System Messages",
+          count,
+          newestMs: Number(newestMs) || Date.now()
+        });
+      } else {
+        blink.clear(blink.SOURCE_IDS.securitySystemMessages);
+      }
+      return;
+    }
+    // Fallback if shared blink module failed to load.
     const tab = byId("securitySystemMessagesTab");
     if (tab) {
-      tab.classList.toggle("is-blink", !!hasUnread);
-      tab.setAttribute("aria-label", hasUnread
+      tab.classList.toggle("is-blink", count > 0);
+      tab.setAttribute("aria-label", count > 0
         ? "Security System Messages — new deny alerts"
         : "Security System Messages");
     }
-    // Also pulse the parent Security tab so unread alerts are visible before expanding.
     const parent = document.querySelector('.admin-tab-parent[data-group="security"]');
-    if (parent) parent.classList.toggle("is-blink", !!hasUnread);
+    if (parent) parent.classList.toggle("is-blink", count > 0);
   }
 
   function renderSystemMessages(rows = []) {
     const host = byId("masterSystemMessages");
     if (!host) return;
     lastSecurityMessages = rows;
-    const unreadCount = rows.filter((row) => row.read !== true).length;
-    setSecurityMessagesBlink(unreadCount > 0);
+    const unread = rows.filter((row) => row.read !== true);
+    const unreadCount = unread.length;
+    const newestUnreadMs = unread.reduce(
+      (max, row) => Math.max(max, Number(row.createdAtMs || row.createdAt?.toMillis?.() || 0)),
+      0
+    );
+    setSecurityMessagesBlink(unreadCount, newestUnreadMs);
     setText("securitySystemMessagesStatus", rows.length
       ? `${rows.length} security message(s) · ${unreadCount} unread`
       : "No security system messages.");

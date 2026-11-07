@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.2.89"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.2.89"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.2.89"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.2.89"/>
+<link rel="stylesheet" href="./styles.css?v=s3.2.90"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.2.90"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.2.90"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.2.90"/>
   <script>
     try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
@@ -140,7 +140,7 @@
             <button class="admin-subtab" data-panel="diagnosticsManualTests" type="button">Manual Feature Tests</button>
             <button class="admin-subtab" id="diagnosticsDisplayErrorsTab" data-panel="diagnosticsDisplayErrors" type="button">Display / Xibo Load Errors</button>
             <button class="admin-subtab" data-panel="diagnosticsFloqCast" type="button" data-i18n="master.diagnosticsFloqCast">FloqCast</button>
-            <button class="admin-subtab" data-panel="appLogging" type="button">Application Logging</button>
+            <button class="admin-subtab" id="appLoggingTab" data-panel="appLogging" data-critical-log="geminiApiAccess" type="button">Application Logging</button>
             <button class="admin-subtab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
             <button class="admin-subtab" data-panel="patronDiagnostics" type="button">Patron Datapoints</button>
           </div>
@@ -1046,7 +1046,7 @@
             Diagnostic logs auto-delete after <strong>30 days</strong>. Board deny alerts live under <strong>Security → Security System Messages</strong>.
           </p>
           <p class="sub small">Client and Cloud Functions write operational events here: auth, ShoutOut submit, Stripe checkout, Connect readiness, media uploads, and cancellations. Use this when a patron reports a failed paid ShoutOut.</p>
-          <p class="sub small"><strong>Gemini API:</strong> filter category <code>gemini</code> (or open the Gemini API Access card). Every Baller's Alert portrait mask / image-edit success and failure is logged with failure reason. Retention 30 days. Readable by Master Admin or FloqR Admin (RBAC). Hourly failure digest goes to Master Admin inbox.</p>
+          <p class="sub small"><strong>Gemini API:</strong> filter category <code>gemini</code> (or open the Gemini API Access card). Every Baller's Alert portrait mask / image-edit success and failure is logged with failure reason. Failures are <strong>critical</strong> — Diagnostics and this tab flash until acknowledged (same standard as Security System Messages). Retention 30 days. Readable by Master Admin or FloqR Admin (RBAC). Hourly failure digest goes to Master Admin inbox.</p>
           <div class="profile-grid">
             <label>Level
               <select id="appLogLevelFilter">
@@ -1075,11 +1075,12 @@
             <div id="appLogList" class="report-block"></div>
           </div>
           <div class="card">
-            <h2>Gemini API Access <span class="sub small">(30-day)</span></h2>
-            <p class="sub small">Dedicated <code>geminiApiAccessLogs</code>: success and failure rows with failure reason. Master Admin or FloqR Admin.</p>
+            <h2>Gemini API Access <span class="sub small">(30-day · critical failures flash tab)</span></h2>
+            <p class="sub small">Dedicated <code>geminiApiAccessLogs</code>: success and failure rows with failure reason. Failures are severity <code>critical</code> and flash Diagnostics → Application Logging until Acknowledge. Master Admin or FloqR Admin.</p>
             <div class="button-row">
               <button id="geminiAccessLogRefreshBtn" type="button">Refresh Gemini logs</button>
               <button id="geminiAccessLogFailuresOnlyBtn" class="ghost" type="button">Failures only</button>
+              <button id="geminiAccessLogAckBtn" class="ghost" type="button">Acknowledge critical failures</button>
             </div>
             <p id="geminiAccessLogStatus" class="status"></p>
             <div id="geminiAccessLogList" class="report-block"></div>
@@ -1938,56 +1939,57 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.2.89"></script>
-<script src="./firebase-config.js?v=s3.2.89"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.2.89"></script>
-<script src="./floqr-chrome-audit.js?v=s3.2.89"></script>
-<script src="./floqr-app-check.js?v=s3.2.89"></script>
-<script src="./floqr-nav.js?v=s3.2.89"></script>
-<script src="./global-profile-status.js?v=s3.2.89"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.2.89"></script>
-<script src="./shared-data.js?v=s3.2.89"></script>
-<script src="./feature-gates.js?v=s3.2.89"></script>
-<script src="./sos2fa.js?v=s3.2.89"></script>
-<script src="./entity-management.js?v=s3.2.89"></script>
-<script src="./ai-service.js?v=s3.2.89"></script>
-<script src="./ai-index-service.js?v=s3.2.89"></script>
-<script src="./ai-search-service.js?v=s3.2.89"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.2.89"></script>
-<script src="./ai-discovery-service.js?v=s3.2.89"></script>
-<script src="./floqr-action-feedback.js?v=s3.2.89"></script>
-<script src="./botdee-help-repository.js?v=s3.2.89"></script>
-<script src="./floqr-i18n-help.js?v=s3.2.89"></script>
-<script src="./help-attach.js?v=s3.2.89"></script>
-<script src="./helper-popouts.js?v=s3.2.89"></script>
-<script src="./floqr-ad-pricing.js?v=s3.2.89"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.2.89"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.2.89"></script>
-<script src="./ad-campaigns.js?v=s3.2.89"></script>
-<script src="./ai-diagnostics-service.js?v=s3.2.89"></script>
-<script src="./duplicate-record-service.js?v=s3.2.89"></script>
-<script src="./floqr-logger.js?v=s3.2.89"></script>
-<script src="./payment-service.js?v=s3.2.89"></script>
-<script src="./floqr-access-notice.js?v=s3.2.89"></script>
-<script src="./master-admin-app.js?v=s3.2.89"></script>
-<script src="./master-ad-management.js?v=s3.2.89"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.2.89"></script>
-<script src="./floqr-feature-services.js?v=s3.2.89"></script>
-<script src="./floqr-reason-prompt.js?v=s3.2.89"></script>
-<script src="./master-feature-services.js?v=s3.2.89"></script>
-<script src="./master-demo-employees.js?v=s3.2.89"></script>
-<script src="./floqr-data-classification.js?v=s3.2.89"></script>
-<script src="./master-data-classification.js?v=s3.2.89"></script>
-<script src="./master-admin-shoutouts.js?v=s3.2.89"></script>
-<script src="./master-display-security.js?v=s3.2.89"></script>
-<script src="./master-diagnostics-panels.js?v=s3.2.89"></script>
-<script src="./master-services-extension.js?v=s3.2.89"></script>
-<script src="./master-logging-extension.js?v=s3.2.89"></script>
-<script src="./master-floqcast-logging.js?v=s3.2.89"></script>
-<script src="./master-mail-logging.js?v=s3.2.89"></script>
-<script src="./master-twilio-logging.js?v=s3.2.89"></script>
-<script src="./notification-center.js?v=s3.2.89"></script>
-<script src="./profile-access-guard.js?v=s3.2.89"></script>
+<script src="./floqr-i18n.js?v=s3.2.90"></script>
+<script src="./firebase-config.js?v=s3.2.90"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.2.90"></script>
+<script src="./floqr-chrome-audit.js?v=s3.2.90"></script>
+<script src="./floqr-app-check.js?v=s3.2.90"></script>
+<script src="./floqr-nav.js?v=s3.2.90"></script>
+<script src="./global-profile-status.js?v=s3.2.90"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.2.90"></script>
+<script src="./shared-data.js?v=s3.2.90"></script>
+<script src="./feature-gates.js?v=s3.2.90"></script>
+<script src="./sos2fa.js?v=s3.2.90"></script>
+<script src="./entity-management.js?v=s3.2.90"></script>
+<script src="./ai-service.js?v=s3.2.90"></script>
+<script src="./ai-index-service.js?v=s3.2.90"></script>
+<script src="./ai-search-service.js?v=s3.2.90"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.2.90"></script>
+<script src="./ai-discovery-service.js?v=s3.2.90"></script>
+<script src="./floqr-action-feedback.js?v=s3.2.90"></script>
+<script src="./botdee-help-repository.js?v=s3.2.90"></script>
+<script src="./floqr-i18n-help.js?v=s3.2.90"></script>
+<script src="./help-attach.js?v=s3.2.90"></script>
+<script src="./helper-popouts.js?v=s3.2.90"></script>
+<script src="./floqr-ad-pricing.js?v=s3.2.90"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.2.90"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.2.90"></script>
+<script src="./ad-campaigns.js?v=s3.2.90"></script>
+<script src="./ai-diagnostics-service.js?v=s3.2.90"></script>
+<script src="./duplicate-record-service.js?v=s3.2.90"></script>
+<script src="./floqr-logger.js?v=s3.2.90"></script>
+<script src="./payment-service.js?v=s3.2.90"></script>
+<script src="./floqr-access-notice.js?v=s3.2.90"></script>
+<script src="./master-admin-app.js?v=s3.2.90"></script>
+<script src="./master-ad-management.js?v=s3.2.90"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.2.90"></script>
+<script src="./floqr-feature-services.js?v=s3.2.90"></script>
+<script src="./floqr-reason-prompt.js?v=s3.2.90"></script>
+<script src="./master-feature-services.js?v=s3.2.90"></script>
+<script src="./master-demo-employees.js?v=s3.2.90"></script>
+<script src="./floqr-data-classification.js?v=s3.2.90"></script>
+<script src="./master-data-classification.js?v=s3.2.90"></script>
+<script src="./master-admin-shoutouts.js?v=s3.2.90"></script>
+<script src="./floqr-critical-log-blink.js?v=s3.2.90"></script>
+<script src="./master-display-security.js?v=s3.2.90"></script>
+<script src="./master-diagnostics-panels.js?v=s3.2.90"></script>
+<script src="./master-services-extension.js?v=s3.2.90"></script>
+<script src="./master-logging-extension.js?v=s3.2.90"></script>
+<script src="./master-floqcast-logging.js?v=s3.2.90"></script>
+<script src="./master-mail-logging.js?v=s3.2.90"></script>
+<script src="./master-twilio-logging.js?v=s3.2.90"></script>
+<script src="./notification-center.js?v=s3.2.90"></script>
+<script src="./profile-access-guard.js?v=s3.2.90"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

@@ -20,7 +20,7 @@ Owner (Nov 4–5 2026): public face uses **Baller's Express**. Package art (`rep
 - **Baller's Alert:** face photo **required** (`requiresFacePhoto`). Dual actions: **Upload photo** (no `capture`) + **Take photo** (`capture="user"`, file fallback). Same pipeline. Cancel keeps prior valid image.
 - **Background removal:** on **Upload/Take** (not only Submit) — client shows local + LED preview immediately, uploads to Storage, then server `baller-portrait-mask` via `functions/gemini-portrait-mask.js` (`@google/genai`, model `gemini-2.5-flash` segmentation — not 3.x). Returns full-frame alpha PNG mask; client composites original with `destination-in`. Placement (zoom/pos) is editable without re-running Gemini. Soft-fail keeps original. Edge quality is coarse (not pro hair matting). File input must stay visually-hidden (`.baller-file-input-host`), never `display:none`.
 - **Display:** card layers scale ~0.935 so flashing red halo (`baller-red-halo-behind`) sits in the black margin behind/around the art (full-bleed LED clips outer-only shadows); face oval uses cutout + transparent slot (never a white plate) + `ballerFaceScale` / `ballerFaceObjectPositionY`.
-- **Gemini audit (s3.2.88):** every mask/edit success/failure writes `geminiApiAccessLogs` (+ `appLogs` category `gemini`) with `failureReason`; 30-day retention; Master Admin or FloqR Admin read; hourly failure inbox.
+- **Gemini audit (s3.2.88+):** every mask/edit success/failure writes `geminiApiAccessLogs` (+ `appLogs` category `gemini`) with `failureReason`; failures are `severity:"critical"` and flash Master Admin **Diagnostics → Application Logging** via `FLOQRCriticalLogBlink` until Acknowledge; 30-day retention; Master Admin or FloqR Admin read; hourly failure inbox.
 
 ## Display
 

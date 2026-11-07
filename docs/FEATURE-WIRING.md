@@ -634,7 +634,8 @@ Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. 
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
 | **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |
 | **AI** | `functions/gemini-portrait-mask.js` (Gemini 2.5 Flash segmentation → full-frame alpha PNG) + `aiEnhanceShoutOutMedia` `baller-portrait-mask` (alias `baller-face-medallion` / `removeBallerPortraitBackground`). Client `destination-in` composite; original immutable |
-| **Gemini audit** | `functions/gemini-api-access-log.js` → `geminiApiAccessLogs` + `appLogs` category `gemini` (success/failure + `failureReason`, 30-day). Hourly `checkGeminiApiAccessFailures` → inbox. Master Admin Application Logging → Gemini API Access card |
+| **Gemini audit** | `functions/gemini-api-access-log.js` → `geminiApiAccessLogs` + `appLogs` category `gemini` (success/failure + `failureReason`, failures `severity:"critical"`, 30-day). Hourly `checkGeminiApiAccessFailures` → inbox. Master Admin Application Logging → Gemini API Access card |
+| **Critical log tab flash** | Standard: `floqr-critical-log-blink.js` (`FLOQRCriticalLogBlink`). Any registered critical failure flashes its subtab + parent group (same `.is-blink` / `criticalLogTabBlink` as Security). Sources: `securitySystemMessages`, `displayLoadErrors`, `geminiApiAccess`. Gemini: live failure watch + **Acknowledge critical failures** (session watermark). Resume `@critical-log-blink$` |
 | **Help** | `help-black-card`, `help-ballers-alert`; intents `black-card`, `ballers-alert` |
 | **Tests** | `functions/baller-card-template.test.js`, `functions/gemini-portrait-mask.test.js`, `functions/gemini-api-access-log.test.js` |
 

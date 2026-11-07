@@ -40,8 +40,15 @@ test("Master Admin Application Logging surfaces Gemini access card", () => {
   const js = fs.readFileSync(path.join(root, "master-logging-extension.js"), "utf8");
   assert.match(html, /geminiAccessLogList/);
   assert.match(html, /category <code>gemini<\/code>/);
+  assert.match(html, /geminiAccessLogAckBtn/);
   assert.match(js, /geminiApiAccessLogs/);
   assert.match(js, /Failure reason/);
+  assert.match(js, /publishGeminiCriticalBlink/);
+});
+
+test("Gemini failures are stamped severity critical", () => {
+  const src = fs.readFileSync(path.join(root, "functions/gemini-api-access-log.js"), "utf8");
+  assert.match(src, /severity: outcome === "failure" \? "critical" : "info"/);
 });
 
 test("Baller halo uses behind-card margin glow (not clipped outer-only shadow)", () => {
