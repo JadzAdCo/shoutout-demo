@@ -65,6 +65,7 @@
     ["aiUserNotificationPreferences", "ownMaster", 0, "Patron notification choices"],
     ["aiUserSignals", "ownMaster", 0, "Patron interest signals"],
     ["appLogs", "master", 0, "Application logs"],
+    ["geminiApiAccessLogs", "master", 0, "Gemini API success/failure access audit (30-day; Master Admin or FloqR Admin)"],
     ["approvedShoutOutLibrary", "public", 0, "Approved ShoutOut ideas"],
     ["audienceCampaigns", "clubAdmin", 0, "Club audience campaigns"],
     ["betaInvites", "master", 1, "Beta tester invitations"],

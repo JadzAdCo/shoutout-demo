@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.87";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.87";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.88";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.88";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.88",
+      title: "s3.2.88 — Baller halo behind card + Gemini access logs + BOT DEE wrap",
+      checks: [
+        {label:"Halo behind card + transparent face slot", file:"display.css", includes:["baller-red-halo-behind", "background:transparent!important", "transform:scale(0.935)"]},
+        {label:"Gemini API access log module", file:"functions/gemini-api-access-log.js", includes:["geminiApiAccessLogs", "failureReason", "RETENTION_MS"]},
+        {label:"Hourly Gemini failure checker", file:"functions/ai-discovery-functions.js", includes:["checkGeminiApiAccessFailures", "logGeminiApiAccess"]},
+        {label:"Master Admin Gemini access card", file:"master-logging-extension.js", includes:["geminiApiAccessLogs", "Failure reason"]},
+        {label:"BOT DEE bubble wrap", file:"bot-dee-chat.css", includes:["min-width: 0", "overflow-wrap: anywhere"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-88-baller-halo-gemini-logs"]}
+      ]
+    },
     {
       version: "s3.2.87",
       title: "s3.2.87 — Baller portrait mask + Upload/Take + red halo + company max 25",
@@ -2723,6 +2735,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-88-baller-halo-gemini-logs",
+      area:"ShoutOut / Diagnostics / BOT DEE",
+      feature:"Baller red halo behind card, Gemini API access logs (30d), BOT DEE wrap",
+      changed:"s3.2.88 — card scales in so flashing red halo sits behind/around the art (not clipped full-bleed); face slot never paints a white plate; geminiApiAccessLogs + appLogs category gemini with failure reason (Master Admin / FloqR Admin); hourly checkGeminiApiAccessFailures inbox; BOT DEE first bubble wraps (min-width:0).",
+      howToTest:"1) Hard-refresh Search + display preview (s3.2.88). 2) Baller's Alert — confirm red glow around the card (black margin), face oval shows warrior through transparent cutout (no white plate). 3) Upload a face; Master Admin → Application Logging → category gemini OR Gemini API Access card shows success (or failure with reason). 4) Open botdee.html — long first reply wraps inside the bubble. 5) Mark Succeed/Failed.",
+      expected:"Halo visible behind card; no white face slot; Gemini success/fail rows with reasons; BOT DEE text wraps.",
+      troubleshoot:"No halo → display.css baller-red-halo-behind + cache-bust. White oval → cutout failed (check gemini logs) or media-slot background not transparent. Empty Gemini card → Functions deploy + rules for geminiApiAccessLogs. BOT DEE overflow → bot-dee-chat.css min-width:0 on bubble/transcript."
+    },
     {
       id:"s3-2-87-baller-portrait-mask",
       area:"ShoutOut / Templates",

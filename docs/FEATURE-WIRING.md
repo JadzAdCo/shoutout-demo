@@ -621,7 +621,7 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.87
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.88
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
 
@@ -630,12 +630,13 @@ Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. 
 | **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:25` |
 | **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py`. Heading + Valid Thru 12/50 + ornate rim in the asset |
 | **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 25). Alert: **Upload photo** + **Take photo** → same pipeline; cancel keeps prior. Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
-| **Display** | `placeBallerFaceSlot` + face oval; chip overlay; flashing red halo (`baller-red-halo`); cutout uses `ballerFaceScale` / `ballerFaceObjectPositionY`; metallic gold emboss; empty company hidden |
+| **Display** | `placeBallerFaceSlot` + face oval; chip overlay; card layers `scale(0.935)` so flashing red halo (`baller-red-halo-behind`) sits in the black margin behind/around the art; face slot `background:transparent` (no white plate); cutout uses `ballerFaceScale` / `ballerFaceObjectPositionY`; metallic gold emboss; empty company hidden |
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
-| **Rules** | `firestore.rules` free-create excludes all four ids |
+| **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |
 | **AI** | `functions/gemini-portrait-mask.js` (Gemini 2.5 Flash segmentation → full-frame alpha PNG) + `aiEnhanceShoutOutMedia` `baller-portrait-mask` (alias `baller-face-medallion` / `removeBallerPortraitBackground`). Client `destination-in` composite; original immutable |
+| **Gemini audit** | `functions/gemini-api-access-log.js` → `geminiApiAccessLogs` + `appLogs` category `gemini` (success/failure + `failureReason`, 30-day). Hourly `checkGeminiApiAccessFailures` → inbox. Master Admin Application Logging → Gemini API Access card |
 | **Help** | `help-black-card`, `help-ballers-alert`; intents `black-card`, `ballers-alert` |
-| **Tests** | `functions/baller-card-template.test.js`, `functions/gemini-portrait-mask.test.js` |
+| **Tests** | `functions/baller-card-template.test.js`, `functions/gemini-portrait-mask.test.js`, `functions/gemini-api-access-log.test.js` |
 
 ## Classic Halloween (`classicHalloween`) — seasonal ShoutOut template
 

@@ -1047,9 +1047,17 @@ service cloud.firestore {
  && request.resource.data.message is string
  && request.resource.data.message.size() <= 2000;
  allow read: if isMasterAdmin()
+ || isFloqrAdmin()
  || (signedIn() && resource.data.uid == request.auth.uid);
  allow update: if false;
  allow delete: if isMasterAdmin();
+ }
+
+ // Gemini API access audit (success + failure reason). Functions-write only.
+ // 30-day retention via expireAtMs / purgeLogRetention. Master Admin or FloqR Admin (RBAC).
+ match /geminiApiAccessLogs/{id} {
+ allow read: if isMasterAdmin() || isFloqrAdmin();
+ allow create, update, delete: if false;
  }
 
  // Twilio Debugger / error-log webhook events (Admin SDK writes only).
@@ -1556,7 +1564,7 @@ service cloud.firestore {
  }
 
  match /aiMediaEdits/{id} {
- allow read, update, delete: if ownsResourceUid();
+ allow read, update, delete: if ownsResourceUid() || isMasterAdmin() || isFloqrAdmin();
  allow create: if createsOwnUid();
  }
 

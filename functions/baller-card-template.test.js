@@ -204,11 +204,14 @@ test("display + composer wire baller cards", () => {
   assert.match(html, /value="none"/);
   assert.match(html, /Name or social @handle|Name or @handle/);
   assert.match(css, /baller-red-halo/);
+  assert.match(css, /baller-red-halo-behind/);
+  assert.match(css, /background:transparent!important/);
   assert.match(display, /ballerFaceScale/);
   assert.match(display, /ballerFaceObjectPositionY/);
   const ai = read("functions/ai-discovery-functions.js");
   assert.match(ai, /baller-portrait-mask/);
   assert.match(ai, /runBallerPortraitMask/);
+  assert.match(ai, /logGeminiApiAccess/);
   const portrait = read("functions/gemini-portrait-mask.js");
   assert.match(portrait, /gemini-2\.5-flash/);
   assert.match(portrait, /@google\/genai|GoogleGenAI/);

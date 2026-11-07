@@ -12,6 +12,8 @@
   const db = firebase.firestore();
   let logs = [];
   let unpaidOrders = [];
+  let geminiLogs = [];
+  let geminiFailuresOnly = false;
 
   function setStatus(message) {
     if (byId("appLoggingStatus")) byId("appLoggingStatus").textContent = message;
@@ -72,6 +74,46 @@
     box.querySelectorAll("[data-cancel-order]").forEach(button => {
       button.addEventListener("click", () => cancelOne(button.dataset.cancelOrder));
     });
+  }
+
+  function setGeminiStatus(message) {
+    if (byId("geminiAccessLogStatus")) byId("geminiAccessLogStatus").textContent = message || "";
+  }
+
+  function renderGeminiLogs() {
+    const list = byId("geminiAccessLogList");
+    if (!list) return;
+    const rows = geminiFailuresOnly
+      ? geminiLogs.filter(row => row.outcome === "failure" || row.ok === false || row.level === "error")
+      : geminiLogs;
+    list.innerHTML = rows.length ? rows.map(row => {
+      const outcome = row.outcome || (row.ok === false ? "failure" : "success");
+      const reason = row.failureReason
+        ? `<p><strong>Failure reason:</strong> ${esc(row.failureReason)}</p>`
+        : "";
+      const details = row.details ? `<pre class="log-details">${esc(JSON.stringify(row.details, null, 2))}</pre>` : "";
+      return `<article class="queue-item log-row level-${esc(row.level || (outcome === "failure" ? "error" : "info"))}">
+        <div class="message-envelope-head"><strong>${esc(String(outcome).toUpperCase())} · ${esc(row.operation || row.enhancementType || "gemini")}${row.model ? ` · ${esc(row.model)}` : ""}</strong><span>${esc(ts(row.createdAt || row.createdAtIso))}</span></div>
+        <p>${esc(row.message || "")}</p>
+        ${reason}
+        <small>${esc(row.email || row.uid || "system")} · path ${esc(row.mediaStoragePath || "-")}</small>
+        ${details}
+      </article>`;
+    }).join("") : `<p class="sub">No Gemini API access rows${geminiFailuresOnly ? " (failures only)" : ""}. Upload a Baller's Alert face photo to create the first success/failure entry.</p>`;
+  }
+
+  async function loadGeminiAccessLogs() {
+    setGeminiStatus("Loading Gemini API access logs…");
+    try {
+      const snap = await db.collection("geminiApiAccessLogs").orderBy("createdAtMs", "desc").limit(150).get();
+      geminiLogs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderGeminiLogs();
+      const fails = geminiLogs.filter(row => row.outcome === "failure" || row.ok === false).length;
+      setGeminiStatus(`Loaded ${geminiLogs.length} Gemini access row(s); ${fails} failure(s). Retention 30 days.`);
+    } catch (error) {
+      setGeminiStatus(error.message || "Could not load Gemini access logs.");
+      if (window.FLOQRLog) window.FLOQRLog.fromError(error, { category: "admin", action: "load_gemini_access_logs" });
+    }
   }
 
   async function loadLogs() {
@@ -175,10 +217,17 @@
   }
 
   function bind() {
-    byId("appLogRefreshBtn")?.addEventListener("click", () => { loadLogs(); loadUnpaid(); });
+    byId("appLogRefreshBtn")?.addEventListener("click", () => { loadLogs(); loadUnpaid(); loadGeminiAccessLogs(); });
     byId("appLogLevelFilter")?.addEventListener("change", renderLogs);
     byId("appLogCategoryFilter")?.addEventListener("input", renderLogs);
     byId("appLogSearch")?.addEventListener("input", renderLogs);
+    byId("geminiAccessLogRefreshBtn")?.addEventListener("click", loadGeminiAccessLogs);
+    byId("geminiAccessLogFailuresOnlyBtn")?.addEventListener("click", () => {
+      geminiFailuresOnly = !geminiFailuresOnly;
+      const btn = byId("geminiAccessLogFailuresOnlyBtn");
+      if (btn) btn.textContent = geminiFailuresOnly ? "Show all" : "Failures only";
+      renderGeminiLogs();
+    });
     byId("clearUnpaidCheckoutsBtn")?.addEventListener("click", clearAllUnpaid);
     byId("purgeTestPaymentsLoggingBtn")?.addEventListener("click", purgeTestPayments);
     byId("checkZebbiesConnectBtn")?.addEventListener("click", checkZebbiesConnect);
@@ -188,6 +237,7 @@
     mount() {
       bind();
       loadLogs();
+      loadGeminiAccessLogs();
       loadUnpaid();
       checkZebbiesConnect();
     }

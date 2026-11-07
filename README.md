@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.87 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.88 (stable)
 
+- s3.2.88: Baller red halo behind card + transparent face slot; Gemini API access logs (30d, Master/FloqR Admin) + hourly failure inbox; BOT DEE bubble wrap.
 - s3.2.87: Baller's Alert Upload+Take photo, Gemini 2.5 Flash portrait mask cutout, red card halo, company WE'RE OUTSIDE LLC max 25.
 - s3.2.86: Fix ShoutOut/floqCast venue search — Aurelia (and other Firestore names) after fast catalog paint.
 - s3.2.85: Master Admin Diagnostics → FloqCast connectivity logs tab; ICE/WebRTC appLogs category floqCast.
