@@ -621,16 +621,16 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.88
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.91
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
 
 | Piece | Where |
 |---|---|
 | **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:25` |
-| **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py`. Heading + Valid Thru 12/50 + ornate rim in the asset |
+| **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py` (exterior flood + non-gold fringe dilate → fill; crisp SVG EMV chip paste; LED letterbox + corner scrub). Chip SVG/PNG: `images/baller/baller-emv-chip.svg`. Heading + Valid Thru 12/50 + ornate rim in the asset |
 | **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 25). Alert: **Upload photo** + **Take photo** → immediate local + LED preview (`processBallerFaceSelection`), then Storage upload + Gemini mask on select (not only Submit); cancel keeps prior. File input uses `.baller-file-input-host` (visually hidden, not `display:none`). Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
-| **Display** | `placeBallerFaceSlot` + face oval; chip overlay; card layers `scale(0.935)` so flashing red halo (`baller-red-halo-behind`) sits in the black margin behind/around the art; face slot `background:transparent` (no white plate); cutout uses `ballerFaceScale` / `ballerFaceObjectPositionY`; metallic gold emboss; empty company hidden |
+| **Display** | `placeBallerFaceSlot` + face oval; chip overlay above face (`z-index:5`); card layers `scale(0.935)` so flashing red halo sits in the black margin; `border-radius:2.9%/4.7%` clips residual silhouette fringe; name/company `top:64%` (64×48: `60%`), type `mainSize×0.92×1.5×1.1` vh (+10%); face slot `background:transparent`; metallic gold emboss; empty company hidden |
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
 | **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |
 | **AI** | `functions/gemini-portrait-mask.js` (default `gemini-3.8-flash`, override `FLOQR_GEMINI_SEGMENTATION_MODEL` → full-frame alpha PNG / polygon) + `aiEnhanceShoutOutMedia` `baller-portrait-mask` (alias `baller-face-medallion` / `removeBallerPortraitBackground`). Client `destination-in` composite; original immutable |

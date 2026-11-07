@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Baller refine QA — @the_don_4ld / FloqMedia</title>
+  <link rel="stylesheet" href="../../display.css"/>
+  <style>
+    html,body{margin:0;background:#050505;color:#ddd;font:14px/1.4 Inter,system-ui,sans-serif}
+    h1{margin:12px 16px;font-size:16px;font-weight:600}
+    .stage{display:flex;flex-wrap:wrap;gap:20px;padding:12px 16px 32px}
+    .frame{background:#111;border:1px solid #333;padding:8px}
+    .frame b{display:block;margin:0 0 6px;font-size:12px;color:#9ab}
+    .led-2x1{width:960px;height:480px;position:relative;overflow:hidden;background:#000}
+    .led-4x3{width:640px;height:480px;position:relative;overflow:hidden;background:#000}
+    .led-2x1 .display-canvas,
+    .led-4x3 .display-canvas{width:100%!important;height:100%!important}
+  </style>
+</head>
+<body>
+  <h1>Baller refine QA — @the_don_4ld / FloqMedia</h1>
+  <div class="stage">
+    <div class="frame">
+      <b>led-96x48 · blackCard</b>
+      <div class="led-2x1" id="p2x1"></div>
+    </div>
+    <div class="frame">
+      <b>led-96x48 · ballersAlert (+ chip overlay)</b>
+      <div class="led-2x1" id="p2x1a"></div>
+    </div>
+    <div class="frame">
+      <b>led-64x48 · blackCard</b>
+      <div class="led-4x3" id="p4x3"></div>
+    </div>
+  </div>
+  <script>
+    function mount(hostId, {bg, alert, format}) {
+      const host = document.getElementById(hostId);
+      const canvas = document.createElement("div");
+      canvas.className = "display-canvas baller-card" + (alert ? " baller-alert" : "");
+      canvas.dataset.screenFormatId = format;
+      canvas.innerHTML = `
+        <div class="display-background" style="position:absolute;inset:0;background-image:url('${bg}');"></div>
+        <div class="display-center baller-card-center">
+          <h1 class="baller-cardholder-name">@the_don_4ld</h1>
+          <h2 class="baller-company-name">FloqMedia</h2>
+        </div>
+        ${alert ? `<div class="baller-chip-overlay" aria-hidden="true"><img src="../../images/baller/baller-emv-chip.png" alt=""/></div>` : ""}
+      `;
+      host.appendChild(canvas);
+      const cardH = host.getBoundingClientRect().height || 480;
+      const mainSize = format === "led-64x48" ? 4.8 : 5.2;
+      const ballerTypePx = Math.min(cardH * 0.1023, Math.max(cardH * 0.046, mainSize * 0.92 * 1.5 * 1.1 * cardH / 100));
+      canvas.querySelector(".baller-cardholder-name").style.setProperty("font-size", ballerTypePx + "px", "important");
+      canvas.querySelector(".baller-company-name").style.setProperty("font-size", ballerTypePx + "px", "important");
+    }
+    mount("p2x1", {bg:"../../images/baller/black-card-2x1.png", alert:false, format:"led-96x48"});
+    mount("p2x1a", {bg:"../../images/baller/ballers-alert-2x1.png", alert:true, format:"led-96x48"});
+    mount("p4x3", {bg:"../../images/baller/black-card-4x3.png", alert:false, format:"led-64x48"});
+  </script>
+</body>
+</html>
