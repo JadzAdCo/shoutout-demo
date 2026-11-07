@@ -3,6 +3,7 @@
  * Collection: geminiApiAccessLogs (Functions-write; Master Admin / FloqR Admin read).
  * Mirrored into appLogs category "gemini" for Application Logging.
  * Retention: 30 days (expireAtMs + purgeLogRetention / expireAtMs sweeper).
+ * Failures are severity critical (Master Admin Application Logging tab flash).
  */
 "use strict";
 
