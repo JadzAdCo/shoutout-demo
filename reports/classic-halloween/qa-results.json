@@ -17,12 +17,12 @@
       "finaleLayer": true,
       "card": "PRESENTED BYFLOQMEDIA"
     },
-    "finaleStartedAtMs": 13155,
+    "finaleStartedAtMs": 17343,
     "finaleClassAfterShots": "halloween-finale is-playing",
     "files": [
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-board-t1s.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-finale-a.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-finale-b.png"
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-96x48-board-t1s.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-96x48-finale-a.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-96x48-finale-b.png"
     ],
     "consoleErrors": []
   },
@@ -45,12 +45,12 @@
       "finaleLayer": true,
       "card": "PRESENTED BYFLOQMEDIA"
     },
-    "finaleStartedAtMs": 16562,
+    "finaleStartedAtMs": 16983,
     "finaleClassAfterShots": "halloween-finale is-playing",
     "files": [
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x48-board-t1s.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x48-finale-a.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x48-finale-b.png"
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x48-board-t1s.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x48-finale-a.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x48-finale-b.png"
     ],
     "consoleErrors": []
   },
@@ -73,12 +73,12 @@
       "finaleLayer": true,
       "card": "PRESENTED BYFLOQMEDIA"
     },
-    "finaleStartedAtMs": 17451,
+    "finaleStartedAtMs": 17951,
     "finaleClassAfterShots": "halloween-finale is-playing",
     "files": [
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x32-board-t1s.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x32-finale-a.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-64x32-finale-b.png"
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x32-board-t1s.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x32-finale-a.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-64x32-finale-b.png"
     ],
     "consoleErrors": []
   },
@@ -100,11 +100,11 @@
       "finaleLayer": true,
       "card": "PRESENTED BYFLOQMEDIA"
     },
-    "finaleStartedAtMs": 17626,
+    "finaleStartedAtMs": 17807,
     "finaleClassAfterShots": "halloween-finale is-playing",
     "files": [
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-reduced-motion-board-t1s.png",
-      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween\\reports\\classic-halloween\\led-96x48-reduced-motion-finale-a.png"
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-96x48-reduced-motion-board-t1s.png",
+      "C:\\Users\\Don\\Documents\\Codex\\2026-06-22\\so\\work\\wt-halloween-rip\\reports\\classic-halloween\\led-96x48-reduced-motion-finale-a.png"
     ],
     "consoleErrors": []
   }
