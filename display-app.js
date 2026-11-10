@@ -304,6 +304,8 @@
       jerseyPrimary: data.jerseyPrimary || source.jerseyPrimary || template.jerseyPrimary,
       jerseySecondary: data.jerseySecondary || source.jerseySecondary || template.jerseySecondary,
       jerseyAccent: data.jerseyAccent || source.jerseyAccent || source.jerseySecondary || template.jerseyAccent,
+      jerseyPlateInk: data.jerseyPlateInk || source.jerseyPlateInk || template.jerseyPlateInk || "",
+      jerseyOverlayWordmark: data.jerseyOverlayWordmark === true || data.jerseyOverlayWordmark === "1" || data.jerseyOverlayWordmark === 1 || !!(source.jerseyOverlayWordmark || template.jerseyOverlayWordmark),
       jerseyCssBack: (data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl)
         ? false
         : (data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.jerseyCssBack !== false)),
@@ -1217,6 +1219,8 @@
       jerseyPrimary: params.get("jerseyPrimary") || "",
       jerseySecondary: params.get("jerseySecondary") || "",
       jerseyAccent: params.get("jerseyAccent") || "",
+      jerseyPlateInk: params.get("jerseyPlateInk") || "",
+      jerseyOverlayWordmark: params.get("jerseyOverlayWordmark") === "1",
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       attribution: params.get("attribution") || "",
       includeAttribution: params.get("includeAttribution") === "1",
@@ -2002,6 +2006,9 @@
       canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
       canvas.style.setProperty("--jersey-secondary", safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff"));
       canvas.style.setProperty("--jersey-accent", safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff"));
+      canvas.style.setProperty("--jersey-plate-ink", safeRender.safeColor(t.jerseyPlateInk || data.jerseyPlateInk || "#ffffff", "#ffffff"));
+      const overlayWord = !!(t.jerseyOverlayWordmark || data.jerseyOverlayWordmark);
+      canvas.classList.toggle("jersey-overlay-wordmark", overlayWord && usePhotoBack);
       if (usePhotoBack) {
         // Named photo kits (country/club wordmark in PNG): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
@@ -2051,10 +2058,10 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        // Real-kit stack: name under plate (+10%), number mid-back (−10%).
+        // Real-kit stack: club word on the plate, name under it, number mid-back.
         baseName = Math.min(7.04, 8.2);
         baseNumber = Math.min(27, 32);
-        baseTeam = 0;
+        baseTeam = overlayWord ? 5.6 : 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
         baseNumber = Math.max(baseNumber, 70);
@@ -2072,13 +2079,14 @@
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
-        const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack) || (sport === "nfl" && usePhotoBack);
-        teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
+        const hideCrest = !teamLabel || (sport === "nfl" && !overlayWord) || (sport === "soccer" && usePhotoBack);
+        teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "") + (overlayWord ? " jersey-overlay-word" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         if (hideCrest) teamEl.textContent = "";
-        else if (sport === "soccer") paintJerseyCollarArch(teamEl, teamLabel);
+        else if (sport === "soccer" || (sport === "nba" && usePhotoBack)) paintJerseyCollarArch(teamEl, teamLabel);
         else teamEl.textContent = teamLabel;
-        teamEl.style.setProperty("font-size", `${teamSize}vh`, "important");
+        const teamFit = Math.min(1, 8.5 / Math.max(1, String(teamLabel || "").length));
+        teamEl.style.setProperty("font-size", `${(teamSize * teamFit).toFixed(2)}vh`, "important");
       }
       canvas.classList.toggle("jersey-name-wrapped", wrapped);
       byId("displayMain").classList.add("soccer-jersey-name");
@@ -2209,7 +2217,7 @@
       return;
     }
     hideJerseyMount();
-    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country");
+    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       stopFloqrCardCycle();

@@ -1159,6 +1159,20 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .soccer-jersey-team{
   display:none!important;
 }
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:calc(16.2% + var(--nfl-photo-stack-y))!important;
+  height:6.8%!important;
+  left:28%!important;
+  right:28%!important;
+  color:var(--jersey-plate-ink,#fff)!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  font-weight:900!important;
+  letter-spacing:.03em!important;
+  -webkit-text-stroke:0.045em rgba(0,0,0,.55);
+  paint-order:stroke fill;
+  z-index:7!important;
+}
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
   /* Patron name BETWEEN baked club nameplate and number (was overlapping plate). */
   top:calc(28% + var(--nfl-photo-stack-y))!important;
@@ -1689,6 +1703,39 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   height:42%!important;
   font-style:normal;
   text-shadow:0 3px 0 rgba(0,0,0,.55),0 0 16px rgba(0,0,0,.35)!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:17.6%!important;
+  height:7.4%!important;
+  left:26%!important;
+  right:26%!important;
+  color:#fff!important;
+  letter-spacing:.08em!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  -webkit-text-stroke:0.055em #111;
+  paint-order:stroke fill;
+  text-shadow:0 0.04em 0 #111;
+  z-index:7!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displayMain.soccer-jersey-name{
+  top:26.2%!important;
+  height:6.6%!important;
+  left:26%!important;
+  right:26%!important;
+  letter-spacing:.12em!important;
+  color:#fff!important;
+  -webkit-text-stroke:0.045em #111;
+  paint-order:stroke fill;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number{
+  top:35%!important;
+  height:24%!important;
+  left:24%!important;
+  right:24%!important;
+  color:#fff!important;
+  -webkit-text-stroke:0.035em #111;
+  paint-order:stroke fill;
 }
 
 /* NFL — bulkier yoke, shoulder name plate, huge thick number */

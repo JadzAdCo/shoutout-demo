@@ -604,10 +604,14 @@
         template: templateId,
         templateName: t.name || templateId,
         jerseyTeamId: "",
-        jerseyTeamLabel: t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase(),
+        jerseyTeamLabel: (t.jerseyStateField && String(byId("jerseyState")?.value || "").trim())
+          ? String(byId("jerseyState").value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 12)
+          : (t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase()),
         jerseyPrimary: t.jerseyPrimary || "",
         jerseySecondary: t.jerseySecondary || "",
         jerseyAccent: t.jerseyAccent || t.jerseySecondary || "",
+        jerseyPlateInk: t.jerseyPlateInk || "",
+        jerseyOverlayWordmark: t.jerseyOverlayWordmark ? "1" : "",
         jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
         backgroundUrl: t.defaultBackgroundUrl || "",
         sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
@@ -753,6 +757,13 @@
     const source = byId("soccerNameSource")?.value || "displayName";
     byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
     const consolidated = isConsolidatedSoccerTemplate();
+    const stateOn = !!getTemplate()?.jerseyStateField;
+    const stateInput = byId("jerseyState");
+    byId("jerseyStateWrap")?.classList.toggle("hidden", !soccer || !stateOn);
+    if (stateOn && stateInput && stateInput.dataset.ready !== "1") {
+      stateInput.value = getTemplate()?.jerseyPlateLabel || "MARYLAND";
+      stateInput.dataset.ready = "1";
+    }
     byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
     byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
     const floqrAttrHint = document.querySelector(".attribution-controls .sub.small");
@@ -4384,6 +4395,8 @@
       if (payload.jerseyPrimary) url.searchParams.set("jerseyPrimary", payload.jerseyPrimary);
       if (payload.jerseySecondary) url.searchParams.set("jerseySecondary", payload.jerseySecondary);
       if (payload.jerseyAccent) url.searchParams.set("jerseyAccent", payload.jerseyAccent);
+      if (payload.jerseyPlateInk) url.searchParams.set("jerseyPlateInk", payload.jerseyPlateInk);
+      if (payload.jerseyOverlayWordmark) url.searchParams.set("jerseyOverlayWordmark", "1");
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
       if (payload.attribution) url.searchParams.set("attribution", payload.attribution);
       if (payload.includeAttribution) url.searchParams.set("includeAttribution", "1");
@@ -5825,6 +5838,7 @@
     byId("ballerFacePosY")?.addEventListener("input", () => { updatePreview(); });
     byId("soccerTeamId")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("jerseyState")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerJerseyNumber")?.addEventListener("input", event => {
       // Any character allowed; hard-cap at 2 glyphs for soccer templates.
       const next = glyphCap(event.currentTarget.value, 2);

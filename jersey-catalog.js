@@ -69,8 +69,10 @@
       league,
       description: isPhoto
         ? (sport === "nfl"
-          ? `$30 ${teamName} NFL jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). NFL · Jersey · ${kindTag}.`
-          : `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`)
+          ? `$30 ${teamName} NFL jersey ShoutOut — 2026 home LED back (96×48, 64×48, 64×32). Club word, name, and number are typed on the kit.`
+          : sport === "nba"
+            ? `$30 ${teamName} basketball jersey ShoutOut — LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit.`
+            : `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`)
         : `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${silhouetteNote}`,
       tags
     };
@@ -109,39 +111,40 @@
     ["Washington Wizards", "#002B5C", "#E31837"]
   ];
 
+  // 2026 home kit: name, file slug, body, number, trim, nameplate.
   const NFL = [
-    ["Arizona Cardinals", "#97233F", "#000000"],
-    ["Atlanta Falcons", "#A71930", "#000000"],
-    ["Baltimore Ravens", "#241773", "#9E7C0C"],
-    ["Buffalo Bills", "#00338D", "#C60C30"],
-    ["Carolina Panthers", "#0085CA", "#101820"],
-    ["Chicago Bears", "#0B162A", "#C83803"],
-    ["Cincinnati Bengals", "#FB4F14", "#000000"],
-    ["Cleveland Browns", "#311D00", "#FF3C00"],
-    ["Dallas Cowboys", "#003594", "#869397"],
-    ["Denver Broncos", "#FB4F14", "#002244"],
-    ["Detroit Lions", "#0076B6", "#B0B7BC"],
-    ["Green Bay Packers", "#203731", "#FFB612"],
-    ["Houston Texans", "#03202F", "#A71930"],
-    ["Indianapolis Colts", "#002C5F", "#A2AAAD"],
-    ["Jacksonville Jaguars", "#101820", "#D7A22A"],
-    ["Kansas City Chiefs", "#E31837", "#FFB81C"],
-    ["Las Vegas Raiders", "#000000", "#A5ACAF"],
-    ["Los Angeles Chargers", "#0080C6", "#FFC20E"],
-    ["Los Angeles Rams", "#003594", "#FFA300"],
-    ["Miami Dolphins", "#008E97", "#FC4C02"],
-    ["Minnesota Vikings", "#4F2683", "#FFC62F"],
-    ["New England Patriots", "#002244", "#C60C30"],
-    ["New Orleans Saints", "#D3BC8D", "#101820"],
-    ["New York Giants", "#0B2265", "#A71930"],
-    ["New York Jets", "#125740", "#000000"],
-    ["Philadelphia Eagles", "#004C54", "#A5ACAF"],
-    ["Pittsburgh Steelers", "#FFB612", "#101820"],
-    ["San Francisco 49ers", "#AA0000", "#B3995D"],
-    ["Seattle Seahawks", "#002244", "#69BE28"],
-    ["Tampa Bay Buccaneers", "#D50A0A", "#FF7900"],
-    ["Tennessee Titans", "#0C2340", "#4B92DB"],
-    ["Washington Commanders", "#5A1414", "#FFB612"]
+    ["Arizona Cardinals", "cardinals", "#97233F", "#FFFFFF", "#000000", "#161616"],
+    ["Atlanta Falcons", "falcons", "#A71930", "#FFFFFF", "#161616", "#161616"],
+    ["Baltimore Ravens", "ravens", "#241773", "#FFFFFF", "#9E7C0C", "#9E7C0C"],
+    ["Buffalo Bills", "bills", "#00338D", "#FFFFFF", "#C60C30", "#C60C30"],
+    ["Carolina Panthers", "panthers", "#101820", "#FFFFFF", "#0085CA", "#B0B7BC"],
+    ["Chicago Bears", "bears", "#0B162A", "#FFFFFF", "#C83803", "#C83803"],
+    ["Cincinnati Bengals", "bengals", "#1A1A1A", "#FB4F14", "#FB4F14", "#FB4F14"],
+    ["Cleveland Browns", "browns", "#3C2415", "#FFFFFF", "#FF3C00", "#FF3C00"],
+    ["Dallas Cowboys", "cowboys", "#F4F4F4", "#041E42", "#869397", "#041E42"],
+    ["Denver Broncos", "broncos", "#FB4F14", "#FFFFFF", "#002244", "#002244"],
+    ["Detroit Lions", "lions", "#0076B6", "#FFFFFF", "#B0B7BC", "#B0B7BC"],
+    ["Green Bay Packers", "packers", "#203731", "#FFFFFF", "#FFB612", "#FFB612"],
+    ["Houston Texans", "texans", "#03202F", "#FFFFFF", "#A71930", "#A71930"],
+    ["Indianapolis Colts", "colts", "#002C5F", "#FFFFFF", "#A2AAAD", "#A2AAAD"],
+    ["Jacksonville Jaguars", "jaguars", "#101820", "#D7A22A", "#006778", "#D7A22A"],
+    ["Kansas City Chiefs", "chiefs", "#E31837", "#FFFFFF", "#FFB81C", "#FFB81C"],
+    ["Las Vegas Raiders", "raiders", "#1A1A1A", "#A5ACAF", "#A5ACAF", "#A5ACAF"],
+    ["Los Angeles Chargers", "chargers", "#0073CF", "#FFFFFF", "#FFC20E", "#FFC20E"],
+    ["Los Angeles Rams", "rams", "#003594", "#FFD100", "#FFD100", "#FFD100"],
+    ["Miami Dolphins", "dolphins", "#008E97", "#FFFFFF", "#FC4C02", "#FC4C02"],
+    ["Minnesota Vikings", "vikings", "#4F2683", "#FFFFFF", "#FFC62F", "#FFC62F"],
+    ["New England Patriots", "patriots", "#002244", "#FFFFFF", "#C60C30", "#C60C30"],
+    ["New Orleans Saints", "saints", "#C5B17A", "#101820", "#101820", "#101820"],
+    ["New York Giants", "giants", "#0B2265", "#FFFFFF", "#A71930", "#A71930"],
+    ["New York Jets", "jets", "#125740", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
+    ["Philadelphia Eagles", "eagles", "#004C54", "#FFFFFF", "#A5ACAF", "#A5ACAF"],
+    ["Pittsburgh Steelers", "steelers", "#161616", "#FFB612", "#FFB612", "#FFB612"],
+    ["San Francisco 49ers", "49ers", "#AA0000", "#FFFFFF", "#B3995D", "#B3995D"],
+    ["Seattle Seahawks", "seahawks", "#002244", "#69BE28", "#69BE28", "#69BE28"],
+    ["Tampa Bay Buccaneers", "buccaneers", "#D50A0A", "#FFFFFF", "#FF7900", "#34302B"],
+    ["Tennessee Titans", "titans", "#4BA3E3", "#FFFFFF", "#C8102E", "#C8102E"],
+    ["Washington Commanders", "commanders", "#5A1414", "#FFB612", "#FFB612", "#FFB612"]
   ];
 
   const EU_SOCCER = [
@@ -311,34 +314,46 @@
     });
   }
 
-  // Eagles-elite silhouette photo backs (solid #000). 2025 top-5 + requested clubs + ScammerVille.
-  const NFL_PHOTO = {
-    "San Francisco 49ers": "./images/nfl/nfl-49ers-back-with-club.png",
-    "Seattle Seahawks": "./images/nfl/nfl-seahawks-back-with-club.png",
-    "Denver Broncos": "./images/nfl/nfl-broncos-back-with-club.png",
-    "Los Angeles Rams": "./images/nfl/nfl-rams-back-with-club.png",
-    "New England Patriots": "./images/nfl/nfl-patriots-back-with-club.png",
-    "Buffalo Bills": "./images/nfl/nfl-bills-back-with-club.png",
-    "Dallas Cowboys": "./images/nfl/nfl-cowboys-back-with-club.png",
-    "New York Giants": "./images/nfl/nfl-giants-back-with-club.png",
-    "Baltimore Ravens": "./images/nfl/nfl-ravens-back-with-club.png",
-    "Washington Commanders": "./images/nfl/nfl-commanders-back-with-club.png"
-  };
+  function plateInk(hex) {
+    const n = parseInt(String(hex || "").replace("#", ""), 16);
+    if (!Number.isFinite(n)) return "#111111";
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return l > 0.62 ? "#111111" : "#FFFFFF";
+  }
 
-  function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags, bgUrl) {
+  function plateName(teamName) {
+    if (/49ers/i.test(teamName)) return "49ERS";
+    const parts = String(teamName || "").trim().split(/\s+/);
+    return (parts[parts.length - 1] || teamName || "").toUpperCase();
+  }
+
+  function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags, bgUrl, extra) {
     const id = `${prefix}${slug(teamName)}`;
     if (nbaNflTemplates[id]) return;
-    nbaNflTemplates[id] = jerseyTemplate({
+    const more = extra || {};
+    const row = jerseyTemplate({
       id,
-      name: `${sport.toUpperCase()} ${teamName}`,
+      name: sport === "nba" && more.stateField ? teamName : `${sport.toUpperCase()} ${teamName}`,
       teamName,
       league,
       sport,
       primary,
       secondary,
+      accent: more.accent || secondary,
       bgUrl: bgUrl || "",
       extraTags
     });
+    if (more.plate) {
+      row.jerseyPlateLabel = more.plate;
+      row.jerseyTeamLabel = more.plate;
+      row.jerseyOverlayWordmark = true;
+      row.jerseyPlateInk = more.plateInk || plateInk(more.plateColor || secondary);
+    }
+    if (more.stateField) row.jerseyStateField = true;
+    nbaNflTemplates[id] = row;
     nbaNflIds.push(id);
   }
 
@@ -366,8 +381,18 @@
   }
 
   NBA.forEach(([name, p, s]) => addNbaNfl("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
-  NFL.forEach(([name, p, s]) => addNbaNfl("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"], NFL_PHOTO[name] || ""));
-  addNbaNfl("nfl", "nfl", "NFL", "ScammerVille", "#004C54", "#B3995D", ["football", "American football", "NFL", "ScammerVille", "parody", "2025"], "./images/nfl/nfl-scammerville-back-with-club.png");
+  NFL.forEach(([name, file, body, number, trim, plate]) => addNbaNfl(
+    "nfl", "nfl", "NFL", name, body, number,
+    ["football", "American football", "NFL", "2026"],
+    `./images/nfl/nfl-${file}-back-with-club.png`,
+    {accent: trim, plate: plateName(name), plateColor: plate, plateInk: plateInk(plate)}
+  ));
+  addNbaNfl("nfl", "nfl", "NFL", "ScammerVille", "#004C54", "#B3995D", ["football", "American football", "NFL", "ScammerVille", "parody", "2026"], "./images/nfl/nfl-scammerville-back-with-club.png", {
+    accent: "#B3995D", plate: "SCAMMERVILLE", plateColor: "#B3995D", plateInk: "#111111"
+  });
+  addNbaNfl("nba", "nba", "NCAA", "Maryland Terps", "#E21833", "#FFFFFF", ["basketball", "NCAA", "Maryland", "Terps", "2026"], "./images/basketball/maryland-terps-2026-back.jpg", {
+    accent: "#FFD520", plate: "MARYLAND", plateColor: "#E21833", plateInk: "#FFFFFF", stateField: true
+  });
   // Promote photo NFL kits with dual-panel shoutout layout flags.
   Object.keys(nbaNflTemplates).forEach(id => {
     const row = nbaNflTemplates[id];
@@ -375,7 +400,7 @@
     row.nflDualLayout = true;
     row.nflShoutOut = true;
     row.layout = "nfl-jersey";
-    row.description = `$30 ${row.teamName} NFL jersey ShoutOut — Eagles-elite silhouette LED back; 96×48 jersey+text, 64×48/64×32 rotating jersey↔text. Emotes OK.`;
+    row.description = `$30 ${row.teamName} NFL jersey ShoutOut — 2026 home LED back; 96×48 jersey+text, 64×48/64×32 rotating jersey↔text. Emotes OK.`;
   });
 
   function resolveSoccerTeam(teamId) {
@@ -414,11 +439,8 @@
   global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
   global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat([
-    "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille",
-    "nflSanFrancisco49ers", "nflScammerVille",
-    "nflSeattleSeahawks", "nflDenverBroncos", "nflLosAngelesRams", "nflNewEnglandPatriots", "nflBuffaloBills",
-    "nflDallasCowboys", "nflNewYorkGiants", "nflBaltimoreRavens", "nflWashingtonCommanders"
-  ]);
+    "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"
+  ]).concat(Object.keys(nbaNflTemplates).filter(id => nbaNflTemplates[id] && nbaNflTemplates[id].defaultBackgroundUrl));
   global.FLOQRSoccerPhotoTeams = function soccerPhotoTeams() {
     const seen = new Set();
     return (global.FLOQR_JERSEY_PHOTO_IDS || []).map(id => soccerTeams[id]).filter(team => {

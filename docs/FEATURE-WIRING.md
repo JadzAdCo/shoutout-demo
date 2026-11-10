@@ -30,6 +30,20 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## 2026 jersey backs — Maryland Terps + NFL home kits (s3.2.91)
+
+**Purpose:** Photo LED backs. Maryland Terps basketball takes State, name, and number. Every NFL club uses its 2026 home colors; the club word sits on the nameplate, and the patron types name and number.
+
+| Layer | Wiring |
+|---|---|
+| Art | `images/basketball/maryland-terps-2026-back.jpg`; `images/nfl/nfl-*-back-with-club.png` from `scripts/build-nfl-2026-jerseys.js` |
+| Catalog | `jersey-catalog.js` — `jerseyOverlayWordmark`, `jerseyPlateLabel`, `jerseyStateField` (Terps only), `nflDualLayout` on NFL photos |
+| Composer | `index.html` `#jerseyState` when `jerseyStateField`; name + mark already on `#soccerJerseyFields` |
+| Board | `display-app.js` paints the plate word when `jerseyOverlayWordmark`; `display.css` places it on the NFL plate and on the Terps upper back |
+| i18n | `editor.jerseyState` in all 11 chrome packs |
+
+---
+
 ## Template selection — LED-true cards + Search lens (s3.2.21)
 
 **Purpose:** Venue template pick uses the Search-page lens field, contextual template-only search, and a true LED preview at the venue primary display size.

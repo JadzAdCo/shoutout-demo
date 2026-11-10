@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>2026 NFL + Terps jersey preview</title>
+  <style>
+    body { margin: 0; background: #111; color: #fff; font-family: "Segoe UI", sans-serif; }
+    h1 { font-size: 22px; margin: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; padding: 0 16px 24px; }
+    figure { margin: 0; background: #000; }
+    .kit { position: relative; }
+    img { width: 100%; display: block; }
+    .plate, .name, .num {
+      position: absolute; left: 24%; right: 24%; text-align: center;
+      font-family: Impact, "Arial Black", sans-serif; text-transform: uppercase;
+      color: #fff; -webkit-text-stroke: 0.04em #111; paint-order: stroke fill;
+    }
+    .plate { top: 22%; font-size: 4.2vw; letter-spacing: .04em; }
+    .name { top: 33%; font-size: 3.2vw; letter-spacing: .12em; }
+    .num { top: 42%; font-size: 14vw; letter-spacing: -.04em; }
+    figcaption { padding: 6px 8px 10px; font-size: 13px; color: #d4d4d8; }
+    @media (min-width: 900px) {
+      .plate { font-size: 15px; }
+      .name { font-size: 12px; }
+      .num { font-size: 54px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>2026 home kits — local check</h1>
+  <div class="grid" id="grid"></div>
+  <script>
+    const kits = [
+      ["Maryland Terps", "images/basketball/maryland-terps-2026-back.jpg", "MARYLAND", "#fff"],
+      ["Falcons", "images/nfl/nfl-falcons-back-with-club.png", "FALCONS", "#fff"],
+      ["Titans", "images/nfl/nfl-titans-back-with-club.png", "TITANS", "#fff"],
+      ["Commanders", "images/nfl/nfl-commanders-back-with-club.png", "COMMANDERS", "#111"],
+      ["Steelers", "images/nfl/nfl-steelers-back-with-club.png", "STEELERS", "#111"],
+      ["Cowboys", "images/nfl/nfl-cowboys-back-with-club.png", "COWBOYS", "#fff"],
+      ["Chargers", "images/nfl/nfl-chargers-back-with-club.png", "CHARGERS", "#111"],
+      ["Rams", "images/nfl/nfl-rams-back-with-club.png", "RAMS", "#111"]
+    ];
+    document.getElementById("grid").innerHTML = kits.map(([title, src, plate, ink]) =>
+      `<figure><div class="kit"><img src="${src}" alt="${title}"><div class="plate" style="color:${ink}">${plate}</div><div class="name">SMITH</div><div class="num">25</div></div><figcaption>${title}</figcaption></figure>`
+    ).join("");
+  </script>
+</body>
+</html>
