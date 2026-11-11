@@ -310,7 +310,8 @@
         ? false
         : (data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.jerseyCssBack !== false)),
       defaultBackgroundUrl: data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl || "",
-      jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || ""
+      jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || "",
+      jerseyOutput: source.jerseyOutput || template.jerseyOutput || null
     };
   }
 
@@ -335,24 +336,51 @@
     return teamEl;
   }
 
-  // Country/club sits on a ~7° collar arch (ends lower, middle follows the neckline).
-  function paintJerseyCollarArch(el, label) {
+  // Basketball team/state words span archDegrees (25°) from the left end to the right end.
+  function jerseyArchRise(len, spanDeg) {
+    const span = spanDeg || 14;
+    if (len <= 1) return 0;
+    const half = (span * Math.PI / 180) / 2;
+    return ((1 - Math.cos(half)) / (2 * Math.sin(half))) * (len - 1) * 0.72;
+  }
+
+  function jerseyArchHtml(chars, spanDeg) {
+    const span = spanDeg || 14;
+    const last = Math.max(1, chars.length - 1);
+    const riseEm = jerseyArchRise(chars.length, span);
+    return chars.map((ch, i) => {
+      const t = chars.length === 1 ? 0 : (i / last) - 0.5;
+      const rot = t * span;
+      const lift = (1 - Math.abs(t) * 2) * riseEm;
+      const glyph = ch === " " ? "&nbsp;" : esc(ch);
+      return `<span class="jersey-arch-ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${glyph}</span>`;
+    }).join("");
+  }
+
+  function paintJerseyCollarArch(el, label, arch) {
     if (!el) return;
-    const chars = glyphs(cleanBoardText(label));
+    const likeMaryland = arch === "maryland" || typeof arch === "number";
+    const span = typeof arch === "number" ? arch : (likeMaryland ? 25 : 14);
+    const cleaned = String(cleanBoardText(label) || "").trim();
+    const lines = likeMaryland ? cleaned.split(/\s+/).filter(Boolean).slice(0, 2) : [];
+    if (lines.length >= 2) {
+      el.classList.add("jersey-collar-arch", "jersey-word-wrap");
+      el.innerHTML = lines.map(part => {
+        const chars = glyphs(part);
+        const rise = jerseyArchRise(chars.length, span);
+        return `<span class="jersey-word-line" style="padding-top:${rise.toFixed(3)}em">${jerseyArchHtml(chars, span)}</span>`;
+      }).join("");
+      return;
+    }
+    el.classList.remove("jersey-word-wrap");
+    const chars = glyphs(cleaned);
     if (!chars.length) {
       el.textContent = "";
       el.classList.remove("jersey-collar-arch");
       return;
     }
     el.classList.add("jersey-collar-arch");
-    const last = Math.max(1, chars.length - 1);
-    el.innerHTML = chars.map((ch, i) => {
-      const t = chars.length === 1 ? 0 : (i / last) - 0.5;
-      const rot = t * 14;
-      const lift = (1 - Math.abs(t) * 2) * 0.18;
-      const glyph = ch === " " ? "&nbsp;" : esc(ch);
-      return `<span class="jersey-arch-ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${glyph}</span>`;
-    }).join("");
+    el.innerHTML = jerseyArchHtml(chars, span);
   }
 
   /** Words are never split: a word longer than maxChars gets its own row and the board fitter shrinks it. */
@@ -2045,7 +2073,9 @@
       });
       const nameGlyphs = glyphLen(nameRows.filter(Boolean).join("") || "");
       // Scale long names down on one line so the number never moves.
-      const fitScale = nameGlyphs > 6 ? (nameGlyphs >= 8 ? 0.82 : 0.9) : 1;
+      const fitScale = (sport === "nba" && usePhotoBack)
+        ? 1
+        : (nameGlyphs > 6 ? (nameGlyphs >= 8 ? 0.82 : 0.9) : 1);
       const wrapped = false;
       const wrapScale = 1;
       // Soccer: upright condensed kit type for CSS name + number only. Country/club is in the PNG.
@@ -2062,6 +2092,22 @@
         baseName = Math.min(7.04, 8.2);
         baseNumber = Math.min(27, 32);
         baseTeam = overlayWord ? 5.6 : 0;
+      } else if (sport === "nba" && usePhotoBack) {
+        // Template jerseyOutput is the approved Maryland tank. Photo is 84% of board width.
+        const out = t.jerseyOutput || {};
+        const word = out.word || { size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13 };
+        const nameSpec = out.name || { size: 0.051, longSize: 0.04, longAt: 9 };
+        const num = out.number || { one: 0.414, two: 0.3036, top: 0.363 };
+        const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+        const jerseyW = /64x48/i.test(formatId) ? 112 : 168;
+        const teamRaw = String(jerseyTeamLabel(t, data) || "").trim();
+        const wordLines = teamRaw.split(/\s+/).filter(Boolean);
+        const wrappedWord = word.wrapAtSpace !== false && wordLines.length >= 2;
+        const teamLen = wrappedWord ? Math.max.apply(null, wordLines.map(part => part.length)) : teamRaw.length;
+        const wordSize = wrappedWord ? word.size : teamLen >= (word.xlongAt || 13) ? (word.xlongSize || word.longSize) : teamLen >= word.longAt ? word.longSize : word.size;
+        baseTeam = jerseyW * wordSize;
+        baseName = jerseyW * (nameGlyphs >= nameSpec.longAt ? nameSpec.longSize : nameSpec.size);
+        baseNumber = jerseyW * (digits >= 2 ? num.two : num.one);
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
         baseNumber = Math.max(baseNumber, 70);
@@ -2071,7 +2117,7 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameFloor = (sport === "nfl" && usePhotoBack) ? 5 : 7;
+      const nameFloor = (sport === "nfl" && usePhotoBack) ? 5 : (sport === "nba" && usePhotoBack) ? 4 : 7;
       const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(nameFloor, baseName * wrapScale * fitScale));
       // Number size/position stay fixed — never shrink because the name is long.
       const numberSize = Math.min(sport === "nfl" ? (usePhotoBack ? 32 : 78) : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber));
@@ -2083,10 +2129,23 @@
         teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "") + (overlayWord ? " jersey-overlay-word" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         if (hideCrest) teamEl.textContent = "";
-        else if (sport === "soccer" || (sport === "nba" && usePhotoBack)) paintJerseyCollarArch(teamEl, teamLabel);
+        else if (sport === "soccer" || (sport === "nba" && usePhotoBack)) {
+          const archDeg = sport === "nba" && usePhotoBack ? ((t.jerseyOutput && t.jerseyOutput.word && t.jerseyOutput.word.archDegrees) || 25) : "";
+          paintJerseyCollarArch(teamEl, teamLabel, archDeg);
+        }
         else teamEl.textContent = teamLabel;
-        const teamFit = Math.min(1, 8.5 / Math.max(1, String(teamLabel || "").length));
+        const teamFit = (sport === "nba" && usePhotoBack) ? 1 : Math.min(1, 8.5 / Math.max(1, String(teamLabel || "").length));
         teamEl.style.setProperty("font-size", `${(teamSize * teamFit).toFixed(2)}vh`, "important");
+        if (sport === "nba" && usePhotoBack && t.jerseyOutput && t.jerseyOutput.word) {
+          const word = t.jerseyOutput.word;
+          const raw = String(teamLabel || "").trim();
+          const lines = raw.split(/\s+/).filter(Boolean);
+          const wrappedWord = word.wrapAtSpace !== false && lines.length >= 2;
+          const measure = wrappedWord ? Math.max.apply(null, lines.map(part => part.length)) : raw.length;
+          const tracking = wrappedWord ? word.tracking : measure >= (word.xlongAt || 13) ? 0.01 : measure >= word.longAt ? word.longTracking : word.tracking;
+          teamEl.style.setProperty("letter-spacing", tracking + "em", "important");
+          if (word.top != null) teamEl.style.setProperty("top", (word.top * 100).toFixed(1) + "%", "important");
+        }
       }
       canvas.classList.toggle("jersey-name-wrapped", wrapped);
       byId("displayMain").classList.add("soccer-jersey-name");
@@ -2098,6 +2157,13 @@
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
+      if (sport === "nba" && usePhotoBack && t.jerseyOutput && t.jerseyOutput.number) {
+        const nameSpec = t.jerseyOutput.name || {};
+        if (nameSpec.top != null) byId("displayMain").style.setProperty("top", (nameSpec.top * 100).toFixed(3) + "%", "important");
+        byId("displaySub").style.setProperty("top", (t.jerseyOutput.number.top * 100).toFixed(3) + "%", "important");
+        const nameTracking = nameGlyphs >= nameSpec.longAt ? nameSpec.longTracking : nameSpec.tracking;
+        if (nameTracking != null) byId("displayMain").style.setProperty("letter-spacing", nameTracking + "em", "important");
+      }
       // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
       if (usePhotoBack && (sport === "soccer" || sport === "nfl")) {
         const mark = String(subText || "").trim();
@@ -2115,6 +2181,20 @@
         byId("displaySub").style.removeProperty("letter-spacing");
       }
       byId("displaySub").textContent = subText;
+      if (sport === "nba" && usePhotoBack) {
+        byId("displaySub").classList.add("jersey-alumni-num");
+        byId("displaySub").style.setProperty("-webkit-text-stroke", "0");
+        const fill = safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff");
+        const accent = safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff");
+        const primary = safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111");
+        const outline = window.FLOQRVarsityNumbers
+          ? window.FLOQRVarsityNumbers.outline(fill, accent, primary)
+          : "#ffffff";
+        byId("displaySub").style.setProperty("--jersey-num-outline", outline);
+        if (t.jerseyOutput && t.jerseyOutput.word && t.jerseyOutput.word.wrapLineHeight && teamEl) {
+          teamEl.style.setProperty("line-height", String(t.jerseyOutput.word.wrapLineHeight), "important");
+        }
+      }
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
 
       // NFL dual: ALWAYS 6s jersey↔shoutout gif loop (all board sizes). FloqR card stays bottom on both frames.

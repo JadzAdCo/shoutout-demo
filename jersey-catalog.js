@@ -71,44 +71,45 @@
         ? (sport === "nfl"
           ? `$30 ${teamName} NFL jersey ShoutOut — 2026 home LED back (96×48, 64×48, 64×32). Club word, name, and number are typed on the kit.`
           : sport === "nba"
-            ? `$30 ${teamName} basketball jersey ShoutOut — LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit.`
+            ? `$30 ${teamName} basketball jersey ShoutOut — 2026/27 icon LED back (96×48, 64×48, 64×32). Team word, name, and number are typed on the kit.`
             : `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`)
         : `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${silhouetteNote}`,
       tags
     };
   }
 
+  // 2026/27 Icon kit: name, file, body, number ink, trim, side.
   const NBA = [
-    ["Atlanta Hawks", "#C8102E", "#FDB927"],
-    ["Boston Celtics", "#007A33", "#BA9653"],
-    ["Brooklyn Nets", "#000000", "#FFFFFF"],
-    ["Charlotte Hornets", "#1D1160", "#00788C"],
-    ["Chicago Bulls", "#CE1141", "#000000"],
-    ["Cleveland Cavaliers", "#860038", "#FDBB30"],
-    ["Dallas Mavericks", "#00538C", "#B8C4CA"],
-    ["Denver Nuggets", "#0E2240", "#FEC524"],
-    ["Detroit Pistons", "#C8102E", "#1D42BA"],
-    ["Golden State Warriors", "#1D428A", "#FFC72C"],
-    ["Houston Rockets", "#CE1141", "#000000"],
-    ["Indiana Pacers", "#002D62", "#FDBB30"],
-    ["LA Clippers", "#C8102E", "#1D428A"],
-    ["Los Angeles Lakers", "#552583", "#FDB927"],
-    ["Memphis Grizzlies", "#5D76A9", "#12173F"],
-    ["Miami Heat", "#98002E", "#F9A01B"],
-    ["Milwaukee Bucks", "#00471B", "#EEE1C6"],
-    ["Minnesota Timberwolves", "#0C2340", "#236192"],
-    ["New Orleans Pelicans", "#0C2340", "#C8102E"],
-    ["New York Knicks", "#006BB6", "#F58426"],
-    ["Oklahoma City Thunder", "#007AC1", "#EF3B24"],
-    ["Orlando Magic", "#0077C0", "#C4CED4"],
-    ["Philadelphia 76ers", "#006BB6", "#ED174C"],
-    ["Phoenix Suns", "#1D1160", "#E56020"],
-    ["Portland Trail Blazers", "#E03A3E", "#000000"],
-    ["Sacramento Kings", "#5A2D81", "#63727A"],
-    ["San Antonio Spurs", "#C4CED4", "#000000"],
-    ["Toronto Raptors", "#CE1141", "#000000"],
-    ["Utah Jazz", "#002B5C", "#00471B"],
-    ["Washington Wizards", "#002B5C", "#E31837"]
+    ["Atlanta Hawks", "hawks", "#C8102E", "#FFFFFF", "#FDB927", "#161616"],
+    ["Boston Celtics", "celtics", "#007A33", "#FFFFFF", "#BA9653", "#FFFFFF"],
+    ["Brooklyn Nets", "nets", "#161616", "#FFFFFF", "#FFFFFF", "#161616"],
+    ["Charlotte Hornets", "hornets", "#1D1160", "#FFFFFF", "#00788C", "#A1A1A4"],
+    ["Chicago Bulls", "bulls", "#CE1141", "#FFFFFF", "#161616", "#161616"],
+    ["Cleveland Cavaliers", "cavaliers", "#860038", "#FDBB30", "#FDBB30", "#041E42"],
+    ["Dallas Mavericks", "mavericks", "#00538C", "#FFFFFF", "#B8C4CA", "#002B5E"],
+    ["Denver Nuggets", "nuggets", "#0E2240", "#FEC524", "#FEC524", "#8B2332"],
+    ["Detroit Pistons", "pistons", "#C8102E", "#FFFFFF", "#1D42BA", "#BEC0C2"],
+    ["Golden State Warriors", "warriors", "#1D428A", "#FFC72C", "#FFC72C", "#FFC72C"],
+    ["Houston Rockets", "rockets", "#CE1141", "#FDB927", "#FDB927", "#161616"],
+    ["Indiana Pacers", "pacers", "#002D62", "#FDBB30", "#FDBB30", "#FDBB30"],
+    ["LA Clippers", "clippers", "#1D428A", "#FFFFFF", "#C8102E", "#FFFFFF"],
+    ["Los Angeles Lakers", "lakers", "#552583", "#FDB927", "#FDB927", "#FDB927"],
+    ["Memphis Grizzlies", "grizzlies", "#5D76A9", "#FFFFFF", "#12173F", "#F5B112"],
+    ["Miami Heat", "heat", "#161616", "#FFFFFF", "#98002E", "#F9A01B"],
+    ["Milwaukee Bucks", "bucks", "#00471B", "#EEE1C6", "#EEE1C6", "#0077C0"],
+    ["Minnesota Timberwolves", "timberwolves", "#0C2340", "#78BE20", "#78BE20", "#236192"],
+    ["New Orleans Pelicans", "pelicans", "#0C2340", "#FFFFFF", "#C8102E", "#B4975A"],
+    ["New York Knicks", "knicks", "#006BB6", "#F58426", "#F58426", "#F58426"],
+    ["Oklahoma City Thunder", "thunder", "#007AC1", "#FDBB30", "#EF3B24", "#FDBB30"],
+    ["Orlando Magic", "magic", "#0077C0", "#FFFFFF", "#C4CED4", "#161616"],
+    ["Philadelphia 76ers", "76ers", "#006BB6", "#FFFFFF", "#ED174C", "#FFFFFF"],
+    ["Phoenix Suns", "suns", "#1D1160", "#E56020", "#E56020", "#E56020"],
+    ["Portland Trail Blazers", "blazers", "#E03A3E", "#FFFFFF", "#161616", "#161616"],
+    ["Sacramento Kings", "kings", "#5A2D81", "#FFFFFF", "#63727A", "#161616"],
+    ["San Antonio Spurs", "spurs", "#161616", "#C4CED4", "#C4CED4", "#C4CED4"],
+    ["Toronto Raptors", "raptors", "#CE1141", "#FFFFFF", "#161616", "#A1A1A4"],
+    ["Utah Jazz", "jazz", "#5B2C82", "#FFFFFF", "#111111", "#6CACE4"],
+    ["Washington Wizards", "wizards", "#002B5C", "#FFFFFF", "#E31837", "#C4CED4"]
   ];
 
   // 2026 home kit: name, file slug, body, number, trim, nameplate.
@@ -324,6 +325,22 @@
     return l > 0.62 ? "#111111" : "#FFFFFF";
   }
 
+  // Approved Maryland tank output. The renderer reads this object; do not restyle basketball type in the page.
+  // Sizes are fractions of the jersey image width. Tops are fractions of the image height.
+  // The photo fabric, collar to hem, is an 80cm adult back.
+  // The team word sits 3 cm higher on the 80 cm back (top 0.103). Each gap below the old 13.7% word was already tightened 30%
+  // (name was 27.2%, number was 36.3%). That 30% tighten replaces the old 5cm floor.
+  // Two-word places (LOS ANGELES, OKLAHOMA CITY) wrap to two lines at the regular word size.
+  // Each line arches 25° from the left end to the right end.
+  // A single word of 10 or more letters (TIMBERWOLVES) still uses the smaller size.
+  const BASKETBALL_JERSEY_OUTPUT = {
+    reference: "maryland-terps-2026",
+    backCm: 80,
+    word: { top: 0.103, liftCm: 4, size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13, tracking: 0.08, longTracking: 0.02, arch: true, archDegrees: 25, wrapAtSpace: true, wrapLines: 2, wrapLineHeight: 0.58, maxChars: 16 },
+    name: { top: 0.2315, size: 0.051, longSize: 0.04, longAt: 9, tracking: 0.14, longTracking: 0.04 },
+    number: { one: 0.414, two: 0.3036, top: 0.32355, style: "alumni-collegiate" }
+  };
+
   function plateName(teamName) {
     if (/49ers/i.test(teamName)) return "49ERS";
     const parts = String(teamName || "").trim().split(/\s+/);
@@ -353,6 +370,10 @@
       row.jerseyPlateInk = more.plateInk || plateInk(more.plateColor || secondary);
     }
     if (more.stateField) row.jerseyStateField = true;
+    if (sport === "nba" && bgUrl) {
+      row.jerseyOutput = BASKETBALL_JERSEY_OUTPUT;
+      row.description += " Output: arch the upper word at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters such as TIMBERWOLVES uses the smaller arch; the number is 41.4% of the jersey width for one digit and 30.4% for two, with its tip 5cm below the name. Numbers are collegiate varsity block numerals: team-color fill, white or team-color outline, angular corners.";
+    }
     nbaNflTemplates[id] = row;
     nbaNflIds.push(id);
   }
@@ -380,7 +401,12 @@
     };
   }
 
-  NBA.forEach(([name, p, s]) => addNbaNfl("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
+  NBA.forEach(([name, file, body, number, trim]) => addNbaNfl(
+    "nba", "nba", "NBA", name, body, number,
+    ["basketball", "NBA", "2026"],
+    `./images/basketball/nba-${file}-back-with-club.png`,
+    {accent: trim, plate: plateName(name), plateColor: number, plateInk: plateInk(number)}
+  ));
   NFL.forEach(([name, file, body, number, trim, plate]) => addNbaNfl(
     "nfl", "nfl", "NFL", name, body, number,
     ["football", "American football", "NFL", "2026"],
@@ -393,6 +419,9 @@
   addNbaNfl("nba", "nba", "NCAA", "Maryland Terps", "#E21833", "#FFFFFF", ["basketball", "NCAA", "Maryland", "Terps", "2026"], "./images/basketball/maryland-terps-2026-back.jpg", {
     accent: "#FFD520", plate: "MARYLAND", plateColor: "#E21833", plateInk: "#FFFFFF", stateField: true
   });
+  if (nbaNflTemplates.nbaMarylandTerps) {
+    nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 41.4% of the jersey width for one digit and 30.4% for two, with its tip 5cm below the name. Numbers are collegiate varsity block numerals: team-color fill, white or team-color outline, angular corners.";
+  }
   // Promote photo NFL kits with dual-panel shoutout layout flags.
   Object.keys(nbaNflTemplates).forEach(id => {
     const row = nbaNflTemplates[id];
@@ -436,6 +465,7 @@
 
   global.FLOQR_SOCCER_TEMPLATE_ID = SOCCER_TEMPLATE_ID;
   global.FLOQR_SOCCER_TEAMS = soccerTeams;
+  global.FLOQR_BASKETBALL_JERSEY_OUTPUT = BASKETBALL_JERSEY_OUTPUT;
   global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
   global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat([

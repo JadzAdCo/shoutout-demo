@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>2026 NBA icon jersey preview</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Collegiate+One&display=swap">
+  <style>
+    body { margin: 0; background: #111; color: #fff; font-family: "Segoe UI", sans-serif; }
+    h1 { font-size: 22px; margin: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 0 16px 24px; }
+    figure { margin: 0; background: #000; }
+    .kit { container-type: inline-size; position: relative; }
+    img { width: 100%; display: block; }
+    .word, .name, .num {
+      position: absolute; left: 27%; right: 27%;
+      display: flex; justify-content: center; align-items: flex-end;
+      font-family: "Arial Black", Impact, "Arial Narrow", sans-serif;
+      font-weight: 900; text-transform: uppercase; line-height: .9; white-space: nowrap;
+      -webkit-text-stroke: 0.045em #111; paint-order: stroke fill;
+      text-shadow: 0 0.05em 0 #000;
+    }
+    .word .ch { display: inline-block; transform-origin: center bottom; }
+    .word { top: 10.3%; font-size: 6.6cqw; letter-spacing: .08em; }
+    .word.wrap { flex-direction: column; align-items: center; justify-content: flex-start; white-space: normal; line-height: .58; gap: .04em; }
+    .word .ln { display: flex; justify-content: center; white-space: nowrap; line-height: .58; }
+    .name { top: 23.15%; font-size: 5.1cqw; letter-spacing: .14em; }
+    .num {
+      top: 32.355%; height: auto; align-items: flex-start; font-size: 52cqw; letter-spacing: .01em; line-height: .82;
+      font-family: "Alumni Sans Collegiate One", Impact, sans-serif; font-weight: 400;
+      -webkit-text-stroke: 0; paint-order: normal;
+      text-shadow:
+        0.012em 0 0 var(--num-outline, #fff),
+        -0.012em 0 0 var(--num-outline, #fff),
+        0 0.012em 0 var(--num-outline, #fff),
+        0 -0.012em 0 var(--num-outline, #fff),
+        0.0085em 0.0085em 0 var(--num-outline, #fff),
+        -0.0085em 0.0085em 0 var(--num-outline, #fff),
+        0.0085em -0.0085em 0 var(--num-outline, #fff),
+        -0.0085em -0.0085em 0 var(--num-outline, #fff);
+    }
+    .kit[data-digits="2"] .num { font-size: 40cqw; }
+    .kit[data-word-len="long"] .word { font-size: 5.2cqw; letter-spacing: .02em; }
+    .kit[data-word-len="xlong"] .word { font-size: 4.2cqw; letter-spacing: .01em; }
+    .kit[data-word-len="wrap"] .word { font-size: 6.6cqw; letter-spacing: .08em; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px 12px; padding: 0 16px 16px; }
+    nav a { color: #e4e4e7; font-size: 13px; }
+    figcaption { padding: 6px 8px 10px; font-size: 13px; color: #d4d4d8; }
+  </style>
+</head>
+<body>
+  <h1>Number check — Oklahoma City 44, Hawks 99</h1>
+  <div class="grid" id="check"></div>
+  <h1>2026/27 NBA icon tanks — all 30</h1>
+  <nav id="jump"></nav>
+  <div class="grid" id="grid"></div>
+  <script src="./jersey-catalog.js?v=s3.2.92"></script>
+  <script src="./floqr-varsity-numbers.js?v=s3.2.92"></script>
+  <script>
+    const kits = [
+      ["Maryland Terps", "terps", "MARYLAND", "#fff", "terps"],
+      ["Oklahoma City Thunder", "thunder", "OKLAHOMA CITY", "#FDBB30", "oklahoma-city"],
+      ["Hawks", "hawks", "HAWKS", "#fff", "hawks"],
+      ["Celtics", "celtics", "CELTICS", "#fff"],
+      ["Nets", "nets", "NETS", "#fff"],
+      ["Hornets", "hornets", "HORNETS", "#fff"],
+      ["Bulls", "bulls", "BULLS", "#fff"],
+      ["Cavaliers", "cavaliers", "CAVALIERS", "#FDBB30"],
+      ["Mavericks", "mavericks", "MAVERICKS", "#fff"],
+      ["Nuggets", "nuggets", "NUGGETS", "#FEC524"],
+      ["Pistons", "pistons", "PISTONS", "#fff"],
+      ["Warriors", "warriors", "WARRIORS", "#FFC72C"],
+      ["Rockets", "rockets", "ROCKETS", "#FDB927"],
+      ["Pacers", "pacers", "PACERS", "#FDBB30"],
+      ["Clippers", "clippers", "CLIPPERS", "#fff"],
+      ["Los Angeles Lakers", "lakers", "LOS ANGELES", "#FDB927", "lakers"],
+      ["Grizzlies", "grizzlies", "GRIZZLIES", "#fff"],
+      ["Heat", "heat", "HEAT", "#fff"],
+      ["Bucks", "bucks", "BUCKS", "#EEE1C6"],
+      ["Timberwolves", "timberwolves", "TIMBERWOLVES", "#78BE20"],
+      ["Pelicans", "pelicans", "PELICANS", "#fff"],
+      ["Knicks", "knicks", "KNICKS", "#F58426"],
+      ["Thunder", "thunder", "THUNDER", "#FDBB30", "thunder"],
+      ["Magic", "magic", "MAGIC", "#fff"],
+      ["76ers", "76ers", "76ERS", "#fff"],
+      ["Suns", "suns", "SUNS", "#E56020"],
+      ["Blazers", "blazers", "BLAZERS", "#fff"],
+      ["Kings", "kings", "KINGS", "#fff"],
+      ["Spurs", "spurs", "SPURS", "#C4CED4"],
+      ["Raptors", "raptors", "RAPTORS", "#fff"],
+      ["Jazz", "jazz", "JAZZ", "#fff"],
+      ["Wizards", "wizards", "WIZARDS", "#fff"]
+    ];
+    const checks = [
+      ["44", "thunder", "OKLAHOMA CITY", "#FDBB30", "n44", "Oklahoma City"],
+      ["99", "hawks", "HAWKS", "#fff", "n99", "Hawks"],
+      ["33", "terps", "MARYLAND", "#fff", "n33", "Terps"],
+      ["80", "lakers", "LOS ANGELES", "#FDB927", "n80", "Lakers"],
+      ["60", "celtics", "CELTICS", "#fff", "n60", "Celtics"]
+    ];
+    const grid = document.getElementById("grid");
+    const check = document.getElementById("check");
+    const jump = document.getElementById("jump");
+    function archLine(text) {
+      const all = Array.from(text);
+      const span = 25;
+      const half = (span * Math.PI / 180) / 2;
+      const rise = all.length <= 1 ? 0 : ((1 - Math.cos(half)) / (2 * Math.sin(half))) * (all.length - 1) * 0.72;
+      const html = all.map((ch, i) => {
+        const t = all.length === 1 ? 0 : (i / (all.length - 1)) - 0.5;
+        const rot = t * span;
+        const lift = (1 - Math.abs(t) * 2) * rise;
+        return `<span class="ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${ch}</span>`;
+      }).join("");
+      return { html, rise };
+    }
+    function paint(host, label, file, word, ink, id, digits, addLink) {
+      const slug = id || label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const fig = document.createElement("figure");
+      fig.id = slug;
+      const lines = word.split(/\s+/).filter(Boolean);
+      const wrapped = lines.length >= 2;
+      const arch = wrapped
+        ? lines.slice(0, 2).map(line => {
+          const row = archLine(line);
+          return `<span class="ln" style="padding-top:${row.rise.toFixed(3)}em">${row.html}</span>`;
+        }).join("")
+        : archLine(word).html;
+      const src = (file === "terps"
+        ? "./images/basketball/maryland-terps-2026-back.jpg"
+        : `./images/basketball/nba-${file}-back-with-club.png`) + "?v=fabric2";
+      const longest = wrapped ? Math.max(...lines.map(line => line.length)) : word.length;
+      const len = wrapped ? "wrap" : longest >= 13 ? "xlong" : longest > 9 ? "long" : "";
+      const row = Object.values(window.FLOQR_JERSEY_CATALOG || {}).find(item => {
+        const url = String(item.defaultBackgroundUrl || "");
+        return file === "terps" ? item.id === "nbaMarylandTerps" : url.endsWith(`/nba-${file}-back-with-club.png`);
+      }) || {};
+      const outline = window.FLOQRVarsityNumbers
+        ? window.FLOQRVarsityNumbers.outline(ink, row.jerseyAccent, row.jerseyPrimary)
+        : "#FFFFFF";
+      fig.innerHTML = `<div class="kit" data-digits="${digits.length}"${len ? ` data-word-len="${len}"` : ""}><img alt="${label}" src="${src}"><div class="word${wrapped ? " wrap" : ""}" style="color:${ink}">${arch}</div><div class="name" style="color:${ink}">SMITH</div><div class="num" style="color:${ink};--num-outline:${outline}">${digits}</div></div><figcaption>${label}</figcaption>`;
+      host.appendChild(fig);
+      if (addLink) {
+        const a = document.createElement("a");
+        a.href = "#" + slug;
+        a.textContent = label;
+        jump.appendChild(a);
+      }
+    }
+    for (const [digits, file, word, ink, id, team] of checks) paint(check, team + " · " + digits, file, word, ink, id, digits, false);
+    for (const [label, file, word, ink, id] of kits) paint(grid, label, file, word, ink, id, "1", true);
+  </script>
+</body>
+</html>

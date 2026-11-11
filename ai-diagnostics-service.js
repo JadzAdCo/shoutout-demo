@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.91";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.91";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.92";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.92";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,10 +223,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.2.91",
-      title: "s3.2.91 — 2026 Maryland Terps + NFL home jersey backs",
+      version: "s3.2.92",
+      title: "s3.2.92 — photorealistic NBA and Terps jersey backs",
       checks: [
-        {label:"Terps State field + overlay catalog", file:"jersey-catalog.js", includes:["Maryland Terps", "jerseyStateField", "jerseyOverlayWordmark", "Atlanta Falcons"]},
+        {label:"Thunder fabric back", file:"jersey-catalog.js", includes:["Oklahoma City Thunder"]},
+        {label:"Alumni number paint", file:"display-app.js", includes:["jersey-alumni-num"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-91-jerseys-2026"]}
+      ]
+    },
+    {
+      version: "s3.2.91",
+      title: "s3.2.91 — 2026 Maryland Terps + NBA icon + NFL home jersey backs",
+      checks: [
+        {label:"Terps State field + NBA/NFL overlay catalog", file:"jersey-catalog.js", includes:["Maryland Terps", "jerseyStateField", "jerseyOverlayWordmark", "Los Angeles Lakers", "Atlanta Falcons"]},
         {label:"Composer State input", file:"index.html", includes:["id=\"jerseyState\"", "editor.jerseyState"]},
         {label:"NFL plate wordmark CSS", file:"display.css", includes:["jersey-overlay-wordmark"]},
         {label:"Overlay paint", file:"display-app.js", includes:["jerseyOverlayWordmark", "jersey-overlay-wordmark"]},
@@ -2770,11 +2779,11 @@
     {
       id:"s3-2-91-jerseys-2026",
       area:"ShoutOut / Jerseys",
-      feature:"2026 Maryland Terps + NFL home jersey backs",
-      changed:"Terps basketball photo back with State, name, and number. All 32 NFL clubs plus ScammerVille use 2026 home colors (Falcons red, Titans columbia blue, Chargers powder blue, Commanders burgundy). Club word, name, and number are typed on the kit. Package s3.2.91.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.2.91 and open templates. 2) Maryland Terps — State MARYLAND, name, number on the red flag-side tank. 3) Change State and confirm the upper word changes. 4) Atlanta Falcons — red home, white number. 5) Tennessee Titans — columbia blue, red nameplate. 6) Washington Commanders — burgundy, gold plate reading COMMANDERS. 7) 96×48, 64×48, and 64×32 previews keep the word, name, and number on the jersey.",
-      expected:"Terps State is editable. Each NFL back matches that club's 2026 home colors. Name and number stay patron-typed. NFL still alternates jersey and ShoutOut text.",
-      troubleshoot:"Old art → hard refresh jersey-catalog.js, display.css, and display-app.js ?v=s3.2.91. Missing PNG → images/nfl/nfl-<club>-back-with-club.png on Pages. Word missing → jerseyOverlayWordmark on the catalog row."
+      feature:"2026 Maryland Terps + NBA icon + NFL home jersey backs",
+      changed:"Terps basketball photo back with State, name, and number. All 30 NBA clubs use a photorealistic 2026/27 icon tank (mesh, stitching, sheen, cloth folds; Lakers purple/gold, Celtics green, Jazz mountain purple, Heat black, Rockets red/yellow). Numbers are Alumni Sans Collegiate One with an outside-only outline so counters stay open. All 32 NFL clubs plus ScammerVille use 2026 home colors. Club word, name, and number are typed on the kit. Package s3.2.92.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.2.92 and open templates. 2) Maryland Terps — State MARYLAND, name, number on the red flag-side tank. 3) Change State and confirm the upper word changes. 4) Los Angeles Lakers — purple mesh tank, gold LOS ANGELES on two lines, number counters show fabric. 5) Boston Celtics — green mesh tank. 6) Oklahoma City Thunder — blue mesh, gold number, OKLAHOMA CITY on two lines. 7) Atlanta Hawks — red mesh, white 9 with an open counter. 8) Houston Rockets — red tank, yellow trim. 9) Atlanta Falcons — red home, white number. 10) 96×48, 64×48, and 64×32 previews keep the word, name, and number on the jersey. Display boards stay display.html?location= with no cache-bust query.",
+      expected:"Terps State is editable. Each NBA back is that club's photorealistic 2026/27 icon tank. Number holes show the jersey. Each NFL back matches that club's 2026 home colors. Name and number stay patron-typed.",
+      troubleshoot:"Old art → hard refresh jersey-catalog.js, display.css, and display-app.js ?v=s3.2.92. Missing NBA PNG → images/basketball/nba-<club>-back-with-club.png on Pages. Missing NFL PNG → images/nfl/nfl-<club>-back-with-club.png. Closed number counters → jersey-alumni-num text-shadow ring, not a text stroke. Word missing → jerseyOverlayWordmark on the catalog row."
     },
     {
       id:"s3-2-90-critical-log-blink",

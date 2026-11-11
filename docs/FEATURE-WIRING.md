@@ -30,14 +30,14 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
-## 2026 jersey backs — Maryland Terps + NFL home kits (s3.2.91)
+## 2026 jersey backs — Maryland Terps + NBA icon + NFL home kits (s3.2.91)
 
-**Purpose:** Photo LED backs. Maryland Terps basketball takes State, name, and number. Every NFL club uses its 2026 home colors; the club word sits on the nameplate, and the patron types name and number.
+**Purpose:** Photo LED backs. Maryland Terps basketball takes State, name, and number. All 30 NBA clubs use a 2026/27 icon tank (same cut as Terps); the club word, name, and number are typed on the kit. Every NFL club uses its 2026 home colors; the club word sits on the nameplate.
 
 | Layer | Wiring |
 |---|---|
-| Art | `images/basketball/maryland-terps-2026-back.jpg`; `images/nfl/nfl-*-back-with-club.png` from `scripts/build-nfl-2026-jerseys.js` |
-| Catalog | `jersey-catalog.js` — `jerseyOverlayWordmark`, `jerseyPlateLabel`, `jerseyStateField` (Terps only), `nflDualLayout` on NFL photos |
+| Art | `images/basketball/maryland-terps-2026-back.jpg`; `images/basketball/nba-*-back-with-club.png` from `scripts/build-nba-2026-jerseys.js`; `images/nfl/nfl-*-back-with-club.png` from `scripts/build-nfl-2026-jerseys.js` |
+| Catalog | `jersey-catalog.js` — `jerseyOverlayWordmark`, `jerseyPlateLabel`, `jerseyStateField` (Terps only), `jerseyOutput` (basketball type: two-word places such as LOS ANGELES and OKLAHOMA CITY wrap to two lines at the regular size; a long single word shrinks; number is Alumni Sans Collegiate One at 41.4% / 30.4% with team-color fill and a white outline; word stays at 10.3%, name at 23.15%, number at 32.355%; number outline is an outside-only text-shadow ring so counters stay open; team/state word arches 25° end to end; NBA and Terps backs are photorealistic mesh fabric), `nflDualLayout` on NFL photos |
 | Composer | `index.html` `#jerseyState` when `jerseyStateField`; name + mark already on `#soccerJerseyFields` |
 | Board | `display-app.js` paints the plate word when `jerseyOverlayWordmark`; `display.css` places it on the NFL plate and on the Terps upper back |
 | i18n | `editor.jerseyState` in all 11 chrome packs |

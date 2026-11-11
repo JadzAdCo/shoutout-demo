@@ -605,7 +605,7 @@
         templateName: t.name || templateId,
         jerseyTeamId: "",
         jerseyTeamLabel: (t.jerseyStateField && String(byId("jerseyState")?.value || "").trim())
-          ? String(byId("jerseyState").value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 12)
+          ? String(byId("jerseyState").value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 16)
           : (t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase()),
         jerseyPrimary: t.jerseyPrimary || "",
         jerseySecondary: t.jerseySecondary || "",
