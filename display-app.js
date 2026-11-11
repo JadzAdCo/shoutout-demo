@@ -1298,6 +1298,34 @@
     return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
   }
 
+  /** Real kit copy. The idle CTA must not count as a name, number, or team. */
+  function jerseyRealText(value = "") {
+    const text = String(value || "").trim();
+    return text && !isLegacyShoutOutIdleText(text) ? text : "";
+  }
+
+  function jerseyIdentityComplete(data = {}, template = {}) {
+    const team = jerseyRealText(data.jerseyTeamLabel || template.jerseyTeamLabel || "");
+    const name = jerseyRealText(data.jerseyPatronName || data.jerseyName || data.mainText || "");
+    const number = jerseyRealText(data.subText || data.jerseyNumber || "");
+    return !!(team && name && number);
+  }
+
+  /** Drop a leftover idle line once the kit already has team, name, and number. */
+  function clearUseShoutOutRemnants(root, keepUpper) {
+    if (!root) return;
+    root.querySelectorAll(".classic-board-lines, .text-overlay-lines").forEach(el => {
+      if (!el.closest("#displayMain")) el.remove();
+    });
+    root.querySelectorAll("*").forEach(el => {
+      if (el.children.length) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text || !isLegacyShoutOutIdleText(text)) return;
+      if (keepUpper && keepUpper.has(text.toUpperCase())) return;
+      el.textContent = "";
+    });
+  }
+
   // An approve merges onto the idle doc, so a stale idleCta must never hide an approved ShoutOut.
   function isIdlePayload(data = {}) {
     const status = String(data.status || "").toLowerCase();
@@ -1759,6 +1787,11 @@
   }
 
   function render(data) {
+    // defaultMain is the idle CTA stored beside a live ShoutOut. Never paint it.
+    if (data && typeof data === "object") {
+      data = {...data};
+      delete data.defaultMain;
+    }
     // Frame loop stop is deferred until we know this paint is not a looping template.
     byId("displayNflShoutPanel")?.remove();
     if (isFloqCastIdlePayload(data)) {
@@ -1831,7 +1864,7 @@
       .split(/\s+/)
       .filter(cls => cls && cls !== "neon")
       .forEach(cls => canvas.classList.add(cls));
-    if (isClassicBoard && !isTextOverlay) canvas.classList.add("classic-board-template");
+    if (isClassicBoard && !isTextOverlay && !isSoccerJersey) canvas.classList.add("classic-board-template");
     canvas.classList.toggle("classic-bw-idle", isClassicBoard && isIdleCta);
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
@@ -1867,8 +1900,9 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
+    const jerseyPatronOnKit = jerseyRealText(data.jerseyPatronName || data.jerseyName || "");
     const rawMain = (isTextOverlay || isSoccerJersey)
-      ? String(data.mainText || "")
+      ? String((isSoccerJersey && isLegacyShoutOutIdleText(data.mainText) && jerseyPatronOnKit) ? jerseyPatronOnKit : (data.mainText || (isSoccerJersey ? jerseyPatronOnKit : "")))
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
     const mainSource = isIdleCta && !isSoccerJersey && !isTextOverlay
@@ -2292,11 +2326,24 @@
           if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
         });
       }
+      if (jerseyIdentityComplete(data, t)) {
+        clearUseShoutOutRemnants(canvas, new Set([
+          String(teamLabel || "").trim().toUpperCase(),
+          String(jerseyNameText || "").trim().toUpperCase(),
+          String(subText || "").trim().toUpperCase()
+        ]));
+      }
       window.FLOQRBoardFit?.scheduleFit(canvas);
       markDisplayReady();
       return;
     }
     hideJerseyMount();
+    const staleTeam = byId("displayJerseyTeam");
+    if (staleTeam) {
+      staleTeam.className = "soccer-jersey-team hidden";
+      staleTeam.textContent = "";
+      staleTeam.setAttribute("aria-hidden", "true");
+    }
     canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
@@ -2585,8 +2632,13 @@
 
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? (doc.data() || {}) : defaultClubDisplayPayload();
+      if (payload && typeof payload === "object") {
+        payload = {...payload};
+        delete payload.defaultMain;
+      }
+      const keepJersey = doc.exists && !isIdlePayload(payload) && jerseyIdentityComplete(payload);
       const isIdleDoc = !doc.exists || isIdlePayload(payload) || !isRenderableLiveContent(payload);
-      if (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText))) {
+      if (!keepJersey && (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText)))) {
         payload = defaultClubDisplayPayload();
       }
       if (!payload.screenFormatId) payload.screenFormatId = boardAssignedFormatId(loc);

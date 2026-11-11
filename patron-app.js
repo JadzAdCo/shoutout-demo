@@ -743,6 +743,10 @@
     if (byId("subText")) byId("subText").value = "";
     return true;
   }
+  function isUseShoutOutPlaceholder(value = "") {
+    const text = String(value || "").trim();
+    return /^use\s*shout\s*out\b/i.test(text) || /^enter shoutout here\b/i.test(text);
+  }
   function syncSoccerJerseyFields() {
     syncBallerCardFields();
     const soccer = isSoccerJerseyTemplate();
@@ -801,6 +805,7 @@
         const shoutLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 64));
         // HTML maxlength is UTF-16 and blocks emoji — grapheme glyphCap is the real gate.
         main.removeAttribute("maxlength");
+        if (isUseShoutOutPlaceholder(main.value)) main.value = "";
         main.value = glyphCap(main.value || "", shoutLimit);
         main.placeholder = caps.lineCount >= 4
           ? `ShoutOut text (max ${shoutLimit} · ${caps.lineCount} lines · emoji OK)`
@@ -4464,6 +4469,20 @@
       ...jerseyPayload,
       ...ballerPayload
     };
+    if (isSoccerJerseyTemplate() && !isNflDualJerseyTemplate()) {
+      const typedName = graphemes(String(soccerNameFromSource() || "").toUpperCase()).slice(0, 8).join("");
+      const typedMark = glyphCap(byId("soccerJerseyNumber")?.value || "", 2);
+      const typedState = getTemplate()?.jerseyStateField
+        ? String(byId("jerseyState")?.value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 16)
+        : "";
+      if (typedName) previewPayload.mainText = typedName;
+      if (typedMark) previewPayload.subText = typedMark;
+      if (typedState) previewPayload.jerseyTeamLabel = typedState;
+      previewPayload.jerseyPatronName = typedName || previewPayload.jerseyPatronName || "";
+    }
+    if (isUseShoutOutPlaceholder(previewPayload.mainText) && previewPayload.jerseyPatronName) {
+      previewPayload.mainText = String(previewPayload.jerseyPatronName).toUpperCase();
+    }
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
       if (window.FLOQRBoardFrame) {
@@ -5858,6 +5877,13 @@
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
     byId("mainText")?.addEventListener("input", event => {
+      if (isSoccerJerseyTemplate() && !isNflDualJerseyTemplate()) {
+        syncSoccerJerseyFields();
+        updatePreview();
+        updateTemplateCharacterCapHint();
+        return;
+      }
+      if (isUseShoutOutPlaceholder(event.currentTarget.value)) event.currentTarget.value = "";
       const next = clampMainTextWhileTyping(event.currentTarget.value);
       if (event.currentTarget.value !== next) event.currentTarget.value = next;
       updateTemplateCharacterCapHint();
