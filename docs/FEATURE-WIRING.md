@@ -8,7 +8,24 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-22 |
+| Local copy | `http://127.0.0.1:4173/` — same files as Pages; browser calls still use live Firebase. See `docs/FLOQR-TECHNICAL-BIBLE.md` §13.4. |
+| Last registry touch | 2026-11-05 |
+
+---
+
+## Local Cloud Agent copy
+
+**Purpose:** Edit and test this repo before a Pages publish or a Firebase deploy.
+
+| Layer | Wiring |
+|---|---|
+| Live site | GitHub Pages `https://jadzadco.github.io/shoutout-demo/` |
+| Live backend | Firebase `shoutoutdemo-5b402`: Auth, Firestore, Storage, Functions `us-central1` |
+| Local UI | `http://127.0.0.1:4173/` and `http://127.0.0.1:4173/?start=search` |
+| Client data | `firebase-config.js` has no emulator switch, so local pages read and write the live project |
+| Functions check | `npm test` in `functions/` |
+| Rules check | `npx --yes firebase-tools@15 emulators:exec --only firestore,storage --project demo-floqr-rules "npm --prefix rules-tests test"` |
+| Detail | `docs/FLOQR-TECHNICAL-BIBLE.md` section 13.4 |
 
 ---
 
