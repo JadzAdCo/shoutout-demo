@@ -235,7 +235,7 @@
       ]
     },
     {
-      version: "s3.3.002",
+      version: "s3.3.001",
       title: "s3.3.001 — PHILA jersey pair 7s + optional ShoutOut 5s",
       checks: [
         {label:"Jersey scene helper", file:"floqr-jersey-scene.js", includes:["sceneAt", "JERSEY_MS", "7000"]},
