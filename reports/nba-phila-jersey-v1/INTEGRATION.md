@@ -14,9 +14,10 @@
 
 | Asset | Status |
 |---|---|
-| `images/basketball/nba-76ers-front-with-club.png` | In use (typed PHILA + number overlays) |
-| `images/basketball/nba-76ers-back-with-club.png` | In use (typed name + number overlays) |
-| Clean blank plates / UV maps / licensed glyph atlas | **Not ready** — current PNGs are working plates with typed overlays; not full photoreal blank pipeline from the contract |
+| `images/basketball/nba-76ers-phila-front-blank.png` | **In use (s3.3.003)** — white Association RGBA; typed PHILA + number overlays |
+| `images/basketball/nba-76ers-phila-back-blank.png` | **In use (s3.3.003)** — white Association RGBA; typed name + number overlays |
+| `images/basketball/nba-76ers-front-with-club.png` / `*-back-with-club.png` | Legacy blue Icon plates — **not** the PHILA pair (caused live blue/opaque failure) |
+| Clean blank plates / UV maps / licensed glyph atlas | Working blanks from package reference (285px layout → upscaled); name/number zones hard-wiped under overlays. Higher-res licensed blanks still preferred when available |
 | Exact season / LockerVision edition proof | **Unverified** — do not label 2026–27 official |
 
 ## How to run

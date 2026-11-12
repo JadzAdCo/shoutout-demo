@@ -445,11 +445,14 @@
         seasonStatus: "reference-specific-unverified",
         packageContract: "reports/nba-phila-jersey-v1",
         pairMessageTheme: "phila",
-        frontBackgroundUrl: "./images/basketball/nba-76ers-front-with-club.png",
-        defaultBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
-        backBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
-        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1"])),
-        description: "$30 Philadelphia 76ers PHILA pair — back + front together 7s, optional ShoutOut 5s (blank message = jersey only). Fixed PHILA wordmark; typed name/number. Reference-specific unverified edition."
+        jerseyCssBack: false,
+        jerseyOnHanger: false,
+        // White Association RGBA blanks (no baked EMBIID/PHILA/21) — overlays supply name/word/number.
+        frontBackgroundUrl: "./images/basketball/nba-76ers-phila-front-blank.png",
+        defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+        backBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1", "white-blank"])),
+        description: "$30 Philadelphia 76ers PHILA pair — white Association blanks, back + front together 7s, optional ShoutOut 5s (blank message = jersey only). Fixed PHILA wordmark; typed name/number. Reference-specific unverified edition."
       };
       nbaNflTemplates.nbaPhiladelphia76ersPhila = phila;
       nbaNflIds.push("nbaPhiladelphia76ersPhila");

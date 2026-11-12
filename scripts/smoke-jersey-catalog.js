@@ -22,7 +22,9 @@ if (!cat.nbaPhiladelphia76ersPhila.nbaJerseyPair) throw new Error("phila jersey 
 if (cat.nbaPhiladelphia76ersPhila.jerseySceneMs !== 7000) throw new Error("phila jersey 7s");
 if (cat.nbaPhiladelphia76ersPhila.messageSceneMs !== 5000) throw new Error("phila message 5s");
 if (cat.nbaPhiladelphia76ersPhila.jerseyTeamLabel !== "PHILA") throw new Error("phila label");
-if (!/nba-76ers-front-with-club\.png/.test(cat.nbaPhiladelphia76ersPhila.frontBackgroundUrl || "")) throw new Error("phila front url");
+if (!/nba-76ers-phila-front-blank\.png/.test(cat.nbaPhiladelphia76ersPhila.frontBackgroundUrl || "")) throw new Error("phila front blank url");
+if (!/nba-76ers-phila-back-blank\.png/.test(cat.nbaPhiladelphia76ersPhila.backBackgroundUrl || "")) throw new Error("phila back blank url");
+if (cat.nbaPhiladelphia76ersPhila.jerseyCssBack !== false) throw new Error("phila photo blanks must win over css hanger");
 const terpsPair = cat.nbaMarylandTerpsThrowbackPair;
 if (!terpsPair || !terpsPair.nbaJerseyPair) throw new Error("terps pair");
 if (terpsPair.stableTemplateId !== "ncaa-umd-2026-27-2002-throwback-white-v2") throw new Error("terps pair stable id");

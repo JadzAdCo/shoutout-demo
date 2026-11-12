@@ -12,6 +12,16 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## PHILA white blanks + Terps gated QA (s3.3.003)
+
+| Piece | Wiring |
+|---|---|
+| PHILA assets | `images/basketball/nba-76ers-phila-{front,back}-blank.png` — white Association RGBA cutouts; catalog overlays supply name / PHILA / number (no baked EMBIID) |
+| Catalog | `nbaPhiladelphia76ersPhila` → blank URLs, `jerseyCssBack: false` |
+| Pair chrome | `display-app.js` skips FloqMedia rail when `pairMode`; `display.css` hides identity rail + single-face `.display-background` on `.nba-jersey-pair` |
+| Terps QA | `maryland-terps-pair-qa.html` — unlock key `terps-pair-qa`; hosts pair flags on published `nbaMarylandTerps` (front=back placeholder). Throwback Pair stays unpublished |
+| Visual QA | `/cursor/stores/self/nba-jersey-pair-visual-qa.md` — PC agent must confirm render vs sample after deploy |
+
 ## Maryland Terps jersey pair v2 (s3.3.002)
 
 | Piece | Wiring |
@@ -22,17 +32,18 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Gate | Unpublished pairs are omitted from `SHOUTOUT_TEMPLATES` / `FLOQR_JERSEY_TEMPLATE_IDS` / photo ids |
 | Display | Shared pair stage; Maryland message gradient when theme set; pair requires front URL + assets ready |
 | Engine | Same `floqr-jersey-scene.js` / FrameLoop as PHILA v1 — do not duplicate |
+| Gated QA | `maryland-terps-pair-qa.html` (s3.3.003) — operator unlock only |
 
-## PHILA jersey pair v1 (s3.3.001)
+## PHILA jersey pair v1 (s3.3.001 → blanks s3.3.003)
 
 | Piece | Wiring |
 |---|---|
 | Brief | `reports/nba-phila-jersey-v1/` (CURSOR_MASTER_PROMPT, IMPLEMENTATION_CONTRACT, SOURCES, reference PNG) |
 | Catalog | `nbaPhiladelphia76ersPhila` — `nbaJerseyPair`, `jerseySceneMs:7000`, `messageSceneMs:5000`, `seasonStatus: reference-specific-unverified`, stable id `nba-phi-phila-white-reference-v1` |
 | Timing | `floqr-jersey-scene.js` `sceneAt`; `floqr-frame-loop.js` `holdMsByPhase` + `includeCopy:false` when ShoutOut blank |
-| Display | Pair stage back-left / front-right; optional ShoutOut panel; loads on `display.html` / `display2.html` |
+| Display | Pair stage back-left / front-right; optional ShoutOut panel; loads on `display.html` / `display2.html`; FloqMedia off on pair |
 | Editor | Name + Number + optional ShoutOut (same chrome as NFL dual for PHILA) |
-| Assets | Working front/back PNGs with typed overlays — blank photoreal plates still open |
+| Assets | White Association blanks `nba-76ers-phila-*-blank.png` (s3.3.003); legacy blue Icon `*-with-club.png` kept for other 76ers template |
 
 ## ShoutOut diagnostics + Baller face upload + PHILA dual (s3.2.101)
 

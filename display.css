@@ -941,8 +941,15 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background:#f4f4f6!important;
 }
 .display-canvas.nba-jersey-pair .display-background{
-  background-size:cover!important;
-  background-position:center!important;
+  /* Pair stage owns the kits — hide the single-face photo layer. */
+  opacity:0!important;
+  background-image:none!important;
+}
+.display-canvas.nba-jersey-pair .display-identity-rail,
+.display-canvas.nba-jersey-pair .soccer-jersey-rail,
+.display-canvas.nba-jersey-pair .floqr-card-bottom{
+  /* FloqMedia rail must not cover the pair composition. */
+  display:none!important;
 }
 .display-canvas.nba-jersey-pair .nba-pair-stage{
   position:absolute;

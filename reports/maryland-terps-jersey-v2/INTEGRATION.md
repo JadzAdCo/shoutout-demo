@@ -1,4 +1,4 @@
-# Maryland Terps jersey v2 — repository integration (s3.3.002)
+# Maryland Terps jersey v2 — repository integration (s3.3.002 / QA s3.3.003)
 
 Extends the shared pair engine from PHILA v1 (`floqr-jersey-scene.js`, `nbaJerseyPair`). Do **not** remove or overwrite `nbaPhiladelphia76ersPhila`.
 
@@ -10,6 +10,7 @@ Extends the shared pair engine from PHILA v1 (`floqr-jersey-scene.js`, `nbaJerse
 | Existing Terps | `nbaMarylandTerps` stays the live back-only LED kit (selector “Maryland Terps”) |
 | Display | Same pair stage + optional ShoutOut; message panel can use Maryland red/gold via `pairMessageTheme` |
 | Timing | Shared `FLOQRJerseyScene.sceneAt` (7s jersey / 5s message / blank = jersey only) |
+| Gated QA | `maryland-terps-pair-qa.html` — unlock `terps-pair-qa`; forces pair flags on published Terps host (front=back placeholder only) |
 | Package | This folder = Cursor brief + composition reference (PHILA layout authority only) |
 
 ## Asset readiness (`productionAssetsReady: false`)

@@ -1465,6 +1465,7 @@
       nbaJerseyPair: params.get("nbaJerseyPair") === "1",
       frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
       backBackgroundUrl: params.get("backBackgroundUrl") || "",
+      pairMessageTheme: params.get("pairMessageTheme") || "",
       sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
@@ -2621,14 +2622,21 @@
         stopSplitMediaLoop();
       }
 
+      // Pair needs a real front plate URL (not a back-only fallback) — unpublished Terps v2 stays gated.
+      // Compute before FloqMedia rail so the pair stage is not covered mid-kit.
+      const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair)
+        && !!(frontBgUrl || t.frontBackgroundUrl)
+        && t.productionAssetsReady !== false;
+
       // FloqR card (bottom): paint BEFORE FrameLoop so a loop throw cannot skip the rail.
       // Always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
       // Mount rail on the canvas (not inside display-center) so bottom:% is the LED, not a mid stack.
+      // NBA jersey pair: hide FloqMedia — the dual kits + optional ShoutOut own the frame.
       let rail = byId("displayIdentityRail");
       if (rail && canvas && rail.parentElement !== canvas) {
         canvas.appendChild(rail);
       }
-      if (rail && t.identityRail !== false) {
+      if (rail && t.identityRail !== false && !pairMode) {
         // Jersey subText is the jersey mark, so only the opted-in attribution can credit the patron.
         mountFloqrCard(rail, {
           data,
@@ -2661,10 +2669,6 @@
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
-        // Pair needs a real front plate URL (not a back-only fallback) — unpublished Terps v2 stays gated.
-        const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair)
-          && !!(frontBgUrl || t.frontBackgroundUrl)
-          && t.productionAssetsReady !== false;
         canvas.classList.toggle("nba-jersey-pair", pairMode);
         canvas.classList.add("nba-dual-faces", "split-media-loop");
         const sceneApi = window.FLOQRJerseyScene;
