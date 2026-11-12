@@ -1,4 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.101 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.001 (stable)
+
+- s3.3.001: PHILA jersey pair v1 — back+front together 7s, optional ShoutOut 5s (blank = jersey only); FrameLoop asymmetric holds; package brief in reports/nba-phila-jersey-v1/.
 
 - s3.2.101: ShoutOut Diagnostics (Master Admin), PHILA dual jersey, Baller's Alert upload chooser + face-camera oval; company max 18 UPPERCASE; Black Card + Black Card (Amex) removed from catalog (Alert kept); portrait decode + Gemini JSON harden.
 

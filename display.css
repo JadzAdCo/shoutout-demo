@@ -936,6 +936,97 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.nba-dual-faces.nba-dual-phase-back .soccer-jersey-team.hidden{
   display:none!important;
 }
+/* PHILA pair (v1): both kits simultaneous — back left, front right; message scene is separate */
+.display-canvas.nba-jersey-pair{
+  background:#f4f4f6!important;
+}
+.display-canvas.nba-jersey-pair .display-background{
+  background-size:cover!important;
+  background-position:center!important;
+}
+.display-canvas.nba-jersey-pair .nba-pair-stage{
+  position:absolute;
+  inset:4%;
+  z-index:3;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(4px,1.2%,10px);
+  align-items:end;
+  pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-stage.hidden{display:none!important}
+.display-canvas.nba-jersey-pair .nba-pair-face{
+  position:relative;
+  height:100%;
+  min-height:0;
+}
+.display-canvas.nba-jersey-pair .nba-pair-kit{
+  position:absolute;
+  inset:0;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+}
+.display-canvas.nba-jersey-pair .nba-pair-back{z-index:1}
+.display-canvas.nba-jersey-pair .nba-pair-front{z-index:2;transform:translateX(-6%)}
+.display-canvas.nba-jersey-pair .nba-pair-name,
+.display-canvas.nba-jersey-pair .nba-pair-team,
+.display-canvas.nba-jersey-pair .nba-pair-number{
+  position:absolute;
+  left:12%;
+  right:12%;
+  text-align:center;
+  color:#1a3a8f;
+  font-family:"Agency FB","Arial Narrow","Franklin Gothic Condensed",Impact,sans-serif;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-shadow:1px 1px 0 #c8102e, -1px 0 0 #c8102e, 0 -1px 0 #c8102e;
+  line-height:.9;
+  pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-name{
+  top:18%;
+  font-size:clamp(10px,4.2cqw,42px);
+}
+.display-canvas.nba-jersey-pair .nba-pair-team{
+  top:22%;
+  font-size:clamp(12px,5cqw,48px);
+}
+.display-canvas.nba-jersey-pair .nba-pair-number{
+  top:38%;
+  font-size:clamp(28px,14cqw,120px);
+  letter-spacing:.02em;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel{
+  position:absolute;
+  inset:6% 5%;
+  z-index:6;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(160deg,#0b1c4a 0%,#1a3a8f 55%,#c8102e 100%);
+  border-radius:clamp(8px,1.5%,16px);
+  padding:clamp(8px,2%,20px);
+  box-sizing:border-box;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel.hidden{display:none!important}
+.display-canvas.nba-jersey-pair .nba-pair-shout-lines{
+  display:grid;
+  gap:clamp(2px,.6%,8px);
+  width:100%;
+  text-align:center;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-lines b{
+  display:block;
+  color:#fff;
+  font-family:"Agency FB","Arial Narrow",Impact,sans-serif;
+  font-weight:800;
+  font-size:clamp(18px,7cqw,72px);
+  line-height:1.05;
+  letter-spacing:.02em;
+  text-shadow:0 2px 0 rgba(0,0,0,.35);
+}
+.display-canvas.nba-jersey-pair.nba-pair-phase-message .nba-pair-stage{display:none!important}
+.display-canvas.nba-jersey-pair.nba-pair-phase-jersey .nba-pair-shout-panel{display:none!important}
 .display-canvas.soccer-jersey-template .soccer-jersey-team.hidden{
   display:none!important;
 }

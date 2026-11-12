@@ -1,0 +1,13 @@
+# Version 1 — NBA / Philadelphia PHILA jersey
+
+Read IMPLEMENTATION_CONTRACT.md and SOURCES.md, then implement this variant in the existing application.
+
+The first production target is the uploaded white PHILA jersey composition, not a blue or black alternate. assets/reference/user-phila-layout.png is the visual authority: rear left, front right; white cloth, navy/blue lettering with red edge/drop-shadow treatment, red/white/blue neck and arm trim, blue side band with white stars and red boundary. Copy the visible wordmark geometry exactly: PHILA, never PHILADELPHIA, SIXERS, or customer Name. Preserve all visually established trim/panel details. Rear EMBIID and both 21 numerals in the source are placeholders to remove and replace with user inputs. EMBIID is the player's rear surname; PHILA is the fixed front team identifier.
+
+The reference's slight three-quarter angles and hanging garment drape matter. Keep both jerseys full length and proportioned; do not turn them into a flat rectangle. Reconstruct/prepare clean customizable front and rear assets at high resolution. The screenshot alone is 285 × 304 px and cannot support a convincing large master. Do not stretch it or cover its text with solid white rectangles. Verify all edge and panel details against high-resolution authorized sources. Tiny patches are not permission to invent sponsor artwork.
+
+Register a stable ID such as nba-phi-phila-white-reference-v1 with seasonStatus: reference-specific-unverified until the exact photographed edition is verified. Do not label the supplied photo as 2026–27 official. The supplied Sotheby's link describes a 2022–23 BLUE Icon game-worn jersey, so use it for material/construction research only, not as proof of the white reference's edition or current sponsors. NBA LockerVision is the official catalog entry point for future current-season variants; detailed visual extraction was unavailable in this research because the app needs JavaScript. Recheck it when preparing assets. Do not copy unverifiable current-season patches onto the user's reference.
+
+The catalog architecture must support other NBA teams later through data and prepared assets, not hardcoded PHILA-specific layout logic. Ship PHILA first. Do not claim that all NBA teams have been completed. Each future edition needs its own fixed front wordmark, number/name style, garment assets/maps and provenance. Team selection is via template cards; the customer still has only the three content inputs.
+
+First complete the photoreal custom PHILA result and verify 96×48, 64×48 and 64×32 cm presets using the shared contract. Return a concise change summary, asset readiness status, actual validation results, and how to run the feature in the real repository.

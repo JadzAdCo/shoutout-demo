@@ -1,0 +1,43 @@
+"use strict";
+
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const path = require("path");
+const fs = require("fs");
+const vm = require("vm");
+
+const root = path.resolve(__dirname, "..");
+const sceneSrc = fs.readFileSync(path.join(root, "floqr-jersey-scene.js"), "utf8");
+const win = {};
+vm.runInNewContext(sceneSrc, { window: win, module: { exports: {} }, exports: {}, globalThis: win });
+const scene = win.FLOQRJerseyScene || require("../floqr-jersey-scene.js");
+
+test("sceneAt: jersey then message then done (12s with message)", () => {
+  assert.equal(scene.sceneAt(0, true), "jersey");
+  assert.equal(scene.sceneAt(6999, true), "jersey");
+  assert.equal(scene.sceneAt(7000, true), "message");
+  assert.equal(scene.sceneAt(11999, true), "message");
+  assert.equal(scene.sceneAt(12000, true), "done");
+});
+
+test("sceneAt: blank message is jersey-only 7s then done", () => {
+  assert.equal(scene.sceneAt(0, false), "jersey");
+  assert.equal(scene.sceneAt(6999, false), "jersey");
+  assert.equal(scene.sceneAt(7000, false), "done");
+  assert.equal(scene.sceneAt(12000, false), "done");
+});
+
+test("hasMessageText trims whitespace", () => {
+  assert.equal(scene.hasMessageText("  HAPPY BIRTHDAY  "), true);
+  assert.equal(scene.hasMessageText("   "), false);
+  assert.equal(scene.hasMessageText(""), false);
+});
+
+test("PHILA catalog is pair mode with 7s/5s and unverified season", () => {
+  const catalog = fs.readFileSync(path.join(root, "jersey-catalog.js"), "utf8");
+  assert.match(catalog, /nbaJerseyPair:\s*true/);
+  assert.match(catalog, /jerseySceneMs:\s*7000/);
+  assert.match(catalog, /messageSceneMs:\s*5000/);
+  assert.match(catalog, /seasonStatus:\s*"reference-specific-unverified"/);
+  assert.match(catalog, /nba-phi-phila-white-reference-v1/);
+});

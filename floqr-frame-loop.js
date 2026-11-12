@@ -36,45 +36,68 @@
   }
 
   function stop(canvas) {
-    if (timer) {
-      g.clearInterval(timer);
-    }
-    timer = null;
+    clearActiveTimer();
     const target = canvas || activeCanvas;
     activeCanvas = null;
     lastPhase = "media";
     target?.classList.remove(LOOP, PHASE_MEDIA, PHASE_COPY);
   }
 
+  function clearActiveTimer() {
+    if (timer) {
+      g.clearTimeout(timer);
+      g.clearInterval(timer);
+    }
+    timer = null;
+  }
+
   function start(canvas, options = {}) {
     if (!canvas) return;
     const onAdvance = typeof options.onAdvance === "function" ? options.onAdvance : null;
     const holdMs = Number(options.holdMs) > 0 ? Number(options.holdMs) : HOLD_MS;
+    const holdByPhase = options.holdMsByPhase && typeof options.holdMsByPhase === "object"
+      ? options.holdMsByPhase
+      : null;
+    // When false, stay on media forever (jersey-only when ShoutOut message is blank).
+    const includeCopy = options.includeCopy !== false;
+    const holdFor = (phase) => {
+      if (holdByPhase) {
+        const keyed = Number(holdByPhase[phase]);
+        if (keyed > 0) return keyed;
+      }
+      return holdMs;
+    };
     // Re-render wipes canvas classes. Keep the running phase so the shoutout frame is not skipped.
     // Always rebind the interval so media↔copy never stalls after a class wipe / re-paint.
-    const resumePhase = (timer && activeCanvas === canvas)
+    let resumePhase = (timer && activeCanvas === canvas)
       ? (canvas.classList.contains(PHASE_COPY) || canvas.classList.contains(PHASE_MEDIA)
         ? phaseOf(canvas)
         : (lastPhase || "media"))
       : "media";
-    if (timer) {
-      g.clearInterval(timer);
-      timer = null;
-    }
+    if (!includeCopy && resumePhase === "copy") resumePhase = "media";
+    clearActiveTimer();
     activeCanvas = canvas;
     canvas.classList.add(LOOP);
     if (prefersReducedMotion()) {
-      setPhase(canvas, "copy");
-      if (onAdvance) g.requestAnimationFrame(() => onAdvance("copy", canvas));
+      const reduced = includeCopy ? "copy" : "media";
+      setPhase(canvas, reduced);
+      if (onAdvance) g.requestAnimationFrame(() => onAdvance(reduced, canvas));
       return;
     }
     setPhase(canvas, resumePhase);
-    timer = g.setInterval(() => {
+    if (onAdvance) g.requestAnimationFrame(() => onAdvance(resumePhase, canvas));
+    if (!includeCopy) {
+      // Jersey-only: no message card — hold media without flipping.
+      return;
+    }
+    const tick = () => {
       if (!activeCanvas) return;
       const next = phaseOf(activeCanvas) === "media" ? "copy" : "media";
       setPhase(activeCanvas, next);
       if (onAdvance) g.requestAnimationFrame(() => onAdvance(next, activeCanvas));
-    }, holdMs);
+      timer = g.setTimeout(tick, holdFor(next));
+    };
+    timer = g.setTimeout(tick, holdFor(resumePhase));
   }
 
   // Named phase cycles (e.g. the FloqR identity card) share the same 6s hold without owning a canvas.

@@ -18,6 +18,9 @@ for (const id of need) {
 if (cat.nbaLosAngelesLakers.jerseyTeamLabel !== "LAKERS") throw new Error("lakers label");
 if (cat.nbaPhiladelphia76ers.jerseyTeamLabel !== "76ERS") throw new Error("sixers label");
 if (!cat.nbaPhiladelphia76ersPhila.nbaDualFaces) throw new Error("phila dual faces");
+if (!cat.nbaPhiladelphia76ersPhila.nbaJerseyPair) throw new Error("phila jersey pair");
+if (cat.nbaPhiladelphia76ersPhila.jerseySceneMs !== 7000) throw new Error("phila jersey 7s");
+if (cat.nbaPhiladelphia76ersPhila.messageSceneMs !== 5000) throw new Error("phila message 5s");
 if (cat.nbaPhiladelphia76ersPhila.jerseyTeamLabel !== "PHILA") throw new Error("phila label");
 if (!/nba-76ers-front-with-club\.png/.test(cat.nbaPhiladelphia76ersPhila.frontBackgroundUrl || "")) throw new Error("phila front url");
 const out = cat.nbaMarylandTerps.jerseyOutput;

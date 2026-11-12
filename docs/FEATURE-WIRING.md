@@ -12,6 +12,17 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## PHILA jersey pair v1 (s3.3.001)
+
+| Piece | Wiring |
+|---|---|
+| Brief | `reports/nba-phila-jersey-v1/` (CURSOR_MASTER_PROMPT, IMPLEMENTATION_CONTRACT, SOURCES, reference PNG) |
+| Catalog | `nbaPhiladelphia76ersPhila` — `nbaJerseyPair`, `jerseySceneMs:7000`, `messageSceneMs:5000`, `seasonStatus: reference-specific-unverified`, stable id `nba-phi-phila-white-reference-v1` |
+| Timing | `floqr-jersey-scene.js` `sceneAt`; `floqr-frame-loop.js` `holdMsByPhase` + `includeCopy:false` when ShoutOut blank |
+| Display | Pair stage back-left / front-right; optional ShoutOut panel; loads on `display.html` / `display2.html` |
+| Editor | Name + Number + optional ShoutOut (same chrome as NFL dual for PHILA) |
+| Assets | Working front/back PNGs with typed overlays — blank photoreal plates still open |
+
 ## ShoutOut diagnostics + Baller face upload + PHILA dual (s3.2.101)
 
 | Piece | Wiring |
