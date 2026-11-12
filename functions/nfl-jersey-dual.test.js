@@ -34,6 +34,9 @@ test("NBA / Terps FloqMedia rail sits under the kit like NFL (never mid-jersey)"
   assert.match(js, /function clearNbaPhotoKitInlineLayout/);
   assert.match(js, /pinJerseyFloqMediaRail\(rail,\s*\{sport\}/);
   assert.match(js, /kit\.kitTop \+ nameSpec\.top \* kit\.kitH/);
+  // Mark digit count must be declared — bare `digits` threw and skipped number + FloqMedia pin.
+  assert.match(js, /const digits = glyphLen\(String\(subText/);
+  assert.match(js, /digits >= 2 \? num\.two : num\.one/);
   // Soccer must clear a prior NBA/NFL inline FloqMedia pin.
   assert.match(js, /Soccer \(and any non-NBA\/NFL kit\) must drop a prior/);
   // Do not destroy the text overlay that owns the FloqMedia rail.

@@ -721,7 +721,10 @@
     try {
       const snap = await db.collection(name).where(field, "==", value).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
-    } catch (e) { return window.FLOQRAccessNotice?.report(name, e) || []; }
+    } catch (e) {
+      console.warn(`FLOQR portal query failed: ${name}.${field}`, e?.code || "", e?.message || e);
+      return window.FLOQRAccessNotice?.report(name, e) || [];
+    }
   }
 
   async function getDocsByIdsSafe(name, ids = [], limit=150) {
@@ -4945,6 +4948,21 @@
         ? completedShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "completed")).join("")
         : `<p class="sub">${esc(tt("portal.noCompletedShoutouts", {}, "No completed ShoutOuts yet."))}</p>`;
       bindShoutoutListActions(completedHost);
+    }
+    // Paid throws land in Completed, not Saved. If Saved is the default empty tab and
+    // Completed has history, open Completed so patrons see their past ShoutOuts.
+    {
+      const paramsEarly = new URL(window.location.href).searchParams;
+      // `sub` is an alias for `pane` in Feature & Orders deep links — honor it too.
+      const deepLinked = !!(paramsEarly.get("id") || paramsEarly.get("ref") || paramsEarly.get("pane") || paramsEarly.get("sub"));
+      const activeSo = document.querySelector("#shoutoutSubtabs .admin-subtab.active")?.getAttribute("data-so-pane") || "";
+      if (!deepLinked
+        && activeSo === "shoutoutSavedPane"
+        && !savedShoutouts.length
+        && !pendingShoutouts.length
+        && completedShoutouts.length) {
+        showShoutoutPane("shoutoutCompletedPane");
+      }
     }
     if (archiveHost) {
       archiveHost.innerHTML = currentArchivedShoutouts.length

@@ -2261,6 +2261,9 @@
         const wordSize = wrappedWord ? word.size : teamLen >= (word.xlongAt || 13) ? (word.xlongSize || word.longSize) : teamLen >= word.longAt ? word.longSize : word.size;
         baseTeam = jerseyW * wordSize;
         baseName = jerseyW * (nameGlyphs >= nameSpec.longAt ? nameSpec.longSize : nameSpec.size);
+        // Digit count from the jersey mark — undeclared `digits` threw ReferenceError and aborted
+        // before #displaySub got textContent / FloqMedia pin (empty number + rail stuck at top).
+        const digits = glyphLen(String(subText || "").trim());
         baseNumber = jerseyW * (digits >= 2 ? num.two : num.one);
       } else if (sport === "nba") {
         clearNbaPhotoKitVars(canvas);
