@@ -1643,6 +1643,7 @@
     stopSplitMediaLoop();
     hideHeistBrandSlide();
     hideJerseyMount();
+    clearNbaPairChrome(canvas);
     if (canvas) {
       canvas.className = "display-canvas display-board-secondary floqcast-idle-canvas";
       canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
@@ -1716,6 +1717,7 @@
     byId("displayNflShoutPanel")?.remove();
     stopMoneyRain();
     const canvas = byId("displayCanvas");
+    clearNbaPairChrome(canvas);
     if (canvas) {
       canvas.className = "display-canvas";
       canvas.style.backgroundImage = "";
@@ -2053,6 +2055,7 @@
     if (isFloqCastIdlePayload(data)) {
       stopSplitMediaLoop();
       stopHalloweenFinale();
+      clearNbaPairChrome(byId("displayCanvas"));
       renderFloqCastIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
     }
