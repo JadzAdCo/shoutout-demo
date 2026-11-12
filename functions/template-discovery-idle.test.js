@@ -91,7 +91,8 @@ test("every club idles on Use ShoutOut @ {club} after a ShoutOut ends", () => {
   assert.match(backend, /mainText: `Use ShoutOut @ \$\{clubName\}`,/);
   assert.match(backend, /batch\.set\(doc\.ref, idleLiveContentAfterExpiry\(/);
   const admin = read("admin-app.js");
-  assert.match(admin, /const defaultMain = `Use ShoutOut @ \$\{loc\.locationName \|\| locationId\}`;/);
+  // Approve deletes idle defaultMain when the jersey already has a real name.
+  assert.match(admin, /defaultMain: firebase\.firestore\.FieldValue\.delete\(\)/);
   assert.match(admin, /const main = `Use ShoutOut @ \$\{loc\.locationName \|\| locationId\}`;/);
 });
 

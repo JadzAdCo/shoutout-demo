@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 166 97" width="166" height="97" role="img" aria-label="EMV chip">
+  <defs>
+    <linearGradient id="chipGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3dfb8"/>
+      <stop offset="42%" stop-color="#d4b07a"/>
+      <stop offset="78%" stop-color="#b0894f"/>
+      <stop offset="100%" stop-color="#8a6638"/>
+    </linearGradient>
+    <linearGradient id="chipSheen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff6e4" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#d4b07a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5a4020" stop-opacity="0.22"/>
+    </linearGradient>
+  </defs>
+  <rect x="1.5" y="1.5" width="163" height="94" rx="11" ry="11" fill="url(#chipGold)" stroke="#5a4020" stroke-width="2"/>
+  <rect x="1.5" y="1.5" width="163" height="94" rx="11" ry="11" fill="url(#chipSheen)"/>
+  <g fill="none" stroke="#3a2a14" stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M52 8 V89"/>
+    <path d="M114 8 V89"/>
+    <path d="M8 48.5 H52"/>
+    <path d="M114 32 H158"/>
+    <path d="M114 65 H158"/>
+    <rect x="68" y="74" width="30" height="8" rx="1.5" fill="#2a1c0c" stroke="none"/>
+  </g>
+  <g fill="none" stroke="#ffe9c2" stroke-opacity="0.28" stroke-width="1">
+    <path d="M10 10 H50 V46"/>
+    <path d="M54 10 H112 V70"/>
+    <path d="M116 10 H156 V30"/>
+  </g>
+</svg>

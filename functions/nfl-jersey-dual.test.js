@@ -18,6 +18,15 @@ test("NFL photo CSS uses real-kit wider scale lock (+15% again)", () => {
   assert.match(css, /animation:\s*nflFloqrCardPulse/);
 });
 
+test("NBA / Terps FloqMedia rail sits under the kit like NFL (never mid-jersey)", () => {
+  const css = fs.readFileSync(path.join(root, "display.css"), "utf8");
+  assert.match(css, /\.display-canvas\.soccer-jersey-template\.jersey-sport-nba\.jersey-photo-back \.display-identity-rail\.soccer-jersey-rail/);
+  assert.match(css, /jersey-sport-nba[\s\S]{0,900}?bottom:1\.2%!important/);
+  const js = fs.readFileSync(path.join(root, "display-app.js"), "utf8");
+  assert.match(js, /clearClassicBoardRemnantsOnJersey/);
+  assert.match(js, /isSeasonalBoardRemnantText/);
+});
+
 test("display-app always dual-loops NFL photo kits and FloqR brand cycle", () => {
   const js = fs.readFileSync(path.join(root, "display-app.js"), "utf8");
   assert.match(js, /const nflDualActive = sport === "nfl" && usePhotoBack/);
@@ -31,7 +40,7 @@ test("display-app always dual-loops NFL photo kits and FloqR brand cycle", () =>
 
 test("Club Admin approve stamps NFL photo background from packaged catalog", () => {
   const js = fs.readFileSync(path.join(root, "admin-app.js"), "utf8");
-  assert.match(js, /resolvedBackgroundUrl = item\.backgroundUrl \|\| packaged\.defaultBackgroundUrl/);
+  assert.match(js, /resolvedBackgroundUrl = boardUrl\(item\.backgroundUrl\) \|\| boardUrl\(packaged\.defaultBackgroundUrl\)/);
   assert.match(js, /nflDualLayout: isNflDual/);
   assert.match(js, /layout: isNflDual \? "nfl-jersey"/);
 });

@@ -33,9 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.92";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.92";
-  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.94";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.94";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -222,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.94",
+      title: "s3.2.94 — Baller corner scrub, NBA FloqMedia bottom, Halloween grave top-left",
+      checks: [
+        {label:"Baller corner scrub + black clip", file:"display.css", includes:["border-radius:3.15% / 5.1%", "outline:2px solid #000"]},
+        {label:"Baller scrub script", file:"scripts/build-baller-card-photos.py", includes:["scrub_led_corner_fringe"]},
+        {label:"NBA FloqMedia bottom pin", file:"display.css", includes:["jersey-sport-nba .display-identity-rail", "bottom:1.2%!important"]},
+        {label:"Jersey remnant clear", file:"display-app.js", includes:["clearClassicBoardRemnantsOnJersey", "isSeasonalBoardRemnantText"]},
+        {label:"Halloween grave top-left", file:"display.css", includes:[".halloween-finale .hw-grave{position:absolute;left:8%;top:4%"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-94-led-display-fixes"]}
+      ]
+    },
     {
       version: "s3.2.92",
       title: "s3.2.92 — photorealistic NBA and Terps jersey backs",
@@ -2777,13 +2788,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-94-led-display-fixes",
+      area:"ShoutOut / Display",
+      feature:"Baller white corner scrub + Terps FloqMedia bottom + Halloween RIP top-left",
+      changed:"s3.2.94 — (1) Baller black-card LED PNGs scrub pale corner wedges; CSS radius + black outline clip AA fringe. (2) NBA/Terps FloqMedia identity rail pinned under the kit like soccer/NFL; classic/Halloween leftover text cleared on jersey paint. (3) Classic Halloween finale moves RIP tomb/grave to top-left; ghosts originate there.",
+      howToTest:"1) Hard-refresh Search + display preview on package s3.2.94. 2) Baller's Alert / Black Card on led-96x48 — black margin outside rounded corners has no white triangular spots. 3) Maryland Terps on led-96x48 — PRESENTED BY FloqMedia sits under the jersey hem (not mid-body); no HAPPY HALLOWEEN remnant from a prior board. 4) Classic Halloween — finale RIP tomb rises in the top-left; ghosts burst from that corner. 5) Display boards stay display.html?location= (never add a cache-bust query). Mark Succeed/Failed.",
+      expected:"Clean Baller corners; Terps FloqMedia under kit; no prior-shoutout text on jersey; Halloween grave top-left with ghosts from there.",
+      troubleshoot:"White wedges → republish images/baller/* + display.css on s3.2.94; check border-radius 3.15%/5.1% + outline. FloqMedia mid-jersey → jersey-sport-nba bottom:1.2% rules. HAPPY HALLOWEEN ghost → clearClassicBoardRemnantsOnJersey / isSeasonalBoardRemnantText on display-app.js. Grave still bottom → .hw-grave left:8% top:4% and hwGhostRush from translate(-20%,10%)."
+    },
+    {
       id:"s3-2-91-jerseys-2026",
       area:"ShoutOut / Jerseys",
       feature:"2026 Maryland Terps + NBA icon + NFL home jersey backs",
       changed:"Terps basketball photo back with State, name, and number. All 30 NBA clubs use a photorealistic 2026/27 icon tank (mesh, stitching, sheen, cloth folds; Lakers purple/gold, Celtics green, Jazz mountain purple, Heat black, Rockets red/yellow). Numbers are Alumni Sans Collegiate One with an outside-only outline so counters stay open. All 32 NFL clubs plus ScammerVille use 2026 home colors. Club word, name, and number are typed on the kit. Package s3.2.92.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.2.92 and open templates. 2) Maryland Terps — State MARYLAND, name, number on the red flag-side tank. 3) Change State and confirm the upper word changes. 4) Los Angeles Lakers — purple mesh tank, gold LOS ANGELES on two lines, number counters show fabric. 5) Boston Celtics — green mesh tank. 6) Oklahoma City Thunder — blue mesh, gold number, OKLAHOMA CITY on two lines. 7) Atlanta Hawks — red mesh, white 9 with an open counter. 8) Houston Rockets — red tank, yellow trim. 9) Atlanta Falcons — red home, white number. 10) 96×48, 64×48, and 64×32 previews keep the word, name, and number on the jersey. Display boards stay display.html?location= with no cache-bust query.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ on package s3.2.92+ and open templates. 2) Maryland Terps — State MARYLAND, name, number on the red flag-side tank. 3) Change State and confirm the upper word changes. 4) Los Angeles Lakers — purple mesh tank, gold LOS ANGELES on two lines, number counters show fabric. 5) Boston Celtics — green mesh tank. 6) Oklahoma City Thunder — blue mesh, gold number, OKLAHOMA CITY on two lines. 7) Atlanta Hawks — red mesh, white 9 with an open counter. 8) Houston Rockets — red tank, yellow trim. 9) Atlanta Falcons — red home, white number. 10) 96×48, 64×48, and 64×32 previews keep the word, name, and number on the jersey. Display boards stay display.html?location= with no cache-bust query.",
       expected:"Terps State is editable. Each NBA back is that club's photorealistic 2026/27 icon tank. Number holes show the jersey. Each NFL back matches that club's 2026 home colors. Name and number stay patron-typed.",
-      troubleshoot:"Old art → hard refresh jersey-catalog.js, display.css, and display-app.js ?v=s3.2.92. Missing NBA PNG → images/basketball/nba-<club>-back-with-club.png on Pages. Missing NFL PNG → images/nfl/nfl-<club>-back-with-club.png. Closed number counters → jersey-alumni-num text-shadow ring, not a text stroke. Word missing → jerseyOverlayWordmark on the catalog row."
+      troubleshoot:"Old art → hard refresh jersey-catalog.js, display.css, and display-app.js on s3.2.92+. Missing NBA PNG → images/basketball/nba-<club>-back-with-club.png on Pages. Missing NFL PNG → images/nfl/nfl-<club>-back-with-club.png. Closed number counters → jersey-alumni-num text-shadow ring, not a text stroke. Word missing → jerseyOverlayWordmark on the catalog row."
     },
     {
       id:"s3-2-90-critical-log-blink",
