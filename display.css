@@ -1837,10 +1837,13 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number .varsity-num{
   display:block;
-  height:1em; /* font-size vh already +20% via jerseyOutput.number (s3.2.97) */
+  height:1em; /* vertical size from jerseyOutput.number (+20% in s3.2.97) */
   width:auto;
   overflow:visible;
   margin-inline:auto;
+  /* Horizontal only: −30% width, height unchanged (s3.2.98) */
+  transform:scaleX(.7);
+  transform-origin:center top;
 }
 
 /* NFL — bulkier yoke, shoulder name plate, huge thick number */

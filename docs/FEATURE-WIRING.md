@@ -30,6 +30,14 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED — Terps number horizontal −30% (s3.2.98)
+
+| Piece | Wiring |
+|---|---|
+| Narrower digits | `display.css` `.varsity-num { transform: scaleX(.7); transform-origin: center top }` — horizontal only; vertical size unchanged from s3.2.97 |
+
+Cache-bust: `display.css` `?v=s3.2.98`. Manual test: `s3-2-98-terps-number-narrow`.
+
 ## LED + Saved — Terps varsity SVG +20% / Saved continue (s3.2.97)
 
 | Piece | Wiring |
