@@ -336,6 +336,11 @@
     byId("ballerUploadCameraBtn")?.addEventListener("click", () => {
       hideChooser();
       openBallerFaceCameraCapture().catch((err) => {
+        // Cancel is intentional — do not open the library picker.
+        if (err?.name === "AbortError" || /cancel/i.test(String(err?.message || ""))) {
+          setBallerFaceStatus("Camera cancelled — choose Photo library or try Camera again.");
+          return;
+        }
         console.warn("baller face camera modal", err?.message || err);
         setBallerFaceStatus(`Camera unavailable — use Photo library. ${String(err?.message || "").slice(0, 100)}`);
         input.accept = "image/*";
@@ -562,23 +567,49 @@
       throw err;
     }
     return new Promise((resolve, reject) => {
+      let settled = false;
       byId("ballerFaceCameraCancelBtn")?.addEventListener("click", () => {
+        if (settled) return;
+        settled = true;
         cleanup();
-        reject(new Error("Camera cancelled."));
+        const cancelErr = new Error("Camera cancelled.");
+        cancelErr.name = "AbortError";
+        reject(cancelErr);
       }, { once: true });
       byId("ballerFaceCameraCaptureBtn")?.addEventListener("click", async () => {
+        if (settled) return;
+        const captureBtn = byId("ballerFaceCameraCaptureBtn");
+        if (captureBtn) captureBtn.disabled = true;
         try {
           const w = video.videoWidth || 720;
           const h = video.videoHeight || 720;
           if (!w || !h) throw new Error("Camera frame not ready.");
-          // Crop to the oval guide (≈62% width × 78% height, centered).
-          const ovalW = w * 0.62;
-          const ovalH = h * 0.78;
-          const sx = (w - ovalW) / 2;
-          const sy = (h - ovalH) / 2;
+          // Map the on-screen oval (inset 11% / 19% of the 3:4 stage over object-fit:cover)
+          // back into source video pixels so the crop matches what the user framed.
+          const stageAspect = 3 / 4;
+          const videoAspect = w / h;
+          let visibleW;
+          let visibleH;
+          let offX;
+          let offY;
+          if (videoAspect > stageAspect) {
+            visibleH = h;
+            visibleW = h * stageAspect;
+            offX = (w - visibleW) / 2;
+            offY = 0;
+          } else {
+            visibleW = w;
+            visibleH = w / stageAspect;
+            offX = 0;
+            offY = (h - visibleH) / 2;
+          }
+          const ovalW = visibleW * 0.62;
+          const ovalH = visibleH * 0.78;
+          const sx = offX + (visibleW - ovalW) / 2;
+          const sy = offY + (visibleH - ovalH) / 2;
           const canvas = document.createElement("canvas");
-          canvas.width = Math.round(ovalW);
-          canvas.height = Math.round(ovalH);
+          canvas.width = Math.max(1, Math.round(ovalW));
+          canvas.height = Math.max(1, Math.round(ovalH));
           const ctx = canvas.getContext("2d");
           // Mirror like a selfie preview.
           ctx.translate(canvas.width, 0);
@@ -587,17 +618,20 @@
           const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.92));
           if (!blob) throw new Error("Could not capture face frame.");
           const file = new File([blob], `baller-face-${Date.now()}.jpg`, { type: "image/jpeg" });
+          settled = true;
           cleanup();
           await processBallerFaceSelection(file);
           resolve(file);
         } catch (err) {
+          if (captureBtn) captureBtn.disabled = false;
           if (statusEl) statusEl.textContent = String(err?.message || err).slice(0, 160);
           else {
+            settled = true;
             cleanup();
             reject(err);
           }
         }
-      }, { once: true });
+      });
     });
   }
 
@@ -1346,6 +1380,11 @@
     "templateSelectPage", "editorPage", "confirmationPage", "adSplashPage"
   ]);
   let activeShoutoutTrail = null;
+
+  function resetShoutoutTrail() {
+    activeShoutoutTrail = null;
+    try { sessionStorage.removeItem("floqrShoutoutTrailId"); } catch (_) {}
+  }
 
   function ensureShoutoutTrail(reason = "flow") {
     if (activeShoutoutTrail?.correlationId) return activeShoutoutTrail;
@@ -5733,6 +5772,7 @@
               || `./patron-portal.html?tab=shoutouts&pane=saved&id=${encodeURIComponent(shoutoutRef.id)}`);
           }
         });
+        resetShoutoutTrail();
         return;
       }
       const priceCents = Math.max(0, Math.round(Number(canonicalTemplate.priceCents || t.priceCents || mediaPayload.priceCents || 0)));
@@ -5759,6 +5799,7 @@
             window.location.assign(url);
           }
         });
+        resetShoutoutTrail();
         return;
       }
       const shoutoutRef = await db.collection("shoutouts").add(payload);
@@ -5775,6 +5816,7 @@
       try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
+      resetShoutoutTrail();
     } catch(e) {
       status.textContent=e.message;
       if (window.FLOQRLog) {
@@ -5791,7 +5833,7 @@
       }
     }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ resetShoutoutTrail(); selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();

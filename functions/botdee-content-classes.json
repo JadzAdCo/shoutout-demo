@@ -191,6 +191,9 @@
     "help-master-ops-status": [
       "masterAdmin"
     ],
+    "help-master-shoutout-diagnostics": [
+      "masterAdmin"
+    ],
     "help-master-shoutout-retention": [
       "masterAdmin"
     ],

@@ -2536,14 +2536,16 @@
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
-        canvas.classList.add("nba-dual-faces", "split-media-loop", "nba-dual-phase-front", "split-media-phase-media");
-        canvas.classList.remove("nba-dual-phase-back", "split-media-phase-copy");
-        applyNbaDualFacePhase("media", canvas, dualUrls);
+        canvas.classList.add("nba-dual-faces", "split-media-loop");
+        // Do not force front here — FLOQRFrameLoop resumes lastPhase on live re-renders
+        // (keepFrameLoop). Align the kit face after start so media↔copy stays in sync.
         startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
           frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
           backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
           defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
         }));
+        const phase = canvas.classList.contains("split-media-phase-copy") ? "copy" : "media";
+        applyNbaDualFacePhase(phase, canvas, dualUrls);
       }
       {
         const keep = new Set([
