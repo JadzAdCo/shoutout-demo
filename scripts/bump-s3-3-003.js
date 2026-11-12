@@ -34,6 +34,9 @@ function run(root) {
     .replace(/PREVIEW_LINKS_PACKAGE = "s3\.\d+\.\d+"/, `PREVIEW_LINKS_PACKAGE = "${NEXT}"`)
     .replace(/CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3\.\d+\.\d+"/, `CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "${NEXT}"`));
   edit("functions/package.json", src => src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`));
+  edit("README.md", src => src
+    .replace(/^# CURRENT PACKAGE: FLOQR ShoutOut s3\.\d+\.\d+[^\n]*/m, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)
+    .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: (changelog — fill in)\n$1`));
   edit("functions/i18n-coverage.test.js", src => src
     .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/, `floqr-i18n and help VERSION are ${NEXT}`)
     .replace(/assert\.match\(i18n, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(i18n, /const VERSION\\s*=\\s*"${NEXT}"/)`)
