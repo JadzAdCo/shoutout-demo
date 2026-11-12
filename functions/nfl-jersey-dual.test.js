@@ -22,9 +22,19 @@ test("NBA / Terps FloqMedia rail sits under the kit like NFL (never mid-jersey)"
   const css = fs.readFileSync(path.join(root, "display.css"), "utf8");
   assert.match(css, /\.display-canvas\.soccer-jersey-template\.jersey-sport-nba\.jersey-photo-back \.display-identity-rail\.soccer-jersey-rail/);
   assert.match(css, /jersey-sport-nba[\s\S]{0,900}?bottom:1\.2%!important/);
+  // Portrait tanks fit by height so the hem stays on-board and FloqMedia is not mid-kit.
+  assert.match(css, /soccer-jersey-template\.jersey-sport-nba\.jersey-photo-back \.display-background/);
+  assert.match(css, /background-size:\s*auto var\(--nba-kit-h/);
+  assert.match(css, /--nba-kit-h:\s*86%/);
   const js = fs.readFileSync(path.join(root, "display-app.js"), "utf8");
   assert.match(js, /clearClassicBoardRemnantsOnJersey/);
   assert.match(js, /isSeasonalBoardRemnantText/);
+  assert.match(js, /function nbaPhotoKitLayout/);
+  assert.match(js, /function pinJerseyFloqMediaRail/);
+  assert.match(js, /pinJerseyFloqMediaRail\(rail,\s*\{sport\}/);
+  assert.match(js, /kit\.kitTop \+ nameSpec\.top \* kit\.kitH/);
+  // Do not destroy the text overlay that owns the FloqMedia rail.
+  assert.doesNotMatch(js, /halloween-finale,\s*\.display-text-overlay/);
 });
 
 test("display-app always dual-loops NFL photo kits and FloqR brand cycle", () => {

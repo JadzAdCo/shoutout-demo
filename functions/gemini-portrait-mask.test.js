@@ -11,8 +11,13 @@ test("gemini-portrait-mask defaults to gemini-3.8-flash (env overrideable)", () 
   assert.match(mask.LIMITATION, /not professional/i);
   assert.deepEqual(mask.thinkingConfigForModel("gemini-3.8-flash"), {thinkingLevel: "LOW"});
   assert.deepEqual(mask.thinkingConfigForModel("gemini-3.7-flash"), {thinkingLevel: "LOW"});
-  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.5-flash"), {thinkingLevel: "MINIMAL"});
+  assert.deepEqual(mask.thinkingConfigForModel("gemini-3.5-flash"), {thinkingLevel: "LOW"});
   assert.deepEqual(mask.thinkingConfigForModel("gemini-2.5-flash"), {thinkingBudget: 0});
+  assert.equal(
+    mask.isThinkingConfigRejected({message: "Thinking level MINIMAL is not supported for this model."}),
+    true
+  );
+  assert.equal(mask.isThinkingConfigRejected({message: "quota exceeded"}), false);
 });
 
 test("parseSegmentationJson accepts array and wrapped shapes", () => {

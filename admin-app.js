@@ -3076,6 +3076,15 @@
       || String(item.template || "").toLowerCase().startsWith("nfl");
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     const resolvedBackgroundUrl = boardUrl(item.backgroundUrl) || boardUrl(packaged.defaultBackgroundUrl);
+    // Full replace (merge:false): a new ShoutOut must wipe the previous board payload.
+    // merge:true left classic-board mainText / backgrounds on Terps and other jersey kits.
+    const jerseyNameOnKit = String(item.jerseyPatronName || item.jerseyName || "").trim();
+    const isJerseyKit = !isNflDual && !!(
+      packaged.layout === "soccer-jersey"
+      || packaged.jerseyNumberField === true
+      || String(item.template || "").match(/^(soccer|nba|nfl)/i)
+      || jerseyNameOnKit
+    );
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
       clubLocationId: locationId,
@@ -3084,19 +3093,22 @@
       template: item.template || "neon",
       templateName: item.templateName || packaged.name || "",
       // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
-      // A jersey that already has a name must not keep the idle "Use ShoutOut @" line as mainText.
+      // Jersey kits: mainText mirrors the kit name; jerseyPatronName is the source of truth on the board.
       mainText: isNflDual
         ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
         : fitAdminShoutoutText(
-          (/^use\s*shout\s*out\b/i.test(String(item.mainText || "").trim()) && String(item.jerseyPatronName || item.jerseyName || "").trim())
-            ? String(item.jerseyPatronName || item.jerseyName).trim()
-            : (item.mainText || "SHOUTOUT!"),
+          (isJerseyKit && jerseyNameOnKit)
+            ? jerseyNameOnKit
+            : ((/^use\s*shout\s*out\b/i.test(String(item.mainText || "").trim()) && jerseyNameOnKit)
+              ? jerseyNameOnKit
+              : (item.mainText || "SHOUTOUT!")),
           textCaps, "main", packaged),
       subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub", packaged),
       attribution: String(item.attribution || "").trim(),
       includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
       attributionChoice: item.attributionChoice || "",
-      jerseyPatronName: item.jerseyPatronName || item.jerseyName || "",
+      jerseyPatronName: jerseyNameOnKit,
+      jerseyName: jerseyNameOnKit,
       nflDualLayout: isNflDual,
       sport: isNflDual ? "nfl" : (item.sport || packaged.sport || ""),
       layout: isNflDual ? "nfl-jersey" : (item.layout || packaged.layout || ""),
@@ -3104,6 +3116,8 @@
       jerseySecondary: boardColor(item.jerseySecondary || packaged.jerseySecondary),
       jerseyAccent: boardColor(item.jerseyAccent || packaged.jerseyAccent || packaged.jerseySecondary),
       jerseyTeamLabel: item.jerseyTeamLabel || packaged.jerseyTeamLabel || "",
+      jerseyOverlayWordmark: item.jerseyOverlayWordmark || packaged.jerseyOverlayWordmark ? "1" : "",
+      jerseyCssBack: resolvedBackgroundUrl ? false : (item.jerseyCssBack === true || packaged.jerseyCssBack === true),
       textLayoutVersion:window.FLOQRTextLayout?.version || "",
       textProfileId:textCaps.profileId || item.textProfileId || "full",
       maxMainCharacters:textCaps.main,
@@ -3156,16 +3170,14 @@
       status: "approved",
       idleCta: false,
       source: "clubAdminApproval",
-      expiredAt: firebase.firestore.FieldValue.delete(),
       displayDurationSeconds: 600,
-      defaultMain: firebase.firestore.FieldValue.delete(),
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
       referenceNumber: item.referenceNumber || "",
       shoutoutId: id,
       approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
+    }, {merge:false});
 
     await createStatusNotification(item,"approved","ShoutOut Approved");
     await auditShoutout(id,item,"approved");

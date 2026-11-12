@@ -1510,6 +1510,32 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   min-height:0!important;
   filter:none;
 }
+/*
+ * NBA / Terps photo backs are portrait. Soccer's width-based `84% auto` overshoots short LEDs,
+ * crops the hem, and makes a screen-bottom FloqMedia card read as mid-kit. Fit the full tank by
+ * height and leave a bottom band for FloqMedia (under the hem).
+ */
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back{
+  --nba-kit-top:1%;
+  --nba-kit-h:86%;
+  --nba-kit-left:34%;
+  --nba-kit-right:34%;
+  --nba-kit-w:32%;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-background{
+  background-size:auto var(--nba-kit-h,86%)!important;
+  background-position:center var(--nba-kit-top,1%)!important;
+  background-repeat:no-repeat!important;
+  background-color:#000!important;
+}
+.display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back,
+.display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back,
+.display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back{
+  /* 4:3 board → taller relative width for the same height-fit tank. */
+  --nba-kit-left:26%;
+  --nba-kit-right:26%;
+  --nba-kit-w:48%;
+}
 /* NBA / Terps — FloqMedia card sits under the kit like soccer/NFL (never mid-jersey). */
 .display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
 .display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.floqr-card-bottom,
@@ -1756,12 +1782,12 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
   display:flex!important;
-  top:10.3%!important;
+  top:calc(var(--nba-kit-top,1%) + 0.103 * var(--nba-kit-h,86%))!important;
   height:auto!important;
   align-items:flex-start!important;
   font-size:11vh!important;
-  left:27%!important;
-  right:27%!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
   color:var(--jersey-secondary,#fff)!important;
   letter-spacing:.08em!important;
   font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
@@ -1780,27 +1806,27 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   letter-spacing:.08em!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:23.15%!important;
+  top:calc(var(--nba-kit-top,1%) + 0.2315 * var(--nba-kit-h,86%))!important;
   height:auto!important;
   align-items:flex-start!important;
   place-items:start center!important;
   overflow:visible!important;
-  left:27%!important;
-  right:27%!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
   letter-spacing:.12em!important;
   color:var(--jersey-secondary,#fff)!important;
   -webkit-text-stroke:0.045em #111;
   paint-order:stroke fill;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:32.355%!important;
+  top:calc(var(--nba-kit-top,1%) + 0.32355 * var(--nba-kit-h,86%))!important;
   height:auto!important;
   align-items:flex-start!important;
   align-content:start!important;
   place-items:start center!important;
   overflow:visible!important;
-  left:27%!important;
-  right:27%!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
   color:var(--jersey-secondary,#fff)!important;
   line-height:.82!important;
   font-family:"Alumni Sans Collegiate One",Impact,"Arial Narrow",sans-serif!important;

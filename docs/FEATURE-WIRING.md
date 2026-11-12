@@ -30,6 +30,21 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED display fixes — Baller rim restore / jersey remnants / floqCast 100s / Gemini thinking (s3.2.95)
+
+**Purpose:** Follow-up to s3.2.94 LED QA + Gemini/floqCast hardening (Nov 2026).
+
+| Fix | Where |
+|---|---|
+| Baller ornate gold rim | `scripts/build-baller-card-photos.py` — exterior flood-fill only (no band luma/chroma wipe that deformed gold filigree); rebuild LED PNGs from package master |
+| Terps / jersey remnants | `display-app.js` `isBoardRemnantText` + `jerseyRealText` — HAPPY HALLOWEEN / idle CTA never become kit name; stop Halloween finale + wipe classic overlays before jersey paint |
+| NBA FloqMedia under hem | Portrait tanks use height-fit (`--nba-kit-h:86%`, `background-size:auto var(--nba-kit-h)`) so the hem stays on-board; rail `bottom:1.2%` + `pinJerseyFloqMediaRail` on canvas (s3.2.95) |
+| floqCast default live | `floqcast-preview.js` + `functions/floqcast-functions.js` — allow **100s**, default **100** (was 90) |
+| Gemini portrait mask | `functions/gemini-portrait-mask.js` — `thinkingLevel: LOW` for all 3.x; retry once without `thinkingConfig` if model rejects thinking args |
+| Upload size | Keep FLOQR **8 MB** Gemini edit cap (`MAX_GEMINI_IMAGE_BYTES`) — do not remove; phone HEIC/JPEG can exceed Function/Gemini payload safely |
+
+Cache-bust: `display.css` / `display-app.js` / `floqcast-preview.js` `?v=s3.2.95`. **Functions deploy required** for Gemini + floqCast duration. Manual test: `s3-2-95-baller-jersey-floqcast-gemini`.
+
 ## LED display fixes — Baller corners / Terps FloqMedia / Halloween grave (s3.2.94)
 
 **Purpose:** Venue LED QA from live screenshots (Nov 2026).
@@ -37,7 +52,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Fix | Where |
 |---|---|
 | Baller white corner wedges | `scripts/build-baller-card-photos.py` `scrub_led_corner_fringe` + black letterbox; `display.css` `.baller-card .display-background` radius `3.15%/5.1%` + black outline |
-| Terps / NBA FloqMedia mid-jersey | `display.css` `.jersey-sport-nba` identity rail `bottom:1.2%` (same idea as NFL); `display-app.js` `clearClassicBoardRemnantsOnJersey` + `isSeasonalBoardRemnantText` so HAPPY HALLOWEEN / classic leftovers never ride a kit |
+| Terps / NBA FloqMedia mid-jersey | Root cause: portrait kit + width-based `84% auto` cropped the hem, so screen-bottom FloqMedia sat mid-torso. Fix (s3.2.95): height-fit tank (`nbaPhotoKitLayout` / `--nba-kit-*`), remap jerseyOutput tops into that box, rail on canvas + `bottom:1.2%` + inline pin. Remnants: `isBoardRemnantText` / `clearClassicBoardRemnantsOnJersey` |
 | Halloween RIP tomb | `display.css` `.hw-grave` top-left (`left:8%;top:4%`); ghosts start near grave (`hwGhostRush` from top-left) |
 
 Cache-bust: `display.css` / `display-app.js` `?v=s3.2.94`. Manual test: `s3-2-94-led-display-fixes`.

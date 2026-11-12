@@ -2,8 +2,8 @@
 (function (global) {
   "use strict";
 
-  const ALLOWED_DURATIONS = [15, 30, 45, 60, 90];
-  const DEFAULT_LIVE_SECONDS = 90;
+  const ALLOWED_DURATIONS = [15, 30, 45, 60, 90, 100];
+  const DEFAULT_LIVE_SECONDS = 100;
   const CONNECT_ARM_DEBOUNCE_MS = 2500;
   const CONNECT_WAIT_DIAG_MS = 30000;
   const LIVE_HEARTBEAT_MS = 10000;

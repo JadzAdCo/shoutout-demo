@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.94";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.94";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.95";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.95";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,20 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.95",
+      title: "s3.2.95 — Baller rim, Terps FloqMedia under hem, remnants, floqCast 100s, Gemini LOW",
+      checks: [
+        {label:"Baller exterior-only scrub", file:"scripts/build-baller-card-photos.py", includes:["grow=2", "Never wipe"]},
+        {label:"NBA height-fit kit box", file:"display.css", includes:["--nba-kit-h:86%", "background-size:auto var(--nba-kit-h"]},
+        {label:"NBA FloqMedia pin helpers", file:"display-app.js", includes:["nbaPhotoKitLayout", "pinJerseyFloqMediaRail"]},
+        {label:"Jersey board remnant guard", file:"display-app.js", includes:["isBoardRemnantText", "stopHalloweenFinale"]},
+        {label:"floqCast 100s client", file:"floqcast-preview.js", includes:["90, 100]", "DEFAULT_LIVE_SECONDS = 100"]},
+        {label:"floqCast 100s server", file:"functions/floqcast-functions.js", includes:["90, 100]"]},
+        {label:"Gemini thinking LOW + retry", file:"functions/gemini-portrait-mask.js", includes:["thinkingLevel: \"LOW\"", "isThinkingConfigRejected"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-95-baller-jersey-floqcast-gemini"]}
+      ]
+    },
     {
       version: "s3.2.94",
       title: "s3.2.94 — Baller corner scrub, NBA FloqMedia bottom, Halloween grave top-left",
@@ -2787,6 +2801,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-95-baller-jersey-floqcast-gemini",
+      area:"ShoutOut / Display / floqCast / Gemini",
+      feature:"Baller gold rim restore, Terps FloqMedia under hem, jersey remnant wipe, floqCast 100s, Gemini thinking LOW",
+      changed:"s3.2.95 — Baller LED PNGs exterior-only scrub (gold rim kept). NBA/Terps portrait tanks height-fit (--nba-kit-h 86%) so FloqMedia sits under the hem, not mid-kit; rail canvas-pinned. Jersey kits reject HAPPY HALLOWEEN / idle CTA as name. floqCast live 100s. Gemini thinkingLevel LOW + retry.",
+      howToTest:"1) Hard-refresh display + floqcast-preview (s3.2.95). 2) Baller's Alert on LED — gold filigree rim intact, no white wedges. 3) Maryland Terps on led-96x48 — full tank collar-to-hem visible; PRESENTED BY FloqMedia in the bottom band under the hem (not mid-body). 4) Classic Halloween then Terps — no HAPPY HALLOWEEN leftover. 5) floqCast Go live ~100s (Functions deploy). 6) Baller Upload face — Gemini mask OK under 8 MB. Mark Succeed/Failed.",
+      expected:"Gold rim crisp; Terps FloqMedia under hem; no seasonal remnants; live ~100s; Gemini mask OK.",
+      troubleshoot:"FloqMedia mid-kit → display.css NBA height-fit (--nba-kit-h) + pinJerseyFloqMediaRail; hard-refresh display.css/display-app.js. Deformed rim → rebuild build-baller-card-photos.py. Remnants → isBoardRemnantText + stopHalloweenFinale; clear stale liveContent mainText. Duration 90 → deploy floqcast-functions. Gemini MINIMAL → deploy gemini-portrait-mask."
+    },
     {
       id:"s3-2-94-led-display-fixes",
       area:"ShoutOut / Display",

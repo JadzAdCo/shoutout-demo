@@ -114,7 +114,10 @@ def blackout_exterior(card: Image.Image, fill=FILL) -> Image.Image:
 
 
 def darken_silhouette_fringe(card: Image.Image, fill=FILL, dark=40) -> Image.Image:
-  """Any card-edge pixel that still looks bright next to exterior → pull to fill."""
+  """Only replace near-white antialias wedges on the *outer* silhouette.
+
+  Saturated gold / ornate rim pixels (warm + chromatic) are never touched.
+  """
   w, h = card.size
   px = card.load()
   visited = [[False] * w for _ in range(h)]
@@ -143,12 +146,14 @@ def darken_silhouette_fringe(card: Image.Image, fill=FILL, dark=40) -> Image.Ima
           continue
         r, g, b = op[nx, ny][:3]
         luma = max(r, g, b)
-        if luma < 70:
+        # Only very pale, near-achromatic fringe — never gold filigree.
+        if luma < 170:
           continue
-        # Pale fringe (white / washed gold) on the outer rim only.
         chroma = max(abs(r - g), abs(g - b), abs(r - b))
-        if chroma > 55 and (r - b) > 50 and r > 140:
-          continue  # keep saturated gold rim body
+        if chroma > 28:
+          continue
+        if (r - b) > 18 and r > 140:
+          continue
         op[nx, ny] = fill
   return out
 
@@ -182,10 +187,13 @@ def paste_clean_chip(card: Image.Image, chip_hires: Image.Image) -> Image.Image:
   return out.convert("RGB")
 
 
-def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=48, grow=8) -> Image.Image:
-  """Remove LANCZOS / bevel speckles outside the rounded card on LED canvases.
-  Flood from the four corners through near-black pixels, grow several px so CSS
-  border-radius antialias sits in pure black, then hard-fill the exterior."""
+def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=36, grow=2) -> Image.Image:
+  """Remove LANCZOS speckles *outside* the rounded card on LED canvases.
+
+  Only flood-fill near-black pixels connected to the canvas corners, then grow
+  a tiny halo so CSS border-radius antialias sits in pure black. Never wipe
+  interior bands by luma/chroma — that deformed the ornate gold rim.
+  """
   w, h = canvas.size
   px = canvas.load()
   visited = [[False] * w for _ in range(h)]
@@ -211,30 +219,12 @@ def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=48, grow=8) -> 
     for x in range(w):
       if visited[y][x]:
         ep[x, y] = 255
-  for _ in range(grow):
+  for _ in range(max(0, grow)):
     exterior = exterior.filter(ImageFilter.MaxFilter(3))
-  # Catch pale corner wedges the flood missed (low-chroma light pixels in the
-  # outer bands) without eating saturated gold rim.
-  ep = exterior.load()
-  band_x, band_y = int(w * 0.14), int(h * 0.18)
-  for y in range(h):
-    for x in range(w):
-      if ep[x, y] >= 128:
-        continue
-      if not (x < band_x or x >= w - band_x or y < band_y or y >= h - band_y):
-        continue
-      r, g, b = px[x, y][:3]
-      chroma = max(abs(r - g), abs(g - b), abs(r - b))
-      luma = max(r, g, b)
-      if (r - b) > 50 and r > 120 and chroma > 40:
-        continue
-      if luma > 36 and chroma < 58:
-        ep[x, y] = 255
   base = Image.new("RGB", (w, h), fill)
-  # Hard fill on the grown exterior — a blurred mask re-introduces pale fringe
-  # when LANCZOS-scaled gold edges are only partially replaced.
   out = Image.composite(base, canvas.convert("RGB"), exterior)
-  return darken_silhouette_fringe(out, fill=fill, dark=40)
+  # Soft fringe pass only touches pixels already adjacent to exterior black.
+  return darken_silhouette_fringe(out, fill=fill, dark=dark)
 
 
 def fit_led(card: Image.Image, tw: int, th: int, fill=FILL, margin=10):

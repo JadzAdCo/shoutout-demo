@@ -22,8 +22,28 @@ const LIMITATION =
 function thinkingConfigForModel(model = SEGMENTATION_MODEL) {
   const id = String(model || "").toLowerCase();
   if (/gemini-2\.5/.test(id)) return {thinkingBudget: 0};
-  if (/gemini-3\.(8|7)/.test(id)) return {thinkingLevel: "LOW"};
-  return {thinkingLevel: "MINIMAL"};
+  if (/gemini-3\./.test(id)) return {thinkingLevel: "LOW"};
+  return {thinkingLevel: "LOW"};
+}
+
+function isThinkingConfigRejected(error) {
+  const msg = String(error?.message || error || "");
+  return /thinking\s*level|thinkingConfig|MINIMAL|INVALID_ARGUMENT/i.test(msg)
+    && /thinking|MINIMAL|not supported/i.test(msg);
+}
+
+async function generateSegmentationContent(ai, {contents, thinkingConfig}) {
+  const base = {
+    model: SEGMENTATION_MODEL,
+    contents,
+    config: {
+      responseMimeType: "application/json"
+    }
+  };
+  if (thinkingConfig) {
+    base.config.thinkingConfig = thinkingConfig;
+  }
+  return ai.models.generateContent(base);
 }
 
 function readImageSize(buffer, contentType = "") {
@@ -203,18 +223,21 @@ async function callGeminiPersonSegmentation({apiKey, buffer, contentType}) {
     "Prefer exactly one entry for the most prominent person. Do not redraw or beautify the photo."
   ].join("\n");
 
-  const response = await ai.models.generateContent({
-    model: SEGMENTATION_MODEL,
-    contents: [
-      {inlineData: {mimeType: contentType || "image/jpeg", data: buffer.toString("base64")}},
-      prompt
-    ],
-    config: {
-      responseMimeType: "application/json",
-      // Minimal / off thinking — required for reliable segmentation masks.
+  const contents = [
+    {inlineData: {mimeType: contentType || "image/jpeg", data: buffer.toString("base64")}},
+    prompt
+  ];
+  let response;
+  try {
+    response = await generateSegmentationContent(ai, {
+      contents,
       thinkingConfig: thinkingConfigForModel(SEGMENTATION_MODEL)
-    }
-  });
+    });
+  } catch (error) {
+    // Model may reject a thinking level we send — retry once with no thinkingConfig.
+    if (!isThinkingConfigRejected(error)) throw error;
+    response = await generateSegmentationContent(ai, {contents, thinkingConfig: null});
+  }
 
   const text = String(response?.text || response?.candidates?.[0]?.content?.parts?.map((p) => p.text).filter(Boolean).join("\n") || "");
   const items = parseSegmentationJson(text);
@@ -270,6 +293,7 @@ module.exports = {
   SEGMENTATION_MODEL,
   LIMITATION,
   thinkingConfigForModel,
+  isThinkingConfigRejected,
   readImageSize,
   parseSegmentationJson,
   pickPrimaryPerson,

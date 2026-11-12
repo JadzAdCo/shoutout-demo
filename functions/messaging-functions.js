@@ -399,6 +399,7 @@ async function applyInboundDecision(clubLocationId, action, shoutoutHint = "") {
     return {ok: true, action: "reject", shoutoutId: doc.id};
   }
 
+  // Full replace so prior board copy (e.g. classic Halloween) cannot linger on the next ShoutOut.
   await db.collection("liveContent").doc(clubLocationId).set({
     location: clubLocationId,
     clubLocationId,
@@ -408,13 +409,17 @@ async function applyInboundDecision(clubLocationId, action, shoutoutHint = "") {
     templateName: item.templateName || "",
     mainText: text(item.mainText || "SHOUTOUT!", 200),
     subText: text(item.subText || "", 120),
+    jerseyPatronName: text(item.jerseyPatronName || item.jerseyName || "", 16),
+    jerseyName: text(item.jerseyPatronName || item.jerseyName || "", 16),
+    jerseyTeamLabel: text(item.jerseyTeamLabel || "", 40),
+    sport: text(item.sport || "", 20),
+    backgroundUrl: text(item.backgroundUrl || "", 500),
     mediaUrl: item.mediaUrl || "",
     mediaType: item.mediaType || "",
     screenFormatId: item.screenFormatId || "led-96x48",
     status: "approved",
     idleCta: false,
     source: "messagingApproval",
-    expiredAt: admin.firestore.FieldValue.delete(),
     displayDurationSeconds: 600,
     submittedBy: item.submittedBy || "unknown",
     approvedBy: "messaging-inbound",
@@ -422,7 +427,7 @@ async function applyInboundDecision(clubLocationId, action, shoutoutHint = "") {
     shoutoutId: doc.id,
     approvedAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, {merge: true});
+  }, {merge: false});
   // Keep shoutout for patron Completed history (do not delete).
   await doc.ref.set({
     status: "approved",

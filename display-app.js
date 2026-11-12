@@ -618,6 +618,53 @@
     return "soccer";
   }
 
+  /**
+   * NBA / Terps photo backs are portrait (≈3:4). Width-based `84% auto` overshoots short LEDs,
+   * crops the hem, and leaves FloqMedia mid-kit. Fit the full tank by height and leave a bottom
+   * band for the FloqMedia card (same idea as soccer under the hem).
+   */
+  function nbaPhotoKitLayout(formatId = "") {
+    const id = String(formatId || "");
+    const boardAspect = /64x48/i.test(id) ? 4 / 3 : 2; // 96×48 and 64×32 are 2:1
+    const imgAspect = 0.75; // w/h of packaged NBA / Terps backs
+    const kitTop = 0.01;
+    const kitH = 0.86; // ~13% reserved for FloqMedia under the hem
+    const kitW = (kitH * imgAspect) / boardAspect;
+    const kitLeft = Math.max(0, (1 - kitW) / 2);
+    const kitRight = kitLeft;
+    // On-screen jersey width in vh (= height-fraction × image aspect × 100).
+    const kitWidthVh = kitH * imgAspect * 100;
+    return {kitTop, kitH, kitW, kitLeft, kitRight, kitWidthVh, boardAspect, imgAspect};
+  }
+
+  function clearNbaPhotoKitVars(canvasEl) {
+    if (!canvasEl || !canvasEl.style) return;
+    ["--nba-kit-top", "--nba-kit-h", "--nba-kit-left", "--nba-kit-right", "--nba-kit-w"].forEach(name => {
+      canvasEl.style.removeProperty(name);
+    });
+  }
+
+  function pinJerseyFloqMediaRail(rail, {sport = ""} = {}) {
+    if (!rail || !rail.style) return;
+    if (sport !== "nba" && sport !== "nfl") return;
+    rail.style.setProperty("top", "auto", "important");
+    rail.style.setProperty("bottom", "1.2%", "important");
+    rail.style.setProperty("left", sport === "nba" ? "6%" : "5%", "important");
+    rail.style.setProperty("right", sport === "nba" ? "6%" : "5%", "important");
+    rail.style.setProperty("height", sport === "nba" ? "11%" : "12%", "important");
+    rail.style.setProperty("transform", "none", "important");
+    rail.style.setProperty("z-index", "60", "important");
+    rail.style.setProperty("opacity", "1", "important");
+    rail.style.setProperty("visibility", "visible", "important");
+  }
+
+  function clearPinnedJerseyFloqMediaRail(rail) {
+    if (!rail || !rail.style) return;
+    ["top", "bottom", "left", "right", "height", "transform", "z-index", "opacity", "visibility"].forEach(name => {
+      rail.style.removeProperty(name);
+    });
+  }
+
   function lockerRoomBackground() {
     return "#000";
   }
@@ -1300,13 +1347,25 @@
 
   /** Prior classic-board / seasonal copy must not become a jersey name. */
   function isSeasonalBoardRemnantText(value = "") {
-    return /^(HAPPY\s+HALLOWEEN|CLASSIC\s+HALLOWEEN)\b/i.test(String(value || "").trim());
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text) return false;
+    return /^(HAPPY\s+HALLOWEEN|CLASSIC\s+HALLOWEEN|MERRY\s+CHRISTMAS|HAPPY\s+NEW\s+YEAR|HAPPY\s+HOLIDAYS)\b/i.test(text)
+      || /^HAPPY\s+HALLOWEEN\b/i.test(text);
   }
 
-  /** Real kit copy. The idle CTA must not count as a name, number, or team. */
+  function isBoardRemnantText(value = "") {
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text) return false;
+    return isLegacyShoutOutIdleText(text)
+      || isSeasonalBoardRemnantText(text)
+      || /^THROW\s+A\s+SHOUT/i.test(text)
+      || /^AWAITING\s+A\s+FLOQCAST\b/i.test(text);
+  }
+
+  /** Real kit copy. Idle / seasonal board remnants must never count as a name, number, or team. */
   function jerseyRealText(value = "") {
     const text = String(value || "").trim();
-    return text && !isLegacyShoutOutIdleText(text) ? text : "";
+    return text && !isBoardRemnantText(text) ? text : "";
   }
 
   function jerseyIdentityComplete(data = {}, template = {}) {
@@ -1344,8 +1403,18 @@
       if (!text) return;
       if (keepUpper && keepUpper.has(text.toUpperCase())) return;
       // Leftover seasonal / classic board copy (e.g. HAPPY HALLOWEEN) outside jersey fields.
-      if (isSeasonalBoardRemnantText(text) || isLegacyShoutOutIdleText(text) || /^THROW\s+A\s+SHOUT/i.test(text)) {
+      if (isBoardRemnantText(text)) {
         el.textContent = "";
+      }
+    });
+    // Always wipe prior classic/seasonal strings from the kit name/number slots before jersey paint.
+    ["displayMain", "displaySub"].forEach(id => {
+      const el = byId(id);
+      if (!el) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (isBoardRemnantText(text)) {
+        el.textContent = "";
+        el.innerHTML = "";
       }
     });
   }
@@ -1925,12 +1994,12 @@
     };
     const locationDefaultMain = clubDefaultMainText(loc);
     const jerseyPatronOnKit = jerseyRealText(data.jerseyPatronName || data.jerseyName || "");
+    // Seasonal copy (e.g. HAPPY HALLOWEEN) is intentional on classic Halloween boards —
+    // only strip it when painting a jersey kit (never as a kit name).
     const rawMain = (isTextOverlay || isSoccerJersey)
-      ? String((isSoccerJersey && (isLegacyShoutOutIdleText(data.mainText) || isSeasonalBoardRemnantText(data.mainText)) && jerseyPatronOnKit)
-        ? jerseyPatronOnKit
-        : (isSoccerJersey && isSeasonalBoardRemnantText(data.mainText) && !jerseyPatronOnKit)
-          ? ""
-          : (data.mainText || (isSoccerJersey ? jerseyPatronOnKit : "")))
+      ? String(isSoccerJersey
+        ? (jerseyPatronOnKit || (isBoardRemnantText(data.mainText) ? "" : jerseyRealText(data.mainText)) || "")
+        : (data.mainText || ""))
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
     const mainSource = isIdleCta && !isSoccerJersey && !isTextOverlay
@@ -2091,6 +2160,8 @@
       stopHalloweenFinale();
       const sport = jerseySportOf(t, data);
       canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "classic-board-template", "classic-bw", "classic-halloween", "halloween-finale-on", "text-overlay-template");
+      // Never remove `.display-text-overlay` — it owns #displayMain / #displaySub / #displayIdentityRail.
+      canvas.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
       const usePhotoBack = !!jerseyBg;
@@ -2126,8 +2197,8 @@
       // NFL photo kits ALWAYS run the dual gif (jersey → shoutout). Do not depend on stale Firestore flags.
       const nflDualActive = sport === "nfl" && usePhotoBack;
       const jerseyNameText = nflDualActive
-        ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || data.jerseyName || ""), 0, 8) || "NYX")
-        : mainText;
+        ? (jerseyPatronName || glyphSlice(cleanBoardText(jerseyRealText(data.jerseyPatronName || data.jerseyName || "")), 0, 8) || "NYX")
+        : (jerseyRealText(data.jerseyPatronName || data.jerseyName || "") || jerseyRealText(mainText) || "");
       const nameRows = jerseyNameRows(jerseyNameText, {
         ...textCaps,
         maxMainCharacters: Math.min(8, Number(textCaps.jerseyNameMax || 8)),
@@ -2156,13 +2227,20 @@
         baseNumber = Math.min(27, 32);
         baseTeam = overlayWord ? 5.6 : 0;
       } else if (sport === "nba" && usePhotoBack) {
-        // Template jerseyOutput is the approved Maryland tank. Photo is 84% of board width.
+        // jerseyOutput sizes are fractions of jersey image width; tops are fractions of image height.
+        // Fit the full portrait tank by height so FloqMedia can sit under the hem (not mid-kit).
         const out = t.jerseyOutput || {};
         const word = out.word || { size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13 };
         const nameSpec = out.name || { size: 0.051, longSize: 0.04, longAt: 9 };
         const num = out.number || { one: 0.414, two: 0.3036, top: 0.363 };
         const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
-        const jerseyW = /64x48/i.test(formatId) ? 112 : 168;
+        const kit = nbaPhotoKitLayout(formatId);
+        canvas.style.setProperty("--nba-kit-top", (kit.kitTop * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-h", (kit.kitH * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-left", (kit.kitLeft * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-right", (kit.kitRight * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-w", (kit.kitW * 100).toFixed(2) + "%");
+        const jerseyW = kit.kitWidthVh;
         const teamRaw = String(jerseyTeamLabel(t, data) || "").trim();
         const wordLines = teamRaw.split(/\s+/).filter(Boolean);
         const wrappedWord = word.wrapAtSpace !== false && wordLines.length >= 2;
@@ -2172,6 +2250,7 @@
         baseName = jerseyW * (nameGlyphs >= nameSpec.longAt ? nameSpec.longSize : nameSpec.size);
         baseNumber = jerseyW * (digits >= 2 ? num.two : num.one);
       } else if (sport === "nba") {
+        clearNbaPhotoKitVars(canvas);
         baseName = Math.min(baseName, 12.5);
         baseNumber = Math.max(baseNumber, 70);
         baseTeam = Math.min(baseTeam, 5.8);
@@ -2207,7 +2286,14 @@
           const measure = wrappedWord ? Math.max.apply(null, lines.map(part => part.length)) : raw.length;
           const tracking = wrappedWord ? word.tracking : measure >= (word.xlongAt || 13) ? 0.01 : measure >= word.longAt ? word.longTracking : word.tracking;
           teamEl.style.setProperty("letter-spacing", tracking + "em", "important");
-          if (word.top != null) teamEl.style.setProperty("top", (word.top * 100).toFixed(1) + "%", "important");
+          const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+          const kit = nbaPhotoKitLayout(formatId);
+          const wordTop = word.top != null ? kit.kitTop + word.top * kit.kitH : null;
+          if (wordTop != null) teamEl.style.setProperty("top", (wordTop * 100).toFixed(2) + "%", "important");
+          // Keep the arch inside the fitted tank (not the old 84%-width crop margins).
+          const inset = Math.min(0.08, kit.kitW * 0.12);
+          teamEl.style.setProperty("left", ((kit.kitLeft + inset) * 100).toFixed(2) + "%", "important");
+          teamEl.style.setProperty("right", ((kit.kitRight + inset) * 100).toFixed(2) + "%", "important");
         }
       }
       canvas.classList.toggle("jersey-name-wrapped", wrapped);
@@ -2222,10 +2308,23 @@
       byId("displaySub").style.setProperty("text-align", "center", "important");
       if (sport === "nba" && usePhotoBack && t.jerseyOutput && t.jerseyOutput.number) {
         const nameSpec = t.jerseyOutput.name || {};
-        if (nameSpec.top != null) byId("displayMain").style.setProperty("top", (nameSpec.top * 100).toFixed(3) + "%", "important");
-        byId("displaySub").style.setProperty("top", (t.jerseyOutput.number.top * 100).toFixed(3) + "%", "important");
+        const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+        const kit = nbaPhotoKitLayout(formatId);
+        const inset = Math.min(0.08, kit.kitW * 0.12);
+        const leftPct = ((kit.kitLeft + inset) * 100).toFixed(2) + "%";
+        const rightPct = ((kit.kitRight + inset) * 100).toFixed(2) + "%";
+        if (nameSpec.top != null) {
+          byId("displayMain").style.setProperty("top", ((kit.kitTop + nameSpec.top * kit.kitH) * 100).toFixed(2) + "%", "important");
+        }
+        byId("displaySub").style.setProperty("top", ((kit.kitTop + t.jerseyOutput.number.top * kit.kitH) * 100).toFixed(2) + "%", "important");
+        byId("displayMain").style.setProperty("left", leftPct, "important");
+        byId("displayMain").style.setProperty("right", rightPct, "important");
+        byId("displaySub").style.setProperty("left", leftPct, "important");
+        byId("displaySub").style.setProperty("right", rightPct, "important");
         const nameTracking = nameGlyphs >= nameSpec.longAt ? nameSpec.longTracking : nameSpec.tracking;
         if (nameTracking != null) byId("displayMain").style.setProperty("letter-spacing", nameTracking + "em", "important");
+      } else if (sport !== "nba" || !usePhotoBack) {
+        clearNbaPhotoKitVars(canvas);
       }
       // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
       if (usePhotoBack && (sport === "soccer" || sport === "nfl")) {
@@ -2324,7 +2423,7 @@
 
       // FloqR card (bottom): paint BEFORE FrameLoop so a loop throw cannot skip the rail.
       // Always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
-      // Mount rail on the canvas (not inside display-center) so format/bezel stacking cannot hide it.
+      // Mount rail on the canvas (not inside display-center) so bottom:% is the LED, not a mid stack.
       let rail = byId("displayIdentityRail");
       if (rail && canvas && rail.parentElement !== canvas) {
         canvas.appendChild(rail);
@@ -2338,12 +2437,11 @@
         });
         rail.classList.remove("hidden");
         rail.setAttribute("aria-hidden", "false");
-        // Keep FloqR above the text overlay on both dual frames.
-        rail.style.setProperty("z-index", "60", "important");
-        rail.style.setProperty("opacity", "1", "important");
-        rail.style.setProperty("visibility", "visible", "important");
+        // NBA/NFL: pin under the kit (CSS + inline so a stale top:86% photo-back rule cannot win).
+        pinJerseyFloqMediaRail(rail, {sport});
       } else if (rail) {
         stopFloqrCardCycle();
+        clearPinnedJerseyFloqMediaRail(rail);
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
       }
@@ -2369,16 +2467,21 @@
       return;
     }
     hideJerseyMount();
+    clearNbaPhotoKitVars(canvas);
     const staleTeam = byId("displayJerseyTeam");
     if (staleTeam) {
       staleTeam.className = "soccer-jersey-team hidden";
       staleTeam.textContent = "";
       staleTeam.setAttribute("aria-hidden", "true");
+      staleTeam.style.removeProperty("top");
+      staleTeam.style.removeProperty("left");
+      staleTeam.style.removeProperty("right");
     }
     canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       stopFloqrCardCycle();
+      clearPinnedJerseyFloqMediaRail(railClear);
       railClear.className = "display-identity-rail hidden";
       railClear.innerHTML = "";
     }
