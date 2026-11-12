@@ -1158,6 +1158,36 @@
     fitNflShoutPanel(byId("displayNflShoutPanel"));
   }
 
+  function applyNbaDualFacePhase(phase, canvas, urls = {}) {
+    if (!canvas?.classList.contains("nba-dual-faces")) return;
+    // FrameLoop: media = front kit (team + number), copy = back kit (name + number).
+    const faceFront = phase === "copy"
+      ? false
+      : phase === "media"
+        ? true
+        : !canvas.classList.contains("nba-dual-phase-back");
+    canvas.classList.toggle("nba-dual-phase-front", faceFront);
+    canvas.classList.toggle("nba-dual-phase-back", !faceFront);
+    const bgEl = byId("displayBackground");
+    const url = faceFront
+      ? (urls.frontBackgroundUrl || urls.defaultBackgroundUrl || "")
+      : (urls.backBackgroundUrl || urls.defaultBackgroundUrl || "");
+    if (bgEl && url) {
+      applyBackgroundLayer(bgEl, { backgroundUrl: url, fit: "contain" });
+      canvas.classList.add("has-background-layer");
+    }
+    const teamEl = byId("displayJerseyTeam");
+    const nameEl = byId("displayMain");
+    if (teamEl) {
+      teamEl.classList.toggle("hidden", !faceFront);
+      teamEl.setAttribute("aria-hidden", faceFront ? "false" : "true");
+    }
+    if (nameEl) {
+      nameEl.classList.toggle("hidden", faceFront);
+      nameEl.setAttribute("aria-hidden", faceFront ? "true" : "false");
+    }
+  }
+
   function heistBrandLogoUrl() {
     return safeRender.safeUrl(loc.logoUrl || loc.clubLogoUrl || loc.brandLogoUrl || "") || HEIST_LOCAL_LOGO;
   }
@@ -1315,6 +1345,9 @@
       attributionChoice: params.get("attributionChoice") || "",
       jerseyPatronName: params.get("jerseyPatronName") || "",
       nflDualLayout: params.get("nflDualLayout") === "1",
+      nbaDualFaces: params.get("nbaDualFaces") === "1",
+      frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
+      backBackgroundUrl: params.get("backBackgroundUrl") || "",
       sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
@@ -1931,6 +1964,8 @@
       || t.layout === "split-media"
       || t.layout === "nfl-jersey"
       || t.nflDualLayout === true
+      || t.nbaDualFaces === true
+      || data.nbaDualFaces === true
       || (isSoccerJersey && String(data.sport || t.sport || "").toLowerCase() === "nfl");
     if (!keepFrameLoop) stopSplitMediaLoop();
     let screenFormatId = String(
@@ -2181,7 +2216,12 @@
       // Never remove `.display-text-overlay` — it owns #displayMain / #displaySub / #displayIdentityRail.
       canvas.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
-      const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
+      const nbaDualFaces = !!(t.nbaDualFaces || data.nbaDualFaces);
+      const frontBgUrl = String(data.frontBackgroundUrl || t.frontBackgroundUrl || "").trim();
+      const backBgUrl = String(data.backBackgroundUrl || t.backBackgroundUrl || t.defaultBackgroundUrl || "").trim();
+      const jerseyBg = nbaDualFaces
+        ? (frontBgUrl || data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
+        : (data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl);
       const usePhotoBack = !!jerseyBg;
       canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
       canvas.style.setProperty("--jersey-secondary", safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff"));
@@ -2189,15 +2229,18 @@
       canvas.style.setProperty("--jersey-plate-ink", safeRender.safeColor(t.jerseyPlateInk || data.jerseyPlateInk || "#ffffff", "#ffffff"));
       const overlayWord = !!(t.jerseyOverlayWordmark || data.jerseyOverlayWordmark);
       canvas.classList.toggle("jersey-overlay-wordmark", overlayWord && usePhotoBack);
+      canvas.classList.toggle("nba-dual-faces", nbaDualFaces && usePhotoBack);
       if (usePhotoBack) {
         // Named photo kits (country/club wordmark in PNG): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
         canvas.classList.add("jersey-photo-back");
         hideJerseyMount();
-        if (!hasBackgroundLayer) {
-          applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
-          bgEl.style.backgroundSize = "";
-          bgEl.style.backgroundPosition = "";
+        if (!hasBackgroundLayer || nbaDualFaces) {
+          applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg, fit: nbaDualFaces ? "contain" : "cover"});
+          if (!nbaDualFaces) {
+            bgEl.style.backgroundSize = "";
+            bgEl.style.backgroundPosition = "";
+          }
           canvas.classList.add("has-background-layer");
         }
       } else {
@@ -2235,6 +2278,7 @@
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
       canvas.classList.remove("jersey-css-country", "nfl-dual-layout", "nfl-dual-side", "nfl-dual-rotate", "split-media-loop", "split-media-phase-media", "split-media-phase-copy");
+      if (!nbaDualFaces) canvas.classList.remove("nba-dual-faces", "nba-dual-phase-front", "nba-dual-phase-back");
       if (sport === "soccer" && usePhotoBack) {
         baseName = Math.min(baseName * 0.56, 9.4);
         baseNumber = Math.min(baseNumber * 0.68, 42);
@@ -2483,6 +2527,25 @@
         requestAnimationFrame(() => {
           if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
         });
+      }
+      if (nbaDualFaces && usePhotoBack) {
+        const dualUrls = {
+          frontBackgroundUrl: frontBgUrl || jerseyBg,
+          backBackgroundUrl: backBgUrl || t.defaultBackgroundUrl || jerseyBg,
+          defaultBackgroundUrl: t.defaultBackgroundUrl || jerseyBg
+        };
+        canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
+        canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
+        canvas.classList.add("nba-dual-faces", "split-media-loop");
+        // Do not force front here — FLOQRFrameLoop resumes lastPhase on live re-renders
+        // (keepFrameLoop). Align the kit face after start so media↔copy stays in sync.
+        startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
+          frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
+          backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
+          defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
+        }));
+        const phase = canvas.classList.contains("split-media-phase-copy") ? "copy" : "media";
+        applyNbaDualFacePhase(phase, canvas, dualUrls);
       }
       {
         const keep = new Set([

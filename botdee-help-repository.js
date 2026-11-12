@@ -1375,6 +1375,22 @@
       page: "master-admin.html#diagnosticsFloqCast"
     },
     {
+      id: "help-master-shoutout-diagnostics",
+      title: "ShoutOut diagnostics",
+      body: "Master Admin → Diagnostics → ShoutOut. Consolidates ShoutOut appLogs (category shoutout): submit and save starts, media and Baller portrait steps, and temporary page_call rows for each composer page in a flow. Group trails by shoutoutTrailId / correlation id with timestamps, template, and location. The patron must be signed in for rows to save. Use this tab instead of hunting ShoutOut rows only under Application Logging.",
+      searchPhrases: [
+        "shoutout diagnostics", "shoutout logs", "shout out diagnostics", "page_call shoutout",
+        "shoutout page trail", "composer pages log", "diagnostics shoutout tab", "baller portrait log"
+      ],
+      links: [
+        {label: "ShoutOut diagnostics", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#diagnosticsShoutOut", search: "shoutout diagnostics"},
+        {label: "Application Logging", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#appLogging", search: "application logging"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsShoutOut"
+    },
+    {
       id: "help-master-ops-status",
       title: "Master Admin security and action status",
       body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask BOT DEE about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",
@@ -1739,10 +1755,13 @@
     },
     {
       id: "help-black-card",
-      title: "Black Card",
-      body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company.",
+      title: "Black Card (retired)",
+      body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE).",
       searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout", "black metal card", "$75 shoutout"],
-      links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
+      links: [
+        {label: "Baller's Alert", href: pageUrl("./", {start: "search"}), search: "baller's alert"},
+        {label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}
+      ],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1750,8 +1769,8 @@
     {
       id: "help-ballers-alert",
       title: "Baller's Alert",
-      body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Upload a photo from your library or take one with the camera. Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only the face sits in the medallion. Helmet, rim, and chip stay. If background removal fails, retry or keep the original. Company is optional (max 18 characters, always UPPERCASE on the card; preset WE'RE OUTSIDE LLC). Valid Thru 12/50.",
-      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo", "face medallion", "upload photo", "take photo", "background removal", "$100 shoutout"],
+      body: "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Use Upload photo → Photo library / files or Camera with face guide (one Upload control — no duplicate Take photo button). Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only the face sits in the medallion. Helmet, rim, and chip stay. If background removal fails, retry or keep the original. Company is optional (max 18 characters, always UPPERCASE on the card; preset WE'RE OUTSIDE LLC). Valid Thru 12/50.",
+      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo", "face medallion", "upload photo", "take photo", "background removal", "company max 18", "$100 shoutout"],
       links: [{label: "Throw a ShoutOut", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",

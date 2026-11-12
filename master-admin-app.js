@@ -323,6 +323,9 @@
       if (panelId === "diagnosticsFloqCast" && window.FLOQRFloqCastDiagnostics) {
         window.FLOQRFloqCastDiagnostics.mount();
       }
+      if (panelId === "diagnosticsShoutOut" && window.FLOQRShoutOutDiagnostics) {
+        window.FLOQRShoutOutDiagnostics.mount();
+      }
       if ((panelId === "mailLogging" || panelId === "twilio_sendgridMailLogs") && window.FLOQRMailLogging) {
         window.FLOQRMailLogging.mount();
       }
@@ -434,6 +437,7 @@
       if (target.closest("#diagnosticsDisplayErrors")) setText("displayLoadErrorsStatus", message);
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#diagnosticsFloqCast")) setText("floqcastDiagStatus", message);
+      if (target.closest("#diagnosticsShoutOut")) setText("shoutoutDiagStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);

@@ -1277,44 +1277,12 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   },
 
   // Design notes: .cursor/rules/design-notes-baller-cards.mdc
-  // Public Baller's Express branding (copyright-safe). Amex twins are Master Admin + Aurelia only.
-  blackCard: {
-    id:'blackCard',
-    name:'Black Card',
-    searchAliases:['black card','ballers express','baller card','metal card','business card shoutout'],
-    scope:'Shared',
-    className:'baller-card',
-    category:'VIP',
-    mediaMode:'No image/video',
-    supportsMedia:false,
-    backgroundEditable:false,
-    ballerCard:true,
-    ballerBrand:'ballers',
-    defaultBackgroundUrl:'./images/baller/black-card-2x1.png',
-    backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/black-card-2x1.png',
-      'led-64x32':'./images/baller/black-card-2x1.png',
-      'led-64x48':'./images/baller/black-card-4x3.png'
-    },
-    priceCents:7500,
-    priceLabel:'$75',
-    Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
-    defaultMain:'',
-    defaultSub:'',
-    lineCount:2,
-    maxCharactersPerLine:22,
-    maxMainCharacters:28,
-    maxSubCharacters:18,
-    textProfileId:'ballerCard',
-    description:"Baller's Express BUSINESS metal card (package art: ornate gold rim, warrior medallion, Valid Thru 12/50). Name or @handle in the lower-left blank row; optional company on the row below (max 18, UPPERCASE). $75. All LED sizes.",
-    howItWorks:"Pick Black Card → choose a name or @handle (casing kept) and optional company → preview → pay $75. The LED embosses your lines on the package artwork.",
-    tags:["black card","baller's express","metal card","vip","business","$75","96x48","64x48","64x32"]
-  },
+  // Public: Baller's Alert only (Black Card / Black Card Amex removed from catalog).
+  // Private Amex twin for Alert remains Master Admin + Aurelia only.
   ballersAlert: {
     id:'ballersAlert',
     name:"Baller's Alert",
-    searchAliases:['ballers alert',"baller's alert",'baller alert','face card','black card photo'],
+    searchAliases:['ballers alert',"baller's alert",'baller alert','face card','black card photo','black card'],
     scope:'Shared',
     className:'baller-card baller-alert',
     category:'VIP',
@@ -1344,43 +1312,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxSubCharacters:18,
     textProfileId:'ballerCard',
     description:"Baller's Express BUSINESS card with your face under the warrior helmet (helmet, rim, and chip stay). Valid Thru 12/50. Name/@handle + optional company (max 18, UPPERCASE). $100. All LED sizes.",
-    howItWorks:"Upload photo (library) or Take photo (camera). Gemini isolates the person; place the face under the helmet with zoom/position. Add name or @handle and optional company, then pay $100.",
-    tags:["baller's alert","black card","face","photo","gemini","ai","vip","$100","96x48","64x48","64x32"]
-  },
-  // Private twins — Master Admin + Aurelia only. Same Baller's Express package art (legacy AMEX microtext may remain in medallion/border).
-  blackCardAmex: {
-    id:'blackCardAmex',
-    name:'Black Card (Amex)',
-    searchAliases:['amex black card','american express black card','amex private'],
-    scope:'Club',
-    venueIds:['temp-democlub-1'],
-    masterAdminOnly:true,
-    className:'baller-card',
-    category:'Aurelia Private',
-    mediaMode:'No image/video',
-    supportsMedia:false,
-    backgroundEditable:false,
-    ballerCard:true,
-    ballerBrand:'amex',
-    defaultBackgroundUrl:'./images/baller/black-card-amex-2x1.png',
-    backgroundUrlByFormat:{
-      'led-96x48':'./images/baller/black-card-amex-2x1.png',
-      'led-64x32':'./images/baller/black-card-amex-2x1.png',
-      'led-64x48':'./images/baller/black-card-amex-4x3.png'
-    },
-    priceCents:7500,
-    priceLabel:'$75',
-    Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
-    defaultMain:'',
-    defaultSub:'',
-    lineCount:2,
-    maxCharactersPerLine:22,
-    maxMainCharacters:28,
-    maxSubCharacters:18,
-    textProfileId:'ballerCard',
-    description:"PRIVATE — Master Admin + Aurelia only. Same Baller's Express BUSINESS package art as public Black Card (legacy AMEX marks may remain in medallion/border). $75.",
-    tags:["amex","american express","black card","private","master admin","aurelia","$75"]
+    howItWorks:"Upload photo → Photo library / files or Camera with face guide. Gemini isolates the person; place the face under the helmet with zoom/position. Add name or @handle and optional company (max 18, UPPERCASE), then pay $100.",
+    tags:["baller's alert","face","photo","gemini","ai","vip","$100","96x48","64x48","64x32"]
   },
   ballersAlertAmex: {
     id:'ballersAlertAmex',
@@ -1656,7 +1589,7 @@ window.FLOQRTemplateCopy = window.FLOQRTemplateCopy || {
   }
 };
 
-window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween','blackCard','ballersAlert'];
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween','ballersAlert'];
 
 window.FLOQR_DISPLAY_FORMATS = {
   "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},

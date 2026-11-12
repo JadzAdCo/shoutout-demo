@@ -423,6 +423,28 @@
   if (nbaNflTemplates.nbaMarylandTerps) {
     nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 49.7% of the jersey width for one digit and 36.4% for two (+20% vertical), with its tip 5cm below the name. Numbers are collegiate varsity block numerals with open counters: team-color fill, contrasting outline, angular corners.";
   }
+  // PHILA front+back dual: rotates front (team word + number) ↔ back (name + number).
+  if (!nbaNflTemplates.nbaPhiladelphia76ersPhila) {
+    const base = nbaNflTemplates.nbaPhiladelphia76ers;
+    if (base) {
+      const phila = {
+        ...base,
+        id: "nbaPhiladelphia76ersPhila",
+        name: "NBA Philadelphia 76ers PHILA",
+        teamName: "Philadelphia 76ers PHILA",
+        jerseyTeamLabel: "PHILA",
+        jerseyPlateLabel: "PHILA",
+        nbaDualFaces: true,
+        frontBackgroundUrl: "./images/basketball/nba-76ers-front-with-club.png",
+        defaultBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
+        backBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
+        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "dual"])),
+        description: "$30 Philadelphia 76ers PHILA dual jersey ShoutOut — rotates front (PHILA + number) and back (name + number) every 6s on LED (96×48, 64×48, 64×32). Typed overlays; varsity numbers."
+      };
+      nbaNflTemplates.nbaPhiladelphia76ersPhila = phila;
+      nbaNflIds.push("nbaPhiladelphia76ersPhila");
+    }
+  }
   // Promote photo NFL kits with dual-panel shoutout layout flags.
   Object.keys(nbaNflTemplates).forEach(id => {
     const row = nbaNflTemplates[id];

@@ -165,11 +165,11 @@
       "id": "help-ballers-alert",
       "kind": "help",
       "label": "Baller's Alert",
-      "blurb": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Upload a photo from your library or take one with the camera. Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only th",
+      "blurb": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Use Upload photo → Photo library / files or Camera with face guide (one Upload control — no duplicate Take photo button). Gemini isolates you from the background (coarse edges ",
       "href": "./?start=search",
       "phrases": [
         "baller s alert",
-        "100 baller s alert the baller s express business metal card with your face under the warrior helmet. upload a photo from your library or take one with the camer",
+        "100 baller s alert the baller s express business metal card with your face under the warrior helmet. use upload photo photo library / files or camera with face ",
         "ballers alert",
         "baller alert",
         "face card",
@@ -178,6 +178,7 @@
         "upload photo",
         "take photo",
         "background removal",
+        "company max 18",
         "100 shoutout",
         "throw a shoutout",
         "help-ballers-alert"
@@ -294,18 +295,20 @@
       "sourceId": "help:help-black-card",
       "id": "help-black-card",
       "kind": "help",
-      "label": "Black Card",
-      "blurb": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embos",
+      "label": "Black Card (retired)",
+      "blurb": "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE).",
       "href": "./?start=search",
       "phrases": [
+        "black card retired",
+        "black card was removed from the shoutout catalog. use baller s alert instead 100 with your face under the warrior helmet optional company max 18 uppercase .",
         "black card",
-        "75 black card a photoreal baller s express business metal card on every led size. choose how your name appears floqr display name @handle or custom and a compan",
         "ballers express",
         "baller s express",
         "metal card",
         "business card shoutout",
         "black metal card",
         "75 shoutout",
+        "baller s alert",
         "throw a shoutout",
         "help-black-card"
       ]
@@ -1437,6 +1440,27 @@
         "privilege admin access",
         "master admin",
         "help-master-ops-status"
+      ]
+    },
+    {
+      "sourceId": "help:help-master-shoutout-diagnostics",
+      "id": "help-master-shoutout-diagnostics",
+      "kind": "help",
+      "label": "ShoutOut diagnostics",
+      "blurb": "Master Admin → Diagnostics → ShoutOut. Consolidates ShoutOut appLogs (category shoutout): submit and save starts, media and Baller portrait steps, and temporary page_call rows for each composer page in a flow. Group trails by shoutoutTrailId / correlation id with timestamps, temp",
+      "href": "./master-admin.html?from=botdee#diagnosticsShoutOut",
+      "phrases": [
+        "shoutout diagnostics",
+        "master admin diagnostics shoutout. consolidates shoutout applogs category shoutout submit and save starts media and baller portrait steps and temporary page_cal",
+        "shoutout logs",
+        "shout out diagnostics",
+        "page_call shoutout",
+        "shoutout page trail",
+        "composer pages log",
+        "diagnostics shoutout tab",
+        "baller portrait log",
+        "application logging",
+        "help-master-shoutout-diagnostics"
       ]
     },
     {
@@ -2614,15 +2638,19 @@
       "id": "ballers-alert",
       "kind": "product",
       "label": "Baller's Alert",
-      "blurb": "$100 Baller's Express card with your face in the upper-left medallion. Face photo required; Valid Thru year 50.",
+      "blurb": "$100 Baller's Express card with your face under the warrior helmet. Face photo required; company max 18 UPPERCASE; Valid Thru year 50.",
       "href": "./?start=search",
       "phrases": [
         "baller s alert",
-        "100 baller s express card with your face in the upper-left medallion. face photo required valid thru year 50.",
+        "100 baller s express card with your face under the warrior helmet. face photo required company max 18 uppercase valid thru year 50.",
         "ballers alert",
         "baller alert",
         "face card",
         "black card photo",
+        "black card",
+        "ballers express",
+        "baller s express",
+        "metal card",
         "ballers-alert"
       ]
     },
@@ -2637,23 +2665,6 @@
         "trade by bartr",
         "marketplace barter and swag.",
         "bartr"
-      ]
-    },
-    {
-      "sourceId": "intent:black-card",
-      "id": "black-card",
-      "kind": "product",
-      "label": "Black Card",
-      "blurb": "$75 Baller's Express BUSINESS metal card — your name and company embossed on every LED size.",
-      "href": "./?start=search",
-      "phrases": [
-        "black card",
-        "75 baller s express business metal card your name and company embossed on every led size.",
-        "ballers express",
-        "baller s express",
-        "metal card",
-        "business card shoutout",
-        "black-card"
       ]
     },
     {

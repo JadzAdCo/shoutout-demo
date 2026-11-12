@@ -1,4 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.96 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.101 (stable)
+
+- s3.2.101: ShoutOut Diagnostics (Master Admin), PHILA dual jersey, Baller's Alert upload chooser + face-camera oval; company max 18 UPPERCASE; Black Card + Black Card (Amex) removed from catalog (Alert kept); portrait decode + Gemini JSON harden.
 
 - s3.2.96: Fix Terps/NBA missing jersey number (`digits` ReferenceError aborted paint + FloqMedia pin); jersey attribution no longer wipes mark; Use Past ShoutOut restores number; My ShoutOuts opens Completed when Saved is empty.
 - s3.2.95: Terps/NBA FloqMedia under hem (height-fit kit), Baller rim restore, jersey remnant wipe, floqCast 100s, Gemini thinkingLevel LOW.

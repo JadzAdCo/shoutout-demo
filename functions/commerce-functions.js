@@ -56,13 +56,14 @@ const SOCCER_JERSEY_PRICE_CENTS = 3000;
 const CLASSIC_HALLOWEEN_TEMPLATE_ID = "classicHalloween";
 const CLASSIC_HALLOWEEN_PRICE_CENTS = 1500;
 const BALLER_CARD_PRICE_CENTS = {
+  // Legacy blackCard / blackCardAmex kept for in-flight / historical orders only — not in catalog.
   blackCard: 7500,
   ballersAlert: 10000,
   blackCardAmex: 7500,
   ballersAlertAmex: 10000
 };
 const BALLER_CARD_TEMPLATE_IDS = new Set(Object.keys(BALLER_CARD_PRICE_CENTS));
-const BALLER_AMEX_TEMPLATE_IDS = new Set(["blackCardAmex", "ballersAlertAmex"]);
+const BALLER_AMEX_TEMPLATE_IDS = new Set(["ballersAlertAmex", "blackCardAmex"]);
 const BALLER_CARD_LABELS = {
   blackCard: "Black Card",
   ballersAlert: "Baller's Alert",
@@ -439,6 +440,12 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     };
   }
   if (BALLER_CARD_TEMPLATE_IDS.has(templateId)) {
+    if (templateId === "blackCard" || templateId === "blackCardAmex") {
+      throw new HttpsError(
+        "failed-precondition",
+        "Black Card was removed from the catalog. Use Baller's Alert (or Baller's Alert Amex at Aurelia)."
+      );
+    }
     const clubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
     if (BALLER_AMEX_TEMPLATE_IDS.has(templateId)) {
       if (!isServerAdminAuth(authContext)) {

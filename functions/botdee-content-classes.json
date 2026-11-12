@@ -191,6 +191,9 @@
     "help-master-ops-status": [
       "masterAdmin"
     ],
+    "help-master-shoutout-diagnostics": [
+      "masterAdmin"
+    ],
     "help-master-shoutout-retention": [
       "masterAdmin"
     ],
@@ -380,9 +383,6 @@
       "patron"
     ],
     "bartr": [
-      "patron"
-    ],
-    "black-card": [
       "patron"
     ],
     "classic-halloween": [
