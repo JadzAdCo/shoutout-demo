@@ -77,7 +77,8 @@
     const ink = hex(fill, "#FFFFFF");
     const keyline = hex(stroke, "#FFFFFF");
     return '<svg class="varsity-num" viewBox="0 0 ' + total + ' ' + H + '" height="1em" focusable="false" aria-hidden="true">' +
-      '<g fill="' + ink + '" stroke="' + keyline + '" stroke-width="11" stroke-linejoin="miter" stroke-miterlimit="4" stroke-linecap="butt" fill-rule="evenodd" paint-order="stroke fill">' +
+      // stroke-width 8.8 = prior 11 × 0.8 (−20% outline weight, s3.2.99)
+      '<g fill="' + ink + '" stroke="' + keyline + '" stroke-width="8.8" stroke-linejoin="miter" stroke-miterlimit="4" stroke-linecap="butt" fill-rule="evenodd" paint-order="stroke fill">' +
       parts.join("") + "</g></svg>";
   }
 

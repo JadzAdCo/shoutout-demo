@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.98";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.98";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.99";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.99";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.99",
+      title: "s3.2.99 — Terps number stroke weight −20%",
+      checks: [
+        {label:"Varsity stroke 8.8", file:"floqr-varsity-numbers.js", includes:["stroke-width=\"8.8\""]},
+        {label:"Varsity cache-bust", file:"display.html", includes:["floqr-varsity-numbers.js?v=s3.2.99"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-99-terps-stroke-thin"]}
+      ]
+    },
     {
       version: "s3.2.98",
       title: "s3.2.98 — Terps number horizontal −30%",
@@ -2843,6 +2852,15 @@
       howToTest:"1) Hard-refresh display.html?location=temp-democlub-1 + Search composer (s3.2.96). 2) Throw Maryland Terps with name DON and number 44 → Club Admin approve. 3) LED shows DON + 44 and FloqMedia under the hem (not over the collar). 4) Composer → Use Past ShoutOut → pick that row → number field shows 44. 5) My Profile → Feature & Orders → My ShoutOuts — Completed lists the approved Terps (Saved may be empty if you never saved a draft). Mark Succeed/Failed.",
       expected:"Number 44 visible on LED; FloqMedia under hem; Past reuse keeps 44; Completed shows paid/approved history.",
       troubleshoot:"Blank number → confirm display-app.js has `const digits = glyphLen` and hard-refresh. FloqMedia at top → paint threw before pin; same digits fix. Past clears number → syncAttribution must skip isSoccerJerseyTemplate. Empty My ShoutOuts Completed while Firestore has approved rows → check signed-in uid matches submittedByUid; console for FLOQR portal query failed."
+    },
+    {
+      id:"s3-2-99-terps-stroke-thin",
+      area:"ShoutOut / Display",
+      feature:"Terps/NBA varsity number outline weight −20%",
+      changed:"s3.2.99 — FLOQRVarsityNumbers stroke-width 11 → 8.8 (−20%). Horizontal scaleX(.7) and +20% height from prior packages unchanged.",
+      howToTest:"1) Hard-refresh display (s3.2.99). 2) Terps number 44 — outline ring looks thinner; counters still open; width/height same as s3.2.98. Mark Succeed/Failed.",
+      expected:"Thinner outline/weight; open counters; same overall size as s3.2.98.",
+      troubleshoot:"Still heavy → hard-refresh floqr-varsity-numbers.js?v=s3.2.99; confirm stroke-width=\"8.8\"."
     },
     {
       id:"s3-2-98-terps-number-narrow",

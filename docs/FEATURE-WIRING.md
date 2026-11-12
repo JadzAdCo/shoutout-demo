@@ -30,6 +30,14 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED — Terps number stroke weight −20% (s3.2.99)
+
+| Piece | Wiring |
+|---|---|
+| Thinner outline | `floqr-varsity-numbers.js` SVG `stroke-width` **8.8** (was 11, −20%) |
+
+Cache-bust: `floqr-varsity-numbers.js` `?v=s3.2.99`. Manual test: `s3-2-99-terps-stroke-thin`.
+
 ## LED — Terps number horizontal −30% (s3.2.98)
 
 | Piece | Wiring |
