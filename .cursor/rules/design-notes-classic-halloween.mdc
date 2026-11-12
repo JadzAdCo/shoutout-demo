@@ -13,7 +13,7 @@ Resume: `@halloween$` / `$halloween$`. Template id **`classicHalloween`**, name 
 |---|---|
 | Board | Same classic three-line board as `blackwhite` (`profileId` = `classicBoard`, `identityRail`, `identity-loop` FloqR identity card). **`blackwhite` itself is unchanged.** |
 | Emoji | Allowed (`allowEmoji: true`). Letters are uppercased, emoji kept; caps count graphemes so an emoji is one glyph and never split. |
-| Background | Dark LED-friendly moonlit graveyard + jack-o'-lanterns: `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32), `-4x3.svg` (64×48 via CSS). Not patron-editable (`backgroundEditable: false`). |
+| Background | Dark LED-friendly moonlit graveyard + jack-o'-lanterns: `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32), `-4x3.svg` (64×48 via CSS). Not patron-editable (`backgroundEditable: false`). No RIP headstone behind the FloqR card on any size (owner, Nov 6 2026) — keep the front row clear across the card's width. |
 | Finale | At the end of each ShoutOut cycle: a grave rises, several white ghosts burst out and rush toward the viewer, the Reaper rises, bats swarm. |
 | Timing | `FLOQRFrameLoop.cycle("halloween-finale", {count: 4})` — 3 board phases + 1 finale phase × 6 s. **No per-template `setInterval` / `setTimeout`.** |
 | Reduced motion | `@media (prefers-reduced-motion: reduce)`: animations off, static ghost line-up + Reaper, no bats, board dimmed. |

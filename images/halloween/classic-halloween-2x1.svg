@@ -103,9 +103,7 @@
   <use href="#tree" xlink:href="#tree" transform="translate(1600 0) scale(-1 1)"/>
 
   <path d="M0 650Q300 628 600 654T1200 644T1600 660V800H0z" fill="#07040b"/>
-  <use href="#stone" xlink:href="#stone" x="232" y="676" width="96" height="168" transform="translate(-48 -84)"/>
   <use href="#cross" xlink:href="#cross" x="1372" y="672" width="96" height="168" transform="translate(-48 -84)"/>
-  <use href="#stone" xlink:href="#stone" x="1270" y="700" width="80" height="140" transform="translate(-40 -70)"/>
   <use href="#cross" xlink:href="#cross" x="330" y="704" width="80" height="140" transform="translate(-40 -70)"/>
 
   <ellipse cx="800" cy="790" rx="900" ry="60" fill="url(#mist)"/>

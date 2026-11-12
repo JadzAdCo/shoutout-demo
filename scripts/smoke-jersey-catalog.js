@@ -1,0 +1,27 @@
+"use strict";
+const fs = require("fs");
+const vm = require("vm");
+const sandbox = {window: {}, console};
+vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync("jersey-catalog.js", "utf8"), sandbox);
+const cat = sandbox.window.FLOQR_JERSEY_CATALOG;
+const nfl = Object.values(cat).filter(t => t.sport === "nfl" && t.defaultBackgroundUrl);
+const nba = Object.values(cat).filter(t => t.sport === "nba" && t.league === "NBA" && t.defaultBackgroundUrl && t.jerseyOverlayWordmark);
+const terps = cat.nbaMarylandTerps;
+if (nfl.length < 33) throw new Error("nfl photos " + nfl.length);
+if (nba.length !== 30) throw new Error("nba photos " + nba.length);
+if (!terps || !terps.jerseyStateField || terps.jerseyTeamLabel !== "MARYLAND") throw new Error("terps");
+const need = ["nflAtlantaFalcons", "nbaLosAngelesLakers", "nbaBostonCeltics", "nbaUtahJazz", "nbaMiamiHeat", "nbaHoustonRockets", "nbaPhiladelphia76ers"];
+for (const id of need) {
+  if (!cat[id] || !cat[id].jerseyOverlayWordmark) throw new Error("missing " + id);
+}
+if (cat.nbaLosAngelesLakers.jerseyTeamLabel !== "LAKERS") throw new Error("lakers label");
+if (cat.nbaPhiladelphia76ers.jerseyTeamLabel !== "76ERS") throw new Error("sixers label");
+const out = cat.nbaMarylandTerps.jerseyOutput;
+if (!out || out.number.one !== 0.414 || out.number.two !== 0.3036 || out.number.top !== 0.32355 || out.number.style !== "alumni-collegiate" || out.name.top !== 0.2315) throw new Error("output number");
+if (out.word.wrapAtSpace !== true || out.word.wrapLines !== 2 || out.word.top !== 0.103 || out.word.liftCm !== 4 || out.word.archDegrees !== 25) throw new Error("wrap");
+if (out.word.longAt !== 10 || "TIMBERWOLVES".length < out.word.longAt) throw new Error("long state");
+if (!/LOS ANGELES/.test(cat.nbaMarylandTerps.description) || !/OKLAHOMA CITY/.test(cat.nbaMarylandTerps.description)) throw new Error("city wrap copy");
+if (!cat.nbaLosAngelesLakers.jerseyOutput || !/OKLAHOMA CITY/.test(cat.nbaMarylandTerps.description)) throw new Error("output on template");
+if (cat.nbaOklahomaCityThunder.jerseyPlateLabel !== "THUNDER") throw new Error("thunder plate");
+console.log("ok", nfl.length, "nfl photos;", nba.length, "nba photos;", terps.id, terps.defaultBackgroundUrl);

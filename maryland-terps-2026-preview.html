@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 Maryland Terps basketball — local preview</title>
+  <style>
+    :root {
+      --red: #e21833;
+      --gold: #ffd520;
+      --ink: #111111;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #050505;
+      color: #f4f4f5;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    header, main { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 28px 0 8px; }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+    .lede { margin: 0; color: #a1a1aa; max-width: 62ch; line-height: 1.45; }
+    .badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 8px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 1.4fr 1.4fr .6fr;
+      gap: 12px;
+      margin: 22px 0 28px;
+    }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #d4d4d8; }
+    input {
+      height: 44px;
+      border: 1px solid #3f3f46;
+      border-radius: 8px;
+      background: #18181b;
+      color: #fff;
+      padding: 0 12px;
+      font: 700 18px/1 "Arial Black", Impact, "Segoe UI", sans-serif;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+    .stage { display: grid; grid-template-columns: minmax(280px, 460px) 1fr; gap: 28px; align-items: start; }
+    .kit {
+      container-type: inline-size;
+      position: relative;
+      width: 100%;
+      background: #000;
+      line-height: 0;
+    }
+    .kit img { width: 100%; height: auto; display: block; }
+    .line {
+      position: absolute;
+      left: 27%;
+      right: 27%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      color: #fff;
+      font-family: "Arial Black", Impact, "Arial Narrow", sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: .9;
+      white-space: nowrap;
+      -webkit-text-stroke: 0.045em var(--ink);
+      paint-order: stroke fill;
+      text-shadow: 0 0.05em 0 #000;
+    }
+    .line .ch { display: inline-block; transform-origin: center bottom; }
+    .state { top: 13.7%; font-size: 6.6cqw; letter-spacing: .08em; }
+    .state.wrap { flex-direction: column; align-items: center; justify-content: flex-start; white-space: normal; line-height: 1; gap: .08em; }
+    .state .ln { display: flex; justify-content: center; white-space: nowrap; line-height: 1; }
+    .name { top: 27.2%; font-size: 5.1cqw; letter-spacing: .14em; }
+    .num {
+      top: 36.3%;
+      height: auto;
+      align-items: flex-start;
+      font-size: 41.4cqw;
+      letter-spacing: 0;
+      line-height: 1;
+      -webkit-text-stroke: 0;
+      text-shadow: none;
+    }
+    .num .varsity-num { display: block; height: 1em; width: auto; overflow: visible; }
+    .kit[data-digits="1"] .num { font-size: 41.4cqw; letter-spacing: 0; }
+    .kit[data-digits="2"] .num { font-size: 30.36cqw; }
+    .kit[data-state-len="long"] .state { font-size: 5.2cqw; letter-spacing: .02em; }
+    .kit[data-state-len="xlong"] .state { font-size: 4.2cqw; letter-spacing: .01em; }
+    .kit[data-state-len="wrap"] .state { font-size: 6.6cqw; letter-spacing: .08em; }
+    .kit[data-name-len="long"] .name { font-size: 4cqw; letter-spacing: .04em; }
+    .boards h2 { margin: 0 0 12px; font-size: 16px; font-weight: 650; }
+    .board-row { display: grid; gap: 16px; }
+    .board-card { min-width: 0; }
+    .board-card p { margin: 8px 0 0; color: #a1a1aa; font-size: 13px; }
+    .board {
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid #27272a;
+    }
+    .board-96 { aspect-ratio: 2 / 1; }
+    .board-64x48 { aspect-ratio: 4 / 3; }
+    .board-64x32 { aspect-ratio: 2 / 1; }
+    .board .kit {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      height: 118%;
+      width: auto;
+      aspect-ratio: 3 / 4;
+      transform: translate(-50%, -50%);
+    }
+    .board-64x48 .kit { height: 108%; top: 48%; }
+    footer { width: min(1100px, calc(100% - 32px)); margin: 28px auto 40px; color: #71717a; font-size: 13px; }
+    @media (max-width: 800px) {
+      form, .stage { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">Local preview · not uploaded</div>
+    <h1>2026 University of Maryland Terps</h1>
+    <p class="lede">Basketball tank in the same studio cut as the recent jersey backs: sleeveless, solid black, Maryland red, flag side panels. State, name, and number stay off the photo so you can type them.</p>
+  </header>
+  <main>
+    <form id="fields" autocomplete="off">
+      <label>State
+        <input id="state" name="state" maxlength="16" value="MARYLAND" spellcheck="false">
+      </label>
+      <label>Name
+        <input id="name" name="name" maxlength="12" value="SMITH" spellcheck="false">
+      </label>
+      <label>Number
+        <input id="number" name="number" maxlength="2" inputmode="numeric" value="1" spellcheck="false">
+      </label>
+    </form>
+    <div class="stage">
+      <div class="kit" id="hero" data-digits="1">
+        <img src="./images/basketball/maryland-terps-2026-back.jpg" alt="2026 Maryland Terps basketball jersey back, blank">
+        <div class="line state" data-role="state"></div>
+        <div class="line name" data-role="name"></div>
+        <div class="line num" data-role="num"></div>
+      </div>
+      <div class="boards">
+        <h2>LED boards</h2>
+        <div class="board-row">
+          <div class="board-card">
+            <div class="board board-96" data-board="96x48"></div>
+            <p>96×48 · wide board</p>
+          </div>
+          <div class="board-card">
+            <div class="board board-64x48" data-board="64x48"></div>
+            <p>64×48</p>
+          </div>
+          <div class="board-card">
+            <div class="board board-64x32" data-board="64x32"></div>
+            <p>64×32</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>Preview only. This kit is not in the jersey catalog and has not been published.</footer>
+  <script src="./floqr-varsity-numbers.js?v=s3.2.91"></script>
+  <script>
+    (function () {
+      var hero = document.getElementById("hero");
+      var img = hero.querySelector("img");
+      document.querySelectorAll("[data-board]").forEach(function (board) {
+        var kit = hero.cloneNode(true);
+        kit.removeAttribute("id");
+        board.appendChild(kit);
+      });
+
+      function esc(ch) {
+        if (ch === " ") return "&nbsp;";
+        return ch.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      }
+
+      function arch(text) {
+        var chars = Array.from(text);
+        if (!chars.length) return { html: "", rise: 0 };
+        var last = Math.max(1, chars.length - 1);
+        var span = 25;
+        var half = (span * Math.PI / 180) / 2;
+        var rise = chars.length <= 1 ? 0 : ((1 - Math.cos(half)) / (2 * Math.sin(half))) * (chars.length - 1) * 0.72;
+        var html = chars.map(function (ch, i) {
+          var t = chars.length === 1 ? 0 : (i / last) - 0.5;
+          var rot = t * span;
+          var lift = (1 - Math.abs(t) * 2) * rise;
+          return '<span class="ch" style="transform:translateY(' + (-lift).toFixed(3) + 'em) rotate(' + rot.toFixed(2) + 'deg)">' + esc(ch) + "</span>";
+        }).join("");
+        return { html: html, rise: rise };
+      }
+
+      function clean(value, max) {
+        return String(value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, max);
+      }
+
+      function paint() {
+        var state = clean(document.getElementById("state").value, 16);
+        var name = clean(document.getElementById("name").value, 12);
+        var number = String(document.getElementById("number").value || "").replace(/\D/g, "").slice(0, 2);
+        document.querySelectorAll(".kit").forEach(function (kit) {
+          var lines = state.split(/\s+/).filter(Boolean);
+          var wrapped = lines.length >= 2;
+          var stateEl = kit.querySelector('[data-role="state"]');
+          kit.dataset.digits = number.length === 2 ? "2" : "1";
+          kit.dataset.stateLen = wrapped ? "wrap" : state.length >= 13 ? "xlong" : state.length > 9 ? "long" : "short";
+          kit.dataset.nameLen = name.length > 8 ? "long" : "short";
+          stateEl.classList.toggle("wrap", wrapped);
+          stateEl.innerHTML = wrapped
+            ? lines.slice(0, 2).map(function (line) {
+              var row = arch(line);
+              return '<span class="ln" style="padding-top:' + row.rise.toFixed(3) + 'em">' + row.html + "</span>";
+            }).join("")
+            : arch(state).html;
+          kit.querySelector('[data-role="name"]').textContent = name;
+          kit.querySelector('[data-role="num"]').innerHTML = window.FLOQRVarsityNumbers.svg(
+            number,
+            "#FFFFFF",
+            window.FLOQRVarsityNumbers.outline("#FFFFFF", "#FFD520", "#E21833")
+          );
+        });
+      }
+
+      document.getElementById("fields").addEventListener("input", paint);
+      window.paintTerpsPreview = paint;
+      if (img.complete) paint();
+      else img.addEventListener("load", paint);
+      paint();
+    })();
+  </script>
+</body>
+</html>

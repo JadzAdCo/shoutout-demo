@@ -102,7 +102,6 @@
   <use href="#tree" xlink:href="#tree" transform="translate(1200 0) scale(-1 1)"/>
 
   <path d="M0 734Q220 708 450 736T900 724T1200 742V900H0z" fill="#07040b"/>
-  <use href="#stone" xlink:href="#stone" x="178" y="768" width="84" height="148" transform="translate(-42 -74)"/>
   <use href="#cross" xlink:href="#cross" x="1022" y="764" width="84" height="148" transform="translate(-42 -74)"/>
 
   <ellipse cx="600" cy="890" rx="700" ry="64" fill="url(#mist)"/>

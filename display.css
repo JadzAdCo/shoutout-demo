@@ -925,6 +925,12 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:inline-block;
   transform-origin:center bottom;
 }
+.display-canvas.soccer-jersey-template .jersey-word-line{
+  display:flex;
+  justify-content:center;
+  white-space:nowrap;
+  line-height:.58;
+}
 .display-canvas.soccer-jersey-template .soccer-jersey-team.hidden{
   display:none!important;
 }
@@ -1158,6 +1164,20 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .soccer-jersey-team{
   display:none!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:calc(16.2% + var(--nfl-photo-stack-y))!important;
+  height:6.8%!important;
+  left:28%!important;
+  right:28%!important;
+  color:var(--jersey-plate-ink,#fff)!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  font-weight:900!important;
+  letter-spacing:.03em!important;
+  -webkit-text-stroke:0.045em rgba(0,0,0,.55);
+  paint-order:stroke fill;
+  z-index:7!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
   /* Patron name BETWEEN baked club nameplate and number (was overlapping plate). */
@@ -1689,6 +1709,75 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   height:42%!important;
   font-style:normal;
   text-shadow:0 3px 0 rgba(0,0,0,.55),0 0 16px rgba(0,0,0,.35)!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:10.3%!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  font-size:11vh!important;
+  left:27%!important;
+  right:27%!important;
+  color:var(--jersey-secondary,#fff)!important;
+  letter-spacing:.08em!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  -webkit-text-stroke:0.055em #111;
+  paint-order:stroke fill;
+  text-shadow:0 0.04em 0 #111;
+  z-index:7!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team.jersey-word-wrap{
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  white-space:normal!important;
+  line-height:.58!important;
+  gap:.04em!important;
+  letter-spacing:.08em!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displayMain.soccer-jersey-name{
+  top:23.15%!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  place-items:start center!important;
+  overflow:visible!important;
+  left:27%!important;
+  right:27%!important;
+  letter-spacing:.12em!important;
+  color:var(--jersey-secondary,#fff)!important;
+  -webkit-text-stroke:0.045em #111;
+  paint-order:stroke fill;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number{
+  top:32.355%!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  align-content:start!important;
+  place-items:start center!important;
+  overflow:visible!important;
+  left:27%!important;
+  right:27%!important;
+  color:var(--jersey-secondary,#fff)!important;
+  line-height:.82!important;
+  font-family:"Alumni Sans Collegiate One",Impact,"Arial Narrow",sans-serif!important;
+  -webkit-text-stroke:0!important;
+  paint-order:normal;
+  letter-spacing:.01em!important;
+  text-shadow:
+    0.012em 0 0 var(--jersey-num-outline,#fff),
+    -0.012em 0 0 var(--jersey-num-outline,#fff),
+    0 0.012em 0 var(--jersey-num-outline,#fff),
+    0 -0.012em 0 var(--jersey-num-outline,#fff),
+    0.0085em 0.0085em 0 var(--jersey-num-outline,#fff),
+    -0.0085em 0.0085em 0 var(--jersey-num-outline,#fff),
+    0.0085em -0.0085em 0 var(--jersey-num-outline,#fff),
+    -0.0085em -0.0085em 0 var(--jersey-num-outline,#fff)!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number .varsity-num{
+  display:block;
+  height:1em;
+  width:auto;
+  overflow:visible;
 }
 
 /* NFL — bulkier yoke, shoulder name plate, huge thick number */

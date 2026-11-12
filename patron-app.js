@@ -604,10 +604,14 @@
         template: templateId,
         templateName: t.name || templateId,
         jerseyTeamId: "",
-        jerseyTeamLabel: t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase(),
+        jerseyTeamLabel: (t.jerseyStateField && String(byId("jerseyState")?.value || "").trim())
+          ? String(byId("jerseyState").value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 16)
+          : (t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase()),
         jerseyPrimary: t.jerseyPrimary || "",
         jerseySecondary: t.jerseySecondary || "",
         jerseyAccent: t.jerseyAccent || t.jerseySecondary || "",
+        jerseyPlateInk: t.jerseyPlateInk || "",
+        jerseyOverlayWordmark: t.jerseyOverlayWordmark ? "1" : "",
         jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
         backgroundUrl: t.defaultBackgroundUrl || "",
         sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
@@ -739,6 +743,10 @@
     if (byId("subText")) byId("subText").value = "";
     return true;
   }
+  function isUseShoutOutPlaceholder(value = "") {
+    const text = String(value || "").trim();
+    return /^use\s*shout\s*out\b/i.test(text) || /^enter shoutout here\b/i.test(text);
+  }
   function syncSoccerJerseyFields() {
     syncBallerCardFields();
     const soccer = isSoccerJerseyTemplate();
@@ -753,6 +761,13 @@
     const source = byId("soccerNameSource")?.value || "displayName";
     byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
     const consolidated = isConsolidatedSoccerTemplate();
+    const stateOn = !!getTemplate()?.jerseyStateField;
+    const stateInput = byId("jerseyState");
+    byId("jerseyStateWrap")?.classList.toggle("hidden", !soccer || !stateOn);
+    if (stateOn && stateInput && stateInput.dataset.ready !== "1") {
+      stateInput.value = getTemplate()?.jerseyPlateLabel || "MARYLAND";
+      stateInput.dataset.ready = "1";
+    }
     byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
     byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
     const floqrAttrHint = document.querySelector(".attribution-controls .sub.small");
@@ -790,6 +805,7 @@
         const shoutLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 64));
         // HTML maxlength is UTF-16 and blocks emoji — grapheme glyphCap is the real gate.
         main.removeAttribute("maxlength");
+        if (isUseShoutOutPlaceholder(main.value)) main.value = "";
         main.value = glyphCap(main.value || "", shoutLimit);
         main.placeholder = caps.lineCount >= 4
           ? `ShoutOut text (max ${shoutLimit} · ${caps.lineCount} lines · emoji OK)`
@@ -4384,6 +4400,8 @@
       if (payload.jerseyPrimary) url.searchParams.set("jerseyPrimary", payload.jerseyPrimary);
       if (payload.jerseySecondary) url.searchParams.set("jerseySecondary", payload.jerseySecondary);
       if (payload.jerseyAccent) url.searchParams.set("jerseyAccent", payload.jerseyAccent);
+      if (payload.jerseyPlateInk) url.searchParams.set("jerseyPlateInk", payload.jerseyPlateInk);
+      if (payload.jerseyOverlayWordmark) url.searchParams.set("jerseyOverlayWordmark", "1");
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
       if (payload.attribution) url.searchParams.set("attribution", payload.attribution);
       if (payload.includeAttribution) url.searchParams.set("includeAttribution", "1");
@@ -4451,6 +4469,20 @@
       ...jerseyPayload,
       ...ballerPayload
     };
+    if (isSoccerJerseyTemplate() && !isNflDualJerseyTemplate()) {
+      const typedName = graphemes(String(soccerNameFromSource() || "").toUpperCase()).slice(0, 8).join("");
+      const typedMark = glyphCap(byId("soccerJerseyNumber")?.value || "", 2);
+      const typedState = getTemplate()?.jerseyStateField
+        ? String(byId("jerseyState")?.value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 16)
+        : "";
+      if (typedName) previewPayload.mainText = typedName;
+      if (typedMark) previewPayload.subText = typedMark;
+      if (typedState) previewPayload.jerseyTeamLabel = typedState;
+      previewPayload.jerseyPatronName = typedName || previewPayload.jerseyPatronName || "";
+    }
+    if (isUseShoutOutPlaceholder(previewPayload.mainText) && previewPayload.jerseyPatronName) {
+      previewPayload.mainText = String(previewPayload.jerseyPatronName).toUpperCase();
+    }
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
       if (window.FLOQRBoardFrame) {
@@ -5825,6 +5857,7 @@
     byId("ballerFacePosY")?.addEventListener("input", () => { updatePreview(); });
     byId("soccerTeamId")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("jerseyState")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerJerseyNumber")?.addEventListener("input", event => {
       // Any character allowed; hard-cap at 2 glyphs for soccer templates.
       const next = glyphCap(event.currentTarget.value, 2);
@@ -5844,6 +5877,13 @@
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
     byId("mainText")?.addEventListener("input", event => {
+      if (isSoccerJerseyTemplate() && !isNflDualJerseyTemplate()) {
+        syncSoccerJerseyFields();
+        updatePreview();
+        updateTemplateCharacterCapHint();
+        return;
+      }
+      if (isUseShoutOutPlaceholder(event.currentTarget.value)) event.currentTarget.value = "";
       const next = clampMainTextWhileTyping(event.currentTarget.value);
       if (event.currentTarget.value !== next) event.currentTarget.value = next;
       updateTemplateCharacterCapHint();

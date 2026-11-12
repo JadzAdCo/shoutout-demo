@@ -3066,7 +3066,6 @@
   }
 
   async function approve(id, item) {
-    const defaultMain = `Use ShoutOut @ ${loc.locationName || locationId}`;
     const textCaps = adminShoutoutTextCaps(item);
     const packaged = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {};
     const itemSport = String(item.sport || packaged.sport || "").toLowerCase();
@@ -3085,9 +3084,14 @@
       template: item.template || "neon",
       templateName: item.templateName || packaged.name || "",
       // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
+      // A jersey that already has a name must not keep the idle "Use ShoutOut @" line as mainText.
       mainText: isNflDual
         ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
-        : fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main", packaged),
+        : fitAdminShoutoutText(
+          (/^use\s*shout\s*out\b/i.test(String(item.mainText || "").trim()) && String(item.jerseyPatronName || item.jerseyName || "").trim())
+            ? String(item.jerseyPatronName || item.jerseyName).trim()
+            : (item.mainText || "SHOUTOUT!"),
+          textCaps, "main", packaged),
       subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub", packaged),
       attribution: String(item.attribution || "").trim(),
       includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
@@ -3154,7 +3158,7 @@
       source: "clubAdminApproval",
       expiredAt: firebase.firestore.FieldValue.delete(),
       displayDurationSeconds: 600,
-      defaultMain,
+      defaultMain: firebase.firestore.FieldValue.delete(),
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
       referenceNumber: item.referenceNumber || "",
