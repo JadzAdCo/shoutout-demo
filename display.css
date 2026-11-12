@@ -1832,22 +1832,15 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   font-family:"Alumni Sans Collegiate One",Impact,"Arial Narrow",sans-serif!important;
   -webkit-text-stroke:0!important;
   paint-order:normal;
-  letter-spacing:.01em!important;
-  text-shadow:
-    0.012em 0 0 var(--jersey-num-outline,#fff),
-    -0.012em 0 0 var(--jersey-num-outline,#fff),
-    0 0.012em 0 var(--jersey-num-outline,#fff),
-    0 -0.012em 0 var(--jersey-num-outline,#fff),
-    0.0085em 0.0085em 0 var(--jersey-num-outline,#fff),
-    -0.0085em 0.0085em 0 var(--jersey-num-outline,#fff),
-    0.0085em -0.0085em 0 var(--jersey-num-outline,#fff),
-    -0.0085em -0.0085em 0 var(--jersey-num-outline,#fff)!important;
+  letter-spacing:0!important;
+  text-shadow:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number .varsity-num{
   display:block;
-  height:1em;
+  height:1em; /* font-size vh already +20% via jerseyOutput.number (s3.2.97) */
   width:auto;
   overflow:visible;
+  margin-inline:auto;
 }
 
 /* NFL — bulkier yoke, shoulder name plate, huge thick number */

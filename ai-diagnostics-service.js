@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.96";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.96";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.97";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.97";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.97",
+      title: "s3.2.97 — Terps varsity SVG numbers +20% + Saved continue",
+      checks: [
+        {label:"NBA varsity SVG paint", file:"display-app.js", includes:["FLOQRVarsityNumbers.svg(subText"]},
+        {label:"Number size +20%", file:"jersey-catalog.js", includes:["one: 0.4968, two: 0.36432"]},
+        {label:"Saved continue button", file:"patron-portal-app.js", includes:["continueSavedShoutout", "resumeMode: \"saved\""]},
+        {label:"Saved deep-link opens Saved pane", file:"patron-portal-app.js", includes:["isSavedShoutout(requestedItem)) showShoutoutPane(\"shoutoutSavedPane\")"]},
+        {label:"Resume draft opens editor", file:"patron-app.js", includes:["draft?.openEditor", "goToEditor()"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-97-terps-varsity-saved"]}
+      ]
+    },
     {
       version: "s3.2.96",
       title: "s3.2.96 — Terps number paint + My ShoutOuts / Use Past restore",
@@ -2822,6 +2834,15 @@
       howToTest:"1) Hard-refresh display.html?location=temp-democlub-1 + Search composer (s3.2.96). 2) Throw Maryland Terps with name DON and number 44 → Club Admin approve. 3) LED shows DON + 44 and FloqMedia under the hem (not over the collar). 4) Composer → Use Past ShoutOut → pick that row → number field shows 44. 5) My Profile → Feature & Orders → My ShoutOuts — Completed lists the approved Terps (Saved may be empty if you never saved a draft). Mark Succeed/Failed.",
       expected:"Number 44 visible on LED; FloqMedia under hem; Past reuse keeps 44; Completed shows paid/approved history.",
       troubleshoot:"Blank number → confirm display-app.js has `const digits = glyphLen` and hard-refresh. FloqMedia at top → paint threw before pin; same digits fix. Past clears number → syncAttribution must skip isSoccerJerseyTemplate. Empty My ShoutOuts Completed while Firestore has approved rows → check signed-in uid matches submittedByUid; console for FLOQR portal query failed."
+    },
+    {
+      id:"s3-2-97-terps-varsity-saved",
+      area:"ShoutOut / Display / My ShoutOuts",
+      feature:"Terps varsity SVG numbers (+20%) with open counters; Saved draft continue works",
+      changed:"s3.2.97 — NBA/Terps numbers paint via FLOQRVarsityNumbers.svg (stroke + evenodd holes = inner encirclement). Number size +20% (0.4968 / 0.36432). After Save, portal deep-link opens Saved pane (not Pending). Continue editing stashes jersey fields and opens the composer editor.",
+      howToTest:"1) Hard-refresh display + Search + My Profile (s3.2.97). 2) Maryland Terps number 44 on LED — digits show clear inner counters/outline, ~20% taller. 3) Save a Terps draft → lands on My ShoutOuts → Saved with that draft. 4) Continue editing → editor opens with name + 44 restored. Mark Succeed/Failed.",
+      expected:"Outlined varsity 44 with open holes; Saved list shows draft; Continue restores fields in editor.",
+      troubleshoot:"Flat Alumni text → display-app must call FLOQRVarsityNumbers.svg; hard-refresh floqr-varsity-numbers.js. Small number → jersey-catalog one/two 0.4968/0.36432. After save opens Pending empty → portal must route isSavedShoutout → shoutoutSavedPane. Continue lands on Search only → continueSavedShoutout + draft.openEditor → goToEditor."
     },
     {
       id:"s3-2-95-baller-jersey-floqcast-gemini",

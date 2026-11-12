@@ -338,7 +338,8 @@
     backCm: 80,
     word: { top: 0.103, liftCm: 4, size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13, tracking: 0.08, longTracking: 0.02, arch: true, archDegrees: 25, wrapAtSpace: true, wrapLines: 2, wrapLineHeight: 0.58, maxChars: 16 },
     name: { top: 0.2315, size: 0.051, longSize: 0.04, longAt: 9, tracking: 0.14, longTracking: 0.04 },
-    number: { one: 0.414, two: 0.3036, top: 0.32355, style: "alumni-collegiate" }
+    // Number height +20% vertical vs prior 0.414 / 0.3036 (s3.2.97).
+    number: { one: 0.4968, two: 0.36432, top: 0.32355, style: "alumni-collegiate" }
   };
 
   function plateName(teamName) {
@@ -372,7 +373,7 @@
     if (more.stateField) row.jerseyStateField = true;
     if (sport === "nba" && bgUrl) {
       row.jerseyOutput = BASKETBALL_JERSEY_OUTPUT;
-      row.description += " Output: arch the upper word at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters such as TIMBERWOLVES uses the smaller arch; the number is 41.4% of the jersey width for one digit and 30.4% for two, with its tip 5cm below the name. Numbers are collegiate varsity block numerals: team-color fill, white or team-color outline, angular corners.";
+      row.description += " Output: arch the upper word at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters such as TIMBERWOLVES uses the smaller arch; the number is 49.7% of the jersey width for one digit and 36.4% for two (+20% vertical), with its tip 5cm below the name. Numbers are collegiate varsity block numerals with open counters: team-color fill, contrasting outline, angular corners.";
     }
     nbaNflTemplates[id] = row;
     nbaNflIds.push(id);
@@ -420,7 +421,7 @@
     accent: "#FFD520", plate: "MARYLAND", plateColor: "#E21833", plateInk: "#FFFFFF", stateField: true
   });
   if (nbaNflTemplates.nbaMarylandTerps) {
-    nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 41.4% of the jersey width for one digit and 30.4% for two, with its tip 5cm below the name. Numbers are collegiate varsity block numerals: team-color fill, white or team-color outline, angular corners.";
+    nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 49.7% of the jersey width for one digit and 36.4% for two (+20% vertical), with its tip 5cm below the name. Numbers are collegiate varsity block numerals with open counters: team-color fill, contrasting outline, angular corners.";
   }
   // Promote photo NFL kits with dual-panel shoutout layout flags.
   Object.keys(nbaNflTemplates).forEach(id => {

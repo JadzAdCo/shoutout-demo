@@ -1129,6 +1129,11 @@
         setText("portalStatus", err.message || "Could not re-use this ShoutOut.");
       }));
     });
+    root?.querySelectorAll(".continue-saved-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => continueSavedShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not continue this saved ShoutOut.");
+      }));
+    });
     root?.querySelectorAll(".save-pending-shoutout-btn").forEach(btn => {
       btn.addEventListener("click", () => savePendingShoutoutAsDraft(btn.dataset.shoutoutId || "").catch(err => {
         setText("portalStatus", err.message || "Could not save this ShoutOut.");
@@ -1161,15 +1166,13 @@
     const mediaBadge = shoutoutHasMedia(x) || mediaThumb
       ? ` - ${esc(tt("portal.hasMedia", {}, "Media"))}`
       : "";
-    const continueHref = window.FLOQRNav?.portalLink?.("./", {start: "editor", savedId: x.id || ""})
-      || `./?start=editor&savedId=${encodeURIComponent(x.id || "")}`;
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
       ${mediaThumb && (mode === "archive" || mode === "completed") ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
       <strong>${esc(x.mainText || "ShoutOut")}</strong>
       <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}${mediaBadge}</p>
       <small>${esc(fmtDate(x.savedAt || x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}${x.screenFormatId ? ` · ${esc(x.screenFormatLabel || x.screenFormatId)}` : ""}</small>
       <p class="queue-actions">
-        ${canContinueSaved ? `<a class="buttonlike continue-saved-shoutout-btn" href="${esc(continueHref)}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</a>` : ""}
+        ${canContinueSaved ? `<button class="buttonlike continue-saved-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</button>` : ""}
         ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
         ${canPreview ? `<button class="buttonlike preview-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.previewShoutout", {}, "Preview"))}</button>` : ""}
         ${canReuse ? `<button class="buttonlike reuse-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.reuseShoutout", {}, "Re-Use ShoutOut"))}</button>` : ""}
@@ -1371,33 +1374,70 @@
     showShoutoutPane("shoutoutArchivePane");
   }
 
-  async function reuseCompletedShoutout(shoutoutId) {
-    const user = auth.currentUser;
-    const row = currentShoutouts.find(item => item.id === shoutoutId)
-      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
-    if (!user || !row) return;
-    const draft = {
+  function shoutoutResumeDraft(row = {}, { resumeMode = "reuse" } = {}) {
+    return {
       mainText: row.mainText || "",
       subText: row.subText || "",
       template: row.template || row.templateId || "blackwhite",
       templateName: row.templateName || "",
       locationId: row.clubLocationId || row.location || "",
       locationName: row.locationName || row.clubName || "",
+      screenFormatId: row.screenFormatId || "",
       mediaUrl: row.mediaUrl || row.archivedMediaUrl || row.originalMediaUrl || "",
       mediaType: row.mediaType || "",
       backgroundUrl: row.backgroundUrl || "",
       attribution: row.attribution || "",
       includeAttribution: !!row.includeAttribution || !!row.attribution,
+      attributionChoice: row.attributionChoice || "",
+      soccerNameSource: row.soccerNameSource || "",
+      jerseyPatronName: row.jerseyPatronName || row.jerseyName || "",
+      jerseyNumber: row.subText || row.jerseyNumber || "",
+      jerseyTeamId: row.jerseyTeamId || "",
+      jerseyTeamLabel: row.jerseyTeamLabel || row.jerseyPlateLabel || "",
+      jerseyPrimary: row.jerseyPrimary || "",
+      jerseySecondary: row.jerseySecondary || "",
+      jerseyAccent: row.jerseyAccent || "",
+      sport: row.sport || "",
+      nflDualLayout: !!row.nflDualLayout,
       sourceShoutoutId: row.id || "",
+      savedShoutoutId: resumeMode === "saved" ? (row.id || "") : "",
       referenceNumber: row.referenceNumber || "",
+      resumeMode,
+      openEditor: true,
       createdAt: Date.now()
     };
+  }
+
+  async function reuseCompletedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId)
+      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row) return;
+    const draft = shoutoutResumeDraft(row, { resumeMode: "reuse" });
     try {
       sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
     } catch (_e) {}
     const params = new URLSearchParams({ start: "shoutout", from: "portal-reuse" });
     if (draft.locationId) params.set("location", draft.locationId);
     if (draft.template) params.set("template", draft.template);
+    window.location.href = `./?${params.toString()}`;
+  }
+
+  async function continueSavedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row || !isSavedShoutout(row)) {
+      setText("portalStatus", tt("portal.shoutoutMissing", {}, "ShoutOut not found."));
+      return;
+    }
+    const draft = shoutoutResumeDraft(row, { resumeMode: "saved" });
+    try {
+      sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
+    } catch (_e) {}
+    const params = new URLSearchParams({ start: "shoutout", from: "portal-saved" });
+    if (draft.locationId) params.set("location", draft.locationId);
+    if (draft.template) params.set("template", draft.template);
+    if (draft.savedShoutoutId) params.set("savedId", draft.savedShoutoutId);
     window.location.href = `./?${params.toString()}`;
   }
 
@@ -4977,6 +5017,7 @@
       || currentArchivedShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
     if (requestedItem) {
       if (requestedItem.complianceArchived || requestedItem._fromArchive) showShoutoutPane("shoutoutArchivePane");
+      else if (isSavedShoutout(requestedItem)) showShoutoutPane("shoutoutSavedPane");
       else if (isCompletedShoutout(requestedItem) && !isPendingShoutout(requestedItem)) showShoutoutPane("shoutoutCompletedPane");
       else showShoutoutPane("shoutoutPendingPane");
     }

@@ -30,6 +30,18 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED + Saved — Terps varsity SVG +20% / Saved continue (s3.2.97)
+
+| Piece | Wiring |
+|---|---|
+| Number inner encirclement | `display-app.js` NBA photo path paints `#displaySub` via `FLOQRVarsityNumbers.svg` (stroke + `fill-rule:evenodd` holes). Thin CSS text-shadow removed for NBA photo kits. |
+| Number +20% vertical | `jersey-catalog.js` `BASKETBALL_JERSEY_OUTPUT.number` `one: 0.4968` / `two: 0.36432` (was 0.414 / 0.3036). |
+| Stroke weight | `floqr-varsity-numbers.js` stroke-width `11` (was 9). |
+| After Save opens Pending | `patron-portal-app.js` deep-link `id=` for `status:saved` now opens **Saved** pane (was always Pending). |
+| Continue editing dead | Continue is a button → `continueSavedShoutout` → session draft with jersey fields + `openEditor` → Search `goToEditor()` (old `?start=editor&savedId=` was never handled). |
+
+Cache-bust: `display.css` / `display-app.js` / `jersey-catalog.js` / `floqr-varsity-numbers.js` / `patron-app.js` / `patron-portal-app.js` / `ai-diagnostics-service.js` `?v=s3.2.97`. Manual test: `s3-2-97-terps-varsity-saved`.
+
 ## LED + My ShoutOuts — missing jersey number / past restore (s3.2.96)
 
 | Piece | Wiring |

@@ -2851,11 +2851,51 @@
       try { sessionStorage.removeItem("FLOQR_REUSE_SHOUTOUT"); } catch (_e) {}
     }
     if (draft.template) selectedTemplate = draft.template;
-    const mainInput = byId("mainText");
-    if (mainInput && draft.mainText) mainInput.value = fitTemplateText(draft.mainText || "", "main");
-    if (byId("subText") && draft.subText != null) byId("subText").value = fitTemplateText(draft.subText || "", "sub");
-    if (byId("includeAttribution")) byId("includeAttribution").checked = !!draft.includeAttribution || !!draft.attribution || !!draft.subText;
-    if (typeof syncAttribution === "function") syncAttribution();
+    if (draft.screenFormatId) selectedScreenFormatId = draft.screenFormatId;
+    const pastTemplate = String(draft.template || "");
+    const pastIsJersey = isSoccerJerseyTemplate(pastTemplate)
+      || /^(soccer|nba|nfl)/i.test(pastTemplate)
+      || ["soccer", "nba", "nfl"].includes(String(draft.sport || "").toLowerCase());
+    if (pastIsJersey) {
+      const pastNflDual = isNflDualJerseyTemplate(pastTemplate)
+        || !!draft.nflDualLayout
+        || String(draft.sport || "").toLowerCase() === "nfl";
+      if (byId("soccerNameSource")) {
+        byId("soccerNameSource").value = draft.soccerNameSource || "manual";
+      }
+      if (byId("soccerManualName")) {
+        byId("soccerManualName").value = String(
+          draft.jerseyPatronName || draft.jerseyName || (pastNflDual ? "" : draft.mainText) || ""
+        ).trim();
+      }
+      if (byId("soccerJerseyNumber")) {
+        byId("soccerJerseyNumber").value = String(draft.jerseyNumber || draft.subText || "").trim();
+      }
+      if (byId("soccerTeamId") && draft.jerseyTeamId) {
+        byId("soccerTeamId").value = String(draft.jerseyTeamId || "");
+      }
+      if (byId("jerseyState") && (draft.jerseyTeamLabel || draft.jerseyPlateLabel)) {
+        byId("jerseyState").value = String(draft.jerseyTeamLabel || draft.jerseyPlateLabel || "").trim();
+        byId("jerseyState").dataset.ready = "1";
+      }
+      if (byId("includeAttribution")) {
+        byId("includeAttribution").checked = !!(draft.includeAttribution && (draft.attribution || draft.attributionChoice));
+      }
+      if (pastNflDual && byId("mainText") && draft.mainText) {
+        byId("mainText").value = fitTemplateText(draft.mainText || "", "main");
+      }
+      if (typeof syncSoccerJerseyFields === "function") syncSoccerJerseyFields();
+      if (typeof syncAttribution === "function") syncAttribution();
+      if (pastNflDual && byId("mainText") && draft.mainText) {
+        byId("mainText").value = fitTemplateText(draft.mainText || "", "main");
+      }
+    } else {
+      const mainInput = byId("mainText");
+      if (mainInput && draft.mainText) mainInput.value = fitTemplateText(draft.mainText || "", "main");
+      if (byId("subText") && draft.subText != null) byId("subText").value = fitTemplateText(draft.subText || "", "sub");
+      if (byId("includeAttribution")) byId("includeAttribution").checked = !!draft.includeAttribution || !!draft.attribution || !!draft.subText;
+      if (typeof syncAttribution === "function") syncAttribution();
+    }
     if (draft.mediaUrl && byId("mediaUrl")) byId("mediaUrl").value = draft.mediaUrl;
     if (draft.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = draft.mediaUrl;
     if (draft.mediaType && byId("shoutoutMediaType")) byId("shoutoutMediaType").value = draft.mediaType;
@@ -4007,8 +4047,11 @@
     const eventLine = event ? [event.eventName || event.title, event.eventDate || event.date].filter(Boolean).join(" · ") : "";
     setText("selectedClubMeta", [eventLine, `${metaPlace} • ${metaGenres}`].filter(Boolean).join(" • "));
     const draft = readReuseShoutoutDraft();
-    selectedTemplate = draft?.template || "blackwhite";
-    selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
+    selectedTemplate = draft?.template || qs("template") || "blackwhite";
+    selectedScreenFormatId = draft?.screenFormatId
+      || loc.primaryDisplayScreenFormatId
+      || loc.displayScreenFormatIds?.[0]
+      || "led-96x48";
     selectedTemplateVariant = null;
     await loadTemplateVariants();
     const templateQuery = pendingTemplateQuery;
@@ -4016,7 +4059,13 @@
     shoutoutTemplateVenueIds = null;
     if (byId("templateSearch")) byId("templateSearch").value = templateQuery;
     byId("templateSearchPanel")?.classList.remove("hidden");
-    renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
+    renderTemplates(); updateTemplateSummary();
+    // Saved / reuse resume: skip template picker and open the editor with fields restored.
+    if (draft?.openEditor || draft?.resumeMode === "saved" || qs("savedId") || qs("from") === "portal-saved") {
+      goToEditor();
+      return;
+    }
+    showPage("templateSelectPage");
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
   let venueTemplateTags = {locationId:"", map:{}};

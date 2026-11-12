@@ -2245,7 +2245,7 @@
         const out = t.jerseyOutput || {};
         const word = out.word || { size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13 };
         const nameSpec = out.name || { size: 0.051, longSize: 0.04, longAt: 9 };
-        const num = out.number || { one: 0.414, two: 0.3036, top: 0.363 };
+        const num = out.number || { one: 0.4968, two: 0.36432, top: 0.32355 };
         const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
         const kit = nbaPhotoKitLayout(formatId);
         canvas.style.setProperty("--nba-kit-top", (kit.kitTop * 100).toFixed(2) + "%");
@@ -2360,10 +2360,10 @@
         byId("displaySub").style.removeProperty("padding-right");
         byId("displaySub").style.removeProperty("letter-spacing");
       }
-      byId("displaySub").textContent = subText;
       if (sport === "nba" && usePhotoBack) {
         byId("displaySub").classList.add("jersey-alumni-num");
         byId("displaySub").style.setProperty("-webkit-text-stroke", "0");
+        byId("displaySub").style.removeProperty("text-shadow");
         const fill = safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff");
         const accent = safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff");
         const primary = safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111");
@@ -2371,9 +2371,17 @@
           ? window.FLOQRVarsityNumbers.outline(fill, accent, primary)
           : "#ffffff";
         byId("displaySub").style.setProperty("--jersey-num-outline", outline);
+        // Varsity SVG: stroke + evenodd holes = inner encirclement (counters stay open).
+        if (window.FLOQRVarsityNumbers?.svg && String(subText || "").trim()) {
+          byId("displaySub").innerHTML = window.FLOQRVarsityNumbers.svg(subText, fill, outline);
+        } else {
+          byId("displaySub").textContent = subText;
+        }
         if (t.jerseyOutput && t.jerseyOutput.word && t.jerseyOutput.word.wrapLineHeight && teamEl) {
           teamEl.style.setProperty("line-height", String(t.jerseyOutput.word.wrapLineHeight), "important");
         }
+      } else {
+        byId("displaySub").textContent = subText;
       }
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
 
