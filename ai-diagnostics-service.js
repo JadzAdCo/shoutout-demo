@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.101";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.101";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.001";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.001";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.001",
+      title: "s3.3.001 — PHILA jersey pair 7s + optional ShoutOut 5s",
+      checks: [
+        {label:"Jersey scene helper", file:"floqr-jersey-scene.js", includes:["sceneAt", "JERSEY_MS", "7000"]},
+        {label:"FrameLoop asymmetric holds", file:"floqr-frame-loop.js", includes:["holdMsByPhase", "includeCopy"]},
+        {label:"PHILA pair catalog", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nba-phi-phila-white-reference-v1"]},
+        {label:"Pair stage display", file:"display-app.js", includes:["paintNbaPairStage", "nba-jersey-pair", "displayNbaPairShoutPanel"]},
+        {label:"Pair CSS", file:"display.css", includes:["nba-pair-stage", "nba-pair-shout-panel"]},
+        {label:"Package brief", file:"reports/nba-phila-jersey-v1/IMPLEMENTATION_CONTRACT.md", includes:["7,000 ms", "5,000 ms"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-001-phila-jersey-pair"]}
+      ]
+    },
     {
       version: "s3.2.101",
       title: "s3.2.101 — ShoutOut diagnostics, Baller upload chooser, PHILA dual, portrait decode",
@@ -2873,6 +2886,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-001-phila-jersey-pair",
+      area:"ShoutOut / Display / NBA",
+      feature:"PHILA jersey pair — back+front 7s, optional ShoutOut 5s",
+      changed:"s3.3.001 — nbaPhiladelphia76ersPhila uses nbaJerseyPair: both kits visible (back left, front right) for 7s; optional message card 5s; blank message = jersey only. FrameLoop holdMsByPhase + includeCopy. Package brief in reports/nba-phila-jersey-v1/.",
+      howToTest:"1) Hard-refresh Search (s3.3.001). 2) Pick NBA Philadelphia 76ers PHILA. 3) Name DON BANYONG, Number 21, Message HAPPY BIRTHDAY, DON! — preview shows pair then ShoutOut card. 4) Clear message — jersey pair only ~7s (no empty card). 5) Check 96×48 / 64×48 / 64×32. Mark Succeed/Failed.",
+      expected:"Pair composition (not rotate); 7s then 5s with message; jersey-only when blank; PHILA wordmark fixed on front; name on back only.",
+      troubleshoot:"Still rotating one kit → hard-refresh display-app.js + display.css + floqr-frame-loop.js. No pair stage → nbaJerseyPair catalog flag. Message never shows → mainText empty or includeCopy false. Wrong timing → floqr-jersey-scene.js / holdMsByPhase."
+    },
     {
       id:"s3-2-101-shoutout-diag-phila-baller",
       area:"ShoutOut / Diagnostics / Display / Baller",

@@ -1134,7 +1134,7 @@
     }, 6000);
   }
 
-  function startFrameLoop(canvas, onAdvance) {
+  function startFrameLoop(canvas, onAdvance, options = {}) {
     if (!canvas) return;
     if (!frameLoop()?.start) {
       startFrameLoopFallback(canvas, onAdvance);
@@ -1145,7 +1145,7 @@
       window.__floqrFrameLoopFallback = null;
     }
     try {
-      frameLoop().start(canvas, {onAdvance});
+      frameLoop().start(canvas, {onAdvance, ...options});
     } catch (err) {
       // FrameLoop must never abort jersey render (FloqR paint runs after this).
       console.warn("FLOQRFrameLoop.start failed; using fallback", err);
@@ -1160,7 +1160,12 @@
 
   function applyNbaDualFacePhase(phase, canvas, urls = {}) {
     if (!canvas?.classList.contains("nba-dual-faces")) return;
-    // FrameLoop: media = front kit (team + number), copy = back kit (name + number).
+    // Pair mode (PHILA v1): both kits stay visible in "media"/jersey; "copy" is the ShoutOut card.
+    if (canvas.classList.contains("nba-jersey-pair")) {
+      applyNbaJerseyPairPhase(phase, canvas, urls);
+      return;
+    }
+    // Legacy rotate: media = front kit (team + number), copy = back kit (name + number).
     const faceFront = phase === "copy"
       ? false
       : phase === "media"
@@ -1186,6 +1191,112 @@
       nameEl.classList.toggle("hidden", faceFront);
       nameEl.setAttribute("aria-hidden", faceFront ? "true" : "false");
     }
+  }
+
+  function ensureNbaPairStage(canvas) {
+    let stage = byId("nbaPairStage");
+    if (stage && stage.parentElement !== canvas) {
+      canvas.appendChild(stage);
+    }
+    if (!stage) {
+      stage = document.createElement("div");
+      stage.id = "nbaPairStage";
+      stage.className = "nba-pair-stage";
+      stage.innerHTML = `
+        <div class="nba-pair-face nba-pair-back" data-face="back">
+          <div class="nba-pair-kit" aria-hidden="true"></div>
+          <div class="nba-pair-name"></div>
+          <div class="nba-pair-number"></div>
+        </div>
+        <div class="nba-pair-face nba-pair-front" data-face="front">
+          <div class="nba-pair-kit" aria-hidden="true"></div>
+          <div class="nba-pair-team"></div>
+          <div class="nba-pair-number"></div>
+        </div>`;
+      canvas.appendChild(stage);
+    }
+    return stage;
+  }
+
+  function hideNbaPairStage() {
+    const stage = byId("nbaPairStage");
+    if (!stage) return;
+    stage.classList.add("hidden");
+    stage.setAttribute("aria-hidden", "true");
+  }
+
+  function paintNbaPairStage(canvas, {
+    frontUrl = "",
+    backUrl = "",
+    nameText = "",
+    teamText = "",
+    numberText = ""
+  } = {}) {
+    const stage = ensureNbaPairStage(canvas);
+    stage.classList.remove("hidden");
+    stage.setAttribute("aria-hidden", "false");
+    const back = stage.querySelector(".nba-pair-back");
+    const front = stage.querySelector(".nba-pair-front");
+    const backKit = back?.querySelector(".nba-pair-kit");
+    const frontKit = front?.querySelector(".nba-pair-kit");
+    if (backKit) {
+      const css = safeRender.cssUrl?.(backUrl) || "";
+      backKit.style.backgroundImage = css || "none";
+    }
+    if (frontKit) {
+      const css = safeRender.cssUrl?.(frontUrl) || "";
+      frontKit.style.backgroundImage = css || "none";
+    }
+    const nameEl = back?.querySelector(".nba-pair-name");
+    const teamEl = front?.querySelector(".nba-pair-team");
+    const backNum = back?.querySelector(".nba-pair-number");
+    const frontNum = front?.querySelector(".nba-pair-number");
+    if (nameEl) nameEl.textContent = String(nameText || "").trim().toUpperCase();
+    if (teamEl) teamEl.textContent = String(teamText || "PHILA").trim().toUpperCase();
+    const num = String(numberText || "").trim();
+    if (backNum) backNum.textContent = num;
+    if (frontNum) frontNum.textContent = num;
+  }
+
+  function applyNbaJerseyPairPhase(phase, canvas, urls = {}) {
+    const showMessage = phase === "copy";
+    canvas.classList.toggle("nba-pair-phase-jersey", !showMessage);
+    canvas.classList.toggle("nba-pair-phase-message", showMessage);
+    canvas.classList.toggle("nba-dual-phase-front", false);
+    canvas.classList.toggle("nba-dual-phase-back", false);
+    const stage = byId("nbaPairStage");
+    if (stage) {
+      stage.classList.toggle("hidden", showMessage);
+      stage.setAttribute("aria-hidden", showMessage ? "true" : "false");
+    }
+    const shout = byId("displayNbaPairShoutPanel");
+    if (shout) {
+      shout.classList.toggle("hidden", !showMessage);
+      shout.setAttribute("aria-hidden", showMessage ? "false" : "true");
+    }
+    // Soft studio field behind the pair; message scene uses the shout panel.
+    const bgEl = byId("displayBackground");
+    if (bgEl && !showMessage) {
+      applyBackgroundLayer(bgEl, { backgroundColor: "#f4f4f6" });
+      canvas.classList.add("has-background-layer");
+    }
+    // Hide single-kit overlays while the pair stage owns the jersey scene.
+    const teamEl = byId("displayJerseyTeam");
+    const nameEl = byId("displayMain");
+    const numEl = byId("displaySub");
+    if (teamEl) {
+      teamEl.classList.add("hidden");
+      teamEl.setAttribute("aria-hidden", "true");
+    }
+    if (nameEl) {
+      nameEl.classList.add("hidden");
+      nameEl.setAttribute("aria-hidden", "true");
+    }
+    if (numEl) {
+      numEl.classList.add("hidden");
+      numEl.setAttribute("aria-hidden", "true");
+    }
+    void urls;
   }
 
   function heistBrandLogoUrl() {
@@ -1346,6 +1457,7 @@
       jerseyPatronName: params.get("jerseyPatronName") || "",
       nflDualLayout: params.get("nflDualLayout") === "1",
       nbaDualFaces: params.get("nbaDualFaces") === "1",
+      nbaJerseyPair: params.get("nbaJerseyPair") === "1",
       frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
       backBackgroundUrl: params.get("backBackgroundUrl") || "",
       sport: params.get("sport") || "",
@@ -2536,16 +2648,65 @@
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
+        const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair);
+        canvas.classList.toggle("nba-jersey-pair", pairMode);
         canvas.classList.add("nba-dual-faces", "split-media-loop");
-        // Do not force front here — FLOQRFrameLoop resumes lastPhase on live re-renders
-        // (keepFrameLoop). Align the kit face after start so media↔copy stays in sync.
-        startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
-          frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
-          backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
-          defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
-        }));
+        const sceneApi = window.FLOQRJerseyScene;
+        const shoutCopy = glyphSlice(cleanDisplayText(mainSource), 0, Math.max(Number(textCaps.main || 48), 48));
+        const hasMessage = sceneApi?.hasMessageText
+          ? sceneApi.hasMessageText(shoutCopy)
+          : !!String(shoutCopy || "").trim();
+        if (pairMode) {
+          paintNbaPairStage(canvas, {
+            frontUrl: dualUrls.frontBackgroundUrl,
+            backUrl: dualUrls.backBackgroundUrl,
+            nameText: jerseyNameText || "",
+            teamText: teamLabel || t.jerseyTeamLabel || "PHILA",
+            numberText: subText || ""
+          });
+          let shoutPanel = byId("displayNbaPairShoutPanel");
+          if (!shoutPanel) {
+            shoutPanel = document.createElement("div");
+            shoutPanel.id = "displayNbaPairShoutPanel";
+            shoutPanel.className = "nba-pair-shout-panel hidden";
+            canvas.appendChild(shoutPanel);
+          }
+          if (hasMessage) {
+            const lineCount = Number(data.lineCount || textCaps.lineCount || 4);
+            const perLine = Number(data.maxCharactersPerLine || textCaps.perLine || 16);
+            const rows = displayTextRows(shoutCopy || " ", {
+              lineCount,
+              maxCharactersPerLine: perLine,
+              maxMainCharacters: Math.max(Number(textCaps.main || 0), 64)
+            }, {uppercase: false});
+            shoutPanel.innerHTML = `<div class="nba-pair-shout-lines">${rows.map((row) => `<b>${esc(row || " ")}</b>`).join("")}</div>`;
+          } else {
+            shoutPanel.innerHTML = "";
+          }
+          const jerseyMs = Number(t.jerseySceneMs || sceneApi?.JERSEY_MS || 7000);
+          const messageMs = Number(t.messageSceneMs || sceneApi?.MESSAGE_MS || 5000);
+          startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
+            frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
+            backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
+            defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
+          }), {
+            includeCopy: hasMessage,
+            holdMsByPhase: { media: jerseyMs, copy: messageMs }
+          });
+        } else {
+          hideNbaPairStage();
+          // Legacy rotate — FrameLoop resumes lastPhase on live re-renders.
+          startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
+            frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
+            backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
+            defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
+          }));
+        }
         const phase = canvas.classList.contains("split-media-phase-copy") ? "copy" : "media";
         applyNbaDualFacePhase(phase, canvas, dualUrls);
+      } else {
+        hideNbaPairStage();
+        canvas.classList.remove("nba-jersey-pair", "nba-pair-phase-jersey", "nba-pair-phase-message");
       }
       {
         const keep = new Set([
