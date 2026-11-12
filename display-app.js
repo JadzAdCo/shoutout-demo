@@ -1219,10 +1219,15 @@
   }
 
   function hideNbaPairStage() {
+    clearNbaPairChrome(byId("displayCanvas"));
+  }
+
+  function clearNbaPairChrome(canvas) {
     const stage = byId("nbaPairStage");
-    if (!stage) return;
-    stage.classList.add("hidden");
-    stage.setAttribute("aria-hidden", "true");
+    if (stage) stage.remove();
+    const shout = byId("displayNbaPairShoutPanel");
+    if (shout) shout.remove();
+    canvas?.classList.remove("nba-jersey-pair", "nba-pair-phase-jersey", "nba-pair-phase-message");
   }
 
   function paintNbaPairStage(canvas, {
@@ -2071,6 +2076,9 @@
     const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true || t.loopMediaWithText === true;
     const isBallerCard = t.ballerCard === true || /\bballer-card\b/.test(String(t.className || "")) || ["blackCard","ballersAlert","blackCardAmex","ballersAlertAmex"].includes(templateId);
     const isBallerAlert = isBallerCard && (t.ballerAlert === true || /\bballer-alert\b/.test(String(t.className || "")) || templateId === "ballersAlert" || templateId === "ballersAlertAmex");
+    const willNbaJerseyPair = isSoccerJersey
+      && !!(t.nbaJerseyPair || data.nbaJerseyPair)
+      && !!(t.nbaDualFaces || data.nbaDualFaces);
     // Preserve media↔copy phase across live re-renders for Christine / split-media / NFL rotate.
     const keepFrameLoop = isChristine
       || t.layout === "split-media"
@@ -2111,6 +2119,8 @@
     const mainLimit = Math.max(1, Number(textCaps.maxMainCharacters || textCaps.main || 60));
     const subLimit = Math.max(0, Number(textCaps.maxSubCharacters ?? textCaps.sub ?? 60));
     const canvas = byId("displayCanvas");
+    // Drop pair stage/card before painting a different item (idle, classic, etc.).
+    if (!willNbaJerseyPair) clearNbaPairChrome(canvas);
     canvas.className = "display-canvas";
     // className may be space-separated (e.g. "soccer-jersey soccer-morocco"); classList.add rejects spaces.
     String(t.className || "")
@@ -2652,7 +2662,8 @@
         canvas.classList.toggle("nba-jersey-pair", pairMode);
         canvas.classList.add("nba-dual-faces", "split-media-loop");
         const sceneApi = window.FLOQRJerseyScene;
-        const shoutCopy = glyphSlice(cleanDisplayText(mainSource), 0, Math.max(Number(textCaps.main || 48), 48));
+        // Pair editor: jerseyPatronName = kit name; mainText = optional ShoutOut (may be blank).
+        const shoutCopy = glyphSlice(cleanDisplayText(data.mainText || ""), 0, Math.max(Number(textCaps.main || 48), 48));
         const hasMessage = sceneApi?.hasMessageText
           ? sceneApi.hasMessageText(shoutCopy)
           : !!String(shoutCopy || "").trim();
@@ -2722,6 +2733,7 @@
       return;
     }
     hideJerseyMount();
+    clearNbaPairChrome(canvas);
     clearNbaPhotoKitVars(canvas);
     clearNbaPhotoKitInlineLayout();
     const staleTeam = byId("displayJerseyTeam");
@@ -2730,7 +2742,7 @@
       staleTeam.textContent = "";
       staleTeam.setAttribute("aria-hidden", "true");
     }
-    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark");
+    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark", "nba-dual-faces", "nba-dual-phase-front", "nba-dual-phase-back");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       stopFloqrCardCycle();
