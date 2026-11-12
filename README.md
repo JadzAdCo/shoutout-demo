@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.95 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.96 (stable)
 
+- s3.2.96: Fix Terps/NBA missing jersey number (`digits` ReferenceError aborted paint + FloqMedia pin); jersey attribution no longer wipes mark; Use Past ShoutOut restores number; My ShoutOuts opens Completed when Saved is empty.
 - s3.2.95: Terps/NBA FloqMedia under hem (height-fit kit), Baller rim restore, jersey remnant wipe, floqCast 100s, Gemini thinkingLevel LOW.
 - s3.2.94: Baller corner scrub, NBA/Terps FloqMedia under kit, Halloween RIP grave top-left.
 - s3.2.91: Baller card refine — clean silhouette (no white corner wedges), SVG EMV chip, name/company +10% and raised ~4mm off gold rim.

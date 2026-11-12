@@ -1642,8 +1642,9 @@
   function syncAttribution() {
     const enabled = !!byId("includeAttribution")?.checked;
     byId("attributionChoiceWrap")?.classList.toggle("hidden", !enabled);
-    // Jersey dual NFL keeps subText as the jersey mark — attribution is payload-only.
-    if (!isNflDualJerseyTemplate() && byId("subText")) {
+    // Soccer / NBA / NFL kits keep #subText as the jersey mark — FloqR-card attribution is payload-only.
+    // (Previously only NFL dual was exempt; NBA/soccer syncAttribution wiped the inputted number.)
+    if (!isSoccerJerseyTemplate() && byId("subText")) {
       byId("subText").value = fitTemplateText(currentAttributionValue(), "sub");
     }
     if (typeof updateTemplateCharacterCapHint === "function") updateTemplateCharacterCapHint();
@@ -4689,7 +4690,8 @@
       pastShoutoutMemoryPromise = (async () => {
         try {
           const snap = await db.collection("shoutouts").where("submittedByUid", "==", currentUser.uid).limit(60).get();
-          const rows = snap.docs.map(d => ({id:d.id, ...d.data()}));
+          const rows = snap.docs.map(d => ({id:d.id, ...d.data()}))
+            .sort((a, b) => Number(b.submittedAt?.seconds || b.paidAt?.seconds || 0) - Number(a.submittedAt?.seconds || a.paidAt?.seconds || 0));
           return rows.slice(0, 12).map(item => ({
             mainText:item.mainText || "",
             subText:item.subText || "",
@@ -4698,6 +4700,8 @@
             location:item.locationName || item.clubName || ""
           }));
         } catch (error) {
+          // Do not permanently cache a failed/empty load — auth race or rules denial must retry.
+          pastShoutoutMemoryPromise = null;
           return window.FLOQRAccessNotice?.report("shoutouts", error) || [];
         }
       })();
@@ -5112,10 +5116,34 @@
       box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||s.attribution||"")}</button>`).join("");
       box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
         const s = rows[Number(btn.dataset.i)];
-        const mainInput = byId("mainText");
-        if (mainInput) mainInput.value = fitTemplateText(s.mainText || "", "main");
-        if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText || !!s.attribution || s.includeAttribution === true;
-        syncAttribution();
+        const pastTemplate = String(s.template || s.templateId || "");
+        const pastIsJersey = isSoccerJerseyTemplate(pastTemplate)
+          || /^(soccer|nba|nfl)/i.test(pastTemplate)
+          || ["soccer", "nba", "nfl"].includes(String(s.sport || "").toLowerCase());
+        if (pastIsJersey) {
+          // Restore name + inputted number onto jersey fields (never treat mark as attribution).
+          if (byId("soccerNameSource")) byId("soccerNameSource").value = "manual";
+          if (byId("soccerManualName")) {
+            byId("soccerManualName").value = String(s.jerseyPatronName || s.jerseyName || s.mainText || "").trim();
+          }
+          if (byId("soccerJerseyNumber")) {
+            byId("soccerJerseyNumber").value = String(s.subText || s.jerseyNumber || "").trim();
+          }
+          if (byId("jerseyState") && (s.jerseyTeamLabel || s.jerseyPlateLabel)) {
+            byId("jerseyState").value = String(s.jerseyTeamLabel || s.jerseyPlateLabel || "").trim();
+            byId("jerseyState").dataset.ready = "1";
+          }
+          if (byId("includeAttribution")) {
+            byId("includeAttribution").checked = !!(s.includeAttribution && (s.attribution || s.attributionChoice));
+          }
+          syncSoccerJerseyFields();
+          syncAttribution();
+        } else {
+          const mainInput = byId("mainText");
+          if (mainInput) mainInput.value = fitTemplateText(s.mainText || "", "main");
+          if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText || !!s.attribution || s.includeAttribution === true;
+          syncAttribution();
+        }
         if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
         if (s.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = s.mediaUrl;
         if (s.mediaType && byId("shoutoutMediaType")) byId("shoutoutMediaType").value = s.mediaType;
@@ -5334,7 +5362,7 @@
       const mainRaw = (ballerFields.mainText || byId("mainText").value.trim());
       try { await window.FLOQRClientIp?.ensure?.(); } catch (_) {}
       const sessionIp = window.FLOQRClientIp?.current?.() || {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, ...ballerFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(ballerFields.subText || byId("subText").value.trim()||"","sub"), ...mediaPayload, status: saveOnly ? "saved" : "pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), savedAt: saveOnly ? firebase.firestore.FieldValue.serverTimestamp() : null, referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, ...ballerFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(ballerFields.subText || (isSoccerJerseyTemplate() ? String(byId("soccerJerseyNumber")?.value || byId("subText")?.value || "").trim() : byId("subText").value.trim()) || "","sub"), ...mediaPayload, status: saveOnly ? "saved" : "pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), savedAt: saveOnly ? firebase.firestore.FieldValue.serverTimestamp() : null, referenceNumber, clientIp: sessionIp.clientIp || "", ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : "" };
       if (saveOnly) {
         status.textContent = tt("page.shoutout.savingDraft", null, "Saving ShoutOut draft…");
         const shoutoutRef = await db.collection("shoutouts").add({

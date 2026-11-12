@@ -30,6 +30,18 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED + My ShoutOuts — missing jersey number / past restore (s3.2.96)
+
+| Piece | Wiring |
+|---|---|
+| Missing number + FloqMedia at collar | `display-app.js` NBA photo path used undeclared `digits` → `ReferenceError` before `#displaySub.textContent` and `pinJerseyFloqMediaRail`. Fix: `const digits = glyphLen(subText)`. |
+| Attribution wiping mark | `patron-app.js` `syncAttribution` now skips all soccer/NBA/NFL kits (not only NFL dual); commit reads `#soccerJerseyNumber` for jersey `subText`. |
+| Use Past ShoutOut | Restores `soccerManualName` + `soccerJerseyNumber` from past row; does not treat jersey mark as attribution. |
+| Past memory | Failed `getPastShoutOutMemory` no longer caches empty forever; rows sorted by `submittedAt`. |
+| My ShoutOuts empty Saved | Firestore had approved rows; Saved drafts can be zero. Portal auto-opens **Completed** when Saved+Pending empty and Completed has history. Query failures `console.warn`. |
+
+Cache-bust: `display-app.js` / `patron-app.js` / `patron-portal-app.js` `?v=s3.2.96`. Manual test: `s3-2-96-jersey-number-my-shoutouts`.
+
 ## LED display fixes — Baller rim restore / jersey remnants / floqCast 100s / Gemini thinking (s3.2.95)
 
 **Purpose:** Follow-up to s3.2.94 LED QA + Gemini/floqCast hardening (Nov 2026).
