@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.92";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.92";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.94";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.94";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.94",
+      title: "s3.2.94 — Baller corner scrub, NBA FloqMedia bottom, Halloween grave top-left",
+      checks: [
+        {label:"Baller corner scrub + black clip", file:"display.css", includes:["border-radius:3.15% / 5.1%", "outline:2px solid #000"]},
+        {label:"Baller scrub script", file:"scripts/build-baller-card-photos.py", includes:["scrub_led_corner_fringe"]},
+        {label:"NBA FloqMedia bottom pin", file:"display.css", includes:["jersey-sport-nba .display-identity-rail", "bottom:1.2%!important"]},
+        {label:"Jersey remnant clear", file:"display-app.js", includes:["clearClassicBoardRemnantsOnJersey", "isSeasonalBoardRemnantText"]},
+        {label:"Halloween grave top-left", file:"display.css", includes:[".halloween-finale .hw-grave{position:absolute;left:8%;top:4%"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-94-led-display-fixes"]}
+      ]
+    },
     {
       version: "s3.2.92",
       title: "s3.2.92 — photorealistic NBA and Terps jersey backs",
@@ -2775,6 +2787,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-94-led-display-fixes",
+      area:"ShoutOut / Display",
+      feature:"Baller white corner scrub + Terps FloqMedia bottom + Halloween RIP top-left",
+      changed:"s3.2.94 — (1) Baller black-card LED PNGs scrub pale corner wedges; CSS radius + black outline clip AA fringe. (2) NBA/Terps FloqMedia identity rail pinned under the kit like soccer/NFL; classic/Halloween leftover text cleared on jersey paint. (3) Classic Halloween finale moves RIP tomb/grave to top-left; ghosts originate there.",
+      howToTest:"1) Hard-refresh Search + display preview with ?v=s3.2.94. 2) Baller's Alert / Black Card on led-96x48 — black margin outside rounded corners has no white triangular spots. 3) Maryland Terps on led-96x48 — PRESENTED BY FloqMedia sits under the jersey hem (not mid-body); no HAPPY HALLOWEEN remnant from a prior board. 4) Classic Halloween — finale RIP tomb rises in the top-left; ghosts burst from that corner. 5) Display boards stay display.html?location= (no ?v=). Mark Succeed/Failed.",
+      expected:"Clean Baller corners; Terps FloqMedia under kit; no prior-shoutout text on jersey; Halloween grave top-left with ghosts from there.",
+      troubleshoot:"White wedges → republish images/baller/* + display.css ?v=s3.2.94; check border-radius 3.15%/5.1% + outline. FloqMedia mid-jersey → jersey-sport-nba bottom:1.2% rules. HAPPY HALLOWEEN ghost → clearClassicBoardRemnantsOnJersey / isSeasonalBoardRemnantText on display-app.js. Grave still bottom → .hw-grave left:8% top:4% and hwGhostRush from translate(-20%,10%)."
+    },
     {
       id:"s3-2-91-jerseys-2026",
       area:"ShoutOut / Jerseys",

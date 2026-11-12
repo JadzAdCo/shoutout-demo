@@ -117,6 +117,10 @@ test("finale runs on FLOQRFrameLoop with no template timer", () => {
 test("finale CSS has a reduced-motion fallback and stays inside the canvas", () => {
   const css = read("display.css");
   assert.match(css, /\.halloween-finale\{position:absolute;inset:0;[^}]*pointer-events:none;overflow:hidden/);
+  // RIP tomb + grave pit sit top-left; ghosts burst from that origin (owner Nov 2026).
+  assert.match(css, /\.halloween-finale \.hw-grave\{position:absolute;left:8%;top:4%/);
+  assert.match(css, /\.halloween-finale \.hw-ghost\{position:absolute;left:14%;top:18%/);
+  assert.match(css, /@keyframes hwGhostRush\{[\s\S]*?translate\(-20%,10%\)/);
   const reduced = css.slice(css.lastIndexOf("@media (prefers-reduced-motion: reduce){"));
   assert.match(reduced, /\.halloween-finale\.is-playing \*\{animation:none!important\}/);
   assert.match(reduced, /\.hw-bat\{display:none\}/);

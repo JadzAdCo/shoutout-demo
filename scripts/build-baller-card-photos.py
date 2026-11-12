@@ -32,7 +32,8 @@ CHIP_PNG = ROOT / "images/baller/baller-emv-chip.png"
 OUT = ROOT / "images/baller"
 META_OUT = Path("/tmp/baller-express-face-css.json")
 
-FILL = (6, 6, 8)
+# Pure LED black — any residual (6,6,8) grey read as a pale wedge next to the red halo.
+FILL = (0, 0, 0)
 
 # Calibrated on the 1581×995 package PNG.
 FACE = {"cx": 278, "cy": 252, "rx": 148, "ry": 168}
@@ -181,10 +182,10 @@ def paste_clean_chip(card: Image.Image, chip_hires: Image.Image) -> Image.Image:
   return out.convert("RGB")
 
 
-def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=32, grow=4) -> Image.Image:
+def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=48, grow=8) -> Image.Image:
   """Remove LANCZOS / bevel speckles outside the rounded card on LED canvases.
-  Flood from the four corners through near-black pixels, grow a few px, then
-  force-fill the entire exterior region (card body stays outside this mask)."""
+  Flood from the four corners through near-black pixels, grow several px so CSS
+  border-radius antialias sits in pure black, then hard-fill the exterior."""
   w, h = canvas.size
   px = canvas.load()
   visited = [[False] * w for _ in range(h)]
@@ -212,16 +213,33 @@ def scrub_led_corner_fringe(canvas: Image.Image, fill=FILL, dark=32, grow=4) -> 
         ep[x, y] = 255
   for _ in range(grow):
     exterior = exterior.filter(ImageFilter.MaxFilter(3))
+  # Catch pale corner wedges the flood missed (low-chroma light pixels in the
+  # outer bands) without eating saturated gold rim.
+  ep = exterior.load()
+  band_x, band_y = int(w * 0.14), int(h * 0.18)
+  for y in range(h):
+    for x in range(w):
+      if ep[x, y] >= 128:
+        continue
+      if not (x < band_x or x >= w - band_x or y < band_y or y >= h - band_y):
+        continue
+      r, g, b = px[x, y][:3]
+      chroma = max(abs(r - g), abs(g - b), abs(r - b))
+      luma = max(r, g, b)
+      if (r - b) > 50 and r > 120 and chroma > 40:
+        continue
+      if luma > 36 and chroma < 58:
+        ep[x, y] = 255
   base = Image.new("RGB", (w, h), fill)
   # Hard fill on the grown exterior — a blurred mask re-introduces pale fringe
   # when LANCZOS-scaled gold edges are only partially replaced.
   out = Image.composite(base, canvas.convert("RGB"), exterior)
-  return darken_silhouette_fringe(out, fill=fill, dark=36)
+  return darken_silhouette_fringe(out, fill=fill, dark=40)
 
 
-def fit_led(card: Image.Image, tw: int, th: int, fill=FILL, margin=4):
-  """Letterbox onto LED canvas with a thin black margin so the rounded-card
-  silhouette (and any residual edge antialias) never kisses the canvas edge."""
+def fit_led(card: Image.Image, tw: int, th: int, fill=FILL, margin=10):
+  """Letterbox onto LED canvas with black margin so the rounded-card silhouette
+  (and any residual edge antialias) never kisses the canvas edge or CSS radius."""
   inner_w = max(1, tw - 2 * margin)
   inner_h = max(1, th - 2 * margin)
   scale = min(inner_w / card.width, inner_h / card.height)

@@ -30,6 +30,18 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## LED display fixes — Baller corners / Terps FloqMedia / Halloween grave (s3.2.94)
+
+**Purpose:** Venue LED QA from live screenshots (Nov 2026).
+
+| Fix | Where |
+|---|---|
+| Baller white corner wedges | `scripts/build-baller-card-photos.py` `scrub_led_corner_fringe` + black letterbox; `display.css` `.baller-card .display-background` radius `3.15%/5.1%` + black outline |
+| Terps / NBA FloqMedia mid-jersey | `display.css` `.jersey-sport-nba` identity rail `bottom:1.2%` (same idea as NFL); `display-app.js` `clearClassicBoardRemnantsOnJersey` + `isSeasonalBoardRemnantText` so HAPPY HALLOWEEN / classic leftovers never ride a kit |
+| Halloween RIP tomb | `display.css` `.hw-grave` top-left (`left:8%;top:4%`); ghosts start near grave (`hwGhostRush` from top-left) |
+
+Cache-bust: `display.css` / `display-app.js` `?v=s3.2.94`. Manual test: `s3-2-94-led-display-fixes`.
+
 ## 2026 jersey backs — Maryland Terps + NBA icon + NFL home kits (s3.2.91)
 
 **Purpose:** Photo LED backs. Maryland Terps basketball takes State, name, and number. All 30 NBA clubs use a 2026/27 icon tank (same cut as Terps); the club word, name, and number are typed on the kit. Every NFL club uses its 2026 home colors; the club word sits on the nameplate.
@@ -635,7 +647,7 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.91
+## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.91 / s3.2.94
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
 

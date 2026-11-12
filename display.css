@@ -1510,6 +1510,50 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   min-height:0!important;
   filter:none;
 }
+/* NBA / Terps — FloqMedia card sits under the kit like soccer/NFL (never mid-jersey). */
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.floqr-card-bottom,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.floqr-card-bottom,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail.floqr-card-bottom,
+.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-64x32="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-96x48="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail{
+  display:grid!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:60!important;
+  position:absolute!important;
+  top:auto!important;
+  bottom:1.2%!important;
+  height:11%!important;
+  left:6%!important;
+  right:6%!important;
+  transform:none!important;
+  margin:0!important;
+  padding:0!important;
+  pointer-events:none!important;
+  place-items:center!important;
+  overflow:visible!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail .classic-identity-shell,
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.floqr-card-bottom .classic-identity-shell{
+  animation:nflFloqrCardPulse 8s cubic-bezier(.2,.8,.2,1) infinite!important;
+  opacity:1!important;
+  visibility:visible!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  filter:none;
+}
 .display-canvas.soccer-jersey-template.jersey-sport-nfl .classic-identity-shell small{
   font-size:clamp(8px,1.6vh,16px)!important;
   letter-spacing:.14em!important;
@@ -2121,10 +2165,11 @@ body.floqcast-live-active .heist-brand-slide{
 .halloween-finale{position:absolute;inset:0;z-index:60;pointer-events:none;overflow:hidden;opacity:0;visibility:hidden}
 .halloween-finale .hw-defs{position:absolute;width:0;height:0;overflow:hidden}
 .halloween-finale.is-playing{visibility:visible;animation:hwLayer 6s linear forwards}
-.halloween-finale .hw-grave{position:absolute;left:50%;bottom:-1%;width:30%;transform:translate(-50%,105%)}
-.halloween-finale .hw-ghost{position:absolute;left:50%;bottom:9%;width:10%;opacity:0;transform-origin:50% 60%;filter:drop-shadow(0 0 .6vh rgba(255,255,255,.85)) drop-shadow(0 0 1.6vh rgba(170,255,220,.35))}
+/* RIP tomb + grave pit: top-left origin; ghosts burst from there (owner Nov 2026). */
+.halloween-finale .hw-grave{position:absolute;left:8%;top:4%;width:22%;transform:translate(-20%,-120%)}
+.halloween-finale .hw-ghost{position:absolute;left:14%;top:18%;width:10%;opacity:0;transform-origin:50% 60%;filter:drop-shadow(0 0 .6vh rgba(255,255,255,.85)) drop-shadow(0 0 1.6vh rgba(170,255,220,.35))}
 .halloween-finale .hw-reaper{position:absolute;right:4%;bottom:0;height:76%;opacity:0;transform:translateY(100%);transform-origin:50% 100%;filter:drop-shadow(0 0 1.2vh rgba(140,60,255,.55))}
-.halloween-finale .hw-bat{position:absolute;left:50%;top:62%;width:6%;opacity:0}
+.halloween-finale .hw-bat{position:absolute;left:18%;top:22%;width:6%;opacity:0}
 .halloween-finale.is-playing .hw-grave{animation:hwGraveRise .7s cubic-bezier(.2,.8,.3,1) forwards,hwGraveSink .5s ease-in 5.3s forwards}
 .halloween-finale.is-playing .hw-pit-glow{animation:hwPitPulse .5s ease-in-out .5s 6 alternate}
 .halloween-finale.is-playing .hw-ghost{animation:hwGhostRush 3.1s cubic-bezier(.45,0,.85,.55) var(--d) forwards}
@@ -2134,15 +2179,15 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.halloween-finale-on .display-text-overlay{animation:hwBoardDim 6s ease-in-out forwards}
 @keyframes hwLayer{0%{opacity:0}6%{opacity:1}92%{opacity:1}100%{opacity:0}}
 @keyframes hwBoardDim{0%{filter:none}10%{filter:brightness(.55) saturate(.8)}85%{filter:brightness(.55) saturate(.8)}100%{filter:none}}
-@keyframes hwGraveRise{to{transform:translate(-50%,0)}}
-@keyframes hwGraveSink{from{transform:translate(-50%,0)}to{transform:translate(-50%,105%)}}
+@keyframes hwGraveRise{to{transform:translate(0,0)}}
+@keyframes hwGraveSink{from{transform:translate(0,0)}to{transform:translate(-20%,-120%)}}
 @keyframes hwPitPulse{from{opacity:.55}to{opacity:1}}
 @keyframes hwGhostRush{
-  0%{opacity:0;transform:translate(-50%,10%) scale(calc(.18 * var(--s,1))) rotate(0)}
-  14%{opacity:1;transform:translate(calc(-50% + var(--gx) * .08),-60%) scale(calc(.42 * var(--s,1))) rotate(-7deg)}
-  34%{opacity:1;transform:translate(calc(-50% + var(--gx) * .25),-150%) scale(calc(.7 * var(--s,1))) rotate(7deg)}
-  58%{opacity:1;transform:translate(calc(-50% + var(--gx) * .55),-175%) scale(calc(1.5 * var(--s,1))) rotate(-5deg)}
-  100%{opacity:0;transform:translate(calc(-50% + var(--gx)),-120%) scale(calc(6 * var(--s,1))) rotate(4deg)}
+  0%{opacity:0;transform:translate(-20%,10%) scale(calc(.18 * var(--s,1))) rotate(0)}
+  14%{opacity:1;transform:translate(calc(-10% + var(--gx) * .08),40%) scale(calc(.42 * var(--s,1))) rotate(-7deg)}
+  34%{opacity:1;transform:translate(calc(10% + var(--gx) * .25),90%) scale(calc(.7 * var(--s,1))) rotate(7deg)}
+  58%{opacity:1;transform:translate(calc(30% + var(--gx) * .55),120%) scale(calc(1.5 * var(--s,1))) rotate(-5deg)}
+  100%{opacity:0;transform:translate(calc(55% + var(--gx)),140%) scale(calc(6 * var(--s,1))) rotate(4deg)}
 }
 @keyframes hwReaper{
   0%{opacity:0;transform:translateY(100%) scale(.9)}
@@ -2161,8 +2206,8 @@ body.floqcast-live-active .heist-brand-slide{
 @media (prefers-reduced-motion: reduce){
   .halloween-finale.is-playing{animation:hwLayer 6s linear forwards}
   .halloween-finale.is-playing *{animation:none!important}
-  .halloween-finale.is-playing .hw-grave{transform:translate(-50%,0)}
-  .halloween-finale.is-playing .hw-ghost{opacity:.92;transform:translate(calc(-50% + var(--gx) * .45),-150%) scale(calc(.75 * var(--s,1)))}
+  .halloween-finale.is-playing .hw-grave{transform:translate(0,0)}
+  .halloween-finale.is-playing .hw-ghost{opacity:.92;transform:translate(calc(20% + var(--gx) * .35),70%) scale(calc(.75 * var(--s,1)))}
   .halloween-finale.is-playing .hw-reaper{opacity:1;transform:none}
   .halloween-finale.is-playing .hw-bat{display:none}
   .display-canvas.halloween-finale-on .display-text-overlay{animation:none;filter:brightness(.6)}
@@ -2199,10 +2244,13 @@ body.floqcast-live-active .heist-brand-slide{
   background-size:cover!important;
   background-position:center!important;
   background-repeat:no-repeat!important;
-  /* Match package rounded-card silhouette so any residual corner fringe is clipped */
-  border-radius:2.9% / 4.7%;
+  /* Slightly tighter than the PNG silhouette so CSS AA blends black→black, never a pale wedge. */
+  border-radius:3.15% / 5.1%;
   overflow:hidden;
-  background-color:#060608;
+  background-color:#000!important;
+  /* Kill subpixel light fringe from GPU compositing of the rounded clip. */
+  outline:2px solid #000;
+  outline-offset:-1px;
   box-shadow:
     0 0 0 3px rgba(255,40,40,.95),
     0 0 18px 6px rgba(255,24,24,.7),
@@ -2215,7 +2263,7 @@ body.floqcast-live-active .heist-brand-slide{
   inset:3.1%;
   z-index:20;
   pointer-events:none;
-  border-radius:2.4% / 3.9%;
+  border-radius:2.55% / 4.2%;
   box-sizing:border-box;
   border:2px solid rgba(255,48,48,.85);
   box-shadow:
@@ -2310,10 +2358,10 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-alert .media-slot{
   position:absolute;
   /* 2x1: face on legion + Rewards text column (rebuilt with black margin) */
-  left:17.153%;
-  top:8.858%;
-  width:14.72%;
-  height:33.431%;
+  left:17.617%;
+  top:9.481%;
+  width:14.498%;
+  height:32.925%;
   aspect-ratio:auto;
   min-height:0;
   border-radius:50%;
@@ -2350,10 +2398,10 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-alert > .baller-chip-overlay,
 .display-canvas.baller-alert .baller-chip-overlay{
   position:absolute;
-  left:21.479%;
-  top:38.508%;
-  width:8.255%;
-  height:9.651%;
+  left:21.879%;
+  top:38.682%;
+  width:8.131%;
+  height:9.505%;
   z-index:5; /* above face slot — portrait cannot distort chip */
   pointer-events:none;
   margin:0;
@@ -2386,17 +2434,17 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .media-slot,
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .media-slot,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .media-slot{
-  left:8.501%;
-  top:15.369%;
-  width:18.598%;
-  height:28.141%;
+  left:8.919%;
+  top:15.636%;
+  width:18.41%;
+  height:27.878%;
 }
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert > .baller-chip-overlay,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .baller-chip-overlay,
 .display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .baller-chip-overlay,
 .display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .baller-chip-overlay{
-  left:13.967%;
-  top:40.327%;
-  width:10.43%;
-  height:8.124%;
+  left:14.33%;
+  top:40.361%;
+  width:10.325%;
+  height:8.048%;
 }

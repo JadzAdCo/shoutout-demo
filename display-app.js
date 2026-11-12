@@ -1298,6 +1298,11 @@
     return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
   }
 
+  /** Prior classic-board / seasonal copy must not become a jersey name. */
+  function isSeasonalBoardRemnantText(value = "") {
+    return /^(HAPPY\s+HALLOWEEN|CLASSIC\s+HALLOWEEN)\b/i.test(String(value || "").trim());
+  }
+
   /** Real kit copy. The idle CTA must not count as a name, number, or team. */
   function jerseyRealText(value = "") {
     const text = String(value || "").trim();
@@ -1323,6 +1328,25 @@
       if (!text || !isLegacyShoutOutIdleText(text)) return;
       if (keepUpper && keepUpper.has(text.toUpperCase())) return;
       el.textContent = "";
+    });
+  }
+
+  /** Classic board / Halloween text must never ride on top of a jersey kit. */
+  function clearClassicBoardRemnantsOnJersey(root, keepUpper) {
+    if (!root) return;
+    stopHalloweenFinale();
+    root.classList.remove("classic-board-template", "classic-bw", "classic-halloween", "halloween-finale-on", "text-overlay-template");
+    root.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
+    root.querySelectorAll("#displayMain, #displaySub, .display-text-overlay b, .display-text-overlay span").forEach(el => {
+      if (el.id === "displayMain" || el.id === "displaySub") return;
+      if (el.closest("#displayMain") || el.closest("#displaySub") || el.closest("#displayJerseyTeam") || el.closest("#displayIdentityRail")) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text) return;
+      if (keepUpper && keepUpper.has(text.toUpperCase())) return;
+      // Leftover seasonal / classic board copy (e.g. HAPPY HALLOWEEN) outside jersey fields.
+      if (isSeasonalBoardRemnantText(text) || isLegacyShoutOutIdleText(text) || /^THROW\s+A\s+SHOUT/i.test(text)) {
+        el.textContent = "";
+      }
     });
   }
 
@@ -1902,7 +1926,11 @@
     const locationDefaultMain = clubDefaultMainText(loc);
     const jerseyPatronOnKit = jerseyRealText(data.jerseyPatronName || data.jerseyName || "");
     const rawMain = (isTextOverlay || isSoccerJersey)
-      ? String((isSoccerJersey && isLegacyShoutOutIdleText(data.mainText) && jerseyPatronOnKit) ? jerseyPatronOnKit : (data.mainText || (isSoccerJersey ? jerseyPatronOnKit : "")))
+      ? String((isSoccerJersey && (isLegacyShoutOutIdleText(data.mainText) || isSeasonalBoardRemnantText(data.mainText)) && jerseyPatronOnKit)
+        ? jerseyPatronOnKit
+        : (isSoccerJersey && isSeasonalBoardRemnantText(data.mainText) && !jerseyPatronOnKit)
+          ? ""
+          : (data.mainText || (isSoccerJersey ? jerseyPatronOnKit : "")))
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
     const mainSource = isIdleCta && !isSoccerJersey && !isTextOverlay
@@ -2060,8 +2088,9 @@
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
+      stopHalloweenFinale();
       const sport = jerseySportOf(t, data);
-      canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl");
+      canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "classic-board-template", "classic-bw", "classic-halloween", "halloween-finale-on", "text-overlay-template");
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
       const usePhotoBack = !!jerseyBg;
@@ -2326,12 +2355,14 @@
           if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
         });
       }
-      if (jerseyIdentityComplete(data, t)) {
-        clearUseShoutOutRemnants(canvas, new Set([
+      {
+        const keep = new Set([
           String(teamLabel || "").trim().toUpperCase(),
           String(jerseyNameText || "").trim().toUpperCase(),
           String(subText || "").trim().toUpperCase()
-        ]));
+        ].filter(Boolean));
+        clearUseShoutOutRemnants(canvas, keep);
+        clearClassicBoardRemnantsOnJersey(canvas, keep);
       }
       window.FLOQRBoardFit?.scheduleFit(canvas);
       markDisplayReady();
