@@ -278,14 +278,33 @@
       actions = document.createElement("div");
       actions.id = "ballerFaceActions";
       actions.className = "baller-face-actions button-row";
+      // One Upload control only — no duplicate "Take photo" beside the native picker sheet.
       actions.innerHTML = `
         <button type="button" id="ballerUploadPhotoBtn" class="primary">Upload photo</button>
-        <button type="button" id="ballerTakePhotoBtn">Take photo</button>
         <button type="button" id="ballerFaceRetryBtn" class="hidden">Retry background removal</button>
+        <div id="ballerUploadChooser" class="baller-upload-chooser hidden" role="menu" aria-label="Face photo source">
+          <button type="button" id="ballerUploadLibraryBtn" role="menuitem">Photo library / files</button>
+          <button type="button" id="ballerUploadCameraBtn" role="menuitem">Camera — face guide</button>
+        </div>
         <p id="ballerFaceStatus" class="status" aria-live="polite"></p>`;
       const note = mediaCard.querySelector(".single-media-upload-note");
       if (note?.nextSibling) mediaCard.insertBefore(actions, note.nextSibling);
       else mediaCard.appendChild(actions);
+    } else if (actions) {
+      // Migrate older markup that still had a standalone Take photo button.
+      byId("ballerTakePhotoBtn")?.remove();
+      if (!byId("ballerUploadChooser") && byId("ballerUploadPhotoBtn")) {
+        const chooser = document.createElement("div");
+        chooser.id = "ballerUploadChooser";
+        chooser.className = "baller-upload-chooser hidden";
+        chooser.setAttribute("role", "menu");
+        chooser.setAttribute("aria-label", "Face photo source");
+        chooser.innerHTML = `
+          <button type="button" id="ballerUploadLibraryBtn" role="menuitem">Photo library / files</button>
+          <button type="button" id="ballerUploadCameraBtn" role="menuitem">Camera — face guide</button>`;
+        byId("ballerUploadPhotoBtn").insertAdjacentElement("afterend", chooser);
+        actions.dataset.bound = "";
+      }
     }
     const input = byId("shoutoutMediaUpload");
     // Keep the input operable: display:none file inputs break programmatic click / change on Safari.
@@ -297,16 +316,32 @@
     }
     if (!input || actions?.dataset.bound === "1") return;
     actions.dataset.bound = "1";
+    const hideChooser = () => byId("ballerUploadChooser")?.classList.add("hidden");
     byId("ballerUploadPhotoBtn")?.addEventListener("click", () => {
+      const chooser = byId("ballerUploadChooser");
+      if (!chooser) {
+        input.accept = "image/*";
+        input.removeAttribute("capture");
+        input.click();
+        return;
+      }
+      chooser.classList.toggle("hidden");
+    });
+    byId("ballerUploadLibraryBtn")?.addEventListener("click", () => {
+      hideChooser();
       input.accept = "image/*";
       input.removeAttribute("capture");
       input.click();
     });
-    byId("ballerTakePhotoBtn")?.addEventListener("click", () => {
-      input.accept = "image/*";
-      // capture=user when camera is available; if denied, the browser falls back to file picker.
-      input.setAttribute("capture", "user");
-      input.click();
+    byId("ballerUploadCameraBtn")?.addEventListener("click", () => {
+      hideChooser();
+      openBallerFaceCameraCapture().catch((err) => {
+        console.warn("baller face camera modal", err?.message || err);
+        setBallerFaceStatus(`Camera unavailable — use Photo library. ${String(err?.message || "").slice(0, 100)}`);
+        input.accept = "image/*";
+        input.removeAttribute("capture");
+        input.click();
+      });
     });
     byId("ballerFaceRetryBtn")?.addEventListener("click", () => {
       const prior = lastValidBallerFace?.uploadResult;
@@ -405,50 +440,221 @@
     byId("ballerFaceRetryBtn")?.classList.toggle("hidden", !retry);
   }
 
-  function loadImageElement(url) {
+  function loadImageFromSrc(src) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error("Could not decode portrait image."));
-      img.src = url;
+      img.src = src;
     });
+  }
+
+  async function bitmapToImageElement(bitmap, objectUrl) {
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bitmap, 0, 0);
+    try { bitmap.close?.(); } catch (_) {}
+    const img = await loadImageFromSrc(canvas.toDataURL("image/png"));
+    if (objectUrl) img._floqrObjectUrl = objectUrl;
+    return img;
+  }
+
+  /**
+   * Load an image for canvas compositing. Firebase Storage download URLs often fail
+   * `new Image()` + crossOrigin (tainted / opaque decode) → "Could not decode portrait image."
+   * Prefer fetch→blob→createImageBitmap, then object URL Image().
+   */
+  async function loadImageElement(url) {
+    const src = String(url || "").trim();
+    if (!src) throw new Error("Could not decode portrait image. (empty URL)");
+    if (src.startsWith("blob:") || src.startsWith("data:")) {
+      try {
+        if (typeof createImageBitmap === "function") {
+          const blob = src.startsWith("blob:")
+            ? await (await fetch(src)).blob()
+            : await (await fetch(src)).blob();
+          const bmp = await createImageBitmap(blob);
+          return bitmapToImageElement(bmp, "");
+        }
+      } catch (_) { /* fall through to Image() */ }
+      return loadImageFromSrc(src);
+    }
+    let objectUrl = "";
+    try {
+      const res = await fetch(src, { mode: "cors", credentials: "omit", cache: "no-store" });
+      if (!res.ok) throw new Error(`Portrait fetch failed (${res.status})`);
+      const blob = await res.blob();
+      if (!blob || !blob.size) throw new Error("Portrait fetch returned an empty image.");
+      if (typeof createImageBitmap === "function") {
+        try {
+          const bmp = await createImageBitmap(blob);
+          return bitmapToImageElement(bmp, "");
+        } catch (_) { /* fall through */ }
+      }
+      objectUrl = URL.createObjectURL(blob);
+      const img = await loadImageFromSrc(objectUrl);
+      img._floqrObjectUrl = objectUrl;
+      return img;
+    } catch (first) {
+      if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch (_) {} }
+      try {
+        return await loadImageFromSrc(src);
+      } catch (_) {
+        throw new Error(`Could not decode portrait image. ${String(first?.message || first).slice(0, 140)}`);
+      }
+    }
+  }
+
+  /**
+   * In-app camera with an oval face guide (Baller's Alert). Prefer over capture=user —
+   * native sheets already offer Take Photo under Upload and do not frame the face.
+   */
+  async function openBallerFaceCameraCapture() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error("Camera API not available in this browser.");
+    }
+    const existing = byId("ballerFaceCameraModal");
+    existing?.remove();
+    const modal = document.createElement("div");
+    modal.id = "ballerFaceCameraModal";
+    modal.className = "baller-face-camera-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Face camera");
+    modal.innerHTML = `
+      <div class="baller-face-camera-dialog">
+        <p class="baller-face-camera-title">Center your face in the oval</p>
+        <div class="baller-face-camera-stage">
+          <video id="ballerFaceCameraVideo" playsinline autoplay muted></video>
+          <div class="baller-face-camera-oval" aria-hidden="true"></div>
+        </div>
+        <p class="baller-face-camera-hint">Fill the oval — shoulders optional. Background is removed after capture.</p>
+        <div class="button-row baller-face-camera-actions">
+          <button type="button" id="ballerFaceCameraCaptureBtn" class="primary">Capture face</button>
+          <button type="button" id="ballerFaceCameraCancelBtn">Cancel</button>
+        </div>
+        <p id="ballerFaceCameraStatus" class="status" aria-live="polite"></p>
+      </div>`;
+    document.body.appendChild(modal);
+    const video = byId("ballerFaceCameraVideo");
+    const statusEl = byId("ballerFaceCameraStatus");
+    let stream = null;
+    const cleanup = () => {
+      try { stream?.getTracks?.().forEach((t) => t.stop()); } catch (_) {}
+      modal.remove();
+    };
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: "user" },
+          width: { ideal: 1280 },
+          height: { ideal: 1280 }
+        }
+      });
+      video.srcObject = stream;
+      await video.play().catch(() => {});
+    } catch (err) {
+      cleanup();
+      throw err;
+    }
+    return new Promise((resolve, reject) => {
+      byId("ballerFaceCameraCancelBtn")?.addEventListener("click", () => {
+        cleanup();
+        reject(new Error("Camera cancelled."));
+      }, { once: true });
+      byId("ballerFaceCameraCaptureBtn")?.addEventListener("click", async () => {
+        try {
+          const w = video.videoWidth || 720;
+          const h = video.videoHeight || 720;
+          if (!w || !h) throw new Error("Camera frame not ready.");
+          // Crop to the oval guide (≈62% width × 78% height, centered).
+          const ovalW = w * 0.62;
+          const ovalH = h * 0.78;
+          const sx = (w - ovalW) / 2;
+          const sy = (h - ovalH) / 2;
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(ovalW);
+          canvas.height = Math.round(ovalH);
+          const ctx = canvas.getContext("2d");
+          // Mirror like a selfie preview.
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(video, sx, sy, ovalW, ovalH, 0, 0, canvas.width, canvas.height);
+          const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.92));
+          if (!blob) throw new Error("Could not capture face frame.");
+          const file = new File([blob], `baller-face-${Date.now()}.jpg`, { type: "image/jpeg" });
+          cleanup();
+          await processBallerFaceSelection(file);
+          resolve(file);
+        } catch (err) {
+          if (statusEl) statusEl.textContent = String(err?.message || err).slice(0, 160);
+          else {
+            cleanup();
+            reject(err);
+          }
+        }
+      }, { once: true });
+    });
+  }
+
+  function releaseLoadedImage(img) {
+    const u = img && img._floqrObjectUrl;
+    if (u) { try { URL.revokeObjectURL(u); } catch (_) {} }
   }
 
   /** Draw original photo, apply full-frame alpha mask with destination-in (portrait layer only). */
   async function compositeBallerPortraitCutout(originalUrl, maskUrl) {
-    const [orig, mask] = await Promise.all([loadImageElement(originalUrl), loadImageElement(maskUrl)]);
-    const w = orig.naturalWidth || orig.width;
-    const h = orig.naturalHeight || orig.height;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(orig, 0, 0, w, h);
-
-    const mCanvas = document.createElement("canvas");
-    mCanvas.width = w;
-    mCanvas.height = h;
-    const mctx = mCanvas.getContext("2d");
-    mctx.drawImage(mask, 0, 0, w, h);
-    const imageData = mctx.getImageData(0, 0, w, h);
-    const d = imageData.data;
-    for (let i = 0; i < d.length; i += 4) {
-      // Grayscale coverage → alpha (keep midtones for soft edges). Never feed opaque B/W to destination-in.
-      const coverage = d[i + 3] > 0 ? Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) : d[i];
-      d[i] = 255;
-      d[i + 1] = 255;
-      d[i + 2] = 255;
-      d[i + 3] = coverage;
+    // Prefer the local File blob when still available — avoids Storage CORS decode races.
+    let originalSrc = originalUrl;
+    let localObjectUrl = "";
+    if (lastValidBallerFace?.file && lastValidBallerFace.file instanceof Blob) {
+      localObjectUrl = URL.createObjectURL(lastValidBallerFace.file);
+      originalSrc = localObjectUrl;
     }
-    mctx.putImageData(imageData, 0, 0);
-    ctx.globalCompositeOperation = "destination-in";
-    ctx.drawImage(mCanvas, 0, 0);
-    ctx.globalCompositeOperation = "source-over";
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-    if (!blob) throw new Error("Portrait composite failed.");
-    return blob;
+    let orig;
+    let mask;
+    try {
+      [orig, mask] = await Promise.all([loadImageElement(originalSrc), loadImageElement(maskUrl)]);
+      const w = orig.naturalWidth || orig.width;
+      const h = orig.naturalHeight || orig.height;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(orig, 0, 0, w, h);
+
+      const mCanvas = document.createElement("canvas");
+      mCanvas.width = w;
+      mCanvas.height = h;
+      const mctx = mCanvas.getContext("2d");
+      mctx.drawImage(mask, 0, 0, w, h);
+      const imageData = mctx.getImageData(0, 0, w, h);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        // Grayscale coverage → alpha (keep midtones for soft edges). Never feed opaque B/W to destination-in.
+        const coverage = d[i + 3] > 0 ? Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) : d[i];
+        d[i] = 255;
+        d[i + 1] = 255;
+        d[i + 2] = 255;
+        d[i + 3] = coverage;
+      }
+      mctx.putImageData(imageData, 0, 0);
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.drawImage(mCanvas, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (!blob) throw new Error("Portrait composite failed.");
+      return blob;
+    } finally {
+      releaseLoadedImage(orig);
+      releaseLoadedImage(mask);
+      if (localObjectUrl) { try { URL.revokeObjectURL(localObjectUrl); } catch (_) {} }
+    }
   }
 
   async function uploadBallerCutoutBlob(blob, referenceNumber, uid) {
@@ -616,10 +822,15 @@
         jerseyPlateInk: t.jerseyPlateInk || "",
         jerseyOverlayWordmark: t.jerseyOverlayWordmark ? "1" : "",
         jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
-        backgroundUrl: t.defaultBackgroundUrl || "",
+        backgroundUrl: t.nbaDualFaces
+          ? (t.frontBackgroundUrl || t.defaultBackgroundUrl || "")
+          : (t.defaultBackgroundUrl || ""),
+        frontBackgroundUrl: t.frontBackgroundUrl || "",
+        backBackgroundUrl: t.backBackgroundUrl || t.defaultBackgroundUrl || "",
         sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
         league: t.league || "",
-        nflDualLayout: !!t.nflDualLayout || t.layout === "nfl-jersey"
+        nflDualLayout: !!t.nflDualLayout || t.layout === "nfl-jersey",
+        nbaDualFaces: !!t.nbaDualFaces
       };
     }
     const team = resolveSelectedSoccerTeam();
@@ -1130,11 +1341,64 @@
     menu.setAttribute("aria-hidden", "true");
   }
 
+  const SHOUTOUT_TRAIL_PAGES = new Set([
+    "shoutoutLandingPage", "categoryPage", "clubActionsPage", "listingPage",
+    "templateSelectPage", "editorPage", "confirmationPage", "adSplashPage"
+  ]);
+  let activeShoutoutTrail = null;
+
+  function ensureShoutoutTrail(reason = "flow") {
+    if (activeShoutoutTrail?.correlationId) return activeShoutoutTrail;
+    activeShoutoutTrail = {
+      correlationId: window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`,
+      startedAtMs: Date.now(),
+      reason: String(reason || "flow").slice(0, 40),
+      pages: []
+    };
+    try { sessionStorage.setItem("floqrShoutoutTrailId", activeShoutoutTrail.correlationId); } catch (_) {}
+    return activeShoutoutTrail;
+  }
+
+  function logShoutoutPageCall(pageId) {
+    if (!SHOUTOUT_TRAIL_PAGES.has(pageId)) return;
+    const trail = ensureShoutoutTrail(pageId);
+    const atMs = Date.now();
+    const step = {
+      pageId,
+      atMs,
+      atIso: new Date(atMs).toISOString(),
+      template: selectedTemplate || "",
+      locationId: selectedLocationId || locationId?.() || "",
+      screenFormatId: selectedScreenFormatId || ""
+    };
+    trail.pages.push(step);
+    if (!window.FLOQRLog?.write) return;
+    window.FLOQRLog.write({
+      level: "info",
+      category: "shoutout",
+      action: "page_call",
+      message: `ShoutOut page ${pageId}`,
+      correlationId: trail.correlationId,
+      details: {
+        shoutoutTrailId: trail.correlationId,
+        pageId,
+        pageIndex: trail.pages.length,
+        template: step.template,
+        locationId: step.locationId,
+        screenFormatId: step.screenFormatId,
+        atMs,
+        atIso: step.atIso,
+        trailStartedAtMs: trail.startedAtMs
+      }
+    });
+  }
+
   function showPage(id) {
     if (!id || !byId(id)) return;
     closeUserDropdown();
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
+    if (SHOUTOUT_TRAIL_PAGES.has(id)) logShoutoutPageCall(id);
     if (id === "templateSelectPage") {
       window.FLOQRBotDee?.setMode?.("templates");
       window.FLOQRBotDee?.ensureTemplateMode?.();
@@ -4461,6 +4725,9 @@
       if (payload.attributionChoice) url.searchParams.set("attributionChoice", payload.attributionChoice);
       if (payload.jerseyPatronName) url.searchParams.set("jerseyPatronName", payload.jerseyPatronName);
       if (payload.nflDualLayout) url.searchParams.set("nflDualLayout", "1");
+      if (payload.nbaDualFaces) url.searchParams.set("nbaDualFaces", "1");
+      if (payload.frontBackgroundUrl) url.searchParams.set("frontBackgroundUrl", payload.frontBackgroundUrl);
+      if (payload.backBackgroundUrl) url.searchParams.set("backBackgroundUrl", payload.backBackgroundUrl);
       if (payload.sport) url.searchParams.set("sport", payload.sport);
       if (payload.soccerNameSource) url.searchParams.set("soccerNameSource", payload.soccerNameSource);
       if (payload.ballerCard) url.searchParams.set("ballerCard", "1");
@@ -5232,7 +5499,8 @@
   async function commitShoutout({mode = "submit"} = {}) {
     const saveOnly = mode === "saved";
     const status=byId("submitStatus");
-    const correlationId = window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`;
+    const trail = ensureShoutoutTrail(saveOnly ? "save" : "submit");
+    const correlationId = trail.correlationId;
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
@@ -5261,12 +5529,14 @@
           message: `${saveOnly ? "Saving" : "Submitting"} ${selectedTemplate || "shoutout"} for ${locationId()}`,
           correlationId,
           details: {
+            shoutoutTrailId: correlationId,
             template: selectedTemplate,
             locationId: locationId(),
             screenFormatId: caps.formatId || selectedScreenFormatId,
             footballIntro: !!footballIntro,
             paymentModel: Number(t.priceCents || 0) > 0 ? "floqr-platform" : "free",
-            mode: saveOnly ? "saved" : "submit"
+            mode: saveOnly ? "saved" : "submit",
+            pageTrail: (trail.pages || []).slice(-20)
           }
         });
       }

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.100";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.100";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.101";
+  const PREVIEW_LINKS_PACKAGE = "s3.2.101";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,24 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.2.101",
+      title: "s3.2.101 — ShoutOut diagnostics, Baller upload chooser, PHILA dual, portrait decode",
+      checks: [
+        {label:"ShoutOut diagnostics module", file:"master-shoutout-logging.js", includes:["FLOQRShoutOutDiagnostics", "page_call", "shoutoutTrailId"]},
+        {label:"Diagnostics ShoutOut subtab", file:"master-admin.html", includes:["diagnosticsShoutOut", "master.diagnosticsShoutOut", "master-shoutout-logging.js"]},
+        {label:"Page trail logger", file:"patron-app.js", includes:["logShoutoutPageCall", "page_call", "openBallerFaceCameraCapture", "ballerUploadChooser"]},
+        {label:"No duplicate Take photo button", file:"patron-app.js", notIncludes:["id=\"ballerTakePhotoBtn\""]},
+        {label:"PHILA dual catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ersPhila", "nbaDualFaces", "PHILA"]},
+        {label:"NBA dual faces display", file:"display-app.js", includes:["applyNbaDualFacePhase", "nbaDualFaces"]},
+        {label:"Portrait JSON repair", file:"functions/gemini-portrait-mask.js", includes:["repairJsonCandidate", "parseSegmentationJson"]},
+        {label:"Black Card removed from catalog", file:"shared-data.js", includes:["ballersAlert:"], notIncludes:["blackCard: {", "blackCardAmex: {"]},
+        {label:"STANDARD has Alert only", file:"shared-data.js", includes:["'classicHalloween','ballersAlert'"], notIncludes:["'blackCard','ballersAlert'"]},
+        {label:"Company max 18", file:"patron-app.js", includes:["BALLER_COMPANY_MAX = 18"]},
+        {label:"Front kit asset", file:"images/basketball/nba-76ers-front-with-club.png", includes:[]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-101-shoutout-diag-phila-baller"]}
+      ]
+    },
     {
       version: "s3.2.100",
       title: "s3.2.100 — Baller company max 18 + UPPERCASE",
@@ -2855,6 +2873,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-2-101-shoutout-diag-phila-baller",
+      area:"ShoutOut / Diagnostics / Display / Baller",
+      feature:"ShoutOut Diagnostics page trails; Baller's Alert only (Black Card removed); company max 18; PHILA dual; portrait decode",
+      changed:"s3.2.101 — Diagnostics → ShoutOut consolidates appLogs category shoutout + page_call trails by shoutoutTrailId. Black Card + Black Card Amex removed from catalog; Baller's Alert kept. Upload photo chooser (library or Camera face guide); no duplicate Take photo. Company max 18 UPPERCASE. PHILA dual rotates front↔back. Portrait createImageBitmap + Gemini JSON repair.",
+      howToTest:"1) Hard-refresh Search + Master Admin (s3.2.101). 2) Template list shows Baller's Alert — not Black Card / Black Card Amex. 3) Baller's Alert company field max 18 UPPERCASE; Media Upload has Upload photo only (chooser: library or Camera face guide). 4) Throw PHILA dual — LED rotates PHILA+number and name+number. 5) Diagnostics → ShoutOut shows page_call trails with id/time/template/location. Mark Succeed/Failed.",
+      expected:"No Black Card templates; Alert company ≤18 UPPERCASE; no duplicate Take photo; PHILA dual rotates; ShoutOut Diagnostics trail list populated when signed in.",
+      troubleshoot:"Black Card still listed → hard-refresh shared-data.js. Take photo button → patron-app removes #ballerTakePhotoBtn. Empty Diagnostics → signed-in patron required. PHILA missing → jersey-catalog + front PNG published. Decode errors → Storage CORS / createImageBitmap; Gemini under Application Logging."
+    },
     {
       id:"s3-2-96-jersey-number-my-shoutouts",
       area:"ShoutOut / Display / Portal",

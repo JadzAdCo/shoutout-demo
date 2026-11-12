@@ -931,6 +931,11 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   white-space:nowrap;
   line-height:.58;
 }
+/* PHILA / NBA dual faces: front shows team+number; back shows name+number */
+.display-canvas.nba-dual-faces.nba-dual-phase-front #displayMain.soccer-jersey-name.hidden,
+.display-canvas.nba-dual-faces.nba-dual-phase-back .soccer-jersey-team.hidden{
+  display:none!important;
+}
 .display-canvas.soccer-jersey-template .soccer-jersey-team.hidden{
   display:none!important;
 }

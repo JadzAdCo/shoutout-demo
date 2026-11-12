@@ -28,6 +28,14 @@ test("parseSegmentationJson accepts array and wrapped shapes", () => {
   assert.equal(wrapped[0].label, "human");
 });
 
+test("parseSegmentationJson repairs truncated object and extracts box_2d", () => {
+  const truncated = 'Here you go:\n{"box_2d":[12,34,56,78],"label":"person","mask":"AAAA';
+  const items = mask.parseSegmentationJson(truncated);
+  assert.equal(items.length, 1);
+  assert.deepEqual(items[0].box_2d, [12, 34, 56, 78]);
+  assert.equal(items[0].label, "person");
+});
+
 test("pickPrimaryPerson prefers person-like labels", () => {
   const pick = mask.pickPrimaryPerson([
     {label: "tree", box_2d: [0, 0, 1, 1]},

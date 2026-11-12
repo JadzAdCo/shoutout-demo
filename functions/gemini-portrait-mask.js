@@ -88,23 +88,87 @@ function stripDataUrl(b64 = "") {
   return idx >= 0 ? raw.slice(idx + 7) : raw.replace(/^data:image\/\w+;base64,/, "");
 }
 
+function repairJsonCandidate(slice = "") {
+  let s = String(slice || "").trim()
+    .replace(/,\s*([}\]])/g, "$1")
+    .replace(/[\u0000-\u001f]+/g, " ");
+  // Balance braces/brackets when the model truncates mid-object.
+  const opens = (s.match(/[\[{]/g) || []).length;
+  const closes = (s.match(/[\]}]/g) || []).length;
+  if (opens > closes) {
+    const stack = [];
+    for (const ch of s) {
+      if (ch === "[" || ch === "{") stack.push(ch === "[" ? "]" : "}");
+      else if (ch === "]" || ch === "}") stack.pop();
+    }
+    s += stack.reverse().join("");
+  }
+  return s;
+}
+
+function isSegmentationItem(item) {
+  return !!(item && typeof item === "object" && !Array.isArray(item) && (
+    Array.isArray(item.box_2d) || item.mask != null || item.label != null
+  ));
+}
+
 function parseSegmentationJson(text = "") {
   const raw = String(text || "").trim();
   if (!raw) return [];
-  let parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (_) {
-    const start = raw.indexOf("[");
-    const end = raw.lastIndexOf("]");
-    if (start < 0 || end <= start) throw new Error("Gemini segmentation response was not JSON.");
-    parsed = JSON.parse(raw.slice(start, end + 1));
+  const tryParse = (candidate) => {
+    const parsed = JSON.parse(candidate);
+    if (Array.isArray(parsed)) {
+      const items = parsed.filter(isSegmentationItem);
+      if (items.length) return items;
+      return null; // bare numeric arrays (e.g. a lone box_2d) are not segment lists
+    }
+    if (Array.isArray(parsed?.boxes)) return parsed.boxes.filter(isSegmentationItem);
+    if (Array.isArray(parsed?.masks)) return parsed.masks.filter(isSegmentationItem);
+    if (isSegmentationItem(parsed)) return [parsed];
+    return null;
+  };
+  const accept = (candidate) => {
+    try {
+      const items = tryParse(candidate);
+      return items && items.length ? items : null;
+    } catch (_) {
+      return null;
+    }
+  };
+  let hit = accept(raw);
+  if (hit) return hit;
+  // Prefer object slices before array slices so a nested box_2d array is not mistaken for the list.
+  const startObj = raw.indexOf("{");
+  if (startObj >= 0) {
+    const endObj = raw.lastIndexOf("}");
+    if (endObj > startObj) {
+      hit = accept(raw.slice(startObj, endObj + 1));
+      if (hit) return hit;
+    }
+    hit = accept(repairJsonCandidate(raw.slice(startObj)));
+    if (hit) return hit;
   }
-  if (Array.isArray(parsed)) return parsed;
-  if (Array.isArray(parsed?.boxes)) return parsed.boxes;
-  if (Array.isArray(parsed?.masks)) return parsed.masks;
-  if (parsed && typeof parsed === "object" && parsed.box_2d) return [parsed];
-  return [];
+  const startArr = raw.indexOf("[");
+  const endArr = raw.lastIndexOf("]");
+  if (startArr >= 0 && endArr > startArr) {
+    hit = accept(raw.slice(startArr, endArr + 1));
+    if (hit) return hit;
+    hit = accept(repairJsonCandidate(raw.slice(startArr, endArr + 1)));
+    if (hit) return hit;
+  }
+  // Last resort: pull a lone box_2d + optional mask string from messy prose.
+  const boxMatch = raw.match(/"box_2d"\s*:\s*\[(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*)\]/);
+  if (boxMatch) {
+    const box_2d = boxMatch[1].split(",").map((n) => Number(String(n).trim()));
+    const maskMatch = raw.match(/"mask"\s*:\s*"([A-Za-z0-9+/=\n\r]{32,})"/);
+    const labelMatch = raw.match(/"label"\s*:\s*"([^"]{1,80})"/);
+    return [{
+      box_2d,
+      mask: maskMatch ? maskMatch[1].replace(/\s+/g, "") : undefined,
+      label: labelMatch ? labelMatch[1] : "person"
+    }];
+  }
+  throw new Error("Gemini segmentation response was not JSON.");
 }
 
 function pickPrimaryPerson(items = []) {

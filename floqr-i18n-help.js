@@ -251,8 +251,8 @@
         body: "Эксклюзив Aurelia за $30. Кошка Shiloh сидит в левой части экрана, а ваш ShoutOut светится белым на тёмной стороне рядом с ней. Эмодзи приветствуются. Введите в поиске «Shiloh», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах тех размеров, которые есть в Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -581,8 +581,8 @@
         body: "Exclusief bij Aurelia voor $30. De kat Shiloh zit links op het scherm en je ShoutOut gloeit wit aan de donkere kant naast haar. Emoji zijn welkom. Typ ‘Shiloh’ in Zoeken, schrijf maximaal drie korte regels en voeg desgewenst je @handle toe. Speelt op de schermformaten die Aurelia heeft."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -911,8 +911,8 @@
         body: "Exclusivité Aurelia à 30 $. Le chat Shiloh est assis à gauche de l’écran et votre ShoutOut brille en blanc sur le côté sombre, juste à côté. Les emoji sont les bienvenus. Tapez « Shiloh » dans Recherche, écrivez jusqu’à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S’affiche sur les tailles d’écran dont dispose Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -1241,8 +1241,8 @@
         body: "Exklusiv bei Aurelia für 30 $. Die Katze Shiloh sitzt links auf der Anzeige, und dein ShoutOut leuchtet weiß auf der dunklen Seite neben ihr. Emojis sind willkommen. Gib „Shiloh“ in der Suche ein, schreib bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf den Displaygrößen, die Aurelia hat."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -1571,8 +1571,8 @@
         body: "Exclusivo de Aurelia por $30. La gata Shiloh aparece a la izquierda de la pantalla y tu ShoutOut brilla en blanco en el lado oscuro, a su lado. Los emojis son bienvenidos. Escribe «Shiloh» en Buscar, escribe hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en los tamaños de pantalla que tiene Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -1901,8 +1901,8 @@
         body: "Esclusiva Aurelia a 30 $. La gatta Shiloh è seduta a sinistra dello schermo e il tuo ShoutOut brilla in bianco sul lato scuro accanto a lei. Le emoji sono benvenute. Scrivi «Shiloh» in Cerca, scrivi fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sulle dimensioni di schermo che ha Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -2231,8 +2231,8 @@
         body: "Exclusivo do Aurelia por US$ 30. A gata Shiloh fica à esquerda da tela e o seu ShoutOut brilha em branco no lado escuro, ao lado dela. Emojis são bem-vindos. Digite «Shiloh» na Busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Aparece nos tamanhos de tela que o Aurelia tem."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -2561,8 +2561,8 @@
         body: "Αποκλειστικό του Aurelia στα 30 $. Η γάτα Shiloh κάθεται στα αριστερά της οθόνης και το ShoutOut σας λάμπει λευκό στη σκοτεινή πλευρά δίπλα της. Τα emoji είναι ευπρόσδεκτα. Πληκτρολογήστε «Shiloh» στην Αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει στα μεγέθη οθόνης που έχει το Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -2891,8 +2891,8 @@
         body: "Wyłącznie w Aurelia za 30 $. Kotka Shiloh siedzi po lewej stronie ekranu, a Twój ShoutOut świeci na biało po ciemnej stronie obok niej. Emoji są mile widziane. Wpisz „Shiloh” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach w rozmiarach, które ma Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
@@ -3221,8 +3221,8 @@
         body: "حصري في Aurelia مقابل 30 $. تجلس القطة Shiloh على يسار الشاشة ويتوهّج ShoutOut الخاص بك باللون الأبيض على الجانب الداكن بجانبها. الرموز التعبيرية مرحّب بها. اكتب «Shiloh» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @اسمك إن أردت. يُعرض على أحجام الشاشات المتوفرة في Aurelia."
       },
       "help-black-card": {
-        title: "Black Card",
-        body: "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
       },
       "help-ballers-alert": {
         title: "Baller's Alert",

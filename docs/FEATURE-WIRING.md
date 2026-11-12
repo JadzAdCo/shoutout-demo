@@ -8,9 +8,23 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-22 |
+| Last registry touch | 2026-11-12 |
 
 ---
+
+## ShoutOut diagnostics + Baller face upload + PHILA dual (s3.2.101)
+
+| Piece | Wiring |
+|---|---|
+| Decode error | Client `loadImageElement` — Storage URL → fetch blob → `createImageBitmap` / object URL; message **"Could not decode portrait image"** = composite could not load original/mask pixels (often after Gemini already returned a mask) |
+| BG removal | `functions/gemini-portrait-mask.js` `parseSegmentationJson` repairs truncated JSON + box_2d fallback; client composite prefers local File blob |
+| Baller Upload | Single **Upload photo** → chooser: Photo library / files **or** Camera — face guide (`openBallerFaceCameraCapture` oval). Standalone **Take photo** removed (duplicate of native sheet). Company max **18** UPPERCASE |
+| Catalog | **Black Card** + **Black Card (Amex)** removed from `SHOUTOUT_TEMPLATES` / STANDARD. Keep **Baller's Alert** (+ Amex twin). Checkout refuses new `blackCard` / `blackCardAmex` |
+| PHILA dual | Catalog `nbaPhiladelphia76ersPhila` (`nbaDualFaces`, `frontBackgroundUrl` + back kit). Display rotates front (PHILA + number) ↔ back (name + number) via `FLOQRFrameLoop` |
+| Diagnostics | Master Admin → **Diagnostics → ShoutOut** (`#diagnosticsShoutOut`, `master-shoutout-logging.js` / `FLOQRShoutOutDiagnostics`). `appLogs` category `shoutout`; subsection groups `page_call` by `shoutoutTrailId` + time/template/location |
+| Page trail | `patron-app.js` `showPage` → `logShoutoutPageCall` for composer pages; submit/save reuses trail correlation id |
+
+Cache-bust: `patron-app.js`, `styles.css`, `jersey-catalog.js`, `display-app.js`, `display.css`, `shared-data.js`, `master-admin.html`, `master-shoutout-logging.js`, `botdee-help-repository.js`, `floqr-i18n.js`, `floqr-i18n-help.js`, `ai-diagnostics-service.js` `?v=s3.2.101`.
 
 ## Passes / door QR (`passes`)
 
@@ -462,7 +476,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Client timer | `suprstar-preview.js` — arms only after **stable ICE/peer `connected`** (2.5s debounce); never on SDP answer alone |
 | WebRTC | `suprstr-webrtc.js` — answer → status `answered`; true `connected` from `connectionState` / ICE |
 | Backend | `startSuprstrLive` sets `liveEndsAtMs:0`; `armSuprstrLiveDuration` sets ends + `liveArmedAtMs` / `liveArmSource` |
-| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `floqCast` (legacy dual-read `suprstar`): `webrtc_status`, `ice_servers`, `live_timer_*`, `live_heartbeat`. Master Admin → **Diagnostics → FloqCast** (`#diagnosticsFloqCast`, `master-floqcast-logging.js` / `FLOQRFloqCastDiagnostics`). Application Logging still shows the same rows under the broader filter. Phone must be signed in to write; display2 is anonymous (console-only). |
+| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `floqCast` (legacy dual-read `suprstar`): `webrtc_status`, `ice_servers`, `live_timer_*`, `live_heartbeat`. Master Admin → **Diagnostics → FloqCast** (`#diagnosticsFloqCast`, `master-floqcast-logging.js` / `FLOQRFloqCastDiagnostics`). **ShoutOut** logs → **Diagnostics → ShoutOut** (`#diagnosticsShoutOut`, `master-shoutout-logging.js`) including `page_call` trails. Application Logging still shows the same rows under the broader filter. Phone must be signed in to write; display2 is anonymous (console-only). |
 | Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
 | Cache bust | Preview + Master Admin FloqCast panel scripts `?v=s3.2.85` |
 
@@ -712,15 +726,15 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
 
-## Baller metal cards (`blackCard` / `ballersAlert` + Amex twins) — s3.2.91 / s3.2.94
+## Baller metal cards (`ballersAlert` + Amex twin) — s3.2.91 / s3.2.101
 
 Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
 
 | Piece | Where |
 |---|---|
-| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:18` (UPPERCASE) |
-| **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py` (exterior flood + non-gold fringe dilate → fill; crisp SVG EMV chip paste; LED letterbox + corner scrub). Chip SVG/PNG: `images/baller/baller-emv-chip.svg`. Heading + Valid Thru 12/50 + ornate rim in the asset |
-| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 18, always UPPERCASE). Alert: **Upload photo** + **Take photo** → immediate local + LED preview (`processBallerFaceSelection`), then Storage upload + Gemini mask on select (not only Submit); cancel keeps prior. File input uses `.baller-file-input-host` (visually hidden, not `display:none`). Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
+| **Catalog** | `shared-data.js` — public **`ballersAlert` only** ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `ballersAlertAmex` (`masterAdminOnly`, Aurelia). **`blackCard` / `blackCardAmex` removed** (s3.2.101). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:18` (UPPERCASE) |
+| **Art** | Package PNG `ballers-express-business.png` → `images/baller/ballers-alert-{2x1,4x3}.png` (+ `-amex-` twin) via `scripts/build-baller-card-photos.py`. Chip SVG/PNG: `images/baller/baller-emv-chip.svg` |
+| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 18, always UPPERCASE). Alert: single **Upload photo** → library/files or **Camera — face guide** (oval); no duplicate Take photo button. Immediate local + LED preview (`processBallerFaceSelection`), then Storage + Gemini mask on select; cancel keeps prior. File input uses `.baller-file-input-host`. Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
 | **Display** | `placeBallerFaceSlot` + face oval; chip overlay above face (`z-index:5`); card layers `scale(0.935)` so flashing red halo sits in the black margin; `border-radius:2.9%/4.7%` clips residual silhouette fringe; name/company `top:64%` (64×48: `60%`), type `mainSize×0.92×1.5×1.1` vh (+10%); face slot `background:transparent`; metallic gold emboss; empty company hidden |
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
 | **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |

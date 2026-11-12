@@ -1203,3 +1203,8 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
   .beta-invite-actions{flex-direction:column;align-items:stretch}
   #betaInviteSubmitBtn{width:100%}
 }
+
+/* Diagnostics → ShoutOut page trails */
+.shoutout-page-trail{margin:8px 0 0;padding-left:1.2rem}
+.shoutout-page-trail li{margin:4px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.shoutout-page-trail li span{opacity:.75;font-size:.9em}

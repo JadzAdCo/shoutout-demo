@@ -87,26 +87,18 @@
       patterns: [/shiloh/, /\bcat\s*(shout|template|background)/, /\bkitty\s*(shout|template)/, /aurelia\s*cat/]
     },
     {
-      id: "black-card",
-      kind: "product",
-      label: "Black Card",
-      blurb: "$75 Baller's Express BUSINESS metal card — your name and company embossed on every LED size.",
-      href: pageUrl("./", {start: "search"}),
-      action: "template",
-      templateId: "blackCard",
-      searchPhrases: ["black card", "ballers express", "baller's express", "metal card", "business card shoutout"],
-      patterns: [/black\s*card/, /baller'?s?\s*express/, /metal\s*card/, /business\s*card\s*shout/]
-    },
-    {
       id: "ballers-alert",
       kind: "product",
       label: "Baller's Alert",
-      blurb: "$100 Baller's Express card with your face in the upper-left medallion. Face photo required; Valid Thru year 50.",
+      blurb: "$100 Baller's Express card with your face under the warrior helmet. Face photo required; company max 18 UPPERCASE; Valid Thru year 50.",
       href: pageUrl("./", {start: "search"}),
       action: "template",
       templateId: "ballersAlert",
-      searchPhrases: ["ballers alert", "baller's alert", "baller alert", "face card", "black card photo"],
-      patterns: [/baller'?s?\s*alert/, /face\s*card/, /black\s*card\s*photo/]
+      searchPhrases: [
+        "ballers alert", "baller's alert", "baller alert", "face card", "black card photo",
+        "black card", "ballers express", "baller's express", "metal card"
+      ],
+      patterns: [/baller'?s?\s*alert/, /face\s*card/, /black\s*card/, /baller'?s?\s*express/, /metal\s*card/]
     },
     {
       id: "classic-halloween",
