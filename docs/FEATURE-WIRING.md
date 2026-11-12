@@ -12,6 +12,17 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Maryland Terps jersey pair v2 (s3.3.002)
+
+| Piece | Wiring |
+|---|---|
+| Brief | `reports/maryland-terps-jersey-v2/` (CURSOR_MASTER_PROMPT, IMPLEMENTATION_CONTRACT, SOURCES, INTEGRATION, composition reference) |
+| Catalog | `nbaMarylandTerpsThrowbackPair` — stable id `ncaa-umd-2026-27-2002-throwback-white-v2`, `nbaJerseyPair`, 7s/5s, `pairMessageTheme: maryland`, **`catalogPublished: false`** / **`productionAssetsReady: false`** (no front blank plate yet) |
+| Live Terps | `nbaMarylandTerps` remains the published back-only LED kit |
+| Gate | Unpublished pairs are omitted from `SHOUTOUT_TEMPLATES` / `FLOQR_JERSEY_TEMPLATE_IDS` / photo ids |
+| Display | Shared pair stage; Maryland message gradient when theme set; pair requires front URL + assets ready |
+| Engine | Same `floqr-jersey-scene.js` / FrameLoop as PHILA v1 — do not duplicate |
+
 ## PHILA jersey pair v1 (s3.3.001)
 
 | Piece | Wiring |

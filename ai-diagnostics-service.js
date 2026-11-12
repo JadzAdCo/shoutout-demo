@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.001";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.001";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.002";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.002";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.002",
+      title: "s3.3.002 — Maryland Terps jersey pair v2 (unpublished until front plate)",
+      checks: [
+        {label:"Terps pair catalog unpublished", file:"jersey-catalog.js", includes:["nbaMarylandTerpsThrowbackPair", "ncaa-umd-2026-27-2002-throwback-white-v2", "catalogPublished: false", "pairMessageTheme: \"maryland\""]},
+        {label:"Publish gate", file:"jersey-catalog.js", includes:["row.catalogPublished === false"]},
+        {label:"Maryland message theme CSS", file:"display.css", includes:["data-pair-message-theme=\"maryland\""]},
+        {label:"Pair requires front plate", file:"display-app.js", includes:["productionAssetsReady !== false"]},
+        {label:"Package brief", file:"reports/maryland-terps-jersey-v2/INTEGRATION.md", includes:["productionAssetsReady: false", "ncaa-umd-2026-27-2002-throwback-white-v2"]},
+        {label:"PHILA pair still present", file:"jersey-catalog.js", includes:["nba-phi-phila-white-reference-v1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-002-maryland-terps-pair-v2"]}
+      ]
+    },
     {
       version: "s3.3.001",
       title: "s3.3.001 — PHILA jersey pair 7s + optional ShoutOut 5s",
@@ -2886,6 +2899,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-002-maryland-terps-pair-v2",
+      area:"ShoutOut / Display / NCAA",
+      feature:"Maryland Terps throwback pair v2 — registered unpublished until front plate",
+      changed:"s3.3.002 — nbaMarylandTerpsThrowbackPair (ncaa-umd-2026-27-2002-throwback-white-v2) shares PHILA pair engine; catalogPublished/productionAssetsReady false; frontBackgroundUrl empty; Maryland message theme CSS ready; live patrons still use nbaMarylandTerps back-only.",
+      howToTest:"1) Hard-refresh Search (s3.3.002). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) PHILA pair still works (7s/5s). 4) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
+      expected:"No unpublished Terps pair in patron picker; PHILA pair unchanged; prep entry exists in jersey-catalog with empty front URL.",
+      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. PHILA broken → do not remove nbaPhiladelphia76ersPhila. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
+    },
     {
       id:"s3-3-001-phila-jersey-pair",
       area:"ShoutOut / Display / NBA",

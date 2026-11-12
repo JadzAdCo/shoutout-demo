@@ -41,3 +41,17 @@ test("PHILA catalog is pair mode with 7s/5s and unverified season", () => {
   assert.match(catalog, /seasonStatus:\s*"reference-specific-unverified"/);
   assert.match(catalog, /nba-phi-phila-white-reference-v1/);
 });
+
+test("Maryland Terps throwback pair v2 is registered unpublished without front plate", () => {
+  const catalog = fs.readFileSync(path.join(root, "jersey-catalog.js"), "utf8");
+  assert.match(catalog, /nbaMarylandTerpsThrowbackPair/);
+  assert.match(catalog, /ncaa-umd-2026-27-2002-throwback-white-v2/);
+  assert.match(catalog, /catalogPublished:\s*false/);
+  assert.match(catalog, /productionAssetsReady:\s*false/);
+  assert.match(catalog, /pairMessageTheme:\s*"maryland"/);
+  assert.match(catalog, /reports\/maryland-terps-jersey-v2/);
+  const integ = fs.readFileSync(path.join(root, "reports/maryland-terps-jersey-v2/INTEGRATION.md"), "utf8");
+  assert.match(integ, /blank \*\*front\*\* plate|front blank plate/i);
+  assert.match(integ, /catalogPublished:\s*false/);
+  assert.match(integ, /productionAssetsReady:\s*false/);
+});

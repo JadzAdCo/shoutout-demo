@@ -34,4 +34,4 @@ Name `DON BANYONG`, Number `21`, Message `HAPPY BIRTHDAY, DON!`
 - High-res blank garment preparation without residual EMBIID/21 ghosts
 - Font atlas matching PHILA block lettering exactly
 - Native-panel pixel export verification at device resolution
-- Maryland Version 2 package (separate)
+- Maryland Version 2 package — see `reports/maryland-terps-jersey-v2/` (unpublished until front plate)

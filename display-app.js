@@ -1257,7 +1257,7 @@
     const backNum = back?.querySelector(".nba-pair-number");
     const frontNum = front?.querySelector(".nba-pair-number");
     if (nameEl) nameEl.textContent = String(nameText || "").trim().toUpperCase();
-    if (teamEl) teamEl.textContent = String(teamText || "PHILA").trim().toUpperCase();
+    if (teamEl) teamEl.textContent = String(teamText || "").trim().toUpperCase();
     const num = String(numberText || "").trim();
     if (backNum) backNum.textContent = num;
     if (frontNum) frontNum.textContent = num;
@@ -2661,7 +2661,10 @@
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
-        const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair);
+        // Pair needs a real front plate URL (not a back-only fallback) — unpublished Terps v2 stays gated.
+        const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair)
+          && !!(frontBgUrl || t.frontBackgroundUrl)
+          && t.productionAssetsReady !== false;
         canvas.classList.toggle("nba-jersey-pair", pairMode);
         canvas.classList.add("nba-dual-faces", "split-media-loop");
         const sceneApi = window.FLOQRJerseyScene;
@@ -2671,11 +2674,12 @@
           ? sceneApi.hasMessageText(shoutCopy)
           : !!String(shoutCopy || "").trim();
         if (pairMode) {
+          const pairTeam = teamLabel || t.jerseyTeamLabel || t.jerseyPlateLabel || "";
           paintNbaPairStage(canvas, {
             frontUrl: dualUrls.frontBackgroundUrl,
             backUrl: dualUrls.backBackgroundUrl,
             nameText: jerseyNameText || "",
-            teamText: teamLabel || t.jerseyTeamLabel || "PHILA",
+            teamText: pairTeam,
             numberText: subText || ""
           });
           let shoutPanel = byId("displayNbaPairShoutPanel");
@@ -2685,6 +2689,9 @@
             shoutPanel.className = "nba-pair-shout-panel hidden";
             canvas.appendChild(shoutPanel);
           }
+          const messageTheme = String(t.pairMessageTheme || data.pairMessageTheme || "").trim().toLowerCase();
+          shoutPanel.dataset.pairMessageTheme = messageTheme || "default";
+          canvas.dataset.pairMessageTheme = messageTheme || "default";
           if (hasMessage) {
             const lineCount = Number(data.lineCount || textCaps.lineCount || 4);
             const perLine = Number(data.maxCharactersPerLine || textCaps.perLine || 16);

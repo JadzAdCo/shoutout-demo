@@ -1,0 +1,52 @@
+{
+  "packageVersion": 2,
+  "templateFamily": "Maryland_Terps",
+  "contentInputs": [
+    "name",
+    "number",
+    "shoutOut"
+  ],
+  "timingMs": {
+    "jersey": 7000,
+    "message": 5000
+  },
+  "blankMessagePolicy": "jersey-only-7000ms",
+  "displayPresets": [
+    {
+      "id": "96x48cm",
+      "widthCm": 96,
+      "heightCm": 48,
+      "aspect": [
+        2,
+        1
+      ]
+    },
+    {
+      "id": "64x48cm",
+      "widthCm": 64,
+      "heightCm": 48,
+      "aspect": [
+        4,
+        3
+      ]
+    },
+    {
+      "id": "64x32cm",
+      "widthCm": 64,
+      "heightCm": 32,
+      "aspect": [
+        2,
+        1
+      ]
+    }
+  ],
+  "nativePixels": "resolve-from-device-config",
+  "fixture": {
+    "name": "Don Banyong",
+    "number": "21",
+    "shoutOut": "HAPPY BIRTHDAY, DON!"
+  },
+  "productionAssetsReady": false,
+  "referenceOnlyAsset": "assets/reference/user-phila-layout.png",
+  "researchDate": "2026-11-12"
+}

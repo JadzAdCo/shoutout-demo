@@ -1008,6 +1008,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   padding:clamp(8px,2%,20px);
   box-sizing:border-box;
 }
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel[data-pair-message-theme="maryland"],
+.display-canvas.nba-jersey-pair[data-pair-message-theme="maryland"] .nba-pair-shout-panel{
+  background:linear-gradient(160deg,#7a0c1c 0%,#E21833 52%,#FFD520 100%);
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel[data-pair-message-theme="phila"],
+.display-canvas.nba-jersey-pair[data-pair-message-theme="phila"] .nba-pair-shout-panel{
+  background:linear-gradient(160deg,#0b1c4a 0%,#1a3a8f 55%,#c8102e 100%);
+}
 .display-canvas.nba-jersey-pair .nba-pair-shout-panel.hidden{display:none!important}
 .display-canvas.nba-jersey-pair .nba-pair-shout-lines{
   display:grid;
