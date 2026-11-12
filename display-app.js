@@ -2151,7 +2151,12 @@
       byId("displaySub").className = "baller-company-name";
       // Preserve casing / leading @ — package art already has BALLER'S EXPRESS BUSINESS heading.
       const ballerName = glyphSlice(cleanDisplayText(mainText || data.mainText || data.displayName || ""), 0, mainLimit);
-      const ballerCompany = glyphSlice(cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || ""), 0, subLimit);
+      // Company line is always uppercase on the LED (composer may still show mixed case briefly).
+      const ballerCompany = glyphSlice(
+        cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || "").toUpperCase(),
+        0,
+        subLimit
+      );
       byId("displayMain").textContent = ballerName;
       byId("displaySub").textContent = ballerCompany; // empty string → CSS :empty hides the row
       // Same font face + size for name and company; prior emboss ×1.5, then +10% (s3.2.91)

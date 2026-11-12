@@ -137,10 +137,13 @@
   const BALLER_COMPANY_PRESETS = {
     "none": "",
     "were-outside": "WE'RE OUTSIDE LLC",
-    "bad-boy": "Bad Boy Inc.",
-    "baddbches": "BaddB$ches Only Corp"
+    "bad-boy": "BAD BOY INC.",
+    "baddbches": "BADDB$CHES CORP"
   };
-  const BALLER_COMPANY_MAX = 25;
+  const BALLER_COMPANY_MAX = 18;
+  function ballerCompanyNormalize(value = "") {
+    return String(value || "").trim().toUpperCase().slice(0, BALLER_COMPANY_MAX);
+  }
   let lastValidBallerFace = null; // {file, previewUrl, uploadResult} — keep on cancel / API failure
   let ballerFaceRequestSeq = 0;
   function isBallerCardTemplate(id = selectedTemplate) {
@@ -182,8 +185,8 @@
   function ballerCompanyFromFields() {
     const preset = byId("ballerCompanyPreset")?.value || "none";
     if (preset === "none" || preset === "") return "";
-    if (preset === "custom") return String(byId("ballerCustomCompany")?.value || "").trim();
-    return BALLER_COMPANY_PRESETS[preset] || "";
+    if (preset === "custom") return ballerCompanyNormalize(byId("ballerCustomCompany")?.value || "");
+    return ballerCompanyNormalize(BALLER_COMPANY_PRESETS[preset] || "");
   }
   function ballerCardPayloadFields() {
     if (!isBallerCardTemplate()) return {};
@@ -191,7 +194,7 @@
     const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || "";
     const formatBg = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[formatId] || t.backgroundUrlByFormat[String(formatId).replace(/^p125-/, "led-")])) || "";
     const name = ballerNameFromSource();
-    const company = String(ballerCompanyFromFields() || "").slice(0, BALLER_COMPANY_MAX);
+    const company = ballerCompanyFromFields();
     const placement = ballerFacePlacementFields();
     const prior = lastValidBallerFace?.uploadResult || {};
     return {
@@ -235,7 +238,7 @@
     if (byId("ballerManualName")) byId("ballerManualName").maxLength = nameLimit;
     if (byId("ballerCustomCompany")) byId("ballerCustomCompany").maxLength = companyLimit;
     const name = String(ballerNameFromSource() || "").slice(0, nameLimit);
-    const company = String(ballerCompanyFromFields() || "").slice(0, companyLimit);
+    const company = ballerCompanyNormalize(ballerCompanyFromFields()).slice(0, companyLimit);
     if (byId("mainText")) byId("mainText").value = name;
     if (byId("subText")) byId("subText").value = company;
     const mediaCard = byId("shoutoutMediaCard");
@@ -5942,7 +5945,10 @@
     byId("ballerCompanyPreset")?.addEventListener("change", () => { syncBallerCardFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("ballerCustomCompany")?.addEventListener("input", () => {
       const el = byId("ballerCustomCompany");
-      if (el && el.value.length > BALLER_COMPANY_MAX) el.value = el.value.slice(0, BALLER_COMPANY_MAX);
+      if (el) {
+        const next = ballerCompanyNormalize(el.value);
+        if (el.value !== next) el.value = next;
+      }
       syncBallerCardFields();
       updatePreview();
       schedulePersonalizedShoutOutRecommendations();

@@ -30,6 +30,16 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Baller company max 18 + UPPERCASE (s3.2.100)
+
+| Piece | Wiring |
+|---|---|
+| Cap | `BALLER_COMPANY_MAX = 18` in `patron-app.js`; catalog/layout `maxSubCharacters:18`; `#ballerCustomCompany` `maxlength="18"` |
+| UPPERCASE | `ballerCompanyNormalize` (composer + payload) + `display-app.js` company `toUpperCase()` on LED |
+| Presets | `WE'RE OUTSIDE LLC`, `BAD BOY INC.`, `BADDB$CHES CORP` (≤18) |
+
+Cache-bust: `patron-app.js` / `shared-data.js` / `display-app.js` / `index.html` / `floqr-i18n-help.js` / `botdee-help-repository.js` `?v=s3.2.100`. Manual test: `s3-2-100-baller-company-18`.
+
 ## LED — Terps number stroke weight −20% (s3.2.99)
 
 | Piece | Wiring |
@@ -708,9 +718,9 @@ Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. 
 
 | Piece | Where |
 |---|---|
-| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:25` |
+| **Catalog** | `shared-data.js` — public `blackCard` ($75) + `ballersAlert` ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `blackCardAmex` / `ballersAlertAmex` (`masterAdminOnly`, Aurelia). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:18` (UPPERCASE) |
 | **Art** | Package PNG `ballers-express-business.png` → `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins share same art) via `scripts/build-baller-card-photos.py` (exterior flood + non-gold fringe dilate → fill; crisp SVG EMV chip paste; LED letterbox + corner scrub). Chip SVG/PNG: `images/baller/baller-emv-chip.svg`. Heading + Valid Thru 12/50 + ornate rim in the asset |
-| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 25). Alert: **Upload photo** + **Take photo** → immediate local + LED preview (`processBallerFaceSelection`), then Storage upload + Gemini mask on select (not only Submit); cancel keeps prior. File input uses `.baller-file-input-host` (visually hidden, not `display:none`). Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
+| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 18, always UPPERCASE). Alert: **Upload photo** + **Take photo** → immediate local + LED preview (`processBallerFaceSelection`), then Storage upload + Gemini mask on select (not only Submit); cancel keeps prior. File input uses `.baller-file-input-host` (visually hidden, not `display:none`). Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
 | **Display** | `placeBallerFaceSlot` + face oval; chip overlay above face (`z-index:5`); card layers `scale(0.935)` so flashing red halo sits in the black margin; `border-radius:2.9%/4.7%` clips residual silhouette fringe; name/company `top:64%` (64×48: `60%`), type `mainSize×0.92×1.5×1.1` vh (+10%); face slot `background:transparent`; metallic gold emboss; empty company hidden |
 | **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
 | **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |

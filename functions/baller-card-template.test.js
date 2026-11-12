@@ -198,17 +198,18 @@ test("display + composer wire baller cards", () => {
   assert.match(patron, /processBallerFaceSelection/);
   assert.match(patron, /showBallerFaceLocalPreview/);
   assert.match(patron, /window\.processBallerFaceSelection/);
-  assert.match(patron, /BALLER_COMPANY_MAX/);
+  assert.match(patron, /BALLER_COMPANY_MAX = 18/);
+  assert.match(patron, /ballerCompanyNormalize/);
   assert.match(patron, /WE'RE OUTSIDE LLC/);
   assert.match(patron, /ballerWithAt/);
   assert.match(patron, /"none": ""/);
-  assert.match(patron, /BaddB\$ches Only Corp/);
+  assert.match(patron, /BADDB\$CHES CORP/);
   const html = read("index.html");
   assert.match(html, /id="ballerCardFields"/);
   assert.match(html, /id="ballerNameSource"/);
   assert.match(html, /id="ballerCompanyPreset"/);
   assert.match(html, /WE'RE OUTSIDE LLC/);
-  assert.match(html, /maxlength="25"/);
+  assert.match(html, /maxlength="18"/);
   assert.match(html, /id="ballerFaceScale"/);
   assert.match(html, /id="ballerFacePosY"/);
   assert.match(html, /value="none"/);
@@ -228,7 +229,7 @@ test("display + composer wire baller cards", () => {
   assert.match(portrait, /@google\/genai|GoogleGenAI/);
   const shared = loadSharedData();
   ALL_IDS.forEach(id => {
-    assert.equal(shared.SHOUTOUT_TEMPLATES[id].maxSubCharacters, 25, `${id} company max 25`);
+    assert.equal(shared.SHOUTOUT_TEMPLATES[id].maxSubCharacters, 18, `${id} company max 18`);
   });
 });
 

@@ -256,7 +256,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — металлическая карта Baller's Express BUSINESS с лицом под шлемом. Загрузите или сделайте фото. Gemini выделяет человека (грубые края); затем зум/позиция. Шлем, кайма и чип остаются. Компания необязательна (макс. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — металлическая карта Baller's Express BUSINESS с лицом под шлемом. Загрузите или сделайте фото. Gemini выделяет человека (грубые края); затем зум/позиция. Шлем, кайма и чип остаются. Компания необязательна (макс. 18, ВЕРХНИЙ РЕГИСТР; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -586,7 +586,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — metalen Baller's Express BUSINESS-kaart met je gezicht onder de helm. Upload of maak een foto. Gemini isoleert de persoon (grove randen); zoom/positie. Helm, rand en chip blijven. Bedrijf optioneel (max 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — metalen Baller's Express BUSINESS-kaart met je gezicht onder de helm. Upload of maak een foto. Gemini isoleert de persoon (grove randen); zoom/positie. Helm, rand en chip blijven. Bedrijf optioneel (max 18, HOOFDLETTERS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -916,7 +916,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — carte métal Baller's Express BUSINESS avec votre visage sous le casque. Téléversez ou prenez une photo. Gemini isole le sujet (contours approximatifs); zoomez/placez le visage. Casque, bordure et puce restent. Société optionnelle (max 25; préréglage WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — carte métal Baller's Express BUSINESS avec votre visage sous le casque. Téléversez ou prenez une photo. Gemini isole le sujet (contours approximatifs); zoomez/placez le visage. Casque, bordure et puce restent. Société optionnelle (max 18, MAJUSCULES; préréglage WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1246,7 +1246,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — die Baller's Express BUSINESS-Metallkarte mit Ihrem Gesicht unter dem Kriegerhelm. Foto hochladen oder aufnehmen. Gemini trennt Sie vom Hintergrund (grobe Kanten); dann Zoomen/Positionieren. Helm, Rand und Chip bleiben. Firma optional (max. 25 Zeichen; Vorgabe WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — die Baller's Express BUSINESS-Metallkarte mit Ihrem Gesicht unter dem Kriegerhelm. Foto hochladen oder aufnehmen. Gemini trennt Sie vom Hintergrund (grobe Kanten); dann Zoomen/Positionieren. Helm, Rand und Chip bleiben. Firma optional (max. 18 Zeichen, GROSSBUCHSTABEN; Vorgabe WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1576,7 +1576,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — tarjeta metálica Baller's Express BUSINESS con tu cara bajo el casco. Sube o toma una foto. Gemini aísla el sujeto (bordes aproximados); ajusta zoom/posición. Casco, borde y chip permanecen. Empresa opcional (máx. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — tarjeta metálica Baller's Express BUSINESS con tu cara bajo el casco. Sube o toma una foto. Gemini aísla el sujeto (bordes aproximados); ajusta zoom/posición. Casco, borde y chip permanecen. Empresa opcional (máx. 18, MAIÚSCULAS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -1906,7 +1906,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — carta metallica Baller's Express BUSINESS con il volto sotto l'elmo. Carica o scatta una foto. Gemini isola il soggetto (bordi approssimativi); zoom/posizione. Elmo, bordo e chip restano. Azienda opzionale (max 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — carta metallica Baller's Express BUSINESS con il volto sotto l'elmo. Carica o scatta una foto. Gemini isola il soggetto (bordi approssimativi); zoom/posizione. Elmo, bordo e chip restano. Azienda opzionale (max 18, MAIUSCOLO; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2236,7 +2236,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — cartão metálico Baller's Express BUSINESS com o rosto sob o capacete. Envie ou tire uma foto. Gemini isola o sujeito (bordas aproximadas); ajuste zoom/posição. Capacete, borda e chip permanecem. Empresa opcional (máx. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — cartão metálico Baller's Express BUSINESS com o rosto sob o capacete. Envie ou tire uma foto. Gemini isola o sujeito (bordas aproximadas); ajuste zoom/posição. Capacete, borda e chip permanecem. Empresa opcional (máx. 18, MAYÚSCULAS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2566,7 +2566,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — μεταλλική κάρτα Baller's Express BUSINESS με το πρόσωπο κάτω από το κράνος. Ανεβάστε ή τραβήξτε φωτογραφία. Το Gemini απομονώνει το θέμα (χονδροειδή άκρα)· ζουμ/θέση. Κράνος, πλαίσιο και chip μένουν. Εταιρεία προαιρετική (μέγ. 25· preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — μεταλλική κάρτα Baller's Express BUSINESS με το πρόσωπο κάτω από το κράνος. Ανεβάστε ή τραβήξτε φωτογραφία. Το Gemini απομονώνει το θέμα (χονδροειδή άκρα)· ζουμ/θέση. Κράνος, πλαίσιο και chip μένουν. Εταιρεία προαιρετική (μέγ. 18, ΚΕΦΑΛΑΙΑ· preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -2896,7 +2896,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — metalowa karta Baller's Express BUSINESS z twarzą pod hełmem. Prześlij lub zrób zdjęcie. Gemini izoluje osobę (przybliżone krawędzie); zoom/pozycja. Hełm, ramka i chip zostają. Firma opcjonalna (maks. 25; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — metalowa karta Baller's Express BUSINESS z twarzą pod hełmem. Prześlij lub zrób zdjęcie. Gemini izoluje osobę (przybliżone krawędzie); zoom/pozycja. Hełm, ramka i chip zostają. Firma opcjonalna (maks. 18, WIELKIE LITERY; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
@@ -3226,7 +3226,7 @@
       },
       "help-ballers-alert": {
         title: "Baller's Alert",
-        body: "$100 Baller's Alert — بطاقة Baller's Express BUSINESS المعدنية مع وجهك تحت الخوذة. ارفع صورة أو التقطها. يعزل Gemini الشخص (حواف تقريبية)؛ ثم كبّر/ضع الوجه. الخوذة والإطار والشريحة تبقى. الشركة اختيارية (حد أقصى 25؛ الإعداد WE'RE OUTSIDE LLC). Valid Thru 12/50."
+        body: "$100 Baller's Alert — بطاقة Baller's Express BUSINESS المعدنية مع وجهك تحت الخوذة. ارفع صورة أو التقطها. يعزل Gemini الشخص (حواف تقريبية)؛ ثم كبّر/ضع الوجه. الخوذة والإطار والشريحة تبقى. الشركة اختيارية (حد أقصى 18، أحرف كبيرة؛ الإعداد WE'RE OUTSIDE LLC). Valid Thru 12/50."
       },
       "help-classic-halloween": {
         title: "Classic Halloween",
