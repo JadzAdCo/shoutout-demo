@@ -5125,6 +5125,9 @@
           const pastNflDual = isNflDualJerseyTemplate(pastTemplate)
             || !!s.nflDualLayout
             || String(s.sport || "").toLowerCase() === "nfl";
+          // Only treat mainText as frame-2 shout when the *current* kit is also NFL dual —
+          // otherwise sync already put the jersey name in #mainText (soccer/NBA).
+          const applyNflShoutCopy = pastNflDual && isNflDualJerseyTemplate();
           if (byId("soccerNameSource")) byId("soccerNameSource").value = "manual";
           if (byId("soccerManualName")) {
             // NFL dual: mainText is frame-2 shout copy; jersey name lives on jerseyPatronName.
@@ -5142,13 +5145,13 @@
           if (byId("includeAttribution")) {
             byId("includeAttribution").checked = !!(s.includeAttribution && (s.attribution || s.attributionChoice));
           }
-          if (pastNflDual && byId("mainText")) {
+          if (applyNflShoutCopy && byId("mainText")) {
             byId("mainText").value = fitTemplateText(s.mainText || "", "main");
           }
           syncSoccerJerseyFields();
           syncAttribution();
           // NFL dual keeps #mainText as shout copy — re-apply after sync so it is not left blank.
-          if (pastNflDual && byId("mainText") && s.mainText) {
+          if (applyNflShoutCopy && byId("mainText") && s.mainText) {
             byId("mainText").value = fitTemplateText(s.mainText || "", "main");
           }
         } else {
