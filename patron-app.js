@@ -336,8 +336,8 @@
     byId("ballerUploadCameraBtn")?.addEventListener("click", () => {
       hideChooser();
       openBallerFaceCameraCapture().catch((err) => {
-        // Cancel is intentional — do not open the library picker.
-        if (err?.name === "AbortError" || /cancel/i.test(String(err?.message || ""))) {
+        // Explicit Cancel only — do not treat getUserMedia AbortError as cancel.
+        if (err?.ballerCameraCancelled === true || err?.name === "BallerCameraCancelled") {
           setBallerFaceStatus("Camera cancelled — choose Photo library or try Camera again.");
           return;
         }
@@ -568,13 +568,17 @@
     }
     return new Promise((resolve, reject) => {
       let settled = false;
+      const rejectCancelled = () => {
+        const cancelErr = new Error("Camera cancelled.");
+        cancelErr.name = "BallerCameraCancelled";
+        cancelErr.ballerCameraCancelled = true;
+        reject(cancelErr);
+      };
       byId("ballerFaceCameraCancelBtn")?.addEventListener("click", () => {
         if (settled) return;
         settled = true;
         cleanup();
-        const cancelErr = new Error("Camera cancelled.");
-        cancelErr.name = "AbortError";
-        reject(cancelErr);
+        rejectCancelled();
       }, { once: true });
       byId("ballerFaceCameraCaptureBtn")?.addEventListener("click", async () => {
         if (settled) return;
@@ -616,6 +620,8 @@
           ctx.scale(-1, 1);
           ctx.drawImage(video, sx, sy, ovalW, ovalH, 0, 0, canvas.width, canvas.height);
           const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.92));
+          // Cancel during toBlob — do not upload or resolve.
+          if (settled) return;
           if (!blob) throw new Error("Could not capture face frame.");
           const file = new File([blob], `baller-face-${Date.now()}.jpg`, { type: "image/jpeg" });
           settled = true;
@@ -623,6 +629,7 @@
           await processBallerFaceSelection(file);
           resolve(file);
         } catch (err) {
+          if (settled) return;
           if (captureBtn) captureBtn.disabled = false;
           if (statusEl) statusEl.textContent = String(err?.message || err).slice(0, 160);
           else {
