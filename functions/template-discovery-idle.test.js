@@ -91,8 +91,8 @@ test("every club idles on Use ShoutOut @ {club} after a ShoutOut ends", () => {
   assert.match(backend, /mainText: `Use ShoutOut @ \$\{clubName\}`,/);
   assert.match(backend, /batch\.set\(doc\.ref, idleLiveContentAfterExpiry\(/);
   const admin = read("admin-app.js");
-  // Approve deletes idle defaultMain when the jersey already has a real name.
-  assert.match(admin, /defaultMain: firebase\.firestore\.FieldValue\.delete\(\)/);
+  // Full replace (merge:false) wipes idle defaultMain / prior board fields on approve.
+  assert.match(admin, /liveContent"\)\.doc\(locationId\)\.set\(\{[\s\S]*?\}, \{merge:false\}\)/);
   assert.match(admin, /const main = `Use ShoutOut @ \$\{loc\.locationName \|\| locationId\}`;/);
 });
 
@@ -111,9 +111,13 @@ test("approving after a 10-minute reset shows the new ShoutOut, not the idle boa
   assert.match(display, /const mainSource = isIdleCta && !isSoccerJersey/);
 
   const admin = read("admin-app.js");
-  const approve = admin.slice(admin.indexOf("async function approve("), admin.indexOf("}, {merge:true});", admin.indexOf("async function approve(")));
+  const approveStart = admin.indexOf("async function approve(");
+  const approve = admin.slice(approveStart, admin.indexOf("}, {merge:false});", approveStart) + "}, {merge:false});".length);
   assert.match(approve, /idleCta: false,/);
-  assert.match(approve, /expiredAt: firebase\.firestore\.FieldValue\.delete\(\),/);
+  assert.match(approve, /\{merge:false\}/);
+  assert.doesNotMatch(approve, /expiredAt: firebase\.firestore\.FieldValue\.delete\(\)/);
   const messaging = read("functions/messaging-functions.js");
-  assert.match(messaging, /status: "approved",\r?\n    idleCta: false,\r?\n    source: "messagingApproval",\r?\n    expiredAt: admin\.firestore\.FieldValue\.delete\(\),/);
+  assert.match(messaging, /status: "approved",\r?\n    idleCta: false,\r?\n    source: "messagingApproval",/);
+  assert.match(messaging, /\}, \{merge: false\}\);/);
+  assert.doesNotMatch(messaging, /expiredAt: admin\.firestore\.FieldValue\.delete\(\)/);
 });

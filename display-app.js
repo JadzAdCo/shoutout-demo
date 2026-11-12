@@ -646,7 +646,11 @@
 
   function pinJerseyFloqMediaRail(rail, {sport = ""} = {}) {
     if (!rail || !rail.style) return;
-    if (sport !== "nba" && sport !== "nfl") return;
+    // Soccer (and any non-NBA/NFL kit) must drop a prior Terps/NFL inline pin or CSS top:80%/86% never wins.
+    if (sport !== "nba" && sport !== "nfl") {
+      clearPinnedJerseyFloqMediaRail(rail);
+      return;
+    }
     rail.style.setProperty("top", "auto", "important");
     rail.style.setProperty("bottom", "1.2%", "important");
     rail.style.setProperty("left", sport === "nba" ? "6%" : "5%", "important");
@@ -662,6 +666,15 @@
     if (!rail || !rail.style) return;
     ["top", "bottom", "left", "right", "height", "transform", "z-index", "opacity", "visibility"].forEach(name => {
       rail.style.removeProperty(name);
+    });
+  }
+
+  /** Drop NBA height-fit inline offsets so soccer/NFL/Halloween CSS can own the box again. */
+  function clearNbaPhotoKitInlineLayout() {
+    ["displayMain", "displaySub", "displayJerseyTeam"].forEach(id => {
+      const el = byId(id);
+      if (!el || !el.style) return;
+      ["top", "left", "right", "letter-spacing", "line-height"].forEach(name => el.style.removeProperty(name));
     });
   }
 
@@ -2323,8 +2336,10 @@
         byId("displaySub").style.setProperty("right", rightPct, "important");
         const nameTracking = nameGlyphs >= nameSpec.longAt ? nameSpec.longTracking : nameSpec.tracking;
         if (nameTracking != null) byId("displayMain").style.setProperty("letter-spacing", nameTracking + "em", "important");
-      } else if (sport !== "nba" || !usePhotoBack) {
+      } else {
+        // Soccer / NFL / CSS hanger: drop any prior Terps/NBA inline tank box.
         clearNbaPhotoKitVars(canvas);
+        clearNbaPhotoKitInlineLayout();
       }
       // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
       if (usePhotoBack && (sport === "soccer" || sport === "nfl")) {
@@ -2468,14 +2483,12 @@
     }
     hideJerseyMount();
     clearNbaPhotoKitVars(canvas);
+    clearNbaPhotoKitInlineLayout();
     const staleTeam = byId("displayJerseyTeam");
     if (staleTeam) {
       staleTeam.className = "soccer-jersey-team hidden";
       staleTeam.textContent = "";
       staleTeam.setAttribute("aria-hidden", "true");
-      staleTeam.style.removeProperty("top");
-      staleTeam.style.removeProperty("left");
-      staleTeam.style.removeProperty("right");
     }
     canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark");
     const railClear = byId("displayIdentityRail");

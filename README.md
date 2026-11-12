@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.2.94 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.2.95 (stable)
 
+- s3.2.95: Terps/NBA FloqMedia under hem (height-fit kit), Baller rim restore, jersey remnant wipe, floqCast 100s, Gemini thinkingLevel LOW.
 - s3.2.94: Baller corner scrub, NBA/Terps FloqMedia under kit, Halloween RIP grave top-left.
 - s3.2.91: Baller card refine — clean silhouette (no white corner wedges), SVG EMV chip, name/company +10% and raised ~4mm off gold rim.
 - s3.2.90: Critical log tab flash standard — Gemini API failures flash Master Admin Diagnostics → Application Logging until Acknowledge (same pattern as Security System Messages).

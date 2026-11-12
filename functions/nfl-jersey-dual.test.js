@@ -31,8 +31,11 @@ test("NBA / Terps FloqMedia rail sits under the kit like NFL (never mid-jersey)"
   assert.match(js, /isSeasonalBoardRemnantText/);
   assert.match(js, /function nbaPhotoKitLayout/);
   assert.match(js, /function pinJerseyFloqMediaRail/);
+  assert.match(js, /function clearNbaPhotoKitInlineLayout/);
   assert.match(js, /pinJerseyFloqMediaRail\(rail,\s*\{sport\}/);
   assert.match(js, /kit\.kitTop \+ nameSpec\.top \* kit\.kitH/);
+  // Soccer must clear a prior NBA/NFL inline FloqMedia pin.
+  assert.match(js, /Soccer \(and any non-NBA\/NFL kit\) must drop a prior/);
   // Do not destroy the text overlay that owns the FloqMedia rail.
   assert.doesNotMatch(js, /halloween-finale,\s*\.display-text-overlay/);
 });
