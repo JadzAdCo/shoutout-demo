@@ -4953,7 +4953,8 @@
     // Completed has history, open Completed so patrons see their past ShoutOuts.
     {
       const paramsEarly = new URL(window.location.href).searchParams;
-      const deepLinked = !!(paramsEarly.get("id") || paramsEarly.get("ref") || paramsEarly.get("pane"));
+      // `sub` is an alias for `pane` in Feature & Orders deep links — honor it too.
+      const deepLinked = !!(paramsEarly.get("id") || paramsEarly.get("ref") || paramsEarly.get("pane") || paramsEarly.get("sub"));
       const activeSo = document.querySelector("#shoutoutSubtabs .admin-subtab.active")?.getAttribute("data-so-pane") || "";
       if (!deepLinked
         && activeSo === "shoutoutSavedPane"

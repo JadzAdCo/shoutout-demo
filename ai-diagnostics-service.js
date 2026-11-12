@@ -229,6 +229,8 @@
         {label:"Jersey syncAttribution skips kits", file:"patron-app.js", includes:["!isSoccerJerseyTemplate() && byId(\"subText\")"]},
         {label:"Use Past restores jersey number", file:"patron-app.js", includes:["pastIsJersey", "soccerJerseyNumber"]},
         {label:"My ShoutOuts opens Completed when Saved empty", file:"patron-portal-app.js", includes:["showShoutoutPane(\"shoutoutCompletedPane\")"]},
+        {label:"Deep link honors sub alias", file:"patron-portal-app.js", includes:["paramsEarly.get(\"sub\")"]},
+        {label:"Use Past NFL keeps shout copy", file:"patron-app.js", includes:["pastNflDual"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-96-jersey-number-my-shoutouts"]}
       ]
     },

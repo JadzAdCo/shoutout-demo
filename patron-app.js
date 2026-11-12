@@ -5122,9 +5122,15 @@
           || ["soccer", "nba", "nfl"].includes(String(s.sport || "").toLowerCase());
         if (pastIsJersey) {
           // Restore name + inputted number onto jersey fields (never treat mark as attribution).
+          const pastNflDual = isNflDualJerseyTemplate(pastTemplate)
+            || !!s.nflDualLayout
+            || String(s.sport || "").toLowerCase() === "nfl";
           if (byId("soccerNameSource")) byId("soccerNameSource").value = "manual";
           if (byId("soccerManualName")) {
-            byId("soccerManualName").value = String(s.jerseyPatronName || s.jerseyName || s.mainText || "").trim();
+            // NFL dual: mainText is frame-2 shout copy; jersey name lives on jerseyPatronName.
+            byId("soccerManualName").value = String(
+              s.jerseyPatronName || s.jerseyName || (pastNflDual ? "" : s.mainText) || ""
+            ).trim();
           }
           if (byId("soccerJerseyNumber")) {
             byId("soccerJerseyNumber").value = String(s.subText || s.jerseyNumber || "").trim();
@@ -5136,8 +5142,15 @@
           if (byId("includeAttribution")) {
             byId("includeAttribution").checked = !!(s.includeAttribution && (s.attribution || s.attributionChoice));
           }
+          if (pastNflDual && byId("mainText")) {
+            byId("mainText").value = fitTemplateText(s.mainText || "", "main");
+          }
           syncSoccerJerseyFields();
           syncAttribution();
+          // NFL dual keeps #mainText as shout copy — re-apply after sync so it is not left blank.
+          if (pastNflDual && byId("mainText") && s.mainText) {
+            byId("mainText").value = fitTemplateText(s.mainText || "", "main");
+          }
         } else {
           const mainInput = byId("mainText");
           if (mainInput) mainInput.value = fitTemplateText(s.mainText || "", "main");
