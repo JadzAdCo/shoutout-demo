@@ -2943,11 +2943,11 @@
     {
       id:"s3-3-005-botdee-locale-public-profiles",
       area:"BOT DEE / i18n / Profiles",
-      feature:"BOT DEE German help links + public profile answers",
-      changed:"s3.3.005 — executeBotSession takes uiLanguage; result cards + action links localize from bot-dee-result-locales.json; Gemini instructed to reply in app language; lookupPublicProfiles tool for public patron/club profiles including image URLs.",
-      howToTest:"1) Set Appearance / profile language to Deutsch. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.005) signed in with botDee access but WITHOUT Mingl/RydR/BartR/floqCast/VIP beta grants. 3) Ask for a German ShoutOut guide — cards German (Einen ShoutOut senden). 4) Help/blurb/reply must NOT list Mingl, RydR, BartR, floqCast, VIP unless granted. 5) Ask about a public club/@handle — public fields/photos only. 6) Mark Succeed/Failed.",
-      expected:"German cards; gated beta brands hidden unless Features & Services grants them; public-profile answers only.",
-      troubleshoot:"English cards → Functions not redeployed / stale bot-dee-chat.js. Beta brands leak → allowedFeatures filter + scrubGatedBrands; confirm canAccessFeature. Profile miss → publicProfileVisibility=public / club published."
+      feature:"BOT DEE locale help + least-privilege feature access",
+      changed:"s3.3.005 — uiLanguage localizes result cards; Features & Services + beta grants drive least privilege: search/help/pitch/tools include only features THIS viewer may use; help blurbs scrub sibling betas the viewer lacks; lookupPublicProfiles for public patron/club fields + images.",
+      howToTest:"Least privilege (both sides). A) No beta grants: hard-refresh botdee.html (s3.3.005); ask ShoutOut how-to in Deutsch/Français/العربية — localized cards; help/reply/greeting must NOT name Mingl, RydR, BartR, floqCast, VIP. B) Grant floqCast (and/or VIP) on the same account via Master Admin Features & Services / beta features — hard-refresh; ask floqCast / VIP how-to — those products MUST appear in search cards, help blurbs, and pitch; still scrub any siblings not granted. C) Public club/@handle → public fields/photos only. Mark Succeed/Failed.",
+      expected:"Granted features visible in search + help; ungranted betas never exposed (scrubbed from multi-product help too); locale cards match uiLanguage.",
+      troubleshoot:"English cards → redeploy executeBotSession / hard-refresh bot-dee-chat.js. Ungranted brand leak → sanitizeFeatureMentions + scrubGatedBrands + canAccessFeature. Granted feature missing → betaTesters.features[key]==1 and IsFeatureEnabled/IsTestFeature; client FLOQRFeatureServices.load. Profile miss → publicProfileVisibility / club published gates."
     },
     {
       id:"s3-3-003-phila-blanks-terps-qa",

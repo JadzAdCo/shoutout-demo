@@ -262,9 +262,13 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
 
   const pitch = bot.chitchatReply("patron", allowed);
   assert.match(pitch, /ShoutOut/);
-  assert.doesNotMatch(pitch, /floqCast|VIP table|Mingl/i);
+  assert.doesNotMatch(pitch, /floqCast|VIP reserV|VIP table|Mingl/i);
 
-  assert.match(bot.systemInstruction("patron", "en", allowed), /NEVER mention/);
+  const deniedNames = bot.deniedBrandNames(allowed);
+  assert.ok(deniedNames.includes("floqCast"));
+  assert.ok(deniedNames.includes("VIP reserV"));
+  assert.ok(deniedNames.includes("Mingl"));
+  assert.match(bot.systemInstruction("patron", "en", allowed), /least privilege/i);
   assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
   // Local greetings must scrub by access — not discard locale when floqCast/VIP appear in chrome packs.
@@ -273,6 +277,35 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
     read("bot-dee-chat.js"),
     /localized !== "botdee\.chatHello" && !\\bMingl\\b/
   );
+});
+
+test("BOT DEE keeps granted beta features in help/search (least privilege)", () => {
+  const granted = ["shoutOut", "botDee", "passes", "floqCast", "vipReservations"];
+  const floq = bot.contextualSearch("make me a superstar floqcast", "patron", granted);
+  assert.ok(floq.results.some(row => /floqcast|suprstr/i.test(row.sourceId + row.id)));
+
+  const vip = bot.contextualSearch("book vip table", "patron", granted);
+  assert.ok(vip.results.some(row => /vip/i.test(row.sourceId + row.id + row.label)));
+
+  const helpBlurb = bot.sanitizeFeatureMentions(
+    "Chat with BOT DEE: ShoutOut, Mingl, RydR, BartR, floqCast, VIP table, clubs.",
+    granted
+  );
+  assert.match(helpBlurb, /ShoutOut/);
+  assert.match(helpBlurb, /floqCast/i);
+  assert.match(helpBlurb, /VIP table/i);
+  assert.doesNotMatch(helpBlurb, /\bMingl\b|\bRydR\b|\bBartR\b/);
+
+  const tools = bot.toolDeclarations(granted).map(t => t.name);
+  assert.ok(tools.includes("createFloqCastRequest"));
+  assert.ok(tools.includes("createVipHold"));
+
+  // Bugbot: NEVER list must omit granted brands (only siblings this viewer lacks).
+  const deniedNames = bot.deniedBrandNames(granted);
+  assert.deepEqual(deniedNames, ["Mingl", "RydR", "BartR"]);
+  const instr = bot.systemInstruction("patron", "en", granted);
+  assert.match(instr, /THIS viewer: ShoutOut, VIP reserV, floqCast/);
+  assert.match(instr, /this viewer lacks: Mingl, RydR, BartR\./);
 });
 
 test("intent:help-* result cards localize via help pack alias", () => {

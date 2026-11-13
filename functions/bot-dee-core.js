@@ -247,10 +247,29 @@ function productPitchLabels(allowedFeatures) {
   const allowed = allowedFeatureSet(allowedFeatures);
   const labels = [];
   if (!allowed || allowed.has("shoutOut")) labels.push("ShoutOut");
-  if (!allowed || allowed.has("vipReservations")) labels.push("VIP table");
+  if (!allowed || allowed.has("vipReservations")) labels.push("VIP reserV");
   if (!allowed || allowed.has("floqCast")) labels.push("floqCast");
   labels.push("scheduling");
   return labels;
+}
+
+/** Brand names Gemini must not speak unless the viewer has that feature key. */
+const GATED_BRAND_LABELS = Object.freeze([
+  {key: "mingl", names: ["Mingl"]},
+  {key: "rydr", names: ["RydR"]},
+  {key: "bartr", names: ["BartR"]},
+  {key: "floqCast", names: ["floqCast", "FloqCAST"]},
+  {key: "vipReservations", names: ["VIP reserV", "VIP table"]}
+]);
+
+function deniedBrandNames(allowedFeatures) {
+  const allowed = allowedFeatureSet(allowedFeatures);
+  if (!allowed) return [];
+  const names = [];
+  GATED_BRAND_LABELS.forEach(({key, names: brandNames}) => {
+    if (!allowed.has(key)) names.push(...brandNames);
+  });
+  return names;
 }
 
 function productPitchSentence(allowedFeatures) {
@@ -586,10 +605,18 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
   const langLine = lang === "en"
     ? "Reply in English unless the user clearly writes in another language."
     : `App language is "${lang}". ALWAYS write your spoken reply in ${lang}. Do not switch to English for help steps or summaries unless the user asked for English. Navigation/result cards are already localized server-side — do not paste English product titles into your prose when a ${lang} wording exists.`;
+  const denied = deniedBrandNames(allowedFeatures);
   const accessLine = allowed
-    ? `Features this viewer may use (dynamic — Features & Services + beta grants): ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. NEVER mention, pitch, or invent steps for Mingl, RydR, BartR, floqCast, FloqCAST, VIP reserV, or other products unless they appear in that allowed list. Private beta features must stay invisible to users without access. If they ask for a gated feature, say it is not available on their account yet — do not name sibling beta products.`
+    ? (
+      `Principle of least privilege — Features & Services + beta grants for THIS viewer: ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. ` +
+      `DO mention, pitch, and help with products on that allowed list (including how-to / help steps and brand names that appear there). ` +
+      (denied.length
+        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products this viewer lacks: ${denied.join(", ")}. `
+        : "") +
+      `If they ask for a product not on their allowed list, say it is not available on their account yet — do not name other products they also lack.`
+    )
     : "Only discuss features returned by tools for this viewer.";
-  const pitchLine = `Ask "what do you want to do" / list ONLY allowed products (${productPitchSentence(allowedFeatures)}) ONLY on the first turn of a conversation or when the patron clearly restarts after a pause — never every reply, and never list gated beta brands.`;
+  const pitchLine = `Ask "what do you want to do" / list ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}) ONLY on the first turn or after a clear restart — never every reply. Include granted betas; omit everything else.`;
   return [
     "You are BOT DEE, FLOQR's in-app chatbot and authorized execution agent. Talk like a helpful friend first — warm, brief, human. You are not a search box and not a FAQ dump. Introduce yourself as BOT DEE when useful.",
     langLine,
@@ -718,6 +745,7 @@ module.exports = {
   filterResultsByFeatureAccess,
   productPitchSentence,
   productPitchLabels,
+  deniedBrandNames,
   TOOL_FEATURE_KEY,
   contextualSearch,
   runTool,
