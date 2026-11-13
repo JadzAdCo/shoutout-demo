@@ -1244,10 +1244,11 @@
     stage.setAttribute("aria-hidden", "false");
     const ink = safeRender.safeColor?.(overlayInk || "#006BB6", "#006BB6") || "#006BB6";
     const outline = safeRender.safeColor?.(overlayOutline || "#ED174C", "#ED174C") || "#ED174C";
-    // Underlay: white fabric behind blue ink; deep blue behind white ink (Icon).
+    // Underlay matches kit fabric (glyph halo only — no chest plates):
+    // white Association behind blue ink; Icon royal behind white ink.
     const underlay = (() => {
       const hex = String(ink || "").replace("#", "").toLowerCase();
-      if (hex === "ffffff" || hex === "fff") return "#003DA5";
+      if (hex === "ffffff" || hex === "fff") return "#006BB6";
       return "#ffffff";
     })();
     canvas.style.setProperty("--nba-pair-ink", ink);
