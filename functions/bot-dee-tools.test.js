@@ -59,6 +59,8 @@ test("friend lookup requires a name match — no social-graph dump", () => {
   assert.match(src, /Require a real name\/handle match/);
   assert.doesNotMatch(src, /points >= 6 \|\| friendContext/);
   assert.match(src, /base < 8\) return/);
+  assert.match(src, /never fall back to leftover verbs/);
+  assert.doesNotMatch(src, /cleanedNeedle/);
 });
 
 test("publicUserCard exposes public facts and relation without private keys", () => {

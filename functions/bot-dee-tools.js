@@ -532,13 +532,9 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const selfQuery = wantPeople && isSelfProfileQuery(rawQuery);
   const friendContext = wantPeople && isFriendContextQuery(rawQuery);
   const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
-  // Friend prompts must use the extracted name. If we cannot parse a name, do not
-  // blank the needle entirely — fall back to a cleaned needle (still require score ≥ 8).
-  const cleanedNeedle = needle
-    .split(/\s+/)
-    .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t))
-    .join(" ");
-  const matchNeedle = friendContext ? (friendName || cleanedNeedle) : needle;
+  // Friend prompts require a parseable person name — never fall back to leftover verbs
+  // (“is”, “look”, …) that would substring-match unrelated public bios.
+  const matchNeedle = friendContext ? friendName : needle;
   const tokens = String(matchNeedle || "")
     .split(/\s+/)
     .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t));
@@ -584,9 +580,8 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     }
   }
 
-  // Public directory: skip when we already have a friend-name hit path with a parsed name
-  // (connections-only). If friend context lacked a parseable name, still allow public search.
-  if (wantPeople && !selfQuery && !(friendContext && friendName) && matchNeedle) {
+  // Public directory for non-friend queries only. Friend asks stay on connections + parsed name.
+  if (wantPeople && !selfQuery && !friendContext && matchNeedle) {
     try {
       const snap = await db.collection("users")
         .where("publicProfileVisibility", "==", "public")
