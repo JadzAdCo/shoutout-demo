@@ -1,6 +1,6 @@
 # BOT DEE Part Two — Phase A PR plan
 
-Owner asked to implement durable threads (the refresh / second-device gap). **PR‑0 is in this change set.** Workflows / version intelligence / LangGraph stay out. D1–D5 still required before full Part Two.
+Owner asked to implement durable threads (the refresh / second-device gap). **PR‑0 is in this change set.** Workflows / version intelligence / LangGraph stay out. Owner **13 Nov 2026:** D1 default, D3 yes, D4 default. **D2 and D5 still open** before PR‑3 / PR‑4.
 
 Flags default **off**. Rollback = flag `0` + revert Functions; schema is additive (no destructive migrations in v1).
 
@@ -127,4 +127,4 @@ Pages publish ≠ Functions deploy. Version intelligence is a **Functions** feat
 - No BOT DEE application semver until CI writes a real manifest  
 - No automatic production deploy  
 
-**Go / no-go for writing code:** owner approves this design + D1–D5. Until then, stop.
+**Go / no-go for writing code:** PR‑0 (durable threads) is in this change set. PR‑1 (version intelligence) can proceed on D4. PR‑3 still needs **D2**. PR‑4 still needs **D5**. No LangGraph / Cloud Tasks unless D5 chooses Tasks.

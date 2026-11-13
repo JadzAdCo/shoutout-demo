@@ -1,6 +1,6 @@
 # BOT DEE Part Two — Phase A (audit / design)
 
-**Status:** specification + audit only. **Not deployed.** Not evidence that durable workflows or version intelligence exist in production.
+**Status:** specification + audit, plus PR‑0 durable threads on the feature branch. **Workflows / version intelligence not deployed.** Owner 13 Nov 2026: D1 default, D3 yes, D4 default; **D2 and D5 still open.**
 
 **Workspace HEAD audited:** `03a17d3f` (`main`, package `s3.3.004` / `functions/package.json` `3.3.004`).
 

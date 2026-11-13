@@ -8,13 +8,15 @@ Constraints from the spec: Firestore + existing Cloud Storage; **no** Cloud SQL,
 
 ## 1. Product decisions that need a yes/no before PR‑2
 
-| ID | Decision | Default if owner is silent |
-|---|---|---|
-| D1 | Extra **awaiting_approval** for chat-started VIP / ShoutOut / floqCast / pay, vs today’s “tool runs immediately + Stripe hosted pay”? | **Gate pay/publish**; holds may stay auto if 30‑min expiry remains |
-| D2 | Who approves: patron confirm in chat, Club Admin inbox, or both? | Patron **explicit confirm** in chat (digest shown); Club Admin only where existing product already requires it |
-| D3 | Idle 60s: expire **thread resume** vs keep workflow for the hold TTL? | Thread messages expire with idle; **workflow** follows the business TTL (VIP hold 30 min) |
-| D4 | Non-admin “what version?” | Public: package id only (`s3.3.004`) + “I can’t verify a BOT DEE application build.” No roadmap |
-| D5 | Recovery worker | Use existing **`onSchedule`** (like `expireVipHolds`). No Cloud Tasks in v1 |
+Owner answers **13 Nov 2026:** D1 default · D3 yes · D4 default. **D2 and D5 still open** (owner asked to explain before choosing).
+
+| ID | Decision | Default | Status |
+|---|---|---|---|
+| D1 | Extra **awaiting_approval** for chat-started VIP / ShoutOut / floqCast / pay, vs today’s “tool runs immediately + Stripe hosted pay”? | **Gate pay/publish**; holds may stay auto if 30‑min expiry remains | **Decided — default.** Chat may create a VIP hold (30‑min TTL). Stripe / publish wait for an approval step (who = D2). |
+| D2 | Who approves: patron confirm in chat, Club Admin inbox, or both? | Patron **explicit confirm** in chat (digest shown); Club Admin only where existing product already requires it | **Open — explain.** |
+| D3 | Conversation pause: expire **thread resume** vs keep workflow for the hold TTL? | Thread messages expire with idle (packaged **300s / 5 min**); **workflow** follows the business TTL (VIP hold 30 min) | **Decided — yes.** Fresh chat after pause; a hold/checkout already started still lives until its own expiry. |
+| D4 | Non-admin “what version?” | Public: package id only + “I can’t verify a BOT DEE application build.” No roadmap | **Decided — default.** Internals only for server-verified Master Admin via `getBotDeeSystemInfo`. |
+| D5 | Recovery worker | Use existing **`onSchedule`** (like `expireVipHolds`). No Cloud Tasks in v1 | **Open — explain.** |
 
 ---
 
