@@ -36,11 +36,47 @@
     }
   }
 
-  /** Client safety net — remap English catalog labels using help packs + chrome keys. */
+  function canUseFeature(key) {
+    try {
+      const FS = global.FLOQRFeatureServices;
+      if (FS && typeof FS.canAccess === "function") return !!FS.canAccess(key);
+    } catch (_) {}
+    return key === "shoutOut" || key === "botDee" || key === "passes";
+  }
+
+  function featureKeyForResult(row) {
+    const sid = String(row?.sourceId || "");
+    const id = String(row?.id || "");
+    const probe = `${sid} ${id}`;
+    if (/mingl/i.test(probe)) return "mingl";
+    if (/\brydr\b/i.test(probe)) return "rydr";
+    if (/bartr|bart-?r/i.test(probe)) return "bartr";
+    if (/floqcast|suprstr/i.test(probe)) return "floqCast";
+    if (/\bvip\b|reserv/i.test(probe)) return "vipReservations";
+    if (/shout/i.test(probe)) return "shoutOut";
+    return null;
+  }
+
+  function scrubGatedBrands(text) {
+    let out = String(text || "");
+    if (!canUseFeature("mingl")) out = out.replace(/\bMingl\b/g, "");
+    if (!canUseFeature("rydr")) out = out.replace(/\bRydR\b/g, "");
+    if (!canUseFeature("bartr")) out = out.replace(/\bBartR\b/g, "");
+    if (!canUseFeature("floqCast")) out = out.replace(/\bfloqCast\b|\bFloqCAST\b|\bFloqCast\b/g, "");
+    if (!canUseFeature("vipReservations")) out = out.replace(/\bVIP reserV\b/g, "");
+    return out
+      .replace(/\(\s*superstar\s*\)/gi, "")
+      .replace(/\s*,\s*,+/g, ",")
+      .replace(/\(\s*\)/g, "")
+      .replace(/\s{2,}/g, " ")
+      .replace(/,\s*$/g, "")
+      .trim();
+  }
+
+  /** Client safety net — locale remap + drop results for features the viewer cannot use. */
   function localizeResults(results) {
     const lang = currentUiLanguage();
-    if (!lang || lang === "en" || !Array.isArray(results)) return results || [];
-    const helpPack = global.FLOQRI18nHelp?.packs?.[lang] || {};
+    const helpPack = (lang && lang !== "en") ? (global.FLOQRI18nHelp?.packs?.[lang] || {}) : {};
     const intentLabel = {
       shoutout: "cat.shoutout",
       floqcast: "cat.floqcast",
@@ -63,7 +99,10 @@
       shoutout: "botdee.link.shoutoutCompose",
       vip: "botdee.link.vipTerms"
     };
-    return results.map(row => {
+    return (results || []).filter(row => {
+      const key = featureKeyForResult(row);
+      return !key || canUseFeature(key);
+    }).map(row => {
       if (!row || typeof row !== "object") return row;
       const next = Object.assign({}, row);
       const sourceId = String(row.sourceId || "");
@@ -85,6 +124,8 @@
       } else if (actionByKind[kind]) {
         next.label = t(actionByKind[kind], next.label);
       }
+      next.label = scrubGatedBrands(next.label);
+      next.blurb = scrubGatedBrands(next.blurb);
       return next;
     });
   }
@@ -151,11 +192,32 @@
   }
 
   /** Offer-help — start / idle-resume greetings only. */
+  function accessibleProductPitch() {
+    const FS = global.FLOQRFeatureServices;
+    const parts = [];
+    const can = key => {
+      try {
+        if (FS && typeof FS.canAccess === "function") return !!FS.canAccess(key);
+      } catch (_) {}
+      return key === "shoutOut";
+    };
+    if (can("shoutOut")) parts.push("ShoutOut");
+    if (can("vipReservations")) parts.push("VIP table");
+    if (can("floqCast")) parts.push("floqCast");
+    parts.push("scheduling");
+    if (parts.length <= 1) return parts[0] ? `${parts[0]} — just say it in plain words.` : "just say it in plain words.";
+    const head = parts.slice(0, -1).join(", ");
+    return `${head}, or ${parts[parts.length - 1]} — just say it in plain words.`;
+  }
+
   function chitchatReply() {
-    return t(
-      "botdee.chatHello",
-      "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
-    );
+    const pitch = accessibleProductPitch();
+    const localized = t("botdee.chatHello", "");
+    // Prefer dynamic access pitch over static i18n product lists that may name gated betas.
+    if (localized && localized !== "botdee.chatHello" && !/\bMingl\b|\bRydR\b|\bBartR\b|\bfloqCast\b|\bVIP table\b/i.test(localized)) {
+      return localized;
+    }
+    return `Hey — BOT DEE here. What do you want to do in FLOQR? ${pitch}`;
   }
 
   /** Soft mid-chat ack — no product pitch. */
@@ -197,10 +259,12 @@
   }
 
   function resumeReply() {
-    return t(
-      "botdee.chatResume",
-      "Welcome back. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
-    );
+    const pitch = accessibleProductPitch();
+    const localized = t("botdee.chatResume", "");
+    if (localized && localized !== "botdee.chatResume" && !/\bMingl\b|\bRydR\b|\bBartR\b|\bfloqCast\b|\bVIP table\b/i.test(localized)) {
+      return localized;
+    }
+    return `Welcome back. What do you want to do in FLOQR? ${pitch}`;
   }
 
   function callable() {
@@ -420,7 +484,7 @@
         uiLanguage: currentUiLanguage()
       };
       const data = (await fn(payload))?.data || {};
-      let reply = String(data.reply || "").trim();
+      let reply = scrubGatedBrands(String(data.reply || "").trim());
       // Stale Functions may still search-miss a greeting-shaped reply — never show that.
       if (!reply || /could not find a clear match/i.test(reply)) {
         reply = t("botdee.chatEmpty", "No answer yet — try quick intent search.");

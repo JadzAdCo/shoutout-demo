@@ -196,25 +196,61 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
 });
 
 test("result cards localize to app language (no English ShoutOut label in German)", () => {
-  const search = bot.contextualSearch("throw a shoutout", "patron");
+  const search = bot.contextualSearch("throw a shoutout", "patron", ["shoutOut", "botDee"]);
   assert.ok(search.results.some(row => row.id === "shoutout" || /shout/i.test(row.label)));
-  const de = bot.localizeSearchPayload(search, "de");
+  const de = bot.localizeSearchPayload(search, "de", ["shoutOut", "botDee"]);
   const shout = de.results.find(row => row.sourceId === "intent:shoutout" || row.id === "shoutout");
   assert.ok(shout, "shoutout intent in results");
   assert.equal(shout.label, "Einen ShoutOut senden");
   assert.match(shout.blurb, /Live-Nachricht|FloqR-Display/i);
   assert.doesNotMatch(shout.label, /^Throw a ShoutOut$/);
 
-  const fallback = bot.formatSearchFallback(de, "de");
+  const fallback = bot.formatSearchFallback(de, "de", ["shoutOut", "botDee"]);
   assert.match(fallback, /Das habe ich für dein Konto gefunden/);
   assert.doesNotMatch(fallback, /Here is what I found/);
 
   const links = bot.linksFromToolResult({checkoutUrl: "https://pay.example/x"}, "de");
   assert.equal(links[0].label, "Sicher bezahlen");
 
-  assert.match(bot.systemInstruction("patron", "de"), /App language is "de"/);
+  assert.match(bot.systemInstruction("patron", "de", ["shoutOut", "botDee"]), /App language is "de"/);
   assert.match(read("bot-dee-chat.js"), /uiLanguage:\s*currentUiLanguage/);
   assert.match(read("bot-dee-chat.js"), /localizeResults/);
+});
+
+test("BOT DEE hides gated beta features the viewer cannot access", () => {
+  const allowed = ["shoutOut", "botDee", "passes"];
+  const search = bot.contextualSearch("mingl chat friends", "patron", allowed);
+  assert.ok(!search.results.some(row => /mingl/i.test(row.sourceId + row.id + row.label)));
+
+  const floq = bot.contextualSearch("make me a superstar floqcast", "patron", allowed);
+  assert.ok(!floq.results.some(row => /floqcast|suprstr/i.test(row.sourceId + row.id)));
+
+  const shout = bot.contextualSearch("throw a shoutout", "patron", allowed);
+  assert.ok(shout.results.some(row => row.sourceId === "intent:shoutout" || row.id === "shoutout"));
+
+  const scrubbed = bot.sanitizeFeatureMentions(
+    "Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs.",
+    allowed
+  );
+  assert.match(scrubbed, /ShoutOut/);
+  assert.doesNotMatch(scrubbed, /\bMingl\b/);
+  assert.doesNotMatch(scrubbed, /\bRydR\b/);
+  assert.doesNotMatch(scrubbed, /\bBartR\b/);
+  assert.doesNotMatch(scrubbed, /\bfloqCast\b/i);
+
+  const tools = bot.toolDeclarations(allowed).map(t => t.name);
+  assert.ok(tools.includes("contextualSearch"));
+  assert.ok(tools.includes("listShoutOutTemplates"));
+  assert.ok(!tools.includes("createVipHold"));
+  assert.ok(!tools.includes("createFloqCastRequest"));
+
+  const pitch = bot.chitchatReply("patron", allowed);
+  assert.match(pitch, /ShoutOut/);
+  assert.doesNotMatch(pitch, /floqCast|VIP table|Mingl/i);
+
+  assert.match(bot.systemInstruction("patron", "en", allowed), /NEVER mention/);
+  assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
+  assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
 });
 
 test("package depends on @google/genai", () => {

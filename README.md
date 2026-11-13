@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.004 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.005 (stable)
 
+- s3.3.005: BOT DEE locale-filtered results + feature-access filtering + public profile tool
 - s3.3.004: PHILA White/Blue colorway select on ShoutOut composer; blue Icon blanks from owner blue-pair control; white blanks from control C.
 - s3.3.003: PHILA white Association RGBA blanks + FloqMedia-off pair; Terps throwback pair still unpublished; gated QA `maryland-terps-pair-qa.html` (unlock `terps-pair-qa`).
 - s3.3.002: Maryland Terps throwback pair v2 — shared pair engine; catalog unpublished until front blank plate; PHILA v1 unchanged. Brief in reports/maryland-terps-jersey-v2/.

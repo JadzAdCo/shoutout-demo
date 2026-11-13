@@ -2945,9 +2945,9 @@
       area:"BOT DEE / i18n / Profiles",
       feature:"BOT DEE German help links + public profile answers",
       changed:"s3.3.005 — executeBotSession takes uiLanguage; result cards + action links localize from bot-dee-result-locales.json; Gemini instructed to reply in app language; lookupPublicProfiles tool for public patron/club profiles including image URLs.",
-      howToTest:"1) Set Appearance / profile language to Deutsch. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.005) signed in with botDee access. 3) Ask: Show me the step by step guide in german on how to throw a shoutout. 4) Reply text + result links must be German (e.g. Einen ShoutOut senden — not Throw a ShoutOut). 5) Ask about a public club or @handle with a published public profile — BOT DEE summarizes public bio/photos only. 6) Mark Succeed/Failed.",
-      expected:"No English product/help card labels when UI is German; public-profile answers cite only public fields/images.",
-      troubleshoot:"English cards → Functions not redeployed (uiLanguage path) or stale bot-dee-chat.js without localizeResults; rebuild bot-dee-result-locales.json. English Gemini prose → systemInstruction lang line / model ignore — still cards must be DE. Profile miss → user needs publicProfileVisibility=public or club published; private email/phone must never appear."
+      howToTest:"1) Set Appearance / profile language to Deutsch. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.005) signed in with botDee access but WITHOUT Mingl/RydR/BartR/floqCast/VIP beta grants. 3) Ask for a German ShoutOut guide — cards German (Einen ShoutOut senden). 4) Help/blurb/reply must NOT list Mingl, RydR, BartR, floqCast, VIP unless granted. 5) Ask about a public club/@handle — public fields/photos only. 6) Mark Succeed/Failed.",
+      expected:"German cards; gated beta brands hidden unless Features & Services grants them; public-profile answers only.",
+      troubleshoot:"English cards → Functions not redeployed / stale bot-dee-chat.js. Beta brands leak → allowedFeatures filter + scrubGatedBrands; confirm canAccessFeature. Profile miss → publicProfileVisibility=public / club published."
     },
     {
       id:"s3-3-003-phila-blanks-terps-qa",
