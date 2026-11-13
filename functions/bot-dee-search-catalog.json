@@ -318,11 +318,11 @@
       "id": "help-bot-dee-mgmt",
       "kind": "help",
       "label": "BOT DEE conversation pause",
-      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a re",
+      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 300 / 5 minutes). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patro",
       "href": "./master-admin.html?from=botdee#featuresBotDee",
       "phrases": [
         "bot dee conversation pause",
-        "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the chat default 60 . after the pause the next message starts a f",
+        "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the chat default 300 / 5 minutes . after the pause the next messa",
         "bot dee idle",
         "bot dee pause",
         "conversation timeout",

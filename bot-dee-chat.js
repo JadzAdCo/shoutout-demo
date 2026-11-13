@@ -4,12 +4,12 @@
    Greetings / acks are local-only when durable is off so a stale Functions deploy cannot
    turn "hello"/"cool" into a contextual-search miss.
    Offer-help CTA only at conversation start and after an idle-ended resume.
-   Idle pause (default 60s, Master Admin botDeeSettings/default) ends the chat. */
+   Conversation pause (default 300s / 5 min, Master Admin botDeeSettings/default) ends the chat. */
 (function (global) {
   "use strict";
 
   const MAX_HISTORY = 12;
-  const DEFAULT_IDLE_SECONDS = 60;
+  const DEFAULT_IDLE_SECONDS = 300;
   const MIN_IDLE_SECONDS = 15;
   const MAX_IDLE_SECONDS = 600;
   const history = [];

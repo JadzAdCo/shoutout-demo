@@ -189,7 +189,7 @@ function isIdentityPrompt(raw) {
 }
 
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
-const DEFAULT_IDLE_SECONDS = 60;
+const DEFAULT_IDLE_SECONDS = 300;
 const MIN_IDLE_SECONDS = 15;
 const MAX_IDLE_SECONDS = 600;
 

@@ -1493,11 +1493,11 @@
             data-floqr-help-search="bot dee|botdee|idle pause|conversation timeout|bot dee settings|floqai settings"
             data-floqr-help-body="Controls how long BOT DEE waits after the last message before ending the chat. After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat replies stay short and do not repeat the offer-help pitch."
           >Conversation pause</h2>
-          <p class="sub small">After this many seconds with no new message, BOT DEE ends the conversation. Saying hi (or anything) after that starts a fresh chat. Default is 60 seconds (1 minute). Range 15–600.</p>
+          <p class="sub small">After this many seconds with no new message, BOT DEE ends the conversation. Saying hi (or anything) after that starts a fresh chat. Default is 300 seconds (5 minutes). Range 15–600.</p>
           <p id="botDeeSettingsStatus" class="status" aria-live="polite"></p>
           <div class="profile-grid">
             <label>Idle pause (seconds)
-              <input id="botDeeIdleSeconds" type="number" min="15" max="600" step="1" value="60" inputmode="numeric"/>
+              <input id="botDeeIdleSeconds" type="number" min="15" max="600" step="1" value="300" inputmode="numeric"/>
             </label>
           </div>
           <p class="button-row">

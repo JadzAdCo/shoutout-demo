@@ -42,7 +42,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 
 ## Durable resume (s3.3.006)
 
-Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the idle window. Idle / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
+Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the conversation pause (`conversationIdleSeconds`; Master Admin; packaged default 300 / 5 minutes). Pause / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
 
 ## Owner action
 

@@ -11,7 +11,7 @@
     "featuresAuditTrail"
   ]);
   const BOT_DEE_SETTINGS_DOC = "botDeeSettings/default";
-  const DEFAULT_IDLE_SECONDS = 60;
+  const DEFAULT_IDLE_SECONDS = 300;
   const MIN_IDLE_SECONDS = 15;
   const MAX_IDLE_SECONDS = 600;
   const AUDIT_LIMIT = 40;
@@ -790,7 +790,7 @@
     const meta = byId("botDeeSettingsMeta");
     if (!meta) return;
     if (!row || !row.updatedAtMs) {
-      meta.textContent = "Using packaged default (60 seconds) until you save.";
+      meta.textContent = "Using packaged default (300 seconds / 5 minutes) until you save.";
       return;
     }
     const when = formatWhen(row.updatedAtMs);

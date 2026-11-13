@@ -385,7 +385,7 @@
     {
       id: "help-bot-dee-mgmt",
       title: "BOT DEE conversation pause",
-      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
+      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 300 / 5 minutes). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
       searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause"],
       links: [{label: "BOT DEE (Master Admin)", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#featuresBotDee"}],
       audiences: ["masterAdmin"],

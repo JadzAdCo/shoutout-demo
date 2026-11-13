@@ -100,11 +100,12 @@ test("cool / ok acknowledgments stay conversational — not a greeting restart o
 });
 
 test("idle settings clamp + soft mid-chat copy helpers", () => {
-  assert.equal(bot.DEFAULT_IDLE_SECONDS, 60);
+  assert.equal(bot.DEFAULT_IDLE_SECONDS, 300);
   assert.equal(bot.clampIdleSeconds(60), 60);
+  assert.equal(bot.clampIdleSeconds(300), 300);
   assert.equal(bot.clampIdleSeconds(5), bot.MIN_IDLE_SECONDS);
   assert.equal(bot.clampIdleSeconds(9999), bot.MAX_IDLE_SECONDS);
-  assert.equal(bot.normalizeBotDeeSettings(null).conversationIdleSeconds, 60);
+  assert.equal(bot.normalizeBotDeeSettings(null).conversationIdleSeconds, 300);
   assert.equal(bot.normalizeBotDeeSettings({conversationIdleSeconds: 90}).conversationIdleSeconds, 90);
   assert.match(bot.stillHereReply(), /still here/i);
   assert.match(bot.idleEndedReply(), /pause|Say hi/i);
@@ -119,8 +120,11 @@ test("setBotDeeSettings callable is exported", () => {
   assert.match(read("functions/index.js"), /setBotDeeSettings:\s*require\("\.\/bot-dee-functions"\)\.setBotDeeSettings/);
   assert.match(read("bot-dee-chat.js"), /botDeeSettings\/default/);
   assert.match(read("bot-dee-chat.js"), /endConversation|chatIdleEnded|chatResume|chatStillHere/);
+  assert.match(read("bot-dee-chat.js"), /const DEFAULT_IDLE_SECONDS = 300/);
   assert.match(read("master-admin.html"), /id="featuresBotDee"/);
+  assert.match(read("master-admin.html"), /id="botDeeIdleSeconds"[^>]*value="300"/);
   assert.match(read("master-feature-services.js"), /setBotDeeSettings/);
+  assert.match(read("master-feature-services.js"), /const DEFAULT_IDLE_SECONDS = 300/);
   assert.match(read("firestore.rules"), /match \/botDeeSettings\/\{docId\}/);
   assert.match(read("firestore.rules"), /match \/botDeeThreads\/\{threadId\}/);
   assert.match(read("functions/index.js"), /getBotDeeThread:\s*require\("\.\/bot-dee-functions"\)\.getBotDeeThread/);
