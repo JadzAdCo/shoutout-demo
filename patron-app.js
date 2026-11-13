@@ -811,6 +811,35 @@
     if (t.catalogPublished === false || t.productionAssetsReady === false) return false;
     return !!(t.frontBackgroundUrl || t.nbaDualFaces);
   }
+  function templateHasJerseyColorways(templateId = selectedTemplate) {
+    const t = getTemplate(templateId || selectedTemplate);
+    return !!(t && Array.isArray(t.jerseyColorways) && t.jerseyColorways.length > 1);
+  }
+  function populateJerseyColorwaySelect(preferredId = "") {
+    const select = byId("jerseyColorway");
+    if (!select) return;
+    const t = getTemplate();
+    const list = Array.isArray(t?.jerseyColorways) ? t.jerseyColorways : [];
+    if (!list.length) {
+      select.innerHTML = "";
+      return;
+    }
+    const current = preferredId || select.value || t.defaultJerseyColorway || list[0].id || "";
+    select.innerHTML = list.map(cw => {
+      const label = cw.i18nKey
+        ? tt(cw.i18nKey, {}, cw.label || cw.id)
+        : (cw.label || cw.id);
+      return `<option value="${esc(cw.id)}">${esc(label)}</option>`;
+    }).join("");
+    if (current && [...select.options].some(opt => opt.value === current)) select.value = current;
+    else select.value = list[0].id;
+  }
+  function resolveActiveJerseyColorway() {
+    const t = getTemplate();
+    if (!t) return null;
+    const id = byId("jerseyColorway")?.value || t.defaultJerseyColorway || "";
+    return window.FLOQRResolveJerseyColorway?.(t, id) || null;
+  }
   function isJerseyShoutDualTemplate(templateId = selectedTemplate) {
     return isNflDualJerseyTemplate(templateId) || isNbaJerseyPairTemplate(templateId);
   }
@@ -859,6 +888,10 @@
     const templateId = String(selectedTemplate || "");
     if (/^(nba|nfl)/i.test(templateId) && !isConsolidatedSoccerTemplate(templateId)) {
       const t = getTemplate(templateId);
+      const cw = resolveActiveJerseyColorway();
+      const frontUrl = cw?.frontBackgroundUrl || t.frontBackgroundUrl || "";
+      const backUrl = cw?.backBackgroundUrl || t.backBackgroundUrl || t.defaultBackgroundUrl || "";
+      const defaultUrl = cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || backUrl || "";
       return {
         ...jerseyAttribution,
         template: templateId,
@@ -867,17 +900,21 @@
         jerseyTeamLabel: (t.jerseyStateField && String(byId("jerseyState")?.value || "").trim())
           ? String(byId("jerseyState").value || "").toUpperCase().replace(/[^A-Z0-9 '&-]/g, "").slice(0, 16)
           : (t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase()),
-        jerseyPrimary: t.jerseyPrimary || "",
-        jerseySecondary: t.jerseySecondary || "",
-        jerseyAccent: t.jerseyAccent || t.jerseySecondary || "",
+        jerseyPrimary: cw?.jerseyPrimary || t.jerseyPrimary || "",
+        jerseySecondary: cw?.jerseySecondary || t.jerseySecondary || "",
+        jerseyAccent: cw?.jerseyAccent || t.jerseyAccent || t.jerseySecondary || "",
         jerseyPlateInk: t.jerseyPlateInk || "",
+        overlayInk: cw?.overlayInk || t.overlayInk || "",
+        overlayOutline: cw?.overlayOutline || t.overlayOutline || "",
+        jerseyColorway: cw?.id || t.defaultJerseyColorway || "",
         jerseyOverlayWordmark: t.jerseyOverlayWordmark ? "1" : "",
-        jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
+        jerseyCssBack: (cw?.defaultBackgroundUrl || t.defaultBackgroundUrl) ? false : (t.jerseyCssBack !== false),
         backgroundUrl: t.nbaDualFaces
-          ? (t.frontBackgroundUrl || t.defaultBackgroundUrl || "")
-          : (t.defaultBackgroundUrl || ""),
-        frontBackgroundUrl: t.frontBackgroundUrl || "",
-        backBackgroundUrl: t.backBackgroundUrl || t.defaultBackgroundUrl || "",
+          ? (frontUrl || defaultUrl || "")
+          : (defaultUrl || ""),
+        frontBackgroundUrl: frontUrl,
+        backBackgroundUrl: backUrl,
+        pairMessageTheme: cw?.pairMessageTheme || t.pairMessageTheme || "",
         sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
         league: t.league || "",
         nflDualLayout: !!t.nflDualLayout || t.layout === "nfl-jersey",
@@ -1037,6 +1074,10 @@
       stateInput.value = getTemplate()?.jerseyPlateLabel || "MARYLAND";
       stateInput.dataset.ready = "1";
     }
+    const colorwaysOn = soccer && templateHasJerseyColorways();
+    byId("jerseyColorwayWrap")?.classList.toggle("hidden", !colorwaysOn);
+    byId("jerseyColorwayHint")?.classList.toggle("hidden", !colorwaysOn);
+    if (colorwaysOn) populateJerseyColorwaySelect(byId("jerseyColorway")?.value || getTemplate()?.defaultJerseyColorway || "");
     byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
     byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
     const floqrAttrHint = document.querySelector(".attribution-controls .sub.small");
@@ -3207,6 +3248,9 @@
       if (byId("soccerTeamId") && draft.jerseyTeamId) {
         byId("soccerTeamId").value = String(draft.jerseyTeamId || "");
       }
+      if (byId("jerseyColorway") && draft.jerseyColorway) {
+        populateJerseyColorwaySelect(String(draft.jerseyColorway || ""));
+      }
       if (byId("jerseyState") && (draft.jerseyTeamLabel || draft.jerseyPlateLabel)) {
         byId("jerseyState").value = String(draft.jerseyTeamLabel || draft.jerseyPlateLabel || "").trim();
         byId("jerseyState").dataset.ready = "1";
@@ -4795,6 +4839,10 @@
       if (payload.nbaJerseyPair) url.searchParams.set("nbaJerseyPair", "1");
       if (payload.frontBackgroundUrl) url.searchParams.set("frontBackgroundUrl", payload.frontBackgroundUrl);
       if (payload.backBackgroundUrl) url.searchParams.set("backBackgroundUrl", payload.backBackgroundUrl);
+      if (payload.jerseyColorway) url.searchParams.set("jerseyColorway", payload.jerseyColorway);
+      if (payload.overlayInk) url.searchParams.set("overlayInk", payload.overlayInk);
+      if (payload.overlayOutline) url.searchParams.set("overlayOutline", payload.overlayOutline);
+      if (payload.pairMessageTheme) url.searchParams.set("pairMessageTheme", payload.pairMessageTheme);
       if (payload.sport) url.searchParams.set("sport", payload.sport);
       if (payload.soccerNameSource) url.searchParams.set("soccerNameSource", payload.soccerNameSource);
       if (payload.ballerCard) url.searchParams.set("ballerCard", "1");
@@ -5866,7 +5914,7 @@
       }
     }
   }
-  function startAnother(){ resetShoutoutTrail(); selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ resetShoutoutTrail(); selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("jerseyColorway"))byId("jerseyColorway").value=getTemplate()?.defaultJerseyColorway||"white"; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -6301,6 +6349,7 @@
     byId("ballerFaceScale")?.addEventListener("input", () => { updatePreview(); });
     byId("ballerFacePosY")?.addEventListener("input", () => { updatePreview(); });
     byId("soccerTeamId")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
+    byId("jerseyColorway")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
     byId("jerseyState")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); });
     byId("soccerJerseyNumber")?.addEventListener("input", event => {

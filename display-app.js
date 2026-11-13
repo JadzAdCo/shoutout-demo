@@ -1235,11 +1235,17 @@
     backUrl = "",
     nameText = "",
     teamText = "",
-    numberText = ""
+    numberText = "",
+    overlayInk = "",
+    overlayOutline = ""
   } = {}) {
     const stage = ensureNbaPairStage(canvas);
     stage.classList.remove("hidden");
     stage.setAttribute("aria-hidden", "false");
+    const ink = safeRender.safeColor?.(overlayInk || "#006BB6", "#006BB6") || "#006BB6";
+    const outline = safeRender.safeColor?.(overlayOutline || "#ED174C", "#ED174C") || "#ED174C";
+    canvas.style.setProperty("--nba-pair-ink", ink);
+    canvas.style.setProperty("--nba-pair-outline", outline);
     const back = stage.querySelector(".nba-pair-back");
     const front = stage.querySelector(".nba-pair-front");
     const backKit = back?.querySelector(".nba-pair-kit");
@@ -1465,6 +1471,9 @@
       nbaJerseyPair: params.get("nbaJerseyPair") === "1",
       frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
       backBackgroundUrl: params.get("backBackgroundUrl") || "",
+      jerseyColorway: params.get("jerseyColorway") || "",
+      overlayInk: params.get("overlayInk") || "",
+      overlayOutline: params.get("overlayOutline") || "",
       pairMessageTheme: params.get("pairMessageTheme") || "",
       sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
@@ -2343,10 +2352,26 @@
       canvas.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const nbaDualFaces = !!(t.nbaDualFaces || data.nbaDualFaces);
-      const frontBgUrl = String(data.frontBackgroundUrl || t.frontBackgroundUrl || "").trim();
-      const backBgUrl = String(data.backBackgroundUrl || t.backBackgroundUrl || t.defaultBackgroundUrl || "").trim();
+      // PHILA White/Blue: resolve colorway before kit URLs so blue is not stuck on white template defaults.
+      const pairColorway = (t.nbaJerseyPair || data.nbaJerseyPair)
+        ? (window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "") || null)
+        : null;
+      const frontBgUrl = String(
+        data.frontBackgroundUrl
+        || pairColorway?.frontBackgroundUrl
+        || t.frontBackgroundUrl
+        || ""
+      ).trim();
+      const backBgUrl = String(
+        data.backBackgroundUrl
+        || pairColorway?.backBackgroundUrl
+        || t.backBackgroundUrl
+        || pairColorway?.defaultBackgroundUrl
+        || t.defaultBackgroundUrl
+        || ""
+      ).trim();
       const jerseyBg = nbaDualFaces
-        ? (frontBgUrl || data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
+        ? (frontBgUrl || data.backgroundUrl || pairColorway?.defaultBackgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
         : (data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl);
       const usePhotoBack = !!jerseyBg;
       canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
@@ -2662,10 +2687,13 @@
         });
       }
       if (nbaDualFaces && usePhotoBack) {
+        const cw = pairColorway
+          || window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "")
+          || null;
         const dualUrls = {
-          frontBackgroundUrl: frontBgUrl || jerseyBg,
-          backBackgroundUrl: backBgUrl || t.defaultBackgroundUrl || jerseyBg,
-          defaultBackgroundUrl: t.defaultBackgroundUrl || jerseyBg
+          frontBackgroundUrl: frontBgUrl || cw?.frontBackgroundUrl || jerseyBg,
+          backBackgroundUrl: backBgUrl || cw?.backBackgroundUrl || cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg,
+          defaultBackgroundUrl: cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
@@ -2684,7 +2712,9 @@
             backUrl: dualUrls.backBackgroundUrl,
             nameText: jerseyNameText || "",
             teamText: pairTeam,
-            numberText: subText || ""
+            numberText: subText || "",
+            overlayInk: data.overlayInk || cw?.overlayInk || t.overlayInk || "#006BB6",
+            overlayOutline: data.overlayOutline || cw?.overlayOutline || t.overlayOutline || "#ED174C"
           });
           let shoutPanel = byId("displayNbaPairShoutPanel");
           if (!shoutPanel) {

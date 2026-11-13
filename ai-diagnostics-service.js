@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.003";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.003";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.004";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.004";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,21 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.004",
+      title: "s3.3.004 — PHILA White/Blue jersey color select + blue Icon blanks",
+      checks: [
+        {label:"PHILA white blank front", file:"images/basketball/nba-76ers-phila-front-blank.png", includes:[]},
+        {label:"PHILA white blank back", file:"images/basketball/nba-76ers-phila-back-blank.png", includes:[]},
+        {label:"PHILA blue blank front", file:"images/basketball/nba-76ers-phila-blue-front-blank.png", includes:[]},
+        {label:"PHILA blue blank back", file:"images/basketball/nba-76ers-phila-blue-back-blank.png", includes:[]},
+        {label:"Colorways catalog", file:"jersey-catalog.js", includes:["jerseyColorways", "FLOQRResolveJerseyColorway", "nba-76ers-phila-blue-front-blank.png"]},
+        {label:"Composer color select", file:"index.html", includes:["jerseyColorway", "editor.jerseyColor"]},
+        {label:"Display pair ink vars", file:"display.css", includes:["--nba-pair-ink", "--nba-pair-outline"]},
+        {label:"Colorway wins over template defaults", file:"display-app.js", includes:["FLOQRResolveJerseyColorway", "cw?.frontBackgroundUrl"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["PHILA White/Blue colorway select"]}
+      ]
+    },
     {
       version: "s3.3.003",
       title: "s3.3.003 — PHILA white blanks + FloqMedia-off pair + Terps gated QA",

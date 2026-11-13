@@ -12,6 +12,16 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## PHILA White/Blue colorways (s3.3.004)
+
+| Piece | Wiring |
+|---|---|
+| Composer | `index.html` `#jerseyColorway` — shown when template has `jerseyColorways` (PHILA pair) |
+| Catalog | `jersey-catalog.js` `nbaPhiladelphia76ersPhila.jerseyColorways` white\|blue + `FLOQRResolveJerseyColorway` |
+| Assets | White `nba-76ers-phila-*-blank.png`; Blue Icon `nba-76ers-phila-blue-*-blank.png` |
+| Display | `display-app.js` pair stage uses colorway URLs + `--nba-pair-ink` / `--nba-pair-outline` |
+| Controls | White C + Blue LED-punch under `reports/nba-phila-jersey-v1/assets/control/` |
+
 ## PHILA white blanks + Terps gated QA (s3.3.003)
 
 | Piece | Wiring |
