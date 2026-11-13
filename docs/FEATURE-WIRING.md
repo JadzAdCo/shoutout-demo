@@ -8,7 +8,26 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-12 |
+| Last registry touch | 2026-11-13 |
+
+---
+
+## Stripe sandbox wiring (s3.3.007)
+
+Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
+
+| Piece | Wiring |
+|---|---|
+| Checkout | Hosted Stripe Checkout via `FLOQRPayments.startCheckout` → `createFloqrCheckoutSession` (`functions/commerce-functions.js`) |
+| Connect binding | `stripeConnectAccounts/{connect_<sha>}` written by Functions only (`createFloqrConnectOnboardingLink`, `getFloqrConnectStatus`, `persistConnectStatus`) |
+| VIP Club Stripe | `loadClubStripeReady` reads `stripeConnectAccounts` (club binding), then club flag fallback. Club Admin onboarding no longer leaves `clubLocations.stripeConnectAccountId` empty as a blocker |
+| Destination charges | When Connect transfers are ready, Checkout sets `payment_intent_data.transfer_data.destination` + `application_fee_amount` for ShoutOut (80/20), floqCast, VIP `clubStripe`, and BartR. ShoutOut still works without Connect (`optionalReadyRecipient`) |
+| Webhook | Same `stripeFloqrWebhook` + `STRIPE_WEBHOOK_SECRET`. Add Dashboard events: `account.updated`, `capability.updated`, `account.application.deauthorized`. Do not require `STRIPE_CONNECT_WEBHOOK_SECRET` |
+| Club flags | `persistConnectStatus` mirrors `stripeTransfersActive` / `stripeCapabilityTransfers` / `stripeConnectLivemode` onto `clubLocations` — **never** the `acct_` id. Client cannot write those fields (`preservesStripeBindingFields`) |
+| Sandbox refund | `refundFloqrCheckoutOrder` (test-mode only, `reverse_transfer` + `refund_application_fee`). Master Admin Logging + `FLOQRPayments.refundCheckoutOrder` |
+| Surfaces | Club Admin public profile Stripe card; Master Admin Application Logging; patron Checkout unchanged |
+| Help | `help-vip-payment-collector` — Club Stripe uses Club Admin Connect onboarding |
+| Deploy | Functions + webhook event list. Pages cache-bust `payment-service.js` / `admin-app.js` / diagnostics |
 
 ---
 
@@ -723,7 +742,7 @@ When adding a section, use this skeleton:
 | **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-terms.html` / `vip-door.html`. Do not await a full clubLocations scan before clearing Restoring (see s3.1.66 `vipCandidateIds`). |
 | **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent` (single Terms check + expand), `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`, `getVipClubSettings`, `saveVipClubSettings` (deposit + `refundPolicy`), `setVipSectionBlocked`, `confirmVipReservationWithoutDeposit`, `adminConfirmVipReservation`, `cancelVipReservation` (clears `isBooked`; FloqMedia/Club Stripe `refunds.create` by policy). Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
 | **Paid-before-booked** | Club `clubLocations.vipSettings.depositRequired` (default on when depositCents &gt; 0). Hold → `status:held` + `isReserved:0` only. Floor map `booked` / `isReserved:1` only after Stripe `fulfillVipReservationOrder` (paymentConfirmed=1), or `confirmVipReservationWithoutDeposit` when deposit not required, or Club Admin `adminConfirmVipReservation` with `paymentRecorded` when deposit required, or Club POS confirm (`confirmVipReservationForClubPos`). |
-| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: BOT DEE `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
+| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Club Stripe** is ready when `stripeConnectAccounts` for the club binding has `transfersReady` (Club Admin → Stripe onboarding), not a typed `acct_` on `clubLocations`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: BOT DEE `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
 | **POS providers** | Toast / SpotOn (open tab ★) / Square / Clover / Generic — sandbox flags: Toast, SpotOn, Square, Clover. Live OAuth/webhook adapters activate when partner credentials are deployed; Connect workflow + connection codes ship now. |
 | **Club Admin** | `admin.html` → **Feature Mgmt** → **VIP reserV** (`#panelVipReserv`) — collector picker, POS connect (sandbox/live), CSV export, billing list, deposit policy, nights, check-in / cancel / block / walk-in. Help: `help-vip-club-admin`, `help-vip-deposit-settings`, `help-vip-payment-collector`. |
 | **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **floqCast** (`#panelFloqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. |

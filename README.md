@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.005 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.007 (stable)
 
+- s3.3.007: Stripe sandbox wiring — Connect → VIP Club Stripe, destination charges when ready, test-mode refunds
 - s3.3.005: BOT DEE locale-filtered results + feature-access filtering + public profile tool
 - s3.3.004: PHILA White/Blue colorway select on ShoutOut composer; blue Icon blanks from owner blue-pair control; white blanks from control C.
 - s3.3.003: PHILA white Association RGBA blanks + FloqMedia-off pair; Terps throwback pair still unpublished; gated QA `maryland-terps-pair-qa.html` (unlock `terps-pair-qa`).

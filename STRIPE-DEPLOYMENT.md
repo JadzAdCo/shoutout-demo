@@ -52,7 +52,14 @@ charge.refunded
 charge.dispute.created
 charge.dispute.updated
 charge.dispute.closed
+account.updated
+capability.updated
+account.application.deauthorized
+customer.subscription.updated
+customer.subscription.deleted
 ```
+
+Connect account events use this **same** endpoint and `STRIPE_WEBHOOK_SECRET`. Do not create a second Connect webhook unless Stripe requires a separate destination.
 
 Copy the endpoint signing secret into Firebase's interactive prompt:
 
@@ -76,7 +83,7 @@ firebase.cmd emulators:exec --only firestore "npm.cmd test --prefix .\functions"
 ## 6. Deploy the hardened Firestore rules and Stripe Functions
 
 ```powershell
-firebase.cmd deploy --only firestore:rules,functions:createFloqrConnectOnboardingLink,functions:getFloqrConnectStatus,functions:createFloqrCheckoutSession,functions:stripeFloqrWebhook --project shoutoutdemo-5b402
+firebase.cmd deploy --only firestore:rules,functions:createFloqrConnectOnboardingLink,functions:getFloqrConnectStatus,functions:createFloqrCheckoutSession,functions:refundFloqrCheckoutOrder,functions:stripeFloqrWebhook --project shoutoutdemo-5b402
 ```
 
 No Stripe key is used by or required for the Robotaxi Pickup simulation.
@@ -95,7 +102,7 @@ Run a small test-mode purchase. Confirm that:
 3. Returning to FLOQR initially shows processing if the webhook has not arrived.
 4. The signed webhook changes the order to paid and creates exactly one fulfillment record.
 5. Re-sending the same Stripe test event does not duplicate fulfillment.
-6. A club or seller with incomplete onboarding cannot open paid Checkout.
+6. A club or seller with incomplete Connect onboarding **can** still open FloqR-priced ShoutOut Checkout (platform charge). Destination charges and VIP Club Stripe require transfers-ready Connect. Refresh Club Admin Stripe status after onboarding.
 7. A signed-in browser cannot write `stripeConnectAccounts`, `stripeWebhookEvents`, or payment-state fields on `serviceOrders`.
 8. A Commerce Checkout holds inventory once, commits it after payment, and restores it after Session expiration or asynchronous payment failure.
 9. Refund/dispute fixtures update the order and require explicit transfer-reversal review when a connected recipient was paid.

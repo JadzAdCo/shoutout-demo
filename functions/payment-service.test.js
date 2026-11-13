@@ -52,6 +52,7 @@ test("payment callables use the compat App Functions client with the deployment 
   assert.match(source, /app\.functions\("us-central1"\)/);
   assert.match(source, /getFloqrClubCheckoutReadiness/);
   assert.match(source, /cancelFloqrCheckoutOrder/);
+  assert.match(source, /refundFloqrCheckoutOrder/);
   assert.match(source, /clearUnpaidFloqrCheckouts/);
   assert.match(source, /purgeFloqrTestPayments/);
 });

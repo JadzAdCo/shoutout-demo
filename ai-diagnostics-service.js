@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.005";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.005";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.007";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.007";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.007",
+      title: "s3.3.007 — Stripe sandbox wiring (Connect → VIP + destination charges + test refunds)",
+      checks: [
+        {label:"Optional Connect recipient", file:"functions/commerce-functions.js", includes:["optionalReadyRecipient", "applyDestinationCharge", "refundFloqrCheckoutOrder"]},
+        {label:"VIP Club Stripe binding", file:"functions/vip-pos-functions.js", includes:["connectBindingId", "stripeConnectAccounts"]},
+        {label:"Connect webhook on platform endpoint", file:"functions/commerce-functions.js", includes:["account.updated", "handleConnectAccountWebhook"]},
+        {label:"Sandbox refund client", file:"payment-service.js", includes:["refundFloqrCheckoutOrder", "refundCheckoutOrder"]},
+        {label:"Club Admin Connect copy", file:"admin.html", includes:["destination-charges this venue"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-007-stripe-sandbox-wire"]}
+      ]
+    },
     {
       version: "s3.3.005",
       title: "s3.3.005 — BOT DEE locale-filtered results + public profile tool",
@@ -2940,6 +2952,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-007-stripe-sandbox-wire",
+      area:"Stripe / Checkout / VIP / Connect",
+      feature:"Sandbox Stripe fully wired (Connect → VIP Club Stripe + destination charges + test refunds)",
+      changed:"s3.3.007 — VIP Club Stripe reads stripeConnectAccounts after Club Admin onboarding; Checkout destination-charges when transfers are ready (ShoutOut 80/20, floqCast, BartR, VIP clubStripe); ShoutOut still works without Connect; stripeFloqrWebhook handles account.updated / capability.updated / deauthorized; refundFloqrCheckoutOrder is test-mode only. Stay on Stripe test keys.",
+      howToTest:"1) Stripe Dashboard stays TEST/sandbox. Add account.updated, capability.updated, account.application.deauthorized to https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/stripeFloqrWebhook (same signing secret). 2) Deploy Functions from origin/main after merge. 3) Club Admin → Stripe onboarding for a test club; Refresh until transfers ready. 4) VIP reserV collector Club Stripe should save (no typed acct id). 5) Paid ShoutOut without Connect still opens FloqR Checkout; with Connect, serviceOrders.connectedAccountId is set. 6) Master Admin Logging → paste a paid test order id → Refund sandbox order. 7) Mark Succeed/Failed.",
+      expected:"Connect onboarding writes stripeConnectAccounts; VIP Club Stripe works; destination charges only when ready; ShoutOut never blocked by missing Connect; sandbox refund reverses the destination transfer; live keys unused.",
+      troubleshoot:"Club Stripe not ready → Functions not redeployed / finish Express onboarding / Refresh status. Destination missing → connectedAccountId empty because transfers not active. Webhook 400 on GET is expected (needs Stripe signature). Refund refused → not test mode, unpaid order, or not Master/Club Admin."
+    },
     {
       id:"s3-3-005-botdee-locale-public-profiles",
       area:"BOT DEE / i18n / Profiles",

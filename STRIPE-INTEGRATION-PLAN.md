@@ -90,7 +90,7 @@ Verify signatures against the raw request body with the official Stripe SDK. Rec
 ### Required before live payments
 
 1. **P0 — Merchant-of-record decision:** confirm FLOQR as merchant of record for ordinary marketplace orders and document taxes, refunds, disputes, Stripe-fee responsibility, and the marketplace commission. Current ordinary-Commerce orders still allocate no FLOQR fee.
-2. **P1 — Refund/dispute operations:** add the authenticated refund action only after policy approval, then perform destination-transfer reversals and customer/seller notifications. Webhook tracking and manual-review flags are implemented.
+2. **P1 — Refund/dispute operations:** **sandbox** `refundFloqrCheckoutOrder` (test-mode only, `reverse_transfer` + `refund_application_fee`) is wired. Live-mode refunds, patron notifications, and published refund policy remain launch-gated. Webhook tracking and manual-review flags are implemented.
 3. **P1 — Connected-account dashboard:** add Stripe's notification banner and account-management embedded components so clubs and sellers can continuously resolve new requirements; the current implementation provides hosted onboarding/update links and status refresh only.
 4. **P1 — Existing account migration:** previously typed `acct_...` values are deliberately ignored. Re-onboard each test club/seller through FLOQR, or add a one-time audited backend migration after verifying account ownership.
 5. **P2 — Dependency migration:** the production dependency audit reports nine moderate advisories in the older Firebase Admin/Functions dependency chain. Upgrade them in a separate tested migration; do not apply a forced major-version audit fix blindly.
@@ -107,7 +107,7 @@ Verify signatures against the raw request body with the official Stripe SDK. Rec
 8. No secret keys appear in deployed static assets, Firestore, logs, or repository history.
 9. Stripe Workbench, Firebase logs, service-order records, and customer-facing status reconcile for every test order.
 10. A user cannot create a club-admin assignment, overwrite an account binding, change payment status, or read another buyer's order from the browser.
-11. An unstarted, pending, restricted, unsupported, closed, or mismatched recipient account cannot open a paid ShoutOut or Commerce Checkout Session.
+11. An unstarted, pending, restricted, unsupported, closed, or mismatched recipient account does **not** block FloqR-priced ShoutOut Checkout (platform charge). Destination charges and VIP Club Stripe stay blocked until transfers are `active`.
 
 ## Launch gate
 

@@ -185,7 +185,7 @@
         "connectWebhookSecret": {
           "value": "",
           "description": "Connect webhook signing secret",
-          "whereToGet": "Stripe Dashboard → Webhooks → Connect endpoint → Signing secret",
+          "whereToGet": "Optional. Prefer adding account.updated, capability.updated, and account.application.deauthorized to the existing platform webhook (STRIPE_WEBHOOK_SECRET). Separate Connect endpoint only if Stripe requires a second destination.",
           "secret": true,
           "required": false,
           "format": "whsec_…",

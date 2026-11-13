@@ -421,10 +421,10 @@
   }
 
   function connectStatusMessage(result = {}) {
-    if (result.transfersReady) return `Club Stripe ready for club-billed products (${result.livemode ? "live mode" : "test mode"}). Patron ShoutOuts still charge FloqR.`;
-    if (!result.connected || result.capabilityStatus === "not-started") return "Club Stripe onboarding has not started (optional — only for club subscription / Commerce).";
+    if (result.transfersReady) return `Club Stripe ready (${result.livemode ? "live mode" : "test mode"}). Paid ShoutOuts, floqCast, and VIP Club Stripe destination-charge this account when ready. Without Connect, FloqR still charges patrons.`;
+    if (!result.connected || result.capabilityStatus === "not-started") return "Club Stripe onboarding has not started (optional). Finish it here so VIP Club Stripe and destination charges can use this venue.";
     const due = Number(result.requirementsDue || 0);
-    return `Club Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""} Not required for patron ShoutOuts.`;
+    return `Club Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""} Patron ShoutOuts still work on FloqR Stripe until Connect is ready.`;
   }
 
   async function refreshClubConnectStatus() {

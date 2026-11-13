@@ -100,7 +100,7 @@ const CATALOG = [
       f("webhookSecret", "Platform webhook signing secret", {secret: true, format: "stripeWebhookSecret", target: {type: "firebaseSecret", name: "STRIPE_WEBHOOK_SECRET"}, where: "Stripe Dashboard → Developers → Webhooks → endpoint → Signing secret"}),
       f("publishableKey", "Publishable key", {secret: false, format: "stripePublishableKey", target: {type: "firestoreDoc"}, where: "Stripe Dashboard → Developers → API keys"}),
       f("connectClientId", "Connect client id", {secret: false, required: false, wired: false, format: "stripeConnectClientId", target: {type: "firestoreDoc"}, where: "Stripe Dashboard → Connect → Settings → OAuth (ca_…)"}),
-      f("connectWebhookSecret", "Connect webhook signing secret", {secret: true, required: false, wired: false, format: "stripeWebhookSecret", target: {type: "firebaseSecret", name: "STRIPE_CONNECT_WEBHOOK_SECRET"}, where: "Stripe Dashboard → Webhooks → Connect endpoint → Signing secret"})
+      f("connectWebhookSecret", "Connect webhook signing secret", {secret: true, required: false, wired: false, format: "stripeWebhookSecret", target: {type: "firebaseSecret", name: "STRIPE_CONNECT_WEBHOOK_SECRET"}, where: "Optional. Prefer adding account.updated, capability.updated, and account.application.deauthorized to the existing platform webhook (STRIPE_WEBHOOK_SECRET). Separate Connect endpoint only if Stripe requires a second destination."})
     ],
     manual: [
       {key: "returnUrlsAllowed", label: "Checkout / Customer Portal return URLs and Connect redirect URIs allow https://www.floqr.app"},

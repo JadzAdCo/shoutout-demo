@@ -243,6 +243,21 @@
     }
   }
 
+  async function refundSandboxOrder() {
+    const orderId = (byId("sandboxRefundOrderId")?.value || "").trim();
+    if (!orderId || !window.FLOQRPayments?.refundCheckoutOrder) return;
+    if (!confirm(`Refund Stripe TEST order ${orderId}? This reverses the destination transfer when Connect was used.`)) return;
+    setStatus(`Refunding sandbox order ${orderId}…`);
+    try {
+      const result = await window.FLOQRPayments.refundCheckoutOrder({orderId, reason: "master-admin-sandbox-refund"});
+      setStatus(`Refunded ${orderId} — Stripe ${result.refundId || "ok"} (${money(result.amountCents)}).`);
+      await loadUnpaid();
+      await loadLogs();
+    } catch (error) {
+      setStatus(error.message || "Sandbox refund failed.");
+    }
+  }
+
   async function purgeTestPayments() {
     if (!window.FLOQRPayments?.purgeTestPayments) return;
     if (!confirm("Permanently delete all Stripe TEST-marked payment ledger rows, related paid shoutouts, and test service orders? This cannot be undone.")) return;
@@ -261,7 +276,7 @@
   async function checkZebbiesConnect() {
     const box = byId("zebbiesConnectReadiness");
     if (box) {
-      box.innerHTML = `<p class="sub"><strong>Paid ShoutOuts do not require club Stripe Connect.</strong> Patron football / priced ShoutOuts are charged to FloqR’s Stripe account. This club earns a tracked 20% share under Account Reconciliation. Club Stripe onboarding is only for club subscription or club-billed Commerce products.</p>`;
+      box.innerHTML = `<p class="sub"><strong>Paid ShoutOuts do not require club Stripe Connect.</strong> Patron football / priced ShoutOuts are charged to FloqR’s Stripe account. When Connect is ready, sandbox Checkout destination-charges the club (FloqR keeps 80%). Club Stripe onboarding is required only for VIP Club Stripe collector and optional destination payouts.</p>`;
     }
     if (!window.FLOQRPayments?.getClubCheckoutReadiness) {
       setStatus("Optional club-billed Connect check unavailable.");
@@ -272,7 +287,7 @@
       const result = await window.FLOQRPayments.getClubCheckoutReadiness({ clubLocationId: "zebbies-garden-washington-dc" });
       if (box) {
         box.innerHTML += result.ready
-          ? `<p class="sub">Optional club Stripe Connect for Zebbies is ready (${esc(result.capabilityStatus || "active")}) for club-billed products only.</p>`
+          ? `<p class="sub">Optional club Stripe Connect for Zebbies is ready (${esc(result.capabilityStatus || "active")}) — destination charges and VIP Club Stripe can use it.</p>`
           : `<p class="sub">Optional club Stripe Connect for Zebbies is not configured. That does <strong>not</strong> block FloqR-priced ShoutOuts such as the $30 football intro.</p>`;
       }
       setStatus(result.ready ? "Optional club Connect ready (not required for ShoutOuts)." : "Club Connect not configured — ShoutOuts still use FloqR Stripe.");
@@ -307,6 +322,7 @@
     byId("geminiAccessLogAckBtn")?.addEventListener("click", acknowledgeGeminiCriticalFailures);
     byId("clearUnpaidCheckoutsBtn")?.addEventListener("click", clearAllUnpaid);
     byId("purgeTestPaymentsLoggingBtn")?.addEventListener("click", purgeTestPayments);
+    byId("sandboxRefundOrderBtn")?.addEventListener("click", refundSandboxOrder);
     byId("checkZebbiesConnectBtn")?.addEventListener("click", checkZebbiesConnect);
   }
 
