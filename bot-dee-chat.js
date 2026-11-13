@@ -226,9 +226,16 @@
   function isVersionPrompt(raw) {
     const q = normalizeChat(raw);
     if (!q || q.length > 140) return false;
-    if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,40}\b(?:version|build|package|release)\b/.test(q)) return true;
-    if (/^(?:version|build|package|release)(?:\s+info|\s+number)?\??$/.test(q)) return true;
-    if (/\b(?:your|bot\s*dee|floqr|app|software)\s+version\b/.test(q)) return true;
+    // Product commerce / feature wording — never hijack as FLOQR stamp.
+    if (/\b(?:shout\s*out|vip|floq\s*cast|floqcast|baller|jersey|template|checkout|stripe|deposit|table)\b/.test(q)) {
+      return false;
+    }
+    if (/\b(?:your|bot\s*dee|floqr|app|software)\s+(?:version|build|package|release)\b/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is)\s+(?:your|the)\s+(?:version|build)(?:\s+info|\s+number)?\b/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,24}\b(?:your|bot\s*dee|floqr)\b.{0,20}\b(?:version|build|package|release)\b/.test(q)) return true;
+    if (/\b(?:what|which)\s+(?:package|release)\s+(?:are you|is this|is floqr|am i on)\b/.test(q)) return true;
+    if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;
+    if (/^(?:package|release)\s+(?:info|version|number)\??$/.test(q)) return true;
     if (/\bversion\s+info\b/.test(q)) return true;
     return false;
   }

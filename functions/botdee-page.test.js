@@ -36,6 +36,8 @@ test("BOT DEE header uses title-row + ? beside title; scope note full width", ()
   assert.match(css, /\.botdee-chat-header\s*\{[^}]*flex-direction:\s*column/s);
   assert.match(css, /\.botdee-scope-note\s*\{[^}]*width:\s*100%/s);
   assert.match(css, /justify-content:\s*flex-start/);
+  assert.match(css, /--help-anchor:\s*end/);
+  assert.match(css, /\.botdee-help-popout > \.help-popout-body[\s\S]*?right:\s*0/s);
   assert.match(read("bot-dee-chat.js"), /isVersionPrompt/);
   assert.match(read("bot-dee-chat.js"), /versionReply/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatVersion"/);

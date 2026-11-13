@@ -164,6 +164,9 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(bot.isVersionPrompt("name your version info"), true);
   assert.equal(bot.isVersionPrompt("who are you"), false);
   assert.equal(bot.isVersionPrompt("throw a shoutout"), false);
+  assert.equal(bot.isVersionPrompt("what is the VIP package"), false);
+  assert.equal(bot.isVersionPrompt("tell me about the ShoutOut package"), false);
+  assert.equal(bot.isVersionPrompt("what package for baller alert"), false);
 
   const reply = bot.versionReply();
   assert.match(reply, /BOT DEE/i);

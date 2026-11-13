@@ -144,16 +144,18 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   flex: 0 0 auto;
   position: relative;
   z-index: 30;
-  /* ? sits immediately after the title — open the panel toward the page edge */
-  --help-anchor: start;
+  /* Prefer open leftward — ? is near the left; left:0 would push a 320px panel off-screen on phone.
+     helper-popouts.js fitHelpPopoutInViewport still flips via data-help-align when needed. */
+  --help-anchor: end;
 }
 
 .botdee-help-popout > .help-popout-body,
 .botdee-help-popout > div:not(summary) {
-  left: 0;
-  right: auto;
+  left: auto;
+  right: 0;
   width: min(320px, calc(100vw - 28px));
   max-width: calc(100vw - 28px);
+  box-sizing: border-box;
 }
 
 .botdee-transcript {

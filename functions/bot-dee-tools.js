@@ -419,6 +419,18 @@ function isFriendContextQuery(raw) {
   return /\b(?:my\s+)?(?:friend|buddy|mate|connection|mingl)\b/i.test(String(raw || ""));
 }
 
+/** Extract the person name from “my friend James” / “about my buddy Erny”. */
+function friendNameFromQuery(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  const m = s.match(
+    /\b(?:my\s+)?(?:friend|buddy|mate|connection)(?:\s+named)?\s+([@A-Za-z][\w.\-']*(?:\s+[A-Za-z][\w.\-']*){0,2})\b/i
+  ) || s.match(
+    /\b(?:about|know about)\s+(?:my\s+)?(?:friend|buddy|mate)\s+([@A-Za-z][\w.\-']+)/i
+  );
+  return m ? normalizeNeedle(m[1]) : "";
+}
+
 async function loadConnectedUids(uid) {
   const ids = new Set();
   try {
@@ -500,7 +512,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   }
   const kind = String(args.kind || "any").trim().toLowerCase();
   const limit = Math.min(PUBLIC_PROFILE_MAX, Math.max(1, Number(args.limit) || 5));
-  const tokens = needle.split(/\s+/).filter(t => t.length > 1 && !["my", "friend", "buddy", "mate", "about", "know", "what", "you", "the"].includes(t));
+  const stop = new Set(["my", "friend", "buddy", "mate", "about", "know", "what", "you", "the", "do", "me", "named", "connection", "mingl"]);
   const viewerUid = sessionRequest.auth.uid;
   const scored = [];
   const seen = new Set();
@@ -508,6 +520,12 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const wantClubs = kind === "any" || kind === "club" || kind === "venue";
   const selfQuery = wantPeople && isSelfProfileQuery(rawQuery);
   const friendContext = wantPeople && isFriendContextQuery(rawQuery);
+  const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
+  // Friend prompts must match the extracted name — never dump the whole social graph.
+  const matchNeedle = friendContext ? friendName : needle;
+  const tokens = String(matchNeedle || "")
+    .split(/\s+/)
+    .filter(t => t.length > 1 && !stop.has(t));
 
   if (wantPeople && selfQuery) {
     try {
@@ -528,7 +546,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     connected = await loadConnectedUids(viewerUid);
   }
 
-  if (wantPeople && connected.size && !selfQuery) {
+  if (wantPeople && connected.size && !selfQuery && matchNeedle) {
     try {
       const ids = [...connected].slice(0, 100);
       const refs = ids.map(id => db.collection("users").doc(id));
@@ -538,18 +556,19 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         const data = doc.data() || {};
         // Connections: public profiles only — never private fields.
         if (!people.isPublic(data)) return;
-        const points = scoreHay(userHaystack(data), needle, tokens) + (friendContext ? 12 : 6);
-        if (points >= 6 || friendContext) {
-          scored.push(publicUserCard(doc.id, data, Math.max(points, friendContext ? 10 : points), {relation: "connection"}));
-          seen.add(doc.id);
-        }
+        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        // Require a real name/handle match (threshold 8). No free pass for “friend” alone.
+        if (base < 8) return;
+        const points = base + (friendContext ? 12 : 6);
+        scored.push(publicUserCard(doc.id, data, points, {relation: "connection"}));
+        seen.add(doc.id);
       });
     } catch (error) {
       console.warn("BOT DEE lookupPublicProfiles connections failed", error?.message || error);
     }
   }
 
-  if (wantPeople && !selfQuery) {
+  if (wantPeople && !selfQuery && !friendContext && matchNeedle) {
     try {
       const snap = await db.collection("users")
         .where("publicProfileVisibility", "==", "public")
@@ -559,21 +578,22 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         if (doc.id === viewerUid || seen.has(doc.id)) return;
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
-        const boost = connected.has(doc.id) ? 10 : 0;
-        const points = scoreHay(userHaystack(data), needle, tokens) + boost;
-        if (points >= 8) {
-          scored.push(publicUserCard(doc.id, data, points, {
-            relation: connected.has(doc.id) ? "connection" : "public"
-          }));
-          seen.add(doc.id);
-        }
+        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        // Must match the query first — connection boost must not invent hits.
+        if (base < 8) return;
+        const points = base + (connected.has(doc.id) ? 10 : 0);
+        scored.push(publicUserCard(doc.id, data, points, {
+          relation: connected.has(doc.id) ? "connection" : "public"
+        }));
+        seen.add(doc.id);
       });
     } catch (error) {
       console.warn("BOT DEE lookupPublicProfiles users failed", error?.message || error);
     }
   }
 
-  if (wantClubs && !selfQuery) {
+  if (wantClubs && !selfQuery && !friendContext) {
+    const clubTokens = needle.split(/\s+/).filter(t => t.length > 1 && !stop.has(t));
     try {
       const snap = await db.collection("clubLocations").limit(PUBLIC_PROFILE_SCAN).get();
       snap.docs.forEach(doc => {
@@ -586,7 +606,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
           ...(Array.isArray(data.artists) ? data.artists : []),
           ...(Array.isArray(data.djs) ? data.djs : [])
         ].filter(Boolean).join(" ");
-        const points = scoreHay(hay, needle, tokens) + (normalizeNeedle(doc.id) === needle ? 20 : 0);
+        const points = scoreHay(hay, needle, clubTokens) + (normalizeNeedle(doc.id) === needle ? 20 : 0);
         if (points >= 8) scored.push(publicClubCard(doc.id, data, points));
       });
     } catch (error) {
@@ -602,11 +622,12 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
   if (profiles.length) {
     note = "Public fields only (plus the viewer's own public-facing card when query is about them). Image URLs are published profile/gallery media — describe them; do not invent private details (email, phone, payment, GPS).";
-    if (friendContext && !profiles.some(p => p.relation === "connection")) {
-      note += " No Mingl/chat connection matched that name with a public profile.";
-    }
   } else if (selfQuery) {
     note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
+  } else if (friendContext) {
+    note = friendName
+      ? `No Mingl/chat connection matched "${friendName}" with a public profile. Ask them to check spelling, or that friend may not have a public profile.`
+      : "Name a friend (for example: my friend James) so I can look up their public profile among your connections.";
   }
   return {
     ok: true,
@@ -656,6 +677,7 @@ module.exports = {
   isClubPublic,
   isSelfProfileQuery,
   isFriendContextQuery,
+  friendNameFromQuery,
   publicUserCard,
   publicUserFacts,
   resolveClubLocationId,
