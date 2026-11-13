@@ -229,7 +229,7 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.ok(shout.results.some(row => row.sourceId === "intent:shoutout" || row.id === "shoutout"));
 
   const scrubbed = bot.sanitizeFeatureMentions(
-    "Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs.",
+    "Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), VIP-Tisch, table VIP, VIP entry, clubs.",
     allowed
   );
   assert.match(scrubbed, /ShoutOut/);
@@ -237,6 +237,7 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.doesNotMatch(scrubbed, /\bRydR\b/);
   assert.doesNotMatch(scrubbed, /\bBartR\b/);
   assert.doesNotMatch(scrubbed, /\bfloqCast\b/i);
+  assert.doesNotMatch(scrubbed, /VIP-Tisch|table VIP|VIP entry/i);
 
   const tools = bot.toolDeclarations(allowed).map(t => t.name);
   assert.ok(tools.includes("contextualSearch"));
@@ -251,6 +252,12 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.match(bot.systemInstruction("patron", "en", allowed), /NEVER mention/);
   assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
+  // Local greetings must scrub by access — not discard locale when floqCast/VIP appear in chrome packs.
+  assert.match(read("bot-dee-chat.js"), /return scrubGatedBrands\(localized\)/);
+  assert.doesNotMatch(
+    read("bot-dee-chat.js"),
+    /localized !== "botdee\.chatHello" && !\\bMingl\\b/
+  );
 });
 
 test("intent:help-* result cards localize via help pack alias", () => {

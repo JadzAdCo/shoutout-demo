@@ -152,12 +152,16 @@ const INTENT_FEATURE_KEY = Object.freeze({
   "ad-campaigns": null
 });
 
+/** VIP product phrases across app languages (brand VIP reserV + localized table/entry wording). */
+const VIP_BRAND_RE =
+  /\bVIP\s*reserV\b|\bVIP[- ]?(?:table|tables|entry|entries|Tisch|Tische|tafel|tafels|стол|стола)\b|\b(?:table|tables|mesa|mesas|tavolo|tavoli|stolik|stoliki)\s+VIP\b|\bVIP\s+τραπέζι\b|\bطاولة\s+VIP\b/gi;
+
 const FEATURE_BRAND_PATTERNS = Object.freeze([
   {key: "mingl", re: /\bMingl\b/g},
   {key: "rydr", re: /\bRydR\b/g},
   {key: "bartr", re: /\bBartR\b/g},
   {key: "floqCast", re: /\bfloqCast\b|\bFloqCAST\b|\bFloqCast\b/g},
-  {key: "vipReservations", re: /\bVIP reserV\b|\bVIP table\b|\bVIP tables\b/gi}
+  {key: "vipReservations", re: VIP_BRAND_RE}
 ]);
 
 function featureKeyForSource(sourceId, id) {
@@ -200,6 +204,7 @@ function sanitizeFeatureMentions(text, allowedFeatures) {
     .replace(/\(\s*superstar\s*\)/gi, "")
     .replace(/\s*,\s*,+/g, ",")
     .replace(/,\s+and\s+,/gi, ",")
+    .replace(/\s+(?:or|oder|ou|o|или|ή|lub|أو)\s+,/gi, ",")
     .replace(/\(\s*,\s*/g, "(")
     .replace(/,\s*\)/g, ")")
     .replace(/\(\s*\)/g, "")

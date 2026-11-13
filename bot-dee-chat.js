@@ -57,16 +57,23 @@
     return null;
   }
 
+  /** VIP product phrases across app languages (brand VIP reserV + localized table/entry wording). */
+  const VIP_BRAND_RE =
+    /\bVIP\s*reserV\b|\bVIP[- ]?(?:table|tables|entry|entries|Tisch|Tische|tafel|tafels|стол|стола)\b|\b(?:table|tables|mesa|mesas|tavolo|tavoli|stolik|stoliki)\s+VIP\b|\bVIP\s+τραπέζι\b|\bطاولة\s+VIP\b/gi;
+
   function scrubGatedBrands(text) {
     let out = String(text || "");
     if (!canUseFeature("mingl")) out = out.replace(/\bMingl\b/g, "");
     if (!canUseFeature("rydr")) out = out.replace(/\bRydR\b/g, "");
     if (!canUseFeature("bartr")) out = out.replace(/\bBartR\b/g, "");
     if (!canUseFeature("floqCast")) out = out.replace(/\bfloqCast\b|\bFloqCAST\b|\bFloqCast\b/g, "");
-    if (!canUseFeature("vipReservations")) out = out.replace(/\bVIP reserV\b/g, "");
+    if (!canUseFeature("vipReservations")) out = out.replace(VIP_BRAND_RE, "");
     return out
       .replace(/\(\s*superstar\s*\)/gi, "")
       .replace(/\s*,\s*,+/g, ",")
+      .replace(/\s+oder\s+,/gi, ",")
+      .replace(/\s+or\s+,/gi, ",")
+      .replace(/\s+ou\s+,/gi, ",")
       .replace(/\(\s*\)/g, "")
       .replace(/\s{2,}/g, " ")
       .replace(/,\s*$/g, "")
@@ -213,13 +220,12 @@
   }
 
   function chitchatReply() {
-    const pitch = accessibleProductPitch();
     const localized = t("botdee.chatHello", "");
-    // Prefer dynamic access pitch over static i18n product lists that may name gated betas.
-    if (localized && localized !== "botdee.chatHello" && !/\bMingl\b|\bRydR\b|\bBartR\b|\bfloqCast\b|\bVIP table\b/i.test(localized)) {
-      return localized;
+    // Keep locale; scrub brands the viewer cannot access (do not force English).
+    if (localized && localized !== "botdee.chatHello") {
+      return scrubGatedBrands(localized);
     }
-    return `Hey — BOT DEE here. What do you want to do in FLOQR? ${pitch}`;
+    return `Hey — BOT DEE here. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
   }
 
   /** Soft mid-chat ack — no product pitch. */
@@ -261,12 +267,11 @@
   }
 
   function resumeReply() {
-    const pitch = accessibleProductPitch();
     const localized = t("botdee.chatResume", "");
-    if (localized && localized !== "botdee.chatResume" && !/\bMingl\b|\bRydR\b|\bBartR\b|\bfloqCast\b|\bVIP table\b/i.test(localized)) {
-      return localized;
+    if (localized && localized !== "botdee.chatResume") {
+      return scrubGatedBrands(localized);
     }
-    return `Welcome back. What do you want to do in FLOQR? ${pitch}`;
+    return `Welcome back. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
   }
 
   function callable() {
