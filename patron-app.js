@@ -804,10 +804,12 @@
     const t = getTemplate(templateId || selectedTemplate);
     return !!(t && (t.layout === "nfl-jersey" || t.nflDualLayout || (t.sport === "nfl" && t.defaultBackgroundUrl)));
   }
-  /** PHILA pair (and future NBA pair kits): Name + Number + optional ShoutOut — same editor chrome as NFL dual. */
+  /** Jersey pair kits (PHILA v1, Maryland Terps v2 when published): Name + Number + optional ShoutOut. */
   function isNbaJerseyPairTemplate(templateId = selectedTemplate) {
     const t = getTemplate(templateId || selectedTemplate);
-    return !!(t && (t.nbaJerseyPair === true || (t.nbaDualFaces === true && t.nbaJerseyPair !== false && String(t.id || "").includes("Phila"))));
+    if (!t || t.nbaJerseyPair !== true) return false;
+    if (t.catalogPublished === false || t.productionAssetsReady === false) return false;
+    return !!(t.frontBackgroundUrl || t.nbaDualFaces);
   }
   function isJerseyShoutDualTemplate(templateId = selectedTemplate) {
     return isNflDualJerseyTemplate(templateId) || isNbaJerseyPairTemplate(templateId);

@@ -42,6 +42,6 @@
     sceneAt,
     hasMessageText,
     holdMsForPhase,
-    version: "s3.3.001"
+    version: "s3.3.002"
   };
 });

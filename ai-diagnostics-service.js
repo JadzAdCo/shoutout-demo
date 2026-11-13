@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.001";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.001";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.003";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.003";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,33 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.003",
+      title: "s3.3.003 — PHILA white blanks + FloqMedia-off pair + Terps gated QA",
+      checks: [
+        {label:"PHILA white blank front", file:"images/basketball/nba-76ers-phila-front-blank.png", includes:[]},
+        {label:"PHILA white blank back", file:"images/basketball/nba-76ers-phila-back-blank.png", includes:[]},
+        {label:"PHILA catalog blanks", file:"jersey-catalog.js", includes:["nba-76ers-phila-front-blank.png", "nba-76ers-phila-back-blank.png", "jerseyCssBack: false"]},
+        {label:"Hide FloqMedia on pair", file:"display-app.js", includes:["!pairMode", "NBA jersey pair: hide FloqMedia"]},
+        {label:"Pair CSS hides rail + single bg", file:"display.css", includes:["nba-jersey-pair .display-identity-rail", "opacity:0!important"]},
+        {label:"Terps pair still unpublished", file:"jersey-catalog.js", includes:["nbaMarylandTerpsThrowbackPair", "catalogPublished: false", "productionAssetsReady: false"]},
+        {label:"Terps gated QA page", file:"maryland-terps-pair-qa.html", includes:["terps-pair-qa", "nbaMarylandTerps", "pairMessageTheme"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-003-phila-blanks-terps-qa"]}
+      ]
+    },
+    {
+      version: "s3.3.002",
+      title: "s3.3.002 — Maryland Terps jersey pair v2 (unpublished until front plate)",
+      checks: [
+        {label:"Terps pair catalog unpublished", file:"jersey-catalog.js", includes:["nbaMarylandTerpsThrowbackPair", "ncaa-umd-2026-27-2002-throwback-white-v2", "catalogPublished: false", "pairMessageTheme: \"maryland\""]},
+        {label:"Publish gate", file:"jersey-catalog.js", includes:["row.catalogPublished === false"]},
+        {label:"Maryland message theme CSS", file:"display.css", includes:["data-pair-message-theme=\"maryland\""]},
+        {label:"Pair requires front plate", file:"display-app.js", includes:["productionAssetsReady !== false"]},
+        {label:"Package brief", file:"reports/maryland-terps-jersey-v2/INTEGRATION.md", includes:["productionAssetsReady: false", "ncaa-umd-2026-27-2002-throwback-white-v2"]},
+        {label:"PHILA pair still present", file:"jersey-catalog.js", includes:["nba-phi-phila-white-reference-v1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-002-maryland-terps-pair-v2"]}
+      ]
+    },
     {
       version: "s3.3.001",
       title: "s3.3.001 — PHILA jersey pair 7s + optional ShoutOut 5s",
@@ -2887,13 +2914,31 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-003-phila-blanks-terps-qa",
+      area:"ShoutOut / Display / NBA / NCAA",
+      feature:"PHILA white Association blanks + FloqMedia-off pair; Terps gated QA",
+      changed:"s3.3.003 — nbaPhiladelphia76ersPhila points at nba-76ers-phila-{front,back}-blank.png (RGBA, no baked EMBIID). Pair hides FloqMedia rail + single-face bg. Terps throwback pair stays unpublished; maryland-terps-pair-qa.html unlock key terps-pair-qa for timing/theme QA (front=back placeholder).",
+      howToTest:"1) Hard-refresh Search + display (s3.3.003). 2) PHILA pair: white kits (not blue Icon), no EMBIID baked in, typed name/PHILA/number, no FloqMedia over kits. 3) Template list still has Maryland Terps back-only — not Throwback Pair. 4) Open maryland-terps-pair-qa.html, unlock with terps-pair-qa, confirm 7s/5s + Maryland gradient. 5) PC visual QA vs white PHILA reference. Mark Succeed/Failed.",
+      expected:"White Association pair silhouette; overlays only for glyphs; FloqMedia hidden on pair; Terps pair not in patron picker; gated QA unlocks.",
+      troubleshoot:"Still blue → catalog still on with-club PNGs / hard-refresh jersey-catalog.js. Opaque box → front blank must be RGBA. FloqMedia mid-kit → display-app pairMode rail hide + display.css. Terps in picker → catalogPublished must stay false. QA blank → wrong key or display preview params."
+    },
+    {
+      id:"s3-3-002-maryland-terps-pair-v2",
+      area:"ShoutOut / Display / NCAA",
+      feature:"Maryland Terps throwback pair v2 — registered unpublished until front plate",
+      changed:"s3.3.002 — nbaMarylandTerpsThrowbackPair (ncaa-umd-2026-27-2002-throwback-white-v2) shares PHILA pair engine; catalogPublished/productionAssetsReady false; frontBackgroundUrl empty; Maryland message theme CSS ready; live patrons still use nbaMarylandTerps back-only.",
+      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) PHILA pair still works (7s/5s). 4) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
+      expected:"No unpublished Terps pair in patron picker; PHILA pair unchanged; prep entry exists in jersey-catalog with empty front URL.",
+      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. PHILA broken → do not remove nbaPhiladelphia76ersPhila. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
+    },
+    {
       id:"s3-3-001-phila-jersey-pair",
       area:"ShoutOut / Display / NBA",
       feature:"PHILA jersey pair — back+front 7s, optional ShoutOut 5s",
       changed:"s3.3.001 — nbaPhiladelphia76ersPhila uses nbaJerseyPair: both kits visible (back left, front right) for 7s; optional message card 5s; blank message = jersey only. FrameLoop holdMsByPhase + includeCopy. Package brief in reports/nba-phila-jersey-v1/.",
-      howToTest:"1) Hard-refresh Search (s3.3.001). 2) Pick NBA Philadelphia 76ers PHILA. 3) Name DON BANYONG, Number 21, Message HAPPY BIRTHDAY, DON! — preview shows pair then ShoutOut card. 4) Clear message — jersey pair only ~7s (no empty card). 5) Check 96×48 / 64×48 / 64×32. Mark Succeed/Failed.",
-      expected:"Pair composition (not rotate); 7s then 5s with message; jersey-only when blank; PHILA wordmark fixed on front; name on back only.",
-      troubleshoot:"Still rotating one kit → hard-refresh display-app.js + display.css + floqr-frame-loop.js. No pair stage → nbaJerseyPair catalog flag. Message never shows → mainText empty or includeCopy false. Wrong timing → floqr-jersey-scene.js / holdMsByPhase."
+      howToTest:"1) Hard-refresh Search (s3.3.003). 2) Pick NBA Philadelphia 76ers PHILA. 3) Name DON BANYONG, Number 21, Message HAPPY BIRTHDAY, DON! — preview shows white pair then ShoutOut card. 4) Clear message — jersey pair only ~7s (no empty card). 5) Check 96×48 / 64×48 / 64×32. Mark Succeed/Failed.",
+      expected:"White Association pair composition (not rotate / not blue Icon); 7s then 5s with message; jersey-only when blank; PHILA wordmark fixed on front; name on back only; no FloqMedia on pair.",
+      troubleshoot:"Still rotating one kit → hard-refresh display-app.js + display.css + floqr-frame-loop.js. No pair stage → nbaJerseyPair catalog flag. Message never shows → mainText empty or includeCopy false. Wrong timing → floqr-jersey-scene.js / holdMsByPhase. Blue Icon → blanks not wired."
     },
     {
       id:"s3-2-101-shoutout-diag-phila-baller",

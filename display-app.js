@@ -1257,7 +1257,7 @@
     const backNum = back?.querySelector(".nba-pair-number");
     const frontNum = front?.querySelector(".nba-pair-number");
     if (nameEl) nameEl.textContent = String(nameText || "").trim().toUpperCase();
-    if (teamEl) teamEl.textContent = String(teamText || "PHILA").trim().toUpperCase();
+    if (teamEl) teamEl.textContent = String(teamText || "").trim().toUpperCase();
     const num = String(numberText || "").trim();
     if (backNum) backNum.textContent = num;
     if (frontNum) frontNum.textContent = num;
@@ -1465,6 +1465,7 @@
       nbaJerseyPair: params.get("nbaJerseyPair") === "1",
       frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
       backBackgroundUrl: params.get("backBackgroundUrl") || "",
+      pairMessageTheme: params.get("pairMessageTheme") || "",
       sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
@@ -2621,14 +2622,21 @@
         stopSplitMediaLoop();
       }
 
+      // Pair needs a real front plate URL (not a back-only fallback) — unpublished Terps v2 stays gated.
+      // Compute before FloqMedia rail so the pair stage is not covered mid-kit.
+      const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair)
+        && !!(frontBgUrl || t.frontBackgroundUrl)
+        && t.productionAssetsReady !== false;
+
       // FloqR card (bottom): paint BEFORE FrameLoop so a loop throw cannot skip the rail.
       // Always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
       // Mount rail on the canvas (not inside display-center) so bottom:% is the LED, not a mid stack.
+      // NBA jersey pair: hide FloqMedia — the dual kits + optional ShoutOut own the frame.
       let rail = byId("displayIdentityRail");
       if (rail && canvas && rail.parentElement !== canvas) {
         canvas.appendChild(rail);
       }
-      if (rail && t.identityRail !== false) {
+      if (rail && t.identityRail !== false && !pairMode) {
         // Jersey subText is the jersey mark, so only the opted-in attribution can credit the patron.
         mountFloqrCard(rail, {
           data,
@@ -2661,7 +2669,6 @@
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
-        const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair);
         canvas.classList.toggle("nba-jersey-pair", pairMode);
         canvas.classList.add("nba-dual-faces", "split-media-loop");
         const sceneApi = window.FLOQRJerseyScene;
@@ -2671,11 +2678,12 @@
           ? sceneApi.hasMessageText(shoutCopy)
           : !!String(shoutCopy || "").trim();
         if (pairMode) {
+          const pairTeam = teamLabel || t.jerseyTeamLabel || t.jerseyPlateLabel || "";
           paintNbaPairStage(canvas, {
             frontUrl: dualUrls.frontBackgroundUrl,
             backUrl: dualUrls.backBackgroundUrl,
             nameText: jerseyNameText || "",
-            teamText: teamLabel || t.jerseyTeamLabel || "PHILA",
+            teamText: pairTeam,
             numberText: subText || ""
           });
           let shoutPanel = byId("displayNbaPairShoutPanel");
@@ -2685,6 +2693,9 @@
             shoutPanel.className = "nba-pair-shout-panel hidden";
             canvas.appendChild(shoutPanel);
           }
+          const messageTheme = String(t.pairMessageTheme || data.pairMessageTheme || "").trim().toLowerCase();
+          shoutPanel.dataset.pairMessageTheme = messageTheme || "default";
+          canvas.dataset.pairMessageTheme = messageTheme || "default";
           if (hasMessage) {
             const lineCount = Number(data.lineCount || textCaps.lineCount || 4);
             const perLine = Number(data.maxCharactersPerLine || textCaps.perLine || 16);

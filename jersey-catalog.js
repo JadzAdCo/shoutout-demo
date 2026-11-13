@@ -440,16 +440,56 @@
         nbaJerseyPair: true,
         jerseySceneMs: 7000,
         messageSceneMs: 5000,
+        catalogPublished: true,
+        productionAssetsReady: true,
         seasonStatus: "reference-specific-unverified",
         packageContract: "reports/nba-phila-jersey-v1",
-        frontBackgroundUrl: "./images/basketball/nba-76ers-front-with-club.png",
-        defaultBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
-        backBackgroundUrl: "./images/basketball/nba-76ers-back-with-club.png",
-        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1"])),
-        description: "$30 Philadelphia 76ers PHILA pair — back + front together 7s, optional ShoutOut 5s (blank message = jersey only). Fixed PHILA wordmark; typed name/number. Reference-specific unverified edition."
+        pairMessageTheme: "phila",
+        jerseyCssBack: false,
+        jerseyOnHanger: false,
+        // White Association RGBA blanks (no baked EMBIID/PHILA/21) — overlays supply name/word/number.
+        frontBackgroundUrl: "./images/basketball/nba-76ers-phila-front-blank.png",
+        defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+        backBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1", "white-blank"])),
+        description: "$30 Philadelphia 76ers PHILA pair — white Association blanks, back + front together 7s, optional ShoutOut 5s (blank message = jersey only). Fixed PHILA wordmark; typed name/number. Reference-specific unverified edition."
       };
       nbaNflTemplates.nbaPhiladelphia76ersPhila = phila;
       nbaNflIds.push("nbaPhiladelphia76ersPhila");
+    }
+  }
+  // Maryland Terps throwback pair (v2): same engine as PHILA. Front blank plate not ready → unpublished.
+  // Stable id ncaa-umd-2026-27-2002-throwback-white-v2. Do not remove PHILA; do not invent front art.
+  if (!nbaNflTemplates.nbaMarylandTerpsThrowbackPair) {
+    const base = nbaNflTemplates.nbaMarylandTerps;
+    if (base) {
+      const terpsPair = {
+        ...base,
+        id: "nbaMarylandTerpsThrowbackPair",
+        stableTemplateId: "ncaa-umd-2026-27-2002-throwback-white-v2",
+        name: "NCAA Maryland Terps Throwback Pair",
+        teamName: "Maryland Terps Throwback Pair",
+        jerseyTeamLabel: "MARYLAND",
+        jerseyPlateLabel: "MARYLAND",
+        jerseyStateField: false,
+        nbaDualFaces: true,
+        nbaJerseyPair: true,
+        jerseySceneMs: 7000,
+        messageSceneMs: 5000,
+        catalogPublished: false,
+        productionAssetsReady: false,
+        seasonStatus: "2026-27-2002-throwback-assets-incomplete",
+        packageContract: "reports/maryland-terps-jersey-v2",
+        pairMessageTheme: "maryland",
+        // Front plate missing — pair stays unpublished until a reviewed blank front lands.
+        frontBackgroundUrl: "",
+        defaultBackgroundUrl: "./images/basketball/maryland-terps-2026-back.jpg",
+        backBackgroundUrl: "./images/basketball/maryland-terps-2026-back.jpg",
+        tags: Array.from(new Set([...(base.tags || []), "MARYLAND", "Terps", "throwback", "pair", "v2", "unpublished"])),
+        description: "$30 Maryland Terps throwback pair (v2) — back + front 7s, optional ShoutOut 5s. Fixed MARYLAND chest wordmark when published. Unpublished until authorized front/back blank plates are ready (see reports/maryland-terps-jersey-v2/INTEGRATION.md)."
+      };
+      nbaNflTemplates.nbaMarylandTerpsThrowbackPair = terpsPair;
+      // Not pushed to nbaNflIds until catalogPublished — keeps patron picker on back-only Terps.
     }
   }
   // Promote photo NFL kits with dual-panel shoutout layout flags.
@@ -500,7 +540,10 @@
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
   global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat([
     "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"
-  ]).concat(Object.keys(nbaNflTemplates).filter(id => nbaNflTemplates[id] && nbaNflTemplates[id].defaultBackgroundUrl));
+  ]).concat(Object.keys(nbaNflTemplates).filter(id => {
+    const row = nbaNflTemplates[id];
+    return row && row.defaultBackgroundUrl && row.catalogPublished !== false;
+  }));
   global.FLOQRSoccerPhotoTeams = function soccerPhotoTeams() {
     const seen = new Set();
     return (global.FLOQR_JERSEY_PHOTO_IDS || []).map(id => soccerTeams[id]).filter(team => {
@@ -517,9 +560,11 @@
 
   function mergeIntoShoutOutTemplates() {
     const templates = global.SHOUTOUT_TEMPLATES || (global.SHOUTOUT_TEMPLATES = {});
-    // NBA / NFL remain individual templates.
+    // NBA / NFL remain individual templates. Pair kits with catalogPublished:false stay prep-only.
     Object.keys(nbaNflTemplates).forEach(id => {
-      if (!templates[id]) templates[id] = nbaNflTemplates[id];
+      const row = nbaNflTemplates[id];
+      if (!row || row.catalogPublished === false) return;
+      if (!templates[id]) templates[id] = row;
     });
     // Enrich consolidated soccer template with searchable team names.
     const soccer = templates[SOCCER_TEMPLATE_ID];

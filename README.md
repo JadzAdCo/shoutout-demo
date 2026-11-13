@@ -1,5 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.001 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.003 (stable)
 
+- s3.3.003: PHILA white Association RGBA blanks + FloqMedia-off pair; Terps throwback pair still unpublished; gated QA `maryland-terps-pair-qa.html` (unlock `terps-pair-qa`).
+- s3.3.002: Maryland Terps throwback pair v2 — shared pair engine; catalog unpublished until front blank plate; PHILA v1 unchanged. Brief in reports/maryland-terps-jersey-v2/.
 - s3.3.001: PHILA jersey pair v1 — back+front together 7s, optional ShoutOut 5s (blank = jersey only); FrameLoop asymmetric holds; package brief in reports/nba-phila-jersey-v1/.
 
 - s3.2.101: ShoutOut Diagnostics (Master Admin), PHILA dual jersey, Baller's Alert upload chooser + face-camera oval; company max 18 UPPERCASE; Black Card + Black Card (Amex) removed from catalog (Alert kept); portrait decode + Gemini JSON harden.
