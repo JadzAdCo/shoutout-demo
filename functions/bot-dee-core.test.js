@@ -213,6 +213,14 @@ test("durable thread helpers isolate uid and idle window", () => {
     Array.from({length: 20}, (_, i) => ({role: i % 2 ? "model" : "user", text: `t${i}`}))
   );
   assert.equal(clipped.length, bot.MAX_HISTORY);
+  const listed = bot.clipModelText("Here is what I found:\n1. ShoutOut — throw one\n2. VIP reserV — book");
+  assert.match(listed, /\n1\. ShoutOut/);
+  assert.doesNotMatch(listed, /found: 1\. ShoutOut/);
+  const kept = bot.clipStoredTurns([{role: "model", text: listed}]);
+  assert.match(kept[0].text, /\n1\. /);
+  assert.equal(bot.isSearchMissReply("I could not find a clear match for your account yet."), true);
+  assert.equal(bot.sanitizeBotReply("I could not find a clear match for your account yet."), "No answer yet — try quick intent search.");
+  assert.match(bot.sanitizeBotReply("Hey — still here."), /still here/);
 });
 
 test("thread snapshot reports idle vs active without leaking another uid", () => {
@@ -242,6 +250,14 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
   }, "abc", settings, now);
   assert.equal(idle.status, "idle_ended");
   assert.deepEqual(idle.turns, []);
+  const last = now - 59_000;
+  const prev = {lastMessageAtMs: last, conversationEpoch: 3, turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}]};
+  const duringGemini = threads.nextTranscript(prev, settings, last + 59_000);
+  assert.equal(duringGemini.turns.length, 2, "idle clock starts when the patron sent, not when Gemini returns");
+  assert.equal(duringGemini.epoch, 3);
+  const alreadyIdle = threads.nextTranscript(prev, settings, last + 61_000);
+  assert.equal(alreadyIdle.turns.length, 0);
+  assert.equal(alreadyIdle.epoch, 4);
 });
 
 test("createVipCheckout branches on venue paymentCollector (not Stripe-only)", () => {

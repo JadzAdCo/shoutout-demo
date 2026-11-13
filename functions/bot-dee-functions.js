@@ -193,6 +193,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const facts = await __botDeeHelpers.roleFactsFor(request.auth);
     const {role} = core.resolveViewerRole(facts);
     const uid = request.auth.uid;
+    const receivedAtMs = Date.now();
     const settings = await threads.loadSettings();
     const coercedThreadId = bot.coerceThreadId(request.data?.threadId, uid);
     let stored = {durable: false, history: [], idleEnded: false, lastMessageAtMs: 0};
@@ -208,7 +209,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       history,
       stored.lastMessageAtMs,
       settings.conversationIdleSeconds,
-      Date.now()
+      receivedAtMs
     );
     const session = Object.freeze({
       userId: uid,
@@ -238,10 +239,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else {
       outcome = localSession(role, userPrompt, {active});
     }
+    outcome.reply = bot.sanitizeBotReply(outcome.reply);
 
     if (settings.durableThreads) {
       try {
-        await threads.persistExchange(uid, settings, userPrompt, outcome.reply);
+        await threads.persistExchange(uid, settings, userPrompt, outcome.reply, {receivedAtMs});
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
         }

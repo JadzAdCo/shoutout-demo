@@ -247,8 +247,27 @@ function remainingIdleMs(lastMessageAtMs, idleSeconds, nowMs) {
   return Math.max(0, last + budget - now);
 }
 
+function clipStoredText(raw, maxChars) {
+  const cap = Number(maxChars) > 0 ? Math.floor(Number(maxChars)) : MAX_MESSAGE_CHARS;
+  return String(raw || "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim()
+    .slice(0, cap);
+}
+
 function clipStoredTurns(turns) {
-  return sanitizeHistory(turns).slice(-MAX_HISTORY);
+  const list = Array.isArray(turns) ? turns : [];
+  const out = [];
+  list.slice(-MAX_HISTORY).forEach(row => {
+    const role = row?.role === "model" || row?.role === "assistant" ? "model" : row?.role === "user" ? "user" : "";
+    const max = role === "model" ? MAX_MODEL_CHARS : MAX_MESSAGE_CHARS;
+    const text = clipStoredText(row?.text || row?.content || "", max);
+    if (!role || !text) return;
+    out.push({role, text});
+  });
+  return out;
 }
 
 function conversationIsActive(history, lastMessageAtMs, idleSeconds, nowMs) {
@@ -257,7 +276,19 @@ function conversationIsActive(history, lastMessageAtMs, idleSeconds, nowMs) {
 }
 
 function clipModelText(raw) {
-  return String(raw || "").replace(/\s+/g, " ").trim().slice(0, MAX_MODEL_CHARS);
+  return clipStoredText(raw, MAX_MODEL_CHARS);
+}
+
+function isSearchMissReply(raw) {
+  const text = String(raw || "").trim();
+  return !text || /could not find a clear match/i.test(text);
+}
+
+function sanitizeBotReply(raw) {
+  if (isSearchMissReply(raw)) {
+    return "No answer yet — try quick intent search.";
+  }
+  return clipModelText(raw);
 }
 
 function isFarewellPrompt(raw) {
@@ -505,9 +536,12 @@ module.exports = {
   eventDocId,
   isThreadIdle,
   remainingIdleMs,
+  clipStoredText,
   clipStoredTurns,
   conversationIsActive,
   clipModelText,
+  isSearchMissReply,
+  sanitizeBotReply,
   contextualSearch,
   runTool,
   systemInstruction,

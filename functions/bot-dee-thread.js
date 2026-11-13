@@ -69,25 +69,34 @@ async function loadThreadState(uid, settings, nowMs) {
   return snapshotToState(snap, uid, idle, nowMs || Date.now());
 }
 
-async function persistExchange(uid, settings, userText, modelText, nowMs) {
+/** Idle rotation uses when the patron sent the message, not when Gemini finished. */
+function nextTranscript(prev, settings, receivedAtMs) {
+  const row = prev && typeof prev === "object" ? prev : {};
+  const last = Number(row.lastMessageAtMs) || 0;
+  let epoch = Math.max(1, Math.floor(Number(row.conversationEpoch) || 1));
+  let turns = Array.isArray(row.turns) ? row.turns : [];
+  if (bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs)) {
+    epoch += last ? 1 : 0;
+    turns = [];
+  }
+  return {epoch, turns};
+}
+
+async function persistExchange(uid, settings, userText, modelText, opts) {
   if (!settings?.durableThreads) return {ok: true, skipped: true};
   const ref = threadRef(uid);
   if (!ref) return {ok: false, error: "missing_uid"};
-  const now = Number(nowMs) || Date.now();
-  const userStored = bot.sanitizeUserPrompt(userText);
-  const modelStored = bot.clipModelText(modelText);
+  const options = opts && typeof opts === "object" ? opts : {nowMs: opts};
+  const now = Number(options.nowMs) || Date.now();
+  const receivedAtMs = Number(options.receivedAtMs) || now;
+  const userStored = bot.clipStoredText(userText, bot.MAX_MESSAGE_CHARS);
+  const modelStored = bot.sanitizeBotReply(modelText);
   if (!userStored) return {ok: false, error: "empty_user"};
 
   await db().runTransaction(async tx => {
     const snap = await tx.get(ref);
     const prev = snap.exists ? snap.data() : {};
-    const last = Number(prev.lastMessageAtMs) || 0;
-    let epoch = Math.max(1, Math.floor(Number(prev.conversationEpoch) || 1));
-    let turns = Array.isArray(prev.turns) ? prev.turns : [];
-    if (bot.isThreadIdle(last, settings.conversationIdleSeconds, now)) {
-      epoch += last ? 1 : 0;
-      turns = [];
-    }
+    let {epoch, turns} = nextTranscript(prev, settings, receivedAtMs);
     let eventCount = Math.max(0, Math.floor(Number(prev.eventCount) || 0));
     let firstSeq = Math.max(0, Math.floor(Number(prev.firstSeq) || 0));
     const userSeq = eventCount + 1;
@@ -173,5 +182,6 @@ module.exports = {
   persistExchange,
   markIdleEnded,
   snapshotToState,
+  nextTranscript,
   emptyState
 };

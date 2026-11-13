@@ -394,11 +394,7 @@
         threadId: threadId || undefined
       };
       const data = (await fn(payload))?.data || {};
-      let reply = String(data.reply || "").trim();
-      // Stale Functions may still search-miss a greeting-shaped reply — never show that.
-      if (!reply || /could not find a clear match/i.test(reply)) {
-        reply = t("botdee.chatEmpty", "No answer yet — try quick intent search.");
-      }
+      const reply = displayReply(data.reply);
       appendBubble("bot", reply, data.results);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
@@ -464,13 +460,21 @@
     armIdleTimer();
   }
 
+  function displayReply(raw) {
+    const text = String(raw || "").trim();
+    if (!text || /could not find a clear match/i.test(text)) {
+      return t("botdee.chatEmpty", "No answer yet — try quick intent search.");
+    }
+    return text;
+  }
+
   function restoreTurns(turns) {
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     history.length = 0;
     (Array.isArray(turns) ? turns : []).forEach(row => {
       const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
-      const text = String(row?.text || "").trim();
+      const text = role === "model" ? displayReply(row?.text) : String(row?.text || "").trim();
       if (!text) return;
       appendBubble(role === "user" ? "user" : "bot", text);
       pushHistory(role, text);
