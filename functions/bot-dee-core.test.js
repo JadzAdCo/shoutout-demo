@@ -323,6 +323,9 @@ test("durable thread helpers isolate uid and idle window", () => {
   );
   assert.equal(clipped.length, bot.MAX_HISTORY);
   const listed = bot.clipModelText("Here is what I found:\n1. ShoutOut — throw one\n2. VIP reserV — book");
+  const userList = bot.clipStoredText("line one\n\nline two", bot.MAX_MESSAGE_CHARS);
+  assert.match(userList, /line one\n\nline two/);
+  assert.doesNotMatch(bot.sanitizeUserPrompt("line one\n\nline two"), /\n/);
   assert.match(listed, /\n1\. ShoutOut/);
   assert.doesNotMatch(listed, /found: 1\. ShoutOut/);
   const kept = bot.clipStoredTurns([{role: "model", text: listed}]);

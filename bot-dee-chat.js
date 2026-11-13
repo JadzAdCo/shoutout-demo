@@ -22,6 +22,7 @@
   let durableEnabled = false;
   let threadId = "";
   let restoreStarted = false;
+  let restoreInFlight = false;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -473,6 +474,7 @@
   }
 
   async function sendMessage(raw) {
+    if (restoreInFlight || byId("botDeeChatForm")?.getAttribute("aria-busy") === "true") return;
     // Keep intentional Shift+Enter newlines; collapse runs of spaces/tabs only.
     const text = String(raw || "")
       .replace(/[ \t]+\n/g, "\n")
@@ -633,42 +635,49 @@
   async function restoreOrWelcome() {
     if (restoreStarted) return;
     restoreStarted = true;
+    restoreInFlight = true;
+    setBusy(true);
     setStatus(t("botdee.chatRestoring", "Restoring your conversation…"));
-    await loadIdleSettings();
-    const user = await waitForAuthUser(8000);
-    const getThread = callable("getBotDeeThread");
-    if (user && getThread) {
-      try {
-        const data = (await getThread({}))?.data || {};
-        durableEnabled = data.durable === true;
-        if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
-        if (data.threadId) threadId = String(data.threadId);
-        if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
-          restoreTurns(data.turns);
-          phase = "active";
-          setStatus("");
-          armIdleTimer(data.remainingMs);
-          return;
+    try {
+      await loadIdleSettings();
+      const user = await waitForAuthUser(8000);
+      const getThread = callable("getBotDeeThread");
+      if (user && getThread) {
+        try {
+          const data = (await getThread({}))?.data || {};
+          durableEnabled = data.durable === true;
+          if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
+          if (data.threadId) threadId = String(data.threadId);
+          if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
+            restoreTurns(data.turns);
+            phase = "active";
+            setStatus("");
+            armIdleTimer(data.remainingMs);
+            return;
+          }
+        } catch (error) {
+          console.warn("BOT DEE restore failed", error?.message || error);
+          durableEnabled = false;
         }
-      } catch (error) {
-        console.warn("BOT DEE restore failed", error?.message || error);
-        durableEnabled = false;
       }
+      setStatus("");
+      welcome();
+      if (phase === "fresh" || phase === "active") armIdleTimer();
+    } finally {
+      restoreInFlight = false;
+      setBusy(false);
+      byId("botDeeChatInput")?.focus();
     }
-    setStatus("");
-    welcome();
-    if (phase === "fresh" || phase === "active") armIdleTimer();
   }
 
   function bind(opts = {}) {
     bindForm();
-    restoreOrWelcome();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");
       if (input) input.value = String(q).slice(0, 200);
     }
-    byId("botDeeChatInput")?.focus();
+    restoreOrWelcome();
     return {sendMessage, openIntentFallback, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
   }
 

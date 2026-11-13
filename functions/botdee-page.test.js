@@ -63,7 +63,13 @@ test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   assert.match(read("bot-dee-chat.js"), /botdee\.chatEmpty/);
   assert.match(read("bot-dee-chat.js"), /No answer yet — try quick intent search/);
   assert.match(read("functions/bot-dee-functions.js"), /receivedAtMs/);
+  assert.match(read("functions/bot-dee-functions.js"), /storedUserText/);
+  assert.match(read("functions/bot-dee-functions.js"), /clipStoredText\(rawMessage/);
   assert.match(read("functions/bot-dee-thread.js"), /nextTranscript/);
+  assert.match(read("functions/bot-dee-thread.js"), /lastMessageAtMs: receivedAtMs/);
+  assert.match(read("bot-dee-chat.js"), /restoreInFlight/);
+  assert.match(read("bot-dee-chat.js"), /if \(restoreInFlight/);
+  assert.match(read("bot-dee-chat.js"), /setBusy\(true\)/);
   assert.match(read("bot-dee-chat.js"), /isChitchatPrompt/);
   assert.match(read("bot-dee-chat.js"), /isMoodPrompt/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatHello/);

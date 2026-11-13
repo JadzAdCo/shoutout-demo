@@ -101,7 +101,7 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
     let firstSeq = Math.max(0, Math.floor(Number(prev.firstSeq) || 0));
     const userSeq = eventCount + 1;
     const modelSeq = eventCount + 2;
-    const userTurn = {role: "user", text: userStored, seq: userSeq, atMs: now};
+    const userTurn = {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs};
     const modelTurn = {role: "model", text: modelStored, seq: modelSeq, atMs: now};
     const nextTurns = bot.clipStoredTurns([...turns, userTurn, modelTurn]);
     const events = ref.collection("events");
@@ -113,7 +113,7 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
         epoch,
         role: "user",
         text: userStored,
-        atMs: now,
+        atMs: receivedAtMs,
         uid
       });
     }
@@ -140,8 +140,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       threadId: bot.threadIdForUid(uid),
       status: "active",
       conversationEpoch: epoch,
-      lastMessageAtMs: now,
-      lastMessageAtIso: new Date(now).toISOString(),
+      lastMessageAtMs: receivedAtMs,
+      lastMessageAtIso: new Date(receivedAtMs).toISOString(),
       revision: Math.max(0, Math.floor(Number(prev.revision) || 0)) + 1,
       turns: nextTurns,
       eventCount,

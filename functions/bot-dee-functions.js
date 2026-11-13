@@ -214,7 +214,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     await audit.assertFeatureAccess(request.auth, "botDee", request);
 
-    const userPrompt = bot.sanitizeUserPrompt(request.data?.message || request.data?.prompt || "");
+    const rawMessage = request.data?.message || request.data?.prompt || "";
+    const storedUserText = bot.clipStoredText(rawMessage, bot.MAX_MESSAGE_CHARS);
+    const userPrompt = bot.sanitizeUserPrompt(rawMessage);
     if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for BOT DEE.");
 
     const uiLanguage = bot.normalizeUiLanguage(
@@ -284,7 +286,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     if (settings.durableThreads) {
       try {
-        await threads.persistExchange(uid, settings, userPrompt, outcome.reply, {receivedAtMs});
+        await threads.persistExchange(uid, settings, storedUserText, outcome.reply, {receivedAtMs});
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
         }
