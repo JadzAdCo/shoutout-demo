@@ -118,13 +118,32 @@ function connectAccountIdFromWebhookEvent(event = {}) {
   return "";
 }
 
-function payoutRecoveryAfterRefund(order = {}, {reverseTransfer = false, charge = null} = {}) {
+function chargeRefundRows(charge = null) {
+  return Array.isArray(charge?.refunds?.data) ? charge.refunds.data : null;
+}
+
+function refundRowReversed(row) {
+  return !!(row && (row.transfer_reversal || row.reverse_transfer === true));
+}
+
+/** Never downgrade a destination reverse to manual review. */
+function lockPayoutRecoveryStatus(existing = "", computed = "") {
+  if (bounded(existing, 80) === "reversed") return "reversed";
+  return bounded(computed, 80);
+}
+
+/**
+ * Empty string = unknown (unexpanded Charge.refunds). Callers must not write that.
+ * Do not treat missing refunds.data as "no reversal".
+ */
+function payoutRecoveryAfterRefund(order = {}, {reverseTransfer = false, charge = null, refunds = null} = {}) {
   if (!bounded(order.connectedAccountId || "", 160)) return "not-applicable";
   if (bounded(order.payoutRecoveryStatus || "", 80) === "reversed") return "reversed";
-  const refunds = Array.isArray(charge?.refunds?.data) ? charge.refunds.data : [];
-  const stripeReversed = reverseTransfer === true
-    || refunds.some(row => !!(row && (row.transfer_reversal || row.reverse_transfer === true)));
-  return stripeReversed ? "reversed" : "manual-transfer-reversal-review";
+  if (reverseTransfer === true) return "reversed";
+  const rows = Array.isArray(refunds) ? refunds : chargeRefundRows(charge);
+  if (!Array.isArray(rows) || !rows.length) return "";
+  if (rows.some(refundRowReversed)) return "reversed";
+  return "manual-transfer-reversal-review";
 }
 
 function buildAccountLinkParams({accountId, capabilityStatus, refreshUrl, returnUrl} = {}) {
@@ -147,6 +166,7 @@ module.exports = {
   connectBindingId,
   connectStatus,
   isStripeConnectedAccountId,
+  lockPayoutRecoveryStatus,
   normalizeConnectEntityType,
   payoutRecoveryAfterRefund,
   recipientCapability

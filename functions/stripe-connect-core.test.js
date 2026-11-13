@@ -8,6 +8,7 @@ const {
   connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
+  lockPayoutRecoveryStatus,
   normalizeConnectEntityType,
   payoutRecoveryAfterRefund
 } = require("./stripe-connect-core");
@@ -112,7 +113,15 @@ test("Connect webhook account id ignores capability and application ids", () => 
 test("refund payout recovery is reversed when Stripe already reversed the destination transfer", () => {
   assert.equal(payoutRecoveryAfterRefund({}, {reverseTransfer: true}), "not-applicable");
   assert.equal(payoutRecoveryAfterRefund({connectedAccountId: "acct_club"}, {reverseTransfer: true}), "reversed");
-  assert.equal(payoutRecoveryAfterRefund({connectedAccountId: "acct_club"}), "manual-transfer-reversal-review");
+  assert.equal(payoutRecoveryAfterRefund({connectedAccountId: "acct_club"}), "");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club"},
+    {charge: {refunded: true, refunds: {object: "list", url: "/v1/charges/ch_1/refunds"}}}
+  ), "");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club"},
+    {charge: {refunds: {data: [{id: "re_1"}]}}}
+  ), "manual-transfer-reversal-review");
   assert.equal(payoutRecoveryAfterRefund(
     {connectedAccountId: "acct_club", payoutRecoveryStatus: "reversed"},
     {charge: {refunded: true}}
@@ -121,4 +130,7 @@ test("refund payout recovery is reversed when Stripe already reversed the destin
     {connectedAccountId: "acct_club"},
     {charge: {refunds: {data: [{id: "re_1", transfer_reversal: "trr_1"}]}}}
   ), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("reversed", "manual-transfer-reversal-review"), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("manual-transfer-reversal-review", "reversed"), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("", ""), "");
 });

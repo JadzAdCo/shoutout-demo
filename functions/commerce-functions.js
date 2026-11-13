@@ -10,6 +10,7 @@ const {
   connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
+  lockPayoutRecoveryStatus,
   normalizeConnectEntityType,
   payoutRecoveryAfterRefund
 } = require("./stripe-connect-core");
@@ -1673,16 +1674,22 @@ exports.refundFloqrCheckoutOrder = onCall({
     throw new HttpsError("internal", "Stripe could not refund this sandbox order.");
   }
   const now = admin.firestore.FieldValue.serverTimestamp();
-  await ref.set({
-    paymentStatus: "refunded",
-    status: "refunded",
-    stripeRefundId: text(refund.id, 200),
-    refundedAt: now,
-    refundReason: reason,
-    refundedByUid: request.auth.uid,
-    payoutRecoveryStatus: payoutRecoveryAfterRefund(order, {reverseTransfer: !!refundParams.reverse_transfer}),
-    updatedAt: now
-  }, {merge: true});
+  await db.runTransaction(async tx => {
+    const latest = await tx.get(ref);
+    if (!latest.exists) return;
+    const current = latest.data() || {};
+    const computed = payoutRecoveryAfterRefund(current, {reverseTransfer: !!refundParams.reverse_transfer});
+    tx.set(ref, {
+      paymentStatus: "refunded",
+      status: "refunded",
+      stripeRefundId: text(refund.id, 200),
+      refundedAt: now,
+      refundReason: reason,
+      refundedByUid: request.auth.uid,
+      payoutRecoveryStatus: lockPayoutRecoveryStatus(current.payoutRecoveryStatus, computed),
+      updatedAt: now
+    }, {merge: true});
+  });
   await writeAppLog({
     level: "info",
     category: "stripe",
@@ -2636,26 +2643,46 @@ async function orderRefForStripeFinancialObject(object = {}) {
   return snap.empty ? null : snap.docs[0].ref;
 }
 
+async function loadChargeRefunds(charge = {}) {
+  const local = Array.isArray(charge?.refunds?.data) ? charge.refunds.data : null;
+  if (local && local.length) return local;
+  const chargeId = text(charge.id, 160);
+  if (!chargeId) return local;
+  try {
+    const list = await stripeClient().refunds.list({charge: chargeId, limit: 20});
+    return Array.isArray(list?.data) ? list.data : local;
+  } catch (error) {
+    console.error("Stripe refund list failed", {errorCode: error?.code || error?.type || "stripe_error"});
+    return local;
+  }
+}
+
 async function recordRefundEvent(charge = {}) {
   const ref = await orderRefForStripeFinancialObject(charge);
   if (!ref) return;
-  const snap = await ref.get();
-  if (!snap.exists) return;
-  const order = snap.data() || {};
-  const amount = Math.max(0, Math.round(Number(charge.amount || order.amountCents || 0)));
+  const refunds = await loadChargeRefunds(charge);
+  const amount = Math.max(0, Math.round(Number(charge.amount || 0)));
   const amountRefunded = Math.max(0, Math.round(Number(charge.amount_refunded || 0)));
   const fullyRefunded = charge.refunded === true || (amount > 0 && amountRefunded >= amount);
   const now = admin.firestore.FieldValue.serverTimestamp();
-  await ref.set({
-    status:fullyRefunded ? "refunded" : "partially-refunded",
-    paymentStatus:fullyRefunded ? "refunded" : "partially-refunded",
-    stripeChargeId:text(charge.id, 160),
-    refundAmountCents:amountRefunded,
-    refundStatus:fullyRefunded ? "full" : "partial",
-    payoutRecoveryStatus: payoutRecoveryAfterRefund(order, {charge}),
-    refundedAt:now,
-    updatedAt:now
-  }, {merge:true});
+  await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return;
+    const order = snap.data() || {};
+    const computed = payoutRecoveryAfterRefund(order, {charge, refunds});
+    const nextStatus = lockPayoutRecoveryStatus(order.payoutRecoveryStatus, computed);
+    const patch = {
+      status: fullyRefunded ? "refunded" : "partially-refunded",
+      paymentStatus: fullyRefunded ? "refunded" : "partially-refunded",
+      stripeChargeId: text(charge.id, 160),
+      refundAmountCents: amountRefunded,
+      refundStatus: fullyRefunded ? "full" : "partial",
+      refundedAt: now,
+      updatedAt: now
+    };
+    if (nextStatus) patch.payoutRecoveryStatus = nextStatus;
+    tx.set(ref, patch, {merge: true});
+  });
 }
 
 async function recordDisputeEvent(dispute = {}, eventType = "") {
