@@ -357,23 +357,84 @@ function imageUrlsFromClub(data = {}) {
   return urls;
 }
 
-function publicUserCard(uid, data = {}, score) {
+/** Public-facing patron fields BOT DEE may summarize (no email/phone/payment/coords). */
+const PUBLIC_USER_FACT_KEYS = Object.freeze([
+  "displayName", "publicName", "fullName", "username", "floqrHandle", "minglHandle",
+  "publicBio", "bio", "tagline", "about", "headline", "pronouns",
+  "city", "publicCity", "country", "publicCountry",
+  "approvedRoles", "genres", "interests", "skills",
+  "instagram", "instagramHandle", "tiktok", "facebook", "twitter", "xHandle", "x",
+  "website", "publicWebsite", "linkedin"
+]);
+
+function publicUserFacts(data = {}) {
+  const facts = {};
+  PUBLIC_USER_FACT_KEYS.forEach(key => {
+    const value = data[key];
+    if (value == null || value === "") return;
+    if (Array.isArray(value)) {
+      const list = value.filter(Boolean).slice(0, 12).map(item => text(item, 60)).filter(Boolean);
+      if (list.length) facts[key] = list;
+      return;
+    }
+    const str = text(value, key === "publicBio" || key === "bio" || key === "about" ? 400 : 160);
+    if (str) facts[key] = str;
+  });
+  return facts;
+}
+
+function publicUserCard(uid, data = {}, score, extras = {}) {
   const handle = text(data.floqrHandle || data.username || data.minglHandle, 80).replace(/^@+/, "");
   const images = imageUrlsFromUser(data);
+  const relation = extras.relation === "self" || extras.relation === "connection" ? extras.relation : "public";
   return {
     kind: "user",
     id: uid,
+    relation,
     displayName: text(data.displayName || data.publicName || data.fullName || handle || "Member", 120),
     handle: handle ? `@${handle}` : "",
     bio: text(data.publicBio || data.bio || data.tagline || data.about || "", 400),
     roles: Array.isArray(data.approvedRoles) ? data.approvedRoles.filter(Boolean).slice(0, 8).map(r => text(r, 40)) : [],
     city: text(data.city || data.publicCity || "", 80),
     country: text(data.country || data.publicCountry || "", 80),
+    website: text(data.website || data.publicWebsite || "", 240),
+    instagram: text(data.instagram || data.instagramHandle || "", 80),
+    facts: publicUserFacts(data),
     photoURL: images[0] || "",
     imageUrls: images,
     profileHref: handle ? `./?start=search&q=${encodeURIComponent("@" + handle)}` : "./",
     score
   };
+}
+
+function isSelfProfileQuery(raw) {
+  const n = normalizeNeedle(raw);
+  if (!n) return false;
+  if (/^(me|myself|my profile|my account|my info|my information|about me|who am i)$/.test(n)) return true;
+  if (/^(what (?:do you )?know about (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself))$/.test(n)) return true;
+  return false;
+}
+
+function isFriendContextQuery(raw) {
+  return /\b(?:my\s+)?(?:friend|buddy|mate|connection|mingl)\b/i.test(String(raw || ""));
+}
+
+async function loadConnectedUids(uid) {
+  const ids = new Set();
+  try {
+    const [connections, rooms] = await Promise.all([
+      db.collection("minglConnections").where("participants", "array-contains", uid).limit(500).get(),
+      db.collection("chatRooms").where("participants", "array-contains", uid).limit(500).get()
+    ]);
+    [...connections.docs, ...rooms.docs].forEach(doc => {
+      (doc.data()?.participants || []).forEach(other => {
+        if (other && other !== uid) ids.add(String(other));
+      });
+    });
+  } catch (error) {
+    console.warn("BOT DEE loadConnectedUids failed", error?.message || error);
+  }
+  return ids;
 }
 
 /** Match club-profile / feature-gates public visibility — never leak offboarded or unpublished clubs. */
@@ -411,47 +472,108 @@ function publicClubCard(id, data = {}, score) {
   };
 }
 
+function userHaystack(data = {}) {
+  return [
+    data.displayName, data.publicName, data.fullName, data.username,
+    data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
+    data.headline, data.city, data.publicCity, data.country, data.publicCountry,
+    data.instagram, data.instagramHandle, data.website, data.publicWebsite,
+    ...(Array.isArray(data.approvedRoles) ? data.approvedRoles : []),
+    ...(Array.isArray(data.genres) ? data.genres : []),
+    ...(Array.isArray(data.interests) ? data.interests : [])
+  ].filter(Boolean).join(" ");
+}
+
 /**
  * Authorized BOT DEE tool — public patron + club profiles (incl. image URLs) only.
+ * Also answers "about me" (viewer's own public-facing fields) and prefers Mingl/chat
+ * connections when the patron asks about a friend.
  */
 async function lookupPublicProfiles(args = {}, sessionRequest) {
   if (!sessionRequest?.auth?.uid) {
     return {ok: false, error: "Sign in to look up public profiles.", code: "unauthenticated"};
   }
-  const needle = normalizeNeedle(args.query);
+  const rawQuery = text(args.query, 160);
+  const needle = normalizeNeedle(rawQuery);
   if (!needle || needle.length < 2) {
-    return {ok: false, error: "Send a name, @handle, or club to look up.", code: "invalid-argument"};
+    return {ok: false, error: "Send a name, @handle, me, or club to look up.", code: "invalid-argument"};
   }
   const kind = String(args.kind || "any").trim().toLowerCase();
   const limit = Math.min(PUBLIC_PROFILE_MAX, Math.max(1, Number(args.limit) || 5));
-  const tokens = needle.split(/\s+/).filter(t => t.length > 1);
+  const tokens = needle.split(/\s+/).filter(t => t.length > 1 && !["my", "friend", "buddy", "mate", "about", "know", "what", "you", "the"].includes(t));
   const viewerUid = sessionRequest.auth.uid;
   const scored = [];
+  const seen = new Set();
+  const wantPeople = kind === "any" || kind === "user" || kind === "patron" || kind === "people";
+  const wantClubs = kind === "any" || kind === "club" || kind === "venue";
+  const selfQuery = wantPeople && isSelfProfileQuery(rawQuery);
+  const friendContext = wantPeople && isFriendContextQuery(rawQuery);
 
-  if (kind === "any" || kind === "user" || kind === "patron" || kind === "people") {
+  if (wantPeople && selfQuery) {
+    try {
+      const snap = await db.collection("users").doc(viewerUid).get();
+      if (snap.exists) {
+        const data = snap.data() || {};
+        // Viewer may always see their own public-facing presentation (still no private keys).
+        scored.push(publicUserCard(viewerUid, data, 100, {relation: "self"}));
+        seen.add(viewerUid);
+      }
+    } catch (error) {
+      console.warn("BOT DEE lookupPublicProfiles self failed", error?.message || error);
+    }
+  }
+
+  let connected = new Set();
+  if (wantPeople && (friendContext || !selfQuery)) {
+    connected = await loadConnectedUids(viewerUid);
+  }
+
+  if (wantPeople && connected.size && !selfQuery) {
+    try {
+      const ids = [...connected].slice(0, 100);
+      const refs = ids.map(id => db.collection("users").doc(id));
+      const snaps = refs.length ? await db.getAll(...refs) : [];
+      snaps.forEach(doc => {
+        if (!doc.exists || seen.has(doc.id)) return;
+        const data = doc.data() || {};
+        // Connections: public profiles only — never private fields.
+        if (!people.isPublic(data)) return;
+        const points = scoreHay(userHaystack(data), needle, tokens) + (friendContext ? 12 : 6);
+        if (points >= 6 || friendContext) {
+          scored.push(publicUserCard(doc.id, data, Math.max(points, friendContext ? 10 : points), {relation: "connection"}));
+          seen.add(doc.id);
+        }
+      });
+    } catch (error) {
+      console.warn("BOT DEE lookupPublicProfiles connections failed", error?.message || error);
+    }
+  }
+
+  if (wantPeople && !selfQuery) {
     try {
       const snap = await db.collection("users")
         .where("publicProfileVisibility", "==", "public")
         .limit(PUBLIC_PROFILE_SCAN)
         .get();
       snap.docs.forEach(doc => {
-        if (doc.id === viewerUid) return;
+        if (doc.id === viewerUid || seen.has(doc.id)) return;
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
-        const hay = [
-          data.displayName, data.publicName, data.fullName, data.username,
-          data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
-          ...(Array.isArray(data.approvedRoles) ? data.approvedRoles : [])
-        ].filter(Boolean).join(" ");
-        const points = scoreHay(hay, needle, tokens);
-        if (points >= 8) scored.push(publicUserCard(doc.id, data, points));
+        const boost = connected.has(doc.id) ? 10 : 0;
+        const points = scoreHay(userHaystack(data), needle, tokens) + boost;
+        if (points >= 8) {
+          scored.push(publicUserCard(doc.id, data, points, {
+            relation: connected.has(doc.id) ? "connection" : "public"
+          }));
+          seen.add(doc.id);
+        }
       });
     } catch (error) {
       console.warn("BOT DEE lookupPublicProfiles users failed", error?.message || error);
     }
   }
 
-  if (kind === "any" || kind === "club" || kind === "venue") {
+  if (wantClubs && !selfQuery) {
     try {
       const snap = await db.collection("clubLocations").limit(PUBLIC_PROFILE_SCAN).get();
       snap.docs.forEach(doc => {
@@ -477,16 +599,25 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     const {score, ...rest} = row;
     return rest;
   });
+  let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
+  if (profiles.length) {
+    note = "Public fields only (plus the viewer's own public-facing card when query is about them). Image URLs are published profile/gallery media — describe them; do not invent private details (email, phone, payment, GPS).";
+    if (friendContext && !profiles.some(p => p.relation === "connection")) {
+      note += " No Mingl/chat connection matched that name with a public profile.";
+    }
+  } else if (selfQuery) {
+    note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
+  }
   return {
     ok: true,
     tool: "lookupPublicProfiles",
-    query: text(args.query, 120),
+    query: rawQuery,
     kind: kind === "patron" || kind === "people" ? "user" : (kind === "venue" ? "club" : kind),
+    selfQuery: !!selfQuery,
+    friendContext: !!friendContext,
     count: profiles.length,
     profiles,
-    note: profiles.length
-      ? "Public fields only. Image URLs are published profile/gallery media — describe them; do not invent private details."
-      : "No public profiles matched. Ask the user to clarify the name or check spelling."
+    note
   };
 }
 
@@ -523,6 +654,10 @@ module.exports = {
   createFloqCastCheckout,
   lookupPublicProfiles,
   isClubPublic,
+  isSelfProfileQuery,
+  isFriendContextQuery,
+  publicUserCard,
+  publicUserFacts,
   resolveClubLocationId,
   requireClubLocationId,
   normalizeClubNeedle,

@@ -207,6 +207,32 @@
     return false;
   }
 
+  function packageLabel() {
+    try {
+      const nav = global.FLOQRNav;
+      const v = String(nav?.appVersion || (typeof nav?.currentVersion === "function" ? nav.currentVersion() : "") || "").trim();
+      if (v) return v.startsWith("s") ? v : `s${v}`;
+    } catch (_) {}
+    try {
+      const scripts = document.querySelectorAll("script[src*='bot-dee-chat.js']");
+      for (const el of scripts) {
+        const m = String(el.getAttribute("src") || "").match(/[?&]v=([^&#]+)/);
+        if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
+      }
+    } catch (_) {}
+    return "s3.3.008";
+  }
+
+  function isVersionPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 140) return false;
+    if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,40}\b(?:version|build|package|release)\b/.test(q)) return true;
+    if (/^(?:version|build|package|release)(?:\s+info|\s+number)?\??$/.test(q)) return true;
+    if (/\b(?:your|bot\s*dee|floqr|app|software)\s+version\b/.test(q)) return true;
+    if (/\bversion\s+info\b/.test(q)) return true;
+    return false;
+  }
+
   function clampIdleSeconds(raw) {
     const n = Math.round(Number(raw));
     if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
@@ -266,6 +292,12 @@
       "botdee.chatIdentity",
       "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper."
     );
+  }
+
+  function versionReply() {
+    const label = packageLabel();
+    const template = t("botdee.chatVersion", "I'm BOT DEE on FLOQR package {version}.");
+    return String(template).replace(/\{version\}/g, label);
   }
 
   function stillHereReply() {
@@ -463,6 +495,7 @@
 
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
+    if (isVersionPrompt(text)) return versionReply();
     if (isAckPrompt(text)) return ackReply(text);
     if (isMoodPrompt(text)) return moodReply();
     if (isChitchatPrompt(text)) {
@@ -497,7 +530,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
       const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
@@ -512,7 +545,7 @@
     }
 
     // Substantive restart after idle (memory-only): one short welcome-back, then answer.
-    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
+    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
       const hello = resumeReply();
       appendBubble("bot", hello);
       pushHistory("model", hello);

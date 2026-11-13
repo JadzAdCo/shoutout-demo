@@ -25,6 +25,22 @@ test("BOT DEE page is botdee.html and every entry point goes there", () => {
   assert.match(read("global-profile-status.js"), /intentSearchHome/);
 });
 
+test("BOT DEE header uses title-row + ? beside title; scope note full width", () => {
+  const html = read("botdee.html");
+  assert.match(html, /botdee-chat-header-main/);
+  assert.match(html, /botdee-title-row feature-landing-title-row/);
+  assert.match(html, /floqr-page-title"[^>]*data-i18n="page\.botdee\.title"/);
+  // ? sits inside the title row (not a lone flex sibling that parks far-right / squeezes scope text).
+  assert.match(html, /botdee-title-row[\s\S]*?help-popout botdee-help-popout[\s\S]*?botDeeScopeNote/);
+  const css = read("bot-dee-chat.css");
+  assert.match(css, /\.botdee-chat-header\s*\{[^}]*flex-direction:\s*column/s);
+  assert.match(css, /\.botdee-scope-note\s*\{[^}]*width:\s*100%/s);
+  assert.match(css, /justify-content:\s*flex-start/);
+  assert.match(read("bot-dee-chat.js"), /isVersionPrompt/);
+  assert.match(read("bot-dee-chat.js"), /versionReply/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatVersion"/);
+});
+
 test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   const html = read("botdee.html");
   assert.match(html, /<body class="botdee-standalone botdee-page" data-floqr-feature="botDee">/, "off/test feature shows the not-available card, no bounce to event search");

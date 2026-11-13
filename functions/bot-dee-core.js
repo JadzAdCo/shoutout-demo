@@ -18,6 +18,15 @@ const DEFAULT_DURABLE_THREADS = 1;
 const THREAD_SCHEMA_VERSION = 1;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const SUPPORTED_UI_LANGS = new Set(["en", "de", "fr", "es", "it", "pt", "ru", "el", "pl", "nl", "ar"]);
+/** FLOQR package stamp — keep in sync with functions/package.json version. */
+const PACKAGE_VERSION = (() => {
+  try {
+    return String(require("./package.json").version || "").trim() || "0.0.0";
+  } catch (_) {
+    return "0.0.0";
+  }
+})();
+const PACKAGE_LABEL = PACKAGE_VERSION.startsWith("s") ? PACKAGE_VERSION : `s${PACKAGE_VERSION}`;
 
 function normalizeUiLanguage(value) {
   const code = String(value || "en").trim().toLowerCase().split(/[-_]/)[0];
@@ -41,9 +50,9 @@ const TOOL_DEFS = [
   {
     name: "lookupPublicProfiles",
     description:
-      "Look up PUBLIC FLOQR patron and/or club profiles (including public photo/gallery image URLs) for contextual answers. Only returns profiles marked public / published. Never returns private fields (email, phone, payment, location coords). Use when the user asks about a person, handle, DJ, staff member, or club public page.",
+      "Look up PUBLIC FLOQR patron and/or club profiles (including public photo/gallery image URLs) for contextual answers. Use for: (1) what do you know about me / my profile — pass query \"me\"; (2) my friend / connection by name — tool prefers Mingl/chat connections' public profiles; (3) any public person, @handle, DJ, staff, or club page. Only returns public / published fields. Never returns private fields (email, phone, payment, location coords).",
     parameters: obj({
-      query: str("Name, @handle, club brand, or keywords to match public profiles."),
+      query: str("Name, @handle, \"me\" / \"myself\", club brand, or keywords to match public profiles."),
       kind: str("Optional filter: user | club | any (default any)."),
       limit: {type: Type.INTEGER, description: "Max profiles to return (1–8)."}
     }, ["query"])
@@ -367,6 +376,17 @@ function isIdentityPrompt(raw) {
   return false;
 }
 
+/** Package / build / version — answer locally with the FLOQR stamp; never dump search hits. */
+function isVersionPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 140) return false;
+  if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,40}\b(?:version|build|package|release)\b/.test(q)) return true;
+  if (/^(?:version|build|package|release)(?:\s+info|\s+number)?\??$/.test(q)) return true;
+  if (/\b(?:your|bot\s*dee|floqr|app|software)\s+version\b/.test(q)) return true;
+  if (/\bversion\s+info\b/.test(q)) return true;
+  return false;
+}
+
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
 const DEFAULT_IDLE_SECONDS = 300;
 const MIN_IDLE_SECONDS = 15;
@@ -479,6 +499,10 @@ function isFarewellPrompt(raw) {
 
 function identityReply() {
   return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper.";
+}
+
+function versionReply() {
+  return `I'm BOT DEE on FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}).`;
 }
 
 /** Offer-help CTA — conversation start / idle resume only (not every mid-chat turn). */
@@ -718,8 +742,11 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
     "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah): one short line only (Cool. / You're welcome.) — do NOT re-introduce yourself, do NOT ask what they want to do, do NOT dump search results, do NOT call any tools.",
     "Farewells (bye, goodbye, later): short goodbye — do NOT call tools.",
     "Identity questions (your name, how to pronounce BOT DEE / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
+    `Version / build / package questions: state FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}) clearly — do NOT call tools.`,
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values. Never invent links or claim payment success without a tool result.",
-    "When the user asks about a person, @handle, DJ, staff member, or a club's public page / photos, call lookupPublicProfiles and answer from returned public fields and image URLs only. If nothing public matches, say so honestly.",
+    "When the user asks what you know about them / their profile (me, myself, who am I, about me), call lookupPublicProfiles with query \"me\" and summarize the returned self card (public-facing fields + photos only).",
+    "When they ask about a friend or connection by name (e.g. my friend James), call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields only; if nothing public matches, say so honestly.",
+    "When the user asks about any other person, @handle, DJ, staff member, or a club's public page / photos, call lookupPublicProfiles and answer from returned public fields and image URLs only. If nothing public matches, say so honestly.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
@@ -815,9 +842,13 @@ module.exports = {
   isChitchatPrompt,
   isMoodPrompt,
   isIdentityPrompt,
+  isVersionPrompt,
   isAckPrompt,
   isFarewellPrompt,
   identityReply,
+  versionReply,
+  PACKAGE_VERSION,
+  PACKAGE_LABEL,
   chitchatReply,
   moodReply,
   ackReply,
