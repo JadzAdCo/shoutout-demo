@@ -6,12 +6,19 @@ const {Type} = require("@google/genai");
 const classification = require("./data-classification-core");
 const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
+const RESULT_LOCALES = require("./bot-dee-result-locales.json");
 
 const MAX_HISTORY = 12;
 const MAX_MESSAGE_CHARS = 2000;
 const MAX_RESULTS = 8;
 const MAX_TOOL_ROUNDS = 4;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
+const SUPPORTED_UI_LANGS = new Set(["en", "de", "fr", "es", "it", "pt", "ru", "el", "pl", "nl", "ar"]);
+
+function normalizeUiLanguage(value) {
+  const code = String(value || "en").trim().toLowerCase().split(/[-_]/)[0];
+  return SUPPORTED_UI_LANGS.has(code) ? code : "en";
+}
 
 const str = (description) => ({type: Type.STRING, description});
 const obj = (properties, required) => ({
@@ -24,8 +31,18 @@ const TOOL_DEFS = [
   {
     name: "contextualSearch",
     description:
-      "Search FLOQR help topics and product intents the signed-in viewer may access. Use only for how-to / product questions with a clear intent. Never call for greetings or small talk (hi, hey, thanks). Returns classification-filtered results only.",
+      "Search FLOQR help topics and product intents the signed-in viewer may access. Use only for how-to / product questions with a clear intent. Never call for greetings or small talk (hi, hey, thanks). Returns classification-filtered results only. Result card labels are localized by the app language on the server — do not invent English titles when the viewer uses another language.",
     parameters: obj({query: str("Plain-language search query from the patron.")}, ["query"])
+  },
+  {
+    name: "lookupPublicProfiles",
+    description:
+      "Look up PUBLIC FLOQR patron and/or club profiles (including public photo/gallery image URLs) for contextual answers. Only returns profiles marked public / published. Never returns private fields (email, phone, payment, location coords). Use when the user asks about a person, handle, DJ, staff member, or club public page.",
+    parameters: obj({
+      query: str("Name, @handle, club brand, or keywords to match public profiles."),
+      kind: str("Optional filter: user | club | any (default any)."),
+      limit: {type: Type.INTEGER, description: "Max profiles to return (1–8)."}
+    }, ["query"])
   },
   {
     name: "listShoutOutTemplates",
@@ -328,7 +345,12 @@ function contextualSearch(query, viewerRole) {
 
 async function runTool(name, args, session) {
   if (name === "contextualSearch") {
-    return contextualSearch(args?.query || session?.lastUserPrompt || "", session.role);
+    const search = contextualSearch(args?.query || session?.lastUserPrompt || "", session.role);
+    return localizeSearchPayload(search, session?.uiLanguage);
+  }
+  if (name === "lookupPublicProfiles") {
+    const tools = require("./bot-dee-tools");
+    return tools.lookupPublicProfiles(args || {}, session?.request);
   }
   const tools = require("./bot-dee-tools");
   if (!session?.request) {
@@ -341,10 +363,58 @@ function toolDeclarations() {
   return TOOL_DEFS;
 }
 
-function systemInstruction(role) {
+function localePack(lang) {
+  const code = normalizeUiLanguage(lang);
+  if (code === "en") return null;
+  return RESULT_LOCALES.byLang?.[code] || null;
+}
+
+function localizeResultRow(row, lang) {
+  if (!row || typeof row !== "object") return row;
+  const pack = localePack(lang);
+  if (!pack) return {...row};
+  const key = String(row.sourceId || "").trim();
+  const hit = key && pack.results?.[key] ? pack.results[key] : null;
+  const next = {...row};
+  if (hit?.label) next.label = hit.label;
+  if (hit?.blurb) next.blurb = hit.blurb;
+  return next;
+}
+
+function localizeSearchPayload(search, lang) {
+  if (!search || typeof search !== "object") return search;
+  const code = normalizeUiLanguage(lang);
+  return {
+    ...search,
+    uiLanguage: code,
+    results: (search.results || []).map(row => localizeResultRow(row, code))
+  };
+}
+
+function localizeActionLink(link, lang) {
+  if (!link || typeof link !== "object") return link;
+  const pack = localePack(lang);
+  if (!pack?.action) return {...link};
+  const kind = String(link.kind || "").toLowerCase();
+  const next = {...link};
+  if (kind === "checkout" && pack.action.paySecurely) next.label = pack.action.paySecurely;
+  if (kind === "floqcast" && pack.action.floqcastPreview) next.label = pack.action.floqcastPreview;
+  if (kind === "shoutout" && pack.action.shoutoutCompose) next.label = pack.action.shoutoutCompose;
+  if (kind === "vip" && pack.action.vipTerms) next.label = pack.action.vipTerms;
+  return next;
+}
+
+function systemInstruction(role, uiLanguage) {
+  const lang = normalizeUiLanguage(uiLanguage);
+  const langLine = lang === "en"
+    ? "Reply in English unless the user clearly writes in another language."
+    : `App language is "${lang}". ALWAYS write your spoken reply in ${lang}. Do not switch to English for help steps or summaries unless the user asked for English. Navigation/result cards are already localized server-side — do not paste English product titles into your prose when a ${lang} wording exists.`;
   return [
-    "You are BOT DEE, FLOQR's in-app chatbot. Talk like a helpful friend first — warm, brief, human. You are not a search box and not a FAQ dump. Introduce yourself as BOT DEE when useful.",
-    "Prefer conversation: answer the person, then (only if useful) offer one next step. Do NOT open with \"Here is what I found\" or a link list unless they clearly asked how to do something in FLOQR.",
+    "You are BOT DEE, FLOQR's in-app chatbot and authorized execution agent. Talk like a helpful friend first — warm, brief, human. You are not a search box and not a FAQ dump. Introduce yourself as BOT DEE when useful.",
+    langLine,
+    "Prefer conversation: answer the person, then (only if useful) offer one next step. Do NOT open with \"Here is what I found\" or a link list unless they clearly asked how to do something in FLOQR. Keep navigation/search suggestion cards separate from your spoken answer — the UI shows result links; your text should stay conversational.",
+    "Act only within the identity, role, and tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public profiles (lookupPublicProfiles) are OK to summarize.",
+    "Never request card numbers, CVVs, passwords, or OTP codes. If supplied, do not repeat them; direct the user to approved secure flows.",
     "Ask \"what do you want to do\" / list products (ShoutOut, VIP, floqCast, scheduling) ONLY on the first turn of a conversation or when the patron clearly restarts after a pause — never every reply.",
     "Greetings on a fresh/restarted chat: reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
     "Greetings mid-chat while already talking: one short line (e.g. \"Hey — still here.\") — do NOT re-list products, do NOT call tools.",
@@ -352,13 +422,14 @@ function systemInstruction(role) {
     "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah): one short line only (Cool. / You're welcome.) — do NOT re-introduce yourself, do NOT ask what they want to do, do NOT dump search results, do NOT call any tools.",
     "Farewells (bye, goodbye, later): short goodbye — do NOT call tools.",
     "Identity questions (your name, how to pronounce BOT DEE / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
-    "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values.",
+    "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values. Never invent links or claim payment success without a tool result.",
+    "When the user asks about a person, @handle, DJ, staff member, or a club's public page / photos, call lookupPublicProfiles and answer from returned public fields and image URLs only. If nothing public matches, say so honestly.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     `Viewer classification role: ${role}.`,
-    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqCAST, BOT DEE, VIP reserV."
+    "Keep brand names as-is: ShoutOut, Mingl, BartR, RydR, FloqCAST, floqCast, BOT DEE, VIP reserV, FloqR, FloqMedia."
   ].join(" ");
 }
 
@@ -378,37 +449,51 @@ function extractText(response) {
   return parts.map(part => part.text || "").join("\n").trim();
 }
 
-function formatSearchFallback(search) {
+function formatSearchFallback(search, lang) {
+  const code = normalizeUiLanguage(lang || search?.uiLanguage);
+  const pack = localePack(code);
   const rows = search?.results || [];
   if (!rows.length) {
-    return "I could not find a clear match for your account yet. Try the quick intent search below, or ask about ShoutOut, VIP reserV, floqCast, or scheduling.";
+    return pack?.fallback?.noMatch
+      || "I could not find a clear match for your account yet. Try the quick intent search below, or ask about ShoutOut, VIP reserV, floqCast, or scheduling.";
   }
-  const lines = ["Here is what I found for your account:"];
+  const header = pack?.fallback?.foundHeader || "Here is what I found for your account:";
+  const lines = [header];
   rows.slice(0, 5).forEach((row, index) => {
-    lines.push(`${index + 1}. ${row.label} — ${row.blurb}`);
-    if (row.href) lines.push(`   Open: ${row.href}`);
+    const localized = localizeResultRow(row, code);
+    lines.push(`${index + 1}. ${localized.label} — ${localized.blurb}`);
+    if (localized.href) lines.push(`   Open: ${localized.href}`);
   });
   return lines.join("\n");
 }
 
-function resultsForClient(search) {
-  return (search?.results || []).map(row => ({
-    sourceId: row.sourceId,
-    label: row.label,
-    blurb: row.blurb,
-    href: row.href,
-    kind: row.kind
-  }));
+function resultsForClient(search, lang) {
+  const code = normalizeUiLanguage(lang || search?.uiLanguage);
+  return (search?.results || []).map(row => {
+    const localized = localizeResultRow(row, code);
+    return {
+      sourceId: localized.sourceId,
+      label: localized.label,
+      blurb: localized.blurb,
+      href: localized.href,
+      kind: localized.kind
+    };
+  });
 }
 
-function linksFromToolResult(result) {
+function linksFromToolResult(result, lang) {
   if (!result || typeof result !== "object") return [];
+  const code = normalizeUiLanguage(lang);
   const links = [];
-  if (result.checkoutUrl) links.push({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"});
-  if (result.previewPath) links.push({label: "Open floqCast preview", href: result.previewPath, kind: "floqcast"});
-  if (result.composeHref) links.push({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"});
+  if (result.checkoutUrl) links.push(localizeActionLink({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"}, code));
+  if (result.previewPath) links.push(localizeActionLink({label: "Open floqCast preview", href: result.previewPath, kind: "floqcast"}, code));
+  if (result.composeHref) links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
   if (result.holdId && !result.checkoutUrl) {
-    links.push({label: "Continue VIP Terms", href: `./vip-terms.html?hold=${encodeURIComponent(result.holdId)}`, kind: "vip"});
+    links.push(localizeActionLink({
+      label: "Continue VIP Terms",
+      href: `./vip-terms.html?hold=${encodeURIComponent(result.holdId)}`,
+      kind: "vip"
+    }, code));
   }
   return links;
 }
@@ -440,6 +525,10 @@ module.exports = {
   idleEndedReply,
   clampIdleSeconds,
   normalizeBotDeeSettings,
+  normalizeUiLanguage,
+  localizeResultRow,
+  localizeSearchPayload,
+  localizeActionLink,
   contextualSearch,
   runTool,
   systemInstruction,
@@ -449,5 +538,6 @@ module.exports = {
   resultsForClient,
   linksFromToolResult,
   BOTDEE_CONTENT,
-  SEARCH_CATALOG
+  SEARCH_CATALOG,
+  RESULT_LOCALES
 };

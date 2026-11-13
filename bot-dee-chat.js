@@ -25,6 +25,70 @@
     return value && value !== key ? value : fallback;
   };
 
+  function currentUiLanguage() {
+    try {
+      if (typeof global.FLOQRI18n?.getLanguage === "function") {
+        return String(global.FLOQRI18n.getLanguage() || "en").split(/[-_]/)[0] || "en";
+      }
+      return String(localStorage.getItem("floqr.uiLanguage") || "en").split(/[-_]/)[0] || "en";
+    } catch (_) {
+      return "en";
+    }
+  }
+
+  /** Client safety net — remap English catalog labels using help packs + chrome keys. */
+  function localizeResults(results) {
+    const lang = currentUiLanguage();
+    if (!lang || lang === "en" || !Array.isArray(results)) return results || [];
+    const helpPack = global.FLOQRI18nHelp?.packs?.[lang] || {};
+    const intentLabel = {
+      shoutout: "cat.shoutout",
+      floqcast: "cat.floqcast",
+      "vip-reserv": "cat.vipreserv",
+      mingl: "cat.mingl",
+      rydr: "cat.rydr",
+      bartr: "cat.bartr",
+      clubs: "cat.clubs",
+      "venue-search": "botdee.intentLabel.venueSearch",
+      "ad-campaigns": "botdee.intentLabel.adCampaigns",
+      "ballers-alert": "botdee.intentLabel.ballersAlert",
+      "classic-halloween": "botdee.intentLabel.classicHalloween",
+      "football-intro": "botdee.intentLabel.footballIntro",
+      shiloh: "botdee.intentLabel.shiloh",
+      "tengo-muchos-dolares": "botdee.intentLabel.tengoMuchosDolares"
+    };
+    const actionByKind = {
+      checkout: "botdee.link.paySecurely",
+      floqcast: "botdee.link.floqcastPreview",
+      shoutout: "botdee.link.shoutoutCompose",
+      vip: "botdee.link.vipTerms"
+    };
+    return results.map(row => {
+      if (!row || typeof row !== "object") return row;
+      const next = Object.assign({}, row);
+      const sourceId = String(row.sourceId || "");
+      const kind = String(row.kind || "").toLowerCase();
+      if (sourceId.startsWith("help:")) {
+        const id = sourceId.slice(5);
+        const hit = helpPack[id];
+        if (hit?.title) next.label = hit.title;
+        if (hit?.body) next.blurb = String(hit.body).replace(/\s+/g, " ").trim().slice(0, 280);
+      } else if (sourceId.startsWith("intent:") || kind === "product") {
+        const id = sourceId.startsWith("intent:") ? sourceId.slice(7) : String(row.id || "");
+        const labelKey = intentLabel[id];
+        if (labelKey) {
+          const label = t(labelKey, next.label);
+          if (label) next.label = label;
+        }
+        const blurb = t(`botdee.intentBlurb.${id}`, "");
+        if (blurb && blurb !== `botdee.intentBlurb.${id}`) next.blurb = blurb;
+      } else if (actionByKind[kind]) {
+        next.label = t(actionByKind[kind], next.label);
+      }
+      return next;
+    });
+  }
+
   /** Mirror of functions/bot-dee-core.js isChitchatPrompt / isAckPrompt / replies. */
   function normalizeChat(value) {
     return String(value || "")
@@ -352,7 +416,8 @@
     try {
       const payload = {
         message: text,
-        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text}))
+        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
+        uiLanguage: currentUiLanguage()
       };
       const data = (await fn(payload))?.data || {};
       let reply = String(data.reply || "").trim();
@@ -360,7 +425,7 @@
       if (!reply || /could not find a clear match/i.test(reply)) {
         reply = t("botdee.chatEmpty", "No answer yet — try quick intent search.");
       }
-      appendBubble("bot", reply, data.results);
+      appendBubble("bot", reply, localizeResults(data.results));
       pushHistory("model", reply);
       setStatus("");
       armIdleTimer();

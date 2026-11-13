@@ -16,6 +16,13 @@ test("BOT DEE search catalog is fresh from help + intents", () => {
   assert.ok(bot.SEARCH_CATALOG.entries.length > 50);
 });
 
+test("BOT DEE result locales are fresh from help + chrome", () => {
+  const {buildLocales, serialize: ser} = require("../scripts/build-bot-dee-result-locales");
+  const current = fs.readFileSync(path.join(__dirname, "bot-dee-result-locales.json"), "utf8").replace(/\r\n/g, "\n");
+  assert.equal(current, ser(buildLocales(root)), "run node scripts/build-bot-dee-result-locales.js");
+  assert.equal(bot.RESULT_LOCALES.byLang.de.results["intent:shoutout"].label, "Einen ShoutOut senden");
+});
+
 test("contextualSearch filters by classification role", () => {
   const patron = bot.contextualSearch("throw a shoutout", "patron");
   assert.ok(patron.results.some(row => /shout/i.test(row.label) || row.id === "shoutout"));
@@ -173,16 +180,41 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.match(src, /assertFeatureAccess\(request\.auth, "botDee"/);
   assert.match(src, /@google\/genai/);
   assert.match(src, /contextualSearch/);
+  assert.match(src, /uiLanguage/);
   assert.doesNotMatch(src, /purchaseVIPReservation/);
   assert.match(read("functions/bot-dee-tools.js"), /startShoutOutCheckout/);
   assert.match(read("functions/bot-dee-tools.js"), /createVipHold/);
   assert.match(read("functions/bot-dee-tools.js"), /createFloqCastCheckout/);
+  assert.match(read("functions/bot-dee-tools.js"), /lookupPublicProfiles/);
   assert.match(read("functions/index.js"), /executeBotSession:\s*require\("\.\/bot-dee-functions"\)\.executeBotSession/);
   const names = bot.toolDeclarations().map(t => t.name);
   assert.ok(names.includes("contextualSearch"));
+  assert.ok(names.includes("lookupPublicProfiles"));
   assert.ok(names.includes("startShoutOutCheckout"));
   assert.ok(names.includes("createVipCheckout"));
   assert.ok(names.includes("createFloqCastRequest"));
+});
+
+test("result cards localize to app language (no English ShoutOut label in German)", () => {
+  const search = bot.contextualSearch("throw a shoutout", "patron");
+  assert.ok(search.results.some(row => row.id === "shoutout" || /shout/i.test(row.label)));
+  const de = bot.localizeSearchPayload(search, "de");
+  const shout = de.results.find(row => row.sourceId === "intent:shoutout" || row.id === "shoutout");
+  assert.ok(shout, "shoutout intent in results");
+  assert.equal(shout.label, "Einen ShoutOut senden");
+  assert.match(shout.blurb, /Live-Nachricht|FloqR-Display/i);
+  assert.doesNotMatch(shout.label, /^Throw a ShoutOut$/);
+
+  const fallback = bot.formatSearchFallback(de, "de");
+  assert.match(fallback, /Das habe ich für dein Konto gefunden/);
+  assert.doesNotMatch(fallback, /Here is what I found/);
+
+  const links = bot.linksFromToolResult({checkoutUrl: "https://pay.example/x"}, "de");
+  assert.equal(links[0].label, "Sicher bezahlen");
+
+  assert.match(bot.systemInstruction("patron", "de"), /App language is "de"/);
+  assert.match(read("bot-dee-chat.js"), /uiLanguage:\s*currentUiLanguage/);
+  assert.match(read("bot-dee-chat.js"), /localizeResults/);
 });
 
 test("package depends on @google/genai", () => {
