@@ -1,6 +1,6 @@
 # BOT DEE Part Two — Phase A PR plan
 
-Owner asked to implement durable threads (the refresh / second-device gap). **PR‑0 is in this change set.** Workflows / version intelligence / LangGraph stay out. Owner **13 Nov 2026:** D1 default, D3 yes, D4 default. **D2 and D5 still open** before PR‑3 / PR‑4.
+Owner asked to implement durable threads (the refresh / second-device gap). **PR‑0 is in this change set.** Workflows / version intelligence / LangGraph stay out until an explicit build go-ahead. Owner **13 Nov 2026:** D1–D5 **all decided** (D2 patron chat Confirm; D5 `onSchedule`, no Cloud Tasks).
 
 Flags default **off**. Rollback = flag `0` + revert Functions; schema is additive (no destructive migrations in v1).
 
@@ -51,14 +51,14 @@ This is the smallest user-visible Master Admin win and does not need the workflo
 
 ## PR‑3 — Consequential tools + approval + idempotency
 
-**Depends on:** PR‑2, owner D1/D2  
+**Depends on:** PR‑2; D1/D2 **decided** (gate pay/publish; patron Confirm in chat)  
 **Touches:** `bot-dee-tools.js` wrappers only (do not fork VIP/Stripe internals)
 
 - `createVipHold` / checkout / floqCast / ShoutOut pay create or advance workflows
 - Side effects **outside** Firestore transactions
 - Reuse Stripe `idempotencyKey` and VIP hold ids in `checkpoint`
 - Uncertain timeout → `awaiting_external`
-- Approval digest + expiry; re-check feature + role at execute
+- Approval digest + expiry; **patron** Confirm in chat before Stripe/publish; Club Admin only where the product already queues; re-check feature + role at execute
 - PCI: still no card storage
 
 ---
@@ -70,7 +70,7 @@ This is the smallest user-visible Master Admin win and does not need the workflo
 
 - Sweep stale leases, expired approvals, `awaiting_external` past deadline
 - Reconcile Stripe/hold by **read** then one idempotent retry max
-- Never Cloud Tasks unless a later architecture decision
+- **D5 decided:** never Cloud Tasks in v1 (owner 13 Nov 2026)
 
 ---
 
@@ -127,4 +127,4 @@ Pages publish ≠ Functions deploy. Version intelligence is a **Functions** feat
 - No BOT DEE application semver until CI writes a real manifest  
 - No automatic production deploy  
 
-**Go / no-go for writing code:** PR‑0 (durable threads) is in this change set. PR‑1 (version intelligence) can proceed on D4. PR‑3 still needs **D2**. PR‑4 still needs **D5**. No LangGraph / Cloud Tasks unless D5 chooses Tasks.
+**Go / no-go for writing code:** D1–D5 are locked. PR‑0 (durable threads) is in this change set. PR‑1–5 (version intelligence, workflows, patron Confirm, `onSchedule` recovery) wait for an **explicit build go-ahead**. No LangGraph / Cloud Tasks.

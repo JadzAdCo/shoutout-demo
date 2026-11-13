@@ -6,17 +6,17 @@ Constraints from the spec: Firestore + existing Cloud Storage; **no** Cloud SQL,
 
 ---
 
-## 1. Product decisions that need a yes/no before PR‑2
+## 1. Product decisions (locked 13 Nov 2026)
 
-Owner answers **13 Nov 2026:** D1 default · D3 yes · D4 default. **D2 and D5 still open** (owner asked to explain before choosing).
+All five are **decided**. Workflows / version intelligence still need an explicit build go-ahead (PR‑1+); this table is the product contract.
 
-| ID | Decision | Default | Status |
-|---|---|---|---|
-| D1 | Extra **awaiting_approval** for chat-started VIP / ShoutOut / floqCast / pay, vs today’s “tool runs immediately + Stripe hosted pay”? | **Gate pay/publish**; holds may stay auto if 30‑min expiry remains | **Decided — default.** Chat may create a VIP hold (30‑min TTL). Stripe / publish wait for an approval step (who = D2). |
-| D2 | Who approves: patron confirm in chat, Club Admin inbox, or both? | Patron **explicit confirm** in chat (digest shown); Club Admin only where existing product already requires it | **Open — explain.** |
-| D3 | Conversation pause: expire **thread resume** vs keep workflow for the hold TTL? | Thread messages expire with idle (packaged **300s / 5 min**); **workflow** follows the business TTL (VIP hold 30 min) | **Decided — yes.** Fresh chat after pause; a hold/checkout already started still lives until its own expiry. |
-| D4 | Non-admin “what version?” | Public: package id only + “I can’t verify a BOT DEE application build.” No roadmap | **Decided — default.** Internals only for server-verified Master Admin via `getBotDeeSystemInfo`. |
-| D5 | Recovery worker | Use existing **`onSchedule`** (like `expireVipHolds`). No Cloud Tasks in v1 | **Open — explain.** |
+| ID | Decision | Status |
+|---|---|---|
+| D1 | Extra **awaiting_approval** for chat-started VIP / ShoutOut / floqCast / pay? | **Default.** Chat may create a VIP hold (30‑min TTL). Stripe / publish wait for patron confirm (D2). |
+| D2 | Who confirms before Stripe or publish? | **Patron in that chat** — digest + yes / Confirm control. Club Admin is **not** a second chat gate; they still approve only where the product already does (ShoutOut queue, floqCast queue). |
+| D3 | Conversation pause vs hold/workflow TTL? | **Yes to split.** Thread messages expire with idle (packaged **300s / 5 min**). Workflow follows the business TTL (VIP hold 30 min). |
+| D4 | Non-admin “what version?” | **Default.** Public: package id only + “I can’t verify a BOT DEE application build.” No roadmap. Internals only for server-verified Master Admin via `getBotDeeSystemInfo`. |
+| D5 | Recovery worker | **`onSchedule` (default).** Same pattern as `expireVipHolds`. **No Cloud Tasks** in v1. |
 
 ---
 
@@ -87,7 +87,7 @@ Illegal hops throw `failed-precondition` and write an event `transition_denied`.
 |---|---|
 | `created` | Doc allocated; payload not validated |
 | `validating` | Schema + RBAC + feature flags |
-| `awaiting_approval` | Digest shown; waiting patron/club confirm |
+| `awaiting_approval` | Digest shown; waiting **patron** Confirm in chat (Club Admin stays on existing product queues) |
 | `ready` | Approved or auto-approved; runnable |
 | `executing` | Lease held; about to / just called downstream |
 | `awaiting_external` | Stripe/POS/webhook outstanding |
@@ -178,8 +178,8 @@ Every read/resume/approve/cancel/status **re-verifies** Auth + feature + live RB
 | Actor | Thread | Workflow | Approve pay/publish | Version internals | Roadmap |
 |---|---|---|---|---|---|
 | Signed-out | deny | deny | deny | deny | deny |
-| Patron (botDee allowed) | own only | own only | own confirm if D2 | public stub only | no |
-| Club Admin | own club workflows if scoped | venue-scoped | if D2 requires club | no | no |
+| Patron (botDee allowed) | own only | own only | **own chat Confirm** before Stripe/publish | public stub only | no |
+| Club Admin | own club workflows if scoped | venue-scoped | existing product queues only (not a second chat gate) | no | no |
 | Master Admin (`isServerAdminAuth`) | break-glass later (not v1) | ops list v1 optional | no silent execute as patron | **yes** via `getBotDeeSystemInfo` | if registry `planned` |
 | Spoofed “I am Master Admin” in chat | — | — | — | **deny**; tool uses token not text | — |
 
