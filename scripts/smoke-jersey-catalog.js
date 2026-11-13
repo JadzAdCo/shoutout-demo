@@ -25,6 +25,14 @@ if (cat.nbaPhiladelphia76ersPhila.jerseyTeamLabel !== "PHILA") throw new Error("
 if (!/nba-76ers-phila-front-blank\.png/.test(cat.nbaPhiladelphia76ersPhila.frontBackgroundUrl || "")) throw new Error("phila front blank url");
 if (!/nba-76ers-phila-back-blank\.png/.test(cat.nbaPhiladelphia76ersPhila.backBackgroundUrl || "")) throw new Error("phila back blank url");
 if (cat.nbaPhiladelphia76ersPhila.jerseyCssBack !== false) throw new Error("phila photo blanks must win over css hanger");
+const philaCw = cat.nbaPhiladelphia76ersPhila.jerseyColorways || [];
+if (philaCw.length !== 2) throw new Error("phila colorways count");
+if (!philaCw.find(c => c.id === "white") || !philaCw.find(c => c.id === "blue")) throw new Error("phila white/blue colorways");
+if (!/phila-blue-front-blank/.test(philaCw.find(c => c.id === "blue").frontBackgroundUrl || "")) throw new Error("phila blue front");
+const blueCw = sandbox.window.FLOQRResolveJerseyColorway?.(cat.nbaPhiladelphia76ersPhila, "blue");
+if (!blueCw || blueCw.overlayInk !== "#FFFFFF") throw new Error("resolve blue colorway");
+const whiteCw = sandbox.window.FLOQRResolveJerseyColorway?.(cat.nbaPhiladelphia76ersPhila, "white");
+if (!whiteCw || whiteCw.overlayInk !== "#006BB6") throw new Error("resolve white colorway");
 const terpsPair = cat.nbaMarylandTerpsThrowbackPair;
 if (!terpsPair || !terpsPair.nbaJerseyPair) throw new Error("terps pair");
 if (terpsPair.stableTemplateId !== "ncaa-umd-2026-27-2002-throwback-white-v2") throw new Error("terps pair stable id");

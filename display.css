@@ -983,11 +983,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   left:12%;
   right:12%;
   text-align:center;
-  color:#1a3a8f;
+  color:var(--nba-pair-ink, #006BB6);
   font-family:"Agency FB","Arial Narrow","Franklin Gothic Condensed",Impact,sans-serif;
   font-weight:800;
   letter-spacing:.04em;
-  text-shadow:1px 1px 0 #c8102e, -1px 0 0 #c8102e, 0 -1px 0 #c8102e;
+  text-shadow:
+    1px 1px 0 var(--nba-pair-outline, #ED174C),
+    -1px 0 0 var(--nba-pair-outline, #ED174C),
+    0 -1px 0 var(--nba-pair-outline, #ED174C);
   line-height:.9;
   pointer-events:none;
 }

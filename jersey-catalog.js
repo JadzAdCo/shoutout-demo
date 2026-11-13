@@ -423,11 +423,45 @@
   if (nbaNflTemplates.nbaMarylandTerps) {
     nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 49.7% of the jersey width for one digit and 36.4% for two (+20% vertical), with its tip 5cm below the name. Numbers are collegiate varsity block numerals with open counters: team-color fill, contrasting outline, angular corners.";
   }
-  // PHILA white reference pair (v1 contract): back left + front right for 7s, optional ShoutOut 5s.
+  // PHILA pair (v1): back left + front right 7s, optional ShoutOut 5s.
+  // Patron picks jersey color on the composer (White Association | Blue Icon).
   // Stable id nba-phi-phila-white-reference-v1; seasonStatus reference-specific-unverified until edition confirmed.
   if (!nbaNflTemplates.nbaPhiladelphia76ersPhila) {
     const base = nbaNflTemplates.nbaPhiladelphia76ers;
     if (base) {
+      const philaColorways = [
+        {
+          id: "white",
+          label: "White (Association)",
+          i18nKey: "editor.jerseyColorWhite",
+          swatch: "#FFFFFF",
+          frontBackgroundUrl: "./images/basketball/nba-76ers-phila-front-blank.png",
+          defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+          backBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
+          jerseyPrimary: "#FFFFFF",
+          jerseySecondary: "#006BB6",
+          jerseyAccent: "#ED174C",
+          overlayInk: "#006BB6",
+          overlayOutline: "#ED174C",
+          pairMessageTheme: "phila"
+        },
+        {
+          id: "blue",
+          label: "Blue (Icon)",
+          i18nKey: "editor.jerseyColorBlue",
+          swatch: "#006BB6",
+          frontBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-front-blank.png",
+          defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-back-blank.png",
+          backBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-back-blank.png",
+          jerseyPrimary: "#006BB6",
+          jerseySecondary: "#FFFFFF",
+          jerseyAccent: "#ED174C",
+          overlayInk: "#FFFFFF",
+          overlayOutline: "#ED174C",
+          pairMessageTheme: "phila"
+        }
+      ];
+      const whiteCw = philaColorways[0];
       const phila = {
         ...base,
         id: "nbaPhiladelphia76ersPhila",
@@ -447,12 +481,20 @@
         pairMessageTheme: "phila",
         jerseyCssBack: false,
         jerseyOnHanger: false,
-        // White Association RGBA blanks (no baked EMBIID/PHILA/21) — overlays supply name/word/number.
-        frontBackgroundUrl: "./images/basketball/nba-76ers-phila-front-blank.png",
-        defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
-        backBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
-        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1", "white-blank"])),
-        description: "$30 Philadelphia 76ers PHILA pair — white Association blanks, back + front together 7s, optional ShoutOut 5s (blank message = jersey only). Fixed PHILA wordmark; typed name/number. Reference-specific unverified edition."
+        requiresColorwaySelect: true,
+        defaultJerseyColorway: "white",
+        jerseyColorways: philaColorways,
+        // Default = White Association blanks; Blue Icon via composer color select.
+        frontBackgroundUrl: whiteCw.frontBackgroundUrl,
+        defaultBackgroundUrl: whiteCw.defaultBackgroundUrl,
+        backBackgroundUrl: whiteCw.backBackgroundUrl,
+        jerseyPrimary: whiteCw.jerseyPrimary,
+        jerseySecondary: whiteCw.jerseySecondary,
+        jerseyAccent: whiteCw.jerseyAccent,
+        overlayInk: whiteCw.overlayInk,
+        overlayOutline: whiteCw.overlayOutline,
+        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1", "white-blank", "blue-icon", "colorway"])),
+        description: "$30 Philadelphia 76ers PHILA pair — pick White (Association) or Blue (Icon) on the ShoutOut screen; back + front together 7s, optional ShoutOut 5s. Fixed PHILA wordmark; typed name/number."
       };
       nbaNflTemplates.nbaPhiladelphia76ersPhila = phila;
       nbaNflIds.push("nbaPhiladelphia76ersPhila");
@@ -557,6 +599,19 @@
   global.FLOQRResolveSoccerTeam = resolveSoccerTeam;
   global.FLOQRSoccerTeamOptions = soccerTeamOptions;
   global.FLOQRFindSoccerTeamsMatching = findSoccerTeamsMatching;
+
+  /** Resolve a jersey colorway (White / Blue) for templates with jerseyColorways[]. */
+  function resolveJerseyColorway(templateOrId, colorwayId) {
+    const t = typeof templateOrId === "string"
+      ? (nbaNflTemplates[templateOrId] || soccerTeams[templateOrId] || null)
+      : (templateOrId || null);
+    if (!t) return null;
+    const list = Array.isArray(t.jerseyColorways) ? t.jerseyColorways : [];
+    if (!list.length) return null;
+    const want = String(colorwayId || t.defaultJerseyColorway || list[0].id || "").trim().toLowerCase();
+    return list.find(c => String(c.id || "").toLowerCase() === want) || list[0] || null;
+  }
+  global.FLOQRResolveJerseyColorway = resolveJerseyColorway;
 
   function mergeIntoShoutOutTemplates() {
     const templates = global.SHOUTOUT_TEMPLATES || (global.SHOUTOUT_TEMPLATES = {});
