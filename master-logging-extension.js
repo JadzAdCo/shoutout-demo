@@ -243,21 +243,6 @@
     }
   }
 
-  async function refundSandboxOrder() {
-    const orderId = (byId("sandboxRefundOrderId")?.value || "").trim();
-    if (!orderId || !window.FLOQRPayments?.refundCheckoutOrder) return;
-    if (!confirm(`Refund Stripe TEST order ${orderId}? This reverses the destination transfer when Connect was used.`)) return;
-    setStatus(`Refunding sandbox order ${orderId}…`);
-    try {
-      const result = await window.FLOQRPayments.refundCheckoutOrder({orderId, reason: "master-admin-sandbox-refund"});
-      setStatus(`Refunded ${orderId} — Stripe ${result.refundId || "ok"} (${money(result.amountCents)}).`);
-      await loadUnpaid();
-      await loadLogs();
-    } catch (error) {
-      setStatus(error.message || "Sandbox refund failed.");
-    }
-  }
-
   async function purgeTestPayments() {
     if (!window.FLOQRPayments?.purgeTestPayments) return;
     if (!confirm("Permanently delete all Stripe TEST-marked payment ledger rows, related paid shoutouts, and test service orders? This cannot be undone.")) return;
@@ -322,7 +307,6 @@
     byId("geminiAccessLogAckBtn")?.addEventListener("click", acknowledgeGeminiCriticalFailures);
     byId("clearUnpaidCheckoutsBtn")?.addEventListener("click", clearAllUnpaid);
     byId("purgeTestPaymentsLoggingBtn")?.addEventListener("click", purgeTestPayments);
-    byId("sandboxRefundOrderBtn")?.addEventListener("click", refundSandboxOrder);
     byId("checkZebbiesConnectBtn")?.addEventListener("click", checkZebbiesConnect);
   }
 

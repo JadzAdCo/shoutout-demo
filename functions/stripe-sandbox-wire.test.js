@@ -52,7 +52,8 @@ test("sandbox refund callable is test-mode only with reverse_transfer", () => {
   assert.match(commerce, /db\.runTransaction\(async tx => \{/);
   assert.match(paymentService, /refundFloqrCheckoutOrder/);
   assert.match(paymentService, /refundCheckoutOrder/);
-  assert.match(logging, /sandboxRefundOrderBtn/);
+  assert.doesNotMatch(logging, /sandboxRefundOrderBtn/);
+  assert.doesNotMatch(read("master-admin.html"), /Refund sandbox order/);
   assert.match(logging, /do not require club Stripe Connect/);
 });
 

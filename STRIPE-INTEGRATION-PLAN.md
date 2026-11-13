@@ -90,7 +90,7 @@ Verify signatures against the raw request body with the official Stripe SDK. Rec
 ### Required before live payments
 
 1. **P0 — Merchant-of-record decision:** confirm FLOQR as merchant of record for ordinary marketplace orders and document taxes, refunds, disputes, Stripe-fee responsibility, and the marketplace commission. Current ordinary-Commerce orders still allocate no FLOQR fee.
-2. **P1 — Refund/dispute operations:** **sandbox** `refundFloqrCheckoutOrder` (test-mode only, `reverse_transfer` + `refund_application_fee`) is wired. Live-mode refunds, patron notifications, and published refund policy remain launch-gated. Webhook tracking and manual-review flags are implemented.
+2. **P1 — Refund/dispute operations:** operator refunds are **out of this sandbox pass** (no Master Admin refund control, no Pages QA). Test-mode callable `refundFloqrCheckoutOrder` remains for webhook payout recovery only. Live-mode refunds, patron notifications, and published refund policy remain launch-gated.
 3. **P1 — Connected-account dashboard:** add Stripe's notification banner and account-management embedded components so clubs and sellers can continuously resolve new requirements; the current implementation provides hosted onboarding/update links and status refresh only.
 4. **P1 — Existing account migration:** previously typed `acct_...` values are deliberately ignored. Re-onboard each test club/seller through FLOQR, or add a one-time audited backend migration after verifying account ownership.
 5. **P2 — Dependency migration:** the production dependency audit reports nine moderate advisories in the older Firebase Admin/Functions dependency chain. Upgrade them in a separate tested migration; do not apply a forced major-version audit fix blindly.
