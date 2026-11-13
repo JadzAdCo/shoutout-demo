@@ -938,7 +938,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 /* PHILA pair (v1): both kits simultaneous — back left, front right; message scene is separate */
 .display-canvas.nba-jersey-pair{
-  background:#f4f4f6!important;
+  background:#000!important;
 }
 .display-canvas.nba-jersey-pair .display-background{
   /* Pair stage owns the kits — hide the single-face photo layer. */
@@ -982,13 +982,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   position:absolute;
   left:12%;
   right:12%;
+  z-index:2;
   text-align:center;
   color:var(--nba-pair-ink, #006BB6);
   font-family:"Agency FB","Arial Narrow","Franklin Gothic Condensed",Impact,sans-serif;
   font-weight:800;
   letter-spacing:.04em;
-  /* text-shadow paints front-to-back: outline first (on top), underlay last
-     (behind) so the 76ers red edge stays visible over the wipe halo. */
+  /* Plate covers residual baked glyphs on blanks; text-shadow paints
+     front-to-back so red outline stays above the fabric underlay halo. */
   text-shadow:
     0.04em 0 0 var(--nba-pair-outline, #ED174C),
     -0.04em 0 0 var(--nba-pair-outline, #ED174C),
@@ -996,13 +997,34 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
     0 -0.04em 0 var(--nba-pair-outline, #ED174C),
     0.08em 0.08em 0 var(--nba-pair-outline, #ED174C),
     -0.08em -0.08em 0 var(--nba-pair-outline, #ED174C),
-    0 0 0.22em var(--nba-pair-underlay, #ffffff),
-    0.1em 0 0 var(--nba-pair-underlay, #ffffff),
-    -0.1em 0 0 var(--nba-pair-underlay, #ffffff),
-    0 0.1em 0 var(--nba-pair-underlay, #ffffff),
-    0 -0.1em 0 var(--nba-pair-underlay, #ffffff);
+    0 0 0.18em var(--nba-pair-underlay, #ffffff),
+    0.08em 0 0 var(--nba-pair-underlay, #ffffff),
+    -0.08em 0 0 var(--nba-pair-underlay, #ffffff),
+    0 0.08em 0 var(--nba-pair-underlay, #ffffff),
+    0 -0.08em 0 var(--nba-pair-underlay, #ffffff);
   line-height:.9;
   pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-name::before,
+.display-canvas.nba-jersey-pair .nba-pair-team::before,
+.display-canvas.nba-jersey-pair .nba-pair-number::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:-1;
+  width:108%;
+  height:118%;
+  border-radius:0.18em;
+  background:var(--nba-pair-underlay, #ffffff);
+  opacity:.94;
+  pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-number::before{
+  width:92%;
+  height:108%;
+  border-radius:0.12em;
 }
 .display-canvas.nba-jersey-pair .nba-pair-name{
   top:18%;
