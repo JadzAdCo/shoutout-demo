@@ -2352,10 +2352,26 @@
       canvas.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const nbaDualFaces = !!(t.nbaDualFaces || data.nbaDualFaces);
-      const frontBgUrl = String(data.frontBackgroundUrl || t.frontBackgroundUrl || "").trim();
-      const backBgUrl = String(data.backBackgroundUrl || t.backBackgroundUrl || t.defaultBackgroundUrl || "").trim();
+      // PHILA White/Blue: resolve colorway before kit URLs so blue is not stuck on white template defaults.
+      const pairColorway = (t.nbaJerseyPair || data.nbaJerseyPair)
+        ? (window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "") || null)
+        : null;
+      const frontBgUrl = String(
+        data.frontBackgroundUrl
+        || pairColorway?.frontBackgroundUrl
+        || t.frontBackgroundUrl
+        || ""
+      ).trim();
+      const backBgUrl = String(
+        data.backBackgroundUrl
+        || pairColorway?.backBackgroundUrl
+        || t.backBackgroundUrl
+        || pairColorway?.defaultBackgroundUrl
+        || t.defaultBackgroundUrl
+        || ""
+      ).trim();
       const jerseyBg = nbaDualFaces
-        ? (frontBgUrl || data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
+        ? (frontBgUrl || data.backgroundUrl || pairColorway?.defaultBackgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
         : (data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl);
       const usePhotoBack = !!jerseyBg;
       canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
@@ -2671,10 +2687,13 @@
         });
       }
       if (nbaDualFaces && usePhotoBack) {
+        const cw = pairColorway
+          || window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "")
+          || null;
         const dualUrls = {
-          frontBackgroundUrl: frontBgUrl || jerseyBg,
-          backBackgroundUrl: backBgUrl || t.defaultBackgroundUrl || jerseyBg,
-          defaultBackgroundUrl: t.defaultBackgroundUrl || jerseyBg
+          frontBackgroundUrl: frontBgUrl || cw?.frontBackgroundUrl || jerseyBg,
+          backBackgroundUrl: backBgUrl || cw?.backBackgroundUrl || cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg,
+          defaultBackgroundUrl: cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg
         };
         canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
         canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
@@ -2688,13 +2707,9 @@
           : !!String(shoutCopy || "").trim();
         if (pairMode) {
           const pairTeam = teamLabel || t.jerseyTeamLabel || t.jerseyPlateLabel || "";
-          // Colorway: payload URLs win; else resolve catalog white/blue for PHILA pair.
-          const cw = window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "") || null;
-          const pairFront = dualUrls.frontBackgroundUrl || cw?.frontBackgroundUrl || "";
-          const pairBack = dualUrls.backBackgroundUrl || cw?.backBackgroundUrl || "";
           paintNbaPairStage(canvas, {
-            frontUrl: pairFront,
-            backUrl: pairBack,
+            frontUrl: dualUrls.frontBackgroundUrl,
+            backUrl: dualUrls.backBackgroundUrl,
             nameText: jerseyNameText || "",
             teamText: pairTeam,
             numberText: subText || "",

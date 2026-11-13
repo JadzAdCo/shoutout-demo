@@ -224,14 +224,16 @@
     {
       version: "s3.3.004",
       title: "s3.3.004 — PHILA White/Blue jersey color select + blue Icon blanks",
-      files: [
+      checks: [
         {label:"PHILA white blank front", file:"images/basketball/nba-76ers-phila-front-blank.png", includes:[]},
         {label:"PHILA white blank back", file:"images/basketball/nba-76ers-phila-back-blank.png", includes:[]},
         {label:"PHILA blue blank front", file:"images/basketball/nba-76ers-phila-blue-front-blank.png", includes:[]},
         {label:"PHILA blue blank back", file:"images/basketball/nba-76ers-phila-blue-back-blank.png", includes:[]},
         {label:"Colorways catalog", file:"jersey-catalog.js", includes:["jerseyColorways", "FLOQRResolveJerseyColorway", "nba-76ers-phila-blue-front-blank.png"]},
         {label:"Composer color select", file:"index.html", includes:["jerseyColorway", "editor.jerseyColor"]},
-        {label:"Display pair ink vars", file:"display.css", includes:["--nba-pair-ink", "--nba-pair-outline"]}
+        {label:"Display pair ink vars", file:"display.css", includes:["--nba-pair-ink", "--nba-pair-outline"]},
+        {label:"Colorway wins over template defaults", file:"display-app.js", includes:["FLOQRResolveJerseyColorway", "cw?.frontBackgroundUrl"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["PHILA White/Blue colorway select"]}
       ]
     },
     {
