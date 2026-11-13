@@ -262,9 +262,13 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
 
   const pitch = bot.chitchatReply("patron", allowed);
   assert.match(pitch, /ShoutOut/);
-  assert.doesNotMatch(pitch, /floqCast|VIP table|Mingl/i);
+  assert.doesNotMatch(pitch, /floqCast|VIP reserV|VIP table|Mingl/i);
 
-  assert.match(bot.systemInstruction("patron", "en", allowed), /least privilege|NEVER mention/i);
+  const deniedNames = bot.deniedBrandNames(allowed);
+  assert.ok(deniedNames.includes("floqCast"));
+  assert.ok(deniedNames.includes("VIP reserV"));
+  assert.ok(deniedNames.includes("Mingl"));
+  assert.match(bot.systemInstruction("patron", "en", allowed), /least privilege/i);
   assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
   // Local greetings must scrub by access — not discard locale when floqCast/VIP appear in chrome packs.
@@ -295,11 +299,13 @@ test("BOT DEE keeps granted beta features in help/search (least privilege)", () 
   const tools = bot.toolDeclarations(granted).map(t => t.name);
   assert.ok(tools.includes("createFloqCastRequest"));
   assert.ok(tools.includes("createVipHold"));
-  // Mingl not in granted → scrub keeps ShoutOut/floqCast/VIP only (see helpBlurb above).
 
+  // Bugbot: NEVER list must omit granted brands (only siblings this viewer lacks).
+  const deniedNames = bot.deniedBrandNames(granted);
+  assert.deepEqual(deniedNames, ["Mingl", "RydR", "BartR"]);
   const instr = bot.systemInstruction("patron", "en", granted);
-  assert.match(instr, /floqCast|VIP table/);
-  assert.match(instr, /DO mention|allowed list/i);
+  assert.match(instr, /THIS viewer: ShoutOut, VIP reserV, floqCast/);
+  assert.match(instr, /this viewer lacks: Mingl, RydR, BartR\./);
 });
 
 test("intent:help-* result cards localize via help pack alias", () => {

@@ -247,10 +247,29 @@ function productPitchLabels(allowedFeatures) {
   const allowed = allowedFeatureSet(allowedFeatures);
   const labels = [];
   if (!allowed || allowed.has("shoutOut")) labels.push("ShoutOut");
-  if (!allowed || allowed.has("vipReservations")) labels.push("VIP table");
+  if (!allowed || allowed.has("vipReservations")) labels.push("VIP reserV");
   if (!allowed || allowed.has("floqCast")) labels.push("floqCast");
   labels.push("scheduling");
   return labels;
+}
+
+/** Brand names Gemini must not speak unless the viewer has that feature key. */
+const GATED_BRAND_LABELS = Object.freeze([
+  {key: "mingl", names: ["Mingl"]},
+  {key: "rydr", names: ["RydR"]},
+  {key: "bartr", names: ["BartR"]},
+  {key: "floqCast", names: ["floqCast", "FloqCAST"]},
+  {key: "vipReservations", names: ["VIP reserV", "VIP table"]}
+]);
+
+function deniedBrandNames(allowedFeatures) {
+  const allowed = allowedFeatureSet(allowedFeatures);
+  if (!allowed) return [];
+  const names = [];
+  GATED_BRAND_LABELS.forEach(({key, names: brandNames}) => {
+    if (!allowed.has(key)) names.push(...brandNames);
+  });
+  return names;
 }
 
 function productPitchSentence(allowedFeatures) {
@@ -586,8 +605,16 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
   const langLine = lang === "en"
     ? "Reply in English unless the user clearly writes in another language."
     : `App language is "${lang}". ALWAYS write your spoken reply in ${lang}. Do not switch to English for help steps or summaries unless the user asked for English. Navigation/result cards are already localized server-side — do not paste English product titles into your prose when a ${lang} wording exists.`;
+  const denied = deniedBrandNames(allowedFeatures);
   const accessLine = allowed
-    ? `Principle of least privilege — Features & Services + beta grants for THIS viewer: ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. DO mention, pitch, and help with products on that allowed list (including in how-to / help steps). NEVER mention, pitch, invent steps for, or leave sibling names in help blurbs for Mingl, RydR, BartR, floqCast, FloqCAST, VIP reserV, or any other product that is NOT on that list. Private beta must stay invisible without a grant. If they ask for a gated feature, say it is not available on their account yet — do not name other betas they also lack.`
+    ? (
+      `Principle of least privilege — Features & Services + beta grants for THIS viewer: ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. ` +
+      `DO mention, pitch, and help with products on that allowed list (including how-to / help steps and brand names that appear there). ` +
+      (denied.length
+        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products this viewer lacks: ${denied.join(", ")}. `
+        : "") +
+      `If they ask for a product not on their allowed list, say it is not available on their account yet — do not name other products they also lack.`
+    )
     : "Only discuss features returned by tools for this viewer.";
   const pitchLine = `Ask "what do you want to do" / list ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}) ONLY on the first turn or after a clear restart — never every reply. Include granted betas; omit everything else.`;
   return [
@@ -718,6 +745,7 @@ module.exports = {
   filterResultsByFeatureAccess,
   productPitchSentence,
   productPitchLabels,
+  deniedBrandNames,
   TOOL_FEATURE_KEY,
   contextualSearch,
   runTool,
