@@ -43,8 +43,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.3.006";
-  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
+  const ICON_V = "s3.3.006";  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
   const NIGHTLIFE_ICONS = {

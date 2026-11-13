@@ -3,7 +3,6 @@
   "use strict";
 
   const VERSION = "s3.3.006";
-
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {

@@ -233,6 +233,18 @@
       ]
     },
     {
+      version: "s3.3.005",
+      title: "s3.3.005 — BOT DEE locale-filtered results + public profile tool",
+      checks: [
+        {label:"Result locales JSON", file:"functions/bot-dee-result-locales.json", includes:["Einen ShoutOut senden", "intent:shoutout"]},
+        {label:"Localize helpers", file:"functions/bot-dee-core.js", includes:["normalizeUiLanguage", "localizeSearchPayload", "lookupPublicProfiles"]},
+        {label:"Public profile tool", file:"functions/bot-dee-tools.js", includes:["lookupPublicProfiles", "publicProfileVisibility"]},
+        {label:"Client uiLanguage", file:"bot-dee-chat.js", includes:["uiLanguage: currentUiLanguage", "localizeResults"]},
+        {label:"Intent blurbs chrome", file:"floqr-i18n.js", includes:["botdee.intentBlurb.shoutout", "botdee.link.paySecurely"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["BOT DEE German help links"]}
+      ]
+    },
+    {
       version: "s3.3.004",
       title: "s3.3.004 — PHILA White/Blue jersey color select + blue Icon blanks",
       checks: [
@@ -2947,6 +2959,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.006) signed in with botDee access. 2) Send a message (try How are you?). 3) Refresh the tab — the transcript should return, not a blank welcome. 4) Open the same URL on another browser/profile signed into the same account — same transcript. 5) Wait for the conversation pause (packaged default 300 seconds / 5 minutes; Master Admin → Features Mgmt → BOT DEE) — next message starts fresh. 6) Master Admin → Diagnostics → Manual Feature Tests → mark Succeed/Failed.",
       expected:"Active chat survives refresh and a second device until the conversation pause or goodbye. After the pause, welcome/fresh chat. Unsigned or durableThreads=0 stays tab-only.",
       troubleshoot:"Always welcome after refresh → Functions deploy getBotDeeThread + executeBotSession (Pages-only is not enough). Permission error → firestore.rules deploy for botDeeThreads. Feature denied → botDee beta/live gate. Old chat.js → hard refresh botdee.html s3.3.006."
+    },
+    {
+      id:"s3-3-005-botdee-locale-public-profiles",
+      area:"BOT DEE / i18n / Profiles",
+      feature:"BOT DEE German help links + public profile answers",
+      changed:"s3.3.005 — executeBotSession takes uiLanguage; result cards + action links localize from bot-dee-result-locales.json; Gemini instructed to reply in app language; lookupPublicProfiles tool for public patron/club profiles including image URLs.",
+      howToTest:"1) Set Appearance / profile language to Deutsch. 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.006) signed in with botDee access but WITHOUT Mingl/RydR/BartR/floqCast/VIP beta grants. 3) Ask for a German ShoutOut guide — cards German (Einen ShoutOut senden). 4) Help/blurb/reply must NOT list Mingl, RydR, BartR, floqCast, VIP unless granted. 5) Ask about a public club/@handle — public fields/photos only. 6) Mark Succeed/Failed.",
+      expected:"German cards; gated beta brands hidden unless Features & Services grants them; public-profile answers only.",
+      troubleshoot:"English cards → Functions not redeployed / stale bot-dee-chat.js. Beta brands leak → allowedFeatures filter + scrubGatedBrands; confirm canAccessFeature. Profile miss → publicProfileVisibility=public / club published."
     },
     {
       id:"s3-3-003-phila-blanks-terps-qa",
