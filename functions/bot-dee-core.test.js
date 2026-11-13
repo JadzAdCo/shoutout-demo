@@ -122,6 +122,8 @@ test("setBotDeeSettings callable is exported", () => {
   assert.match(read("master-admin.html"), /id="featuresBotDee"/);
   assert.match(read("master-feature-services.js"), /setBotDeeSettings/);
   assert.match(read("firestore.rules"), /match \/botDeeSettings\/\{docId\}/);
+  assert.match(read("firestore.rules"), /match \/botDeeThreads\/\{threadId\}/);
+  assert.match(read("functions/index.js"), /getBotDeeThread:\s*require\("\.\/bot-dee-functions"\)\.getBotDeeThread/);
 });
 
 test("Name / pronunciation is identity — not a search dump", () => {
@@ -178,6 +180,10 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.match(read("functions/bot-dee-tools.js"), /createVipHold/);
   assert.match(read("functions/bot-dee-tools.js"), /createFloqCastCheckout/);
   assert.match(read("functions/index.js"), /executeBotSession:\s*require\("\.\/bot-dee-functions"\)\.executeBotSession/);
+  assert.match(read("functions/index.js"), /getBotDeeThread:\s*require\("\.\/bot-dee-functions"\)\.getBotDeeThread/);
+  assert.match(src, /exports\.getBotDeeThread/);
+  assert.match(src, /persistExchange/);
+  assert.match(src, /durableThreads/);
   const names = bot.toolDeclarations().map(t => t.name);
   assert.ok(names.includes("contextualSearch"));
   assert.ok(names.includes("startShoutOutCheckout"));
@@ -188,6 +194,54 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
 test("package depends on @google/genai", () => {
   const pkg = JSON.parse(read("functions/package.json"));
   assert.ok(pkg.dependencies["@google/genai"]);
+});
+
+test("durable thread helpers isolate uid and idle window", () => {
+  assert.equal(bot.threadIdForUid("abc"), "abc");
+  assert.equal(bot.coerceThreadId("other-user", "abc"), "abc");
+  assert.equal(bot.coerceThreadId("abc_ulid123", "abc"), "abc");
+  assert.equal(bot.eventDocId(12), "e00000012");
+  assert.equal(bot.eventDocId(0), "");
+  assert.equal(bot.normalizeBotDeeSettings({}).durableThreads, 1);
+  assert.equal(bot.normalizeBotDeeSettings({durableThreads: 0}).durableThreads, 0);
+  const now = 1_700_000_000_000;
+  assert.equal(bot.isThreadIdle(now - 59_000, 60, now), false);
+  assert.equal(bot.isThreadIdle(now - 60_000, 60, now), true);
+  assert.equal(bot.conversationIsActive([{role: "user", text: "hi"}], now - 10_000, 60, now), true);
+  assert.equal(bot.conversationIsActive([{role: "user", text: "hi"}], now - 61_000, 60, now), false);
+  const clipped = bot.clipStoredTurns(
+    Array.from({length: 20}, (_, i) => ({role: i % 2 ? "model" : "user", text: `t${i}`}))
+  );
+  assert.equal(clipped.length, bot.MAX_HISTORY);
+});
+
+test("thread snapshot reports idle vs active without leaking another uid", () => {
+  const threads = require("./bot-dee-thread");
+  const now = 1_700_000_060_000;
+  const settings = {durableThreads: 1, conversationIdleSeconds: 60};
+  const active = threads.snapshotToState({
+    exists: true,
+    data: () => ({
+      uid: "abc",
+      turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}],
+      lastMessageAtMs: now - 10_000,
+      conversationEpoch: 2,
+      revision: 4
+    })
+  }, "abc", settings, now);
+  assert.equal(active.status, "active");
+  assert.equal(active.history.length, 2);
+  const idle = threads.snapshotToState({
+    exists: true,
+    data: () => ({
+      uid: "abc",
+      turns: [{role: "user", text: "hi"}],
+      lastMessageAtMs: now - 61_000,
+      conversationEpoch: 2
+    })
+  }, "abc", settings, now);
+  assert.equal(idle.status, "idle_ended");
+  assert.deepEqual(idle.turns, []);
 });
 
 test("createVipCheckout branches on venue paymentCollector (not Stripe-only)", () => {

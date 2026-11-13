@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.004";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.004";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.006";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.006";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.006",
+      title: "s3.3.006 — BOT DEE durable threads (refresh / second device resume)",
+      checks: [
+        {label:"Thread persist", file:"functions/bot-dee-thread.js", includes:["botDeeThreads", "persistExchange", "loadThreadState"]},
+        {label:"getBotDeeThread export", file:"functions/index.js", includes:["getBotDeeThread"]},
+        {label:"Chat restore", file:"bot-dee-chat.js", includes:["getBotDeeThread", "restoreOrWelcome", "durableEnabled"]},
+        {label:"Owner-only rules", file:"firestore.rules", includes:["match /botDeeThreads/{threadId}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-006-botdee-durable-threads"]}
+      ]
+    },
     {
       version: "s3.3.004",
       title: "s3.3.004 — PHILA White/Blue jersey color select + blue Icon blanks",
@@ -2928,6 +2939,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-006-botdee-durable-threads",
+      area:"BOT DEE",
+      feature:"Durable chat threads — refresh and second device resume",
+      changed:"s3.3.006 — signed-in BOT DEE stores the last 12 turns under botDeeThreads/{uid}. Refresh or another phone restores while inside the idle pause (default 60s). Idle / goodbye starts a fresh conversation. Flag durableThreads defaults on. Needs Pages + Functions + firestore.rules.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.006) signed in with botDee access. 2) Send a message (try How are you?). 3) Refresh the tab — the transcript should return, not a blank welcome. 4) Open the same URL on another browser/profile signed into the same account — same transcript. 5) Wait the idle pause (~60s) — next message starts fresh. 6) Master Admin → Diagnostics → Manual Feature Tests → mark Succeed/Failed.",
+      expected:"Active chat survives refresh and a second device until idle/goodbye. After idle, welcome/fresh chat. Unsigned or durableThreads=0 stays tab-only.",
+      troubleshoot:"Always welcome after refresh → Functions deploy getBotDeeThread + executeBotSession (Pages-only is not enough). Permission error → firestore.rules deploy for botDeeThreads. Feature denied → botDee beta/live gate. Old chat.js → hard refresh botdee.html s3.3.006."
+    },
     {
       id:"s3-3-003-phila-blanks-terps-qa",
       area:"ShoutOut / Display / NBA / NCAA",

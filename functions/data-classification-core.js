@@ -104,6 +104,8 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock); Functions-write"],
+    ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeAccessThrottle", "secret", 0, "BOT DEE access-denial log rate limits"],
     ["floqAiAccessThrottle", "secret", 0, "Legacy BOT DEE access-denial throttle id (pre-botDee rename; deny-all)"],
     ["floqrAdmins", "master", 1, "Assigned FloqR Admins (template catalog access)"],

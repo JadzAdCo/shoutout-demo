@@ -1,6 +1,7 @@
 /* BOT DEE chat client — wires botdee.html transcript to executeBotSession.
    Intent search stays available as a collapsible fast path / fallback.
-   Greetings / acks are answered locally (chatbot) so a stale Functions deploy cannot
+   Durable threads (getBotDeeThread): signed-in refresh / second device resume.
+   Greetings / acks are local-only when durable is off so a stale Functions deploy cannot
    turn "hello"/"cool" into a contextual-search miss.
    Offer-help CTA only at conversation start and after an idle-ended resume.
    Idle pause (default 60s, Master Admin botDeeSettings/default) ends the chat. */
@@ -18,6 +19,9 @@
   let idleSeconds = DEFAULT_IDLE_SECONDS;
   let idleTimer = null;
   let settingsLoaded = false;
+  let durableEnabled = false;
+  let threadId = "";
+  let restoreStarted = false;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -139,13 +143,44 @@
     );
   }
 
-  function callable() {
+  function callable(name) {
     try {
       if (!global.firebase?.functions || !global.firebase.apps?.length) return null;
-      return global.firebase.app().functions("us-central1").httpsCallable("executeBotSession");
+      return global.firebase.app().functions("us-central1").httpsCallable(name || "executeBotSession");
     } catch (_) {
       return null;
     }
+  }
+
+  function waitForAuthUser(ms) {
+    return new Promise(resolve => {
+      let auth;
+      try {
+        auth = global.firebase.auth();
+      } catch (_) {
+        resolve(null);
+        return;
+      }
+      if (auth.currentUser) {
+        resolve(auth.currentUser);
+        return;
+      }
+      let done = false;
+      const finish = user => {
+        if (done) return;
+        done = true;
+        try { unsub(); } catch (_) { /* ignore */ }
+        resolve(user || null);
+      };
+      let unsub = () => {};
+      try {
+        unsub = auth.onAuthStateChanged(user => finish(user));
+      } catch (_) {
+        finish(null);
+        return;
+      }
+      setTimeout(() => finish(auth.currentUser), ms || 8000);
+    });
   }
 
   function esc(value) {
@@ -252,11 +287,13 @@
     }
   }
 
-  function armIdleTimer() {
+  function armIdleTimer(overrideMs) {
     clearIdleTimer();
     // fresh (welcome painted) and active both idle-out; ended stays quiet.
     if (phase === "ended") return;
-    const ms = clampIdleSeconds(idleSeconds) * 1000;
+    const ms = overrideMs != null
+      ? Math.max(0, Number(overrideMs) || 0)
+      : clampIdleSeconds(idleSeconds) * 1000;
     idleTimer = setTimeout(() => endConversation("idle"), ms);
   }
 
@@ -313,8 +350,9 @@
     appendBubble("user", text);
     pushHistory("user", text);
 
-    // Chatbot first: never let hello / "cool" / name questions fall through to a search miss.
-    if (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text)) {
+    // Local chatbot first only when durable threads are off (old Functions / flag 0).
+    // Durable path always hits executeBotSession so refresh / another phone can resume.
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
       const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
@@ -328,8 +366,8 @@
       return;
     }
 
-    // Substantive restart after idle: one short welcome-back, then answer their ask.
-    if (resuming) {
+    // Substantive restart after idle (memory-only): one short welcome-back, then answer.
+    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
       const hello = resumeReply();
       appendBubble("bot", hello);
       pushHistory("model", hello);
@@ -339,7 +377,7 @@
     setBusy(true);
     setStatus(t("botdee.chatThinking", "BOT DEE is thinking…"));
 
-    const fn = callable();
+    const fn = callable("executeBotSession");
     if (!fn) {
       setBusy(false);
       setStatus("");
@@ -352,7 +390,8 @@
     try {
       const payload = {
         message: text,
-        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text}))
+        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
+        threadId: threadId || undefined
       };
       const data = (await fn(payload))?.data || {};
       let reply = String(data.reply || "").trim();
@@ -362,8 +401,16 @@
       }
       appendBubble("bot", reply, data.results);
       pushHistory("model", reply);
+      if (data.threadId) threadId = String(data.threadId);
+      if (data.durable === true) durableEnabled = true;
+      if (data.durable === false) durableEnabled = false;
+      if (data.conversationIdleSeconds) idleSeconds = clampIdleSeconds(data.conversationIdleSeconds);
       setStatus("");
-      armIdleTimer();
+      if (isFarewellPrompt(text)) {
+        endConversation("silent");
+      } else {
+        armIdleTimer();
+      }
     } catch (error) {
       const code = String(error?.code || "");
       let msg = t("botdee.chatError", "BOT DEE could not answer. Try quick intent search.");
@@ -417,13 +464,52 @@
     armIdleTimer();
   }
 
+  function restoreTurns(turns) {
+    const log = byId("botDeeTranscript");
+    if (log) log.innerHTML = "";
+    history.length = 0;
+    (Array.isArray(turns) ? turns : []).forEach(row => {
+      const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
+      const text = String(row?.text || "").trim();
+      if (!text) return;
+      appendBubble(role === "user" ? "user" : "bot", text);
+      pushHistory(role, text);
+    });
+  }
+
+  async function restoreOrWelcome() {
+    if (restoreStarted) return;
+    restoreStarted = true;
+    setStatus(t("botdee.chatRestoring", "Restoring your conversation…"));
+    await loadIdleSettings();
+    const user = await waitForAuthUser(8000);
+    const getThread = callable("getBotDeeThread");
+    if (user && getThread) {
+      try {
+        const data = (await getThread({}))?.data || {};
+        durableEnabled = data.durable === true;
+        if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
+        if (data.threadId) threadId = String(data.threadId);
+        if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
+          restoreTurns(data.turns);
+          phase = "active";
+          setStatus("");
+          armIdleTimer(data.remainingMs);
+          return;
+        }
+      } catch (error) {
+        console.warn("BOT DEE restore failed", error?.message || error);
+        durableEnabled = false;
+      }
+    }
+    setStatus("");
+    welcome();
+    if (phase === "fresh" || phase === "active") armIdleTimer();
+  }
+
   function bind(opts = {}) {
     bindForm();
-    loadIdleSettings().finally(() => {
-      welcome();
-      // Re-arm with loaded idle seconds if welcome already painted.
-      if (phase === "fresh" || phase === "active") armIdleTimer();
-    });
+    restoreOrWelcome();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");

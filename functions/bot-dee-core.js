@@ -8,9 +8,13 @@ const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 
 const MAX_HISTORY = 12;
+const MAX_STORED_EVENTS = 24;
 const MAX_MESSAGE_CHARS = 2000;
+const MAX_MODEL_CHARS = 8000;
 const MAX_RESULTS = 8;
 const MAX_TOOL_ROUNDS = 4;
+const DEFAULT_DURABLE_THREADS = 1;
+const THREAD_SCHEMA_VERSION = 1;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 
 const str = (description) => ({type: Type.STRING, description});
@@ -195,14 +199,65 @@ function clampIdleSeconds(raw) {
   return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
 }
 
+function flag01(value, fallback) {
+  if (value === 0 || value === "0" || value === false) return 0;
+  if (value === 1 || value === "1" || value === true) return 1;
+  return fallback === 0 || fallback === 1 ? fallback : 0;
+}
+
 function normalizeBotDeeSettings(raw) {
   const row = raw && typeof raw === "object" ? raw : {};
   return {
     conversationIdleSeconds: clampIdleSeconds(
       row.conversationIdleSeconds != null ? row.conversationIdleSeconds : DEFAULT_IDLE_SECONDS
     ),
+    durableThreads: flag01(row.durableThreads, DEFAULT_DURABLE_THREADS),
     revision: Math.max(0, Math.floor(Number(row.revision) || 0))
   };
+}
+
+function threadIdForUid(uid) {
+  return String(uid || "").trim();
+}
+
+/** v1 is one thread per uid. Guessed or foreign ids are ignored. */
+function coerceThreadId(requested, uid) {
+  void requested;
+  return threadIdForUid(uid);
+}
+
+function eventDocId(seq) {
+  const n = Number(seq);
+  if (!Number.isFinite(n) || n < 1) return "";
+  return `e${String(Math.floor(n)).padStart(8, "0")}`;
+}
+
+function isThreadIdle(lastMessageAtMs, idleSeconds, nowMs) {
+  const last = Number(lastMessageAtMs) || 0;
+  if (!last) return false;
+  const now = Number(nowMs) || Date.now();
+  return now - last >= clampIdleSeconds(idleSeconds) * 1000;
+}
+
+function remainingIdleMs(lastMessageAtMs, idleSeconds, nowMs) {
+  const last = Number(lastMessageAtMs) || 0;
+  const budget = clampIdleSeconds(idleSeconds) * 1000;
+  if (!last) return budget;
+  const now = Number(nowMs) || Date.now();
+  return Math.max(0, last + budget - now);
+}
+
+function clipStoredTurns(turns) {
+  return sanitizeHistory(turns).slice(-MAX_HISTORY);
+}
+
+function conversationIsActive(history, lastMessageAtMs, idleSeconds, nowMs) {
+  if (isThreadIdle(lastMessageAtMs, idleSeconds, nowMs)) return false;
+  return sanitizeHistory(history).length > 0;
+}
+
+function clipModelText(raw) {
+  return String(raw || "").replace(/\s+/g, " ").trim().slice(0, MAX_MODEL_CHARS);
 }
 
 function isFarewellPrompt(raw) {
@@ -417,7 +472,11 @@ module.exports = {
   TEXT_MODEL,
   MAX_TOOL_ROUNDS,
   MAX_HISTORY,
+  MAX_STORED_EVENTS,
   MAX_MESSAGE_CHARS,
+  MAX_MODEL_CHARS,
+  DEFAULT_DURABLE_THREADS,
+  THREAD_SCHEMA_VERSION,
   MIN_SEARCH_SCORE,
   DEFAULT_IDLE_SECONDS,
   MIN_IDLE_SECONDS,
@@ -439,7 +498,16 @@ module.exports = {
   resumeReply,
   idleEndedReply,
   clampIdleSeconds,
+  flag01,
   normalizeBotDeeSettings,
+  threadIdForUid,
+  coerceThreadId,
+  eventDocId,
+  isThreadIdle,
+  remainingIdleMs,
+  clipStoredTurns,
+  conversationIsActive,
+  clipModelText,
   contextualSearch,
   runTool,
   systemInstruction,

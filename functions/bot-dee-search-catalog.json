@@ -318,7 +318,7 @@
       "id": "help-bot-dee-mgmt",
       "kind": "help",
       "label": "BOT DEE conversation pause",
-      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat cool/ok/thanks stay short and do not repeat th",
+      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a re",
       "href": "./master-admin.html?from=botdee#featuresBotDee",
       "phrases": [
         "bot dee conversation pause",
@@ -370,6 +370,9 @@
         "ask bot dee",
         "bot dee page",
         "chat with bot dee",
+        "resume chat",
+        "refresh bot dee",
+        "other phone",
         "general search",
         "search everything",
         "what can i search",

@@ -8,7 +8,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-12 |
+| Last registry touch | 2026-11-13 |
 
 ---
 
@@ -546,16 +546,17 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 |---|---|
 | UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
 | Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat + intent fallback; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) gate intent cards |
-| Backend | `functions/bot-dee-functions.js` `executeBotSession` + `setBotDeeSettings`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
+| Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
 | Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
 | Conversation idle (s3.2.70) | Client ends chat after `conversationIdleSeconds` (default **60**) with no message → `chatIdleEnded`; history cleared; next message resumes. Config: Firestore `botDeeSettings/default` (signed-in read; Functions-write). Master Admin → Features Mgmt → **BOT DEE** → Save via callable `setBotDeeSettings` (SOS2FA + reason ≥ 8). Clamp 15–600s. |
-| Data / security | `botDeeSettings/{docId}`: P ops setting (idle seconds, revision, actor email, reason); not patron PII. Rules: signed-in read, write false. Callable re-checks Master Admin + SOS2FA. |
+| Durable threads (s3.3.006) | Signed-in chats store under `botDeeThreads/{uid}` (doc id = uid) + `events` (pruned to 24). Last 12 turns feed Gemini. Idle or farewell starts a fresh epoch. Refresh / second device: `getBotDeeThread` restores while inside the pause window. Flag `botDeeSettings.durableThreads` default **1**; `0` rolls back to tab-only history. Client still sends `history` for old Functions. Guessed `threadId` is ignored (`coerceThreadId` → uid). |
+| Data / security | `botDeeSettings/{docId}`: P ops setting (idle seconds, `durableThreads`, revision, actor email, reason); not patron PII. Rules: signed-in read, write false. `botDeeThreads` / `botDeeThreads/events`: owner read (`uid` + doc id match), write false (Admin SDK). Callables re-check Auth + `botDee` feature gate. Classification: ownMaster + PII. |
 | Tools | `contextualSearch`; `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates (`functions/bot-dee-tools.js`) |
 | VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
 | Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
-| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` |
+| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring) |
 | Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `botdee.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |

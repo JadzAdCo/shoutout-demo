@@ -34,10 +34,15 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 
 ## Backend
 
-- `functions/bot-dee-functions.js` — `executeBotSession`
-- `functions/bot-dee-core.js` — tools, scoring, sanitization
+- `functions/bot-dee-functions.js` — `executeBotSession`, `getBotDeeThread`, `setBotDeeSettings`
+- `functions/bot-dee-thread.js` — Firestore persist under `botDeeThreads/{uid}`
+- `functions/bot-dee-core.js` — tools, scoring, sanitization, thread helpers
 - `functions/data-classification-functions.js` — `getBotDeeAccess` (+ `getFloqAiAccess` alias)
 - Catalog: `node scripts/build-bot-dee-search-catalog.js`
+
+## Durable resume (s3.3.006)
+
+Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the idle window. Idle / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
 
 ## Owner action
 

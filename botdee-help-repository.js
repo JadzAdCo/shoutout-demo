@@ -375,8 +375,8 @@
     {
       id: "help-botdee-page",
       title: "BOT DEE",
-      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
-      searchPhrases: ["bot dee", "botdee", "ask bot dee", "bot dee page", "chat with bot dee", "general search", "search everything", "what can i search", "enter to send", "shift enter", "how are you bot dee", "floqai", "floqai page", "ask floqai"],
+      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone, until the pause timer ends. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Quick intent search stays available as a fast path when you want product cards without chat.",
+      searchPhrases: ["bot dee", "botdee", "ask bot dee", "bot dee page", "chat with bot dee", "resume chat", "refresh bot dee", "other phone", "general search", "search everything", "what can i search", "enter to send", "shift enter", "how are you bot dee", "floqai", "floqai page", "ask floqai"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -385,7 +385,7 @@
     {
       id: "help-bot-dee-mgmt",
       title: "BOT DEE conversation pause",
-      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
+      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 60). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
       searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause"],
       links: [{label: "BOT DEE (Master Admin)", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#featuresBotDee"}],
       audiences: ["masterAdmin"],

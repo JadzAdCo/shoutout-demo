@@ -1,6 +1,6 @@
 # BOT DEE Part Two — Phase A PR plan
 
-**No application code in this PR.** Implementation starts only after owner approval of [PHASE-A-DESIGN.md](./PHASE-A-DESIGN.md) decisions D1–D5.
+Owner asked to implement durable threads (the refresh / second-device gap). **PR‑0 is in this change set.** Workflows / version intelligence / LangGraph stay out. D1–D5 still required before full Part Two.
 
 Flags default **off**. Rollback = flag `0` + revert Functions; schema is additive (no destructive migrations in v1).
 
