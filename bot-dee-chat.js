@@ -25,6 +25,128 @@
     return value && value !== key ? value : fallback;
   };
 
+  function currentUiLanguage() {
+    try {
+      if (typeof global.FLOQRI18n?.getLanguage === "function") {
+        return String(global.FLOQRI18n.getLanguage() || "en").split(/[-_]/)[0] || "en";
+      }
+      return String(localStorage.getItem("floqr.uiLanguage") || "en").split(/[-_]/)[0] || "en";
+    } catch (_) {
+      return "en";
+    }
+  }
+
+  function canUseFeature(key) {
+    try {
+      const FS = global.FLOQRFeatureServices;
+      if (FS && typeof FS.canAccess === "function") return !!FS.canAccess(key);
+    } catch (_) {}
+    return key === "shoutOut" || key === "botDee" || key === "passes";
+  }
+
+  function featureKeyForResult(row) {
+    const sid = String(row?.sourceId || "");
+    const id = String(row?.id || "");
+    const probe = `${sid} ${id}`;
+    if (/mingl/i.test(probe)) return "mingl";
+    if (/\brydr\b/i.test(probe)) return "rydr";
+    if (/bartr|bart-?r/i.test(probe)) return "bartr";
+    if (/floqcast|suprstr/i.test(probe)) return "floqCast";
+    if (/\bvip\b|reserv/i.test(probe)) return "vipReservations";
+    if (/shout/i.test(probe)) return "shoutOut";
+    return null;
+  }
+
+  /** VIP product phrases across app languages.
+   *  Unicode letter boundaries — ASCII `\b` misses Cyrillic/Greek/Arabic. */
+  const VIP_BRAND_RE =
+    /(?<![\p{L}\p{N}_])(?:VIP\s*reserV|VIP[- ]?(?:table|tables|entry|entries|Tisch|Tische|tafel|tafels|стол|стола)|(?:table|tables|mesa|mesas|tavolo|tavoli|stolik|stoliki)\s+VIP|VIP\s+τραπέζι|طاولة\s+VIP)(?![\p{L}\p{N}_])/giu;
+
+  function scrubGatedBrands(text) {
+    let out = String(text || "");
+    if (!canUseFeature("mingl")) out = out.replace(/\bMingl\b/g, "");
+    if (!canUseFeature("rydr")) out = out.replace(/\bRydR\b/g, "");
+    if (!canUseFeature("bartr")) out = out.replace(/\bBartR\b/g, "");
+    if (!canUseFeature("floqCast")) out = out.replace(/\bfloqCast\b|\bFloqCAST\b|\bFloqCast\b/g, "");
+    if (!canUseFeature("vipReservations")) out = out.replace(VIP_BRAND_RE, "");
+    out = out
+      .replace(/\(\s*superstar\s*\)/gi, "")
+      .replace(/\s+(?:or|oder|ou|o|или|ή|lub|أو)\s+,/gi, ",")
+      .replace(/\(\s*\)/g, "")
+      .replace(/:\s*,/g, ":");
+    let prev = "";
+    while (prev !== out) {
+      prev = out;
+      out = out
+        .replace(/,\s*,+/g, ",")
+        .replace(/\s{2,}/g, " ")
+        .replace(/\s+,/g, ",")
+        .replace(/,\s*$/g, "")
+        .replace(/^,\s*/g, "")
+        .trim();
+    }
+    return out;
+  }
+
+  /** Client safety net — locale remap + drop results for features the viewer cannot use. */
+  function localizeResults(results) {
+    const lang = currentUiLanguage();
+    const helpPack = (lang && lang !== "en") ? (global.FLOQRI18nHelp?.packs?.[lang] || {}) : {};
+    const intentLabel = {
+      shoutout: "cat.shoutout",
+      floqcast: "cat.floqcast",
+      "vip-reserv": "cat.vipreserv",
+      mingl: "cat.mingl",
+      rydr: "cat.rydr",
+      bartr: "cat.bartr",
+      clubs: "cat.clubs",
+      "venue-search": "botdee.intentLabel.venueSearch",
+      "ad-campaigns": "botdee.intentLabel.adCampaigns",
+      "ballers-alert": "botdee.intentLabel.ballersAlert",
+      "classic-halloween": "botdee.intentLabel.classicHalloween",
+      "football-intro": "botdee.intentLabel.footballIntro",
+      shiloh: "botdee.intentLabel.shiloh",
+      "tengo-muchos-dolares": "botdee.intentLabel.tengoMuchosDolares"
+    };
+    const actionByKind = {
+      checkout: "botdee.link.paySecurely",
+      floqcast: "botdee.link.floqcastPreview",
+      shoutout: "botdee.link.shoutoutCompose",
+      vip: "botdee.link.vipTerms"
+    };
+    return (results || []).filter(row => {
+      const key = featureKeyForResult(row);
+      return !key || canUseFeature(key);
+    }).map(row => {
+      if (!row || typeof row !== "object") return row;
+      const next = Object.assign({}, row);
+      const sourceId = String(row.sourceId || "");
+      const kind = String(row.kind || "").toLowerCase();
+      if (sourceId.startsWith("help:") || sourceId.startsWith("intent:help-") || String(row.id || "").startsWith("help-")) {
+        const id = sourceId.startsWith("help:")
+          ? sourceId.slice(5)
+          : (sourceId.startsWith("intent:") ? sourceId.slice("intent:".length) : String(row.id || ""));
+        const hit = helpPack[id];
+        if (hit?.title) next.label = hit.title;
+        if (hit?.body) next.blurb = String(hit.body).replace(/\s+/g, " ").trim().slice(0, 280);
+      } else if (sourceId.startsWith("intent:") || kind === "product") {
+        const id = sourceId.startsWith("intent:") ? sourceId.slice(7) : String(row.id || "");
+        const labelKey = intentLabel[id];
+        if (labelKey) {
+          const label = t(labelKey, next.label);
+          if (label) next.label = label;
+        }
+        const blurb = t(`botdee.intentBlurb.${id}`, "");
+        if (blurb && blurb !== `botdee.intentBlurb.${id}`) next.blurb = blurb;
+      } else if (actionByKind[kind]) {
+        next.label = t(actionByKind[kind], next.label);
+      }
+      next.label = scrubGatedBrands(next.label);
+      next.blurb = scrubGatedBrands(next.blurb);
+      return next;
+    });
+  }
+
   /** Mirror of functions/bot-dee-core.js isChitchatPrompt / isAckPrompt / replies. */
   function normalizeChat(value) {
     return String(value || "")
@@ -87,11 +209,31 @@
   }
 
   /** Offer-help — start / idle-resume greetings only. */
+  function accessibleProductPitch() {
+    const FS = global.FLOQRFeatureServices;
+    const parts = [];
+    const can = key => {
+      try {
+        if (FS && typeof FS.canAccess === "function") return !!FS.canAccess(key);
+      } catch (_) {}
+      return key === "shoutOut";
+    };
+    if (can("shoutOut")) parts.push("ShoutOut");
+    if (can("vipReservations")) parts.push("VIP table");
+    if (can("floqCast")) parts.push("floqCast");
+    parts.push("scheduling");
+    if (parts.length <= 1) return parts[0] ? `${parts[0]} — just say it in plain words.` : "just say it in plain words.";
+    const head = parts.slice(0, -1).join(", ");
+    return `${head}, or ${parts[parts.length - 1]} — just say it in plain words.`;
+  }
+
   function chitchatReply() {
-    return t(
-      "botdee.chatHello",
-      "Hey — BOT DEE here. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
-    );
+    const localized = t("botdee.chatHello", "");
+    // Keep locale; scrub brands the viewer cannot access (do not force English).
+    if (localized && localized !== "botdee.chatHello") {
+      return scrubGatedBrands(localized);
+    }
+    return `Hey — BOT DEE here. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
   }
 
   /** Soft mid-chat ack — no product pitch. */
@@ -133,10 +275,11 @@
   }
 
   function resumeReply() {
-    return t(
-      "botdee.chatResume",
-      "Welcome back. What do you want to do in FLOQR? ShoutOut, VIP table, floqCast, scheduling, or something else — just say it in plain words."
-    );
+    const localized = t("botdee.chatResume", "");
+    if (localized && localized !== "botdee.chatResume") {
+      return scrubGatedBrands(localized);
+    }
+    return `Welcome back. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
   }
 
   function callable() {
@@ -352,15 +495,16 @@
     try {
       const payload = {
         message: text,
-        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text}))
+        history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
+        uiLanguage: currentUiLanguage()
       };
       const data = (await fn(payload))?.data || {};
-      let reply = String(data.reply || "").trim();
+      let reply = scrubGatedBrands(String(data.reply || "").trim());
       // Stale Functions may still search-miss a greeting-shaped reply — never show that.
       if (!reply || /could not find a clear match/i.test(reply)) {
         reply = t("botdee.chatEmpty", "No answer yet — try quick intent search.");
       }
-      appendBubble("bot", reply, data.results);
+      appendBubble("bot", reply, localizeResults(data.results));
       pushHistory("model", reply);
       setStatus("");
       armIdleTimer();

@@ -62,10 +62,28 @@ function functionResponsePart(call, result) {
   };
 }
 
-async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
+async function loadAllowedFeatures(auth) {
+  const fsCore = require("./feature-services-core");
+  const viewer = await audit.viewerFor(auth);
+  const snaps = await Promise.all(fsCore.FEATURE_KEYS.map(key => audit.loadFeature(key)));
+  const keys = [];
+  const labels = [];
+  snaps.forEach(feature => {
+    if (!feature?.key) return;
+    if (fsCore.canAccessFeature(feature, viewer)) {
+      keys.push(feature.key);
+      labels.push(feature.label || feature.key);
+    }
+  });
+  return {keys, labels, viewer};
+}
+
+async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures}) {
+  const lang = bot.normalizeUiLanguage(uiLanguage || session?.uiLanguage);
+  const allowed = allowedFeatures || session?.allowedFeatures || null;
   const ai = new GoogleGenAI({apiKey});
   const contents = bot.historyToContents(history, userPrompt);
-  const tools = [{functionDeclarations: bot.toolDeclarations()}];
+  const tools = [{functionDeclarations: bot.toolDeclarations(allowed)}];
   let lastSearch = null;
   const actionLinks = [];
   let rounds = 0;
@@ -76,7 +94,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       model: bot.TEXT_MODEL,
       contents,
       config: {
-        systemInstruction: bot.systemInstruction(role),
+        systemInstruction: bot.systemInstruction(role, lang, allowed),
         tools,
         // AUTO must NOT set allowedFunctionNames — Gemini 400s with
         // "Please set allowed_function_names only when function calling mode is ANY"
@@ -93,12 +111,14 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
     const calls = response.functionCalls || [];
     if (!calls.length) {
       const text = bot.extractText(response);
+      const replyRaw = text || bot.formatSearchFallback(lastSearch, lang, allowed);
       return {
-        reply: text || bot.formatSearchFallback(lastSearch),
-        results: [...bot.resultsForClient(lastSearch), ...actionLinks],
+        reply: bot.sanitizeFeatureMentions(replyRaw, allowed),
+        results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
         provider: "gemini",
         model: bot.TEXT_MODEL,
-        toolRounds: rounds - (text ? 1 : 0)
+        toolRounds: rounds - (text ? 1 : 0),
+        uiLanguage: lang
       };
     }
 
@@ -113,30 +133,34 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session}) {
       const args = call.args && typeof call.args === "object" ? call.args : {};
       const result = await bot.runTool(call.name, args, session);
       if (call.name === "contextualSearch") lastSearch = result;
-      bot.linksFromToolResult(result).forEach(link => actionLinks.push(link));
+      bot.linksFromToolResult(result, lang).forEach(link => actionLinks.push(link));
       responseParts.push(functionResponsePart(call, result));
     }
     contents.push({role: "user", parts: responseParts});
   }
 
   return {
-    reply: bot.formatSearchFallback(lastSearch),
-    results: [...bot.resultsForClient(lastSearch), ...actionLinks],
+    reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
+    results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
     provider: "gemini",
     model: bot.TEXT_MODEL,
     toolRounds: rounds,
-    truncated: true
+    truncated: true,
+    uiLanguage: lang
   };
 }
 
-function localSession(role, userPrompt) {
+function localSession(role, userPrompt, uiLanguage, allowedFeatures) {
+  const lang = bot.normalizeUiLanguage(uiLanguage);
+  const allowed = allowedFeatures || null;
   if (bot.isAckPrompt(userPrompt)) {
     return {
       reply: bot.ackReply(role, userPrompt),
       results: [],
       provider: "local-chitchat",
       model: "ack",
-      toolRounds: 0
+      toolRounds: 0,
+      uiLanguage: lang
     };
   }
   if (bot.isMoodPrompt(userPrompt)) {
@@ -145,16 +169,18 @@ function localSession(role, userPrompt) {
       results: [],
       provider: "local-chitchat",
       model: "mood",
-      toolRounds: 0
+      toolRounds: 0,
+      uiLanguage: lang
     };
   }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
-      reply: bot.chitchatReply(role),
+      reply: bot.chitchatReply(role, allowed),
       results: [],
       provider: "local-chitchat",
       model: "chitchat",
-      toolRounds: 0
+      toolRounds: 0,
+      uiLanguage: lang
     };
   }
   if (bot.isIdentityPrompt(userPrompt)) {
@@ -163,16 +189,18 @@ function localSession(role, userPrompt) {
       results: [],
       provider: "local-identity",
       model: "identity",
-      toolRounds: 0
+      toolRounds: 0,
+      uiLanguage: lang
     };
   }
-  const search = bot.contextualSearch(userPrompt, role);
+  const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
   return {
-    reply: bot.formatSearchFallback(search),
-    results: bot.resultsForClient(search),
+    reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(search, lang, allowed), allowed),
+    results: bot.resultsForClient(search, lang),
     provider: "local-fallback",
     model: "contextualSearch",
-    toolRounds: 1
+    toolRounds: 1,
+    uiLanguage: lang
   };
 }
 
@@ -186,12 +214,25 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const userPrompt = bot.sanitizeUserPrompt(request.data?.message || request.data?.prompt || "");
     if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for BOT DEE.");
 
+    const uiLanguage = bot.normalizeUiLanguage(
+      request.data?.uiLanguage || request.data?.lang || request.data?.locale
+    );
     const history = bot.sanitizeHistory(request.data?.history);
     const facts = await __botDeeHelpers.roleFactsFor(request.auth);
     const {role} = core.resolveViewerRole(facts);
+    let allowedFeatures = null;
+    try {
+      const access = await loadAllowedFeatures(request.auth);
+      allowedFeatures = access.keys;
+    } catch (error) {
+      console.warn("BOT DEE feature access load failed; fail closed to live defaults", error?.message || error);
+      allowedFeatures = ["shoutOut", "botDee", "passes"];
+    }
     const session = Object.freeze({
       userId: request.auth.uid,
       role,
+      uiLanguage,
+      allowedFeatures,
       lastUserPrompt: userPrompt,
       request
     });
@@ -200,23 +241,25 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     let outcome;
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
     if (bot.isChitchatPrompt(userPrompt) || bot.isIdentityPrompt(userPrompt)) {
-      outcome = localSession(role, userPrompt);
+      outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
     } else if (apiKey) {
       try {
-        outcome = await runGeminiSession({apiKey, role, history, userPrompt, session});
+        outcome = await runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures});
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
-        outcome = localSession(role, userPrompt);
+        outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
     } else {
-      outcome = localSession(role, userPrompt);
+      outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
     }
 
     console.info(JSON.stringify({
       event: "botdee.session",
       uid: request.auth.uid,
       role,
+      uiLanguage,
+      allowedFeatures,
       provider: outcome.provider,
       results: (outcome.results || []).length,
       toolRounds: outcome.toolRounds || 0
@@ -225,6 +268,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     return {
       ok: true,
       role,
+      uiLanguage,
+      allowedFeatures,
       reply: outcome.reply,
       results: outcome.results || [],
       provider: outcome.provider,

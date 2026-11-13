@@ -24,3 +24,15 @@ test("listShoutOutTemplates source resolves clubLocationId via requireClubLocati
   assert.match(src, /CLUB_NAME_ALIASES/);
   assert.match(src, /aurelia:\s*"temp-democlub-1"/);
 });
+
+test("isClubPublic rejects offboarded / unpublished clubs", () => {
+  assert.equal(tools.isClubPublic({visibility: "public"}), true);
+  assert.equal(tools.isClubPublic({visibility: "public", publicProfilePublished: true, publicVisible: true}), true);
+  assert.equal(tools.isClubPublic({visibility: "public", offboarded: true}), false);
+  assert.equal(tools.isClubPublic({visibility: "public", status: "offboarded"}), false);
+  assert.equal(tools.isClubPublic({visibility: "public", publicProfilePublished: false}), false);
+  assert.equal(tools.isClubPublic({visibility: "public", publicVisible: false}), false);
+  assert.equal(tools.isClubPublic({visibility: "public", publicProfileEnabled: false}), false);
+  assert.equal(tools.isClubPublic({visibility: "public", active: false}), false);
+  assert.equal(tools.isClubPublic({visibility: "private"}), false);
+});
