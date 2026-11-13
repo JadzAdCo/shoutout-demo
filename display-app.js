@@ -1244,8 +1244,15 @@
     stage.setAttribute("aria-hidden", "false");
     const ink = safeRender.safeColor?.(overlayInk || "#006BB6", "#006BB6") || "#006BB6";
     const outline = safeRender.safeColor?.(overlayOutline || "#ED174C", "#ED174C") || "#ED174C";
+    // Underlay: white fabric behind blue ink; deep blue behind white ink (Icon).
+    const underlay = (() => {
+      const hex = String(ink || "").replace("#", "").toLowerCase();
+      if (hex === "ffffff" || hex === "fff") return "#003DA5";
+      return "#ffffff";
+    })();
     canvas.style.setProperty("--nba-pair-ink", ink);
     canvas.style.setProperty("--nba-pair-outline", outline);
+    canvas.style.setProperty("--nba-pair-underlay", underlay);
     const back = stage.querySelector(".nba-pair-back");
     const front = stage.querySelector(".nba-pair-front");
     const backKit = back?.querySelector(".nba-pair-kit");
