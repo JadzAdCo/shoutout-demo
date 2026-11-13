@@ -509,12 +509,31 @@ function localePack(lang) {
   return RESULT_LOCALES.byLang?.[code] || null;
 }
 
+function localeLookupKeys(row) {
+  const sourceId = String(row?.sourceId || "").trim();
+  const id = String(row?.id || "").trim();
+  const keys = [];
+  if (sourceId) keys.push(sourceId);
+  // HELP intents are catalogued as intent:help-* but locales are keyed help:<id>.
+  if (sourceId.startsWith("intent:help-")) keys.push(`help:${sourceId.slice("intent:".length)}`);
+  if (id.startsWith("help-")) keys.push(`help:${id}`);
+  if (sourceId.startsWith("intent:") && !sourceId.startsWith("intent:help-")) {
+    keys.push(sourceId);
+  }
+  return [...new Set(keys.filter(Boolean))];
+}
+
 function localizeResultRow(row, lang) {
   if (!row || typeof row !== "object") return row;
   const pack = localePack(lang);
   if (!pack) return {...row};
-  const key = String(row.sourceId || "").trim();
-  const hit = key && pack.results?.[key] ? pack.results[key] : null;
+  let hit = null;
+  for (const key of localeLookupKeys(row)) {
+    if (pack.results?.[key]) {
+      hit = pack.results[key];
+      break;
+    }
+  }
   const next = {...row};
   if (hit?.label) next.label = hit.label;
   if (hit?.blurb) next.blurb = hit.blurb;
@@ -676,6 +695,7 @@ module.exports = {
   normalizeBotDeeSettings,
   normalizeUiLanguage,
   localizeResultRow,
+  localeLookupKeys,
   localizeSearchPayload,
   localizeActionLink,
   featureKeyForSource,

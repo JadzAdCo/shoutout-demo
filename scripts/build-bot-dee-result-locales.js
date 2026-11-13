@@ -85,10 +85,13 @@ function buildLocales(root = ROOT) {
     Object.keys(pack).forEach(id => {
       const row = pack[id] || {};
       if (!row.title && !row.body) return;
-      rows[`help:${id}`] = {
+      const localized = {
         label: String(row.title || id).slice(0, 120),
         blurb: sliceBlurb(row.body)
       };
+      rows[`help:${id}`] = localized;
+      // Catalog also emits HELP intents as intent:help-* — alias so German UI remaps them.
+      rows[`intent:${id}`] = localized;
     });
 
     Object.entries(INTENT_LABEL_KEYS).forEach(([id, labelKey]) => {

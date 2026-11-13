@@ -376,10 +376,19 @@ function publicUserCard(uid, data = {}, score) {
   };
 }
 
+/** Match club-profile / feature-gates public visibility — never leak offboarded or unpublished clubs. */
 function isClubPublic(data = {}) {
+  if (!data || typeof data !== "object") return false;
+  if (data.offboarded === true) return false;
+  const status = String(data.status || "").trim().toLowerCase();
+  if (["offboarded", "deleted", "disabled"].includes(status)) return false;
   if (data.publicProfilePublished === false) return false;
+  if (data.publicVisible === false || data.publicProfileEnabled === false) return false;
+  if (data.active === false) return false;
+  if (data.appEnabled === false) return false;
   const visibility = String(data.visibility || "public").trim().toLowerCase();
-  return visibility === "public" || visibility === "";
+  if (visibility && visibility !== "public") return false;
+  return true;
 }
 
 function publicClubCard(id, data = {}, score) {
@@ -513,6 +522,7 @@ module.exports = {
   createFloqCastRequest,
   createFloqCastCheckout,
   lookupPublicProfiles,
+  isClubPublic,
   resolveClubLocationId,
   requireClubLocationId,
   normalizeClubNeedle,

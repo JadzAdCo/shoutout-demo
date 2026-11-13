@@ -107,8 +107,10 @@
       const next = Object.assign({}, row);
       const sourceId = String(row.sourceId || "");
       const kind = String(row.kind || "").toLowerCase();
-      if (sourceId.startsWith("help:")) {
-        const id = sourceId.slice(5);
+      if (sourceId.startsWith("help:") || sourceId.startsWith("intent:help-") || String(row.id || "").startsWith("help-")) {
+        const id = sourceId.startsWith("help:")
+          ? sourceId.slice(5)
+          : (sourceId.startsWith("intent:") ? sourceId.slice("intent:".length) : String(row.id || ""));
         const hit = helpPack[id];
         if (hit?.title) next.label = hit.title;
         if (hit?.body) next.blurb = String(hit.body).replace(/\s+/g, " ").trim().slice(0, 280);

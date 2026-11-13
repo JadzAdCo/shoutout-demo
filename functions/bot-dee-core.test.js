@@ -253,6 +253,21 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
 });
 
+test("intent:help-* result cards localize via help pack alias", () => {
+  const row = {
+    sourceId: "intent:help-botdee-page",
+    id: "help-botdee-page",
+    kind: "product",
+    label: "BOT DEE",
+    blurb: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast"
+  };
+  const de = bot.localizeResultRow(row, "de");
+  assert.equal(de.label, "BOT DEE");
+  assert.match(de.blurb, /Chatte mit BOT DEE|BOT DEE-Seite/i);
+  assert.doesNotMatch(de.blurb, /Chat with BOT DEE on the BOT DEE page in plain words/);
+  assert.ok(bot.RESULT_LOCALES.byLang.de.results["intent:help-botdee-page"]);
+});
+
 test("package depends on @google/genai", () => {
   const pkg = JSON.parse(read("functions/package.json"));
   assert.ok(pkg.dependencies["@google/genai"]);
