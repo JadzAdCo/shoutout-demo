@@ -24,6 +24,8 @@ test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients"
   assert.doesNotMatch(backend, /payment_method_types/);
   assert.match(backend, /v2\.core\.accounts\.retrieve/);
   assert.match(backend, /trustedConnectRecipient/);
+  assert.match(backend, /optionalReadyRecipient/);
+  assert.match(backend, /applyDestinationCharge/);
   assert.match(backend, /paymentModel:"floqr-platform"/);
   assert.match(backend, /SHOUTOUT_CLUB_SHARE_PERCENT = 20/);
   assert.match(backend, /This ShoutOut template does not require checkout/);
@@ -31,7 +33,9 @@ test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients"
   assert.match(backend, /assignment\.data\(\)\?\.status, 40\)\.toLowerCase\(\) === "active"/);
   assert.match(backend, /function testPaymentFields/);
   assert.match(backend, /exports\.purgeFloqrTestPayments/);
+  assert.match(backend, /exports\.refundFloqrCheckoutOrder/);
   assert.match(backend, /isTestPayment/);
+  assert.doesNotMatch(backend, /type !== "commerce" && type !== "shoutout"/);
 });
 
 test("Commerce inventory is reserved before Checkout and released safely", () => {

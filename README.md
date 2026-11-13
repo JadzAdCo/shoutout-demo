@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.006 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.007 (stable)
 
+- s3.3.007: Stripe sandbox wiring — Connect → VIP Club Stripe, destination charges when ready (test keys only; no operator refunds).
 - s3.3.006: BOT DEE durable threads — signed-in chat resumes after refresh or on a second device until the idle pause.
 - s3.3.005: BOT DEE locale-filtered results + feature-access filtering + public profile tool
 - s3.3.004: PHILA White/Blue colorway select on ShoutOut composer; blue Icon blanks from owner blue-pair control; white blanks from control C.

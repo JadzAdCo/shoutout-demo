@@ -155,6 +155,20 @@
     }
   }
 
+  async function refundCheckoutOrder({orderId, reason} = {}) {
+    requireUser();
+    if (!orderId) throw new Error("Choose a paid sandbox order to refund.");
+    try {
+      const response = await callable("refundFloqrCheckoutOrder")({orderId, reason: reason || "sandbox-refund"});
+      await logClient("info", "checkout_refunded_client", `Sandbox refund ${orderId}`, {orderId, reason});
+      return response?.data || {};
+    } catch (error) {
+      const unwrapped = unwrapCallableError(error);
+      await logClient("error", "checkout_refund_failed", unwrapped.message, {orderId});
+      throw unwrapped;
+    }
+  }
+
   async function cancelCheckoutOrder({orderId, reason} = {}) {
     requireUser();
     if (!orderId) throw new Error("Choose a checkout order to cancel.");
@@ -230,6 +244,7 @@
     confirmCheckoutSession,
     startConnectOnboarding,
     cancelCheckoutOrder,
+    refundCheckoutOrder,
     clearUnpaidCheckouts,
     purgeTestPayments,
     publishFollowerCampaign,

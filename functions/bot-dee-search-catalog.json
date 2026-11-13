@@ -2510,7 +2510,7 @@
       "id": "help-vip-payment-collector",
       "kind": "help",
       "label": "VIP reserV payment collector & Club POS",
-      "blurb": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to Floq",
+      "blurb": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect from Club Admin → Stripe onboarding — FLOQR stores the account in stripeConnectAccounts, not a typed ",
       "href": "./admin.html?from=botdee&location=temp-democlub-1&tab=panelVipReserv",
       "phrases": [
         "vip reserv payment collector club pos",

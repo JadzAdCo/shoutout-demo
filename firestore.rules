@@ -209,7 +209,9 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "stripeTransfersActive",
+ "stripeCapabilityTransfers"
  ]);
  }
 
@@ -664,7 +666,9 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "stripeTransfersActive",
+ "stripeCapabilityTransfers"
  ]);
  allow update: if (isMasterAdmin() || isClubManager(id))
  && preservesStripeBindingFields();
