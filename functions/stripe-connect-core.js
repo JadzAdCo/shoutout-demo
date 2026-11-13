@@ -98,6 +98,35 @@ function buildRecipientAccountParams({bindingId, entityType, entityId, displayNa
   return params;
 }
 
+function isStripeConnectedAccountId(value = "") {
+  return /^acct_[A-Za-z0-9]+$/i.test(bounded(value, 160));
+}
+
+/** Connect webhooks: capability.updated.object.id is the capability; deauthorized.object.id is ca_. Only accept acct_. */
+function connectAccountIdFromWebhookEvent(event = {}) {
+  const object = event?.data?.object && typeof event.data.object === "object" ? event.data.object : {};
+  const type = bounded(event?.type, 80);
+  const candidates = type === "capability.updated"
+    ? [object.account, event.account]
+    : type === "account.application.deauthorized"
+      ? [event.account, object.account]
+      : [event.account, object.id, object.account];
+  for (const candidate of candidates) {
+    const id = bounded(candidate, 160);
+    if (isStripeConnectedAccountId(id)) return id;
+  }
+  return "";
+}
+
+function payoutRecoveryAfterRefund(order = {}, {reverseTransfer = false, charge = null} = {}) {
+  if (!bounded(order.connectedAccountId || "", 160)) return "not-applicable";
+  if (bounded(order.payoutRecoveryStatus || "", 80) === "reversed") return "reversed";
+  const refunds = Array.isArray(charge?.refunds?.data) ? charge.refunds.data : [];
+  const stripeReversed = reverseTransfer === true
+    || refunds.some(row => !!(row && (row.transfer_reversal || row.reverse_transfer === true)));
+  return stripeReversed ? "reversed" : "manual-transfer-reversal-review";
+}
+
 function buildAccountLinkParams({accountId, capabilityStatus, refreshUrl, returnUrl} = {}) {
   const account = bounded(accountId, 160);
   if (!account || !refreshUrl) throw new Error("Connect onboarding link data is incomplete.");
@@ -114,8 +143,11 @@ function buildAccountLinkParams({accountId, capabilityStatus, refreshUrl, return
 module.exports = {
   buildAccountLinkParams,
   buildRecipientAccountParams,
+  connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
+  isStripeConnectedAccountId,
   normalizeConnectEntityType,
+  payoutRecoveryAfterRefund,
   recipientCapability
 };

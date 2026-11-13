@@ -7,9 +7,11 @@ const {defineSecret} = require("firebase-functions/params");
 const {
   buildAccountLinkParams,
   buildRecipientAccountParams,
+  connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
-  normalizeConnectEntityType
+  normalizeConnectEntityType,
+  payoutRecoveryAfterRefund
 } = require("./stripe-connect-core");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -676,7 +678,7 @@ async function refreshConnectBindingFromStripeAccount(accountHint = {}) {
 
 async function handleConnectAccountWebhook(event) {
   const object = event.data?.object || {};
-  const accountId = text(event.account || object.id || object.account, 160);
+  const accountId = connectAccountIdFromWebhookEvent(event);
   if (!accountId) return null;
   if (event.type === "account.application.deauthorized") {
     const found = await db.collection("stripeConnectAccounts").where("accountId", "==", accountId).limit(1).get();
@@ -1678,6 +1680,7 @@ exports.refundFloqrCheckoutOrder = onCall({
     refundedAt: now,
     refundReason: reason,
     refundedByUid: request.auth.uid,
+    payoutRecoveryStatus: payoutRecoveryAfterRefund(order, {reverseTransfer: !!refundParams.reverse_transfer}),
     updatedAt: now
   }, {merge: true});
   await writeAppLog({
@@ -2649,7 +2652,7 @@ async function recordRefundEvent(charge = {}) {
     stripeChargeId:text(charge.id, 160),
     refundAmountCents:amountRefunded,
     refundStatus:fullyRefunded ? "full" : "partial",
-    payoutRecoveryStatus:order.connectedAccountId ? "manual-transfer-reversal-review" : "not-applicable",
+    payoutRecoveryStatus: payoutRecoveryAfterRefund(order, {charge}),
     refundedAt:now,
     updatedAt:now
   }, {merge:true});

@@ -22,9 +22,9 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 | Connect binding | `stripeConnectAccounts/{connect_<sha>}` written by Functions only (`createFloqrConnectOnboardingLink`, `getFloqrConnectStatus`, `persistConnectStatus`) |
 | VIP Club Stripe | `loadClubStripeReady` reads `stripeConnectAccounts` (club binding), then club flag fallback. Club Admin onboarding no longer leaves `clubLocations.stripeConnectAccountId` empty as a blocker |
 | Destination charges | When Connect transfers are ready, Checkout sets `payment_intent_data.transfer_data.destination` + `application_fee_amount` for ShoutOut (80/20), floqCast, VIP `clubStripe`, and BartR. ShoutOut still works without Connect (`optionalReadyRecipient`) |
-| Webhook | Same `stripeFloqrWebhook` + `STRIPE_WEBHOOK_SECRET`. Add Dashboard events: `account.updated`, `capability.updated`, `account.application.deauthorized`. Do not require `STRIPE_CONNECT_WEBHOOK_SECRET` |
+| Webhook | Same `stripeFloqrWebhook` + `STRIPE_WEBHOOK_SECRET`. Add Dashboard events: `account.updated`, `capability.updated`, `account.application.deauthorized`. Lookup uses `connectAccountIdFromWebhookEvent` (`acct_` only — never capability names or `ca_`). Do not require `STRIPE_CONNECT_WEBHOOK_SECRET` |
 | Club flags | `persistConnectStatus` mirrors `stripeTransfersActive` / `stripeCapabilityTransfers` / `stripeConnectLivemode` onto `clubLocations` — **never** the `acct_` id. Client cannot write those fields (`preservesStripeBindingFields`) |
-| Sandbox refund | `refundFloqrCheckoutOrder` (test-mode only, `reverse_transfer` + `refund_application_fee`). Master Admin Logging + `FLOQRPayments.refundCheckoutOrder` |
+| Sandbox refund | `refundFloqrCheckoutOrder` (test-mode only, `reverse_transfer` + `refund_application_fee`). Writes `payoutRecoveryStatus: reversed` when the destination transfer is reversed; `charge.refunded` does not overwrite that back to `manual-transfer-reversal-review`. Master Admin Logging + `FLOQRPayments.refundCheckoutOrder` |
 | Surfaces | Club Admin public profile Stripe card; Master Admin Application Logging; patron Checkout unchanged |
 | Help | `help-vip-payment-collector` — Club Stripe uses Club Admin Connect onboarding |
 | Deploy | Functions + webhook event list. Pages cache-bust `payment-service.js` / `admin-app.js` / diagnostics |

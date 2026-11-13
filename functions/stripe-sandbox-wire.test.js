@@ -34,6 +34,8 @@ test("Connect webhook events refresh bindings on the existing platform endpoint"
   assert.match(commerce, /capability\.updated/);
   assert.match(commerce, /account\.application\.deauthorized/);
   assert.match(commerce, /async function handleConnectAccountWebhook/);
+  assert.match(commerce, /connectAccountIdFromWebhookEvent\(event\)/);
+  assert.doesNotMatch(commerce, /event\.account \|\| object\.id \|\| object\.account/);
   assert.match(commerce, /stripeTransfersActive/);
   assert.doesNotMatch(commerce, /STRIPE_CONNECT_WEBHOOK_SECRET/);
 });
@@ -43,6 +45,8 @@ test("sandbox refund callable is test-mode only with reverse_transfer", () => {
   assert.match(commerce, /Sandbox refunds are only available while Stripe is in test mode/);
   assert.match(commerce, /refundParams\.reverse_transfer = true/);
   assert.match(commerce, /refund_application_fee: true/);
+  assert.match(commerce, /payoutRecoveryAfterRefund\(order, \{reverseTransfer: !!refundParams\.reverse_transfer\}\)/);
+  assert.match(commerce, /payoutRecoveryAfterRefund\(order, \{charge\}\)/);
   assert.match(paymentService, /refundFloqrCheckoutOrder/);
   assert.match(paymentService, /refundCheckoutOrder/);
   assert.match(logging, /sandboxRefundOrderBtn/);
