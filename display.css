@@ -987,10 +987,16 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   font-family:"Agency FB","Arial Narrow","Franklin Gothic Condensed",Impact,sans-serif;
   font-weight:800;
   letter-spacing:.04em;
+  /* Underlay blocks residual baked glyphs; outline matches team red. */
   text-shadow:
-    1px 1px 0 var(--nba-pair-outline, #ED174C),
-    -1px 0 0 var(--nba-pair-outline, #ED174C),
-    0 -1px 0 var(--nba-pair-outline, #ED174C);
+    0 0 0.18em var(--nba-pair-underlay, #ffffff),
+    0.06em 0 0 var(--nba-pair-underlay, #ffffff),
+    -0.06em 0 0 var(--nba-pair-underlay, #ffffff),
+    0 0.06em 0 var(--nba-pair-underlay, #ffffff),
+    0 -0.06em 0 var(--nba-pair-underlay, #ffffff),
+    0.08em 0.08em 0 var(--nba-pair-outline, #ED174C),
+    -0.04em 0 0 var(--nba-pair-outline, #ED174C),
+    0 -0.04em 0 var(--nba-pair-outline, #ED174C);
   line-height:.9;
   pointer-events:none;
 }
