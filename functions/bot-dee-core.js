@@ -9,9 +9,13 @@ const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 const RESULT_LOCALES = require("./bot-dee-result-locales.json");
 
 const MAX_HISTORY = 12;
+const MAX_STORED_EVENTS = 24;
 const MAX_MESSAGE_CHARS = 2000;
+const MAX_MODEL_CHARS = 8000;
 const MAX_RESULTS = 8;
 const MAX_TOOL_ROUNDS = 4;
+const DEFAULT_DURABLE_THREADS = 1;
+const THREAD_SCHEMA_VERSION = 1;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const SUPPORTED_UI_LANGS = new Set(["en", "de", "fr", "es", "it", "pt", "ru", "el", "pl", "nl", "ar"]);
 
@@ -364,7 +368,7 @@ function isIdentityPrompt(raw) {
 }
 
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
-const DEFAULT_IDLE_SECONDS = 60;
+const DEFAULT_IDLE_SECONDS = 300;
 const MIN_IDLE_SECONDS = 15;
 const MAX_IDLE_SECONDS = 600;
 
@@ -374,14 +378,97 @@ function clampIdleSeconds(raw) {
   return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
 }
 
+function flag01(value, fallback) {
+  if (value === 0 || value === "0" || value === false) return 0;
+  if (value === 1 || value === "1" || value === true) return 1;
+  return fallback === 0 || fallback === 1 ? fallback : 0;
+}
+
 function normalizeBotDeeSettings(raw) {
   const row = raw && typeof raw === "object" ? raw : {};
   return {
     conversationIdleSeconds: clampIdleSeconds(
       row.conversationIdleSeconds != null ? row.conversationIdleSeconds : DEFAULT_IDLE_SECONDS
     ),
+    durableThreads: flag01(row.durableThreads, DEFAULT_DURABLE_THREADS),
     revision: Math.max(0, Math.floor(Number(row.revision) || 0))
   };
+}
+
+function threadIdForUid(uid) {
+  return String(uid || "").trim();
+}
+
+/** v1 is one thread per uid. Guessed or foreign ids are ignored. */
+function coerceThreadId(requested, uid) {
+  void requested;
+  return threadIdForUid(uid);
+}
+
+function eventDocId(seq) {
+  const n = Number(seq);
+  if (!Number.isFinite(n) || n < 1) return "";
+  return `e${String(Math.floor(n)).padStart(8, "0")}`;
+}
+
+function isThreadIdle(lastMessageAtMs, idleSeconds, nowMs) {
+  const last = Number(lastMessageAtMs) || 0;
+  if (!last) return false;
+  const now = Number(nowMs) || Date.now();
+  return now - last >= clampIdleSeconds(idleSeconds) * 1000;
+}
+
+function remainingIdleMs(lastMessageAtMs, idleSeconds, nowMs) {
+  const last = Number(lastMessageAtMs) || 0;
+  const budget = clampIdleSeconds(idleSeconds) * 1000;
+  if (!last) return budget;
+  const now = Number(nowMs) || Date.now();
+  return Math.max(0, last + budget - now);
+}
+
+function clipStoredText(raw, maxChars) {
+  const cap = Number(maxChars) > 0 ? Math.floor(Number(maxChars)) : MAX_MESSAGE_CHARS;
+  return String(raw || "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim()
+    .slice(0, cap);
+}
+
+function clipStoredTurns(turns) {
+  const list = Array.isArray(turns) ? turns : [];
+  const out = [];
+  list.slice(-MAX_HISTORY).forEach(row => {
+    const role = row?.role === "model" || row?.role === "assistant" ? "model" : row?.role === "user" ? "user" : "";
+    const max = role === "model" ? MAX_MODEL_CHARS : MAX_MESSAGE_CHARS;
+    const text = clipStoredText(row?.text || row?.content || "", max);
+    if (!role || !text) return;
+    out.push({role, text});
+  });
+  return out;
+}
+
+function conversationIsActive(history, lastMessageAtMs, idleSeconds, nowMs) {
+  if (isThreadIdle(lastMessageAtMs, idleSeconds, nowMs)) return false;
+  return sanitizeHistory(history).length > 0;
+}
+
+function clipModelText(raw) {
+  return clipStoredText(raw, MAX_MODEL_CHARS);
+}
+
+/** Canonical stored miss copy — must match `botdee.chatEmpty` English. Client localizes it. */
+const SEARCH_MISS_FALLBACK = "No answer yet — try quick intent search.";
+
+function isSearchMissReply(raw) {
+  const text = String(raw || "").trim();
+  return !text || /could not find a clear match/i.test(text) || text === SEARCH_MISS_FALLBACK;
+}
+
+function sanitizeBotReply(raw) {
+  if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
+  return clipModelText(raw);
 }
 
 function isFarewellPrompt(raw) {
@@ -712,7 +799,11 @@ module.exports = {
   TEXT_MODEL,
   MAX_TOOL_ROUNDS,
   MAX_HISTORY,
+  MAX_STORED_EVENTS,
   MAX_MESSAGE_CHARS,
+  MAX_MODEL_CHARS,
+  DEFAULT_DURABLE_THREADS,
+  THREAD_SCHEMA_VERSION,
   MIN_SEARCH_SCORE,
   DEFAULT_IDLE_SECONDS,
   MIN_IDLE_SECONDS,
@@ -734,7 +825,20 @@ module.exports = {
   resumeReply,
   idleEndedReply,
   clampIdleSeconds,
+  flag01,
   normalizeBotDeeSettings,
+  threadIdForUid,
+  coerceThreadId,
+  eventDocId,
+  isThreadIdle,
+  remainingIdleMs,
+  clipStoredText,
+  clipStoredTurns,
+  conversationIsActive,
+  clipModelText,
+  SEARCH_MISS_FALLBACK,
+  isSearchMissReply,
+  sanitizeBotReply,
   normalizeUiLanguage,
   localizeResultRow,
   localeLookupKeys,

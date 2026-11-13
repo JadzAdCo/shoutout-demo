@@ -1,5 +1,6 @@
 /* BOT DEE — executeBotSession callable (Auth + botDee gate + classification → Gemini + tools).
    Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role).
+   Durable threads: getBotDeeThread + persist under botDeeThreads/{uid}.
    Master Admin: setBotDeeSettings (idle pause) under SOS2FA. */
 "use strict";
 
@@ -9,6 +10,7 @@ const {defineSecret} = require("firebase-functions/params");
 const {GoogleGenAI, FunctionCallingConfigMode} = require("@google/genai");
 const core = require("./data-classification-core");
 const bot = require("./bot-dee-core");
+const threads = require("./bot-dee-thread");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const {__botDeeHelpers} = require("./data-classification-functions");
 const {assertSos2faSession} = require("./sos2fa-functions");
@@ -150,9 +152,10 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
-function localSession(role, userPrompt, uiLanguage, allowedFeatures) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
+  const isActive = !!active;
   if (bot.isAckPrompt(userPrompt)) {
     return {
       reply: bot.ackReply(role, userPrompt),
@@ -175,10 +178,10 @@ function localSession(role, userPrompt, uiLanguage, allowedFeatures) {
   }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
-      reply: bot.chitchatReply(role, allowed),
+      reply: isActive ? bot.stillHereReply() : bot.chitchatReply(role, allowed),
       results: [],
       provider: "local-chitchat",
-      model: "chitchat",
+      model: isActive ? "still-here" : "chitchat",
       toolRounds: 0,
       uiLanguage: lang
     };
@@ -211,15 +214,36 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     await audit.assertFeatureAccess(request.auth, "botDee", request);
 
-    const userPrompt = bot.sanitizeUserPrompt(request.data?.message || request.data?.prompt || "");
+    const rawMessage = request.data?.message || request.data?.prompt || "";
+    const storedUserText = bot.clipStoredText(rawMessage, bot.MAX_MESSAGE_CHARS);
+    const userPrompt = bot.sanitizeUserPrompt(rawMessage);
     if (!userPrompt) throw new HttpsError("invalid-argument", "Send a message for BOT DEE.");
 
     const uiLanguage = bot.normalizeUiLanguage(
       request.data?.uiLanguage || request.data?.lang || request.data?.locale
     );
-    const history = bot.sanitizeHistory(request.data?.history);
+    const clientHistory = bot.sanitizeHistory(request.data?.history);
     const facts = await __botDeeHelpers.roleFactsFor(request.auth);
     const {role} = core.resolveViewerRole(facts);
+    const uid = request.auth.uid;
+    const receivedAtMs = Date.now();
+    const settings = await threads.loadSettings();
+    const coercedThreadId = bot.coerceThreadId(request.data?.threadId, uid);
+    let stored = {durable: false, history: [], idleEnded: false, lastMessageAtMs: 0};
+    if (settings.durableThreads) {
+      try {
+        stored = await threads.loadThreadState(uid, settings);
+      } catch (err) {
+        console.warn("BOT DEE loadThread failed", err?.message || err);
+      }
+    }
+    const history = settings.durableThreads ? stored.history : clientHistory;
+    const active = bot.conversationIsActive(
+      history,
+      stored.lastMessageAtMs,
+      settings.conversationIdleSeconds,
+      receivedAtMs
+    );
     let allowedFeatures = null;
     try {
       const access = await loadAllowedFeatures(request.auth);
@@ -229,7 +253,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       allowedFeatures = ["shoutOut", "botDee", "passes"];
     }
     const session = Object.freeze({
-      userId: request.auth.uid,
+      userId: uid,
       role,
       uiLanguage,
       allowedFeatures,
@@ -240,27 +264,45 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const apiKey = geminiKey();
     let outcome;
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
-    if (bot.isChitchatPrompt(userPrompt) || bot.isIdentityPrompt(userPrompt)) {
-      outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
+    if (
+      bot.isAckPrompt(userPrompt)
+      || bot.isMoodPrompt(userPrompt)
+      || bot.isChitchatPrompt(userPrompt)
+      || bot.isIdentityPrompt(userPrompt)
+    ) {
+      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
     } else if (apiKey) {
       try {
         outcome = await runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures});
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
-        outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
+        outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
     } else {
-      outcome = localSession(role, userPrompt, uiLanguage, allowedFeatures);
+      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
+    }
+    outcome.reply = bot.sanitizeBotReply(outcome.reply);
+
+    if (settings.durableThreads) {
+      try {
+        await threads.persistExchange(uid, settings, storedUserText, outcome.reply, {receivedAtMs});
+        if (bot.isFarewellPrompt(userPrompt)) {
+          await threads.markIdleEnded(uid, settings);
+        }
+      } catch (err) {
+        console.warn("BOT DEE persist failed", err?.message || err);
+      }
     }
 
     console.info(JSON.stringify({
       event: "botdee.session",
-      uid: request.auth.uid,
+      uid,
       role,
       uiLanguage,
       allowedFeatures,
       provider: outcome.provider,
+      durable: !!settings.durableThreads,
       results: (outcome.results || []).length,
       toolRounds: outcome.toolRounds || 0
     }));
@@ -274,7 +316,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       results: outcome.results || [],
       provider: outcome.provider,
       model: outcome.model,
-      toolRounds: outcome.toolRounds || 0
+      toolRounds: outcome.toolRounds || 0,
+      durable: !!settings.durableThreads,
+      threadId: coercedThreadId || bot.threadIdForUid(uid),
+      conversationIdleSeconds: settings.conversationIdleSeconds
     };
   } catch (error) {
     throw asHttps(error);
@@ -331,6 +376,44 @@ exports.setBotDeeSettings = onCall(ADMIN_CALL_OPTS, async request => {
       reason: after.lastChangeReason
     }));
     return {ok: true, settings: bot.normalizeBotDeeSettings(after), before, after};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+const GET_THREAD_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB", maxInstances: 20};
+
+exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to chat with BOT DEE.");
+    }
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
+    const uid = request.auth.uid;
+    const settings = await threads.loadSettings();
+    if (!settings.durableThreads) {
+      return {
+        ok: true,
+        durable: false,
+        status: "fresh",
+        threadId: bot.threadIdForUid(uid),
+        turns: [],
+        idleSeconds: settings.conversationIdleSeconds,
+        remainingMs: settings.conversationIdleSeconds * 1000
+      };
+    }
+    const state = await threads.loadThreadState(uid, settings);
+    return {
+      ok: true,
+      durable: true,
+      status: state.status,
+      threadId: state.threadId,
+      turns: state.turns,
+      conversationEpoch: state.conversationEpoch,
+      lastMessageAtMs: state.lastMessageAtMs,
+      remainingMs: state.remainingMs,
+      idleSeconds: settings.conversationIdleSeconds
+    };
   } catch (error) {
     throw asHttps(error);
   }

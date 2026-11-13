@@ -55,11 +55,26 @@ test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   assert.match(page, /getViewerAudience/);
   assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
+  assert.match(read("bot-dee-chat.js"), /getBotDeeThread/);
+  assert.match(read("bot-dee-chat.js"), /Restoring your conversation/);
+  assert.match(read("bot-dee-chat.js"), /durableEnabled/);
+  assert.match(read("bot-dee-chat.js"), /restoreOrWelcome/);
+  assert.match(read("bot-dee-chat.js"), /function displayReply/);
+  assert.match(read("bot-dee-chat.js"), /botdee\.chatEmpty/);
+  assert.match(read("bot-dee-chat.js"), /No answer yet — try quick intent search/);
+  assert.match(read("functions/bot-dee-functions.js"), /receivedAtMs/);
+  assert.match(read("functions/bot-dee-functions.js"), /storedUserText/);
+  assert.match(read("functions/bot-dee-functions.js"), /clipStoredText\(rawMessage/);
+  assert.match(read("functions/bot-dee-thread.js"), /nextTranscript/);
+  assert.match(read("functions/bot-dee-thread.js"), /lastMessageAtMs: receivedAtMs/);
+  assert.match(read("bot-dee-chat.js"), /restoreInFlight/);
+  assert.match(read("bot-dee-chat.js"), /if \(restoreInFlight/);
+  assert.match(read("bot-dee-chat.js"), /setBusy\(true\)/);
   assert.match(read("bot-dee-chat.js"), /isChitchatPrompt/);
   assert.match(read("bot-dee-chat.js"), /isMoodPrompt/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatHello/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatMood/);
-  assert.match(read("bot-dee-chat.js"), /Chatbot first/);
+  assert.match(read("bot-dee-chat.js"), /Local chatbot first only when durable threads are off/);
   assert.match(read("bot-dee-chat.js"), /Shift\+Enter|shiftKey/);
   assert.match(read("bot-dee-chat.js"), /event\.key !== "Enter"/);
   assert.match(read("botdee.html"), /Enter sends/);
@@ -103,6 +118,8 @@ test("BOT DEE page chrome is localized", () => {
   assert.match(helpRepo, /Ask FloqR with BOT DEE/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatWelcome"/);
   assert.match(read("floqr-i18n.js"), /"botdee\.helpComposer"/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatRestoring"/);
+  assert.match(helpRepo, /refresh or open another phone/);
   assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
   // Patron-facing chrome + help title/body values never say FloqAi (legacy search aliases OK).
   const chromeVals = [...read("floqr-i18n.js").matchAll(/:\s*"([^"]*)"/g)].map(m => m[1]);

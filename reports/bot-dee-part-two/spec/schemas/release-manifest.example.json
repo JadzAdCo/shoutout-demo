@@ -1,0 +1,11 @@
+{
+  "_example_only": true,
+  "application": "BOT-DEE",
+  "version": "0.0.0-EXAMPLE-NOT-DEPLOYED",
+  "environment": "example",
+  "releaseChannel": "example",
+  "buildSha": "EXAMPLE",
+  "deployedAt": null,
+  "capabilityRegistryRevision": "EXAMPLE",
+  "documentationRevision": "EXAMPLE"
+}

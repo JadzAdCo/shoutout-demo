@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.005";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.005";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.006";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.006";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.006",
+      title: "s3.3.006 — BOT DEE durable threads (refresh / second device resume)",
+      checks: [
+        {label:"Thread persist", file:"functions/bot-dee-thread.js", includes:["botDeeThreads", "persistExchange", "loadThreadState"]},
+        {label:"getBotDeeThread export", file:"functions/index.js", includes:["getBotDeeThread"]},
+        {label:"Chat restore", file:"bot-dee-chat.js", includes:["getBotDeeThread", "restoreOrWelcome", "durableEnabled"]},
+        {label:"Owner-only rules", file:"firestore.rules", includes:["match /botDeeThreads/{threadId}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-006-botdee-durable-threads"]}
+      ]
+    },
     {
       version: "s3.3.005",
       title: "s3.3.005 — BOT DEE locale-filtered results + public profile tool",
@@ -2941,13 +2952,23 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-006-botdee-durable-threads",
+      area:"BOT DEE",
+      feature:"Durable chat threads — refresh and second device resume",
+      changed:"s3.3.006 — signed-in BOT DEE stores the last 12 turns under botDeeThreads/{uid}. Refresh or another phone restores while inside the conversation pause (Master Admin setting; packaged default 300 seconds / 5 minutes). Idle / goodbye starts a fresh conversation. Flag durableThreads defaults on. Needs Pages + Functions + firestore.rules.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.006) signed in with botDee access. 2) Send a message (try How are you?). 3) Refresh the tab — the transcript should return, not a blank welcome. 4) Open the same URL on another browser/profile signed into the same account — same transcript. 5) Wait for the conversation pause (packaged default 300 seconds / 5 minutes; Master Admin → Features Mgmt → BOT DEE) — next message starts fresh. 6) Master Admin → Diagnostics → Manual Feature Tests → mark Succeed/Failed.",
+      expected:"Active chat survives refresh and a second device until the conversation pause or goodbye. After the pause, welcome/fresh chat. Unsigned or durableThreads=0 stays tab-only.",
+      troubleshoot:"Always welcome after refresh → Functions deploy getBotDeeThread + executeBotSession (Pages-only is not enough). Permission error → firestore.rules deploy for botDeeThreads. Feature denied → botDee beta/live gate. Old chat.js → hard refresh botdee.html s3.3.006."
+    },
+    {
       id:"s3-3-005-botdee-locale-public-profiles",
       area:"BOT DEE / i18n / Profiles",
       feature:"BOT DEE locale help + least-privilege feature access",
       changed:"s3.3.005 — uiLanguage localizes result cards; Features & Services + beta grants drive least privilege: search/help/pitch/tools include only features THIS viewer may use; help blurbs scrub sibling betas the viewer lacks; lookupPublicProfiles for public patron/club fields + images.",
-      howToTest:"Least privilege (both sides). A) No beta grants: hard-refresh botdee.html (s3.3.005); ask ShoutOut how-to in Deutsch/Français/العربية — localized cards; help/reply/greeting must NOT name Mingl, RydR, BartR, floqCast, VIP. B) Grant floqCast (and/or VIP) on the same account via Master Admin Features & Services / beta features — hard-refresh; ask floqCast / VIP how-to — those products MUST appear in search cards, help blurbs, and pitch; still scrub any siblings not granted. C) Public club/@handle → public fields/photos only. Mark Succeed/Failed.",
+      howToTest:"Least privilege (both sides). A) No beta grants: hard-refresh botdee.html (s3.3.006); ask ShoutOut how-to in Deutsch/Français/العربية — localized cards; help/reply/greeting must NOT name Mingl, RydR, BartR, floqCast, VIP. B) Grant floqCast (and/or VIP) on the same account via Master Admin Features & Services / beta features — hard-refresh; ask floqCast / VIP how-to — those products MUST appear in search cards, help blurbs, and pitch; still scrub any siblings not granted. C) Public club/@handle → public fields/photos only. Mark Succeed/Failed.",
       expected:"Granted features visible in search + help; ungranted betas never exposed (scrubbed from multi-product help too); locale cards match uiLanguage.",
       troubleshoot:"English cards → redeploy executeBotSession / hard-refresh bot-dee-chat.js. Ungranted brand leak → sanitizeFeatureMentions + scrubGatedBrands + canAccessFeature. Granted feature missing → betaTesters.features[key]==1 and IsFeatureEnabled/IsTestFeature; client FLOQRFeatureServices.load. Profile miss → publicProfileVisibility / club published gates."
+
     },
     {
       id:"s3-3-003-phila-blanks-terps-qa",
