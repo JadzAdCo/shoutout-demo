@@ -232,6 +232,9 @@
     }
     if (/\b(?:your|bot\s*dee|floqr|app|software)\s+(?:version|build|package|release)\b/.test(q)) return true;
     if (/\b(?:what|which|whats|what s|what is)\s+(?:your|the)\s+(?:version|build)(?:\s+info|\s+number)?\b/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is)\s+(?:version|build)\s+of\s+(?:floqr|bot\s*dee|the\s+app|this\s+app|the\s+software)\b/.test(q)) return true;
+    if (/\b(?:version|build)\s+of\s+(?:floqr|bot\s*dee|the\s+app|this\s+app)\b/.test(q)) return true;
+    if (/^(?:what|which)\s+(?:version|build)\??$/.test(q)) return true;
     if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,24}\b(?:your|bot\s*dee|floqr)\b.{0,20}\b(?:version|build|package|release)\b/.test(q)) return true;
     if (/\b(?:what|which)\s+(?:package|release)\s+(?:are you|is this|is floqr|am i on)\b/.test(q)) return true;
     if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;

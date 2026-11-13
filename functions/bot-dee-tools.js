@@ -416,19 +416,30 @@ function isSelfProfileQuery(raw) {
 }
 
 function isFriendContextQuery(raw) {
-  return /\b(?:my\s+)?(?:friend|buddy|mate|connection|mingl)\b/i.test(String(raw || ""));
+  // Do not treat bare “Mingl” as friend context — that blocked normal name lookups (e.g. “James on Mingl”).
+  return /\b(?:my\s+)?(?:friend|buddy|mate|connection)\b/i.test(String(raw || ""));
 }
 
-/** Extract the person name from “my friend James” / “about my buddy Erny”. */
+const FRIEND_NAME_STOPS = new Set([
+  "from", "at", "in", "the", "a", "an", "who", "that", "this", "with", "on", "of",
+  "club", "venue", "here", "there", "someone", "anybody", "anyone", "named", "called"
+]);
+
+/** Extract the person name from “my friend James” / “my friend, Erny”. */
 function friendNameFromQuery(raw) {
   const s = String(raw || "").trim();
   if (!s) return "";
   const m = s.match(
-    /\b(?:my\s+)?(?:friend|buddy|mate|connection)(?:\s+named)?\s+([@A-Za-z][\w.\-']*(?:\s+[A-Za-z][\w.\-']*){0,2})\b/i
+    /\b(?:my\s+)?(?:friend|buddy|mate|connection)(?:\s+named)?[,:\s]+([@A-Za-z][\w.\-']*(?:\s+[A-Za-z][\w.\-']*){0,2})\b/i
   ) || s.match(
-    /\b(?:about|know about)\s+(?:my\s+)?(?:friend|buddy|mate)\s+([@A-Za-z][\w.\-']+)/i
+    /\b(?:about|know about)\s+(?:my\s+)?(?:friend|buddy|mate)[,:\s]+([@A-Za-z][\w.\-']+)/i
   );
-  return m ? normalizeNeedle(m[1]) : "";
+  if (!m) return "";
+  const parts = normalizeNeedle(m[1])
+    .split(/\s+/)
+    .filter(part => part && !FRIEND_NAME_STOPS.has(part));
+  if (!parts.length || FRIEND_NAME_STOPS.has(parts[0])) return "";
+  return parts.join(" ");
 }
 
 async function loadConnectedUids(uid) {
@@ -521,11 +532,16 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const selfQuery = wantPeople && isSelfProfileQuery(rawQuery);
   const friendContext = wantPeople && isFriendContextQuery(rawQuery);
   const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
-  // Friend prompts must match the extracted name — never dump the whole social graph.
-  const matchNeedle = friendContext ? friendName : needle;
+  // Friend prompts must use the extracted name. If we cannot parse a name, do not
+  // blank the needle entirely — fall back to a cleaned needle (still require score ≥ 8).
+  const cleanedNeedle = needle
+    .split(/\s+/)
+    .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t))
+    .join(" ");
+  const matchNeedle = friendContext ? (friendName || cleanedNeedle) : needle;
   const tokens = String(matchNeedle || "")
     .split(/\s+/)
-    .filter(t => t.length > 1 && !stop.has(t));
+    .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t));
 
   if (wantPeople && selfQuery) {
     try {
@@ -568,7 +584,9 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     }
   }
 
-  if (wantPeople && !selfQuery && !friendContext && matchNeedle) {
+  // Public directory: skip when we already have a friend-name hit path with a parsed name
+  // (connections-only). If friend context lacked a parseable name, still allow public search.
+  if (wantPeople && !selfQuery && !(friendContext && friendName) && matchNeedle) {
     try {
       const snap = await db.collection("users")
         .where("publicProfileVisibility", "==", "public")

@@ -45,9 +45,12 @@ test("self / friend profile query helpers", () => {
   assert.equal(tools.isFriendContextQuery("what do you know about my friend James"), true);
   assert.equal(tools.isFriendContextQuery("my buddy Erny"), true);
   assert.equal(tools.isFriendContextQuery("Decades club"), false);
+  assert.equal(tools.isFriendContextQuery("James on Mingl"), false, "bare Mingl is not friend context");
   assert.equal(tools.friendNameFromQuery("what do you know about my friend James"), "james");
   assert.equal(tools.friendNameFromQuery("my buddy Erny"), "erny");
+  assert.equal(tools.friendNameFromQuery("my friend, James"), "james");
   assert.equal(tools.friendNameFromQuery("my friends"), "");
+  assert.equal(tools.friendNameFromQuery("my friend from the club"), "");
 });
 
 test("friend lookup requires a name match — no social-graph dump", () => {

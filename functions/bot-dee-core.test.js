@@ -162,6 +162,9 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(bot.isVersionPrompt("version info"), true);
   assert.equal(bot.isVersionPrompt("what package are you on"), true);
   assert.equal(bot.isVersionPrompt("name your version info"), true);
+  assert.equal(bot.isVersionPrompt("what version of FLOQR"), true);
+  assert.equal(bot.isVersionPrompt("what version of the app"), true);
+  assert.equal(bot.isVersionPrompt("what version"), true);
   assert.equal(bot.isVersionPrompt("who are you"), false);
   assert.equal(bot.isVersionPrompt("throw a shoutout"), false);
   assert.equal(bot.isVersionPrompt("what is the VIP package"), false);
