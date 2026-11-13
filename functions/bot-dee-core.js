@@ -152,9 +152,10 @@ const INTENT_FEATURE_KEY = Object.freeze({
   "ad-campaigns": null
 });
 
-/** VIP product phrases across app languages (brand VIP reserV + localized table/entry wording). */
+/** VIP product phrases across app languages.
+ *  Unicode letter boundaries — ASCII `\b` does not treat Cyrillic/Greek/Arabic as word chars. */
 const VIP_BRAND_RE =
-  /\bVIP\s*reserV\b|\bVIP[- ]?(?:table|tables|entry|entries|Tisch|Tische|tafel|tafels|стол|стола)\b|\b(?:table|tables|mesa|mesas|tavolo|tavoli|stolik|stoliki)\s+VIP\b|\bVIP\s+τραπέζι\b|\bطاولة\s+VIP\b/gi;
+  /(?<![\p{L}\p{N}_])(?:VIP\s*reserV|VIP[- ]?(?:table|tables|entry|entries|Tisch|Tische|tafel|tafels|стол|стола)|(?:table|tables|mesa|mesas|tavolo|tavoli|stolik|stoliki)\s+VIP|VIP\s+τραπέζι|طاولة\s+VIP)(?![\p{L}\p{N}_])/giu;
 
 const FEATURE_BRAND_PATTERNS = Object.freeze([
   {key: "mingl", re: /\bMingl\b/g},
@@ -202,15 +203,24 @@ function sanitizeFeatureMentions(text, allowedFeatures) {
   });
   out = out
     .replace(/\(\s*superstar\s*\)/gi, "")
-    .replace(/\s*,\s*,+/g, ",")
     .replace(/,\s+and\s+,/gi, ",")
     .replace(/\s+(?:or|oder|ou|o|или|ή|lub|أو)\s+,/gi, ",")
     .replace(/\(\s*,\s*/g, "(")
     .replace(/,\s*\)/g, ")")
     .replace(/\(\s*\)/g, "")
-    .replace(/:\s*,/g, ":")
-    .replace(/,\s*,/g, ",")
-    .replace(/\s{2,}/g, " ")
+    .replace(/:\s*,/g, ":");
+  let prev = "";
+  while (prev !== out) {
+    prev = out;
+    out = out
+      .replace(/,\s*,+/g, ",")
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+,/g, ",")
+      .replace(/,\s*$/g, "")
+      .replace(/^,\s*/g, "")
+      .trim();
+  }
+  out = out
     .replace(/\s+,/g, ",")
     .replace(/,\s*\./g, ".")
     .replace(/,\s*$/g, "")

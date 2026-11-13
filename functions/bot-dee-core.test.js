@@ -239,6 +239,21 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.doesNotMatch(scrubbed, /\bfloqCast\b/i);
   assert.doesNotMatch(scrubbed, /VIP-Tisch|table VIP|VIP entry/i);
 
+  const nonLatin = bot.sanitizeFeatureMentions(
+    "ShoutOut, VIP-стол, VIP τραπέζι, طاولة VIP, floqCast, scheduling",
+    allowed
+  );
+  assert.match(nonLatin, /ShoutOut/);
+  assert.match(nonLatin, /scheduling/);
+  assert.doesNotMatch(nonLatin, /VIP-стол|VIP τραπέζι|طاولة VIP|floqCast/i);
+  assert.doesNotMatch(nonLatin, /,\s*,/);
+
+  const commas = bot.sanitizeFeatureMentions(
+    "ShoutOut, VIP table, floqCast, scheduling",
+    allowed
+  );
+  assert.equal(commas, "ShoutOut, scheduling");
+
   const tools = bot.toolDeclarations(allowed).map(t => t.name);
   assert.ok(tools.includes("contextualSearch"));
   assert.ok(tools.includes("listShoutOutTemplates"));
