@@ -462,7 +462,12 @@
 
   function displayReply(raw) {
     const text = String(raw || "").trim();
-    if (!text || /could not find a clear match/i.test(text)) {
+    // Server stores English botdee.chatEmpty; live + restore both localize it.
+    if (
+      !text
+      || /could not find a clear match/i.test(text)
+      || text === "No answer yet — try quick intent search."
+    ) {
       return t("botdee.chatEmpty", "No answer yet — try quick intent search.");
     }
     return text;

@@ -219,7 +219,9 @@ test("durable thread helpers isolate uid and idle window", () => {
   const kept = bot.clipStoredTurns([{role: "model", text: listed}]);
   assert.match(kept[0].text, /\n1\. /);
   assert.equal(bot.isSearchMissReply("I could not find a clear match for your account yet."), true);
-  assert.equal(bot.sanitizeBotReply("I could not find a clear match for your account yet."), "No answer yet — try quick intent search.");
+  assert.equal(bot.isSearchMissReply(bot.SEARCH_MISS_FALLBACK), true);
+  assert.equal(bot.sanitizeBotReply("I could not find a clear match for your account yet."), bot.SEARCH_MISS_FALLBACK);
+  assert.equal(bot.sanitizeBotReply(bot.SEARCH_MISS_FALLBACK), bot.SEARCH_MISS_FALLBACK);
   assert.match(bot.sanitizeBotReply("Hey — still here."), /still here/);
 });
 

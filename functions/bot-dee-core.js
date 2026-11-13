@@ -279,15 +279,16 @@ function clipModelText(raw) {
   return clipStoredText(raw, MAX_MODEL_CHARS);
 }
 
+/** Canonical stored miss copy — must match `botdee.chatEmpty` English. Client localizes it. */
+const SEARCH_MISS_FALLBACK = "No answer yet — try quick intent search.";
+
 function isSearchMissReply(raw) {
   const text = String(raw || "").trim();
-  return !text || /could not find a clear match/i.test(text);
+  return !text || /could not find a clear match/i.test(text) || text === SEARCH_MISS_FALLBACK;
 }
 
 function sanitizeBotReply(raw) {
-  if (isSearchMissReply(raw)) {
-    return "No answer yet — try quick intent search.";
-  }
+  if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
   return clipModelText(raw);
 }
 
@@ -540,6 +541,7 @@ module.exports = {
   clipStoredTurns,
   conversationIsActive,
   clipModelText,
+  SEARCH_MISS_FALLBACK,
   isSearchMissReply,
   sanitizeBotReply,
   contextualSearch,
