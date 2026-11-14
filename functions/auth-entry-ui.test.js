@@ -257,14 +257,15 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   const portalApp = readReleaseFile("patron-portal-app.js");
   assert.match(portalApp, /lang\.aiGrammar/);
   assert.match(portalApp, /floqr:ui-language/);
-  assert.match(portalApp, /shoutouts\s*:\s*["']portalFeatureOrders["']/);
   assert.match(portalApp, /showFeatureOrdersPane/);
   assert.match(portalApp, /isPendingShoutout/);
   assert.match(portalApp, /isSavedShoutout/);
   assert.match(portalApp, /applyShoutoutHistoryRetention/);
-  assert.match(portalApp, /templates\s*:\s*["']portalFeatureOrders["']/);
   assert.match(portalApp, /_recoveredFromOrder/);
   assert.match(portalApp, /patronShoutoutArchives/);
+  const portalTabs = readReleaseFile("floqr-portal-tabs.js");
+  assert.match(portalTabs, /shoutouts\s*:\s*["']portalFeatureOrders["']/);
+  assert.match(portalTabs, /templates\s*:\s*["']portalFeatureOrders["']/);
 });
 
 test("club approve keeps shoutout docs for Completed history", () => {
