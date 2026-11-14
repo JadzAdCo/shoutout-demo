@@ -296,6 +296,29 @@ html[data-floqr-chrome="whiteBlack"] .botdee-msg-avatar {
   margin-top: 2px;
 }
 
+.botdee-photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+  max-width: 100%;
+}
+
+.botdee-photo {
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.botdee-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .botdee-chat-status {
   min-height: 1.2em;
   margin: 0;

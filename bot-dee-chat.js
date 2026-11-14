@@ -220,7 +220,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.008";
+    return "s3.3.009";
   }
 
   function isVersionPrompt(raw) {
@@ -380,7 +380,92 @@
   // Dedicated robot-head mark for bubble origin (not Site-chrome pack JPG).
   const BOT_AVATAR_SRC = "./images/botdee-chat-avatar.png";
 
-  function appendBubble(role, text, results) {
+  function hostEndsWith(host, suffix) {
+    return host === suffix || host.endsWith(`.${suffix}`);
+  }
+
+  function isAllowedPhotoUrl(raw) {
+    let parsed;
+    try {
+      parsed = new URL(String(raw || "").trim());
+    } catch (_) {
+      return false;
+    }
+    if (parsed.protocol !== "https:") return false;
+    if (parsed.username || parsed.password) return false;
+    const host = parsed.hostname.toLowerCase();
+    if (hostEndsWith(host, "stripe.com") || hostEndsWith(host, "stripe.network")) return false;
+    if (host === "firebasestorage.googleapis.com" || hostEndsWith(host, "firebasestorage.app")) return true;
+    if (hostEndsWith(host, "googleusercontent.com")) return true;
+    const path = `${parsed.pathname || ""}${parsed.search || ""}`;
+    if (/\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:$|[?#])/i.test(path)) return true;
+    if (/\/o\//.test(parsed.pathname || "") && /alt=media/i.test(parsed.search || "")) return true;
+    return false;
+  }
+
+  function harvestMediaFromText(raw) {
+    const seen = new Set();
+    const out = [];
+    String(raw || "").replace(/https?:\/\/[^\s)\]>'"]+/gi, url => {
+      const clean = String(url || "").replace(/[.,;:]+$/, "").trim();
+      if (!isAllowedPhotoUrl(clean) || seen.has(clean)) return "";
+      seen.add(clean);
+      out.push({url: clean, alt: "Public photo", kind: "photo"});
+      return "";
+    });
+    return out.slice(0, 8);
+  }
+
+  function stripBackendLinks(raw) {
+    let text = String(raw || "");
+    text = text.replace(/\[[^\]]{0,120}\]\((https?:[^)\s]+)\)/gi, (full, url) => (
+      isAllowedPhotoUrl(url) || /firebasestorage|googleusercontent/i.test(url) ? "" : full
+    ));
+    text = text.replace(/https?:\/\/[^\s)\]>'"]+/gi, url => {
+      const clean = String(url || "").replace(/[.,;:]+$/, "");
+      return (isAllowedPhotoUrl(clean) || /firebasestorage|googleusercontent/i.test(clean)) ? "" : url;
+    });
+    text = text.replace(/\b(?:view image|gallery photo\s*\d+|profile picture)\s*:?/gi, " ");
+    text = text.replace(/\(\s*\)/g, "");
+    text = text.replace(/[ \t]{2,}/g, " ");
+    text = text.replace(/\n{3,}/g, "\n\n");
+    return text.trim();
+  }
+
+  function mergeMedia(fromServer, fromText) {
+    const seen = new Set();
+    const out = [];
+    [...(Array.isArray(fromServer) ? fromServer : []), ...(Array.isArray(fromText) ? fromText : [])].forEach(item => {
+      const url = String(item?.url || "").trim();
+      if (!isAllowedPhotoUrl(url) || seen.has(url)) return;
+      seen.add(url);
+      out.push({url, alt: String(item.alt || "Public photo").slice(0, 80), kind: "photo"});
+    });
+    return out.slice(0, 8);
+  }
+
+  function appendPhotoGallery(article, media) {
+    if (!Array.isArray(media) || !media.length) return;
+    const gallery = document.createElement("div");
+    gallery.className = "botdee-photo-gallery";
+    gallery.setAttribute("role", "list");
+    media.forEach(item => {
+      const figure = document.createElement("figure");
+      figure.className = "botdee-photo";
+      figure.setAttribute("role", "listitem");
+      const img = document.createElement("img");
+      img.src = item.url;
+      img.alt = item.alt || "";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.referrerPolicy = "no-referrer";
+      figure.appendChild(img);
+      gallery.appendChild(figure);
+    });
+    article.appendChild(gallery);
+  }
+
+  function appendBubble(role, text, results, media) {
     const log = byId("botDeeTranscript");
     if (!log) return;
     const isUser = role === "user";
@@ -407,10 +492,13 @@
       tail.setAttribute("aria-hidden", "true");
       article.appendChild(tail);
     }
-    const body = document.createElement("div");
-    body.className = "botdee-bubble-text";
-    body.textContent = text;
-    article.appendChild(body);
+    if (text) {
+      const body = document.createElement("div");
+      body.className = "botdee-bubble-text";
+      body.textContent = text;
+      article.appendChild(body);
+    }
+    if (!isUser) appendPhotoGallery(article, media);
     if (Array.isArray(results) && results.length) {
       const list = document.createElement("ul");
       list.className = "botdee-result-links";
@@ -583,8 +671,9 @@
         uiLanguage: currentUiLanguage()
       };
       const data = (await fn(payload))?.data || {};
+      const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const reply = displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results));
+      appendBubble("bot", reply, localizeResults(data.results), media);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
@@ -659,7 +748,7 @@
     ) {
       return t("botdee.chatEmpty", "No answer yet — try quick intent search.");
     }
-    return scrubGatedBrands(text);
+    return scrubGatedBrands(stripBackendLinks(text));
   }
 
   function restoreTurns(turns) {
@@ -669,9 +758,10 @@
     (Array.isArray(turns) ? turns : []).forEach(row => {
       const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
       const text = role === "model" ? displayReply(row?.text) : String(row?.text || "").trim();
-      if (!text) return;
-      appendBubble(role === "user" ? "user" : "bot", text);
-      pushHistory(role, text);
+      const media = role === "model" ? mergeMedia(row?.media, harvestMediaFromText(row?.text)) : [];
+      if (!text && !media.length) return;
+      appendBubble(role === "user" ? "user" : "bot", text, null, media);
+      if (text) pushHistory(role, text);
     });
   }
 

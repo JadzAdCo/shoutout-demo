@@ -84,3 +84,99 @@ test("publicUserCard exposes public facts and relation without private keys", ()
   assert.equal(card.phone, undefined);
   assert.equal(card.facts.email, undefined);
 });
+
+const SAMPLE_PUBLIC = {
+  publicProfileVisibility: "public",
+  displayName: "Don Papi",
+  floqrHandle: "DonBans",
+  instagramHandle: "the_don_4ld",
+  publicBio: "Just a Don",
+  city: "Washington",
+  country: "United States",
+  musicInterests: ["Afro House", "Amapiano"],
+  travelInterests: ["Lisbon", "Lagos"],
+  foodChoices: ["Jollof", "oysters"],
+  hobbies: ["cars"],
+  favoriteBeverages: ["champagne"],
+  nightlifeStyle: "VIP nights",
+  lookingToMeet: "music lovers",
+  photoURL: "https://example.com/don.jpg",
+  email: "secret@example.com",
+  phone: "+12025550123"
+};
+
+test("publicUserCard includes opted-in Mingl datapoints and never email/phone", () => {
+  const card = tools.publicUserCard("uid1", SAMPLE_PUBLIC, 20);
+  assert.equal(card.displayName, "Don Papi");
+  assert.equal(card.handle, "@DonBans");
+  assert.equal(card.instagramHandle, "@the_don_4ld");
+  assert.deepEqual(card.music, ["Afro House", "Amapiano"]);
+  assert.deepEqual(card.travel, ["Lisbon", "Lagos"]);
+  assert.deepEqual(card.food, ["Jollof", "oysters"]);
+  assert.deepEqual(card.hobbies, ["cars"]);
+  assert.deepEqual(card.beverages, ["champagne"]);
+  assert.equal(card.lookingToMeet, "music lovers");
+  assert.equal(card.city, "Washington");
+  assert.ok(card.imageUrls.includes("https://example.com/don.jpg"));
+  assert.equal(card.email, undefined);
+  assert.equal(card.phone, undefined);
+});
+
+test("publicUserCard omits datapoints the patron opted out of", () => {
+  const card = tools.publicUserCard("uid1", {
+    ...SAMPLE_PUBLIC,
+    publicMinglDatapoints: ["location", "media"]
+  }, 10);
+  assert.equal(card.city, "Washington");
+  assert.equal(card.music, undefined);
+  assert.equal(card.food, undefined);
+  assert.equal(card.travel, undefined);
+  assert.ok(card.imageUrls.length);
+});
+
+test("userHaystack matches Mingl public interests so BOT DEE can find by food/music/travel", () => {
+  const hay = tools.userHaystack(SAMPLE_PUBLIC).toLowerCase();
+  assert.match(hay, /afro house/);
+  assert.match(hay, /jollof/);
+  assert.match(hay, /lisbon/);
+  const optedOut = tools.userHaystack({...SAMPLE_PUBLIC, publicMinglDatapoints: ["location"]});
+  assert.doesNotMatch(optedOut.toLowerCase(), /jollof/);
+  assert.match(optedOut, /Washington/);
+});
+
+test("isSelfQuery recognizes my public profile and the viewer's handle/name", () => {
+  assert.equal(tools.isSelfQuery("my floqr public profile music food travel", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("what can people see on my public profile", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("what are my food preferences", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("donbans", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("@DonBans", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("don papi", SAMPLE_PUBLIC), true);
+  assert.equal(tools.isSelfQuery("aurelia shoutout", SAMPLE_PUBLIC), false);
+  assert.equal(tools.isSelfQuery("my music at aurelia", SAMPLE_PUBLIC), false);
+  assert.equal(tools.isSelfQuery("food and travel at decades", SAMPLE_PUBLIC), false);
+  assert.equal(tools.isSelfQuery("notdonbans", SAMPLE_PUBLIC), false);
+});
+
+test("injectSelfProfile does not send Mingl datapoints from a non-public self profile", () => {
+  const privateSelf = {
+    ...SAMPLE_PUBLIC,
+    publicProfileVisibility: "followers"
+  };
+  const unpublished = tools.selfProfileCard("uid1", privateSelf, 48);
+  assert.equal(unpublished.published, false);
+  assert.equal(unpublished.food, undefined);
+  assert.equal(unpublished.music, undefined);
+  assert.equal(unpublished.travel, undefined);
+  assert.equal(unpublished.city, undefined);
+  assert.match(unpublished.note, /not public/i);
+
+  const publicCard = tools.selfProfileCard("uid1", SAMPLE_PUBLIC, 48);
+  assert.equal(publicCard.published, true);
+  assert.deepEqual(publicCard.food, ["Jollof", "oysters"]);
+
+  const scored = tools.injectSelfProfile([], "uid1", privateSelf, true);
+  assert.equal(scored.length, 1);
+  assert.equal(scored[0].food, undefined);
+  assert.equal(tools.injectSelfProfile([{id: "uid1"}], "uid1", SAMPLE_PUBLIC, true).length, 1);
+  assert.equal(tools.injectSelfProfile([], "uid1", SAMPLE_PUBLIC, false).length, 0);
+});

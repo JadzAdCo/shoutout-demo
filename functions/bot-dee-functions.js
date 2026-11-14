@@ -88,6 +88,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   const tools = [{functionDeclarations: bot.toolDeclarations(allowed)}];
   let lastSearch = null;
   const actionLinks = [];
+  const mediaItems = [];
   let rounds = 0;
 
   while (rounds < bot.MAX_TOOL_ROUNDS) {
@@ -117,6 +118,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       return {
         reply: bot.sanitizeFeatureMentions(replyRaw, allowed),
         results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+        media: mediaItems.slice(0, 8),
         provider: "gemini",
         model: bot.TEXT_MODEL,
         toolRounds: rounds - (text ? 1 : 0),
@@ -136,7 +138,10 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       const result = await bot.runTool(call.name, args, session);
       if (call.name === "contextualSearch") lastSearch = result;
       bot.linksFromToolResult(result, lang).forEach(link => actionLinks.push(link));
-      responseParts.push(functionResponsePart(call, result));
+      bot.mediaFromToolResult(result).forEach(item => {
+        if (!mediaItems.some(existing => existing.url === item.url)) mediaItems.push(item);
+      });
+      responseParts.push(functionResponsePart(call, bot.stripMediaFromToolResult(result)));
     }
     contents.push({role: "user", parts: responseParts});
   }
@@ -144,6 +149,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   return {
     reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
     results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+    media: mediaItems.slice(0, 8),
     provider: "gemini",
     model: bot.TEXT_MODEL,
     toolRounds: rounds,
@@ -296,7 +302,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     if (settings.durableThreads) {
       try {
-        await threads.persistExchange(uid, settings, storedUserText, outcome.reply, {receivedAtMs});
+        await threads.persistExchange(uid, settings, storedUserText, outcome.reply, {
+          receivedAtMs,
+          media: outcome.media
+        });
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
         }
@@ -324,6 +333,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       allowedFeatures,
       reply: outcome.reply,
       results: outcome.results || [],
+      media: Array.isArray(outcome.media) ? outcome.media.slice(0, 8) : [],
       provider: outcome.provider,
       model: outcome.model,
       toolRounds: outcome.toolRounds || 0,

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.008";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.008";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.009";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.009";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.009",
+      title: "s3.3.009 — BOT DEE public profile datapoints + photo gallery",
+      checks: [
+        {label:"Opted-in Mingl datapoints on card", file:"functions/bot-dee-tools.js", includes:["PUBLIC_MINGL_DATAPOINT_KEYS", "foodChoices", "travelInterests", "isSelfQuery"]},
+        {label:"Prompt forbids doesn't-track claim", file:"functions/bot-dee-core.js", includes:["Never say FLOQR does not track music", "publicMinglDatapoints", "stripMediaFromToolResult"]},
+        {label:"Chat gallery", file:"bot-dee-chat.js", includes:["botdee-photo-gallery", "stripBackendLinks"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-009-botdee-public-datapoints"]}
+      ]
+    },
     {
       version: "s3.3.008",
       title: "s3.3.008 — BOT DEE mobile header, about-me/friends public profiles, version",
@@ -2974,6 +2984,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-009-botdee-public-datapoints",
+      area:"BOT DEE / Profiles / Mingl",
+      feature:"BOT DEE reads opted-in public profile datapoints",
+      changed:"s3.3.009 — lookupPublicProfiles returns the same public Mingl datapoints a patron opted to share (music, travel, food, hobbies, beverages, events, looking-to-meet, location, media), including the signed-in user's own public projection for “my public profile”. Chat renders public photos as a gallery and strips storage URLs. Needs Functions deploy.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.009) signed in with botDee access and a public FLOQR profile that has music/food/travel filled and opted public (My Profile → Privacy datapoint sharing). 2) Ask: do you have access to what people see on my public profile, like food, music, or travel? 3) BOT DEE must summarize those public datapoints — not say FLOQR doesn't track them. 4) Ask to show public photos — images appear in the chat, not firebasestorage / token= links. 5) Ask about another public @handle — only opted-in fields. 6) Mark Succeed/Failed.",
+      expected:"BOT DEE lists the patron's public music / food / travel from the live profile. Photos render as a gallery. Missing field = not filled or not opted public. Never email/phone/GPS. Functions deploy required.",
+      troubleshoot:"Still says FLOQR doesn't track music/food/travel → Functions not redeployed (Pages-only is not enough) or publicMinglDatapoints omitted that key. Raw storage URLs → hard-refresh bot-dee-chat.js s3.3.009 and confirm executeBotSession media stripping. Empty lists → fill the datapoints on My Profile and tick them under Privacy."
+    },
     {
       id:"s3-3-008-botdee-mobile-profile-version",
       area:"BOT DEE",

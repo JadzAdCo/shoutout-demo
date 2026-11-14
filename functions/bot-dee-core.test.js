@@ -194,6 +194,74 @@ test("lookupPublicProfiles tool covers me + friends in description", () => {
   assert.match(bot.systemInstruction("patron"), /friend or connection/i);
 });
 
+test("lookupPublicProfiles prompt and card cover opted-in public datapoints", () => {
+  const core = read("functions/bot-dee-core.js");
+  assert.match(core, /publicMinglDatapoints/);
+  assert.match(core, /Never say FLOQR does not track music/);
+  const toolsSrc = read("functions/bot-dee-tools.js");
+  assert.match(toolsSrc, /foodChoices/);
+  assert.match(toolsSrc, /travelInterests/);
+  assert.match(toolsSrc, /isSelfQuery/);
+  assert.match(toolsSrc, /userHaystack/);
+  assert.match(toolsSrc, /injectSelfProfile/);
+  assert.match(toolsSrc, /unpublishedSelfCard/);
+  assert.match(core, /NEVER print http\(s\) URLs/);
+  assert.match(core, /stripMediaFromToolResult/);
+});
+
+test("BOT DEE strips backend photo URLs and harvests them for the chat gallery", () => {
+  const dumped = "Here are the public photos (**Don Papi** / `@DonBans`): 1. **Profile Picture**: [View Image](https://lh3.googleusercontent.com/a/ACg8ocIGAMLQJThIG22Yl69fKEAUB__RYKHzRjj_ArDT7Kq4jLw54rdlZQ=s96-c) 2. **Gallery Photo 1**: [View Image](https://firebasestorage.googleapis.com/v0/b/shoutoutdemo-5b402.firebasestorage.app/o/profileMedia%2Fslot-1.jpg?alt=media&token=e66da7l4-fc3f-4296-bde5-314a200770a9)";
+  const cleaned = bot.stripBackendLinks(dumped);
+  assert.doesNotMatch(cleaned, /firebasestorage/i);
+  assert.doesNotMatch(cleaned, /googleusercontent/i);
+  assert.doesNotMatch(cleaned, /token=/i);
+  assert.doesNotMatch(cleaned, /View Image/i);
+  const media = bot.harvestMediaFromText(dumped);
+  assert.equal(media.length, 2);
+  assert.ok(media.every(item => bot.isAllowedPhotoUrl(item.url)));
+  const card = {
+    profiles: [{
+      displayName: "Don Papi",
+      photoURL: "https://lh3.googleusercontent.com/a/photo",
+      imageUrls: ["https://firebasestorage.googleapis.com/v0/b/x/o/a.jpg?alt=media&token=1"],
+      email: "secret@example.com"
+    }]
+  };
+  const harvested = bot.mediaFromToolResult(card);
+  assert.equal(harvested.length, 2);
+  const stripped = bot.stripMediaFromToolResult(card);
+  assert.equal(stripped.profiles[0].photoURL, undefined);
+  assert.equal(stripped.profiles[0].imageUrls, undefined);
+  assert.equal(stripped.profiles[0].photoCount, 2);
+  assert.match(stripped.displayHint, /Never print URLs/);
+  const withMedia = bot.clipStoredTurns([{
+    role: "model",
+    text: "Here are the photos.",
+    media: harvested
+  }]);
+  assert.equal(withMedia[0].media.length, 2);
+
+  const clubLogo = "https://images.getbento.com/accounts/c91f13a9c8b9b7e67e9a92798b49e3c3/media/images/81154Logo_Heist.png";
+  const venuePng = "https://decadesdc.com/wp-content/uploads/2024/02/Logo-p-500x97-1-1.png";
+  assert.equal(bot.isAllowedPhotoUrl(clubLogo), true);
+  assert.equal(bot.isAllowedPhotoUrl(venuePng), true);
+  assert.equal(bot.isAllowedPhotoUrl("https://checkout.stripe.com/c/pay/cs_test_123"), false);
+  assert.equal(bot.isAllowedPhotoUrl("https://jadzadco.github.io/shoutout-demo/botdee.html"), false);
+  assert.equal(bot.isAllowedPhotoUrl("https://images.getbento.com/accounts/heist"), false);
+  assert.equal(bot.isAllowedPhotoUrl("https://jadzadco.github.io/shoutout-demo/images/botdee-chat-avatar.png"), true);
+  const mixed = bot.stripMediaFromToolResult({
+    profiles: [{
+      displayName: "Heist",
+      photoURL: clubLogo,
+      imageUrls: ["https://checkout.stripe.com/c/pay/cs_test_123", venuePng]
+    }]
+  });
+  assert.equal(mixed.profiles[0].photoCount, 2);
+  assert.equal(bot.mediaFromToolResult({
+    profiles: [{photoURL: clubLogo, imageUrls: ["https://checkout.stripe.com/c/pay/cs_test_123", venuePng]}]
+  }).length, 2);
+});
+
 test("Gemini toolConfig uses AUTO without allowedFunctionNames", () => {
   const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-functions.js"), "utf8");
   assert.match(src, /FunctionCallingConfigMode\.AUTO/);

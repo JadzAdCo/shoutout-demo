@@ -78,6 +78,9 @@ test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   assert.match(read("bot-dee-chat.js"), /durableEnabled/);
   assert.match(read("bot-dee-chat.js"), /restoreOrWelcome/);
   assert.match(read("bot-dee-chat.js"), /function displayReply/);
+  assert.match(read("bot-dee-chat.js"), /function stripBackendLinks/);
+  assert.match(read("bot-dee-chat.js"), /botdee-photo-gallery/);
+  assert.match(read("bot-dee-chat.css"), /\.botdee-photo-gallery/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatEmpty/);
   assert.match(read("bot-dee-chat.js"), /No answer yet — try quick intent search/);
   assert.match(read("functions/bot-dee-functions.js"), /receivedAtMs/);

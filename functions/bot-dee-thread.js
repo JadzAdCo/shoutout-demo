@@ -103,6 +103,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
     const modelSeq = eventCount + 2;
     const userTurn = {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs};
     const modelTurn = {role: "model", text: modelStored, seq: modelSeq, atMs: now};
+    const media = bot.clipStoredMedia(options.media);
+    if (media.length) modelTurn.media = media;
     const nextTurns = bot.clipStoredTurns([...turns, userTurn, modelTurn]);
     const events = ref.collection("events");
     const userId = bot.eventDocId(userSeq);

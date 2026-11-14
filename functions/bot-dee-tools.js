@@ -383,28 +383,85 @@ function publicUserFacts(data = {}) {
   return facts;
 }
 
+/** Same keys as My Profile → Privacy datapoint sharing / Mingl `PUBLIC_MINGL_DATAPOINTS`. */
+const PUBLIC_MINGL_DATAPOINT_KEYS = Object.freeze([
+  "location", "gender", "height", "music", "events", "travel", "hobbies", "food", "beverage", "meet", "media"
+]);
+
+function listField(value, maxItems = 12, maxEach = 80) {
+  const items = Array.isArray(value) ? value : String(value || "").split(/[,;|/]+/);
+  return items.map(item => text(item, maxEach)).filter(Boolean).slice(0, maxItems);
+}
+
+function publicMinglKeys(data = {}) {
+  if (Array.isArray(data.publicMinglDatapoints) && data.publicMinglDatapoints.length) {
+    return data.publicMinglDatapoints.map(key => String(key || "").trim()).filter(Boolean);
+  }
+  return PUBLIC_MINGL_DATAPOINT_KEYS.slice();
+}
+
+function datapointAllowed(data, key) {
+  return publicMinglKeys(data).includes(key);
+}
+
+function heightDisplay(data = {}) {
+  const labeled = text(data.heightDisplay || data.height, 40);
+  if (labeled) return labeled;
+  const feet = data.heightFeet;
+  const inches = data.heightInches;
+  if (feet != null && String(feet).trim() !== "") return text(`${feet}'${inches || 0}"`, 20);
+  return "";
+}
+
 function publicUserCard(uid, data = {}, score, extras = {}) {
   const handle = text(data.floqrHandle || data.username || data.minglHandle, 80).replace(/^@+/, "");
-  const images = imageUrlsFromUser(data);
+  const allowed = key => datapointAllowed(data, key);
+  const images = allowed("media") ? imageUrlsFromUser(data) : [];
+  const instagram = text(data.instagram || data.instagramHandle, 80).replace(/^@+/, "");
   const relation = extras.relation === "self" || extras.relation === "connection" ? extras.relation : "public";
-  return {
+  const card = {
     kind: "user",
     id: uid,
     relation,
     displayName: text(data.displayName || data.publicName || data.fullName || handle || "Member", 120),
     handle: handle ? `@${handle}` : "",
-    bio: text(data.publicBio || data.bio || data.tagline || data.about || "", 400),
+    instagram: instagram ? `@${instagram}` : "",
+    instagramHandle: instagram ? `@${instagram}` : "",
+    bio: text(data.publicBio || data.publicProfileBioOriginal || data.publicProfileBioEnglish || data.bio || data.tagline || data.about || "", 400),
     roles: Array.isArray(data.approvedRoles) ? data.approvedRoles.filter(Boolean).slice(0, 8).map(r => text(r, 40)) : [],
-    city: text(data.city || data.publicCity || "", 80),
-    country: text(data.country || data.publicCountry || "", 80),
     website: text(data.website || data.publicWebsite || "", 240),
-    instagram: text(data.instagram || data.instagramHandle || "", 80),
+    visibility: text(data.publicProfileVisibility || "followers", 24),
     facts: publicUserFacts(data),
     photoURL: images[0] || "",
     imageUrls: images,
     profileHref: handle ? `./?start=search&q=${encodeURIComponent("@" + handle)}` : "./",
-    score
+    score,
+    ...extras
   };
+  if (allowed("location")) {
+    card.city = text(data.city || data.publicCity || "", 80);
+    card.region = text(data.state || data.region || data.province || data.stateRegionProvince || "", 80);
+    card.country = text(data.country || data.publicCountry || "", 80);
+  }
+  if (allowed("gender")) card.gender = text(data.gender || "", 40);
+  if (allowed("height")) card.height = heightDisplay(data);
+  if (allowed("music")) card.music = listField(data.musicInterests || data.favoriteGenres);
+  if (allowed("events")) {
+    card.nightlifeStyle = text(data.nightlifeStyle || "", 120);
+    card.events = listField(data.nightlifeInterests);
+  }
+  if (allowed("travel")) card.travel = listField(data.travelInterests);
+  if (allowed("hobbies")) card.hobbies = listField(data.hobbies || data.generalHobbies);
+  if (allowed("food")) card.food = listField(data.foodChoices);
+  if (allowed("beverage")) card.beverages = listField(data.favoriteBeverages);
+  if (allowed("meet")) card.lookingToMeet = text(data.lookingToMeet || "", 160);
+  ["gender", "height", "nightlifeStyle", "lookingToMeet", "city", "region", "country", "instagram", "instagramHandle", "website"].forEach(key => {
+    if (!card[key]) delete card[key];
+  });
+  ["music", "events", "travel", "hobbies", "food", "beverages", "roles", "imageUrls"].forEach(key => {
+    if (Array.isArray(card[key]) && !card[key].length) delete card[key];
+  });
+  return card;
 }
 
 function isSelfProfileQuery(raw) {
@@ -413,6 +470,61 @@ function isSelfProfileQuery(raw) {
   if (/^(me|myself|my profile|my account|my info|my information|about me|who am i)$/.test(n)) return true;
   if (/^(what (?:do you )?know about (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself))$/.test(n)) return true;
   return false;
+}
+
+function hasPhrase(hay, phrase) {
+  const p = normalizeNeedle(phrase);
+  if (!p || p.length < 3) return false;
+  return ` ${hay} `.includes(` ${p} `);
+}
+
+function isSelfQuery(needle, viewerData = {}) {
+  const n = normalizeNeedle(needle);
+  if (!n) return false;
+  if (isSelfProfileQuery(n)) return true;
+  if (/^(me|myself|mine)$/.test(n)) return true;
+  const myAsk = /\b(my|mine)\b/.test(n);
+  const profileAsk = /\b(profile|public|floqr|mingl)\b/.test(n);
+  if (myAsk && profileAsk) return true;
+  if (myAsk && /\b(food|music|travel|hobby|hobbies|eat|drink|beverage|handle|bio|photo)\b/.test(n)) {
+    if (!/\b(at|for)\b/.test(n)) return true;
+  }
+  const handle = normalizeNeedle(viewerData.floqrHandle || viewerData.username || viewerData.minglHandle || "");
+  const name = normalizeNeedle(viewerData.displayName || viewerData.publicName || "");
+  if (handle && (n === handle || hasPhrase(n, handle))) return true;
+  if (name && name.length >= 4 && hasPhrase(n, name)) return true;
+  return false;
+}
+
+function unpublishedSelfCard(uid, data = {}, score, extra = {}) {
+  const handle = text(data.floqrHandle || data.username || data.minglHandle, 80).replace(/^@+/, "");
+  return {
+    kind: "user",
+    id: uid,
+    isSelf: true,
+    relation: extra.relation || "self",
+    published: false,
+    visibility: text(data.publicProfileVisibility || "followers", 24),
+    displayName: text(data.displayName || data.publicName || handle || "Member", 120),
+    handle: handle ? `@${handle}` : "",
+    note: "This FLOQR profile is not public. Other people cannot see Mingl datapoints (music, food, travel, hobbies, location). Do not describe those fields as public.",
+    score,
+    ...extra
+  };
+}
+
+function selfProfileCard(uid, data = {}, score, extra = {}) {
+  if (people.isPublic(data)) {
+    return publicUserCard(uid, data, score, {isSelf: true, published: true, ...extra});
+  }
+  return unpublishedSelfCard(uid, data, score, extra);
+}
+
+function injectSelfProfile(scored, viewerUid, viewerData, selfAsk) {
+  if (!selfAsk || !viewerUid || !viewerData) return scored;
+  if (scored.some(row => row.id === viewerUid)) return scored;
+  scored.push(selfProfileCard(viewerUid, viewerData, 48, {relation: "self"}));
+  return scored;
 }
 
 function isFriendContextQuery(raw) {
@@ -496,15 +608,26 @@ function publicClubCard(id, data = {}, score) {
 }
 
 function userHaystack(data = {}) {
-  return [
+  const parts = [
     data.displayName, data.publicName, data.fullName, data.username,
     data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
-    data.headline, data.city, data.publicCity, data.country, data.publicCountry,
-    data.instagram, data.instagramHandle, data.website, data.publicWebsite,
+    data.headline, data.instagram, data.instagramHandle, data.website, data.publicWebsite,
     ...(Array.isArray(data.approvedRoles) ? data.approvedRoles : []),
     ...(Array.isArray(data.genres) ? data.genres : []),
     ...(Array.isArray(data.interests) ? data.interests : [])
-  ].filter(Boolean).join(" ");
+  ];
+  if (datapointAllowed(data, "location")) {
+    parts.push(data.city, data.publicCity, data.state, data.region, data.country, data.publicCountry);
+  }
+  if (datapointAllowed(data, "gender")) parts.push(data.gender);
+  if (datapointAllowed(data, "music")) parts.push(...listField(data.musicInterests || data.favoriteGenres, 20, 60));
+  if (datapointAllowed(data, "events")) parts.push(data.nightlifeStyle, ...listField(data.nightlifeInterests, 20, 60));
+  if (datapointAllowed(data, "travel")) parts.push(...listField(data.travelInterests, 20, 60));
+  if (datapointAllowed(data, "hobbies")) parts.push(...listField(data.hobbies || data.generalHobbies, 20, 60));
+  if (datapointAllowed(data, "food")) parts.push(...listField(data.foodChoices, 20, 60));
+  if (datapointAllowed(data, "beverage")) parts.push(...listField(data.favoriteBeverages, 20, 60));
+  if (datapointAllowed(data, "meet")) parts.push(data.lookingToMeet);
+  return parts.filter(Boolean).join(" ");
 }
 
 /**
@@ -529,7 +652,14 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const seen = new Set();
   const wantPeople = kind === "any" || kind === "user" || kind === "patron" || kind === "people";
   const wantClubs = kind === "any" || kind === "club" || kind === "venue";
-  const selfQuery = wantPeople && isSelfProfileQuery(rawQuery);
+  let viewerData = null;
+  try {
+    const viewerSnap = await db.collection("users").doc(viewerUid).get();
+    if (viewerSnap.exists) viewerData = viewerSnap.data() || {};
+  } catch (error) {
+    console.warn("BOT DEE lookupPublicProfiles viewer failed", error?.message || error);
+  }
+  const selfQuery = wantPeople && isSelfQuery(rawQuery, viewerData || {});
   const friendContext = wantPeople && isFriendContextQuery(rawQuery);
   const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
   // Friend prompts require a parseable person name — never fall back to leftover verbs
@@ -539,18 +669,9 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     .split(/\s+/)
     .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t));
 
-  if (wantPeople && selfQuery) {
-    try {
-      const snap = await db.collection("users").doc(viewerUid).get();
-      if (snap.exists) {
-        const data = snap.data() || {};
-        // Viewer may always see their own public-facing presentation (still no private keys).
-        scored.push(publicUserCard(viewerUid, data, 100, {relation: "self"}));
-        seen.add(viewerUid);
-      }
-    } catch (error) {
-      console.warn("BOT DEE lookupPublicProfiles self failed", error?.message || error);
-    }
+  if (wantPeople && selfQuery && viewerData) {
+    scored.push(selfProfileCard(viewerUid, viewerData, 100, {relation: "self"}));
+    seen.add(viewerUid);
   }
 
   let connected = new Set();
@@ -634,7 +755,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   });
   let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
   if (profiles.length) {
-    note = "Public fields only (plus the viewer's own public-facing card when query is about them). Image URLs are published profile/gallery media — describe them; do not invent private details (email, phone, payment, GPS).";
+    note = "Public opted-in datapoints only (publicMinglDatapoints: music, travel, food, hobbies, beverages, events, looking-to-meet, location, media) plus the viewer's own public-facing card when the query is about them. Missing music/food/travel means not filled or not opted public — do not claim FLOQR never stores them. photoCount photos are shown by the FLOQR app — never print URLs, tokens, or storage paths. Never invent private details (email, phone, GPS).";
   } else if (selfQuery) {
     note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
   } else if (friendContext) {
@@ -693,6 +814,14 @@ module.exports = {
   friendNameFromQuery,
   publicUserCard,
   publicUserFacts,
+  PUBLIC_MINGL_DATAPOINT_KEYS,
+  publicMinglKeys,
+  datapointAllowed,
+  userHaystack,
+  isSelfQuery,
+  unpublishedSelfCard,
+  selfProfileCard,
+  injectSelfProfile,
   resolveClubLocationId,
   requireClubLocationId,
   normalizeClubNeedle,

@@ -50,7 +50,7 @@ const TOOL_DEFS = [
   {
     name: "lookupPublicProfiles",
     description:
-      "Look up PUBLIC FLOQR patron and/or club profiles (including public photo/gallery image URLs) for contextual answers. Use for: (1) what do you know about me / my profile — pass query \"me\"; (2) my friend / connection by name — tool prefers Mingl/chat connections' public profiles; (3) any public person, @handle, DJ, staff, or club page. Only returns public / published fields. Never returns private fields (email, phone, payment, location coords).",
+      "Look up PUBLIC FLOQR patron and/or club profiles, including datapoints the patron opted to share (music, travel, food, hobbies, beverages, events, looking-to-meet, location, public photos) via publicMinglDatapoints. Use for: (1) what do you know about me / my profile — pass query \"me\"; (2) my friend / connection by name — tool prefers Mingl/chat connections' public profiles; (3) any public person, @handle, DJ, staff, or club page; (4) the signed-in user's own public profile (\"my public profile\" / food / music / travel people can see). Never returns email, phone, payment, GPS, or opted-out fields. Missing music/food/travel means not filled or not opted public — not that FLOQR never stores them. photoCount means the FLOQR app will display those photos — never print image URLs, tokens, storage paths, or googleusercontent / firebasestorage links.",
     parameters: obj({
       query: str("Name, @handle, \"me\" / \"myself\", club brand, or keywords to match public profiles."),
       kind: str("Optional filter: user | club | any (default any)."),
@@ -468,6 +468,116 @@ function clipStoredText(raw, maxChars) {
     .slice(0, cap);
 }
 
+function hostEndsWith(host, suffix) {
+  return host === suffix || host.endsWith(`.${suffix}`);
+}
+
+function isAllowedPhotoUrl(raw) {
+  let parsed;
+  try {
+    parsed = new URL(String(raw || "").trim());
+  } catch (_) {
+    return false;
+  }
+  if (parsed.protocol !== "https:") return false;
+  if (parsed.username || parsed.password) return false;
+  const host = parsed.hostname.toLowerCase();
+  if (hostEndsWith(host, "stripe.com") || hostEndsWith(host, "stripe.network")) return false;
+  if (host === "firebasestorage.googleapis.com" || hostEndsWith(host, "firebasestorage.app")) return true;
+  if (hostEndsWith(host, "googleusercontent.com")) return true;
+  const path = `${parsed.pathname || ""}${parsed.search || ""}`;
+  if (/\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:$|[?#])/i.test(path)) return true;
+  if (/\/o\//.test(parsed.pathname || "") && /alt=media/i.test(parsed.search || "")) return true;
+  return false;
+}
+
+function clipStoredMedia(media) {
+  const seen = new Set();
+  const out = [];
+  (Array.isArray(media) ? media : []).forEach(item => {
+    const url = String(item?.url || item || "").trim().slice(0, 500);
+    if (!isAllowedPhotoUrl(url) || seen.has(url)) return;
+    seen.add(url);
+    out.push({
+      url,
+      alt: String(item?.alt || "Public photo").trim().slice(0, 80) || "Public photo",
+      kind: "photo"
+    });
+  });
+  return out.slice(0, 8);
+}
+
+function harvestMediaFromText(raw) {
+  const seen = new Set();
+  const out = [];
+  String(raw || "").replace(/https?:\/\/[^\s)\]>'"]+/gi, url => {
+    const clean = String(url || "").replace(/[.,;:]+$/, "").trim();
+    if (!isAllowedPhotoUrl(clean) || seen.has(clean)) return "";
+    seen.add(clean);
+    out.push({url: clean.slice(0, 500), alt: "Public photo", kind: "photo"});
+    return "";
+  });
+  return out.slice(0, 8);
+}
+
+function stripBackendLinks(raw) {
+  let text = String(raw || "");
+  text = text.replace(/\[[^\]]{0,120}\]\((https?:[^)\s]+)\)/gi, (full, url) => (
+    isAllowedPhotoUrl(url) || /firebasestorage|googleusercontent/i.test(url) ? "" : full
+  ));
+  text = text.replace(/https?:\/\/[^\s)\]>'"]+/gi, url => {
+    const clean = String(url || "").replace(/[.,;:]+$/, "");
+    return (isAllowedPhotoUrl(clean) || /firebasestorage|googleusercontent/i.test(clean)) ? "" : url;
+  });
+  text = text.replace(/\b(?:view image|gallery photo\s*\d+|profile picture)\s*:?/gi, " ");
+  text = text.replace(/\(\s*\)/g, "");
+  text = text.replace(/[ \t]{2,}/g, " ");
+  text = text.replace(/\n{3,}/g, "\n\n");
+  return text.trim();
+}
+
+function mediaFromToolResult(result) {
+  if (!result || typeof result !== "object") return [];
+  const seen = new Set();
+  const out = [];
+  const push = (url, alt) => {
+    const clean = String(url || "").trim().slice(0, 500);
+    if (!isAllowedPhotoUrl(clean) || seen.has(clean)) return;
+    seen.add(clean);
+    out.push({
+      url: clean,
+      alt: String(alt || "Public photo").trim().slice(0, 80) || "Public photo",
+      kind: "photo"
+    });
+  };
+  clipStoredMedia(result.media).forEach(item => push(item.url, item.alt));
+  (Array.isArray(result.profiles) ? result.profiles : []).forEach(profile => {
+    const name = String(profile?.displayName || profile?.handle || "Public photo").trim() || "Public photo";
+    const urls = [];
+    if (profile?.photoURL) urls.push(profile.photoURL);
+    (Array.isArray(profile?.imageUrls) ? profile.imageUrls : []).forEach(item => urls.push(item));
+    [...new Set(urls.filter(Boolean))].forEach((url, index) => push(url, `${name} photo ${index + 1}`));
+  });
+  return out.slice(0, 8);
+}
+
+function stripMediaFromToolResult(result) {
+  if (!result || typeof result !== "object") return result;
+  const copy = JSON.parse(JSON.stringify(result));
+  delete copy.media;
+  (Array.isArray(copy.profiles) ? copy.profiles : []).forEach((profile, index) => {
+    const original = (result.profiles || [])[index] || profile;
+    profile.photoCount = mediaFromToolResult({profiles: [original]}).length;
+    delete profile.photoURL;
+    delete profile.imageUrls;
+  });
+  if (copy.note) {
+    copy.note = String(copy.note).replace(/Image URLs are published gallery media\.?/i, "").trim();
+  }
+  copy.displayHint = "The FLOQR app displays photos in the chat. Never print URLs, tokens, storage paths, or googleusercontent / firebasestorage links.";
+  return copy;
+}
+
 function clipStoredTurns(turns) {
   const list = Array.isArray(turns) ? turns : [];
   const out = [];
@@ -476,7 +586,12 @@ function clipStoredTurns(turns) {
     const max = role === "model" ? MAX_MODEL_CHARS : MAX_MESSAGE_CHARS;
     const text = clipStoredText(row?.text || row?.content || "", max);
     if (!role || !text) return;
-    out.push({role, text});
+    const item = {role, text};
+    if (role === "model") {
+      const media = clipStoredMedia(row.media);
+      if (media.length) item.media = media;
+    }
+    out.push(item);
   });
   return out;
 }
@@ -500,7 +615,7 @@ function isSearchMissReply(raw) {
 
 function sanitizeBotReply(raw) {
   if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
-  return clipModelText(raw);
+  return clipModelText(stripBackendLinks(raw));
 }
 
 function isFarewellPrompt(raw) {
@@ -756,9 +871,9 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
     "Identity questions (your name, how to pronounce BOT DEE / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
     `Version / build / package questions: state FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}) clearly — do NOT call tools.`,
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values. Never invent links or claim payment success without a tool result.",
-    "When the user asks what you know about them / their profile (me, myself, who am I, about me), call lookupPublicProfiles with query \"me\" and summarize the returned self card (public-facing fields + photos only).",
+    "When the user asks what you know about them / their profile (me, myself, who am I, about me), call lookupPublicProfiles with query \"me\" and summarize the returned self card (public opted-in datapoints + photos only).",
     "When they ask about a friend or connection by name (e.g. my friend James), call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields only; if nothing public matches, say so honestly.",
-    "When the user asks about any other person, @handle, DJ, staff member, or a club's public page / photos, call lookupPublicProfiles and answer from returned public fields and image URLs only. If nothing public matches, say so honestly.",
+    "When the user asks about any other person, @handle, DJ, staff member, a club public page / photos, or what is on a public FLOQR profile (including their own: \"my public profile\", food / music / travel people can see), call lookupPublicProfiles and answer from returned public datapoints only. Patrons opt those fields in on My Profile (publicMinglDatapoints). Never say FLOQR does not track music, food, travel, hobbies, or similar — if a field is absent from the tool result, say it is not on that public profile (not filled or not opted public). Never invent private details. If nothing public matches, say so honestly. If photoCount > 0, say the photos are shown in the chat — NEVER print http(s) URLs, firebasestorage, googleusercontent, token=, storage paths, or \"View Image\" links. The UI renders photos.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
@@ -902,6 +1017,12 @@ module.exports = {
   formatSearchFallback,
   resultsForClient,
   linksFromToolResult,
+  isAllowedPhotoUrl,
+  clipStoredMedia,
+  harvestMediaFromText,
+  stripBackendLinks,
+  mediaFromToolResult,
+  stripMediaFromToolResult,
   BOTDEE_CONTENT,
   SEARCH_CATALOG,
   RESULT_LOCALES
