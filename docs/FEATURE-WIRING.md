@@ -47,6 +47,21 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 
 ---
 
+## Master Admin 5-min rollup (s3.3.013)
+
+| | |
+|---|---|
+| **Purpose** | Precompute panel summary datapoints every 5 minutes so Master Admin strips do not run 27 collection counts / 1200-club duplicate scans / 750×3 commerce pulls on every panel open |
+| **Schedule** | `scheduledMasterAdminRollup` — `every 5 minutes` UTC (`functions/master-admin-rollup-functions.js`) |
+| **Callable** | `refreshMasterAdminRollup` — Master Admin only (`isServerAdminAuth`); writes same doc |
+| **Doc** | `masterAdminRollups/current` — `diagnostics.collectionCounts`, `aiCrawl` status counts + last run, `duplicates` clusters, `commerce` paid aggregates, `templates`, `recommendations` |
+| **Rules** | Master Admin read; client write `false` (Functions Admin SDK only) |
+| **Client** | `master-admin-rollup.js` → `FLOQRMasterAdminRollup` — bind + load on sign-in; `paintForPanel` from `activatePanel`; Diagnostics **Refresh rollup** button |
+| **Panel behavior** | Diagnostics mount paints rollup only (Run/Refresh Diagnostics = full live scan). Duplicate Records mount paints rollup; Refresh = live 1200 scan. AI Crawling `#aiCrawlingSummary` = rollup; `#aiDiscoverySummary` keeps how-to. Commerce/templates/recs metric cards from rollup |
+| **Classification** | `floqr-data-classification.js` register + `masterAdminRollup` job collections |
+| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-data-classification.js` `?v=s3.3.013` |
+| **Deploy** | Functions + Firestore rules required for live schedule/callable; Pages for client strips |
+
 ## PHILA front+back pair retired (s3.3.012)
 
 | Piece | Wiring |
@@ -698,7 +713,7 @@ When adding a section, use this skeleton:
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
-| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand. **s3.3.010:** sign-in also defers Diagnostics (`refreshDiagnostics` = 27 collections + package file fetches), AI Crawling queue + listing delete (1000 clubs/events), Duplicate Records scan, Services & Commerce (750×3 orders/campaigns/pickups), Template Management, and Recommendation Moderation until those panels open (`activatePanel`). |
+| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand. **s3.3.010:** sign-in also defers Diagnostics / AI crawl / duplicates / commerce / templates / recs until panel open. **s3.3.013:** those panels paint from `masterAdminRollups/current` (5-min schedule + Refresh rollup); full live scans only on Run/Refresh. |
 | **Beta invite consent (s3.1.56 / clean UI s3.1.70)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR Beta Test & Prerelease Agreement; Booking Disclaimer body in `?` (`help-beta-booking-disclaimer`); invite intro in title `?` (`help-beta-tester`); no green “FLOQR Beta” eyebrow / “Signed in…” status. Required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` (`BETA_AGREEMENT` v2 — reverse-payments / non-refundable). Profile card via `global-profile-status.js`. |
 | **Profile menu fail-closed** | Search `#userDropdown` + `global-profile-status` mint feature links hidden; `FLOQRFeatureServices.applyFeatureLinks` reveals only granted Live/Beta. CSS: `.user-dropdown … .hidden` / `[hidden]` must beat `display:block!important` (also injected in `ensureLinkStyles`). |
 | **Profile card close (s3.2.61)** | In-card `.profile-menu-link` / `data-patron-menu` click closes the open card before navigate. `showPage` / `pageshow` / `popstate` / sign-out also close. Toggle refuses empty slim box until menu content is rendered (`menuReady` / `userDropdownHasContent`). |

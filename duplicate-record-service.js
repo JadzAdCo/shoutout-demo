@@ -692,8 +692,14 @@
       byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
       byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
     }
-    duplicatePanelLoading = refreshDuplicateDiagnostics().finally(() => { duplicatePanelLoading = null; });
-    return duplicatePanelLoading;
+    /* Summary strip from 5-min rollup; full 1200-club scan only on Refresh Duplicate Diagnostics. */
+    const rollup = window.FLOQRMasterAdminRollup?.getCached?.();
+    if (rollup?.duplicates) {
+      setStatus(`Rollup: ${Number(rollup.duplicates.clusterCount || 0)} duplicate group(s) from ${Number(rollup.duplicates.clubsScanned || 0)} clubs. Press Refresh for a live scan.`);
+    } else {
+      setStatus("Rollup summary loading… Press Refresh Duplicate Diagnostics for a live scan.");
+    }
+    return null;
   }
 
   window.FLOQRDuplicateRecords = {

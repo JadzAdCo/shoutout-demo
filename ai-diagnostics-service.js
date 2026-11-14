@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.012";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.012";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.013";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.013";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -222,6 +222,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.013",
+      title: "s3.3.013 — Master Admin 5-min rollup + summary strips",
+      checks: [
+        {label:"Rollup Functions", file:"functions/master-admin-rollup-functions.js", includes:["scheduledMasterAdminRollup", "refreshMasterAdminRollup", "masterAdminRollups/current"]},
+        {label:"Index export", file:"functions/index.js", includes:["master-admin-rollup-functions"]},
+        {label:"Rules", file:"firestore.rules", includes:["match /masterAdminRollups/{id}"]},
+        {label:"Client module", file:"master-admin-rollup.js", includes:["FLOQRMasterAdminRollup", "paintForPanel", "refreshMasterAdminRollup"]},
+        {label:"HTML strips", file:"master-admin.html", includes:["refreshMasterAdminRollupBtn", "servicesCommerceRollup", "templateManagementRollup", "aiCrawlingSummary"]},
+        {label:"Sign-in bind", file:"master-admin-app.js", includes:["FLOQRMasterAdminRollup?.bind", "FLOQRMasterAdminRollup?.paintForPanel"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-013-master-admin-rollup"]}
+      ]
+    },
+    {
       version: "s3.3.012",
       title: "s3.3.012 — Height unit-first + structured RydR pickup",
       checks: [
@@ -262,7 +275,7 @@
         {label:"Sign-in skips Diagnostics mount", file:"master-admin-app.js", includes:["Do not pull Diagnostics", "loadLightLocations"]},
         {label:"activatePanel mounts Diagnostics", file:"master-admin-app.js", includes:["FLOQRDiagnostics?.mount", "FLOQRMasterServices?.mount"]},
         {label:"Services lazy mount", file:"master-services-extension.js", includes:["FLOQRMasterServices", "async function mount("]},
-        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "never on Master Admin sign-in"]},
+        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "Rollup summary loaded"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-010-master-admin-load-perf"]}
       ]
     },
@@ -3029,6 +3042,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-013-master-admin-rollup",
+      area:"Master Admin",
+      feature:"5-min rollup summary strips (Diagnostics / AI / Duplicates / Commerce)",
+      changed:"s3.3.013 — scheduledMasterAdminRollup every 5 min writes masterAdminRollups/current; Refresh rollup callable; panels paint strips without 27×750 live pulls. Diagnostics mount no longer auto-runs full refresh; Duplicate Records waits for Refresh.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.013 and sign in (Functions must be deployed with refreshMasterAdminRollup). 2) Open Diagnostics — summary strip shows collection counts from rollup; status says press Run/Refresh for full scan. 3) Press Refresh rollup — strip timestamps update. 4) Open AI Crawling / Duplicate Records / Services & Commerce — strips show queue/cluster/order counts. 5) Mark Succeed/Failed.",
+      expected:"Sign-in stays light; each heavy panel shows rollup metrics immediately; full scans only on explicit Refresh/Run.",
+      troubleshoot:"No rollup yet → press Refresh rollup (needs Functions deploy). Permission denied → Master Admin only. Empty strip after refresh → check Cloud Scheduler / scheduledMasterAdminRollup logs. Still freezes opening Diagnostics → confirm mount no longer awaits refreshDiagnostics."
+    },
     {
       id:"s3-3-012-height-pickup-locale",
       area:"Profile / RydR",
@@ -9871,8 +9893,9 @@
       renderSourceExtractionReport();
       renderCrawlContactExport();
       renderPackageDiagnosticsArchives();
-      /* Full refresh (27 collections + package file fetches) only when Diagnostics opens — never on Master Admin sign-in. */
-      await refreshDiagnostics();
+      /* Summary strip comes from masterAdminRollups/current (5-min schedule).
+         Full refresh (27 collections + package file fetches) only on Run / Refresh Diagnostics. */
+      setText("diagnosticsStatus", "Rollup summary loaded. Press Run Diagnostics or Refresh Diagnostics for a full live scan.");
       state.diagnosticsReady = true;
     })().finally(() => { mountInFlight = null; });
     return mountInFlight;

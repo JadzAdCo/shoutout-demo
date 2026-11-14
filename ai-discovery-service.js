@@ -864,12 +864,14 @@
     if (masterPanelLoading) return masterPanelLoading;
     masterPanelLoading = (async () => {
       await ensureDiscoveryDefaults();
+      /* Counts live in #aiCrawlingSummary from masterAdminRollups; keep operator how-to here. */
       byId("aiDiscoverySummary").innerHTML = simpleRows([
         ["How it works", "Search → review cards → Approve or Needs research → live listing"],
         ["Publish rule", "Approve only when Name, Genre, DJs, Promoters, Address, City, Country, Phone, Email, and Instagram are filled"],
         ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
         ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
       ]);
+      window.FLOQRMasterAdminRollup?.paintForPanel?.("aiCrawling");
       if (!masterPanelBound) {
         masterPanelBound = true;
         byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
