@@ -120,16 +120,34 @@ jobs:
           # Full `firebase deploy --only functions` updates ~200 Gen2 services at once
           # and hits Cloud Run CPU + Cloud Functions mutation/minute quotas.
           # Batch like deploy-reconcile.ps1 (size 20, cool-down, 3 retries).
+          # [firebase-deploy-crawl] deploys only AI Crawling callables/schedules (includes
+          # first-time scheduledRetirePastCrawledEvents, which functions:list cannot see yet).
           set -euo pipefail
-          mapfile -t FNS < <(
-            firebase functions:list --project shoutoutdemo-5b402 --json \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{
-                  const j=JSON.parse(s); const rows=j.result||j;
-                  const ids=[...new Set((rows||[]).map(r=>r.id||r.entryPoint).filter(Boolean))].sort();
-                  if(!ids.length){console.error("no functions listed"); process.exit(1);}
-                  process.stdout.write(ids.join("\n")+"\n");
-                });'
-          )
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
+            FNS=(
+              scheduledAiDiscoveryCrawl
+              scheduledRetirePastCrawledEvents
+              retirePastCrawledEvents
+              runFloqrDiscoveryCrawl
+              runInstantDiscoveryCrawl
+              previewDiscoveryAutoApprove
+            )
+            echo "Crawl-only deploy: ${FNS[*]}"
+          else
+            mapfile -t FNS < <(
+              firebase functions:list --project shoutoutdemo-5b402 --json \
+                | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{
+                    const j=JSON.parse(s); const rows=j.result||j;
+                    const ids=[...new Set((rows||[]).map(r=>r.id||r.entryPoint).filter(Boolean))].sort();
+                    if(!ids.length){console.error("no functions listed"); process.exit(1);}
+                    process.stdout.write(ids.join("\n")+"\n");
+                  });'
+            )
+            if ! printf '%s\n' "${FNS[@]}" | grep -qx 'scheduledRetirePastCrawledEvents'; then
+              FNS+=("scheduledRetirePastCrawledEvents")
+            fi
+          fi
           echo "Deploying ${#FNS[@]} functions in batches of 20"
           BATCH=20
           SLEEP_BETWEEN=75
