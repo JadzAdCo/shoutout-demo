@@ -1019,7 +1019,7 @@
     "help-club-display-screens": ["venueAdmin"], "help-venue-website-ingest": ["venueAdmin"],
     "help-venue-hours-calendar": ["venueAdmin"],
     "help-translation-overrides": ["masterAdmin"], "help-template-catalog-report": ["masterAdmin"],
-    "help-venue-crawl-datapoints": ["masterAdmin"], "help-mail-logging": ["masterAdmin"]
+    "help-venue-crawl-datapoints": ["masterAdmin"], "help-master-aicrawl-diagnostics": ["masterAdmin"], "help-mail-logging": ["masterAdmin"]
   });
 
   /** Local tier from the help repository's viewer flags (UX only; the server callable is the control). */

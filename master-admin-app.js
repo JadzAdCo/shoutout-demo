@@ -326,6 +326,9 @@
       if (panelId === "diagnosticsShoutOut" && window.FLOQRShoutOutDiagnostics) {
         window.FLOQRShoutOutDiagnostics.mount();
       }
+      if (panelId === "diagnosticsAiCrawl" && window.FLOQRAiCrawlDiagnostics) {
+        window.FLOQRAiCrawlDiagnostics.mount();
+      }
       if ((panelId === "mailLogging" || panelId === "twilio_sendgridMailLogs") && window.FLOQRMailLogging) {
         window.FLOQRMailLogging.mount();
       }

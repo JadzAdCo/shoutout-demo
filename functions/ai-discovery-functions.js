@@ -27,6 +27,7 @@ const crawlCore = require("./discovery-crawl-core");
 const autoApprove = require("./discovery-auto-approve");
 const pastEvents = require("./discovery-past-events");
 const gatesCore = require("./discovery-gates-core");
+const crawlLog = require("./discovery-log-core");
 const {sendSystemMail} = require("./mail-log");
 const {
   looksLikeBrokenDemoEmail,
@@ -96,13 +97,76 @@ function proposedTypeFromJobEventType(eventType = "") {
 
 let crawlContext = {
   importGates: gatesCore.defaultImportGates(),
-  duplicateUniverse: []
+  publishingRules: gatesCore.defaultPublishingRules(),
+  pastEventPolicy: gatesCore.DEFAULT_PAST_EVENT_POLICY,
+  duplicateUniverse: [],
+  autoPublished: [],
+  ignoredPast: 0,
+  correlationId: ""
 };
+
+async function writeCrawlLog(entry = {}) {
+  try {
+    const payload = crawlLog.buildCrawlLog({
+      ...entry,
+      correlationId: entry.correlationId || crawlContext.correlationId || ""
+    });
+    await db.collection("appLogs").add({
+      ...payload,
+      userAgent: "firebase-functions",
+      appVersion: "s3.3.019",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtMs: Date.now(),
+      expireAtMs: Date.now() + (30 * 24 * 60 * 60 * 1000)
+    });
+  } catch (error) {
+    console.warn("AI crawl appLogs write failed:", error.message || error);
+  }
+}
+
+function escapeHtmlLite(value = "") {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[ch]));
+}
+
+async function emailAutoPublishedDigest({runId = "", trigger = "crawl"} = {}) {
+  const rows = crawlContext.autoPublished || [];
+  if (!rows.length) return {sent: false, count: 0};
+  const to = MASTER_ADMIN_EMAILS[0] || "bans.don@gmail.com";
+  const from = EMAIL_OTP_FROM;
+  const subject = `FLOQR AI Crawling — ${rows.length} auto-published listing(s)`;
+  const lines = rows.map(row => `- ${row.title} (${row.collection}/${row.id}) · ${row.city || ""} ${row.country || ""} · ${row.crawlType || ""}`);
+  const textBody = [`Auto-published from ${trigger} run ${runId || "(none)"}:`, "", ...lines, "", "Review: Master Admin → AI Crawling → Approved."].join("\n");
+  const htmlBody = `<p>${rows.length} listing(s) were auto-published from <strong>${escapeHtmlLite(trigger)}</strong>.</p>
+    <ul>${rows.map(row => `<li>${escapeHtmlLite(row.title)} — ${escapeHtmlLite(row.collection)}/${escapeHtmlLite(row.id)} · ${escapeHtmlLite(row.city)} ${escapeHtmlLite(row.country)}</li>`).join("")}</ul>
+    <p>Master Admin → AI Crawling → Approved. Duplicates were blocked; past events were ignored.</p>`;
+  try {
+    const sent = await sendgridMail({
+      to,
+      from,
+      subject,
+      textBody,
+      htmlBody,
+      kind: "system",
+      source: "aiCrawl.autoPublish",
+      trigger,
+      extra: {runId, count: rows.length}
+    });
+    return {sent: true, count: rows.length, mailLogId: sent.mailLogId};
+  } catch (error) {
+    console.warn("Auto-publish email failed:", error.message || error);
+    return {sent: false, count: rows.length, error: String(error.message || error)};
+  }
+}
 
 async function beginCrawlContext() {
   try {
     const gatesSnap = await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").get();
-    const importGates = gatesCore.normalizeImportGates(gatesSnap.exists ? gatesSnap.data()?.importGates : null);
+    const data = gatesSnap.exists ? (gatesSnap.data() || {}) : {};
+    const importGates = gatesCore.normalizeImportGates(data.importGates);
+    const publishingRules = gatesCore.normalizePublishingRules(data.publishingRules);
+    const pastEventPolicy = gatesCore.normalizePastEventPolicy(data.pastEventPolicy);
     const [liveSnap, eventSnap, queueSnap] = await Promise.all([
       db.collection("clubLocations").limit(800).get(),
       db.collection("events").limit(400).get(),
@@ -111,24 +175,40 @@ async function beginCrawlContext() {
     const live = liveSnap.docs.map(doc => ({id: doc.id, collection: "clubLocations", ...doc.data()}))
       .filter(row => String(row.status || "active") !== "deleted" && !row.aliasOf && !row.mergedInto);
     const events = eventSnap.docs.map(doc => {
-      const data = doc.data() || {};
+      const dataRow = doc.data() || {};
       return {
         id: doc.id,
         collection: "events",
         entityKind: "event",
-        proposedType: data.proposedType || data.eventType || "event",
-        proposedTitle: data.eventName || data.title || data.proposedTitle || "",
-        proposedLocationName: data.locationName || data.venueName || "",
-        proposedAddress: data.fullAddress || data.address || "",
-        ...data
+        proposedType: dataRow.proposedType || dataRow.eventType || "event",
+        proposedTitle: dataRow.eventName || dataRow.title || dataRow.proposedTitle || "",
+        proposedLocationName: dataRow.locationName || dataRow.venueName || "",
+        proposedAddress: dataRow.fullAddress || dataRow.address || "",
+        ...dataRow
       };
     }).filter(row => String(row.status || "active") !== "deleted");
     const queue = queueSnap.docs.map(doc => ({id: doc.id, collection: "aiDiscoveryQueue", ...doc.data()}))
       .filter(row => !["deleted", "rejected"].includes(String(row.status || "")));
-    crawlContext = {importGates, duplicateUniverse: [...live, ...events, ...queue]};
+    crawlContext = {
+      importGates,
+      publishingRules,
+      pastEventPolicy,
+      duplicateUniverse: [...live, ...events, ...queue],
+      autoPublished: [],
+      ignoredPast: 0,
+      correlationId: crawlContext.correlationId || ""
+    };
   } catch (error) {
     console.warn("Discovery crawl context load failed:", error.message);
-    crawlContext = {importGates: gatesCore.defaultImportGates(), duplicateUniverse: crawlContext.duplicateUniverse || []};
+    crawlContext = {
+      importGates: gatesCore.defaultImportGates(),
+      publishingRules: gatesCore.defaultPublishingRules(),
+      pastEventPolicy: gatesCore.DEFAULT_PAST_EVENT_POLICY,
+      duplicateUniverse: crawlContext.duplicateUniverse || [],
+      autoPublished: [],
+      ignoredPast: 0,
+      correlationId: crawlContext.correlationId || ""
+    };
   }
   return crawlContext;
 }
@@ -162,6 +242,20 @@ function stampDiscoveryClassification(record = {}) {
   }
   next.missingDatapoints = missingDatapoints(next);
   next.importGatesSnapshot = crawlContext.importGates;
+  next.publishingRulesSnapshot = crawlContext.publishingRules;
+  if (next.duplicateFlag) {
+    writeCrawlLog({
+      action: "duplicate_flag",
+      level: "warn",
+      message: `Duplicate ${next.proposedTitle || next.queueDocId || "listing"} (${(next.duplicateReasons || []).join(", ")})`,
+      details: {
+        match: next.duplicateMatch || null,
+        crawlType: next.proposedType || "",
+        city: next.city || "",
+        country: next.country || ""
+      }
+    });
+  }
   if (next.duplicateFlag && next.crawlScope !== "updates-only") {
     next.crawlResultStatus = "possible-duplicate";
   } else {
@@ -446,7 +540,10 @@ function cityCountryFromText(sourceUrl = "", text = "", location = {}) {
 }
 
 function missingDatapoints(record = {}) {
-  return gatesCore.missingDatapoints(record, crawlContext.importGates);
+  return gatesCore.missingDatapoints(record, {
+    publishingRules: crawlContext.publishingRules,
+    ...crawlContext.importGates
+  });
 }
 
 function contactFieldSnapshot(record = {}) {
@@ -1103,11 +1200,27 @@ async function runScheduledCrawl(scheduleDoc, now = new Date()) {
     return null;
   }
   try {
+    crawlContext.correlationId = claimId;
+    await writeCrawlLog({action: "run_start", message: `Scheduled crawl ${claimId}`, details: {slot: timing.slot}, runId: claimId});
     const records = await crawlPublicEventSources(schedule.criteria || schedule);
     for (const record of records) await writeDiscoveryQueueItem(await classifyDiscoveryRecord(record));
-    await claim.set({status:"completed", resultCount:records.length, completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    const mail = await emailAutoPublishedDigest({runId: claimId, trigger: "scheduled-crawl"});
+    await claim.set({
+      status:"completed",
+      resultCount:records.length,
+      autoPublishedCount: (crawlContext.autoPublished || []).length,
+      ignoredPastCount: crawlContext.ignoredPast || 0,
+      completedAt:admin.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    await writeCrawlLog({
+      action: "run_complete",
+      message: `Scheduled crawl wrote ${records.length} candidate(s)`,
+      details: {resultCount: records.length, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+      runId: claimId
+    });
     return records.length;
   } catch (error) {
+    await writeCrawlLog({action: "run_failed", level: "error", message: String(error.message || error), runId: claimId});
     await claim.set({status:"failed", error:String(error.message || error).slice(0, 1000), completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
     throw error;
   }
@@ -1143,6 +1256,17 @@ async function maybeAutoPublishRecord(record = {}, queueDocId = "") {
   };
   if (decision.route !== "AUTO_PUBLISH") {
     await db.collection("aiDiscoveryQueue").doc(queueDocId).set(patch, {merge: true});
+    await writeCrawlLog({
+      action: "auto_publish_denied",
+      level: "info",
+      message: `Queued for review: ${record.proposedTitle || queueDocId}`,
+      details: {
+        queueDocId,
+        crawlType: record.proposedType || "",
+        failures: decision.failures || [],
+        reason: decision.reason
+      }
+    });
     return {autoPublished: false, decision};
   }
   // Past dated events never auto-publish to LIVE upcoming rails.
@@ -1177,6 +1301,22 @@ async function maybeAutoPublishRecord(record = {}, queueDocId = "") {
     reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge: true});
+  const published = {
+    title: live.payload.locationName || live.payload.eventName || live.id,
+    collection: live.collection,
+    id: live.id,
+    crawlType: record.proposedType || "",
+    city: live.payload.city || "",
+    country: live.payload.country || ""
+  };
+  crawlContext.autoPublished = crawlContext.autoPublished || [];
+  crawlContext.autoPublished.push(published);
+  await writeCrawlLog({
+    action: "auto_publish",
+    level: "info",
+    message: `Auto-published ${published.title} to ${live.collection}/${live.id}`,
+    details: published
+  });
   return {autoPublished: true, decision, live};
 }
 
@@ -1187,6 +1327,21 @@ async function writeDiscoveryQueueItem(record) {
     collectedAtIso,
     collectedAtLabel: record.collectedAtLabel || collectedAtIso
   }, record.crawlerDateSource || (record.eventStartIso ? "schema.org/crawl" : "places-or-undated"));
+  if (crawlContext.pastEventPolicy?.ignoreOnCrawl !== 0
+    && pastEvents.classifyLifecycle(stamped) === "past") {
+    crawlContext.ignoredPast = (crawlContext.ignoredPast || 0) + 1;
+    await writeCrawlLog({
+      action: "past_event_ignored",
+      level: "info",
+      message: `Ignored past event ${stamped.proposedTitle || stamped.eventStartIso || "untitled"}`,
+      details: {
+        eventStartIso: stamped.eventStartIso || stamped.proposedDate || "",
+        city: stamped.city || "",
+        crawlType: stamped.proposedType || ""
+      }
+    });
+    return "";
+  }
   const docId = crawlCore.resolveQueueDocId(stamped);
   const ref = db.collection("aiDiscoveryQueue").doc(docId);
   const existingSnap = await ref.get();
@@ -1529,23 +1684,38 @@ async function uploadEnhancedGeminiImage({bucket, outputPath, buffer, contentTyp
   return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(outputPath)}?alt=media&token=${encodeURIComponent(token)}`;
 }
 
-exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", timeZone:"UTC", region:"us-central1", secrets:[GOOGLE_PLACES_API_KEY]}, async () => {
+exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", timeZone:"UTC", region:"us-central1", secrets:[GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY]}, async () => {
   const schedules = await db.collection("aiCrawlerSchedules").where("enabled", "==", true).get();
   for (const schedule of schedules.docs) await runScheduledCrawl(schedule);
   return null;
 });
 
-/** Daily: mark past dated events, then soft-retire ones older than 14 days from public rails. */
+/** Daily: mark past dated events, retire, then remove from FLOQR after the publishing-rule window. */
 exports.scheduledRetirePastCrawledEvents = onSchedule({
   schedule: "every 24 hours",
   timeZone: "UTC",
   region: "us-central1"
 }, async () => {
-  // Keep recent past on public pastEvents rails; only retire after 14 days.
+  await beginCrawlContext();
+  const policy = crawlContext.pastEventPolicy || gatesCore.DEFAULT_PAST_EVENT_POLICY;
   await pastEvents.markPastInCollection(db, "events", {limit: 400});
   await pastEvents.markPastInCollection(db, "aiDiscoveryQueue", {limit: 400});
-  await pastEvents.retirePastCrawledEvents(db, {mode: "retire", olderThanHours: 14 * 24, limit: 400});
-  return null;
+  const retired = await pastEvents.retirePastCrawledEvents(db, {
+    mode: "retire",
+    olderThanHours: Math.max(0, Number(policy.retireAfterDays || 0)) * 24,
+    limit: 400
+  });
+  const removed = await pastEvents.retirePastCrawledEvents(db, {
+    mode: "remove",
+    olderThanHours: Math.max(0, Number(policy.removeAfterDays || 14)) * 24,
+    limit: 400
+  });
+  await writeCrawlLog({
+    action: "past_event_cleaned",
+    message: `Past events retired ${retired.retired || 0}, removed ${removed.removed || 0}`,
+    details: {retired, removed, policy}
+  });
+  return {retired, removed};
 });
 
 /**
@@ -1562,6 +1732,13 @@ exports.retirePastCrawledEvents = onCall({region: "us-central1"}, async request 
     olderThanHours,
     limit: Math.max(1, Math.min(500, Number(request.data?.limit || 300)))
   });
+  await writeCrawlLog({
+    action: "past_event_cleaned",
+    message: `Master Admin ${mode} past events`,
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    details: {mode, olderThanHours, ...summary}
+  });
   return {ok: true, ...summary};
 });
 
@@ -1574,12 +1751,20 @@ exports.previewDiscoveryAutoApprove = onCall({region: "us-central1"}, async requ
 
 exports.runFloqrDiscoveryCrawl = onCall({
   region:"us-central1",
-  secrets:[GOOGLE_PLACES_API_KEY],
+  secrets:[GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY],
   timeoutSeconds:240,
   memory:"512MiB"
 }, async request => {
   await assertMasterAdmin(request);
   await beginCrawlContext();
+  crawlContext.correlationId = String(request.data?.runId || `manual_${Date.now()}`);
+  await writeCrawlLog({
+    action: "run_start",
+    message: "Manual discovery crawl started",
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: crawlContext.correlationId
+  });
   const criteria = request.data?.criteria || {};
   const structuredPlan = request.data?.structuredPlan || criteria.structuredPlan || {};
   const runId = String(request.data?.runId || "");
@@ -1601,10 +1786,21 @@ exports.runFloqrDiscoveryCrawl = onCall({
     created += 1;
   }
   const contactStats = summarizeContactLift(liftRows);
+  const mail = await emailAutoPublishedDigest({runId: crawlContext.correlationId, trigger: "manual-crawl"});
+  await writeCrawlLog({
+    action: "run_complete",
+    message: `Manual crawl wrote ${created} candidate(s)`,
+    details: {created, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: crawlContext.correlationId
+  });
   return {
     created,
     placesConfigured: !!optionalPlacesKey(),
     ticketmaster: "later",
+    autoPublishedCount: (crawlContext.autoPublished || []).length,
+    ignoredPastCount: crawlContext.ignoredPast || 0,
     contactStats,
     message: created
       ? `Discovery crawl wrote ${created} Google Places candidate(s). Contact-complete ${contactStats.contactCompleteBeforePct}% → ${contactStats.contactCompleteAfterPct}% after website enrich.`
@@ -1620,7 +1816,7 @@ exports.runFloqrDiscoveryCrawl = onCall({
  */
 exports.runInstantDiscoveryCrawl = onCall({
   region: "us-central1",
-  secrets: [GOOGLE_PLACES_API_KEY],
+  secrets: [GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY],
   timeoutSeconds: 300,
   memory: "512MiB"
 }, async request => {
@@ -1649,6 +1845,14 @@ exports.runInstantDiscoveryCrawl = onCall({
     requestedByUid: request.auth?.uid || "",
     requestedByEmail: String(request.auth?.token?.email || ""),
     startedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  crawlContext.correlationId = runRef.id;
+  await writeCrawlLog({
+    action: "run_start",
+    message: "Instant crawl started",
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: runRef.id
   });
 
   try {
@@ -1686,6 +1890,7 @@ exports.runInstantDiscoveryCrawl = onCall({
       : (optionalPlacesKey()
         ? `Instant crawl found no Places matches for ${jobs.length} job(s). Broaden the saved schedule.`
         : "GOOGLE_PLACES_API_KEY is not configured.");
+    const mail = await emailAutoPublishedDigest({runId: runRef.id, trigger: "instant-crawl"});
     await runRef.set({
       status: "completed",
       createdRecordCount: created,
@@ -1693,11 +1898,21 @@ exports.runInstantDiscoveryCrawl = onCall({
       jobLimit,
       jobsAttempted: jobs.length,
       contactStats,
+      autoPublishedCount: (crawlContext.autoPublished || []).length,
+      ignoredPastCount: crawlContext.ignoredPast || 0,
       placesConfigured: !!optionalPlacesKey(),
       completedAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       note: message
     }, {merge: true});
+    await writeCrawlLog({
+      action: "run_complete",
+      message,
+      details: {created, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+      uid: request.auth?.uid || "system",
+      email: String(request.auth?.token?.email || ""),
+      runId: runRef.id
+    });
     return {
       created,
       runId: runRef.id,
@@ -1714,6 +1929,14 @@ exports.runInstantDiscoveryCrawl = onCall({
       message
     };
   } catch (error) {
+    await writeCrawlLog({
+      action: "run_failed",
+      level: "error",
+      message: String(error?.message || error),
+      uid: request.auth?.uid || "system",
+      email: String(request.auth?.token?.email || ""),
+      runId: runRef.id
+    });
     await runRef.set({
       status: "failed",
       error: String(error?.message || error).slice(0, 1000),

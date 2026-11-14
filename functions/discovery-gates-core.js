@@ -5,20 +5,90 @@
  */
 "use strict";
 
+const CONTACT_MODES = [
+  {key: "phoneOrEmail", label: "Phone or Email (at least one)"},
+  {key: "phone", label: "Phone required"},
+  {key: "email", label: "Email required"},
+  {key: "none", label: "Contact optional"}
+];
+
+const DISCOVERY_CSV_COLUMNS = [
+  {key: "recordKind", header: "recordKind", sampleClub: "club", sampleEvent: "event"},
+  {key: "crawlType", header: "crawlType", sampleClub: "nightclub", sampleEvent: "comedyShow"},
+  {key: "name", header: "name", sampleClub: "Jimmy'z Monte-Carlo", sampleEvent: "Friday Comedy Night"},
+  {key: "genres", header: "genres", sampleClub: "Hip Hop, House", sampleEvent: "Comedy"},
+  {key: "artistsOrDjs", header: "artistsOrDjs", sampleClub: "Resident DJs", sampleEvent: "Featured comics"},
+  {key: "promoters", header: "promoters", sampleClub: "", sampleEvent: ""},
+  {key: "address", header: "address", sampleClub: "26 Avenue Princesse Grace", sampleEvent: "12 Rue de la Gaite"},
+  {key: "city", header: "city", sampleClub: "Monte Carlo", sampleEvent: "Paris"},
+  {key: "country", header: "country", sampleClub: "Monaco", sampleEvent: "France"},
+  {key: "phone", header: "phone", sampleClub: "+37798067000", sampleEvent: "+33144556677"},
+  {key: "email", header: "email", sampleClub: "", sampleEvent: "comedy@example.com"},
+  {key: "instagram", header: "instagram", sampleClub: "jimmyzmontecarlo", sampleEvent: ""},
+  {key: "facebook", header: "facebook", sampleClub: "", sampleEvent: ""},
+  {key: "website", header: "website", sampleClub: "https://www.montecarlosbm.com/en/jimmyz", sampleEvent: "https://www.example-comedy.fr"},
+  {key: "date", header: "date", sampleClub: "", sampleEvent: "2026-12-18"},
+  {key: "time", header: "time", sampleClub: "", sampleEvent: "21:00"},
+  {key: "description", header: "description", sampleClub: "Iconic Monte-Carlo nightclub.", sampleEvent: "Stand-up comedy with featured artists."},
+  {key: "ticketUrl", header: "ticketUrl", sampleClub: "", sampleEvent: "https://www.eventbrite.com/e/example"},
+  {key: "sourceUrl", header: "sourceUrl", sampleClub: "https://www.montecarlosbm.com/en/jimmyz", sampleEvent: "https://www.example-comedy.fr/friday"},
+  {key: "placesId", header: "placesId", sampleClub: "", sampleEvent: ""}
+];
+
 const IMPORT_GATE_FIELDS = [
   {key: "name", label: "Name", group: "identity", appliesTo: "both", defaultVenue: 1, defaultEvent: 1},
-  {key: "genres", label: "Genre", group: "nightlife", appliesTo: "both", defaultVenue: 0, defaultEvent: 0},
-  {key: "artistsOrDjs", label: "DJ(s)/Artist(s)", group: "nightlife", appliesTo: "venue", defaultVenue: 0, defaultEvent: 0},
+  {key: "genres", label: "Genre", group: "nightlife", appliesTo: "both", defaultVenue: 1, defaultEvent: 1},
+  {key: "artistsOrDjs", label: "DJ(s)/Artist(s)", group: "nightlife", appliesTo: "venue", defaultVenue: 1, defaultEvent: 0},
   {key: "promoters", label: "Promoter(s)", group: "nightlife", appliesTo: "both", defaultVenue: 0, defaultEvent: 0},
-  {key: "address", label: "Address", group: "location", appliesTo: "both", defaultVenue: 1, defaultEvent: 0},
+  {key: "address", label: "Address", group: "location", appliesTo: "both", defaultVenue: 1, defaultEvent: 1},
   {key: "city", label: "City", group: "location", appliesTo: "both", defaultVenue: 1, defaultEvent: 1},
   {key: "country", label: "Country", group: "location", appliesTo: "both", defaultVenue: 1, defaultEvent: 1},
-  {key: "phone", label: "Phone", group: "contact", appliesTo: "both", defaultVenue: 1, defaultEvent: 0},
+  {key: "phone", label: "Phone", group: "contact", appliesTo: "both", defaultVenue: 0, defaultEvent: 0},
   {key: "email", label: "Email", group: "contact", appliesTo: "both", defaultVenue: 0, defaultEvent: 0},
   {key: "instagram", label: "Instagram", group: "social", appliesTo: "both", defaultVenue: 0, defaultEvent: 0},
   {key: "date", label: "Date", group: "schedule", appliesTo: "event", defaultVenue: 0, defaultEvent: 1},
   {key: "time", label: "Time", group: "schedule", appliesTo: "event", defaultVenue: 0, defaultEvent: 1}
 ];
+
+const NIGHTLIFE_VENUE_FIELDS = {
+  name: 1, genres: 1, artistsOrDjs: 1, promoters: 0, address: 1, city: 1, country: 1,
+  phone: 0, email: 0, instagram: 0, date: 0, time: 0
+};
+const NIGHTLIFE_EVENT_FIELDS = {
+  name: 1, genres: 1, artistsOrDjs: 1, promoters: 0, address: 1, city: 1, country: 1,
+  phone: 0, email: 0, instagram: 0, date: 1, time: 1
+};
+const DAYTIME_EVENT_FIELDS = {
+  name: 1, genres: 1, artistsOrDjs: 0, promoters: 0, address: 1, city: 1, country: 1,
+  phone: 0, email: 0, instagram: 0, date: 1, time: 1
+};
+
+const CRAWL_TYPE_CATALOG = [
+  {key: "nightclub", label: "Nightclub", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "club", label: "Club", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "beachClub", label: "Beach Club", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "lounge", label: "Lounge", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "rooftopLounge", label: "Rooftop Lounge", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "rooftopBar", label: "Rooftop Bar", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "dayClub", label: "Day Club", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "bar", label: "Bar", family: "venue", fields: NIGHTLIFE_VENUE_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "comedyShow", label: "Comedy Show", family: "event", fields: NIGHTLIFE_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "concert", label: "Concert", family: "event", fields: NIGHTLIFE_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "ticketedShow", label: "Ticketed Show", family: "event", fields: NIGHTLIFE_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "promoterEvent", label: "Promoter Event", family: "event", fields: NIGHTLIFE_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "event", label: "Event", family: "event", fields: NIGHTLIFE_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "daytimeEvent", label: "Daytime Event", family: "event", fields: DAYTIME_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "fleaMarket", label: "Flea Market", family: "event", fields: DAYTIME_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "farmersMarket", label: "Farmers Market", family: "event", fields: DAYTIME_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "communityMarket", label: "Community Market", family: "event", fields: DAYTIME_EVENT_FIELDS, contactMode: "phoneOrEmail"},
+  {key: "festival", label: "Festival", family: "event", fields: DAYTIME_EVENT_FIELDS, contactMode: "phoneOrEmail"}
+];
+
+const DEFAULT_PAST_EVENT_POLICY = {
+  ignoreOnCrawl: 1,
+  retireAfterDays: 14,
+  removeAfterDays: 14
+};
 
 /** Cities people use interchangeably (Monaco / Monte Carlo is the owner example). */
 const CITY_ALIAS_GROUPS = [
@@ -75,14 +145,60 @@ function as01(value, fallback = 0) {
   return fallback;
 }
 
-function defaultImportGates() {
-  const venue = {};
-  const event = {};
+function cloneFields(fields = {}) {
+  const next = {};
   IMPORT_GATE_FIELDS.forEach(field => {
-    venue[field.key] = field.defaultVenue;
-    event[field.key] = field.defaultEvent;
+    next[field.key] = as01(fields[field.key], field.defaultVenue);
   });
-  return {venue, event};
+  return next;
+}
+
+function defaultPublishingRules() {
+  const rules = {};
+  CRAWL_TYPE_CATALOG.forEach(type => {
+    rules[type.key] = {
+      fields: cloneFields(type.fields),
+      contactMode: type.contactMode || "phoneOrEmail"
+    };
+  });
+  return rules;
+}
+
+function normalizeContactMode(value, fallback = "phoneOrEmail") {
+  const key = String(value || "").trim();
+  return CONTACT_MODES.some(mode => mode.key === key) ? key : fallback;
+}
+
+function normalizePublishingRules(raw = {}) {
+  const defaults = defaultPublishingRules();
+  const source = raw && typeof raw === "object" ? raw : {};
+  const next = {};
+  CRAWL_TYPE_CATALOG.forEach(type => {
+    const row = source[type.key] && typeof source[type.key] === "object" ? source[type.key] : {};
+    const fieldsSrc = row.fields && typeof row.fields === "object" ? row.fields : row;
+    next[type.key] = {
+      fields: cloneFields({...defaults[type.key].fields, ...fieldsSrc}),
+      contactMode: normalizeContactMode(row.contactMode, defaults[type.key].contactMode)
+    };
+  });
+  return next;
+}
+
+function normalizePastEventPolicy(raw = {}) {
+  const source = raw && typeof raw === "object" ? raw : {};
+  return {
+    ignoreOnCrawl: as01(source.ignoreOnCrawl, DEFAULT_PAST_EVENT_POLICY.ignoreOnCrawl),
+    retireAfterDays: Math.max(0, Number(source.retireAfterDays ?? DEFAULT_PAST_EVENT_POLICY.retireAfterDays) || 0),
+    removeAfterDays: Math.max(0, Number(source.removeAfterDays ?? DEFAULT_PAST_EVENT_POLICY.removeAfterDays) || 0)
+  };
+}
+
+function defaultImportGates() {
+  const rules = defaultPublishingRules();
+  return {
+    venue: {...rules.nightclub.fields},
+    event: {...rules.daytimeEvent.fields}
+  };
 }
 
 function normalizeImportGates(raw = {}) {
@@ -165,6 +281,8 @@ function datapointPresent(record = {}, key = "") {
       return hasAny(record.email);
     case "instagram":
       return hasAny(record.socialMediaHandles?.instagram || record.instagramHandle);
+    case "facebook":
+      return hasAny(record.socialMediaHandles?.facebook || record.facebookHandle);
     case "date":
       return hasAny(record.proposedDate || record.eventStartIso);
     case "time":
@@ -185,11 +303,50 @@ function isEventRecord(record = {}) {
   return false;
 }
 
+function crawlTypeOf(record = {}) {
+  const classified = classifyEntity(record);
+  if (classified.entityKind === "event") return classified.eventCategory || "event";
+  return classified.venueCategory || "nightclub";
+}
+
+function publishingRuleFor(record = {}, bundle = null) {
+  const rules = bundle && bundle.publishingRules
+    ? normalizePublishingRules(bundle.publishingRules)
+    : (bundle && (bundle.nightclub || bundle.daytimeEvent) ? normalizePublishingRules(bundle) : defaultPublishingRules());
+  const type = crawlTypeOf(record);
+  return rules[type] || (isEventRecord(record) ? rules.daytimeEvent : rules.nightclub);
+}
+
+function missingContact(record = {}, mode = "phoneOrEmail") {
+  const phone = datapointPresent(record, "phone");
+  const email = datapointPresent(record, "email");
+  if (mode === "phone") return phone ? [] : ["Phone"];
+  if (mode === "email") return email ? [] : ["Email"];
+  if (mode === "phoneOrEmail") return (phone || email) ? [] : ["Phone or Email"];
+  return [];
+}
+
 function missingDatapoints(record = {}, gates = null) {
-  const normalized = normalizeImportGates(gates);
   const event = isEventRecord(record);
-  const map = event ? normalized.event : normalized.venue;
   const missing = [];
+  const bundle = gates && typeof gates === "object" ? gates : null;
+  const hasPublishing = !!(bundle && (bundle.publishingRules || bundle.nightclub || bundle.beachClub));
+  if (hasPublishing || !bundle || (!bundle.venue && !bundle.event)) {
+    const rule = publishingRuleFor(record, bundle);
+    IMPORT_GATE_FIELDS.forEach(field => {
+      if (field.appliesTo === "venue" && event) return;
+      if (field.appliesTo === "event" && !event) return;
+      if (rule.fields[field.key] !== 1) return;
+      if (field.key === "phone" || field.key === "email") return;
+      if (!datapointPresent(record, field.key)) {
+        missing.push(event && field.key === "promoters" ? "Organizer(s) / Promoter(s)" : field.label);
+      }
+    });
+    missing.push(...missingContact(record, rule.contactMode));
+    return missing;
+  }
+  const normalized = normalizeImportGates(bundle);
+  const map = event ? normalized.event : normalized.venue;
   IMPORT_GATE_FIELDS.forEach(field => {
     if (field.appliesTo === "venue" && event) return;
     if (field.appliesTo === "event" && !event) return;
@@ -198,7 +355,28 @@ function missingDatapoints(record = {}, gates = null) {
       missing.push(event && field.key === "promoters" ? "Organizer(s) / Promoter(s)" : field.label);
     }
   });
+  const contactMode = bundle.contactMode || (event ? "phoneOrEmail" : "phoneOrEmail");
+  if (!map.phone && !map.email) missing.push(...missingContact(record, contactMode));
   return missing;
+}
+
+function publishBlockers(record = {}, bundle = null) {
+  const missing = missingDatapoints(record, bundle);
+  const duplicateBlocks = !!(record.duplicateFlag && record.crawlScope !== "updates-only");
+  const past = isEventRecord(record) && /^(past|retired|removed)$/i.test(String(record.lifecycleStatus || ""));
+  const blockers = [...missing];
+  if (duplicateBlocks) {
+    const who = record.duplicateMatch?.matchName || record.duplicateMatch?.matchId || "another listing";
+    blockers.push(`Possible duplicate of ${who}`);
+  }
+  if (past) blockers.push("Past event");
+  return {
+    ok: blockers.length === 0,
+    missing,
+    duplicateBlocks,
+    pastEvent: past,
+    blockers
+  };
 }
 
 function classifyEntity(record = {}) {
@@ -449,17 +627,185 @@ function proposedTypeFromJobEventType(eventType = "") {
   return "nightclub";
 }
 
+function csvEscape(value = "") {
+  const text = String(value ?? "");
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function splitCsvLine(line = "") {
+  const cells = [];
+  let current = "";
+  let quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (quoted) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+      } else if (ch === '"') {
+        quoted = false;
+      } else {
+        current += ch;
+      }
+    } else if (ch === '"') {
+      quoted = true;
+    } else if (ch === ",") {
+      cells.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  cells.push(current);
+  return cells;
+}
+
+function csvHeaderRow() {
+  return DISCOVERY_CSV_COLUMNS.map(col => col.header).join(",");
+}
+
+function listCell(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join("; ");
+  return String(value || "").replace(/,/g, "; ");
+}
+
+function csvRowFromRecord(record = {}) {
+  const classified = classifyEntity(record);
+  const kind = classified.entityKind === "event" ? "event" : "club";
+  const crawlType = crawlTypeOf(record);
+  const values = {
+    recordKind: kind,
+    crawlType,
+    name: record.proposedTitle || record.proposedLocationName || record.locationName || record.eventName || "",
+    genres: listCell(record.genres),
+    artistsOrDjs: listCell(record.artistsOrDjs || record.artists || record.djs),
+    promoters: listCell(record.promoters || record.organizers),
+    address: record.proposedAddress || record.address || record.fullAddress || record.streetAddress || "",
+    city: record.city || "",
+    country: record.country || "",
+    phone: record.telephone || record.phone || "",
+    email: record.email || "",
+    instagram: record.socialMediaHandles?.instagram || record.instagramHandle || "",
+    facebook: record.socialMediaHandles?.facebook || record.facebookHandle || "",
+    website: record.officialWebsite || record.website || "",
+    date: record.proposedDate || record.eventDate || (record.eventStartIso || "").slice(0, 10),
+    time: record.proposedTime || record.eventTime || "",
+    description: record.proposedDescription || record.aiSummary || record.description || "",
+    ticketUrl: record.ticketUrl || "",
+    sourceUrl: record.sourceUrl || "",
+    placesId: record.placesId || ""
+  };
+  return DISCOVERY_CSV_COLUMNS.map(col => csvEscape(values[col.key] || "")).join(",");
+}
+
+function serializeDiscoveryCsv(records = []) {
+  const lines = [csvHeaderRow()];
+  (records || []).forEach(record => lines.push(csvRowFromRecord(record)));
+  return `${lines.join("\r\n")}\r\n`;
+}
+
+function sampleDiscoveryCsv() {
+  const club = {};
+  const event = {};
+  DISCOVERY_CSV_COLUMNS.forEach(col => {
+    club[col.key] = col.sampleClub;
+    event[col.key] = col.sampleEvent;
+  });
+  return serializeDiscoveryCsv([
+    recordFromCsvRow(club),
+    recordFromCsvRow(event)
+  ]);
+}
+
+function recordFromCsvRow(row = {}) {
+  const kind = String(row.recordKind || row.kind || "").toLowerCase() === "event" ? "event" : "club";
+  const crawlType = String(row.crawlType || row.proposedType || (kind === "event" ? "event" : "nightclub")).trim();
+  const genres = String(row.genres || "").split(/[;,]/).map(part => part.trim()).filter(Boolean);
+  const artists = String(row.artistsOrDjs || "").split(/[;,]/).map(part => part.trim()).filter(Boolean);
+  const promoters = String(row.promoters || "").split(/[;,]/).map(part => part.trim()).filter(Boolean);
+  const instagram = String(row.instagram || "").replace(/^@/, "").trim();
+  const facebook = String(row.facebook || "").replace(/^@/, "").trim();
+  const record = {
+    entityKind: kind === "event" ? "event" : "venue",
+    proposedType: crawlType,
+    proposedTitle: row.name || "",
+    proposedLocationName: kind === "club" ? (row.name || "") : "",
+    genres,
+    artistsOrDjs: artists,
+    promoters,
+    proposedAddress: row.address || "",
+    streetAddress: row.address || "",
+    city: row.city || "",
+    country: row.country || "",
+    telephone: row.phone || "",
+    phone: row.phone || "",
+    email: row.email || "",
+    instagramHandle: instagram,
+    facebookHandle: facebook,
+    socialMediaHandles: {instagram, facebook},
+    officialWebsite: row.website || "",
+    website: row.website || "",
+    proposedDate: row.date || "",
+    proposedTime: row.time || "",
+    eventStartIso: row.date ? `${row.date}T${row.time || "12:00"}` : "",
+    proposedDescription: row.description || "",
+    ticketUrl: row.ticketUrl || "",
+    sourceUrl: row.sourceUrl || "",
+    placesId: row.placesId || "",
+    discoveryMode: "csv-import",
+    status: "pendingReview"
+  };
+  return {...record, ...classifyEntity(record)};
+}
+
+function parseDiscoveryCsv(text = "") {
+  const raw = String(text || "").replace(/^\uFEFF/, "");
+  const lines = raw.split(/\r?\n/).filter(line => line.trim());
+  if (!lines.length) return {headers: [], rows: [], records: [], errors: ["Empty CSV"]};
+  const headers = splitCsvLine(lines[0]).map(h => h.trim());
+  const expected = DISCOVERY_CSV_COLUMNS.map(col => col.header);
+  const missingHeaders = expected.filter(name => !headers.includes(name));
+  const errors = [];
+  if (missingHeaders.length) {
+    errors.push(`CSV headers must match the template. Missing: ${missingHeaders.join(", ")}`);
+  }
+  const records = [];
+  const rows = [];
+  lines.slice(1).forEach((line, index) => {
+    const cells = splitCsvLine(line);
+    const row = {};
+    headers.forEach((header, i) => { row[header] = cells[i] || ""; });
+    rows.push(row);
+    if (!String(row.name || "").trim()) {
+      errors.push(`Row ${index + 2}: name is required`);
+      return;
+    }
+    records.push(recordFromCsvRow(row));
+  });
+  return {headers, rows, records, errors, templateMatch: missingHeaders.length === 0};
+}
+
 module.exports = {
   IMPORT_GATE_FIELDS,
+  CONTACT_MODES,
+  DISCOVERY_CSV_COLUMNS,
+  CRAWL_TYPE_CATALOG,
   CITY_ALIAS_GROUPS,
   COUNTRY_ALIAS_GROUPS,
   VENUE_TYPE_LABELS,
   EVENT_TYPE_LABELS,
+  DEFAULT_PAST_EVENT_POLICY,
   defaultImportGates,
   normalizeImportGates,
+  defaultPublishingRules,
+  normalizePublishingRules,
+  normalizePastEventPolicy,
   datapointPresent,
   isEventRecord,
+  crawlTypeOf,
+  publishingRuleFor,
   missingDatapoints,
+  publishBlockers,
   classifyEntity,
   cityCanonical,
   countryCanonical,
@@ -471,5 +817,11 @@ module.exports = {
   findDuplicates,
   applyDuplicateStamp,
   proposedTypeFromJobEventType,
-  normalizedKey
+  normalizedKey,
+  csvHeaderRow,
+  csvRowFromRecord,
+  serializeDiscoveryCsv,
+  sampleDiscoveryCsv,
+  parseDiscoveryCsv,
+  recordFromCsvRow
 };

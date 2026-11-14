@@ -258,12 +258,14 @@ function processCrawledItem(raw = {}) {
 
   if (raw.duplicateFlag) failures.push("possible_duplicate");
   if (!hasIdentityAnchor(raw, kind)) failures.push("identity_anchor_missing");
-  gatesCore.missingDatapoints(raw, raw.importGatesSnapshot).forEach(label => {
+  const gateBundle = raw.publishingRulesSnapshot
+    ? {publishingRules: raw.publishingRulesSnapshot, ...raw.importGatesSnapshot}
+    : raw.importGatesSnapshot;
+  gatesCore.missingDatapoints(raw, gateBundle).forEach(label => {
     failures.push(`import_gate_${String(label).replace(/\s+/g, "_").toLowerCase()}`);
   });
-  if (!email) failures.push("email_invalid");
-  if (!phone) failures.push("phone_not_e164");
-  if (!instagram) failures.push("instagram_invalid");
+  if (raw.email && !email) failures.push("email_invalid");
+  if ((raw.telephone || raw.phone) && !phone) failures.push("phone_not_e164");
   if (!validLatLng(raw.latitude, raw.longitude)) failures.push("lat_lng_invalid");
 
   let eventStartIso = "";

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.018 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.019 (stable)
 
+- s3.3.019: AI crawl publishing rules, CSV import/export, past-event cleanup, crawl diagnostics
 - s3.3.018: AI crawl Import datapoints, duplicate establishment check, club vs event
 - s3.3.017: VCC queue links, FloqCAST label, AI crawl KPI jump, IP language, Prior/Future travel, nights/splash/handle
 - s3.3.016: Site chrome applies on Back to Search and login without a manual refresh

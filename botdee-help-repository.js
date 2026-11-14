@@ -1099,12 +1099,12 @@
       id: "help-venue-crawl-datapoints",
       audiences: ["masterAdmin"],
       title: "AI crawl venue datapoints",
-      body: "On Master Admin → AI Crawling, use Import datapoints to tick which fields must be present before Approve or Onboard selected. Promoter(s) and Email do not block import unless you tick them. Cards show whether the listing is a club (nightclub, beach club, lounge) or an event. The crawler flags duplicates when two rows share a phone, a physical address, or a club name — Monaco and Monte Carlo count as the same city. Already-onboarded venues stay updates-only. Use Needs research when a ticked field is still missing.",
+      body: "On Master Admin → AI Crawling, set a Publishing rule per crawl type. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. Download the sample CSV, export unpublished rows, and import with the same headers. Save keeps edits on the review card without going live. Publish always blocks duplicates (same phone, address, or club name — Monaco equals Monte Carlo) and ignores past events. Auto-published listings are emailed; logs are under Diagnostics → AI Crawling.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
-        "import datapoints", "duplicate venue", "monaco monte carlo",
+        "import datapoints", "publishing rule", "csv import", "csv export", "duplicate venue", "monaco monte carlo",
         "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
-        "club admin imports"
+        "club admin imports", "publish discovery", "save discovery card"
       ],
       links: [
         {label: "Master Admin AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"})}
@@ -1375,6 +1375,22 @@
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#diagnosticsFloqCast"
+    },
+    {
+      id: "help-master-aicrawl-diagnostics",
+      title: "AI Crawling diagnostics",
+      body: "Master Admin → Diagnostics → AI Crawling. Categorized appLogs with category aiCrawl: Runs, Discoveries, Duplicates, Auto-publish, CSV, Past events, and Publish. Instant Crawl, CSV import, Save, and Publish write rows here. Auto-publish also emails the Master Admin list. Functions deploy is required for server crawl logs and the auto-publish email.",
+      searchPhrases: [
+        "ai crawling logs", "ai crawl diagnostics", "discovery logs", "auto publish email",
+        "csv import crawl", "past event cleanup", "duplicate crawl log"
+      ],
+      links: [
+        {label: "AI Crawling diagnostics", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#diagnosticsAiCrawl", search: "ai crawling diagnostics"},
+        {label: "AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#aiCrawling", search: "ai crawling"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsAiCrawl"
     },
     {
       id: "help-master-shoutout-diagnostics",

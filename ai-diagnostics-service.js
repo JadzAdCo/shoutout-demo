@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.018";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.018";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.019";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.019";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.019",
+      title: "s3.3.019 — AI crawl publishing rules, CSV, past events, crawl logs",
+      checks: [
+        {label:"Publishing rule card", file:"master-admin.html", includes:["Publishing rule", "aiDiscoveryPublishType", "aiDiscoveryCsvTemplateBtn", "Clean past events now"]},
+        {label:"CSV template + diagnostics tab", file:"master-admin.html", includes:["diagnosticsAiCrawl", "master-aicrawl-logging.js"]},
+        {label:"Discovery CSV + rules", file:"functions/discovery-gates-core.js", includes:["DISCOVERY_CSV_COLUMNS", "phoneOrEmail", "defaultPublishingRules"]},
+        {label:"Crawl logs + auto-publish email", file:"functions/ai-discovery-functions.js", includes:["writeCrawlLog", "emailAutoPublishedDigest", "past_event_ignored"]},
+        {label:"Client CSV import", file:"ai-discovery-service.js", includes:["importDiscoveryCsv", "exportUnpublishedCsv", "sampleDiscoveryCsv"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-019-ai-crawl-csv-publish"]}
+      ]
+    },
     {
       version: "s3.3.018",
       title: "s3.3.018 — AI crawl import datapoints, duplicates, club vs event",
@@ -3127,6 +3139,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-019-ai-crawl-csv-publish",
+      area:"Master Admin",
+      feature:"AI crawl publishing rules, CSV, past events, diagnostics logs",
+      changed:"s3.3.019 — Publishing rule per crawl type (nightclub needs Name/Genre/DJ(s)/Address/City/Country and Phone or Email; Promoter and Instagram optional). Sample CSV, unpublished export, and mass import share one template. Publish always duplicate-checks. Crawler ignores past events; Clean past events now removes them from FLOQR. Auto-published listings email Master Admin. Diagnostics → AI Crawling shows categorized appLogs.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.019, sign in, AI Crawling. 2) Publishing rule: Nightclub shows Name/Genre/DJ(s)/Address/City/Country ticked; contact = Phone or Email. 3) Download sample CSV, export unpublished, re-import the sample — rows appear in Review Discovery Queue, not live, if they duplicate Jimmy'z. 4) Review Discovery Queue table shows one column per header (Country, City, Genre, Name, Type, Collected, Ready, Missing) — not a jammed single line. 5) Edit a card, tap Save — it stays unpublished. Tap Publish only when ready. 6) Diagnostics → AI Crawling shows CSV / publish families after import. 7) Clean past events now. 8) Mark Succeed/Failed.",
+      expected:"Mass CSV uses the same headers as export. The readiness table has aligned columns. Save does not go live. Publish / Onboard still require the publishing rule and no duplicate. Logs are split by family.",
+      troubleshoot:"CSV rejected → headers must match the sample exactly. Import writes to queue but not live → expected until Publish. Table columns jammed → hard-refresh admin.css; the table must use discovery-queue-table, not report-table. No auto-publish email → Functions deploy of runInstantDiscoveryCrawl with SENDGRID. Empty Diagnostics tab → Instant Crawl / CSV while signed in; Functions write category aiCrawl."
+    },
     {
       id:"s3-3-018-ai-crawl-import-gates",
       area:"Master Admin",
@@ -9847,7 +9868,7 @@
       ["Crawl schedule", schedule?.frequency || "Not saved"],
       ["Daily run times", schedule?.scheduleHours?.join(", ") || "Not saved"],
       ["Schedule time zone", schedule?.timeZone || "Not saved"],
-      ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
+      ["Publishing rule", "Per crawl type. Nightclubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Promoter(s) and Instagram are optional. Duplicates and past events never go live."]
     ]);
   }
 

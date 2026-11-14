@@ -56,7 +56,7 @@
     ["aiDiagnosticsReports", "master", 0, "Diagnostics reports"],
     ["masterAdminRollups", "master", 0, "Precomputed Master Admin summary datapoints (5 min schedule; counts only)"],
     ["aiDiscoveryQueue", "master", 1, "AI Crawling review queue (venue contacts, duplicateMatch, entityKind)"],
-    ["aiDiscoveryRatingCriteria", "master", 0, "AI Crawling rating weights + import datapoint ticks"],
+    ["aiDiscoveryRatingCriteria", "master", 0, "AI Crawling rating weights, publishing rules, past-event policy"],
     ["aiDiscoverySources", "master", 0, "AI Crawling source websites"],
     ["aiIndex", "internal", 0, "Search index of published venues and events"],
     ["aiMediaEdits", "ownMaster", 0, "AI photo edits made by a patron"],

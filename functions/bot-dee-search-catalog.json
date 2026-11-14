@@ -1355,6 +1355,27 @@
       ]
     },
     {
+      "sourceId": "help:help-master-aicrawl-diagnostics",
+      "id": "help-master-aicrawl-diagnostics",
+      "kind": "help",
+      "label": "AI Crawling diagnostics",
+      "blurb": "Master Admin → Diagnostics → AI Crawling. Categorized appLogs with category aiCrawl: Runs, Discoveries, Duplicates, Auto-publish, CSV, Past events, and Publish. Instant Crawl, CSV import, Save, and Publish write rows here. Auto-publish also emails the Master Admin list. Functions",
+      "href": "./master-admin.html?from=botdee#diagnosticsAiCrawl",
+      "phrases": [
+        "ai crawling diagnostics",
+        "master admin diagnostics ai crawling. categorized applogs with category aicrawl runs discoveries duplicates auto-publish csv past events and publish. instant cr",
+        "ai crawling logs",
+        "ai crawl diagnostics",
+        "discovery logs",
+        "auto publish email",
+        "csv import crawl",
+        "past event cleanup",
+        "duplicate crawl log",
+        "ai crawling",
+        "help-master-aicrawl-diagnostics"
+      ]
+    },
+    {
       "sourceId": "help:help-master-completed-log",
       "id": "help-master-completed-log",
       "kind": "help",
@@ -2357,16 +2378,19 @@
       "id": "help-venue-crawl-datapoints",
       "kind": "help",
       "label": "AI crawl venue datapoints",
-      "blurb": "On Master Admin → AI Crawling, use Import datapoints to tick which fields must be present before Approve or Onboard selected. Promoter(s) and Email do not block import unless you tick them. Cards show whether the listing is a club (nightclub, beach club, lounge) or an event. The ",
+      "blurb": "On Master Admin → AI Crawling, set a Publishing rule per crawl type. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. ",
       "href": "./master-admin.html?from=botdee",
       "phrases": [
         "ai crawl venue datapoints",
-        "on master admin ai crawling use import datapoints to tick which fields must be present before approve or onboard selected. promoter s and email do not block imp",
+        "on master admin ai crawling set a publishing rule per crawl type. nightclubs and beach clubs need name genre dj s address city country and a phone or email. day",
         "ai crawl",
         "discovery crawl",
         "venue datapoints",
         "impactful datapoints",
         "import datapoints",
+        "publishing rule",
+        "csv import",
+        "csv export",
         "duplicate venue",
         "monaco monte carlo",
         "crawl ingest",
@@ -2374,6 +2398,8 @@
         "hoursstructured crawl",
         "needs research",
         "club admin imports",
+        "publish discovery",
+        "save discovery card",
         "master admin ai crawling",
         "help-venue-crawl-datapoints"
       ]

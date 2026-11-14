@@ -182,6 +182,9 @@
     "help-master-ad-stats": [
       "masterAdmin"
     ],
+    "help-master-aicrawl-diagnostics": [
+      "masterAdmin"
+    ],
     "help-master-completed-log": [
       "masterAdmin"
     ],
