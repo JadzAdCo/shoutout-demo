@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.015 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.016 (stable)
 
+- s3.3.016: Site chrome applies on Back to Search and login without a manual refresh
 - s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
 - s3.3.014: United States height defaults to ft; every other country defaults to m
 - s3.3.013: United States height defaults to ft; every other country defaults to m

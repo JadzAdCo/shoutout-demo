@@ -17,6 +17,9 @@
 
   const STORAGE_KEY = "floqr.isSiteChrome";
   const LEGACY_STORAGE_KEY = "floqr.uiChrome";
+  const STORAGE_AT_KEY = "floqr.isSiteChromeAt";
+  /** Keep a just-picked chrome over a stale users/{uid} cache (Back / login). */
+  const LOCAL_CHROME_FRESH_MS = 30 * 60 * 1000;
   const FEATURE_KEY = "siteChrome";
   const SCHEMES = [
     "traditional",
@@ -43,7 +46,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.3.015";
+  const ICON_V = "s3.3.016";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
@@ -321,6 +324,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, String(next));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
+      localStorage.setItem(STORAGE_AT_KEY, String(Date.now()));
     } catch (_) { /* ignore */ }
     const scheme = schemeFromSiteChrome(next);
     applyDocument(scheme);
@@ -351,10 +355,32 @@
     } catch (_) { /* ignore */ }
   }
 
+  function readStoredAt() {
+    try { return Number(localStorage.getItem(STORAGE_AT_KEY) || 0) || 0; }
+    catch (_) { return 0; }
+  }
+
+  function profileChromeAtMs(profile) {
+    const raw = profile?.uiChromeUpdatedAt || profile?.isSiteChromeUpdatedAt;
+    if (!raw) return 0;
+    try {
+      if (typeof raw.toMillis === "function") return raw.toMillis();
+      if (typeof raw.toDate === "function") return raw.toDate().getTime();
+      if (typeof raw.seconds === "number") return Math.round(raw.seconds * 1000);
+      if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+      const parsed = Date.parse(raw);
+      return Number.isFinite(parsed) ? parsed : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
   function hydrateFromProfile(profile) {
     let code = SITE_CHROME.NIGHTLIFE;
+    let fromProfile = false;
     if (profile && Object.prototype.hasOwnProperty.call(profile, "isSiteChrome")) {
       code = normalizeSiteChrome(profile.isSiteChrome);
+      fromProfile = true;
     } else if (profile?.uiChrome) {
       const legacyName = String(profile.uiChrome).trim().toLowerCase();
       // Old profiles stored uiChrome "blackDarkGreen" for the purple theme (code 4)
@@ -363,12 +389,23 @@
       } else {
         code = siteChromeFromScheme(profile.uiChrome);
       }
-    } else {
-      return applyDocument(getChrome());
+      fromProfile = true;
     }
+    const stored = readStoredSiteChrome();
+    const storedAt = readStoredAt();
+    const profileAt = profileChromeAtMs(profile);
+    const storedAge = storedAt ? Date.now() - storedAt : Infinity;
+    const storedIsFresh = storedAt > 0 && storedAge >= 0 && storedAge <= LOCAL_CHROME_FRESH_MS;
+    /* A picker write in this session beats a cached users/{uid} snapshot after
+       Back / login. Older localStorage still yields to a newer profile (other device). */
+    if (storedIsFresh && (!fromProfile || !profileAt || storedAt >= profileAt)) {
+      return applyDocument(schemeFromSiteChrome(stored));
+    }
+    if (!fromProfile) return applyDocument(getChrome());
     try {
       localStorage.setItem(STORAGE_KEY, String(code));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(code));
+      localStorage.setItem(STORAGE_AT_KEY, String(profileAt || Date.now()));
     } catch (_) { /* ignore */ }
     return applyDocument(schemeFromSiteChrome(code));
   }
@@ -487,13 +524,13 @@
   function bindLiveSync() {
     if (global.__floqrChromeLiveSyncBound) return;
     global.__floqrChromeLiveSyncBound = true;
-    const resync = () => {
-      try { syncFromStorage(); } catch (_) { /* ignore */ }
+    const resync = (ev) => {
+      try { syncFromStorage({ force: !!(ev && ev.persisted) }); } catch (_) { /* ignore */ }
     };
     try {
       global.addEventListener("storage", (ev) => {
         if (!ev) return;
-        if (ev.key && ev.key !== STORAGE_KEY && ev.key !== LEGACY_STORAGE_KEY) return;
+        if (ev.key && ev.key !== STORAGE_KEY && ev.key !== LEGACY_STORAGE_KEY && ev.key !== STORAGE_AT_KEY) return;
         resync();
       });
     } catch (_) { /* ignore */ }
@@ -562,6 +599,8 @@
   global.FLOQRChromeScheme = {
     STORAGE_KEY,
     LEGACY_STORAGE_KEY,
+    STORAGE_AT_KEY,
+    LOCAL_CHROME_FRESH_MS,
     FEATURE_KEY,
     SITE_CHROME,
     SCHEMES,

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.015";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.015";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.016";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.016";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.016",
+      title: "s3.3.016 — Site chrome applies on Back to Search and on login without a manual refresh",
+      checks: [
+        {label:"Back follows href across documents", file:"floqr-nav.js", includes:["sameDocumentBackHref"]},
+        {label:"Fresh picker timestamp", file:"floqr-chrome-scheme.js", includes:["STORAGE_AT_KEY", "floqr.isSiteChromeAt"]},
+        {label:"Search/login force sync", file:"patron-app.js", includes:["landingPage", "syncFromStorage?.({force: true})"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-016-chrome-back-login"]}
+      ]
+    },
     {
       version: "s3.3.015",
       title: "s3.3.015 — My Profile refresh stays on My Profile; ShoutOut editor focuses Message",
@@ -3053,6 +3063,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-016-chrome-back-login",
+      area:"Site chrome",
+      feature:"Back to Search and login pick up the new chrome",
+      changed:"s3.3.016 — After changing Site chrome on Appearance, Back to Search and the Welcome/login card show the new chrome without a hard refresh.",
+      howToTest:"1) Sign in, open My Profile → Appearance, pick a chrome that is not the current one. 2) Tap Back. Confirm Search tiles, FloqR mark, and page wash match the new chrome immediately. 3) Sign out (or open Welcome). Confirm the login card uses the same chrome — no refresh. 4) Mark Succeed/Failed.",
+      expected:"Search and login paint the chrome just chosen. A later hard refresh still matches. Changing chrome on another device still wins after the 30-minute local picker window.",
+      troubleshoot:"Still old chrome until refresh → hard-refresh index.html + patron-portal.html + floqr-nav.js + floqr-chrome-scheme.js + patron-app.js s3.3.016. Confirm Back is a real navigation to ./?start=search (not history.back to a frozen page). Confirm localStorage floqr.isSiteChrome matches the picker and floqr.isSiteChromeAt is recent."
+    },
     {
       id:"s3-3-015-portal-tab-editor-focus",
       area:"My Profile / ShoutOut",

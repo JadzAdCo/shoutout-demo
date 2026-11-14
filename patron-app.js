@@ -1544,6 +1544,9 @@
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
     if (SHOUTOUT_TRAIL_PAGES.has(id)) logShoutoutPageCall(id);
+    if (id === "landingPage" || id === "categoryPage") {
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) {}
+    }
     if (id === "templateSelectPage") {
       window.FLOQRBotDee?.setMode?.("templates");
       window.FLOQRBotDee?.ensureTemplateMode?.();
@@ -2641,7 +2644,13 @@
     try {
       window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
     } catch (_) { /* ignore */ }
-    window.location.href = "./";
+    try {
+      const file = String(window.location.pathname.split("/").pop() || "").toLowerCase();
+      const onSearch = !file || file === "index.html";
+      if (!onSearch) window.location.replace("./");
+    } catch (_) {
+      window.location.href = "./";
+    }
   }
   window.jadzPatronLogout = logout;
 
@@ -6518,9 +6527,9 @@
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     byId("userDropdown")?.addEventListener("click", closeUserDropdownOnNavClick);
-    window.addEventListener("pageshow", () => {
+    window.addEventListener("pageshow", (ev) => {
       closeUserDropdown();
-      try { window.FLOQRChromeScheme?.syncFromStorage?.(); } catch (_) { /* ignore */ }
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: !!ev?.persisted}); } catch (_) { /* ignore */ }
     });
     window.addEventListener("popstate", () => closeUserDropdown());
     window.addEventListener("floqr-chrome-change", () => {
