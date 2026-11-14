@@ -161,7 +161,10 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const tagsLink = byId("clubTemplateTagsLink");
-    if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}`;
+    if (tagsLink) {
+      tagsLink.href = window.FLOQRNav?.adminLink?.("./template-tags.html", {location: locationId})
+        || `./template-tags.html?location=${encodeURIComponent(locationId)}`;
+    }
     byId("saveRepPoliciesBtn")?.addEventListener("click", () => savePolicies().catch(error => { byId("repStatus").textContent = error.message; }));
     auth.onAuthStateChanged(user => { if (user) loadRep().catch(error => { byId("repStatus").textContent = error.message; }); });
   });

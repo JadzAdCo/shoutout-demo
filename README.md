@@ -7,6 +7,8 @@
 - s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
 - s3.3.014: Profile country dropdown + PHILA retire + Master Admin 5-min rollup + BOT DEE chat-only
 - s3.3.013: United States height defaults to ft; every other country defaults to m
+- s3.2.29: PC Search composition centered (logo + Search + icons).
+- s3.2.28: Template Description / How it works / Tag labels; Club Admin club-owned tags.
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)
 - s3.3.012: retire PHILA front+back pair template; keep nbaPhiladelphia76ers (76ERS)
 - s3.3.011: ShoutOut page trail (button → venue → splash → checkout), Continue to Checkout one-tap lock, BOT DEE frameless photo pop-out

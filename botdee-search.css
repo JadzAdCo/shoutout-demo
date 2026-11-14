@@ -432,6 +432,7 @@
   width:100%;
   max-width:720px;
   margin:0 auto 18px; /* center under FloqR logo (desktop + phone) */
+  box-sizing:border-box;
 }
 .category-botdee-intro,
 .category-botdee-speech{

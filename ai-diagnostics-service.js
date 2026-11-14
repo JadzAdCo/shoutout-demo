@@ -1272,15 +1272,44 @@
     },
 
     {
+    {
+      version: "s3.2.29",
+      title: "s3.2.29 — PC Search composition centered",
+      checks: [
+        {label:"Package version s3.2.29", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.29\""]},
+        {label:"Search field centered", file:"floqai-search.css", includes:["margin:0 auto 18px"]},
+        {label:"Desktop Search composition", file:"styles.css", includes:["floqr-desktop-browser #categoryPage.page.active", "justify-content:center", "max-width:720px"]},
+        {label:"Desktop app column centered", file:"styles.css", includes:["html.floqr-desktop-browser .app{", "margin-left:auto", "margin-right:auto"]},
+        {label:"Desktop admin shell centered", file:"admin.css", includes:["html.floqr-desktop-browser .admin-shell{", "max-width:1180px", "margin-left:auto"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.29\""]}
+      ]
+    },
+{
+      version: "s3.2.28",
+      title: "s3.2.28 — Template Description / How it works / Tag labels",
+      checks: [
+        {label:"Package version s3.2.28", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
+        {label:"Labeled template copy UI", file:"patron-app.js", includes:["template.descriptionLabel", "template.tagLabel", "template-select-tags-line", "publicTagsForTemplate"]},
+        {label:"Club-owned tag replace helper", file:"floqr-template-tags.js", includes:["isClubOwnedTemplate", "publicTagsFor", "ownership: \"club\""]},
+        {label:"Rules club-owned template tags", file:"firestore.rules", includes:["templateOwnedByClub", "s3.2.28-club-owned-template-tags", "ownership == \"club\""]},
+        {label:"Template copy CSS", file:"styles.css", includes:[".template-select-copy", ".template-select-tag-chips"]},
+        {label:"Club Admin tag ownership copy", file:"admin.html", includes:["admin.templateCopyOwnership", "templateTags.openFromAdmin"]},
+        {label:"Club Admin cards show Description/How it works/Tag", file:"admin-app.js", includes:["club-template-mgmt-copy", "FLOQRTemplateCopy?.howitWorks", "publicTagsFor"]},
+        {label:"Master Admin owns description/howitWorks note", file:"master-admin.html", includes:["Ownership:", "templateManageHowitWorks96", "Patrons see the three labeled lines"]},
+        {label:"Master save preserves club venueIds", file:"master-admin-app.js", includes:["Preserve club ownership", "payload.venueIds"]},
+        {label:"i18n descriptionLabel + tagLabel", file:"floqr-i18n.js", includes:["\"template.descriptionLabel\": \"Description\"", "\"template.tagLabel\": \"Tag\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
+      ]
+    },
       version: "s3.2.27",
       title: "s3.2.27 — Template howitWorks + Traditional description",
       checks: [
-        {label:"Package version s3.2.27", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.27", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Traditional description rewrite", file:"shared-data.js", includes:["antiquated club signs"], notIncludes:["Default shared marquee lightbox for every club"]},
         {label:"howitWorks helper", file:"shared-data.js", includes:["FLOQRTemplateCopy", "howitWorks(template, formatId)"]},
         {label:"Template card howitWorks UI", file:"patron-app.js", includes:["template-select-howitworks", "FLOQRTemplateCopy?.howitWorks"]},
         {label:"i18n howItWorks", file:"floqr-i18n.js", includes:["\"template.howItWorks\": \"How it works\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
@@ -1296,21 +1325,21 @@
       version: "s3.2.25",
       title: "s3.2.25 — Search icons at bottom on phone/tablet",
       checks: [
-        {label:"Package version s3.2.25", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.25", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Mobile/tablet pin Search icons to bottom", file:"styles.css", includes:["max-width:1180px)", "#categoryPage.page.active", "margin-top:auto!important", "100dvh"]},
         {label:"Desktop under-Search icon layout", file:"styles.css", includes:["min-width:1181px)", "margin-top:28px!important", "max-width:720px"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.24",
       title: "s3.2.24 — Login last Site chrome + single Privacy link",
       checks: [
-        {label:"Package version s3.2.24", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.24", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Chrome paint keeps last-used", file:"floqr-chrome-scheme.js", includes:["always paint last-used chrome", "hydrateFromProfile", "applyDocument(getChrome())"], notIncludes:["Only force Nightlife after access is known to be denied"]},
         {label:"Single Privacy footer link", file:"index.html", includes:["data-i18n=\"app.privacy\">Privacy</a>", "login-page-footer"], notIncludes:["data-i18n=\"app.doNotSell\""]},
         {label:"i18n app.privacy", file:"floqr-i18n.js", includes:["\"app.privacy\": \"Privacy\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
@@ -1321,19 +1350,19 @@
         {label:"Welcome help OTP-only body", file:"botdee-help-repository.js", includes:["Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Index help body trimmed", file:"index.html", includes:["data-floqr-help-body=\"Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Left-align welcome + 80px under logo", file:"styles.css", includes:["margin:80px 0 14px", "login-welcome-line.help-label{display:flex", "justify-content:flex-start", "text-align:left"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.22",
       title: "s3.2.22 — Login privacy footer + short welcome + ? beside copy",
       checks: [
-        {label:"Package version s3.2.22", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.22", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Welcome copy Please signin or signup", file:"index.html", includes:["Please signin or signup", "help-label-text", "login-page-footer"]},
         {label:"Privacy link in page footer", file:"index.html", includes:["class=\"login-page-footer\"", "class=\"login-legal\"", "data-i18n=\"app.privacy\"", "role=\"contentinfo\""]},
         {label:"Footer CSS pins legal to bottom", file:"styles.css", includes:["#landingPage.page.active{display:flex", "login-page-footer{position:fixed", "bottom:0", "login-welcome-line.help-label"]},
         {label:"i18n welcome short", file:"floqr-i18n.js", includes:["\"app.welcomeSignIn\": \"Please signin or signup\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
@@ -1344,19 +1373,19 @@
         {label:"Template search lens form", file:"index.html", includes:["id=\"templateSearchForm\"", "id=\"templateSearchGo\"", "category-botdee-lens"]},
         {label:"LED preview helpers", file:"patron-app.js", includes:["templateLedPreviewHtml", "mountTemplateLedPreviews", "primaryTemplateFormat"]},
         {label:"Use-only card actions", file:"patron-app.js", includes:["data-template-open", "template-select-card"], notIncludes:["data-template-preview=\"${esc(template.id)}\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.20",
       title: "s3.2.20 — Site chrome from FloqR tile palette",
       checks: [
-        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.20", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Tile palette CSS vars", file:"styles.css", includes:["--floqr-tile-cyan:#00c8ff", "--floqr-tile-magenta:#ff2eb8", "--floqr-brand-gradient-h"]},
         {label:"Login stack uses tile gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,var(--floqr-tile-cyan)", "var(--floqr-tile-violet)", "var(--floqr-tile-magenta)"]},
         {label:"Theme blocks consume tile accents", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"]", "--accent:var(--floqr-tile-cyan)", "html[data-floqr-chrome=\"blackTiffany\"]", "html[data-floqr-chrome=\"whiteBlack\"]", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
         {label:"Palette ref path in CSS", file:"styles.css", includes:["images/chrome/floqr-tile-palette-ref.png", "--floqr-tile-coral:#ff4d6a"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
@@ -1367,14 +1396,14 @@
         {label:"Search lens submit in field", file:"index.html", includes:["category-botdee-field", "category-botdee-lens", "id=\"categoryBotDeeGo\""]},
         {label:"Lens CSS no fill shiny outline", file:"botdee-search.css", includes:[".category-botdee-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
         {label:"Icon faces transparent + tile halo", file:"styles.css", includes:["background:transparent", "rgba(0,200,255,.28)", "rgba(255,46,184,.2)"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
     {
       version: "s3.2.18",
       title: "s3.2.18 — Search traditional profile chip + Clubs/Lounge/Events placeholder",
       checks: [
-        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
         {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryBotDeeForm"]},
         {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
@@ -3941,6 +3970,24 @@
         expected:"Wordmark and chrome colors match the selected theme on Search, receipts, and door pass.",
         troubleshoot:"Old Black Dark Green label → hard refresh; code 4 is Purple & White. Missing script mark → floqr-hero-*.png + applyBrandLogos."
       },
+    {
+      id:"s3-2-29-pc-search-centered",
+      area:"Search / Home",
+      feature:"PC Search composition centered",
+      changed:"Search field centered under FloqR mark. On PC (desktop device class or width ≥1181px), logo + Search + icons form one vertically centered column — icons no longer stuck to the bottom of tall monitors. Package s3.2.29.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search on a PC (package s3.2.29). 2) Confirm FloqR logo, Search bar, and product icons are horizontally centered and grouped mid-viewport (not logo/search at top with icons alone at bottom). 3) Narrow window / phone: icons may still pin toward the bottom. 4) Login and Club Admin shells remain centered in the content column.",
+      expected:"PC: centered column composition. Phone/tablet: prior bottom-pin behavior kept.",
+      troubleshoot:"Still left-docked Search → floqai-search.css margin:0 auto 18px + hard refresh. Icons at bottom on PC → floqr-desktop-browser class missing or styles.css desktop override not loaded (s3.2.29)."
+    },
+    {
+      id:"s3-2-28-template-tag-labels",
+      area:"ShoutOut / Templates",
+      feature:"Labeled Description / How it works / Tag on template cards",
+      changed:"Template cards show Description:, How it works:, and Tag: lines with individual tag chips. Club Admin edits venue tags (Template Mgmt → Manage template tags); Master Admin owns description + per-size howitWorks. Full catalog seeded with size-specific howitWorks. Package s3.2.28.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → open template select. 2) Confirm each card has labeled Description:, How it works:, and Tag: chips. 3) Club Admin → Manage template tags — club-owned first and editable; Start from catalog tags then edit; patrons see Tag: replace. 4) Shared FloqR templates show read-only Tag chips (no add form); direct Firestore write to a shared templateId must fail after rules deploy s3.2.28-club-owned-template-tags. 5) Master Admin → edit Description + How it works per LED size.",
+      expected:"Three labeled lines; Club Admin edits Tag only on club-owned; shared FloqR read-only at UI + rules; Master owns description/howitWorks.",
+      troubleshoot:"Missing Tag line → patron-app.js template-select-tags-line + s3.2.28. Can edit shared tags → isClubOwnedTemplate + rules templateOwnedByClub. Club-owned save denied → sync clubOwnedTemplateIds on clubLocations or publish templates/{id}.venueIds; deploy firestore.rules s3.2.28."
+    },
     {
       id:"s3-2-27-template-howitworks",
       area:"ShoutOut / Templates",

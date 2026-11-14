@@ -57,13 +57,81 @@ test("template select UI renders howitWorks datapoint", () => {
   assert.match(patron, /FLOQRTemplateCopy\?\.howitWorks/);
   assert.match(patron, /template-select-howitworks/);
   assert.match(patron, /template\.howItWorks/);
+  assert.match(patron, /template\.descriptionLabel/);
+  assert.match(patron, /template\.tagLabel/);
+  assert.match(patron, /template-select-tags-line/);
   const css = read("styles.css");
   assert.match(css, /\.template-select-howitworks\{/);
+  assert.match(css, /\.template-select-copy\{/);
   assert.match(css, /-webkit-line-clamp:2/);
   const i18n = read("floqr-i18n.js");
   assert.equal((i18n.match(/"template\.howItWorks":/g) || []).length, 11);
+  assert.equal((i18n.match(/"template\.descriptionLabel":/g) || []).length, 11);
+  assert.equal((i18n.match(/"template\.tagLabel":/g) || []).length, 11);
   const master = read("master-admin.html");
   assert.match(master, /id="templateManageHowitWorks96"/);
   assert.match(master, /id="templateManageHowitWorks64x48"/);
   assert.match(master, /id="templateManageHowitWorks64x32"/);
+  assert.match(master, /Ownership:/);
+  assert.match(master, /Master Admin edits/);
+  assert.match(master, /Patrons see the three labeled lines/);
+  const admin = read("admin.html");
+  assert.match(admin, /admin\.templateCopyOwnership/);
+  assert.match(admin, /templateTags\.openFromAdmin/);
+  const adminApp = read("admin-app.js");
+  assert.match(adminApp, /club-template-mgmt-copy/);
+  assert.match(adminApp, /FLOQRTemplateCopy\?\.howitWorks/);
+  const masterApp = read("master-admin-app.js");
+  assert.match(masterApp, /Preserve club ownership/);
+  assert.match(masterApp, /payload\.venueIds/);
+  assert.match(masterApp, /<strong>Description:<\/strong>/);
+});
+
+test("every catalog template has description + per-size howitWorks", () => {
+  const win = loadShared();
+  for (const [id, t] of Object.entries(win.SHOUTOUT_TEMPLATES || {})) {
+    assert.ok(String(t.description || "").trim(), `${id} description`);
+    assert.equal(typeof t.howitWorks, "object", `${id} howitWorks object`);
+    for (const fid of ["led-96x48", "led-64x48", "led-64x32"]) {
+      assert.ok(String(t.howitWorks[fid] || "").trim(), `${id} howitWorks ${fid}`);
+    }
+  }
+});
+
+test("club-owned template tags replace catalog tags when venue tags are set", () => {
+  const ctx = {
+    window: {},
+    console,
+    Object,
+    Array,
+    String,
+    Number,
+    Boolean,
+    Math,
+    Date,
+    JSON,
+    RegExp,
+    Error,
+    Map,
+    Set,
+    Promise,
+    document: {documentElement: {}, body: {}},
+    navigator: {userAgent: ""}
+  };
+  ctx.window = ctx;
+  ctx.globalThis = ctx;
+  vm.runInNewContext(read("shared-data.js"), ctx, {timeout: 5000});
+  vm.runInNewContext(read("floqr-template-tags.js"), ctx, {timeout: 5000});
+  const T = ctx.FLOQRTemplateTags;
+  const heist = ctx.SHOUTOUT_TEMPLATES.heistVaultNight;
+  assert.equal(T.isClubOwnedTemplate(heist, "heist-washington-dc"), true);
+  assert.equal(T.isClubOwnedTemplate(ctx.SHOUTOUT_TEMPLATES.blackwhite, "heist-washington-dc"), false);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(T.publicTagsFor(heist, ["vip night"], "heist-washington-dc"))),
+    ["vip night"]
+  );
+  assert.ok(T.publicTagsFor(heist, [], "heist-washington-dc").includes("heist"));
+  const shared = ctx.SHOUTOUT_TEMPLATES.neon;
+  assert.equal(T.publicTagsFor(shared, ["local"], "heist-washington-dc").includes("local"), false, "shared ignores venue tags");
+  assert.ok(T.publicTagsFor(shared, ["local"], "heist-washington-dc").includes("neon"));
 });

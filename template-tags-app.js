@@ -52,17 +52,40 @@
   }
 
   function templateRow(template) {
+    const clubOwned = TT.isClubOwnedTemplate?.(template, locationId);
     const venueTags = state.tags[template.id] || [];
     const builtIn = (template.tags || []).slice(0, 8);
-    const chips = venueTags.map(tag => `<span class="template-tag-chip">${esc(tag)}${state.role.canDelete ? ` <button type="button" class="ghost" data-tag-remove="${esc(template.id)}" data-tag="${esc(tag)}" aria-label="${esc(t("templateTags.remove", "Remove tag {tag}", {tag}))}">×</button>` : ""}</span>`).join("");
-    return `<article class="queue-item template-tags-row" data-template-row="${esc(template.id)}">
-      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(template.category || "")}</span></div>
-      <p class="sub small">${esc(t("templateTags.builtIn", "FLOQR tags:"))} ${esc(builtIn.join(", "))}</p>
-      <div class="template-tag-chips">${chips || `<span class="sub small">${esc(t("templateTags.none", "No venue tags yet."))}</span>`}</div>
-      <form class="template-tag-add" data-tag-add="${esc(template.id)}">
+    const displayTags = clubOwned
+      ? (venueTags.length ? venueTags : builtIn)
+      : builtIn;
+    const desc = window.FLOQRTemplateCopy?.description?.(template) || template.description || "";
+    const primary = state.venue?.primaryDisplayScreenFormatId || state.venue?.displayScreenFormatIds?.[0] || "led-96x48";
+    const how = window.FLOQRTemplateCopy?.howitWorks?.(template, primary) || "";
+    const canEdit = clubOwned && state.role.canWrite;
+    const chips = displayTags.map(tag => {
+      const removable = canEdit && state.role.canDelete && clubOwned && venueTags.length;
+      return `<span class="template-tag-chip">${esc(tag)}${removable ? ` <button type="button" class="ghost" data-tag-remove="${esc(template.id)}" data-tag="${esc(tag)}" aria-label="${esc(t("templateTags.remove", "Remove tag {tag}", {tag}))}">×</button>` : ""}</span>`;
+    }).join("");
+    const tagHint = clubOwned
+      ? t("templateTags.clubOwnedEditable", "Club-owned template — Tag chips you set here replace the catalog tags patrons see.")
+      : t("templateTags.sharedReadOnly", "Shared FloqR template — Tag chips are Master Admin / FLOQR catalog only (read-only here).");
+    const seedBtn = clubOwned && !venueTags.length && builtIn.length && canEdit
+      ? `<button type="button" class="buttonlike" data-tag-seed="${esc(template.id)}">${esc(t("templateTags.seedFromCatalog", "Start from catalog tags"))}</button>`
+      : "";
+    const form = canEdit
+      ? `<form class="template-tag-add" data-tag-add="${esc(template.id)}">
         <input type="text" maxlength="${TT.MAX_TAG_LENGTH}" placeholder="${esc(t("templateTags.placeholder", "Add a tag, e.g. game night"))}" aria-label="${esc(t("templateTags.placeholder", "Add a tag, e.g. game night"))}"/>
         <button type="submit" class="primary">${esc(t("templateTags.add", "Add tag"))}</button>
-      </form>
+        ${seedBtn}
+      </form>`
+      : "";
+    return `<article class="queue-item template-tags-row" data-template-row="${esc(template.id)}">
+      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(clubOwned ? t("templateTags.clubOwned", "Club-owned") : t("templateTags.sharedFloqr", "Shared FloqR"))}</span></div>
+      ${desc ? `<p class="sub small"><strong>${esc(t("template.descriptionLabel", "Description"))}:</strong> ${esc(desc)}</p>` : ""}
+      ${how ? `<p class="sub small"><strong>${esc(t("template.howItWorks", "How it works"))}:</strong> ${esc(how)}</p>` : ""}
+      <p class="sub small"><strong>${esc(t("template.tagLabel", "Tag"))}:</strong> ${esc(tagHint)}</p>
+      <div class="template-tag-chips">${chips || `<span class="sub small">${esc(t("templateTags.none", "No venue tags yet."))}</span>`}</div>
+      ${form}
     </article>`;
   }
 
@@ -83,7 +106,9 @@
       render();
     } catch (error) {
       console.warn("Template tag save failed", error?.code || "", error?.message || error);
-      setStatus(t("templateTags.denied", "You can't change that tag. Ask your Club Admin for the Template Administrator role."));
+      setStatus(error?.message === "not-club-owned"
+        ? t("templateTags.sharedReadOnly", "Shared FloqR template — Tag chips are Master Admin / FLOQR catalog only (read-only here).")
+        : t("templateTags.denied", "You can't change that tag. Ask your Club Admin for the Template Administrator role."));
     } finally {
       state.busy = false;
     }
@@ -96,6 +121,11 @@
       if (!form) return;
       event.preventDefault();
       const id = form.dataset.tagAdd;
+      const template = state.templates.find(row => row.id === id);
+      if (!TT.isClubOwnedTemplate?.(template, locationId)) {
+        setStatus(t("templateTags.sharedReadOnly", "Shared FloqR template — Tag chips are Master Admin / FLOQR catalog only (read-only here)."));
+        return;
+      }
       const input = form.querySelector("input");
       try {
         const next = TT.addTag(state.tags[id] || [], input.value, state.role);
@@ -106,9 +136,23 @@
       }
     });
     list.addEventListener("click", event => {
+      const seed = event.target.closest("[data-tag-seed]");
+      if (seed) {
+        const id = seed.dataset.tagSeed;
+        const template = state.templates.find(row => row.id === id);
+        if (!template || !state.role.canWrite || !TT.isClubOwnedTemplate?.(template, locationId)) return;
+        const seeded = (template.tags || []).map(TT.normalizeTag).filter(Boolean).slice(0, TT.MAX_TAGS);
+        commit(id, seeded);
+        return;
+      }
       const button = event.target.closest("[data-tag-remove]");
       if (!button) return;
       const id = button.dataset.tagRemove;
+      const template = state.templates.find(row => row.id === id);
+      if (!TT.isClubOwnedTemplate?.(template, locationId)) {
+        setStatus(t("templateTags.sharedReadOnly", "Shared FloqR template — Tag chips are Master Admin / FLOQR catalog only (read-only here)."));
+        return;
+      }
       try {
         commit(id, TT.removeTag(state.tags[id] || [], button.dataset.tag, state.role));
       } catch (_) {
@@ -134,6 +178,25 @@
     }
     state.templates = TT.templatesForVenue(locationId, state.venue);
     state.tags = await TT.loadVenueTags(db, locationId);
+    // Keep Firestore clubOwnedTemplateIds in sync so rules deny Tag writes on shared FloqR templates.
+    if (state.role.canWrite) {
+      const ownedIds = state.templates
+        .filter(template => TT.isClubOwnedTemplate(template, locationId))
+        .map(template => template.id);
+      const live = Array.isArray(state.venue.clubOwnedTemplateIds) ? state.venue.clubOwnedTemplateIds.map(String) : [];
+      const same = ownedIds.length === live.length && ownedIds.every(id => live.includes(id));
+      if (ownedIds.length && !same) {
+        try {
+          await db.collection("clubLocations").doc(locationId).set({
+            clubOwnedTemplateIds: ownedIds,
+            clubOwnedTemplateIdsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, {merge: true});
+          state.venue.clubOwnedTemplateIds = ownedIds;
+        } catch (error) {
+          console.warn("clubOwnedTemplateIds sync skipped", error?.code || "", error?.message || error);
+        }
+      }
+    }
     byId("templateTagsRole").textContent = roleLabel(state.role);
     byId("templateTagsPanel").classList.remove("hidden");
     setStatus("");
