@@ -53,6 +53,7 @@
   let profileLocaleHint = {};
   let profileHeightCtl = null;
   let profilePickupCtl = null;
+  let profileGeoCtl = null;
   let lastProfileReadError = null;
   let minglCandidates = [];
   let minglConnections = [];
@@ -1537,12 +1538,31 @@
     });
   }
 
+  function resetPageScroll() {
+    const jump = () => {
+      try { window.scrollTo(0, 0); } catch (_) {}
+      try { document.documentElement.scrollTop = 0; } catch (_) {}
+      try { document.body.scrollTop = 0; } catch (_) {}
+      try {
+        const page = document.querySelector(".page.active");
+        if (page) page.scrollTop = 0;
+      } catch (_) {}
+    };
+    jump();
+    return jump;
+  }
+
   function showPage(id) {
     if (!id || !byId(id)) return;
+    document.documentElement.classList.remove("floqr-shoutout-direct");
     closeUserDropdown();
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
+    resetPageScroll();
     if (SHOUTOUT_TRAIL_PAGES.has(id)) logShoutoutPageCall(id);
+    if (id === "landingPage" || id === "categoryPage") {
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) {}
+    }
     if (id === "templateSelectPage") {
       window.FLOQRBotDee?.setMode?.("templates");
       window.FLOQRBotDee?.ensureTemplateMode?.();
@@ -1551,6 +1571,13 @@
       window.FLOQRBotDee?.syncVisibility?.();
     } else {
       window.FLOQRBotDee?.syncVisibility?.();
+    }
+    if (id === "editorPage") {
+      const focus = () => focusFirstEditorInput();
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => requestAnimationFrame(focus));
+      else setTimeout(focus, 0);
+      setTimeout(focus, 50);
+      setTimeout(focus, 200);
     }
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -1741,7 +1768,16 @@
     const venuePicked = !!options.venue && !!(selectedLocationId || pendingDirectLocation);
     applySplashHeader(venuePicked);
     if (venuePicked) renderSplashVenue();
-    startSplash(type, venuePicked ? locationId() : "");
+    showPage("adSplashPage");
+    const ad = renderSplashAd(type, venuePicked ? locationId() : "");
+    /* Paid/house splash still holds. Venue-picked with no creative continues as soon as templates are ready. */
+    if (ad || !venuePicked) {
+      startSplashHold();
+      return;
+    }
+    const fn = pendingCategoryAfterAd;
+    pendingCategoryAfterAd = null;
+    if (typeof fn === "function") Promise.resolve().then(fn);
   }
 
   function renderSplashVenue() {
@@ -1774,18 +1810,16 @@
     }
   }
 
-  function startSplash(type, venueId) {
+  function startSplashHold(durationMs) {
     const statementPrimary = byId("splashStatementPrimary");
     const statementSecondary = byId("splashStatementSecondary");
     statementPrimary?.classList.remove("is-hidden");
     statementSecondary?.classList.remove("is-hidden");
-    showPage("adSplashPage");
     clearAdSplashTimers();
-    renderSplashAd(type, venueId);
-    const durationMs = splashDurationMs();
+    const ms = Number(durationMs) > 0 ? Number(durationMs) : splashDurationMs();
     adStatementTimers = [
-      setTimeout(() => statementPrimary?.classList.add("is-hidden"), durationMs * 0.4),
-      setTimeout(() => statementSecondary?.classList.add("is-hidden"), durationMs * 0.7)
+      setTimeout(() => statementPrimary?.classList.add("is-hidden"), ms * 0.4),
+      setTimeout(() => statementSecondary?.classList.add("is-hidden"), ms * 0.7)
     ];
     adTimer = setTimeout(() => {
       clearAdSplashTimers();
@@ -1793,7 +1827,7 @@
       const fn = pendingCategoryAfterAd;
       pendingCategoryAfterAd = null;
       if (typeof fn === "function") fn();
-    }, durationMs);
+    }, ms);
   }
 
   function clearAdSplashTimers() {
@@ -2141,7 +2175,21 @@
         status.textContent = pickupCheck.error;
         return;
       }
-      const pickupParts = pickupCheck?.parts || {};
+      const phoneCheck = profileGeoCtl?.validateMobile?.({required: false})
+        || window.FLOQRGeoCatalog?.validateMobile?.(
+          byId("profileCountry")?.value,
+          byId("profilePhoneNational")?.value,
+          {required: false}
+        );
+      if (phoneCheck && !phoneCheck.ok) {
+        status.textContent = phoneCheck.error || "Enter a valid mobile number for SMS and WhatsApp.";
+        return;
+      }
+      const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? (pickupCheck.parts || {}) : {};
+      const countryCode = profileGeoCtl?.countryCode?.() || byId("profileCountry")?.value || "";
+      const countryName = profileGeoCtl?.countryName?.() || window.FLOQRGeoCatalog?.countryNameOf?.(countryCode) || byId("profileCountry")?.value.trim() || "";
+      const regionCode = pickupParts.regionCode || profileGeoCtl?.regionCode?.() || "";
+      const regionName = pickupParts.region || profileGeoCtl?.regionName?.() || "";
       const profile = {
         uid: currentUser.uid,
         floqrHandle,
@@ -2151,12 +2199,17 @@
         phoneNumber: currentUser.phoneNumber || "",
         photoURL: currentUser.photoURL || "",
         providerIds: (currentUser.providerData || []).map(p => p.providerId),
-        country: byId("profileCountry").value.trim(),
-        region: byId("profileRegion").value.trim(),
-        city: byId("profileCity").value.trim(),
+        phone: phoneCheck?.e164 || profileGeoCtl?.e164?.() || "",
+        country: countryName,
+        countryCode,
+        region: regionName,
+        regionCode,
+        city: pickupParts.city || byId("profileTaxiCity")?.value.trim() || "",
         taxiStreetNumber: pickupParts.streetNumber || "",
         taxiStreetName: pickupParts.streetName || "",
         taxiCity: pickupParts.city || "",
+        taxiRegion: pickupParts.region || regionName,
+        taxiRegionCode: pickupParts.regionCode || regionCode,
         taxiPostalCode: pickupParts.postalCode || "",
         taxiPostalKind: pickupParts.postalKind || "",
         taxiPickupAddress: pickupCheck?.composed || byId("profileTaxiPickupAddress")?.value.trim() || "",
@@ -2174,6 +2227,11 @@
         analyticsConsent: byId("profileAnalyticsConsent").checked,
         marketingConsent: byId("profileMarketingConsent").checked,
         referredByPromoterId: new URL(window.location.href).searchParams.get("promoter") || "",
+        preferredLanguage: window.FLOQRI18n?.getLanguage?.() || "",
+        uiLanguage: window.FLOQRI18n?.getLanguage?.() || "",
+        languageSettings: {
+          preferredLanguage: window.FLOQRI18n?.getLanguage?.() || "auto"
+        },
         profileCompleted: true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -2621,7 +2679,13 @@
     try {
       window.FLOQRChromeScheme?.syncFromStorage?.({force: true});
     } catch (_) { /* ignore */ }
-    window.location.href = "./";
+    try {
+      const file = String(window.location.pathname.split("/").pop() || "").toLowerCase();
+      const onSearch = !file || file === "index.html";
+      if (!onSearch) window.location.replace("./");
+    } catch (_) {
+      window.location.href = "./";
+    }
   }
   window.jadzPatronLogout = logout;
 
@@ -2972,7 +3036,10 @@
       ...(publicDatapointAllowed(profile, "events") ? [profile.nightlifeStyle, ...(profile.nightlifeInterests || [])] : []),
       ...(publicDatapointAllowed(profile, "meet") ? [profile.lookingToMeet] : []),
       ...(publicDatapointAllowed(profile, "music") ? (profile.musicInterests || profile.favoriteGenres || []) : []),
-      ...(publicDatapointAllowed(profile, "travel") ? (profile.travelInterests || []) : []),
+      ...(publicDatapointAllowed(profile, "travel") ? [
+        ...(profile.priorTravels?.length ? profile.priorTravels : (profile.travelInterests || [])),
+        ...(profile.futureTravelDestinations || [])
+      ] : []),
       ...(publicDatapointAllowed(profile, "hobbies") ? (profile.hobbies || profile.generalHobbies || []) : []),
       ...(publicDatapointAllowed(profile, "food") ? (profile.foodChoices || []) : []),
       ...(publicDatapointAllowed(profile, "beverage") ? (profile.favoriteBeverages || []) : [])
@@ -3033,7 +3100,10 @@
     {key:"height", label:"Height", get:p => heightDisplay(p) || p.height},
     {key:"music", label:"Music", get:p => p.musicInterests || p.favoriteGenres},
     {key:"events", label:"Events", get:p => p.nightlifeInterests || p.nightlifeStyle},
-    {key:"travel", label:"Travel", get:p => p.travelInterests},
+    {key:"travel", label:"Travel", get:p => [
+      ...(Array.isArray(p.priorTravels) && p.priorTravels.length ? p.priorTravels : (p.travelInterests || [])),
+      ...(p.futureTravelDestinations || [])
+    ]},
     {key:"hobbies", label:"Hobbies", get:p => p.hobbies || p.generalHobbies},
     {key:"food", label:"Food", get:p => p.foodChoices},
     {key:"beverage", label:"Beverages", get:p => p.favoriteBeverages},
@@ -3166,15 +3236,15 @@
   }
 
   function countryUsesFeetInches(country = "") {
-    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "u.s", "u.s.", "united states"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
     return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyProfileHeightUnit() {
-    profileHeightCtl?.setLocale?.(currentProfileLocale());
+  function applyProfileHeightUnit(opts = {}) {
+    profileHeightCtl?.setLocale?.(currentProfileLocale(), opts);
     profilePickupCtl?.paintPostal?.();
   }
 
@@ -4414,7 +4484,7 @@
       if (FL?.normalizeVenue && FL?.renderVenueCardHtml) {
         const venue = FL.normalizeVenue(id, l);
         const productBadge = featureKey === "shoutOut" ? "ShoutOut"
-          : featureKey === "floqCast" ? "floqCast"
+          : featureKey === "floqCast" ? "FloqCAST"
             : featureKey === "vipReservations" ? "VIP reserV"
               : (countryLabel || "Club");
         const actions = `<a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a>`
@@ -5209,7 +5279,7 @@
       displayName:profile.displayName || currentUser?.displayName || "",
       city:profile.city || profile.locationCity || "",
       country:profile.country || "",
-      interests:unique(splitSuggestionValues([profile.interests, profile.hobbies, profile.musicGenres, profile.favoriteMusic, profile.eventInterests, profile.favoriteBeverages, profile.travelInterests, profile.favoriteVenueTypes])).slice(0, 12)
+      interests:unique(splitSuggestionValues([profile.interests, profile.hobbies, profile.musicGenres, profile.favoriteMusic, profile.eventInterests, profile.favoriteBeverages, profile.priorTravels, profile.travelInterests, profile.futureTravelDestinations, profile.favoriteVenueTypes])).slice(0, 12)
     };
   }
 
@@ -6149,6 +6219,40 @@
     screenSelect.disabled = !supported.length;
   }
 
+  function editorFieldIsVisible(el) {
+    if (!el || el.disabled) return false;
+    const type = String(el.type || "").toLowerCase();
+    if (["hidden", "file", "button", "submit", "checkbox", "radio", "reset", "image"].includes(type)) return false;
+    let node = el;
+    while (node && node !== document.documentElement) {
+      if (node.hidden) return false;
+      if (node.classList?.contains("hidden")) return false;
+      node = node.parentElement;
+    }
+    return true;
+  }
+
+  function firstEditorInput(page) {
+    if (!page) return null;
+    const main = page.querySelector("#mainText") || byId("mainText");
+    if (main && editorFieldIsVisible(main)) return main;
+    const nodes = page.querySelectorAll("textarea, input, select");
+    for (const el of nodes) {
+      if (editorFieldIsVisible(el)) return el;
+    }
+    return null;
+  }
+
+  function focusFirstEditorInput() {
+    const page = byId("editorPage");
+    const target = firstEditorInput(page);
+    const jump = resetPageScroll();
+    if (!target) return;
+    try { target.focus({ preventScroll: true }); }
+    catch (_) { try { target.focus(); } catch (_) { /* ignore */ } }
+    jump();
+  }
+
   function goToEditor() {
     shoutoutTemplateChosen = true;
     const l=getLocation(), t=getTemplate();
@@ -6165,6 +6269,9 @@
     applyReuseShoutoutDraft({ clear: true });
     updatePreview();
     showPage("editorPage");
+    const focus = () => focusFirstEditorInput();
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => requestAnimationFrame(focus));
+    else setTimeout(focus, 0);
     try { window.FLOQRClientIp?.ensure?.(); } catch (_) {}
   }
 
@@ -6215,7 +6322,7 @@
     const featureItems = [
       ["bartr", window.FLOQRNav?.stampCurrentVersion?.("./commerce.html", {from: "search"}) || "./commerce.html?from=search", tt("nav.bartr", {}, "BartR")],
       ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
-      ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "floqCast")],
+      ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "FloqCAST")],
       ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
       ["botDee", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.botdee", {}, "dj BOT")]
     ];
@@ -6406,12 +6513,27 @@
       hint: "profileHeightHint",
       locale: currentProfileLocale
     }) || null;
+    profileGeoCtl = window.FLOQRGeoCatalog?.bind?.({
+      countryEl: byId("profileCountry"),
+      regionEl: byId("profileTaxiRegion"),
+      regionTextEl: byId("profileTaxiRegionText"),
+      regionLabelEl: byId("profileTaxiRegionLabel"),
+      dialEl: byId("profilePhoneDial"),
+      nationalEl: byId("profilePhoneNational"),
+      hiddenEl: byId("profilePhone"),
+      onCountry: () => {
+        applyProfileHeightUnit({fromCountry: true});
+        profilePickupCtl?.paintPostal?.();
+        profilePickupCtl?.validate?.(false);
+      }
+    }) || null;
     profilePickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "profileTaxiStreetNumber",
         streetName: "profileTaxiStreetName",
         city: "profileTaxiCity",
-        citySource: "profileCity",
+        region: "profileTaxiRegion",
+        regionText: "profileTaxiRegionText",
         postal: "profileTaxiPostal",
         postalLabel: "profileTaxiPostalLabel",
         composed: "profileTaxiPickupAddress",
@@ -6421,10 +6543,12 @@
     }) || null;
     window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
       profileLocaleHint = hint || {};
+      if (!byId("profileCountry")?.value && (hint.ipCountryCode || hint.ipCountry)) {
+        profileGeoCtl?.setCountry?.(hint.ipCountryCode || hint.ipCountry, {silent: true});
+      }
       applyProfileHeightUnit();
     }).catch(() => {});
-    byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit());
-    byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit());
+    byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit({fromCountry: true}));
     applyProfileHeightUnit();
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);
@@ -6464,9 +6588,9 @@
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     byId("userDropdown")?.addEventListener("click", closeUserDropdownOnNavClick);
-    window.addEventListener("pageshow", () => {
+    window.addEventListener("pageshow", (ev) => {
       closeUserDropdown();
-      try { window.FLOQRChromeScheme?.syncFromStorage?.(); } catch (_) { /* ignore */ }
+      try { window.FLOQRChromeScheme?.syncFromStorage?.({force: !!ev?.persisted}); } catch (_) { /* ignore */ }
     });
     window.addEventListener("popstate", () => closeUserDropdown());
     window.addEventListener("floqr-chrome-change", () => {
@@ -6475,7 +6599,6 @@
     bind("saveProfileBtn", saveProfile);
     floqrId().bindInstagramInput?.(byId("profileInstagram"));
     floqrId().bindFloqrHandleInput?.(byId("profileUsername"));
-    floqrId().attachHelpPopout?.(byId("profileFloqrHandleHelp"), floqrId().FLOQR_HANDLE_HELP);
     byId("templateSearch")?.addEventListener("input", () => { renderTemplates(); });
     byId("templateSearchForm")?.addEventListener("submit", event => {
       event.preventDefault();

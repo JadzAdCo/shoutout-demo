@@ -25,6 +25,9 @@ test("processCrawledItem AUTO_PUBLISH when schema + score clear threshold", () =
     placesId: "ChIJ_test_place_123",
     parentPlacesId: "ChIJ_test_place_123",
     proposedTitle: "Saturday Hip Hop Night at Gate Club",
+    genres: ["Hip Hop"],
+    artistsOrDjs: ["Resident DJs"],
+    proposedAddress: "12 Rue de la Roquette",
     proposedDescription: "A full night of hip hop with resident DJs and guest performers on the main floor and rooftop. Doors at ten. Tickets available online.",
     eventStartIso: future,
     proposedDate: future.slice(0, 10),
@@ -110,6 +113,33 @@ test("past event lifecycle classification", () => {
   assert.equal(past.classifyLifecycle({eventStartIso: "2020-01-01T00:00:00.000Z"}), "past");
   assert.equal(past.classifyLifecycle({eventStartIso: "2099-01-01T00:00:00.000Z"}), "upcoming");
   assert.equal(past.classifyLifecycle({lifecycleStatus: "retired", eventStartIso: "2020-01-01T00:00:00.000Z"}), "retired");
+});
+
+test("possible duplicates never auto-publish as a new listing", () => {
+  const future = new Date(Date.now() + 7 * 86400000).toISOString();
+  const decision = auto.processCrawledItem({
+    proposedType: "nightclub",
+    entityKind: "venue",
+    placesId: "ChIJ_dup_place",
+    proposedTitle: "Jimmy'z Monte-Carlo Nightclub",
+    proposedDescription: "Resident DJs and guest performers on the main floor. Doors at eleven. Table service available.",
+    latitude: 43.746,
+    longitude: 7.427,
+    email: "vip@jimmyzmontecarlo.com",
+    telephone: "+37798067000",
+    instagramHandle: "jimmyzmontecarlo",
+    socialMediaHandles: {instagram: "jimmyzmontecarlo"},
+    officialWebsite: "https://www.montecarlosbm.com/jimmyz",
+    sourceConfirmations: {googlePlaces: true},
+    sourceName: "Google Places API",
+    city: "Monte Carlo",
+    country: "Monaco",
+    duplicateFlag: true,
+    crawlScope: "updates-only",
+    onboardedListingId: "jimmyz-monaco"
+  });
+  assert.equal(decision.route, "ADMIN_QUEUE");
+  assert.ok(decision.failures.includes("possible_duplicate"));
 });
 
 test("mapPool runs with bounded concurrency", async () => {

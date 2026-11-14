@@ -326,6 +326,9 @@
       if (panelId === "diagnosticsShoutOut" && window.FLOQRShoutOutDiagnostics) {
         window.FLOQRShoutOutDiagnostics.mount();
       }
+      if (panelId === "diagnosticsAiCrawl" && window.FLOQRAiCrawlDiagnostics) {
+        window.FLOQRAiCrawlDiagnostics.mount();
+      }
       if ((panelId === "mailLogging" || panelId === "twilio_sendgridMailLogs") && window.FLOQRMailLogging) {
         window.FLOQRMailLogging.mount();
       }
@@ -1874,7 +1877,8 @@
       Food: profile.foodChoices || profile.favoriteFoods,
       Music: profile.musicInterests || profile.favoriteGenres,
       Hobbies: profile.hobbies || profile.generalHobbies,
-      Travel: profile.travelInterests,
+      Travel: profile.priorTravels || profile.travelInterests,
+      FutureTravel: profile.futureTravelDestinations,
       Events: profile.nightlifeInterests || profile.nightlifeStyle,
       Beverages: profile.favoriteBeverages || profile.beverageChoices,
       Meet: profile.lookingToMeet

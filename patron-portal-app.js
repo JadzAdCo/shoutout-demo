@@ -13,6 +13,20 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const splitCSV = value => String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   const joinCSV = value => Array.isArray(value) ? value.join(", ") : String(value || "");
+  const priorTravelsOf = profile => {
+    if (Array.isArray(profile?.priorTravels) && profile.priorTravels.length) return profile.priorTravels;
+    return Array.isArray(profile?.travelInterests) ? profile.travelInterests : splitCSV(profile?.travelInterests);
+  };
+  const futureTravelsOf = profile => (
+    Array.isArray(profile?.futureTravelDestinations)
+      ? profile.futureTravelDestinations
+      : splitCSV(profile?.futureTravelDestinations)
+  );
+  const defaultPreferredLanguage = profile => {
+    const saved = profile?.preferredLanguage || profile?.languageSettings?.preferredLanguage || "";
+    if (saved && saved !== "auto") return saved;
+    return window.FLOQRI18n?.getLanguage?.() || "";
+  };
   function parsePersonalCorrections(value = "") {
     const seen = new Set();
     return String(value || "")
@@ -120,15 +134,15 @@
   }
 
   function countryUsesFeetInches(country = "") {
-    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "u.s", "u.s.", "united states"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
     return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyEditHeightUnit() {
-    editHeightCtl?.setLocale?.(currentEditLocale());
+  function applyEditHeightUnit(opts = {}) {
+    editHeightCtl?.setLocale?.(currentEditLocale(), opts);
     editPickupCtl?.paintPostal?.();
   }
 
@@ -220,6 +234,7 @@
   let profileLocaleHint = {};
   let editHeightCtl = null;
   let editPickupCtl = null;
+  let editGeoCtl = null;
   let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
@@ -248,7 +263,7 @@
     {key:"height", label:"Height"},
     {key:"music", label:"Music interests"},
     {key:"events", label:"Event and nightlife interests"},
-    {key:"travel", label:"Travel interests"},
+    {key:"travel", label:"Prior travels and future destinations"},
     {key:"hobbies", label:"General hobbies"},
     {key:"food", label:"Food choices"},
     {key:"beverage", label:"Favorite beverage choices"},
@@ -399,6 +414,17 @@
     parent?.classList.add("active");
   }
 
+  function persistPortalTab(panelId, extra = {}) {
+    const Tabs = window.FLOQRPortalTabs;
+    if (!Tabs?.persistHref || !panelId) return;
+    try { sessionStorage.setItem(Tabs.STORAGE_KEY, panelId); } catch (_) { /* ignore */ }
+    try {
+      const next = Tabs.persistHref(window.location.href, panelId, extra);
+      const cur = window.location.pathname + window.location.search + window.location.hash;
+      if (next && next !== cur) history.replaceState(null, "", next);
+    } catch (_) { /* ignore */ }
+  }
+
   function showPortalPanel(panelId, tabPanelId = "") {
     let resolved = panelId;
     let foPane = "";
@@ -424,6 +450,9 @@
       hidePortalFoSubtabs();
     }
     syncInboxComposeChrome();
+    persistPortalTab(resolved, {
+      sub: resolved === "portalFeatureOrders" ? (window.FLOQRPortalTabs?.subForFoPane?.(foPane) || "") : ""
+    });
   }
 
   function showFeatureOrdersPane(paneId) {
@@ -447,6 +476,9 @@
       const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
       if (!activeSub) showShoutoutPane("shoutoutSavedPane");
     }
+    persistPortalTab("portalFeatureOrders", {
+      sub: window.FLOQRPortalTabs?.subForFoPane?.(target) || ""
+    });
   }
 
   function renderFeatureOrdersStatus() {
@@ -465,7 +497,7 @@
     const rows = [
       {label: t("nav.myShoutouts", "My ShoutOuts"), status: shoutStatus, pane: "foShoutoutsPane"},
       vipOn ? {label: t("nav.guestListReserv", "Guest List & reserV"), status: t("portal.fo.periodActive", "Active this period"), pane: "foVipPane"} : null,
-      castOn ? {label: t("nav.myFloqCasts", "My FloqCasts"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
+      castOn ? {label: t("nav.myFloqCasts", "My FloqCAST"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
       {label: t("nav.myInvoices", "My Invoices"), status: t("portal.fo.invoicesHint", "Open for paid receipts"), pane: "foInvoicesPane"}
     ].filter(Boolean);
     host.innerHTML = rows.map(r =>
@@ -585,92 +617,51 @@
       if (!btn) return;
       showShoutoutPane(btn.dataset.soPane);
     });
-    const tab = new URL(window.location.href).searchParams.get("tab");
-    if (tab) {
-      if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({from:"portal"});
-        const room = new URL(window.location.href).searchParams.get("room");
-        if (room) params.set("room", room);
-        window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
-        return;
+    restorePortalTabFromUrl();
+    window.addEventListener("hashchange", () => {
+      const hash = String(location.hash.replace(/^#/, "") || "").trim();
+      if (hash && window.FLOQRPortalTabs?.knownPanel?.(hash) && byId(hash)) {
+        showPortalPanel(hash, hash);
       }
-      const map = {
-        messages:"portalMessages",
-        inbox:"portalMessages",
-        help:"portalHelp",
-        profile:"portalProfile",
-        public:"portalPublicProfile",
-        media:"portalPublicProfile",
-        settings:"portalProfile",
-        language:"portalLanguageSettings",
-        "language-settings":"portalLanguageSettings",
-        appearance:"portalAppearance",
-        chrome:"portalAppearance",
-        "site-chrome":"portalAppearance",
-        "sitechrome":"portalAppearance",
-        theme:"portalAppearance",
-        "my-privacy":"portalPrivacy",
-        "ai-notifications":"portalAiNotifications",
-        templates:"portalFeatureOrders",
-        "my-templates":"portalFeatureOrders",
-        privacy:"portalPrivacy",
-        bartr:"portalBartrStore",
-        commerce:"portalBartrStore",
-        store:"portalBartrStore",
-        "ad-campaigns":"portalAdCampaigns",
-        adcampaigns:"portalAdCampaigns",
-        advertise:"portalAdCampaigns",
-        ads:"portalAdCampaigns",
-        "mingl-friends":"portalMinglFriends",
-        friends:"portalMinglFriends",
-        unmingl:"portalMinglFriends",
-        "work-calendar":"portalWorkCalendar",
-        workcalendar:"portalWorkCalendar",
-        "staff-calendar":"portalWorkCalendar",
-        "service-members":"portalServiceMembers",
-        servicemembers:"portalServiceMembers",
-        "role-request":"portalServiceMembers",
-        shoutouts:"portalFeatureOrders",
-        myshoutouts:"portalFeatureOrders",
-        "my-shoutouts":"portalFeatureOrders",
-        shoutout:"portalFeatureOrders",
-        "feature-orders":"portalFeatureOrders",
-        featureorders:"portalFeatureOrders",
-        "paid-services":"portalFeatureOrders",
-        invoices:"portalFeatureOrders",
-        reservations:"portalFeatureOrders",
-        "guest-list-reserv":"portalFeatureOrders",
-        vip:"portalFeatureOrders",
-        "vip-reservations":"portalFeatureOrders",
-        vipreservations:"portalFeatureOrders",
-        passes:"portalFeatureOrders",
-        pass:"portalFeatureOrders",
-        "door-pass":"portalFeatureOrders",
-        doorpass:"portalFeatureOrders"
-      };
-      const mapped = map[tab] || "";
-      const btn = document.querySelector(`[data-panel='${mapped}']`);
-      if (btn) btn.click();
-      else if (mapped) showPortalPanel(mapped, mapped);
-      if (mapped === "portalFeatureOrders") {
-        const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
-        if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations", "passes", "pass", "door-pass", "doorpass"].includes(tab) || sub === "vip" || sub === "reserv" || sub === "passes") {
-          showFeatureOrdersPane("foVipPane");
-        } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
-          showFeatureOrdersPane("foShoutoutsPane");
-          if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
-          else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
-          else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
-          else if (sub === "saved") showShoutoutPane("shoutoutSavedPane");
-          else if (sub === "pending") showShoutoutPane("shoutoutPendingPane");
-          else showShoutoutPane("shoutoutSavedPane");
-        } else if (["paid-services", "invoices"].includes(tab) || sub === "invoices") {
-          showFeatureOrdersPane("foInvoicesPane");
-        } else if (sub === "floqcast" || sub === "floqcasts") {
-          showFeatureOrdersPane("foFloqCastsPane");
-        } else {
-          showFeatureOrdersPane("foStatusPane");
-        }
+    });
+  }
+
+  function restorePortalTabFromUrl() {
+    const Tabs = window.FLOQRPortalTabs;
+    let stored = "";
+    try { stored = sessionStorage.getItem(Tabs?.STORAGE_KEY || "floqr.portalPanel") || ""; } catch (_) { /* ignore */ }
+    const found = Tabs?.resolve?.({ href: window.location.href, stored }) || {};
+    const tab = String(found.tab || new URL(window.location.href).searchParams.get("tab") || "").trim().toLowerCase();
+    if (found.redirectMingl || ["chats","mingl","mingl-chat"].includes(tab)) {
+      const params = new URLSearchParams({from:"portal"});
+      const room = new URL(window.location.href).searchParams.get("room");
+      if (room) params.set("room", room);
+      window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
+      return;
+    }
+    const mapped = found.panelId || "";
+    if (!mapped) return;
+    const btn = document.querySelector(`[data-panel='${mapped}']`);
+    if (btn) btn.click();
+    else showPortalPanel(mapped, mapped);
+    if (mapped === "portalFeatureOrders") {
+      const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
+      if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations", "passes", "pass", "door-pass", "doorpass"].includes(tab) || sub === "vip" || sub === "reserv" || sub === "passes") {
+        showFeatureOrdersPane("foVipPane");
+      } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
+        showFeatureOrdersPane("foShoutoutsPane");
+        if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
+        else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+        else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
+        else if (sub === "saved") showShoutoutPane("shoutoutSavedPane");
+        else if (sub === "pending") showShoutoutPane("shoutoutPendingPane");
+        else showShoutoutPane("shoutoutSavedPane");
+      } else if (["paid-services", "invoices"].includes(tab) || sub === "invoices") {
+        showFeatureOrdersPane("foInvoicesPane");
+      } else if (sub === "floqcast" || sub === "floqcasts") {
+        showFeatureOrdersPane("foFloqCastsPane");
+      } else {
+        showFeatureOrdersPane("foStatusPane");
       }
     }
   }
@@ -1540,7 +1531,7 @@
       correctionMode:profile.languageSettings?.correctionMode || "approvalRequired",
       highlightSpellingErrors:profile.languageSettings?.highlightSpellingErrors !== false,
       highlightGrammarSuggestions:profile.languageSettings?.highlightGrammarSuggestions !== false,
-      preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || "auto",
+      preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || defaultPreferredLanguage(profile) || "auto",
       tonePreference:profile.languageSettings?.tonePreference || "keepTone",
       emojiSkinTone:profile.languageSettings?.emojiSkinTone || "yellow",
       personalDictionary:Array.isArray(profile.languageSettings?.personalDictionary) ? profile.languageSettings.personalDictionary : [],
@@ -2057,11 +2048,15 @@
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
     byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
-    byId("editPhone").value = profile.phone || user.phoneNumber || "";
+    editGeoCtl?.fill?.({
+      country: profile.countryCode || profile.country || "",
+      countryCode: profile.countryCode || "",
+      region: profile.regionCode || profile.region || profile.taxiRegion || "",
+      regionCode: profile.regionCode || profile.taxiRegionCode || "",
+      phone: profile.phone || user.phoneNumber || ""
+    });
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
-    byId("editCity").value = profile.city || "";
-    byId("editCountry").value = profile.country || "";
-    byId("editLanguage").value = profile.preferredLanguage || "";
+    byId("editLanguage").value = profile.preferredLanguage || defaultPreferredLanguage(profile) || "";
     byId("editGender").value = profile.gender || "";
     editHeightCtl?.fill?.({
       unit: profile.heightUnit,
@@ -2095,7 +2090,8 @@
     byId("editProfileVisibility").value = profile.publicProfileVisibility || "followers";
     byId("editPublicProfileLanguageMode").value = profile.publicProfileLanguageMode || "preferred";
     byId("editMusicInterests").value = joinCSV(profile.musicInterests || profile.favoriteGenres);
-    byId("editTravelInterests").value = joinCSV(profile.travelInterests);
+    byId("editTravelInterests").value = joinCSV(priorTravelsOf(profile));
+    if (byId("editFutureTravel")) byId("editFutureTravel").value = joinCSV(futureTravelsOf(profile));
     byId("editHobbies").value = joinCSV(profile.hobbies || profile.generalHobbies);
     byId("editFoodChoices").value = joinCSV(profile.foodChoices) || "Sushi, Tapas, Steakhouse";
     byId("editFavoriteBeverages").value = joinCSV(profile.favoriteBeverages) || "Champagne, Tequila, Mocktails";
@@ -2379,17 +2375,43 @@
       setText("portalStatus", pickupCheck.error);
       return;
     }
+    const phoneCheck = editGeoCtl?.validateMobile?.({required: false})
+      || window.FLOQRGeoCatalog?.validateMobile?.(
+        byId("editCountry")?.value,
+        byId("editPhoneNational")?.value,
+        {required: false}
+      );
+    if (phoneCheck && !phoneCheck.ok) {
+      setText("portalStatus", phoneCheck.error || (window.FLOQRI18n?.t?.("portal.phone.invalid") || "Enter a valid mobile number for SMS and WhatsApp."));
+      const hint = byId("editPhoneHint");
+      if (hint) {
+        hint.textContent = phoneCheck.error || hint.textContent;
+        hint.classList.add("is-error");
+        hint.hidden = false;
+      }
+      return;
+    }
     const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? pickupCheck.parts : null;
+    const countryCode = editGeoCtl?.countryCode?.() || byId("editCountry")?.value || "";
+    const countryName = editGeoCtl?.countryName?.() || window.FLOQRGeoCatalog?.countryNameOf?.(countryCode) || "";
+    const regionCode = pickupParts?.regionCode || editGeoCtl?.regionCode?.() || "";
+    const regionName = pickupParts?.region || editGeoCtl?.regionName?.() || "";
+    const cityValue = pickupParts?.city || byId("editTaxiCity")?.value.trim() || "";
+    const phoneE164 = phoneCheck?.e164 || editGeoCtl?.e164?.() || "";
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
       floqrHandle,
       username,
-      phone: byId("editPhone").value.trim(),
-      city: byId("editCity").value.trim(),
-      country: byId("editCountry").value.trim(),
-      preferredLanguage,
+      phone: phoneE164,
+      city: cityValue,
+      country: countryName,
+      countryCode,
+      region: regionName,
+      regionCode,
+      preferredLanguage: preferredLanguage || defaultPreferredLanguage(currentProfile),
+      uiLanguage: window.FLOQRI18n?.normalizeCode?.(preferredLanguage) || window.FLOQRI18n?.getLanguage?.() || currentProfile?.uiLanguage || "",
       gender: byId("editGender").value,
       height: heightCheck?.empty ? (currentProfile?.height || "") : (heightCheck?.normalized || byId("editHeight").value.trim()),
       heightUnit: heightCheck?.empty
@@ -2409,6 +2431,8 @@
       publicProfileLanguageMode: byId("editPublicProfileLanguageMode").value,
       musicInterests: splitCSV(byId("editMusicInterests").value),
       travelInterests: splitCSV(byId("editTravelInterests").value),
+      priorTravels: splitCSV(byId("editTravelInterests").value),
+      futureTravelDestinations: splitCSV(byId("editFutureTravel")?.value || ""),
       hobbies: splitCSV(byId("editHobbies").value),
       foodChoices: splitCSV(byId("editFoodChoices").value || "Sushi, Tapas, Steakhouse"),
       favoriteBeverages: splitCSV(byId("editFavoriteBeverages").value || "Champagne, Tequila, Mocktails"),
@@ -2427,6 +2451,8 @@
       updates.taxiStreetNumber = pickupParts.streetNumber || "";
       updates.taxiStreetName = pickupParts.streetName || "";
       updates.taxiCity = pickupParts.city || "";
+      updates.taxiRegion = pickupParts.region || regionName;
+      updates.taxiRegionCode = pickupParts.regionCode || regionCode;
       updates.taxiPostalCode = pickupParts.postalCode || "";
       updates.taxiPostalKind = pickupParts.postalKind || "";
       updates.taxiPickupAddress = pickupCheck.composed;
@@ -2441,7 +2467,12 @@
     }
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
     setText("portalStatus", "Profile updated.");
-    await loadPortal(user);
+    try {
+      await loadPortal(user);
+    } catch (reloadError) {
+      console.warn("Profile saved; portal reload failed", reloadError);
+      setText("portalStatus", "Profile updated.");
+    }
     });
   }
 
@@ -2760,7 +2791,8 @@
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (travelMetadata.length) {
-        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), travelMetadata));
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(priorTravelsOf(currentProfile)), travelMetadata));
+        update.priorTravels = update.travelInterests;
         byId("editTravelInterests").value = joinCSV(update.travelInterests);
       }
       await db.collection("users").doc(user.uid).set(update, {merge:true});
@@ -2842,7 +2874,8 @@
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (addTravel && metadata) {
-        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), [metadata]));
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(priorTravelsOf(currentProfile)), [metadata]));
+        update.priorTravels = update.travelInterests;
         byId("editTravelInterests").value = joinCSV(update.travelInterests);
       }
       await db.collection("users").doc(user.uid).set(update, {merge:true});
@@ -2978,7 +3011,8 @@
         <p>${esc(displayBio)}</p>
         <div class="profile-section"><strong>Height</strong><p>${esc(heightDisplay(profile) || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
-        <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
+        <div class="profile-section"><strong>Prior Travels</strong>${chips(priorTravelsOf(profile))}</div>
+        <div class="profile-section"><strong>Future Travel</strong>${chips(futureTravelsOf(profile))}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
         <div class="profile-section"><strong>Food Choices</strong>${chips(profile.foodChoices)}</div>
         <div class="profile-section"><strong>Favorite Beverages</strong>${chips(profile.favoriteBeverages)}</div>
@@ -3025,7 +3059,7 @@
   }
 
   function smStatusText(key, vars = {}, fallback = "") {
-    const text = window.FLOQRI18n?.t?.(`portal.serviceMembers.${key}`, vars);
+    const text = window.FLOQRI18n?.t?.(`portal.serviceMembers.${key}`, vars || {});
     return text && text !== `portal.serviceMembers.${key}` ? text : fallback;
   }
 
@@ -4234,6 +4268,9 @@
   }
 
   function isUsMarketplaceEligible(profile = {}) {
+    if (window.FLOQRProfileLocale?.isUnitedStates?.(profile.country || profile.countryCode)) return true;
+    const iso = window.FLOQRGeoCatalog?.countryCodeOf?.(profile.countryCode || profile.country);
+    if (iso === "US") return true;
     const value = String(profile.country || "").trim().toLowerCase();
     return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america"].includes(value);
   }
@@ -4378,7 +4415,7 @@
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
     const tt = (key, vars, fallback) => {
-      const value = window.FLOQRI18n?.t?.(key, vars);
+      const value = window.FLOQRI18n?.t?.(key, vars || {});
       return value && value !== key ? value : (fallback || key);
     };
     const roleText = esc(roles.join(", ") || "Patron");
@@ -4399,11 +4436,13 @@
         <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
       </ul>`;
     }
-    byId("composePolicyNote").textContent = canDirect ? tt("inbox.composeNoteStaff") : tt("inbox.composeNotePatron");
-    byId("sendMessageBtn").disabled = false;
-    byId("composeRecipientSearch").disabled = false;
-    byId("composeSubject").disabled = false;
-    byId("composeBody").disabled = false;
+    if (byId("composePolicyNote")) {
+      byId("composePolicyNote").textContent = canDirect ? tt("inbox.composeNoteStaff") : tt("inbox.composeNotePatron");
+    }
+    if (byId("sendMessageBtn")) byId("sendMessageBtn").disabled = false;
+    if (byId("composeRecipientSearch")) byId("composeRecipientSearch").disabled = false;
+    if (byId("composeSubject")) byId("composeSubject").disabled = false;
+    if (byId("composeBody")) byId("composeBody").disabled = false;
   }
 
   const SERVICE_ROLE_LABELS = {
@@ -5150,7 +5189,6 @@
     });
     window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
     window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
-    window.FLOQRIdentity?.attachHelpPopout?.(byId("editFloqrHandleHelp"), window.FLOQRIdentity?.FLOQR_HANDLE_HELP);
     bind("memberStripeConnectBtn", startMemberConnectOnboarding);
     bind("memberStripeConnectRefreshBtn", refreshMemberConnectStatus);
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);
@@ -5253,12 +5291,37 @@
       hint: "editHeightHint",
       locale: currentEditLocale
     }) || null;
+    editGeoCtl = window.FLOQRGeoCatalog?.bind?.({
+      countryEl: byId("editCountry"),
+      regionEl: byId("editTaxiRegion"),
+      regionTextEl: byId("editTaxiRegionText"),
+      regionLabelEl: byId("editTaxiRegionLabel"),
+      dialEl: byId("editPhoneDial"),
+      nationalEl: byId("editPhoneNational"),
+      hiddenEl: byId("editPhone"),
+      onCountry: () => {
+        applyEditHeightUnit({fromCountry: true});
+        editPickupCtl?.paintPostal?.();
+        editPickupCtl?.validate?.(false);
+      }
+    }) || null;
+    window.FLOQRPlaceSuggest?.bindPlaceField?.({
+      input: "editTravelInterests",
+      hint: "editPriorTravelHint",
+      suggest: "editPriorTravelSuggest"
+    });
+    window.FLOQRPlaceSuggest?.bindPlaceField?.({
+      input: "editFutureTravel",
+      hint: "editFutureTravelHint",
+      suggest: "editFutureTravelSuggest"
+    });
     editPickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "editTaxiStreetNumber",
         streetName: "editTaxiStreetName",
         city: "editTaxiCity",
-        citySource: "editCity",
+        region: "editTaxiRegion",
+        regionText: "editTaxiRegionText",
         postal: "editTaxiPostal",
         postalLabel: "editTaxiPostalLabel",
         composed: "editTaxiPickupAddress",
@@ -5268,10 +5331,12 @@
     }) || null;
     window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
       profileLocaleHint = hint || {};
+      if (!byId("editCountry")?.value && (hint.ipCountryCode || hint.ipCountry)) {
+        editGeoCtl?.setCountry?.(hint.ipCountryCode || hint.ipCountry, {silent: true});
+      }
       applyEditHeightUnit();
     }).catch(() => {});
-    byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit());
-    byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit());
+    byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit({fromCountry: true}));
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {

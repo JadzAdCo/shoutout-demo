@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.3.014"/>
-  <link rel="stylesheet" href="./mingl-gist.css?v=s3.3.014"/>
-  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.014"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.014"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.019"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=s3.3.019"/>
+  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.019"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.019"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
   <script>
     /* Paint Site chrome before CSS so the closed profile card is not stuck on Nightlife. */
@@ -26,6 +26,16 @@
       if(__floqrChrome){
         document.documentElement.setAttribute("data-floqr-chrome",__floqrChrome);
         document.documentElement.setAttribute("data-is-site-chrome",String(__floqrChromeRaw!=null&&__floqrChromeRaw!==""?__floqrChromeRaw:({nightlife:0,traditional:1,blackTiffany:2,whiteBlack:3,purpleWhite:4,blackDarkGreen:5})[__floqrChrome]));
+      }
+    }catch(_){}
+  </script>
+  <script>
+    /* Venue ShoutOut deep link: paint splash immediately so the wash is never blank. */
+    try{
+      var __q=new URLSearchParams(location.search);
+      var __start=String(__q.get("start")||"").toLowerCase();
+      if(__q.get("location")||__q.get("club")||__q.get("event")||__start==="shoutout"){
+        document.documentElement.classList.add("floqr-shoutout-direct");
       }
     }catch(_){}
   </script>
@@ -56,7 +66,7 @@
     <div class="login-wrap">
       <div class="login-card">
         <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-          <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
           <div class="hero-logo-fallback hidden">FloqR</div>
         </a>
         <h2
@@ -202,7 +212,7 @@
         <button id="backToWelcomeFromProfileBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <h1>Create your profile</h1>
@@ -212,25 +222,37 @@
 
     <div class="card profile-card">
       <div class="profile-grid">
-        <label>FloqR / Mingl handle *
+        <label>
           <span class="label-inline-row">
-            <input id="profileUsername" maxlength="28" placeholder="@your_handle"/>
-            <button type="button" id="profileFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button>
+            <span data-i18n="portal.field.floqrHandle">FloqR / Mingl handle</span>
+            <span aria-hidden="true"> *</span>
+            <button type="button" class="floqr-help-popout" data-floqr-help-id="help-floqr-handle" data-floqr-help-title="FloqR / Mingl handle" data-floqr-help-body="FloqR / Mingl handle: letters, numbers, underscores (_), and dashes (-) only. No spaces, emoji, or other symbols. Shown as @your_handle on public profiles." data-floqr-help-search="floqr handle|mingl handle|username|@handle|your_handle" aria-label="Help">?</button>
           </span>
+          <input id="profileUsername" maxlength="28" placeholder="@your_handle" autocomplete="username"/>
         </label>
         <label>Display name
           <input id="profileDisplayName" maxlength="60" placeholder="Your display name"/>
         </label>
-        <label>Country
-          <input id="profileCountry" placeholder="United States"/>
+        <label>
+          <span class="label-inline-row">
+            <span data-i18n="portal.field.country">Country</span>
+            <button type="button" class="floqr-help-popout" data-floqr-help-id="help-profile-country" aria-label="Help">?</button>
+          </span>
+          <select id="profileCountry" autocomplete="country"></select>
         </label>
-        <label>State / Region / Province
-          <input id="profileRegion" placeholder="District of Columbia"/>
+        <label>
+          <span class="label-inline-row">
+            <span data-i18n="portal.field.mobile">Mobile</span>
+            <button type="button" class="floqr-help-popout" data-floqr-help-id="help-profile-mobile" aria-label="Help">?</button>
+          </span>
+          <div class="phone-input-row">
+            <span id="profilePhoneDial" class="phone-dial" aria-hidden="true">(+)</span>
+            <input id="profilePhoneNational" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="202-733-0274"/>
+          </div>
+          <input id="profilePhone" class="hidden" type="tel" autocomplete="tel"/>
+          <p id="profilePhoneHint" class="field-hint" data-i18n="portal.phone.hint">Used for SMS and WhatsApp.</p>
         </label>
-        <label>City
-          <input id="profileCity" placeholder="Washington, DC"/>
-        </label>
-        <label class="span-2">
+        <label class="profile-grid-wide">
           <span class="label-inline-row">
             <span data-i18n="portal.field.taxiPickup">Taxi pickup address</span>
             <button type="button" class="floqr-help-popout" data-floqr-help-id="help-taxi-pickup-address" aria-label="Help">?</button>
@@ -245,7 +267,12 @@
             <label><span data-i18n="portal.field.city">City</span>
               <input id="profileTaxiCity" autocomplete="address-level2" placeholder="Washington"/>
             </label>
-            <label><span id="profileTaxiPostalLabel" data-i18n="portal.field.zip">ZIP</span>
+            <label>
+              <span id="profileTaxiRegionLabel" data-i18n="portal.field.state">State</span>
+              <select id="profileTaxiRegion" autocomplete="address-level1"></select>
+              <input id="profileTaxiRegionText" autocomplete="address-level1" hidden/>
+            </label>
+            <label class="pickup-postal"><span id="profileTaxiPostalLabel" data-i18n="portal.field.zip">ZIP</span>
               <input id="profileTaxiPostal" autocomplete="postal-code" inputmode="numeric" placeholder="20005"/>
             </label>
           </div>
@@ -331,7 +358,7 @@
 
     <div class="category-brand-stack">
       <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-        <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+        <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
       </a>
     </div>
 
@@ -351,7 +378,7 @@
 
     <div class="category-grid compact-category-grid">
       <div class="search-icon-row">
-        <!-- Spot order (visible): 1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings → Appearance · 5 floqCast -->
+        <!-- Spot order (visible): 1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings → Appearance · 5 FloqCAST -->
         <a id="shoutoutBtnCard" class="shoutout-icon-card" href="./shoutout-search.html?from=search" data-feature-key="shoutOut" data-i18n-aria="cat.shoutout" aria-label="Throw a ShoutOut">
           <span class="shoutout-icon-face chrome-photo-face" aria-hidden="true">
             <img data-floqr-chrome-icon="shoutOut" src="./images/chrome/shoutout-nightlife.png" alt="" class="shoutout-tile-mark" width="96" height="96"/>
@@ -372,7 +399,7 @@
             <img data-floqr-chrome-icon="settings" src="./images/chrome/settings-nightlife.jpg" alt="" class="settings-tile-mark" width="96" height="96"/>
           </span>
         </a>
-        <a id="floqcastBtnCard" class="shoutout-icon-card floqcast-icon-card hidden" href="./floqcast-search.html?from=search" data-feature-key="floqCast" data-i18n-aria="cat.floqcast" aria-label="floqCast">
+        <a id="floqcastBtnCard" class="shoutout-icon-card floqcast-icon-card hidden" href="./floqcast-search.html?from=search" data-feature-key="floqCast" data-i18n-aria="cat.floqcast" aria-label="FloqCAST">
           <span class="floqcast-icon-face chrome-photo-face" aria-hidden="true">
             <img data-floqr-chrome-icon="floqCast" src="./images/chrome/floqcast-nightlife.jpg" alt="" class="floqcast-tile-mark" width="96" height="96"/>
           </span>
@@ -389,7 +416,7 @@
       <div class="botdee-search-main intent-search-main">
         <div class="botdee-brand-row">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="intent-floqr-logo botdee-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="intent-floqr-logo botdee-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
             <div class="hero-logo-fallback hidden">FloqR</div>
           </a>
           <button id="botDeeHelpBtn" class="botdee-help-btn" type="button" aria-expanded="false" aria-controls="botDeeHelpPopout" title="BOT DEE help">?</button>
@@ -398,9 +425,9 @@
           <button id="botDeeHelpClose" class="botdee-help-close" type="button" aria-label="Close help">&times;</button>
           <p class="eyebrow">BOT DEE</p>
           <p><strong>Ask FloqR</strong> with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
-          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>, <em>make me a superstar</em>, User Guide phrases like <em>create a schedule</em> / <em>publish schedule</em>, or <em>website ingest</em> / <em>staff calendar</em>.</p>
+          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>, <em>make me a superstar</em>, User Guide phrases like <em>create a schedule</em> / <em>publish schedule</em>, or <em>website ingest</em> / <em>staff calendar</em>.</p>
           <div class="botdee-help-links" data-botdee-search-catalog="1">
-            <a href="./floqcast-search.html?from=botdee" data-search="floqcast|floq cast|floqCast|make me a floqcast|make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the floqCast board.">Make me a floqCast / superstar</a>
+            <a href="./floqcast-search.html?from=botdee" data-search="floqcast|floq cast|floqCast|make me a floqcast|make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the FloqCAST board.">Make me a FloqCAST / superstar</a>
             <a href="./role-request.html?from=botdee&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
             <a href="./role-request.html?from=botdee&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
             <a href="./role-request.html?from=botdee&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
@@ -437,7 +464,7 @@
       <div>
         <button id="backToCategoriesFromMinglBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="product-brand-stack">
-          <img src="./images/floqr-color.png?v=s3.3.014" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./images/floqr-color.png?v=s3.3.019" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
           <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
         </div>
@@ -491,7 +518,7 @@
         <button id="backToCategoriesFromActionsBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <h1 data-i18n="page.clubActions.title">What would you like to do?</h1>
@@ -520,7 +547,7 @@
             <div id="splashClubLogoFallback" class="hero-logo-fallback splash-fallback-logo">CLUB</div>
           </div>
           <div id="splashFloqrLogoWrap" class="splash-logo-wrap">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
             <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
           </div>
         </div>
@@ -561,7 +588,7 @@
         <button id="backToCategoriesBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <h1 id="listingTitle" data-i18n="listing.searchClubs">Search Clubs</h1>
@@ -589,7 +616,7 @@
         <button id="backToListingBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <h1 id="selectedClubTitle">Location</h1>
@@ -624,7 +651,7 @@
         <button id="backToTemplatesBtn" class="floqr-back-btn" type="button" data-i18n="nav.backShort">&lt; Back</button>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <h1 id="editorClubTitle" data-i18n="editor.createMessage">Create your message</h1>
@@ -892,7 +919,7 @@
 
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
-      <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" data-floqr-brand-logo width="160" style="display:block;margin:0 auto 12px"/>
+      <img src="./images/floqr-color.png?v=s3.3.019" alt="FloqR" class="product-parent-logo" data-floqr-brand-logo width="160" style="display:block;margin:0 auto 12px"/>
       <h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
       <div class="receipt">
         <p><strong>Reference:</strong> <span id="confirmRef">—</span></p>
@@ -926,62 +953,63 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.014"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.014"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.014"></script>
-<script src="./floqr-people-directory.js?v=s3.3.014"></script>
-<script src="./floqr-app-check.js?v=s3.3.014"></script>
-<script src="./floqr-nav.js?v=s3.3.014"></script>
-<script src="./floqr-i18n.js?v=s3.3.014"></script>
-<script src="./floqr-place-i18n.js?v=s3.3.014"></script>
-<script src="./botdee-help-repository.js?v=s3.3.014"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.014"></script>
-<script src="./floqr-venue-query.js?v=s3.3.014"></script>
-<script src="./floqr-venue-actions.js?v=s3.3.014"></script>
-<script src="./intent-search.js?v=s3.3.014"></script>
-<script src="./botdee-search.js?v=s3.3.014"></script>
-<script src="./global-profile-status.js?v=s3.3.014"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.014"></script>
-<script src="./shared-data.js?v=s3.3.014"></script>
-<script src="./national-teams-data.js?v=s3.3.014"></script>
-<script src="./jersey-catalog.js?v=s3.3.014"></script>
-<script src="./feature-gates.js?v=s3.3.014"></script>
-<script src="./floqr-feature-services.js?v=s3.3.014"></script>
-<script src="./url-media-field.js?v=s3.3.014"></script>
-<script src="./ai-service.js?v=s3.3.014"></script>
-<script src="./ai-index-service.js?v=s3.3.014"></script>
-<script src="./ai-search-service.js?v=s3.3.014"></script>
-<script src="./floqr-geo-search.js?v=s3.3.014"></script>
-<script src="./floqr-profile-locale.js?v=s3.3.014"></script>
-<script src="./floqr-feature-landing.js?v=s3.3.014"></script>
-<script src="./ai-location-service.js?v=s3.3.014"></script>
-<script src="./ai-notification-service.js?v=s3.3.014"></script>
-<script src="./ai-template-studio.js?v=s3.3.014"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.014"></script>
-<script src="./ai-grammar-service.js?v=s3.3.014"></script>
-<script src="./help-attach.js?v=s3.3.014"></script>
-<script src="./helper-popouts.js?v=s3.3.014"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.014"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.014"></script>
-<script src="./floqr-consent-mode.js?v=s3.3.014"></script>
-<script src="./floqr-canonical.js?v=s3.3.014"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.014"></script>
-<script src="./ad-campaigns.js?v=s3.3.014"></script>
-<script src="./floqr-ad-tracking.js?v=s3.3.014"></script>
-<script src="./floqr-identity.js?v=s3.3.014"></script>
-<script src="./floqr-blocks.js?v=s3.3.014"></script>
-<script src="./floqr-logger.js?v=s3.3.014"></script>
-<script src="./floqr-client-ip.js?v=s3.3.014"></script>
-<script src="./payment-service.js?v=s3.3.014"></script>
-<script src="./welcome-button-gradient.js?v=s3.3.014"></script>
-<script src="./floqr-name-shoutout.js?v=s3.3.014"></script>
-<script src="./floqr-board-frame.js?v=s3.3.014"></script>
-<script src="./floqr-safe-render.js?v=s3.3.014"></script>
-<script src="./floqr-template-preview.js?v=s3.3.014"></script>
-<script src="./floqr-template-tags.js?v=s3.3.014"></script>
-<script src="./floqr-access-notice.js?v=s3.3.014"></script>
-<script src="./patron-app.js?v=s3.3.014"></script>
-<script src="./ai-assistant-ui.js?v=s3.3.014"></script>
-<script src="./ai-media-service.js?v=s3.3.014"></script>
-<script src="./notification-center.js?v=s3.3.014"></script></body>
+<script src="./firebase-config.js?v=s3.3.019"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.019"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.019"></script>
+<script src="./floqr-people-directory.js?v=s3.3.019"></script>
+<script src="./floqr-app-check.js?v=s3.3.019"></script>
+<script src="./floqr-nav.js?v=s3.3.019"></script>
+<script src="./floqr-i18n.js?v=s3.3.019"></script>
+<script src="./floqr-place-i18n.js?v=s3.3.019"></script>
+<script src="./botdee-help-repository.js?v=s3.3.019"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.019"></script>
+<script src="./floqr-venue-query.js?v=s3.3.019"></script>
+<script src="./floqr-venue-actions.js?v=s3.3.019"></script>
+<script src="./intent-search.js?v=s3.3.019"></script>
+<script src="./botdee-search.js?v=s3.3.019"></script>
+<script src="./global-profile-status.js?v=s3.3.019"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.019"></script>
+<script src="./shared-data.js?v=s3.3.019"></script>
+<script src="./national-teams-data.js?v=s3.3.019"></script>
+<script src="./jersey-catalog.js?v=s3.3.019"></script>
+<script src="./feature-gates.js?v=s3.3.019"></script>
+<script src="./floqr-feature-services.js?v=s3.3.019"></script>
+<script src="./url-media-field.js?v=s3.3.019"></script>
+<script src="./ai-service.js?v=s3.3.019"></script>
+<script src="./ai-index-service.js?v=s3.3.019"></script>
+<script src="./ai-search-service.js?v=s3.3.019"></script>
+<script src="./floqr-geo-search.js?v=s3.3.019"></script>
+<script src="./floqr-geo-catalog.js?v=s3.3.019"></script>
+<script src="./floqr-profile-locale.js?v=s3.3.019"></script>
+<script src="./floqr-feature-landing.js?v=s3.3.019"></script>
+<script src="./ai-location-service.js?v=s3.3.019"></script>
+<script src="./ai-notification-service.js?v=s3.3.019"></script>
+<script src="./ai-template-studio.js?v=s3.3.019"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.019"></script>
+<script src="./ai-grammar-service.js?v=s3.3.019"></script>
+<script src="./help-attach.js?v=s3.3.019"></script>
+<script src="./helper-popouts.js?v=s3.3.019"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.019"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.019"></script>
+<script src="./floqr-consent-mode.js?v=s3.3.019"></script>
+<script src="./floqr-canonical.js?v=s3.3.019"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.019"></script>
+<script src="./ad-campaigns.js?v=s3.3.019"></script>
+<script src="./floqr-ad-tracking.js?v=s3.3.019"></script>
+<script src="./floqr-identity.js?v=s3.3.019"></script>
+<script src="./floqr-blocks.js?v=s3.3.019"></script>
+<script src="./floqr-logger.js?v=s3.3.019"></script>
+<script src="./floqr-client-ip.js?v=s3.3.019"></script>
+<script src="./payment-service.js?v=s3.3.019"></script>
+<script src="./welcome-button-gradient.js?v=s3.3.019"></script>
+<script src="./floqr-name-shoutout.js?v=s3.3.019"></script>
+<script src="./floqr-board-frame.js?v=s3.3.019"></script>
+<script src="./floqr-safe-render.js?v=s3.3.019"></script>
+<script src="./floqr-template-preview.js?v=s3.3.019"></script>
+<script src="./floqr-template-tags.js?v=s3.3.019"></script>
+<script src="./floqr-access-notice.js?v=s3.3.019"></script>
+<script src="./patron-app.js?v=s3.3.019"></script>
+<script src="./ai-assistant-ui.js?v=s3.3.019"></script>
+<script src="./ai-media-service.js?v=s3.3.019"></script>
+<script src="./notification-center.js?v=s3.3.019"></script></body>
 </html>

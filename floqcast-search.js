@@ -41,7 +41,7 @@
   }
 
   function accessCheck(user) {
-    if (!user) return {ok: false, reason: "Sign in to use floqCast."};
+    if (!user) return {ok: false, reason: "Sign in to use FloqCAST."};
     const email = String(user.email || "").toLowerCase();
     if (!email || !email.includes("@")) return {ok: false, reason: "Sign in with Google or Microsoft (email required)."};
     return {ok: true, email};
@@ -81,7 +81,7 @@
     const q = String(byId("floqcastVenueSearch")?.value || "").trim();
     const total = venueRows.length;
     if (!total) {
-      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow floqCast."));
+      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow FloqCAST."));
       return;
     }
     setVenueStatus(FL()?.statusLine?.({
@@ -89,7 +89,7 @@
       shown: visibleCount,
       query: q,
       locationContext,
-      featureLabel: "floqCast venues"
+      featureLabel: "FloqCAST venues"
     }) || `${visibleCount} venue(s)`);
   }
 
@@ -110,7 +110,7 @@
     const rows = filteredVenues();
     updateVenueStatusLine(rows.length);
     if (!rows.length) {
-      grid.innerHTML = `<p class="sub small">${esc(t("page.floqcast.noMatch", "No floqCast venues match that search."))}</p>`;
+      grid.innerHTML = `<p class="sub small">${esc(t("page.floqcast.noMatch", "No FloqCAST venues match that search."))}</p>`;
       return;
     }
     grid.innerHTML = rows.map((r) => {
@@ -127,7 +127,7 @@
           selected,
           ctaLabel,
           ctaAttr,
-          productBadge: "floqCast"
+          productBadge: "FloqCAST"
         }).replace("feature-landing-card", "feature-landing-card floqcast-venue-item");
       }
       return `<article class="card club-card floqcast-venue-item${selected ? " is-selected" : ""}" data-venue-id="${esc(r.id)}">
@@ -248,7 +248,7 @@
       selectedVenueId = "";
       syncSelect();
       renderVenueGrid();
-      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow floqCast."));
+      setVenueStatus(t("page.floqcast.noVenues", "No venues currently allow FloqCAST."));
       byId("floqcastGoLiveBtn") && (byId("floqcastGoLiveBtn").disabled = true);
       return;
     }
@@ -323,8 +323,8 @@
       previewTab = window.open("about:blank", "floqr_floqcast_preview");
       if (previewTab) {
         try {
-          previewTab.document.title = "floqCast Preview";
-          previewTab.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening your private floqCast preview…</p>";
+          previewTab.document.title = "FloqCAST Preview";
+          previewTab.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening your private FloqCAST preview…</p>";
           previewTab.opener = null;
         } catch (_) {}
       }
@@ -360,9 +360,9 @@
       }
     } catch (err) {
       try { previewTab?.close(); } catch (_) {}
-      setLiveStatus(err?.message || "Could not start floqCast.");
+      setLiveStatus(err?.message || "Could not start FloqCAST.");
       if (btn) btn.disabled = false;
-      await logPopup("checkout_failed", err?.message || "Could not start floqCast.", {locationId: venue.id});
+      await logPopup("checkout_failed", err?.message || "Could not start FloqCAST.", {locationId: venue.id});
     }
   }
 
@@ -424,7 +424,7 @@
       const check = accessCheck(user);
       if (!check.ok) {
         showGate(true);
-        setStatus(user ? `Access issue: ${check.reason}` : "Sign in to open floqCast.");
+        setStatus(user ? `Access issue: ${check.reason}` : "Sign in to open FloqCAST.");
         return;
       }
       setStatus("");

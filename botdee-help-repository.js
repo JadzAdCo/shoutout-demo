@@ -353,11 +353,11 @@
     {
       id: "botdee-ask-floqr",
       title: "Ask FloqR with BOT DEE",
-      body: "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      body: "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "bot dee", "botdee", "ask bot dee", "plain words", "i want to be able to", "help", "make me a superstar", "floqai"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
-        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
+        {label: "Open FloqCAST", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       page: "index.html#botDeeHelpPopout"
@@ -375,7 +375,7 @@
     {
       id: "help-botdee-page",
       title: "BOT DEE",
-      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself and asks what you want help with. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone, until the pause timer ends. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Signed-in BOT DEE uses the same public volunteered profile datapoints you can see (music, food, travel, hobbies, and the rest of Privacy datapoint sharing) — never email, phone, card numbers, or GPS. Tap a photo in the chat to pop it out into a separate window. Close with X or Close to see the chat again.",
+      body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself and asks what you want help with. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone, until the pause timer ends. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Signed-in BOT DEE uses the same public volunteered profile datapoints you can see (music, food, travel, hobbies, and the rest of Privacy datapoint sharing) — never email, phone, card numbers, or GPS. Tap a photo in the chat to pop it out into a separate window. Close with X or Close to see the chat again.",
       searchPhrases: ["bot dee", "botdee", "ask bot dee", "bot dee page", "chat with bot dee", "help", "bot dee help", "what can you do", "resume chat", "refresh bot dee", "other phone", "general search", "search everything", "what can i search", "enter to send", "shift enter", "how are you bot dee", "floqai", "floqai page", "ask floqai", "public profile", "enlarge photo", "tap photo", "pop out photo", "photo window"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -404,8 +404,8 @@
     },
     {
       id: "help-floqcast",
-      title: "Make me a floqCast / superstar",
-      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the floqCast Queue → Go live on the floqCast board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
+      title: "Make me a FloqCAST / superstar",
+      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the FloqCAST Queue → Go live on the FloqCAST board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
         "floqcast", "floq cast", "floqCast", "make me a floqcast", "make me a floq cast",
         "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
@@ -413,21 +413,21 @@
         "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
       ],
       links: [
-        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
+        {label: "Open FloqCAST", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron"]
     },
     {
       id: "help-floqcast-choose-venue",
-      title: "Choose a floqCast venue",
-      body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here.",
+      title: "Choose a FloqCAST venue",
+      body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here.",
       searchPhrases: [
         "choose a floqcast venue", "floqcast venue", "nearest floqcast", "floqcast near me",
         "search floqcast club", "floqcast event venue", "closest floqcast", "floqcast sound", "floqcast screen size"
       ],
       links: [
-        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
+        {label: "Open FloqCAST", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron"]
@@ -527,7 +527,7 @@
     {
       id: "help-vip-club-admin",
       title: "Club Admin VIP reserV management",
-      body: "Club Admin → Feature Mgmt → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Feature Mgmt also holds ShoutOut (Queue / Display / Template Mgmt) and floqCast. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
+      body: "Club Admin → Feature Mgmt → VIP reserV manages tonight’s reservations: check in, no-show, cancel, block/unblock sections, and walk-in book. Feature Mgmt also holds ShoutOut (Queue / Display / Template Mgmt) and FloqCAST. Firestore isBooked controls map booked status — set to 1 only after deposit pay (FloqMedia/Club Stripe), Club POS confirm, or admin-recorded payment. Cancel always clears isBooked to 0. For FloqMedia / Club Stripe, Cancel can also refund the deposit per the club’s refund policy (full by default, or hours-based partial/none). Club POS voids stay on Toast/SpotOn. Holds never set isBooked. Door staff can also use VIP reserV Door.",
       searchPhrases: [
         "vip club admin", "manage vip reservations", "vip deposit required", "paid before booked",
         "block vip table", "walk-in vip", "vip admin book", "require deposit before booked",
@@ -1097,12 +1097,14 @@
     },
     {
       id: "help-venue-crawl-datapoints",
+      audiences: ["masterAdmin"],
       title: "AI crawl venue datapoints",
-      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Crawls also check venue website footers and contact pages for social handles. Each card shows when it was collected. Already-onboarded venues are scanned for lineup/event updates only. Use the country tabs to filter the queue. Approve when ready, or choose Needs research.",
+      body: "On Master Admin → AI Crawling, set a Publishing rule per crawl type. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. Download the sample CSV, export unpublished rows, and import with the same headers. Save keeps edits on the review card without going live. Publish always blocks duplicates (same phone, address, or club name — Monaco equals Monte Carlo) and ignores past events. Auto-published listings are emailed; logs are under Diagnostics → AI Crawling.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
+        "import datapoints", "publishing rule", "csv import", "csv export", "duplicate venue", "monaco monte carlo",
         "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
-        "club admin imports"
+        "club admin imports", "publish discovery", "save discovery card"
       ],
       links: [
         {label: "Master Admin AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"})}
@@ -1359,8 +1361,8 @@
     },
     {
       id: "help-master-floqcast-diagnostics",
-      title: "FloqCast diagnostics",
-      body: "Master Admin → Diagnostics → FloqCast. Shows connectivity rows from appLogs for categories floqCast and legacy suprstar: WebRTC status, ICE/TURN source, live heartbeats, and board wait timeouts. Phone Go live must be signed in for rows to save. Display boards are anonymous so their console-only events do not appear here. Intermittent connects often mean STUN-only (no TURN) — look for iceSource stun-only or stun-fallback.",
+      title: "FloqCAST diagnostics",
+      body: "Master Admin → Diagnostics → FloqCAST. Shows connectivity rows from appLogs for categories floqCast and legacy suprstar: WebRTC status, ICE/TURN source, live heartbeats, and board wait timeouts. Phone Go live must be signed in for rows to save. Display boards are anonymous so their console-only events do not appear here. Intermittent connects often mean STUN-only (no TURN) — look for iceSource stun-only or stun-fallback.",
       searchPhrases: [
         "floqcast diagnostics", "floqcast logs", "floq cast diagnostics", "webrtc logs", "ice servers log",
         "turn stun floqcast", "suprstar logs", "floqcast connectivity", "why floqcast disconnects",
@@ -1373,6 +1375,22 @@
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#diagnosticsFloqCast"
+    },
+    {
+      id: "help-master-aicrawl-diagnostics",
+      title: "AI Crawling diagnostics",
+      body: "Master Admin → Diagnostics → AI Crawling. Categorized appLogs with category aiCrawl: Runs, Discoveries, Duplicates, Auto-publish, CSV, Past events, and Publish. Instant Crawl, CSV import, Save, and Publish write rows here. Auto-publish also emails the Master Admin list. Functions deploy is required for server crawl logs and the auto-publish email.",
+      searchPhrases: [
+        "ai crawling logs", "ai crawl diagnostics", "discovery logs", "auto publish email",
+        "csv import crawl", "past event cleanup", "duplicate crawl log"
+      ],
+      links: [
+        {label: "AI Crawling diagnostics", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#diagnosticsAiCrawl", search: "ai crawling diagnostics"},
+        {label: "AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#aiCrawling", search: "ai crawling"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#diagnosticsAiCrawl"
     },
     {
       id: "help-master-shoutout-diagnostics",
@@ -1491,7 +1509,7 @@
     {
       id: "help-app-language",
       title: "App language / FloqR webapp language",
-      body: "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it anytime under My Profile → Language Settings → FloqR webapp language (saved on this device and on your profile). FLOQR does not choose language from IP address or country. To fix AI-sounding German or Arabic wording for everyone, Master Admin uses Translation Overrides.",
+      body: "A new visitor with a Spanish internet location starts FloqR in Spanish, and Preferred Language is set to Spanish. Other mapped countries follow the same rule (a French IP starts in French). After the first visit, this setting and your saved profile language win. Change it anytime under My Profile → Language Settings. Unsupported languages stay in English. To fix wording for everyone, Master Admin uses Translation Overrides.",
       searchPhrases: [
         "app language", "webapp language", "dutch", "nederlands", "browser language", "first use language",
         "change language", "switch language", "ui language", "detect language", "language settings",
@@ -1549,7 +1567,7 @@
     {
       id: "help-profile-height",
       title: "Height",
-      body: "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can still switch the unit.",
+      body: "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. United States defaults to ft. Every other country, and a non-U.S. internet location, defaults to m. You can still switch the unit.",
       searchPhrases: [
         "height", "how tall", "feet", "meters", "ft", "height unit", "6'0", "1.78"
       ],
@@ -1559,12 +1577,73 @@
       page: "patron-portal.html"
     },
     {
+      id: "help-floqr-handle",
+      title: "FloqR / Mingl handle",
+      body: "FloqR / Mingl handle: letters, numbers, underscores (_), and dashes (-) only. No spaces, emoji, or other symbols. Shown as @your_handle on public profiles.",
+      searchPhrases: [
+        "floqr handle", "mingl handle", "username", "@handle", "your_handle", "display handle"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-profile-country",
+      title: "Country",
+      body: "Choose your country from the list. United States is first, then Canada, then featured nightlife markets, then every other country. The list is stored on this page so Profile loads quickly — it is not fetched from a database. Country sets your mobile calling code (+1 for the United States), the height unit default, and ZIP vs postal on taxi pickup.",
+      searchPhrases: [
+        "country", "country dropdown", "united states", "canada", "select country", "state list"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-profile-mobile",
+      title: "Mobile",
+      body: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      searchPhrases: [
+        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-prior-travels",
+      title: "Prior Travels (City or Country)",
+      body: "List cities or countries you have already visited, comma-separated (Barcelona, Miami, Spain). Use real place names — FLOQR suggests spelling from a city/country catalog, then Google AI Studio (Gemini) when you are signed in. This is the public Mingl travel datapoint when you opt in under Privacy.",
+      searchPhrases: [
+        "prior travels", "travel interest", "travel interests", "cities I visited", "countries I visited",
+        "travel datapoint", "spell city", "spell country"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-future-travel",
+      title: "Future Travel Destination (City or Country)",
+      body: "List cities or countries you want to visit next, comma-separated (Lisbon, Japan). Enter a city or a country, not a venue or neighborhood. FLOQR suggests standard spelling. When you opt travel in under Privacy, BOT DEE can use these destinations the same way as prior travels.",
+      searchPhrases: [
+        "future travel", "future destination", "where I want to go", "travel plans", "next trip"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
       id: "help-taxi-pickup-address",
       title: "Taxi pickup address",
-      body: "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint.",
+      body: "RydR pickup needs a street number, street name, city, state or province (for the listed countries), and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint.",
       searchPhrases: [
         "taxi pickup", "pickup address", "rydr address", "zip code", "postal code",
-        "street number", "hail a ride address"
+        "street number", "hail a ride address", "state", "province"
       ],
       links: [
         {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})},

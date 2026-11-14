@@ -138,12 +138,18 @@
     "help-floqcast-choose-venue": [
       "patron"
     ],
+    "help-floqr-handle": [
+      "patron"
+    ],
     "help-floqr-inbox-rules": [
       "patron",
       "serviceMember",
       "venueAdmin"
     ],
     "help-football-intro": [
+      "patron"
+    ],
+    "help-future-travel": [
       "patron"
     ],
     "help-general-notifications": [
@@ -174,6 +180,9 @@
       "masterAdmin"
     ],
     "help-master-ad-stats": [
+      "masterAdmin"
+    ],
+    "help-master-aicrawl-diagnostics": [
       "masterAdmin"
     ],
     "help-master-completed-log": [
@@ -215,7 +224,16 @@
     "help-onboarding": [
       "masterAdmin"
     ],
+    "help-prior-travels": [
+      "patron"
+    ],
+    "help-profile-country": [
+      "patron"
+    ],
     "help-profile-height": [
+      "patron"
+    ],
+    "help-profile-mobile": [
       "patron"
     ],
     "help-public-media-sharing": [
@@ -430,6 +448,12 @@
     "help-floqcast": [
       "patron"
     ],
+    "help-floqr-handle": [
+      "patron"
+    ],
+    "help-future-travel": [
+      "patron"
+    ],
     "help-general": [
       "patron"
     ],
@@ -463,7 +487,16 @@
     "help-post-ad": [
       "patron"
     ],
+    "help-prior-travels": [
+      "patron"
+    ],
+    "help-profile-country": [
+      "patron"
+    ],
     "help-profile-height": [
+      "patron"
+    ],
+    "help-profile-mobile": [
       "patron"
     ],
     "help-promoter": [

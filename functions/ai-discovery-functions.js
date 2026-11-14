@@ -26,6 +26,8 @@ const venueDatapoints = require("./venue-datapoint-extract");
 const crawlCore = require("./discovery-crawl-core");
 const autoApprove = require("./discovery-auto-approve");
 const pastEvents = require("./discovery-past-events");
+const gatesCore = require("./discovery-gates-core");
+const crawlLog = require("./discovery-log-core");
 const {sendSystemMail} = require("./mail-log");
 const {
   looksLikeBrokenDemoEmail,
@@ -86,11 +88,180 @@ function isDaytimeEventType(value = "") {
 }
 
 function proposedTypeFromJobEventType(eventType = "") {
-  const text = String(eventType || "");
-  if (isDaytimeEventType(text)) return "daytimeEvent";
-  if (/comedy/i.test(text)) return "comedyShow";
-  if (/concert|event|festival|market|dj|promoter|party/i.test(text)) return "event";
-  return "club";
+  if (isDaytimeEventType(eventType)) {
+    const typed = gatesCore.proposedTypeFromJobEventType(eventType);
+    return /flea|farmers|community|festival|daytime/i.test(typed) ? typed : "daytimeEvent";
+  }
+  return gatesCore.proposedTypeFromJobEventType(eventType);
+}
+
+let crawlContext = {
+  importGates: gatesCore.defaultImportGates(),
+  publishingRules: gatesCore.defaultPublishingRules(),
+  pastEventPolicy: gatesCore.DEFAULT_PAST_EVENT_POLICY,
+  duplicateUniverse: [],
+  autoPublished: [],
+  ignoredPast: 0,
+  correlationId: ""
+};
+
+async function writeCrawlLog(entry = {}) {
+  try {
+    const payload = crawlLog.buildCrawlLog({
+      ...entry,
+      correlationId: entry.correlationId || crawlContext.correlationId || ""
+    });
+    await db.collection("appLogs").add({
+      ...payload,
+      userAgent: "firebase-functions",
+      appVersion: "s3.3.019",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtMs: Date.now(),
+      expireAtMs: Date.now() + (30 * 24 * 60 * 60 * 1000)
+    });
+  } catch (error) {
+    console.warn("AI crawl appLogs write failed:", error.message || error);
+  }
+}
+
+function escapeHtmlLite(value = "") {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[ch]));
+}
+
+async function emailAutoPublishedDigest({runId = "", trigger = "crawl"} = {}) {
+  const rows = crawlContext.autoPublished || [];
+  if (!rows.length) return {sent: false, count: 0};
+  const to = MASTER_ADMIN_EMAILS[0] || "bans.don@gmail.com";
+  const from = EMAIL_OTP_FROM;
+  const subject = `FLOQR AI Crawling — ${rows.length} auto-published listing(s)`;
+  const lines = rows.map(row => `- ${row.title} (${row.collection}/${row.id}) · ${row.city || ""} ${row.country || ""} · ${row.crawlType || ""}`);
+  const textBody = [`Auto-published from ${trigger} run ${runId || "(none)"}:`, "", ...lines, "", "Review: Master Admin → AI Crawling → Approved."].join("\n");
+  const htmlBody = `<p>${rows.length} listing(s) were auto-published from <strong>${escapeHtmlLite(trigger)}</strong>.</p>
+    <ul>${rows.map(row => `<li>${escapeHtmlLite(row.title)} — ${escapeHtmlLite(row.collection)}/${escapeHtmlLite(row.id)} · ${escapeHtmlLite(row.city)} ${escapeHtmlLite(row.country)}</li>`).join("")}</ul>
+    <p>Master Admin → AI Crawling → Approved. Duplicates were blocked; past events were ignored.</p>`;
+  try {
+    const sent = await sendgridMail({
+      to,
+      from,
+      subject,
+      textBody,
+      htmlBody,
+      kind: "system",
+      source: "aiCrawl.autoPublish",
+      trigger,
+      extra: {runId, count: rows.length}
+    });
+    return {sent: true, count: rows.length, mailLogId: sent.mailLogId};
+  } catch (error) {
+    console.warn("Auto-publish email failed:", error.message || error);
+    return {sent: false, count: rows.length, error: String(error.message || error)};
+  }
+}
+
+async function beginCrawlContext() {
+  try {
+    const gatesSnap = await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").get();
+    const data = gatesSnap.exists ? (gatesSnap.data() || {}) : {};
+    const importGates = gatesCore.normalizeImportGates(data.importGates);
+    const publishingRules = gatesCore.normalizePublishingRules(data.publishingRules);
+    const pastEventPolicy = gatesCore.normalizePastEventPolicy(data.pastEventPolicy);
+    const [liveSnap, eventSnap, queueSnap] = await Promise.all([
+      db.collection("clubLocations").limit(800).get(),
+      db.collection("events").limit(400).get(),
+      db.collection("aiDiscoveryQueue").limit(800).get()
+    ]);
+    const live = liveSnap.docs.map(doc => ({id: doc.id, collection: "clubLocations", ...doc.data()}))
+      .filter(row => String(row.status || "active") !== "deleted" && !row.aliasOf && !row.mergedInto);
+    const events = eventSnap.docs.map(doc => {
+      const dataRow = doc.data() || {};
+      return {
+        id: doc.id,
+        collection: "events",
+        entityKind: "event",
+        proposedType: dataRow.proposedType || dataRow.eventType || "event",
+        proposedTitle: dataRow.eventName || dataRow.title || dataRow.proposedTitle || "",
+        proposedLocationName: dataRow.locationName || dataRow.venueName || "",
+        proposedAddress: dataRow.fullAddress || dataRow.address || "",
+        ...dataRow
+      };
+    }).filter(row => String(row.status || "active") !== "deleted");
+    const queue = queueSnap.docs.map(doc => ({id: doc.id, collection: "aiDiscoveryQueue", ...doc.data()}))
+      .filter(row => !["deleted", "rejected"].includes(String(row.status || "")));
+    crawlContext = {
+      importGates,
+      publishingRules,
+      pastEventPolicy,
+      duplicateUniverse: [...live, ...events, ...queue],
+      autoPublished: [],
+      ignoredPast: 0,
+      correlationId: crawlContext.correlationId || ""
+    };
+  } catch (error) {
+    console.warn("Discovery crawl context load failed:", error.message);
+    crawlContext = {
+      importGates: gatesCore.defaultImportGates(),
+      publishingRules: gatesCore.defaultPublishingRules(),
+      pastEventPolicy: gatesCore.DEFAULT_PAST_EVENT_POLICY,
+      duplicateUniverse: crawlContext.duplicateUniverse || [],
+      autoPublished: [],
+      ignoredPast: 0,
+      correlationId: crawlContext.correlationId || ""
+    };
+  }
+  return crawlContext;
+}
+
+function rememberDuplicateCandidate(record = {}) {
+  if (!record) return;
+  crawlContext.duplicateUniverse = crawlContext.duplicateUniverse || [];
+  crawlContext.duplicateUniverse.push(record);
+}
+
+function stampDiscoveryClassification(record = {}) {
+  const kind = gatesCore.classifyEntity(record);
+  let next = {
+    ...record,
+    entityKind: kind.entityKind,
+    venueCategory: kind.venueCategory,
+    eventCategory: kind.eventCategory,
+    kindLabel: kind.kindLabel,
+    listingClass: kind.listingClass,
+    proposedType: record.proposedType || kind.proposedType
+  };
+  const matches = gatesCore.findDuplicates(next, crawlContext.duplicateUniverse || []);
+  next = gatesCore.applyDuplicateStamp(next, matches);
+  if (next.duplicateFlag) {
+    const who = next.duplicateMatch?.matchName || next.duplicateMatch?.matchId || "another listing";
+    const why = (next.duplicateReasons || []).join(", ") || "same establishment";
+    next.aiRatingReasons = uniqueListLocal([
+      ...(next.aiRatingReasons || []),
+      `Possible duplicate (${why}) of ${who}`
+    ]);
+  }
+  next.missingDatapoints = missingDatapoints(next);
+  next.importGatesSnapshot = crawlContext.importGates;
+  next.publishingRulesSnapshot = crawlContext.publishingRules;
+  if (next.duplicateFlag) {
+    writeCrawlLog({
+      action: "duplicate_flag",
+      level: "warn",
+      message: `Duplicate ${next.proposedTitle || next.queueDocId || "listing"} (${(next.duplicateReasons || []).join(", ")})`,
+      details: {
+        match: next.duplicateMatch || null,
+        crawlType: next.proposedType || "",
+        city: next.city || "",
+        country: next.country || ""
+      }
+    });
+  }
+  if (next.duplicateFlag && next.crawlScope !== "updates-only") {
+    next.crawlResultStatus = "possible-duplicate";
+  } else {
+    next.crawlResultStatus = next.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  }
+  return next;
 }
 
 const DEFAULT_DISCOVERY_MARKETS = [
@@ -369,31 +540,10 @@ function cityCountryFromText(sourceUrl = "", text = "", location = {}) {
 }
 
 function missingDatapoints(record = {}) {
-  const missing = [];
-  const daytime = isDaytimeEventType(record.proposedType || "")
-    || isDaytimeEventType((record.categories || []).join(" "))
-    || isDaytimeEventType(record.proposedTitle || "");
-  if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
-  if (!(record.genres || []).length) missing.push("Genre");
-  if (!daytime) {
-    const artists = record.artistsOrDjs || record.artists || record.djs;
-    if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
-  }
-  const promoters = record.promoters || record.promotionGroup;
-  if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) {
-    missing.push(daytime ? "Organizer(s) / Promoter(s)" : "Promoter(s)");
-  }
-  if (!record.proposedAddress) missing.push("Address");
-  if (!record.city) missing.push("City");
-  if (!record.country) missing.push("Country");
-  if (!(record.telephone || record.phone)) missing.push("Phone");
-  if (!record.email) missing.push("Email");
-  if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
-  if (/comedy/i.test(record.proposedType || "") || daytime) {
-    if (!record.proposedDate) missing.push("Date");
-    if (!record.proposedTime) missing.push("Time");
-  }
-  return missing;
+  return gatesCore.missingDatapoints(record, {
+    publishingRules: crawlContext.publishingRules,
+    ...crawlContext.importGates
+  });
 }
 
 function contactFieldSnapshot(record = {}) {
@@ -522,13 +672,13 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
   };
   Object.assign(record, venueDatapoints.enrichVenueRecord(record, {html, text: visibleText}));
   if (!record.email) record.email = extractEmail(visibleText) || extractEmail(html);
-  record.missingDatapoints = missingDatapoints(record);
-  record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  Object.assign(record, stampDiscoveryClassification(record));
   record.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
   return record;
 }
 
 async function crawlPublicEventSources(criteria = {}) {
+  await beginCrawlContext();
   const sources = await db.collection("aiDiscoverySources").where("enabled", "==", true).get();
   const discovered = [];
   for (const doc of sources.docs) {
@@ -548,11 +698,13 @@ async function crawlPublicEventSources(criteria = {}) {
         crawlCriteria:criteria
       };
       const enriched = await enrichRecordFromPublicWebsite(record);
-      let venue = await applyOnboardedUpdatePolicy(enriched.venue || record);
-      venue.entityKind = crawlCore.isTimedEventRecord(venue) ? "event" : "venue";
+      let venue = stampDiscoveryClassification(await applyOnboardedUpdatePolicy(enriched.venue || record));
+      rememberDuplicateCandidate(venue);
       discovered.push(venue);
       for (const child of enriched.childEvents || []) {
-        discovered.push(await applyOnboardedUpdatePolicy(child));
+        const childNext = stampDiscoveryClassification(await applyOnboardedUpdatePolicy(child));
+        rememberDuplicateCandidate(childNext);
+        discovered.push(childNext);
       }
     } catch (error) {
       console.warn(`Skipping source ${sourceUrl}:`, error.message);
@@ -685,27 +837,30 @@ function uniqueListLocal(values = []) {
 
 async function findMatchingLiveListing(record = {}) {
   const website = String(record.officialWebsite || record.website || "").trim().toLowerCase().replace(/\/$/, "");
-  const name = normalized(record.proposedTitle || record.proposedLocationName || "");
-  const city = normalized(record.city || "");
-  const country = normalized(record.country || "");
-  try {
-    const snap = await db.collection("clubLocations").limit(400).get();
-    for (const doc of snap.docs) {
-      const row = {id: doc.id, collection: "clubLocations", ...doc.data()};
-      if (String(row.status || "active") === "deleted") continue;
-      const liveWeb = String(row.officialWebsite || row.website || "").trim().toLowerCase().replace(/\/$/, "");
-      if (website && liveWeb && (website === liveWeb || website.includes(liveWeb) || liveWeb.includes(website))) {
-        return row;
-      }
-      const liveName = normalized(row.locationName || row.brandName || "");
-      const liveCity = normalized(row.city || "");
-      const liveCountry = normalized(row.country || "");
-      if (name && liveName && name === liveName && (!city || !liveCity || city === liveCity) && (!country || !liveCountry || country === liveCountry)) {
-        return row;
-      }
+  const pool = (crawlContext.duplicateUniverse || []).filter(row => row.collection === "clubLocations");
+  const scan = async () => {
+    if (pool.length) return pool;
+    try {
+      const snap = await db.collection("clubLocations").limit(800).get();
+      return snap.docs.map(doc => ({id: doc.id, collection: "clubLocations", ...doc.data()}));
+    } catch (error) {
+      console.warn("Onboarded listing lookup failed:", error.message);
+      return [];
     }
-  } catch (error) {
-    console.warn("Onboarded listing lookup failed:", error.message);
+  };
+  const rows = await scan();
+  for (const row of rows) {
+    if (String(row.status || "active") === "deleted" || row.aliasOf || row.mergedInto) continue;
+    const liveWeb = String(row.officialWebsite || row.website || "").trim().toLowerCase().replace(/\/$/, "");
+    if (website && liveWeb && (website === liveWeb || website.includes(liveWeb) || liveWeb.includes(website))) {
+      return row;
+    }
+    const same = gatesCore.sameEstablishment(record, {
+      ...row,
+      proposedLocationName: row.locationName || row.brandName,
+      proposedAddress: row.fullAddress || row.address || row.streetAddress
+    });
+    if (same.match) return row;
   }
   return null;
 }
@@ -897,8 +1052,8 @@ async function searchGooglePlaces(job, apiKey) {
       searchQuery:job.query || "",
       searchLanguage:job.language || "",
       aiSummary: daytimeJob
-        ? "Localized daytime event / market candidate from Places. Complete organizer, date/time, email, and Instagram before approval."
-        : "Localized venue discovery candidate with Places hours/summary when available. Complete DJ/artist, promoter, email, and Instagram before approval.",
+        ? "Localized daytime event / market candidate from Places. Master Admin import datapoints decide what must be filled before onboard."
+        : "Localized venue discovery candidate with Places hours/summary when available. Master Admin import datapoints decide what must be filled before onboard.",
       aiConfidenceScore:0.86,
       aiStarRating:4,
       aiRatingReasons:["Google Places structured record", "Localized market-language query", hoursStructured ? "Opening hours captured" : "Master Admin review required"],
@@ -910,15 +1065,13 @@ async function searchGooglePlaces(job, apiKey) {
     Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
     const contactBefore = contactFieldSnapshot(baseRecord);
     const enriched = await enrichRecordFromPublicWebsite(baseRecord);
-    let venue = await applyOnboardedUpdatePolicy(enriched.venue || baseRecord);
-    venue.entityKind = "venue";
-    venue.missingDatapoints = missingDatapoints(venue);
-    venue.crawlResultStatus = venue.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    let venue = stampDiscoveryClassification(await applyOnboardedUpdatePolicy(enriched.venue || baseRecord));
     venue.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
     venue.contactLift = {
       before: contactBefore,
       after: contactFieldSnapshot(venue)
     };
+    rememberDuplicateCandidate(venue);
     venue.queueDocId = crawlCore.resolveQueueDocId(venue);
     venue.legalCompliance = crawlCore.buildLegalCompliance(
       venue,
@@ -931,16 +1084,17 @@ async function searchGooglePlaces(job, apiKey) {
         latitude: child.latitude ?? venue.latitude,
         longitude: child.longitude ?? venue.longitude
       });
-      childNext.missingDatapoints = missingDatapoints(childNext);
-      childNext.crawlResultStatus = childNext.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
       childNext.lifecycleStatus = pastEvents.classifyLifecycle(childNext);
-      out.push(childNext);
+      const stampedChild = stampDiscoveryClassification(childNext);
+      rememberDuplicateCandidate(stampedChild);
+      out.push(stampedChild);
     }
   }
   return out;
 }
 
 async function discoverPlacesForCriteria(criteria = {}) {
+  if (!(crawlContext.duplicateUniverse || []).length) await beginCrawlContext();
   const apiKey = optionalPlacesKey();
   const jobs = Array.isArray(criteria.structuredPlan?.jobs) ? criteria.structuredPlan.jobs.slice(0, 25) : [];
   if (!apiKey || !jobs.length) return [];
@@ -1046,27 +1200,41 @@ async function runScheduledCrawl(scheduleDoc, now = new Date()) {
     return null;
   }
   try {
+    crawlContext.correlationId = claimId;
+    await writeCrawlLog({action: "run_start", message: `Scheduled crawl ${claimId}`, details: {slot: timing.slot}, runId: claimId});
     const records = await crawlPublicEventSources(schedule.criteria || schedule);
     for (const record of records) await writeDiscoveryQueueItem(await classifyDiscoveryRecord(record));
-    await claim.set({status:"completed", resultCount:records.length, completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    const mail = await emailAutoPublishedDigest({runId: claimId, trigger: "scheduled-crawl"});
+    await claim.set({
+      status:"completed",
+      resultCount:records.length,
+      autoPublishedCount: (crawlContext.autoPublished || []).length,
+      ignoredPastCount: crawlContext.ignoredPast || 0,
+      completedAt:admin.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    await writeCrawlLog({
+      action: "run_complete",
+      message: `Scheduled crawl wrote ${records.length} candidate(s)`,
+      details: {resultCount: records.length, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+      runId: claimId
+    });
     return records.length;
   } catch (error) {
+    await writeCrawlLog({action: "run_failed", level: "error", message: String(error.message || error), runId: claimId});
     await claim.set({status:"failed", error:String(error.message || error).slice(0, 1000), completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
     throw error;
   }
 }
 
 async function classifyDiscoveryRecord(record) {
-  const classified = {
+  const classified = stampDiscoveryClassification({
     ...record,
     aiSummary:record.aiSummary || record.proposedDescription || "",
     aiConfidenceScore:record.aiConfidenceScore || 0.76,
     aiStarRating:record.aiStarRating || 3,
     aiRatingReasons:record.aiRatingReasons || ["Extracted from configured public source URL"],
     updatedAt:admin.firestore.FieldValue.serverTimestamp()
-  };
-  classified.missingDatapoints = missingDatapoints(classified);
-  classified.crawlResultStatus = classified.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  });
   return classified;
 }
 
@@ -1088,6 +1256,17 @@ async function maybeAutoPublishRecord(record = {}, queueDocId = "") {
   };
   if (decision.route !== "AUTO_PUBLISH") {
     await db.collection("aiDiscoveryQueue").doc(queueDocId).set(patch, {merge: true});
+    await writeCrawlLog({
+      action: "auto_publish_denied",
+      level: "info",
+      message: `Queued for review: ${record.proposedTitle || queueDocId}`,
+      details: {
+        queueDocId,
+        crawlType: record.proposedType || "",
+        failures: decision.failures || [],
+        reason: decision.reason
+      }
+    });
     return {autoPublished: false, decision};
   }
   // Past dated events never auto-publish to LIVE upcoming rails.
@@ -1122,6 +1301,22 @@ async function maybeAutoPublishRecord(record = {}, queueDocId = "") {
     reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge: true});
+  const published = {
+    title: live.payload.locationName || live.payload.eventName || live.id,
+    collection: live.collection,
+    id: live.id,
+    crawlType: record.proposedType || "",
+    city: live.payload.city || "",
+    country: live.payload.country || ""
+  };
+  crawlContext.autoPublished = crawlContext.autoPublished || [];
+  crawlContext.autoPublished.push(published);
+  await writeCrawlLog({
+    action: "auto_publish",
+    level: "info",
+    message: `Auto-published ${published.title} to ${live.collection}/${live.id}`,
+    details: published
+  });
   return {autoPublished: true, decision, live};
 }
 
@@ -1132,6 +1327,21 @@ async function writeDiscoveryQueueItem(record) {
     collectedAtIso,
     collectedAtLabel: record.collectedAtLabel || collectedAtIso
   }, record.crawlerDateSource || (record.eventStartIso ? "schema.org/crawl" : "places-or-undated"));
+  if (crawlContext.pastEventPolicy?.ignoreOnCrawl !== 0
+    && pastEvents.classifyLifecycle(stamped) === "past") {
+    crawlContext.ignoredPast = (crawlContext.ignoredPast || 0) + 1;
+    await writeCrawlLog({
+      action: "past_event_ignored",
+      level: "info",
+      message: `Ignored past event ${stamped.proposedTitle || stamped.eventStartIso || "untitled"}`,
+      details: {
+        eventStartIso: stamped.eventStartIso || stamped.proposedDate || "",
+        city: stamped.city || "",
+        crawlType: stamped.proposedType || ""
+      }
+    });
+    return "";
+  }
   const docId = crawlCore.resolveQueueDocId(stamped);
   const ref = db.collection("aiDiscoveryQueue").doc(docId);
   const existingSnap = await ref.get();
@@ -1474,23 +1684,38 @@ async function uploadEnhancedGeminiImage({bucket, outputPath, buffer, contentTyp
   return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(outputPath)}?alt=media&token=${encodeURIComponent(token)}`;
 }
 
-exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", timeZone:"UTC", region:"us-central1", secrets:[GOOGLE_PLACES_API_KEY]}, async () => {
+exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", timeZone:"UTC", region:"us-central1", secrets:[GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY]}, async () => {
   const schedules = await db.collection("aiCrawlerSchedules").where("enabled", "==", true).get();
   for (const schedule of schedules.docs) await runScheduledCrawl(schedule);
   return null;
 });
 
-/** Daily: mark past dated events, then soft-retire ones older than 14 days from public rails. */
+/** Daily: mark past dated events, retire, then remove from FLOQR after the publishing-rule window. */
 exports.scheduledRetirePastCrawledEvents = onSchedule({
   schedule: "every 24 hours",
   timeZone: "UTC",
   region: "us-central1"
 }, async () => {
-  // Keep recent past on public pastEvents rails; only retire after 14 days.
+  await beginCrawlContext();
+  const policy = crawlContext.pastEventPolicy || gatesCore.DEFAULT_PAST_EVENT_POLICY;
   await pastEvents.markPastInCollection(db, "events", {limit: 400});
   await pastEvents.markPastInCollection(db, "aiDiscoveryQueue", {limit: 400});
-  await pastEvents.retirePastCrawledEvents(db, {mode: "retire", olderThanHours: 14 * 24, limit: 400});
-  return null;
+  const retired = await pastEvents.retirePastCrawledEvents(db, {
+    mode: "retire",
+    olderThanHours: Math.max(0, Number(policy.retireAfterDays || 0)) * 24,
+    limit: 400
+  });
+  const removed = await pastEvents.retirePastCrawledEvents(db, {
+    mode: "remove",
+    olderThanHours: Math.max(0, Number(policy.removeAfterDays || 14)) * 24,
+    limit: 400
+  });
+  await writeCrawlLog({
+    action: "past_event_cleaned",
+    message: `Past events retired ${retired.retired || 0}, removed ${removed.removed || 0}`,
+    details: {retired, removed, policy}
+  });
+  return {retired, removed};
 });
 
 /**
@@ -1507,6 +1732,13 @@ exports.retirePastCrawledEvents = onCall({region: "us-central1"}, async request 
     olderThanHours,
     limit: Math.max(1, Math.min(500, Number(request.data?.limit || 300)))
   });
+  await writeCrawlLog({
+    action: "past_event_cleaned",
+    message: `Master Admin ${mode} past events`,
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    details: {mode, olderThanHours, ...summary}
+  });
   return {ok: true, ...summary};
 });
 
@@ -1519,11 +1751,20 @@ exports.previewDiscoveryAutoApprove = onCall({region: "us-central1"}, async requ
 
 exports.runFloqrDiscoveryCrawl = onCall({
   region:"us-central1",
-  secrets:[GOOGLE_PLACES_API_KEY],
+  secrets:[GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY],
   timeoutSeconds:240,
   memory:"512MiB"
 }, async request => {
   await assertMasterAdmin(request);
+  await beginCrawlContext();
+  crawlContext.correlationId = String(request.data?.runId || `manual_${Date.now()}`);
+  await writeCrawlLog({
+    action: "run_start",
+    message: "Manual discovery crawl started",
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: crawlContext.correlationId
+  });
   const criteria = request.data?.criteria || {};
   const structuredPlan = request.data?.structuredPlan || criteria.structuredPlan || {};
   const runId = String(request.data?.runId || "");
@@ -1541,13 +1782,25 @@ exports.runFloqrDiscoveryCrawl = onCall({
     // Strip ephemeral lift object before write (kept only in response stats).
     delete classified.contactLift;
     await writeDiscoveryQueueItem(classified);
+    rememberDuplicateCandidate({...classified, collection: "aiDiscoveryQueue"});
     created += 1;
   }
   const contactStats = summarizeContactLift(liftRows);
+  const mail = await emailAutoPublishedDigest({runId: crawlContext.correlationId, trigger: "manual-crawl"});
+  await writeCrawlLog({
+    action: "run_complete",
+    message: `Manual crawl wrote ${created} candidate(s)`,
+    details: {created, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: crawlContext.correlationId
+  });
   return {
     created,
     placesConfigured: !!optionalPlacesKey(),
     ticketmaster: "later",
+    autoPublishedCount: (crawlContext.autoPublished || []).length,
+    ignoredPastCount: crawlContext.ignoredPast || 0,
     contactStats,
     message: created
       ? `Discovery crawl wrote ${created} Google Places candidate(s). Contact-complete ${contactStats.contactCompleteBeforePct}% → ${contactStats.contactCompleteAfterPct}% after website enrich.`
@@ -1563,7 +1816,7 @@ exports.runFloqrDiscoveryCrawl = onCall({
  */
 exports.runInstantDiscoveryCrawl = onCall({
   region: "us-central1",
-  secrets: [GOOGLE_PLACES_API_KEY],
+  secrets: [GOOGLE_PLACES_API_KEY, SENDGRID_API_KEY],
   timeoutSeconds: 300,
   memory: "512MiB"
 }, async request => {
@@ -1580,6 +1833,7 @@ exports.runInstantDiscoveryCrawl = onCall({
   structuredPlan = {...structuredPlan, jobs, jobCount: jobs.length};
   criteria.structuredPlan = structuredPlan;
 
+  await beginCrawlContext();
   const runRef = db.collection("aiCrawlRuns").doc();
   await runRef.set({
     trigger: "instant",
@@ -1591,6 +1845,14 @@ exports.runInstantDiscoveryCrawl = onCall({
     requestedByUid: request.auth?.uid || "",
     requestedByEmail: String(request.auth?.token?.email || ""),
     startedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  crawlContext.correlationId = runRef.id;
+  await writeCrawlLog({
+    action: "run_start",
+    message: "Instant crawl started",
+    uid: request.auth?.uid || "system",
+    email: String(request.auth?.token?.email || ""),
+    runId: runRef.id
   });
 
   try {
@@ -1619,6 +1881,7 @@ exports.runInstantDiscoveryCrawl = onCall({
       });
       delete classified.contactLift;
       await writeDiscoveryQueueItem(classified);
+      rememberDuplicateCandidate({...classified, collection: "aiDiscoveryQueue"});
       created += 1;
     }
     const contactStats = summarizeContactLift(liftRows);
@@ -1627,6 +1890,7 @@ exports.runInstantDiscoveryCrawl = onCall({
       : (optionalPlacesKey()
         ? `Instant crawl found no Places matches for ${jobs.length} job(s). Broaden the saved schedule.`
         : "GOOGLE_PLACES_API_KEY is not configured.");
+    const mail = await emailAutoPublishedDigest({runId: runRef.id, trigger: "instant-crawl"});
     await runRef.set({
       status: "completed",
       createdRecordCount: created,
@@ -1634,11 +1898,21 @@ exports.runInstantDiscoveryCrawl = onCall({
       jobLimit,
       jobsAttempted: jobs.length,
       contactStats,
+      autoPublishedCount: (crawlContext.autoPublished || []).length,
+      ignoredPastCount: crawlContext.ignoredPast || 0,
       placesConfigured: !!optionalPlacesKey(),
       completedAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       note: message
     }, {merge: true});
+    await writeCrawlLog({
+      action: "run_complete",
+      message,
+      details: {created, autoPublished: (crawlContext.autoPublished || []).length, ignoredPast: crawlContext.ignoredPast || 0, mail},
+      uid: request.auth?.uid || "system",
+      email: String(request.auth?.token?.email || ""),
+      runId: runRef.id
+    });
     return {
       created,
       runId: runRef.id,
@@ -1655,6 +1929,14 @@ exports.runInstantDiscoveryCrawl = onCall({
       message
     };
   } catch (error) {
+    await writeCrawlLog({
+      action: "run_failed",
+      level: "error",
+      message: String(error?.message || error),
+      uid: request.auth?.uid || "system",
+      email: String(request.auth?.token?.email || ""),
+      runId: runRef.id
+    });
     await runRef.set({
       status: "failed",
       error: String(error?.message || error).slice(0, 1000),
@@ -2280,6 +2562,78 @@ exports.aiSuggestGrammarCorrection = onCall({
     };
   } catch (error) {
     console.warn("Gemini grammar correction fallback:", error.message);
+    return fallback;
+  }
+});
+
+const PLACE_NAME_ALIASES = {
+  barclona: "Barcelona",
+  barcelone: "Barcelona",
+  barcellona: "Barcelona",
+  espana: "Spain",
+  "españa": "Spain",
+  lisboa: "Lisbon",
+  milano: "Milan",
+  roma: "Rome",
+  "nueva york": "New York",
+  "ciudad de mexico": "Mexico City",
+  cdmx: "Mexico City",
+  munchen: "Munich"
+};
+
+function fallbackPlaceNames(tokens = []) {
+  return (Array.isArray(tokens) ? tokens : []).slice(0, 8).map(raw => {
+    const input = clampText(raw, 80);
+    const key = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    const suggestion = PLACE_NAME_ALIASES[key] || "";
+    return {
+      input,
+      suggestion: suggestion || input,
+      kind: suggestion ? "place" : "unknown",
+      confidence: suggestion ? 0.9 : 0.2,
+      source: suggestion ? "local-alias" : "local-fallback"
+    };
+  }).filter(item => item.input);
+}
+
+exports.aiSuggestPlaceNames = onCall({
+  region:"us-central1",
+  secrets:[GEMINI_API_KEY],
+  timeoutSeconds:20,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const tokens = Array.isArray(request.data?.tokens) ? request.data.tokens : [];
+  const fallback = {places: fallbackPlaceNames(tokens), provider:"local-fallback"};
+  if (!optionalGeminiSecretValue()) return fallback;
+  const names = tokens.map(value => clampText(value, 80)).filter(Boolean).slice(0, 8);
+  if (!names.length) return fallback;
+  const prompt = [
+    "You are FLOQR helping a signed-in patron spell city or country names for travel profile fields.",
+    "Return only JSON with key places: an array of {input, suggestion, kind, confidence}.",
+    "kind must be city or country. suggestion is the canonical English place name (Barcelona, Spain, Mexico City).",
+    "If the input is already a real city or country, suggestion equals the canonical spelling.",
+    "Do not invent neighborhoods, venues, or people. Do not translate FLOQR, ShoutOut, Mingl, or VIP reserV.",
+    "This draft is private and must not be indexed.",
+    `Preferred language: ${clampText(request.data?.preferredLanguage || "auto", 8)}`,
+    `Tokens: ${JSON.stringify(names)}`
+  ].join("\n");
+  try {
+    const json = await callGeminiJson(prompt, "Place name spelling");
+    const places = Array.isArray(json?.places) ? json.places.slice(0, 8).map(item => ({
+      input: clampText(item?.input || "", 80),
+      suggestion: clampText(item?.suggestion || item?.name || "", 80),
+      kind: /country/i.test(item?.kind || "") ? "country" : "city",
+      confidence: Math.max(0, Math.min(Number(item?.confidence || 0.7), 1)),
+      source: "gemini"
+    })).filter(item => item.input && item.suggestion) : fallback.places;
+    return {
+      places: places.length ? places : fallback.places,
+      provider: places.length ? "gemini" : "local-fallback",
+      model: GEMINI_TEXT_MODEL
+    };
+  } catch (error) {
+    console.warn("Gemini place-name fallback:", error.message);
     return fallback;
   }
 });

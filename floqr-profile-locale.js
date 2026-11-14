@@ -7,9 +7,36 @@
   "use strict";
 
   const US_NAMES = new Set([
-    "us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "america"
+    "us", "usa", "u.s", "u.s.", "u.s.a", "u.s.a.", "u s", "u s a",
+    "united states", "united states of america", "the united states", "the usa", "america"
   ]);
   const CA_NAMES = new Set(["ca", "can", "canada"]);
+  const ES_NAMES = new Set(["es", "esp", "spain", "espana", "españa", "mexico", "méxico"]);
+  const DE_NAMES = new Set(["de", "deu", "germany", "deutschland"]);
+  const TR_NAMES = new Set(["tr", "tur", "turkey", "turkiye", "türkiye"]);
+  const AE_NAMES = new Set(["ae", "are", "uae", "dubai", "united arab emirates", "the united arab emirates"]);
+  /** Unambiguous IP/profile country → site language. Gulf AE is a prompt (Arabic vs English), not auto-Arabic. */
+  const LANG_BY_COUNTRY = {
+    es: ["ES", "MX", "AR", "CO", "CL", "PE", "VE", "EC", "GT", "CU", "BO", "DO", "HN", "PY", "SV", "NI", "CR", "PA", "UY", "GQ", "PR"],
+    fr: ["FR", "MC", "SN", "CI", "ML", "HT", "NE", "BF", "BJ", "TG", "GA", "CG", "CD", "GN", "CM"],
+    de: ["DE", "AT", "LI"],
+    it: ["IT", "SM", "VA"],
+    pt: ["PT", "BR", "AO", "MZ", "CV", "GW", "ST", "TL"],
+    nl: ["NL", "SR", "AW", "CW"],
+    el: ["GR", "CY"],
+    pl: ["PL"],
+    ru: ["RU", "BY"],
+    ar: ["SA", "EG", "MA", "DZ", "TN", "IQ", "JO", "LB", "OM", "YE", "LY", "SD", "SY", "PS"],
+    en: ["US", "GB", "AU", "NZ", "IE", "NG", "GH", "KE", "JM", "TT", "BB", "BS", "BZ", "GY", "ZA"]
+  };
+  /** Ask the patron which language to use (do not auto-pick). Dubai / UAE → Arabic or English. */
+  const LANGUAGE_PROMPT_COUNTRIES = {
+    AE: {codes: ["ar", "en"], region: "uae"}
+  };
+  const COUNTRY_TO_LANG = Object.create(null);
+  Object.keys(LANG_BY_COUNTRY).forEach(lang => {
+    LANG_BY_COUNTRY[lang].forEach(cc => { COUNTRY_TO_LANG[cc] = lang; });
+  });
   const ZIP_RE = /^\d{5}(?:-\d{4})?$/;
   const CA_POSTAL_RE = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
   const OTHER_POSTAL_RE = /^[A-Z0-9][A-Z0-9 \-]{1,11}$/i;
@@ -38,12 +65,32 @@
     return text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
 
+  const NAME_TO_CC = {
+    france: "FR", frankreich: "FR", francia: "FR",
+    italy: "IT", italia: "IT", italien: "IT",
+    portugal: "PT", brazil: "BR", brasil: "BR",
+    netherlands: "NL", holland: "NL", nederland: "NL",
+    greece: "GR", ellada: "GR",
+    poland: "PL", polska: "PL",
+    russia: "RU",
+    egypt: "EG", morocco: "MA", "saudi arabia": "SA",
+    "united kingdom": "GB", uk: "GB", england: "GB", britain: "GB"
+  };
+
   function countryCodeOf(value) {
     const raw = text(value).toUpperCase();
     if (/^[A-Z]{2}$/.test(raw)) return raw;
+    const fromCatalog = root?.FLOQRGeoCatalog?.countryCodeOf?.(value);
+    if (fromCatalog) return fromCatalog;
     const name = keyCountry(value);
-    if (US_NAMES.has(name)) return "US";
+    const compact = name.replace(/[^a-z]/g, "");
+    if (US_NAMES.has(name) || compact === "us" || compact === "usa" || compact === "unitedstates" || compact === "unitedstatesofamerica") return "US";
     if (CA_NAMES.has(name)) return "CA";
+    if (ES_NAMES.has(name)) return name === "mexico" || name === "méxico" ? "MX" : "ES";
+    if (DE_NAMES.has(name)) return "DE";
+    if (TR_NAMES.has(name)) return "TR";
+    if (AE_NAMES.has(name)) return "AE";
+    if (NAME_TO_CC[name]) return NAME_TO_CC[name];
     return "";
   }
 
@@ -58,10 +105,10 @@
   function usesFeetInches(input = {}) {
     const profileRaw = text(input.country || input.profileCountry);
     const profile = countryCodeOf(profileRaw);
-    if (profile) return profile === "US" || profile === "CA";
+    if (profile) return profile === "US";
     if (profileRaw) return false;
     const ip = countryCodeOf(input.ipCountry || input.ipCountryCode);
-    return ip === "US" || ip === "CA";
+    return ip === "US";
   }
 
   function usesZip(input = {}) {
@@ -76,6 +123,52 @@
   function preferredHeightUnit(input) {
     if (typeof input === "string") return usesFeetInches({country: input}) ? "ft" : "m";
     return usesFeetInches(input || {}) ? "ft" : "m";
+  }
+
+  function languageFromCountryCode(value) {
+    const code = countryCodeOf(value) || text(value).toUpperCase();
+    if (/^[A-Z]{2}$/.test(code) && COUNTRY_TO_LANG[code]) return COUNTRY_TO_LANG[code];
+    return "";
+  }
+
+  function resolvedCountryCode(input = {}) {
+    const profileRaw = text(input.country || input.profileCountry);
+    const profile = countryCodeOf(profileRaw);
+    if (profile) return profile;
+    const ip = countryCodeOf(input.ipCountry || input.ipCountryCode) || text(input.ipCountryCode).toUpperCase();
+    return /^[A-Z]{2}$/.test(ip) ? ip : "";
+  }
+
+  /**
+   * How a new patron's site language is chosen.
+   * Unambiguous countries auto-map (Germany → de, Spain → es). Turkey stays on the browser until a Turkish pack ships.
+   * Dubai / UAE prompts Arabic vs English. Mixed CA/BE/CH fall through to the browser.
+   * IP is never stored.
+   */
+  function languagePlan(input = {}) {
+    const countryCode = resolvedCountryCode(input);
+    const prompt = countryCode && LANGUAGE_PROMPT_COUNTRIES[countryCode];
+    if (prompt) return {mode: "prompt", countryCode, codes: prompt.codes.slice(), region: prompt.region};
+    const code = languageFromCountryCode(countryCode);
+    if (code) return {mode: "auto", code, countryCode, codes: [code]};
+    return {mode: "none", code: "", countryCode, codes: []};
+  }
+
+  /**
+   * Site + Preferred Language default for a new patron (auto countries only).
+   * Dubai/UAE returns "" so the UI can ask Arabic vs English.
+   */
+  function preferredUiLanguage(input = {}) {
+    const plan = languagePlan(input);
+    return plan.mode === "auto" ? plan.code : "";
+  }
+
+  function isNewLanguageUser(profile = {}, stored) {
+    const saved = text(stored);
+    if (saved) return false;
+    if (text(profile.uiLanguage) || text(profile.preferredLanguage) || text(profile.languageSettings?.preferredLanguage)) return false;
+    if (profile.profileCompleted || profile.createdAt) return false;
+    return true;
   }
 
   function normalizeHeightUnit(unit) {
@@ -232,26 +325,37 @@
     return {ok: true, normalized: value};
   }
 
+  function regionRequired(locale = {}) {
+    const iso = countryCodeOf(locale.country || locale.profileCountry)
+      || countryCodeOf(locale.ipCountryCode || locale.ipCountry);
+    const list = root?.FLOQRGeoCatalog?.subdivisionsOf?.(iso) || [];
+    return list.length > 0;
+  }
+
   function validatePickupParts(parts = {}, locale = {}) {
     const zipMode = usesZip(locale);
     const streetNumber = validateStreetNumber(parts.streetNumber);
     const streetName = text(parts.streetName);
     const city = text(parts.city);
+    const region = text(parts.regionCode || parts.region);
     const postal = validatePostal(parts.postalCode, zipMode);
-    const missing = !streetNumber.ok || !streetName || !city || !postal.ok;
+    const needRegion = regionRequired(locale);
+    const missing = !streetNumber.ok || !streetName || !city || !postal.ok || (needRegion && !region);
     if (missing) {
       return {
         ok: false,
         usesZip: zipMode,
         error: !postal.ok && text(parts.postalCode)
           ? postal.error
-          : t("portal.pickup.addressIncomplete", "Enter street number, street name, city, and ZIP or postal code.")
+          : t("portal.pickup.addressIncomplete", "Enter street number, street name, city, state or province, and ZIP or postal code.")
       };
     }
     const composed = composePickupAddress({
       streetNumber: streetNumber.normalized,
       streetName,
       city,
+      region,
+      regionCode: text(parts.regionCode),
       postalCode: postal.normalized
     });
     return {
@@ -261,6 +365,8 @@
         streetNumber: streetNumber.normalized,
         streetName,
         city,
+        region,
+        regionCode: text(parts.regionCode) || region,
         postalCode: postal.normalized,
         postalKind: postal.kind
       },
@@ -270,12 +376,18 @@
 
   function composePickupAddress(parts = {}) {
     const line = [text(parts.streetNumber), text(parts.streetName)].filter(Boolean).join(" ");
-    return [line, text(parts.city), text(parts.postalCode)].filter(Boolean).join(", ");
+    const region = text(parts.regionCode || parts.region);
+    const postal = text(parts.postalCode);
+    const city = text(parts.city);
+    if (region && postal) {
+      return [line, [city, [region, postal].filter(Boolean).join(" ")].filter(Boolean).join(", ")].filter(Boolean).join(", ");
+    }
+    return [line, [city, region].filter(Boolean).join(", "), postal].filter(Boolean).join(", ");
   }
 
   function splitPickupAddress(raw) {
     const value = text(raw);
-    if (!value) return {streetNumber: "", streetName: "", city: "", postalCode: ""};
+    if (!value) return {streetNumber: "", streetName: "", city: "", region: "", postalCode: ""};
     const chunks = value.split(",").map(part => part.trim()).filter(Boolean);
     const first = chunks.shift() || "";
     const numberMatch = first.match(/^(\d+[A-Za-z]?(?:-\d+[A-Za-z]?)?)\s+(.*)$/);
@@ -283,6 +395,7 @@
     const streetName = numberMatch ? numberMatch[2] : first;
     let postalCode = "";
     let city = chunks.join(", ");
+    let region = "";
     if (chunks.length) {
       const last = chunks[chunks.length - 1];
       const zipMatch = last.match(/(\d{5}(?:-\d{4})?)\s*$/);
@@ -290,7 +403,14 @@
       const generic = last.match(/\b([A-Z0-9][A-Z0-9 \-]{2,11})\s*$/i);
       if (zipMatch) {
         postalCode = zipMatch[1];
-        city = [chunks.slice(0, -1).join(", "), last.slice(0, zipMatch.index).replace(/[,\s]+$/, "")].filter(Boolean).join(", ");
+        const leftover = last.slice(0, zipMatch.index).replace(/[,\s]+$/, "").trim();
+        const prior = chunks.slice(0, -1);
+        if (/^[A-Z]{2}$/.test(leftover) && prior.length) {
+          region = leftover;
+          city = prior.join(", ");
+        } else {
+          city = [prior.join(", "), leftover].filter(Boolean).join(", ");
+        }
       } else if (postalMatch) {
         postalCode = postalMatch[1].toUpperCase();
         city = [chunks.slice(0, -1).join(", "), last.slice(0, postalMatch.index).replace(/[,\s]+$/, "")].filter(Boolean).join(", ");
@@ -299,7 +419,7 @@
         city = chunks.slice(0, -1).join(", ");
       }
     }
-    return {streetNumber, streetName, city, postalCode};
+    return {streetNumber, streetName, city, region, postalCode};
   }
 
   function pickupFromProfile(profile = {}) {
@@ -307,6 +427,8 @@
       streetNumber: text(profile.taxiStreetNumber),
       streetName: text(profile.taxiStreetName),
       city: text(profile.taxiCity || profile.city),
+      region: text(profile.taxiRegion || profile.region),
+      regionCode: text(profile.taxiRegionCode || profile.regionCode),
       postalCode: text(profile.taxiPostalCode)
     };
     if (structured.streetNumber || structured.streetName) return structured;
@@ -450,12 +572,16 @@
         return result;
       },
       syncPlaceholder,
-      setLocale(next) {
-        if (unitEl.dataset.userSelected) {
+      setLocale(next, opts = {}) {
+        const loc = next || locale();
+        const countryRaw = text(loc.country || loc.profileCountry);
+        // Country typing always drives the default (US → ft, else m).
+        // Skip only a late IP lookup after the patron already picked a unit with no country yet.
+        if (!opts.fromCountry && unitEl.dataset.userSelected && !countryRaw) {
           syncPlaceholder();
           return;
         }
-        const nextUnit = preferredHeightUnit(next || locale());
+        const nextUnit = preferredHeightUnit(loc);
         const prevUnit = normalizeHeightUnit(unitEl.value);
         if (prevUnit && nextUnit && prevUnit !== nextUnit && text(heightEl.value)) {
           const converted = convertHeight(heightEl.value, prevUnit, nextUnit);
@@ -484,6 +610,8 @@
     const numberEl = byId(ids.streetNumber);
     const nameEl = byId(ids.streetName);
     const cityEl = byId(ids.city);
+    const regionEl = ids.region ? byId(ids.region) : null;
+    const regionTextEl = ids.regionText ? byId(ids.regionText) : null;
     const postalEl = byId(ids.postal);
     const composedEl = ids.composed ? byId(ids.composed) : null;
     const labelEl = ids.postalLabel ? byId(ids.postalLabel) : (postalEl?.previousElementSibling || null);
@@ -500,11 +628,25 @@
       applyPostalLabel(labelEl, postalEl, usesZip(locale()));
     }
 
+    function readRegion() {
+      if (regionEl && !regionEl.hidden && regionEl.options && regionEl.options.length) {
+        const code = text(regionEl.value);
+        const iso = countryCodeOf(locale().country || locale().profileCountry);
+        const hit = root?.FLOQRGeoCatalog?.regionOf?.(iso, code);
+        return {regionCode: code, region: hit ? hit[1] : code};
+      }
+      const typed = text(regionTextEl?.value);
+      return {regionCode: "", region: typed};
+    }
+
     function read() {
+      const region = readRegion();
       return {
         streetNumber: numberEl.value,
         streetName: nameEl.value,
         city: cityEl.value,
+        region: region.region,
+        regionCode: region.regionCode,
         postalCode: postalEl.value
       };
     }
@@ -514,6 +656,8 @@
         streetNumber: text(parts.streetNumber),
         streetName: text(parts.streetName),
         city: text(parts.city),
+        region: text(parts.region || parts.regionCode),
+        regionCode: text(parts.regionCode),
         postalCode: text(parts.postalCode)
       };
       if (!next.streetNumber && !next.streetName && parts.address) {
@@ -523,45 +667,56 @@
       nameEl.value = next.streetName;
       cityEl.value = next.city;
       postalEl.value = next.postalCode;
+      const iso = countryCodeOf(locale().country || locale().profileCountry);
+      if (regionEl && regionEl.options && regionEl.options.length) {
+        const hit = root?.FLOQRGeoCatalog?.regionOf?.(iso, next.regionCode || next.region);
+        regionEl.value = hit ? hit[0] : "";
+      }
+      if (regionTextEl && (regionTextEl.hidden === false || regionEl?.hidden)) {
+        regionTextEl.value = next.region || next.regionCode;
+      }
       if (composedEl) composedEl.value = composePickupAddress(next);
     }
 
     function validate(required) {
       paintPostal();
-      const result = validatePickupParts(read(), locale());
-      if (!required && !text(numberEl.value) && !text(nameEl.value) && !text(postalEl.value) && !text(cityEl.value)) {
+      const snapshot = read();
+      const blank = !text(numberEl.value) && !text(nameEl.value) && !text(postalEl.value) && !text(cityEl.value)
+        && !text(snapshot.region) && !text(snapshot.regionCode);
+      const result = validatePickupParts(snapshot, locale());
+      if (!required && blank) {
         setHint(hintEl, "", false);
         if (composedEl) composedEl.value = "";
-        return {ok: true, empty: true, composed: "", parts: read()};
+        return {ok: true, empty: true, composed: "", parts: snapshot};
       }
       setHint(hintEl, result.ok ? "" : result.error, !result.ok);
-      if (composedEl) composedEl.value = result.ok ? result.composed : composePickupAddress(read());
+      if (composedEl) composedEl.value = result.ok ? result.composed : composePickupAddress(snapshot);
       return result;
     }
 
-    [numberEl, nameEl, cityEl, postalEl].forEach(el => {
+    [numberEl, nameEl, cityEl, postalEl, regionEl, regionTextEl].filter(Boolean).forEach(el => {
       el.addEventListener("input", () => validate(false));
+      el.addEventListener("change", () => validate(false));
       el.addEventListener("blur", () => validate(false));
     });
-    const citySource = typeof ids.citySource === "string" ? byId(ids.citySource) : ids.citySource;
-    if (citySource) {
-      citySource.addEventListener("input", () => {
-        copyCityIfEmpty(cityEl, citySource);
-        validate(false);
-      });
-      copyCityIfEmpty(cityEl, citySource);
-    }
     paintPostal();
 
     return {validate, read, fill, paintPostal};
   }
 
   return {
+    countryCodeOf,
     isUnitedStates,
     isCanada,
     usesFeetInches,
     usesZip,
     preferredHeightUnit,
+    preferredUiLanguage,
+    languagePlan,
+    languageFromCountryCode,
+    isNewLanguageUser,
+    LANG_BY_COUNTRY,
+    LANGUAGE_PROMPT_COUNTRIES,
     normalizeHeightUnit,
     validateHeight,
     convertHeight,

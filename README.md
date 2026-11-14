@@ -1,6 +1,12 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.014 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.019 (stable)
 
-- s3.3.014: PHILA retire + Master Admin 5-min rollup + BOT DEE chat-only
+- s3.3.019: AI crawl publishing rules, CSV import/export, past-event cleanup, crawl diagnostics
+- s3.3.018: AI crawl Import datapoints, duplicate establishment check, club vs event
+- s3.3.017: VCC queue links, FloqCAST label, AI crawl KPI jump, IP language, Prior/Future travel, nights/splash/handle
+- s3.3.016: Site chrome applies on Back to Search and login without a manual refresh
+- s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
+- s3.3.014: Profile country dropdown + PHILA retire + Master Admin 5-min rollup + BOT DEE chat-only
+- s3.3.013: United States height defaults to ft; every other country defaults to m
 - s3.2.29: PC Search composition centered (logo + Search + icons).
 - s3.2.28: Template Description / How it works / Tag labels; Club Admin club-owned tags.
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)

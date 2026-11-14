@@ -12,6 +12,14 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## GDPR data residency (security compliance — not migrated yet)
+
+Owner requirement: **EU / EEA / UK patron PII must live on European Firebase/Firestore hosting** (GDPR). Live today is **`us-central1` only** — that is not the compliance end state. **Middle East location is undecided** (do not invent `me-central1` / `me-west1` / Europe). Do not run the split until the owner schedules it. Do not persist client IP. New PII stores must stay movable in-region.
+
+Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`. Technical Bible §1.16 / §11.3.
+
+---
+
 ## Height unit + RydR pickup locale (s3.3.012)
 
 Unit-first height and structured taxi pickup. Profile country wins; if empty, IP country (never stored) from `FLOQRGeoSearch.ipLocation`.
@@ -19,12 +27,60 @@ Unit-first height and structured taxi pickup. Profile country wins; if empty, IP
 | Piece | Wiring |
 |---|---|
 | Module | `floqr-profile-locale.js` (`window.FLOQRProfileLocale`) — `bindHeightFields`, `bindPickupFields`, `validateHeight`, `usesZip` |
-| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. US/Canada default ft; other countries / non-US IP default m. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
-| Pickup | Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Composed `taxiPickupAddress` for RydR/commerce. Private on `users/{uid}` — not a Mingl public datapoint |
+| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. **United States defaults to ft.** Every other country (including Canada) and a non-US IP default to **m**. Typing the country field applies that default. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
+| Pickup | Street #, street name, city, state/province (featured countries), ZIP (US resident) or postal (Canada / other / non-US IP). Composed `taxiPickupAddress` for RydR/commerce. Private on `users/{uid}` — not a Mingl public datapoint |
 | Surfaces | Search welcome (`index.html`), My Profile (`patron-portal.html`), RydR (`pickup.html`) |
-| Data | `users.taxiStreetNumber` / `taxiStreetName` / `taxiCity` / `taxiPostalCode` / `taxiPostalKind` / `taxiPickupAddress` — ownMaster PII, self-write |
-| Help | `help-profile-height`, `help-taxi-pickup-address` (patron) |
-| Tests | `functions/profile-locale.test.js` |
+| Data | `users.taxiStreetNumber` / `taxiStreetName` / `taxiCity` / `taxiRegion` / `taxiRegionCode` / `taxiPostalCode` / `taxiPostalKind` / `taxiPickupAddress` — ownMaster PII, self-write |
+| Help | `help-profile-height`, `help-profile-country`, `help-profile-mobile`, `help-taxi-pickup-address` (patron) |
+| Tests | `functions/profile-locale.test.js`, `functions/geo-catalog.test.js` |
+
+**ShoutOut nights / splash / editor + handle help (s3.3.017):** Venue cards list nights in calendar order with Oxford *and* (`Wed, Thu, Fri, and Sat`). Venue ShoutOut deep links paint `#adSplashPage` immediately (`html.floqr-shoutout-direct`) so Search never flashes blank; the 5s splash hold runs only for a paid/house creative or a Search-path (no venue yet). `showPage` always scrolls to top; Use a template focuses Message. FloqR / Mingl handle `?` sits on the label row (same as Country / Taxi), not in the input bubble — `hydrateInlineHelpButtons` swaps `button.floqr-help-popout` for the standard `details.help-popout`.
+
+**VCC Dashboard queue links + FloqCAST label (s3.3.017):** Club Admin Dashboard `#metricPendingCard` / `#metricFloqCastDashCard` call `activatePanel("panelQueue"|"panelFloqCast")` when the count is **greater than 1**. Visible product name is **FloqCAST** (chrome `admin.floqcastQueue` / `cat.floqcast`); catalog key, files, and callables stay `floqCast`.
+
+**AI Crawling publishing rules + CSV + logs (s3.3.019):** Master Admin → AI Crawling → **Publishing rule** per crawl type (`publishingRules` on `aiDiscoveryRatingCriteria/defaultNightlifeRating`). Nightclubs need Name, Genre, DJ(s), Address, City, Country, and Phone or Email; Promoter(s)/Instagram optional. Shared CSV template for sample / unpublished export / mass import. Review queue uses a real `discovery-queue-table` (not `.report-table`). Card actions are **Publish** (live) and **Save** (queue only). Publish always duplicate-checks. Past events ignored on crawl and cleaned via `retirePastCrawledEvents`. Auto-publish emails Master Admin. Categorized `appLogs` `category: aiCrawl` on Diagnostics → AI Crawling (`master-aicrawl-logging.js`). Modules: `functions/discovery-gates-core.js`, `functions/discovery-log-core.js`, `floqr-discovery-gates.js`.
+
+**AI Crawling KPI jump (s3.3.017):** Rollup cards Needs research / Approved / Pending review are buttons (`data-ai-status-filter`) that call `FLOQRAIDiscovery.jumpToStatus` → `#aiDiscoveryStatusFilter` + scroll `#aiDiscoveryQueueList`.
+
+**IP preferred language + Prior / Future travel (s3.3.017):** `FLOQRProfileLocale.languagePlan` maps country/IP to a supported site language (Spain→es, Germany→de). UAE/Dubai prompts Arabic vs English. IP is never stored. Travel Interest split into Prior Travels + Future Travel Destination with `floqr-place-suggest.js` catalog then Gemini. Help: `help-prior-travels`, `help-future-travel`. Turkish pack not added this pass.
+
+| Piece | Wiring |
+|---|---|
+| Nights | `floqr-feature-landing.js` `openDaysLabel` / `joinAndList` / `featureLanding.list.and` |
+| Splash | `index.html` early-paint script; `styles.css` `html.floqr-shoutout-direct`; `patron-app.js` `showAdSplash` |
+| Editor | `patron-app.js` `resetPageScroll` + `focusFirstEditorInput({preventScroll})` |
+| Handle help | `index.html` / `patron-portal.html` `.label-inline-row` + `help-floqr-handle`; `help-attach.js` `hydrateInlineHelpButtons` |
+| Tests | `functions/shoutout-profile-ux.test.js`, `functions/feature-landing.test.js` |
+
+**Country / mobile / taxi State (s3.3.014):** Static in-page catalog (`floqr-geo-catalog.js`) — not Firestore. Country dropdown: United States, Canada, `----`, featured nightlife markets A–Z (France, Germany, Italy, Russia, Spain, Turkey, UAE, UK), `----`, remaining countries A–Z. Featured countries ship State / Province / Region lists. Country fills mobile `(+dial)`; national digits validate to E.164 for SMS/WhatsApp. Redundant standalone City removed; Country sits above taxi; taxi includes State. Phone row is a compact `(+1)` + national input (no grid stretch).
+
+| Piece | Wiring |
+|---|---|
+| Module | `floqr-geo-catalog.js` (`window.FLOQRGeoCatalog`) — ISO2, ITU dial, NSN length, subdivisions |
+| Surfaces | `patron-portal.html` Edit Profile, Search create-profile (`index.html`), RydR `pickup.html` |
+| Client | `patron-portal-app.js` / `patron-app.js` `bind()` + E.164 save; `floqr-profile-locale.js` compose includes region |
+| Data | `users.country` (English name) + `countryCode`; `region` / `regionCode`; `phone` E.164; taxi region fields |
+| Help | `help-profile-country`, `help-profile-mobile` |
+
+**Site chrome on Back / login (s3.3.016):** Changing Site chrome then tapping **Back** (or opening login) no longer keeps the previous chrome until a manual refresh. Cross-document Back loads Search/login instead of bfcache; `floqr.isSiteChromeAt` stops `hydrateFromProfile` from restoring a stale `users/{uid}` snapshot; Search and the Welcome/login card force-repaint from localStorage.
+
+**Portal tab restore + ShoutOut editor first field (s3.3.015):** Clicking **My Profile** (and every other portal tab) writes `?tab=` + `#panelId` via `history.replaceState`, same idea as Club Admin hashes. Hard refresh on My Profile reopens My Profile instead of Overview. SessionStorage is a reload-only fallback (a fresh Search → Portal navigate still lands on Overview unless `?tab=` is set). After Throw a ShoutOut → Use a template, `goToEditor` scrolls to and focuses the first visible composer field (`#mainText` Message, or Team / jersey fields when Message is hidden).
+
+| Piece | Wiring |
+|---|---|
+| Module | `floqr-portal-tabs.js` (`window.FLOQRPortalTabs`) — `resolve` / `persistHref` |
+| Surfaces | `patron-portal.html` tabs; Search `index.html` ShoutOut editor |
+| Client | `patron-portal-app.js` `persistPortalTab` / `restorePortalTabFromUrl`; `patron-app.js` `focusFirstEditorInput` |
+| URL | `patron-portal.html?tab=profile#portalProfile` (Overview drops `tab` and uses `#portalOverview`) |
+| Tests | `functions/portal-tab-persist.test.js`, `functions/editor-first-field.test.js` |
+
+**Save Profile crash (s3.3.013):** My Profile **Save Profile** reloads the portal after the Firestore write. `renderPolicies` called `FLOQRI18n.t(key, null)`, and `t()` did `Object.keys(null)` → `Cannot convert undefined or null to object`. `t` / `tIn` now coerce non-object vars to `{}`. Portal policy helper uses `vars || {}`. A failed reload after a successful write no longer reports the save as failed.
+
+| Piece | Wiring |
+|---|---|
+| Surfaces | `patron-portal.html` → **Save Profile** (`#saveProfileBtn`) |
+| Client | `floqr-i18n.js` `interpolationVars` · `patron-portal-app.js` `saveProfile` / `renderPolicies` |
+| Tests | `functions/i18n-t-vars.test.js` |
 
 ---
 
@@ -59,7 +115,7 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 | **Client** | `master-admin-rollup.js` → `FLOQRMasterAdminRollup` — bind + load on sign-in; `paintForPanel` from `activatePanel`; Diagnostics **Refresh rollup** button |
 | **Panel behavior** | Diagnostics mount paints rollup only (Run/Refresh Diagnostics = full live scan). Duplicate Records mount paints rollup; Refresh = live 1200 scan. AI Crawling `#aiCrawlingSummary` = rollup; `#aiDiscoverySummary` keeps how-to. Commerce/templates/recs metric cards from rollup |
 | **Classification** | `floqr-data-classification.js` register + `masterAdminRollup` job collections |
-| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-data-classification.js` `?v=s3.3.013` |
+| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-discovery-gates.js` / `floqr-data-classification.js` `?v=s3.3.018` |
 | **Deploy** | Functions + Firestore rules required for live schedule/callable; Pages for client strips |
 
 ## PHILA front+back pair retired (s3.3.012)
@@ -298,12 +354,12 @@ Cache-bust: `display.css` / `display-app.js` `?v=s3.2.94`. Manual test: `s3-2-94
 |---|---|
 | Login copy | `index.html` `.login-welcome-line.help-label` → `app.welcomeSignIn` = **Please signin or signup**; left-justified with `?` (`align-self:flex-start`); **80px** under FloqR mark (`.login-card > .floqr-home-link`) |
 | Login legal | `footer.login-page-footer` — single **Privacy** link (`app.privacy` → `privacy.html`). CSS: `position:fixed; bottom:0` (+ safe-area). DNS/GPC controls remain under My Profile → My Privacy |
-| Login Site chrome | Early localStorage paint (`floqr.isSiteChrome`) + `FLOQRChromeScheme` always paints last-used chrome on login/Search (does **not** demote to Nightlife when beta access is unresolved/denied). Cross-device: `hydrateFromProfile` reads `users.isSiteChrome` after sign-in and writes localStorage. Picker UI still gated by `siteChrome` beta |
+| Login Site chrome | Early localStorage paint (`floqr.isSiteChrome`) + `FLOQRChromeScheme` always paints last-used chrome on login/Search (does **not** demote to Nightlife when beta access is unresolved/denied). Cross-device: `hydrateFromProfile` reads `users.isSiteChrome` after sign-in and writes localStorage unless a **fresh** picker write (`floqr.isSiteChromeAt`, 30 min) is newer than the cached profile. Picker UI still gated by `siteChrome` beta |
 | Login layout | `#loginActions` 2-column grid, half-height buttons; SMS/WhatsApp keep 2-line `has-sub` labels |
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
 | Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.26` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
-| Back | Site-wide compact left-justified pill: `.global-back-btn` / `.floqr-back-btn` + `nav.backShort` (`< Back`) via `applyGlobalBack`. **Never** full-bleed (`width:auto!important`; excluded from mobile `.buttonlike{width:100%}`). Follows Site chrome (WB: white fill + shiny black text + black outline). Click prefers `history.back()` with `resolveBack` href fallback. Headers: Back (left) → centered FloqR mark → page title |
+| Back | Site-wide compact left-justified pill: `.global-back-btn` / `.floqr-back-btn` + `nav.backShort` (`< Back`) via `applyGlobalBack`. **Never** full-bleed (`width:auto!important`; excluded from mobile `.buttonlike{width:100%}`). Follows Site chrome (WB: white fill + shiny black text + black outline). Same-document click uses `history.back()`; **cross-document** Back (My Profile → Search / login) follows the `searchHome()` href so early-paint reads `floqr.isSiteChrome` instead of restoring bfcache. Headers: Back (left) → centered FloqR mark → page title |
 | White/Black active controls (s3.2.52) | Active tabs/buttons stay **white fill + shiny black text** with thin **Tiffany** border (`--floqr-tiffany` / `#00d4fe` — FloqCAST T / BOT DEE). Never grey/black fill (was `--hot/--accent` both `#111` on `.admin-tab.active`). |
 | Welcome OAuth | `patron-app.js` `signInProvider`: **popup first on every device** (user tap). Never redirect-first on mobile — GitHub Pages ↔ `*.firebaseapp.com` redirect often returns null under ITP (s3.2.35 regression: “full-page sign-in did not finish”). `auth/popup-blocked` → redirect last resort; never redirect on popup-closed. Failed redirect sets `floqr.authPreferPopup` and tells the patron to allow the popup or use Email/SMS OTP. `getRedirectResult` waits briefly for `onAuthStateChanged`. Portal Google (`patron-portal-app.js`) matches: popup first. |
 | Search | `#categoryBotDeeInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryBotDeeGo.category-botdee-lens` inside `.category-botdee-field` (no full-width Search button). `.category-botdee-search` is `max-width:720px; margin:0 auto` so the desktop bar centers under the FloqR logo. Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryBotDeeSpeech` (removed) + green `.category-or` removed |
@@ -325,10 +381,10 @@ Cache-bust: `display.css` / `display-app.js` `?v=s3.2.94`. Manual test: `s3-2-94
 |---|---|
 | Feature | `featureServices/siteChrome` — Release Control Enable Feature / Enable Beta Feature (default off/test); empty `buttonIds` (no Search tile). Alias: `traditionalTheme` → `siteChrome` |
 | Access | Master Admin → Features Mgmt → **Release Control** row **Site chrome**; invite/assign `betaTesters.features.siteChrome=1` |
-| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Purple & White, `5` Black & Dark Green (+ legacy `uiChrome` string) |
+| Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Purple & White, `5` Black & Dark Green (+ legacy `uiChrome` string). Browser-only `floqr.isSiteChromeAt` (not PII, not Firestore) timestamps the last picker write so a stale profile cache cannot revert Search/login |
 | Default | `0` / Nightlife for new patrons; last-used chrome is painted from localStorage / profile even when beta access is off (login + Search). Picker UI fail-closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` / `data-floqr-theme-locked` gated) |
-| Live resync (s3.2.61) | `syncFromStorage` + listeners: `storage` (other tabs), `BroadcastChannel("floqr-chrome")`, `pageshow` / `focus` / `visibilitychange`. Soft sign-out dispatches `floqr:auth-signed-out` → force re-paint so login/Search match last-used chrome without manual refresh |
+| Live resync (s3.2.61 / s3.3.016) | `syncFromStorage` + listeners: `storage` (other tabs), `BroadcastChannel("floqr-chrome")`, `pageshow` (`force` when `persisted`) / `focus` / `visibilitychange`. Search `#categoryPage` and login `#landingPage` `showPage` force-repaint from localStorage. Soft sign-out dispatches `floqr:auth-signed-out` → force re-paint. Logout on Search stays in-document (no no-op `./` assign); logout from a satellite `replace("./")`. `hydrateFromProfile` will not clobber a picker write from the last 30 min with a stale Firestore cache |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
 | CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Traditional secondary buttons = View Club style (charcoal fill, `--floqr-tile-cyan` ink; active = thin cyan border); Black Tiffany = cyan/azure; White/Black = white surfaces + **white cards** + shiny-black outline CTAs/login (white fill, `#0a0a0a` border + ink); VIP `vip.css` also forces white `body.vip-page` under whiteBlack (overrides nightlife hero wash); Purple & White = violet/coral; Black & Dark Green = forest green |
@@ -810,7 +866,7 @@ When adding a section, use this skeleton:
 | **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Club Stripe** is ready when `stripeConnectAccounts` for the club binding has `transfersReady` (Club Admin → Stripe onboarding), not a typed `acct_` on `clubLocations`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: BOT DEE `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
 | **POS providers** | Toast / SpotOn (open tab ★) / Square / Clover / Generic — sandbox flags: Toast, SpotOn, Square, Clover. Live OAuth/webhook adapters activate when partner credentials are deployed; Connect workflow + connection codes ship now. |
 | **Club Admin** | `admin.html` → **Feature Mgmt** → **VIP reserV** (`#panelVipReserv`) — collector picker, POS connect (sandbox/live), CSV export, billing list, deposit policy, nights, check-in / cancel / block / walk-in. Help: `help-vip-club-admin`, `help-vip-deposit-settings`, `help-vip-payment-collector`. |
-| **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **floqCast** (`#panelFloqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. |
+| **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **FloqCAST** (`#panelFloqCast`, key `floqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. Dashboard Pending ShoutOuts / Pending FloqCAST link those queues when count > 1 (s3.3.017). |
 | **Master Admin** | Features Mgmt → VIP reserV Payments (`#featuresVipPayments`) — enable providers, seed catalog, network billing statements. |
 | **Per-table Firestore status** | `clubLocations/{clubLocationId}/vipNights/{night}/tables/{tableNumber}` — doc id = printed table number. Fields: `isBooked` (`"1"` / `"0"`), `isBookedYes` (`"yes"` / `"no"`), `status`, `reservationId`. **Booking-status control:** `getVipAvailability` marks a section booked only when `isBooked==="1"` (not legacy `vipInventory.isReserved` alone). Set to booked only after payment completes (Stripe fulfill, no-deposit confirm, Club POS confirm, admin walk-in with payment recorded). Cancel always clears `isBooked` to `"0"`. Rules: public read, Functions-only write. Classified as `clubLocations/vipNights`. |
 | **Hold TTL + free table** | Hold datapoints: `vipHolds.expiresAtMs`, `vipInventory.status=held` + `expiresAtMs` (30 min via `HOLD_MS`). **Not booked** while held (`isReserved:0`, `isBooked:"0"`). `expireVipHolds` scheduled every 5 min frees inventory; `getVipAvailability` lazy-expires stale held rows. Client hold banner countdown clears UI at expiry. |

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.014";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.014";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.019";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.019";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -222,6 +222,80 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.019",
+      title: "s3.3.019 — AI crawl publishing rules, CSV, past events, crawl logs",
+      checks: [
+        {label:"Publishing rule card", file:"master-admin.html", includes:["Publishing rule", "aiDiscoveryPublishType", "aiDiscoveryCsvTemplateBtn", "Clean past events now"]},
+        {label:"CSV template + diagnostics tab", file:"master-admin.html", includes:["diagnosticsAiCrawl", "master-aicrawl-logging.js"]},
+        {label:"Discovery CSV + rules", file:"functions/discovery-gates-core.js", includes:["DISCOVERY_CSV_COLUMNS", "phoneOrEmail", "defaultPublishingRules"]},
+        {label:"Crawl logs + auto-publish email", file:"functions/ai-discovery-functions.js", includes:["writeCrawlLog", "emailAutoPublishedDigest", "past_event_ignored"]},
+        {label:"Client CSV import", file:"ai-discovery-service.js", includes:["importDiscoveryCsv", "exportUnpublishedCsv", "sampleDiscoveryCsv"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-019-ai-crawl-csv-publish"]}
+      ]
+    },
+    {
+      version: "s3.3.018",
+      title: "s3.3.018 — AI crawl import datapoints, duplicates, club vs event",
+      checks: [
+        {label:"Import datapoints card", file:"master-admin.html", includes:["Import datapoints", "saveAiDiscoveryImportGatesBtn", "Possible duplicates"]},
+        {label:"Discovery gates browser mirror", file:"floqr-discovery-gates.js", includes:["FLOQRDiscoveryGates", "monaco-monte-carlo"]},
+        {label:"Server import gates", file:"functions/discovery-gates-core.js", includes:["defaultImportGates", "sameEstablishment"]},
+        {label:"Crawl stamps duplicates", file:"functions/ai-discovery-functions.js", includes:["stampDiscoveryClassification", "beginCrawlContext"]},
+        {label:"Auto-approve blocks duplicates", file:"functions/discovery-auto-approve.js", includes:["possible_duplicate"]},
+        {label:"Queue uses Master Admin ticks", file:"ai-discovery-service.js", includes:["saveImportGates", "duplicateFlag"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-018-ai-crawl-import-gates"]}
+      ]
+    },
+    {
+      version: "s3.3.017",
+      title: "s3.3.017 — Calendar nights, no blank ShoutOut splash, handle ? beside the label",
+      checks: [
+        {label:"Weekday sort + and", file:"floqr-feature-landing.js", includes:["joinAndList", "featureLanding.list.and"]},
+        {label:"Direct splash paint", file:"index.html", includes:["floqr-shoutout-direct"]},
+        {label:"Skip unpaid venue hold", file:"patron-app.js", includes:["if (ad || !venuePicked)"]},
+        {label:"Handle help on label", file:"patron-portal.html", includes:["help-floqr-handle", "label-inline-row"]},
+        {label:"Hydrate field ? buttons", file:"help-attach.js", includes:["hydrateInlineHelpButtons"]},
+        {label:"VCC queue links", file:"admin-app.js", includes:["setDashboardQueueLink", "n > 1"]},
+        {label:"FloqCAST dashboard label", file:"admin.html", includes:["Pending FloqCAST"]},
+        {label:"AI crawl KPI filters", file:"master-admin-rollup.js", includes:["data-ai-status-filter", "needsResearch"]},
+        {label:"IP preferred language", file:"floqr-profile-locale.js", includes:["languagePlan", "LANGUAGE_PROMPT_COUNTRIES"]},
+        {label:"Prior / future travel", file:"patron-portal.html", includes:["help-prior-travels", "editFutureTravel"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-017-nights-splash-handle", "s3-3-017-vcc-queue-floqcast", "s3-3-017-ai-crawl-kpi", "s3-3-017-lang-travel"]}
+      ]
+    },
+    {
+      version: "s3.3.016",
+      title: "s3.3.016 — Site chrome applies on Back to Search and on login without a manual refresh",
+      checks: [
+        {label:"Back follows href across documents", file:"floqr-nav.js", includes:["sameDocumentBackHref"]},
+        {label:"Fresh picker timestamp", file:"floqr-chrome-scheme.js", includes:["STORAGE_AT_KEY", "floqr.isSiteChromeAt"]},
+        {label:"Search/login force sync", file:"patron-app.js", includes:["landingPage", "syncFromStorage?.({force: true})"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-016-chrome-back-login"]}
+      ]
+    },
+    {
+      version: "s3.3.015",
+      title: "s3.3.015 — My Profile refresh stays on My Profile; ShoutOut editor focuses Message",
+      checks: [
+        {label:"Portal tab persist helper", file:"floqr-portal-tabs.js", includes:["persistHref", "tab=profile", "STORAGE_KEY"]},
+        {label:"Portal restore on load", file:"patron-portal-app.js", includes:["persistPortalTab", "restorePortalTabFromUrl"]},
+        {label:"Editor first field", file:"patron-app.js", includes:["focusFirstEditorInput", "firstEditorInput"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-015-portal-tab-editor-focus"]}
+      ]
+    },
+    {
+      version: "s3.3.014",
+      title: "s3.3.014 — Profile country dropdown, mobile (+dial), taxi State",
+      checks: [
+        {label:"Static geo catalog", file:"floqr-geo-catalog.js", includes:["FEATURED_HEAD", "United States", "toE164"]},
+        {label:"Profile country select", file:"patron-portal.html", includes:["editCountry", "editPhoneNational", "editTaxiRegion"]},
+        {label:"No redundant City", file:"patron-portal.html", notIncludes:["id=\"editCity\""]},
+        {label:"Search country select", file:"index.html", includes:["profileCountry", "profilePhoneNational", "profileTaxiRegion"]},
+        {label:"RydR taxi State", file:"pickup.html", includes:["pickupRegion"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-profile-geo"]}
+      ]
+    },
+    {
       version: "s3.3.014",
       title: "s3.3.014 — BOT DEE chat-only: no ? / scope; help like version; no Quick intent",
       checks: [
@@ -230,6 +304,18 @@
         {label:"Server help", file:"functions/bot-dee-core.js", includes:["function isHelpPrompt", "function helpReply"]},
         {label:"Callable local help", file:"functions/bot-dee-functions.js", includes:["isHelpPrompt(userPrompt)", "local-help"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-botdee-help-chat"]}
+      ]
+    },
+    {
+      version: "s3.3.013",
+      title: "s3.3.013 — United States height defaults to ft; other countries default to m",
+      checks: [
+        {label:"US-only ft default", file:"floqr-profile-locale.js", includes:["return profile === \"US\"", "fromCountry"]},
+        {label:"Country field drives unit Search", file:"patron-app.js", includes:["applyProfileHeightUnit({fromCountry: true})"]},
+        {label:"Country field drives unit Profile", file:"patron-portal-app.js", includes:["applyEditHeightUnit({fromCountry: true})"]},
+        {label:"Save Profile null i18n vars", file:"floqr-i18n.js", includes:["function interpolationVars(vars)"]},
+        {label:"Portal policy helper null-safe", file:"patron-portal-app.js", includes:["vars || {}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-013-save-profile"]}
       ]
     },
     {
@@ -1531,7 +1617,7 @@
       version: "s3.1.89",
       title: "Search Select follows floqCast/VIP intent",
       checks: [
-        {label:"Venue actions registry", file:"floqr-venue-actions.js", includes:["FLOQRVenueActions", "Go floqCast", "buildUrl"]},
+        {label:"Venue actions registry", file:"floqr-venue-actions.js", includes:["FLOQRVenueActions", "Go FloqCAST", "buildUrl"]},
         {label:"index loads venue-actions", file:"index.html", includes:["floqr-venue-actions.js"]},
         {label:"Listing activateListingVenue", file:"patron-app.js", includes:["activateListingVenue", "listingVenueAction"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.89\""]}
@@ -3083,6 +3169,87 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-019-ai-crawl-csv-publish",
+      area:"Master Admin",
+      feature:"AI crawl publishing rules, CSV, past events, diagnostics logs",
+      changed:"s3.3.019 — Publishing rule per crawl type (nightclub needs Name/Genre/DJ(s)/Address/City/Country and Phone or Email; Promoter and Instagram optional). Sample CSV, unpublished export, and mass import share one template. Publish always duplicate-checks. Crawler ignores past events; Clean past events now removes them from FLOQR. Auto-published listings email Master Admin. Diagnostics → AI Crawling shows categorized appLogs.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.019, sign in, AI Crawling. 2) Publishing rule: Nightclub shows Name/Genre/DJ(s)/Address/City/Country ticked; contact = Phone or Email. 3) Download sample CSV, export unpublished, re-import the sample — rows appear in Review Discovery Queue, not live, if they duplicate Jimmy'z. 4) Review Discovery Queue table shows one column per header (Country, City, Genre, Name, Type, Collected, Ready, Missing) — not a jammed single line. 5) Edit a card, tap Save — it stays unpublished. Tap Publish only when ready. 6) Diagnostics → AI Crawling shows CSV / publish families after import. 7) Clean past events now. 8) Mark Succeed/Failed.",
+      expected:"Mass CSV uses the same headers as export. The readiness table has aligned columns. Save does not go live. Publish / Onboard still require the publishing rule and no duplicate. Logs are split by family.",
+      troubleshoot:"CSV rejected → headers must match the sample exactly. Import writes to queue but not live → expected until Publish. Table columns jammed → hard-refresh admin.css; the table must use discovery-queue-table, not report-table. No auto-publish email → Functions deploy of runInstantDiscoveryCrawl with SENDGRID. Empty Diagnostics tab → Instant Crawl / CSV while signed in; Functions write category aiCrawl."
+    },
+    {
+      id:"s3-3-018-ai-crawl-import-gates",
+      area:"Master Admin",
+      feature:"AI crawl import datapoints + duplicates",
+      changed:"s3.3.018 — Master Admin ticks which discovery fields must be present before Approve / Onboard. Promoter(s) and Email are off unless ticked. Same phone, same address, or same club name flags a duplicate (Monaco = Monte Carlo). Cards show club vs event vs beach club.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.018, sign in, open AI Crawling. 2) Confirm Import datapoints: venue Name/Address/City/Country/Phone ticked; Promoter(s) and Email off. 3) Save import datapoints, then Instant Crawl Now. 4) A card missing only Promoter(s)/Email is Ready. 5) Two Jimmy'z rows (Monaco vs Monte Carlo, or same phone) show Possible duplicate and cannot Onboard selected as a new club. Live matches stay Updates only. 6) Kind line reads Club · Nightclub / Beach Club or Event · …. 7) Mark Succeed/Failed.",
+      expected:"Approve follows the ticks, not a hardcoded Promoter/Email list. Duplicates are flagged and blocked from creating a second club. Kind is club vs event.",
+      troubleshoot:"Still blocked on Promoter(s)/Email → save Import datapoints (Promoter/Email unticked) and hard-refresh ai-discovery-service.js + floqr-discovery-gates.js. Duplicate missed → Functions deploy of discovery-gates-core.js / ai-discovery-functions.js. Monaco vs Monte Carlo still two clubs → city alias monaco-monte-carlo in FLOQRDiscoveryGates."
+    },
+    {
+      id:"s3-3-017-nights-splash-handle",
+      area:"ShoutOut / My Profile",
+      feature:"Calendar nights, skip unpaid splash, handle ? beside the label",
+      changed:"s3.3.017 — Venue Nights read Wed, Thu, Fri, and Sat. Venue ShoutOut links never flash a blank Search page; the 5s splash only holds when a paid/house creative is showing. Use a template opens at Message. FloqR / Mingl handle ? sits next to the label (not in a bubble on the input).",
+      howToTest:"1) Hard-refresh Search s3.3.017. Throw a ShoutOut, pick a venue whose nights were out of order — card must list calendar order with and. 2) From a club page tap Throw a ShoutOut. Confirm no blank wash; splash is brief unless an ad creative is on screen. 3) Use a template — editor is at the top with the caret in Message. 4) My Profile → FloqR / Mingl handle: ? is beside the label, same as Taxi pickup, and tapping it opens handle rules. 5) Mark Succeed/Failed.",
+      expected:"Nights are calendar-ordered. No 5s branding hold without an ad. Editor opens on Message. Handle ? is on the label, not the right edge of @handle.",
+      troubleshoot:"Nights still wed, fri, sat, thu → hard-refresh shoutout-search.html + floqr-feature-landing.js s3.3.017. Blank page / 5s splash → index.html early-paint + patron-app.js showAdSplash. Handle ? still on the input → patron-portal.html + help-attach.js hydrateInlineHelpButtons; the ? must not share a flex row with the input."
+    },
+    {
+      id:"s3-3-017-vcc-queue-floqcast",
+      area:"Club Admin",
+      feature:"Dashboard queue links + FloqCAST label",
+      changed:"s3.3.017 — Venue Command Center Dashboard Pending ShoutOuts and Pending FloqCAST become links to those queues when the count is greater than 1. Visible product name is FloqCAST (feature key stays floqCast).",
+      howToTest:"1) Hard-refresh admin.html s3.3.017 as a Club Admin. 2) On Dashboard, with 0 or 1 pending ShoutOut, the Pending ShoutOuts card is not a link. With 2+, tap it — Queue Mgmt opens. 3) Same for Pending FloqCAST → FloqCAST queue. 4) Confirm the card and Feature Mgmt tab say FloqCAST, not floqCast. 5) Mark Succeed/Failed.",
+      expected:"Count 0–1 stays a static card. Count 2+ jumps to the matching queue. Label is exactly FloqCAST.",
+      troubleshoot:"Card never links → admin-app.js setDashboardQueueLink and n > 1. Still floqCast → hard-refresh admin.html + floqr-i18n.js s3.3.017."
+    },
+    {
+      id:"s3-3-017-ai-crawl-kpi",
+      area:"Master Admin",
+      feature:"AI Crawling Needs research / Approved KPI cards",
+      changed:"s3.3.017 — AI Crawling rollup cards for Needs research and Approved jump to Review Discovery Queue with that status filter.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.017, sign in, open AI Crawling. 2) Tap Needs research — the Review Discovery Queue filter becomes Needs research and the list scrolls into view. 3) Tap Approved — filter becomes Approved. 4) Mark Succeed/Failed.",
+      expected:"Those two KPI cards (and Pending review) change the queue filter and scroll to the cards. Queue total / Schedule on stay static.",
+      troubleshoot:"Cards not clickable → master-admin-rollup.js data-ai-status-filter + FLOQRAIDiscovery.jumpToStatus. Filter does not change → ai-discovery-service.js jumpToStatus / #aiDiscoveryStatusFilter."
+    },
+    {
+      id:"s3-3-017-lang-travel",
+      area:"My Profile",
+      feature:"IP preferred language + Prior / Future travel",
+      changed:"s3.3.017 — New patrons get a site language from IP/country (Spain → Spanish, Germany → German). Dubai / UAE asks Arabic vs English. Travel Interest is Prior Travels plus Future Travel Destination, with city/country spelling help.",
+      howToTest:"1) Hard-refresh My Profile s3.3.017. 2) Confirm Prior Travels and Future Travel Destination fields with ? help. Type Barclona — a Barcelona suggestion appears. 3) On a new session with a Spanish IP (or Country = Spain) and no saved language, the site is Spanish. Germany → German. UAE/Dubai shows Arabic vs English. 4) Mark Succeed/Failed.",
+      expected:"Travel fields save comma-separated cities/countries. Language follows country/IP for new patrons; UAE prompts. Turkish is not auto-selected.",
+      troubleshoot:"Old Travel Interests box → patron-portal.html s3.3.017 + floqr-place-suggest.js. Wrong language → floqr-profile-locale.js languagePlan + floqr-i18n.js maybePromptReturningPatron. IP is never stored."
+    },
+    {
+      id:"s3-3-016-chrome-back-login",
+      area:"Site chrome",
+      feature:"Back to Search and login pick up the new chrome",
+      changed:"s3.3.016 — After changing Site chrome on Appearance, Back to Search and the Welcome/login card show the new chrome without a hard refresh.",
+      howToTest:"1) Sign in, open My Profile → Appearance, pick a chrome that is not the current one. 2) Tap Back. Confirm Search tiles, FloqR mark, and page wash match the new chrome immediately. 3) Sign out (or open Welcome). Confirm the login card uses the same chrome — no refresh. 4) Mark Succeed/Failed.",
+      expected:"Search and login paint the chrome just chosen. A later hard refresh still matches. Changing chrome on another device still wins after the 30-minute local picker window.",
+      troubleshoot:"Still old chrome until refresh → hard-refresh index.html + patron-portal.html + floqr-nav.js + floqr-chrome-scheme.js + patron-app.js s3.3.016. Confirm Back is a real navigation to ./?start=search (not history.back to a frozen page). Confirm localStorage floqr.isSiteChrome matches the picker and floqr.isSiteChromeAt is recent."
+    },
+    {
+      id:"s3-3-015-portal-tab-editor-focus",
+      area:"My Profile / ShoutOut",
+      feature:"Portal tab restore + editor first field",
+      changed:"s3.3.015 — Hard refresh on My Profile stays on My Profile (URL ?tab=profile). Throw a ShoutOut → Use a template opens the editor on the first input (Message).",
+      howToTest:"1) Hard-refresh My Profile s3.3.015, sign in, open My Profile. Confirm the address bar has tab=profile. 2) Hard refresh that tab. Confirm Edit Profile is still showing — not Overview. 3) Open Search → Throw a ShoutOut → pick a venue → Use a classic template. Confirm the caret is in Enter ShoutOut Here (Message) and that box is in view. 4) Mark Succeed/Failed.",
+      expected:"Refresh keeps My Profile. Template Use lands on the Message box (or the first jersey field when Message is hidden).",
+      troubleshoot:"Refresh still Overview → hard-refresh patron-portal.html + floqr-portal-tabs.js + patron-portal-app.js s3.3.015 and confirm ?tab=profile after clicking My Profile. Editor opens mid-preview → hard-refresh index.html + patron-app.js; confirm goToEditor calls focusFirstEditorInput."
+    },
+    {
+      id:"s3-3-014-profile-geo",
+      area:"My Profile",
+      feature:"Country dropdown, mobile calling code, taxi State",
+      changed:"s3.3.014 — Country is a static in-page list (US, Canada, featured markets, then the rest). Featured countries have State/Province lists. Country fills Mobile (+1 for the United States). Taxi includes State; the extra City field is gone. Country sits above taxi. Phone is a compact (+dial) + national box for SMS/WhatsApp.",
+      howToTest:"1) Hard-refresh My Profile s3.3.014. 2) Open Country: United States first, Canada second, a ----, then France/Germany/Italy/Russia/Spain/Turkey/UAE/UK, another ----, then the rest A–Z. 3) Pick United States — Mobile shows (+1); taxi State is a 50-state + DC list; ZIP stays ZIP. 4) Type 2027330274 — it formats and Save Profile stores +12027330274. Type 123 and Save — blocked. 5) Pick France — Mobile (+33), height defaults to m, pickup label is Postal code, Region list appears. 6) Confirm there is only one City (inside taxi) and Country is above taxi. 7) Mark Succeed/Failed.",
+      expected:"Country list order matches the spec. US sets (+1) and State. Invalid mobile cannot save. No giant phone box. No second City field.",
+      troubleshoot:"Still a text Country box or huge phone input → hard-refresh patron-portal.html + floqr-geo-catalog.js + styles.css s3.3.014. Empty State list → country not one of the featured ten. Save rejects a good US number → enter 10 digits after (+1), not +1 again."
+    },
+    {
       id:"s3-3-014-botdee-help-chat",
       area:"BOT DEE",
       feature:"No ? bubble / scope line; type help like version",
@@ -3090,6 +3257,15 @@
       howToTest:"1) Hard-refresh botdee.html s3.3.014 signed in with botDee. 2) Confirm no ? next to the title and no Showing answers for… line. 3) Type help — BOT DEE explains itself and asks what you want help with (no product-card dump). 4) Type version — still gets the package stamp. 5) Mark Succeed/Failed.",
       expected:"Clean title header; help and version answer in chat without opening a ? bubble or intent strip.",
       troubleshoot:"? still visible → hard-refresh botdee.html. Showing answers… → stale botdee-page.js. help dumps search cards → Functions not redeployed with isHelpPrompt / local-help."
+    },
+    {
+      id:"s3-3-013-save-profile",
+      area:"My Profile",
+      feature:"Save Profile",
+      changed:"s3.3.013 — Save Profile no longer throws Cannot convert undefined or null to object. Inbox policy copy was calling FLOQRI18n.t(key, null) during the post-save reload.",
+      howToTest:"1) Hard-refresh My Profile (patron-portal.html s3.3.013). 2) Sign in. 3) Change a harmless field (display name or city) and tap Save Profile. 4) Confirm the overlay says Profile saved (not the TypeError). 5) Reload My Profile and confirm the field stuck. 6) Mark Succeed/Failed.",
+      expected:"Save Profile succeeds. Overlay does not show Cannot convert undefined or null to object. The edited field is still there after reload.",
+      troubleshoot:"Still TypeError → hard-refresh floqr-i18n.js and patron-portal-app.js s3.3.013. Confirm interpolationVars is in floqr-i18n.js. If Firestore permission-denied appears instead, that is a rules/auth issue, not this i18n crash."
     },
     {
       id:"s3-3-013-master-admin-rollup",
@@ -3104,10 +3280,10 @@
       id:"s3-3-012-height-pickup-locale",
       area:"Profile / RydR",
       feature:"Height unit-first + structured taxi pickup",
-      changed:"s3.3.012 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. US/Canada default ft; other countries and non-US IP default m. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
-      howToTest:"1) Hard-refresh Search and My Profile s3.3.012. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States — ZIP. Canada — ft + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
-      expected:"ft and m cannot be mixed. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
-      troubleshoot:"Still a single height box → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.012. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
+      changed:"s3.3.013 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. United States defaults to ft; every other country (including Canada) and a non-US IP default to m. Typing U.S. / USA / United States in Country sets ft. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
+      howToTest:"1) Hard-refresh Search and My Profile s3.3.013. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States or U.S. — height unit becomes ft and pickup is ZIP. Set country to Canada — height unit is m + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
+      expected:"ft and m cannot be mixed. Selecting United States sets height to ft. Any other country sets m. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
+      troubleshoot:"Still m after typing United States → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.013. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
     },
     {
       id:"s3-3-012-phila-pair-retired",
@@ -5659,11 +5835,21 @@
   }
 
   function requiredDatapointLabels(type = "") {
-    // Daytime flea/festival: organizers matter; DJs usually do not. Date/time required.
-    if (isDaytimeEventType(type)) {
-      return ["name", "genres", "promoters", "address", "city", "country", "telephone", "email", "instagram", "date", "time"];
+    const api = window.FLOQRDiscoveryGates;
+    if (api?.IMPORT_GATE_FIELDS) {
+      const event = isDaytimeEventType(type) || isComedyEventType(type);
+      const gates = api.normalizeImportGates ? api.normalizeImportGates(api.defaultImportGates()) : api.defaultImportGates();
+      const map = event ? (gates.event || {}) : (gates.venue || {});
+      return api.IMPORT_GATE_FIELDS.filter(field => {
+        if (field.appliesTo === "venue" && event) return false;
+        if (field.appliesTo === "event" && !event) return false;
+        return map[field.key] === 1;
+      }).map(field => field.key === "phone" ? "telephone" : field.key);
     }
-    const base = ["name", "genres", "artistsOrDjs", "promoters", "address", "city", "country", "telephone", "email", "instagram"];
+    if (isDaytimeEventType(type)) {
+      return ["name", "address", "city", "country", "date", "time"];
+    }
+    const base = ["name", "address", "city", "country", "telephone"];
     if (isComedyEventType(type)) return [...base, "date", "time"];
     return base;
   }
@@ -5847,35 +6033,25 @@
   }
 
   function sourceRecordMissingDatapoints(record = {}) {
+    if (window.FLOQRDiscoveryGates?.missingDatapoints) {
+      return window.FLOQRDiscoveryGates.missingDatapoints(record);
+    }
     const required = requiredDatapointLabels(record.proposedType || "");
     const has = {
       name: !!record.proposedTitle,
-      genres: !!(record.genres || []).length,
-      artistsOrDjs: !!(record.artistsOrDjs || []).length || !!(record.artists || []).length || !!(record.djs || []).length || !!String(record.artistsOrDjs || record.artists || record.djs || "").trim(),
-      promoters: !!(record.promoters || []).length || !!String(record.promoters || record.promotionGroup || "").trim(),
       address: !!record.proposedAddress,
       city: !!record.city,
       country: !!record.country,
       telephone: !!(record.telephone || record.phone),
-      email: !!record.email,
-      instagram: !!(record.socialMediaHandles?.instagram || record.instagramHandle),
       date: !!record.proposedDate,
       time: !!record.proposedTime
     };
-    const daytime = isDaytimeEventType(record.proposedType || "")
-      || isDaytimeEventType((record.categories || []).join(" "))
-      || isDaytimeEventType(record.proposedTitle || "");
     return required.filter(key => !has[key]).map(key => ({
       name:"Name",
-      genres:"Genre",
-      artistsOrDjs:"DJ(s)/Artist(s)",
-      promoters: daytime ? "Organizer(s) / Promoter(s)" : "Promoter(s)",
       address:"Address",
       city:"City",
       country:"Country",
       telephone:"Phone",
-      email:"Email",
-      instagram:"Instagram",
       date:"Date",
       time:"Time"
     }[key] || key));
@@ -8297,22 +8473,18 @@
     const query = override.query || crawlQueryForJob({eventType, genre, city, country});
     const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, country, genre, eventType});
     const requiredDatapoints = requiredDatapointLabels(eventType);
-    const defaultMissing = isDaytimeEventType(eventType)
-      ? ["Genre", "Organizer(s) / Promoter(s)", "Phone", "Email", "Instagram", "Address", "Date", "Time"]
-      : [
-        "Genre",
-        "DJ(s)/Artist(s)",
-        "Promoter(s)",
-        "Phone",
-        "Email",
-        "Instagram",
-        "Address",
-        ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
-      ];
+    const placeholder = {
+      proposedType: eventTypeToProposedType(eventType),
+      entityKind: isDaytimeEventType(eventType) || isComedyEventType(eventType) ? "event" : "venue",
+      proposedTitle: title,
+      city,
+      country
+    };
+    const defaultMissing = sourceRecordMissingDatapoints(placeholder);
     const record = {
       proposedType,
       proposedTitle: title,
-      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete impactful datapoints (genre, DJ/artist, promoter, contacts) before approval.`,
+      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Approve when the Import datapoints Master Admin ticked are present.`,
       proposedDate: "",
       proposedTime: "",
       proposedLocationName: override.locationName || title,
@@ -9743,7 +9915,7 @@
       ["Crawl schedule", schedule?.frequency || "Not saved"],
       ["Daily run times", schedule?.scheduleHours?.join(", ") || "Not saved"],
       ["Schedule time zone", schedule?.timeZone || "Not saved"],
-      ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
+      ["Publishing rule", "Per crawl type. Nightclubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Promoter(s) and Instagram are optional. Duplicates and past events never go live."]
     ]);
   }
 

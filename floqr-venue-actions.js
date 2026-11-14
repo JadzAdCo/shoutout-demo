@@ -19,7 +19,7 @@
       featureKey: "floqCast",
       priority: 100,
       ctaKey: "listing.goFloqCast",
-      ctaFallback: "Go floqCast",
+      ctaFallback: "Go FloqCAST",
       strip: [
         "floqcast", "floq cast", "floq-cast",
         "superstar", "super star", "super-star",

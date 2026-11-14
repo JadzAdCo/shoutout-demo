@@ -182,7 +182,7 @@
       ${featureLink("mingl", hrefMingl(), `${t("nav.minglChat", "Mingl Chat")} (${c.chats})`, blank)}
       ${featureLink("bartr", hrefStamp("./commerce.html", { from: "search" }), t("nav.bartr", "BartR"), blank)}
       ${featureLink("rydr", hrefStamp("./rydr.html", { from: "search" }), t("cat.rydr", "RydR"), blank)}
-      ${featureLink("floqCast", hrefStamp("./floqcast-search.html", { from: "search" }), t("cat.floqcast", "floqCast"), blank)}
+      ${featureLink("floqCast", hrefStamp("./floqcast-search.html", { from: "search" }), t("cat.floqcast", "FloqCAST"), blank)}
       ${featureLink("vipReservations", hrefStamp("./vip.html", { from: "search" }), t("cat.vipreserv", "VIP reserV"), blank)}
       ${featureLink("botDee", hrefBotDee(), t("cat.botdee", "BOT DEE"), blank)}
       <button id="floqrGlobalSignOutBtn" type="button">${esc(t("app.signOut", "Sign out"))}</button>`;

@@ -43,9 +43,14 @@
   }
 
   function metricGrid(rows) {
-    return `<div class="metric-grid floqr-rollup-strip">${rows.map(([label, value]) =>
-      `<div class="metric-card"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`
-    ).join("")}</div>
+    return `<div class="metric-grid floqr-rollup-strip">${rows.map(([label, value, meta]) => {
+      const filter = meta?.filter ? String(meta.filter) : "";
+      const tag = filter ? "button" : "div";
+      const extra = filter
+        ? ` type="button" class="metric-card" data-ai-status-filter="${esc(filter)}"`
+        : ` class="metric-card"`;
+      return `<${tag}${extra}><span>${esc(label)}</span><strong>${esc(value)}</strong></${tag}>`;
+    }).join("")}</div>
     <p class="sub small floqr-rollup-meta">Rollup ${esc(fmtWhen(cached?.updatedAtMs))} · source ${esc(cached?.source || "—")} · Refresh for live detail.</p>`;
   }
 
@@ -68,9 +73,9 @@
     const a = cached?.aiCrawl || {};
     const html = metricGrid([
       ["Queue total", fmtNum(a.queueTotal)],
-      ["Pending review", fmtNum(a.pendingReview)],
-      ["Needs research", fmtNum(a.needsResearch)],
-      ["Approved", fmtNum(a.approved)],
+      ["Pending review", fmtNum(a.pendingReview), {filter: "pendingReview"}],
+      ["Needs research", fmtNum(a.needsResearch), {filter: "needsResearch"}],
+      ["Approved", fmtNum(a.approved), {filter: "approved"}],
       ["Schedule on", a.scheduleEnabled === true ? "Yes" : a.scheduleEnabled === false ? "No" : "—"],
       ["Last crawl", a.lastRunId ? `${a.lastRunStatus || "run"} · ${fmtWhen(a.lastRunAtMs)}` : "—"]
     ]);
@@ -188,6 +193,14 @@
     auth = options.auth || auth;
     if (bound) return;
     bound = true;
+    document.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-ai-status-filter]");
+      if (!btn) return;
+      const status = btn.getAttribute("data-ai-status-filter");
+      if (!status) return;
+      event.preventDefault();
+      global.FLOQRAIDiscovery?.jumpToStatus?.(status);
+    });
     byId("refreshMasterAdminRollupBtn")?.addEventListener("click", async () => {
       const status = byId("diagnosticsStatus") || byId("aiDiscoveryStatus");
       if (status) status.textContent = "Refreshing Master Admin rollup…";

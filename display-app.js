@@ -1531,7 +1531,7 @@
     const clubName = clubVenueName(location);
     if (DISPLAY_BOARD === "secondary") {
       // display2 / Xibo floqCast board idle CTA
-      return `Awaiting a floqCast stream. Go live @ ${clubName}`;
+      return `Awaiting a FloqCAST stream. Go live @ ${clubName}`;
     }
     return `Use ShoutOut @ ${clubName}`;
   }
@@ -1707,12 +1707,12 @@
     byId("displayBrand").textContent = "";
     if (mediaSlot) {
       mediaSlot.className = "media-slot floqcast-idle-logo-slot";
-      mediaSlot.innerHTML = `<img src="${esc(FLOQCAST_LOGO)}" alt="floqCast" class="floqcast-idle-logo" decoding="async"/>`;
+      mediaSlot.innerHTML = `<img src="${esc(FLOQCAST_LOGO)}" alt="FloqCAST" class="floqcast-idle-logo" decoding="async"/>`;
     }
     byId("displayMain").className = "floqcast-idle-copy";
     byId("displayMain").style.removeProperty("font-size");
     byId("displayMain").innerHTML = [
-      `<span class="floqcast-idle-line">Awaiting a floqCast stream.</span>`,
+      `<span class="floqcast-idle-line">Awaiting a FloqCAST stream.</span>`,
       `<span class="floqcast-idle-line">Go live @ ${esc(clubName)}</span>`,
       // Feature: make clear this is the idle/default board, not an IP/security block.
       `<span class="floqcast-idle-note">Idle board · no guest is live right now</span>`

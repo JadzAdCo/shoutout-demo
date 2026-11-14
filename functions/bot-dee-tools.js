@@ -443,8 +443,12 @@ function volunteeredPublicDatapoints(data = {}) {
     if (events.length) datapoints.events = events;
   }
   if (allowed("travel")) {
-    const travel = listField(data.travelInterests);
-    if (travel.length) datapoints.travel = travel;
+    const prior = listField(data.priorTravels?.length ? data.priorTravels : data.travelInterests);
+    const future = listField(data.futureTravelDestinations);
+    const travel = [...prior, ...future.filter(name => !prior.includes(name))];
+    if (prior.length) datapoints.travel = prior;
+    if (future.length) datapoints.futureTravel = future;
+    if (travel.length && !datapoints.travel) datapoints.travel = travel;
   }
   if (allowed("hobbies")) {
     const hobbies = listField(data.hobbies || data.generalHobbies);
@@ -522,6 +526,7 @@ function publicUserCard(uid, data = {}, score, extras = {}) {
   if (dp.nightlifeStyle) card.nightlifeStyle = dp.nightlifeStyle;
   if (dp.events) card.events = dp.events;
   if (dp.travel) card.travel = dp.travel;
+  if (dp.futureTravel) card.futureTravel = dp.futureTravel;
   if (dp.hobbies) card.hobbies = dp.hobbies;
   if (dp.food) card.food = dp.food;
   if (dp.beverages) card.beverages = dp.beverages;
@@ -529,7 +534,7 @@ function publicUserCard(uid, data = {}, score, extras = {}) {
   ["gender", "height", "nightlifeStyle", "lookingToMeet", "city", "region", "country", "instagram", "instagramHandle", "website"].forEach(key => {
     if (!card[key]) delete card[key];
   });
-  ["music", "events", "travel", "hobbies", "food", "beverages", "roles", "imageUrls"].forEach(key => {
+  ["music", "events", "travel", "futureTravel", "hobbies", "food", "beverages", "roles", "imageUrls"].forEach(key => {
     if (Array.isArray(card[key]) && !card[key].length) delete card[key];
   });
   return card;
@@ -694,7 +699,10 @@ function userHaystack(data = {}) {
   if (datapointAllowed(data, "height")) parts.push(heightDisplay(data));
   if (datapointAllowed(data, "music")) parts.push(...listField(data.musicInterests || data.favoriteGenres));
   if (datapointAllowed(data, "events")) parts.push(data.nightlifeStyle, ...listField(data.nightlifeInterests));
-  if (datapointAllowed(data, "travel")) parts.push(...listField(data.travelInterests));
+  if (datapointAllowed(data, "travel")) {
+    parts.push(...listField(data.priorTravels?.length ? data.priorTravels : data.travelInterests));
+    parts.push(...listField(data.futureTravelDestinations));
+  }
   if (datapointAllowed(data, "hobbies")) parts.push(...listField(data.hobbies || data.generalHobbies));
   if (datapointAllowed(data, "food")) parts.push(...listField(data.foodChoices));
   if (datapointAllowed(data, "beverage")) parts.push(...listField(data.favoriteBeverages));

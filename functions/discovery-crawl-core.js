@@ -359,7 +359,10 @@ function mergeQueuePolicy(existing = {}, incoming = {}) {
     "aiStarRating", "aiRatingReasons", "relatedEvents", "legalCompliance", "lifecycleStatus",
     "crawlerDateSource", "extractedImages", "categories", "genres", "searchQuery",
     "placesRating", "placesUserRatingCount", "businessStatus", "socialPagesFetched",
-    "autoApproveDecision", "publishConfidence"
+    "autoApproveDecision", "publishConfidence",
+    "duplicateFlag", "duplicateCandidateIds", "duplicateReasons", "duplicateMatch",
+    "entityKind", "venueCategory", "eventCategory", "kindLabel", "listingClass",
+    "importGatesSnapshot", "crawlResultStatus"
   ];
   const out = {...existing, ...incoming};
   if (preserveHuman) {

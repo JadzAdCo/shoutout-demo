@@ -72,6 +72,11 @@ html[data-floqr-chrome="whiteBlack"] .admin-subtab.active{
 .admin-panel-section.active{display:block}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:12px 0 18px}
 .metric-card{border:1px solid var(--line);border-radius:22px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.06));box-shadow:0 18px 50px rgba(0,0,0,.25)}
+button.metric-card{font:inherit;color:inherit;text-align:left;width:100%;appearance:none;-webkit-appearance:none}
+.metric-card.is-queue-link,.metric-card[data-ai-status-filter]{cursor:pointer}
+.metric-card.is-queue-link:hover,.metric-card.is-queue-link:focus-visible,
+.metric-card[data-ai-status-filter]:hover,.metric-card[data-ai-status-filter]:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.metric-card.is-queue-link span{text-decoration:underline}
 .metric-card span{display:block;color:var(--muted);font-weight:800;font-size:13px}
 .metric-card strong{display:block;font-size:clamp(28px,4vw,46px);line-height:1;margin-top:8px;color:var(--lime)}
 .report-block{color:var(--text)}
@@ -614,6 +619,65 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 .discovery-country-tabs .admin-subtab{margin:0}
 .discovery-country-tabs .admin-subtab.active{outline:2px solid var(--accent, #dfff5a)}
 .discovery-meta{font-size:.86rem;opacity:.88;margin:.35rem 0 .6rem}
+.import-gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:0 0 14px}
+.file-button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer}
+.file-button input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.import-gate-grid label{display:flex;gap:8px;align-items:center;margin:0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(0,0,0,.16)}
+.import-gate-grid input{width:auto;margin:0}
+.ai-discovery-item.is-duplicate{border-color:rgba(245,158,11,.7)}
+.status-pill.dup{background:rgba(245,158,11,.22)}
+/* Real HTML table — never reuse .report-table (that class is a div-grid and collapses columns). */
+.discovery-queue-table-wrap{
+  width:100%;
+  max-width:100%;
+  overflow:auto;
+  max-height:360px;
+  margin:10px 0 0;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(0,0,0,.22);
+}
+.discovery-queue-table{
+  display:table;
+  width:max(100%, 980px);
+  min-width:980px;
+  border-collapse:separate;
+  border-spacing:0;
+  table-layout:auto;
+  font-size:13px;
+  line-height:1.4;
+  color:var(--text);
+}
+.discovery-queue-table thead th{
+  position:sticky;
+  top:0;
+  z-index:1;
+  text-align:left;
+  white-space:nowrap;
+  padding:10px 12px;
+  background:#121826;
+  border-bottom:1px solid rgba(255,255,255,.18);
+  font-weight:800;
+  color:#dfe7ff;
+}
+.discovery-queue-table tbody td{
+  display:table-cell;
+  padding:9px 12px;
+  text-align:left;
+  vertical-align:top;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  white-space:nowrap;
+}
+.discovery-queue-table td.discovery-name,
+.discovery-queue-table td.discovery-missing{
+  white-space:normal;
+  min-width:140px;
+  max-width:240px;
+}
+.discovery-queue-table tbody tr:nth-child(even){background:rgba(255,255,255,.03)}
+.discovery-queue-table tbody tr.is-ready td:nth-child(7){color:#9dffb0;font-weight:800}
+.discovery-queue-table tbody tr:not(.is-ready) td:nth-child(7){color:#ffb4a8;font-weight:800}
+.discovery-queue-table.is-compact{min-width:0;width:100%}
 .admin-detail>div,.json-disclosure>div,.json-disclosure>textarea{margin:0 14px 14px}
 .json-disclosure textarea{width:calc(100% - 28px);min-height:260px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}
 .template-view-card{width:min(980px,94vw);max-height:94vh;overflow:auto;text-align:left}

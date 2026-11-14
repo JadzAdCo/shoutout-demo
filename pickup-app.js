@@ -18,6 +18,7 @@
   let userProfile = {};
   let pickupLocaleHint = {};
   let pickupAddressCtl = null;
+  let pickupGeoCtl = null;
   let savedPickupAddresses = [];
   let selectedSaveLabel = "Home";
   let rideTimer = 0;
@@ -598,6 +599,10 @@
       ? {...((window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {}), ...clubSnap.data()}
       : (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
     destination = addressOf(club);
+    pickupGeoCtl?.setCountry?.(userProfile.countryCode || userProfile.country || "", {
+      region: userProfile.regionCode || userProfile.region || userProfile.taxiRegion || "",
+      silent: true
+    });
     fillPickupAddress(window.FLOQRProfileLocale?.pickupFromProfile?.(userProfile) || userProfile.taxiPickupAddress || userProfile.pickupAddress || "");
     byId("pickupDestination").value = destination;
     updateMapsLink();
@@ -690,11 +695,20 @@
     byId("pickupForAnotherPayment")?.addEventListener("change", updatePaymentPlan);
     byId("pickupSharedPayment")?.addEventListener("change", updatePaymentPlan);
     updateBookingMode();
+    pickupGeoCtl = window.FLOQRGeoCatalog?.bind?.({
+      countryEl: byId("pickupCountry"),
+      regionEl: byId("pickupRegion"),
+      regionTextEl: byId("pickupRegionText"),
+      regionLabelEl: byId("pickupRegionLabel"),
+      onCountry: () => pickupAddressCtl?.paintPostal?.()
+    }) || null;
     pickupAddressCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "pickupStreetNumber",
         streetName: "pickupStreetName",
         city: "pickupCity",
+        region: "pickupRegion",
+        regionText: "pickupRegionText",
         postal: "pickupPostal",
         postalLabel: "pickupPostalLabel",
         composed: "pickupAddress",

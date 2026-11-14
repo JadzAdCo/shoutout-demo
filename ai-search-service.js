@@ -58,7 +58,7 @@
         profile.displayName, profile.username, profile.city, profile.region,
         profile.country, profile.bio, profile.gender, profile.nightlifeStyle,
         profile.lookingToMeet, profile.musicInterests || profile.favoriteGenres,
-        profile.travelInterests, profile.hobbies || profile.generalHobbies,
+        profile.priorTravels, profile.travelInterests, profile.futureTravelDestinations, profile.hobbies || profile.generalHobbies,
         profile.foodChoices, profile.favoriteBeverages
       ].flat().filter(Boolean).join(" "),
       profile,

@@ -962,7 +962,7 @@ function linksFromToolResult(result, lang) {
   const code = normalizeUiLanguage(lang);
   const links = [];
   if (result.checkoutUrl) links.push(localizeActionLink({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"}, code));
-  if (result.previewPath) links.push(localizeActionLink({label: "Open floqCast preview", href: result.previewPath, kind: "floqcast"}, code));
+  if (result.previewPath) links.push(localizeActionLink({label: "Open FloqCAST preview", href: result.previewPath, kind: "floqcast"}, code));
   if (result.composeHref) links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
   if (result.holdId && !result.checkoutUrl) {
     links.push(localizeActionLink({

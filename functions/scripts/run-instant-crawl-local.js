@@ -21,6 +21,7 @@ if (!process.env.GOOGLE_PLACES_API_KEY) {
 // Load discovery module after env is set. Secrets wrappers may still need defineSecret
 // mock — so this script reimplements a thin Places+enrich path using the extractors.
 const venueDatapoints = require("../venue-datapoint-extract");
+const gatesCore = require("../discovery-gates-core");
 
 const args = process.argv.slice(2);
 const jobLimit = Number((args.find(a => a.startsWith("--jobs=")) || "--jobs=8").split("=")[1]) || 8;
@@ -204,20 +205,7 @@ async function loadJobs() {
   const pct = v => (n ? Math.round((v / n) * 1000) / 10 : 0);
 
   function missingOnboard(record = {}) {
-    const missing = [];
-    if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
-    if (!(record.genres || []).length) missing.push("Genre");
-    const artists = record.artistsOrDjs || record.artists || record.djs;
-    if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
-    const promoters = record.promoters || record.promotionGroup;
-    if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) missing.push("Promoter(s)");
-    if (!(record.proposedAddress || record.address)) missing.push("Address");
-    if (!record.city) missing.push("City");
-    if (!record.country) missing.push("Country");
-    if (!(record.telephone || record.phone)) missing.push("Phone");
-    if (!record.email) missing.push("Email");
-    if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
-    return missing;
+    return gatesCore.missingDatapoints(record);
   }
 
   const completedAt = new Date().toISOString();
@@ -269,7 +257,7 @@ async function loadJobs() {
       String(a.genre).localeCompare(b.genre) ||
       String(a.name).localeCompare(b.name)
     ),
-    note: "Contact-complete = Phone + Email + Instagram. Onboard-ready = Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram."
+    note: "Contact-complete = Phone + Email + Instagram. Onboard-ready follows Master Admin Import datapoints (defaults: Name, Address, City, Country, Phone)."
   };
 
   if (doWrite) {

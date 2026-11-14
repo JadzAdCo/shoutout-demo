@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.3.014";
+  const APP_V = "s3.3.019";
 
   function navT(key, fallback) {
     try {
@@ -42,6 +42,21 @@
       return String(global.location.pathname.split("/").pop() || "").toLowerCase();
     } catch (e) {
       return "";
+    }
+  }
+
+  function navFileName(pathnameOrFile) {
+    const file = String(pathnameOrFile || "").split("/").pop() || "";
+    const name = file.toLowerCase();
+    return !name || name === "index.html" ? "index.html" : name;
+  }
+
+  function sameDocumentBackHref(href) {
+    try {
+      const dest = new URL(href || "", global.location.href);
+      return navFileName(dest.pathname) === navFileName(pageName());
+    } catch (e) {
+      return true;
     }
   }
 
@@ -218,6 +233,9 @@
             return;
           }
           try {
+            /* Cross-document Back (My Profile → Search / login) follows the href.
+               history.back() restores bfcache with the previous Site chrome. */
+            if (!sameDocumentBackHref(anchor.href || next.href)) return;
             if (global.history && global.history.length > 1) {
               event.preventDefault();
               global.history.back();
@@ -251,6 +269,7 @@
         el.dataset.floqrHistoryBackBound = "1";
         el.addEventListener("click", (event) => {
           try {
+            if (!sameDocumentBackHref(el.href || el.getAttribute?.("href") || "")) return;
             if (global.history && global.history.length > 1) {
               event.preventDefault();
               global.history.back();

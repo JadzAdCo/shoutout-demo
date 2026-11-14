@@ -16,7 +16,7 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 - Rating criteria use **number inputs** (weights). Machine dump stays under Advanced.
 - Profile import: **Prepare Club Admin imports** → review cards → Save drafts / send link. Advanced “generated data” disclosure is optional.
 - Source Detail Extraction is a **wizard**: one event/venue detail URL (not a search-results list) → extract → save.
-- Queue actions: **Approve** | **Needs research** | Reject | Duplicate | Delete.
+- Queue actions: **Publish** | **Save** (keep edits, do not go live) | **Needs research** | Reject | Duplicate | Delete.
 - **Mass onboard:** select ready cards (all required datapoints present) → **Onboard selected**. Not-ready cards stay listed with **Missing datapoints** called out; they cannot be selected for mass publish.
 
 ## Schedule (defaults)
@@ -49,7 +49,7 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 | `aiCrawlRuns` | Manual / scheduled run lifecycle |
 | `aiDiscoveryQueue` | Review-only candidates (+ `profile-import-draft`) |
 | `aiDiscoverySources` | Enabled public source URLs |
-| `aiDiscoveryRatingCriteria` | Star/confidence weights |
+| `aiDiscoveryRatingCriteria` | Star/confidence weights + Master Admin `importGates` ticks |
 | `clubLocations` / `events` | Live after Approve |
 | `aiIndex` | Upsert on approve |
 
@@ -63,13 +63,33 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 - **Stale Record Cleanup**: soft-clear ~**4 days** (`stale-cache-cleared`). Approved listings, profiles, ShoutOuts, guest lists, audit history **untouched**.
 - Profile import: `missingOnly` / never overwrite existing public-profile fields.
 
-## Approval datapoints (impactful)
+## Publishing rules (per crawl type)
 
-**Nightlife / ticketed:** Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy).
+Master Admin → AI Crawling → **Publishing rule** chooses required fields **by crawl type** (`aiDiscoveryRatingCriteria/defaultNightlifeRating.publishingRules`). One size does not fit all.
 
-**Daytime** (`daytimeEvent` / flea / farmers / community market / fall or daytime festival): Name, Genre, Organizer(s)/Promoter(s), Address, City, Country, Phone, Email, Instagram, **Date**, **Time**. DJ(s) not required.
+**Nightclub / beach club / lounge / bar defaults:** Name, Genre, DJ(s)/Artist(s), Address, City, Country, and **Phone or Email** (at least one). Promoter(s) and Instagram/other socials are optional.
 
-Incomplete → cannot Approve; use **Needs research** (`status: needsResearch`).
+**Daytime markets / festivals:** Name, Genre, Address, City, Country, Date, Time, Phone or Email. DJ(s) not required.
+
+**Comedy / concert / ticketed:** nightlife event checklist including Date, Time, and DJ(s)/Artist(s).
+
+Approve, mass onboard, CSV import, and auto-publish all use the same rule plus a duplicate check. Past events are never published.
+
+## CSV mass import / export
+
+Same template for sample download, unpublished export, and mass import (`recordKind,crawlType,name,genres,artistsOrDjs,promoters,address,city,country,phone,email,instagram,facebook,website,date,time,description,ticketUrl,sourceUrl,placesId`). Import lands in `aiDiscoveryQueue` as `discoveryMode: csv-import` — live publish still requires the publishing rule and no duplicate.
+
+## Past events
+
+Crawler **ignores** already-past dated events. Live `events` are marked `past`, retired after `retireAfterDays` (default 14), then removed from FLOQR (`status: deleted`) after `removeAfterDays`. Master Admin **Clean past events now** calls `retirePastCrawledEvents`.
+
+## Establishment duplicates
+
+Same **phone** OR same **physical address** OR same **club name** (city aliases applied) = the same establishment. Monaco / Monte Carlo / Monaco-Ville share city alias `monaco-monte-carlo`. Live `clubLocations` matches become `updates-only`. Other queue matches get `duplicateFlag` + `duplicateMatch` and cannot mass-onboard as a new club.
+
+## Club vs event
+
+Each queue row is classified `entityKind` `venue` | `event` with `venueCategory` (nightclub, beachClub, lounge, rooftopLounge, rooftopBar, dayClub, bar) or `eventCategory` (comedyShow, daytimeEvent, fleaMarket, festival, …). Review cards show **Club · Beach Club** vs **Event · Comedy Show**. Dated JSON-LD children stay events; Places businesses stay venues.
 
 ## Security
 
@@ -109,9 +129,9 @@ Review Discovery Queue shows dynamic **country tabs** (All + each country presen
 
 ## Onboard readiness blockers (engine gaps)
 
-Approve / mass onboard require nightlife checklist above, or the daytime checklist (no DJ; Date/Time required).
+Approve / mass onboard require the **Publishing rule** for that crawl type. Possible duplicates cannot onboard as a new club. Past events are ignored.
 
-Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages. Daytime markets need **organizer** + schedule from the event page.
+Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages. Leave those on Needs research rather than inventing TBA.
 
 **Next crawl improvements (priority):**
 
@@ -123,7 +143,7 @@ Places + website enrich usually fills Name / Address / City / Country / Genre (f
 ## FIX PROMPT
 
 ```
-AI crawl: aggregator brand-domain preferencer + WhatsApp phone + href socials + secondary contact pages; collectedAt; updates-only; country tabs. Design notes: design-notes-ai-discovery-crawl.mdc
+AI crawl: Master Admin Import datapoints (Promoter/Email off unless ticked); same phone/address/name = one establishment (Monaco ≡ Monte Carlo); classify club vs event vs beach club. Design notes: design-notes-ai-discovery-crawl.mdc
 ```
 
-Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-venue-datapoints.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.
+Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-discovery-gates.js`, `floqr-venue-datapoints.js`, `functions/discovery-gates-core.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.
