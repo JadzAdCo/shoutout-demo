@@ -54,7 +54,7 @@ test("Club Admin repository lists one card per template, Heist exclusives first,
   assert.match(read("admin.html"), /data-floqr-help-id="help-club-template-repository"/);
 });
 
-test("patron Search and FloqAi route a misspelled Tengo muchos dólares to the Heist template", () => {
+test("patron Search and BOT DEE route a misspelled Tengo muchos dólares to the Heist template", () => {
   const app = read("patron-app.js");
   assert.match(app, /matcher \? matcher\.phraseMatches\(q, phrase\) : q\.includes\(phrase\)/);
   assert.match(app, /\(t\.searchAliases \|\| \[\]\)\.join\(" "\)/);
@@ -62,5 +62,5 @@ test("patron Search and FloqAi route a misspelled Tengo muchos dólares to the H
   const block = intents.slice(intents.indexOf('id: "tengo-muchos-dolares"'), intents.indexOf('id: "floqcast"'));
   const patternLine = block.slice(block.indexOf("patterns: ["));
   const patterns = Array.from(patternLine.slice(0, patternLine.indexOf("\n")).matchAll(/\/((?:[^/\\]|\\.)+)\//g)).map(m => new RegExp(m[1]));
-  assert.ok(patterns.some(re => re.test("tendo mucho dolares")), "FloqAi intent tolerates 'tendo mucho dolares'");
+  assert.ok(patterns.some(re => re.test("tendo mucho dolares")), "BOT DEE intent tolerates 'tendo mucho dolares'");
 });

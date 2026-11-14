@@ -8,12 +8,16 @@ const adFns = require("./ad-functions");
 
 module.exports = {
   ...require("./ai-discovery-functions"),
+  ...require("./master-admin-rollup-functions"),
   ...require("./commerce-functions"),
   ...require("./messaging-functions"),
   ...require("./marketing-campaign-functions"),
   ...require("./scheduling-functions"),
   ...require("./venue-ingest-functions"),
   ...require("./data-classification-functions"),
+  executeBotSession: require("./bot-dee-functions").executeBotSession,
+  getBotDeeThread: require("./bot-dee-functions").getBotDeeThread,
+  setBotDeeSettings: require("./bot-dee-functions").setBotDeeSettings,
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),

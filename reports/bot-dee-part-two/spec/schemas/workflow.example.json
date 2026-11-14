@@ -1,0 +1,18 @@
+{
+  "_example_only": true,
+  "workflowId": "EXAMPLE",
+  "tenantId": "EXAMPLE",
+  "actorUid": "EXAMPLE",
+  "threadId": "EXAMPLE",
+  "definition": "vip_reservation",
+  "definitionVersion": 1,
+  "state": "awaiting_approval",
+  "revision": 3,
+  "stepIndex": 2,
+  "approvalDigest": "EXAMPLE",
+  "idempotencyKey": "EXAMPLE",
+  "retryCount": 0,
+  "leaseExpiresAt": null,
+  "createdAt": "SERVER_TIMESTAMP",
+  "updatedAt": "SERVER_TIMESTAMP"
+}

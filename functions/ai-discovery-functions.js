@@ -39,6 +39,8 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const MAX_GEMINI_IMAGE_BYTES = 8 * 1024 * 1024;
+const portraitMask = require("./gemini-portrait-mask");
+const geminiAccessLog = require("./gemini-api-access-log");
 
 const MONTHS = {
   jan: "01", january: "01",
@@ -1361,6 +1363,15 @@ function safeEnhancementPrompt(prompt = "", enhancementType = "") {
       `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
     ].join("\n");
   }
+  if (type === "baller-face-medallion" || type === "baller-portrait-mask") {
+    // Image-edit path is legacy soft-fail only. Prefer baller-portrait-mask (segmentation) —
+    // do not regenerate / beautify the patron's face.
+    return [
+      "Do not redraw or beautify this photo. If you must return an image, crop loosely around the primary person's head and shoulders only.",
+      "Preserve identity exactly. No filters, helmets, chips, logos, or card chrome.",
+      `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
+    ].join("\n");
+  }
   const requested = String(prompt || enhancementType || "Improve this ShoutOut media for a nightlife LED display.").slice(0, 600);
   return [
     "Edit only the uploaded ShoutOut media image. Do not add text, logos, watermarks, QR codes, or HTML/CSS/JavaScript.",
@@ -1924,6 +1935,101 @@ exports.aiExtractPublicSourceUrl = functions.https.onCall(async (data, context) 
   };
 });
 
+async function runBallerPortraitMask({uid, email, mediaStoragePath, referenceNumber}) {
+  const original = await downloadOwnedImage(mediaStoragePath, uid);
+  let segmented;
+  try {
+    segmented = await portraitMask.callGeminiPersonSegmentation({
+      apiKey: geminiSecretValue(),
+      buffer: original.buffer,
+      contentType: original.contentType
+    });
+  } catch (error) {
+    const message = String(error?.message || error).slice(0, 400);
+    await geminiAccessLog.logGeminiApiAccess(db, {
+      ok: false,
+      uid,
+      email,
+      operation: "baller-portrait-mask",
+      enhancementType: "baller-portrait-mask",
+      model: portraitMask.SEGMENTATION_MODEL,
+      mediaStoragePath: original.mediaStoragePath,
+      referenceNumber,
+      failureReason: message,
+      errorCode: error?.code || "segmentation_failed",
+      message: `Gemini portrait mask failed: ${message}`
+    });
+    throw new HttpsError(
+      "failed-precondition",
+      `Portrait background removal failed: ${message}. ${portraitMask.LIMITATION}`
+    );
+  }
+  const maskPath = enhancedPathForOriginal(
+    original.mediaStoragePath,
+    referenceNumber,
+    "image/png"
+  ).replace("/enhanced/", "/masks/").replace(/gemini-/, "mask-");
+  const maskUrl = await uploadEnhancedGeminiImage({
+    bucket: original.bucket,
+    outputPath: maskPath,
+    buffer: segmented.maskPngBuffer,
+    contentType: "image/png"
+  });
+  await db.collection("aiMediaEdits").add({
+    uid,
+    sourceType: "shoutoutMedia",
+    originalMediaStoragePath: original.mediaStoragePath,
+    maskMediaStoragePath: maskPath,
+    enhancementType: "baller-portrait-mask",
+    provider: "gemini",
+    model: segmented.model,
+    maskFormat: segmented.maskFormat,
+    width: segmented.width,
+    height: segmented.height,
+    box2d: segmented.box2d || null,
+    limitations: segmented.limitations,
+    status: "completed",
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await geminiAccessLog.logGeminiApiAccess(db, {
+    ok: true,
+    uid,
+    email,
+    operation: "baller-portrait-mask",
+    enhancementType: "baller-portrait-mask",
+    model: segmented.model,
+    mediaStoragePath: original.mediaStoragePath,
+    referenceNumber,
+    message: "Gemini portrait mask succeeded",
+    details: {
+      width: segmented.width,
+      height: segmented.height,
+      maskFormat: segmented.maskFormat,
+      softEdges: !!segmented.softEdges,
+      limitations: segmented.limitations || null
+    }
+  });
+  return {
+    status: "masked",
+    provider: "gemini",
+    model: segmented.model,
+    originalMediaUrl: original.mediaUrl || "",
+    originalMediaStoragePath: original.mediaStoragePath,
+    maskMediaUrl: maskUrl,
+    maskMediaStoragePath: maskPath,
+    width: segmented.width,
+    height: segmented.height,
+    box2d: segmented.box2d,
+    boxPixels: segmented.boxPixels,
+    label: segmented.label,
+    maskFormat: segmented.maskFormat,
+    softEdges: segmented.softEdges,
+    limitations: segmented.limitations,
+    aiMediaSafetyStatus: "passed",
+    aiMediaSafetyNotes: segmented.limitations
+  };
+}
+
 exports.aiEnhanceShoutOutMedia = onCall({
   region:"us-central1",
   secrets:[GEMINI_API_KEY],
@@ -1931,55 +2037,147 @@ exports.aiEnhanceShoutOutMedia = onCall({
   memory:"1GiB"
 }, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const uid = request.auth.uid;
+  const email = String(request.auth.token?.email || "").trim().toLowerCase();
   if (request.data?.mode === "diagnostic") {
-    geminiSecretValue();
+    try {
+      geminiSecretValue();
+      await geminiAccessLog.logGeminiApiAccess(db, {
+        ok: true,
+        uid,
+        email,
+        operation: "diagnostic",
+        enhancementType: "diagnostic",
+        model: GEMINI_IMAGE_EDIT_MODEL,
+        message: "Gemini secret configured (diagnostic)"
+      });
+    } catch (error) {
+      await geminiAccessLog.logGeminiApiAccess(db, {
+        ok: false,
+        uid,
+        email,
+        operation: "diagnostic",
+        enhancementType: "diagnostic",
+        failureReason: String(error?.message || error).slice(0, 400),
+        errorCode: error?.code || "not_configured",
+        message: "Gemini diagnostic failed"
+      });
+      throw error;
+    }
     return {
       status:"configured",
       provider:"gemini",
       model:GEMINI_IMAGE_EDIT_MODEL,
-      capabilities:["authenticated ShoutOut image editing", "Storage owner path enforcement", "diagnostic secret check"],
+      segmentationModel: portraitMask.SEGMENTATION_MODEL,
+      capabilities:[
+        "authenticated ShoutOut image editing",
+        `baller-portrait-mask segmentation (${portraitMask.SEGMENTATION_MODEL})`,
+        "Storage owner path enforcement",
+        "diagnostic secret check",
+        "geminiApiAccessLogs 30-day audit"
+      ],
       videoEditing:"Video uploads use FLOQR first-7-second trim; this callable edits images."
     };
   }
-  const uid = request.auth.uid;
   const mediaStoragePath = String(request.data?.mediaStoragePath || "").trim();
-  const prompt = safeEnhancementPrompt(request.data?.prompt, request.data?.enhancementType);
+  const enhancementType = String(request.data?.enhancementType || "image-edit").trim();
   if (!mediaStoragePath) throw new HttpsError("invalid-argument", "mediaStoragePath is required.");
-  const original = await downloadOwnedImage(mediaStoragePath, uid);
-  const edited = await callGeminiImageEdit({
-    buffer:original.buffer,
-    contentType:original.contentType,
-    prompt
-  });
-  const outputPath = enhancedPathForOriginal(original.mediaStoragePath, request.data?.referenceNumber, edited.contentType);
-  const enhancedMediaUrl = await uploadEnhancedGeminiImage({
-    bucket:original.bucket,
-    outputPath,
-    buffer:edited.data,
-    contentType:edited.contentType
-  });
-  await db.collection("aiMediaEdits").add({
-    uid,
-    sourceType:"shoutoutMedia",
-    originalMediaStoragePath:original.mediaStoragePath,
-    enhancedMediaStoragePath:outputPath,
-    enhancementType:String(request.data?.enhancementType || "image-edit").slice(0, 80),
-    prompt:String(request.data?.prompt || "").slice(0, 600),
-    provider:"gemini",
-    model:GEMINI_IMAGE_EDIT_MODEL,
-    status:"completed",
-    createdAt:admin.firestore.FieldValue.serverTimestamp()
-  });
-  return {
-    status:"enhanced",
-    provider:"gemini",
-    model:GEMINI_IMAGE_EDIT_MODEL,
-    enhancedMediaUrl,
-    enhancedMediaStoragePath:outputPath,
-    aiMediaSafetyStatus:"passed",
-    aiMediaSafetyNotes:edited.textNotes || "Gemini returned an edited image suitable for ShoutOut review."
-  };
+
+  // Baller's Alert: segmentation mask only — never redraw the patron's face.
+  if (enhancementType === "baller-portrait-mask" || enhancementType === "baller-face-medallion") {
+    try {
+      return await runBallerPortraitMask({
+        uid,
+        email,
+        mediaStoragePath,
+        referenceNumber: request.data?.referenceNumber
+      });
+    } catch (error) {
+      if (!(error instanceof HttpsError)) {
+        await geminiAccessLog.logGeminiApiAccess(db, {
+          ok: false,
+          uid,
+          email,
+          operation: "baller-portrait-mask",
+          enhancementType: "baller-portrait-mask",
+          mediaStoragePath,
+          referenceNumber: request.data?.referenceNumber,
+          failureReason: String(error?.message || error).slice(0, 400),
+          errorCode: "unexpected"
+        });
+      }
+      if (error instanceof HttpsError) throw error;
+      throw new HttpsError("failed-precondition", String(error?.message || error).slice(0, 400));
+    }
+  }
+
+  const prompt = safeEnhancementPrompt(request.data?.prompt, enhancementType);
+  try {
+    const original = await downloadOwnedImage(mediaStoragePath, uid);
+    const edited = await callGeminiImageEdit({
+      buffer:original.buffer,
+      contentType:original.contentType,
+      prompt
+    });
+    const outputPath = enhancedPathForOriginal(original.mediaStoragePath, request.data?.referenceNumber, edited.contentType);
+    const enhancedMediaUrl = await uploadEnhancedGeminiImage({
+      bucket:original.bucket,
+      outputPath,
+      buffer:edited.data,
+      contentType:edited.contentType
+    });
+    await db.collection("aiMediaEdits").add({
+      uid,
+      sourceType:"shoutoutMedia",
+      originalMediaStoragePath:original.mediaStoragePath,
+      enhancedMediaStoragePath:outputPath,
+      enhancementType:enhancementType.slice(0, 80),
+      prompt:String(request.data?.prompt || "").slice(0, 600),
+      provider:"gemini",
+      model:GEMINI_IMAGE_EDIT_MODEL,
+      status:"completed",
+      createdAt:admin.firestore.FieldValue.serverTimestamp()
+    });
+    await geminiAccessLog.logGeminiApiAccess(db, {
+      ok: true,
+      uid,
+      email,
+      operation: enhancementType.slice(0, 80) || "image-edit",
+      enhancementType: enhancementType.slice(0, 80),
+      model: GEMINI_IMAGE_EDIT_MODEL,
+      mediaStoragePath: original.mediaStoragePath,
+      referenceNumber: request.data?.referenceNumber,
+      message: `Gemini image edit succeeded (${enhancementType})`
+    });
+    return {
+      status:"enhanced",
+      provider:"gemini",
+      model:GEMINI_IMAGE_EDIT_MODEL,
+      enhancedMediaUrl,
+      enhancedMediaStoragePath:outputPath,
+      aiMediaSafetyStatus:"passed",
+      aiMediaSafetyNotes:edited.textNotes || "Gemini returned an edited image suitable for ShoutOut review."
+    };
+  } catch (error) {
+    await geminiAccessLog.logGeminiApiAccess(db, {
+      ok: false,
+      uid,
+      email,
+      operation: enhancementType.slice(0, 80) || "image-edit",
+      enhancementType: enhancementType.slice(0, 80),
+      model: GEMINI_IMAGE_EDIT_MODEL,
+      mediaStoragePath,
+      referenceNumber: request.data?.referenceNumber,
+      failureReason: String(error?.message || error).slice(0, 1000),
+      errorCode: error?.code || "image_edit_failed",
+      message: `Gemini image edit failed (${enhancementType})`
+    });
+    throw error;
+  }
 });
+
+/** Alias for Baller's Alert background removal (same callable, clearer name). */
+exports.removeBallerPortraitBackground = exports.aiEnhanceShoutOutMedia;
 
 exports.aiSuggestShoutOut = onCall({
   region:"us-central1",
@@ -2571,7 +2769,7 @@ function defaultFloqrPreviewLinks(v = "s3.0.102") {
     ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
     ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
-    ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+    ["Search / BOT DEE", `${base}/?v=${v}&start=intent`],
     ["Aurelia display board", `${base}/display.html?location=temp-democlub-1`]
   ];
 }
@@ -2701,4 +2899,19 @@ exports.sendFloqrPreviewLinksEmail = onCall({
     packageVersion
   });
   return {ok: true, to: toEmail, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status: sent.status, mailLogId: sent.mailLogId, tlsProtocol: sent.tlsProtocol};
+});
+
+/** Hourly Gemini API failure digest → Master Admin / FloqR Admin inbox. */
+exports.checkGeminiApiAccessFailures = onSchedule({
+  region: "us-central1",
+  schedule: "every 60 minutes",
+  timeZone: "UTC",
+  timeoutSeconds: 120,
+  memory: "256MiB"
+}, async () => {
+  const result = await geminiAccessLog.notifyGeminiFailuresLastHour(db, {
+    masterAdminEmails: MASTER_ADMIN_EMAILS
+  });
+  console.log("checkGeminiApiAccessFailures", JSON.stringify(result));
+  return result;
 });

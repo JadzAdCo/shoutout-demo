@@ -11,7 +11,7 @@
   const COLLECTION = "dataClassification";
   const TIERS = ["isPatronAccessible", "isRegularEmployeeAccessible", "isPrivilegedEmployeeAccessible", "isClubAdminAccessible", "isMasterAdminAccessible"];
   const FLAGS = ["isPublicAccessible", ...TIERS, "ownRecordReadable", "containsPII"];
-  /** Platform server identity (Admin SDK jobs, FloqAi resolver). Always 1, never editable, never a client role. */
+  /** Platform server identity (Admin SDK jobs, BOT DEE resolver). Always 1, never editable, never a client role. */
   const SYSTEM_FLAG = "isSystemAccessible";
   const LEVELS = ["public", "internal", "clubConfidential", "restricted", "secret"];
   const ROLES = ["anonymous", "patron", "regular", "privileged", "clubAdmin", "master", "system"];
@@ -54,17 +54,19 @@
     ["aiCrawlerSchedules", "master", 0, "AI Crawling schedule"],
     ["aiCrawlRuns", "master", 0, "AI Crawling run history"],
     ["aiDiagnosticsReports", "master", 0, "Diagnostics reports"],
+    ["masterAdminRollups", "master", 0, "Precomputed Master Admin summary datapoints (5 min schedule; counts only)"],
     ["aiDiscoveryQueue", "master", 1, "AI Crawling review queue (venue contacts)"],
     ["aiDiscoveryRatingCriteria", "master", 0, "AI Crawling rating weights"],
     ["aiDiscoverySources", "master", 0, "AI Crawling source websites"],
     ["aiIndex", "internal", 0, "Search index of published venues and events"],
     ["aiMediaEdits", "ownMaster", 0, "AI photo edits made by a patron"],
     ["aiRecommendations", "ownMaster", 0, "Personal recommendations"],
-    ["aiSearchLogs", "master", 0, "FloqAi search history"],
+    ["aiSearchLogs", "master", 0, "BOT DEE search history"],
     ["aiTemplatePromptHistory", "ownMaster", 0, "Patron AI template prompts"],
     ["aiUserNotificationPreferences", "ownMaster", 0, "Patron notification choices"],
     ["aiUserSignals", "ownMaster", 0, "Patron interest signals"],
     ["appLogs", "master", 0, "Application logs"],
+    ["geminiApiAccessLogs", "master", 0, "Gemini API success/failure access audit (30-day; Master Admin or FloqR Admin)"],
     ["approvedShoutOutLibrary", "public", 0, "Approved ShoutOut ideas"],
     ["audienceCampaigns", "clubAdmin", 0, "Club audience campaigns"],
     ["betaInvites", "master", 1, "Beta tester invitations"],
@@ -76,7 +78,7 @@
     ["clubDailyAuthCodes", "clubPrivileged", 0, "Daily door / staff codes"],
     ["clubEmployeeDesignations", "ownClubPrivileged", 1, "Club staff roster and roles"],
     ["clubLocationAliases", "public", 0, "Merged venue aliases"],
-    ["clubLocations", "public", 0, "Published venue profiles"],
+    ["clubLocations", "public", 0, "Published venue profiles; Connect transfer-ready flags only (no acct id)"],
     ["clubLocations/vipNights", "public", 0, "VIP reserV per-table isBooked status by night (tables/{tableNumber})"],
     ["clubMarketingCampaigns", "clubAdmin", 0, "Club marketing campaigns"],
     ["clubMedia", "public", 0, "Published venue photos and videos"],
@@ -102,7 +104,11 @@
     ["featureServiceAuditHead", "master", 0, "Audit chain head"],
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
-    ["floqAiAccessThrottle", "secret", 0, "FloqAi access-denial log rate limits"],
+    ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock); Functions-write"],
+    ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
+    ["botDeeAccessThrottle", "secret", 0, "BOT DEE access-denial log rate limits"],
+    ["floqAiAccessThrottle", "secret", 0, "Legacy BOT DEE access-denial throttle id (pre-botDee rename; deny-all)"],
     ["floqrAdmins", "master", 1, "Assigned FloqR Admins (template catalog access)"],
     ["friendRequests", "ownMaster", 0, "Friend requests"],
     ["friendships", "ownMaster", 0, "Friend connections"],
@@ -145,7 +151,7 @@
     ["spotAdCampaigns", "public", 0, "Ads shown on display boards"],
     ["staffMarketingConsentLogs", "ownClubAdmin", 1, "Staff marketing media consent evidence"],
     ["staffMarketingConsentThrottle", "secret", 0, "Staff consent change rate limits"],
-    ["stripeConnectAccounts", "clubAdmin", 1, "Club payout accounts"],
+    ["stripeConnectAccounts", "clubAdmin", 1, "Club/seller Connect bindings (Functions-only acct id); VIP Club Stripe reads this, not clubLocations.stripeConnectAccountId"],
     ["stripeWebhookEvents", "secret", 0, "Payment processor events"],
     ["suprstarRequests", "ownClubAdmin", 1, "floqCast live video requests"],
     ["suprstrEntitlements", "ownMaster", 0, "floqCast purchases"],
@@ -198,6 +204,12 @@
     ["users", "marketingMediaConsent", "ownClubAdmin", 1, "Staff consent to appear in a club's marketing media (Club Admins of the affiliated club)"],
     ["users", "email", "ownMaster", 1, "Account email"],
     ["users", "phone", "ownMaster", 1, "Account phone number"],
+    ["users", "taxiPickupAddress", "ownMaster", 1, "Private RydR pickup line (composed street + city + ZIP/postal)"],
+    ["users", "taxiStreetNumber", "ownMaster", 1, "Private RydR street number"],
+    ["users", "taxiStreetName", "ownMaster", 1, "Private RydR street name"],
+    ["users", "taxiCity", "ownMaster", 1, "Private RydR pickup city"],
+    ["users", "taxiPostalCode", "ownMaster", 1, "Private RydR ZIP or postal code"],
+    ["users", "taxiPostalKind", "ownMaster", 0, "Private RydR postal kind (zip vs postal)"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];
@@ -537,9 +549,10 @@
 
   /** Least-privilege manifest: each server job states its purpose and the only collections it may read as System. */
   const SYSTEM_JOBS = {
-    floqAiAccess: {purpose: "Resolve the caller's tier so FloqAi shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "floqAiAccessThrottle", "betaTesters"]},
+    botDeeAccess: {purpose: "Resolve the caller's tier so BOT DEE shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "botDeeAccessThrottle", "floqAiAccessThrottle", "betaTesters"]},
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
     dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]},
+    masterAdminRollup: {purpose: "Precompute Master Admin panel summary counts every 5 minutes", collections: ["masterAdminRollups", "users", "shoutouts", "liveContent", "guestListRequests", "messages", "inboxNotifications", "clubLocations", "clubLocationAliases", "events", "templates", "minglConnections", "minglAudit", "chatRooms", "chatMessages", "roleRequests", "clubEmployeeDesignations", "patronTemplateVariants", "aiIndex", "aiUserNotificationPreferences", "aiSearchLogs", "aiRecommendations", "aiDiscoverySources", "aiDiscoveryQueue", "aiDiscoveryRatingCriteria", "aiCrawlRuns", "aiCrawlerSchedules", "aiDiagnosticsReports", "serviceOrders", "audienceCampaigns", "pickupRequests", "shoutoutRecommendations"]},
     peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
     shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]}
   };
@@ -576,7 +589,7 @@
     return {role: "patron", clubIds: []};
   }
 
-  // ---- FloqAi content (help entries, intents). Translations inherit the source id's class. ----
+  // ---- BOT DEE content (help entries, intents). Translations inherit the source id's class. ----
 
   const AUDIENCE_FLAG = {
     public: "isPublicAccessible",
@@ -588,7 +601,7 @@
   };
   const SOURCE_ID = /^(help|intent):[A-Za-z0-9][A-Za-z0-9_-]{0,119}$/;
 
-  /** Builds a classification row from FloqAi audiences; null when unclassified (fail closed). */
+  /** Builds a classification row from BOT DEE audiences; null when unclassified (fail closed). */
   function classifyAudiences(audiences, sourceId = "") {
     const list = (Array.isArray(audiences) ? audiences : []).filter(key => AUDIENCE_FLAG[key]);
     if (!list.length) return null;
@@ -611,7 +624,7 @@
     return classifyAudiences(table[key], id);
   }
 
-  /** Filters FloqAi source ids for a viewer; unknown or malformed ids are denied. */
+  /** Filters BOT DEE source ids for a viewer; unknown or malformed ids are denied. */
   function filterContent(sourceIds, manifest, viewer) {
     const allowed = [];
     const denied = [];

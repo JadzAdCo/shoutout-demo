@@ -7,6 +7,7 @@ const {__featureServiceHelpers: featureAccess} = require("./feature-services-fun
 const payments = require("./vip-payments-core");
 const vipCore = require("./vip-core");
 const tableStatus = require("./vip-table-status");
+const {connectBindingId} = require("./stripe-connect-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -82,15 +83,33 @@ async function loadClubPaymentSettings(clubLocationId) {
 }
 
 async function loadClubStripeReady(clubLocationId) {
-  const snap = await db.collection("clubLocations").doc(text(clubLocationId, 120)).get();
-  const row = snap.exists ? snap.data() || {} : {};
-  const acct = text(row.stripeConnectAccountId || row.stripeAccountId, 120);
-  const transfers = row.stripeTransfersActive === true || row.stripeTransfersActive === 1
-    || text(row.stripeCapabilityTransfers, 40) === "active";
+  const clubId = text(clubLocationId, 120);
+  if (!clubId) {
+    return {connectedAccountId: "", transfersReady: false, livemode: false};
+  }
+  let binding = {};
+  try {
+    const bindingSnap = await db.collection("stripeConnectAccounts").doc(connectBindingId("club", clubId)).get();
+    binding = bindingSnap.exists ? bindingSnap.data() || {} : {};
+  } catch (_) {
+    binding = {};
+  }
+  let acct = text(binding.accountId, 160);
+  let transfers = binding.transfersReady === true || binding.transfersReady === 1
+    || text(binding.capabilityStatus, 40) === "active";
+  let livemode = binding.livemode === true || binding.livemode === 1;
+  if (!acct) {
+    const snap = await db.collection("clubLocations").doc(clubId).get();
+    const row = snap.exists ? snap.data() || {} : {};
+    acct = text(row.stripeConnectAccountId || row.stripeAccountId, 120);
+    transfers = row.stripeTransfersActive === true || row.stripeTransfersActive === 1
+      || text(row.stripeCapabilityTransfers, 40) === "active";
+    livemode = row.stripeConnectLivemode === true || row.stripeLivemode === true || row.stripeLivemode === 1;
+  }
   return {
     connectedAccountId: acct,
     transfersReady: !!(acct && transfers),
-    livemode: row.stripeLivemode === true || row.stripeLivemode === 1
+    livemode
   };
 }
 
@@ -421,7 +440,7 @@ exports.seedVipPosProviders = onCall(CALL_OPTS, async request => {
  * Club POS path: FLOQR confirms the reservation after Terms; POS owns deposit/tab/spend.
  * Inventory marks booked so the map shows reserved; paymentConfirmed stays 0 until POS webhook (later).
  */
-exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, async request => {
+async function runConfirmVipReservationForClubPos(request) {
   await featureAccess.assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
@@ -529,11 +548,14 @@ exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, async request => {
     reservationId: reservationRef.id,
     passToken
   };
-});
+}
+
+exports.confirmVipReservationForClubPos = onCall(CALL_OPTS, runConfirmVipReservationForClubPos);
 
 exports.__vipPosHelpers = {
   loadClubPaymentSettings,
   loadClubStripeReady,
   normalizePaymentSettings,
+  runConfirmVipReservationForClubPos,
   payments
 };

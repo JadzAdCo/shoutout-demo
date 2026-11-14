@@ -11,9 +11,9 @@
     "title": "Archived ShoutOuts",
     "body": "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive."
   },
-  "floqai-ask-floqr": {
-    "title": "Ask FloqR with FloqAi",
-    "body": "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
+  "botdee-ask-floqr": {
+    "title": "Ask FloqR with BOT DEE",
+    "body": "Ask FloqR with BOT DEE — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
   },
   "help-soccer-jersey": {
     "title": "Soccer jersey ShoutOut",
@@ -25,7 +25,7 @@
   },
   "help-floqcast-choose-venue": {
     "title": "Choose a floqCast venue",
-    "body": "The first four clubs are the nearest floqCast venues (browser location, like ShoutOut). Type a club or event name to bring up matches. Only clubs with floqCast enabled appear here."
+    "body": "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
   },
   "help-become-club-admin": {
     "title": "Become a Club Admin",
@@ -89,7 +89,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Create and publish a staff schedule",
-    "body": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Delete multiple scheduled or draft shifts",
@@ -127,6 +127,14 @@
     "title": "Profile & Settings",
     "body": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options."
   },
+  "help-profile-height": {
+    "title": "Height",
+    "body": "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can still switch the unit."
+  },
+  "help-taxi-pickup-address": {
+    "title": "Taxi pickup address",
+    "body": "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint."
+  },
   "help-onboarding": {
     "title": "Onboarding",
     "body": "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues."
@@ -137,11 +145,11 @@
   },
   "help-default-template": {
     "title": "Default Template",
-    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
+    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use BOT DEE below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
   },
-  "help-floqai-template-search": {
-    "title": "FloqAi template search",
-    "body": "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
+  "help-botdee-template-search": {
+    "title": "BOT DEE template search",
+    "body": "Tap the moving BOT DEE mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
   },
   "help-mingl-requests": {
     "title": "About Mingl Requests",
@@ -199,6 +207,10 @@
     "title": "Shiloh",
     "body": "$30 Aurelia exclusive. Shiloh the cat sits on the left of the board and your ShoutOut glows in white on the dark side beside her. Emoji are welcome. Type “Shiloh” in Search, write up to three short lines, and add your @handle if you like. Plays on the board sizes Aurelia has."
   },
+  "help-classic-halloween": {
+    "title": "Classic Halloween",
+    "body": "$15 Classic Halloween, at every club. The classic three-line ShoutOut board on a moonlit graveyard with jack-o'-lanterns, and emoji are welcome. At the end of each cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. Type “Halloween” in Search, write up to three short lines, and add your @handle if you like. Plays on 96×48, 64×48 and 64×32 boards."
+  },
   "help-display-idle-default": {
     "title": "Idle board: Use ShoutOut @ venue",
     "body": "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away."
@@ -247,9 +259,9 @@
     "title": "Club website feed",
     "body": "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links."
   },
-  "help-floqai-page": {
-    "title": "FloqAi",
-    "body": "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers."
+  "help-botdee-page": {
+    "title": "BOT DEE",
+    "body": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. Results only include what your account can use. Quick intent search stays available as a fast path when you want product cards without chat."
   },
   "help-scheduling-schedule-for": {
     "title": "Staff Scheduling",
@@ -285,7 +297,7 @@
   },
   "help-vip-choose-venue": {
     "title": "Choose a VIP reserV venue",
-    "body": "Only clubs subscribed to VIP reserV appear here — same idea as picking a ShoutOut venue. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
+    "body": "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
   },
   "help-vip-floqr-stripe-aurelia": {
     "title": "Set FloqMedia Stripe for Aurelia (Demo Club)",
@@ -293,7 +305,7 @@
   },
   "help-vip-payment-collector": {
     "title": "VIP reserV payment collector & Club POS",
-    "body": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask FloqAi how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps."
+    "body": "Preferred for live clubs with Toast/SpotOn: Club POS — FLOQR books, holds, and maps the table; the POS owns deposit, open tab, and spend. Alternatives: Club Stripe (venue Connect), FloqMedia Stripe (FloqR platform), or VIP reserV engine + CSV. Aurelia (Demo Club) defaults to FloqMedia Stripe — ask BOT DEE how to set FloqMedia Stripe for Aurelia for the Master Admin and Club Admin steps."
   },
   "help-vip-table-isbooked": {
     "title": "VIP table isBooked status in Firestore",
@@ -306,5 +318,21 @@
   "help-chrome-audit": {
     "title": "Site chrome audit",
     "body": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrome audit. If receipts stay on Nightlife, Copy chrome fix prompt and give it to Codex."
+  },
+  "help-shoutout-choose-venue": {
+    "title": "Choose a ShoutOut venue",
+    "body": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+  },
+  "help-search-settings-appearance": {
+    "title": "Settings on Search",
+    "body": "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks."
+  },
+  "help-black-card": {
+    "title": "Black Card (retired)",
+    "body": "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Use Upload photo → Photo library / files or Camera with face guide (one Upload control — no duplicate Take photo button). Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only the face sits in the medallion. Helmet, rim, and chip stay. If background removal fails, retry or keep the original. Company is optional (max 18 characters, always UPPERCASE on the card; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
   }
 }

@@ -119,6 +119,7 @@
   }
 
   async function submitConsentAndPay() {
+    if (payBtn?.dataset.criticalBusy === "1") return;
     if (!activeHold?.holdId) {
       setStatus(t("page.vipTerms.missingHold", "No active hold. Return to the floor map and hold a table first."));
       return;
@@ -133,7 +134,12 @@
       marketing: !!document.getElementById("vipCheckMarketing")?.checked
     };
     setStatus(t("page.vip.recordingConsent", "Recording consent…"));
-    if (payBtn) payBtn.disabled = true;
+    if (payBtn) {
+      payBtn.dataset.criticalBusy = "1";
+      payBtn.disabled = true;
+      payBtn.classList.add("is-critical-busy");
+      payBtn.setAttribute("aria-busy", "true");
+    }
     try {
       await refreshCollector();
       const consentRes = await callable("recordVipConsent")({
@@ -173,7 +179,12 @@
       if (!url) throw new Error("Checkout URL missing");
       location.href = url;
     } catch (err) {
-      if (payBtn) payBtn.disabled = false;
+      if (payBtn) {
+        payBtn.dataset.criticalBusy = "";
+        payBtn.disabled = false;
+        payBtn.classList.remove("is-critical-busy");
+        payBtn.removeAttribute("aria-busy");
+      }
       const msg = err?.message || String(err);
       setStatus(msg.replace(/^.*?:\s*/, "") || t("page.vip.checkoutFailed", "Checkout could not start."));
     }

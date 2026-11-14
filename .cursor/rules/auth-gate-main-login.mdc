@@ -19,7 +19,7 @@ Do **not** embed a second incomplete login card on private pages.
 
 ## Exceptions (do not redirect / do not require full home login)
 
-- Public / display surfaces: `display.html`, `display2.html`, `club-profile.html`, marketing/landing cards, FloqAi search as public browse
+- Public / display surfaces: `display.html`, `display2.html`, `club-profile.html`, marketing/landing cards, BOT DEE search as public browse
 - Popouts / previews / frame previews (`*-preview*.html`, `suprstar-live-popout.html`, etc.)
 - Master Admin: keep allow-listed Google/Microsoft policy (not Email OTP for production Master Admin)
 - Pages that already host the full multi-method login card as their primary job (`index.html`)

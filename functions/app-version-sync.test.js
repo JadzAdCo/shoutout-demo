@@ -58,16 +58,16 @@ test("FLOQRNav never puts v= on a link and drops an incoming v from old bookmark
     nav.portalLink("./mingl-chat.html?v=29.09.8", {room: "r1"}),
     nav.adminLink("./club-profile.html"),
     nav.masterLink("./floqcast-search.html"),
-    nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"),
+    nav.stampCurrentVersion("./botdee.html?v=s3.1.20&q=hi"),
     nav.intentSearchHome(),
     nav.resolveBack("mingl").href,
     nav.resolveBack("bartr").href,
     nav.resolveBack("portal").href
   ];
   assert.deepEqual(hrefs.filter((href) => /[?&]v=/.test(href)), []);
-  assert.equal(nav.stampCurrentVersion("./floqai.html?v=s3.1.20&q=hi"), "./floqai.html?q=hi");
+  assert.equal(nav.stampCurrentVersion("./botdee.html?v=s3.1.20&q=hi"), "./botdee.html?q=hi");
   assert.equal(nav.adminPortalUrl("zebbies"), "./admin.html?location=zebbies&from=master");
-  assert.equal(nav.intentSearchHome(), "./floqai.html");
+  assert.equal(nav.intentSearchHome(), "./botdee.html");
   assert.equal(nav.stableDisplayUrl("zebbies"), "./display.html?location=zebbies");
   assert.equal(nav.stampCurrentVersion("./display2.html?location=zebbies&v=s3.0.1&screen=led-64x32"), "./display2.html?location=zebbies");
 });
@@ -75,7 +75,7 @@ test("FLOQRNav never puts v= on a link and drops an incoming v from old bookmark
 function generatedHrefs(appVersion) {
   const win = {URLSearchParams, URL, console, FLOQRNav: appVersion == null ? undefined : {appVersion}};
   win.window = win;
-  vm.runInNewContext(read("floqai-help-repository.js"), win);
+  vm.runInNewContext(read("botdee-help-repository.js"), win);
   vm.runInNewContext(read("intent-search.js"), win);
   const everyone = {IsPatron: 1, IsServiceMember: 1, IsVenueAdmin: 1, IsMasterAdmin: 1};
   const {PRODUCT_INTENTS, HELP_INTENTS} = win.FLOQRIntentSearch;
@@ -83,13 +83,13 @@ function generatedHrefs(appVersion) {
   return [...json.matchAll(/"href":"([^"]*)"/g)].map((hit) => hit[1]).filter((href) => href.startsWith("./"));
 }
 
-test("FloqAi links carry no version and no dangling ? / ?& whatever FLOQRNav says", () => {
+test("BOT DEE links carry no version and no dangling ? / ?& whatever FLOQRNav says", () => {
   for (const version of [pkgVersion, "", undefined]) {
     const hrefs = generatedHrefs(version);
     assert.ok(hrefs.length > 50, `found ${hrefs.length} links`);
     const bad = hrefs.filter((href) => /[?&]v=|\?&|\?(?:#|$)/.test(href));
     assert.deepEqual(bad, [], `appVersion=${JSON.stringify(version)}`);
-    assert.ok(hrefs.includes("./scheduling.html?from=floqai"));
+    assert.ok(hrefs.includes("./scheduling.html?from=botdee"));
   }
 });
 
@@ -136,11 +136,11 @@ test("Display / Xibo pages are never linked with v=", () => {
   assert.deepEqual(hits, []);
 });
 
-test("pages load floqr-nav.js before the FloqAi link builders", () => {
+test("pages load floqr-nav.js before the BOT DEE link builders", () => {
   const bad = htmlPages().flatMap((name) => {
     const html = read(name);
     const nav = html.search(/src="\.\/floqr-nav\.js/);
-    return ["floqai-help-repository.js", "intent-search.js"]
+    return ["botdee-help-repository.js", "intent-search.js"]
       .filter((dep) => {
         const at = html.indexOf(`src="./${dep}`);
         return at >= 0 && (nav < 0 || nav > at);

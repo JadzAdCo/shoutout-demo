@@ -173,6 +173,10 @@ async function loadFeature(featureKey) {
   if (!snap.exists && key === "floqCast") {
     snap = await db.collection(C.features).doc("supRstar").get();
   }
+  // One-release dual-read: prefer botDee doc; fall back to legacy featureServices/floqAi.
+  if (!snap.exists && key === "botDee") {
+    snap = await db.collection(C.features).doc("floqAi").get();
+  }
   return core.normalizeFeature(key, snap.exists ? snap.data() : null);
 }
 
@@ -268,6 +272,7 @@ exports.seedFeatureServices = onCall(CALL_OPTS, async request => {
     const refs = core.FEATURE_KEYS.map(key => db.collection(C.features).doc(key));
     const snaps = await Promise.all(refs.map(ref => tx.get(ref)));
     const legacySupRstar = await tx.get(db.collection(C.features).doc("supRstar"));
+    const legacyFloqAi = await tx.get(db.collection(C.features).doc("floqAi"));
     const legacyTraditionalTheme = await tx.get(db.collection(C.features).doc("traditionalTheme"));
     const head = await tx.get(headRef());
     const missing = snaps.map((snap, i) => (snap.exists ? null : core.FEATURE_KEYS[i])).filter(Boolean);
@@ -278,6 +283,10 @@ exports.seedFeatureServices = onCall(CALL_OPTS, async request => {
       let legacy = key === "floqCast" && legacySupRstar.exists ? legacySupRstar.data() : null;
       let reason = "Initial seed from packaged catalog";
       if (key === "floqCast" && legacy) reason = "Seeded floqCast from legacy featureServices/supRstar";
+      if (key === "botDee" && legacyFloqAi.exists) {
+        legacy = legacyFloqAi.data();
+        reason = "Seeded botDee from legacy featureServices/floqAi";
+      }
       if (key === "siteChrome" && legacyTraditionalTheme.exists) {
         legacy = legacyTraditionalTheme.data();
         reason = "Seeded siteChrome from legacy featureServices/traditionalTheme";

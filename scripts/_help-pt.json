@@ -11,9 +11,9 @@
     "title": "ShoutOuts arquivados",
     "body": "Archive guarda uma cópia comprimida do texto e da mídia do seu ShoutOut concluído (se o original tinha mídia) em armazenamento Firebase econômico e remove de Concluídos. Abra Archive a qualquer momento. Reutilizar também funciona a partir de Archive."
   },
-  "floqai-ask-floqr": {
-    "title": "Pergunte FloqR com FloqAi",
-    "body": "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+  "botdee-ask-floqr": {
+    "title": "Pergunte FloqR com BOT DEE",
+    "body": "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
   },
   "help-soccer-jersey": {
     "title": "Camisa de futebol ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Crie e publique uma agenda de equipe",
-    "body": "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Excluir vários turnos agendados ou rascunhos",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Modelo padrão",
-    "body": "Clássico tradicional preto e branco grátis. Use FloqAi abaixo para modelos de Esportes, Jersey, VIP, Humor, Carros, Vídeo, Fotos e Ballers."
+    "body": "Clássico tradicional preto e branco grátis. Use BOT DEE abaixo para modelos de Esportes, Jersey, VIP, Humor, Carros, Vídeo, Fotos e Ballers."
   },
-  "help-floqai-template-search": {
-    "title": "FloqAi pesquisa de modelos",
-    "body": "Toque na marca móvel FloqAi (ou espere pelos balões de fala) e peça Esportes, Jersey, NBA, NFL, Carros, Humor, VIP, Vídeo, Fotos ou Ballers."
+  "help-botdee-template-search": {
+    "title": "BOT DEE pesquisa de modelos",
+    "body": "Toque na marca móvel BOT DEE (ou espere pelos balões de fala) e peça Esportes, Jersey, NBA, NFL, Carros, Humor, VIP, Vídeo, Fotos ou Ballers."
   },
   "help-mingl-requests": {
     "title": "Sobre Mingl solicitações",
@@ -162,5 +162,13 @@
   "help-public-media-sharing": {
     "title": "Mídia pública e compartilhamento de dados",
     "body": "Escolha várias imagens ou vídeos curtos de uma vez e organize a ordem no perfil público. Os perfis suportam até 8 imagens e 2 vídeos curtos."
+  },
+  "help-black-card": {
+    "title": "Black Card",
+    "body": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
   }
 }

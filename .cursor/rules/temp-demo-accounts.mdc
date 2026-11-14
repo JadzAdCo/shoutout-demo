@@ -31,7 +31,7 @@ To remove the demo pack:
 1. Delete or disable Auth users matching `temp_*@floqr-demo.com`
 2. Delete Firestore `users/{uid}` (and mirrors: associations, designations, scheduling, etc.)
 3. Delete Storage avatar/icon paths under the demo prefix (e.g. `demo-avatars/temp_*`)
-4. Remove Master Admin temporal tab: `master-admin.html` section, script include, `floqai-help-repository.js` entry, any `FEATURE-WIRING.md` demo section
+4. Remove Master Admin temporal tab: `master-admin.html` section, script include, `botdee-help-repository.js` entry, any `FEATURE-WIRING.md` demo section
 5. Remove cursor rule `.cursor/rules/temp-demo-accounts.mdc` when the pack is retired
 6. Soft-disable option: set `demoTemporary: true` + `active: false` / Auth disabled without hard delete so accounts can be re-enabled for another QA pass
 

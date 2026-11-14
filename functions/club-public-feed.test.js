@@ -117,5 +117,5 @@ test("feed handler + Club Admin card + public iframe are wired", () => {
   assert.match(embed, /club-embed\.js/);
   assert.doesNotMatch(embed, /firebase-config/);
   assert.match(read("club-embed.js"), /dataset=club/);
-  assert.match(read("floqai-help-repository.js"), /id: "help-club-website-feed"/);
+  assert.match(read("botdee-help-repository.js"), /id: "help-club-website-feed"/);
 });

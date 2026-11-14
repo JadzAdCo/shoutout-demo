@@ -53,7 +53,7 @@ Not chosen: open public API without key (scraping, abuse), webhooks (club sites 
 
 ## i18n / help
 
-Chrome `websiteFeed.*` (16) + `page.clubEmbed.*` (13) × 11 packs. Help `help-club-website-feed` (venueAdmin) in `admin.html`, `floqai-help-repository.js`, `_help-en.json`, 10 help packs. Script: `scripts/add-club-website-feed-i18n.js`.
+Chrome `websiteFeed.*` (16) + `page.clubEmbed.*` (13) × 11 packs. Help `help-club-website-feed` (venueAdmin) in `admin.html`, `botdee-help-repository.js`, `_help-en.json`, 10 help packs. Script: `scripts/add-club-website-feed-i18n.js`.
 
 ## Cutover
 

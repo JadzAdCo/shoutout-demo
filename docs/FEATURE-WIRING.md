@@ -8,9 +8,125 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-10-22 |
+| Last registry touch | 2026-11-14 |
 
 ---
+
+## Height unit + RydR pickup locale (s3.3.012)
+
+Unit-first height and structured taxi pickup. Profile country wins; if empty, IP country (never stored) from `FLOQRGeoSearch.ipLocation`.
+
+| Piece | Wiring |
+|---|---|
+| Module | `floqr-profile-locale.js` (`window.FLOQRProfileLocale`) — `bindHeightFields`, `bindPickupFields`, `validateHeight`, `usesZip` |
+| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. US/Canada default ft; other countries / non-US IP default m. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
+| Pickup | Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Composed `taxiPickupAddress` for RydR/commerce. Private on `users/{uid}` — not a Mingl public datapoint |
+| Surfaces | Search welcome (`index.html`), My Profile (`patron-portal.html`), RydR (`pickup.html`) |
+| Data | `users.taxiStreetNumber` / `taxiStreetName` / `taxiCity` / `taxiPostalCode` / `taxiPostalKind` / `taxiPickupAddress` — ownMaster PII, self-write |
+| Help | `help-profile-height`, `help-taxi-pickup-address` (patron) |
+| Tests | `functions/profile-locale.test.js` |
+
+---
+
+## Stripe sandbox wiring (s3.3.007)
+
+Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
+
+| Piece | Wiring |
+|---|---|
+| Checkout | Hosted Stripe Checkout via `FLOQRPayments.startCheckout` → `createFloqrCheckoutSession` (`functions/commerce-functions.js`). Critical pay CTAs (`submitShoutoutBtn` Continue to Checkout, VIP Pay deposit, floqCast pay) lock on the first tap (`FLOQRPayments.lockCriticalButton` → `.is-critical-busy`, greyed, `pointer-events:none`) so a slow session create cannot double-charge. |
+| Connect binding | `stripeConnectAccounts/{connect_<sha>}` written by Functions only (`createFloqrConnectOnboardingLink`, `getFloqrConnectStatus`, `persistConnectStatus`) |
+| VIP Club Stripe | `loadClubStripeReady` reads `stripeConnectAccounts` (club binding), then club flag fallback. Club Admin onboarding no longer leaves `clubLocations.stripeConnectAccountId` empty as a blocker |
+| Destination charges | When Connect transfers are ready, Checkout sets `payment_intent_data.transfer_data.destination` + `application_fee_amount` for ShoutOut (80/20), floqCast, VIP `clubStripe`, and BartR. ShoutOut still works without Connect (`optionalReadyRecipient`) |
+| Webhook | Same `stripeFloqrWebhook` + `STRIPE_WEBHOOK_SECRET`. Add Dashboard events: `account.updated`, `capability.updated`, `account.application.deauthorized`. Lookup uses `connectAccountIdFromWebhookEvent` (`acct_` only — never capability names or `ca_`). Do not require `STRIPE_CONNECT_WEBHOOK_SECRET` |
+| Club flags | `persistConnectStatus` mirrors `stripeTransfersActive` / `stripeCapabilityTransfers` / `stripeConnectLivemode` onto `clubLocations` — **never** the `acct_` id. Client cannot write those fields (`preservesStripeBindingFields`) |
+| Sandbox refund | Callable `refundFloqrCheckoutOrder` stays test-mode only (`reverse_transfer` + `refund_application_fee`) for webhook payout recovery. **Operator refunds are out of this pass** — no Master Admin “Refund sandbox order” control, no Pages QA. |
+| Surfaces | Club Admin public profile Stripe card; Master Admin Application Logging; patron Checkout unchanged |
+| Help | `help-vip-payment-collector` — Club Stripe uses Club Admin Connect onboarding |
+| Deploy | Functions + webhook event list. Pages cache-bust `payment-service.js` / `admin-app.js` / diagnostics |
+
+---
+
+## Master Admin 5-min rollup (s3.3.013)
+
+| | |
+|---|---|
+| **Purpose** | Precompute panel summary datapoints every 5 minutes so Master Admin strips do not run 27 collection counts / 1200-club duplicate scans / 750×3 commerce pulls on every panel open |
+| **Schedule** | `scheduledMasterAdminRollup` — `every 5 minutes` UTC (`functions/master-admin-rollup-functions.js`) |
+| **Callable** | `refreshMasterAdminRollup` — Master Admin only (`isServerAdminAuth`); writes same doc |
+| **Doc** | `masterAdminRollups/current` — `diagnostics.collectionCounts`, `aiCrawl` status counts + last run, `duplicates` clusters, `commerce` paid aggregates, `templates`, `recommendations` |
+| **Rules** | Master Admin read; client write `false` (Functions Admin SDK only) |
+| **Client** | `master-admin-rollup.js` → `FLOQRMasterAdminRollup` — bind + load on sign-in; `paintForPanel` from `activatePanel`; Diagnostics **Refresh rollup** button |
+| **Panel behavior** | Diagnostics mount paints rollup only (Run/Refresh Diagnostics = full live scan). Duplicate Records mount paints rollup; Refresh = live 1200 scan. AI Crawling `#aiCrawlingSummary` = rollup; `#aiDiscoverySummary` keeps how-to. Commerce/templates/recs metric cards from rollup |
+| **Classification** | `floqr-data-classification.js` register + `masterAdminRollup` job collections |
+| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-data-classification.js` `?v=s3.3.013` |
+| **Deploy** | Functions + Firestore rules required for live schedule/callable; Pages for client strips |
+
+## PHILA front+back pair retired (s3.3.012)
+
+| Piece | Wiring |
+|---|---|
+| Removed | `nbaPhiladelphia76ersPhila` (front+back / `nbaJerseyPair`) — no longer in catalog or picker |
+| Kept | `nbaPhiladelphia76ers` — back-only 76ERS plate |
+| Pair engine | Display `.nba-pair-kit-stack` / `paintIndependentPairFace` remains for unpublished Terps throwback pair |
+| Test | `functions/phila-independent-pair.test.js` asserts pair gone + 76ers kept |
+
+## PHILA White/Blue colorways (s3.3.004) — historical (pair retired)
+
+| Piece | Wiring |
+|---|---|
+| Composer | `index.html` `#jerseyColorway` — shown when template has `jerseyColorways` (PHILA pair) |
+| Catalog | `jersey-catalog.js` `nbaPhiladelphia76ersPhila.jerseyColorways` white\|blue + `FLOQRResolveJerseyColorway` |
+| Assets | White `nba-76ers-phila-*-blank.png`; Blue Icon `nba-76ers-phila-blue-*-blank.png` |
+| Display | `display-app.js` pair stage uses colorway URLs + `--nba-pair-ink` / `--nba-pair-outline` |
+| Controls | White C + Blue LED-punch under `reports/nba-phila-jersey-v1/assets/control/` |
+
+## PHILA white blanks + Terps gated QA (s3.3.003)
+
+| Piece | Wiring |
+|---|---|
+| PHILA assets | `images/basketball/nba-76ers-phila-{front,back}-blank.png` — white Association RGBA cutouts; catalog overlays supply name / PHILA / number (no baked EMBIID) |
+| Catalog | `nbaPhiladelphia76ersPhila` → blank URLs, `jerseyCssBack: false` |
+| Pair chrome | `display-app.js` skips FloqMedia rail when `pairMode`; `display.css` hides identity rail + single-face `.display-background` on `.nba-jersey-pair` |
+| Terps QA | `maryland-terps-pair-qa.html` — unlock key `terps-pair-qa`; hosts pair flags on published `nbaMarylandTerps` (front=back placeholder). Throwback Pair stays unpublished |
+| Visual QA | `/cursor/stores/self/nba-jersey-pair-visual-qa.md` — PC agent must confirm render vs sample after deploy |
+
+## Maryland Terps jersey pair v2 (s3.3.002)
+
+| Piece | Wiring |
+|---|---|
+| Brief | `reports/maryland-terps-jersey-v2/` (CURSOR_MASTER_PROMPT, IMPLEMENTATION_CONTRACT, SOURCES, INTEGRATION, composition reference) |
+| Catalog | `nbaMarylandTerpsThrowbackPair` — stable id `ncaa-umd-2026-27-2002-throwback-white-v2`, `nbaJerseyPair`, 7s/5s, `pairMessageTheme: maryland`, **`catalogPublished: false`** / **`productionAssetsReady: false`** (no front blank plate yet) |
+| Live Terps | `nbaMarylandTerps` remains the published back-only LED kit |
+| Gate | Unpublished pairs are omitted from `SHOUTOUT_TEMPLATES` / `FLOQR_JERSEY_TEMPLATE_IDS` / photo ids |
+| Display | Shared pair stage; Maryland message gradient when theme set; pair requires front URL + assets ready |
+| Engine | Same `floqr-jersey-scene.js` / FrameLoop as PHILA v1 — do not duplicate |
+| Gated QA | `maryland-terps-pair-qa.html` (s3.3.003) — operator unlock only |
+
+## PHILA jersey pair v1 (s3.3.001 → blanks s3.3.003)
+
+| Piece | Wiring |
+|---|---|
+| Brief | `reports/nba-phila-jersey-v1/` (CURSOR_MASTER_PROMPT, IMPLEMENTATION_CONTRACT, SOURCES, reference PNG) |
+| Catalog | `nbaPhiladelphia76ersPhila` — `nbaJerseyPair`, `jerseySceneMs:7000`, `messageSceneMs:5000`, `seasonStatus: reference-specific-unverified`, stable id `nba-phi-phila-white-reference-v1` |
+| Timing | `floqr-jersey-scene.js` `sceneAt`; `floqr-frame-loop.js` `holdMsByPhase` + `includeCopy:false` when ShoutOut blank |
+| Display | Pair stage back-left / front-right; optional ShoutOut panel; loads on `display.html` / `display2.html`; FloqMedia off on pair |
+| Editor | Name + Number + optional ShoutOut (same chrome as NFL dual for PHILA) |
+| Assets | White Association blanks `nba-76ers-phila-*-blank.png` (s3.3.003); legacy blue Icon `*-with-club.png` kept for other 76ers template |
+
+## ShoutOut diagnostics + Baller face upload + PHILA dual (s3.2.101)
+
+| Piece | Wiring |
+|---|---|
+| Decode error | Client `loadImageElement` — Storage URL → fetch blob → `createImageBitmap` / object URL; message **"Could not decode portrait image"** = composite could not load original/mask pixels (often after Gemini already returned a mask) |
+| BG removal | `functions/gemini-portrait-mask.js` `parseSegmentationJson` repairs truncated JSON + box_2d fallback; client composite prefers local File blob |
+| Baller Upload | Single **Upload photo** → chooser: Photo library / files **or** Camera — face guide (`openBallerFaceCameraCapture` oval). Standalone **Take photo** removed (duplicate of native sheet). Company max **18** UPPERCASE |
+| Catalog | **Black Card** + **Black Card (Amex)** removed from `SHOUTOUT_TEMPLATES` / STANDARD. Keep **Baller's Alert** (+ Amex twin). Checkout refuses new `blackCard` / `blackCardAmex` |
+| PHILA dual | Catalog `nbaPhiladelphia76ersPhila` (`nbaDualFaces`, `frontBackgroundUrl` + back kit). Display rotates front (PHILA + number) ↔ back (name + number) via `FLOQRFrameLoop` |
+| Diagnostics | Master Admin → **Diagnostics → ShoutOut** (`#diagnosticsShoutOut`, `master-shoutout-logging.js` / `FLOQRShoutOutDiagnostics`). `appLogs` category `shoutout`; subsection groups `page_call` by `shoutoutTrailId` + time/template/location |
+| Page trail | Starts on ShoutOut button (`shoutoutButton`) → Choose a venue (`shoutout-search.html` `shoutoutSearchPage`) → Throw ShoutOut Here (`throwShoutoutHere`) → `?start=shoutout` skips Search and opens splash (`adSplashPage`) → `templateSelectPage` → `editorPage` → `confirmationPage` → `checkoutRedirect` (Stripe host only) → `paymentReturn`. `FLOQRLog.shoutoutPageCall` in `floqr-logger.js`. Venue/template empty until chosen (never Zebbies/`blackwhite` defaults). Trail id rides `shoutoutTrailId` query + sessionStorage. Dead in-page `shoutoutLandingPage` removed. |
+
+Cache-bust: `patron-app.js`, `styles.css`, `jersey-catalog.js`, `display-app.js`, `display.css`, `shared-data.js`, `master-admin.html`, `master-shoutout-logging.js`, `botdee-help-repository.js`, `floqr-i18n.js`, `floqr-i18n-help.js`, `ai-diagnostics-service.js` `?v=s3.2.101`.
 
 ## Passes / door QR (`passes`)
 
@@ -30,19 +146,110 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Baller company max 18 + UPPERCASE (s3.2.100)
+
+| Piece | Wiring |
+|---|---|
+| Cap | `BALLER_COMPANY_MAX = 18` in `patron-app.js`; catalog/layout `maxSubCharacters:18`; `#ballerCustomCompany` `maxlength="18"` |
+| UPPERCASE | `ballerCompanyNormalize` (composer + payload) + `display-app.js` company `toUpperCase()` on LED |
+| Presets | `WE'RE OUTSIDE LLC`, `BAD BOY INC.`, `BADDB$CHES CORP` (≤18) |
+
+Cache-bust: `patron-app.js` / `shared-data.js` / `display-app.js` / `index.html` / `floqr-i18n-help.js` / `botdee-help-repository.js` `?v=s3.2.100`. Manual test: `s3-2-100-baller-company-18`.
+
+## LED — Terps number stroke weight −20% (s3.2.99)
+
+| Piece | Wiring |
+|---|---|
+| Thinner outline | `floqr-varsity-numbers.js` SVG `stroke-width` **8.8** (was 11, −20%) |
+
+Cache-bust: `floqr-varsity-numbers.js` `?v=s3.2.99`. Manual test: `s3-2-99-terps-stroke-thin`.
+
+## LED — Terps number horizontal −30% (s3.2.98)
+
+| Piece | Wiring |
+|---|---|
+| Narrower digits | `display.css` `.varsity-num { transform: scaleX(.7); transform-origin: center top }` — horizontal only; vertical size unchanged from s3.2.97 |
+
+Cache-bust: `display.css` `?v=s3.2.98`. Manual test: `s3-2-98-terps-number-narrow`.
+
+## LED + Saved — Terps varsity SVG +20% / Saved continue (s3.2.97)
+
+| Piece | Wiring |
+|---|---|
+| Number inner encirclement | `display-app.js` NBA photo path paints `#displaySub` via `FLOQRVarsityNumbers.svg` (stroke + `fill-rule:evenodd` holes). Thin CSS text-shadow removed for NBA photo kits. |
+| Number +20% vertical | `jersey-catalog.js` `BASKETBALL_JERSEY_OUTPUT.number` `one: 0.4968` / `two: 0.36432` (was 0.414 / 0.3036). |
+| Stroke weight | `floqr-varsity-numbers.js` stroke-width `11` (was 9). |
+| After Save opens Pending | `patron-portal-app.js` deep-link `id=` for `status:saved` now opens **Saved** pane (was always Pending). |
+| Continue editing dead | Continue is a button → `continueSavedShoutout` → session draft with jersey fields + `openEditor` → Search `goToEditor()` (old `?start=editor&savedId=` was never handled). |
+
+Cache-bust: `display.css` / `display-app.js` / `jersey-catalog.js` / `floqr-varsity-numbers.js` / `patron-app.js` / `patron-portal-app.js` / `ai-diagnostics-service.js` `?v=s3.2.97`. Manual test: `s3-2-97-terps-varsity-saved`.
+
+## LED + My ShoutOuts — missing jersey number / past restore (s3.2.96)
+
+| Piece | Wiring |
+|---|---|
+| Missing number + FloqMedia at collar | `display-app.js` NBA photo path used undeclared `digits` → `ReferenceError` before `#displaySub.textContent` and `pinJerseyFloqMediaRail`. Fix: `const digits = glyphLen(subText)`. |
+| Attribution wiping mark | `patron-app.js` `syncAttribution` now skips all soccer/NBA/NFL kits (not only NFL dual); commit reads `#soccerJerseyNumber` for jersey `subText`. |
+| Use Past ShoutOut | Restores `soccerManualName` + `soccerJerseyNumber` from past row; does not treat jersey mark as attribution. |
+| Past memory | Failed `getPastShoutOutMemory` no longer caches empty forever; rows sorted by `submittedAt`. |
+| My ShoutOuts empty Saved | Firestore had approved rows; Saved drafts can be zero. Portal auto-opens **Completed** when Saved+Pending empty and Completed has history. Query failures `console.warn`. |
+
+Cache-bust: `display-app.js` / `patron-app.js` / `patron-portal-app.js` `?v=s3.2.96`. Manual test: `s3-2-96-jersey-number-my-shoutouts`.
+
+## LED display fixes — Baller rim restore / jersey remnants / floqCast 100s / Gemini thinking (s3.2.95)
+
+**Purpose:** Follow-up to s3.2.94 LED QA + Gemini/floqCast hardening (Nov 2026).
+
+| Fix | Where |
+|---|---|
+| Baller ornate gold rim | `scripts/build-baller-card-photos.py` — exterior flood-fill only (no band luma/chroma wipe that deformed gold filigree); rebuild LED PNGs from package master |
+| Terps / jersey remnants | `display-app.js` `isBoardRemnantText` + `jerseyRealText` — HAPPY HALLOWEEN / idle CTA never become kit name; stop Halloween finale + wipe classic overlays before jersey paint |
+| NBA FloqMedia under hem | Portrait tanks use height-fit (`--nba-kit-h:86%`, `background-size:auto var(--nba-kit-h)`) so the hem stays on-board; rail `bottom:1.2%` + `pinJerseyFloqMediaRail` on canvas (s3.2.95) |
+| floqCast default live | `floqcast-preview.js` + `functions/floqcast-functions.js` — allow **100s**, default **100** (was 90) |
+| Gemini portrait mask | `functions/gemini-portrait-mask.js` — `thinkingLevel: LOW` for all 3.x; retry once without `thinkingConfig` if model rejects thinking args |
+| Upload size | Keep FLOQR **8 MB** Gemini edit cap (`MAX_GEMINI_IMAGE_BYTES`) — do not remove; phone HEIC/JPEG can exceed Function/Gemini payload safely |
+
+Cache-bust: `display.css` / `display-app.js` / `floqcast-preview.js` `?v=s3.2.95`. **Functions deploy required** for Gemini + floqCast duration. Manual test: `s3-2-95-baller-jersey-floqcast-gemini`.
+
+## LED display fixes — Baller corners / Terps FloqMedia / Halloween grave (s3.2.94)
+
+**Purpose:** Venue LED QA from live screenshots (Nov 2026).
+
+| Fix | Where |
+|---|---|
+| Baller white corner wedges | `scripts/build-baller-card-photos.py` `scrub_led_corner_fringe` + black letterbox; `display.css` `.baller-card .display-background` radius `3.15%/5.1%` + black outline |
+| Terps / NBA FloqMedia mid-jersey | Root cause: portrait kit + width-based `84% auto` cropped the hem, so screen-bottom FloqMedia sat mid-torso. Fix (s3.2.95): height-fit tank (`nbaPhotoKitLayout` / `--nba-kit-*`), remap jerseyOutput tops into that box, rail on canvas + `bottom:1.2%` + inline pin. Remnants: `isBoardRemnantText` / `clearClassicBoardRemnantsOnJersey` |
+| Halloween RIP tomb | `display.css` `.hw-grave` top-left (`left:8%;top:4%`); ghosts start near grave (`hwGhostRush` from top-left) |
+
+Cache-bust: `display.css` / `display-app.js` `?v=s3.2.94`. Manual test: `s3-2-94-led-display-fixes`.
+
+## 2026 jersey backs — Maryland Terps + NBA icon + NFL home kits (s3.2.91)
+
+**Purpose:** Photo LED backs. Maryland Terps basketball takes State, name, and number. All 30 NBA clubs use a 2026/27 icon tank (same cut as Terps); the club word, name, and number are typed on the kit. Every NFL club uses its 2026 home colors; the club word sits on the nameplate.
+
+| Layer | Wiring |
+|---|---|
+| Art | `images/basketball/maryland-terps-2026-back.jpg`; `images/basketball/nba-*-back-with-club.png` from `scripts/build-nba-2026-jerseys.js`; `images/nfl/nfl-*-back-with-club.png` from `scripts/build-nfl-2026-jerseys.js` |
+| Catalog | `jersey-catalog.js` — `jerseyOverlayWordmark`, `jerseyPlateLabel`, `jerseyStateField` (Terps only), `jerseyOutput` (basketball type: two-word places such as LOS ANGELES and OKLAHOMA CITY wrap to two lines at the regular size; a long single word shrinks; number is Alumni Sans Collegiate One at 41.4% / 30.4% with team-color fill and a white outline; word stays at 10.3%, name at 23.15%, number at 32.355%; number outline is an outside-only text-shadow ring so counters stay open; team/state word arches 25° end to end; NBA and Terps backs are photorealistic mesh fabric), `nflDualLayout` on NFL photos |
+| Composer | `index.html` `#jerseyState` when `jerseyStateField`; name + mark already on `#soccerJerseyFields` |
+| Board | `display-app.js` paints the plate word when `jerseyOverlayWordmark`; `display.css` places it on the NFL plate and on the Terps upper back. Once team, name, and number are real, the idle `Use ShoutOut @` line is not painted (`defaultMain` is deleted on approve and ignored on the board). |
+| i18n | `editor.jerseyState` in all 11 chrome packs |
+
+---
+
 ## Template selection — LED-true cards + Search lens (s3.2.21)
 
 **Purpose:** Venue template pick uses the Search-page lens field, contextual template-only search, and a true LED preview at the venue primary display size.
 
 | Layer | Wiring |
 |---|---|
-| Surface | `index.html` `#templateSelectPage` — `#templateSearchForm` / `#templateSearch` + `#templateSearchGo.category-floqai-lens` (always visible) |
+| Surface | `index.html` `#templateSelectPage` — `#templateSearchForm` / `#templateSearch` + `#templateSearchGo.category-botdee-lens` (always visible) |
 | Client | `patron-app.js` — `templateLedPreviewHtml`, `mountTemplateLedPreviews`, `primaryTemplateFormat`; cards Use-only |
 | Preview | `floqr-template-preview.js` `previewUrl` + `sampleFor` stock text/media; `floqr-board-frame.js` mounts native aspect |
 | Format | Venue `primaryDisplayScreenFormatId` (fallback overlapping formats); label on card head with template name |
 | Search scope | Official / club-approved / personal / community via `floqrSearch` + tags/description/popularity ranking |
-| CSS | `styles.css` `.template-select-*`; reuses `floqai-search.css` lens field |
-| Help | `help-default-template`, `help-floqai-template-search` |
+| CSS | `styles.css` `.template-select-*`; reuses `botdee-search.css` lens field |
+| Help | `help-default-template`, `help-botdee-template-search` |
 | Diagnostics | Manual test `s3-2-21-template-select-led-search` |
 
 ---
@@ -96,10 +303,11 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Login colors | `#loginActions` stack = FloqR tile `cyan → violet → magenta` (`--floqr-tile-*`) |
 | Logo | `images/floqr-color.png` — NL display tiles + white FloqR text, no charcoal pill; `?v=s3.2.26` |
 | Logo → home | `floqr-nav.js` `bindHomeLogos()` / `data-floqr-home-logo` → `searchHome()` (`./?start=search`) |
-| Back | Site-wide Image-2 pill: `.global-back-btn` / `.floqr-back-btn` + topbar `[data-i18n="nav.backShort"]` — centered periwinkle pill, label `nav.backShort` (`< Back`) via `applyGlobalBack`; click prefers `history.back()` with `resolveBack` href fallback. Headers: Back → centered FloqR mark (`.floqr-page-brand` / `.product-brand-stack` / `.category-brand-stack`) → page title |
-| Welcome OAuth | `patron-app.js` `signInProvider`: phone/tablet/WebView → `signInWithRedirect` first (`oauthPopupsUnreliable`); desktop → popup; `auth/popup-blocked` → redirect; never redirect on popup-closed. `getRedirectResult` waits briefly for `onAuthStateChanged` |
-| Search | `#categoryFloqAiInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryFloqAiGo.category-floqai-lens` inside `.category-floqai-field` (no full-width Search button). Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryFloqAiSpeech` + green `.category-or` removed |
-| Template FloqAi | Floating `#floqAiAgent` / speech **off** on `#templateSelectPage` (`floqai-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
+| Back | Site-wide compact left-justified pill: `.global-back-btn` / `.floqr-back-btn` + `nav.backShort` (`< Back`) via `applyGlobalBack`. **Never** full-bleed (`width:auto!important`; excluded from mobile `.buttonlike{width:100%}`). Follows Site chrome (WB: white fill + shiny black text + black outline). Click prefers `history.back()` with `resolveBack` href fallback. Headers: Back (left) → centered FloqR mark → page title |
+| White/Black active controls (s3.2.52) | Active tabs/buttons stay **white fill + shiny black text** with thin **Tiffany** border (`--floqr-tiffany` / `#00d4fe` — FloqCAST T / BOT DEE). Never grey/black fill (was `--hot/--accent` both `#111` on `.admin-tab.active`). |
+| Welcome OAuth | `patron-app.js` `signInProvider`: **popup first on every device** (user tap). Never redirect-first on mobile — GitHub Pages ↔ `*.firebaseapp.com` redirect often returns null under ITP (s3.2.35 regression: “full-page sign-in did not finish”). `auth/popup-blocked` → redirect last resort; never redirect on popup-closed. Failed redirect sets `floqr.authPreferPopup` and tells the patron to allow the popup or use Email/SMS OTP. `getRedirectResult` waits briefly for `onAuthStateChanged`. Portal Google (`patron-portal-app.js`) matches: popup first. |
+| Search | `#categoryBotDeeInput` placeholder `Search for Clubs, Lounge, Events, etc.`; submit is `#categoryBotDeeGo.category-botdee-lens` inside `.category-botdee-field` (no full-width Search button). `.category-botdee-search` is `max-width:720px; margin:0 auto` so the desktop bar centers under the FloqR logo. Icon faces: transparent + tile-palette halo (no `#000` tile). `#categoryBotDeeSpeech` (removed) + green `.category-or` removed |
+| Template BOT DEE | Floating `#botDeeAgent` / speech **off** on `#templateSelectPage` (`botdee-search.js` `syncAgentVisibility` → intent only). Lens `#templateSearchPanel` stays |
 | Search icon position | Phone/tablet (`max-width:1180px` + `floqr-mobile-browser` / `floqr-tablet-browser`): `#categoryPage` flex column, `.category-grid:has(.search-icon-row)` `margin-top:auto` so FloqCAST / ShoutOut / reserVIP / BOT DEE sit at the bottom of the viewport (safe-area aware). Wide desktop (`min-width:1181px`): icons stay under Search with centered max-width row — viewport width wins over `floqr-desktop-browser` so iPad “desktop site” still pins |
 | Traditional login | `html[data-floqr-chrome="traditional"]` charcoal cards + soft tile accents on primary/login |
 | Profile chip | `.user-menu-btn` hardcoded charcoal `linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)` for nightlife/traditional/tiffany/dark-green/white-black — not Nightlife pink/cyan |
@@ -120,19 +328,21 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Preference | Firestore `users/{uid}.isSiteChrome` — `0` Nightlife, `1` Traditional, `2` Black Tiffany, `3` White/Black, `4` Purple & White, `5` Black & Dark Green (+ legacy `uiChrome` string) |
 | Default | `0` / Nightlife for new patrons; last-used chrome is painted from localStorage / profile even when beta access is off (login + Search). Picker UI fail-closed until `FLOQRFeatureServices.canAccess("siteChrome")` |
 | Client | `floqr-chrome-scheme.js` → `FLOQRChromeScheme` (`data-floqr-chrome`, `data-is-site-chrome`, `syncAccessGate` paints stored chrome — does not force Nightlife; `hydrateFromProfile` for cross-device; `data-floqr-theme-panel` / `data-floqr-theme-locked` gated) |
+| Live resync (s3.2.61) | `syncFromStorage` + listeners: `storage` (other tabs), `BroadcastChannel("floqr-chrome")`, `pageshow` / `focus` / `visibilitychange`. Soft sign-out dispatches `floqr:auth-signed-out` → force re-paint so login/Search match last-used chrome without manual refresh |
 | Icons | Packs under `images/chrome/*` — nightlife / traditional / `vip-blacktiffany` / `vip-blackdarkgreen` / `*-whiteblack.*` |
 | Palette | `:root` `--floqr-tile-cyan\|azure\|violet\|magenta\|coral` + `--floqr-brand-gradient` / `-h` (s3.2.20) |
 | CSS slices | Nightlife = full spectrum on black; Traditional = charcoal + soft brand; Traditional secondary buttons = View Club style (charcoal fill, `--floqr-tile-cyan` ink; active = thin cyan border); Black Tiffany = cyan/azure; White/Black = white surfaces + **white cards** + shiny-black outline CTAs/login (white fill, `#0a0a0a` border + ink); VIP `vip.css` also forces white `body.vip-page` under whiteBlack (overrides nightlife hero wash); Purple & White = violet/coral; Black & Dark Green = forest green |
 | Classic B&W template | `className: classic-bw` — LED board + FloqR identity rail use **red/black letterboard art**. Vault select **card shell** follows Site chrome (Traditional charcoal, White/Black white); only the mini-preview/LED keeps red. |
 | Letter fit tags | Patron template cards show `FLOQRTextLayout` maxima per venue size (`96×48: 3×15=45`). Caps sized for ~1–3 m on P1.56. |
 | FloqR Admin (templates) | Firestore `floqrAdmins/{uid}` (status active) or claim `floqrAdmin`. Rules: `canManageCatalogTemplates()` → `templates` write. Master Admin → Entity Onboarding card assigns/revokes. FloqR Admin-only session opens Template Management. |
-| VIP icons | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; White/Black pack uses shiny chrome-black fonts + thin drawn ring; FloqCAST tips (Fl/T) preserved outside ring (`ICON_V` s3.2.07) |
+| Feature icons (s3.2.63) | Rounded-square Search / hero marks for FloqCast, ShoutOut, VIP ReserV, BOT DEE, BartR, RydR, **Settings** — all 6 Site chromes. FloqCast F + BOT DEE B tips padded inside square. VIP seats-removed lounge. ShoutOut traditional/WB tiffany **OUT**. Settings rebuilt square (no circular ring). Search tile CSS `border-radius:8.6%` (SQ_CORNER/S=88/1024) — never `50%` (clips square rings). Review `images/review/square-chrome-pack/`; live `images/chrome/*`. `ICON_V` s3.2.63 |
+| VIP icons (legacy round) | `scripts/build-chrome-icons.py` v31 — thin ring (`RING_STROKE=8`), only `re` under ring, raised mark; superseded for Search tiles by s3.2.62+ square pack |
 | Surfaces | My Profile → **Appearance** → **Site chrome** card picker (`.chrome-select-*`); Language Settings no longer hosts the picker. Release Control titles use white `h2.features-release-title` + `?` |
 | Routes | `patron-portal.html?tab=appearance` (`portalAppearance`); aliases `chrome` / `site-chrome` / `theme` |
-| Profile chrome | Page title `portal.title` = **Profile & Settings**; manage blurb in title `?` (`help-my-profile`); global Back always Image-2 periwinkle pill + `nav.backShort` (`< Back`) via `FLOQRNav.applyGlobalBack` after i18n; FloqR mark under Back (`.floqr-page-brand`) |
+| Profile chrome | Page title `portal.title` = **Profile & Settings**; manage blurb in title `?` (`help-my-profile`); global Back = compact left `< Back` via `FLOQRNav.applyGlobalBack` after i18n; FloqR mark under Back (`.floqr-page-brand`) |
 | Receipts | `payment-return.html` / `ad-invoice.html` / `pass.html` — early-paint `data-floqr-chrome` + `floqr-chrome-scheme.js`; payment-return hydrates `users.isSiteChrome` after auth |
 | Chrome audit | `floqr-chrome-audit.js` — Master Admin switch starts a localStorage session; each loaded page probes expected vs actual → pass/fail. Master Admin → Diagnostics → Manual Feature Tests → **Read Site chrome audit** / **Copy chrome fix prompt** |
-| i18n / help | `nav.appearance`, `appearance.*`, `chrome.*` (+ blurbs / `lockedHint`); FloqAi `help-chrome-scheme` → Appearance; Master `help-chrome-audit` |
+| i18n / help | `nav.appearance`, `appearance.*`, `chrome.*` (+ blurbs / `lockedHint`); BOT DEE `help-chrome-scheme` → Appearance; Master `help-chrome-audit` |
 
 ---
 
@@ -170,9 +380,12 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Sign-in (QA) | Home → Email sign-in → `temp_*@floqr-demo.com` → Send 6-minute code → **8-character** OTP arrives at `bans.don@gmail.com` with subject `[FLOQR demo → …]` → Verify. Seed sets `profileCompleted: true`. Club Admin skips SMS MFA for `@floqr-demo.com`. Table “QA ref” is tracking only (not the OTP). |
 | Private pages | No Google-only login. Unsigned users redirect to home (`floqr-auth-gate.js` / `profile-access-guard.js`) with `returnTo`. |
 | Welcome OAuth (s3.1.85) | `patron-app.js` `signInProvider`: Google/Facebook/Microsoft use **popup**. `auth/popup-closed-by-user` does **not** call `signInWithRedirect` (GitHub Pages ↔ `*.firebaseapp.com` often returns null and left Welcome stuck on “Redirecting to secure sign-in…”). Only `auth/popup-blocked` tries full-page redirect; `getRedirectResult` clears pending status. |
-| Search beta tiles (s3.1.86) | `searchVisible` / `searchTileVisible`: test features show for **Master Admin** (Beta pill, QA) and granted beta testers. floqCast / VIP / FloqAi stay `hidden` for regular patrons until Live or a beta grant. CSS: floqCast/VIP `<img>` marks no longer `height:100%` (was collapsing when face height is auto). |
+| Search beta tiles (s3.1.86) | `searchVisible` / `searchTileVisible`: test features show for **Master Admin** (Beta pill, QA) and granted beta testers. floqCast / VIP / BOT DEE stay `hidden` for regular patrons until Live or a beta grant. CSS: floqCast/VIP `<img>` marks no longer `height:100%` (was collapsing when face height is auto). |
 | floqCast mark + live arm (s3.1.87) | `images/floqcast-icon.svg` must be valid UTF-8 (Windows-1252 `0x97` in a comment broke SVG-as-`<img>` → blank Search mark). Preview: `armFloqCastLiveDuration` only after stable ICE (`floqcast-webrtc.js` reports `answered` ≠ `connected`). `repairFloqCastPaidOrders` skips `ended`/`rejected` (no false “Moved N into queue”). Queue UI hides ended rows. |
 | floqCast venue geo pick (s3.1.88) | `floqcast-search.html` loads `floqr-geo-search.js`. Empty search shows **top 4 nearest** floqCast venues (GPS → IP → profile city via `FLOQRGeoSearch.resolveUserLocation` / `sortNearest`). Typing matches club, brand, city, or `SHOUTOUT_EVENTS` event name. Status line shows nearest-of-N + place/source. Help: `help-floqcast-choose-venue`. |
+| ShoutOut / floqCast fast venue paint (s3.2.86) | Landings paint from packaged catalog first (parallel `loadVenueRecord` in background). Must load `floqr-temp-qa-showcase.js` before `shared-data.js`, and rebuild rows via `FLOQRFeatureGates.getCachedVenue` so Firestore names (e.g. **Aurelia** / `temp-democlub-1`) enter the search haystack — do not rebuild from empty temp stubs only. |
+| Feature landing standard (s3.2.44) | Shared `floqr-feature-landing.js` + `.css` (`FLOQRFeatureLanding`). **ShoutOut** `shoutout-search.html`, **VIP** `vip.html`, **floqCast** `floqcast-search.html`: Back → **product chrome icon only** (no FloqR parent) → title + `?` → Choose a venue → GPS nearest **4** cards with feature facts (ShoutOut: LED sizes + patron custom; VIP: open days / deposit / dress / age; floqCast: screen + sound). Search hub listing also uses fact cards + top-4 when the query is empty. Help: `help-shoutout-choose-venue`, `help-vip-choose-venue`, `help-floqcast-choose-venue`. Nav: `FLOQRNav.shoutoutHome()`. |
+| Feature landing Site chrome (s3.2.51) | Landings follow selected Site chrome (not Nightlife-locked). Early-paint `data-floqr-chrome` on `floqcast-search.html` / `shoutout-search.html` / `vip.html` / `vip-terms.html`. Body washes per scheme in `floqr-feature-landing.css` for `body.floqcast-page` / `shoutout-search-page` / `vip-page`. Removed `!important` Nightlife lock from `floqcast-search.css` + `vip.css`. Auth hydrate: `hydrateFromProfile` on floqCast + ShoutOut landings (VIP already). |
 | AI crawl daytime events (s3.1.98–100) | Crawler was nightlife-only (clubs/DJ), so daytime listings like The Parks DC **Flea + Fall Festival** never entered `aiDiscoveryQueue`. Added daytime event types (flea / farmers / community market, daytime + fall festival), Community/Festival/Market genres, Places `daytimeEvent` mapping, and daytime approval checklist (organizer + date/time; no DJ). **Washington places:** canonical markets `Washington, DC` (`washington-dc`) vs `Washington State` / `Seattle` (`washington-state` / `seattle-wa`). Bare “Washington” → capital. Places text + lat/lng bias differ (DC 38.91°N vs Seattle 47.61°N). Live schedule cities use **Washington, DC**. |
 | Discovery crawl production upgrades (s3.1.101) | **Bounded concurrency:** `mapPool` (3) in `discoverPlacesForCriteria`; per-host HTML delay via `waitForHostBudget`. **Deterministic upserts:** queue ids `place_{placesId}` / `evt_{sha1(placesId\|start\|title)}` with `mergeQueuePolicy` (protects approved human fields). **Venue→event:** JSON-LD `Event`/`MusicEvent`/`ComedyEvent`/`Festival` → child dated docs (`attachEventsFromHtml`). **Auto-approve:** `processCrawledItem` (`discovery-auto-approve.js`) — identity anchors + schema gates + ≥92% confidence → live `clubLocations`/`events`; else `ADMIN_QUEUE`. **Past events:** `lifecycleStatus` upcoming/past/retired/removed; public feed `eventsView` vs `pastEventsView`; callable `retirePastCrawledEvents` + daily schedule. Modules: `discovery-crawl-core.js`, `discovery-auto-approve.js`, `discovery-past-events.js`. |
 | floqCast ~10s drop / WebRTC hold (s3.1.102) | STUN-only + aggressive `displayJoins` rebuilds killed peers after brief ICE `disconnected` (~10s). Fix: `restartIce` before hard rebuild; `peerMediaAlive` / hold-media-alive; `DISPLAY_JOIN_DEBOUNCE_MS`; longer disconnect holds. |
@@ -249,7 +462,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | URL contract | Display 1: `display.html?location={id}&k={token}` — **no `?v=`**. Display 2: `display2.html?location={id}&k={token}`. Token lock default ON unless `displayTokenRequired === false`. |
 | Gate logic | **OR:** allowlisted IP unlocks **or** valid `?k=` unlocks. Deny only when every configured gate fails. Reasons include `ip_or_token_ok`, `token_missing`, `token_denied`, `token_not_configured`, `ip_denied`, `restriction_enabled_empty_allowlist`, combined `ip_denied+token_missing`. |
 | Token compare | Access logs + Security System Messages record **last 5** of provided `?k=` vs expected secret, plus redacted `pageUrl` (`k=…xxxxx`). Full secrets never logged. |
-| Help | `help-display-security-setting` in `floqai-help-repository.js` |
+| Help | `help-display-security-setting` in `botdee-help-repository.js` |
 
 **Ops notes**
 
@@ -295,7 +508,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | UI | `master-admin.html` SOS2FA gate + channel radios (Both / SMS / Email) |
 | Styles | `admin.css` `.sos2fa-channel-option` (radio sizing); `styles.css` must not force radios to `width:100%` |
 | Backend | `functions/sos2fa-functions.js` (+ Twilio / mail paths as deployed) |
-| Help | SOS2FA popouts + FloqAi repository entries |
+| Help | SOS2FA popouts + BOT DEE repository entries |
 
 ---
 
@@ -386,22 +599,62 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Client timer | `suprstar-preview.js` — arms only after **stable ICE/peer `connected`** (2.5s debounce); never on SDP answer alone |
 | WebRTC | `suprstr-webrtc.js` — answer → status `answered`; true `connected` from `connectionState` / ICE |
 | Backend | `startSuprstrLive` sets `liveEndsAtMs:0`; `armSuprstrLiveDuration` sets ends + `liveArmedAtMs` / `liveArmSource` |
-| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `suprstar` (`webrtc_status`, `live_timer_*`, `live_heartbeat`, display `display_*`) |
+| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `floqCast` (legacy dual-read `suprstar`): `webrtc_status`, `ice_servers`, `live_timer_*`, `live_heartbeat`. Master Admin → **Diagnostics → FloqCast** (`#diagnosticsFloqCast`, `master-floqcast-logging.js` / `FLOQRFloqCastDiagnostics`). **ShoutOut** logs → **Diagnostics → ShoutOut** (`#diagnosticsShoutOut`, `master-shoutout-logging.js`) including `page_call` trails. Application Logging still shows the same rows under the broader filter. Phone must be signed in to write; display2 is anonymous (console-only). |
 | Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
-| Cache bust | Preview scripts `?v=29.09.121` |
+| Cache bust | Preview + Master Admin FloqCast panel scripts `?v=s3.2.85` |
 
 ---
 
-## FloqAi intent search (plain-language router)
+## BOT DEE intent search (plain-language router)
 
-**Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR).
+**Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR). Stays the **feature-optimized fast path / fallback** under BOT DEE chat (and inside feature searches).
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / FloqAi (`index.html` intent panel) |
+| UI | Search still hosts the intent panel on `index.html` when used; `botdee.html` is **chat only** (Quick intent search removed s3.3.014). No `?` help bubble / no “Showing answers for…” scope line — type **help** (like **version**) for a local BOT DEE help reply |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
-| Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
-| Cache bust | `intent-search.js?v=` on `index.html` |
+| Help seed | `botdee-help-repository.js` (loaded before `intent-search.js`) |
+| Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
+
+---
+
+## BOT DEE chat (Phase 1 — `executeBotSession`)
+
+**Purpose:** Headless BOT DEE agent: Auth + `botDee` feature gate + data classification → Gemini (`@google/genai`) + tools. Tools re-validate product gates and wrap existing VIP / ShoutOut / FloqCAST / checkout runners. Chat never collects card data.
+
+| Layer | Wiring |
+|---|---|
+| UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) for audience scope |
+| Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
+| Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
+| Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
+| Conversation idle (s3.2.70) | Client ends chat after `conversationIdleSeconds` (packaged default **300** / 5 minutes) with no message → `chatIdleEnded`; history cleared; next message resumes. Config: Firestore `botDeeSettings/default` (signed-in read; Functions-write). Master Admin → Features Mgmt → **BOT DEE** → Save via callable `setBotDeeSettings` (SOS2FA + reason ≥ 8). Clamp 15–600s. |
+| Durable threads (s3.3.006) | Signed-in chats store under `botDeeThreads/{uid}` (doc id = uid) + `events` (pruned to 24). Last 12 turns feed Gemini. Conversation pause or farewell starts a fresh epoch. Refresh / second device: `getBotDeeThread` restores while inside `conversationIdleSeconds` (Master Admin; packaged default 300 / 5 minutes, clamp 15–600). Flag `botDeeSettings.durableThreads` default **1**; `0` rolls back to tab-only history. Client still sends `history` for old Functions. Guessed `threadId` is ignored (`coerceThreadId` → uid). Composer locks (`restoreInFlight` + `setBusy`) until restore finishes so a local chitchat cannot race `restoreTurns`. Idle clock / `lastMessageAtMs` is **when the patron sent** (`receivedAtMs`), not persist time. Stored user text is `clipStoredText` (Shift+Enter newlines kept); `sanitizeUserPrompt` still flattens for Gemini/search. |
+| Data / security | `botDeeSettings/{docId}`: P ops setting (idle seconds, `durableThreads`, revision, actor email, reason); not patron PII. Rules: signed-in read, write false. `botDeeThreads` / `botDeeThreads/events`: owner read (`uid` + doc id match), write false (Admin SDK). Callables re-check Auth + `botDee` feature gate. Classification: ownMaster + PII. |
+| Tools | `contextualSearch`; `lookupPublicProfiles` (public patrons + published clubs, incl. image URLs); `listShoutOutTemplates`; `startShoutOutCheckout`; `createVipHold` / `recordVipConsent` / `createVipCheckout`; `createFloqCastRequest` / `createFloqCastCheckout` — each re-validates product gate then delegates (`functions/bot-dee-tools.js`) |
+| Locale (s3.3.005) | Client sends `uiLanguage` from `FLOQRI18n.getLanguage()`. Server localizes result cards + action-link labels via `functions/bot-dee-result-locales.json` (build: `scripts/build-bot-dee-result-locales.js` from help packs + chrome keys). Gemini system instruction requires reply in app language. Client `localizeResults` is a safety net. English catalog text must not show when UI is DE/FR/… |
+| Feature access (s3.3.005) | **Least privilege:** session loads Features & Services via `canAccessFeature` (live / test+beta grant / Master Admin). Search cards, Gemini tools, pitches, and help blurbs include products **this viewer may use**; scrub sibling betas they lack (multi-product help too). Granted floqCast/VIP/etc. **must** stay visible. Client `scrubGatedBrands` + `FLOQRFeatureServices.canAccess` safety net. |
+| Public profiles | `lookupPublicProfiles` is viewer-context: the same volunteered public datapoints a signed-in patron can already see (not PII/PCI — never email/phone/PAN/GPS). Cards include `sharedDatapoints` (opted-in keys) + `datapoints` (every filled value; lists up to 40). Default missing `publicMinglDatapoints` = all keys; explicit `[]` = share none. **About me:** query `me` / `isSelfQuery` returns the viewer's public card (`relation:"self"`). Unpublished self = identity-only. **Friends:** Mingl/chat connections preferred; public profiles only. Missing key = empty or opted out — never “FLOQR doesn’t track that.” Data class: public P fields; Functions Admin SDK read. |
+| Public photos | `executeBotSession` returns `media[]` (https image URLs only). Gemini sees `photoCount`, not storage URLs. Client `.botdee-photo-gallery` thumbnails fly out (`.botdee-photo-flyout`) into a frameless `window.open` of `botdee-photo-popout.html` (X + Close; chat stays visible). Popup blocked → status, no covering overlay. |
+| Version (s3.3.008) | `isVersionPrompt` / `versionReply` (client + `localSession`) state FLOQR package stamp from `functions/package.json` (`PACKAGE_LABEL` e.g. `s3.3.008`). System instruction also names the stamp. |
+| Mobile header (s3.3.008) | `botdee.html`: icon + `.feature-landing-title-row` (title + `?` beside title) + full-width `#botDeeScopeNote` under the row — fixes 1-char vertical scope text and far-right `?`. |
+| VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
+| Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
+| Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
+| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring) |
+| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood); page popout `botdee.helpComposer` |
+| Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
+| Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |
+| BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (never FloqAi). Catalog key `botDee` with one-release dual-read from `floqAi`. Page file is `botdee.html`. Legacy `floqai.html` removed (s3.2.75). See `design-notes-botdee-rename.mdc`. |
+| BOT DEE welcome (s3.2.65) | `botdee.chatWelcome` = **Hi, I am BOT DEE. How can I help you?** (all langs). |
+| BOT DEE bubble chrome (s3.2.66–67) | Bot replies: CSS speech-origin tip (`.botdee-bubble-tail`) + **robot-head** avatar `images/botdee-chat-avatar.png` (s3.2.67 — not Site-chrome pack JPG). Header mark stays `data-floqr-chrome-icon="botDee"`. |
+| BOT DEE club names | Tools resolve display names → slugs (`Aurelia` → `temp-democlub-1`) via `resolveClubLocationId` in `bot-dee-tools.js` before Firestore lookup. |
+| BOT DEE Gemini (s3.2.67) | `executeBotSession` toolConfig = `FunctionCallingConfigMode.AUTO` **without** `allowedFunctionNames` (AUTO+names → Gemini 400 → silent `contextualSearch` fallback). Identity prompts (`isIdentityPrompt` / name pronunciation) answer locally. Help `?` panels: `fitHelpPopoutInViewport` in `helper-popouts.js` + `styles.css` `data-help-align`. |
+| FloqCast Go live CTA (s3.2.59) | Venue button + sticky: **Go live, start a cast** (`page.floqcast.goLiveCta` / `floqcast-search.js`). |
+| Black & Dark Green icons (s3.2.58) | `BLACK_DARK_GREEN_ICONS` full pack (`*-blackdarkgreen.*`) — accent = Settings wordmark \"tings\" **`#5ac783`** (+ companion `#2e8a5a`). Build: `scripts/build-blackdarkgreen-icons.py`. CSS `html[data-floqr-chrome=blackDarkGreen] --accent:#5ac783`. |
+| Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
+| Page title size | Shared schema: `.floqr-page-title` / `.floqr-page-title-row` + feature `.feature-landing-title-row`. Size = Appearance `h2` via `--floqr-page-title-size` (= `--floqr-title-size`). All title text (`.help-label-text`) inherits; `?` stays 11px badge. Profile & Settings one line (`admin.css` / `floqr-feature-landing.css`). |
 
 ---
 
@@ -438,7 +691,7 @@ VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/
 | Backend | Reservation callables; cancel → Stripe refund; hours gate; party-join via ref (no waitress accept) |
 | Data | Table maps/sections/reservations; section→waitress/CSR; activity `referenceNumber` on receipt + inbox |
 | Hours | Require structured club hours before enabling live hail during “open” |
-| Help / FloqAi | “VIP table”, “hail waitress”, “table reservation”, “join table party” |
+| Help / BOT DEE | “VIP table”, “hail waitress”, “table reservation”, “join table party” |
 
 ### Test methodology (abbrev.)
 
@@ -448,7 +701,7 @@ VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/
 4. Outside hours → hard block + CSR/on-duty text option; fix hours in VCC and retest open window.  
 5. Existing hail auto-attaches ref; New-service hail allowed without prior VIP purchase.
 
-**Manual QA hub (layouts, scheduling, today’s ship):** `feature-tests-v29-09-122.html` on the feature branch — deep links for Shôko Scheduling, birthday layouts, supRstar timer, display IP-or-token, FloqAi cues.
+**Manual QA hub (layouts, scheduling, today’s ship):** `feature-tests-v29-09-122.html` on the feature branch — deep links for Shôko Scheduling, birthday layouts, supRstar timer, display IP-or-token, BOT DEE cues.
 
 When adding a section, use this skeleton:
 
@@ -481,9 +734,10 @@ When adding a section, use this skeleton:
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
-| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand |
+| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand. **s3.3.010:** sign-in also defers Diagnostics / AI crawl / duplicates / commerce / templates / recs until panel open. **s3.3.013:** those panels paint from `masterAdminRollups/current` (5-min schedule + Refresh rollup); full live scans only on Run/Refresh. |
 | **Beta invite consent (s3.1.56 / clean UI s3.1.70)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR Beta Test & Prerelease Agreement; Booking Disclaimer body in `?` (`help-beta-booking-disclaimer`); invite intro in title `?` (`help-beta-tester`); no green “FLOQR Beta” eyebrow / “Signed in…” status. Required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` (`BETA_AGREEMENT` v2 — reverse-payments / non-refundable). Profile card via `global-profile-status.js`. |
 | **Profile menu fail-closed** | Search `#userDropdown` + `global-profile-status` mint feature links hidden; `FLOQRFeatureServices.applyFeatureLinks` reveals only granted Live/Beta. CSS: `.user-dropdown … .hidden` / `[hidden]` must beat `display:block!important` (also injected in `ensureLinkStyles`). |
+| **Profile card close (s3.2.61)** | In-card `.profile-menu-link` / `data-patron-menu` click closes the open card before navigate. `showPage` / `pageshow` / `popstate` / sign-out also close. Toggle refuses empty slim box until menu content is rendered (`menuReady` / `userDropdownHasContent`). |
 | **Inbox Recipient autocomplete** | Compose uses `#composeRecipientSearch` only — results appear after 2+ typed characters; empty query never dumps the directory. One Club Admin row (not one per support mailbox). |
 | **Inbox-first + New Message FAB (s3.1.58)** | `loadPortal` renders `messages` + `inboxNotifications` before shoutout history / directory scans. Compose sheet `#portalCompose` stays hidden until floating `#inboxNewMessageFab`. Recipient directory: CSR + Club Admin seed first, then `FLOQRPeople.listSafe("contacts")`; Club Admin email local-parts searchable (not displayed). Profile-menu counts skip soft-deleted inbox rows. Follow Service: `listSafe("services")` + token haystack (handle/club/genre) + loading status. Help: `help-floqr-inbox-rules`. |
 | **Inbox paint gate (s3.1.59)** | `loadAndRenderInbox(user)` starts immediately after profile bootstrap — **before** `renderTemplateVariantSettings` / BartR / AI prefs (those awaits left Inbox on Loading while menu already showed 5/10). Fast path = `recipientUid` queries (same as profile menu) + 12s timeout; email-scoped rows enrich without blocking first paint. |
@@ -491,9 +745,9 @@ When adding a section, use this skeleton:
 | **Beta invite email handoff (s3.1.61–62)** | Email/private browsers have no Firebase session — landing no longer sticks on Restoring/Checking. `ensureAuth()` initializes Firebase before `auth()`; stashes invite `t` in `FLOQR_BETA_INVITE_TOKEN`; **Sign in to accept this invite** → home OTP with `returnTo` keeping `t`. `createBetaInvite` Inbox `link` is absolute Pages URL. |
 | **Profile card on satellites (s3.1.63)** | `global-profile-status.js` calls `initializeApp` before `onAuthStateChanged` so beta-invite (and other satellites) show photo/initials when signed in — not a stuck `?` pill. |
 | **Active beta testers table (s3.1.63)** | Master Admin → Features Mgmt → Beta & Testing — compact `.beta-testers-table` (tester + feature columns + Save/Revoke), ≤3 visual lines per user. |
-| **FloqAi Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.floqai-icon-face`, reuses Search `.category-floqai-mark` + `floqr-tiles-transparent.png`, white FloqAi word beside mark. |
-| **Search icon tiles** | `#categoryPage .search-icon-row` order: **floqCast → ShoutOut → VIP reserV → BOT DEE** (tile label; key `floqAi`). All four use chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK` (ShoutOut nightlife `shoutout-nightlife.png`, traditional `shoutout-traditional-green.png`; floqCast/VIP chrome JPGs; BOT DEE chrome photo). Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
-| **Search FloqAi box (s3.2.18)** | No speech bubble. Input placeholder (`cat.floqaiPlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
+| **BOT DEE Search tile (s3.1.64)** | `#intentSearchBtnCard` uses `.shoutout-icon-card` / black `.botdee-icon-face`, reuses Search `.category-botdee-mark` + `floqr-tiles-transparent.png`, white BOT DEE word beside mark. |
+| **Search icon tiles** | `#categoryPage .search-icon-row` order: **ShoutOut → BOT DEE → VIP reserV → Settings → floqCast** (BOT DEE key `botDee`). Chrome photo faces via `data-floqr-chrome-icon` + `FLOQRChromeScheme.ICON_PACK`. Mobile/tablet: 3 across; PC: one line. Display2 idle logo: `images/chrome/floqcast-nightlife.jpg` (`display-app.js` `FLOQCAST_LOGO`). |
+| **Search BOT DEE box (s3.2.18)** | No speech bubble. Input placeholder (`cat.botdeePlaceholder`) = “Search for Clubs, Lounge, Events, etc.” (localized). |
 | **floqCast board (s3.1.78)** | Always `display2.html?location=` + `suprstrLive/{id}__secondary`. Callables force `displayBoard: secondary`. Display 1 must not load `display-floqcast.js`. |
 | **floqCast idle 64×48 (s3.1.108)** | Idle mark ~+30% (`36vh` / `60vw` vs base `28vh`/`46vw`) when `data-is-64x48=1` / `led-64x48`. `renderFloqCastIdleScreen` stamps format flags. Hello copy (`#displayMain.floqcast-idle-copy`) uses `margin-top:auto` so AWAITING / GO LIVE / idle note sit under the larger icon. Short-viewport media query must keep the 36vh/60vw scale (not shrink to 64×32 idle). |
 | **Feature landing headers (s3.1.77)** | Site architecture: Back → FloqR logo → feature hero icon **under** FloqR → title + `?` (VIP pattern). floqCast uses `floqcast-hero-icon.svg` (not `suprstr-logo.png`, not side-by-side with FloqR). Venue pick = search + cards. Rule: `.cursor/rules/design-notes-feature-landing-pages.mdc`. |
@@ -509,14 +763,14 @@ When adding a section, use this skeleton:
 1. Register one row in `floqr-venue-actions.js` `ACTIONS`: `id`, `featureKey`, `patterns` / `strip`, `ctaKey`, `buildUrl(locationId)` or `mode: "shoutout"`.
 2. Listing reads `FLOQRVenueActions.resolve({query, listingType})` for label + click.
 3. Satellite accepts `?location=` (floqCast / VIP already) and still runs `FLOQRFeatureServices` / session shell / callables.
-4. Mirror patterns in `intent-search.js` `PRODUCT_INTENTS` for FloqAi carpets (keep in sync when adding a product).
+4. Mirror patterns in `intent-search.js` `PRODUCT_INTENTS` for BOT DEE carpets (keep in sync when adding a product).
 5. Tests: `functions/floqr-venue-actions.test.js` — intent → URL, gate deny → fallback, index script order.
 
 **Security (Bible §8.3 / §11):** Query string and CTA are **UX only**. Authorization stays on: feature flags (`searchVisible` / `guardPage`), Firebase Auth + satellite session shell, Firestore rules, money/live callables. Never grant floqCast/VIP from a crafted `?location=` alone.
 
 **Default:** No product cue → Select still starts ShoutOut (historical primary LED product). Explicit `listingType=shoutout` → “Throw ShoutOut Here”.
 | **VIP catalog (s3.1.66)** | `vip-app.js` `vipCandidateIds` — only PLAN_BY_ID + `getVipBetaVenues` + static `featureGates.vipReservations===true` (never all ~590 `SHOUTOUT_CLUB_LOCATIONS`). `showApp` clears Restoring / unhides `#vipApp` before `loadSubscribedVenues`. |
-| **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — FloqAi/floqCast/VIP tiles are shoutout-icon-card, not category-card.
+| **Beta pill (s3.1.68)** | `.shoutout-icon-card.feature-beta::after` (same yellow pill as `.category-card`) — BOT DEE/floqCast/VIP tiles are shoutout-icon-card, not category-card.
 | **Package** | s3.1.80 |
 
 ## Beta invite landing (`beta-invite.html`)
@@ -528,7 +782,7 @@ When adding a section, use this skeleton:
 | Client | `beta-invite-app.js` stashes/restores `t`, wires `FLOQRSessionShell.loginHref()` returnTo, passes `{token, checks}` to `acceptBetaInvite`; `unlockAgreementUi` clears status (no Signed-in line) |
 | Server | `functions/feature-services-functions.js` `createBetaInvite` / `respondToInvite` — absolute invite URL; refuses without both checks; stamps `agreementDocId` / `agreementVersion` / `agreementSha256` (canonical v2 FloqR, reverse-payments refund) |
 | Data | `betaInvites/{hash}` + `betaTesters/{uid}.consent` |
-| Help / FloqAi | `help-beta-tester`, `help-beta-booking-disclaimer`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
+| Help / BOT DEE | `help-beta-tester`, `help-beta-booking-disclaimer`; phrases: beta agreement, booking disclaimer, sign in to accept this invite |
 | Link reuse | `betaInvites.isBetaLinkused` `0|1` — set `1` on successful accept (terms + subscribe); `evaluateInvite` denies reuse with clear “link already used” error |
 
 ## VIP reserV (`vipReservations`) — Phase 2
@@ -538,7 +792,7 @@ When adding a section, use this skeleton:
 | **Brand** | VIP reserV (never translate) |
 | **Feature key** | `vipReservations` in `functions/feature-services-core.js` + `floqr-feature-services.js` — default `IsFeatureEnabled=0`, `IsTestFeature=1`, route `./vip.html?from=search` |
 | **Search tile** | `index.html` `#vipReservBtnCard` `data-feature-key="vipReservations"` |
-| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` — FloqR + VIP icon hero. Title `?` (`help-vip-book-table` holds intro); Choose a venue `?` (`help-vip-choose-venue`); no green Signed-in status. Table tap opens centered pop-out (`#info` + `#vipTablePopoutBackdrop`), not a bottom sheet. Inventory `isReserved` `0|1` on `vipInventory`. **Live map/list state:** `getVipAvailability` → `setStates` full map (`available`\|`held`\|`booked`\|`notBookable` per section). Aurelia background SVG is status-neutral (`data-state="neutral"`); overlay draws tint + seat label + status text. **Workflow:** venue search → floor map + night → hold → `vip-terms.html` → Stripe deposit → `vip.html?vipPaid=1` |
+| **Patron page** | `vip.html` + `vip-app.js` + `vip.css` + `vip-floor-viewer.js` + `floqr-feature-landing.js` — VIP chrome icon hero (**no FloqR**). Title `?` (`help-vip-book-table`); Choose a venue `?` (`help-vip-choose-venue`); GPS nearest 4 + VIP fact cards; no green Signed-in status. Table tap opens centered pop-out (`#info` + `#vipTablePopoutBackdrop`). Inventory `isReserved` `0|1` on `vipInventory`. **Workflow:** venue search → floor map + night → hold → `vip-terms.html` → Stripe deposit → `vip.html?vipPaid=1` |
 | **Terms page** | `vip-terms.html` + `vip-terms-app.js` — satellite session shell; hold via `sessionStorage` `FLOQR_VIP_HOLD` + `?holdId=`; single required `checks.terms` (server `expandConsentChecks` fills refund/noShow/age21/minimumSpend; marketing optional) |
 | **Mobile map** | `vip-floor-viewer.css` ≤600px — selected table `#info` in document flow **below** the map (not fixed bottom sheet). Desktop sticky side panel unchanged |
 | **Profile menu** | `global-profile-status.js` `featureLink("vipReservations", …, "VIP reserV")` — same Features & Services gate as Search tile |
@@ -546,13 +800,14 @@ When adding a section, use this skeleton:
 | **Door** | `vip-door.html` + `vip-door-app.js` (satellite session shell) — list, check-in, no-show |
 | **My Profile** | Feature & Orders → Guest List & reserV (`?tab=guest-list-reserv` / legacy `?tab=reservations`) — list + Show pass |
 | **Search + landing icon** | Chrome pack via `data-floqr-chrome-icon="vipReserv"` → `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg` (`FLOQRChromeScheme`). Landing `vip.html` / `vip-terms.html` hero same pack; hydrate `isSiteChrome` from profile in `vip-app.js`. Legacy SVG (`vip-reserv-icon.svg` / `vip-reserv-mark.svg`) retired from Search/landing. |
-| **Floor plans** | Static `vip-plans/` (`decades.json`, `lima-twist.json`, `aurelia.json`) + `functions/vip-beta-catalog.js`. Aurelia 2D published (`aurelia-floor-map.svg` bookable seats neutralized — no baked Available/Booked); 3D walk-through at `reports/vip-aurelia-demo/` (Explore 3D CTA on `vip.html`). Rebuild: `plan-svg.mjs` `neutralBookable: true` for Pages background art |
+| **Floor plans** | Static `vip-plans/` (`decades.json`, `lima-twist.json`, `aurelia.json`, `shoko-barcelona.json`) + `functions/vip-beta-catalog.js`. Aurelia 2D published (`aurelia-floor-map.svg` bookable seats neutralized — no baked Available/Booked); 3D walk-through at `reports/vip-aurelia-demo/` (Explore 3D CTA on `vip.html`). **Shôko Barcelona** (`shoko-barcelona-spain`): NYE'27 map + pricing. Rebuild: `plan-svg.mjs` `neutralBookable: true` for Pages background art |
+| **Night-scoped prices** | `vip-beta-catalog` / plan JSON `nightPricing[YYYY-MM-DD].sections[sectionId]` → `computePartyAmounts(..., {nightOverride})`. `extraNights` merge into `getVipAvailability` bookable nights (NYE beyond rolling horizon). Checkout uses `hold.amounts.currency` (EUR for Shôko). **Shôko:** standard (regular) minimum = NYE list ÷ 4; regular deposit = 25% of standard; NYE minimum = flyer list; NYE deposit = 50% of NYE list. |
 | **POS (future)** | Research/design only: `reports/vip-pos-integrations.md` — top 4 Toast, Square, SpotOn, Clover; Generic CSV/manual fallback. Not built. |
 | **Product chrome** | Same pink/cyan body + glass cards as ShoutOut — `styles.css` + scoped `vip-floor-viewer.css` (never global `:root`/`body` flat black). Rule: `.cursor/rules/design-notes-product-chrome.mdc` |
 | **Session** | `floqr-session-shell.js` after `firebase-config.js` on `vip.html` / `vip-terms.html` / `vip-door.html`. Do not await a full clubLocations scan before clearing Restoring (see s3.1.66 `vipCandidateIds`). |
 | **Callables** | `functions/vip-functions.js` — `getVipBetaVenues`, `getVipAvailability`, `createVipHold`, `releaseVipHold`, `recordVipConsent` (single Terms check + expand), `getMyVipReservations`, `getVipReservationPass`, `listVipReservations`, `checkInVipReservation`, `markVipNoShow`, `getVipClubSettings`, `saveVipClubSettings` (deposit + `refundPolicy`), `setVipSectionBlocked`, `confirmVipReservationWithoutDeposit`, `adminConfirmVipReservation`, `cancelVipReservation` (clears `isBooked`; FloqMedia/Club Stripe `refunds.create` by policy). Checkout: `createFloqrCheckoutSession` `orderType: "vipReservation"` (`holdId` + `consentId`). Fulfillment confirms reservation + `deliverServiceReceipt` Inbox |
 | **Paid-before-booked** | Club `clubLocations.vipSettings.depositRequired` (default on when depositCents &gt; 0). Hold → `status:held` + `isReserved:0` only. Floor map `booked` / `isReserved:1` only after Stripe `fulfillVipReservationOrder` (paymentConfirmed=1), or `confirmVipReservationWithoutDeposit` when deposit not required, or Club Admin `adminConfirmVipReservation` with `paymentRecorded` when deposit required, or Club POS confirm (`confirmVipReservationForClubPos`). |
-| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: FloqAi `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
+| **Payment collectors (VIP-B-01)** | `clubPos` (preferred for live Toast/SpotOn), `clubStripe`, `floqrStripe`, `manualCsv`. **Club Stripe** is ready when `stripeConnectAccounts` for the club binding has `transfersReady` (Club Admin → Stripe onboarding), not a typed `acct_` on `clubLocations`. **Aurelia demo (`temp-democlub-1`)** defaults to `floqrStripe` (FloqMedia Stripe). Setup help: BOT DEE `help-vip-floqr-stripe-aurelia`. Catalog: `functions/vip-payments-core.js`. Callables: `getVipPaymentCatalog`, `getVipPaymentSettings`, `saveVipPaymentSettings`, `beginVipPosConnect`, `confirmVipPosConnected`, `disconnectVipPos`, `confirmVipReservationForClubPos`, `exportVipReservationsCsv`, `listVipBillingStatements`, `setVipPosProviderEnabled`, `seedVipPosProviders`. |
 | **POS providers** | Toast / SpotOn (open tab ★) / Square / Clover / Generic — sandbox flags: Toast, SpotOn, Square, Clover. Live OAuth/webhook adapters activate when partner credentials are deployed; Connect workflow + connection codes ship now. |
 | **Club Admin** | `admin.html` → **Feature Mgmt** → **VIP reserV** (`#panelVipReserv`) — collector picker, POS connect (sandbox/live), CSV export, billing list, deposit policy, nights, check-in / cancel / block / walk-in. Help: `help-vip-club-admin`, `help-vip-deposit-settings`, `help-vip-payment-collector`. |
 | **Club Admin Feature Mgmt (s3.1.84)** | Parent tab **Feature Mgmt** nests **ShoutOut** (sub: Queue Mgmt → `#panelQueue`, Display Mgmt → `#panelDisplaySecurity`, Template Mgmt → `#panelTemplateBackgrounds`), **floqCast** (`#panelFloqCast`), **VIP reserV**. Deep links `?tab=` / `#panel*` still activate nested parents. |
@@ -564,8 +819,9 @@ When adding a section, use this skeleton:
 | **Cancel + refund (s3.1.83)** | Club Admin → VIP reserV Cancel. Always frees inventory + clears `isBooked`. FloqMedia Stripe / Club Stripe: optional Stripe refund (`processRefund`, default on) using `vipSettings.refundPolicy` — club cancel mode `full` (default) / `policy` (hours windows) / `none`. Club POS / CSV: table freed; POS void stays on Toast/SpotOn. UI: refund-on-cancel checkbox + policy hours. |
 | **Data** | `vipInventory` (legacy night×section lock), `vipHolds`, `vipActiveHolds`, `vipConsents`, `vipReservations`, `clubLocations.vipSettings`, `clubLocations/.../vipNights/.../tables`, `vipPosConnections`, `vipPosProviders`, `vipPosStatements` (Functions-write) |
 | **VIP-B-24** | `receipt-delivery.js` SMS via `sendTwilioMessagesApi`; `secret-redaction.js` protects `FLOQR-…` / `VR-…` invoice numbers |
-| **Help / FloqAi** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
-| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant. Venue opt-in: `clubLocations.featureGates.vipReservations` (default **false** in `feature-gates.js`). Beta seeds: Decades, Lima Twist, Aurelia (`temp-democlub-1`) |
+| **Help / BOT DEE** | `help-vip-book-table`, `help-vip-floor-map`, `help-vip-terms-consent`, `help-vip-door-pass`, `help-vip-door-ops`, `help-vip-receipt-sms-redaction-fixes`; intent `vip-reserv` |
+| **Gate** | Master Admin → Features & Services → seed/enable `vipReservations`; beta testers need grant. Venue opt-in: `clubLocations.featureGates.vipReservations` (default **false** in `feature-gates.js` **and** `functions/feature-gate-functions.js`). Entity Management → Save Venue Feature Gates. **s3.2.71 fix:** server `DEFAULT_VENUE_GATES` must include `vipReservations` + `passes` or ticks are stripped on save; refuse saves on merged duplicate club ids (e.g. `shoko-barcelona-beach-club-spain` → use `shoko-barcelona-spain`). Beta seeds: Decades, Lima Twist, Aurelia (`temp-democlub-1`), Shôko Barcelona (`shoko-barcelona-spain`) |
+| **Shôko NYE'27 event** | `shared-data.js` event `shoko-nye-2027` (2026-12-31) + flyer `images/events/shoko-barcelona-nye-2027.png`; VIP night prices only for that date |
 | **Not yet** | Promoter path, counsel Live Terms, Model B invoicing |
 | **Design notes** | `.cursor/rules/design-notes-vip-reservations.mdc`, `.cursor/rules/design-notes-product-chrome.mdc`, `.cursor/rules/design-notes-aurelia-scene-standard.mdc` |
 | **Owner decisions** | `reports/vip-owner-decision-sheet.md` |
@@ -582,7 +838,7 @@ When adding a section, use this skeleton:
 
 ## Search category icon row (spots)
 
-Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2 ShoutOut** · **3 VIP reserV** · **4 BOT DEE** (Search tile label; feature key `floqAi`). Hidden: Mingl / BartR / RydR.
+Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `botDee`). Hidden: Mingl / BartR / RydR.
 
 ## Chrome icon drafts (nightlife / traditional review)
 
@@ -592,10 +848,44 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 floqCast** · **2
 | **Builder** | `scripts/build-chrome-icons.py` — modular: ring once → graphic layers → type under/over → assemble |
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
 | **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
-| **FloqCAST** | `images/review/actual-icons/floqcast-v4-circle-silhouette.png`; trad `images/chrome/floqcast-traditional-green.png` / `floqcast-traditional.jpg`; nightlife `floqcast-nightlife.jpg` + V4 PNG. Search tile: `data-floqr-chrome-icon="floqCast"` → ICON_PACK |
-| **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="floqAi"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
+| **FloqCAST** | Image 2 / V4 full mark: `images/chrome/floqcast-nightlife.jpg` (+ traditional / traditional-green). White/Black Search uses `floqcast-whiteblack.png`: **Image-2 geometry** on white (full-width FloqCAST via `place_floqcast_q_kiss`, ring `R=490`, dark ink + Tiffany T + tip halo) — same proportions as Nightlife chrome, WB palette only. Review SVGs: `images/review/floqcast-icon-{nightlife,traditional,whiteblack}.svg`. Search: `data-floqr-chrome-icon="floqCast"` → ICON_PACK (`ICON_V` s3.2.50). Display2 idle: `FLOQCAST_LOGO` → nightlife JPG (no `?v=`). |
+| **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="botDee"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` (mirrors BOT DEE face) |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
+
+## Baller metal cards (`ballersAlert` + Amex twin) — s3.2.91 / s3.2.101
+
+Resume `@baller$`. Design notes: `.cursor/rules/design-notes-baller-cards.mdc`. Package: `reports/baller-cards/express-package/`.
+
+| Piece | Where |
+|---|---|
+| **Catalog** | `shared-data.js` — public **`ballersAlert` only** ($100) in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; private `ballersAlertAmex` (`masterAdminOnly`, Aurelia). **`blackCard` / `blackCardAmex` removed** (s3.2.101). Flags `ballerCard`, `ballerAlert`, `ballerBrand`, `requiresFacePhoto`, `textProfileId:'ballerCard'`; company `maxSubCharacters:18` (UPPERCASE) |
+| **Art** | Package PNG `ballers-express-business.png` → `images/baller/ballers-alert-{2x1,4x3}.png` (+ `-amex-` twin) via `scripts/build-baller-card-photos.py`. Chip SVG/PNG: `images/baller/baller-emv-chip.svg` |
+| **Composer** | `#ballerCardFields`: name or @handle + optional company (preset `WE'RE OUTSIDE LLC`, max 18, always UPPERCASE). Alert: single **Upload photo** → library/files or **Camera — face guide** (oval); no duplicate Take photo button. Immediate local + LED preview (`processBallerFaceSelection`), then Storage + Gemini mask on select; cancel keeps prior. File input uses `.baller-file-input-host`. Placement sliders `#ballerFaceScale` / `#ballerFacePosY` |
+| **Display** | `placeBallerFaceSlot` + face oval; chip overlay above face (`z-index:5`); card layers `scale(0.935)` so flashing red halo sits in the black margin; `border-radius:2.9%/4.7%` clips residual silhouette fringe; name/company `top:64%` (64×48: `60%`), type `mainSize×0.92×1.5×1.1` vh (+10%); face slot `background:transparent`; metallic gold emboss; empty company hidden |
+| **Checkout** | `functions/commerce-functions.js` `BALLER_CARD_PRICE_CENTS` + Amex requires `isServerAdminAuth` + Aurelia; `ballerCard` text caps (sub 25) |
+| **Rules** | `firestore.rules` free-create excludes all four ids; `geminiApiAccessLogs` Master Admin / FloqR Admin read |
+| **AI** | `functions/gemini-portrait-mask.js` (default `gemini-3.8-flash`, override `FLOQR_GEMINI_SEGMENTATION_MODEL` → full-frame alpha PNG / polygon) + `aiEnhanceShoutOutMedia` `baller-portrait-mask` (alias `baller-face-medallion` / `removeBallerPortraitBackground`). Client `destination-in` composite; original immutable |
+| **Gemini audit** | `functions/gemini-api-access-log.js` → `geminiApiAccessLogs` + `appLogs` category `gemini` (success/failure + `failureReason`, failures `severity:"critical"`, 30-day). Hourly `checkGeminiApiAccessFailures` → inbox. Master Admin Application Logging → Gemini API Access card |
+| **Critical log tab flash** | Standard: `floqr-critical-log-blink.js` (`FLOQRCriticalLogBlink`). Any registered critical failure flashes its subtab + parent group (same `.is-blink` / `criticalLogTabBlink` as Security). Sources: `securitySystemMessages`, `displayLoadErrors`, `geminiApiAccess`. Gemini: live failure watch + **Acknowledge critical failures** (session watermark). Resume `@critical-log-blink$` |
+| **Help** | `help-black-card`, `help-ballers-alert`; intents `black-card`, `ballers-alert` |
+| **Tests** | `functions/baller-card-template.test.js`, `functions/gemini-portrait-mask.test.js`, `functions/gemini-api-access-log.test.js` |
+
+## Classic Halloween (`classicHalloween`) — seasonal ShoutOut template
+
+Live package **s3.2.71**. Resume `@halloween$`.
+
+| Piece | Where |
+|---|---|
+| **Design notes** | `.cursor/rules/design-notes-classic-halloween.mdc` |
+| **Catalog** | `shared-data.js` `SHOUTOUT_TEMPLATES.classicHalloween` (`scope:'Shared'`, `seasonal`, `allowEmoji`, `halloweenFinale`, `Is96x48/Is64x48/Is64x32 = 1`, `priceCents:1500`) + `SHOUTOUT_STANDARD_TEMPLATE_IDS`. Packaged only — no Firestore `templates` doc needed |
+| **Composer** | `patron-app.js` Seasonal section (`template.seasonalSection`), seasonal kept on `restrictTemplatesToLocationSet` venues, `isEmojiClassicBoardTemplate` (uppercase + grapheme caps, no HTML `maxlength`). `admin-app.js` `fitAdminEmojiText` for admin board writes |
+| **Display** | `display-app.js` `syncHalloweenFinale` / `stopHalloweenFinale` on `FLOQRFrameLoop.cycle("halloween-finale")` (3 board phases + 1 finale phase × 6 s; no template timer); emoji branch `glyphSlice(cleanDisplayText(...))`. `display.css` `.classic-halloween` + `.halloween-finale` + reduced-motion block. Art `images/halloween/classic-halloween-2x1.svg` (96×48, 64×32) / `-4x3.svg` (64×48) |
+| **Checkout** | `functions/commerce-functions.js` `CLASSIC_HALLOWEEN_PRICE_CENTS = 1500` in `normalizeCheckoutPayload` + `describeOrder` (server price wins); classic board text caps via `CLASSIC_BOARD_TEMPLATE_IDS` |
+| **Rules** | `firestore.rules` `validFreePatronShoutoutCreate` refuses `template == 'classicHalloween'` (no free direct create of the paid template) |
+| **Help** | `help-classic-halloween` (patron) in `botdee-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js` (10 langs); BOT DEE intent `classic-halloween` in `intent-search.js`; regenerated `functions/botdee-content-classes.json` + `functions/bot-dee-search-catalog.json` |
+| **Diagnostics** | Manual Feature Test `s3-2-71-classic-halloween`; package install checks `s3.2.71` |
+| **Tests / QA** | `functions/classic-halloween-template.test.js`; visual QA `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/*.png` + `qa-results.json` |

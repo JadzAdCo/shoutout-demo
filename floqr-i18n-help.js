@@ -2,8 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.2.40";
-
+  const VERSION = "s3.3.014";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -14,9 +13,13 @@
         title: "Согласие персонала на маркетинг",
         body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Спросите FloqAi о чём угодно в FLOQR своими словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. В результатах только то, что доступно вашему аккаунту. Гости, персонал, Club Admins и Master Admins видят свои ответы."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings на Search",
+        body: "На экране Home Search нажмите Settings, чтобы открыть Profile & Settings на вкладке Appearance — там Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Плитка Settings использует тот же набор chrome-иконок, что и другие метки Search."
       },
       "help-club-website-feed": {
         title: "Фид для сайта клуба",
@@ -74,9 +77,9 @@
         title: "Архивные ShoutOuts",
         body: "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Спросите FloqR через FloqAi",
-        body: "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
+      "botdee-ask-floqr": {
+        title: "Спросите FloqR через BOT DEE",
+        body: "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
       },
       "help-soccer-jersey": {
         title: "ShoutOut в футбольной майке",
@@ -88,7 +91,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Выберите площадку floqCast",
-        body: "Первые четыре клуба — ближайшие площадки floqCast (геолокация браузера, как в ShoutOut). Введите название клуба или события, чтобы найти совпадения."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -96,7 +103,7 @@
       },
       "help-vip-choose-venue": {
         title: "Выберите клуб VIP reserV",
-        body: "Здесь отображаются только клубы с подпиской VIP reserV — как при выборе площадки для ShoutOut. Ищите по названию, городу или жанру, затем нажмите Select venue, чтобы открыть карту зала и выбор ночи."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -164,7 +171,7 @@
       },
       "help-create-publish-schedule": {
         title: "Создать и опубликовать расписание персонала",
-        body: "Добавьте черновики на сетке люди × дни, проверьте чипы, затем Publish schedule. Работники должны подтвердить смену, прежде чем она станет confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Добавьте черновики на сетке люди × дни, проверьте чипы, затем Publish schedule. Работники должны подтвердить смену, прежде чем она станет confirmed. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Удалить несколько запланированных или черновых смен",
@@ -214,6 +221,14 @@
         title: "Профиль и настройки",
         body: "Управляйте профилем, My Privacy, уведомлениями AI, шаблонами ShoutOut, публичными медиа, ShoutOuts, списками гостей, FloqR Inbox и Mingl. Откройте Профиль и настройки для ролей, инструментов продавца и параметров аккаунта."
       },
+      "help-profile-height": {
+        title: "Рост",
+        body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США и Канада по умолчанию ft; другие страны и интернет-место вне США — m. Единицу всё равно можно переключить."
+      },
+      "help-taxi-pickup-address": {
+        title: "Адрес подачи такси",
+        body: "Для RydR нужны номер дома, улица, город и ZIP или почтовый индекс. Жители США вводят ZIP (12345 или 12345-6789). Канада и другие страны, либо интернет-место вне США, используют почтовый индекс. FLOQR подставляет подпись из страны профиля и IP. Адрес остаётся частным — это не публичный пункт Mingl."
+      },
       "help-onboarding": {
         title: "Онбординг",
         body: "Онбординг патрона / service member — запросите доступ Club Admin, DJ, Promoter или hospitality. Master Admins также могут онбордить площадки."
@@ -226,7 +241,7 @@
         title: "Шаблон по умолчанию",
         body: "Бесплатный классический чёрно-белый Traditional. Карточка показывает настоящее LED-превью в основном размере экрана площадки (имя и размер сверху; описание и теги снизу). Нажмите «Использовать», чтобы открыть редактор. Ищите выше публичные, клубные и личные шаблоны по имени, описанию, тегам или популярности."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Поиск шаблонов",
         body: "Используйте поле с лупой (тот же дизайн, что у Search), чтобы найти шаблоны по имени, описанию, тегам, спорту, VIP, медиа или популярности. В результатах — официальные шаблоны FLOQR, клубные фоны и ваши личные. Каждая карточка — настоящее LED-превью основного размера; «Использовать» — единственное действие."
       },
@@ -241,6 +256,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Эксклюзив Aurelia за $30. Кошка Shiloh сидит в левой части экрана, а ваш ShoutOut светится белым на тёмной стороне рядом с ней. Эмодзи приветствуются. Введите в поиске «Shiloh», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах тех размеров, которые есть в Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — металлическая карта Baller's Express BUSINESS с лицом под шлемом. Загрузите или сделайте фото. Gemini выделяет человека (грубые края); затем зум/позиция. Шлем, кайма и чип остаются. Компания необязательна (макс. 18, ВЕРХНИЙ РЕГИСТР; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween за $15 — в любом клубе. Классическое трёхстрочное табло ShoutOut на фоне кладбища под луной с тыквами-фонарями; эмодзи приветствуются. В конце каждого цикла белые призраки вылетают из могилы и мчатся на зрителей, а Смерть с косой поднимается и кружат летучие мыши. Введите в поиске «Halloween», напишите до трёх коротких строк и при желании добавьте свой @ник. Показывается на экранах 96×48, 64×48 и 64×32."
       },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
@@ -304,7 +331,7 @@
       },
       "help-vip-payment-collector": {
         title: "Сборщик оплаты VIP reserV и Club POS",
-        body: "Предпочтительно для живых клубов с Toast/SpotOn: Club POS — FLOQR бронирует/держит/карту; POS владеет депозитом, счётом и тратами. Альтернативы: Club Stripe, FloqMedia Stripe (FloqR) или движок VIP + CSV. Aurelia (Demo Club) по умолчанию FloqMedia Stripe — спросите FloqAi шаги Master и Club Admin."
+        body: "Предпочтительно для живых клубов с Toast/SpotOn: Club POS — FLOQR бронирует/держит/карту; POS владеет депозитом, счётом и тратами. Альтернативы: Club Stripe, FloqMedia Stripe (FloqR) или движок VIP + CSV. Aurelia (Demo Club) по умолчанию FloqMedia Stripe — спросите BOT DEE шаги Master и Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Статус isBooked VIP-столов в Firestore",
@@ -324,9 +351,13 @@
         title: "Marketingtoestemming voor personeel",
         body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Vraag FloqAi alles over FLOQR in je eigen woorden: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. De resultaten tonen alleen wat jouw account mag gebruiken. Bezoekers, personeel, Club Admins en Master Admins zien elk hun eigen antwoorden."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings op Search",
+        body: "Tik op Search op Settings om Profile & Settings te openen op het tabblad Appearance — daar staat Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). De Settings-tegel gebruikt hetzelfde chrome-iconenpakket als de andere Search-merken."
       },
       "help-club-website-feed": {
         title: "Feed voor de clubwebsite",
@@ -384,9 +415,9 @@
         title: "Gearchiveerde ShoutOuts",
         body: "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Vraag FloqR met FloqAi",
-        body: "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
+      "botdee-ask-floqr": {
+        title: "Vraag FloqR met BOT DEE",
+        body: "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
       },
       "help-soccer-jersey": {
         title: "Voetbalshirt ShoutOut",
@@ -398,7 +429,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Kies een floqCast-venue",
-        body: "De eerste vier clubs zijn de dichtstbijzijnde floqCast-venues (browserlocatie, zoals bij ShoutOut). Typ een club- of eventnaam om matches te zien."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
@@ -406,7 +441,7 @@
       },
       "help-vip-choose-venue": {
         title: "Kies een VIP reserV-venue",
-        body: "Alleen clubs met een VIP reserV-abonnement verschijnen hier — hetzelfde idee als een ShoutOut-venue kiezen. Zoek op naam, stad of genre en tik Select venue om de plattegrond en nachtkeuze te openen."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -474,7 +509,7 @@
       },
       "help-create-publish-schedule": {
         title: "Personeelsrooster maken en publiceren",
-        body: "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Meerdere geplande of conceptdiensten verwijderen",
@@ -524,6 +559,14 @@
         title: "Profiel & instellingen",
         body: "Beheer je profiel, My Privacy, AI-meldingen, ShoutOut-templates, openbare media, ShoutOuts, gastenlijsten, FloqR Inbox en Mingl. Open Profiel & instellingen voor rollen, verkoperstools en accountopties."
       },
+      "help-profile-height": {
+        title: "Lengte",
+        body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. VS en Canada starten op ft; andere landen en een niet-Amerikaanse internetlocatie op m. Je kunt de eenheid nog wisselen."
+      },
+      "help-taxi-pickup-address": {
+        title: "Taxi-ophaaladres",
+        body: "RydR-ophaal vraagt huisnummer, straatnaam, stad en ZIP of postcode. VS-inwoners vullen ZIP in (12345 of 12345-6789). Canada en andere landen, of een niet-Amerikaanse internetlocatie, gebruiken een postcode. FLOQR zet het label automatisch vanuit je profielland en IP. Dit adres blijft privé — geen openbaar Mingl-datapunt."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Patron- / service-member-onboarding — vraag Club Admin-, DJ-, Promoter- of hospitality-toegang aan. Master Admins kunnen ook venues onboarden."
@@ -536,7 +579,7 @@
         title: "Standaardsjabloon",
         body: "Gratis Traditional zwart-wit klassiek. De kaart toont een echte LED-voorbeeldweergave op het primaire schermformaat van de locatie (naam en afmeting boven; beschrijving en tags onder). Tik op Gebruiken voor de editor. Zoek hierboven naar openbare, club-goedgekeurde en persoonlijke sjablonen op naam, beschrijving, tags of populariteit."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Sjabloonzoeken",
         body: "Gebruik het zoekveld met lens (zelfde ontwerp als Search) om sjablonen te vinden op naam, beschrijving, tags, sport, VIP, media of populariteit. Resultaten omvatten officiële FLOQR-sjablonen, club-goedgekeurde achtergronden en je persoonlijke. Elke kaart is een echte LED-voorbeeld op het primaire formaat — Gebruiken is de enige actie."
       },
@@ -551,6 +594,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusief bij Aurelia voor $30. De kat Shiloh zit links op het scherm en je ShoutOut gloeit wit aan de donkere kant naast haar. Emoji zijn welkom. Typ ‘Shiloh’ in Zoeken, schrijf maximaal drie korte regels en voeg desgewenst je @handle toe. Speelt op de schermformaten die Aurelia heeft."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — metalen Baller's Express BUSINESS-kaart met je gezicht onder de helm. Upload of maak een foto. Gemini isoleert de persoon (grove randen); zoom/positie. Helm, rand en chip blijven. Bedrijf optioneel (max 18, HOOFDLETTERS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween voor $15, in elke club. Het klassieke ShoutOut-bord met drie regels op een maanverlichte begraafplaats met pompoenlantaarns; emoji zijn welkom. Aan het eind van elke cyclus stijgen witte spoken op uit een graf en stormen op het publiek af, terwijl Magere Hein opdoemt en vleermuizen rondfladderen. Typ “Halloween” in Zoeken, schrijf tot drie korte regels en voeg desgewenst je @handle toe. Speelt op borden van 96×48, 64×48 en 64×32."
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
@@ -614,7 +669,7 @@
       },
       "help-vip-payment-collector": {
         title: "VIP reserV-betalingscollector & Club POS",
-        body: "Voorkeur voor live clubs met Toast/SpotOn: Club POS — FLOQR boekt/houdt/kaart; POS beheert borg, tab en besteding. Alternatieven: Club Stripe, FloqMedia Stripe (FloqR) of VIP-engine + CSV. Aurelia (Demo Club) standaard FloqMedia Stripe — vraag FloqAi om Master- en Club Admin-stappen."
+        body: "Voorkeur voor live clubs met Toast/SpotOn: Club POS — FLOQR boekt/houdt/kaart; POS beheert borg, tab en besteding. Alternatieven: Club Stripe, FloqMedia Stripe (FloqR) of VIP-engine + CSV. Aurelia (Demo Club) standaard FloqMedia Stripe — vraag BOT DEE om Master- en Club Admin-stappen."
       },
       "help-vip-table-isbooked": {
         title: "VIP-tafel isBooked-status in Firestore",
@@ -634,9 +689,13 @@
         title: "Consentement marketing du personnel",
         body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Demandez à FloqAi tout ce qui concerne FLOQR, avec vos mots : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Les résultats ne montrent que ce que votre compte peut utiliser. Clients, personnel, Club Admins et Master Admins voient chacun leurs propres réponses."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings sur Search",
+        body: "Sur l’écran Search, touchez Settings pour ouvrir Profile & Settings sur l’onglet Appearance — le Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) s’y trouve. La tuile Settings utilise le même pack d’icônes chrome que les autres marques Search."
       },
       "help-club-website-feed": {
         title: "Flux pour le site du club",
@@ -694,9 +753,9 @@
         title: "ShoutOuts archivés",
         body: "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Demandez FloqR avec FloqAi",
-        body: "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
+      "botdee-ask-floqr": {
+        title: "Demandez FloqR avec BOT DEE",
+        body: "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
       },
       "help-soccer-jersey": {
         title: "Maillot de football ShoutOut",
@@ -708,7 +767,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Choisir un lieu floqCast",
-        body: "Les quatre premiers clubs sont les lieux floqCast les plus proches (géolocalisation du navigateur, comme ShoutOut). Tapez un nom de club ou d'événement pour afficher les correspondances."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -716,7 +779,7 @@
       },
       "help-vip-choose-venue": {
         title: "Choisir un lieu VIP reserV",
-        body: "Seuls les clubs abonnés à VIP reserV apparaissent ici — même idée que pour choisir un lieu ShoutOut. Recherchez par nom, ville ou genre, puis sélectionnez le lieu pour ouvrir le plan et la nuit."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -784,7 +847,7 @@
       },
       "help-create-publish-schedule": {
         title: "Créer et publier un planning du personnel",
-        body: "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. FloqAi : create a schedule, publish schedule, how to schedule staff."
+        body: "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. BOT DEE : create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Supprimer plusieurs équipes planifiées ou brouillons",
@@ -834,6 +897,14 @@
         title: "Profil et paramètres",
         body: "Gérez votre profil, My Privacy, les notifications AI, les modèles ShoutOut, les médias publics, les ShoutOuts, les listes d’invités, FloqR Inbox et Mingl. Ouvrez Profil et paramètres pour les rôles, les outils vendeur et les options de compte."
       },
+      "help-profile-height": {
+        title: "Taille",
+        body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. États-Unis et Canada : ft par défaut ; autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
+      },
+      "help-taxi-pickup-address": {
+        title: "Adresse de prise en charge taxi",
+        body: "RydR a besoin du numéro, du nom de rue, de la ville et d'un ZIP ou code postal. Les résidents américains saisissent un ZIP (12345 ou 12345-6789). Le Canada, les autres pays, ou une localisation internet hors USA, utilisent un code postal. FLOQR choisit le libellé d'après le pays du profil et l'IP. Cette adresse reste privée — ce n'est pas un datapoint Mingl public."
+      },
       "help-onboarding": {
         title: "Intégration",
         body: "Intégration des clients/membres de service : demandez un accès Club Admin, DJ, Promoter ou un accès d'hospitalité. Les Master Admins peuvent également embarquer sur des sites."
@@ -846,7 +917,7 @@
         title: "Modèle par défaut",
         body: "Classique noir et blanc Traditionnel gratuit. La carte montre un vrai aperçu LED à la taille d’écran principale du lieu (nom et dimension en haut ; description et tags en bas). Touchez Utiliser pour ouvrir l’éditeur. Cherchez ci-dessus les modèles publics, approuvés par le club et personnels par nom, description, tags ou popularité."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Recherche de modèles",
         body: "Utilisez le champ loupe (même design que Search) pour trouver des modèles par nom, description, tags, sports, VIP, média ou popularité. Les résultats incluent les modèles FLOQR officiels, les fonds approuvés par le club et vos fonds personnels. Chaque carte est un vrai aperçu LED à la taille principale du lieu — Utiliser est la seule action."
       },
@@ -861,6 +932,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivité Aurelia à 30 $. Le chat Shiloh est assis à gauche de l’écran et votre ShoutOut brille en blanc sur le côté sombre, juste à côté. Les emoji sont les bienvenus. Tapez « Shiloh » dans Recherche, écrivez jusqu’à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S’affiche sur les tailles d’écran dont dispose Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — carte métal Baller's Express BUSINESS avec votre visage sous le casque. Téléversez ou prenez une photo. Gemini isole le sujet (contours approximatifs); zoomez/placez le visage. Casque, bordure et puce restent. Société optionnelle (max 18, MAJUSCULES; préréglage WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween à $15, dans tous les clubs. Le tableau ShoutOut classique sur trois lignes, dans un cimetière au clair de lune avec des citrouilles d'Halloween — les émojis sont les bienvenus. À la fin de chaque cycle, des fantômes blancs jaillissent d'une tombe et foncent vers le public, pendant que la Faucheuse se dresse et que des chauves-souris tourbillonnent. Tapez « Halloween » dans la recherche, écrivez jusqu'à trois lignes courtes et ajoutez votre @pseudo si vous le souhaitez. S'affiche sur les écrans 96×48, 64×48 et 64×32."
       },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
@@ -924,7 +1007,7 @@
       },
       "help-vip-payment-collector": {
         title: "Collecteur de paiement VIP reserV et Club POS",
-        body: "Préféré pour les clubs live avec Toast/SpotOn : Club POS — FLOQR réserve/maintient/carte ; le POS gère acompte, addition et dépenses. Alternatives : Club Stripe, FloqMedia Stripe (FloqR), ou moteur VIP + CSV. Aurelia (Demo Club) utilise FloqMedia Stripe par défaut — demandez à FloqAi les étapes Master Admin et Club Admin."
+        body: "Préféré pour les clubs live avec Toast/SpotOn : Club POS — FLOQR réserve/maintient/carte ; le POS gère acompte, addition et dépenses. Alternatives : Club Stripe, FloqMedia Stripe (FloqR), ou moteur VIP + CSV. Aurelia (Demo Club) utilise FloqMedia Stripe par défaut — demandez à BOT DEE les étapes Master Admin et Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Statut isBooked des tables VIP dans Firestore",
@@ -944,9 +1027,13 @@
         title: "Marketing-Einwilligung für Personal",
         body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Frag FloqAi alles über FLOQR in deinen eigenen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Die Ergebnisse zeigen nur, was dein Konto nutzen darf. Gäste, Personal, Club Admins und Master Admins sehen jeweils ihre eigenen Antworten."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings auf Search",
+        body: "Tippe auf dem Search-Bildschirm auf Settings, um Profile & Settings auf dem Tab Appearance zu öffnen — dort liegt Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Die Settings-Kachel nutzt dasselbe Chrome-Icon-Paket wie die anderen Search-Marken."
       },
       "help-club-website-feed": {
         title: "Feed für die Club-Website",
@@ -1004,9 +1091,9 @@
         title: "Archivierte ShoutOuts",
         body: "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Fragen Sie FloqR mit FloqAi",
-        body: "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
+      "botdee-ask-floqr": {
+        title: "Fragen Sie FloqR mit BOT DEE",
+        body: "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
       },
       "help-soccer-jersey": {
         title: "Fußballtrikot ShoutOut",
@@ -1018,7 +1105,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "floqCast-Venue wählen",
-        body: "Die ersten vier Clubs sind die nächsten floqCast-Venues (Browser-Standort, wie bei ShoutOut). Tippe einen Club- oder Eventnamen, um Treffer zu sehen."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
@@ -1026,7 +1117,7 @@
       },
       "help-vip-choose-venue": {
         title: "VIP reserV-Venue wählen",
-        body: "Hier erscheinen nur Clubs mit VIP reserV-Abo — wie bei der ShoutOut-Venue-Auswahl. Suche nach Name, Stadt oder Genre und tippe Select venue, um den Floorplan und die Nachtauswahl zu öffnen."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1094,7 +1185,7 @@
       },
       "help-create-publish-schedule": {
         title: "Erstellen und veröffentlichen Sie einen Personalplan",
-        body: "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Fügen Sie Entwurfsschichten im Raster „Personen × Tage“ hinzu, überprüfen Sie die Chips und dann Publish schedule. Arbeiter müssen bestätigen, bevor eine Schicht bestätigt wird. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Löschen Sie mehrere geplante oder Entwurfsschichten",
@@ -1144,6 +1235,14 @@
         title: "Profil & Einstellungen",
         body: "Verwalte dein Profil, My Privacy, AI-Benachrichtigungen, ShoutOut-Vorlagen, öffentliche Medien, ShoutOuts, Gästelisten, FloqR Inbox und Mingl. Öffne Profil & Einstellungen für Rollen, Verkäufer-Tools und Kontooptionen."
       },
+      "help-profile-height": {
+        title: "Größe",
+        body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. USA und Kanada starten mit ft; andere Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
+      },
+      "help-taxi-pickup-address": {
+        title: "Taxi-Abholadresse",
+        body: "RydR braucht Hausnummer, Straße, Stadt und ZIP oder Postleitzahl. US-Einwohner geben ZIP ein (12345 oder 12345-6789). Kanada und andere Länder oder ein nicht-US-Internetstandort nutzen eine Postleitzahl. FLOQR setzt die Beschriftung aus Profilland und IP. Die Adresse bleibt privat — kein öffentlicher Mingl-Datenpunkt."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Onboarding von Gönnern/Service-Mitgliedern – Fordern Sie Club Admin, DJ, Promoter oder Hospitality-Zugang an. Master Admins können auch Veranstaltungsorte an Bord nehmen."
@@ -1156,7 +1255,7 @@
         title: "Standardvorlage",
         body: "Kostenloses klassisches Schwarz-Weiß Traditional. Die Karte zeigt eine echte LED-Vorschau in der primären Displaygröße des Ortes (Name und Maß oben; Beschreibung und Tags unten). Tippe auf Verwenden für den Editor. Suche oben nach öffentlichen, club-freigegebenen und persönlichen Vorlagen nach Name, Beschreibung, Tags oder Beliebtheit."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Vorlagensuche",
         body: "Nutze das Suchlinsen-Feld (gleiches Design wie Search), um Vorlagen nach Name, Beschreibung, Tags, Sport, VIP, Medien oder Beliebtheit zu finden. Ergebnisse umfassen offizielle FLOQR-Vorlagen, club-freigegebene Hintergründe und deine persönlichen. Jede Karte ist eine echte LED-Vorschau in der primären Größe — Verwenden ist die einzige Aktion."
       },
@@ -1171,6 +1270,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exklusiv bei Aurelia für 30 $. Die Katze Shiloh sitzt links auf der Anzeige, und dein ShoutOut leuchtet weiß auf der dunklen Seite neben ihr. Emojis sind willkommen. Gib „Shiloh“ in der Suche ein, schreib bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf den Displaygrößen, die Aurelia hat."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — die Baller's Express BUSINESS-Metallkarte mit Ihrem Gesicht unter dem Kriegerhelm. Foto hochladen oder aufnehmen. Gemini trennt Sie vom Hintergrund (grobe Kanten); dann Zoomen/Positionieren. Helm, Rand und Chip bleiben. Firma optional (max. 18 Zeichen, GROSSBUCHSTABEN; Vorgabe WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween für $15, in jedem Club. Die klassische dreizeilige ShoutOut-Anzeige auf einem mondbeschienenen Friedhof mit Kürbislaternen – Emojis sind willkommen. Am Ende jedes Durchlaufs steigen weiße Geister aus einem Grab und stürmen auf das Publikum zu, während der Sensenmann auftaucht und Fledermäuse schwärmen. Gib „Halloween“ in die Suche ein, schreibe bis zu drei kurze Zeilen und füge auf Wunsch dein @Handle hinzu. Läuft auf Anzeigen in 96×48, 64×48 und 64×32."
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
@@ -1234,7 +1345,7 @@
       },
       "help-vip-payment-collector": {
         title: "VIP reserV Zahlungskollektor & Club POS",
-        body: "Bevorzugt für Live-Clubs mit Toast/SpotOn: Club POS — FLOQR bucht/hält/karte; POS übernimmt Anzahlung, Tab und Umsatz. Alternativen: Club Stripe, FloqMedia Stripe (FloqR) oder VIP-Engine + CSV. Aurelia (Demo Club) standardmäßig FloqMedia Stripe — FloqAi für Master-/Club-Admin-Schritte fragen."
+        body: "Bevorzugt für Live-Clubs mit Toast/SpotOn: Club POS — FLOQR bucht/hält/karte; POS übernimmt Anzahlung, Tab und Umsatz. Alternativen: Club Stripe, FloqMedia Stripe (FloqR) oder VIP-Engine + CSV. Aurelia (Demo Club) standardmäßig FloqMedia Stripe — BOT DEE für Master-/Club-Admin-Schritte fragen."
       },
       "help-vip-table-isbooked": {
         title: "VIP-Tisch isBooked-Status in Firestore",
@@ -1254,9 +1365,13 @@
         title: "Consentimiento de marketing del personal",
         body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Pregunta a FloqAi lo que quieras sobre FLOQR con tus palabras: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Los resultados solo incluyen lo que tu cuenta puede usar. Clientes, personal, Club Admins y Master Admins ven cada uno sus propias respuestas."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings en Search",
+        body: "En la pantalla Search, toca Settings para abrir Profile & Settings en la pestaña Appearance — ahí está Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). La ficha Settings usa el mismo pack de iconos chrome que las demás marcas de Search."
       },
       "help-club-website-feed": {
         title: "Feed para la web del club",
@@ -1314,9 +1429,9 @@
         title: "ShoutOuts archivados",
         body: "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Pregunta FloqR con FloqAi",
-        body: "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
+      "botdee-ask-floqr": {
+        title: "Pregunta FloqR con BOT DEE",
+        body: "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
       },
       "help-soccer-jersey": {
         title: "Camiseta de fútbol ShoutOut",
@@ -1328,7 +1443,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Elige un local floqCast",
-        body: "Los cuatro primeros clubs son los locales floqCast más cercanos (geolocalización del navegador, como ShoutOut). Escribe un club o evento para ver coincidencias."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -1336,7 +1455,7 @@
       },
       "help-vip-choose-venue": {
         title: "Elegir un local VIP reserV",
-        body: "Aquí solo aparecen clubs con suscripción VIP reserV — igual que al elegir un local para ShoutOut. Busca por nombre, ciudad o género y pulsa Select venue para abrir el mapa y la noche."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1404,7 +1523,7 @@
       },
       "help-create-publish-schedule": {
         title: "Crear y publicar un horario de personal",
-        body: "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Agregue turnos preliminares en la cuadrícula de personas x días, revise los chips y luego Publish schedule. Los trabajadores deben confirmar antes de que se confirme un turno. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Eliminar múltiples turnos programados o borradores",
@@ -1454,6 +1573,14 @@
         title: "Perfil y ajustes",
         body: "Gestiona tu perfil, My Privacy, notificaciones AI, plantillas ShoutOut, medios públicos, ShoutOuts, listas de invitados, FloqR Inbox y Mingl. Abre Perfil y ajustes para roles, herramientas de vendedor y opciones de cuenta."
       },
+      "help-profile-height": {
+        title: "Estatura",
+        body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. y Canadá usan ft; otros países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
+      },
+      "help-taxi-pickup-address": {
+        title: "Dirección de recogida de taxi",
+        body: "RydR pide número, calle, ciudad y ZIP o código postal. Los residentes de EE. UU. usan ZIP (12345 o 12345-6789). Canadá y otros países, o una ubicación de internet no estadounidense, usan código postal. FLOQR elige la etiqueta con el país del perfil y la IP. La dirección es privada: no es un dato público de Mingl."
+      },
       "help-onboarding": {
         title: "Incorporación",
         body: "Incorporación de patrón/miembro del servicio: solicite Club Admin, DJ, Promoter o acceso de hospitalidad. Los Master Admins también pueden incorporar lugares."
@@ -1466,7 +1593,7 @@
         title: "Plantilla predeterminada",
         body: "Clásico blanco y negro Traditional gratis. La tarjeta muestra una vista previa LED real al tamaño de pantalla principal del local (nombre y dimensión arriba; descripción y etiquetas abajo). Toca Usar para abrir el editor. Busca arriba plantillas públicas, aprobadas por el club y personales por nombre, descripción, etiquetas o popularidad."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Búsqueda de plantillas",
         body: "Usa el campo con lupa (mismo diseño que Search) para encontrar plantillas por nombre, descripción, etiquetas, deportes, VIP, medios o popularidad. Los resultados incluyen plantillas oficiales FLOQR, fondos aprobados por el club y tus fondos personales. Cada tarjeta es una vista previa LED real al tamaño principal — Usar es la única acción."
       },
@@ -1481,6 +1608,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivo de Aurelia por $30. La gata Shiloh aparece a la izquierda de la pantalla y tu ShoutOut brilla en blanco en el lado oscuro, a su lado. Los emojis son bienvenidos. Escribe «Shiloh» en Buscar, escribe hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en los tamaños de pantalla que tiene Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — tarjeta metálica Baller's Express BUSINESS con tu cara bajo el casco. Sube o toma una foto. Gemini aísla el sujeto (bordes aproximados); ajusta zoom/posición. Casco, borde y chip permanecen. Empresa opcional (máx. 18, MAIÚSCULAS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween por $15, en todos los clubes. El clásico tablero ShoutOut de tres líneas sobre un cementerio a la luz de la luna con calabazas de Halloween; los emojis son bienvenidos. Al final de cada ciclo, fantasmas blancos salen de una tumba y se lanzan hacia el público mientras se alza la Parca y vuelan murciélagos. Escribe «Halloween» en la búsqueda, redacta hasta tres líneas cortas y añade tu @usuario si quieres. Se muestra en pantallas de 96×48, 64×48 y 64×32."
       },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
@@ -1544,7 +1683,7 @@
       },
       "help-vip-payment-collector": {
         title: "Cobrador de pago VIP reserV y Club POS",
-        body: "Preferido para clubs en vivo con Toast/SpotOn: Club POS — FLOQR reserva/retiene/mapa; el POS cobra depósito, cuenta y gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) o motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por defecto — pregunte a FloqAi los pasos Master y Club Admin."
+        body: "Preferido para clubs en vivo con Toast/SpotOn: Club POS — FLOQR reserva/retiene/mapa; el POS cobra depósito, cuenta y gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) o motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por defecto — pregunte a BOT DEE los pasos Master y Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked de mesas VIP en Firestore",
@@ -1564,9 +1703,13 @@
         title: "Consenso marketing del personale",
         body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Chiedi a FloqAi qualsiasi cosa su FLOQR con parole tue: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. I risultati includono solo ciò che il tuo account può usare. Clienti, personale, Club Admin e Master Admin vedono ognuno le proprie risposte."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings su Search",
+        body: "Nella schermata Search tocca Settings per aprire Profile & Settings sulla scheda Appearance — lì c’è Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). La tile Settings usa lo stesso pack di icone chrome degli altri marchi Search."
       },
       "help-club-website-feed": {
         title: "Feed per il sito del club",
@@ -1624,9 +1767,9 @@
         title: "ShoutOut archiviati",
         body: "Archive memorizza una copia compressa del testo e dei media dello ShoutOut completato (se presenti) in storage Firebase economico e lo rimuove da Completati. Apri Archive quando vuoi. Riusa funziona anche da Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Chiedi FloqR con FloqAi",
-        body: "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
+      "botdee-ask-floqr": {
+        title: "Chiedi FloqR con BOT DEE",
+        body: "Chiedi FloqR con BOT DEE: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
       },
       "help-soccer-jersey": {
         title: "Maglia da calcio ShoutOut",
@@ -1638,7 +1781,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Scegli un locale floqCast",
-        body: "I primi quattro club sono i locali floqCast più vicini (geolocalizzazione del browser, come ShoutOut). Digita un club o un evento per vedere le corrispondenze."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
@@ -1646,7 +1793,7 @@
       },
       "help-vip-choose-venue": {
         title: "Scegli un locale VIP reserV",
-        body: "Qui compaiono solo i club abbonati a VIP reserV — stessa idea della scelta locale ShoutOut. Cerca per nome, città o genere, poi Select venue per aprire la mappa e la notte."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -1714,7 +1861,7 @@
       },
       "help-create-publish-schedule": {
         title: "Creare e pubblicare un programma del personale",
-        body: "Aggiungi i turni provvisori sulla griglia persone x giorni, rivedi i chip, quindi Publish schedule. I lavoratori devono confermare prima che un turno venga confermato. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Aggiungi i turni provvisori sulla griglia persone x giorni, rivedi i chip, quindi Publish schedule. I lavoratori devono confermare prima che un turno venga confermato. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Elimina più turni programmati o bozze",
@@ -1764,6 +1911,14 @@
         title: "Profilo e impostazioni",
         body: "Gestisci il tuo profilo, My Privacy, notifiche AI, modelli ShoutOut, media pubblici, ShoutOuts, liste ospiti, FloqR Inbox e Mingl. Apri Profilo e impostazioni per ruoli, strumenti venditore e opzioni account."
       },
+      "help-profile-height": {
+        title: "Altezza",
+        body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Stati Uniti e Canada partono da ft; altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
+      },
+      "help-taxi-pickup-address": {
+        title: "Indirizzo di ritiro taxi",
+        body: "RydR richiede numero civico, via, città e ZIP o CAP. I residenti USA inseriscono lo ZIP (12345 o 12345-6789). Canada e altri Paesi, o una posizione internet non USA, usano il codice postale. FLOQR imposta l'etichetta da Paese del profilo e IP. L'indirizzo resta privato: non è un datapoint Mingl pubblico."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Onboarding utente/membro del servizio: richiedi Club Admin, DJ, Promoter o accesso all'ospitalità. Anche gli utenti possono partecipare alle sedi."
@@ -1776,7 +1931,7 @@
         title: "Modello predefinito",
         body: "Classico bianco e nero Traditional gratuito. La scheda mostra un’anteprima LED reale alla dimensione display principale del locale (nome e dimensione in alto; descrizione e tag in basso). Tocca Usa per aprire l’editor. Cerca sopra modelli pubblici, approvati dal club e personali per nome, descrizione, tag o popolarità."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Ricerca modelli",
         body: "Usa il campo lente (stesso design di Search) per trovare modelli per nome, descrizione, tag, sport, VIP, media o popolarità. I risultati includono modelli FLOQR ufficiali, sfondi approvati dal club e i tuoi personali. Ogni scheda è un’anteprima LED reale alla dimensione principale — Usa è l’unica azione."
       },
@@ -1791,6 +1946,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Esclusiva Aurelia a 30 $. La gatta Shiloh è seduta a sinistra dello schermo e il tuo ShoutOut brilla in bianco sul lato scuro accanto a lei. Le emoji sono benvenute. Scrivi «Shiloh» in Cerca, scrivi fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sulle dimensioni di schermo che ha Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — carta metallica Baller's Express BUSINESS con il volto sotto l'elmo. Carica o scatta una foto. Gemini isola il soggetto (bordi approssimativi); zoom/posizione. Elmo, bordo e chip restano. Azienda opzionale (max 18, MAIUSCOLO; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween a $15, in tutti i club. Il classico tabellone ShoutOut a tre righe su un cimitero al chiaro di luna con zucche di Halloween; le emoji sono benvenute. Alla fine di ogni ciclo, fantasmi bianchi escono da una tomba e si lanciano verso il pubblico mentre la Morte si alza e volano i pipistrelli. Scrivi «Halloween» nella ricerca, inserisci fino a tre righe brevi e aggiungi il tuo @handle se vuoi. Va in onda sugli schermi 96×48, 64×48 e 64×32."
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
@@ -1854,7 +2021,7 @@
       },
       "help-vip-payment-collector": {
         title: "Collettore pagamento VIP reserV e Club POS",
-        body: "Preferito per club live con Toast/SpotOn: Club POS — FLOQR prenota/mantiene/mappa; il POS gestisce deposito, conto e spesa. Alternative: Club Stripe, FloqMedia Stripe (FloqR) o motore VIP + CSV. Aurelia (Demo Club) di default FloqMedia Stripe — chiedi a FloqAi i passi Master e Club Admin."
+        body: "Preferito per club live con Toast/SpotOn: Club POS — FLOQR prenota/mantiene/mappa; il POS gestisce deposito, conto e spesa. Alternative: Club Stripe, FloqMedia Stripe (FloqR) o motore VIP + CSV. Aurelia (Demo Club) di default FloqMedia Stripe — chiedi a BOT DEE i passi Master e Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Stato isBooked tavoli VIP in Firestore",
@@ -1874,9 +2041,13 @@
         title: "Consentimento de marketing da equipe",
         body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Pergunte ao FloqAi qualquer coisa sobre o FLOQR com suas palavras: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. Os resultados mostram só o que sua conta pode usar. Clientes, equipe, Club Admins e Master Admins veem cada um as próprias respostas."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings na Search",
+        body: "No ecrã Search, toque em Settings para abrir Profile & Settings no separador Appearance — o Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) fica aí. O mosaico Settings usa o mesmo pack de ícones chrome das outras marcas Search."
       },
       "help-club-website-feed": {
         title: "Feed para o site do clube",
@@ -1934,9 +2105,9 @@
         title: "ShoutOuts arquivados",
         body: "Archive guarda uma cópia comprimida do texto e da mídia do seu ShoutOut concluído (se o original tinha mídia) em armazenamento Firebase econômico e remove de Concluídos. Abra Archive a qualquer momento. Reutilizar também funciona a partir de Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Pergunte FloqR com FloqAi",
-        body: "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+      "botdee-ask-floqr": {
+        title: "Pergunte FloqR com BOT DEE",
+        body: "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
       },
       "help-soccer-jersey": {
         title: "Camisa de futebol ShoutOut",
@@ -1948,7 +2119,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Escolher um local floqCast",
-        body: "Os primeiros quatro clubes são os locais floqCast mais próximos (geolocalização do navegador, como ShoutOut). Escreva um clube ou evento para ver correspondências."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -1956,7 +2131,7 @@
       },
       "help-vip-choose-venue": {
         title: "Escolher um local VIP reserV",
-        body: "Só aparecem aqui clubes com assinatura VIP reserV — a mesma ideia de escolher um local ShoutOut. Pesquise por nome, cidade ou género e toque Select venue para abrir o mapa e a noite."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2024,7 +2199,7 @@
       },
       "help-create-publish-schedule": {
         title: "Crie e publique uma agenda de equipe",
-        body: "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Excluir vários turnos agendados ou rascunhos",
@@ -2074,6 +2249,14 @@
         title: "Perfil e configurações",
         body: "Gerencie seu perfil, My Privacy, notificações AI, modelos ShoutOut, mídia pública, ShoutOuts, listas de convidados, FloqR Inbox e Mingl. Abra Perfil e configurações para funções, ferramentas de vendedor e opções de conta."
       },
+      "help-profile-height": {
+        title: "Altura",
+        body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. EUA e Canadá começam em ft; outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
+      },
+      "help-taxi-pickup-address": {
+        title: "Morada de recolha de táxi",
+        body: "O RydR precisa de número, rua, cidade e ZIP ou código postal. Residentes dos EUA usam ZIP (12345 ou 12345-6789). Canadá e outros países, ou uma localização de internet fora dos EUA, usam código postal. O FLOQR escolhe o rótulo pelo país do perfil e pelo IP. A morada fica privada — não é um datapoint público do Mingl."
+      },
       "help-onboarding": {
         title: "Integração",
         body: "Integração de usuários/membros de serviço — solicite acesso Club Admin, DJ, Promoter ou acesso de hospitalidade. Os Master Admins também podem integrar locais."
@@ -2086,7 +2269,7 @@
         title: "Modelo predefinido",
         body: "Clássico preto e branco Traditional gratuito. O cartão mostra uma pré-visualização LED real no tamanho de ecrã principal do local (nome e dimensão em cima; descrição e tags em baixo). Toque em Usar para abrir o editor. Pesquise acima modelos públicos, aprovados pelo clube e pessoais por nome, descrição, tags ou popularidade."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Pesquisa de modelos",
         body: "Use o campo com lente (mesmo design da Search) para encontrar modelos por nome, descrição, tags, desporto, VIP, média ou popularidade. Os resultados incluem modelos oficiais FLOQR, fundos aprovados pelo clube e os seus pessoais. Cada cartão é uma pré-visualização LED real no tamanho principal — Usar é a única ação."
       },
@@ -2101,6 +2284,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Exclusivo do Aurelia por US$ 30. A gata Shiloh fica à esquerda da tela e o seu ShoutOut brilha em branco no lado escuro, ao lado dela. Emojis são bem-vindos. Digite «Shiloh» na Busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Aparece nos tamanhos de tela que o Aurelia tem."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — cartão metálico Baller's Express BUSINESS com o rosto sob o capacete. Envie ou tire uma foto. Gemini isola o sujeito (bordas aproximadas); ajuste zoom/posição. Capacete, borda e chip permanecem. Empresa opcional (máx. 18, MAYÚSCULAS; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween por $15, em todos os clubes. O clássico painel ShoutOut de três linhas num cemitério ao luar com abóboras de Halloween; emojis são bem-vindos. No fim de cada ciclo, fantasmas brancos saem de um túmulo e avançam em direção ao público enquanto a Morte surge e morcegos revoam. Digite “Halloween” na busca, escreva até três linhas curtas e adicione seu @usuário se quiser. Passa em painéis 96×48, 64×48 e 64×32."
       },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
@@ -2164,7 +2359,7 @@
       },
       "help-vip-payment-collector": {
         title: "Cobrador de pagamento VIP reserV e Club POS",
-        body: "Preferido para clubs ao vivo com Toast/SpotOn: Club POS — FLOQR reserva/segura/mapa; o POS trata depósito, conta e gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) ou motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por omissão — pergunte ao FloqAi os passos Master e Club Admin."
+        body: "Preferido para clubs ao vivo com Toast/SpotOn: Club POS — FLOQR reserva/segura/mapa; o POS trata depósito, conta e gasto. Alternativas: Club Stripe, FloqMedia Stripe (FloqR) ou motor VIP + CSV. Aurelia (Demo Club) usa FloqMedia Stripe por omissão — pergunte ao BOT DEE os passos Master e Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Estado isBooked das mesas VIP no Firestore",
@@ -2184,9 +2379,13 @@
         title: "Συγκατάθεση μάρκετινγκ προσωπικού",
         body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Ρωτήστε το FloqAi οτιδήποτε για το FLOQR με δικά σας λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Τα αποτελέσματα περιλαμβάνουν μόνο ό,τι μπορεί να χρησιμοποιήσει ο λογαριασμός σας. Θαμώνες, προσωπικό, Club Admins και Master Admins βλέπουν ο καθένας τις δικές του απαντήσεις."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings στην Search",
+        body: "Στην οθόνη Search πατήστε Settings για να ανοίξετε Profile & Settings στην καρτέλα Appearance — εκεί είναι το Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Το πλακίδιο Settings χρησιμοποιεί το ίδιο πακέτο εικονιδίων chrome με τα άλλα σήματα Search."
       },
       "help-club-website-feed": {
         title: "Ροή για τον ιστότοπο του κλαμπ",
@@ -2244,9 +2443,9 @@
         title: "Αρχειοθετημένα ShoutOuts",
         body: "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Ρωτήστε το FloqR με το FloqAi",
-        body: "Ρωτήστε το FloqR με το FloqAi — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
+      "botdee-ask-floqr": {
+        title: "Ρωτήστε το FloqR με το BOT DEE",
+        body: "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
       },
       "help-soccer-jersey": {
         title: "Ποδοσφαιρική φανέλα ShoutOut",
@@ -2258,7 +2457,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Επιλέξτε χώρο floqCast",
-        body: "Τα πρώτα τέσσερα κλαμπ είναι οι πλησιέστεροι χώροι floqCast (γεωτοποθεσία προγράμματος περιήγησης, όπως στο ShoutOut). Πληκτρολογήστε όνομα κλαμπ ή εκδήλωσης για αντιστοιχίες."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -2266,7 +2469,7 @@
       },
       "help-vip-choose-venue": {
         title: "Επιλέξτε χώρο VIP reserV",
-        body: "Εδώ εμφανίζονται μόνο clubs με συνδρομή VIP reserV — ίδια ιδέα με την επιλογή χώρου ShoutOut. Αναζητήστε με όνομα, πόλη ή είδος και πατήστε Select venue για χάρτη και βραδιά."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2334,7 +2537,7 @@
       },
       "help-create-publish-schedule": {
         title: "Δημιουργήστε και δημοσιεύστε ένα πρόγραμμα προσωπικού",
-        body: "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Διαγράψτε πολλές προγραμματισμένες ή πρόχειρες βάρδιες",
@@ -2384,6 +2587,14 @@
         title: "Προφίλ και ρυθμίσεις",
         body: "Διαχειριστείτε το προφίλ σας, My Privacy, ειδοποιήσεις AI, πρότυπα ShoutOut, δημόσια μέσα, ShoutOuts, λίστες επισκεπτών, FloqR Inbox και Mingl. Ανοίξτε Προφίλ και ρυθμίσεις για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
       },
+      "help-profile-height": {
+        title: "Ύψος",
+        body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. ΗΠΑ και Καναδάς ξεκινούν σε ft· άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
+      },
+      "help-taxi-pickup-address": {
+        title: "Διεύθυνση παραλαβής ταξί",
+        body: "Το RydR θέλει αριθμό, οδό, πόλη και ZIP ή ταχυδρομικό κώδικα. Κάτοικοι ΗΠΑ βάζουν ZIP (12345 ή 12345-6789). Καναδάς και άλλες χώρες, ή μη αμερικανική θέση διαδικτύου, χρησιμοποιούν ταχυδρομικό κώδικα. Το FLOQR βάζει την ετικέτα από τη χώρα προφίλ και την IP. Η διεύθυνση μένει ιδιωτική — δεν είναι δημόσιο datapoint Mingl."
+      },
       "help-onboarding": {
         title: "Ενσωμάτωση",
         body: "Επιβίβαση προστάτη/μέλους υπηρεσίας — αίτημα Club Admin, DJ, Promoter ή πρόσβαση φιλοξενίας. Τα Master Admin μπορούν επίσης να επιβιβαστούν σε χώρους."
@@ -2396,7 +2607,7 @@
         title: "Προεπιλεγμένο πρότυπο",
         body: "Δωρεάν κλασικό ασπρόμαυρο Traditional. Η κάρτα δείχνει πραγματική προεπισκόπηση LED στο κύριο μέγεθος οθόνης του χώρου (όνομα και διάσταση πάνω· περιγραφή και ετικέτες κάτω). Πατήστε Χρήση για τον επεξεργαστή. Αναζητήστε πάνω δημόσια, εγκεκριμένα από club και προσωπικά πρότυπα με όνομα, περιγραφή, ετικέτες ή δημοφιλία."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Αναζήτηση προτύπων",
         body: "Χρησιμοποιήστε το πεδίο με φακό (ίδιο σχέδιο με το Search) για πρότυπα με όνομα, περιγραφή, ετικέτες, sports, VIP, μέσα ή δημοφιλία. Τα αποτελέσματα περιλαμβάνουν επίσημα πρότυπα FLOQR, εγκεκριμένα φόντα club και τα προσωπικά σας. Κάθε κάρτα είναι πραγματική προεπισκόπηση LED στο κύριο μέγεθος — η Χρήση είναι η μόνη ενέργεια."
       },
@@ -2411,6 +2622,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Αποκλειστικό του Aurelia στα 30 $. Η γάτα Shiloh κάθεται στα αριστερά της οθόνης και το ShoutOut σας λάμπει λευκό στη σκοτεινή πλευρά δίπλα της. Τα emoji είναι ευπρόσδεκτα. Πληκτρολογήστε «Shiloh» στην Αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει στα μεγέθη οθόνης που έχει το Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — μεταλλική κάρτα Baller's Express BUSINESS με το πρόσωπο κάτω από το κράνος. Ανεβάστε ή τραβήξτε φωτογραφία. Το Gemini απομονώνει το θέμα (χονδροειδή άκρα)· ζουμ/θέση. Κράνος, πλαίσιο και chip μένουν. Εταιρεία προαιρετική (μέγ. 18, ΚΕΦΑΛΑΙΑ· preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween με $15, σε κάθε club. Ο κλασικός πίνακας ShoutOut τριών γραμμών σε ένα φεγγαρόλουστο νεκροταφείο με φαναράκια-κολοκύθες· τα emoji είναι ευπρόσδεκτα. Στο τέλος κάθε κύκλου, λευκά φαντάσματα βγαίνουν από έναν τάφο και ορμούν προς το κοινό, ενώ ο Χάρος υψώνεται και νυχτερίδες πετούν. Πληκτρολογήστε «Halloween» στην αναζήτηση, γράψτε έως τρεις σύντομες γραμμές και προσθέστε το @handle σας αν θέλετε. Παίζει σε οθόνες 96×48, 64×48 και 64×32."
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
@@ -2474,7 +2697,7 @@
       },
       "help-vip-payment-collector": {
         title: "Συλλέκτης πληρωμής VIP reserV και Club POS",
-        body: "Προτιμώμενο για ζωντανά clubs με Toast/SpotOn: Club POS — το FLOQR κρατάει/χαρτογραφεί· το POS διαχειρίζεται προκαταβολή, λογαριασμό και δαπάνη. Εναλλακτικές: Club Stripe, FloqMedia Stripe (FloqR) ή VIP engine + CSV. Η Aurelia (Demo Club) προεπιλέγει FloqMedia Stripe — ρωτήστε το FloqAi τα βήματα Master και Club Admin."
+        body: "Προτιμώμενο για ζωντανά clubs με Toast/SpotOn: Club POS — το FLOQR κρατάει/χαρτογραφεί· το POS διαχειρίζεται προκαταβολή, λογαριασμό και δαπάνη. Εναλλακτικές: Club Stripe, FloqMedia Stripe (FloqR) ή VIP engine + CSV. Η Aurelia (Demo Club) προεπιλέγει FloqMedia Stripe — ρωτήστε το BOT DEE τα βήματα Master και Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Κατάσταση isBooked τραπεζιών VIP στο Firestore",
@@ -2494,9 +2717,13 @@
         title: "Zgoda marketingowa personelu",
         body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "Zapytaj FloqAi o wszystko w FLOQR własnymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Wyniki obejmują tylko to, z czego może korzystać Twoje konto. Goście, personel, Club Admini i Master Admini widzą własne odpowiedzi."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings na Search",
+        body: "Na ekranie Search stuknij Settings, aby otworzyć Profile & Settings na karcie Appearance — tam jest Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Kafelek Settings używa tego samego pakietu ikon chrome co inne znaki Search."
       },
       "help-club-website-feed": {
         title: "Kanał dla strony klubu",
@@ -2554,9 +2781,9 @@
         title: "Zarchiwizowane ShoutOuts",
         body: "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
       },
-      "floqai-ask-floqr": {
-        title: "Zapytaj FloqR z FloqAi",
-        body: "Zapytaj FloqR z FloqAi — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
+      "botdee-ask-floqr": {
+        title: "Zapytaj FloqR z BOT DEE",
+        body: "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
       },
       "help-soccer-jersey": {
         title: "Koszulka piłkarska ShoutOut",
@@ -2568,7 +2795,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "Wybierz lokal floqCast",
-        body: "Pierwsze cztery kluby to najbliższe lokale floqCast (geolokalizacja przeglądarki, jak w ShoutOut). Wpisz nazwę klubu lub wydarzenia, aby zobaczyć dopasowania."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
@@ -2576,7 +2807,7 @@
       },
       "help-vip-choose-venue": {
         title: "Wybierz lokal VIP reserV",
-        body: "Tutaj widać tylko kluby z subskrypcją VIP reserV — tak jak przy wyborze lokalu ShoutOut. Szukaj po nazwie, mieście lub gatunku, potem Select venue, aby otworzyć mapę i noc."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2644,7 +2875,7 @@
       },
       "help-create-publish-schedule": {
         title: "Tworzenie i publikowanie harmonogramu pracy personelu",
-        body: "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. FloqAi: create a schedule, publish schedule, how to schedule staff."
+        body: "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. BOT DEE: create a schedule, publish schedule, how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "Usuń wiele zaplanowanych lub roboczych zmian",
@@ -2694,6 +2925,14 @@
         title: "Profil i ustawienia",
         body: "Zarządzaj profilem, My Privacy, powiadomieniami AI, szablonami ShoutOut, mediami publicznymi, ShoutOuts, listami gości, FloqR Inbox i Mingl. Otwórz Profil i ustawienia, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
       },
+      "help-profile-height": {
+        title: "Wzrost",
+        body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA i Kanada startują od ft; inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
+      },
+      "help-taxi-pickup-address": {
+        title: "Adres odbioru taksówki",
+        body: "RydR wymaga numeru, ulicy, miasta oraz ZIP lub kodu pocztowego. Mieszkańcy USA podają ZIP (12345 lub 12345-6789). Kanada i inne kraje albo nielokacja internetowa spoza USA używają kodu pocztowego. FLOQR ustawia etykietę z kraju profilu i IP. Adres zostaje prywatny — to nie publiczny punkt Mingl."
+      },
       "help-onboarding": {
         title: "Wprowadzenie",
         body: "Onboarding patrona / członka obsługi — żądanie dostępu do Club Admin, DJ, Promoter lub usług hotelarskich. Master Admin może również wdrażać obiekty."
@@ -2706,7 +2945,7 @@
         title: "Domyślny szablon",
         body: "Bezpłatny klasyczny czarno-biały Traditional. Karta pokazuje prawdziwy podgląd LED w głównym rozmiarze ekranu lokalu (nazwa i wymiar u góry; opis i tagi u dołu). Dotknij Użyj, aby otworzyć edytor. Szukaj powyżej publicznych, zatwierdzonych przez klub i osobistych szablonów po nazwie, opisie, tagach lub popularności."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "Wyszukiwanie szablonów",
         body: "Użyj pola z lupą (ten sam wygląd co Search), aby znaleźć szablony po nazwie, opisie, tagach, sporcie, VIP, mediach lub popularności. Wyniki obejmują oficjalne szablony FLOQR, tła zatwierdzone przez klub i Twoje osobiste. Każda karta to prawdziwy podgląd LED w głównym rozmiarze — Użyj to jedyna akcja."
       },
@@ -2721,6 +2960,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "Wyłącznie w Aurelia za 30 $. Kotka Shiloh siedzi po lewej stronie ekranu, a Twój ShoutOut świeci na biało po ciemnej stronie obok niej. Emoji są mile widziane. Wpisz „Shiloh” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach w rozmiarach, które ma Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — metalowa karta Baller's Express BUSINESS z twarzą pod hełmem. Prześlij lub zrób zdjęcie. Gemini izoluje osobę (przybliżone krawędzie); zoom/pozycja. Hełm, ramka i chip zostają. Firma opcjonalna (maks. 18, WIELKIE LITERY; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween za $15, w każdym klubie. Klasyczna trzywierszowa tablica ShoutOut na tle cmentarza w świetle księżyca z dyniowymi lampionami; emoji są mile widziane. Na końcu każdego cyklu białe duchy wylatują z grobu i pędzą w stronę publiczności, a Kostucha się podnosi i krążą nietoperze. Wpisz „Halloween” w wyszukiwarce, napisz do trzech krótkich linijek i dodaj swój @nick, jeśli chcesz. Wyświetla się na ekranach 96×48, 64×48 i 64×32."
       },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
@@ -2784,7 +3035,7 @@
       },
       "help-vip-payment-collector": {
         title: "Kolektor płatności VIP reserV i Club POS",
-        body: "Preferowane dla klubów live z Toast/SpotOn: Club POS — FLOQR rezerwuje/trzyma/mapę; POS obsługuje depozyt, rachunek i wydatki. Alternatywy: Club Stripe, FloqMedia Stripe (FloqR) lub silnik VIP + CSV. Aurelia (Demo Club) domyślnie FloqMedia Stripe — zapytaj FloqAi o kroki Master i Club Admin."
+        body: "Preferowane dla klubów live z Toast/SpotOn: Club POS — FLOQR rezerwuje/trzyma/mapę; POS obsługuje depozyt, rachunek i wydatki. Alternatywy: Club Stripe, FloqMedia Stripe (FloqR) lub silnik VIP + CSV. Aurelia (Demo Club) domyślnie FloqMedia Stripe — zapytaj BOT DEE o kroki Master i Club Admin."
       },
       "help-vip-table-isbooked": {
         title: "Status isBooked stolików VIP w Firestore",
@@ -2804,9 +3055,13 @@
         title: "موافقة الطاقم على التسويق",
         body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."
       },
-      "help-floqai-page": {
-        title: "FloqAi",
-        body: "اسأل FloqAi عن أي شيء في FLOQR بكلماتك: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تتضمن النتائج فقط ما يمكن لحسابك استخدامه. يرى الرواد والطاقم ومسؤولو النوادي ومسؤولو المنصة كلٌّ إجاباته الخاصة."
+      "help-botdee-page": {
+        title: "BOT DEE",
+        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
+      },
+      "help-search-settings-appearance": {
+        title: "Settings في Search",
+        body: "في شاشة Search، اضغط Settings لفتح Profile & Settings على تبويب Appearance — حيث يوجد Site chrome (Nightlife وTraditional وBlack Tiffany وWhite/Black وPurple & White وBlack & Dark Green). تستخدم بلاطة Settings نفس حزمة أيقونات الكروم لعلامات Search الأخرى."
       },
       "help-club-website-feed": {
         title: "موجز موقع النادي",
@@ -2864,9 +3119,9 @@
         title: "ShoutOuts المؤرشفة",
         body: "يخزّن Archive نسخة مضغوطة من نص ووسائط ShoutOut المكتمل (إن وُجدت وسائط) في تخزين Firebase منخفض التكلفة ويزيله من المكتملة. افتح Archive في أي وقت. تعمل إعادة الاستخدام أيضاً من Archive."
       },
-      "floqai-ask-floqr": {
-        title: "اسأل FloqR مع FloqAi",
-        body: "اسأل FloqR مع FloqAi — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
+      "botdee-ask-floqr": {
+        title: "اسأل FloqR مع BOT DEE",
+        body: "اسأل FloqR مع BOT DEE — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
       },
       "help-soccer-jersey": {
         title: "قميص كرة القدم ShoutOut",
@@ -2878,7 +3133,11 @@
       },
       "help-floqcast-choose-venue": {
         title: "اختر مكان floqCast",
-        body: "أول أربعة أندية هي أقرب أماكن floqCast (موقع المتصفح، مثل ShoutOut). اكتب اسم نادٍ أو حدث لإظهار التطابقات."
+        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+      },
+      "help-shoutout-choose-venue": {
+        title: "Choose a ShoutOut venue",
+        body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",
@@ -2886,7 +3145,7 @@
       },
       "help-vip-choose-venue": {
         title: "اختر مكان VIP reserV",
-        body: "تظهر هنا فقط النوادي المشتركة في VIP reserV — نفس فكرة اختيار مكان ShoutOut. ابحث بالاسم أو المدينة أو النوع ثم Select venue لفتح الخريطة والليلة."
+        body: "Only clubs subscribed to VIP reserV appear here. The first four are nearest (GPS). Cards show open days, minimum deposit, dress code, and age. Search by name, city, or genre, then Select venue to open that club’s floor map and night picker."
       },
       "help-vip-floor-map": {
         title: "VIP reserV floor map",
@@ -2954,7 +3213,7 @@
       },
       "help-create-publish-schedule": {
         title: "إنشاء ونشر جدول الموظفين",
-        body: "أضف نوبات مسودة على شبكة الأشخاص × الأيام، راجع البطاقات، ثم Publish schedule. يجب على العمال التأكيد قبل أن تصبح النوبة مؤكدة. FloqAi: create a schedule، publish schedule، how to schedule staff."
+        body: "أضف نوبات مسودة على شبكة الأشخاص × الأيام، راجع البطاقات، ثم Publish schedule. يجب على العمال التأكيد قبل أن تصبح النوبة مؤكدة. BOT DEE: create a schedule، publish schedule، how to schedule staff."
       },
       "help-multi-delete-shifts": {
         title: "حذف عدة نوبات مجدولة أو مسودة",
@@ -3004,6 +3263,14 @@
         title: "الملف والإعدادات",
         body: "أدِر ملفك وMy Privacy وإشعارات AI وقوالب ShoutOut والوسائط العامة وShoutOuts وقوائم الضيوف وFloqR Inbox وMingl. افتح الملف والإعدادات للأدوار وأدوات البائع وخيارات الحساب."
       },
+      "help-profile-height": {
+        title: "الطول",
+        body: "اختر ft أو m أولاً ثم أدخل طولك بهذه الوحدة. الأقدام: 6'0\". الأمتار: 1.78. الخلط ممنوع — لا يُحفظ 1.78 كـ ft ولا 6'0\" كـ m. الولايات المتحدة وكندا تبدآن بـ ft؛ البلدان الأخرى وموقع الإنترنت غير الأمريكي بـ m. يمكنك تبديل الوحدة."
+      },
+      "help-taxi-pickup-address": {
+        title: "عنوان التقاط سيارة الأجرة",
+        body: "يحتاج RydR إلى رقم الشارع واسمه والمدينة وZIP أو الرمز البريدي. المقيمون في الولايات المتحدة يدخلون ZIP (12345 أو 12345-6789). كندا والبلدان الأخرى أو موقع إنترنت غير أمريكي يستخدمون الرمز البريدي. يضع FloqR التسمية من بلد الملف وIP. العنوان يبقى خاصًا — ليس نقطة بيانات Mingl عامة."
+      },
       "help-onboarding": {
         title: "الإعداد",
         body: "إعداد الرعاة / أعضائها في الخدمة — طلب Club Admin، DJ، Promoter، أو الوصول للضيافة. يمكن أيضًا لـ Master Admin إعداد الأماكن."
@@ -3016,7 +3283,7 @@
         title: "القالب الافتراضي",
         body: "كلاسيكي أسود وأبيض Traditional مجاني. تُظهر البطاقة معاينة LED حقيقية بحجم الشاشة الأساسي للمكان (الاسم والأبعاد في الأعلى؛ الوصف والوسوم في الأسفل). اضغط استخدام لفتح المحرر. ابحث أعلاه عن القوالب العامة والمعتمدة من النادي والشخصية بالاسم أو الوصف أو الوسوم أو الشهرة."
       },
-      "help-floqai-template-search": {
+      "help-botdee-template-search": {
         title: "بحث القوالب",
         body: "استخدم حقل العدسة (نفس تصميم Search) للعثور على القوالب بالاسم أو الوصف أو الوسوم أو الرياضة أو VIP أو الوسائط أو الشهرة. تشمل النتائج قوالب FLOQR الرسمية وخلفيات النادي المعتمدة وخلفياتك الشخصية. كل بطاقة معاينة LED حقيقية بالحجم الأساسي — استخدام هو الإجراء الوحيد."
       },
@@ -3031,6 +3298,18 @@
       "help-shiloh": {
         title: "Shiloh",
         body: "حصري في Aurelia مقابل 30 $. تجلس القطة Shiloh على يسار الشاشة ويتوهّج ShoutOut الخاص بك باللون الأبيض على الجانب الداكن بجانبها. الرموز التعبيرية مرحّب بها. اكتب «Shiloh» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @اسمك إن أردت. يُعرض على أحجام الشاشات المتوفرة في Aurelia."
+      },
+      "help-black-card": {
+        title: "Black Card (retired)",
+        body: "Black Card was removed from the ShoutOut catalog. Use Baller's Alert instead — $100 with your face under the warrior helmet, optional company (max 18, UPPERCASE)."
+      },
+      "help-ballers-alert": {
+        title: "Baller's Alert",
+        body: "$100 Baller's Alert — بطاقة Baller's Express BUSINESS المعدنية مع وجهك تحت الخوذة. ارفع صورة أو التقطها. يعزل Gemini الشخص (حواف تقريبية)؛ ثم كبّر/ضع الوجه. الخوذة والإطار والشريحة تبقى. الشركة اختيارية (حد أقصى 18، أحرف كبيرة؛ الإعداد WE'RE OUTSIDE LLC). Valid Thru 12/50."
+      },
+      "help-classic-halloween": {
+        title: "Classic Halloween",
+        body: "Classic Halloween مقابل $15، في كل النوادي. لوحة ShoutOut الكلاسيكية بثلاثة أسطر على مقبرة مضاءة بالقمر مع فوانيس اليقطين، والرموز التعبيرية مرحّب بها. في نهاية كل دورة، تنطلق أشباح بيضاء من قبر وتندفع نحو الجمهور بينما يظهر حاصد الأرواح وتحلّق الخفافيش. اكتب «Halloween» في البحث، واكتب حتى ثلاثة أسطر قصيرة، وأضف @معرّفك إن أردت. تُعرض على لوحات 96×48 و64×48 و64×32."
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",
@@ -3094,7 +3373,7 @@
       },
       "help-vip-payment-collector": {
         title: "جامع دفع VIP reserV وClub POS",
-        body: "المفضّل للأندية الحية مع Toast/SpotOn: Club POS — FLOQR يحجز/يمسك/خريطة؛ الـ POS يملك العربون والحساب والإنفاق. بدائل: Club Stripe أو FloqMedia Stripe (FloqR) أو محرك VIP + CSV. Aurelia (Demo Club) افتراضياً FloqMedia Stripe — اسأل FloqAi عن خطوات Master وClub Admin."
+        body: "المفضّل للأندية الحية مع Toast/SpotOn: Club POS — FLOQR يحجز/يمسك/خريطة؛ الـ POS يملك العربون والحساب والإنفاق. بدائل: Club Stripe أو FloqMedia Stripe (FloqR) أو محرك VIP + CSV. Aurelia (Demo Club) افتراضياً FloqMedia Stripe — اسأل BOT DEE عن خطوات Master وClub Admin."
       },
       "help-vip-table-isbooked": {
         title: "حالة isBooked لطاولات VIP في Firestore",
@@ -3149,7 +3428,8 @@
       const id = String(
         node.dataset?.helpId
         || node.getAttribute?.("data-help-id")
-        || node.dataset?.floqaiHelpId
+        || node.dataset?.botdeeHelpId || node.dataset?.floqaiHelpId
+        || node.getAttribute?.("data-botdee-help-id")
         || node.getAttribute?.("data-floqai-help-id")
         || ""
       ).trim();
@@ -3163,7 +3443,7 @@
       } catch (_) {}
       if (!entry) {
         const summary = node.querySelector?.("summary");
-        const bodyEl = node.querySelector?.(".help-popout-body, .floqai-help-body, div:not(summary)");
+        const bodyEl = node.querySelector?.(".help-popout-body, .botdee-help-body, div:not(summary)");
         entry = {
           id,
           title: String(summary?.getAttribute("aria-label") || "").replace(/^Help:\s*/i, "") || id,
@@ -3177,7 +3457,7 @@
       const body = localized.body || entry.body;
       const summary = node.querySelector?.("summary");
       if (summary) summary.setAttribute("aria-label", title ? `Help: ${title}` : "Help");
-      const bodyEl = node.querySelector?.(".help-popout-body, .floqai-help-body");
+      const bodyEl = node.querySelector?.(".help-popout-body, .botdee-help-body");
       if (bodyEl && body != null && body !== "") {
         if (!bodyEl.querySelector?.("a,button,ul,ol")) bodyEl.textContent = body;
       }

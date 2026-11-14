@@ -140,7 +140,7 @@ test("Template select LED preview, Use-only, tag search and roles are wired", ()
   assert.match(app, /\$\{venueTagsFor\(t\)\.join\(" "\)\}/);
   const index = read("index.html");
   assert.match(index, /id="templateSearchForm"/);
-  assert.match(index, /id="templateSearchGo"[^>]*class="category-floqai-lens"/);
+  assert.match(index, /id="templateSearchGo"[^>]*class="category-botdee-lens"/);
   assert.doesNotMatch(index, /id="templateSearchPanel"[^>]*\bhidden\b/);
   assert.ok(index.indexOf("floqr-template-preview.js") < index.indexOf("patron-app.js"));
   assert.ok(index.indexOf("floqr-template-tags.js") < index.indexOf("patron-app.js"));

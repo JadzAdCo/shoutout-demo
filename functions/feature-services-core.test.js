@@ -20,15 +20,18 @@ function loadClientModule() {
   return sandbox.window.FLOQRFeatureServices;
 }
 
-test("ShoutOut and Passes are live by default; every other feature is test-only", () => {
-  const live = core.FEATURE_CATALOG.filter(row => row.IsFeatureEnabled === 1).map(row => row.key);
-  assert.deepEqual(live, ["shoutOut", "passes"]);
-  const liveKeys = new Set(live);
-  core.FEATURE_CATALOG.filter(row => !liveKeys.has(row.key)).forEach(row => {
+test("ShoutOut and Passes are live by default; botDee is Beta-enabled; others test-only off", () => {
+  const enabled = core.FEATURE_CATALOG.filter(row => row.IsFeatureEnabled === 1).map(row => row.key);
+  assert.deepEqual(enabled, ["shoutOut", "botDee", "passes"]);
+  assert.equal(core.catalogEntry("botDee").IsTestFeature, 1, "botDee stays Beta (test)");
+  assert.equal(core.catalogEntry("shoutOut").IsTestFeature, 0);
+  assert.equal(core.catalogEntry("passes").IsTestFeature, 0);
+  const enabledKeys = new Set(enabled);
+  core.FEATURE_CATALOG.filter(row => !enabledKeys.has(row.key)).forEach(row => {
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });
-  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "floqAi", "vipReservations", "passes", "siteChrome"]);
+  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "botDee", "vipReservations", "passes", "siteChrome"]);
   assert.equal(core.canonicalizeFeatureKey("traditionalTheme"), "siteChrome");
 });
 
@@ -44,6 +47,20 @@ test("legacy supRstar feature key aliases to floqCast (beta grants + catalog)", 
   const mapped = core.validateBetaFeatures(["supRstar"], {requireOne: true});
   assert.equal(mapped.floqCast, 1);
   assert.equal(mapped.supRstar, undefined);
+});
+
+test("legacy floqAi feature key aliases to botDee (beta grants + catalog)", () => {
+  assert.equal(core.canonicalizeFeatureKey("floqAi"), "botDee");
+  assert.equal(core.catalogEntry("floqAi")?.key, "botDee");
+  const grants = core.betaGrantsFrom({
+    IsBetaTester: 1,
+    status: "active",
+    features: {floqAi: 1}
+  });
+  assert.equal(grants.botDee, 1);
+  const mapped = core.validateBetaFeatures(["floqAi"], {requireOne: true});
+  assert.equal(mapped.botDee, 1);
+  assert.equal(mapped.floqAi, undefined);
 });
 
 test("client catalog mirrors the server catalog (keys, routes, defaults)", () => {
@@ -120,7 +137,7 @@ test("beta grants are per feature, only for active testers, never ShoutOut", () 
 test("beta feature choices are validated", () => {
   const all = Object.fromEntries(core.BETA_ELIGIBLE_KEYS.map(key => [key, 0]));
   assert.deepEqual(core.validateBetaFeatures(["mingl", "rydr"]), {...all, mingl: 1, rydr: 1});
-  assert.deepEqual(core.validateBetaFeatures({bartr: "1", floqAi: 0}), {...all, bartr: 1});
+  assert.deepEqual(core.validateBetaFeatures({bartr: "1", botDee: 0}), {...all, bartr: 1});
   assert.throws(() => core.validateBetaFeatures(["shoutOut"]), /Not a beta feature/);
   assert.throws(() => core.validateBetaFeatures(["nope"]), /Not a beta feature/);
   assert.throws(() => core.validateBetaFeatures([]), /at least one feature/);
@@ -276,7 +293,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
   const app = read("patron-app.js");
   assert.match(app, /FLOQRFeatureServices\?\.applySearchUi/);
-  assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("floqAi"\)/, "start=intent must not bypass the floqAi gate");
+  assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("botDee"\)/, "start=intent must not bypass the botDee gate");
   assert.match(read("floqr-feature-services.js"), /searchVisible\(/);
 });
 

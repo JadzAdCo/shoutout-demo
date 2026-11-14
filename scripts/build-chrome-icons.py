@@ -1644,34 +1644,42 @@ def to_white_black(
 
 
 def build_floqcast_whiteblack() -> Path:
-    """FloqCAST White/Black from layers — Fl/T tips never wiped by white outside ring.
+    """FloqCAST White/Black — Image-2 geometry, WB palette.
 
-    Order: white bg → chrome graphic → under type (Fl) → thin shiny black ring → over type (oqCAST+T).
+    Same ring + full-width FloqCAST placement as Nightlife Image 2
+    (`place_floqcast_q_kiss`). WB colors only: white field, chrome ink
+    graphic, dark FloqCAS + Tiffany T, chrome ring, tip halo.
+
+    Order: white → graphic → under (Fl) → ring → over (oqCAST+T) → tip halo.
     """
     LAYERS.mkdir(parents=True, exist_ok=True)
     ensure_ring()
     g = Image.open(extract_floqcast_graphic())
     under, over, body = floqcast_wm()
+    # Image-2 placement — full Nightlife body size (no chord-fit shrink)
     left, top = place_floqcast_q_kiss(body, graphic_bottom(g, 700) + 8, bias=4)
-    print(f"  FloqCAST WB place left={left} top={top} body={body.size}")
+    print(f"  FloqCAST WB Image-2 place left={left} top={top} body={body.size}")
 
-    wb_stroke = 3  # small shiny-black ring
+    # Ring presence closer to Nightlife stroke (not hairline BOT-DEE 3px)
+    wb_stroke = max(5, RING_STROKE - 2)  # ~6 at RING_STROKE=8
     wb_half = wb_stroke / 2.0
     yy, xx = np.indices((S, S))
     dist = np.sqrt((xx - CX) ** 2 + (yy - CY) ** 2)
-    # Darker chrome-black type for white field contrast
-    font_chrome = shiny_chrome_tone(np.full((S, S), 160.0, np.float32), yy, xx, for_type=True)
-    font_chrome = np.clip(font_chrome * 0.72, 10, 110)
+    font_chrome = shiny_chrome_tone(
+        np.full((S, S), 160.0, np.float32), yy, xx, for_type=True
+    )
+    font_chrome = np.clip(font_chrome * 0.48, 8, 48)
 
+    # 1) White circle / field (no border yet)
     base = Image.new("RGBA", (S, S), (255, 255, 255, 255))
 
-    # Graphic → chrome linework on white
+    # 2) Cast graphic (Image-2 silhouette → chrome ink)
     ga = np.array(g.convert("RGBA"))
     gr, gg, gb, gal = (ga[:, :, i].astype(np.float32) for i in range(4))
     glum = 0.299 * gr + 0.587 * gg + 0.114 * gb
-    chrome = shiny_chrome_tone(glum, yy, xx)
+    chrome = np.clip(shiny_chrome_tone(glum, yy, xx) * 0.55, 10, 72)
     gout = np.zeros_like(ga)
-    line = (glum >= 30) & (gal > 8) & (dist < (R - 4))
+    line = (glum >= 26) & (gal > 8) & (dist < (R - 6))
     gout[line, 0] = gout[line, 1] = gout[line, 2] = chrome[line]
     gout[line, 3] = 255
     base.alpha_composite(Image.fromarray(gout, "RGBA"))
@@ -1679,52 +1687,146 @@ def build_floqcast_whiteblack() -> Path:
     def type_layer(im: Image.Image) -> Image.Image:
         a = np.array(paste_type(im, left, top))
         ink = a[:, :, 3] > 20
+        tiffany = (
+            ink
+            & (a[:, :, 0] < 120)
+            & (a[:, :, 1] > 140)
+            & (a[:, :, 2] > 170)
+        )
         out = np.zeros_like(a)
         for c in range(3):
             out[:, :, c] = np.where(ink, font_chrome, 0)
+        out[tiffany, 0] = TIFFANY[0]
+        out[tiffany, 1] = TIFFANY[1]
+        out[tiffany, 2] = TIFFANY[2]
         out[:, :, 3] = np.where(ink, 255, 0)
         return Image.fromarray(out, "RGBA")
 
-    # Under (Fl) → thin shiny-black ring → over (oqCAST + T)
-    base.alpha_composite(type_layer(under))
-    # Shiny black ring: dark body + silver specular (not light grey)
+    under_t = type_layer(under)
+    over_t = type_layer(over)
+
+    # 3) Under type (Fl) — Image-2: F/L sit under the ring chord
+    base.alpha_composite(under_t)
+
+    # 4) In-asset chrome ring — same R as Nightlife Image 2
     ring_chrome = shiny_chrome_tone(np.full((S, S), 200.0, np.float32), yy, xx)
-    ring_chrome = np.clip(12.0 + ring_chrome * 0.35, 14, 95)
+    ring_chrome = np.clip(8.0 + ring_chrome * 0.32, 10, 60)
     ra = np.zeros((S, S, 4), np.uint8)
     ring_mask = np.abs(dist - R) <= wb_half
+    # Soft AA outside solid stroke (never toward white through type)
+    ring_aa = (np.abs(dist - R) <= (wb_half + 0.9)) & ~ring_mask
     for c in range(3):
         ra[:, :, c] = np.where(ring_mask, ring_chrome, 0).astype(np.uint8)
-    ra[:, :, 3] = np.where(ring_mask, 255, 0).astype(np.uint8)
+        ra[:, :, c] = np.where(
+            ring_aa, np.clip(ring_chrome * 0.55, 14, 90).astype(np.uint8), ra[:, :, c]
+        )
+    ra[:, :, 3] = np.where(ring_mask | ring_aa, 255, 0).astype(np.uint8)
     base.alpha_composite(Image.fromarray(ra, "RGBA"))
-    base.alpha_composite(type_layer(over))
+
+    # 5) Over type (oqCAST + Tiffany T) — on top of ring like Image 2
+    base.alpha_composite(over_t)
 
     out = np.array(base)
     out[:, :, 3] = 255
-    # Outside white — but keep any type ink that extends past the ring (Fl / T tips)
-    type_ink = (np.array(type_layer(under))[:, :, 3] > 20) | (
-        np.array(type_layer(over))[:, :, 3] > 20
-    )
-    outside = dist > (R + wb_half + 0.5)
-    out[outside & ~type_ink, :3] = 255
-    # Final tip stamp over white field
-    tips = type_ink & (dist > (R + wb_half))
-    for c in range(3):
-        out[:, :, c] = np.where(tips, font_chrome, out[:, :, c])
 
-    dst = ROOT / "images/chrome/floqcast-whiteblack.jpg"
-    Image.fromarray(out, "RGBA").convert("RGB").save(dst, quality=96, subsampling=0)
-    preview = Image.fromarray(out, "RGBA").convert("RGB").resize((640, 640), Image.Resampling.LANCZOS)
-    preview.save("/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95)
-    Image.fromarray(out, "RGBA").convert("RGB").crop((0, 600, 360, 1024)).resize(
-        (360, 424), Image.Resampling.LANCZOS
-    ).save("/opt/cursor/artifacts/floqcast-wb-fl-fixed.png", quality=95)
-    Image.fromarray(out, "RGBA").convert("RGB").crop((660, 600, 1024, 1024)).resize(
-        (364, 424), Image.Resampling.LANCZOS
-    ).save("/opt/cursor/artifacts/floqcast-wb-t-fixed.png", quality=95)
-    print(
-        f"  FloqCAST WB tips outside={int(tips.sum())} ring={wb_stroke}px → {dst.name}"
+    # Tip halo + restamp outside ring (Image-2 tip overhang on white)
+    ua = np.array(under_t)
+    oa = np.array(over_t)
+    fl_ink = ua[:, :, 3] > 20
+    t_ink = (
+        (oa[:, :, 3] > 20)
+        & (oa[:, :, 0] < 120)
+        & (oa[:, :, 1] > 140)
+        & (oa[:, :, 2] > 170)
     )
-    return dst
+    type_ink = (ua[:, :, 3] > 20) | (oa[:, :, 3] > 20)
+    tips_out = type_ink & (dist > (R + wb_half))
+    tip_fl = tips_out & fl_ink
+    tip_t = tips_out & t_ink
+
+    tip_dilate = (
+        np.array(
+            Image.fromarray((tips_out.astype(np.uint8) * 255)).filter(
+                ImageFilter.MaxFilter(11)
+            )
+        )
+        > 0
+    )
+    halo = tip_dilate & ~type_ink & (dist > (R + wb_half)) & (dist < (R + 42))
+    halo_tone = np.clip(
+        205.0 + shiny_chrome_tone(np.full((S, S), 40.0, np.float32), yy, xx) * 0.10,
+        195,
+        232,
+    )
+    t_halo = halo & (
+        np.array(
+            Image.fromarray((t_ink.astype(np.uint8) * 255)).filter(ImageFilter.MaxFilter(13))
+        )
+        > 0
+    )
+    for c in range(3):
+        out[:, :, c] = np.where(halo, halo_tone, out[:, :, c])
+    # Soft cyan tip-halo under Tiffany T (Image-2 neon fringe → WB)
+    out[t_halo, 0] = np.minimum(out[t_halo, 0], 170)
+    out[t_halo, 1] = np.maximum(out[t_halo, 1], 228)
+    out[t_halo, 2] = np.maximum(out[t_halo, 2], 248)
+
+    # Solid tips last (F/L chrome, T tiffany) — never nicked by ring AA
+    for c in range(3):
+        out[:, :, c] = np.where(tip_fl, font_chrome, out[:, :, c])
+    out[tip_t, 0] = TIFFANY[0]
+    out[tip_t, 1] = TIFFANY[1]
+    out[tip_t, 2] = TIFFANY[2]
+
+    # Outside far field white (keep tip + halo)
+    wipe = (dist > (R + 42)) & ~tips_out & ~halo
+    out[wipe, :3] = 255
+
+    final = Image.fromarray(out, "RGBA").convert("RGB")
+
+    fa = np.array(final)
+    flum = fa.mean(axis=2)
+    ring_peak = 0
+    ring_r = None
+    for r0 in np.linspace(470, 505, 71):
+        n = int(((np.abs(dist - r0) <= 1.0) & (flum < 90)).sum())
+        if n > ring_peak:
+            ring_peak, ring_r = n, float(r0)
+    tip_max = float(dist[tips_out].max()) if tips_out.any() else 0.0
+    # Type width vs Nightlife Image 2 (should be ~full chord, not shrunk)
+    type_m = ((flum < 90) & (yy > 650)) | (
+        (fa[:, :, 0] < 120) & (fa[:, :, 1] > 140) & (fa[:, :, 2] > 170) & (yy > 650)
+    )
+    tw = int(np.where(type_m)[1].max() - np.where(type_m)[1].min()) + 1 if type_m.any() else 0
+
+    dst_png = ROOT / "images/chrome/floqcast-whiteblack.png"
+    dst_jpg = ROOT / "images/chrome/floqcast-whiteblack.jpg"
+    final.save(dst_png, optimize=True)
+    final.save(dst_jpg, quality=98, subsampling=0)
+
+    final.resize((640, 640), Image.Resampling.LANCZOS).save(
+        "/opt/cursor/artifacts/floqcast-wb-full-fixed.png", quality=95
+    )
+    final.resize((110, 110), Image.Resampling.LANCZOS).save(
+        "/opt/cursor/artifacts/floqcast-wb-tile-sim.png"
+    )
+    # Image-2 vs WB wordmark proof
+    nl = Image.open(ROOT / "images/chrome/floqcast-nightlife.jpg").convert("RGB")
+    proof = Image.new("RGB", (960, 460), (20, 20, 20))
+    proof.paste(nl.crop((30, 700, 994, 1010)).resize((920, 180)), (20, 40))
+    proof.paste(final.crop((30, 700, 994, 1010)).resize((920, 180)), (20, 260))
+    ImageDraw.Draw(proof).text((20, 12), "IMAGE 2 Nightlife wordmark", fill=(255, 220, 80))
+    ImageDraw.Draw(proof).text(
+        (20, 232), "WB Image-2 proportions (full width)", fill=(160, 210, 255)
+    )
+    proof.save("/opt/cursor/artifacts/wb_image2_proportions_fixed.png")
+
+    print(
+        f"  FloqCAST WB Image-2 props ring_r={ring_r} peak={ring_peak} "
+        f"stroke={wb_stroke} typeW={tw} tips_out={int(tips_out.sum())} "
+        f"halo={int(halo.sum())} tip_max={tip_max:.1f} → {dst_png.name}"
+    )
+    return dst_png
 
 
 def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
@@ -1744,9 +1846,10 @@ def recolor_vip_ring(src: Path, dst: Path, mode: str) -> None:
         tb = 254 * (1 - ang) + 255 * ang
         out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
     elif mode == "forest":
-        tr = 20 * (1 - ang) + 34 * ang
-        tg = 60 * (1 - ang) + 139 * ang
-        tb = 30 * (1 - ang) + 34 * ang
+        # Settings blackDarkGreen \"tings\" #5ac783 → darker #2e8a5a along the ring
+        tr = 46 * (1 - ang) + 90 * ang
+        tg = 138 * (1 - ang) + 199 * ang
+        tb = 90 * (1 - ang) + 131 * ang
         out[ring, 0], out[ring, 1], out[ring, 2] = tr[ring], tg[ring], tb[ring]
     Image.fromarray(out.astype(np.uint8), "RGBA").convert("RGB").save(
         dst, quality=96, subsampling=0

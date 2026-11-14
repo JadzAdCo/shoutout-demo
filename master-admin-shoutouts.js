@@ -323,17 +323,21 @@
     }
   }
 
+  let handlersBound = false;
   function mount() {
     if (!byId("soComplianceResults")) return;
     if (!byId("soComplianceFrom")?.value) byId("soComplianceFrom").value = startOfDayInput(60);
     if (!byId("soComplianceTo")?.value) byId("soComplianceTo").value = endOfDayInput();
-    byId("soComplianceSearchBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
-    byId("soComplianceRefreshBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
-    byId("soComplianceExportCsvBtn")?.addEventListener("click", () => exportComplianceLogsCsv());
-    byId("soRetentionRefreshBtn")?.addEventListener("click", () => loadRetentionPolicy().catch(console.warn));
-    byId("soComplianceBackfillBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
-    byId("soComplianceRebuildBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
-    loadVenues().catch(console.warn);
+    if (!handlersBound) {
+      handlersBound = true;
+      byId("soComplianceSearchBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
+      byId("soComplianceRefreshBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
+      byId("soComplianceExportCsvBtn")?.addEventListener("click", () => exportComplianceLogsCsv());
+      byId("soRetentionRefreshBtn")?.addEventListener("click", () => loadRetentionPolicy().catch(console.warn));
+      byId("soComplianceBackfillBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
+      byId("soComplianceRebuildBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
+    }
+    /* Venues + compliance logs load in onPanel — not on every Master Admin sign-in. */
   }
 
   function onPanel(panelId) {

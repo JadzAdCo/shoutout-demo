@@ -24,6 +24,8 @@ test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients"
   assert.doesNotMatch(backend, /payment_method_types/);
   assert.match(backend, /v2\.core\.accounts\.retrieve/);
   assert.match(backend, /trustedConnectRecipient/);
+  assert.match(backend, /optionalReadyRecipient/);
+  assert.match(backend, /applyDestinationCharge/);
   assert.match(backend, /paymentModel:"floqr-platform"/);
   assert.match(backend, /SHOUTOUT_CLUB_SHARE_PERCENT = 20/);
   assert.match(backend, /This ShoutOut template does not require checkout/);
@@ -31,7 +33,9 @@ test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients"
   assert.match(backend, /assignment\.data\(\)\?\.status, 40\)\.toLowerCase\(\) === "active"/);
   assert.match(backend, /function testPaymentFields/);
   assert.match(backend, /exports\.purgeFloqrTestPayments/);
+  assert.match(backend, /exports\.refundFloqrCheckoutOrder/);
   assert.match(backend, /isTestPayment/);
+  assert.doesNotMatch(backend, /type !== "commerce" && type !== "shoutout"/);
 });
 
 test("Commerce inventory is reserved before Checkout and released safely", () => {
@@ -82,6 +86,10 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
   assert.match(backend, /members\.length !== 4/);
   assert.match(patronApp, /priceCents > 0/);
   assert.match(patronApp, /Continue to \$30 FloqR Checkout/);
+  assert.match(patronApp, /lockCriticalButton/);
+  assert.match(patronApp, /page\.shoutout\.openingCheckout/);
+  assert.match(fs.readFileSync(path.join(root, "styles.css"), "utf8"), /button\.is-critical-busy/);
+  assert.match(fs.readFileSync(path.join(root, "payment-service.js"), "utf8"), /function lockCriticalButton/);
 });
 
 test("Traditional Black and White keeps a global fixed identity rail", () => {
@@ -168,6 +176,10 @@ test("all published templates have display-aware text contracts", () => {
         assert.ok(rule.subTextSizePercent >= 50 && rule.subTextSizePercent <= 70, `${template.id} soccer mark size`);
         assert.equal(rule.sub, 2, `${template.id} soccer mark must be exactly 2 characters`);
         assert.ok(rule.main <= rule.lineCount * rule.perLine, `${template.id} soccer main ceiling`);
+      } else if (rule.profileId === "ballerCard" || rule.profileId === "nflJersey") {
+        assert.ok(rule.mainTextSizePercent > 0 && rule.mainTextSizePercent < 20.8, `${template.id} embossed/jersey size`);
+        assert.ok(rule.subTextSizePercent > 0, `${template.id} sub size`);
+        assert.ok(rule.main >= 1 && rule.perLine >= 1, `${template.id} caps`);
       } else {
         assert.equal(rule.mainTextSizePercent, 20.8);
         assert.equal(rule.subTextSizePercent, 7.8);

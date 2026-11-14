@@ -7,20 +7,25 @@ const path = require("node:path");
 
 const readReleaseFile = relativePath => fs.readFileSync(path.resolve(__dirname, "..", relativePath), "utf8");
 
-test("Welcome OAuth does not redirect on popup-closed (GitHub Pages redirect is unreliable)", () => {
+test("Welcome OAuth prefers popup on every device (GitHub Pages redirect is unreliable)", () => {
   const app = readReleaseFile("patron-app.js");
-  assert.match(app, /Desktop: prefer popup\. Do NOT redirect on popup-closed-by-user/);
+  assert.match(app, /Prefer popup from the user tap on every device/);
   assert.match(app, /AUTH_REDIRECT_PENDING_KEY/);
-  assert.match(app, /oauthPopupsUnreliable/);
+  assert.match(app, /AUTH_PREFER_POPUP_KEY/);
   assert.match(app, /signInProviderRedirect/);
-  // Mobile/tablet skips popup (browsers block it) and uses redirect first.
-  assert.match(app, /if \(oauthPopupsUnreliable\(\)\) \{\s*await signInProviderRedirect/);
+  assert.match(app, /signInWithPopup\(provider\)/);
+  // Must NOT redirect-first on mobile (s3.2.35 regression on GitHub Pages + ITP).
+  assert.doesNotMatch(app, /oauthPopupsUnreliable/);
+  assert.doesNotMatch(app, /if \(oauthPopupsUnreliable\(\)\)/);
   // popup-closed must set cancel copy via oauthAuthErrorMessage — not kick off redirect.
   assert.match(app, /code === "auth\/popup-closed-by-user"[\s\S]{0,180}setStatus\(oauthAuthErrorMessage/);
   assert.match(app, /was cancelled\. Tap Continue with/);
   // User-facing status string must not be minted (comment may mention the old bug).
   assert.doesNotMatch(app, /setStatus\(`\$\{label\} popup closed or blocked\. Redirecting/);
   assert.doesNotMatch(app, /\$\{label\} popup was blocked\. Trying full-page sign-in/);
+  // After a failed redirect, next attempt prefers popup + clearer copy.
+  assert.match(app, /full-page sign-in could not finish on this browser/);
+  assert.match(app, /allow the popup, or use Email \/ SMS OTP/);
 });
 
 test("email sign-in matches the Facebook color and exposes a selected confirmation", () => {
@@ -232,10 +237,10 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   assert.match(portal, /data-i18n="lang.webappLanguage"/);
   assert.match(portal, /data-i18n="lang.testHint"/);
   const index = readReleaseFile("index.html");
-  assert.match(index, /data-i18n-placeholder="cat.floqaiPlaceholder"/);
+  assert.match(index, /data-i18n-placeholder="cat.botdeePlaceholder"/);
   assert.match(index, /placeholder="Search for Clubs, Lounge, Events, etc\."/);
   assert.match(index, /data-i18n="nav.backShort"/);
-  assert.doesNotMatch(index, /data-i18n="cat.floqaiWelcome"/);
+  assert.doesNotMatch(index, /data-i18n="cat.botdeeWelcome"/);
   assert.match(index, /help-attach\.js\?v=s3\./);
   const helpAttach = readReleaseFile("help-attach.js");
   assert.match(helpAttach, /function glueOrphanPopouts/);

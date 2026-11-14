@@ -23,6 +23,19 @@
   let iceServersCacheUntil = 0;
   let iceServersInflight = null;
 
+  let lastIceSource = "stun-fallback";
+
+  function iceSource() {
+    return lastIceSource;
+  }
+
+  function iceHasTurn(servers) {
+    return (servers || []).some((s) => {
+      const urls = [].concat(s?.urls || s?.url || []);
+      return urls.some((u) => /^turns?:/i.test(String(u || "")));
+    });
+  }
+
   async function resolveIceServers() {
     const now = Date.now();
     if (iceServersCache && now < iceServersCacheUntil) return iceServersCache;
@@ -37,9 +50,42 @@
         if (!servers.length) throw new Error("empty-ice");
         iceServersCache = servers;
         iceServersCacheUntil = Date.now() + ttlMs;
+        lastIceSource = String(res?.data?.source || (iceHasTurn(servers) ? "turn" : "stun-only"));
+        if (!iceHasTurn(servers)) {
+          console.warn("[floqCast] ICE has no TURN — hard NAT may fail intermittently", lastIceSource);
+        }
+        try {
+          global.FLOQRLog?.write?.({
+            level: iceHasTurn(servers) ? "info" : "warn",
+            category: "floqCast",
+            action: "ice_servers",
+            message: iceHasTurn(servers)
+              ? `floqCast ICE ready (${lastIceSource})`
+              : `floqCast ICE has no TURN (${lastIceSource}) — connectivity may be intermittent`,
+            details: {
+              iceSource: lastIceSource,
+              serverCount: servers.length,
+              hasTurn: iceHasTurn(servers),
+              ttlMs
+            },
+            source: "floqcast-webrtc"
+          });
+        } catch (_) {}
         return iceServersCache;
-      } catch (_) {
-        return STUN_SERVERS;
+      } catch (err) {
+        lastIceSource = "stun-fallback";
+        console.warn("[floqCast] getFloqCastIceServers failed — STUN only", String(err?.message || err).slice(0, 160));
+        try {
+          global.FLOQRLog?.write?.({
+            level: "warn",
+            category: "floqCast",
+            action: "ice_servers",
+            message: `getFloqCastIceServers failed — STUN fallback`,
+            details: {iceSource: lastIceSource, error: String(err?.message || err).slice(0, 160)},
+            source: "floqcast-webrtc"
+          });
+        } catch (_) {}
+        return STUN_SERVERS
       } finally {
         iceServersInflight = null;
       }
@@ -1171,6 +1217,8 @@
     ICE_SERVERS,
     STUN_SERVERS,
     resolveIceServers,
+    iceSource,
+    iceHasTurn,
     peerMediaAlive,
     getCameraStream,
     listVideoDevices,

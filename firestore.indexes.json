@@ -1,6 +1,14 @@
 {
   "indexes": [
     {
+      "collectionGroup": "geminiApiAccessLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "outcome", "order": "ASCENDING" },
+        { "fieldPath": "createdAtMs", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "suprstarRequests",
       "queryScope": "COLLECTION",
       "fields": [

@@ -22,7 +22,7 @@ English-only help for a French (or any supported) speaker is a **product bug**. 
 
 | Audience | Datapoint | Must translate |
 |---|---|---|
-| Patron | `IsPatron=1` | Search + My Profile chrome, satellite titles, patron `?` / FloqAi help |
+| Patron | `IsPatron=1` | Search + My Profile chrome, satellite titles, patron `?` / BOT DEE help |
 | Service member | `IsServiceMember=1` | Work Calendar / role help |
 | Venue admin | `IsVenueAdmin=1` (legacy `IsClubAdmin` / `isClubAdmin` alias into this) | Club Admin chrome + venueAdmin help |
 
@@ -33,7 +33,7 @@ Master Admin–only help may stay English until requested; keyed master **tabs**
 Before **every** commit that touches UI or help, and before **every** Pages publish:
 
 1. **Chrome:** every supported lang has `CHROME.*` key-count **===** `CHROME.en` (no silent English fallback).
-2. **Help:** every patron / venueAdmin / serviceMember help id in `floqai-help-repository.js` has title+body in `floqr-i18n-help.js` for **every** non-English supported lang (`de fr es it pt ru el pl nl ar`).
+2. **Help:** every patron / venueAdmin / serviceMember help id in `botdee-help-repository.js` has title+body in `floqr-i18n-help.js` for **every** non-English supported lang (`de fr es it pt ru el pl nl ar`).
 3. New English UI string → `data-i18n` / `t(key)` + fill **all** chrome packs in the same change.
 4. New/changed English help → update **all** help locale packs in the same change.
 5. Cache-bust `floqr-i18n.js` and `floqr-i18n-help.js` `?v=`.
@@ -49,4 +49,4 @@ Language is **not** path-based (`/de/`, `/fr/`). It is `profile.uiLanguage` + `l
 
 ## Protected brands (never translate)
 
-ShoutOut, Mingl, BartR, RydR, FloqAi, dj BOT, djBOT, FloqR, FloqCAST, floqCast, VIP reserV, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.
+ShoutOut, Mingl, BartR, RydR, BOT DEE, dj BOT, djBOT, FloqR, FloqCAST, floqCast, VIP reserV, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.

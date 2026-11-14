@@ -1,7 +1,7 @@
 /**
  * Google geocoding for clubLocations: every new or moved venue gets latitude/longitude once,
  * so nearest-first search works for any city without code changes.
- * Design notes: .cursor/rules/design-notes-floqai-venue-search.mdc
+ * Design notes: .cursor/rules/design-notes-botdee-venue-search.mdc
  */
 "use strict";
 

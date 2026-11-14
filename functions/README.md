@@ -65,6 +65,6 @@ If `GEMINI_API_KEY` does not exist yet, set it before deployment:
 firebase functions:secrets:set GEMINI_API_KEY
 ```
 
-The default image model is `gemini-3.1-flash-image`. The default text model is `gemini-3.6-flash` (replaces retired `gemini-2.5-flash` for new API keys). To override them in backend runtime configuration, set `FLOQR_GEMINI_IMAGE_MODEL` and `FLOQR_GEMINI_TEXT_MODEL`.
+The default image model is `gemini-3.1-flash-image`. The default text model is `gemini-3.6-flash` (replaces retired `gemini-2.5-flash` for new API keys). Baller portrait segmentation defaults to `gemini-3.8-flash` (`FLOQR_GEMINI_SEGMENTATION_MODEL`). To override image/text models in backend runtime configuration, set `FLOQR_GEMINI_IMAGE_MODEL` and `FLOQR_GEMINI_TEXT_MODEL`.
 
 After deployment, run Master Admin > Diagnostics. `ShoutOut: Media AI panel` passes only when the callable responds in diagnostic mode and the secret is available.

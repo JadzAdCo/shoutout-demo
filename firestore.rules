@@ -23,6 +23,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.006: botDeeThreads/{uid} + events owner-read, Functions-write (durable BOT DEE resume)
 // - s3.2.28: venueTemplateTags create/update only for club-owned templates (clubLocations.clubOwnedTemplateIds
 //   or templates/{id}.venueIds). Shared FloqR catalog tags stay read-only for Club Admin. Delete still allowed
 //   for Template Administrators so stray shared overlays can be cleaned up.
@@ -213,7 +214,9 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "stripeTransfersActive",
+ "stripeCapabilityTransfers"
  ]);
  }
 
@@ -668,7 +671,9 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "stripeTransfersActive",
+ "stripeCapabilityTransfers"
  ]);
  allow update: if (isMasterAdmin() || isClubManager(id))
  && preservesStripeBindingFields();
@@ -720,8 +725,34 @@ service cloud.firestore {
  allow write: if false;
  }
 
+ // Legacy throttle collection id (pre-botDee rename); keep deny-all.
  match /floqAiAccessThrottle/{uid} {
  allow read, write: if false;
+ }
+
+ match /botDeeAccessThrottle/{uid} {
+ allow read, write: if false;
+ }
+
+ // BOT DEE conversation settings (idle pause). Signed-in read; Functions-write only (SOS2FA).
+ match /botDeeSettings/{docId} {
+ allow read: if signedIn();
+ allow write: if false;
+ }
+
+ // BOT DEE durable threads (one doc per uid). Owner read; Functions-write.
+ match /botDeeThreads/{threadId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && resource.data.uid == request.auth.uid;
+ allow write: if false;
+ match /events/{eventId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
  }
 
  // Staff marketing media consent evidence: written only by recordStaffMarketingConsent.
@@ -953,6 +984,11 @@ service cloud.firestore {
  && request.resource.data.template != 'heistNeonMask'
  && request.resource.data.template != 'heistDupontUnder'
  && request.resource.data.template != 'heistRedLux'
+ && request.resource.data.template != 'classicHalloween'
+ && request.resource.data.template != 'blackCard'
+ && request.resource.data.template != 'ballersAlert'
+ && request.resource.data.template != 'blackCardAmex'
+ && request.resource.data.template != 'ballersAlertAmex'
  && request.resource.data.submittedByUid == request.auth.uid
  && request.resource.data.mainText is string
  && request.resource.data.mainText.size() <= 120;
@@ -1053,9 +1089,17 @@ service cloud.firestore {
  && request.resource.data.message is string
  && request.resource.data.message.size() <= 2000;
  allow read: if isMasterAdmin()
+ || isFloqrAdmin()
  || (signedIn() && resource.data.uid == request.auth.uid);
  allow update: if false;
  allow delete: if isMasterAdmin();
+ }
+
+ // Gemini API access audit (success + failure reason). Functions-write only.
+ // 30-day retention via expireAtMs / purgeLogRetention. Master Admin or FloqR Admin (RBAC).
+ match /geminiApiAccessLogs/{id} {
+ allow read: if isMasterAdmin() || isFloqrAdmin();
+ allow create, update, delete: if false;
  }
 
  // Twilio Debugger / error-log webhook events (Admin SDK writes only).
@@ -1562,7 +1606,7 @@ service cloud.firestore {
  }
 
  match /aiMediaEdits/{id} {
- allow read, update, delete: if ownsResourceUid();
+ allow read, update, delete: if ownsResourceUid() || isMasterAdmin() || isFloqrAdmin();
  allow create: if createsOwnUid();
  }
 
@@ -1595,6 +1639,12 @@ service cloud.firestore {
 
  match /aiDiagnosticsReports/{id} {
  allow read, write: if isMasterAdmin();
+ }
+
+ // Precomputed Master Admin summary datapoints (Functions write every 5 min).
+ match /masterAdminRollups/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
  }
 
  match /aiAssistantSessions/{uid} {

@@ -14,9 +14,9 @@ const NEXT_NUM = NEXT.slice(1);
 const NEW_TESTS = ["session-hint-hero-help.test.js"];
 const CHANGED_ASSETS = [
   "floqr-i18n.js",
-  "floqai-help-repository.js",
+  "botdee-help-repository.js",
   "intent-search.js",
-  "floqai-page.js",
+  "botdee-page.js",
   "floqr-session-shell.js",
   "help-attach.js",
   "helper-popouts.js",
@@ -73,7 +73,7 @@ edit("README.md", src => {
   if (!head.test(src)) throw new Error("README head");
   if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
   const eol = src.includes("\r\n") ? "\r\n" : "\n";
-  const note = `- ${NEXT}: FloqAi links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.`;
+  const note = `- ${NEXT}: BOT DEE links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.`;
   return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
 });
 

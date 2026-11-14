@@ -39,5 +39,28 @@
   }
 
   async function load() { [orders, campaigns, pickups] = await Promise.all([collection("serviceOrders", 750), collection("audienceCampaigns", 750), collection("pickupRequests", 750)]); render(); }
-  document.addEventListener("DOMContentLoaded", () => auth.onAuthStateChanged(user => { if (user) load(); }));
+
+  let mounted = false;
+  let loading = null;
+  /** Lazy: only when Services & Commerce panel opens (not on every Master Admin sign-in). */
+  async function mount() {
+    if (!auth.currentUser) return;
+    if (loading) return loading;
+    if (mounted && orders.length) return;
+    loading = load().then(() => { mounted = true; }).finally(() => { loading = null; });
+    return loading;
+  }
+
+  window.FLOQRMasterServices = {mount, load, render};
+  document.addEventListener("DOMContentLoaded", () => {
+    /* Bind only — do not fetch 750×3 commerce docs until the panel is opened. */
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        mounted = false;
+        orders = [];
+        campaigns = [];
+        pickups = [];
+      }
+    });
+  });
 })();

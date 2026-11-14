@@ -76,16 +76,32 @@
     }
   }
 
-  function setDisplayErrorsBlink(hasNew) {
+  function setDisplayErrorsBlink(hasNew, newestMs = 0) {
+    const blink = window.FLOQRCriticalLogBlink;
+    const count = typeof hasNew === "number" ? Math.max(0, hasNew) : (hasNew ? 1 : 0);
+    if (blink) {
+      if (count > 0) {
+        blink.set(blink.SOURCE_IDS.displayLoadErrors, {
+          tabId: "diagnosticsDisplayErrorsTab",
+          parentGroup: "diagnostics",
+          label: "Display / Xibo Load Errors",
+          count,
+          newestMs: Number(newestMs) || Date.now()
+        });
+      } else {
+        blink.clear(blink.SOURCE_IDS.displayLoadErrors);
+      }
+      return;
+    }
     const tab = byId("diagnosticsDisplayErrorsTab");
     if (tab) {
-      tab.classList.toggle("is-blink", !!hasNew);
-      tab.setAttribute("aria-label", hasNew
+      tab.classList.toggle("is-blink", count > 0);
+      tab.setAttribute("aria-label", count > 0
         ? "Display / Xibo Load Errors — new fallback hits"
         : "Display / Xibo Load Errors");
     }
     const parent = document.querySelector('.admin-tab-parent[data-group="diagnostics"]');
-    if (parent) parent.classList.toggle("is-blink", !!hasNew);
+    if (parent) parent.classList.toggle("is-blink", count > 0);
   }
 
   function formatDatePart(ms) {
@@ -127,9 +143,9 @@
     const viewing = byId("diagnosticsDisplayErrors")?.classList.contains("active");
     if (viewing && newestMs) {
       setSeenMs(newestMs);
-      setDisplayErrorsBlink(false);
+      setDisplayErrorsBlink(0, newestMs);
     } else {
-      setDisplayErrorsBlink(newCount > 0);
+      setDisplayErrorsBlink(newCount, newestMs);
     }
 
     setText("displayLoadErrorsStatus", rows.length
@@ -224,7 +240,18 @@
   }
 
   function ensureMounted() {
-    // Placeholder for future lazy mounts; diagnostics core still boots from master-admin-app.
+    /* Diagnostics core mounts lazily from activatePanel (Run Diagnostics / Manual Tests / Archives). */
+    try {
+      const auth = window.firebase?.auth?.();
+      const db = window.firebase?.firestore?.();
+      if (auth?.currentUser && db && window.FLOQRDiagnostics?.mount) {
+        window.FLOQRDiagnostics.mount({
+          db,
+          auth,
+          storage: window.firebase?.storage?.() || null
+        });
+      }
+    } catch (_) { /* ignore */ }
   }
 
   function bind() {

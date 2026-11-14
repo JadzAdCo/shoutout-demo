@@ -1,4 +1,4 @@
-/* Data classification register, System tier, and FloqAi enforcement.
+/* Data classification register, System tier, and BOT DEE enforcement.
    Design notes: .cursor/rules/design-notes-data-classification.mdc */
 "use strict";
 
@@ -9,8 +9,8 @@ const path = require("path");
 const vm = require("vm");
 
 const dc = require("./data-classification-core");
-const manifest = require("./floqai-content-classes.json");
-const {buildManifest, serialize} = require("../scripts/build-floqai-content-classes");
+const manifest = require("./botdee-content-classes.json");
+const {buildManifest, serialize} = require("../scripts/build-botdee-content-classes");
 
 const ROOT = path.resolve(__dirname, "..");
 const read = file => fs.readFileSync(path.join(ROOT, file), "utf8");
@@ -64,8 +64,8 @@ test("System jobs are least-privilege: allowlisted collections only, each with a
     assert.ok(entry.purpose.length > 20, `${job} purpose`);
     entry.collections.forEach(collection => assert.ok(dc.COLLECTIONS.includes(collection), `${job} → ${collection} is classified`));
   });
-  assert.equal(dc.systemJob("floqAiAccess", "clubLocations").job, "floqAiAccess");
-  assert.throws(() => dc.systemJob("floqAiAccess", "sos2faTotp"), /may not read/);
+  assert.equal(dc.systemJob("botDeeAccess", "clubLocations").job, "botDeeAccess");
+  assert.throws(() => dc.systemJob("botDeeAccess", "sos2faTotp"), /may not read/);
   assert.throws(() => dc.systemJob("unknownJob", "users"), /Unknown system job/);
 });
 
@@ -98,14 +98,14 @@ const EXPECTED = {
   system: []
 };
 
-test("FloqAi filter matrix: each tier sees exactly its classified content", () => {
+test("BOT DEE filter matrix: each tier sees exactly its classified content", () => {
   Object.entries(EXPECTED).forEach(([role, audiences]) => {
     const {allowed} = dc.filterContent(Object.values(SAMPLE), manifest, {role});
     assert.deepEqual(allowed.sort(), audiences.map(key => SAMPLE[key]).sort(), role);
   });
 });
 
-test("FloqAi fails closed on unclassified, malformed, or unknown ids", () => {
+test("BOT DEE fails closed on unclassified, malformed, or unknown ids", () => {
   const bad = ["intent:does-not-exist", "help:popout-runtime-only", "", "intent:", "help:../users", "users", "intent:<script>", "x:help-general"];
   const {allowed, denied} = dc.filterContent(bad, manifest, {role: "master"});
   assert.deepEqual(allowed, []);
@@ -117,7 +117,7 @@ test("FloqAi fails closed on unclassified, malformed, or unknown ids", () => {
   assert.equal(dc.sanitizeSourceIds(Array.from({length: 200}, (_, i) => `intent:i${i}`)).length, dc.MAX_CONTENT_IDS);
 });
 
-test("every FloqAi help entry and intent is classified, and the server manifest matches the source", () => {
+test("every BOT DEE help entry and intent is classified, and the server manifest matches the source", () => {
   const built = buildManifest(ROOT);
   const unclassifiedHelp = Object.entries(built.help).filter(([, a]) => !a.length).map(([id]) => id);
   const unclassifiedIntents = Object.entries(built.intents).filter(([, a]) => !a.length).map(([id]) => id);
@@ -125,8 +125,8 @@ test("every FloqAi help entry and intent is classified, and the server manifest 
   assert.deepEqual(unclassifiedIntents, []);
   assert.ok(Object.keys(built.help).length >= 80);
   assert.ok(Object.keys(built.intents).length >= 45);
-  const current = fs.readFileSync(path.join(__dirname, "floqai-content-classes.json"), "utf8").replace(/\r\n/g, "\n");
-  assert.equal(current, serialize(built), "run node scripts/build-floqai-content-classes.js");
+  const current = fs.readFileSync(path.join(__dirname, "botdee-content-classes.json"), "utf8").replace(/\r\n/g, "\n");
+  assert.equal(current, serialize(built), "run node scripts/build-botdee-content-classes.js");
   Object.entries(built.help).forEach(([id, audiences]) => assert.ok(dc.contentRow(`help:${id}`, built), `help:${id} classifies`));
   Object.entries(built.intents).forEach(([id]) => assert.ok(dc.contentRow(`intent:${id}`, built), `intent:${id} classifies`));
 });
@@ -139,7 +139,7 @@ test("translated help inherits its source entry's classification", () => {
   };
   win.window = win;
   const ctx = vm.createContext(win);
-  vm.runInContext(read("floqai-help-repository.js"), ctx);
+  vm.runInContext(read("botdee-help-repository.js"), ctx);
   const repo = win.FLOQRHelpRepository;
   const all = {IsPatron: 1, IsServiceMember: 1, IsVenueAdmin: 1, IsMasterAdmin: 1};
   const localized = repo.toSearchIntents(all);
@@ -161,15 +161,16 @@ test("intent-search.js classifies every curated intent and has no default-audien
   assert.ok(src.includes("enforceServerVerdicts"));
 });
 
-test("getFloqAiAccess resolves the tier server-side, keeps the floqAi feature guard, and logs restricted denials", () => {
+test("getBotDeeAccess resolves the tier server-side, keeps the botDee feature guard, and logs restricted denials", () => {
   const src = fs.readFileSync(path.join(__dirname, "data-classification-functions.js"), "utf8");
-  assert.ok(src.includes("exports.getFloqAiAccess"));
-  assert.ok(src.includes('assertFeatureAccess(request.auth || null, "floqAi", request)'));
+  assert.ok(src.includes("exports.getBotDeeAccess"));
+  assert.ok(src.includes("exports.getFloqAiAccess = exports.getBotDeeAccess"), "legacy callable alias");
+  assert.ok(src.includes('assertFeatureAccess(request.auth || null, "botDee", request)'));
   assert.ok(src.includes("core.resolveViewerRole(await roleFactsFor(request.auth))"));
   assert.ok(!/request\.data\??\.(role|tier|audience|isMasterAdmin)/.test(src), "never trusts a client-supplied role");
   assert.ok(src.includes("writeUnchainedAudit"));
-  assert.ok(src.includes("floqai.content_denied"));
-  assert.ok(src.includes("core.systemJob(FLOQAI_JOB, collection)"));
+  assert.ok(src.includes("botdee.content_denied"));
+  assert.ok(src.includes("core.systemJob(BOTDEE_JOB, collection)"));
   assert.ok(src.includes('request.app ? "verified" : "missing"'));
   assert.ok(!/enforceAppCheck:\s*true/.test(src), "App Check is recorded, not enforced yet");
   const index = fs.readFileSync(path.join(__dirname, "index.js"), "utf8");
@@ -179,7 +180,7 @@ test("getFloqAiAccess resolves the tier server-side, keeps the floqAi feature gu
 test("rules lock the register, throttles, and consent evidence to server writes", () => {
   const access = dc.parseRulesAccess(rules);
   assert.deepEqual(access.dataClassification, {read: "master", write: "none"});
-  assert.deepEqual(access.floqAiAccessThrottle, {read: "none", write: "none"});
+  assert.deepEqual(access.botDeeAccessThrottle, {read: "none", write: "none"});
   assert.deepEqual(access.staffMarketingConsentThrottle, {read: "none", write: "none"});
   assert.equal(access.staffMarketingConsentLogs.write, "none");
 });
@@ -225,9 +226,12 @@ test("Master Admin Security → Data classification panel is wired and SOS2FA-ga
   assert.ok(/floqr-data-classification\.js[\s\S]*master-data-classification\.js/.test(html));
   assert.ok(/"dataClassification"/.test(read("sos2fa.js")));
   assert.ok(read("master-admin-app.js").includes("FLOQRMasterDataClassification"));
-  const floqai = read("floqai.html");
-  assert.ok(/floqr-data-classification\.js[\s\S]*floqai-access\.js[\s\S]*intent-search\.js/.test(floqai));
-  assert.ok(floqai.includes('data-floqr-feature="floqAi"'));
+  const botdee = read("botdee.html");
+  assert.ok(/floqr-data-classification\.js[\s\S]*botdee-access\.js[\s\S]*botdee-page\.js/.test(botdee));
+  assert.doesNotMatch(botdee, /intent-search\.js/, "BOT DEE is chat-only; intent search stays off the page");
+  assert.ok(botdee.includes('data-floqr-feature="botDee"'));
+  assert.equal(fs.existsSync(path.join(ROOT, "floqai.html")), false, "floqai.html removed");
+  assert.ok(fs.existsSync(path.join(ROOT, "botdee.html")), "botdee.html present");
 });
 
 test("Save all validates every row and needs a reason", () => {
@@ -292,7 +296,7 @@ test("fix list groups the live exposure report by kind of gap", () => {
 
 test("saveAllDataClassifications is SOS2FA-gated, chained in one transaction, and the panel has one Save all button", () => {
   const fns = read("functions/data-classification-functions.js");
-  const body = fns.slice(fns.indexOf("exports.saveAllDataClassifications"), fns.indexOf("// ---- FloqAi enforcement"));
+  const body = fns.slice(fns.indexOf("exports.saveAllDataClassifications"), fns.indexOf("// ---- BOT DEE enforcement"));
   assert.ok(body.includes('audit.assertAdmin(request, "dataClass.saveAll")'));
   assert.ok(body.includes("core.validateSaveAll") && body.includes("core.planSaveAll"));
   assert.ok(body.includes("db.runTransaction") && body.includes("audit.appendChainedAudit(tx, head"));

@@ -33,9 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.2.40";
-  const PREVIEW_LINKS_PACKAGE = "s3.2.40";
-  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.014";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.014";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -223,6 +222,832 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.014",
+      title: "s3.3.014 — BOT DEE chat-only: no ? / scope; help like version; no Quick intent",
+      checks: [
+        {label:"No ? bubble or scope line", file:"botdee.html", notIncludes:["botdee-help-popout", "botDeeScopeNote", "botDeeIntentFallback", "intent-search.js"]},
+        {label:"Help local reply", file:"bot-dee-chat.js", includes:["isHelpPrompt", "helpReply", "botdee.chatHelp"]},
+        {label:"Server help", file:"functions/bot-dee-core.js", includes:["function isHelpPrompt", "function helpReply"]},
+        {label:"Callable local help", file:"functions/bot-dee-functions.js", includes:["isHelpPrompt(userPrompt)", "local-help"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-botdee-help-chat"]}
+      ]
+    },
+    {
+      version: "s3.3.013",
+      title: "s3.3.013 — Master Admin 5-min rollup + summary strips",
+      checks: [
+        {label:"Rollup Functions", file:"functions/master-admin-rollup-functions.js", includes:["scheduledMasterAdminRollup", "refreshMasterAdminRollup", "masterAdminRollups/current"]},
+        {label:"Index export", file:"functions/index.js", includes:["master-admin-rollup-functions"]},
+        {label:"Rules", file:"firestore.rules", includes:["match /masterAdminRollups/{id}"]},
+        {label:"Client module", file:"master-admin-rollup.js", includes:["FLOQRMasterAdminRollup", "paintForPanel", "refreshMasterAdminRollup"]},
+        {label:"HTML strips", file:"master-admin.html", includes:["refreshMasterAdminRollupBtn", "servicesCommerceRollup", "templateManagementRollup", "aiCrawlingSummary"]},
+        {label:"Sign-in bind", file:"master-admin-app.js", includes:["FLOQRMasterAdminRollup?.bind", "FLOQRMasterAdminRollup?.paintForPanel"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-013-master-admin-rollup"]}
+      ]
+    },
+    {
+      version: "s3.3.012",
+      title: "s3.3.012 — Height unit-first + structured RydR pickup",
+      checks: [
+        {label:"Locale helper", file:"floqr-profile-locale.js", includes:["bindHeightFields", "bindPickupFields", "usesZip"]},
+        {label:"Unit before height Search", file:"index.html", includes:["profileHeightUnit", "profileTaxiStreetNumber"]},
+        {label:"Unit before height Profile", file:"patron-portal.html", includes:["editHeightUnit", "editTaxiStreetNumber"]},
+        {label:"RydR structured pickup", file:"pickup.html", includes:["pickupStreetNumber", "pickupPostal"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-height-pickup-locale"]}
+      ]
+    },
+    {
+      version: "s3.3.012",
+      title: "s3.3.012 — retire PHILA front+back pair; keep 76ers",
+      checks: [
+        {label:"PHILA pair removed", file:"jersey-catalog.js", includes:["Retired: nbaPhiladelphia76ersPhila"]},
+        {label:"76ers back-only kept", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
+        {label:"Pair engine kept for Terps", file:"display-app.js", includes:["paintIndependentPairFace", "nba-pair-kit-stack"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-phila-pair-retired"]}
+      ]
+    },
+    {
+      version: "s3.3.011",
+      title: "s3.3.011 — ShoutOut page trail + checkout one-tap + BOT DEE photo pop-out",
+      checks: [
+        {label:"ShoutOut trail helper", file:"floqr-logger.js", includes:["shoutoutPageCall", "startShoutoutTrail", "venueChosen"]},
+        {label:"Deep link skips Search", file:"patron-app.js", includes:["isShoutoutDeepLink", "checkoutRedirect", "shoutoutButton"]},
+        {label:"Choose a venue logs", file:"shoutout-search.js", includes:["shoutoutSearchPage", "throwShoutoutHere"]},
+        {label:"Leftover landing removed", file:"index.html", notIncludes:["id=\"shoutoutLandingPage\""]},
+        {label:"Checkout one-tap lock", file:"payment-service.js", includes:["lockCriticalButton"]},
+        {label:"Photo pop-out", file:"bot-dee-chat.js", includes:["botdee-photo-popout.html", "playPhotoFlyout"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-011-shoutout-page-trail"]}
+      ]
+    },
+    {
+      version: "s3.3.010",
+      title: "s3.3.010 — Master Admin sign-in load perf (defer heavy panels)",
+      checks: [
+        {label:"Sign-in skips Diagnostics mount", file:"master-admin-app.js", includes:["Do not pull Diagnostics", "loadLightLocations"]},
+        {label:"activatePanel mounts Diagnostics", file:"master-admin-app.js", includes:["FLOQRDiagnostics?.mount", "FLOQRMasterServices?.mount"]},
+        {label:"Services lazy mount", file:"master-services-extension.js", includes:["FLOQRMasterServices", "async function mount("]},
+        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "Rollup summary loaded"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-010-master-admin-load-perf"]}
+      ]
+    },
+    {
+      version: "s3.3.009",
+      title: "s3.3.009 — BOT DEE public profile datapoints + photo gallery",
+      checks: [
+        {label:"Opted-in Mingl datapoints on card", file:"functions/bot-dee-tools.js", includes:["PUBLIC_MINGL_DATAPOINT_KEYS", "foodChoices", "travelInterests", "isSelfQuery"]},
+        {label:"Prompt forbids doesn't-track claim", file:"functions/bot-dee-core.js", includes:["Never say FLOQR does not track music", "stripMediaFromToolResult"]},
+        {label:"Chat gallery", file:"bot-dee-chat.js", includes:["botdee-photo-gallery", "stripBackendLinks"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-009-botdee-public-datapoints"]}
+      ]
+    },
+    {
+      version: "s3.3.008",
+      title: "s3.3.008 — BOT DEE mobile header, about-me/friends public profiles, version",
+      checks: [
+        {label:"Title-row header", file:"botdee.html", includes:["botdee-chat-header-main", "feature-landing-title-row", "botDeeScopeNote"]},
+        {label:"Scope note full width", file:"bot-dee-chat.css", includes:["flex-direction: column", ".botdee-scope-note"]},
+        {label:"Self + connections lookup", file:"functions/bot-dee-tools.js", includes:["isSelfProfileQuery", "loadConnectedUids", "relation: \"self\""]},
+        {label:"Version local reply", file:"functions/bot-dee-core.js", includes:["isVersionPrompt", "versionReply", "PACKAGE_LABEL"]},
+        {label:"Client version mirror", file:"bot-dee-chat.js", includes:["isVersionPrompt", "versionReply", "botdee.chatVersion"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-008-botdee-mobile-profile-version"]}
+      ]
+    },
+    {
+      version: "s3.3.007",
+      title: "s3.3.007 — Stripe sandbox wiring (Connect → VIP + destination charges)",
+      checks: [
+        {label:"Optional Connect recipient", file:"functions/commerce-functions.js", includes:["optionalReadyRecipient", "applyDestinationCharge"]},
+        {label:"VIP Club Stripe binding", file:"functions/vip-pos-functions.js", includes:["connectBindingId", "stripeConnectAccounts"]},
+        {label:"Connect webhook on platform endpoint", file:"functions/commerce-functions.js", includes:["account.updated", "handleConnectAccountWebhook"]},
+        {label:"Club Admin Connect copy", file:"admin.html", includes:["destination-charges this venue"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-007-stripe-sandbox-wire"]}
+      ]
+    },
+    {
+      version: "s3.3.006",
+      title: "s3.3.006 — BOT DEE durable threads (refresh / second device resume)",
+      checks: [
+        {label:"Thread persist", file:"functions/bot-dee-thread.js", includes:["botDeeThreads", "persistExchange", "loadThreadState"]},
+        {label:"getBotDeeThread export", file:"functions/index.js", includes:["getBotDeeThread"]},
+        {label:"Chat restore", file:"bot-dee-chat.js", includes:["getBotDeeThread", "restoreOrWelcome", "durableEnabled"]},
+        {label:"Owner-only rules", file:"firestore.rules", includes:["match /botDeeThreads/{threadId}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-006-botdee-durable-threads"]}
+      ]
+    },
+    {
+      version: "s3.3.005",
+      title: "s3.3.005 — BOT DEE locale-filtered results + public profile tool",
+      checks: [
+        {label:"Result locales JSON", file:"functions/bot-dee-result-locales.json", includes:["Einen ShoutOut senden", "intent:shoutout"]},
+        {label:"Localize helpers", file:"functions/bot-dee-core.js", includes:["normalizeUiLanguage", "localizeSearchPayload", "lookupPublicProfiles"]},
+        {label:"Public profile tool", file:"functions/bot-dee-tools.js", includes:["lookupPublicProfiles", "publicProfileVisibility"]},
+        {label:"Client uiLanguage", file:"bot-dee-chat.js", includes:["uiLanguage: currentUiLanguage", "localizeResults"]},
+        {label:"Intent blurbs chrome", file:"floqr-i18n.js", includes:["botdee.intentBlurb.shoutout", "botdee.link.paySecurely"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["BOT DEE German help links"]}
+      ]
+    },
+    {
+      version: "s3.3.004",
+      title: "s3.3.004 — PHILA White/Blue jersey color select + blue Icon blanks",
+      checks: [
+        {label:"PHILA white blank front", file:"images/basketball/nba-76ers-phila-front-blank.png", includes:[]},
+        {label:"PHILA white blank back", file:"images/basketball/nba-76ers-phila-back-blank.png", includes:[]},
+        {label:"PHILA blue blank front", file:"images/basketball/nba-76ers-phila-blue-front-blank.png", includes:[]},
+        {label:"PHILA blue blank back", file:"images/basketball/nba-76ers-phila-blue-back-blank.png", includes:[]},
+        {label:"Colorways catalog", file:"jersey-catalog.js", includes:["jerseyColorways", "FLOQRResolveJerseyColorway", "nba-76ers-phila-blue-front-blank.png"]},
+        {label:"Composer color select", file:"index.html", includes:["jerseyColorway", "editor.jerseyColor"]},
+        {label:"Display pair ink vars", file:"display.css", includes:["--nba-pair-ink", "--nba-pair-outline"]},
+        {label:"Colorway wins over template defaults", file:"display-app.js", includes:["FLOQRResolveJerseyColorway", "cw?.frontBackgroundUrl"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["PHILA White/Blue colorway select"]}
+      ]
+    },
+    {
+      version: "s3.3.003",
+      title: "s3.3.003 — PHILA white blanks + FloqMedia-off pair + Terps gated QA",
+      checks: [
+        {label:"PHILA white blank front", file:"images/basketball/nba-76ers-phila-front-blank.png", includes:[]},
+        {label:"PHILA white blank back", file:"images/basketball/nba-76ers-phila-back-blank.png", includes:[]},
+        {label:"PHILA catalog blanks", file:"jersey-catalog.js", includes:["nba-76ers-phila-front-blank.png", "nba-76ers-phila-back-blank.png", "jerseyCssBack: false"]},
+        {label:"Hide FloqMedia on pair", file:"display-app.js", includes:["!pairMode", "NBA jersey pair: hide FloqMedia"]},
+        {label:"Pair CSS hides rail + single bg", file:"display.css", includes:["nba-jersey-pair .display-identity-rail", "opacity:0!important"]},
+        {label:"Terps pair still unpublished", file:"jersey-catalog.js", includes:["nbaMarylandTerpsThrowbackPair", "catalogPublished: false", "productionAssetsReady: false"]},
+        {label:"Terps gated QA page", file:"maryland-terps-pair-qa.html", includes:["terps-pair-qa", "nbaMarylandTerps", "pairMessageTheme"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-003-phila-blanks-terps-qa"]}
+      ]
+    },
+    {
+      version: "s3.3.002",
+      title: "s3.3.002 — Maryland Terps jersey pair v2 (unpublished until front plate)",
+      checks: [
+        {label:"Terps pair catalog unpublished", file:"jersey-catalog.js", includes:["nbaMarylandTerpsThrowbackPair", "ncaa-umd-2026-27-2002-throwback-white-v2", "catalogPublished: false", "pairMessageTheme: \"maryland\""]},
+        {label:"Publish gate", file:"jersey-catalog.js", includes:["row.catalogPublished === false"]},
+        {label:"Maryland message theme CSS", file:"display.css", includes:["data-pair-message-theme=\"maryland\""]},
+        {label:"Pair requires front plate", file:"display-app.js", includes:["productionAssetsReady !== false"]},
+        {label:"Package brief", file:"reports/maryland-terps-jersey-v2/INTEGRATION.md", includes:["productionAssetsReady: false", "ncaa-umd-2026-27-2002-throwback-white-v2"]},
+        {label:"76ers back-only present", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-002-maryland-terps-pair-v2"]}
+      ]
+    },
+    {
+      version: "s3.3.001",
+      title: "s3.3.001 — PHILA jersey pair 7s + optional ShoutOut 5s",
+      checks: [
+        {label:"Jersey scene helper", file:"floqr-jersey-scene.js", includes:["sceneAt", "JERSEY_MS", "7000"]},
+        {label:"FrameLoop asymmetric holds", file:"floqr-frame-loop.js", includes:["holdMsByPhase", "includeCopy"]},
+        {label:"Terps pair timing flags", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nbaMarylandTerpsThrowbackPair"]},
+        {label:"Pair stage display", file:"display-app.js", includes:["paintNbaPairStage", "nba-jersey-pair", "displayNbaPairShoutPanel"]},
+        {label:"Pair CSS", file:"display.css", includes:["nba-pair-stage", "nba-pair-shout-panel"]},
+        {label:"Package brief", file:"reports/nba-phila-jersey-v1/IMPLEMENTATION_CONTRACT.md", includes:["7,000 ms", "5,000 ms"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-001-phila-jersey-pair"]}
+      ]
+    },
+    {
+      version: "s3.2.101",
+      title: "s3.2.101 — ShoutOut diagnostics, Baller upload chooser, PHILA dual, portrait decode",
+      checks: [
+        {label:"ShoutOut diagnostics module", file:"master-shoutout-logging.js", includes:["FLOQRShoutOutDiagnostics", "page_call", "shoutoutTrailId"]},
+        {label:"Diagnostics ShoutOut subtab", file:"master-admin.html", includes:["diagnosticsShoutOut", "master.diagnosticsShoutOut", "master-shoutout-logging.js"]},
+        {label:"Page trail logger", file:"patron-app.js", includes:["logShoutoutPageCall", "page_call", "openBallerFaceCameraCapture", "ballerUploadChooser"]},
+        {label:"No duplicate Take photo button", file:"patron-app.js", notIncludes:["id=\"ballerTakePhotoBtn\""]},
+        {label:"76ers catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers", "76ERS"]},
+        {label:"NBA dual faces display", file:"display-app.js", includes:["applyNbaDualFacePhase", "nbaDualFaces"]},
+        {label:"Portrait JSON repair", file:"functions/gemini-portrait-mask.js", includes:["repairJsonCandidate", "parseSegmentationJson"]},
+        {label:"Black Card removed from catalog", file:"shared-data.js", includes:["ballersAlert:"], notIncludes:["blackCard: {", "blackCardAmex: {"]},
+        {label:"STANDARD has Alert only", file:"shared-data.js", includes:["'classicHalloween','ballersAlert'"], notIncludes:["'blackCard','ballersAlert'"]},
+        {label:"Company max 18", file:"patron-app.js", includes:["BALLER_COMPANY_MAX = 18"]},
+        {label:"Front kit asset", file:"images/basketball/nba-76ers-front-with-club.png", includes:[]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-101-shoutout-diag-phila-baller"]}
+      ]
+    },
+    {
+      version: "s3.2.100",
+      title: "s3.2.100 — Baller company max 18 + UPPERCASE",
+      checks: [
+        {label:"Company max 18", file:"patron-app.js", includes:["BALLER_COMPANY_MAX = 18", "ballerCompanyNormalize"]},
+        {label:"Composer maxlength 18", file:"index.html", includes:["maxlength=\"18\"", "always UPPERCASE"]},
+        {label:"LED company uppercase", file:"display-app.js", includes:[".toUpperCase()"]},
+        {label:"Catalog maxSub 18", file:"shared-data.js", includes:["maxSubCharacters:18"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-100-baller-company-18"]}
+      ]
+    },
+    {
+      version: "s3.2.99",
+      title: "s3.2.99 — Terps number stroke weight −20%",
+      checks: [
+        {label:"Varsity stroke 8.8", file:"floqr-varsity-numbers.js", includes:["stroke-width=\"8.8\""]},
+        {label:"Varsity cache-bust", file:"display.html", includes:["floqr-varsity-numbers.js?v=s3.2.99"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-99-terps-stroke-thin"]}
+      ]
+    },
+    {
+      version: "s3.2.98",
+      title: "s3.2.98 — Terps number horizontal −30%",
+      checks: [
+        {label:"Varsity scaleX 0.7", file:"display.css", includes:["transform:scaleX(.7)"]},
+        {label:"Display CSS cache-bust", file:"display.html", includes:["display.css?v=s3.2.98"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-98-terps-number-narrow"]}
+      ]
+    },
+    {
+      version: "s3.2.97",
+      title: "s3.2.97 — Terps varsity SVG numbers +20% + Saved continue",
+      checks: [
+        {label:"NBA varsity SVG paint", file:"display-app.js", includes:["FLOQRVarsityNumbers.svg(subText"]},
+        {label:"Number size +20%", file:"jersey-catalog.js", includes:["one: 0.4968, two: 0.36432"]},
+        {label:"Saved continue button", file:"patron-portal-app.js", includes:["continueSavedShoutout", "resumeMode: \"saved\""]},
+        {label:"Saved deep-link opens Saved pane", file:"patron-portal-app.js", includes:["isSavedShoutout(requestedItem)) showShoutoutPane(\"shoutoutSavedPane\")"]},
+        {label:"Resume draft opens editor", file:"patron-app.js", includes:["draft?.openEditor", "goToEditor()"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-97-terps-varsity-saved"]}
+      ]
+    },
+    {
+      version: "s3.2.96",
+      title: "s3.2.96 — Terps number paint + My ShoutOuts / Use Past restore",
+      checks: [
+        {label:"NBA digits declared before size", file:"display-app.js", includes:["const digits = glyphLen(String(subText"]},
+        {label:"Jersey syncAttribution skips kits", file:"patron-app.js", includes:["!isSoccerJerseyTemplate() && byId(\"subText\")"]},
+        {label:"Use Past restores jersey number", file:"patron-app.js", includes:["pastIsJersey", "soccerJerseyNumber"]},
+        {label:"My ShoutOuts opens Completed when Saved empty", file:"patron-portal-app.js", includes:["showShoutoutPane(\"shoutoutCompletedPane\")"]},
+        {label:"Deep link honors sub alias", file:"patron-portal-app.js", includes:["paramsEarly.get(\"sub\")"]},
+        {label:"Use Past NFL keeps shout copy", file:"patron-app.js", includes:["pastNflDual"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-96-jersey-number-my-shoutouts"]}
+      ]
+    },
+    {
+      version: "s3.2.95",
+      title: "s3.2.95 — Baller rim, Terps FloqMedia under hem, remnants, floqCast 100s, Gemini LOW",
+      checks: [
+        {label:"Baller exterior-only scrub", file:"scripts/build-baller-card-photos.py", includes:["grow=2", "Never wipe"]},
+        {label:"NBA height-fit kit box", file:"display.css", includes:["--nba-kit-h:86%", "background-size:auto var(--nba-kit-h"]},
+        {label:"NBA FloqMedia pin helpers", file:"display-app.js", includes:["nbaPhotoKitLayout", "pinJerseyFloqMediaRail"]},
+        {label:"Jersey board remnant guard", file:"display-app.js", includes:["isBoardRemnantText", "stopHalloweenFinale"]},
+        {label:"floqCast 100s client", file:"floqcast-preview.js", includes:["90, 100]", "DEFAULT_LIVE_SECONDS = 100"]},
+        {label:"floqCast 100s server", file:"functions/floqcast-functions.js", includes:["90, 100]"]},
+        {label:"Gemini thinking LOW + retry", file:"functions/gemini-portrait-mask.js", includes:["thinkingLevel: \"LOW\"", "isThinkingConfigRejected"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-95-baller-jersey-floqcast-gemini"]}
+      ]
+    },
+    {
+      version: "s3.2.94",
+      title: "s3.2.94 — Baller corner scrub, NBA FloqMedia bottom, Halloween grave top-left",
+      checks: [
+        {label:"Baller corner scrub + black clip", file:"display.css", includes:["border-radius:3.15% / 5.1%", "outline:2px solid #000"]},
+        {label:"Baller scrub script", file:"scripts/build-baller-card-photos.py", includes:["scrub_led_corner_fringe"]},
+        {label:"NBA FloqMedia bottom pin", file:"display.css", includes:["jersey-sport-nba .display-identity-rail", "bottom:1.2%!important"]},
+        {label:"Jersey remnant clear", file:"display-app.js", includes:["clearClassicBoardRemnantsOnJersey", "isSeasonalBoardRemnantText"]},
+        {label:"Halloween grave top-left", file:"display.css", includes:[".halloween-finale .hw-grave{position:absolute;left:8%;top:4%"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-94-led-display-fixes"]}
+      ]
+    },
+    {
+      version: "s3.2.92",
+      title: "s3.2.92 — photorealistic NBA and Terps jersey backs",
+      checks: [
+        {label:"Thunder fabric back", file:"jersey-catalog.js", includes:["Oklahoma City Thunder"]},
+        {label:"Alumni number paint", file:"display-app.js", includes:["jersey-alumni-num"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-91-jerseys-2026"]}
+      ]
+    },
+    {
+      version: "s3.2.91",
+      title: "s3.2.91 — 2026 Maryland Terps + NBA icon + NFL home jersey backs",
+      checks: [
+        {label:"Terps State field + NBA/NFL overlay catalog", file:"jersey-catalog.js", includes:["Maryland Terps", "jerseyStateField", "jerseyOverlayWordmark", "Los Angeles Lakers", "Atlanta Falcons"]},
+        {label:"Composer State input", file:"index.html", includes:["id=\"jerseyState\"", "editor.jerseyState"]},
+        {label:"NFL plate wordmark CSS", file:"display.css", includes:["jersey-overlay-wordmark"]},
+        {label:"Overlay paint", file:"display-app.js", includes:["jerseyOverlayWordmark", "jersey-overlay-wordmark"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-91-jerseys-2026"]}
+      ]
+    },
+    {
+      version: "s3.2.90",
+      title: "s3.2.90 — Critical log tab flash standard (Gemini + Security)",
+      checks: [
+        {label:"Shared critical log blink module", file:"floqr-critical-log-blink.js", includes:["FLOQRCriticalLogBlink", "geminiApiAccess", "criticalLogAck"]},
+        {label:"Gemini critical severity + flash", file:"functions/gemini-api-access-log.js", includes:["severity: outcome === \"failure\" ? \"critical\" : \"info\""]},
+        {label:"Application Logging ack + live watch", file:"master-logging-extension.js", includes:["publishGeminiCriticalBlink", "geminiAccessLogAckBtn", "startGeminiCriticalWatch"]},
+        {label:"Master Admin script + tab id", file:"master-admin.html", includes:["floqr-critical-log-blink.js", "appLoggingTab", "geminiAccessLogAckBtn"]},
+        {label:"Critical blink CSS", file:"admin.css", includes:["criticalLogTabBlink"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-90-critical-log-blink"]}
+      ]
+    },
+    {
+      version: "s3.2.89",
+      title: "s3.2.89 — Baller face immediate preview + Gemini on select",
+      checks: [
+        {label:"Immediate face preview + Gemini on select", file:"patron-app.js", includes:["processBallerFaceSelection", "showBallerFaceLocalPreview", "window.processBallerFaceSelection"]},
+        {label:"Visually-hidden file input host", file:"styles.css", includes:["baller-file-input-host"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-89-baller-face-preview"]}
+      ]
+    },
+    {
+      version: "s3.2.88",
+      title: "s3.2.88 — Baller halo behind card + Gemini access logs + BOT DEE wrap",
+      checks: [
+        {label:"Halo behind card + transparent face slot", file:"display.css", includes:["baller-red-halo-behind", "background:transparent!important", "transform:scale(0.935)"]},
+        {label:"Gemini API access log module", file:"functions/gemini-api-access-log.js", includes:["geminiApiAccessLogs", "failureReason", "RETENTION_MS"]},
+        {label:"Hourly Gemini failure checker", file:"functions/ai-discovery-functions.js", includes:["checkGeminiApiAccessFailures", "logGeminiApiAccess"]},
+        {label:"Master Admin Gemini access card", file:"master-logging-extension.js", includes:["geminiApiAccessLogs", "Failure reason"]},
+        {label:"BOT DEE bubble wrap", file:"bot-dee-chat.css", includes:["min-width: 0", "overflow-wrap: anywhere"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-88-baller-halo-gemini-logs"]}
+      ]
+    },
+    {
+      version: "s3.2.87",
+      title: "s3.2.87 — Baller portrait mask + Upload/Take + red halo + company max 25",
+      checks: [
+        {label:"Gemini portrait mask module", file:"functions/gemini-portrait-mask.js", includes:["gemini-3.8-flash", "callGeminiPersonSegmentation", "GoogleGenAI"]},
+        {label:"Callable baller-portrait-mask", file:"functions/ai-discovery-functions.js", includes:["baller-portrait-mask", "runBallerPortraitMask"]},
+        {label:"Upload + Take photo", file:"patron-app.js", includes:["ballerUploadPhotoBtn", "ballerTakePhotoBtn", "compositeBallerPortraitCutout"]},
+        {label:"Company WE'RE OUTSIDE LLC + max 25", file:"index.html", includes:["WE'RE OUTSIDE LLC", "maxlength=\"25\"", "ballerFaceScale"]},
+        {label:"Red halo CSS", file:"display.css", includes:["baller-red-halo"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-87-baller-portrait-mask"]}
+      ]
+    },
+    {
+      version: "s3.2.85",
+      title: "s3.2.85 — Master Admin Diagnostics FloqCast connectivity tab",
+      checks: [
+        {label:"FloqCast diagnostics module", file:"master-floqcast-logging.js", includes:["FLOQRFloqCastDiagnostics", "floqCast", "ice_servers"]},
+        {label:"Diagnostics FloqCast subtab", file:"master-admin.html", includes:["diagnosticsFloqCast", "master.diagnosticsFloqCast", "master-floqcast-logging.js"]},
+        {label:"Panel mount", file:"master-admin-app.js", includes:["diagnosticsFloqCast", "FLOQRFloqCastDiagnostics"]},
+        {label:"ICE log category floqCast", file:"floqcast-webrtc.js", includes:["category: \"floqCast\"", "action: \"ice_servers\""]},
+        {label:"Preview liveDiag floqCast", file:"floqcast-preview.js", includes:["category: \"floqCast\""]},
+        {label:"i18n tab label", file:"floqr-i18n.js", includes:["master.diagnosticsFloqCast"]},
+        {label:"Help topic", file:"botdee-help-repository.js", includes:["help-master-floqcast-diagnostics"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-85-floqcast-diagnostics-tab"]}
+      ]
+    },
+    {
+      version: "s3.2.82",
+      title: "s3.2.82 — Baller's Express package art (face under helmet, name/@handle, optional company)",
+      checks: [
+        {label:"Package master art", file:"reports/baller-cards/express-package/ballers-express-business.png", includes:[]},
+        {label:"Builder uses package PNG", file:"scripts/build-baller-card-photos.py", includes:["express-package/ballers-express-business.png", "FACE"]},
+        {label:"Face-only ellipse CSS", file:"display.css", includes:["left:20.299%", "top:16.281%", "width:7.235%", "height:17.286%", "text-transform:none"]},
+        {label:"Composer name/@ + blank company", file:"index.html", includes:["Name or social @handle", "value=\"none\"", "Leave blank"]},
+        {label:"Preserve @ casing", file:"patron-app.js", includes:["ballerWithAt", "\"none\": \"\""]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.82\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-82-baller-express-package"]}
+      ]
+    },
+    {
+      version: "s3.2.81",
+      title: "s3.2.81 — Baller's Alert face on Centurion medallion + identical Amex ornate rim (all LED sizes)",
+      checks: [
+        {label:"Face reparent to canvas", file:"display-app.js", includes:["placeBallerFaceSlot", "resolveBallerBackgroundUrl", "baller-face-medallion-slot"]},
+        {label:"Face CSS canvas % (2x1 + 4x3)", file:"display.css", includes:["left:20.299%", "top:16.281%"]},
+        {label:"Photoreal PNG not SVG", file:"shared-data.js", includes:["black-card-2x1.png", "ballers-alert-2x1.png", "black-card-amex-2x1.png"], notIncludes:["black-card-2x1.svg"]},
+        {label:"Build package art", file:"scripts/build-baller-card-photos.py", includes:["express-package", "fit_led"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.82\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-81-baller-face-centurion"]}
+      ]
+    },
+    {
+      version: "s3.2.80",
+      title: "s3.2.80 — Black Card photoreal Centurion frame + Baller's Alert (Baller's Express public; Amex private)",
+      checks: [
+        {label:"Catalog public + Amex", file:"shared-data.js", includes:["blackCard:", "ballersAlert:", "blackCardAmex:", "ballersAlertAmex:", "masterAdminOnly:true", "priceCents:7500", "priceCents:10000"]},
+        {label:"STANDARD public only", file:"shared-data.js", includes:["'blackCard','ballersAlert'"], notIncludes:["'blackCardAmex'"]},
+        {label:"Art Baller's photoreal PNG", file:"images/baller/black-card-2x1.png", includes:[]},
+        {label:"Art Amex private PNG", file:"images/baller/black-card-amex-2x1.png", includes:[]},
+        {label:"Display baller", file:"display-app.js", includes:["isBallerCard", "baller-face-medallion-slot"]},
+        {label:"Display CSS", file:"display.css", includes:["baller-card", "baller-alert"]},
+        {label:"Composer fields", file:"index.html", includes:["ballerCardFields", "ballerNameSource", "ballerCompanyPreset"]},
+        {label:"Checkout prices + Amex gate", file:"functions/commerce-functions.js", includes:["BALLER_CARD_PRICE_CENTS", "BALLER_AMEX_TEMPLATE_IDS"]},
+        {label:"Rules refuse free", file:"firestore.rules", includes:["blackCard", "ballersAlert", "blackCardAmex"]},
+        {label:"Help + intents", file:"botdee-help-repository.js", includes:["help-black-card", "help-ballers-alert"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-78-baller-cards"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.81\""]}
+      ]
+    },
+    {
+      version: "s3.2.77",
+      title: "s3.2.77 — help/i18n BOT DEE verbiage (no FloqAi)",
+      checks: [
+        {label:"Help page title BOT DEE", file:"botdee-help-repository.js", includes:["title: \"BOT DEE\"", "Ask FloqR with BOT DEE"], notIncludes:["FloqAi"]},
+        {label:"Help packs no FloqAi", file:"floqr-i18n-help.js", notIncludes:["FloqAi"]},
+        {label:"Chrome welcome BOT DEE", file:"floqr-i18n.js", includes:["Hi, I am BOT DEE"], notIncludes:["Hi, I am FloqAi"]},
+        {label:"from=botdee links", file:"botdee-help-repository.js", includes:["from: \"botdee\""], notIncludes:["from: \"floqai\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-77-botdee-help-verbiage"]}
+      ]
+    },
+    {
+      version: "s3.2.76",
+      title: "s3.2.76 — technical rename floqAi → botDee",
+      checks: [
+        {label:"Catalog key botDee", file:"functions/feature-services-core.js", includes:["key: \"botDee\"", "floqAi: \"botDee\""]},
+        {label:"Client alias", file:"floqr-feature-services.js", includes:["floqAi: \"botDee\"", "key: \"botDee\""]},
+        {label:"Modules renamed", file:"botdee.html", includes:["botdee-page.js", "botdee-access.js", "botdee-help-repository.js", "data-floqr-feature=\"botDee\""]},
+        {label:"Callable + alias", file:"functions/data-classification-functions.js", includes:["exports.getBotDeeAccess", "exports.getFloqAiAccess = exports.getBotDeeAccess"]},
+        {label:"Chrome icon botDee", file:"floqr-chrome-scheme.js", includes:["botDee:", "featureKey === \"floqAi\" ? \"botDee\""]},
+        {label:"Rename design notes", file:".cursor/rules/design-notes-botdee-rename.mdc", includes:["Phase B — technical ids", "getBotDeeAccess"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-76-botdee-technical-rename"]}
+      ]
+    },
+    {
+      version: "s3.2.75",
+      title: "s3.2.75 — remove floqai.html (botdee.html only)",
+      checks: [
+        {label:"Page file", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "botdee.helpComposer"]},
+        {label:"Agent speech BOT DEE", file:"botdee-search.js", includes:["Hi, I am BOT DEE"], notIncludes:["Hi, I am FloqAi"]},
+        {label:"Auth gate no floqai-search", file:"floqr-auth-gate.js", notIncludes:["floqai-search.html"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-75-botdee-no-floqai-html", "floqai.html → 404"]}
+      ]
+    },
+    {
+      version: "s3.2.74",
+      title: "s3.2.74 — botdee.html page rename + FloqAi→BOT DEE help scrub",
+      checks: [
+        {label:"Page file", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "data-floqr-feature=\"botDee\"", "botdee.helpComposer"]},
+        {label:"Nav home", file:"floqr-nav.js", includes:["buildUrl(\"./botdee.html\")"]},
+        {label:"Feature label", file:"floqr-feature-services.js", includes:["label: \"BOT DEE\"", "route: \"./botdee.html\""]},
+        {label:"Help repo links", file:"botdee-help-repository.js", includes:["Open BOT DEE", "./botdee.html"]},
+        {label:"No FloqAi in help packs", file:"floqr-i18n-help.js", notIncludes:["FloqAi"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-74-botdee-page-rename"]}
+      ]
+    },
+    {
+      version: "s3.2.73",
+      title: "s3.2.73 — BOT DEE ? help documents Enter/Shift+Enter + chat tip",
+      checks: [
+        {label:"Help composer chrome", file:"floqr-i18n.js", includes:["botdee.helpComposer", "Press Enter to send", "VERSION = \"s3.2.73\""]},
+        {label:"Help repo Enter", file:"botdee-help-repository.js", includes:["Press Enter to send a message", "Shift+Enter"]},
+        {label:"Help locale packs", file:"floqr-i18n-help.js", includes:["help-botdee-page", "Shift+Enter", "VERSION = \"s3.2.73\""]},
+        {label:"Page popout", file:"botdee.html", includes:["botdee.helpComposer", "floqr-i18n-help.js?v=s3.2.73"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-73-botdee-help-composer"]}
+      ]
+    },
+    {
+      version: "s3.2.72",
+      title: "s3.2.72 — BOT DEE Enter=Send + conversational mood replies",
+      checks: [
+        {label:"Enter sends", file:"bot-dee-chat.js", includes:["shiftKey", "Enter", "requestSubmit"]},
+        {label:"Mood prompt", file:"functions/bot-dee-core.js", includes:["isMoodPrompt", "moodReply"]},
+        {label:"Client mood", file:"bot-dee-chat.js", includes:["isMoodPrompt", "botdee.chatMood"]},
+        {label:"Chrome mood key", file:"floqr-i18n.js", includes:["botdee.chatMood", "Enter sends", "VERSION = \"s3.2.73\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-72-botdee-enter-mood"]},
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.73"]}
+      ]
+    },
+    {
+      version: "s3.2.71",
+      title: "s3.2.71 — Classic Halloween seasonal ShoutOut ($15)",
+      checks: [
+        {label:"Catalog classicHalloween", file:"shared-data.js", includes:["classicHalloween", "halloweenFinale", "priceCents:1500", "classic-halloween-2x1.svg"]},
+        {label:"Standard ids", file:"shared-data.js", includes:["'classicHalloween'"]},
+        {label:"Display finale", file:"display-app.js", includes:["syncHalloweenFinale", "halloween-finale", "HALLOWEEN_"]},
+        {label:"Display CSS", file:"display.css", includes:["classic-halloween", "halloween-finale"]},
+        {label:"Art 2x1", file:"images/halloween/classic-halloween-2x1.svg", includes:["svg"]},
+        {label:"Art 4x3", file:"images/halloween/classic-halloween-4x3.svg", includes:["svg"]},
+        {label:"Checkout $15", file:"functions/commerce-functions.js", includes:["CLASSIC_HALLOWEEN_TEMPLATE_ID", "CLASSIC_HALLOWEEN_PRICE_CENTS = 1500"]},
+        {label:"Rules refuse free", file:"firestore.rules", includes:["classicHalloween"]},
+        {label:"Help + intent", file:"botdee-help-repository.js", includes:["help-classic-halloween"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-2-71-classic-halloween"]},
+        {label:"Package marker", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.71\""]},
+        {label:"shared-data cache-bust", file:"index.html", includes:["shared-data.js?v=s3.2.71"]}
+      ]
+    },
+    {
+      version: "s3.2.70",
+      title: "s3.2.70 — BOT DEE idle end + offer-help only on start/resume",
+      checks: [
+        {label:"Idle helpers", file:"functions/bot-dee-core.js", includes:["DEFAULT_IDLE_SECONDS", "idleEndedReply", "stillHereReply", "ONLY on the first turn"]},
+        {label:"Soft ack", file:"functions/bot-dee-core.js", includes:["You're welcome.", "Take care — say hi"]},
+        {label:"Settings callable", file:"functions/bot-dee-functions.js", includes:["exports.setBotDeeSettings", "botDeeSettings/default"]},
+        {label:"Client idle session", file:"bot-dee-chat.js", includes:["endConversation", "chatResume", "chatStillHere", "botDeeSettings/default"]},
+        {label:"Master Admin BOT DEE panel", file:"master-admin.html", includes:["id=\"featuresBotDee\"", "botDeeIdleSeconds"]},
+        {label:"Features mount", file:"master-feature-services.js", includes:["loadBotDeeSettings", "setBotDeeSettings"]},
+        {label:"Rules", file:"firestore.rules", includes:["match /botDeeSettings/{docId}"]},
+        {label:"Chrome keys", file:"floqr-i18n.js", includes:["botdee.chatResume", "master.featuresBotDee", "VERSION = \"s3.2.70\""]},
+        {label:"Manual test idle", file:"ai-diagnostics-service.js", includes:["s3-2-70-botdee-idle-resume"]},
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+      ]
+    },
+    {
+      version: "s3.2.69",
+      title: "s3.2.69 — BOT DEE cool/ok acknowledgments stay conversational",
+      checks: [
+        {label:"Ack prompt helper", file:"functions/bot-dee-core.js", includes:["isAckPrompt", "ackReply", "Acknowledgments mid-chat"]},
+        {label:"Client ack mirror", file:"bot-dee-chat.js", includes:["isAckPrompt", "ackReply", "botdee.chatAck"]},
+        {label:"Chrome ack key", file:"floqr-i18n.js", includes:["botdee.chatAck", "VERSION = \"s3.2.70\""]},
+        {label:"Manual test cool ack", file:"ai-diagnostics-service.js", includes:["s3-2-69-botdee-cool-ack"]},
+        {label:"floqai cache-bust", file:"botdee.html", includes:["bot-dee-chat.js?v=s3.2.70"]}
+      ]
+    },
+    {
+      version: "s3.2.68",
+      title: "s3.2.68 — Shôko Barcelona VIP floor plan + NYE'27 prices",
+      checks: [
+        {label:"Shôko VIP plan", file:"vip-plans/shoko-barcelona.json", includes:["shoko-barcelona-spain", "nightPricing", "2026-12-31"]},
+        {label:"VIP app maps Shôko", file:"vip-app.js", includes:["shoko-barcelona-spain", "shoko-barcelona.json"]},
+        {label:"VIP beta catalog Shôko", file:"functions/vip-beta-catalog.js", includes:["shoko-barcelona-spain", "nightPricing"]},
+        {label:"NYE event seed", file:"shared-data.js", includes:["shoko-nye-2027", "NYE'27"]},
+        {label:"Manual test Shôko VIP", file:"ai-diagnostics-service.js", includes:["s3-2-68-shoko-vip-nye"]},
+        {label:"Diagnostics package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]},
+        {label:"VIP pages cache-bust", file:"vip.html", includes:["vip-app.js?v=s3.2.68", "vip-floor-viewer.js?v=s3.2.68"]}
+      ]
+    },
+    {
+      version: "s3.2.67",
+      title: "s3.2.67 — BOT DEE Gemini fix + help popout + robot avatar",
+      checks: [
+        {label:"Package version s3.2.67", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.67\""]},
+        {label:"Gemini AUTO without allowedFunctionNames", file:"functions/bot-dee-functions.js", includes:["FunctionCallingConfigMode.AUTO"], notIncludes:["allowedFunctionNames: bot.TOOL_NAMES"]},
+        {label:"Identity prompt local path", file:"functions/bot-dee-core.js", includes:["isIdentityPrompt", "identityReply"]},
+        {label:"Help popout viewport fit", file:"helper-popouts.js", includes:["fitHelpPopoutInViewport", "data-help-align"]},
+        {label:"Help popout CSS no clip", file:"styles.css", includes:["data-help-align=\"end\"", "overflow-wrap:anywhere"]},
+        {label:"Robot-head avatar src", file:"bot-dee-chat.js", includes:["botdee-chat-avatar.png", "isIdentityPrompt", "botdee-msg-avatar"]},
+        {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar", "pixelated"]},
+        {label:"Manual test Gemini", file:"ai-diagnostics-service.js", includes:["s3-2-67-botdee-gemini-name"]},
+        {label:"Manual test help popout", file:"ai-diagnostics-service.js", includes:["s3-2-67-help-popout-viewport"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.68\""]}
+      ]
+    },
+    {
+      version: "s3.2.66",
+      title: "s3.2.66 — BOT DEE bubble avatar + speech tip",
+      checks: [
+        {label:"Package version s3.2.66", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.66\""]},
+        {label:"Bot bubble avatar", file:"bot-dee-chat.js", includes:["botdee-msg-avatar", "botdee-bubble-tail"]},
+        {label:"Bot bubble CSS tip", file:"bot-dee-chat.css", includes:["botdee-bubble-tail", "botdee-msg-avatar"]},
+        {label:"Manual test s3.2.66", file:"ai-diagnostics-service.js", includes:["s3-2-66-botdee-bubble-avatar"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.66\""]}
+      ]
+    },
+    {
+      version: "s3.2.65",
+      title: "s3.2.65 — BOT DEE welcome How can I help you?",
+      checks: [
+        {label:"Package version s3.2.65", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.65\""]},
+        {label:"Welcome copy", file:"floqr-i18n.js", includes:["\"botdee.chatWelcome\": \"Hi, I am BOT DEE. How can I help you?\""]},
+        {label:"Manual test s3.2.65", file:"ai-diagnostics-service.js", includes:["s3-2-65-botdee-welcome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.65\""]}
+      ]
+    },
+    {
+      version: "s3.2.64",
+      title: "s3.2.64 — BOT DEE greets on hello (not search miss)",
+      checks: [
+        {label:"Package version s3.2.64", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.64\""]},
+        {label:"Client chitchat hello", file:"bot-dee-chat.js", includes:["isChitchatPrompt", "botdee.chatHello", "Chatbot first"]},
+        {label:"Server hello chitchat", file:"functions/bot-dee-core.js", includes:["hello how are you", "isChitchatPrompt"]},
+        {label:"Manual test s3.2.64", file:"ai-diagnostics-service.js", includes:["s3-2-64-botdee-hello-chitchat"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.64\""]}
+      ]
+    },
+    {
+      version: "s3.2.63",
+      title: "s3.2.63 — Settings square chrome + Search tile CSS",
+      checks: [
+        {label:"Package version s3.2.63", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.63\""]},
+        {label:"ICON_V s3.2.63", file:"floqr-chrome-scheme.js", includes:["const ICON_V = \"s3.2.63\""]},
+        {label:"Search tile square radius", file:"styles.css", includes:["border-radius:8.6%", "settings-icon-face"]},
+        {label:"Manual test s3.2.63", file:"ai-diagnostics-service.js", includes:["s3-2-63-settings-square-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.63\""]}
+      ]
+    },
+    {
+      version: "s3.2.62",
+      title: "s3.2.62 — Rounded-square Search feature icons",
+      checks: [
+        {label:"Package version s3.2.62", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.62\""]},
+        {label:"ICON_V s3.2.62", file:"floqr-chrome-scheme.js", includes:["const ICON_V = \"s3.2.62\""]},
+        {label:"Square FloqCast blackTiffany pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blacktiffany.jpg", "botdee-blacktiffany.jpg", "shoutout-blacktiffany.jpg"]},
+        {label:"Square purpleWhite pack", file:"floqr-chrome-scheme.js", includes:["floqcast-purplewhite.jpg", "vip-purplewhite.jpg", "bartr-purplewhite.jpg"]},
+        {label:"Manual test s3.2.62", file:"ai-diagnostics-service.js", includes:["s3-2-62-square-chrome-icons"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.62\""]}
+      ]
+    },
+    {
+      version: "s3.2.61",
+      title: "s3.2.61 — Live Site chrome resync + profile card close",
+      checks: [
+        {label:"Package version s3.2.61", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.61\""]},
+        {label:"Chrome syncFromStorage", file:"floqr-chrome-scheme.js", includes:["syncFromStorage", "bindLiveSync", "BroadcastChannel", "floqr:auth-signed-out"]},
+        {label:"Search profile closes on nav", file:"patron-app.js", includes:["closeUserDropdown", "closeUserDropdownOnNavClick", "userDropdownHasContent"]},
+        {label:"Global profile empty-box guard", file:"global-profile-status.js", includes:["menuReady", "closeDropdown", "pageshow"]},
+        {label:"Manual test s3.2.61", file:"ai-diagnostics-service.js", includes:["s3-2-61-chrome-live-profile-card"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.61\""]}
+      ]
+    },
+    {
+      version: "s3.2.60",
+      title: "s3.2.60 — BOT DEE verbiage (not BOT DEE) + Go live, start a cast",
+      checks: [
+        {label:"Package version s3.2.60", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.60\""]},
+        {label:"Search tile BOT DEE", file:"floqr-i18n.js", includes:["\"cat.botdee\": \"BOT DEE\"", "\"page.botdee.title\": \"BOT DEE\""]},
+        {label:"Chat welcome BOT DEE", file:"bot-dee-chat.js", includes:["I am BOT DEE"]},
+        {label:"No BOT DEE chat welcome", file:"floqr-i18n.js", includes:["\"botdee.chatWelcome\": \"Hi, I am BOT DEE. How can I help you?\""]},
+        {label:"FloqCast Go live CTA", file:"floqr-i18n.js", includes:["Go live, start a cast"]},
+        {label:"Manual test s3.2.60", file:"ai-diagnostics-service.js", includes:["s3-2-60-botdee-verbiage"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.60\""]}
+      ]
+    },
+    {
+      version: "s3.2.59",
+      title: "s3.2.59 — BOT DEE chat brand + Go live, start a cast",
+      checks: [
+        {label:"Package version s3.2.59", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.59\""]},
+        {label:"Search tile BOT DEE (not BOT DEE)", file:"floqr-i18n.js", includes:["\"cat.botdee\": \"BOT DEE\"", "\"botdee.chatWelcome\""]},
+        {label:"Chat welcome BOT DEE", file:"bot-dee-chat.js", includes:["I am BOT DEE"]},
+        {label:"FloqCast Go live CTA", file:"floqr-i18n.js", includes:["Go live, start a cast"]},
+        {label:"FloqCast search fallback CTA", file:"floqcast-search.js", includes:["Go live, start a cast"]},
+        {label:"Manual test s3.2.59", file:"ai-diagnostics-service.js", includes:["s3-2-59-botdee-brand-golive-cast"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.59\""]}
+      ]
+    },
+    {
+      version: "s3.2.58",
+      title: "s3.2.58 — Black & Dark Green icons = Settings tings #5ac783",
+      checks: [
+        {label:"Package version s3.2.58", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.58\""]},
+        {label:"BDG accent Settings tings green", file:"styles.css", includes:["--accent:#5ac783", "html[data-floqr-chrome=\"blackDarkGreen\"]"]},
+        {label:"BDG full icon pack", file:"floqr-chrome-scheme.js", includes:["floqcast-blackdarkgreen.jpg", "botdee-blackdarkgreen.jpg", "shoutout-blackdarkgreen.png", "bartr-blackdarkgreen.png", "rydr-blackdarkgreen.png"]},
+        {label:"BDG icon build script", file:"scripts/build-blackdarkgreen-icons.py", includes:["#5ac783", "TINGS"]},
+        {label:"Search icon order", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"Manual test s3.2.58", file:"ai-diagnostics-service.js", includes:["s3-2-58-bdg-icons-tings-green"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.58\""]}
+      ]
+    },
+    {
+      version: "s3.2.57",
+      title: "s3.2.57 — floqr-page-title schema (= Appearance h2)",
+      checks: [
+        {label:"Package version s3.2.57", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.57\""]},
+        {label:"page-title token", file:"styles.css", includes:["--floqr-page-title-size:var(--floqr-title-size)"]},
+        {label:"Profile title row schema", file:"patron-portal.html", includes:["floqr-page-title-row", "floqr-page-title help-label"]},
+        {label:"Profile title CSS inherits Appearance size", file:"admin.css", includes:["Profile & Settings title space = Appearance h2 size", "font-size:var(--floqr-page-title-size", "font-size:inherit!important"]},
+        {label:"Feature landing page-title schema", file:"floqr-feature-landing.css", includes:["Feature search title schema", ".floqr-page-title", "font-size: var(--floqr-page-title-size"]},
+        {label:"Manual test s3.2.57", file:"ai-diagnostics-service.js", includes:["s3-2-57-page-title-appearance"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.57\""]}
+      ]
+    },
+    {
+      version: "s3.2.56",
+      title: "s3.2.56 — WB profile card + Appearance-sized page titles",
+      checks: [
+        {label:"Package version s3.2.56", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.56\""]},
+        {label:"WB profile white + shiny black initials", file:"styles.css", includes:["Never list whiteBlack here", "background:#ffffff!important", "Shiny black initials", "-webkit-text-fill-color:#0a0a0a!important"]},
+        {label:"Manual test s3.2.56", file:"ai-diagnostics-service.js", includes:["s3-2-56-wb-profile-title-size"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.56\""]}
+      ]
+    },
+    {
+      version: "s3.2.55",
+      title: "s3.2.55 — Search icon order + VIP collector-aware BOT DEE pay",
+      checks: [
+        {label:"Package version s3.2.55", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.55\""]},
+        {label:"Search icon order ShoutOut→BOT DEE→VIP→Settings→floqCast", file:"index.html", includes:["1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings", "id=\"shoutoutBtnCard\"", "id=\"intentSearchBtnCard\"", "id=\"settingsBtnCard\"", "id=\"floqcastBtnCard\""]},
+        {label:"VIP createVipCheckout collector branch", file:"functions/bot-dee-tools.js", includes:["runConfirmVipReservationForClubPos", "checkoutMode: \"clubPos\"", "runConfirmVipReservationWithoutDeposit"]},
+        {label:"botDee seed Beta enabled", file:"functions/feature-services-core.js", includes:["key: \"botDee\"", "IsFeatureEnabled: 1", "IsTestFeature: 1"]},
+        {label:"Manual test s3.2.55", file:"ai-diagnostics-service.js", includes:["s3-2-55-search-order-vip-collector"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.55\""]}
+      ]
+    },
+    {
+      version: "s3.2.54",
+      title: "s3.2.54 — BOT DEE pay tools + Search Settings → Appearance",
+      checks: [
+        {label:"Package version s3.2.54", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.54\""]},
+        {label:"Settings search tile", file:"index.html", includes:["id=\"settingsBtnCard\"", "tab=appearance", "data-floqr-chrome-icon=\"settings\""]},
+        {label:"Settings chrome icons", file:"floqr-chrome-scheme.js", includes:["settings-nightlife.jpg", "settings-whiteblack.jpg"]},
+        {label:"BOT DEE product tools", file:"functions/bot-dee-tools.js", includes:["createVipCheckout", "startShoutOutCheckout", "createFloqCastCheckout"]},
+        {label:"Manual test s3.2.54", file:"ai-diagnostics-service.js", includes:["s3-2-54-bot-dee-tools-settings"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.54\""]}
+      ]
+    },
+    {
+      version: "s3.2.53",
+      title: "s3.2.53 — BOT DEE Phase 1 chat + executeBotSession",
+      checks: [
+        {label:"Package version s3.2.53", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.53\""]},
+        {label:"BOT DEE chat shell", file:"botdee.html", includes:["id=\"botDeeChatPage\"", "bot-dee-chat.js", "botDeeIntentFallback"]},
+        {label:"executeBotSession export", file:"functions/index.js", includes:["executeBotSession"]},
+        {label:"contextualSearch tool", file:"functions/bot-dee-core.js", includes:["contextualSearch"]},
+        {label:"Manual test s3.2.53", file:"ai-diagnostics-service.js", includes:["s3-2-53-bot-dee-phase1-chat"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.53\""]}
+      ]
+    },
+    {
+      version: "s3.2.52",
+      title: "s3.2.52 — WB Tiffany active tabs + compact left Back",
+      checks: [
+        {label:"Package version s3.2.52", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.52\""]},
+        {label:"Tiffany token", file:"styles.css", includes:["--floqr-tiffany:#00d4fe"]},
+        {label:"WB active Tiffany border", file:"styles.css", includes:["admin-tab.active", "var(--floqr-tiffany"]},
+        {label:"Back not full-bleed mobile", file:"styles.css", includes:["buttonlike:not(.global-back-btn)", "width:auto!important"]},
+        {label:"Manual test s3.2.52", file:"ai-diagnostics-service.js", includes:["s3-2-52-wb-active-tiffany-back"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.52\""]}
+      ]
+    },
+    {
+      version: "s3.2.51",
+      title: "s3.2.51 — Feature landings follow selected Site chrome",
+      checks: [
+        {label:"Package version s3.2.51", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.51\""]},
+        {label:"ICON_V s3.2.51", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.51\""]},
+        {label:"Feature landing chrome washes", file:"floqr-feature-landing.css", includes:["html[data-floqr-chrome=\"whiteBlack\"] body.floqcast-page", "body.shoutout-search-page", "body.vip-page"]},
+        {label:"floqCast early-paint", file:"floqcast-search.html", includes:["floqr.isSiteChrome", "data-floqr-chrome"]},
+        {label:"Manual test s3.2.51", file:"ai-diagnostics-service.js", includes:["s3-2-51-feature-landing-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.51\""]}
+      ]
+    },
+    {
+      version: "s3.2.50",
+      title: "s3.2.50 — FloqCAST WB Image-2 full-width wordmark + ring proportions",
+      checks: [
+        {label:"Package version s3.2.50", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.50\""]},
+        {label:"ICON_V s3.2.50", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.50\"", "floqcast-whiteblack.png"]},
+        {label:"WB uses Image-2 placement", file:"scripts/build-chrome-icons.py", includes:["Image-2 geometry", "place_floqcast_q_kiss", "no chord-fit shrink"]},
+        {label:"Manual test s3.2.50", file:"ai-diagnostics-service.js", includes:["s3-2-50-floqcast-wb-image2-props"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.50\""]}
+      ]
+    },
+    {
+      version: "s3.2.49",
+      title: "s3.2.49 — FloqCAST WB reinstate peer ring + F/L/T tip halo",
+      checks: [
+        {label:"Package version s3.2.49", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.49\""]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.49", file:"ai-diagnostics-service.js", includes:["s3-2-49-floqcast-wb-ring-halo"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.49\""]}
+      ]
+    },
+    {
+      version: "s3.2.48",
+      title: "s3.2.48 — FloqCAST WB: no second asset ring (Fl/T tips solid)",
+      checks: [
+        {label:"Package version s3.2.48", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.48\""]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.48", file:"ai-diagnostics-service.js", includes:["s3-2-48-floqcast-wb-no-double-ring"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.48\""]}
+      ]
+    },
+    {
+      version: "s3.2.47",
+      title: "s3.2.47 — FloqCAST White/Black Image-2 on white (not Nightlife neon)",
+      checks: [
+        {label:"Package version s3.2.47", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.47\""]},
+        {label:"WB floqCast PNG", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.47", file:"ai-diagnostics-service.js", includes:["s3-2-47-floqcast-wb-white-ink"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.47\""]}
+      ]
+    },
+    {
+      version: "s3.2.46",
+      title: "s3.2.46 — FloqCAST White/Black Search tile matches Image-2 SVG",
+      checks: [
+        {label:"Package version s3.2.46", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.46\""]},
+        {label:"WB floqCast uses PNG Image-2 mark", file:"floqr-chrome-scheme.js", includes:["floqcast-whiteblack.png"]},
+        {label:"Manual test s3.2.46", file:"ai-diagnostics-service.js", includes:["s3-2-46-floqcast-wb-svg-tile"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.46\""]}
+      ]
+    },
+    {
+      version: "s3.2.45",
+      title: "s3.2.45 — FloqCAST Image 2 chrome + SVG sync (nightlife / traditional / whiteblack)",
+      checks: [
+        {label:"Package version s3.2.45", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.45\""]},
+        {label:"ICON_V s3.2.45", file:"floqr-chrome-scheme.js", includes:["ICON_V = \"s3.2.45\"", "floqcast-nightlife.jpg"]},
+        {label:"FloqCAST nightlife SVG embeds Image 2", file:"images/review/floqcast-icon-nightlife.svg", includes:["aria-label=\"FloqCAST nightlife\"", "data:image/jpeg;base64,"]},
+        {label:"FloqCAST traditional SVG", file:"images/review/floqcast-icon-traditional.svg", includes:["aria-label=\"FloqCAST traditional\"", "data:image/jpeg;base64,"]},
+        {label:"FloqCAST whiteblack SVG", file:"images/review/floqcast-icon-whiteblack.svg", includes:["aria-label=\"FloqCAST white black\"", "data:image/jpeg;base64,"]},
+        {label:"Display idle FloqCAST nightlife", file:"display-app.js", includes:["FLOQCAST_LOGO = \"./images/chrome/floqcast-nightlife.jpg\""]},
+        {label:"Desktop Search bar centered", file:"botdee-search.css", includes:["margin:0 auto 18px"]},
+        {label:"Review page Image 2 pack", file:"icon-review-floqcast-botdee-nf.html", includes:["s3.2.45", "floqcast-icon-nightlife.svg", "floqcast-icon-whiteblack.svg"]},
+        {label:"Manual test s3.2.45", file:"ai-diagnostics-service.js", includes:["s3-2-45-floqcast-image2-chrome"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.45\""]}
+      ]
+    },
+    {
+      version: "s3.2.44",
+      title: "s3.2.44 — Standardized feature landings (ShoutOut / VIP / floqCast)",
+      checks: [
+        {label:"Package version s3.2.44", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.44\""]},
+        {label:"Shared feature landing module", file:"floqr-feature-landing.js", includes:["NEARBY_TOP = 4", "factsForFeature", "FLOQRFeatureLanding"]},
+        {label:"ShoutOut feature landing", file:"shoutout-search.html", includes:["floqr-feature-landing.js", "data-floqr-chrome-icon=\"shoutOut\"", "data-feature-landing=\"1\""]},
+        {label:"No FloqR parent on ShoutOut landing", file:"shoutout-search.html", notIncludes:["product-parent-logo"]},
+        {label:"VIP uses feature landing + geo", file:"vip.html", includes:["floqr-feature-landing.js", "floqr-geo-search.js", "data-feature-landing=\"1\""]},
+        {label:"floqCast chrome icon hero", file:"floqcast-search.html", includes:["data-floqr-chrome-icon=\"floqCast\"", "floqr-feature-landing.js"]},
+        {label:"Search tile → shoutout-search", file:"index.html", includes:["href=\"./shoutout-search.html?from=search\""]},
+        {label:"Manual test s3.2.44", file:"ai-diagnostics-service.js", includes:["s3-2-44-feature-landing-standard"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.44\""]}
+      ]
+    },
+    {
+      version: "s3.2.43",
+      title: "s3.2.43 — Google sign-in popup-first (fix mobile redirect ITP)",
+      checks: [
+        {label:"Package version s3.2.43", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.43\""]},
+        {label:"Welcome popup-first OAuth", file:"patron-app.js", includes:["Prefer popup from the user tap on every device", "AUTH_PREFER_POPUP_KEY", "signInWithPopup(provider)"]},
+        {label:"No mobile redirect-first", file:"patron-app.js", notIncludes:["oauthPopupsUnreliable", "if (oauthPopupsUnreliable())"]},
+        {label:"Portal Google popup-first", file:"patron-portal-app.js", includes:["Prefer popup on every device", "signInWithPopup(provider)"]},
+        {label:"Manual test s3.2.43", file:"ai-diagnostics-service.js", includes:["s3-2-43-google-signin-popup-first"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.43\""]}
+      ]
+    },
+    {
       version: "s3.2.40",
       title: "s3.2.40 — Traditional View Club buttons + classic-bw red LED",
       checks: [
@@ -403,11 +1228,11 @@
     },
     {
       version: "s3.2.26",
-      title: "s3.2.26 — Template select without floating FloqAi",
+      title: "s3.2.26 — Template select without floating BOT DEE",
       checks: [
-        {label:"Package version s3.2.26", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
-        {label:"Agent visibility intent-only", file:"floqai-search.js", includes:["const show = !!onIntent;", "Template select already has the lens Search field"], notIncludes:["const show = !!(onIntent || onTemplates)"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
+        {label:"Package version s3.2.26", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Agent visibility intent-only", file:"botdee-search.js", includes:["const show = !!onIntent;", "Template select already has the lens Search field"], notIncludes:["const show = !!(onIntent || onTemplates)"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
       ]
     },
     {
@@ -435,8 +1260,8 @@
       version: "s3.2.23",
       title: "s3.2.23 — Login welcome help trim + left-align + 80px under logo",
       checks: [
-        {label:"Package version s3.2.23", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
-        {label:"Welcome help OTP-only body", file:"floqai-help-repository.js", includes:["Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
+        {label:"Package version s3.2.23", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Welcome help OTP-only body", file:"botdee-help-repository.js", includes:["Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Index help body trimmed", file:"index.html", includes:["data-floqr-help-body=\"Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP)"], notIncludes:["Search and book entertainment and nightlife events worldwide"]},
         {label:"Left-align welcome + 80px under logo", file:"styles.css", includes:["margin:80px 0 14px", "login-welcome-line.help-label{display:flex", "justify-content:flex-start", "text-align:left"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
@@ -458,8 +1283,8 @@
       version: "s3.2.21",
       title: "s3.2.21 — Template select LED preview + Search lens",
       checks: [
-        {label:"Package version s3.2.21", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
-        {label:"Template search lens form", file:"index.html", includes:["id=\"templateSearchForm\"", "id=\"templateSearchGo\"", "category-floqai-lens"]},
+        {label:"Package version s3.2.21", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Template search lens form", file:"index.html", includes:["id=\"templateSearchForm\"", "id=\"templateSearchGo\"", "category-botdee-lens"]},
         {label:"LED preview helpers", file:"patron-app.js", includes:["templateLedPreviewHtml", "mountTemplateLedPreviews", "primaryTemplateFormat"]},
         {label:"Use-only card actions", file:"patron-app.js", includes:["data-template-open", "template-select-card"], notIncludes:["data-template-preview=\"${esc(template.id)}\""]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
@@ -481,9 +1306,9 @@
       version: "s3.2.19",
       title: "s3.2.19 — Search lens in input + grey halo icons (no black tile)",
       checks: [
-        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
-        {label:"Search lens submit in field", file:"index.html", includes:["category-floqai-field", "category-floqai-lens", "id=\"categoryFloqAiGo\""]},
-        {label:"Lens CSS no fill shiny outline", file:"floqai-search.css", includes:[".category-floqai-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
+        {label:"Package version s3.2.19", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.27\""]},
+        {label:"Search lens submit in field", file:"index.html", includes:["category-botdee-field", "category-botdee-lens", "id=\"categoryBotDeeGo\""]},
+        {label:"Lens CSS no fill shiny outline", file:"botdee-search.css", includes:[".category-botdee-lens{", "background:transparent!important", "border:1.6px solid #0a0a0a"]},
         {label:"Icon faces transparent + tile halo", file:"styles.css", includes:["background:transparent", "rgba(0,200,255,.28)", "rgba(255,46,184,.2)"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
@@ -494,10 +1319,10 @@
       checks: [
         {label:"Package version s3.2.18", file:"floqr-nav.js", includes:["const APP_V = \"s3.2.28\""]},
         {label:"Charcoal profile chip always", file:"styles.css", includes:["html[data-floqr-chrome=\"nightlife\"] .user-menu-btn", "linear-gradient(145deg,#4a4a4a,#1c1c1c 55%,#0e0e0e)"]},
-        {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
+        {label:"Search placeholder Clubs Lounge Events", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryBotDeeForm"]},
         {label:"No Welcome speech / OR on Search", file:"index.html", notIncludes:["categoryFloqAiSpeech", "Welcome, type below to search for Events", "class=\"category-or\""]},
-        {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
+        {label:"i18n placeholder", file:"floqr-i18n.js", includes:["\"cat.botdeePlaceholder\": \"Search for Clubs, Lounge, Events, etc.\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
       ]
     },
     {
@@ -508,8 +1333,8 @@
         {label:"Login CSS 2-col half buttons", file:"styles.css", includes:["#loginActions{display:grid;grid-template-columns:1fr 1fr", "login-welcome-line"]},
         {label:"Traditional login + profile card", file:"styles.css", includes:["html[data-floqr-chrome=\"traditional\"] #loginActions .signin", "html[data-floqr-chrome=\"traditional\"] .user-menu-btn", "html[data-floqr-chrome=\"traditional\"] .profile-card"]},
         {label:"History Back + home logo", file:"floqr-nav.js", includes:["nav.backShort", "history.back", "bindHomeLogos", "s3.2.27"]},
-        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryFloqAiForm"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
+        {label:"Search placeholder no speech/OR", file:"index.html", includes:["Search for Clubs, Lounge, Events, etc.", "categoryBotDeeForm"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.27\""]}
       ]
     },
 
@@ -526,11 +1351,11 @@
     },
     {
       version: "s3.1.110",
-      title: "Search FloqAi placeholder = Clubs or Lounges hint",
+      title: "Search BOT DEE placeholder = Clubs or Lounges hint",
       checks: [
         {label:"Search placeholder Clubs or Lounges", file:"index.html", includes:["You may also search for: Clubs or Lounges"]},
-        {label:"i18n placeholder matches Also hint", file:"floqr-i18n.js", includes:["\"cat.floqaiPlaceholder\": \"You may also search for: Clubs or Lounges\""]},
-        {label:"Speech dialog Welcome only", file:"patron-app.js", includes:["CATEGORY_FLOQAI_DIALOG = [\"cat.floqaiWelcome\"]"]},
+        {label:"i18n placeholder matches Also hint", file:"floqr-i18n.js", includes:["\"cat.botdeePlaceholder\": \"You may also search for: Clubs or Lounges\""]},
+        {label:"Speech dialog Welcome only", file:"patron-app.js", includes:["CATEGORY_FLOQAI_DIALOG = [\"cat.botdeeWelcome\"]"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.110\""]}
       ]
     },
@@ -718,7 +1543,7 @@
       checks: [
         {label:"floqCast loads geo search", file:"floqcast-search.html", includes:["floqr-geo-search.js"]},
         {label:"Nearest top-4 constant", file:"floqcast-search.js", includes:["NEARBY_TOP = 4", "resolveUserLocation", "eventNames"]},
-        {label:"Choose-venue help id", file:"floqai-help-repository.js", includes:["help-floqcast-choose-venue"]},
+        {label:"Choose-venue help id", file:"botdee-help-repository.js", includes:["help-floqcast-choose-venue"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.88\""]}
       ]
     },
@@ -866,7 +1691,7 @@
       title: "Search tile marks 80% + bottom wordmarks",
       checks: [
         {label:"Column faces 80% marks", file:"styles.css", includes:["flex-direction:column", "width:80%"]},
-        {label:"Search icon row", file:"index.html", includes:["floqcast-icon-face", "vip-icon-face", "floqai-icon-face"]},
+        {label:"Search icon row", file:"index.html", includes:["floqcast-icon-face", "vip-icon-face", "botdee-icon-face"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.67\""]}
       ]
     },
@@ -882,9 +1707,9 @@
     },
     {
       version: "s3.1.65",
-      title: "Search icon tiles FloqAi/floqCast/VIP faces + 3-across",
+      title: "Search icon tiles BOT DEE/floqCast/VIP faces + 3-across",
       checks: [
-        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "floqai-icon-face"]},
+        {label:"Search icon row + VIP face", file:"index.html", includes:["search-icon-row", "vip-icon-face", "vip-reserv-mark.svg", "floqcast-icon-face", "floqcast-icon.svg", "botdee-icon-face"]},
         {label:"No caption under ShoutOut/VIP", file:"index.html", notIncludes:["shoutout-icon-title"]},
         {label:"3-across mobile CSS", file:"styles.css", includes:["search-icon-row", "vip-icon-face", "floqcast-icon-face", "calc((100% - 20px) / 3)"]},
         {label:"floqCast cast icon asset", file:"images/floqcast-icon.svg", includes:["floqCast", "FloqMedia LED"]},
@@ -893,10 +1718,10 @@
     },
     {
       version: "s3.1.64",
-      title: "FloqAi Search tile matches ShoutOut",
+      title: "BOT DEE Search tile matches ShoutOut",
       checks: [
-        {label:"FloqAi icon card", file:"index.html", includes:["floqai-icon-card", "category-floqai-mark", "floqai-icon-word"]},
-        {label:"Black FloqAi face", file:"styles.css", includes:["floqai-icon-face", "background:#000"]},
+        {label:"BOT DEE icon card", file:"index.html", includes:["botdee-icon-card", "category-botdee-mark", "botdee-icon-word"]},
+        {label:"Black BOT DEE face", file:"styles.css", includes:["botdee-icon-face", "background:#000"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.64\""]}
       ]
     },
@@ -1831,7 +2656,7 @@
         {label:"Work Sheet callable + page", file:"functions/scheduling-functions.js", includes:["listStaffWorksheet"]},
         {label:"Work Sheet UI", file:"staff-worksheet.html", includes:["Work Sheet - Weekly Staff Calendar"]},
         {label:"Embed iframe page", file:"schedule-embed.html", includes:["embedWeekGrid"]},
-        {label:"Help repository ingest + worksheet", file:"floqai-help-repository.js", includes:["help-staff-worksheet", "help-venue-website-ingest"]},
+        {label:"Help repository ingest + worksheet", file:"botdee-help-repository.js", includes:["help-staff-worksheet", "help-venue-website-ingest"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.115\""]}
       ]
     },
@@ -1841,8 +2666,8 @@
       checks:[
         {label:"Batch delete callable", file:"functions/scheduling-functions.js", includes:["deleteScheduleShifts", "sanitizeShiftIds"]},
         {label:"Select shifts toolbar", file:"admin.html", includes:["schedSelectBtn", "Delete selected"]},
-        {label:"FloqAi User Guide catalog", file:"index.html", includes:["User Guide", "Create and publish a staff schedule", "Delete multiple shifts"]},
-        {label:"Help repository steps", file:"floqai-help-repository.js", includes:["help-staff-schedule-user-guide", "help-create-publish-schedule", "help-multi-delete-shifts"]},
+        {label:"BOT DEE User Guide catalog", file:"index.html", includes:["User Guide", "Create and publish a staff schedule", "Delete multiple shifts"]},
+        {label:"Help repository steps", file:"botdee-help-repository.js", includes:["help-staff-schedule-user-guide", "help-create-publish-schedule", "help-multi-delete-shifts"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.114\""]}
       ]
     },
@@ -1892,24 +2717,24 @@
       ]
     },
     {
-      version: "s3.0.105-floqai-venue-search",
-      title: "FloqAi venue search + Welcome help + no signed-in interstitial",
+      version: "s3.0.105-botdee-venue-search",
+      title: "BOT DEE venue search + Welcome help + no signed-in interstitial",
       checks: [
         {label:"Venue query parser", file:"floqr-venue-query.js", includes:["beach-clubs", "lounge-club", "matchesFilters"]},
-        {label:"Stationary FloqAi above search", file:"index.html", includes:["id=\"categoryFloqAiSpeech\"", "data-i18n=\"cat.floqaiWelcome\"", "floqr-venue-query.js?v="]},
+        {label:"Stationary BOT DEE above search", file:"index.html", includes:["id=\"categoryFloqAiSpeech\"", "data-i18n=\"cat.botdeeWelcome\"", "floqr-venue-query.js?v="]},
         {label:"Welcome help popout", file:"index.html", includes:["data-floqr-help-id=\"help-welcome\""]},
-        {label:"Signed-in skips interstitial", file:"patron-app.js", includes:["rememberSignedInHint", "runStartVenueQuery", "bindCategoryFloqAi"]},
-        {label:"FloqAi venue intent", file:"intent-search.js", includes:["venueSearchIntent", "start: \"search\""]}
+        {label:"Signed-in skips interstitial", file:"patron-app.js", includes:["rememberSignedInHint", "runStartVenueQuery", "bindCategoryBOT DEE"]},
+        {label:"BOT DEE venue intent", file:"intent-search.js", includes:["venueSearchIntent", "start: \"search\""]}
       ]
     },
     {
       version: "s3.0.106-location-aware-search",
-      title: "Nearest-first search (GPS → IP) + Google venue geocoding + FloqAi dialog polish",
+      title: "Nearest-first search (GPS → IP) + Google venue geocoding + BOT DEE dialog polish",
       checks: [
         {label:"Geo search module", file:"floqr-geo-search.js", includes:["resolveUserLocation", "sortNearest", "get.geojs.io", "floqr.ipLocation.v1"]},
         {label:"Near me word list", file:"floqr-venue-query.js", includes:["NEAR_ME", "near me", "cerca de mi", "рядом"]},
-        {label:"Listing nearest-first sort", file:"patron-app.js", includes:["sortListingNearest", "floqr:location-updated", "cat.floqaiNearYou"]},
-        {label:"Geo module loaded before location AI", file:"index.html", includes:["floqr-geo-search.js?v=s3.0.106", "help-location-search", "category-floqai-mark-halo"]},
+        {label:"Listing nearest-first sort", file:"patron-app.js", includes:["sortListingNearest", "floqr:location-updated", "cat.botdeeNearYou"]},
+        {label:"Geo module loaded before location AI", file:"index.html", includes:["floqr-geo-search.js?v=s3.0.106", "help-location-search", "category-botdee-mark-halo"]},
         {label:"Google venue geocode trigger", file:"functions/venue-geocode-functions.js", includes:["onClubLocationGeocode", "scheduledVenueGeocodeBackfill", "GOOGLE_PLACES_API_KEY"]},
         {label:"Privacy discloses location", file:"privacy.html", includes:["Approximate location for search", "GeoJS"]}
       ]
@@ -1922,7 +2747,7 @@
         {label:"WhatsApp OTP client", file:"patron-app.js", includes:["requestWhatsAppOtp", "verifyWhatsAppOtp", "signInWithCustomToken"]},
         {label:"WhatsApp OTP callables", file:"functions/whatsapp-otp-functions.js", includes:["exports.requestWhatsAppOtp", "exports.verifyWhatsAppOtp", "forceSecurity: true", "fetchTwilioMessage"]},
         {label:"Compliance row forced for auth events", file:"functions/twilio-log.js", includes:["forceSecurity === true", "ContentSid: template"]},
-        {label:"Welcome help explains OTP", file:"floqai-help-repository.js", includes:["One Time Password (OTP)", "whatsapp otp"]},
+        {label:"Welcome help explains OTP", file:"botdee-help-repository.js", includes:["One Time Password (OTP)", "whatsapp otp"]},
         {label:"Privacy discloses OTP logging", file:"privacy.html", includes:["One Time Password (OTP) sign-in"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.107\""]}
       ]
@@ -2116,22 +2941,22 @@
     },
     {
       version: "s3.1.21-data-classification",
-      title: "Data classification register with a Master Admin Security tab, server-only System tier, FloqAi results filtered by classification on the server, and staff marketing media consent",
+      title: "Data classification register with a Master Admin Security tab, server-only System tier, BOT DEE results filtered by classification on the server, and staff marketing media consent",
       checks: [
         {label:"Classification core", file:"floqr-data-classification.js", includes:["function filterContent(", "SYSTEM_JOBS"]},
         {label:"Security tab", file:"master-admin.html", includes:["id=\"dataClassification\""]},
-        {label:"FloqAi access gate", file:"floqai-access.js", includes:["getFloqAiAccess"]},
-        {label:"FloqAi classified intents", file:"intent-search.js", includes:["INTENT_AUDIENCES"]}
+        {label:"BOT DEE access gate", file:"botdee-access.js", includes:["getBotDeeAccess"]},
+        {label:"BOT DEE classified intents", file:"intent-search.js", includes:["INTENT_AUDIENCES"]}
       ]
     },
     {
       version: "s3.1.20-club-feed-floqai",
-      title: "Club Admin website feed (iframe / JSON / RSS of events, DJs, featured staff, gallery), staff photo consent before publishing pictures, and FloqAi on its own page",
+      title: "Club Admin website feed (iframe / JSON / RSS of events, DJs, featured staff, gallery), staff photo consent before publishing pictures, and BOT DEE on its own page",
       checks: [
         {label:"Club feed datasets", file:"functions/club-public-feed-core.js", includes:["function staffView(", "function buildEventsRss("]},
         {label:"Website feed card", file:"admin.html", includes:["id=\"websiteFeedGenerateBtn\""]},
         {label:"Club website iframe", file:"club-embed.js", includes:["dataset"]},
-        {label:"FloqAi page", file:"floqai.html", includes:["data-floqr-feature=\"floqAi\""]}
+        {label:"BOT DEE page", file:"botdee.html", includes:["data-floqr-feature=\"botDee\""]}
       ]
     },
     {
@@ -2149,7 +2974,7 @@
       checks: [
         {label:"Declarative recommendation help", file:"index.html", includes:["data-floqr-help-id=\"help-ai-recommendations\"", "data-floqr-help-id=\"help-trending-shoutouts\""]},
         {label:"Status text stays visible", file:"patron-app.js", includes:["data-keep-visible='true'>${esc(emptyText)}"]},
-        {label:"Recommendation help in repository", file:"floqai-help-repository.js", includes:["id: \"help-ai-recommendations\""]}
+        {label:"Recommendation help in repository", file:"botdee-help-repository.js", includes:["id: \"help-ai-recommendations\""]}
       ]
     },
     {
@@ -2238,7 +3063,7 @@
         {label:"Shared template matcher", file:"shared-data.js", includes:["window.FLOQRTemplateMatch", "phraseMatches"]},
         {label:"Club Admin exclusive-first repository", file:"admin-app.js", includes:["function templateMatchesQuery(", "template-exclusive-tag"]},
         {label:"Patron Search fuzzy template route", file:"patron-app.js", includes:["matcher.phraseMatches(q, phrase)"]},
-        {label:"Club template help", file:"floqai-help-repository.js", includes:["help-club-template-repository"]}
+        {label:"Club template help", file:"botdee-help-repository.js", includes:["help-club-template-repository"]}
       ]
     },
     {
@@ -2247,7 +3072,7 @@
       checks: [
         {label:"Exclusive section in picker", file:"patron-app.js", includes:["template-section-exclusive", "function startTemplateShoutout("]},
         {label:"Template names from Search", file:"patron-app.js", includes:["function exclusiveTemplateForQuery("]},
-        {label:"FloqAi template intents", file:"intent-search.js", includes:["id: \"football-intro\"", "id: \"tengo-muchos-dolares\""]},
+        {label:"BOT DEE template intents", file:"intent-search.js", includes:["id: \"football-intro\"", "id: \"tengo-muchos-dolares\""]},
         {label:"Money rain on display", file:"display-app.js", includes:["function syncMoneyRain(", "MONEY_RAIN_BILLS"]},
         {label:"Idle doc renders club default", file:"display-app.js", includes:["const isIdleDoc ="]},
         {label:"Server reset to Use ShoutOut @", file:"functions/commerce-functions.js", includes:["function idleLiveContentAfterExpiry("]},
@@ -2257,14 +3082,672 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-014-botdee-help-chat",
+      area:"BOT DEE",
+      feature:"No ? bubble / scope line; type help like version",
+      changed:"s3.3.014 — botdee.html header is title only (no ? help popout, no Showing answers for…). Quick intent search removed. Typing help / what can you do returns a local BOT DEE help reply and asks what you want help with (same path as version).",
+      howToTest:"1) Hard-refresh botdee.html s3.3.014 signed in with botDee. 2) Confirm no ? next to the title and no Showing answers for… line. 3) Type help — BOT DEE explains itself and asks what you want help with (no product-card dump). 4) Type version — still gets the package stamp. 5) Mark Succeed/Failed.",
+      expected:"Clean title header; help and version answer in chat without opening a ? bubble or intent strip.",
+      troubleshoot:"? still visible → hard-refresh botdee.html. Showing answers… → stale botdee-page.js. help dumps search cards → Functions not redeployed with isHelpPrompt / local-help."
+    },
+    {
+      id:"s3-3-013-master-admin-rollup",
+      area:"Master Admin",
+      feature:"5-min rollup summary strips (Diagnostics / AI / Duplicates / Commerce)",
+      changed:"s3.3.013 — scheduledMasterAdminRollup every 5 min writes masterAdminRollups/current; Refresh rollup callable; panels paint strips without 27×750 live pulls. Diagnostics mount no longer auto-runs full refresh; Duplicate Records waits for Refresh.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.013 and sign in (Functions must be deployed with refreshMasterAdminRollup). 2) Open Diagnostics — summary strip shows collection counts from rollup; status says press Run/Refresh for full scan. 3) Press Refresh rollup — strip timestamps update. 4) Open AI Crawling / Duplicate Records / Services & Commerce — strips show queue/cluster/order counts. 5) Mark Succeed/Failed.",
+      expected:"Sign-in stays light; each heavy panel shows rollup metrics immediately; full scans only on explicit Refresh/Run.",
+      troubleshoot:"No rollup yet → press Refresh rollup (needs Functions deploy). Permission denied → Master Admin only. Empty strip after refresh → check Cloud Scheduler / scheduledMasterAdminRollup logs. Still freezes opening Diagnostics → confirm mount no longer awaits refreshDiagnostics."
+    },
+    {
+      id:"s3-3-012-height-pickup-locale",
+      area:"Profile / RydR",
+      feature:"Height unit-first + structured taxi pickup",
+      changed:"s3.3.012 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. US/Canada default ft; other countries and non-US IP default m. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
+      howToTest:"1) Hard-refresh Search and My Profile s3.3.012. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States — ZIP. Canada — ft + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
+      expected:"ft and m cannot be mixed. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
+      troubleshoot:"Still a single height box → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.012. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
+    },
+    {
+      id:"s3-3-012-phila-pair-retired",
+      area:"ShoutOut / Display / NBA",
+      feature:"PHILA front+back pair removed; 76ers back-only kept",
+      changed:"s3.3.012 — delete nbaPhiladelphia76ersPhila (front+back). Keep nbaPhiladelphia76ers (76ERS plate).",
+      howToTest:"1) Hard-refresh Search. 2) Template list must NOT show NBA Philadelphia 76ers PHILA. 3) NBA Philadelphia 76ers (back-only) still available. 4) Mark Succeed/Failed.",
+      expected:"No PHILA pair in picker; regular 76ers jersey still composes.",
+      troubleshoot:"PHILA pair still listed → hard-refresh jersey-catalog.js. 76ers missing → restore nbaPhiladelphia76ers row."
+    },
+    {
+      id:"s3-3-011-shoutout-page-trail",
+      area:"ShoutOut / Diagnostics",
+      feature:"ShoutOut page trail matches patron steps",
+      changed:"s3.3.011 — Diagnostics → ShoutOut logs ShoutOut button, Choose a venue, Throw ShoutOut Here, splash, template, editor, Continue to Checkout, payment return. Search is not a step. Venue/template empty until chosen (no Zebbies/blackwhite defaults). Leftover in-page shoutoutLandingPage removed.",
+      howToTest:"1) Hard-refresh Search s3.3.011 signed in. 2) Tap ShoutOut → Choose a venue → Aurelia Throw ShoutOut Here. Confirm Search tiles do not flash. 3) Splash → Shiloh → Continue to Checkout (one tap greys the button). 4) Master Admin → Diagnostics → ShoutOut: one trail with shoutoutButton, shoutoutSearchPage, throwShoutoutHere, adSplashPage, templateSelectPage, editorPage, confirmationPage, checkoutRedirect, paymentReturn. Location temp-democlub-1; template shiloh on editor+. 5) Mark Succeed/Failed.",
+      expected:"Trail matches the patron path. No categoryPage. No zebbies-garden-washington-dc unless that club was chosen.",
+      troubleshoot:"Search still in the trail → hard-refresh patron-app.js / floqr-nav.js; confirm ?start=shoutout skips categoryPage. Zebbies with no throw → old rows from before this fix; look at created time. Missing Choose a venue → shoutout-search.js + floqr-logger.js not cache-busted."
+    },
+    {
+      id:"s3-3-010-checkout-one-tap",
+      area:"ShoutOut / Checkout",
+      feature:"Continue to Checkout locks after one tap",
+      changed:"s3.3.011 — Continue to Checkout / Submit / Save ShoutOut grey out on the first tap (is-critical-busy). VIP Pay deposit and floqCast pay use the same one-tap lock.",
+      howToTest:"1) Hard-refresh Search, sign in, Throw a priced ShoutOut to the editor. 2) Tap Continue to Checkout once. The button must grey out immediately (Opening checkout…) and ignore a second tap. 3) If checkout fails, the button returns. 4) Mark Succeed/Failed.",
+      expected:"One tap starts checkout. No double Stripe sessions from impatient extra taps.",
+      troubleshoot:"Still clickable → hard-refresh patron-app.js + payment-service.js + styles.css s3.3.011. Two Stripe tabs → Functions still slow but the second click should no-op; confirm dataset.criticalBusy=1 in inspector."
+    },
+    {
+      id:"s3-3-010-master-admin-load-perf",
+      area:"Master Admin",
+      feature:"Sign-in load — defer heavy Diagnostics / crawl / commerce",
+      changed:"s3.3.010 — Master Admin sign-in no longer runs Diagnostics refresh (27 collections + package file fetches), AI Crawling queue + listing delete, Duplicate Records scan, Services & Commerce 750×3, templates, or recommendations. Those mount when their panel opens.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html (package s3.3.010) and sign in. 2) Network Dashboard should appear usable within a few seconds (not a long freeze). 3) Open Diagnostics → Run Diagnostics — then the heavy refresh runs. 4) Open AI Crawling / Services & Commerce / Duplicate Records only when needed. 5) Mark Succeed/Failed.",
+      expected:"Sign-in is responsive; heavy Firestore/file work starts only after opening those panels.",
+      troubleshoot:"Still freezes on sign-in → hard-refresh Master Admin (cache-bust master-admin-app.js); confirm onAuth no longer calls FLOQRDiagnostics.mount. Empty Diagnostics until opened is expected — press Refresh there."
+    },
+    {
+      id:"s3-3-009-botdee-public-datapoints",
+      area:"BOT DEE / Profiles / Mingl",
+      feature:"BOT DEE reads opted-in public profile datapoints",
+      changed:"s3.3.010 — lookupPublicProfiles returns every volunteered public datapoint the signed-in viewer can see (sharedDatapoints + full datapoints values, not PII/PCI). Chat thumbnails fly out into a frameless photo window (X / Close); BOT DEE chat stays visible.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html signed in with botDee and a public profile that has music/food/travel filled and opted public. 2) Ask: do you have access to what people see on my public profile, like food, music, or travel? 3) BOT DEE must list those volunteered values — not say FLOQR doesn't track them. 4) Ask to show public photos — tap a thumbnail; the photo animates out into a separate frameless window. Close with X or Close and confirm the chat is still behind. 5) Ask about another public @handle — only volunteered public fields. 6) Mark Succeed/Failed.",
+      expected:"BOT DEE uses every public volunteered key/value the viewer can see. Photos pop out in an animated frameless window. Never email/phone/PAN/GPS.",
+      troubleshoot:"Still says FLOQR doesn't track music/food/travel → Functions not redeployed or the field is empty/opted out. Tap does nothing → allow pop-ups, hard-refresh bot-dee-chat.js, confirm .botdee-photo-open buttons. Overlay covering chat → stale cache of the old in-page viewer. Raw storage URLs → executeBotSession media stripping."
+    },
+    {
+      id:"s3-3-008-botdee-mobile-profile-version",
+      area:"BOT DEE",
+      feature:"Mobile header + public me/friends + version",
+      changed:"botdee.html / bot-dee-chat.css title-row ?; lookupPublicProfiles self+connections; versionReply",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.008) on a phone-width viewport signed in with botDee. 2) Confirm BOT DEE title has ? immediately beside it (not a mid-screen bar) and “Showing answers for …” wraps normally as a full-width line (not vertical one-letter columns). 3) Ask “what do you know about me?” — BOT DEE summarizes your public-facing profile fields/photos. 4) Ask “what do you know about my friend <Name>” for a Mingl/chat connection with a public profile — answers from that public card. 5) Ask “what is your version?” / “version info” — reply names package s3.3.008. 6) Mark Succeed/Failed.",
+      expected:"Mobile title+? layout correct; about-me and friend public profiles work; version stamp spoken.",
+      troubleshoot:"If scope text is still vertical, confirm bot-dee-chat.css has .botdee-chat-header flex-direction:column and #botDeeScopeNote is outside the title row. If about-me fails, redeploy executeBotSession from origin/main and confirm lookupPublicProfiles selfQuery path. If version missing, check isVersionPrompt local path + PACKAGE_LABEL in bot-dee-core.js."
+    },
+    {
+      id:"s3-3-007-stripe-sandbox-wire",
+      area:"Stripe / Checkout / VIP / Connect",
+      feature:"Sandbox Stripe fully wired (Connect → VIP Club Stripe + destination charges)",
+      changed:"s3.3.007 — VIP Club Stripe reads stripeConnectAccounts after Club Admin onboarding; Checkout destination-charges when transfers are ready (ShoutOut 80/20, floqCast, BartR, VIP clubStripe); ShoutOut still works without Connect; stripeFloqrWebhook handles account.updated / capability.updated / deauthorized. Stay on Stripe test keys. No operator refund QA — do not refund on Pages.",
+      howToTest:"1) Stripe Dashboard stays TEST/sandbox. Add account.updated, capability.updated, account.application.deauthorized to https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/stripeFloqrWebhook (same signing secret). 2) Deploy Functions from origin/main after merge. 3) Club Admin → Stripe onboarding for a test club; Refresh until transfers ready. 4) VIP reserV collector Club Stripe should save (no typed acct id). 5) Paid ShoutOut without Connect still opens FloqR Checkout; with Connect, serviceOrders.connectedAccountId is set. 6) Mark Succeed/Failed. Do not refund any order.",
+      expected:"Connect onboarding writes stripeConnectAccounts; VIP Club Stripe works; destination charges only when ready; ShoutOut never blocked by missing Connect; live keys unused. Master Admin Logging has no Refund sandbox order control.",
+      troubleshoot:"Club Stripe not ready → Functions not redeployed / finish Express onboarding / Refresh status. Destination missing → connectedAccountId empty because transfers not active. Webhook 400 on GET is expected (needs Stripe signature). Do not look for a refund button on live Pages."
+    },
+    {
+      id:"s3-3-006-botdee-durable-threads",
+      area:"BOT DEE",
+      feature:"Durable chat threads — refresh and second device resume",
+      changed:"s3.3.006 — signed-in BOT DEE stores the last 12 turns under botDeeThreads/{uid}. Refresh or another phone restores while inside the conversation pause (Master Admin setting; packaged default 300 seconds / 5 minutes). Idle / goodbye starts a fresh conversation. Flag durableThreads defaults on. Needs Pages + Functions + firestore.rules.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.007) signed in with botDee access. 2) Send a message (try How are you?). 3) Refresh the tab — the transcript should return, not a blank welcome. 4) Open the same URL on another browser/profile signed into the same account — same transcript. 5) Wait for the conversation pause (packaged default 300 seconds / 5 minutes; Master Admin → Features Mgmt → BOT DEE) — next message starts fresh. 6) Master Admin → Diagnostics → Manual Feature Tests → mark Succeed/Failed.",
+      expected:"Active chat survives refresh and a second device until the conversation pause or goodbye. After the pause, welcome/fresh chat. Unsigned or durableThreads=0 stays tab-only.",
+      troubleshoot:"Always welcome after refresh → Functions deploy getBotDeeThread + executeBotSession (Pages-only is not enough). Permission error → firestore.rules deploy for botDeeThreads. Feature denied → botDee beta/live gate. Old chat.js → hard refresh botdee.html s3.3.007."
+    },
+    {
+      id:"s3-3-005-botdee-locale-public-profiles",
+      area:"BOT DEE / i18n / Profiles",
+      feature:"BOT DEE locale help + least-privilege feature access",
+      changed:"s3.3.005 — uiLanguage localizes result cards; Features & Services + beta grants drive least privilege: search/help/pitch/tools include only features THIS viewer may use; help blurbs scrub sibling betas the viewer lacks; lookupPublicProfiles for public patron/club fields + images.",
+      howToTest:"Least privilege (both sides). A) No beta grants: hard-refresh botdee.html (s3.3.007); ask ShoutOut how-to in Deutsch/Français/العربية — localized cards; help/reply/greeting must NOT name Mingl, RydR, BartR, floqCast, VIP. B) Grant floqCast (and/or VIP) on the same account via Master Admin Features & Services / beta features — hard-refresh; ask floqCast / VIP how-to — those products MUST appear in search cards, help blurbs, and pitch; still scrub any siblings not granted. C) Public club/@handle → public fields/photos only. Mark Succeed/Failed.",
+      expected:"Granted features visible in search + help; ungranted betas never exposed (scrubbed from multi-product help too); locale cards match uiLanguage.",
+      troubleshoot:"English cards → redeploy executeBotSession / hard-refresh bot-dee-chat.js. Ungranted brand leak → sanitizeFeatureMentions + scrubGatedBrands + canAccessFeature. Granted feature missing → betaTesters.features[key]==1 and IsFeatureEnabled/IsTestFeature; client FLOQRFeatureServices.load. Profile miss → publicProfileVisibility / club published gates."
+
+    },
+    {
+      id:"s3-3-003-phila-blanks-terps-qa",
+      area:"ShoutOut / Display / NBA / NCAA",
+      feature:"PHILA white Association blanks + FloqMedia-off pair; Terps gated QA",
+      changed:"s3.3.003 — nbaPhiladelphia76ersPhila points at nba-76ers-phila-{front,back}-blank.png (RGBA, no baked EMBIID). Pair hides FloqMedia rail + single-face bg. Terps throwback pair stays unpublished; maryland-terps-pair-qa.html unlock key terps-pair-qa for timing/theme QA (front=back placeholder).",
+      howToTest:"1) Hard-refresh Search + display (s3.3.003). 2) PHILA pair: white kits (not blue Icon), no EMBIID baked in, typed name/PHILA/number, no FloqMedia over kits. 3) Template list still has Maryland Terps back-only — not Throwback Pair. 4) Open maryland-terps-pair-qa.html, unlock with terps-pair-qa, confirm 7s/5s + Maryland gradient. 5) PC visual QA vs white PHILA reference. Mark Succeed/Failed.",
+      expected:"White Association pair silhouette; overlays only for glyphs; FloqMedia hidden on pair; Terps pair not in patron picker; gated QA unlocks.",
+      troubleshoot:"Still blue → catalog still on with-club PNGs / hard-refresh jersey-catalog.js. Opaque box → front blank must be RGBA. FloqMedia mid-kit → display-app pairMode rail hide + display.css. Terps in picker → catalogPublished must stay false. QA blank → wrong key or display preview params."
+    },
+    {
+      id:"s3-3-002-maryland-terps-pair-v2",
+      area:"ShoutOut / Display / NCAA",
+      feature:"Maryland Terps throwback pair v2 — registered unpublished until front plate",
+      changed:"s3.3.002 — nbaMarylandTerpsThrowbackPair (ncaa-umd-2026-27-2002-throwback-white-v2) shares PHILA pair engine; catalogPublished/productionAssetsReady false; frontBackgroundUrl empty; Maryland message theme CSS ready; live patrons still use nbaMarylandTerps back-only.",
+      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
+      expected:"No unpublished Terps pair in patron picker; prep entry exists in jersey-catalog with empty front URL.",
+      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
+    },
+    {
+      id:"s3-3-001-phila-jersey-pair",
+      area:"ShoutOut / Display / NBA",
+      feature:"PHILA jersey pair — back+front 7s, optional ShoutOut 5s",
+      changed:"s3.3.001 — nbaPhiladelphia76ersPhila uses nbaJerseyPair: both kits visible (back left, front right) for 7s; optional message card 5s; blank message = jersey only. FrameLoop holdMsByPhase + includeCopy. Package brief in reports/nba-phila-jersey-v1/.",
+      howToTest:"1) Hard-refresh Search (s3.3.003). 2) Pick NBA Philadelphia 76ers PHILA. 3) Name DON BANYONG, Number 21, Message HAPPY BIRTHDAY, DON! — preview shows white pair then ShoutOut card. 4) Clear message — jersey pair only ~7s (no empty card). 5) Check 96×48 / 64×48 / 64×32. Mark Succeed/Failed.",
+      expected:"White Association pair composition (not rotate / not blue Icon); 7s then 5s with message; jersey-only when blank; PHILA wordmark fixed on front; name on back only; no FloqMedia on pair.",
+      troubleshoot:"Still rotating one kit → hard-refresh display-app.js + display.css + floqr-frame-loop.js. No pair stage → nbaJerseyPair catalog flag. Message never shows → mainText empty or includeCopy false. Wrong timing → floqr-jersey-scene.js / holdMsByPhase. Blue Icon → blanks not wired."
+    },
+    {
+      id:"s3-2-101-shoutout-diag-phila-baller",
+      area:"ShoutOut / Diagnostics / Display / Baller",
+      feature:"ShoutOut Diagnostics page trails; Baller's Alert only (Black Card removed); company max 18; PHILA dual; portrait decode",
+      changed:"s3.2.101 — Diagnostics → ShoutOut consolidates appLogs category shoutout + page_call trails by shoutoutTrailId. Black Card + Black Card Amex removed from catalog; Baller's Alert kept. Upload photo chooser (library or Camera face guide); no duplicate Take photo. Company max 18 UPPERCASE. PHILA dual rotates front↔back. Portrait createImageBitmap + Gemini JSON repair.",
+      howToTest:"1) Hard-refresh Search + Master Admin (s3.2.101). 2) Template list shows Baller's Alert — not Black Card / Black Card Amex. 3) Baller's Alert company field max 18 UPPERCASE; Media Upload has Upload photo only (chooser: library or Camera face guide). 4) Throw PHILA dual — LED rotates PHILA+number and name+number. 5) Diagnostics → ShoutOut shows page_call trails with id/time/template/location. Mark Succeed/Failed.",
+      expected:"No Black Card templates; Alert company ≤18 UPPERCASE; no duplicate Take photo; PHILA dual rotates; ShoutOut Diagnostics trail list populated when signed in.",
+      troubleshoot:"Black Card still listed → hard-refresh shared-data.js. Take photo button → patron-app removes #ballerTakePhotoBtn. Empty Diagnostics → signed-in patron required. PHILA missing → jersey-catalog + front PNG published. Decode errors → Storage CORS / createImageBitmap; Gemini under Application Logging."
+    },
+    {
+      id:"s3-2-96-jersey-number-my-shoutouts",
+      area:"ShoutOut / Display / Portal",
+      feature:"Terps jersey number paints; Use Past restores mark; My ShoutOuts shows Completed history",
+      changed:"s3.2.96 — NBA photo path declared `digits` from subText (was ReferenceError → blank number + FloqMedia stuck at top). Attribution sync no longer wipes soccer/NBA jersey mark. Use Past ShoutOut restores name+number. My ShoutOuts auto-opens Completed when Saved is empty but history exists.",
+      howToTest:"1) Hard-refresh display.html?location=temp-democlub-1 + Search composer (s3.2.96). 2) Throw Maryland Terps with name DON and number 44 → Club Admin approve. 3) LED shows DON + 44 and FloqMedia under the hem (not over the collar). 4) Composer → Use Past ShoutOut → pick that row → number field shows 44. 5) My Profile → Feature & Orders → My ShoutOuts — Completed lists the approved Terps (Saved may be empty if you never saved a draft). Mark Succeed/Failed.",
+      expected:"Number 44 visible on LED; FloqMedia under hem; Past reuse keeps 44; Completed shows paid/approved history.",
+      troubleshoot:"Blank number → confirm display-app.js has `const digits = glyphLen` and hard-refresh. FloqMedia at top → paint threw before pin; same digits fix. Past clears number → syncAttribution must skip isSoccerJerseyTemplate. Empty My ShoutOuts Completed while Firestore has approved rows → check signed-in uid matches submittedByUid; console for FLOQR portal query failed."
+    },
+    {
+      id:"s3-2-100-baller-company-18",
+      area:"ShoutOut / Baller",
+      feature:"Baller company max 18 + always UPPERCASE",
+      changed:"s3.2.100 — BALLER_COMPANY_MAX 18; ballerCompanyNormalize uppercases + truncates; LED displaySub uppercases company; presets BAD BOY INC. / BADDB$CHES CORP fit the cap.",
+      howToTest:"1) Hard-refresh Search (s3.2.100). 2) Black Card / Baller's Alert → Custom company type mixed case longer than 18 — field caps at 18 UPPERCASE. 3) Preview/LED company line is UPPERCASE. Mark Succeed/Failed.",
+      expected:"Input max 18; company on card is uppercase regardless of typing.",
+      troubleshoot:"Still 25 → hard-refresh patron-app.js + index.html + shared-data.js. Mixed case on LED → display-app.js toUpperCase on baller company."
+    },
+    {
+      id:"s3-2-99-terps-stroke-thin",
+      area:"ShoutOut / Display",
+      feature:"Terps/NBA varsity number outline weight −20%",
+      changed:"s3.2.99 — FLOQRVarsityNumbers stroke-width 11 → 8.8 (−20%). Horizontal scaleX(.7) and +20% height from prior packages unchanged.",
+      howToTest:"1) Hard-refresh display (s3.2.99). 2) Terps number 44 — outline ring looks thinner; counters still open; width/height same as s3.2.98. Mark Succeed/Failed.",
+      expected:"Thinner outline/weight; open counters; same overall size as s3.2.98.",
+      troubleshoot:"Still heavy → hard-refresh floqr-varsity-numbers.js?v=s3.2.99; confirm stroke-width=\"8.8\"."
+    },
+    {
+      id:"s3-2-98-terps-number-narrow",
+      area:"ShoutOut / Display",
+      feature:"Terps/NBA varsity number horizontal −30%",
+      changed:"s3.2.98 — .varsity-num uses transform:scaleX(.7) so width shrinks 30% while vertical size stays at the s3.2.97 +20% height.",
+      howToTest:"1) Hard-refresh display.html?location=temp-democlub-1 (s3.2.98). 2) Maryland Terps number 44 — digits look narrower than s3.2.97 but same height, outline/counters still open. Mark Succeed/Failed.",
+      expected:"Numbers ~30% narrower horizontally; height unchanged; counters still open.",
+      troubleshoot:"Still wide → hard-refresh display.css?v=s3.2.98; confirm scaleX(.7) on .varsity-num."
+    },
+    {
+      id:"s3-2-97-terps-varsity-saved",
+      area:"ShoutOut / Display / My ShoutOuts",
+      feature:"Terps varsity SVG numbers (+20%) with open counters; Saved draft continue works",
+      changed:"s3.2.97 — NBA/Terps numbers paint via FLOQRVarsityNumbers.svg (stroke + evenodd holes = inner encirclement). Number size +20% (0.4968 / 0.36432). After Save, portal deep-link opens Saved pane (not Pending). Continue editing stashes jersey fields and opens the composer editor.",
+      howToTest:"1) Hard-refresh display + Search + My Profile (s3.2.97). 2) Maryland Terps number 44 on LED — digits show clear inner counters/outline, ~20% taller. 3) Save a Terps draft → lands on My ShoutOuts → Saved with that draft. 4) Continue editing → editor opens with name + 44 restored. Mark Succeed/Failed.",
+      expected:"Outlined varsity 44 with open holes; Saved list shows draft; Continue restores fields in editor.",
+      troubleshoot:"Flat Alumni text → display-app must call FLOQRVarsityNumbers.svg; hard-refresh floqr-varsity-numbers.js. Small number → jersey-catalog one/two 0.4968/0.36432. After save opens Pending empty → portal must route isSavedShoutout → shoutoutSavedPane. Continue lands on Search only → continueSavedShoutout + draft.openEditor → goToEditor."
+    },
+    {
+      id:"s3-2-95-baller-jersey-floqcast-gemini",
+      area:"ShoutOut / Display / floqCast / Gemini",
+      feature:"Baller gold rim restore, Terps FloqMedia under hem, jersey remnant wipe, floqCast 100s, Gemini thinking LOW",
+      changed:"s3.2.95 — Baller LED PNGs exterior-only scrub (gold rim kept). NBA/Terps portrait tanks height-fit (--nba-kit-h 86%) so FloqMedia sits under the hem, not mid-kit; rail canvas-pinned. Jersey kits reject HAPPY HALLOWEEN / idle CTA as name. floqCast live 100s. Gemini thinkingLevel LOW + retry.",
+      howToTest:"1) Hard-refresh display + floqcast-preview (s3.2.95). 2) Baller's Alert on LED — gold filigree rim intact, no white wedges. 3) Maryland Terps on led-96x48 — full tank collar-to-hem visible; PRESENTED BY FloqMedia in the bottom band under the hem (not mid-body). 4) Classic Halloween then Terps — no HAPPY HALLOWEEN leftover. 5) floqCast Go live ~100s (Functions deploy). 6) Baller Upload face — Gemini mask OK under 8 MB. Mark Succeed/Failed.",
+      expected:"Gold rim crisp; Terps FloqMedia under hem; no seasonal remnants; live ~100s; Gemini mask OK.",
+      troubleshoot:"FloqMedia mid-kit → display.css NBA height-fit (--nba-kit-h) + pinJerseyFloqMediaRail; hard-refresh display.css/display-app.js. Deformed rim → rebuild build-baller-card-photos.py. Remnants → isBoardRemnantText + stopHalloweenFinale; clear stale liveContent mainText. Duration 90 → deploy floqcast-functions. Gemini MINIMAL → deploy gemini-portrait-mask."
+    },
+    {
+      id:"s3-2-94-led-display-fixes",
+      area:"ShoutOut / Display",
+      feature:"Baller white corner scrub + Terps FloqMedia bottom + Halloween RIP top-left",
+      changed:"s3.2.94 — (1) Baller black-card LED PNGs scrub pale corner wedges; CSS radius + black outline clip AA fringe. (2) NBA/Terps FloqMedia identity rail pinned under the kit like soccer/NFL; classic/Halloween leftover text cleared on jersey paint. (3) Classic Halloween finale moves RIP tomb/grave to top-left; ghosts originate there.",
+      howToTest:"1) Hard-refresh Search + display preview on package s3.2.94. 2) Baller's Alert / Black Card on led-96x48 — black margin outside rounded corners has no white triangular spots. 3) Maryland Terps on led-96x48 — PRESENTED BY FloqMedia sits under the jersey hem (not mid-body); no HAPPY HALLOWEEN remnant from a prior board. 4) Classic Halloween — finale RIP tomb rises in the top-left; ghosts burst from that corner. 5) Display boards stay display.html?location= (never add a cache-bust query). Mark Succeed/Failed.",
+      expected:"Clean Baller corners; Terps FloqMedia under kit; no prior-shoutout text on jersey; Halloween grave top-left with ghosts from there.",
+      troubleshoot:"White wedges → republish images/baller/* + display.css on s3.2.94; check border-radius 3.15%/5.1% + outline. FloqMedia mid-jersey → jersey-sport-nba bottom:1.2% rules. HAPPY HALLOWEEN ghost → clearClassicBoardRemnantsOnJersey / isSeasonalBoardRemnantText on display-app.js. Grave still bottom → .hw-grave left:8% top:4% and hwGhostRush from translate(-20%,10%)."
+    },
+    {
+      id:"s3-2-91-jerseys-2026",
+      area:"ShoutOut / Jerseys",
+      feature:"2026 Maryland Terps + NBA icon + NFL home jersey backs",
+      changed:"Terps basketball photo back with State, name, and number. All 30 NBA clubs use a photorealistic 2026/27 icon tank (mesh, stitching, sheen, cloth folds; Lakers purple/gold, Celtics green, Jazz mountain purple, Heat black, Rockets red/yellow). Numbers are Alumni Sans Collegiate One with an outside-only outline so counters stay open. All 32 NFL clubs plus ScammerVille use 2026 home colors. Club word, name, and number are typed on the kit. Package s3.2.92.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ on package s3.2.92+ and open templates. 2) Maryland Terps — State MARYLAND, name, number on the red flag-side tank. 3) Change State and confirm the upper word changes. 4) Los Angeles Lakers — purple mesh tank, gold LOS ANGELES on two lines, number counters show fabric. 5) Boston Celtics — green mesh tank. 6) Oklahoma City Thunder — blue mesh, gold number, OKLAHOMA CITY on two lines. 7) Atlanta Hawks — red mesh, white 9 with an open counter. 8) Houston Rockets — red tank, yellow trim. 9) Atlanta Falcons — red home, white number. 10) 96×48, 64×48, and 64×32 previews keep the word, name, and number on the jersey. Display boards stay display.html?location= with no cache-bust query.",
+      expected:"Terps State is editable. Each NBA back is that club's photorealistic 2026/27 icon tank. Number holes show the jersey. Each NFL back matches that club's 2026 home colors. Name and number stay patron-typed.",
+      troubleshoot:"Old art → hard refresh jersey-catalog.js, display.css, and display-app.js on s3.2.92+. Missing NBA PNG → images/basketball/nba-<club>-back-with-club.png on Pages. Missing NFL PNG → images/nfl/nfl-<club>-back-with-club.png. Closed number counters → jersey-alumni-num text-shadow ring, not a text stroke. Word missing → jerseyOverlayWordmark on the catalog row."
+    },
+    {
+      id:"s3-2-90-critical-log-blink",
+      area:"Master Admin / Diagnostics / Security",
+      feature:"Critical log tab flash standard (Gemini API failures)",
+      changed:"s3.2.90 — Shared FLOQRCriticalLogBlink: recorded critical failures flash the log subtab + parent group (same pattern as Security System Messages). Gemini API access failures are severity critical and flash Diagnostics → Application Logging until Acknowledge critical failures.",
+      howToTest:"1) Hard-refresh Master Admin (s3.2.90). 2) With a geminiApiAccessLogs failure present (or force a Baller's Alert mask failure), confirm Diagnostics parent + Application Logging subtab flash. 3) Open Application Logging → Gemini API Access → Acknowledge critical failures — flash stops. 4) Confirm Security System Messages still flash on unread deny alerts. 5) Mark Succeed/Failed.",
+      expected:"Critical Gemini failures flash Application Logging (+ Diagnostics parent) until acknowledged; Security blink unchanged.",
+      troubleshoot:"No flash → floqr-critical-log-blink.js loaded before logging/security scripts; failure rows need outcome=failure / severity=critical; Functions deploy for new severity stamp. Flash won't clear → Acknowledge button or sessionStorage floqr.criticalLogAck.geminiApiAccess. Parent stays on with other diagnostics critical sources (display load errors)."
+    },
+    {
+      id:"s3-2-89-baller-face-preview",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Alert selected photo previews immediately + Gemini on upload",
+      changed:"s3.2.89 — Upload/Take shows the selected face in the media preview and LED frame right away; Storage upload + Gemini mask run on select (not only Submit). File input uses visually-hidden host (not display:none) so Safari click works.",
+      howToTest:"1) Hard-refresh Search (s3.2.89). 2) Baller's Alert → Upload photo. 3) Confirm thumbnail preview appears under Media Upload and the LED preview shows the face in the medallion. 4) Status moves Upload → Removing background → cutout. 5) Mark Succeed/Failed.",
+      expected:"Selected picture visible immediately; cutout replaces it after Gemini; no white-only/blank preview.",
+      troubleshoot:"No thumbnail → baller-file-input-host + processBallerFaceSelection on change. LED blank → updatePreview uses dataset.previewUrl / lastValidBallerFace.previewUrl. Gemini never starts → signed in + Functions GEMINI_API_KEY."
+    },
+    {
+      id:"s3-2-88-baller-halo-gemini-logs",
+      area:"ShoutOut / Diagnostics / BOT DEE",
+      feature:"Baller red halo behind card, Gemini API access logs (30d), BOT DEE wrap",
+      changed:"s3.2.88 — card scales in so flashing red halo sits behind/around the art (not clipped full-bleed); face slot never paints a white plate; geminiApiAccessLogs + appLogs category gemini with failure reason (Master Admin / FloqR Admin); hourly checkGeminiApiAccessFailures inbox; BOT DEE first bubble wraps (min-width:0).",
+      howToTest:"1) Hard-refresh Search + display preview (s3.2.88). 2) Baller's Alert — confirm red glow around the card (black margin), face oval shows warrior through transparent cutout (no white plate). 3) Upload a face; Master Admin → Application Logging → category gemini OR Gemini API Access card shows success (or failure with reason). 4) Open botdee.html — long first reply wraps inside the bubble. 5) Mark Succeed/Failed.",
+      expected:"Halo visible behind card; no white face slot; Gemini success/fail rows with reasons; BOT DEE text wraps.",
+      troubleshoot:"No halo → display.css baller-red-halo-behind + cache-bust. White oval → cutout failed (check gemini logs) or media-slot background not transparent. Empty Gemini card → Functions deploy + rules for geminiApiAccessLogs. BOT DEE overflow → bot-dee-chat.css min-width:0 on bubble/transcript."
+    },
+    {
+      id:"s3-2-87-baller-portrait-mask",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Alert Upload+Take photo, Gemini mask cutout, red halo, company max 25",
+      changed:"s3.2.87 — dual Upload photo / Take photo (cancel keeps prior). Server gemini-portrait-mask (Gemini 2.5 Flash segmentation) → full-frame alpha PNG; client destination-in cutout into face oval with editable zoom/position. Flashing red halo on card. Company preset WE'RE OUTSIDE LLC; maxlength 25.",
+      howToTest:"1) Hard-refresh Search (s3.2.87). 2) Baller's Alert — Upload photo from library AND Take photo; cancel picker keeps prior face. 3) Wait for background-removal status; Retry on failure. 4) Move Face zoom / vertical position without re-running Gemini. 5) Company preset WE'RE OUTSIDE LLC shows in full (not truncated). 6) Preview matches LED; red halo flashes around black card. 7) Mark Succeed/Failed.",
+      expected:"Both photo actions work; cutout face under helmet only; halo flashes; company ≤25; preview=LED.",
+      troubleshoot:"Camera-only → Upload must omit capture=. Mask fail → Functions GEMINI_API_KEY + FLOQR_GEMINI_SEGMENTATION_MODEL (default gemini-3.8-flash; 2.5 retired for many new keys). Halo missing → display.css baller-red-halo. Truncated company → maxSubCharacters 25 + letter-spacing."
+    },
+    {
+      id:"s3-2-86-aurelia-venue-search",
+      area:"ShoutOut / Feature landing",
+      feature:"ShoutOut venue search finds Aurelia after fast catalog paint",
+      changed:"s3.2.86 — feature landings load temp QA showcase + use Firestore-merged venue cache so Aurelia brand/name enter the search haystack (fast paint no longer leaves empty temp-democlub stubs).",
+      howToTest:"1) Hard-refresh ShoutOut Choose a venue (s3.2.86). 2) Type Aurelia — card appears (Aurelia Demo Club / temp-democlub-1). 3) Empty search still shows nearest 4 quickly. 4) Mark Succeed/Failed.",
+      expected:"Typing Aurelia matches; list paints fast without waiting on sequential Firestore.",
+      troubleshoot:"No Aurelia → confirm floqr-temp-qa-showcase.js before shared-data on shoutout-search.html; feature-gates getCachedVenue after loadVenueRecord; hard refresh."
+    },
+    {
+      id:"s3-2-85-floqcast-diagnostics-tab",
+      area:"Master Admin / Diagnostics",
+      feature:"Diagnostics → FloqCast connectivity logs tab",
+      changed:"s3.2.85 — new Master Admin Diagnostics subtab FloqCast reads appLogs categories floqCast + legacy suprstar (ICE source, webrtc_status, live_*). Preview/WebRTC write category floqCast.",
+      howToTest:"1) Hard-refresh Master Admin (package s3.2.85). 2) Diagnostics → FloqCast tab visible. 3) Go live once signed in on floqcast-preview; Refresh FloqCast logs — ice_servers / webrtc_status rows appear. 4) Mark Succeed/Failed.",
+      expected:"FloqCast tab lists connectivity rows; STUN-only shows iceSource stun-only or stun-fallback.",
+      troubleshoot:"Empty tab → patron must be signed in (boards cannot write appLogs). Still under Application Logging filter category floqCast/suprstar. ICE missing → floqcast-webrtc.js resolveIceServers FLOQRLog write."
+    },
+    {
+      id:"s3-2-84-baller-face-chip",
+      area:"ShoutOut / Templates",
+      feature:"Baller face on Rewards band + complete chip overlay",
+      changed:"s3.2.84 — face oval covers roman legion + Rewards/Service/Member/Since. Complete EMV chip PNG overlays at original art position. Name/company raised to clear gold strip. Venue search paints immediately.",
+      howToTest:"1) Hard-refresh display s3.2.84. 2) Baller's Alert with portrait — face covers most of warrior + Rewards text; chip sits on top. 3) Name/company clear gold strip. 4) ShoutOut Choose a venue loads quickly. 5) Mark Succeed/Failed.",
+      expected:"Face right on Rewards band; chip over face; fast venue list.",
+      troubleshoot:"Chip missing → images/baller/baller-emv-chip.png + placeBallerChipOverlay. Face left → display.css face % for 2x1/4x3."
+    },
+    {
+      id:"s3-2-83-baller-type-face",
+      area:"ShoutOut / Templates",
+      feature:"Baller name/company same type +50%; face nudge; AMEX→Baller",
+      changed:"s3.2.83 — name and company share emboss font/size (+50%). Face oval −3mm left / +4mm down, +20% size. Bottom gold-strip AMEX replaced with Baller.",
+      howToTest:"1) Hard-refresh display s3.2.83. 2) Black Card with name+company — same gold type size. 3) Alert face sits slightly left/down, larger. 4) Bottom strip reads Baller not AMEX. 5) Mark Succeed/Failed.",
+      expected:"Matched larger type; shifted larger face; Baller bottom mark.",
+      troubleshoot:"Old AMEX → rebuild scripts/build-baller-card-photos.py from express-package PNG. Type size → display-app.js ballerTypeVh."
+    },
+    {
+      id:"s3-2-82-baller-express-package",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Express package art — face under helmet; name/@handle; optional company",
+      changed:"s3.2.82 — base art from express-package/ballers-express-business.png (BALLER'S EXPRESS BUSINESS, Valid Thru 12/50, ornate gold rim). Face-only ellipse under warrior helmet. Name/@handle casing preserved; company optional/blank. Pages only (no Functions deploy required for art/CSS; Gemini prompt update needs Functions if AI bake is used).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.82). 2) Black Card — name José @handle, leave company blank → preview shows gold emboss name only, package heading untouched. 3) Baller's Alert — upload/take face → face sits under helmet (helmet+chip visible). 4) Check led-96x48, led-64x48, led-64x32. 5) Master Admin Aurelia still sees Amex twins with same package art. 6) Mark Succeed/Failed.",
+      expected:"One BALLER'S EXPRESS BUSINESS heading; 12/50; blank company row empty; face under helmet only; preview matches LED.",
+      troubleshoot:"Old Centurion photo art → hard refresh images/baller/* ?v=s3.2.82 + rebuild scripts/build-baller-card-photos.py. Face covers helmet → display.css face ellipse %. Forced ALL CAPS → display-app.js must not toUpperCase baller lines. Company required error → company preset none allowed."
+    },
+    {
+      id:"s3-2-81-baller-face-centurion",
+      area:"ShoutOut / Templates",
+      feature:"Baller's Alert face sits in Centurion medallion; ornate Amex rim; LED 96×48 / 64×48 / 64×32",
+      changed:"Superseded visually by s3-2-82-baller-express-package (package art). Kept for history.",
+      howToTest:"See s3-2-82-baller-express-package.",
+      expected:"Package art on LED with face under helmet.",
+      troubleshoot:"See s3-2-82-baller-express-package."
+    },
+    {
+      id:"s3-2-78-baller-cards",
+      area:"ShoutOut / Templates",
+      feature:"Black Card ($75) + Baller's Alert ($100) — Baller's Express public; Amex Master Admin + Aurelia only",
+      changed:"Public Baller's Express metal-card templates (name source + company presets; Alert requires face photo + optional Gemini medallion). Private Amex twins gated masterAdminOnly + Aurelia. Package s3.2.80 — photoreal Centurion-frame PNGs. Follow-up face placement: s3-2-81-baller-face-centurion.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.81). 2) Throw ShoutOut → Black Card — set name + company → checkout $75. 3) Baller's Alert — upload face → checkout $100; face sits in Centurion medallion. 4) As non-Master Admin at Aurelia, Amex twins must NOT list. 5) As Master Admin at Aurelia, Amex twins list with AMERICAN EXPRESS art. 6) BOT DEE: black card / baller's alert → help. 7) Mark Succeed/Failed.",
+      expected:"Public pair everywhere at $75/$100 with Baller's Express art; Amex only for Master Admin on Aurelia; free create refused by rules.",
+      troubleshoot:"Missing templates → hard refresh shared-data.js ?v=s3.2.81. Wrong price → Functions deploy createFloqrCheckoutSession (BALLER_CARD_PRICE_CENTS). Amex visible to patrons → patron-app masterAdminOnly filter + commerce Amex gate. Face over name → see s3-2-81-baller-face-centurion. Gemini skip OK — medallion still shows original photo."
+    },
+    {
+      id:"s3-2-77-botdee-help-verbiage",
+      area:"BOT DEE",
+      feature:"Help + translations say BOT DEE (not FloqAi)",
+      changed:"Chrome packs, help locale packs, and botdee-help-repository titles/bodies use BOT DEE only. Help links use from=botdee. Legacy floqai kept only as search aliases. Package s3.2.77.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.77). 2) Open ? — title/body say BOT DEE, never FloqAi. 3) Switch UI language (fr/de/ar) — help still BOT DEE. 4) Search FloqAi in BOT DEE still finds help via alias. 5) Mark Succeed/Failed.",
+      expected:"Every visible help string says BOT DEE; FloqAi typing still finds the same help.",
+      troubleshoot:"Old FloqAi copy → hard refresh floqr-i18n.js + floqr-i18n-help.js + botdee-help-repository.js ?v=s3.2.77."
+    },
+    {
+      id:"s3-2-76-botdee-technical-rename",
+      area:"BOT DEE",
+      feature:"Technical ids floqAi → botDee (dual-read)",
+      changed:"Catalog key botDee with floqAi alias; modules botdee-*.js; getBotDeeAccess←getFloqAiAccess; chrome icon botDee; i18n botdee.*; help-botdee-page. Design notes design-notes-botdee-rename.mdc. Package s3.2.76. Needs Pages + Functions deploy for new callable name (alias kept one release).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.76). 2) Master Admin → Features Mgmt → seed if needed → BOT DEE row key botDee. 3) Search tile opens botdee.html; chrome icon loads. 4) Intent cards / chat still work when signed in with access. 5) floqai.html still 404. 6) Mark Succeed/Failed.",
+      expected:"botDee is the live feature key; legacy floqAi grants still work via dual-read; no FloqAi in patron UI.",
+      troubleshoot:"Feature denied after rename → seedFeatureServices (copies floqAi→botDee) or beta features.botDee. getBotDeeAccess 404 → Functions deploy. Old floqai-*.js 404 → hard refresh HTML cache-bust s3.2.76."
+    },
+    {
+      id:"s3-2-75-botdee-no-floqai-html",
+      area:"BOT DEE",
+      feature:"floqai.html removed — botdee.html only",
+      changed:"Deleted floqai.html and floqai-search.html (404, no redirect). Floating agent speech is Hi, I am BOT DEE. Help/labels stay BOT DEE. Technical ids later renamed botDee (s3.2.76). Package s3.2.75 (Pages).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.75+). 2) Open ? — BOT DEE only. 3) https://jadzadco.github.io/shoutout-demo/floqai.html → 404. 4) floqai-search.html → 404. 5) Search tile → botdee.html. 6) Mark Succeed/Failed.",
+      expected:"botdee.html works; floqai*.html 404; no FloqAi in patron-facing copy.",
+      troubleshoot:"floqai.html still loads → Pages not on s3.2.75+ / CDN cache. Still FloqAi speech → hard refresh botdee-search.js. Tile wrong URL → floqr-nav.js + index.html cache-bust."
+    },
+    {
+      id:"s3-2-74-botdee-page-rename",
+      area:"BOT DEE",
+      feature:"botdee.html page + FloqAi→BOT DEE help",
+      changed:"Canonical BOT DEE URL is botdee.html (s3.2.74). s3.2.75 removes legacy floqai.html entirely.",
+      howToTest:"Superseded by s3-2-75-botdee-no-floqai-html — confirm botdee.html and 404 on floqai.html.",
+      expected:"botdee.html is canonical.",
+      troubleshoot:"See s3-2-75-botdee-no-floqai-html."
+    },
+    {
+      id:"s3-2-73-botdee-help-composer",
+      area:"BOT DEE",
+      feature:"? help documents Enter=Send · Shift+Enter newline · chatable mood",
+      changed:"BOT DEE page ? popout adds botdee.helpComposer; help-botdee-page body + all 10 help locale packs + BOT DEE search phrases cover Enter/Shift+Enter and How are you? chat tip. Package s3.2.73 (Pages only).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.73) with floqAi. 2) Open the header ? → body mentions Enter to send, Shift+Enter new line, and chatting like a person / How are you?. 3) Switch UI language (e.g. fr/de) → same facts still present. 4) Mark Succeed/Failed.",
+      expected:"? help states Enter=Send, Shift+Enter=newline, and that mood/how-are-you stays conversational.",
+      troubleshoot:"Old help → hard refresh botdee.html + floqr-i18n.js + floqr-i18n-help.js ?v=s3.2.73. Missing composer paragraph → confirm botdee.helpComposer in chrome pack. BOT DEE search miss → botdee-help-repository.js searchPhrases enter to send."
+    },
+    {
+      id:"s3-2-72-botdee-enter-mood",
+      area:"BOT DEE",
+      feature:"Enter sends · Shift+Enter newline · how-are-you stays chat",
+      changed:"Composer Enter = Send (Shift+Enter = new line). Mood/how-are-you gets a friendly reply (not search / not bare still-here). Gemini systemInstruction pushes chat-first. Package s3.2.72. Functions deploy executeBotSession for server path.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.73) with floqAi. 2) Type How are you? and press Enter (not the Send button) → message sends; reply thanks for asking / doing great — NOT Here is what I found. 3) Type a longer note, Shift+Enter for a second line, then Enter to send. 4) Mid-chat hey → Hey — still here. 5) Mark Succeed/Failed.",
+      expected:"Enter submits; Shift+Enter inserts a newline; how-are-you is conversational with no search dump.",
+      troubleshoot:"Enter still newlines → hard refresh bot-dee-chat.js ?v=s3.2.73. Mood still search → Functions deploy executeBotSession (isMoodPrompt/moodReply). Client-only mood works without redeploy for exact how-are-you prompts."
+    },
+    {
+      id:"s3-2-71-classic-halloween",
+      area:"ShoutOut / Templates",
+      feature:"Classic Halloween seasonal template ($15) + LED finale",
+      changed:"New packaged template classicHalloween: classic 3-line board + emoji, moonlit graveyard SVG, FLOQRFrameLoop halloween-finale (ghosts/Reaper/bats), all venues + all LED sizes, server price 1500¢, firestore.rules blocks free direct create. Package s3.2.71. Needs Pages + firestore.rules + commerce Functions deploy.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (s3.2.71). 2) Throw a ShoutOut → Seasonal → Classic Halloween (all venues). 3) Composer shows graveyard art; emoji OK on lines. 4) Checkout total $15.00 (not free). 5) After pay/approve, open display.html?location=<id> (no ?v=) — 3 board phases then ghost/Reaper/bat finale (~6s each). 6) BOT DEE / BOT DEE: classic halloween → help-classic-halloween. 7) Mark Succeed/Failed in Diagnostics → Manual Feature Tests.",
+      expected:"Template listed under Seasonal everywhere; $15 Stripe; LED plays board then finale; free client create of classicHalloween refused by rules.",
+      troubleshoot:"Missing template → hard refresh shared-data.js ?v=s3.2.71. Wrong price → Functions deploy createFloqrCheckoutSession (CLASSIC_HALLOWEEN_PRICE_CENTS). Blank art → SVG XML valid on Pages images/halloween/. No finale → display-app.js + display.css cache-bust; FLOQRFrameLoop.cycle halloween-finale. Free create succeeds → firestore.rules deploy (classicHalloween exclusion)."
+    },
+    {
+      id:"s3-2-70-botdee-idle-resume",
+      area:"BOT DEE",
+      feature:"Offer-help once + idle end (~60s) + Master Admin idle setting",
+      changed:"Mid-chat cool/ok/thanks → short Cool./You're welcome. (no product pitch). Offer-help only on welcome and after idle resume. Idle timer (default 60s, botDeeSettings/default) ends the chat. Master Admin → Features Mgmt → BOT DEE sets conversationIdleSeconds via setBotDeeSettings (SOS2FA + reason). Package s3.2.70.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.70) with floqAi. 2) Welcome asks how it can help once. 3) Say cool → Cool. only — no Want to keep going / product list. 4) Say hey mid-chat → Hey — still here. 5) Wait ~60s idle → pause message; next hi gets Welcome back + offer-help. 6) Master Admin → Features Mgmt → BOT DEE → set idle seconds → Save with reason (SOS2FA).",
+      expected:"No repetitive offer-help mid-chat; idle ends conversation; resume asks once; Master Admin can change idle seconds.",
+      troubleshoot:"Still repeating pitch → hard refresh bot-dee-chat.js ?v=s3.2.70. Idle never ends → check botDeeSettings/default read + console. Save fails → Functions deploy setBotDeeSettings + SOS2FA unlock. Panel missing → master-admin.html #featuresBotDee."
+    },
+    {
+      id:"s3-2-69-botdee-cool-ack",
+      area:"BOT DEE",
+      feature:"Acknowledgments (cool / ok / thanks) stay conversational",
+      changed:"isAckPrompt + ackReply — mid-chat cool/ok/thanks get a short continue reply, not a Hey BOT DEE restart and not search. Client mirror in bot-dee-chat.js; Gemini systemInstruction forbids tools on acks. Softened further in s3.2.70 (no product pitch on ack).",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.2.70) signed in with floqAi. 2) Say hello. 3) Say cool → Cool. — NOT Here is what I found and NOT Hey — BOT DEE here. 4) Say thanks → You're welcome.",
+      expected:"cool stays chat mode; short ack; no search dump; no full re-intro.",
+      troubleshoot:"Still greeting restart → hard refresh bot-dee-chat.js ?v=s3.2.70. Still search → Functions deploy executeBotSession (bot-dee-core isAckPrompt). Old Pages cache → confirm botdee.html script ?v=."
+    },
+    {
+      id:"s3-2-68-shoko-vip-nye",
+      area:"VIP reserV / Events",
+      feature:"Shôko Barcelona VIP floor plan + NYE'27 event-only table prices",
+      changed:"vip-plans/shoko-barcelona.json (68 bookable + DJ); nightPricing 2026-12-31 EUR flyer list; standard (non-NYE) = NYE÷4; deposit 25% of standard (regular) / 50% of NYE list (NYE). Event shoko-nye-2027. Package s3.2.68. Functions deploy required for live holds/prices.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html?location=shoko-barcelona-spain (s3.2.68) with vipReservations access. 2) Map shows Terraza / Lounge / SUPER VIP / KAI ZEN / LA SUÏTE. 3) Non-NYE night: SUPER VIP minimum 5.000€, pay today 1.250€ (25%). 4) Night 2026-12-31: SUPER VIP minimum 20.000€, pay today 10.000€ (50%). 5) Search/events lists NYE'27. 6) BOT DEE: Aurelia still resolves.",
+      expected:"Regular nights use standard = NYE/4 with 25% deposit; NYE uses flyer list with 50% deposit; both EUR; Aurelia still resolves.",
+      troubleshoot:"Blank map → vip-plans/shoko-barcelona.json + PNG on Pages. Wrong deposit % → Functions deploy vip-functions/vip-beta-catalog. No NYE night → extraNights merge deploy. Aurelia not found → executeBotSession resolveClubLocationId on us-central1."
+    },
+      {
+        id:"s3-2-67-botdee-gemini-name",
+        area:"BOT DEE",
+        feature:"Gemini answers name pronunciation (not search dump)",
+        changed:"Root cause: Gemini 400 when AUTO + allowedFunctionNames — every non-greeting silently fell back to contextualSearch (Here is what I found…). Fixed toolConfig; identity prompts (how is your name pronounced) answered locally as BOT DEE. Functions redeploy required. Package s3.2.67.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.67) signed in with floqAi. 2) Ask how is your name pronounced? → BOT DEE explains bot + dee — NOT Here is what I found for your account. 3) Ask throw a shoutout → still product help. 4) Mark Succeed/Failed.",
+        expected:"Identity/name questions get a conversational BOT DEE reply; product how-tos still search/tool.",
+        troubleshoot:"Still search dump → confirm Functions executeBotSession redeployed from main with GEMINI_API_KEY secret; check Cloud Logs for botdee.session provider=gemini (not local-fallback). Client-only identity path works without redeploy for the exact name prompt."
+      },
+      {
+        id:"s3-2-67-help-popout-viewport",
+        area:"Help / BOT DEE",
+        feature:"Help ? panels stay fully in view (PC + mobile)",
+        changed:"help-popout-body max-width + overflow-wrap; helper-popouts fitHelpPopoutInViewport flips left/right and nudges on screen. BOT DEE header ? opens leftward. Package s3.2.67.",
+        howToTest:"1) Hard-refresh botdee.html (package s3.2.67) on PC and phone. 2) Tap ? next to BOT DEE. 3) Full help intro + scope text visible — no letters cut off at the right edge. 4) Spot-check another page with a right-side ?. 5) Mark Succeed/Failed.",
+        expected:"Entire help verbiage readable inside the viewport.",
+        troubleshoot:"Still clipped → hard refresh styles.css + helper-popouts.js + bot-dee-chat.css (s3.2.67). Parent overflow:hidden → check botdee-shell overflow:visible."
+      },
+      {
+        id:"s3-2-67-botdee-robot-avatar",
+        area:"BOT DEE",
+        feature:"Robot-head avatar on bot chat bubbles",
+        changed:"Bot bubbles use images/botdee-chat-avatar.png (cyan-eye robot head) + speech tip. Not the full Site-chrome BOT DEE JPG. Package s3.2.67.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.67) signed in with floqAi access. 2) Welcome / reply bubbles show the small robot-head mark (antenna + cyan eyes + headphone cups) left of the text with a speech-origin tip — not the nightlife chrome square pack. 3) Header icon may still be Site chrome. 4) Mark Succeed/Failed.",
+        expected:"Bubble origin = robot-head avatar; tip points at it.",
+        troubleshoot:"Still full chrome face in bubbles → hard refresh bot-dee-chat.js + botdee-chat-avatar.png (s3.2.67). 404 on avatar → confirm images/botdee-chat-avatar.png on Pages main."
+      },
+      {
+        id:"s3-2-66-botdee-bubble-avatar",
+        area:"BOT DEE",
+        feature:"Bot bubble avatar + speech tip (superseded by s3.2.67 robot head)",
+        changed:"s3.2.66 added bubble avatar + .botdee-bubble-tail. s3.2.67 swaps avatar to robot-head PNG.",
+        howToTest:"Prefer s3-2-67-botdee-robot-avatar. Confirm tip still present on bot bubbles.",
+        expected:"Speech tip on bot bubbles.",
+        troubleshoot:"No tip → hard refresh bot-dee-chat.css (s3.2.67)."
+      },
+      {
+        id:"s3-2-65-botdee-welcome",
+        area:"BOT DEE",
+        feature:"Welcome — How can I help you?",
+        changed:"botdee.chatWelcome is now Hi, I am BOT DEE. How can I help you? (all langs). Package s3.2.65.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.65). 2) Opening bubble is Hi, I am BOT DEE. How can I help you? — no Quick intent search line in the greeting. 3) Mark Succeed/Failed.",
+        expected:"Short welcome only.",
+        troubleshoot:"Old long greeting → hard refresh floqr-i18n.js + bot-dee-chat.js (s3.2.65)."
+      },
+      {
+        id:"s3-2-64-botdee-hello-chitchat",
+        area:"BOT DEE",
+        feature:"Hello greets like a chatbot (not a search miss)",
+        changed:"bot-dee-chat.js answers greetings locally before executeBotSession; server isChitchatPrompt widened (hello / hello how are you). Package s3.2.64. Functions deploy still needed for server path parity.",
+        howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (package s3.2.64) signed in with floqAi access. 2) Type hello (or Hi / Hey) → BOT DEE replies Hey — BOT DEE here… (not a clear-match / search-miss message). 3) Type throw a shoutout → product help / results (search path still works). 4) Mark Succeed/Failed.",
+        expected:"Greetings get a conversational reply; how-to questions still search/tool.",
+        troubleshoot:"Still search-miss on hello → hard refresh bot-dee-chat.js (s3.2.64) on botdee.html; confirm you are on botdee.html chat, not the Search hub venue lens. Server-only path still miss → deploy Functions from origin/main (executeBotSession + bot-dee-core chitchat)."
+      },
+      {
+        id:"s3-2-63-settings-square-chrome",
+        area:"Site chrome / Search",
+        feature:"Settings icon rounded-square (matches FloqCast/VIP) + Search tile CSS",
+        changed:"Settings chrome JPGs rebuilt as rounded-square (no circular ring) for all 6 Site chromes. Search tile CSS border-radius 50% → 8.6% (SQ_CORNER/S) so square rings are not circular-cropped. ICON_V / package s3.2.63.",
+        howToTest:"1) Hard-refresh Search (package s3.2.63) https://jadzadco.github.io/shoutout-demo/ — Settings tile matches FloqCast/VIP as a rounded square (same corner radius; no circular ring). 2) Appearance → cycle all 6 chromes — Settings updates with each. 3) FloqCast F tip and other square marks still intact (CSS no longer clips). 4) Mark Succeed/Failed.",
+        expected:"Settings and every feature face share rounded-square chrome; circular crop gone.",
+        troubleshoot:"Settings still round → hard refresh styles.css + images/chrome/settings-nightlife.jpg (ICON_V s3.2.63). Square corners clipped → confirm styles.css uses border-radius:8.6% on icon-face/tile-mark (not 50%). Stale art → check settings-*.jpg file dates vs s3.2.63."
+      },
+      {
+        id:"s3-2-62-square-chrome-icons",
+        area:"Site chrome / Search",
+        feature:"Rounded-square feature icons (FloqCast F + BOT DEE B tips complete)",
+        changed:"Search/product feature marks are rounded-square for all 6 Site chromes (FloqCast, ShoutOut, VIP ReserV, BOT DEE, BartR, RydR). FloqCast F and BOT DEE B tips regenerated inside square safe inset (no circular crop/ring clip). VIP seats-removed lounge. ShoutOut traditional/WB tiffany OUT. Settings later squared in s3.2.63. ICON_V s3.2.62.",
+        howToTest:"1) Hard-refresh Search (package s3.2.62) https://jadzadco.github.io/shoutout-demo/ — tiles are rounded squares (not circles). 2) FloqCast: leading F top-left tip complete (not flat-cut). 3) BOT DEE: B tip + antenna complete. 4) Appearance → cycle Nightlife / Traditional / White-Black / Black Tiffany / Purple & White / Black & Dark Green — each feature face updates. 5) ShoutOut Traditional + White/Black: OUT is tiffany. 6) VIP lounge has no dining seats. 7) Mark Succeed/Failed.",
+        expected:"All six chromes show square feature icons; FloqCast F and BOT DEE B tips intact.",
+        troubleshoot:"Still round → hard refresh floqr-chrome-scheme.js (asset cache-bust s3.2.62) + images/chrome/floqcast-nightlife.jpg (and peers). F tip cut → confirm square pack nightlife JPG not old round file; ICON_V must be s3.2.62. Wrong chrome face → check BLACK_TIFFANY_ICONS / PURPLE_WHITE_ICONS full packs (not nightlife Object.assign leftovers)."
+      },
+      {
+        id:"s3-2-61-chrome-live-profile-card",
+        area:"Site chrome / Profile menu",
+        feature:"Live chrome after Appearance + login chrome after logout + profile card closes on nav",
+        changed:"floqr-chrome-scheme syncFromStorage on storage/BroadcastChannel/pageshow/focus/visibility + floqr:auth-signed-out. Search/global profile menus close on in-card link, showPage, pageshow, popstate; refuse empty slim open until content rendered. Package s3.2.61.",
+        howToTest:"1) Hard-refresh Search s3.2.61 signed in with Site chrome beta. 2) Appearance → pick a non-Nightlife chrome → Back to Search (no hard refresh) — tiles/logos match new chrome. 3) Sign out — login/welcome shows same chrome without F5. 4) Sign in → open profile card → tap My Profile / Inbox / a feature link — card closes as destination opens. 5) Return to Search — card must be closed; reopen shows full menu text (not empty slim box). 6) Mark Succeed/Failed.",
+        expected:"Chrome updates without manual refresh; logout login matches selection; profile card never sticks open or opens empty.",
+        troubleshoot:"Stale chrome → confirm floqr-chrome-scheme.js?v=s3.2.61 has syncFromStorage/bindLiveSync; bfcache needs pageshow. Login Nightlife after logout → floqr:auth-signed-out + syncFromStorage({force:true}) in patron-app updateLoginUI. Empty slim card → global-profile-status menuReady / patron-app userDropdownHasContent; close on .profile-menu-link before navigate."
+      },
+      {
+        id:"s3-2-60-botdee-verbiage",
+        area:"BOT DEE / floqCast",
+        feature:"BOT DEE verbiage (not BOT DEE) + Go live, start a cast",
+        changed:"Patron-facing BOT DEE labels are BOT DEE. FloqCast CTA “Go live, start a cast”. Package s3.2.60.",
+        howToTest:"1) Hard-refresh Search — tile is BOT DEE. 2) Open chat — welcome BOT DEE. 3) Send Hey — greeting, no hits. 4) floqCast — Go live, start a cast. 5) Mark Succeed/Failed.",
+        expected:"Patron chrome says BOT DEE; FloqCast CTA matches.",
+        troubleshoot:"Still BOT DEE → hard refresh floqr-i18n.js + botdee.html + bot-dee-chat.js."
+      },
+      {
+        id:"s3-2-59-botdee-brand-golive-cast",
+        area:"BOT DEE / floqCast",
+        feature:"BOT DEE verbiage + Go live, start a cast CTA",
+        changed:"Patron-facing BOT DEE labels are BOT DEE (chat title, welcome, Search tile, help). FloqCast venue CTA is “Go live, start a cast” (all langs). Package s3.2.59+; technical ids stay floqAi.",
+        howToTest:"1) Hard-refresh Search — tile aria/label is BOT DEE. 2) Open chat page — title + welcome + placeholder say BOT DEE (not BOT DEE). 3) Send Hey — BOT DEE greets, no hit list. 4) floqCast search — venue button reads Go live, start a cast. 5) Mark Succeed/Failed.",
+        expected:"Patron chrome says BOT DEE; FloqCast CTA grammar matches; Hey stays conversational.",
+        troubleshoot:"Still BOT DEE → hard refresh floqr-i18n.js + botdee.html + bot-dee-chat.js. Old CTA → floqcast-search.js + i18n goLiveCta. Hey hits → Functions deploy executeBotSession."
+      },
+      {
+        id:"s3-2-58-botdee-chitchat-not-hits",
+        area:"BOT DEE",
+        feature:"BOT DEE greets like a chatbot (Hey ≠ search hits)",
+        changed:"executeBotSession short-circuits greetings/small talk (hi/hey/thanks) to a conversational reply with zero contextualSearch results. Search token match is word-boundary (hey≠they); min score 3. Functions deploy bot-dee-core + bot-dee-functions.",
+        howToTest:"1) Open BOT DEE (botdee.html) signed in. 2) Send Hey (or Hi). 3) Expect a short friendly reply asking what you want to do — NOT \"Here is what I found for your account\" with Club Admin / SMS hits. 4) Then ask \"throw a shoutout\" — still get helpful product/how-to answer. 5) Mark Succeed/Failed.",
+        expected:"Hey → chat greeting; real intents still searchable; no hit-list dump for small talk.",
+        troubleshoot:"Still hit list → Functions deploy executeBotSession (bot-dee-functions + bot-dee-core) not Pages-only; confirm provider local-chitchat in function logs for Hey. Gemini path should not run for isChitchatPrompt."
+      },
+      {
+        id:"s3-2-58-bdg-icons-tings-green",
+        area:"Site chrome / Search",
+        feature:"Black & Dark Green icons match Settings tings green + Search order live",
+        changed:"Black & Dark Green Search tiles (ShoutOut/BOT DEE/VIP/floqCast/BartR/RydR) recolored to Settings \"tings\" fill #5ac783 (companion #2e8a5a). CSS --accent=#5ac783. Full BLACK_DARK_GREEN_ICONS pack (not nightlife leftovers). Search order 1–5 ships on main. Package s3.2.58.",
+        howToTest:"1) Hard-refresh Search s3.2.58 — order left-to-right: ShoutOut, BOT DEE, VIP, Settings, floqCast. 2) Appearance → Black & Dark Green — tile greens match Settings wordmark \"tings\" (bright #5ac783, not old forest #2d8a5a). 3) Spot-check VIP/floqCast/BOT DEE faces. 4) Mark Succeed/Failed.",
+        expected:"Icon order correct; BDG tiles use Settings tings green; Settings tile unchanged as source.",
+        troubleshoot:"Old green → hard refresh floqr-chrome-scheme.js + images/chrome/*-blackdarkgreen.* + styles.css?v=s3.2.58. Nightlife faces on BDG → ICON_PACK blackDarkGreen must list *-blackdarkgreen paths. Wrong order → confirm index.html spot comment + card ids; Pages deploy of main."
+      },
+      {
+        id:"s3-2-57-page-title-appearance",
+        area:"Profile / Feature landings",
+        feature:"floqr-page-title schema = Appearance h2 size",
+        changed:"Shared .floqr-page-title / .floqr-page-title-row for Profile & Settings and feature search landings. Title text inherits --floqr-page-title-size (= Appearance h2). One line; ? stays badge-sized. Package s3.2.57.",
+        howToTest:"1) Hard-refresh Profile & Settings s3.2.57 — title one line, same size as Appearance heading in that panel. 2) Open Appearance tab and compare side-by-side. 3) Open floqCast / ShoutOut / VIP search — titles use same size. 4) Mark Succeed/Failed.",
+        expected:"Profile & Settings title text matches Appearance; feature search titles match; no oversized marketing h1.",
+        troubleshoot:"Still large → hard refresh styles.css + admin.css + floqr-feature-landing.css?v=s3.2.57; confirm --floqr-page-title-size and class floqr-page-title on the h1."
+      },
+      {
+        id:"s3-2-56-wb-profile-title-size",
+        area:"Site chrome / Profile / Feature landings",
+        feature:"White/Black profile card + Appearance-sized titles",
+        changed:"WB profile chip is white with shiny black initials (no charcoal override). Other chromes keep accent-tuned cards. Profile & Settings + floqCast/ShoutOut/VIP feature search titles use --floqr-title-size (same as Appearance h2) and stay one line. Package s3.2.56.",
+        howToTest:"1) Hard-refresh Search s3.2.56 with White/Black chrome — profile chip top-right is white, initials shiny black (not white-on-black). 2) Open Profile & Settings — title is one line, same size as Appearance heading. 3) Open floqCast / ShoutOut / VIP search landings — title size matches Appearance. 4) Spot-check Nightlife/Traditional/Tiffany profile chips still charcoal/accent. 5) Mark Succeed/Failed.",
+        expected:"WB chip white + black initials; Profile & Settings one line; feature landing titles match Appearance.",
+        troubleshoot:"Still charcoal on WB → hard refresh styles.css s3.2.56; confirm html[data-floqr-chrome=whiteBlack] and no charcoal rule listing whiteBlack. Title wraps → admin.css nowrap + --floqr-title-size; feature landings need floqr-feature-landing.css?v=s3.2.56."
+      },
+      {
+        id:"s3-2-55-search-order-vip-collector",
+        area:"Search / BOT DEE / VIP",
+        feature:"Search icon order + BOT DEE VIP pay follows venue collector",
+        changed:"Search spots: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast. createVipCheckout branches clubPos (Toast/SpotOn confirm, no Stripe URL) / no-deposit confirm / floqrStripe|clubStripe checkoutUrl — same as vip-terms. floqAi packaged Beta enabled. Package s3.2.55 + full Functions deploy.",
+        howToTest:"1) Hard-refresh Search s3.2.55 — left-to-right: ShoutOut, BOT DEE, VIP (if gated on), Settings, floqCast (if gated on). 2) Settings → Appearance. 3) BOT DEE: for a clubPos venue after hold+consent, tool should confirm for POS (passHref / message) not invent Stripe checkoutUrl; Aurelia floqrStripe may still return checkoutUrl. 4) Mark Succeed/Failed.",
+        expected:"Icon order matches; VIP pay path matches venue collector; no card entry in chat; floqAi Beta tile visible to testers.",
+        troubleshoot:"Wrong order → hard refresh index.html s3.2.55. BOT DEE gated → featureServices/floqAi IsFeatureEnabled=1 + IsTestFeature=1 (already Beta live). Stripe on Toast venue → Functions deploy bot-dee-tools + vip-pos runConfirmVipReservationForClubPos; check hold.paymentCollector."
+      },
+      {
+        id:"s3-2-54-bot-dee-tools-settings",
+        area:"BOT DEE / Search",
+        feature:"BOT DEE VIP/ShoutOut/FloqCAST tools + Search Settings → Appearance",
+        changed:"executeBotSession tools wrap createVipHold/consent/checkout, ShoutOut checkout, FloqCAST request/checkout (role re-validated). Search adds Settings chrome tile for all schemes; opens Profile Appearance. Package s3.2.54 + Functions deploy.",
+        howToTest:"1) Hard-refresh Search s3.2.54 — Settings tile appears after BOT DEE; icon swaps with Site chrome. 2) Tap Settings → My Profile opens on Appearance tab. 3) Open BOT DEE chat (floqAi granted) — ask for VIP/ShoutOut/floqCast help; tool replies may include checkout/preview links (no card entry in chat). 4) Confirm Manual Feature Test row Succeed/Failed.",
+        expected:"Settings → Appearance; BOT DEE can start hold/consent/checkout flows via tools; Stripe URLs only (no PAN in chat).",
+        troubleshoot:"No Settings tile → hard refresh index.html + floqr-chrome-scheme.js + settings-*.jpg. Wrong tab → href must include tab=appearance. Tool errors → Functions deploy executeBotSession with GEMINI_API_KEY + STRIPE_SECRET_KEY; feature gates shoutOut/vipReservations/floqCast."
+      },
+      {
+        id:"s3-2-53-bot-dee-phase1-chat",
+        area:"BOT DEE / BOT DEE",
+        feature:"BOT DEE Phase 1 — chat shell + executeBotSession contextualSearch",
+        changed:"botdee.html is a chrome chat window (left BOT DEE icon, compact Back, transcript + Send) wired to executeBotSession. Phase 1 tool: classification-gated contextualSearch. Quick intent search stays a collapsible fast path. Package s3.2.53. Requires Functions deploy of executeBotSession + GEMINI_API_KEY for Gemini replies (local search fallback without Gemini).",
+        howToTest:"1) Hard-refresh Search tile BOT DEE → botdee.html (package s3.2.53) while signed in with floqAi access. 2) Confirm chat header icon + Back left; type “throw a shoutout” and Send. 3) Expect a BOT DEE reply and/or result links filtered to your role. 4) Open Quick intent search — cards still appear for the same query. 5) Sign out / no floqAi grant → feature not-available or chat sign-in error, not a silent bounce to Event search.",
+        expected:"Chat UI primary; intent fallback works; answers respect classification; no VIP/pay tools yet.",
+        troubleshoot:"No chat UI → hard refresh botdee.html + bot-dee-chat.js?v=s3.2.53. Callable missing → deploy Functions executeBotSession. Gemini errors but links appear → local contextualSearch fallback OK. Empty results for patron-only topics while Master Admin → check roleFactsFor / botdee-content-classes."
+      },
+      {
+        id:"s3-2-52-wb-active-tiffany-back",
+        area:"Site chrome / Profile",
+        feature:"White/Black active tabs Tiffany border + compact left Back",
+        changed:"WB active admin-tabs/buttons: white fill, shiny black text, thin Tiffany (#00d4fe) border — never grey fill. Global Back is small left-justified site-wide (excluded from mobile buttonlike width:100%). Package s3.2.52.",
+        howToTest:"1) Hard-refresh Profile & Settings (package s3.2.52) with White/Black chrome. 2) Open Appearance: active tab readable (white + Tiffany border, black text). 3) Confirm < Back is a small chip on the LEFT, not full-width. 4) Spot-check floqCast / VIP landing Back chips.",
+        expected:"Active Appearance tab text visible; Back compact left; WB button chrome consistent.",
+        troubleshoot:"Grey active tab → hard refresh styles.css and admin.css cache-bust for s3.2.52. Full-width Back → confirm .global-back-btn has width:auto!important and mobile .buttonlike excludes .global-back-btn."
+      },
+      {
+        id:"s3-2-51-feature-landing-chrome",
+        area:"Feature landings / Site chrome",
+        feature:"floqCast / ShoutOut / VIP landings honor selected Site chrome",
+        changed:"Early-paint data-floqr-chrome on feature landings; floqr-feature-landing.css body washes per scheme; removed Nightlife !important lock from floqcast-search.css + vip.css. Package s3.2.51.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.51. 2) Appearance → White / Black. 3) Open floqCast tile → floqcast-search.html: page background white (not NL purple/navy), WB floqCast icon, dark title. 4) Repeat for shoutout-search.html and vip.html. 5) Switch Nightlife — landings show NL wash again.",
+        expected:"Feature landing body + icons match the active Site chrome on all three product search pages.",
+        troubleshoot:"Still NL purple on WB → hard refresh floqr-feature-landing.css?v=s3.2.51; confirm early-paint script in landing HTML; floqcast-search.css must not set Nightlife body !important."
+      },
+      {
+        id:"s3-2-50-floqcast-wb-image2-props",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — Image-2 ring + full-width text proportions",
+        changed:"WB floqcast-whiteblack.png uses Nightlife Image-2 geometry: place_floqcast_q_kiss full-width wordmark (~875), ring R=490 stroke~6, under→ring→over, tip halo. No chord-fit shrink. Package s3.2.50.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.50. 2) Language Settings → White / Black. 3) Compare floqCast WB tile to Nightlife: same text/ring proportions (full-width FloqCAST under the arc), WB colors only. 4) Wordmark not tiny/chord-shrunk inside the circle.",
+        expected:"WB matches Image-2 layout scale; dark ink + Tiffany T on white with chrome ring.",
+        troubleshoot:"Text still tiny → hard refresh floqcast-whiteblack.png?v=s3.2.50; rebuild must call place_floqcast_q_kiss without chord-fit. Nightlife wrong → only WB builder changed."
+      },
+      {
+        id:"s3-2-49-floqcast-wb-ring-halo",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — peer ring + F/L/T tip halo",
+        changed:"Reinstate in-asset chrome ring at peer R=490. Build order: white circle (no border) → cast graphic → FloqCAST type → ring → F/L/T tip kiss + soft halo. Package s3.2.49.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.49. 2) Language Settings → White / Black. 3) floqCast tile ring matches BOT DEE circle size. 4) F / L / T tips kiss the ring with a soft halo outside — not mid-letter notches. 5) Nightlife neon ring unchanged.",
+        expected:"WB floqCast has peer-sized in-asset ring; F/L/T tips sit on/over the stroke with tip halo.",
+        troubleshoot:"No ring → hard refresh floqcast-whiteblack.png?v=s3.2.49. Ring cuts mid-letter → rebuild --floqcast-wb-only (raise + tip kiss). Ring size ≠ BOT DEE → confirm R=490 stroke."
+      },
+      {
+        id:"s3-2-48-floqcast-wb-no-double-ring",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black — no second ring cutting Fl/T",
+        changed:"WB floqcast-whiteblack.png no longer draws an in-asset ring (Search CSS border-radius:50% is the only circle). Graphic ring-annulus leftovers stripped; full body wordmark stamped last; inset keeps Fl/T inside CSS circle. Package s3.2.48.",
+        howToTest:"1) Hard-refresh Search ?v=s3.2.48. 2) Language Settings → White / Black. 3) Zoom floqCast tile: FloqCAS + cyan T are solid — no thin grey ring notching F or T. 4) Nightlife chrome still has its neon ring (unchanged).",
+        expected:"One circular crop (CSS). Fl and T tips solid, not sliced by an inner ring.",
+        troubleshoot:"Still see inner ring through F/T → hard refresh floqcast-whiteblack.png?v=s3.2.48; rebuild scripts/build-chrome-icons.py --floqcast-wb-only. Nightlife wrongly lost ring → only WB builder changed."
+      },
+      {
+        id:"s3-2-47-floqcast-wb-white-ink",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black = Image-2 on white (matches peer WB tiles)",
+        changed:"Rebuild floqcast-whiteblack.png as white-field Image-2 silhouette + dark ink + Tiffany T (same language as ShoutOut/BOT DEE WB). Not Nightlife neon on WB. Package s3.2.47.",
+        howToTest:"1) Hard-refresh Search floqr-chrome-scheme.js?v=s3.2.47. 2) Language Settings → White / Black. 3) floqCast tile: white disc, black phone→LED silhouette, FloqCAS black + cyan T — same chrome language as ShoutOut/BOT DEE. 4) Nightlife chrome still shows neon Image-2.",
+        expected:"WB Search floqCast is black-on-white Image-2, not neon Nightlife and not muddy grey.",
+        troubleshoot:"Still neon black disc → hard refresh; confirm src floqcast-whiteblack.png s3.2.47. Still grey mud → rebuild via scripts/build-chrome-icons.py --floqcast-wb-only."
+      },
+      {
+        id:"s3-2-46-floqcast-wb-svg-tile",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST White/Black Search tile matches Image-2 SVG",
+        changed:"White/Black floqCast no longer uses muddy grey convert. ICON_PACK whiteBlack.floqCast → floqcast-whiteblack.png (same Image-2 nightlife assemble as the review SVG). Package s3.2.46.",
+        howToTest:"1) Hard-refresh Search floqr-chrome-scheme.js?v=s3.2.46. 2) Language Settings → White / Black. 3) floqCast tile shows neon Image-2 mark (pink smoke, Tiffany T, neon ring) — same as Nightlife / SVG — not grey mud. 4) Compare to icon-review-floqcast-botdee-nf.html White/Black.",
+        expected:"WB Search floqCast matches the SVG/Nightlife FloqCAST mark; sharp at tile size.",
+        troubleshoot:"Still grey → hard refresh floqr-chrome-scheme.js s3.2.46; confirm img src is floqcast-whiteblack.png not old jpg grey convert."
+      },
+      {
+        id:"s3-2-45-floqcast-image2-chrome",
+        area:"Search / Chrome icons",
+        feature:"FloqCAST Image 2 (V4) nightlife + traditional + whiteblack in production",
+        changed:"Rebuilt FloqCAST chrome from V4 layers (FloqCAST + Tiffany T). Production: floqcast-nightlife.jpg / traditional.jpg / traditional-green.png / whiteblack.jpg. Review SVGs embed the same JPEGs (floqcast-icon-nightlife|traditional|whiteblack.svg). ICON_V s3.2.45. Display2 idle still FLOQCAST_LOGO → nightlife JPG.",
+        howToTest:"1) Hard-refresh Search with floqr-chrome-scheme.js?v=s3.2.45 + botdee-search.css?v=s3.2.45. 2) floqCast tile shows full FloqCAST mark (capital F, Tiffany T, phone→LED). 3) On a wide desktop window: Search bar is centered under the FloqR logo (not left-stuck). 4) Open icon-review-floqcast-botdee-nf.html — Nightlife JPG and SVG match; Traditional + White/Black siblings match. 5) Language Settings → Traditional / White-Black: floqCast tile swaps. 6) display2.html?location=temp-democlub-1 idle shows same nightlife mark (no ?v=).",
+        expected:"Search + landing + Display2 idle all show Image 2 FloqCAST; desktop Search bar centered under FloqR; scheme swaps load matching traditional/whiteblack chrome.",
+        troubleshoot:"Old monitor-style v9 mark → hard refresh floqr-chrome-scheme.js s3.2.45 + floqcast-nightlife.jpg. Search bar still left → hard refresh botdee-search.css s3.2.45 (must have margin:0 auto 18px on .category-botdee-search). SVG ≠ JPG → re-embed from chrome JPGs. Display2 stale → Xibo layout cache / hard refresh display-app.js (never add ?v= on Display URL)."
+      },
+      {
+        id:"s3-2-44-feature-landing-standard",
+        area:"Search / Feature landings",
+        feature:"Standardized ShoutOut / VIP / floqCast venue landings",
+        changed:"Shared FLOQRFeatureLanding: product chrome icon (no FloqR), Choose a venue, GPS nearest 4 cards with feature-specific facts. ShoutOut → shoutout-search.html; VIP + floqCast wired the same. General Search listing uses fact cards + top-4 when empty. Package s3.2.44.",
+        howToTest:"1) Hard-refresh Search (?v=s3.2.44). 2) Tap ShoutOut tile → shoutout-search: product icon only, 4 nearest cards with Displays + Patron ShoutOuts. 3) Tap VIP → same chrome pattern + open/deposit/dress/age facts. 4) Tap floqCast → screen + sound facts. 5) Empty club Search on hub shows 4 nearest general fact cards. Allow location when prompted.",
+        expected:"All three feature landings match: no FloqR logo, Search/Choose a venue, ~4 GPS cards, feature facts visible; Select venue continues each flow.",
+        troubleshoot:"Still FloqR on landing → hard refresh floqr-feature-landing.css + page HTML s3.2.44. Full alphabet list → empty the search box (typed query shows all matches). Missing facts → check club seed fields (VenueSupports*, agePolicy, dressCode, vipSettings)."
+      },
+      {
+        id:"s3-2-43-google-signin-popup-first",
+        area:"Auth / Welcome",
+        feature:"Google sign-in popup-first (fix mobile redirect ITP)",
+        changed:"Reverted s3.2.35 mobile redirect-first. Welcome + My Profile Google use signInWithPopup from the user tap on every device. Redirect only if popup-blocked. Failed redirect sets floqr.authPreferPopup and tells patron to allow popup or use Email/SMS OTP. Fixes 'Google full-page sign-in did not finish' on iPhone + GitHub Pages. Package s3.2.43.",
+        howToTest:"1) Hard-refresh Welcome on iPhone Safari (?v=s3.2.43). Clear site data for jadzadco.github.io if a prior failed redirect left sessionStorage. 2) Tap Continue with Google — Google account UI should open (popup / sheet from the tap), not immediately full-page redirect. 3) Finish → Search signed in. 4) If browser blocks popup: allow popups for jadzadco.github.io and retry, or use Email OTP. 5) Desktop Chrome popup still works; cancel stays retryable.",
+        expected:"No 'full-page sign-in did not finish' after a normal Google complete; phone signs in via popup from the tap.",
+        troubleshoot:"Still full-page did not finish → hard refresh patron-app.js s3.2.43 (must NOT call oauthPopupsUnreliable redirect-first). Popup blocked → Settings → Safari → allow popups for the site, or Email OTP. Firebase authorized domains must include jadzadco.github.io."
+      },
       {
         id:"s3-2-35-google-mobile-redirect",
         area:"Auth / Welcome",
-        feature:"Google sign-in on phone skips blocked popup",
-        changed:"iPhone / iPad / Android / WebView use signInWithRedirect immediately (no popup → 'Google popup was blocked'). Desktop still uses popup; popup-blocked still falls back to redirect. getRedirectResult waits briefly for onAuthStateChanged. Package s3.2.35.",
-        howToTest:"1) Hard-refresh Welcome on iPhone Safari (s3.2.35). 2) Tap Google — full-page Google account picker (not a blocked popup message). 3) Finish sign-in → Search. 4) Desktop Chrome: Google still opens a popup. 5) My Profile signed-out Google button uses the same mobile redirect path.",
-        expected:"Phone never shows 'Google popup was blocked'; desktop popup still works; cancel on desktop stays retryable.",
-        troubleshoot:"Still popup-blocked on iPhone → hard-refresh patron-app.js s3.2.35; confirm oauthPopupsUnreliable. Redirect returns to Welcome unsigned → Firebase authorized domains include jadzadco.github.io; retry once."
+        feature:"(superseded) Google mobile redirect-first — caused ITP failures",
+        changed:"s3.2.35 used signInWithRedirect first on phone. That regresses on GitHub Pages under ITP. Superseded by s3-2-43-google-signin-popup-first (s3.2.43).",
+        howToTest:"Skip — use s3-2-43-google-signin-popup-first instead.",
+        expected:"N/A — superseded.",
+        troubleshoot:"See s3-2-43-google-signin-popup-first."
       },
       {
         id:"s3-2-34-unified-back-header",
@@ -2298,7 +3781,7 @@
         area:"My Profile / Appearance",
         feature:"Appearance tab + Site chrome cards + Nightlife white neon mark",
         changed:"New Appearance tab hosts Site chrome (moved off Language Settings). Card picker with swatch + script logo + checkmark. Nightlife FloqR mark is white script with tinniest cyan→violet→magenta border halo. Package s3.2.31.",
-        howToTest:"1) Hard-refresh My Profile (s3.2.31) → open Appearance tab (not Language Settings). 2) With Site chrome beta: Site chrome section + ? help; six look cards. 3) Tap Nightlife — white script mark with neon halo; Search/login logos match. 4) Tap Traditional / Tiffany / White-Black / Purple & White / Black & Dark Green — chrome + wordmark swap. 5) Without beta: locked hint only. 6) FloqAi “site chrome” → Appearance deep link.",
+        howToTest:"1) Hard-refresh My Profile (s3.2.31) → open Appearance tab (not Language Settings). 2) With Site chrome beta: Site chrome section + ? help; six look cards. 3) Tap Nightlife — white script mark with neon halo; Search/login logos match. 4) Tap Traditional / Tiffany / White-Black / Purple & White / Black & Dark Green — chrome + wordmark swap. 5) Without beta: locked hint only. 6) BOT DEE “site chrome” → Appearance deep link.",
         expected:"Appearance → Site chrome is the only picker; Nightlife uses white+neon halo mark; Language Settings has no chrome buttons.",
         troubleshoot:"Still under Language Settings → hard refresh patron-portal.html s3.2.31. No Appearance tab → nav.appearance i18n + portalAppearance. Nightlife still multicolor floqr-color → BRAND_LOGOS nightlife → floqr-hero-nightlife-white-glow.png. Cards missing → siteChrome beta + syncAccessGate."
       },
@@ -2341,11 +3824,11 @@
     {
       id:"s3-2-26-template-no-float-floqai",
       area:"ShoutOut / Templates",
-      feature:"No floating FloqAi on template select",
-      changed:"Template select (club ShoutOut templates) no longer shows the floating FloqAi tile/speech. Lens Search field remains. Floating agent stays on Ask FloqR / intent only. Package s3.2.26.",
-      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → pick a club → template select. 2) Confirm no floating colored-tile FloqAi mark wanders the page. 3) Template search lens still works. 4) Open Ask FloqR / floqai.html — floating FloqAi may still appear there.",
+      feature:"No floating BOT DEE on template select",
+      changed:"Template select (club ShoutOut templates) no longer shows the floating BOT DEE tile/speech. Lens Search field remains. Floating agent stays on Ask FloqR / intent only. Package s3.2.26.",
+      howToTest:"1) Hard-refresh Search → Throw a ShoutOut → pick a club → template select. 2) Confirm no floating colored-tile BOT DEE mark wanders the page. 3) Template search lens still works. 4) Open Ask FloqR / botdee.html — floating BOT DEE may still appear there.",
       expected:"Template select clean; no float. Intent page unchanged.",
-      troubleshoot:"Still floating → hard refresh floqai-search.js s3.2.26; syncAgentVisibility must use show=!!onIntent only."
+      troubleshoot:"Still floating → hard refresh botdee-search.js s3.2.26; syncAgentVisibility must use show=!!onIntent only."
     },
     {
       id:"s3-2-25-search-icons-bottom",
@@ -2372,7 +3855,7 @@
       changed:"Removed Search and book…friends and family from help-welcome (all help locales). Welcome Please signin or signup and ? are left-justified. 80px gap under FloqR logo before welcome + sign-in buttons. Package s3.2.23.",
       howToTest:"1) Hard-refresh signed-out home https://jadzadco.github.io/shoutout-demo/. 2) Measure ~80px between FloqR logo and Please signin or signup. 3) Welcome + ? are left-aligned in the card (not centered). 4) Open ? — body starts with Sign in with Google… (no Search and book / Mingl sentence). 5) Switch language (FR/DE/ES) — help still OTP-focused without nightlife opener.",
       expected:"Left welcome+?; 80px under logo; OTP-only help in every language.",
-      troubleshoot:"Still centered → styles.css login-card flex + align-self:flex-start; hard refresh. Gap small → .login-card > .floqr-home-link margin-bottom 80px. Old help sentence → floqr-i18n-help.js / floqai-help-repository.js s3.2.23."
+      troubleshoot:"Still centered → styles.css login-card flex + align-self:flex-start; hard refresh. Gap small → .login-card > .floqr-home-link margin-bottom 80px. Old help sentence → floqr-i18n-help.js / botdee-help-repository.js s3.2.23."
     },
     {
       id:"s3-2-22-login-privacy-footer-welcome",
@@ -2390,7 +3873,7 @@
       changed:"Template page always shows Search-page lens field. Cards render display.html stock preview at venue primary LED size (name+dimension on top; description/tags below). Only Use remains (Preview/Customize removed from cards). Package s3.2.21.",
       howToTest:"1) Hard-refresh Search, start ShoutOut → Aurelia (or any venue) template page (?v=s3.2.22). 2) Lens search field is under club meta (same chrome as Search). 3) Default card shows true LED board (not mini CSS thumbnail); top shows template name + e.g. 96×48. 4) Only Use button — no Preview / Customize Background. 5) Search jersey/VIP/birthday — official + club/personal matches; popularity/name ranking. 6) Use opens editor.",
       expected:"Lens search filters templates; each card is a primary-size LED preview with Use only.",
-      troubleshoot:"No lens → index.html templateSearchForm + floqai-search.css. Mini CSS preview still → patron-app templateLedPreviewHtml + floqr-board-frame.js. Wrong size → venue primaryDisplayScreenFormatId. Preview/Customize still there → hard refresh patron-app.js s3.2.22."
+      troubleshoot:"No lens → index.html templateSearchForm + botdee-search.css. Mini CSS preview still → patron-app templateLedPreviewHtml + floqr-board-frame.js. Wrong size → venue primaryDisplayScreenFormatId. Preview/Customize still there → hard refresh patron-app.js s3.2.22."
     },
     {
       id:"s3-2-20-tile-palette-site-chrome",
@@ -2405,10 +3888,10 @@
       id:"s3-2-19-search-lens-grey-halo",
       area:"Search UI",
       feature:"Search lens in input + grey halo icons (no black tile)",
-      changed:"#categoryFloqAiGo is a lens button inside the search field (same form submit). Icon faces transparent with slight grey halo — no #000 tile. Package s3.2.19.",
-      howToTest:"1) Hard-refresh Search (styles + floqai-search.css ?v=s3.2.20). 2) No full-width black Search button — lens at the right end of the input; tap it or Enter runs Search. 3) FloqCAST / ShoutOut / reserVIP / BOT DEE have no thick black square; soft tile/grey halo. 4) White/Black: lens has shiny black outline, no fill.",
+      changed:"#categoryBotDeeGo is a lens button inside the search field (same form submit). Icon faces transparent with slight grey halo — no #000 tile. Package s3.2.19.",
+      howToTest:"1) Hard-refresh Search (styles + botdee-search.css ?v=s3.2.20). 2) No full-width black Search button — lens at the right end of the input; tap it or Enter runs Search. 3) FloqCAST / ShoutOut / reserVIP / BOT DEE have no thick black square; soft tile/grey halo. 4) White/Black: lens has shiny black outline, no fill.",
       expected:"Lens submits search; icons float with halo only.",
-      troubleshoot:"Still black tile → styles.css icon-face must be background:transparent. Still big Search button → index uses category-floqai-lens; hard refresh floqai-search.css s3.2.20."
+      troubleshoot:"Still black tile → styles.css icon-face must be background:transparent. Still big Search button → index uses category-botdee-lens; hard refresh botdee-search.css s3.2.20."
     },
     {
       id:"s3-2-18-search-traditional-chip-placeholder",
@@ -2513,7 +3996,7 @@
       id:"s3-2-06-white-black-chrome",
       area:"Site chrome + icons",
       feature:"White/Black theme + themed VIP icon packs",
-      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/FloqAi/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.07.",
+      changed:"isSiteChrome=3 White/Black (white bg, charcoal text, slim charcoal borders). Icon packs: vip-whiteblack + FloqCast/ShoutOut/BOT DEE/BartR/RydR whiteblack; VIP blacktiffany + blackdarkgreen ring variants. Package s3.2.07.",
       howToTest:"1) Hard-refresh Language Settings (s3.2.07) with Site chrome beta. 2) Switch White/Black — page is white with charcoal text and slim dark borders; Search tiles show whiteblack icons. 3) Black Tiffany / Black Dark Green swap VIP tile art. 4) Traditional / Nightlife still work.",
       expected:"Five themes selectable; White/Black is light; icons match theme.",
       troubleshoot:"No White/Black button → hard refresh patron-portal + floqr-i18n s3.2.07. Icons stuck dark → confirm ICON_PACK whiteBlack paths 200."
@@ -2559,7 +4042,7 @@
       area:"Search + My Profile + floqCast",
       feature:"Patron Nightlife/Traditional icon chrome + FLOQR Twilio TURN",
       changed:"Search toolbar + Language Settings toggle icons via FLOQRChromeScheme (images/chrome/*). FloqCast ICE uses getFloqCastIceServers (Twilio Network Traversal). Package s3.1.103.",
-      howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/FloqAi marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
+      howToTest:"1) Hard-refresh Search (s3.1.103). 2) Toggle Nightlife ↔ Traditional under Or — FloqCast/VIP/ShoutOut/BOT DEE marks swap. 3) My Profile → Language Settings → same toggle persists after reload. 4) Go live floqCast ≥60s on display2 (s3.1.103).",
       expected:"Icons swap instantly; choice survives reload; live stream ≥60s with Twilio TURN.",
       troubleshoot:"Icons stuck → confirm floqr-chrome-scheme.js loaded and images/chrome/* 200. TURN stun-only → redeploy Functions with TWILIO_* secrets; check getFloqCastIceServers."
     },
@@ -2583,10 +4066,10 @@
     },
     {
       id:"s3-1-110-search-placeholder-clubs-lounges",
-      area:"Search FloqAi",
+      area:"Search BOT DEE",
       feature:"Placeholder shows You may also search for: Clubs or Lounges",
-      changed:"Moved cat.floqaiAlso copy into the Search input placeholder (all langs). FloqAi speech stays on Welcome only. Package s3.1.110 / rolled into s3.2.00.",
-      howToTest:"1) Hard-refresh Search (s3.2.00). 2) Empty search box shows placeholder You may also search for: Clubs or Lounges (not Hip Hop/EDM examples). 3) FloqAi line above stays Welcome, type below to search for Events. 4) Switch language — placeholder is the localized Also string.",
+      changed:"Moved cat.botdeeAlso copy into the Search input placeholder (all langs). BOT DEE speech stays on Welcome only. Package s3.1.110 / rolled into s3.2.00.",
+      howToTest:"1) Hard-refresh Search (s3.2.00). 2) Empty search box shows placeholder You may also search for: Clubs or Lounges (not Hip Hop/EDM examples). 3) BOT DEE line above stays Welcome, type below to search for Events. 4) Switch language — placeholder is the localized Also string.",
       expected:"Hint is inside the input; speech does not rotate the Also line.",
       troubleshoot:"Old Hip Hop placeholder → hard refresh index.html + floqr-i18n.js + patron-app.js s3.2.00."
     },
@@ -2665,18 +4148,18 @@
     {
       id:"s3-1-68-search-beta-pill",
       area:"Search / Product tiles",
-      feature:"Beta pill on FloqAi / floqCast / VIP tiles",
+      feature:"Beta pill on BOT DEE / floqCast / VIP tiles",
       changed:"styles.css Beta ::after covers .shoutout-icon-card.feature-beta (not only .category-card). Package s3.1.68.",
-      howToTest:"1) As a beta tester with FloqAi/floqCast/VIP grants, hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.68). 2) Yellow Beta pills sit on the top-right of those three tiles.",
+      howToTest:"1) As a beta tester with BOT DEE/floqCast/VIP grants, hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.68). 2) Yellow Beta pills sit on the top-right of those three tiles.",
       expected:"Beta pill visible on each test-feature Search tile that uses shoutout-icon-card.",
       troubleshoot:"No pill → styles.css must include .shoutout-icon-card.feature-beta::after; feature services must set feature-beta + data-beta-label. Hard refresh styles.css."
     },
     {
       id:"s3-1-67-search-tile-icon-scale",
       area:"Search / Product tiles",
-      feature:"Large in-face icons for FloqAi / floqCast / VIP",
-      changed:"FloqAi, floqCast, and VIP faces stack a ~80% mark above an in-face wordmark (ShoutOut visual weight). Package s3.1.67.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.67) with FloqAi/floqCast/VIP grants. 2) Each of those three black tiles shows a large icon filling most of the square and the product name at the bottom inside the tile. 3) ShoutOut remains the full-bleed logo tile.",
+      feature:"Large in-face icons for BOT DEE / floqCast / VIP",
+      changed:"BOT DEE, floqCast, and VIP faces stack a ~80% mark above an in-face wordmark (ShoutOut visual weight). Package s3.1.67.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ (package s3.1.67) with BOT DEE/floqCast/VIP grants. 2) Each of those three black tiles shows a large icon filling most of the square and the product name at the bottom inside the tile. 3) ShoutOut remains the full-bleed logo tile.",
       expected:"Icons dominate each tile (~80%); labels sit at the bottom inside the black face, not beside a tiny mark.",
       troubleshoot:"Still side-by-side tiny marks → styles.css must use flex-direction:column and width:80% on tile marks; hard refresh styles.css cache-bust s3.1.67."
     },
@@ -2764,9 +4247,9 @@
     {
       id:"s3-1-86-search-beta-tiles-master",
       area:"Search / Beta tiles",
-      feature:"Master Admin sees floqCast / VIP / FloqAi Search tiles",
+      feature:"Master Admin sees floqCast / VIP / BOT DEE Search tiles",
       changed:"searchVisible / searchTileVisible allow Master Admin for test features (Beta pill). CSS: floqCast/VIP marks no longer height:100% (icon collapse). Package s3.1.86.",
-      howToTest:"1) Sign in as Master Admin (Google). 2) Hard-refresh Search. 3) Confirm floqCast, VIP reserV, FloqAi tiles with Beta pills and visible marks (not empty black). 4) Beta tester with grants still sees granted tiles only.",
+      howToTest:"1) Sign in as Master Admin (Google). 2) Hard-refresh Search. 3) Confirm floqCast, VIP reserV, BOT DEE tiles with Beta pills and visible marks (not empty black). 4) Beta tester with grants still sees granted tiles only.",
       expected:"Master Admin Search shows enabled test tiles with artwork + Beta pill.",
       troubleshoot:"Still only ShoutOut → hard-refresh floqr-feature-services.js ?v=s3.1.87. Tile hidden → Features Mgmt Enable Feature=1 + Enable Beta=1 for that key."
     },
@@ -2809,11 +4292,11 @@
     {
       id:"s3-1-81-aurelia-floqr-stripe",
       area:"VIP reserV / Aurelia demo",
-      feature:"FloqMedia Stripe default for Aurelia + FloqAi setup guide",
-      changed:"Aurelia temp-democlub-1 vipSettings.paymentCollector=floqrStripe. FloqAi help-vip-floqr-stripe-aurelia + chrome/help i18n. Package s3.1.81.",
-      howToTest:"Ask FloqAi: set FloqMedia Stripe for Aurelia. Follow Master Admin then Club Admin steps. Confirm collector FloqMedia Stripe on admin.html?location=temp-democlub-1 tab VIP reserV.",
+      feature:"FloqMedia Stripe default for Aurelia + BOT DEE setup guide",
+      changed:"Aurelia temp-democlub-1 vipSettings.paymentCollector=floqrStripe. BOT DEE help-vip-floqr-stripe-aurelia + chrome/help i18n. Package s3.1.81.",
+      howToTest:"Ask BOT DEE: set FloqMedia Stripe for Aurelia. Follow Master Admin then Club Admin steps. Confirm collector FloqMedia Stripe on admin.html?location=temp-democlub-1 tab VIP reserV.",
       expected:"Help returns Master+Club steps; Club Admin shows FloqMedia Stripe selected after save.",
-      troubleshoot:"Help missing → hard-refresh floqai-help-repository + floqr-i18n-help s3.1.81. Collector wrong → Save payment collector on VIP reserV."
+      troubleshoot:"Help missing → hard-refresh botdee-help-repository + floqr-i18n-help s3.1.81. Collector wrong → Save payment collector on VIP reserV."
     },
     {
       id:"s3-1-80-vip-club-pos",
@@ -2926,27 +4409,27 @@
     {
       id:"s3-1-65-search-icon-tiles-standard",
       area:"Search / Product tiles",
-      feature:"Standardized ShoutOut / floqCast / VIP / FloqAi icon tiles",
-      changed:"Search tiles use black faces with in-tile wordmarks (FloqAi, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.69.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with FloqAi/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) FloqAi / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; FloqAi → floqai.html.",
+      feature:"Standardized ShoutOut / floqCast / VIP / BOT DEE icon tiles",
+      changed:"Search tiles use black faces with in-tile wordmarks (BOT DEE, floqCast, VIP reserV). Removed Throw a ShoutOut and VIP reserV captions under icons. New floqCast cast-to-LED icon (phone → beam → FloqMedia display). Mobile/tablet show three tiles per row; PC keeps one line. Package s3.1.69.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ as a beta tester with BOT DEE/floqCast/VIP grants. 2) Confirm no text under ShoutOut or VIP tiles. 3) BOT DEE / floqCast / VIP each show icon + word inside the black square. 4) On phone/tablet width, three tiles sit side by side; on desktop, one horizontal row. 5) Tap floqCast → floqcast-search; VIP → vip.html; BOT DEE → botdee.html.",
       expected:"Caption-free standardized tiles; floqCast shows cast-to-display art; 3-across on mobile/tablet.",
       troubleshoot:"Caption still under VIP → index.html must use vip-icon-face + vip-icon-word, not shoutout-icon-title. Wide floqCast beige card → must be shoutout-icon-card floqcast-icon-card. 2-across only → styles.css search-icon-row + max-width:900px three-column flex."
     },
     {
-      id:"s3-1-64-floqai-search-tile",
-      area:"Search / FloqAi",
-      feature:"FloqAi tile matches ShoutOut card",
-      changed:"Search FloqAi control uses shoutout-icon-card size with black face, reuses the Search FloqAi tiles mark (floqr-tiles-transparent), white FloqAi word beside the icon. Package s3.1.64.",
-      howToTest:"1) As beta tester with FloqAi grant, hard-refresh Search. 2) FloqAi tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white FloqAi text beside it. 4) Tap opens floqai.html.",
-      expected:"FloqAi and ShoutOut tiles match box size; FloqAi uses existing Search mark asset.",
-      troubleshoot:"Wide beige tile → hard refresh index.html + styles.css. Wrong icon → must use category-floqai-mark + floqr-tiles-transparent.png."
+      id:"s3-1-64-botdee-search-tile",
+      area:"Search / BOT DEE",
+      feature:"BOT DEE tile matches ShoutOut card",
+      changed:"Search BOT DEE control uses shoutout-icon-card size with black face, reuses the Search BOT DEE tiles mark (floqr-tiles-transparent), white BOT DEE word beside the icon. Package s3.1.64.",
+      howToTest:"1) As beta tester with BOT DEE grant, hard-refresh Search. 2) BOT DEE tile sits beside ShoutOut at the same square size. 3) Black background, glowing tiles icon (same as above the search field), white BOT DEE text beside it. 4) Tap opens botdee.html.",
+      expected:"BOT DEE and ShoutOut tiles match box size; BOT DEE uses existing Search mark asset.",
+      troubleshoot:"Wide beige tile → hard refresh index.html + styles.css. Wrong icon → must use category-botdee-mark + floqr-tiles-transparent.png."
     },
     {
       id:"s3-1-63-beta-profile-card-testers-table",
       area:"Beta invite / Master Admin Features Mgmt",
       feature:"Signed-in profile card on beta-invite + compact Active beta testers table",
       changed:"global-profile-status ensureAuth initializes Firebase so the profile pill shows photo/initials after join. Active beta testers render as a table (tester + feature checkboxes + Save/Revoke) ≤3 lines per user. Package s3.1.63.",
-      howToTest:"1) As invited patron complete beta join → top-right profile pill shows your photo or initials (not ?). 2) As Master Admin open Features Mgmt → Beta & Testing → Active beta testers is a compact table. 3) Toggle FloqAi → Save still works.",
+      howToTest:"1) As invited patron complete beta join → top-right profile pill shows your photo or initials (not ?). 2) As Master Admin open Features Mgmt → Beta & Testing → Active beta testers is a compact table. 3) Toggle BOT DEE → Save still works.",
       expected:"Profile card authenticated on beta-invite; one tester uses ≤3 visual lines in a table.",
       troubleshoot:"Still ? on pill → hard refresh global-profile-status.js + beta-invite.html. Tall list → master-feature-services.js must build beta-testers-table."
     },
@@ -3018,7 +4501,7 @@
       area:"Search / Profile menu / Features & Services",
       feature:"Gated profile-menu links stay hidden for every patron",
       changed:"CSS .user-dropdown … .hidden / [hidden] beats display:block!important; same rule injected via FLOQRFeatureServices.ensureLinkStyles. Search + global profile mint feature links hidden until applyFeatureLinks. Package s3.1.57.",
-      howToTest:"1) Sign in as a patron with no beta grants (e.g. temp_waitress_4 / May Shah). 2) Open Search profile menu → Mingl/BartR/RydR/VIP/floqCast/FloqAi must stay hidden when Off/ungranted. 3) Open My Profile or Club Admin profile card → same fail-closed. 4) Master Admin / granted beta tester still sees allowed links (+ Beta pill when beta).",
+      howToTest:"1) Sign in as a patron with no beta grants (e.g. temp_waitress_4 / May Shah). 2) Open Search profile menu → Mingl/BartR/RydR/VIP/floqCast/BOT DEE must stay hidden when Off/ungranted. 3) Open My Profile or Club Admin profile card → same fail-closed. 4) Master Admin / granted beta tester still sees allowed links (+ Beta pill when beta).",
       expected:"Off/ungranted features never appear in any profile menu for any patron.",
       troubleshoot:"Links still show → hard refresh styles.css + floqr-feature-services.js ?v=s3.1.57. Search-only leak → patron-app.js must mint data-floqr-feature-link hidden then applyFeatureLinks."
     },
@@ -3045,7 +4528,7 @@
       area:"VIP reserV / Terms / Mobile / Confirmation",
       feature:"Venue search first → map → separate Terms page (one checkbox) → deposit → receipt",
       changed:"vip-terms.html with full Terms verbiage + single accept; hold handoff via sessionStorage FLOQR_VIP_HOLD; recordVipConsent expands audit checks server-side; mobile selected-table info below map; vipPaid confirmation receipt card (ShoutOut-like). Package s3.1.54.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html — venue search is first (no map until Select venue). 2) Select Aurelia → night + floor map. On a phone width, tap a green table — selected table details appear below the map (not a fixed overlay). PC keeps the side panel. 3) Hold this table → Continue to Terms → vip-terms.html shows scrollable Terms + one required checkbox (+ optional marketing) → Pay deposit (Stripe 4242…). 4) Return vipPaid=1 → confirmation receipt with Open door pass. 5) FloqAi: vip terms / accept terms vip.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/vip.html — venue search is first (no map until Select venue). 2) Select Aurelia → night + floor map. On a phone width, tap a green table — selected table details appear below the map (not a fixed overlay). PC keeps the side panel. 3) Hold this table → Continue to Terms → vip-terms.html shows scrollable Terms + one required checkbox (+ optional marketing) → Pay deposit (Stripe 4242…). 4) Return vipPaid=1 → confirmation receipt with Open door pass. 5) BOT DEE: vip terms / accept terms vip.",
       expected:"One Terms checkbox on a separate page with readable verbiage; venue-first workflow; mobile info below map; confirmation receipt after pay; pass link works.",
       troubleshoot:"Multi-checkbox still on vip.html → hard refresh cache-bust s3.1.54. Terms page missing hold → sessionStorage cleared or hold expired; re-hold on map. Consent fails → Functions need expandConsentChecks deploy ([firebase-deploy]). Mobile overlay → vip-floor-viewer.css ≤600px must use position:static for aside.info."
     },
@@ -3090,7 +4573,7 @@
       area:"Search / VIP reserV / Portal / Door",
       feature:"VIP reserV Phase 2 — holds, Terms consent, FloqR Stripe deposit, Guest List & reserV, door check-in",
       changed:"createVipHold / recordVipConsent / createFloqrCheckoutSession orderType vipReservation; vip.html night + hold countdown + consent; patron-portal Guest List & reserV; vip-door.html check-in/no-show; VIP-B-24 receipt SMS + FLOQR invoice redactor. Package s3.1.46.",
-      howToTest:"1) Master Admin F&S: seed/enable vipReservations Test=1, grant beta tester. 2) Hard-refresh Search → VIP reserV. 3) vip.html → Decades → pick tonight → Hold this table → accept all required Terms → Pay deposit (Stripe test). 4) Return vipPaid=1 → portal ?tab=guest-list-reserv → Show pass. 5) vip-door.html?location=decades-washington-dc → check in with token or list button. FloqAi: book a table / door pass.",
+      howToTest:"1) Master Admin F&S: seed/enable vipReservations Test=1, grant beta tester. 2) Hard-refresh Search → VIP reserV. 3) vip.html → Decades → pick tonight → Hold this table → accept all required Terms → Pay deposit (Stripe test). 4) Return vipPaid=1 → portal ?tab=guest-list-reserv → Show pass. 5) vip-door.html?location=decades-washington-dc → check in with token or list button. BOT DEE: book a table / door pass.",
       expected:"Hold lasts 30 min; consent required before Checkout; deposit confirms reservation; pass token works at door; no-show blocked after check-in. Aurelia bookable (s3.1.49+).",
       troubleshoot:"Hold fails → Functions deploy vip-functions + feature grant. Checkout unsupported type → commerce-functions vipReservation branch deployed. Pass missing → reservation status must be confirmed. Tile missing → seedFeatureServices."
     },
@@ -3098,16 +4581,16 @@
       id:"s3-1-45-vip-reserv-phase1",
       area:"Search / VIP reserV",
       feature:"VIP reserV Phase 1 — beta feature key, Search tile, floor maps for Decades and Lima Twist Club",
-      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP reserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia was soon in Phase 1 (published s3.1.49). FloqAi finds book a table / VIP reserV. Holds and deposits are Phase 2.",
-      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP reserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP reserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club / Aurelia. Signed out → home sign-in with returnTo. FloqAi: book a table.",
+      changed:"New Features & Services key vipReservations (Test by default). Search shows VIP reserV for granted beta testers / Master Admin Open link. vip.html loads Decades and Lima Twist floor plans from vip-plans/; Aurelia was soon in Phase 1 (published s3.1.49). BOT DEE finds book a table / VIP reserV. Holds and deposits are Phase 2.",
+      howToTest:"As Master Admin open Features & Services, Seed if needed, set VIP reserV Enabled=1 and Test=1, grant a beta tester. As that tester hard-refresh Search → VIP reserV tile with Beta. Open vip.html → pick Decades → green/amber/red tables render; switch to Lima Twist Club / Aurelia. Signed out → home sign-in with returnTo. BOT DEE: book a table.",
       expected:"Map loads for Decades, Lima Twist, and Aurelia (s3.1.49+); bars/DJ not bookable. Feature off → not-available gate.",
       troubleshoot:"Tile missing → seedFeatureServices and beta grant for vipReservations. Blank map → check vip-plans/*.json and PNG/SVG paths, hard refresh ?v=."
     },
     {
       id:"s3-0-110-beta-rbac-login-redirect",
       area:"Sign-in / Master Admin / Search",
-      feature:"Welcome buttons share the FloqAi blue-to-purple look; SMS OTP is US & Canada; beta testers get only the features chosen for them; opening any page signed out goes to the sign-in page",
-      changed:"All Welcome sign-in buttons use the FloqAi blue-to-purple gradient with white text and same-size icons (email, SMS, WhatsApp). WhatsApp is last. SMS OTP says US & Canada Only. A feature with IsFeatureEnabled=0 is off for everyone. IsFeatureEnabled=1 and IsTestFeature=1 shows the Search button only to beta testers granted that feature; Master Admins use the Open link in Features & Services. Master Admins cannot be beta testers. Opening a forwarded page while signed out opens the FLOQR sign-in page and returns to that page after sign-in.",
+      feature:"Welcome buttons share the BOT DEE blue-to-purple look; SMS OTP is US & Canada; beta testers get only the features chosen for them; opening any page signed out goes to the sign-in page",
+      changed:"All Welcome sign-in buttons use the BOT DEE blue-to-purple gradient with white text and same-size icons (email, SMS, WhatsApp). WhatsApp is last. SMS OTP says US & Canada Only. A feature with IsFeatureEnabled=0 is off for everyone. IsFeatureEnabled=1 and IsTestFeature=1 shows the Search button only to beta testers granted that feature; Master Admins use the Open link in Features & Services. Master Admins cannot be beta testers. Opening a forwarded page while signed out opens the FLOQR sign-in page and returns to that page after sign-in.",
       howToTest:"Signed out, open https://jadzadco.github.io/shoutout-demo/commerce.html → you land on the Welcome sign-in page; sign in and you return to commerce (or see the not-available message). As Master Admin, open Features & Services, set BartR Enabled=1 and Test=1, invite a test patron with only BartR ticked. As that patron accept the invite → Search shows BartR with a Beta label and no other test feature. As Master Admin, Search does not show BartR; the Open link does.",
       expected:"Buttons look the same with white text; WhatsApp is the last button. Test features appear only for their granted beta testers. Off features are closed for everyone. Signed-out links go to the general sign-in page, not a Google-only page."
     },
@@ -3129,18 +4612,18 @@
     },
     {
       id:"s3-0-106-location-aware-search",
-      area:"Search / FloqAi",
+      area:"Search / BOT DEE",
       feature:"Nearest-first search (GPS, then IP), near me, Google venue coordinates",
-      changed:"Listings now show the closest events and clubs first, then by name. FLOQR uses phone/browser GPS when allowed, otherwise an IP city estimate. Near me works in all languages. Venues get Google coordinates automatically. Search for heading and venue tiles removed; FloqAi mark animates with a borderless dialog.",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your city> first (GPS). Deny location in a private window → status says (IP estimate). Search Clubs in Monaco → only Monaco venues, closest to you first then by name. Tap ? beside Location-aware search. Switch language and repeat.",
+      changed:"Listings now show the closest events and clubs first, then by name. FLOQR uses phone/browser GPS when allowed, otherwise an IP city estimate. Near me works in all languages. Venues get Google coordinates automatically. Search for heading and venue tiles removed; BOT DEE mark animates with a borderless dialog.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/ and sign in. Watch the BOT DEE mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your city> first (GPS). Deny location in a private window → status says (IP estimate). Search Clubs in Monaco → only Monaco venues, closest to you first then by name. Tap ? beside Location-aware search. Switch language and repeat.",
       expected:"No Search for heading or venue tiles. Nearest-first order with GPS or IP source shown. Explicit city filters results. Help and status text translated."
     },
     {
-      id:"s3-0-105-floqai-venue-search",
-      area:"Search / FloqAi",
-      feature:"FloqAi venue search on Search for, Welcome help, no signed-in interstitial",
-      changed:"Welcome now has a ? help with the landing description. Signed-in patrons go straight to Search for. FloqAi sits above a search box on Search for and understands Events, Clubs, Beach Clubs, Lounges and Lounge-Clubs plus genre and city (e.g. Hip Hop Clubs in DC, EDM Events in New York).",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. FloqAi speech stays Welcome; the search box placeholder is You may also search for: Clubs or Lounges. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
+      id:"s3-0-105-botdee-venue-search",
+      area:"Search / BOT DEE",
+      feature:"BOT DEE venue search on Search for, Welcome help, no signed-in interstitial",
+      changed:"Welcome now has a ? help with the landing description. Signed-in patrons go straight to Search for. BOT DEE sits above a search box on Search for and understands Events, Clubs, Beach Clubs, Lounges and Lounge-Clubs plus genre and city (e.g. Hip Hop Clubs in DC, EDM Events in New York).",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. BOT DEE speech stays Welcome; the search box placeholder is You may also search for: Clubs or Lounges. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what BOT DEE understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
       expected:"Help popout opens beside Welcome. No interstitial. Clubs / Events / Beach Clubs listings open with genre and city filters applied. Dialog text is translated."
     },
     {
@@ -3148,7 +4631,7 @@
       area:"My Privacy / compliance",
       feature:"Privacy Policy, Do Not Sell / GPC, server export and delete",
       changed:"Added privacy.html (www.floqr.com canonical). My Privacy has Do Not Sell or Share, GPC auto-apply, Download My Data via exportPatronData, and Request Data Delete via requestPatronDelete. Targeted ads skip profile tags when DNS/GPC/sharing is off. privacyConsents is owner-create only.",
-      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server export with bundles); FloqAi “do not sell”. Optional GPC browser. Ads: DNS on → house/all still rotate, targeted tags stop. Delete only on disposable test account (type DELETE). Full steps: .cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc Manual test process.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server export with bundles); BOT DEE “do not sell”. Optional GPC browser. Ads: DNS on → house/all still rotate, targeted tags stop. Delete only on disposable test account (type DELETE). Full steps: .cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc Manual test process.",
       expected:"Policy loads. DNS persists. Export JSON includes profile bundles. Targeted tag scoring stops while house ads can still show. Delete requires typing DELETE and anonymizes the account."
     },
     {
@@ -3249,11 +4732,11 @@
     },
     {
       id:"v29-09-114-schedule-multi-delete-user-guide",
-      area:"Club Admin / Scheduling / FloqAi",
+      area:"Club Admin / Scheduling / BOT DEE",
       feature:"Multi-delete shifts + User Guide create/publish",
-      changed:"Select shifts on the week grid (day header + Drafts/Pending/Confirmed filter, mix chips across days) then Delete selected. User Guide card under Scheduling. FloqAi ? catalog User Guide plus create a schedule / publish schedule / delete Wednesday drafts.",
-      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Guide. FloqAi: type create a schedule and publish schedule.",
-      expected:"Mixed selection deletes in one confirm. User Guide lists create/publish and multi-delete steps. FloqAi returns those step cards with Scheduling User Guide links."
+      changed:"Select shifts on the week grid (day header + Drafts/Pending/Confirmed filter, mix chips across days) then Delete selected. User Guide card under Scheduling. BOT DEE ? catalog User Guide plus create a schedule / publish schedule / delete Wednesday drafts.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Guide. BOT DEE: type create a schedule and publish schedule.",
+      expected:"Mixed selection deletes in one confirm. User Guide lists create/publish and multi-delete steps. BOT DEE returns those step cards with Scheduling User Guide links."
     },
     {
       id:"v29-09-113-schedule-pending-confirm-delete",
@@ -8366,7 +9849,7 @@
         ["Work Sheet staff calendar", `${base}/staff-worksheet.html?location=temp-democlub-1`],
         ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html`],
         ["Master Admin diagnostics", `${base}/master-admin.html`],
-        ["Search / FloqAi", `${base}/?start=intent`],
+        ["Search / BOT DEE", `${base}/?start=intent`],
         ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1`]
       ]
     };
@@ -8452,27 +9935,37 @@
     }));
   }
 
+  let mountInFlight = null;
   async function mount(options = {}) {
-    state.db = options.db;
-    state.auth = options.auth;
-    state.storage = options.storage || (window.firebase?.storage ? firebase.storage() : null);
+    state.db = options.db || state.db;
+    state.auth = options.auth || state.auth;
+    state.storage = options.storage || state.storage || (window.firebase?.storage ? firebase.storage() : null);
     if (!state.db) {
       setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
       return;
     }
-    if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
-    hydrateDefaultControls();
-    if (!state.mounted) {
-      state.mounted = true;
-      bindControls();
-    }
-    const schedule = await readScheduleSafe();
-    if (schedule) applyScheduleToControls(schedule);
-    renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
-    renderSourceExtractionReport();
-    renderCrawlContactExport();
-    renderPackageDiagnosticsArchives();
-    await refreshDiagnostics();
+    /* Idempotent: panel activate + deep-link must not re-run the full suite every click. */
+    if (state.diagnosticsReady) return state.lastFeatures ? {cached: true} : null;
+    if (mountInFlight) return mountInFlight;
+    mountInFlight = (async () => {
+      if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
+      hydrateDefaultControls();
+      if (!state.mounted) {
+        state.mounted = true;
+        bindControls();
+      }
+      const schedule = await readScheduleSafe();
+      if (schedule) applyScheduleToControls(schedule);
+      renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+      renderSourceExtractionReport();
+      renderCrawlContactExport();
+      renderPackageDiagnosticsArchives();
+      /* Summary strip comes from masterAdminRollups/current (5-min schedule).
+         Full refresh (27 collections + package file fetches) only on Run / Refresh Diagnostics. */
+      setText("diagnosticsStatus", "Rollup summary loaded. Press Run Diagnostics or Refresh Diagnostics for a full live scan.");
+      state.diagnosticsReady = true;
+    })().finally(() => { mountInFlight = null; });
+    return mountInFlight;
   }
 
   window.FLOQRDiagnostics = {

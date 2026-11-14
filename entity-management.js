@@ -280,8 +280,23 @@
     return q.split(/\s+/).every(token => blob.includes(token));
   }
 
+  function isMergedDuplicateClub(row = {}) {
+    const status = String(row.status || "").toLowerCase();
+    if (status === "merged") return true;
+    if (row.active === false && (row.mergedInto || row.aliasOf || row.canonicalLocationId)
+      && String(row.canonicalLocationId || row.mergedInto || row.aliasOf) !== String(row.id || "")) {
+      return true;
+    }
+    return false;
+  }
+
+  function canonicalClubId(row = {}, id = "") {
+    return String(row.canonicalLocationId || row.mergedInto || row.aliasOf || id || row.id || "").trim();
+  }
+
   function statusBadge(row) {
     const g = gates();
+    if (isMergedDuplicateClub(row)) return `<span class="entity-badge entity-badge-off">Merged duplicate</span>`;
     if (g?.entityIsOffboarded(row)) return `<span class="entity-badge entity-badge-off">Offboarded</span>`;
     if (!g?.entityIsAppEnabled(row)) return `<span class="entity-badge entity-badge-off">Disabled</span>`;
     if (g?.isSuperAdmin(row.email, row) || row.superAdmin) return `<span class="entity-badge entity-badge-super">Super Admin</span>`;
@@ -382,6 +397,18 @@
       setStatus("Entity not found in catalog.");
       return;
     }
+    if (type === "club" && isMergedDuplicateClub(row)) {
+      const canonId = canonicalClubId(row, id);
+      const canon = canonId && canonId !== String(id) ? findEntity("club", canonId) : null;
+      if (canon) {
+        setStatus(`“${entityTitle(row, "club")}” is a merged duplicate. Opening canonical venue ${canonId}.`);
+        selected = {type: "club", id: canonId, row: canon};
+        renderSearchResults();
+        renderManagePanel();
+        return;
+      }
+      setStatus(`This club id is a merged duplicate of ${canonId || "another venue"}. Save gates on the canonical venue only.`);
+    }
     selected = {type, id, row};
     renderSearchResults();
     renderManagePanel();
@@ -441,9 +468,10 @@
       ${type === "club" && !offboarded ? `
         <div class="card entity-gate-card">
           <h4>Per-venue feature gates</h4>
-          <p class="sub small">Disable venue ability to use UberAds, WindowAds, BartR Stores, ShoutOut, or floqCast.</p>
+          <p class="sub small">Opt venues into UberAds, WindowAds, BartR Stores, ShoutOut, floqCast, <strong>VIP reserV</strong>, and Door Passes. VIP reserV and Passes default off until you tick and save them.</p>
+          ${isMergedDuplicateClub(row) ? `<p class="sub small" style="color:#b91c1c">Merged duplicate — gates will not apply to Search / VIP. Use canonical <code>${esc(canonicalClubId(row, id))}</code>.</p>` : ""}
           <div class="privacy-datapoint-grid">${venueGateChecks(row)}</div>
-          <button id="saveVenueGatesBtn" class="primary" type="button">Save Venue Feature Gates</button>
+          <button id="saveVenueGatesBtn" class="primary" type="button" ${isMergedDuplicateClub(row) ? "disabled" : ""}>Save Venue Feature Gates</button>
         </div>` : ""}
       ${!isSuper && !offboarded ? `
         <div class="card entity-offboard-card">
@@ -480,16 +508,25 @@
     });
 
     byId("saveVenueGatesBtn")?.addEventListener("click", async () => {
+      if (type === "club" && isMergedDuplicateClub(row)) {
+        setStatus(`Refused — ${id} is a merged duplicate. Open ${canonicalClubId(row, id)} and save there.`);
+        return;
+      }
       const nextGates = {};
       wrap.querySelectorAll("[data-venue-gate]").forEach(input => {
         nextGates[input.dataset.venueGate] = !!input.checked;
       });
       try {
         setStatus("Saving venue feature gates...");
-        await invokeCallable("setVenueFeatureGates", {clubId:id, gates:nextGates});
-        row.featureGates = nextGates;
+        const res = await invokeCallable("setVenueFeatureGates", {clubId:id, gates:nextGates});
+        const saved = res?.data?.featureGates || nextGates;
+        row.featureGates = saved;
         gates()?.invalidateVenueCache?.(id);
-        setStatus("Venue feature gates saved.");
+        const vipOn = saved.vipReservations === true;
+        setStatus(vipOn
+          ? "Venue feature gates saved (VIP reserV on)."
+          : "Venue feature gates saved.");
+        renderManagePanel();
       } catch (e) {
         setStatus(e.message || String(e));
       }

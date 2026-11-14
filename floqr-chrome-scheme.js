@@ -43,14 +43,16 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.2.40";
+  const ICON_V = "s3.3.014";
   /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
+  /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
   const NIGHTLIFE_ICONS = {
     floqCast: "./images/chrome/floqcast-nightlife.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-nightlife.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-nightlife.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-nightlife.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V
   };
@@ -58,26 +60,45 @@
     floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-traditional.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-traditional.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-traditional.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V
   };
-  const BLACK_TIFFANY_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
-    vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V
-  });
-  const PURPLE_WHITE_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
-    // Purple chrome keeps neon nightlife tiles; VIP mark stays nightlife neon
-    shoutOut: "./images/chrome/shoutout-nightlife.png?v=" + ICON_V
-  });
-  const BLACK_DARK_GREEN_ICONS = Object.assign({}, NIGHTLIFE_ICONS, {
+  const BLACK_TIFFANY_ICONS = {
+    floqCast: "./images/chrome/floqcast-blacktiffany.jpg?v=" + ICON_V,
+    vipReserv: "./images/chrome/vip-blacktiffany.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-blacktiffany.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-blacktiffany.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-blacktiffany.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-blacktiffany.jpg?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-blacktiffany.jpg?v=" + ICON_V
+  };
+  const PURPLE_WHITE_ICONS = {
+    floqCast: "./images/chrome/floqcast-purplewhite.jpg?v=" + ICON_V,
+    vipReserv: "./images/chrome/vip-purplewhite.jpg?v=" + ICON_V,
+    shoutOut: "./images/chrome/shoutout-purplewhite.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-purplewhite.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-purplewhite.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-purplewhite.jpg?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-purplewhite.jpg?v=" + ICON_V
+  };
+  /* Accents use Settings \"tings\" green #5ac783 (see scripts/build-blackdarkgreen-icons.py). */
+  const BLACK_DARK_GREEN_ICONS = {
+    floqCast: "./images/chrome/floqcast-blackdarkgreen.jpg?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-blackdarkgreen.jpg?v=" + ICON_V,
-    shoutOut: "./images/chrome/shoutout-traditional-green.png?v=" + ICON_V
-  });
+    shoutOut: "./images/chrome/shoutout-blackdarkgreen.png?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-blackdarkgreen.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V,
+    bartR: "./images/chrome/bartr-blackdarkgreen.png?v=" + ICON_V,
+    rydR: "./images/chrome/rydr-blackdarkgreen.png?v=" + ICON_V
+  };
   const WHITE_BLACK_ICONS = {
-    floqCast: "./images/chrome/floqcast-whiteblack.jpg?v=" + ICON_V,
+    floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
     vipReserv: "./images/chrome/vip-whiteblack.jpg?v=" + ICON_V,
     shoutOut: "./images/chrome/shoutout-whiteblack.png?v=" + ICON_V,
-    floqAi: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
+    botDee: "./images/chrome/botdee-whiteblack.jpg?v=" + ICON_V,
+    settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V
   };
@@ -123,7 +144,7 @@
     "img.floqr-hero-logo",
     "img.product-parent-logo",
     "img.intent-floqr-logo",
-    "img.floqai-hero-logo",
+    "img.botdee-hero-logo",
     "img.splash-logo",
     "img[data-floqr-brand-logo]",
     "[data-floqr-brand-logo] img"
@@ -301,10 +322,12 @@
       localStorage.setItem(STORAGE_KEY, String(next));
       localStorage.setItem(LEGACY_STORAGE_KEY, schemeFromSiteChrome(next));
     } catch (_) { /* ignore */ }
-    applyDocument(schemeFromSiteChrome(next));
+    const scheme = schemeFromSiteChrome(next);
+    applyDocument(scheme);
     global.dispatchEvent(new CustomEvent("floqr-chrome-change", {
-      detail: {chrome: schemeFromSiteChrome(next), isSiteChrome: next}
+      detail: {chrome: scheme, isSiteChrome: next}
     }));
+    broadcastChrome(scheme, next);
     if (opts.persistProfile !== false) tryPersistProfile(next);
     return next;
   }
@@ -352,7 +375,9 @@
 
   function iconUrl(featureKey, scheme) {
     const pack = ICON_PACK[normalizeScheme(scheme || effectiveChrome())] || ICON_PACK[DEFAULT_SCHEME];
-    return pack[featureKey] || null;
+    // One-release dual-read: legacy data-floqr-chrome-icon="floqAi" → botDee pack slot.
+    const key = featureKey === "floqAi" ? "botDee" : featureKey;
+    return pack[key] || null;
   }
 
   function brandLogoUrl(scheme) {
@@ -388,7 +413,7 @@
         img.classList.contains("floqr-hero-logo") ||
         img.classList.contains("product-parent-logo") ||
         img.classList.contains("intent-floqr-logo") ||
-        img.classList.contains("floqai-hero-logo") ||
+        img.classList.contains("botdee-hero-logo") ||
         img.classList.contains("splash-logo") ||
         img.hasAttribute("data-floqr-brand-logo") ||
         /floqr/i.test(alt) ||
@@ -397,6 +422,14 @@
       img.setAttribute("src", url + bust);
       img.setAttribute("data-floqr-brand-logo", scheme);
     });
+  }
+
+  function paintedScheme() {
+    try {
+      return normalizeScheme(global.document?.documentElement?.getAttribute("data-floqr-chrome") || "");
+    } catch (_) {
+      return "";
+    }
   }
 
   function applyDocument(scheme) {
@@ -426,6 +459,62 @@
       btn.setAttribute("aria-pressed", normalizeScheme(name) === s ? "true" : "false");
     });
     return s;
+  }
+
+  /** Re-paint from localStorage when bfcache / other tab / focus restored chrome out of date. */
+  function syncFromStorage(opts = {}) {
+    const stored = getChrome();
+    const force = opts.force === true;
+    if (!force && paintedScheme() === stored) return stored;
+    return applyDocument(stored);
+  }
+
+  function broadcastChrome(scheme, code) {
+    try {
+      if (!global.__floqrChromeBroadcast) {
+        global.__floqrChromeBroadcast = typeof BroadcastChannel !== "undefined"
+          ? new BroadcastChannel("floqr-chrome")
+          : null;
+      }
+      global.__floqrChromeBroadcast?.postMessage({
+        type: "floqr-chrome-change",
+        chrome: scheme,
+        isSiteChrome: code
+      });
+    } catch (_) { /* ignore */ }
+  }
+
+  function bindLiveSync() {
+    if (global.__floqrChromeLiveSyncBound) return;
+    global.__floqrChromeLiveSyncBound = true;
+    const resync = () => {
+      try { syncFromStorage(); } catch (_) { /* ignore */ }
+    };
+    try {
+      global.addEventListener("storage", (ev) => {
+        if (!ev) return;
+        if (ev.key && ev.key !== STORAGE_KEY && ev.key !== LEGACY_STORAGE_KEY) return;
+        resync();
+      });
+    } catch (_) { /* ignore */ }
+    try {
+      global.addEventListener("pageshow", resync);
+      global.addEventListener("focus", resync);
+      global.document?.addEventListener?.("visibilitychange", () => {
+        if (global.document.visibilityState === "visible") resync();
+      });
+    } catch (_) { /* ignore */ }
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        const bus = new BroadcastChannel("floqr-chrome");
+        global.__floqrChromeBroadcast = bus;
+        bus.onmessage = (ev) => {
+          const data = ev?.data;
+          if (!data || data.type !== "floqr-chrome-change") return;
+          resync();
+        };
+      }
+    } catch (_) { /* ignore */ }
   }
 
   function markFeaturesAccessResolved() {
@@ -489,6 +578,7 @@
     brandLogoUrl,
     applyDocument,
     applyBrandLogos,
+    syncFromStorage,
     bindToggle,
     syncAccessGate,
     markFeaturesAccessResolved,
@@ -511,6 +601,7 @@
       applyDocument(getChrome());
     }
     bindToggle();
+    bindLiveSync();
   }
 
   if (global.document?.readyState === "loading") {
@@ -525,6 +616,13 @@
         featuresAccessResolved = true;
         syncAccessGate();
       } catch (_) { /* ignore */ }
+    });
+  } catch (_) { /* ignore */ }
+
+  // Soft sign-out (no full reload) must keep the login/welcome paint on last-used chrome.
+  try {
+    global.addEventListener("floqr:auth-signed-out", () => {
+      try { syncFromStorage({force: true}); } catch (_) { /* ignore */ }
     });
   } catch (_) { /* ignore */ }
 })(typeof window !== "undefined" ? window : globalThis);

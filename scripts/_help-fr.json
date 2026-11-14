@@ -11,9 +11,9 @@
     "title": "ShoutOuts archivés",
     "body": "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
   },
-  "floqai-ask-floqr": {
-    "title": "Demandez FloqR avec FloqAi",
-    "body": "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
+  "botdee-ask-floqr": {
+    "title": "Demandez FloqR avec BOT DEE",
+    "body": "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
   },
   "help-soccer-jersey": {
     "title": "Maillot de football ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Créer et publier un planning du personnel",
-    "body": "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. FloqAi : create a schedule, publish schedule, how to schedule staff."
+    "body": "Ajoutez des équipes de brouillon sur la grille personnes × jours, examinez les puces, puis Publish schedule. Les travailleurs doivent confirmer avant qu'un quart de travail soit confirmé. BOT DEE : create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Supprimer plusieurs équipes planifiées ou brouillons",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Modèle par défaut",
-    "body": "Classique traditionnel noir et blanc gratuit. Utilisez FloqAi ci-dessous pour les modèles Sports, Jersey, VIP, Humour, Voitures, Vidéo, Images et Ballers."
+    "body": "Classique traditionnel noir et blanc gratuit. Utilisez BOT DEE ci-dessous pour les modèles Sports, Jersey, VIP, Humour, Voitures, Vidéo, Images et Ballers."
   },
-  "help-floqai-template-search": {
-    "title": "FloqAi recherche de modèles",
-    "body": "Appuyez sur la marque FloqAi en mouvement (ou attendez ses bulles), puis demandez Sports, Jersey, NBA, NFL, Cars, Humour, VIP, Video, Pictures ou Ballers."
+  "help-botdee-template-search": {
+    "title": "BOT DEE recherche de modèles",
+    "body": "Appuyez sur la marque BOT DEE en mouvement (ou attendez ses bulles), puis demandez Sports, Jersey, NBA, NFL, Cars, Humour, VIP, Video, Pictures ou Ballers."
   },
   "help-mingl-requests": {
     "title": "Environ Mingl demandes",
@@ -162,5 +162,13 @@
   "help-public-media-sharing": {
     "title": "Médias publics et partage",
     "body": "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
+  },
+  "help-black-card": {
+    "title": "Black Card",
+    "body": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
   }
 }

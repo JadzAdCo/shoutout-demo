@@ -174,6 +174,7 @@
     "featuresReleaseControl",
     "featuresBetaTesting",
     "featuresVipPayments",
+    "featuresBotDee",
     "featuresAuditTrail",
     "dataClassification",
     "adApprovalQueue",
@@ -183,12 +184,13 @@
     "adSettingsPanel"
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
-  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresAuditTrail"];
+  const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresBotDee", "featuresAuditTrail"];
   const PANEL_LABELS = {
     featuresServices: "Features Mgmt",
     featuresReleaseControl: "Features Mgmt · Release Control",
     featuresBetaTesting: "Features Mgmt · Beta & Testing",
     featuresVipPayments: "Features Mgmt · VIP reserV Payments",
+    featuresBotDee: "Features Mgmt · BOT DEE",
     featuresAuditTrail: "Features Mgmt · Audit Trail",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
@@ -318,6 +320,12 @@
       }
 
       if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
+      if (panelId === "diagnosticsFloqCast" && window.FLOQRFloqCastDiagnostics) {
+        window.FLOQRFloqCastDiagnostics.mount();
+      }
+      if (panelId === "diagnosticsShoutOut" && window.FLOQRShoutOutDiagnostics) {
+        window.FLOQRShoutOutDiagnostics.mount();
+      }
       if ((panelId === "mailLogging" || panelId === "twilio_sendgridMailLogs") && window.FLOQRMailLogging) {
         window.FLOQRMailLogging.mount();
       }
@@ -334,7 +342,30 @@
       }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
+        /* Summary strip from 5-min rollup first; full 27-collection refresh only via Run/Refresh. */
+        window.FLOQRMasterAdminRollup?.paintForPanel?.(panelId);
+        window.FLOQRDiagnostics?.mount?.({db, auth, storage});
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
+      }
+      if (panelId === "aiCrawling") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("aiCrawling");
+        window.FLOQRAIDiscovery?.mountMasterAdminPanel?.({db, auth});
+      }
+      if (panelId === "duplicateRecords") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("duplicateRecords");
+        window.FLOQRDuplicateRecords?.mount?.({db, auth});
+      }
+      if (panelId === "servicesCommerce") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("servicesCommerce");
+        window.FLOQRMasterServices?.mount?.();
+      }
+      if (panelId === "templateManagement") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("templateManagement");
+        loadManagedTemplates().catch(() => {});
+      }
+      if (panelId === "recommendationModeration") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("recommendationModeration");
+        loadRecommendationModeration().catch(() => {});
       }
       if (panelId === "translationOverrides") {
         window.FLOQRMasterTranslationOverrides?.mount?.();
@@ -428,6 +459,8 @@
       if (target.closest("#diagnostics")) setText("diagnosticsStatus", message);
       if (target.closest("#diagnosticsDisplayErrors")) setText("displayLoadErrorsStatus", message);
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
+      if (target.closest("#diagnosticsFloqCast")) setText("floqcastDiagStatus", message);
+      if (target.closest("#diagnosticsShoutOut")) setText("shoutoutDiagStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
@@ -2388,7 +2421,12 @@
         setText("masterActionFeedback", `Opened ${panelLabel(resumed)}.`);
       }
       /* Do not pull 1000 users/shoutouts on every sign-in — that freezes Master Admin
-         (Features / Svc, Entity Mgmt, deep links). Dashboard stats load on demand. */
+         (Features / Svc, Entity Mgmt, deep links). Also do not pull Diagnostics
+         (27 collections + package file fetches), AI crawl queues, duplicate scans,
+         commerce orders, templates, or recommendations. Those mount when their panel opens.
+         Summary strips read masterAdminRollups/current (5-min schedule). */
+      window.FLOQRMasterAdminRollup?.bind?.({db, auth});
+      window.FLOQRMasterAdminRollup?.load?.({showEmpty: true}).catch(() => {});
       loadLightLocations().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});
@@ -2397,11 +2435,8 @@
       if (hashPanelId() === "networkDashboard" || resumed === "networkDashboard") {
         loadNetworkReports({force: false});
       }
-      loadManagedTemplates();
-      loadRecommendationModeration();
-      if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
-      if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
-      if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});
+      /* Wire ShoutOut compliance button handlers only (no venue/log fetch until panel).
+         Deep-linked heavy panels are mounted by resumeDeepLinkPanel → activatePanel. */
       if (window.FLOQRMasterShoutouts) window.FLOQRMasterShoutouts.mount();
       if (window.FLOQRAppLogging) window.FLOQRLog?.write?.({
         level: "info",

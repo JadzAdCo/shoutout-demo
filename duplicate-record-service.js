@@ -673,20 +673,33 @@
     await mergePairByIds(primaryId, duplicateIds);
   }
 
+  let duplicatePanelBound = false;
+  let duplicatePanelLoading = null;
   async function mount(options = {}) {
     db = options.db || db;
     auth = options.auth || auth;
     if (!db || !auth || !byId("duplicateRecords")) return;
-    byId("refreshDuplicateRecordsBtn")?.addEventListener("click", refreshDuplicateDiagnostics);
-    byId("duplicateRecordSearch")?.addEventListener("input", () => {
-      renderDuplicateGroups();
-      const query = byId("duplicateRecordSearch")?.value.trim() || "";
-      const visible = filterGroups(duplicateGroups).length;
-      setStatus(query ? `Search filter applied to last live scan: "${query}" (${visible} visible group(s)).` : `Search cleared. Showing ${visible} duplicate group(s) from the last live scan.`);
-    });
-    byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
-    byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
-    await refreshDuplicateDiagnostics();
+    if (duplicatePanelLoading) return duplicatePanelLoading;
+    if (!duplicatePanelBound) {
+      duplicatePanelBound = true;
+      byId("refreshDuplicateRecordsBtn")?.addEventListener("click", refreshDuplicateDiagnostics);
+      byId("duplicateRecordSearch")?.addEventListener("input", () => {
+        renderDuplicateGroups();
+        const query = byId("duplicateRecordSearch")?.value.trim() || "";
+        const visible = filterGroups(duplicateGroups).length;
+        setStatus(query ? `Search filter applied to last live scan: "${query}" (${visible} visible group(s)).` : `Search cleared. Showing ${visible} duplicate group(s) from the last live scan.`);
+      });
+      byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
+      byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
+    }
+    /* Summary strip from 5-min rollup; full 1200-club scan only on Refresh Duplicate Diagnostics. */
+    const rollup = window.FLOQRMasterAdminRollup?.getCached?.();
+    if (rollup?.duplicates) {
+      setStatus(`Rollup: ${Number(rollup.duplicates.clusterCount || 0)} duplicate group(s) from ${Number(rollup.duplicates.clubsScanned || 0)} clubs. Press Refresh for a live scan.`);
+    } else {
+      setStatus("Rollup summary loading… Press Refresh Duplicate Diagnostics for a live scan.");
+    }
+    return null;
   }
 
   window.FLOQRDuplicateRecords = {

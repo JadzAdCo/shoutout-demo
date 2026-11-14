@@ -1,0 +1,45 @@
+# Critical log tab flash (always)
+
+Resume: `@critical-log-blink$` / `$critical-logs$`.
+
+When a **critical** failure is recorded in a Master Admin log surface, the matching **subtab and parent group tab flash** (`.is-blink` / `criticalLogTabBlink`) until the operator acknowledges or clears the unread state. Same visual language as Security System Messages — do not invent one-off blink CSS per panel.
+
+## Module
+
+`floqr-critical-log-blink.js` → `window.FLOQRCriticalLogBlink`
+
+```js
+FLOQRCriticalLogBlink.set("geminiApiAccess", {
+  tabId: "appLoggingTab",
+  parentGroup: "diagnostics",
+  label: "Application Logging",
+  count: failureCount,
+  newestMs
+});
+FLOQRCriticalLogBlink.ack("geminiApiAccess"); // session watermark
+FLOQRCriticalLogBlink.clear("geminiApiAccess");
+```
+
+Parent group blink = **OR** of every registered source under that `data-group`.
+
+## Registered sources (extend here)
+
+| Source id | Tab | Parent | Critical when |
+|---|---|---|---|
+| `securitySystemMessages` | Security System Messages | `security` | Unread security inbox rows |
+| `displayLoadErrors` | Display / Xibo Load Errors | `diagnostics` | New load-error events (seen watermark) |
+| `geminiApiAccess` | Application Logging | `diagnostics` | `geminiApiAccessLogs` failures (`severity:"critical"`) |
+
+## Gemini (example critical log)
+
+- Writer: `functions/gemini-api-access-log.js` stamps `severity:"critical"` / `critical:true` on failures.
+- Live watch + Acknowledge: `master-logging-extension.js`.
+- Ack is sessionStorage (`floqr.criticalLogAck.geminiApiAccess`) — flash returns when a **newer** failure arrives.
+
+## Checklist (new critical log)
+
+- [ ] Stamp `severity: "critical"` (or equivalent) on the failure row
+- [ ] Register via `FLOQRCriticalLogBlink.set` (not a one-off `.is-blink` toggle that fights the parent OR)
+- [ ] Provide clear/ack path (mark-read, seen watermark, or Acknowledge button)
+- [ ] Load `floqr-critical-log-blink.js` before the panel script on Master Admin
+- [ ] Update `docs/FEATURE-WIRING.md` + diagnostics Manual Feature Test

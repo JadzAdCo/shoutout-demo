@@ -33,8 +33,8 @@ test("shoutoutLink builds the venue / event deep link with no v= and no current-
     "./?start=shoutout&location=zebbies-garden-washington-dc&event=evt+7"
   );
   assert.equal(nav.shoutoutLink({eventId: "evt-9"}), "./?start=shoutout&event=evt-9");
-  assert.equal(nav.shoutoutLink({}), "./?start=search");
-  assert.equal(nav.shoutoutLink(), "./?start=search");
+  assert.equal(nav.shoutoutLink({}), "./shoutout-search.html?from=search");
+  assert.equal(nav.shoutoutLink(), "./shoutout-search.html?from=search");
   assert.doesNotMatch(nav.shoutoutLink({locationId: "a"}), /[?&]v=/);
 });
 
@@ -121,7 +121,7 @@ test("unknown or hidden venue never falls back to Zebbies: Search with a status 
 test("Search entry uses the deep-link path instead of the old splash + 400 ms race", () => {
   const src = read("patron-app.js");
   const entry = sliceFn(src, "async function continueToMainCategories", "function rememberSignedInHint");
-  assert.match(entry, /if \(pendingDirectLocation \|\| pendingDirectEvent\) \{\s*await openDirectVenueShoutout\(\);\s*return;/);
+  assert.match(entry, /if \(isShoutoutDeepLink\(\)\) \{\s*byId\("landingPage"\)\?\.classList\.remove\("active"\);\s*await openDirectVenueShoutout\(\);\s*return;/);
   assert.doesNotMatch(entry, /setTimeout\(\(\) => selectLocationForShoutOut/);
   assert.match(src, /let pendingDirectEvent = qs\("event", ""\);/);
   const select = sliceFn(src, "async function selectLocationForShoutOut", "function showTemplateSelection");
@@ -164,7 +164,7 @@ test("every Throw a ShoutOut entry point goes through FLOQRNav.shoutoutLink / sh
   assert.match(assistant, /shoutoutLink\(\{locationId:item\.id\}\)/);
   assert.match(assistant, /shoutoutLink\(\{eventId:item\.id\}\)/);
   assert.doesNotMatch(assistant, /\.\/\?location=/);
-  assert.doesNotMatch(read("intent-search.js"), /pageUrl\("\.\/", \{[^}]*\blocation:/, "FloqAi results never hand-build a Search ?location= link");
+  assert.doesNotMatch(read("intent-search.js"), /pageUrl\("\.\/", \{[^}]*\blocation:/, "BOT DEE results never hand-build a Search ?location= link");
 
   assert.match(read("entity-management.js"), /shoutout: \{label: "ShoutOut link"[\s\S]*?FLOQRNav\?\.shoutoutUrl\?\.\(\{locationId: id\}\)/);
   assert.match(read("admin-app.js"), /FLOQRNav\?\.shoutoutUrl\?\.\(\{locationId\}\)/);

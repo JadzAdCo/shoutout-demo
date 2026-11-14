@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* s3.1.31 demo sign-in code: anchored, idempotent edits to files other work also touches
-   (index.html, patron-app.js, floqr-i18n.js, floqai-help-repository.js, functions/package.json,
-   functions/floqai-content-classes.json). Applied to the workspace, to a HEAD export for the commit,
+   (index.html, patron-app.js, floqr-i18n.js, botdee-help-repository.js, functions/package.json,
+   functions/botdee-content-classes.json). Applied to the workspace, to a HEAD export for the commit,
    and to the staged main tree when publishing — never a whole-file copy.
    Usage: node scripts/apply-s3-1-31-demo-signin-edits.js [rootDir]
    Design notes: .cursor/rules/design-notes-demo-signin.mdc */
@@ -141,7 +141,7 @@ const EDITS = {
       `<div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 6-minute code</button></div>`,
       `<div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 6-minute code</button><button id="emailOtpHaveCodeBtn" type="button" data-i18n="app.emailHaveCode">I already have a code</button></div>`,
       `id="emailOtpHaveCodeBtn"`);
-    for (const file of ["patron-app.js", "floqr-i18n.js", "floqai-help-repository.js"]) out = bumpScript(out, file);
+    for (const file of ["patron-app.js", "floqr-i18n.js", "botdee-help-repository.js"]) out = bumpScript(out, file);
     return out;
   },
   "patron-app.js": src => PATRON_APP_EDITS.reduce((out, edit) => replaceOnce(out, edit.find, edit.replacement, edit.marker), src),
@@ -154,11 +154,11 @@ const EDITS = {
     const addition = `\n      "app.emailHaveCode": ${JSON.stringify(button)},\n      "app.emailHaveCodeHint": ${JSON.stringify(hint)},\n      "app.emailHaveCodeNeedEmail": ${JSON.stringify(needEmail)},`;
     return out.slice(0, at + anchor.length) + addition + out.slice(at + anchor.length);
   }, src),
-  "floqai-help-repository.js": src => {
+  "botdee-help-repository.js": src => {
     const anchor = `\n    {\n      id: "help-master-completed-log",`;
     if (src.includes(`id: "help-master-demo-signin"`)) return src;
     const at = src.indexOf(anchor);
-    if (at < 0) throw new Error("floqai-help-repository.js: help-master-completed-log anchor missing");
+    if (at < 0) throw new Error("botdee-help-repository.js: help-master-completed-log anchor missing");
     return src.slice(0, at) + HELP_ENTRY + src.slice(at);
   },
   "functions/package.json": src => {
@@ -170,7 +170,7 @@ const EDITS = {
     JSON.parse(out);
     return out;
   },
-  "functions/floqai-content-classes.json": src => {
+  "functions/botdee-content-classes.json": src => {
     const manifest = JSON.parse(src);
     manifest.help["help-master-demo-signin"] = ["masterAdmin"];
     manifest.help = Object.fromEntries(Object.entries(manifest.help).sort(([a], [b]) => a.localeCompare(b)));

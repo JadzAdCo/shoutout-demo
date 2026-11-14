@@ -112,7 +112,7 @@ test("every feature link surface goes through linkState", () => {
 
   const menu = read("global-profile-status.js");
   assert.match(menu, /data-floqr-feature-link="\$\{esc\(key\)\}"/);
-  ["mingl", "bartr", "rydr", "floqCast", "floqAi"].forEach(key => {
+  ["mingl", "bartr", "rydr", "floqCast", "botDee"].forEach(key => {
     assert.match(menu, new RegExp(`featureLink\\("${key}"`), `profile menu link for ${key}`);
   });
   assert.match(menu, /fs\.applyFeatureLinks\(dropdown\)/);
@@ -186,7 +186,7 @@ test("reason prompt copy exists in every chrome language", () => {
 });
 
 test("help and rules document the s3.1.30 contract", () => {
-  const repo = read("floqai-help-repository.js");
+  const repo = read("botdee-help-repository.js");
   assert.match(repo, /Enable Beta Feature \(IsTestFeature\)/);
   assert.match(repo, /"enable beta feature"/);
   const rule = read(".cursor/rules/reason-prompt-on-save.mdc");

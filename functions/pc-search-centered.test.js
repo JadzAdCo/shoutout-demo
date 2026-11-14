@@ -9,8 +9,8 @@ const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 test("PC Search field and composition are centered", () => {
-  const searchCss = read("floqai-search.css");
-  assert.match(searchCss, /\.category-floqai-search\{[\s\S]*?margin:\s*0 auto 18px/);
+  const searchCss = read("botdee-search.css");
+  assert.match(searchCss, /\.category-botdee-search\{[\s\S]*?margin:\s*0 auto 18px/);
   const css = read("styles.css");
   assert.match(css, /html\.floqr-desktop-browser #categoryPage\.page\.active/);
   assert.match(css, /html\.floqr-desktop-browser \.app\{/);

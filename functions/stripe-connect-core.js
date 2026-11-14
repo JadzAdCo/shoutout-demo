@@ -98,6 +98,54 @@ function buildRecipientAccountParams({bindingId, entityType, entityId, displayNa
   return params;
 }
 
+function isStripeConnectedAccountId(value = "") {
+  return /^acct_[A-Za-z0-9]+$/i.test(bounded(value, 160));
+}
+
+/** Connect webhooks: capability.updated.object.id is the capability; deauthorized.object.id is ca_. Only accept acct_. */
+function connectAccountIdFromWebhookEvent(event = {}) {
+  const object = event?.data?.object && typeof event.data.object === "object" ? event.data.object : {};
+  const type = bounded(event?.type, 80);
+  const candidates = type === "capability.updated"
+    ? [object.account, event.account]
+    : type === "account.application.deauthorized"
+      ? [event.account, object.account]
+      : [event.account, object.id, object.account];
+  for (const candidate of candidates) {
+    const id = bounded(candidate, 160);
+    if (isStripeConnectedAccountId(id)) return id;
+  }
+  return "";
+}
+
+function chargeRefundRows(charge = null) {
+  return Array.isArray(charge?.refunds?.data) ? charge.refunds.data : null;
+}
+
+function refundRowReversed(row) {
+  return !!(row && (row.transfer_reversal || row.reverse_transfer === true));
+}
+
+/** Never downgrade a destination reverse to manual review. */
+function lockPayoutRecoveryStatus(existing = "", computed = "") {
+  if (bounded(existing, 80) === "reversed") return "reversed";
+  return bounded(computed, 80);
+}
+
+/**
+ * Empty string = unknown (unexpanded Charge.refunds). Callers must not write that.
+ * Do not treat missing refunds.data as "no reversal".
+ */
+function payoutRecoveryAfterRefund(order = {}, {reverseTransfer = false, charge = null, refunds = null} = {}) {
+  if (!bounded(order.connectedAccountId || "", 160)) return "not-applicable";
+  if (bounded(order.payoutRecoveryStatus || "", 80) === "reversed") return "reversed";
+  if (reverseTransfer === true) return "reversed";
+  const rows = Array.isArray(refunds) ? refunds : chargeRefundRows(charge);
+  if (!Array.isArray(rows) || !rows.length) return "";
+  if (rows.some(refundRowReversed)) return "reversed";
+  return "manual-transfer-reversal-review";
+}
+
 function buildAccountLinkParams({accountId, capabilityStatus, refreshUrl, returnUrl} = {}) {
   const account = bounded(accountId, 160);
   if (!account || !refreshUrl) throw new Error("Connect onboarding link data is incomplete.");
@@ -114,8 +162,12 @@ function buildAccountLinkParams({accountId, capabilityStatus, refreshUrl, return
 module.exports = {
   buildAccountLinkParams,
   buildRecipientAccountParams,
+  connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
+  isStripeConnectedAccountId,
+  lockPayoutRecoveryStatus,
   normalizeConnectEntityType,
+  payoutRecoveryAfterRefund,
   recipientCapability
 };

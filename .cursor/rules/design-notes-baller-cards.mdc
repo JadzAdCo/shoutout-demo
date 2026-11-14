@@ -1,0 +1,51 @@
+# Baller metal cards — Black Card + Baller's Alert
+
+Resume: `@baller$` / `$black-card$` / `$ballers-alert$`.
+
+## Product
+
+| Template id | Name | Price | Brand on face | Audience |
+|---|---|---|---|---|
+| `blackCard` | **Black Card** | $75 (`7500`) | Baller's Express BUSINESS | Shared / every venue (STANDARD) |
+| `ballersAlert` | **Baller's Alert** | $100 (`10000`) | Baller's Express BUSINESS + face | Shared / every venue (STANDARD) |
+| `blackCardAmex` | Black Card (Amex) | $75 | Same package art (private twin) | **Master Admin + Aurelia only** |
+| `ballersAlertAmex` | Baller's Alert (Amex) | $100 | Same package art + face | **Master Admin + Aurelia only** |
+
+Owner (Nov 4–5 2026): public face uses **Baller's Express**. Package art (`reports/baller-cards/express-package/`) is the canonical base — metallic gold **BALLER'S EXPRESS / BUSINESS**, Valid Thru **12/50**, ornate gold rim, warrior medallion. Legacy AMEX microtext inside the medallion/border may remain; do not treat that as a request to rebrand. Amex twins stay Master Admin + Aurelia only while consent is pending.
+
+## Composer
+
+- **Name or @handle:** FloqR display name · FloqR/@Mingl handle · Instagram · manual → `mainText` / `displayName`. Preserve casing, accents, Unicode, and a leading `@`. No forced uppercase.
+- **Company (optional):** blank by default · presets `WE'RE OUTSIDE LLC` · `Bad Boy Inc.` · `BaddB$ches Only Corp` · custom → `subText` / `companyName`. **Max 25 characters.** Blank leaves the finished card row empty (no placeholder).
+- **Baller's Alert:** face photo **required** (`requiresFacePhoto`). Dual actions: **Upload photo** (no `capture`) + **Take photo** (`capture="user"`, file fallback). Same pipeline. Cancel keeps prior valid image.
+- **Background removal:** on **Upload/Take** (not only Submit) — client shows local + LED preview immediately, uploads to Storage, then server `baller-portrait-mask` via `functions/gemini-portrait-mask.js` (`@google/genai`, default `gemini-3.8-flash`; override `FLOQR_GEMINI_SEGMENTATION_MODEL`). Returns full-frame alpha PNG mask (base64 PNG or polygon fallback); client composites original with `destination-in`. Placement (zoom/pos) is editable without re-running Gemini. Soft-fail keeps original. Edge quality is coarse (not pro hair matting). File input must stay visually-hidden (`.baller-file-input-host`), never `display:none`.
+- **Display:** card layers scale ~0.935 so flashing red halo (`baller-red-halo-behind`) sits in the black margin behind/around the art (full-bleed LED clips outer-only shadows); face oval uses cutout + transparent slot (never a white plate) + `ballerFaceScale` / `ballerFaceObjectPositionY`.
+- **Gemini audit (s3.2.88+):** every mask/edit success/failure writes `geminiApiAccessLogs` (+ `appLogs` category `gemini`) with `failureReason`; failures are `severity:"critical"` and flash Master Admin **Diagnostics → Application Logging** via `FLOQRCriticalLogBlink` until Acknowledge; 30-day retention; Master Admin or FloqR Admin read; hourly failure inbox.
+
+## Display
+
+- Art: `images/baller/*-{2x1,4x3}.png` (+ `-amex-` twins) from `scripts/build-baller-card-photos.py` ← `express-package/ballers-express-business.png`. Letterbox for LED aspect; never crop the ornate rim.
+- Class: `baller-card` (+ `baller-alert`). Name/company metallic gold emboss in the lower-left blank rows (`top:~74%`) — **same typeface and size** (`ballerTypeVh`, +50% vs s3.2.82). Empty company uses `:empty { display:none }`.
+- **Face (s3.2.83):** `#mediaSlot` reparented to canvas; face oval +20% and nudged −3mm left / +4mm down on card (`2x1`: 16.832% / 22.01% / 8.642% × 20.704%; `64x48`: 8.286% / 26.464% / 10.879% × 17.368%). Bottom gold-strip mark is **Baller** (not AMEX).
+- `resolveBallerBackgroundUrl` forces packaged PNG over stale SVG.
+- Valid Thru **12/50** is burned into the package art (not a separate overlay).
+
+## Gates
+
+- Catalog: public pair in `SHOUTOUT_STANDARD_TEMPLATE_IDS`; Amex twins `venueIds:['temp-democlub-1']` + `masterAdminOnly:true` (not STANDARD).
+- Client: `renderTemplates` hides `masterAdminOnly` unless Master Admin.
+- Server: `commerce-functions` forces price; Amex requires `isServerAdminAuth` + Aurelia club id.
+- Rules: `validFreePatronShoutoutCreate` excludes all four ids (paid checkout only).
+
+## Do not
+
+- Do not list Amex twins for patrons or non-Aurelia venues.
+- Do not paint a second BALLER'S EXPRESS heading over the package art.
+- Do not cover the full medallion / helmet / chip with a rectangular photo.
+- Do not invent real payment BINs; art numbers stay fictional.
+
+## FIX PROMPT
+
+```
+Baller cards (express package): public blackCard ($75) + ballersAlert ($100); private Amex twins Master Admin + Aurelia. Package PNG base; name/@handle casing preserved; optional blank company; Alert face-only under helmet. Design notes: design-notes-baller-cards.mdc
+```

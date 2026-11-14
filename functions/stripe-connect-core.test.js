@@ -5,9 +5,12 @@ const assert = require("node:assert/strict");
 const {
   buildAccountLinkParams,
   buildRecipientAccountParams,
+  connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
-  normalizeConnectEntityType
+  lockPayoutRecoveryStatus,
+  normalizeConnectEntityType,
+  payoutRecoveryAfterRefund
 } = require("./stripe-connect-core");
 
 test("normalizes supported FLOQR Connect entity types", () => {
@@ -76,4 +79,58 @@ test("uses onboarding until transfers are active, then account update", () => {
   const update = buildAccountLinkParams({accountId:"acct_test", capabilityStatus:"active", refreshUrl:"https://example.com/refresh"});
   assert.equal(update.use_case.type, "account_update");
   assert.deepEqual(update.use_case.account_update.configurations, ["recipient"]);
+});
+
+test("Connect webhook account id ignores capability and application ids", () => {
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "account.updated",
+    data: {object: {id: "acct_club1"}}
+  }), "acct_club1");
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "capability.updated",
+    account: "acct_club2",
+    data: {object: {id: "transfers", account: "acct_club2"}}
+  }), "acct_club2");
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "capability.updated",
+    data: {object: {id: "card_payments", account: "acct_fromObject"}}
+  }), "acct_fromObject");
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "capability.updated",
+    data: {object: {id: "transfers"}}
+  }), "");
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "account.application.deauthorized",
+    account: "acct_club3",
+    data: {object: {id: "ca_123"}}
+  }), "acct_club3");
+  assert.equal(connectAccountIdFromWebhookEvent({
+    type: "account.application.deauthorized",
+    data: {object: {id: "ca_123"}}
+  }), "");
+});
+
+test("refund payout recovery is reversed when Stripe already reversed the destination transfer", () => {
+  assert.equal(payoutRecoveryAfterRefund({}, {reverseTransfer: true}), "not-applicable");
+  assert.equal(payoutRecoveryAfterRefund({connectedAccountId: "acct_club"}, {reverseTransfer: true}), "reversed");
+  assert.equal(payoutRecoveryAfterRefund({connectedAccountId: "acct_club"}), "");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club"},
+    {charge: {refunded: true, refunds: {object: "list", url: "/v1/charges/ch_1/refunds"}}}
+  ), "");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club"},
+    {charge: {refunds: {data: [{id: "re_1"}]}}}
+  ), "manual-transfer-reversal-review");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club", payoutRecoveryStatus: "reversed"},
+    {charge: {refunded: true}}
+  ), "reversed");
+  assert.equal(payoutRecoveryAfterRefund(
+    {connectedAccountId: "acct_club"},
+    {charge: {refunds: {data: [{id: "re_1", transfer_reversal: "trr_1"}]}}}
+  ), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("reversed", "manual-transfer-reversal-review"), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("manual-transfer-reversal-review", "reversed"), "reversed");
+  assert.equal(lockPayoutRecoveryStatus("", ""), "");
 });

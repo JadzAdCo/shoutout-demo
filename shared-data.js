@@ -332,8 +332,11 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
       "Tue 2026-08-11: GIMS",
       "Tue 2026-08-18: LA FOUINE",
       "Tue 2026-08-25: KISS KISS BANG BANG",
-      "Thu 2026-09-10: YOMO"
+      "Thu 2026-09-10: YOMO",
+      "Wed 2026-12-31: NYE'27 — New Year's Eve 2027"
     ],
+    featureGates:{shoutOut:true, guestList:true, vipReservations:true, ticketing:true},
+    vipReservationsEnabled:1,
     templates:["latin","hiphop","vip","neon","soccerJersey"],
     soccerJerseyTeamIds:["soccerCameroon","soccerRussia","soccerUkraine"],
     displayScreenFormatIds:["led-96x48","led-64x48","led-64x32"],
@@ -729,6 +732,13 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
       vipReservations: true,
       passes: true
     });
+    // Keep searchable even when showcase script is missing (feature landings used to miss this).
+    if (!aurelia.locationName) aurelia.locationName = "Aurelia (Demo Club)";
+    if (!aurelia.brandName) aurelia.brandName = "Aurelia";
+    aurelia.searchAliases = Array.from(new Set([
+      ...(Array.isArray(aurelia.searchAliases) ? aurelia.searchAliases : []),
+      "aurelia", "demo club", "temp-democlub-1"
+    ]));
   }
   ["decades-washington-dc", "lima-twist-washington-dc"].forEach(id => {
     const row = locations[id];
@@ -832,6 +842,31 @@ window.SHOUTOUT_EVENTS = {
     genres:["Reggaeton","Latin Urban"], artists:["YOMO"],
     eventDate:"2026-09-10", eventDay:"Thursday", eventTime:"Late", active:true,
     ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-nye-2027": {
+    eventName:"NYE'27 — New Year's Eve 2027",
+    locationId:"shoko-barcelona-spain",
+    clubLocationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Open Format","House","Reggaeton","Hip Hop","R&B"],
+    artists:["Guest DJs"],
+    presentedBy:["Shôko Barcelona"],
+    promoters:["Shôko"],
+    description:"Una noche sin filtros, sin pausas, sin excusas. From Barcelona — New Year's Eve into 2027 with VIP table packages across Terraza, Lounge, SUPER VIP, KAI ZEN, and LA SUÏTE.",
+    eventDate:"2026-12-31",
+    eventDay:"Thursday",
+    eventTime:"Late — into 2027",
+    agePolicy:"18+",
+    venueSpace:"Full club · Terraza · Lounge · SUPER VIP · KAI ZEN · LA SUÏTE",
+    flyerUrl:"./images/events/shoko-barcelona-nye-2027.png",
+    eventsPageUrl:"https://shoko.biz/",
+    ticketUrl:"https://shoko.biz/",
+    vipPassUrl:"./vip.html?location=shoko-barcelona-spain",
+    sourceUrls:["https://shoko.biz/"],
+    onboardingSource:"owner-nye-flyer-oct-2026",
+    vipNight:"2026-12-31",
+    vipNightPricing:true,
+    active:true
   },
   "chrystie-friday-night": {
     eventName:"Chrystie Cannes Friday Night", locationId:"chrystie-cannes-france",
@@ -1219,6 +1254,114 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     },
     tags:["shiloh","cat","kitty","aurelia","pet","cute","club exclusive","photo background","emoji","$30","96x48","64x48","64x32"]
   },
+  // Design notes: .cursor/rules/design-notes-classic-halloween.mdc
+  classicHalloween: {
+    id:'classicHalloween',
+    name:'Classic Halloween',
+    searchAliases:['classic halloween','halloween','halloween shoutout','spooky','ghost shoutout'],
+    scope:'Shared',
+    seasonal:true,
+    className:'classic-bw classic-halloween',
+    category:'Seasonal',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    allowEmoji:true,
+    halloweenFinale:true,
+    defaultBackgroundUrl:'./images/halloween/classic-halloween-2x1.svg',
+    priceCents:1500,
+    priceLabel:'$15',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'HAPPY HALLOWEEN 🎃',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:16,
+    maxMainCharacters:48,
+    maxSubCharacters:20,
+    identityRail:true,
+    identityAnimation:'identity-loop',
+    identityAnimationSeconds:6,
+    description:'The classic three-line ShoutOut board on a moonlit graveyard with jack-o\'-lanterns. Emoji welcome. At the end of every message cycle, white ghosts burst out of a grave and rush toward the crowd while the Reaper rises and bats swarm. $15. Sizes: 96×48, 64×48, 64×32.',
+    tags:["halloween","classic halloween","spooky","ghost","ghosts","graveyard","pumpkin","jack-o-lantern","reaper","bats","seasonal","classic","3 lines","emoji","$15","96x48","64x48","64x32"]
+  },
+
+  // Design notes: .cursor/rules/design-notes-baller-cards.mdc
+  // Public: Baller's Alert only (Black Card / Black Card Amex removed from catalog).
+  // Private Amex twin for Alert remains Master Admin + Aurelia only.
+  ballersAlert: {
+    id:'ballersAlert',
+    name:"Baller's Alert",
+    searchAliases:['ballers alert',"baller's alert",'baller alert','face card','black card photo','black card'],
+    scope:'Shared',
+    className:'baller-card baller-alert',
+    category:'VIP',
+    mediaMode:'Face photo required',
+    supportsMedia:true,
+    supportsImage:true,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerAlert:true,
+    ballerBrand:'ballers',
+    requiresFacePhoto:true,
+    defaultBackgroundUrl:'./images/baller/ballers-alert-2x1.png',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/ballers-alert-2x1.png',
+      'led-64x32':'./images/baller/ballers-alert-2x1.png',
+      'led-64x48':'./images/baller/ballers-alert-4x3.png'
+    },
+    priceCents:10000,
+    priceLabel:'$100',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:18,
+    textProfileId:'ballerCard',
+    description:"Baller's Express BUSINESS card with your face under the warrior helmet (helmet, rim, and chip stay). Valid Thru 12/50. Name/@handle + optional company (max 18, UPPERCASE). $100. All LED sizes.",
+    howItWorks:"Upload photo → Photo library / files or Camera with face guide. Gemini isolates the person; place the face under the helmet with zoom/position. Add name or @handle and optional company (max 18, UPPERCASE), then pay $100.",
+    tags:["baller's alert","face","photo","gemini","ai","vip","$100","96x48","64x48","64x32"]
+  },
+  ballersAlertAmex: {
+    id:'ballersAlertAmex',
+    name:"Baller's Alert (Amex)",
+    searchAliases:['amex ballers alert','american express face card'],
+    scope:'Club',
+    venueIds:['temp-democlub-1'],
+    masterAdminOnly:true,
+    className:'baller-card baller-alert',
+    category:'Aurelia Private',
+    mediaMode:'Face photo required',
+    supportsMedia:true,
+    supportsImage:true,
+    backgroundEditable:false,
+    ballerCard:true,
+    ballerAlert:true,
+    ballerBrand:'amex',
+    requiresFacePhoto:true,
+    defaultBackgroundUrl:'./images/baller/ballers-alert-amex-2x1.png',
+    backgroundUrlByFormat:{
+      'led-96x48':'./images/baller/ballers-alert-amex-2x1.png',
+      'led-64x32':'./images/baller/ballers-alert-amex-2x1.png',
+      'led-64x48':'./images/baller/ballers-alert-amex-4x3.png'
+    },
+    priceCents:10000,
+    priceLabel:'$100',
+    Is96x48:1, Is64x48:1, Is64x32:1,
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    defaultMain:'',
+    defaultSub:'',
+    lineCount:2,
+    maxCharactersPerLine:22,
+    maxMainCharacters:28,
+    maxSubCharacters:18,
+    textProfileId:'ballerCard',
+    description:"PRIVATE — Master Admin + Aurelia only. Baller's Express BUSINESS package art with face under the warrior helmet; Valid Thru 12/50. $100.",
+    tags:["amex","american express","baller's alert","private","master admin","aurelia","face","$100"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, description:'Upscale nightlife ShoutOut for VIP tables and luxury nights. Locked text geometry with an always-on FloqR card.', howitWorks:{'led-96x48':'On 96×48, Luxury Night plays as a text ShoutOut on a three-line board (about 16 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle (display name, Instagram, or Mingl handle).','led-64x48':'On 64×48, Luxury Night plays as a text ShoutOut on a three-line board (about 16 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle.','led-64x32':'On 64×32, Luxury Night plays as a text ShoutOut on a tighter three-line board (about 10 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle.'}, tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, description:'Corporate and brand-event ShoutOut on a classic board. Clean three-line message plus FloqR card branding.', howitWorks:{'led-96x48':'On 96×48, Corporate Event plays as a text ShoutOut on a three-line board (about 15 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle (display name, Instagram, or Mingl handle).','led-64x48':'On 64×48, Corporate Event plays as a text ShoutOut on a three-line board (about 16 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle.','led-64x32':'On 64×32, Corporate Event plays as a text ShoutOut on a tighter three-line board (about 10 characters per line). A FloqR card below always shows PRESENTED BY FloqMedia and, when the patron opts in, alternates every 6 seconds with FROM @handle.'}, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {
@@ -1466,7 +1609,7 @@ window.FLOQRTemplateCopy = window.FLOQRTemplateCopy || {
   }
 };
 
-window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey'];
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey','classicHalloween','ballersAlert'];
 
 window.FLOQR_DISPLAY_FORMATS = {
   "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},
@@ -1548,6 +1691,14 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:30,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:26,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2}
+    }
+  },
+  ballerCard: {
+    label:"Baller's Express metal card — name + company",
+    formats:{
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:22,maxMainCharacters:28,maxSubCharacters:18,minimumFontPixels:36,mainTextSizePercent:5.2,subTextSizePercent:3.6},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:18,maxMainCharacters:22,maxSubCharacters:18,minimumFontPixels:32,mainTextSizePercent:4.8,subTextSizePercent:3.4},
+      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:18,maxMainCharacters:22,maxSubCharacters:18,minimumFontPixels:28,mainTextSizePercent:5.0,subTextSizePercent:3.5}
     }
   }
 };

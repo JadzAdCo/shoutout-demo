@@ -925,6 +925,140 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:inline-block;
   transform-origin:center bottom;
 }
+.display-canvas.soccer-jersey-template .jersey-word-line{
+  display:flex;
+  justify-content:center;
+  white-space:nowrap;
+  line-height:.58;
+}
+/* PHILA / NBA dual faces: front shows team+number; back shows name+number */
+.display-canvas.nba-dual-faces.nba-dual-phase-front #displayMain.soccer-jersey-name.hidden,
+.display-canvas.nba-dual-faces.nba-dual-phase-back .soccer-jersey-team.hidden{
+  display:none!important;
+}
+/* PHILA pair (v1): both kits simultaneous — back left, front right; message scene is separate */
+.display-canvas.nba-jersey-pair{
+  background:#000!important;
+}
+.display-canvas.nba-jersey-pair .display-background{
+  /* Pair stage owns the kits — hide the single-face photo layer. */
+  opacity:0!important;
+  background-image:none!important;
+}
+.display-canvas.nba-jersey-pair .display-identity-rail,
+.display-canvas.nba-jersey-pair .soccer-jersey-rail,
+.display-canvas.nba-jersey-pair .floqr-card-bottom{
+  /* FloqMedia rail must not cover the pair composition. */
+  display:none!important;
+}
+.display-canvas.nba-jersey-pair .nba-pair-stage{
+  position:absolute;
+  inset:4%;
+  z-index:3;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(4px,1.2%,10px);
+  align-items:end;
+  pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-stage.hidden{display:none!important}
+.display-canvas.nba-jersey-pair .nba-pair-face{
+  position:relative;
+  height:100%;
+  min-height:0;
+}
+.display-canvas.nba-jersey-pair .nba-pair-kit{
+  position:absolute;
+  inset:0;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+}
+.display-canvas.nba-jersey-pair .nba-pair-back{z-index:1}
+.display-canvas.nba-jersey-pair .nba-pair-front{z-index:2;transform:translateX(-6%)}
+.display-canvas.nba-jersey-pair .nba-pair-name,
+.display-canvas.nba-jersey-pair .nba-pair-team,
+.display-canvas.nba-jersey-pair .nba-pair-number{
+  position:absolute;
+  left:12%;
+  right:12%;
+  text-align:center;
+  color:var(--nba-pair-ink, #006BB6);
+  font-family:"Agency FB","Arial Narrow","Franklin Gothic Condensed",Impact,sans-serif;
+  font-weight:800;
+  letter-spacing:.04em;
+  /* Glyph-shaped cover only (no chest-wide ::before plates — those read as blotches).
+     text-shadow paints front-to-back: red outline first, fabric underlay behind. */
+  text-shadow:
+    0.045em 0 0 var(--nba-pair-outline, #ED174C),
+    -0.045em 0 0 var(--nba-pair-outline, #ED174C),
+    0 0.045em 0 var(--nba-pair-outline, #ED174C),
+    0 -0.045em 0 var(--nba-pair-outline, #ED174C),
+    0.08em 0.08em 0 var(--nba-pair-outline, #ED174C),
+    -0.08em -0.08em 0 var(--nba-pair-outline, #ED174C),
+    0.08em -0.08em 0 var(--nba-pair-outline, #ED174C),
+    -0.08em 0.08em 0 var(--nba-pair-outline, #ED174C),
+    0 0 0.28em var(--nba-pair-underlay, #ffffff),
+    0.12em 0 0.04em var(--nba-pair-underlay, #ffffff),
+    -0.12em 0 0.04em var(--nba-pair-underlay, #ffffff),
+    0 0.12em 0.04em var(--nba-pair-underlay, #ffffff),
+    0 -0.12em 0.04em var(--nba-pair-underlay, #ffffff),
+    0.1em 0.1em 0.05em var(--nba-pair-underlay, #ffffff),
+    -0.1em -0.1em 0.05em var(--nba-pair-underlay, #ffffff);
+  line-height:.9;
+  pointer-events:none;
+}
+.display-canvas.nba-jersey-pair .nba-pair-name{
+  top:18%;
+  font-size:clamp(10px,4.2cqw,42px);
+}
+.display-canvas.nba-jersey-pair .nba-pair-team{
+  top:22%;
+  font-size:clamp(12px,5cqw,48px);
+}
+.display-canvas.nba-jersey-pair .nba-pair-number{
+  top:38%;
+  font-size:clamp(28px,14cqw,120px);
+  letter-spacing:.02em;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel{
+  position:absolute;
+  inset:6% 5%;
+  z-index:6;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(160deg,#0b1c4a 0%,#1a3a8f 55%,#c8102e 100%);
+  border-radius:clamp(8px,1.5%,16px);
+  padding:clamp(8px,2%,20px);
+  box-sizing:border-box;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel[data-pair-message-theme="maryland"],
+.display-canvas.nba-jersey-pair[data-pair-message-theme="maryland"] .nba-pair-shout-panel{
+  background:linear-gradient(160deg,#7a0c1c 0%,#E21833 52%,#FFD520 100%);
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel[data-pair-message-theme="phila"],
+.display-canvas.nba-jersey-pair[data-pair-message-theme="phila"] .nba-pair-shout-panel{
+  background:linear-gradient(160deg,#0b1c4a 0%,#1a3a8f 55%,#c8102e 100%);
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-panel.hidden{display:none!important}
+.display-canvas.nba-jersey-pair .nba-pair-shout-lines{
+  display:grid;
+  gap:clamp(2px,.6%,8px);
+  width:100%;
+  text-align:center;
+}
+.display-canvas.nba-jersey-pair .nba-pair-shout-lines b{
+  display:block;
+  color:#fff;
+  font-family:"Agency FB","Arial Narrow",Impact,sans-serif;
+  font-weight:800;
+  font-size:clamp(18px,7cqw,72px);
+  line-height:1.05;
+  letter-spacing:.02em;
+  text-shadow:0 2px 0 rgba(0,0,0,.35);
+}
+.display-canvas.nba-jersey-pair.nba-pair-phase-message .nba-pair-stage{display:none!important}
+.display-canvas.nba-jersey-pair.nba-pair-phase-jersey .nba-pair-shout-panel{display:none!important}
 .display-canvas.soccer-jersey-template .soccer-jersey-team.hidden{
   display:none!important;
 }
@@ -1158,6 +1292,20 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .soccer-jersey-team{
   display:none!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:calc(16.2% + var(--nfl-photo-stack-y))!important;
+  height:6.8%!important;
+  left:28%!important;
+  right:28%!important;
+  color:var(--jersey-plate-ink,#fff)!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  font-weight:900!important;
+  letter-spacing:.03em!important;
+  -webkit-text-stroke:0.045em rgba(0,0,0,.55);
+  paint-order:stroke fill;
+  z-index:7!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
   /* Patron name BETWEEN baked club nameplate and number (was overlapping plate). */
@@ -1490,6 +1638,76 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   min-height:0!important;
   filter:none;
 }
+/*
+ * NBA / Terps photo backs are portrait. Soccer's width-based `84% auto` overshoots short LEDs,
+ * crops the hem, and makes a screen-bottom FloqMedia card read as mid-kit. Fit the full tank by
+ * height and leave a bottom band for FloqMedia (under the hem).
+ */
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back{
+  --nba-kit-top:1%;
+  --nba-kit-h:86%;
+  --nba-kit-left:34%;
+  --nba-kit-right:34%;
+  --nba-kit-w:32%;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-background{
+  background-size:auto var(--nba-kit-h,86%)!important;
+  background-position:center var(--nba-kit-top,1%)!important;
+  background-repeat:no-repeat!important;
+  background-color:#000!important;
+}
+.display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back,
+.display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back,
+.display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back{
+  /* 4:3 board → taller relative width for the same height-fit tank. */
+  --nba-kit-left:26%;
+  --nba-kit-right:26%;
+  --nba-kit-w:48%;
+}
+/* NBA / Terps — FloqMedia card sits under the kit like soccer/NFL (never mid-jersey). */
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.floqr-card-bottom,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.floqr-card-bottom,
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail.floqr-card-bottom,
+.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-64x32="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-is-96x48="1"].soccer-jersey-template.jersey-sport-nba .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nba.jersey-photo-back .display-identity-rail.soccer-jersey-rail{
+  display:grid!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:60!important;
+  position:absolute!important;
+  top:auto!important;
+  bottom:1.2%!important;
+  height:11%!important;
+  left:6%!important;
+  right:6%!important;
+  transform:none!important;
+  margin:0!important;
+  padding:0!important;
+  pointer-events:none!important;
+  place-items:center!important;
+  overflow:visible!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail .classic-identity-shell,
+.display-canvas.soccer-jersey-template.jersey-sport-nba .display-identity-rail.floqr-card-bottom .classic-identity-shell{
+  animation:nflFloqrCardPulse 8s cubic-bezier(.2,.8,.2,1) infinite!important;
+  opacity:1!important;
+  visibility:visible!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  filter:none;
+}
 .display-canvas.soccer-jersey-template.jersey-sport-nfl .classic-identity-shell small{
   font-size:clamp(8px,1.6vh,16px)!important;
   letter-spacing:.14em!important;
@@ -1689,6 +1907,71 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   height:42%!important;
   font-style:normal;
   text-shadow:0 3px 0 rgba(0,0,0,.55),0 0 16px rgba(0,0,0,.35)!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team{
+  display:flex!important;
+  top:calc(var(--nba-kit-top,1%) + 0.103 * var(--nba-kit-h,86%))!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  font-size:11vh!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
+  color:var(--jersey-secondary,#fff)!important;
+  letter-spacing:.08em!important;
+  font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;
+  -webkit-text-stroke:0.055em #111;
+  paint-order:stroke fill;
+  text-shadow:0 0.04em 0 #111;
+  z-index:7!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back.jersey-overlay-wordmark .soccer-jersey-team.jersey-word-wrap{
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  white-space:normal!important;
+  line-height:.58!important;
+  gap:.04em!important;
+  letter-spacing:.08em!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displayMain.soccer-jersey-name{
+  top:calc(var(--nba-kit-top,1%) + 0.2315 * var(--nba-kit-h,86%))!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  place-items:start center!important;
+  overflow:visible!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
+  letter-spacing:.12em!important;
+  color:var(--jersey-secondary,#fff)!important;
+  -webkit-text-stroke:0.045em #111;
+  paint-order:stroke fill;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number{
+  top:calc(var(--nba-kit-top,1%) + 0.32355 * var(--nba-kit-h,86%))!important;
+  height:auto!important;
+  align-items:flex-start!important;
+  align-content:start!important;
+  place-items:start center!important;
+  overflow:visible!important;
+  left:calc(var(--nba-kit-left,34%) + 4%)!important;
+  right:calc(var(--nba-kit-right,34%) + 4%)!important;
+  color:var(--jersey-secondary,#fff)!important;
+  line-height:.82!important;
+  font-family:"Alumni Sans Collegiate One",Impact,"Arial Narrow",sans-serif!important;
+  -webkit-text-stroke:0!important;
+  paint-order:normal;
+  letter-spacing:0!important;
+  text-shadow:none!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nba.jersey-photo-back #displaySub.soccer-jersey-number .varsity-num{
+  display:block;
+  height:1em; /* vertical size from jerseyOutput.number (+20% in s3.2.97) */
+  width:auto;
+  overflow:visible;
+  margin-inline:auto;
+  /* Horizontal only: −30% width, height unchanged (s3.2.98) */
+  transform:scaleX(.7);
+  transform-origin:center top;
 }
 
 /* NFL — bulkier yoke, shoulder name plate, huge thick number */
@@ -2017,3 +2300,301 @@ body.floqcast-live-active .heist-brand-slide{
 .display-canvas.shiloh-cat #displaySub:empty{display:none}
 .display-canvas.shiloh-cat[data-screen-format-id="led-64x48"] .display-center{left:50%;right:3%;top:10%;bottom:10%}
 .display-canvas.shiloh-cat[data-screen-format-id="led-64x32"] .display-center{left:47%;right:2.5%;top:6%;bottom:6%}
+
+/* Classic Halloween (all venues, all sizes). Design notes: .cursor/rules/design-notes-classic-halloween.mdc */
+.display-canvas.classic-halloween{background:#05030a!important}
+.display-canvas.classic-halloween .display-background{background-size:cover!important;background-position:center bottom!important}
+.display-canvas.classic-halloween[data-screen-format-id="led-64x48"] .display-background{background-image:url("images/halloween/classic-halloween-4x3.svg")!important}
+.display-canvas.classic-halloween .display-center{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+.display-canvas.classic-halloween.classic-board-template .display-center:before{border-color:#ff7a18!important;box-shadow:0 0 14px rgba(255,122,24,.75),0 0 30px rgba(140,60,255,.35),0 0 0 2px rgba(255,214,150,.45) inset!important}
+.display-canvas.classic-halloween.classic-board-template .display-center:after{background:linear-gradient(180deg,rgba(16,8,26,.88),rgba(7,3,12,.92))!important;border-color:#ff7a18!important;box-shadow:0 0 18px rgba(255,122,24,.45),inset 0 0 26px rgba(120,50,200,.28)!important}
+.display-canvas.classic-halloween #displayMain.classic-bw-board{color:#fff3e0!important;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(100% / var(--board-lines,3) - 2px),rgba(150,90,220,.22) calc(100% / var(--board-lines,3) - 2px),rgba(150,90,220,.22) calc(100% / var(--board-lines,3) + 2px))!important}
+.display-canvas.classic-halloween.classic-board-template .classic-board-lines b{color:#fff3e0!important;font-family:Impact,"Arial Black","Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",Arial,sans-serif!important;text-shadow:0 2px 0 #3a1600,0 0 .18em rgba(255,122,24,.6),0 4px 10px rgba(0,0,0,.6)!important;filter:none!important}
+.display-canvas.classic-halloween .classic-identity-shell{border-color:#ffe2b8!important;background:linear-gradient(90deg,#050505 0 18%,#e85a00 18% 82%,#050505 82% 100%)!important;box-shadow:0 0 0 clamp(2px,.35vw,5px) #ff7a18,0 0 clamp(12px,2vw,30px) rgba(255,122,24,.65)!important}
+
+.halloween-finale{position:absolute;inset:0;z-index:60;pointer-events:none;overflow:hidden;opacity:0;visibility:hidden}
+.halloween-finale .hw-defs{position:absolute;width:0;height:0;overflow:hidden}
+.halloween-finale.is-playing{visibility:visible;animation:hwLayer 6s linear forwards}
+/* RIP tomb + grave pit: top-left origin; ghosts burst from there (owner Nov 2026). */
+.halloween-finale .hw-grave{position:absolute;left:8%;top:4%;width:22%;transform:translate(-20%,-120%)}
+.halloween-finale .hw-ghost{position:absolute;left:14%;top:18%;width:10%;opacity:0;transform-origin:50% 60%;filter:drop-shadow(0 0 .6vh rgba(255,255,255,.85)) drop-shadow(0 0 1.6vh rgba(170,255,220,.35))}
+.halloween-finale .hw-reaper{position:absolute;right:4%;bottom:0;height:76%;opacity:0;transform:translateY(100%);transform-origin:50% 100%;filter:drop-shadow(0 0 1.2vh rgba(140,60,255,.55))}
+.halloween-finale .hw-bat{position:absolute;left:18%;top:22%;width:6%;opacity:0}
+.halloween-finale.is-playing .hw-grave{animation:hwGraveRise .7s cubic-bezier(.2,.8,.3,1) forwards,hwGraveSink .5s ease-in 5.3s forwards}
+.halloween-finale.is-playing .hw-pit-glow{animation:hwPitPulse .5s ease-in-out .5s 6 alternate}
+.halloween-finale.is-playing .hw-ghost{animation:hwGhostRush 3.1s cubic-bezier(.45,0,.85,.55) var(--d) forwards}
+.halloween-finale.is-playing .hw-reaper{animation:hwReaper 4.6s ease-in-out .8s forwards}
+.halloween-finale.is-playing .hw-reaper-eye{animation:hwEyes .4s ease-in-out 1.4s 8 alternate}
+.halloween-finale.is-playing .hw-bat{animation:hwBat 2.4s ease-out var(--d) forwards,hwFlap .18s linear var(--d) 13 alternate}
+.display-canvas.halloween-finale-on .display-text-overlay{animation:hwBoardDim 6s ease-in-out forwards}
+@keyframes hwLayer{0%{opacity:0}6%{opacity:1}92%{opacity:1}100%{opacity:0}}
+@keyframes hwBoardDim{0%{filter:none}10%{filter:brightness(.55) saturate(.8)}85%{filter:brightness(.55) saturate(.8)}100%{filter:none}}
+@keyframes hwGraveRise{to{transform:translate(0,0)}}
+@keyframes hwGraveSink{from{transform:translate(0,0)}to{transform:translate(-20%,-120%)}}
+@keyframes hwPitPulse{from{opacity:.55}to{opacity:1}}
+@keyframes hwGhostRush{
+  0%{opacity:0;transform:translate(-20%,10%) scale(calc(.18 * var(--s,1))) rotate(0)}
+  14%{opacity:1;transform:translate(calc(-10% + var(--gx) * .08),40%) scale(calc(.42 * var(--s,1))) rotate(-7deg)}
+  34%{opacity:1;transform:translate(calc(10% + var(--gx) * .25),90%) scale(calc(.7 * var(--s,1))) rotate(7deg)}
+  58%{opacity:1;transform:translate(calc(30% + var(--gx) * .55),120%) scale(calc(1.5 * var(--s,1))) rotate(-5deg)}
+  100%{opacity:0;transform:translate(calc(55% + var(--gx)),140%) scale(calc(6 * var(--s,1))) rotate(4deg)}
+}
+@keyframes hwReaper{
+  0%{opacity:0;transform:translateY(100%) scale(.9)}
+  22%{opacity:1;transform:translateY(0) scale(1)}
+  62%{opacity:1;transform:translateY(-2%) scale(1.04)}
+  82%{opacity:1;transform:translate(-30%,-4%) scale(1.55)}
+  100%{opacity:0;transform:translate(-45%,-4%) scale(1.9)}
+}
+@keyframes hwEyes{from{opacity:.45}to{opacity:1}}
+@keyframes hwBat{
+  0%{opacity:0;transform:translate(-50%,0) scale(.3)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--bx)),var(--by)) scale(1.6)}
+}
+@keyframes hwFlap{from{scale:1 1}to{scale:1 .45}}
+@media (prefers-reduced-motion: reduce){
+  .halloween-finale.is-playing{animation:hwLayer 6s linear forwards}
+  .halloween-finale.is-playing *{animation:none!important}
+  .halloween-finale.is-playing .hw-grave{transform:translate(0,0)}
+  .halloween-finale.is-playing .hw-ghost{opacity:.92;transform:translate(calc(20% + var(--gx) * .35),70%) scale(calc(.75 * var(--s,1)))}
+  .halloween-finale.is-playing .hw-reaper{opacity:1;transform:none}
+  .halloween-finale.is-playing .hw-bat{display:none}
+  .display-canvas.halloween-finale-on .display-text-overlay{animation:none;filter:brightness(.6)}
+}
+/* Baller's Express package art — design-notes-baller-cards.mdc / express-package */
+.display-canvas.baller-card{
+  /* Black stage behind a slightly scaled-down card so the red halo sits
+     BEHIND/around the card (full-bleed LED clips any outer canvas shadow). */
+  background:#000!important;
+  overflow:hidden;
+  animation:none;
+  box-shadow:none;
+}
+.display-canvas.baller-card::before{
+  /* Soft red wash in the black margin behind the card */
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 48%,rgba(255,28,28,.55) 0%,rgba(160,0,0,.28) 38%,transparent 70%);
+  animation:baller-red-halo-wash 1.15s ease-in-out infinite;
+}
+.display-canvas.baller-card .display-background,
+.display-canvas.baller-card > .media-slot,
+.display-canvas.baller-card > .baller-chip-overlay,
+.display-canvas.baller-card .display-center{
+  /* Keep face/chip/name aligned with package art while leaving a halo margin */
+  transform:scale(0.935);
+  transform-origin:center center;
+}
+.display-canvas.baller-card .display-background{
+  z-index:1;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  /* Slightly tighter than the PNG silhouette so CSS AA blends black→black, never a pale wedge. */
+  border-radius:3.15% / 5.1%;
+  overflow:hidden;
+  background-color:#000!important;
+  /* Kill subpixel light fringe from GPU compositing of the rounded clip. */
+  outline:2px solid #000;
+  outline-offset:-1px;
+  box-shadow:
+    0 0 0 3px rgba(255,40,40,.95),
+    0 0 18px 6px rgba(255,24,24,.7),
+    0 0 40px 14px rgba(180,0,0,.45);
+  animation:baller-red-halo-behind 1.15s ease-in-out infinite;
+}
+.display-canvas.baller-card::after{
+  content:"";
+  position:absolute;
+  inset:3.1%;
+  z-index:20;
+  pointer-events:none;
+  border-radius:2.55% / 4.2%;
+  box-sizing:border-box;
+  border:2px solid rgba(255,48,48,.85);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,70,70,.55),
+    inset 0 0 16px 3px rgba(255,24,24,.35);
+  animation:baller-red-halo-inset 1.15s ease-in-out infinite;
+}
+@keyframes baller-red-halo-wash{
+  0%,100%{opacity:.55}
+  50%{opacity:1}
+}
+@keyframes baller-red-halo-behind{
+  0%,100%{
+    box-shadow:
+      0 0 0 2px rgba(220,20,20,.55),
+      0 0 12px 4px rgba(255,24,24,.4),
+      0 0 28px 10px rgba(160,0,0,.28);
+  }
+  50%{
+    box-shadow:
+      0 0 0 4px rgba(255,48,48,1),
+      0 0 26px 10px rgba(255,24,24,.85),
+      0 0 52px 20px rgba(200,0,0,.55);
+  }
+}
+@keyframes baller-red-halo-inset{
+  0%,100%{border-color:rgba(220,20,20,.45);opacity:.7}
+  50%{border-color:rgba(255,60,60,1);opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .display-canvas.baller-card::before,
+  .display-canvas.baller-card::after,
+  .display-canvas.baller-card .display-background{animation:none}
+}
+/* Name + company sit in the blank emboss band BELOW Valid Thru.
+   Raised from the near-rim 74% band by ~4 mm of card height (≈10% → 64%)
+   so FloqMedia clears the bottom gold rim; +10% type in display-app.js. */
+.display-canvas.baller-card .display-center{
+  position:absolute;
+  left:16.6%;
+  width:35%;
+  right:auto;
+  top:64%;
+  bottom:auto;
+  height:auto;
+  max-height:16%;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  text-align:left;
+  gap:.35vh;
+  z-index:3;
+  pointer-events:none;
+}
+.display-canvas.baller-card #displayMain,
+.display-canvas.baller-card #displaySub,
+.display-canvas.baller-card .baller-cardholder-name,
+.display-canvas.baller-card .baller-company-name{
+  margin:0;
+  padding:0;
+  line-height:1.05;
+  text-transform:none!important; /* preserve entered casing / @handles */
+  font-family:"Times New Roman",Times,Georgia,serif;
+  letter-spacing:.04em; /* tighter so 25-char company (e.g. WE'RE OUTSIDE LLC) fits */
+  font-weight:700;
+  /* Metallic gold emboss — same face for name + company */
+  color:#e8d5a3!important;
+  text-shadow:
+    0 1px 0 rgba(255,236,190,.55),
+    0 -1px 0 rgba(40,24,4,.85),
+    1px 1px 0 rgba(20,12,0,.55)!important;
+  max-width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:clip; /* prefer full company text over ellipsis truncate */
+  filter:none!important;
+}
+.display-canvas.baller-card #displaySub:empty,
+.display-canvas.baller-card .baller-company-name:empty{
+  display:none!important;
+}
+.display-canvas.baller-card .display-identity-rail,
+.display-canvas.baller-card .display-brand,
+.display-canvas.baller-card .brand{
+  display:none!important;
+}
+/* Face ellipse covers most of the roman face + Rewards/Service/Member/Since band.
+   mediaSlot is reparented onto #displayCanvas — % are of the card canvas.
+   Complete EMV chip overlays the face at original art position (z-index above). */
+.display-canvas.baller-alert > .media-slot,
+.display-canvas.baller-alert .media-slot{
+  position:absolute;
+  /* 2x1: face on legion + Rewards text column (rebuilt with black margin) */
+  left:17.617%;
+  top:9.481%;
+  width:14.498%;
+  height:32.925%;
+  aspect-ratio:auto;
+  min-height:0;
+  border-radius:50%;
+  overflow:hidden;
+  border:0;
+  box-shadow:none;
+  z-index:4;
+  /* Never paint a white/opaque plate behind the cutout — warrior art must show through */
+  background:transparent!important;
+  display:block!important;
+  padding:0;
+  margin:0;
+  pointer-events:none;
+  mix-blend-mode:normal;
+}
+.display-canvas.baller-alert .media-slot img,
+.display-canvas.baller-alert .media-slot video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center var(--baller-face-pos-y, 28%);
+  transform:scale(var(--baller-face-scale, 1));
+  transform-origin:center var(--baller-face-pos-y, 28%);
+  /* Cutout PNG must not paint a white/letterbox plate over warrior art */
+  background:transparent!important;
+  background-color:transparent!important;
+  mix-blend-mode:normal;
+  /* Soft engraved warm cast so photo sits in the medallion */
+  filter:sepia(.18) contrast(1.05) brightness(.96) saturate(.92);
+}
+.display-canvas.baller-alert .media-slot .media-placeholder{
+  display:none!important; /* empty = keep warrior face from base art */
+}
+.display-canvas.baller-alert > .baller-chip-overlay,
+.display-canvas.baller-alert .baller-chip-overlay{
+  position:absolute;
+  left:21.879%;
+  top:38.682%;
+  width:8.131%;
+  height:9.505%;
+  z-index:5; /* above face slot — portrait cannot distort chip */
+  pointer-events:none;
+  margin:0;
+  padding:0;
+  border:0;
+  background:#0a0806;
+  border-radius:12%;
+  overflow:hidden;
+}
+.display-canvas.baller-alert .baller-chip-overlay img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  image-rendering:auto;
+}
+.display-canvas.baller-card:not(.baller-alert) .media-slot,
+.display-canvas.baller-card:not(.baller-alert) .baller-chip-overlay{
+  display:none!important;
+}
+.display-canvas.baller-card[data-screen-format-id="led-64x48"] .display-center,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"] .display-center{
+  left:8%;
+  width:44%;
+  top:60%;
+}
+/* led-64x48 → 4x3 letterboxed package art */
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert > .media-slot,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .media-slot,
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .media-slot,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .media-slot{
+  left:8.919%;
+  top:15.636%;
+  width:18.41%;
+  height:27.878%;
+}
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert > .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert > .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="led-64x48"].baller-alert .baller-chip-overlay,
+.display-canvas.baller-card[data-screen-format-id="p125-64x48"].baller-alert .baller-chip-overlay{
+  left:14.33%;
+  top:40.361%;
+  width:10.325%;
+  height:8.048%;
+}

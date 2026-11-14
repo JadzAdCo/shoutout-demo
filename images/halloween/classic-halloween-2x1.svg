@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 800" width="1600" height="800" preserveAspectRatio="xMidYMax slice">
+  <title>Classic Halloween — moonlit graveyard</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#04020a"/>
+      <stop offset=".55" stop-color="#140826"/>
+      <stop offset=".8" stop-color="#26103a"/>
+      <stop offset="1" stop-color="#170a1c"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff2c8" stop-opacity=".42"/>
+      <stop offset=".45" stop-color="#ffb36b" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#7a3cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moon" cx="40%" cy="38%" r="65%">
+      <stop offset="0" stop-color="#fffbe8"/>
+      <stop offset=".7" stop-color="#f3e3b2"/>
+      <stop offset="1" stop-color="#cdb57d"/>
+    </radialGradient>
+    <radialGradient id="pk" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffa53a"/>
+      <stop offset=".55" stop-color="#e8600e"/>
+      <stop offset="1" stop-color="#7c2604"/>
+    </radialGradient>
+    <radialGradient id="pkGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a1c" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ff8a1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mist" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#9a74e8" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#9a74e8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <symbol id="pumpkin" viewBox="-100 -100 200 180" overflow="visible">
+      <ellipse cx="0" cy="0" rx="150" ry="120" fill="url(#pkGlow)"/>
+      <path d="M-6-74C-6-92 6-98 16-92L8-68z" fill="#3c5b1c"/>
+      <ellipse cx="-40" cy="0" rx="50" ry="70" fill="url(#pk)"/>
+      <ellipse cx="40" cy="0" rx="50" ry="70" fill="url(#pk)"/>
+      <ellipse cx="0" cy="0" rx="44" ry="74" fill="url(#pk)"/>
+      <path d="M-22-66C-34-30-34 30-22 70M22-66C34-30 34 30 22 70" stroke="#8a2f06" stroke-width="3" fill="none" opacity=".7"/>
+      <g fill="#ffd84a" filter="url(#glow)">
+        <path d="M-48-18h28l-14-26z"/>
+        <path d="M20-18h28L34-44z"/>
+        <path d="M-8 4h16L0-10z"/>
+        <path d="M-58 16Q0 70 58 16l-12 7-8 12-10-10-12 14-10-12-10 12-10-12-10 12-10-12-10 8z"/>
+      </g>
+    </symbol>
+    <symbol id="stone" viewBox="-40 -70 80 140" overflow="visible">
+      <path d="M-30 64V-22c0-30 14-44 30-44s30 14 30 44v86z" fill="#29232f" stroke="#4a4157" stroke-width="3"/>
+      <text x="0" y="-8" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#5e546d">RIP</text>
+      <path d="M-16 12h32M-12 24h24" stroke="#3b3346" stroke-width="3"/>
+    </symbol>
+    <symbol id="cross" viewBox="-40 -70 80 140" overflow="visible">
+      <path d="M-6 64V-30h-22v-14h22v-22h12v22h22v14H6v94z" fill="#231d2a" stroke="#40384c" stroke-width="3"/>
+    </symbol>
+    <path id="bat" d="M30 10c-2-6-6-6-8-2-8-6-16-4-20-2 8 4 6 10 6 12 6-4 10-2 12 0 4-4 8-2 10 4 2-6 6-8 10-4 2-2 6-4 12 0 0-2-2-8 6-12-4-2-12-4-20 2-2-4-6-4-8 2z" fill="#030106"/>
+    <g id="tree" fill="none" stroke="#030106" stroke-linecap="round">
+      <path d="M44 820C56 660 30 520 62 400 82 320 70 220 112 118" stroke-width="44"/>
+      <path d="M62 404C124 364 182 334 262 252" stroke-width="18"/>
+      <path d="M112 120C152 80 204 58 302 28" stroke-width="12"/>
+      <path d="M82 300C142 270 162 200 232 150" stroke-width="12"/>
+      <path d="M70 524C130 502 172 472 236 470" stroke-width="12"/>
+      <path d="M262 252l62-24M232 150l40-50M302 28l60-20M196 330l44 32M236 470l50 18M180 92l-10-46M150 280l-4-44" stroke-width="5"/>
+      <path d="M50 640C20 610-10 600-40 600" stroke-width="14"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="800" fill="url(#sky)"/>
+  <g fill="#fff8e6">
+    <circle cx="140" cy="40" r="1.6"/><circle cx="330" cy="70" r="1.2"/><circle cx="460" cy="28" r="1.8"/><circle cx="610" cy="88" r="1.1"/>
+    <circle cx="720" cy="36" r="1.5"/><circle cx="860" cy="64" r="1.2"/><circle cx="980" cy="22" r="1.7"/><circle cx="1090" cy="80" r="1.1"/>
+    <circle cx="1420" cy="30" r="1.6"/><circle cx="1530" cy="120" r="1.2"/><circle cx="1570" cy="40" r="1.4"/><circle cx="40" cy="150" r="1.3"/>
+    <circle cx="560" cy="190" r="1"/><circle cx="780" cy="160" r="1.2"/><circle cx="1010" cy="200" r="1"/><circle cx="260" cy="210" r="1.1"/>
+  </g>
+
+  <circle cx="1210" cy="190" r="260" fill="url(#moonGlow)"/>
+  <circle cx="1210" cy="190" r="112" fill="url(#moon)"/>
+  <g fill="#d8c58f" opacity=".55">
+    <ellipse cx="1176" cy="160" rx="18" ry="14"/><ellipse cx="1238" cy="214" rx="24" ry="18"/><ellipse cx="1250" cy="150" rx="10" ry="8"/><ellipse cx="1186" cy="236" rx="9" ry="7"/>
+  </g>
+  <g fill="#3a1d5c" opacity=".55">
+    <ellipse cx="1150" cy="250" rx="170" ry="16"/><ellipse cx="1290" cy="226" rx="120" ry="11"/>
+  </g>
+
+  <use href="#bat" xlink:href="#bat" transform="translate(1050 110) scale(1.3)"/>
+  <use href="#bat" xlink:href="#bat" transform="translate(1310 70) scale(.9)"/>
+  <use href="#bat" xlink:href="#bat" transform="translate(520 14) scale(1.1)"/>
+  <use href="#bat" xlink:href="#bat" transform="translate(1440 8) scale(.8)"/>
+  <use href="#bat" xlink:href="#bat" transform="translate(180 12) scale(.75)"/>
+
+  <path d="M0 600Q200 556 420 590T860 578T1300 566T1600 588V800H0z" fill="#100a1a"/>
+  <g opacity=".85">
+    <use href="#stone" xlink:href="#stone" x="340" y="520" width="80" height="140" transform="translate(-40 -70)"/>
+    <use href="#cross" xlink:href="#cross" x="560" y="512" width="80" height="140" transform="translate(-40 -70)"/>
+    <use href="#stone" xlink:href="#stone" x="1020" y="518" width="80" height="140" transform="translate(-40 -70)"/>
+    <use href="#cross" xlink:href="#cross" x="1240" y="514" width="80" height="140" transform="translate(-40 -70)"/>
+  </g>
+
+  <use href="#tree" xlink:href="#tree"/>
+  <use href="#tree" xlink:href="#tree" transform="translate(1600 0) scale(-1 1)"/>
+
+  <path d="M0 650Q300 628 600 654T1200 644T1600 660V800H0z" fill="#07040b"/>
+  <use href="#cross" xlink:href="#cross" x="1372" y="672" width="96" height="168" transform="translate(-48 -84)"/>
+  <use href="#cross" xlink:href="#cross" x="330" y="704" width="80" height="140" transform="translate(-40 -70)"/>
+
+  <ellipse cx="800" cy="790" rx="900" ry="60" fill="url(#mist)"/>
+  <ellipse cx="160" cy="770" rx="320" ry="50" fill="url(#mist)"/>
+  <ellipse cx="1440" cy="770" rx="320" ry="50" fill="url(#mist)"/>
+
+  <use href="#pumpkin" xlink:href="#pumpkin" x="104" y="722" width="150" height="135" transform="translate(-75 -75)"/>
+  <use href="#pumpkin" xlink:href="#pumpkin" x="210" y="768" width="78" height="70" transform="translate(-39 -39)"/>
+  <use href="#pumpkin" xlink:href="#pumpkin" x="1496" y="722" width="150" height="135" transform="translate(-75 -75)"/>
+  <use href="#pumpkin" xlink:href="#pumpkin" x="1390" y="768" width="78" height="70" transform="translate(-39 -39)"/>
+</svg>

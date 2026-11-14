@@ -24,7 +24,7 @@ function loadRepository() {
     setTimeout
   };
   win.window = win;
-  vm.runInContext(read("floqai-help-repository.js"), vm.createContext(win), {filename: "floqai-help-repository.js"});
+  vm.runInContext(read("botdee-help-repository.js"), vm.createContext(win), {filename: "botdee-help-repository.js"});
   return win.FLOQRHelpRepository;
 }
 
@@ -144,14 +144,14 @@ test("All Locations help is Master Admin only in the repository and the server c
   }
   repo.register({id: HELP_ID, title: "All Locations", body: entry.body, source: "help-attach"});
   assert.deepEqual([...repo.entries().find(row => row.id === HELP_ID).audiences], ["masterAdmin"], "DOM registration must keep the seeded audience");
-  const classes = JSON.parse(read("functions/floqai-content-classes.json"));
+  const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help[HELP_ID], ["masterAdmin"]);
 });
 
 test("Master Admin audit/hero assets are cache-busted (s3.2.00 package)", () => {
   const html = read("master-admin.html");
   assert.match(html, /\.\/help-attach\.js\?v=s3\.\d+\.\d+"/);
-  for (const file of ["admin.css", "floqai-help-repository.js", "master-feature-services.js"]) {
+  for (const file of ["admin.css", "botdee-help-repository.js", "master-feature-services.js"]) {
     assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.\\d+\\.\\d+"`));
   }
   assert.doesNotMatch(html, /display2?\.html\?location=[^"'\s<>]*[?&]v=/);

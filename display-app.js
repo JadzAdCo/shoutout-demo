@@ -304,11 +304,14 @@
       jerseyPrimary: data.jerseyPrimary || source.jerseyPrimary || template.jerseyPrimary,
       jerseySecondary: data.jerseySecondary || source.jerseySecondary || template.jerseySecondary,
       jerseyAccent: data.jerseyAccent || source.jerseyAccent || source.jerseySecondary || template.jerseyAccent,
+      jerseyPlateInk: data.jerseyPlateInk || source.jerseyPlateInk || template.jerseyPlateInk || "",
+      jerseyOverlayWordmark: data.jerseyOverlayWordmark === true || data.jerseyOverlayWordmark === "1" || data.jerseyOverlayWordmark === 1 || !!(source.jerseyOverlayWordmark || template.jerseyOverlayWordmark),
       jerseyCssBack: (data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl)
         ? false
         : (data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.jerseyCssBack !== false)),
       defaultBackgroundUrl: data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl || "",
-      jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || ""
+      jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || "",
+      jerseyOutput: source.jerseyOutput || template.jerseyOutput || null
     };
   }
 
@@ -333,24 +336,51 @@
     return teamEl;
   }
 
-  // Country/club sits on a ~7° collar arch (ends lower, middle follows the neckline).
-  function paintJerseyCollarArch(el, label) {
+  // Basketball team/state words span archDegrees (25°) from the left end to the right end.
+  function jerseyArchRise(len, spanDeg) {
+    const span = spanDeg || 14;
+    if (len <= 1) return 0;
+    const half = (span * Math.PI / 180) / 2;
+    return ((1 - Math.cos(half)) / (2 * Math.sin(half))) * (len - 1) * 0.72;
+  }
+
+  function jerseyArchHtml(chars, spanDeg) {
+    const span = spanDeg || 14;
+    const last = Math.max(1, chars.length - 1);
+    const riseEm = jerseyArchRise(chars.length, span);
+    return chars.map((ch, i) => {
+      const t = chars.length === 1 ? 0 : (i / last) - 0.5;
+      const rot = t * span;
+      const lift = (1 - Math.abs(t) * 2) * riseEm;
+      const glyph = ch === " " ? "&nbsp;" : esc(ch);
+      return `<span class="jersey-arch-ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${glyph}</span>`;
+    }).join("");
+  }
+
+  function paintJerseyCollarArch(el, label, arch) {
     if (!el) return;
-    const chars = glyphs(cleanBoardText(label));
+    const likeMaryland = arch === "maryland" || typeof arch === "number";
+    const span = typeof arch === "number" ? arch : (likeMaryland ? 25 : 14);
+    const cleaned = String(cleanBoardText(label) || "").trim();
+    const lines = likeMaryland ? cleaned.split(/\s+/).filter(Boolean).slice(0, 2) : [];
+    if (lines.length >= 2) {
+      el.classList.add("jersey-collar-arch", "jersey-word-wrap");
+      el.innerHTML = lines.map(part => {
+        const chars = glyphs(part);
+        const rise = jerseyArchRise(chars.length, span);
+        return `<span class="jersey-word-line" style="padding-top:${rise.toFixed(3)}em">${jerseyArchHtml(chars, span)}</span>`;
+      }).join("");
+      return;
+    }
+    el.classList.remove("jersey-word-wrap");
+    const chars = glyphs(cleaned);
     if (!chars.length) {
       el.textContent = "";
       el.classList.remove("jersey-collar-arch");
       return;
     }
     el.classList.add("jersey-collar-arch");
-    const last = Math.max(1, chars.length - 1);
-    el.innerHTML = chars.map((ch, i) => {
-      const t = chars.length === 1 ? 0 : (i / last) - 0.5;
-      const rot = t * 14;
-      const lift = (1 - Math.abs(t) * 2) * 0.18;
-      const glyph = ch === " " ? "&nbsp;" : esc(ch);
-      return `<span class="jersey-arch-ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${glyph}</span>`;
-    }).join("");
+    el.innerHTML = jerseyArchHtml(chars, span);
   }
 
   /** Words are never split: a word longer than maxChars gets its own row and the board fitter shrinks it. */
@@ -588,6 +618,66 @@
     return "soccer";
   }
 
+  /**
+   * NBA / Terps photo backs are portrait (≈3:4). Width-based `84% auto` overshoots short LEDs,
+   * crops the hem, and leaves FloqMedia mid-kit. Fit the full tank by height and leave a bottom
+   * band for the FloqMedia card (same idea as soccer under the hem).
+   */
+  function nbaPhotoKitLayout(formatId = "") {
+    const id = String(formatId || "");
+    const boardAspect = /64x48/i.test(id) ? 4 / 3 : 2; // 96×48 and 64×32 are 2:1
+    const imgAspect = 0.75; // w/h of packaged NBA / Terps backs
+    const kitTop = 0.01;
+    const kitH = 0.86; // ~13% reserved for FloqMedia under the hem
+    const kitW = (kitH * imgAspect) / boardAspect;
+    const kitLeft = Math.max(0, (1 - kitW) / 2);
+    const kitRight = kitLeft;
+    // On-screen jersey width in vh (= height-fraction × image aspect × 100).
+    const kitWidthVh = kitH * imgAspect * 100;
+    return {kitTop, kitH, kitW, kitLeft, kitRight, kitWidthVh, boardAspect, imgAspect};
+  }
+
+  function clearNbaPhotoKitVars(canvasEl) {
+    if (!canvasEl || !canvasEl.style) return;
+    ["--nba-kit-top", "--nba-kit-h", "--nba-kit-left", "--nba-kit-right", "--nba-kit-w"].forEach(name => {
+      canvasEl.style.removeProperty(name);
+    });
+  }
+
+  function pinJerseyFloqMediaRail(rail, {sport = ""} = {}) {
+    if (!rail || !rail.style) return;
+    // Soccer (and any non-NBA/NFL kit) must drop a prior Terps/NFL inline pin or CSS top:80%/86% never wins.
+    if (sport !== "nba" && sport !== "nfl") {
+      clearPinnedJerseyFloqMediaRail(rail);
+      return;
+    }
+    rail.style.setProperty("top", "auto", "important");
+    rail.style.setProperty("bottom", "1.2%", "important");
+    rail.style.setProperty("left", sport === "nba" ? "6%" : "5%", "important");
+    rail.style.setProperty("right", sport === "nba" ? "6%" : "5%", "important");
+    rail.style.setProperty("height", sport === "nba" ? "11%" : "12%", "important");
+    rail.style.setProperty("transform", "none", "important");
+    rail.style.setProperty("z-index", "60", "important");
+    rail.style.setProperty("opacity", "1", "important");
+    rail.style.setProperty("visibility", "visible", "important");
+  }
+
+  function clearPinnedJerseyFloqMediaRail(rail) {
+    if (!rail || !rail.style) return;
+    ["top", "bottom", "left", "right", "height", "transform", "z-index", "opacity", "visibility"].forEach(name => {
+      rail.style.removeProperty(name);
+    });
+  }
+
+  /** Drop NBA height-fit inline offsets so soccer/NFL/Halloween CSS can own the box again. */
+  function clearNbaPhotoKitInlineLayout() {
+    ["displayMain", "displaySub", "displayJerseyTeam"].forEach(id => {
+      const el = byId(id);
+      if (!el || !el.style) return;
+      ["top", "left", "right", "letter-spacing", "line-height"].forEach(name => el.style.removeProperty(name));
+    });
+  }
+
   function lockerRoomBackground() {
     return "#000";
   }
@@ -800,6 +890,79 @@
     scheduleMoneyRain(canvas, layer, moneyRainDelaySeconds(template));
   }
 
+  /**
+   * Classic Halloween finale: the board holds HALLOWEEN_BOARD_PHASES × 6s, then ghosts / Reaper / bats play for one 6s phase.
+   * Runs on FLOQRFrameLoop.cycle (no template timer). Design notes: .cursor/rules/design-notes-classic-halloween.mdc
+   */
+  const HALLOWEEN_FINALE_CYCLE = "halloween-finale";
+  const HALLOWEEN_BOARD_PHASES = 3;
+  const HALLOWEEN_GHOSTS = [
+    {gx: "-34vw", d: ".55s", s: "1"}, {gx: "26vw", d: ".9s", s: ".9"}, {gx: "-8vw", d: "1.25s", s: "1.15"},
+    {gx: "38vw", d: "1.6s", s: ".85"}, {gx: "-22vw", d: "1.95s", s: "1"}, {gx: "10vw", d: "2.3s", s: "1.2"}
+  ];
+  const HALLOWEEN_BATS = [
+    {bx: "-46vw", by: "-38vh", d: ".2s"}, {bx: "44vw", by: "-42vh", d: ".35s"}, {bx: "-30vw", by: "-50vh", d: ".5s"},
+    {bx: "36vw", by: "-24vh", d: ".65s"}, {bx: "-50vw", by: "-14vh", d: ".8s"}, {bx: "20vw", by: "-54vh", d: ".95s"}
+  ];
+  let halloweenFinaleKey = "";
+
+  function halloweenFinaleMarkup() {
+    const ghosts = HALLOWEEN_GHOSTS.map(g => `<svg class="hw-ghost" style="--gx:${g.gx};--d:${g.d};--s:${g.s}" viewBox="0 0 100 124"><use href="#hwGhostShape"/></svg>`).join("");
+    const bats = HALLOWEEN_BATS.map(b => `<svg class="hw-bat" style="--bx:${b.bx};--by:${b.by};--d:${b.d}" viewBox="0 0 60 30"><use href="#hwBatShape"/></svg>`).join("");
+    return `<svg class="hw-defs" width="0" height="0" focusable="false"><defs>
+<radialGradient id="hwGhostFill" cx="42%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".62" stop-color="#f1f4fa"/><stop offset="1" stop-color="#c9d2e2"/></radialGradient>
+<radialGradient id="hwPitGlow" cx="50%" cy="60%" r="50%"><stop offset="0" stop-color="#e9fff4" stop-opacity=".95"/><stop offset=".5" stop-color="#9dffc9" stop-opacity=".45"/><stop offset="1" stop-color="#4dff9a" stop-opacity="0"/></radialGradient>
+<g id="hwGhostShape"><path fill="url(#hwGhostFill)" d="M50 4C25 4 12 24 12 50v56c6-8 12-8 16 2 5 10 10 10 14-1 4-10 12-10 16 0 4 11 9 11 14 1 4-10 10-10 16-2V50C88 24 75 4 50 4z"/><path fill="url(#hwGhostFill)" d="M14 58C4 60 0 70 3 78c5-2 9-6 12-10zM86 58c10 2 14 12 11 20-5-2-9-6-12-10z"/><ellipse cx="37" cy="46" rx="7" ry="10" fill="#0d0d12"/><ellipse cx="63" cy="46" rx="7" ry="10" fill="#0d0d12"/><ellipse cx="50" cy="71" rx="8" ry="11" fill="#16161d"/></g>
+<path id="hwBatShape" fill="#07040b" d="M30 10c-2-6-6-6-8-2-8-6-16-4-20-2 8 4 6 10 6 12 6-4 10-2 12 0 4-4 8-2 10 4 2-6 6-8 10-4 2-2 6-4 12 0 0-2-2-8 6-12-4-2-12-4-20 2-2-4-6-4-8 2z"/>
+</defs></svg>
+<svg class="hw-reaper" viewBox="0 0 130 210"><path fill="#09060f" stroke="#3d3050" stroke-width="2" d="M62 8C38 8 28 30 28 54l-6 70-12 82h104l-12-82-6-70C96 30 86 8 62 8z"/><ellipse cx="62" cy="54" rx="18" ry="23" fill="#000"/><circle class="hw-reaper-eye" cx="55" cy="52" r="3.2" fill="#ff5a1f"/><circle class="hw-reaper-eye" cx="69" cy="52" r="3.2" fill="#ff5a1f"/><path fill="none" stroke="#09060f" stroke-width="10" stroke-linecap="round" d="M92 96q16 4 18 18"/><path stroke="#6b5a45" stroke-width="4.5" stroke-linecap="round" d="M110 22l4 186"/><path fill="#d3d8e2" d="M110 24C82 4 44 10 18 36c30-14 62-14 92 2z"/><path fill="#ece9f6" opacity=".45" d="M106 26C82 14 52 16 30 32c26-10 52-10 76 0z"/></svg>
+<div class="hw-bats">${bats}</div>
+<div class="hw-ghosts">${ghosts}</div>
+<svg class="hw-grave" viewBox="0 0 220 130"><ellipse cx="110" cy="104" rx="104" ry="24" fill="#2b1a12"/><ellipse cx="110" cy="100" rx="96" ry="18" fill="#3b2617"/><path fill="#3a3346" stroke="#625872" stroke-width="3" d="M76 82V34c0-20 15-30 34-30s34 10 34 30v48z"/><text x="110" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#9d93ad">RIP</text><path fill="#241c2e" d="M86 70h48v4H86z"/><ellipse class="hw-pit-glow" cx="110" cy="102" rx="78" ry="26" fill="url(#hwPitGlow)"/><ellipse cx="110" cy="104" rx="56" ry="9" fill="#050305"/><path fill="#1c120c" d="M20 108c18-8 34-6 46 2-14 6-32 6-46-2zM154 110c14-8 30-8 46 0-16 6-32 6-46 0z"/></svg>`;
+  }
+
+  function stopHalloweenFinale() {
+    frameLoop()?.stopCycle?.(HALLOWEEN_FINALE_CYCLE);
+    halloweenFinaleKey = "";
+    byId("displayHalloweenFinale")?.remove();
+    byId("displayCanvas")?.classList.remove("halloween-finale-on");
+  }
+
+  function syncHalloweenFinale(canvas, enabled, data = {}) {
+    const loop = frameLoop();
+    if (!enabled || !canvas || typeof loop?.cycle !== "function") {
+      stopHalloweenFinale();
+      return;
+    }
+    let layer = byId("displayHalloweenFinale");
+    const key = livePlaybackKey(data);
+    if (layer && key === halloweenFinaleKey) {
+      canvas.classList.toggle("halloween-finale-on", layer.classList.contains("is-playing"));
+      return;
+    }
+    stopHalloweenFinale();
+    halloweenFinaleKey = key;
+    layer = document.createElement("div");
+    layer.id = "displayHalloweenFinale";
+    layer.className = "halloween-finale";
+    layer.setAttribute("aria-hidden", "true");
+    layer.innerHTML = halloweenFinaleMarkup();
+    canvas.appendChild(layer);
+    loop.cycle(HALLOWEEN_FINALE_CYCLE, {
+      count: HALLOWEEN_BOARD_PHASES + 1,
+      onAdvance: index => {
+        const host = byId("displayCanvas");
+        if (!host || !layer.isConnected) {
+          loop.stopCycle(HALLOWEEN_FINALE_CYCLE);
+          return;
+        }
+        const playing = index === HALLOWEEN_BOARD_PHASES;
+        layer.classList.toggle("is-playing", playing);
+        host.classList.toggle("halloween-finale-on", playing);
+      }
+    });
+  }
+
   function resetBackgroundLayer(bgEl) {
     if (!bgEl) return;
     bgEl.className = "display-background";
@@ -818,11 +981,63 @@
     if (!url) return "cover";
     const designed = String(template.defaultBackgroundUrl || "").trim();
     if (designed && url === designed) return "cover";
-    if (template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
+    if (template.ballerCard || template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
       return "cover";
     }
     if (String(data.mediaFit || "").toLowerCase() === "cover") return "cover";
     return "contain";
+  }
+
+  /* Baller's Alert face must sit on the Centurion medallion (% of canvas).
+     #mediaSlot lives under .display-center (bottom name band) in the HTML —
+     absolute % there puts the face over the cardholder name. Reparent for alert. */
+  const BALLER_CHIP_SRC = "./images/baller/baller-emv-chip.png";
+
+  function placeBallerFaceSlot(canvas, center, mediaSlot, onCanvas) {
+    if (!mediaSlot || !canvas) return;
+    if (onCanvas) {
+      if (mediaSlot.parentElement !== canvas) canvas.appendChild(mediaSlot);
+      return;
+    }
+    if (center && mediaSlot.parentElement !== center) {
+      const before = byId("displayMain") || center.firstChild;
+      center.insertBefore(mediaSlot, before);
+    }
+  }
+
+  /** Complete EMV chip PNG over the face ellipse at original package-art position. */
+  function placeBallerChipOverlay(canvas, show) {
+    if (!canvas) return;
+    let chip = byId("ballerChipOverlay");
+    if (!chip) {
+      chip = document.createElement("div");
+      chip.id = "ballerChipOverlay";
+      chip.className = "baller-chip-overlay hidden";
+      chip.setAttribute("aria-hidden", "true");
+      chip.innerHTML = `<img src="${BALLER_CHIP_SRC}" alt="" decoding="async">`;
+      canvas.appendChild(chip);
+    } else if (chip.parentElement !== canvas) {
+      canvas.appendChild(chip);
+    }
+    chip.classList.toggle("hidden", !show);
+    // Keep chip after mediaSlot in DOM so paint order matches z-index (image then chip).
+    if (show) {
+      const face = byId("mediaSlot");
+      if (face && face.parentElement === canvas && chip.previousElementSibling !== face) {
+        canvas.appendChild(chip);
+      }
+    }
+  }
+
+  function resolveBallerBackgroundUrl(data = {}, template = {}, screenFormatId = "") {
+    const formatKey = String(screenFormatId || "").replace(/^p125-/, "led-");
+    const byFormat = (template.backgroundUrlByFormat && (template.backgroundUrlByFormat[screenFormatId] || template.backgroundUrlByFormat[formatKey])) || "";
+    const packaged = byFormat || template.defaultBackgroundUrl || "";
+    const raw = String(data.backgroundUrl || packaged || "").trim();
+    // Stale Firestore / preview rows may still point at the SVG triple-line draft.
+    if (!raw || /\.svg(\?|$)/i.test(raw) || /baller\/.*\.svg/i.test(raw)) return packaged;
+    if (packaged && /\.png(\?|$)/i.test(packaged) && !/\.png(\?|$)/i.test(raw)) return packaged;
+    return raw || packaged;
   }
 
   function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "", fit = "cover" } = {}) {
@@ -919,7 +1134,7 @@
     }, 6000);
   }
 
-  function startFrameLoop(canvas, onAdvance) {
+  function startFrameLoop(canvas, onAdvance, options = {}) {
     if (!canvas) return;
     if (!frameLoop()?.start) {
       startFrameLoopFallback(canvas, onAdvance);
@@ -930,7 +1145,7 @@
       window.__floqrFrameLoopFallback = null;
     }
     try {
-      frameLoop().start(canvas, {onAdvance});
+      frameLoop().start(canvas, {onAdvance, ...options});
     } catch (err) {
       // FrameLoop must never abort jersey render (FloqR paint runs after this).
       console.warn("FLOQRFrameLoop.start failed; using fallback", err);
@@ -941,6 +1156,180 @@
   function refitNflShoutOnCopy(phase, canvas) {
     if (phase !== "copy" || !canvas?.classList.contains("nfl-dual-rotate")) return;
     fitNflShoutPanel(byId("displayNflShoutPanel"));
+  }
+
+  function applyNbaDualFacePhase(phase, canvas, urls = {}) {
+    if (!canvas?.classList.contains("nba-dual-faces")) return;
+    // Pair mode (PHILA v1): both kits stay visible in "media"/jersey; "copy" is the ShoutOut card.
+    if (canvas.classList.contains("nba-jersey-pair")) {
+      applyNbaJerseyPairPhase(phase, canvas, urls);
+      return;
+    }
+    // Legacy rotate: media = front kit (team + number), copy = back kit (name + number).
+    const faceFront = phase === "copy"
+      ? false
+      : phase === "media"
+        ? true
+        : !canvas.classList.contains("nba-dual-phase-back");
+    canvas.classList.toggle("nba-dual-phase-front", faceFront);
+    canvas.classList.toggle("nba-dual-phase-back", !faceFront);
+    const bgEl = byId("displayBackground");
+    const url = faceFront
+      ? (urls.frontBackgroundUrl || urls.defaultBackgroundUrl || "")
+      : (urls.backBackgroundUrl || urls.defaultBackgroundUrl || "");
+    if (bgEl && url) {
+      applyBackgroundLayer(bgEl, { backgroundUrl: url, fit: "contain" });
+      canvas.classList.add("has-background-layer");
+    }
+    const teamEl = byId("displayJerseyTeam");
+    const nameEl = byId("displayMain");
+    if (teamEl) {
+      teamEl.classList.toggle("hidden", !faceFront);
+      teamEl.setAttribute("aria-hidden", faceFront ? "false" : "true");
+    }
+    if (nameEl) {
+      nameEl.classList.toggle("hidden", faceFront);
+      nameEl.setAttribute("aria-hidden", faceFront ? "true" : "false");
+    }
+  }
+
+  function ensureNbaPairStage(canvas) {
+    let stage = byId("nbaPairStage");
+    if (stage && stage.parentElement !== canvas) {
+      canvas.appendChild(stage);
+    }
+    if (!stage) {
+      stage = document.createElement("div");
+      stage.id = "nbaPairStage";
+      stage.className = "nba-pair-stage";
+      stage.innerHTML = `
+        <div class="nba-pair-face nba-pair-back" data-face="back">
+          <div class="nba-pair-kit" aria-hidden="true"></div>
+          <div class="nba-pair-name"></div>
+          <div class="nba-pair-number"></div>
+        </div>
+        <div class="nba-pair-face nba-pair-front" data-face="front">
+          <div class="nba-pair-kit" aria-hidden="true"></div>
+          <div class="nba-pair-team"></div>
+          <div class="nba-pair-number"></div>
+        </div>`;
+      canvas.appendChild(stage);
+    }
+    return stage;
+  }
+
+  function hideNbaPairStage() {
+    clearNbaPairChrome(byId("displayCanvas"));
+  }
+
+  function clearNbaPairChrome(canvas) {
+    const stage = byId("nbaPairStage");
+    if (stage) stage.remove();
+    const shout = byId("displayNbaPairShoutPanel");
+    if (shout) shout.remove();
+    canvas?.classList.remove("nba-jersey-pair", "nba-pair-phase-jersey", "nba-pair-phase-message");
+  }
+
+  function paintNbaPairStage(canvas, {
+    frontUrl = "",
+    backUrl = "",
+    nameText = "",
+    teamText = "",
+    numberText = "",
+    overlayInk = "",
+    overlayOutline = ""
+  } = {}) {
+    const stage = ensureNbaPairStage(canvas);
+    stage.classList.remove("hidden");
+    stage.setAttribute("aria-hidden", "false");
+    const ink = safeRender.safeColor?.(overlayInk || "#006BB6", "#006BB6") || "#006BB6";
+    const outline = safeRender.safeColor?.(overlayOutline || "#ED174C", "#ED174C") || "#ED174C";
+    // Underlay matches kit fabric (glyph halo only — no chest plates):
+    // white Association behind blue ink; Icon royal behind white ink.
+    const underlay = (() => {
+      const hex = String(ink || "").replace("#", "").toLowerCase();
+      if (hex === "ffffff" || hex === "fff") return "#006BB6";
+      return "#ffffff";
+    })();
+    canvas.style.setProperty("--nba-pair-ink", ink);
+    canvas.style.setProperty("--nba-pair-outline", outline);
+    canvas.style.setProperty("--nba-pair-underlay", underlay);
+
+    const faceOut = pairFaceOutput || {};
+    const fill = safeRender.safeColor?.(jerseySecondary || ink, ink) || ink;
+    const accent = safeRender.safeColor?.(jerseyAccent || outline, outline) || outline;
+    const primary = safeRender.safeColor?.(jerseyPrimary || underlay, underlay) || underlay;
+    const numOutline = window.FLOQRVarsityNumbers
+      ? window.FLOQRVarsityNumbers.outline(fill, accent, primary)
+      : outline;
+
+    paintIndependentPairFace(stage.querySelector(".nba-pair-back"), {
+      kitUrl: backUrl,
+      faceOutput: faceOut.back || faceOut,
+      nameText,
+      numberText,
+      fillColor: fill,
+      outlineColor: numOutline,
+      mode: "back"
+    });
+    paintIndependentPairFace(stage.querySelector(".nba-pair-front"), {
+      kitUrl: frontUrl,
+      faceOutput: faceOut.front || faceOut,
+      teamText,
+      numberText,
+      fillColor: fill,
+      outlineColor: numOutline,
+      mode: "front"
+    });
+    // Pair kit stacks own the lettering — keep single-face soccer overlays empty + hidden.
+    ["displayMain", "displaySub", "displayJerseyTeam"].forEach((id) => {
+      const el = byId(id);
+      if (!el) return;
+      el.classList.add("hidden");
+      el.setAttribute("aria-hidden", "true");
+      if (id !== "displayJerseyTeam") el.textContent = "";
+    });
+  }
+
+  function applyNbaJerseyPairPhase(phase, canvas, urls = {}) {
+    const showMessage = phase === "copy";
+    canvas.classList.toggle("nba-pair-phase-jersey", !showMessage);
+    canvas.classList.toggle("nba-pair-phase-message", showMessage);
+    canvas.classList.toggle("nba-dual-phase-front", false);
+    canvas.classList.toggle("nba-dual-phase-back", false);
+    const stage = byId("nbaPairStage");
+    if (stage) {
+      stage.classList.toggle("hidden", showMessage);
+      stage.setAttribute("aria-hidden", showMessage ? "true" : "false");
+    }
+    const shout = byId("displayNbaPairShoutPanel");
+    if (shout) {
+      shout.classList.toggle("hidden", !showMessage);
+      shout.setAttribute("aria-hidden", showMessage ? "false" : "true");
+    }
+    // Soft studio field behind the pair; message scene uses the shout panel.
+    const bgEl = byId("displayBackground");
+    if (bgEl && !showMessage) {
+      applyBackgroundLayer(bgEl, { backgroundColor: "#f4f4f6" });
+      canvas.classList.add("has-background-layer");
+    }
+    // Hide single-kit overlays while the pair stage owns the jersey scene.
+    const teamEl = byId("displayJerseyTeam");
+    const nameEl = byId("displayMain");
+    const numEl = byId("displaySub");
+    if (teamEl) {
+      teamEl.classList.add("hidden");
+      teamEl.setAttribute("aria-hidden", "true");
+    }
+    if (nameEl) {
+      nameEl.classList.add("hidden");
+      nameEl.setAttribute("aria-hidden", "true");
+    }
+    if (numEl) {
+      numEl.classList.add("hidden");
+      numEl.setAttribute("aria-hidden", "true");
+    }
+    void urls;
   }
 
   function heistBrandLogoUrl() {
@@ -1092,16 +1481,32 @@
       jerseyPrimary: params.get("jerseyPrimary") || "",
       jerseySecondary: params.get("jerseySecondary") || "",
       jerseyAccent: params.get("jerseyAccent") || "",
+      jerseyPlateInk: params.get("jerseyPlateInk") || "",
+      jerseyOverlayWordmark: params.get("jerseyOverlayWordmark") === "1",
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       attribution: params.get("attribution") || "",
       includeAttribution: params.get("includeAttribution") === "1",
       attributionChoice: params.get("attributionChoice") || "",
       jerseyPatronName: params.get("jerseyPatronName") || "",
       nflDualLayout: params.get("nflDualLayout") === "1",
+      nbaDualFaces: params.get("nbaDualFaces") === "1",
+      nbaJerseyPair: params.get("nbaJerseyPair") === "1",
+      frontBackgroundUrl: params.get("frontBackgroundUrl") || "",
+      backBackgroundUrl: params.get("backBackgroundUrl") || "",
+      jerseyColorway: params.get("jerseyColorway") || "",
+      overlayInk: params.get("overlayInk") || "",
+      overlayOutline: params.get("overlayOutline") || "",
+      pairMessageTheme: params.get("pairMessageTheme") || "",
       sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
       stadiumMessage: params.get("stadiumMessage") || "",
+      ballerCard: params.get("ballerCard") === "1",
+      ballerAlert: params.get("ballerAlert") === "1",
+      ballerFaceScale: params.get("ballerFaceScale") ? Number(params.get("ballerFaceScale")) : undefined,
+      ballerFaceObjectPositionY: params.get("ballerFaceObjectPositionY") != null && params.get("ballerFaceObjectPositionY") !== ""
+        ? Number(params.get("ballerFaceObjectPositionY"))
+        : undefined,
       animationDurationSeconds: 20,
       locationName: loc.locationName,
       status: "preview"
@@ -1133,6 +1538,80 @@
 
   function isLegacyShoutOutIdleText(value = "") {
     return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
+  }
+
+  /** Prior classic-board / seasonal copy must not become a jersey name. */
+  function isSeasonalBoardRemnantText(value = "") {
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text) return false;
+    return /^(HAPPY\s+HALLOWEEN|CLASSIC\s+HALLOWEEN|MERRY\s+CHRISTMAS|HAPPY\s+NEW\s+YEAR|HAPPY\s+HOLIDAYS)\b/i.test(text)
+      || /^HAPPY\s+HALLOWEEN\b/i.test(text);
+  }
+
+  function isBoardRemnantText(value = "") {
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text) return false;
+    return isLegacyShoutOutIdleText(text)
+      || isSeasonalBoardRemnantText(text)
+      || /^THROW\s+A\s+SHOUT/i.test(text)
+      || /^AWAITING\s+A\s+FLOQCAST\b/i.test(text);
+  }
+
+  /** Real kit copy. Idle / seasonal board remnants must never count as a name, number, or team. */
+  function jerseyRealText(value = "") {
+    const text = String(value || "").trim();
+    return text && !isBoardRemnantText(text) ? text : "";
+  }
+
+  function jerseyIdentityComplete(data = {}, template = {}) {
+    const team = jerseyRealText(data.jerseyTeamLabel || template.jerseyTeamLabel || "");
+    const name = jerseyRealText(data.jerseyPatronName || data.jerseyName || data.mainText || "");
+    const number = jerseyRealText(data.subText || data.jerseyNumber || "");
+    return !!(team && name && number);
+  }
+
+  /** Drop a leftover idle line once the kit already has team, name, and number. */
+  function clearUseShoutOutRemnants(root, keepUpper) {
+    if (!root) return;
+    root.querySelectorAll(".classic-board-lines, .text-overlay-lines").forEach(el => {
+      if (!el.closest("#displayMain")) el.remove();
+    });
+    root.querySelectorAll("*").forEach(el => {
+      if (el.children.length) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text || !isLegacyShoutOutIdleText(text)) return;
+      if (keepUpper && keepUpper.has(text.toUpperCase())) return;
+      el.textContent = "";
+    });
+  }
+
+  /** Classic board / Halloween text must never ride on top of a jersey kit. */
+  function clearClassicBoardRemnantsOnJersey(root, keepUpper) {
+    if (!root) return;
+    stopHalloweenFinale();
+    root.classList.remove("classic-board-template", "classic-bw", "classic-halloween", "halloween-finale-on", "text-overlay-template");
+    root.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
+    root.querySelectorAll("#displayMain, #displaySub, .display-text-overlay b, .display-text-overlay span").forEach(el => {
+      if (el.id === "displayMain" || el.id === "displaySub") return;
+      if (el.closest("#displayMain") || el.closest("#displaySub") || el.closest("#displayJerseyTeam") || el.closest("#displayIdentityRail")) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text) return;
+      if (keepUpper && keepUpper.has(text.toUpperCase())) return;
+      // Leftover seasonal / classic board copy (e.g. HAPPY HALLOWEEN) outside jersey fields.
+      if (isBoardRemnantText(text)) {
+        el.textContent = "";
+      }
+    });
+    // Always wipe prior classic/seasonal strings from the kit name/number slots before jersey paint.
+    ["displayMain", "displaySub"].forEach(id => {
+      const el = byId(id);
+      if (!el) return;
+      const text = String(el.textContent || "").replace(/\s+/g, " ").trim();
+      if (isBoardRemnantText(text)) {
+        el.textContent = "";
+        el.innerHTML = "";
+      }
+    });
   }
 
   // An approve merges onto the idle doc, so a stale idleCta must never hide an approved ShoutOut.
@@ -1196,6 +1675,7 @@
     stopSplitMediaLoop();
     hideHeistBrandSlide();
     hideJerseyMount();
+    clearNbaPairChrome(canvas);
     if (canvas) {
       canvas.className = "display-canvas display-board-secondary floqcast-idle-canvas";
       canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
@@ -1269,6 +1749,7 @@
     byId("displayNflShoutPanel")?.remove();
     stopMoneyRain();
     const canvas = byId("displayCanvas");
+    clearNbaPairChrome(canvas);
     if (canvas) {
       canvas.className = "display-canvas";
       canvas.style.backgroundImage = "";
@@ -1596,10 +2077,17 @@
   }
 
   function render(data) {
+    // defaultMain is the idle CTA stored beside a live ShoutOut. Never paint it.
+    if (data && typeof data === "object") {
+      data = {...data};
+      delete data.defaultMain;
+    }
     // Frame loop stop is deferred until we know this paint is not a looping template.
     byId("displayNflShoutPanel")?.remove();
     if (isFloqCastIdlePayload(data)) {
       stopSplitMediaLoop();
+      stopHalloweenFinale();
+      clearNbaPairChrome(byId("displayCanvas"));
       renderFloqCastIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
     }
@@ -1621,11 +2109,18 @@
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true || t.loopMediaWithText === true;
+    const isBallerCard = t.ballerCard === true || /\bballer-card\b/.test(String(t.className || "")) || ["blackCard","ballersAlert","blackCardAmex","ballersAlertAmex"].includes(templateId);
+    const isBallerAlert = isBallerCard && (t.ballerAlert === true || /\bballer-alert\b/.test(String(t.className || "")) || templateId === "ballersAlert" || templateId === "ballersAlertAmex");
+    const willNbaJerseyPair = isSoccerJersey
+      && !!(t.nbaJerseyPair || data.nbaJerseyPair)
+      && !!(t.nbaDualFaces || data.nbaDualFaces);
     // Preserve media↔copy phase across live re-renders for Christine / split-media / NFL rotate.
     const keepFrameLoop = isChristine
       || t.layout === "split-media"
       || t.layout === "nfl-jersey"
       || t.nflDualLayout === true
+      || t.nbaDualFaces === true
+      || data.nbaDualFaces === true
       || (isSoccerJersey && String(data.sport || t.sport || "").toLowerCase() === "nfl");
     if (!keepFrameLoop) stopSplitMediaLoop();
     let screenFormatId = String(
@@ -1659,13 +2154,15 @@
     const mainLimit = Math.max(1, Number(textCaps.maxMainCharacters || textCaps.main || 60));
     const subLimit = Math.max(0, Number(textCaps.maxSubCharacters ?? textCaps.sub ?? 60));
     const canvas = byId("displayCanvas");
+    // Drop pair stage/card before painting a different item (idle, classic, etc.).
+    if (!willNbaJerseyPair) clearNbaPairChrome(canvas);
     canvas.className = "display-canvas";
     // className may be space-separated (e.g. "soccer-jersey soccer-morocco"); classList.add rejects spaces.
     String(t.className || "")
       .split(/\s+/)
       .filter(cls => cls && cls !== "neon")
       .forEach(cls => canvas.classList.add(cls));
-    if (isClassicBoard && !isTextOverlay) canvas.classList.add("classic-board-template");
+    if (isClassicBoard && !isTextOverlay && !isSoccerJersey) canvas.classList.add("classic-board-template");
     canvas.classList.toggle("classic-bw-idle", isClassicBoard && isIdleCta);
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
@@ -1675,7 +2172,10 @@
     canvas.dataset.is64x48 = isChristine ? "1" : (screenFlags.is64x48 || "0");
     canvas.dataset.is64x32 = isChristine ? "0" : (screenFlags.is64x32 || "0");
     canvas.dataset.textProfile = textCaps.profileId || "custom";
-    const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
+    const formatBackgroundUrl = (t.backgroundUrlByFormat && (t.backgroundUrlByFormat[screenFormatId] || t.backgroundUrlByFormat[String(screenFormatId || "").replace(/^p125-/, "led-")])) || "";
+    const backgroundUrl = isBallerCard
+      ? resolveBallerBackgroundUrl(data, t, screenFormatId)
+      : (data.backgroundUrl || formatBackgroundUrl || t.defaultBackgroundUrl || "");
     const backgroundColor = data.backgroundColor || "";
     const backgroundGradient = data.backgroundGradient || "";
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
@@ -1687,6 +2187,7 @@
     const frameUrl = resolveFrameOverlayUrl(t, data);
     const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);
     syncMoneyRain(canvas, !isIdleCta && (t.moneyRain === true || templateId === "heistVaultDollars" || rawTemplateId === "heistRedLux"), data, t);
+    syncHalloweenFinale(canvas, !isIdleCta && isClassicBoard && t.halloweenFinale === true, data);
     canvas.classList.toggle("frame-overlay-template", hasFrameOverlay);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
@@ -1697,8 +2198,13 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
+    const jerseyPatronOnKit = jerseyRealText(data.jerseyPatronName || data.jerseyName || "");
+    // Seasonal copy (e.g. HAPPY HALLOWEEN) is intentional on classic Halloween boards —
+    // only strip it when painting a jersey kit (never as a kit name).
     const rawMain = (isTextOverlay || isSoccerJersey)
-      ? String(data.mainText || "")
+      ? String(isSoccerJersey
+        ? (jerseyPatronOnKit || (isBoardRemnantText(data.mainText) ? "" : jerseyRealText(data.mainText)) || "")
+        : (data.mainText || ""))
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
     const mainSource = isIdleCta && !isSoccerJersey && !isTextOverlay
@@ -1719,6 +2225,8 @@
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
       : isClassicBoard && isIdleCta && !isTextOverlay
       ? mainSource
+      : isClassicBoard && t.allowEmoji === true
+      ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
       : isClassicBoard
       ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
       // Soft composer caps guide writing; display packs all words then shrinks type (no drop).
@@ -1763,7 +2271,7 @@
     }
     const mediaUrl = safeMediaUrl(data.mediaUrl);
     const mediaType = data.mediaType || "";
-    const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
+    const usesSplitMedia = !isBallerCard && (t.layout === "split-media" || (t.supportsMedia && mediaUrl));
     byId("displayMain").style.setProperty("font-size", `${usesSplitMedia ? mainSize * .78 : mainSize}vh`, "important");
     byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
     if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
@@ -1786,31 +2294,126 @@
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
+    } else if (isBallerAlert) {
+      // Image first on the roman face + Rewards text band, then complete chip over it.
+      placeBallerFaceSlot(canvas, center, mediaSlot, true);
+      mediaSlot.classList.remove("hidden");
+      mediaSlot.dataset.ballerFace = "baller-face-medallion-slot";
+      if (mediaUrl) {
+        const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
+        mediaSlot.innerHTML = isVideo
+          ? "<video src=\"" + esc(mediaUrl) + "\" autoplay muted loop playsinline></video>"
+          : "<img src=\"" + esc(mediaUrl) + "\" alt=\"Cardholder face\">";
+        const mediaElement = mediaSlot.querySelector("img,video");
+        if (mediaElement) {
+          const faceScale = Math.max(1, Math.min(2.2, Number(data.ballerFaceScale || 1) || 1));
+          const facePosY = Math.max(0, Math.min(70, Number(data.ballerFaceObjectPositionY ?? 28)));
+          mediaSlot.style.setProperty("--baller-face-scale", String(faceScale));
+          mediaSlot.style.setProperty("--baller-face-pos-y", `${facePosY}%`);
+          mediaElement.style.objectFit = "cover";
+          mediaElement.style.objectPosition = `center ${facePosY}%`;
+          mediaElement.style.transform = `scale(${faceScale})`;
+          mediaElement.style.transformOrigin = `center ${facePosY}%`;
+        }
+        placeBallerChipOverlay(canvas, true);
+      } else {
+        // No portrait — leave warrior face; hide chip overlay (base art already has chip).
+        mediaSlot.innerHTML = "";
+        placeBallerChipOverlay(canvas, false);
+      }
     } else {
+      placeBallerFaceSlot(canvas, center, mediaSlot, false);
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+      delete mediaSlot.dataset.ballerFace;
+      placeBallerChipOverlay(canvas, false);
+    }
+    if (isBallerCard) {
+      stopHeistIdentityCycle();
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
+      canvas.classList.add("baller-card");
+      if (isBallerAlert) canvas.classList.add("baller-alert");
+      else canvas.classList.remove("baller-alert");
+      if (center) {
+        center.classList.remove("split-media-layout");
+        center.classList.add("baller-card-center");
+      }
+      byId("displayMain").className = "baller-cardholder-name";
+      byId("displaySub").className = "baller-company-name";
+      // Preserve casing / leading @ — package art already has BALLER'S EXPRESS BUSINESS heading.
+      const ballerName = glyphSlice(cleanDisplayText(mainText || data.mainText || data.displayName || ""), 0, mainLimit);
+      // Company line is always uppercase on the LED (composer may still show mixed case briefly).
+      const ballerCompany = glyphSlice(
+        cleanDisplayText(subText || data.subText || data.ballerCompany || data.companyName || "").toUpperCase(),
+        0,
+        subLimit
+      );
+      byId("displayMain").textContent = ballerName;
+      byId("displaySub").textContent = ballerCompany; // empty string → CSS :empty hides the row
+      // Same font face + size for name and company; prior emboss ×1.5, then +10% (s3.2.91)
+      const ballerTypeVh = Math.min(10.23, Math.max(4.6, mainSize * 0.92 * 1.5 * 1.1));
+      byId("displayMain").style.setProperty("font-size", ballerTypeVh + "vh", "important");
+      byId("displaySub").style.setProperty("font-size", ballerTypeVh + "vh", "important");
+      const rail = byId("displayIdentityRail");
+      if (rail) {
+        rail.className = "display-identity-rail hidden";
+        rail.innerHTML = "";
+      }
+      markDisplayReady();
+      return;
     }
     if (isSoccerJersey) {
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
+      stopHalloweenFinale();
       const sport = jerseySportOf(t, data);
-      canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl");
+      canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "classic-board-template", "classic-bw", "classic-halloween", "halloween-finale-on", "text-overlay-template");
+      // Never remove `.display-text-overlay` — it owns #displayMain / #displaySub / #displayIdentityRail.
+      canvas.querySelectorAll(".classic-board-lines, .text-overlay-lines, .halloween-finale").forEach(el => el.remove());
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
-      const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
+      const nbaDualFaces = !!(t.nbaDualFaces || data.nbaDualFaces);
+      // PHILA White/Blue: resolve colorway before kit URLs so blue is not stuck on white template defaults.
+      const pairColorway = (t.nbaJerseyPair || data.nbaJerseyPair)
+        ? (window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "") || null)
+        : null;
+      const frontBgUrl = String(
+        data.frontBackgroundUrl
+        || pairColorway?.frontBackgroundUrl
+        || t.frontBackgroundUrl
+        || ""
+      ).trim();
+      const backBgUrl = String(
+        data.backBackgroundUrl
+        || pairColorway?.backBackgroundUrl
+        || t.backBackgroundUrl
+        || pairColorway?.defaultBackgroundUrl
+        || t.defaultBackgroundUrl
+        || ""
+      ).trim();
+      const jerseyBg = nbaDualFaces
+        ? (frontBgUrl || data.backgroundUrl || pairColorway?.defaultBackgroundUrl || t.defaultBackgroundUrl || backgroundUrl)
+        : (data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl);
       const usePhotoBack = !!jerseyBg;
       canvas.style.setProperty("--jersey-primary", safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111"));
       canvas.style.setProperty("--jersey-secondary", safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff"));
       canvas.style.setProperty("--jersey-accent", safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff"));
+      canvas.style.setProperty("--jersey-plate-ink", safeRender.safeColor(t.jerseyPlateInk || data.jerseyPlateInk || "#ffffff", "#ffffff"));
+      const overlayWord = !!(t.jerseyOverlayWordmark || data.jerseyOverlayWordmark);
+      canvas.classList.toggle("jersey-overlay-wordmark", overlayWord && usePhotoBack);
+      canvas.classList.toggle("nba-dual-faces", nbaDualFaces && usePhotoBack);
       if (usePhotoBack) {
         // Named photo kits (country/club wordmark in PNG): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
         canvas.classList.add("jersey-photo-back");
         hideJerseyMount();
-        if (!hasBackgroundLayer) {
-          applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
-          bgEl.style.backgroundSize = "";
-          bgEl.style.backgroundPosition = "";
+        if (!hasBackgroundLayer || nbaDualFaces) {
+          applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg, fit: nbaDualFaces ? "contain" : "cover"});
+          if (!nbaDualFaces) {
+            bgEl.style.backgroundSize = "";
+            bgEl.style.backgroundPosition = "";
+          }
           canvas.classList.add("has-background-layer");
         }
       } else {
@@ -1828,8 +2431,8 @@
       // NFL photo kits ALWAYS run the dual gif (jersey → shoutout). Do not depend on stale Firestore flags.
       const nflDualActive = sport === "nfl" && usePhotoBack;
       const jerseyNameText = nflDualActive
-        ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || data.jerseyName || ""), 0, 8) || "NYX")
-        : mainText;
+        ? (jerseyPatronName || glyphSlice(cleanBoardText(jerseyRealText(data.jerseyPatronName || data.jerseyName || "")), 0, 8) || "NYX")
+        : (jerseyRealText(data.jerseyPatronName || data.jerseyName || "") || jerseyRealText(mainText) || "");
       const nameRows = jerseyNameRows(jerseyNameText, {
         ...textCaps,
         maxMainCharacters: Math.min(8, Number(textCaps.jerseyNameMax || 8)),
@@ -1838,7 +2441,9 @@
       });
       const nameGlyphs = glyphLen(nameRows.filter(Boolean).join("") || "");
       // Scale long names down on one line so the number never moves.
-      const fitScale = nameGlyphs > 6 ? (nameGlyphs >= 8 ? 0.82 : 0.9) : 1;
+      const fitScale = (sport === "nba" && usePhotoBack)
+        ? 1
+        : (nameGlyphs > 6 ? (nameGlyphs >= 8 ? 0.82 : 0.9) : 1);
       const wrapped = false;
       const wrapScale = 1;
       // Soccer: upright condensed kit type for CSS name + number only. Country/club is in the PNG.
@@ -1846,16 +2451,44 @@
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
       canvas.classList.remove("jersey-css-country", "nfl-dual-layout", "nfl-dual-side", "nfl-dual-rotate", "split-media-loop", "split-media-phase-media", "split-media-phase-copy");
+      if (!nbaDualFaces) canvas.classList.remove("nba-dual-faces", "nba-dual-phase-front", "nba-dual-phase-back");
       if (sport === "soccer" && usePhotoBack) {
         baseName = Math.min(baseName * 0.56, 9.4);
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        // Real-kit stack: name under plate (+10%), number mid-back (−10%).
+        // Real-kit stack: club word on the plate, name under it, number mid-back.
         baseName = Math.min(7.04, 8.2);
         baseNumber = Math.min(27, 32);
-        baseTeam = 0;
+        baseTeam = overlayWord ? 5.6 : 0;
+      } else if (sport === "nba" && usePhotoBack) {
+        // jerseyOutput sizes are fractions of jersey image width; tops are fractions of image height.
+        // Fit the full portrait tank by height so FloqMedia can sit under the hem (not mid-kit).
+        const out = t.jerseyOutput || {};
+        const word = out.word || { size: 0.066, longSize: 0.052, longAt: 10, xlongSize: 0.042, xlongAt: 13 };
+        const nameSpec = out.name || { size: 0.051, longSize: 0.04, longAt: 9 };
+        const num = out.number || { one: 0.4968, two: 0.36432, top: 0.32355 };
+        const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+        const kit = nbaPhotoKitLayout(formatId);
+        canvas.style.setProperty("--nba-kit-top", (kit.kitTop * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-h", (kit.kitH * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-left", (kit.kitLeft * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-right", (kit.kitRight * 100).toFixed(2) + "%");
+        canvas.style.setProperty("--nba-kit-w", (kit.kitW * 100).toFixed(2) + "%");
+        const jerseyW = kit.kitWidthVh;
+        const teamRaw = String(jerseyTeamLabel(t, data) || "").trim();
+        const wordLines = teamRaw.split(/\s+/).filter(Boolean);
+        const wrappedWord = word.wrapAtSpace !== false && wordLines.length >= 2;
+        const teamLen = wrappedWord ? Math.max.apply(null, wordLines.map(part => part.length)) : teamRaw.length;
+        const wordSize = wrappedWord ? word.size : teamLen >= (word.xlongAt || 13) ? (word.xlongSize || word.longSize) : teamLen >= word.longAt ? word.longSize : word.size;
+        baseTeam = jerseyW * wordSize;
+        baseName = jerseyW * (nameGlyphs >= nameSpec.longAt ? nameSpec.longSize : nameSpec.size);
+        // Digit count from the jersey mark — undeclared `digits` threw ReferenceError and aborted
+        // before #displaySub got textContent / FloqMedia pin (empty number + rail stuck at top).
+        const digits = glyphLen(String(subText || "").trim());
+        baseNumber = jerseyW * (digits >= 2 ? num.two : num.one);
       } else if (sport === "nba") {
+        clearNbaPhotoKitVars(canvas);
         baseName = Math.min(baseName, 12.5);
         baseNumber = Math.max(baseNumber, 70);
         baseTeam = Math.min(baseTeam, 5.8);
@@ -1864,7 +2497,7 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameFloor = (sport === "nfl" && usePhotoBack) ? 5 : 7;
+      const nameFloor = (sport === "nfl" && usePhotoBack) ? 5 : (sport === "nba" && usePhotoBack) ? 4 : 7;
       const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(nameFloor, baseName * wrapScale * fitScale));
       // Number size/position stay fixed — never shrink because the name is long.
       const numberSize = Math.min(sport === "nfl" ? (usePhotoBack ? 32 : 78) : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber));
@@ -1872,13 +2505,34 @@
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
-        const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack) || (sport === "nfl" && usePhotoBack);
-        teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
+        const hideCrest = !teamLabel || (sport === "nfl" && !overlayWord) || (sport === "soccer" && usePhotoBack);
+        teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "") + (overlayWord ? " jersey-overlay-word" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         if (hideCrest) teamEl.textContent = "";
-        else if (sport === "soccer") paintJerseyCollarArch(teamEl, teamLabel);
+        else if (sport === "soccer" || (sport === "nba" && usePhotoBack)) {
+          const archDeg = sport === "nba" && usePhotoBack ? ((t.jerseyOutput && t.jerseyOutput.word && t.jerseyOutput.word.archDegrees) || 25) : "";
+          paintJerseyCollarArch(teamEl, teamLabel, archDeg);
+        }
         else teamEl.textContent = teamLabel;
-        teamEl.style.setProperty("font-size", `${teamSize}vh`, "important");
+        const teamFit = (sport === "nba" && usePhotoBack) ? 1 : Math.min(1, 8.5 / Math.max(1, String(teamLabel || "").length));
+        teamEl.style.setProperty("font-size", `${(teamSize * teamFit).toFixed(2)}vh`, "important");
+        if (sport === "nba" && usePhotoBack && t.jerseyOutput && t.jerseyOutput.word) {
+          const word = t.jerseyOutput.word;
+          const raw = String(teamLabel || "").trim();
+          const lines = raw.split(/\s+/).filter(Boolean);
+          const wrappedWord = word.wrapAtSpace !== false && lines.length >= 2;
+          const measure = wrappedWord ? Math.max.apply(null, lines.map(part => part.length)) : raw.length;
+          const tracking = wrappedWord ? word.tracking : measure >= (word.xlongAt || 13) ? 0.01 : measure >= word.longAt ? word.longTracking : word.tracking;
+          teamEl.style.setProperty("letter-spacing", tracking + "em", "important");
+          const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+          const kit = nbaPhotoKitLayout(formatId);
+          const wordTop = word.top != null ? kit.kitTop + word.top * kit.kitH : null;
+          if (wordTop != null) teamEl.style.setProperty("top", (wordTop * 100).toFixed(2) + "%", "important");
+          // Keep the arch inside the fitted tank (not the old 84%-width crop margins).
+          const inset = Math.min(0.08, kit.kitW * 0.12);
+          teamEl.style.setProperty("left", ((kit.kitLeft + inset) * 100).toFixed(2) + "%", "important");
+          teamEl.style.setProperty("right", ((kit.kitRight + inset) * 100).toFixed(2) + "%", "important");
+        }
       }
       canvas.classList.toggle("jersey-name-wrapped", wrapped);
       byId("displayMain").classList.add("soccer-jersey-name");
@@ -1890,6 +2544,28 @@
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
+      if (sport === "nba" && usePhotoBack && t.jerseyOutput && t.jerseyOutput.number) {
+        const nameSpec = t.jerseyOutput.name || {};
+        const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+        const kit = nbaPhotoKitLayout(formatId);
+        const inset = Math.min(0.08, kit.kitW * 0.12);
+        const leftPct = ((kit.kitLeft + inset) * 100).toFixed(2) + "%";
+        const rightPct = ((kit.kitRight + inset) * 100).toFixed(2) + "%";
+        if (nameSpec.top != null) {
+          byId("displayMain").style.setProperty("top", ((kit.kitTop + nameSpec.top * kit.kitH) * 100).toFixed(2) + "%", "important");
+        }
+        byId("displaySub").style.setProperty("top", ((kit.kitTop + t.jerseyOutput.number.top * kit.kitH) * 100).toFixed(2) + "%", "important");
+        byId("displayMain").style.setProperty("left", leftPct, "important");
+        byId("displayMain").style.setProperty("right", rightPct, "important");
+        byId("displaySub").style.setProperty("left", leftPct, "important");
+        byId("displaySub").style.setProperty("right", rightPct, "important");
+        const nameTracking = nameGlyphs >= nameSpec.longAt ? nameSpec.longTracking : nameSpec.tracking;
+        if (nameTracking != null) byId("displayMain").style.setProperty("letter-spacing", nameTracking + "em", "important");
+      } else {
+        // Soccer / NFL / CSS hanger: drop any prior Terps/NBA inline tank box.
+        clearNbaPhotoKitVars(canvas);
+        clearNbaPhotoKitInlineLayout();
+      }
       // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
       if (usePhotoBack && (sport === "soccer" || sport === "nfl")) {
         const mark = String(subText || "").trim();
@@ -1906,7 +2582,29 @@
         byId("displaySub").style.removeProperty("padding-right");
         byId("displaySub").style.removeProperty("letter-spacing");
       }
-      byId("displaySub").textContent = subText;
+      if (sport === "nba" && usePhotoBack) {
+        byId("displaySub").classList.add("jersey-alumni-num");
+        byId("displaySub").style.setProperty("-webkit-text-stroke", "0");
+        byId("displaySub").style.removeProperty("text-shadow");
+        const fill = safeRender.safeColor(t.jerseySecondary || data.jerseySecondary, "#ffffff");
+        const accent = safeRender.safeColor(t.jerseyAccent || data.jerseyAccent || t.jerseySecondary, "#ffffff");
+        const primary = safeRender.safeColor(t.jerseyPrimary || data.jerseyPrimary, "#111111");
+        const outline = window.FLOQRVarsityNumbers
+          ? window.FLOQRVarsityNumbers.outline(fill, accent, primary)
+          : "#ffffff";
+        byId("displaySub").style.setProperty("--jersey-num-outline", outline);
+        // Varsity SVG: stroke + evenodd holes = inner encirclement (counters stay open).
+        if (window.FLOQRVarsityNumbers?.svg && String(subText || "").trim()) {
+          byId("displaySub").innerHTML = window.FLOQRVarsityNumbers.svg(subText, fill, outline);
+        } else {
+          byId("displaySub").textContent = subText;
+        }
+        if (t.jerseyOutput && t.jerseyOutput.word && t.jerseyOutput.word.wrapLineHeight && teamEl) {
+          teamEl.style.setProperty("line-height", String(t.jerseyOutput.word.wrapLineHeight), "important");
+        }
+      } else {
+        byId("displaySub").textContent = subText;
+      }
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
 
       // NFL dual: ALWAYS 6s jersey↔shoutout gif loop (all board sizes). FloqR card stays bottom on both frames.
@@ -1971,14 +2669,21 @@
         stopSplitMediaLoop();
       }
 
+      // Pair needs a real front plate URL (not a back-only fallback) — unpublished Terps v2 stays gated.
+      // Compute before FloqMedia rail so the pair stage is not covered mid-kit.
+      const pairMode = !!(t.nbaJerseyPair || data.nbaJerseyPair)
+        && !!(frontBgUrl || t.frontBackgroundUrl)
+        && t.productionAssetsReady !== false;
+
       // FloqR card (bottom): paint BEFORE FrameLoop so a loop throw cannot skip the rail.
       // Always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
-      // Mount rail on the canvas (not inside display-center) so format/bezel stacking cannot hide it.
+      // Mount rail on the canvas (not inside display-center) so bottom:% is the LED, not a mid stack.
+      // NBA jersey pair: hide FloqMedia — the dual kits + optional ShoutOut own the frame.
       let rail = byId("displayIdentityRail");
       if (rail && canvas && rail.parentElement !== canvas) {
         canvas.appendChild(rail);
       }
-      if (rail && t.identityRail !== false) {
+      if (rail && t.identityRail !== false && !pairMode) {
         // Jersey subText is the jersey mark, so only the opted-in attribution can credit the patron.
         mountFloqrCard(rail, {
           data,
@@ -1987,12 +2692,11 @@
         });
         rail.classList.remove("hidden");
         rail.setAttribute("aria-hidden", "false");
-        // Keep FloqR above the text overlay on both dual frames.
-        rail.style.setProperty("z-index", "60", "important");
-        rail.style.setProperty("opacity", "1", "important");
-        rail.style.setProperty("visibility", "visible", "important");
+        // NBA/NFL: pin under the kit (CSS + inline so a stale top:86% photo-back rule cannot win).
+        pinJerseyFloqMediaRail(rail, {sport});
       } else if (rail) {
         stopFloqrCardCycle();
+        clearPinnedJerseyFloqMediaRail(rail);
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
       }
@@ -2004,15 +2708,115 @@
           if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
         });
       }
+      if (nbaDualFaces && usePhotoBack) {
+        const cw = pairColorway
+          || window.FLOQRResolveJerseyColorway?.(t, data.jerseyColorway || t.defaultJerseyColorway || "")
+          || null;
+        const dualUrls = {
+          frontBackgroundUrl: frontBgUrl || cw?.frontBackgroundUrl || jerseyBg,
+          backBackgroundUrl: backBgUrl || cw?.backBackgroundUrl || cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg,
+          defaultBackgroundUrl: cw?.defaultBackgroundUrl || t.defaultBackgroundUrl || jerseyBg
+        };
+        canvas.dataset.nbaDualFrontUrl = dualUrls.frontBackgroundUrl;
+        canvas.dataset.nbaDualBackUrl = dualUrls.backBackgroundUrl;
+        canvas.classList.toggle("nba-jersey-pair", pairMode);
+        canvas.classList.add("nba-dual-faces", "split-media-loop");
+        const sceneApi = window.FLOQRJerseyScene;
+        // Pair editor: jerseyPatronName = kit name; mainText = optional ShoutOut (may be blank).
+        const shoutCopy = glyphSlice(cleanDisplayText(data.mainText || ""), 0, Math.max(Number(textCaps.main || 48), 48));
+        const hasMessage = sceneApi?.hasMessageText
+          ? sceneApi.hasMessageText(shoutCopy)
+          : !!String(shoutCopy || "").trim();
+        if (pairMode) {
+          const pairTeam = teamLabel || t.jerseyTeamLabel || t.jerseyPlateLabel || "";
+          paintNbaPairStage(canvas, {
+            frontUrl: dualUrls.frontBackgroundUrl,
+            backUrl: dualUrls.backBackgroundUrl,
+            nameText: jerseyNameText || "",
+            teamText: pairTeam,
+            numberText: subText || "",
+            overlayInk: data.overlayInk || cw?.overlayInk || t.overlayInk || "#006BB6",
+            overlayOutline: data.overlayOutline || cw?.overlayOutline || t.overlayOutline || "#ED174C",
+            pairFaceOutput: t.pairFaceOutput || data.pairFaceOutput || null,
+            jerseySecondary: data.jerseySecondary || cw?.jerseySecondary || t.jerseySecondary || "",
+            jerseyAccent: data.jerseyAccent || cw?.jerseyAccent || t.jerseyAccent || "",
+            jerseyPrimary: data.jerseyPrimary || cw?.jerseyPrimary || t.jerseyPrimary || ""
+          });
+          let shoutPanel = byId("displayNbaPairShoutPanel");
+          if (!shoutPanel) {
+            shoutPanel = document.createElement("div");
+            shoutPanel.id = "displayNbaPairShoutPanel";
+            shoutPanel.className = "nba-pair-shout-panel hidden";
+            canvas.appendChild(shoutPanel);
+          }
+          const messageTheme = String(t.pairMessageTheme || data.pairMessageTheme || "").trim().toLowerCase();
+          shoutPanel.dataset.pairMessageTheme = messageTheme || "default";
+          canvas.dataset.pairMessageTheme = messageTheme || "default";
+          if (hasMessage) {
+            const lineCount = Number(data.lineCount || textCaps.lineCount || 4);
+            const perLine = Number(data.maxCharactersPerLine || textCaps.perLine || 16);
+            const rows = displayTextRows(shoutCopy || " ", {
+              lineCount,
+              maxCharactersPerLine: perLine,
+              maxMainCharacters: Math.max(Number(textCaps.main || 0), 64)
+            }, {uppercase: false});
+            shoutPanel.innerHTML = `<div class="nba-pair-shout-lines">${rows.map((row) => `<b>${esc(row || " ")}</b>`).join("")}</div>`;
+          } else {
+            shoutPanel.innerHTML = "";
+          }
+          const jerseyMs = Number(t.jerseySceneMs || sceneApi?.JERSEY_MS || 7000);
+          const messageMs = Number(t.messageSceneMs || sceneApi?.MESSAGE_MS || 5000);
+          startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
+            frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
+            backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
+            defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
+          }), {
+            includeCopy: hasMessage,
+            holdMsByPhase: { media: jerseyMs, copy: messageMs }
+          });
+        } else {
+          hideNbaPairStage();
+          // Legacy rotate — FrameLoop resumes lastPhase on live re-renders.
+          startFrameLoop(canvas, (phase) => applyNbaDualFacePhase(phase, canvas, {
+            frontBackgroundUrl: canvas.dataset.nbaDualFrontUrl,
+            backBackgroundUrl: canvas.dataset.nbaDualBackUrl,
+            defaultBackgroundUrl: canvas.dataset.nbaDualBackUrl
+          }));
+        }
+        const phase = canvas.classList.contains("split-media-phase-copy") ? "copy" : "media";
+        applyNbaDualFacePhase(phase, canvas, dualUrls);
+      } else {
+        hideNbaPairStage();
+        canvas.classList.remove("nba-jersey-pair", "nba-pair-phase-jersey", "nba-pair-phase-message");
+      }
+      {
+        const keep = new Set([
+          String(teamLabel || "").trim().toUpperCase(),
+          String(jerseyNameText || "").trim().toUpperCase(),
+          String(subText || "").trim().toUpperCase()
+        ].filter(Boolean));
+        clearUseShoutOutRemnants(canvas, keep);
+        clearClassicBoardRemnantsOnJersey(canvas, keep);
+      }
       window.FLOQRBoardFit?.scheduleFit(canvas);
       markDisplayReady();
       return;
     }
     hideJerseyMount();
-    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country");
+    clearNbaPairChrome(canvas);
+    clearNbaPhotoKitVars(canvas);
+    clearNbaPhotoKitInlineLayout();
+    const staleTeam = byId("displayJerseyTeam");
+    if (staleTeam) {
+      staleTeam.className = "soccer-jersey-team hidden";
+      staleTeam.textContent = "";
+      staleTeam.setAttribute("aria-hidden", "true");
+    }
+    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country", "jersey-overlay-wordmark", "nba-dual-faces", "nba-dual-phase-front", "nba-dual-phase-back");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       stopFloqrCardCycle();
+      clearPinnedJerseyFloqMediaRail(railClear);
       railClear.className = "display-identity-rail hidden";
       railClear.innerHTML = "";
     }
@@ -2297,8 +3101,13 @@
 
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? (doc.data() || {}) : defaultClubDisplayPayload();
+      if (payload && typeof payload === "object") {
+        payload = {...payload};
+        delete payload.defaultMain;
+      }
+      const keepJersey = doc.exists && !isIdlePayload(payload) && jerseyIdentityComplete(payload);
       const isIdleDoc = !doc.exists || isIdlePayload(payload) || !isRenderableLiveContent(payload);
-      if (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText))) {
+      if (!keepJersey && (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText)))) {
         payload = defaultClubDisplayPayload();
       }
       if (!payload.screenFormatId) payload.screenFormatId = boardAssignedFormatId(loc);

@@ -11,9 +11,9 @@
     "title": "Gearchiveerde ShoutOuts",
     "body": "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
   },
-  "floqai-ask-floqr": {
-    "title": "Vraag FloqR met FloqAi",
-    "body": "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
+  "botdee-ask-floqr": {
+    "title": "Vraag FloqR met BOT DEE",
+    "body": "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
   },
   "help-soccer-jersey": {
     "title": "Voetbalshirt ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Personeelsrooster maken en publiceren",
-    "body": "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Meerdere geplande of conceptdiensten verwijderen",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Standaardsjabloon",
-    "body": "Gratis Traditional Black and White Classic. Gebruik FloqAi hieronder voor Sports-, Jersey-, VIP-, Humor-, Cars-, Video-, Pictures- en Ballers-sjablonen."
+    "body": "Gratis Traditional Black and White Classic. Gebruik BOT DEE hieronder voor Sports-, Jersey-, VIP-, Humor-, Cars-, Video-, Pictures- en Ballers-sjablonen."
   },
-  "help-floqai-template-search": {
-    "title": "FloqAi-sjabloonzoeken",
-    "body": "Tik op het bewegende FloqAi-merkteken (of wacht op de speech bubbles) en vraag om Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures of Ballers."
+  "help-botdee-template-search": {
+    "title": "BOT DEE-sjabloonzoeken",
+    "body": "Tik op het bewegende BOT DEE-merkteken (of wacht op de speech bubbles) en vraag om Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures of Ballers."
   },
   "help-mingl-requests": {
     "title": "Over Mingl Requests",
@@ -162,5 +162,13 @@
   "help-public-media-sharing": {
     "title": "Openbare media en gegevensdeling",
     "body": "Kies meerdere afbeeldingen of korte video's tegelijk en rangschik daarna hun volgorde op het openbare profiel. Profielen ondersteunen tot 8 afbeeldingen en 2 korte video's."
+  },
+  "help-black-card": {
+    "title": "Black Card",
+    "body": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
   }
 }

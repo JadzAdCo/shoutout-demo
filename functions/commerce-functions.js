@@ -7,9 +7,12 @@ const {defineSecret} = require("firebase-functions/params");
 const {
   buildAccountLinkParams,
   buildRecipientAccountParams,
+  connectAccountIdFromWebhookEvent,
   connectBindingId,
   connectStatus,
-  normalizeConnectEntityType
+  lockPayoutRecoveryStatus,
+  normalizeConnectEntityType,
+  payoutRecoveryAfterRefund
 } = require("./stripe-connect-core");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -52,6 +55,24 @@ const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
   "soccerJersey", "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
 ]);
 const SOCCER_JERSEY_PRICE_CENTS = 3000;
+/* s3.2.71 CI deploy marker — re-trigger after Cloud Run CPU quota [firebase-deploy] */
+const CLASSIC_HALLOWEEN_TEMPLATE_ID = "classicHalloween";
+const CLASSIC_HALLOWEEN_PRICE_CENTS = 1500;
+const BALLER_CARD_PRICE_CENTS = {
+  // Legacy blackCard / blackCardAmex kept for in-flight / historical orders only — not in catalog.
+  blackCard: 7500,
+  ballersAlert: 10000,
+  blackCardAmex: 7500,
+  ballersAlertAmex: 10000
+};
+const BALLER_CARD_TEMPLATE_IDS = new Set(Object.keys(BALLER_CARD_PRICE_CENTS));
+const BALLER_AMEX_TEMPLATE_IDS = new Set(["ballersAlertAmex", "blackCardAmex"]);
+const BALLER_CARD_LABELS = {
+  blackCard: "Black Card",
+  ballersAlert: "Baller's Alert",
+  blackCardAmex: "Black Card (Amex)",
+  ballersAlertAmex: "Baller's Alert (Amex)"
+};
 function isSportsJerseyTemplateId(templateId = "") {
   const id = String(templateId || "");
   if (id === "soccerJersey" || SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
@@ -63,7 +84,7 @@ function isNflDualJerseyTemplateId(templateId = "") {
 }
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", CLASSIC_HALLOWEEN_TEMPLATE_ID, "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,10,30,16]
@@ -82,6 +103,9 @@ const SHOUTOUT_TEXT_LIMITS = {
   },
   soccerJersey:{
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
+  },
+  ballerCard:{
+    "led-96x48":[2,22,28,25],"led-64x48":[2,18,22,25],"led-64x32":[2,18,22,25]
   },
   // Must match shared-data nflJersey — shoutout copy is NOT the jersey name.
   nflJersey:{
@@ -244,13 +268,15 @@ function checkoutTextCaps(templateId = "", formatId = "") {
       ? "nflJersey"
       : isSportsJerseyTemplateId(templateId)
         ? "soccerJersey"
-        : templateId === "car"
-          ? "car"
-          : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
-            ? "splitMedia"
-            : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
-              ? "classicBoard"
-              : "full";
+        : BALLER_CARD_TEMPLATE_IDS.has(templateId)
+          ? "ballerCard"
+          : templateId === "car"
+            ? "car"
+            : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+              ? "splitMedia"
+              : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+                ? "classicBoard"
+                : "full";
   const canonicalFormatId = canonicalCheckoutFormatId(formatId);
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[canonicalFormatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
@@ -391,6 +417,16 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
       }
     };
   }
+  if (templateId === CLASSIC_HALLOWEEN_TEMPLATE_ID) {
+    return {
+      ...rawPayload,
+      shoutout:{
+        ...shoutout,
+        priceCents:CLASSIC_HALLOWEEN_PRICE_CENTS,
+        priceLabel:"$15"
+      }
+    };
+  }
   if (HEIST_ART_TEMPLATE_IDS.has(templateId)) {
     const heistClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
     if (heistClubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
@@ -403,6 +439,42 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
         location:HEIST_DC_LOCATION_ID,
         screenFormatId:screenFormatId || "led-64x32",
         priceCents:HEIST_ART_PRICE_CENTS
+      }
+    };
+  }
+  if (BALLER_CARD_TEMPLATE_IDS.has(templateId)) {
+    if (templateId === "blackCard" || templateId === "blackCardAmex") {
+      throw new HttpsError(
+        "failed-precondition",
+        "Black Card was removed from the catalog. Use Baller's Alert (or Baller's Alert Amex at Aurelia)."
+      );
+    }
+    const clubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
+    if (BALLER_AMEX_TEMPLATE_IDS.has(templateId)) {
+      if (!isServerAdminAuth(authContext)) {
+        throw new HttpsError("permission-denied", "American Express baller cards are Master Admin only while Amex consent is pending.");
+      }
+      if (clubId !== AURELIA_LOCATION_ID) {
+        throw new HttpsError("failed-precondition", "American Express baller cards are available only at Aurelia.");
+      }
+    }
+    const priceCents = BALLER_CARD_PRICE_CENTS[templateId];
+    const priceLabel = priceCents === 10000 ? "$100" : "$75";
+    return {
+      ...rawPayload,
+      clubLocationId: clubId || rawPayload.clubLocationId,
+      shoutout:{
+        ...shoutout,
+        clubLocationId: clubId || shoutout.clubLocationId,
+        location: clubId || shoutout.location,
+        ballerCard: true,
+        ballerAlert: templateId === "ballersAlert" || templateId === "ballersAlertAmex",
+        ballerBrand: BALLER_AMEX_TEMPLATE_IDS.has(templateId) ? "amex" : "ballers",
+        ballerNameSource: text(rawShoutout.ballerNameSource, 40),
+        ballerCompanyPreset: text(rawShoutout.ballerCompanyPreset, 80),
+        priceCents,
+        priceLabel,
+        templateName: BALLER_CARD_LABELS[templateId] || shoutout.templateName
       }
     };
   }
@@ -547,6 +619,81 @@ async function persistConnectStatus(bindingRef, entity, account, status) {
     livemode:status.livemode,
     updatedAt:now
   }, {merge:true});
+  if (entity.entityType === "club" && entity.entityId) {
+    await db.collection("clubLocations").doc(text(entity.entityId, 200)).set({
+      stripeTransfersActive: status.transfersReady ? 1 : 0,
+      stripeCapabilityTransfers: text(status.capabilityStatus, 40),
+      stripeConnectLivemode: status.livemode === true,
+      stripeConnectUpdatedAt: now
+    }, {merge:true});
+  }
+}
+
+async function optionalReadyRecipient(entityType, entityId) {
+  try {
+    return await trustedConnectRecipient(entityType, entityId);
+  } catch (error) {
+    const code = text(error?.code || "", 80);
+    if (code === "failed-precondition" || code === "invalid-argument" || code === "unauthenticated") return null;
+    console.warn("optional Connect recipient skipped", {entityType, errorCode: code || error?.type || "stripe_error"});
+    return null;
+  }
+}
+
+function applyDestinationCharge(params, summary = {}) {
+  const destination = text(summary.connectedAccountId, 160);
+  if (!destination || !params?.payment_intent_data) return false;
+  params.payment_intent_data.transfer_data = {destination};
+  const fee = Math.max(0, Math.round(Number(summary.floqrShareCents || 0)));
+  const amount = Math.max(0, Math.round(Number(summary.amountCents || 0)));
+  if (fee > 0 && fee < amount) params.payment_intent_data.application_fee_amount = fee;
+  return true;
+}
+
+async function refreshConnectBindingFromStripeAccount(accountHint = {}) {
+  const accountId = text(accountHint.id || accountHint.account, 160);
+  if (!accountId) return null;
+  let bindingRef = null;
+  let entity = null;
+  const metaBinding = text(accountHint.metadata?.floqr_binding_id, 80);
+  if (metaBinding) {
+    bindingRef = db.collection("stripeConnectAccounts").doc(metaBinding);
+    const snap = await bindingRef.get();
+    if (snap.exists) {
+      const row = snap.data() || {};
+      entity = {entityType: row.entityType, entityId: row.entityId};
+    }
+  }
+  if (!bindingRef || !entity) {
+    const found = await db.collection("stripeConnectAccounts").where("accountId", "==", accountId).limit(1).get();
+    if (found.empty) return null;
+    bindingRef = found.docs[0].ref;
+    const row = found.docs[0].data() || {};
+    entity = {entityType: row.entityType, entityId: row.entityId};
+  }
+  const account = await retrieveConnectAccount(accountId);
+  const status = connectStatus(account);
+  await persistConnectStatus(bindingRef, entity, account, status);
+  return {accountId, bindingId: bindingRef.id, ...status};
+}
+
+async function handleConnectAccountWebhook(event) {
+  const object = event.data?.object || {};
+  const accountId = connectAccountIdFromWebhookEvent(event);
+  if (!accountId) return null;
+  if (event.type === "account.application.deauthorized") {
+    const found = await db.collection("stripeConnectAccounts").where("accountId", "==", accountId).limit(1).get();
+    if (found.empty) return null;
+    const row = found.docs[0].data() || {};
+    await persistConnectStatus(found.docs[0].ref, {entityType: row.entityType, entityId: row.entityId}, {id: accountId}, {
+      capabilityStatus: "inactive",
+      transfersReady: false,
+      requirementsDue: 1,
+      livemode: false
+    });
+    return {accountId, deauthorized: true};
+  }
+  return refreshConnectBindingFromStripeAccount({id: accountId, account: accountId, metadata: object.metadata || {}});
 }
 
 async function trustedConnectRecipient(entityType, entityId) {
@@ -707,13 +854,19 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
     const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
     const soccerJersey = isSportsJerseyTemplateId(templateId);
+    const classicHalloween = templateId === CLASSIC_HALLOWEEN_TEMPLATE_ID;
+    const ballerCard = BALLER_CARD_TEMPLATE_IDS.has(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
       : heistArt
         ? HEIST_ART_PRICE_CENTS
         : soccerJersey
           ? SOCCER_JERSEY_PRICE_CENTS
-          : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+          : classicHalloween
+            ? CLASSIC_HALLOWEEN_PRICE_CENTS
+            : ballerCard
+              ? BALLER_CARD_PRICE_CENTS[templateId]
+              : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }
@@ -723,12 +876,20 @@ exports.createFloqrConnectOnboardingLink = onCall({
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && !FOOTBALL_TEAM_INTRO_LOCATION_IDS.has(clubId)) throw new HttpsError("failed-precondition", FOOTBALL_TEAM_INTRO_VENUE_MESSAGE);
     if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
+    if (ballerCard && BALLER_AMEX_TEMPLATE_IDS.has(templateId)) {
+      if (clubId !== AURELIA_LOCATION_ID) throw new HttpsError("failed-precondition", "American Express baller cards are available only at Aurelia.");
+    }
     const venueName = text(shoutout.locationName || shoutout.clubName || shoutout.brandName || clubId, 80);
+    const recipient = await optionalReadyRecipient("club", clubId);
     const templateName = footballTeamIntro
       ? "Football Intro"
       : heistArt
         ? "Heist Art"
-        : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
+        : classicHalloween
+          ? "Classic Halloween"
+          : ballerCard
+            ? (BALLER_CARD_LABELS[templateId] || "Black Card")
+            : text(shoutout.templateName || shoutout.template || "ShoutOut", 80);
     const itemName = shoutoutReceiptTitle({
       templateName,
       locationName: venueName,
@@ -738,13 +899,16 @@ exports.createFloqrConnectOnboardingLink = onCall({
     return {
       amountCents:pricedAmountCents,
       itemName,
-      description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
+      description: recipient
+        ? "Payment via Stripe Checkout. FloqR keeps 80%; the club share transfers to the venue Connect account."
+        : "Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
       floqrShareCents:split.floqrShare,
       clubSharePercent:SHOUTOUT_CLUB_SHARE_PERCENT,
-      paymentModel:"floqr-platform",
-      settlementStatus:"accrued-pending-payout",
+      paymentModel: recipient ? "destination-connect" : "floqr-platform",
+      settlementStatus: recipient ? "connect-destination" : "accrued-pending-payout",
+      connectedAccountId: recipient?.accountId || "",
       clubLocationId:clubId,
       venueName
     };
@@ -776,7 +940,8 @@ exports.createFloqrConnectOnboardingLink = onCall({
     if (!listingCheck.ok) {
       throw new HttpsError("failed-precondition", listingCheck.errors[0] || "This DJ/media listing is not eligible for checkout.");
     }
-    // FloqR is MoR (same pattern as priced ShoutOuts). Vendor share accrues for payout; vendor fulfills.
+    // FloqR is MoR. When the seller Connect account is ready, sandbox Checkout destination-charges them.
+    const recipient = await optionalReadyRecipient(sellerEntityType, sellerEntityId);
     return {
       amountCents,
       venueShareCents:0,
@@ -790,8 +955,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
       sellerEntityType,
       sellerUid:text(product.sellerUid, 160),
       sellerName:text(product.sellerName || "BartR vendor", 120),
-      paymentModel:"floqr-platform",
-      settlementStatus:"accrued-pending-payout",
+      paymentModel: recipient ? "destination-connect" : "floqr-platform",
+      settlementStatus: recipient ? "connect-destination" : "accrued-pending-payout",
+      connectedAccountId: recipient?.accountId || "",
       marketplace:"bartr",
       productId,
       productType:text(product.productType || "physical", 40),
@@ -933,20 +1099,25 @@ exports.createFloqrConnectOnboardingLink = onCall({
     }
     const unitCents = 2000;
     const split = moneyParts(unitCents, SHOUTOUT_CLUB_SHARE_PERCENT);
+    const clubLocationId = text(req.locationId, 120);
+    const recipient = await optionalReadyRecipient("club", clubLocationId);
     return {
       amountCents:unitCents,
       unitAmountCents:unitCents,
       quantity:1,
       itemName:"floqCast live appearance ($20)",
-      description:"Payment is charged to FloqR. After payment, the venue approves before your camera goes to the floqCast board.",
+      description: recipient
+        ? "Payment via Stripe Checkout. After payment, the venue approves before Go live. Club share transfers to Connect."
+        : "Payment is charged to FloqR. After payment, the venue approves before your camera goes to the floqCast board.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
       floqrShareCents:split.floqrShare,
       clubSharePercent:SHOUTOUT_CLUB_SHARE_PERCENT,
-      paymentModel:"floqr-platform",
+      paymentModel: recipient ? "destination-connect" : "floqr-platform",
+      connectedAccountId: recipient?.accountId || "",
       product:"suprstarRequest",
       requestId,
-      clubLocationId:text(req.locationId, 120),
+      clubLocationId,
       referenceNumber:text(req.referenceNumber, 80)
     };
   }
@@ -994,9 +1165,11 @@ exports.createFloqrConnectOnboardingLink = onCall({
       venueShareCents = charged;
       collectorLabel = "Club Stripe";
     }
+    const currency = String(hold.amounts?.currency || "usd").trim().toLowerCase() || "usd";
     return {
       amountCents: charged,
       unitAmountCents: charged,
+      currency,
       quantity: 1,
       itemName: `Table ${label} deposit — ${club}, ${night}`,
       description: `VIP reserV deposit (covers ${included} guests). Balance of minimum spend is due at the venue. Collector: ${collectorLabel}.`,
@@ -1027,7 +1200,7 @@ function stripeLineItem(order) {
     productData.images = [order.productSnapshot.imageUrl];
   }
   return {
-    price_data:{currency:"usd", unit_amount:order.unitAmountCents || order.amountCents, product_data:productData},
+    price_data:{currency: String(order.currency || "usd").toLowerCase() || "usd", unit_amount:order.unitAmountCents || order.amountCents, product_data:productData},
     quantity:order.quantity || 1
   };
 }
@@ -1101,12 +1274,7 @@ const CHECKOUT_FEATURE_KEYS = Object.freeze({
   vipReservation: "vipReservations"
 });
 
-exports.createFloqrCheckoutSession = onCall({
-  region:"us-central1",
-  secrets:[STRIPE_SECRET_KEY],
-  timeoutSeconds:30,
-  memory:"256MiB"
-}, async request => {
+async function runCreateFloqrCheckoutSession(request) {
   const correlationId = text(request.data?.correlationId, 80) || `chk_${Date.now().toString(36)}`;
   const type = text(request.data?.orderType, 80);
   const logBase = {
@@ -1204,7 +1372,7 @@ exports.createFloqrCheckoutSession = onCall({
       ipSource:"checkout-callable",
       status:"checkout-created",
       paymentStatus:"unpaid",
-      currency:"usd",
+      currency: String(summary.currency || "usd").toLowerCase() || "usd",
       ...summary,
       ...testFields,
       payload,
@@ -1288,13 +1456,7 @@ exports.createFloqrCheckoutSession = onCall({
     if (type === "commerce" || type === "shoutout") {
       params.expires_at = Math.floor(Date.now() / 1000) + (type === "commerce" ? COMMERCE_RESERVATION_SECONDS : SHOUTOUT_CHECKOUT_EXPIRY_SECONDS);
     }
-    if (!isSubscription && summary.connectedAccountId && type !== "commerce" && type !== "shoutout") {
-      // Destination charges only for non-BartR / non-ShoutOut seller-billed products.
-      params.payment_intent_data.transfer_data = {destination:summary.connectedAccountId};
-      if (Number(summary.floqrShareCents || 0) > 0) {
-        params.payment_intent_data.application_fee_amount = summary.floqrShareCents;
-      }
-    }
+    if (!isSubscription) applyDestinationCharge(params, summary);
     let session;
     try {
       session = await stripeClient().checkout.sessions.create(params, {idempotencyKey:`floqr-checkout-${orderRef.id}`});
@@ -1344,7 +1506,15 @@ exports.createFloqrCheckoutSession = onCall({
     });
     throw error;
   }
-});
+}
+
+exports.createFloqrCheckoutSession = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, runCreateFloqrCheckoutSession);
+
 
 async function cancelUnpaidOrder(orderId, authContext, reason = "cancelled") {
   const id = text(orderId, 120);
@@ -1451,6 +1621,85 @@ exports.cancelFloqrCheckoutOrder = onCall({
 }, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   return cancelUnpaidOrder(request.data?.orderId, request.auth, text(request.data?.reason, 120) || "user-cancelled");
+});
+
+async function canSandboxRefundOrder(authContext, order = {}) {
+  if (await isMasterAdminAuth(authContext)) return true;
+  const clubId = text(order.clubLocationId, 120);
+  if (clubId && await canManageClubFinances(clubId, authContext)) return true;
+  return false;
+}
+
+/** Test-mode only. Live Stripe refunds stay launch-gated. */
+exports.refundFloqrCheckoutOrder = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:60,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  if (!isStripeTestMode()) {
+    throw new HttpsError("failed-precondition", "Sandbox refunds are only available while Stripe is in test mode.");
+  }
+  const orderId = text(request.data?.orderId, 160);
+  if (!orderId) throw new HttpsError("invalid-argument", "orderId is required.");
+  const reason = text(request.data?.reason, 200) || "sandbox-refund";
+  const ref = db.collection("serviceOrders").doc(orderId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Order not found.");
+  const order = snap.data() || {};
+  if (!(await canSandboxRefundOrder(request.auth, order))) {
+    throw new HttpsError("permission-denied", "Master Admin or Club Admin for this venue is required.");
+  }
+  if (text(order.paymentStatus, 40) !== "paid") {
+    throw new HttpsError("failed-precondition", "Only paid sandbox orders can be refunded.");
+  }
+  if (order.stripeLivemode === true) {
+    throw new HttpsError("failed-precondition", "Live Stripe charges cannot be refunded with this sandbox tool.");
+  }
+  const paymentIntentId = text(order.stripePaymentIntentId, 200);
+  if (!paymentIntentId) throw new HttpsError("failed-precondition", "This order has no Stripe payment intent to refund.");
+  const refundParams = {
+    payment_intent: paymentIntentId,
+    reason: "requested_by_customer",
+    refund_application_fee: true,
+    metadata: {orderId, refundedByUid: request.auth.uid, sandbox: "1", reason}
+  };
+  if (text(order.connectedAccountId, 160)) refundParams.reverse_transfer = true;
+  let refund;
+  try {
+    refund = await stripeClient().refunds.create(refundParams, {idempotencyKey: `floqr-sandbox-refund-${orderId}`});
+  } catch (error) {
+    console.error("Sandbox Stripe refund failed", {orderId, errorCode: error?.code || error?.type || "stripe_error"});
+    throw new HttpsError("internal", "Stripe could not refund this sandbox order.");
+  }
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  await db.runTransaction(async tx => {
+    const latest = await tx.get(ref);
+    if (!latest.exists) return;
+    const current = latest.data() || {};
+    const computed = payoutRecoveryAfterRefund(current, {reverseTransfer: !!refundParams.reverse_transfer});
+    tx.set(ref, {
+      paymentStatus: "refunded",
+      status: "refunded",
+      stripeRefundId: text(refund.id, 200),
+      refundedAt: now,
+      refundReason: reason,
+      refundedByUid: request.auth.uid,
+      payoutRecoveryStatus: lockPayoutRecoveryStatus(current.payoutRecoveryStatus, computed),
+      updatedAt: now
+    }, {merge: true});
+  });
+  await writeAppLog({
+    level: "info",
+    category: "stripe",
+    action: "sandbox_refund",
+    message: `Sandbox refund ${refund.id} for order ${orderId}`,
+    uid: request.auth.uid,
+    email: request.auth.token?.email || "",
+    details: {orderId, refundId: refund.id, amountCents: refund.amount, reverseTransfer: !!refundParams.reverse_transfer}
+  });
+  return {ok: true, orderId, refundId: refund.id, amountCents: refund.amount};
 });
 
 /** Client-side fallback when Stripe webhook fulfillment is delayed or missed. */
@@ -2394,26 +2643,46 @@ async function orderRefForStripeFinancialObject(object = {}) {
   return snap.empty ? null : snap.docs[0].ref;
 }
 
+async function loadChargeRefunds(charge = {}) {
+  const local = Array.isArray(charge?.refunds?.data) ? charge.refunds.data : null;
+  if (local && local.length) return local;
+  const chargeId = text(charge.id, 160);
+  if (!chargeId) return local;
+  try {
+    const list = await stripeClient().refunds.list({charge: chargeId, limit: 20});
+    return Array.isArray(list?.data) ? list.data : local;
+  } catch (error) {
+    console.error("Stripe refund list failed", {errorCode: error?.code || error?.type || "stripe_error"});
+    return local;
+  }
+}
+
 async function recordRefundEvent(charge = {}) {
   const ref = await orderRefForStripeFinancialObject(charge);
   if (!ref) return;
-  const snap = await ref.get();
-  if (!snap.exists) return;
-  const order = snap.data() || {};
-  const amount = Math.max(0, Math.round(Number(charge.amount || order.amountCents || 0)));
+  const refunds = await loadChargeRefunds(charge);
+  const amount = Math.max(0, Math.round(Number(charge.amount || 0)));
   const amountRefunded = Math.max(0, Math.round(Number(charge.amount_refunded || 0)));
   const fullyRefunded = charge.refunded === true || (amount > 0 && amountRefunded >= amount);
   const now = admin.firestore.FieldValue.serverTimestamp();
-  await ref.set({
-    status:fullyRefunded ? "refunded" : "partially-refunded",
-    paymentStatus:fullyRefunded ? "refunded" : "partially-refunded",
-    stripeChargeId:text(charge.id, 160),
-    refundAmountCents:amountRefunded,
-    refundStatus:fullyRefunded ? "full" : "partial",
-    payoutRecoveryStatus:order.connectedAccountId ? "manual-transfer-reversal-review" : "not-applicable",
-    refundedAt:now,
-    updatedAt:now
-  }, {merge:true});
+  await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return;
+    const order = snap.data() || {};
+    const computed = payoutRecoveryAfterRefund(order, {charge, refunds});
+    const nextStatus = lockPayoutRecoveryStatus(order.payoutRecoveryStatus, computed);
+    const patch = {
+      status: fullyRefunded ? "refunded" : "partially-refunded",
+      paymentStatus: fullyRefunded ? "refunded" : "partially-refunded",
+      stripeChargeId: text(charge.id, 160),
+      refundAmountCents: amountRefunded,
+      refundStatus: fullyRefunded ? "full" : "partial",
+      refundedAt: now,
+      updatedAt: now
+    };
+    if (nextStatus) patch.payoutRecoveryStatus = nextStatus;
+    tx.set(ref, patch, {merge: true});
+  });
 }
 
 async function recordDisputeEvent(dispute = {}, eventType = "") {
@@ -2534,6 +2803,8 @@ exports.stripeFloqrWebhook = onRequest({
     } else if (["customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
       if (text(session.metadata?.orderType, 80) === "adCampaign") await require("./ad-functions").__adHelpers.syncAdSubscription(session);
       else await syncSchedulingSubscriptionFromStripe(session);
+    } else if (["account.updated", "capability.updated", "account.application.deauthorized"].includes(event.type)) {
+      await handleConnectAccountWebhook(event);
     }
     await claim.ref.set({status:"processed", processedAt:admin.firestore.FieldValue.serverTimestamp(), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
     response.json({received:true});
@@ -2827,6 +3098,16 @@ exports.sendTestPaidShoutoutReceipt = onCall({
   };
 });
 
+exports.__checkoutHelpers = {
+  runCreateFloqrCheckoutSession,
+  normalizeCheckoutPayload,
+  describeOrder,
+  optionalReadyRecipient,
+  applyDestinationCharge,
+  persistConnectStatus,
+  refreshConnectBindingFromStripeAccount,
+  handleConnectAccountWebhook
+};
 exports.__receiptHelpers = {
   buildTempShoutoutReceipt,
   promoteShoutoutReceipt,

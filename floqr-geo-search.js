@@ -1,5 +1,5 @@
 /* FLOQR location-aware search order: GPS first, then IP estimate, then profile city; nearest first, then name. */
-// Design notes: .cursor/rules/design-notes-floqai-venue-search.mdc
+// Design notes: .cursor/rules/design-notes-botdee-venue-search.mdc
 (function (root, factory) {
   const api = factory(root);
   if (typeof module === "object" && module.exports) module.exports = api;
@@ -180,7 +180,8 @@
       accuracy: finite(extra.accuracy),
       city: extra.city || near?.city || "",
       region: extra.region || "",
-      country: extra.country || near?.country || ""
+      country: extra.country || near?.country || "",
+      countryCode: String(extra.countryCode || extra.country_code || "").trim().toUpperCase().slice(0, 2)
     };
   }
 
@@ -229,12 +230,17 @@
     if (!json || typeof json !== "object" || json.success === false || json.error === true) return null;
     const p = point(json.latitude ?? json.lat, json.longitude ?? json.lon ?? json.lng);
     if (!p) return null;
+    const country = String(json.country_name || json.country || "");
+    const countryCode = String(json.country_code || json.countryCode || json.country_code2 || "")
+      .trim()
+      .toUpperCase();
     return {
       latitude: p.latitude,
       longitude: p.longitude,
       city: String(json.city || ""),
       region: String(json.region || json.region_name || ""),
-      country: String(json.country_name || json.country || "")
+      country,
+      countryCode: countryCode.length === 2 ? countryCode : ""
     };
   }
 
@@ -319,6 +325,7 @@
     compareNames,
     sortNearest,
     parseIpPayload,
+    ipLocation,
     resolveUserLocation,
     resetCache
   };

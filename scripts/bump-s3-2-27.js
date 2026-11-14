@@ -71,7 +71,7 @@ function run(root) {
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
     const note = [
       `- ${NEXT}: Template howitWorks datapoint (per LED size) + Traditional description rewrite.`,
-      `- s3.2.26: Template select hides floating FloqAi (lens Search only).`
+      `- s3.2.26: Template select hides floating BOT DEE (lens Search only).`
     ].join(eol);
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
   });

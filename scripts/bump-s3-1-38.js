@@ -61,7 +61,7 @@ function run(root) {
     if (!head.test(src)) throw new Error("README head");
     if (src.includes(`# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)) return src;
     const eol = src.includes("\r\n") ? "\r\n" : "\n";
-    const note = `- ${NEXT}: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and FloqAi search ("Shiloh", "cat template") in all 11 languages.`;
+    const note = `- ${NEXT}: New Aurelia-exclusive ShoutOut template Shiloh ($30). Shiloh the cat sits on the left of the board and the patron's message glows in white on the dark side beside her; emoji are welcome. Offered only at Aurelia, flagged for every LED size (96×48, 64×48, 64×32) so it plays on whichever boards Aurelia has. Patron help and BOT DEE search ("Shiloh", "cat template") in all 11 languages.`;
     return src.replace(head, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)${eol}${eol}${note}`);
   });
 

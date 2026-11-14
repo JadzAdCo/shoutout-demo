@@ -10,7 +10,7 @@ const at = file => path.join(root, file);
 const edit = (file, fn) => fs.writeFileSync(at(file), fn(fs.readFileSync(at(file), "utf8")));
 
 const versioned = [
-  "club-embed.html", "club-profile.html", "display.html", "admin.html", "display2.html", "floqai.html", "floqai-search.html",
+  "club-embed.html", "club-profile.html", "display.html", "admin.html", "display2.html", "botdee.html", "botdee-search.html",
   "floqr-nav.js", "guest-list.html", "index.html", "master-admin.html", "patron-portal.html", "role-request.html", "template-tags.html"
 ];
 for (const file of versioned) {

@@ -6,7 +6,7 @@
   const PUBLIC = new Set([
     "", "index.html",
     "display.html", "display2.html", "display-error.html", "displays.html",
-    "club-profile.html", "role-profiles.html", "rydr.html", "floqai-search.html",
+    "club-profile.html", "role-profiles.html", "rydr.html",
     "payment-return.html", "auth-debug.html"
   ]);
   const IS_PREVIEW = /preview|popout|seed|migration|feature-tests|onboard-dc|jersey-preview|heist-|bartr-ui|rydr-icon|rydr-logo|ad-campaign|mobile-test/i.test(path);

@@ -9,7 +9,7 @@
     bartr: true,
     rydr: true,
     mingl: true,
-    floqAi: true,
+    botDee: true,
     shoutOut: true
   });
 
@@ -29,7 +29,7 @@
     bartr: "BartR",
     rydr: "RydR",
     mingl: "Mingl",
-    floqAi: "FloqAi (Quick Search and Help)",
+    botDee: "BOT DEE (Quick Search and Help)",
     shoutOut: "ShoutOut"
   });
 
@@ -71,6 +71,11 @@
     Object.keys(DEFAULT_PATRON_GATES).forEach(key => {
       if (raw && Object.prototype.hasOwnProperty.call(raw, key)) out[key] = raw[key] !== false;
     });
+    // Legacy patronFeatureGates.floqAi → botDee for one release.
+    if (raw && Object.prototype.hasOwnProperty.call(raw, "floqAi")
+      && !Object.prototype.hasOwnProperty.call(raw, "botDee")) {
+      out.botDee = raw.floqAi !== false;
+    }
     return out;
   }
 
@@ -161,6 +166,15 @@
     }
   }
 
+  /** Packaged catalog row, or Firestore-merged cache after loadVenueRecord. */
+  function getCachedVenue(clubId) {
+    const id = String(clubId || "").trim();
+    if (!id) return null;
+    if (venueGateCache.has(id)) return venueGateCache.get(id);
+    const staticRow = (root.SHOUTOUT_CLUB_LOCATIONS || {})[id];
+    return staticRow ? { id, ...staticRow } : null;
+  }
+
   function invalidateVenueCache(clubId) {
     if (clubId) venueGateCache.delete(String(clubId));
     else venueGateCache.clear();
@@ -172,7 +186,7 @@
       ["rydr", ["rydrBtnCard"]],
       ["mingl", ["minglBtnCard", "confirmGoMinglBtn"]],
       ["shoutOut", ["shoutoutBtnCard", "clubShoutoutBtn"]],
-      ["floqAi", ["floqAiMark", "floqAiHelpBtn", "intentSearchOpenBtn", "askFloqrOpenBtn"]]
+      ["botDee", ["botDeeMark", "botDeeHelpBtn", "intentSearchOpenBtn", "askFloqrOpenBtn"]]
     ];
     map.forEach(([key, ids]) => {
       const allowed = patronMayUse(key, userOrEmail, profile);
@@ -184,8 +198,8 @@
         if ("disabled" in el) el.disabled = !allowed;
       });
     });
-    document.querySelectorAll("[data-floqai-gate]").forEach(el => {
-      const allowed = patronMayUse("floqAi", userOrEmail, profile);
+    document.querySelectorAll("[data-botdee-gate]").forEach(el => {
+      const allowed = patronMayUse("botDee", userOrEmail, profile);
       el.classList.toggle("hidden", !allowed);
     });
   }
@@ -209,6 +223,7 @@
     getPatronGates,
     setCachedPatronGates,
     loadVenueRecord,
+    getCachedVenue,
     invalidateVenueCache,
     applyPatronGateUi,
     patronGatesLoaded: () => patronGatesLoaded

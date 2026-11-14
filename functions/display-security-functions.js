@@ -1257,6 +1257,12 @@ exports.purgeLogRetention = onSchedule({
     diagnosticDeleted += n;
     if (n < 400) break;
   }
+  let geminiAccessDeleted = 0;
+  for (let i = 0; i < 5; i += 1) {
+    const n = await deleteOldByCreatedAtMs("geminiApiAccessLogs", now - DIAGNOSTIC_LOG_RETENTION_MS);
+    geminiAccessDeleted += n;
+    if (n < 400) break;
+  }
   for (let i = 0; i < 5; i += 1) {
     const n = await deleteOldByCreatedAtMs("displayAccessLogs", now - SECURITY_LOG_RETENTION_MS);
     securityDeleted += n;
@@ -1309,8 +1315,8 @@ exports.purgeLogRetention = onSchedule({
     securityMessagesDeleted = count;
   }
 
-  console.log("purgeLogRetention", {diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted});
-  return {ok: true, diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted};
+  console.log("purgeLogRetention", {diagnosticDeleted, geminiAccessDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted});
+  return {ok: true, diagnosticDeleted, geminiAccessDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted};
 });
 
 exports.__displaySecurityHelpers = {

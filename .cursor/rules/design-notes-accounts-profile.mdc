@@ -1,0 +1,74 @@
+---
+description: Accounts management profile (Oct 29 2026) — configure every third-party account (Twilio, SendGrid, Stripe, Azure, domain/OAuth/App Check for www.floqr.app, TURN, IAM signer, POS partners, TSA, Meta Business) in one seeding step without secrets in chat or git
+alwaysApply: true
+---
+
+# Accounts management profile
+
+Resume: `@accounts$` / `$accounts-profile$`.
+
+Owner (Oct 29 2026): "Accounts will be provided later. Create a mgmt profile to configure accounts via seeding."
+
+## Files
+
+| File | Git | Role |
+|---|---|---|
+| `config/accounts-profile.example.json` | committed | Every field: description, where to get it, secret yes/no, format, target, whether code reads it today. Values empty. Regenerate with `--write-example` after editing the catalog (a test fails otherwise). |
+| `config/accounts-profile.local.json` | **gitignored** (`config/*.local.json`) | Owner's copy with real values. Never commit, never paste into chat. |
+| `scripts/seed-accounts-profile.js` | committed | Catalog (source of truth for target / secret / format), validator, masked plan, applier. |
+| `scripts/seed-accounts-profile.test.js` | committed | `node --test scripts/seed-accounts-profile.test.js` — validation, masking, no secret in argv / logs / Firestore, env merge, example parity. No network. Lives outside `functions/` so `check-functions-sync.js` is unaffected. |
+
+## Owner flow
+
+1. `copy config\accounts-profile.example.json config\accounts-profile.local.json`, fill `value` for the accounts you have (empty = skip; empty never clears an existing secret), set `manual.*.value` to `true` after each Console step.
+2. `node scripts/seed-accounts-profile.js` — dry run (default): validates and prints a plan with secrets masked (`••••` + last 4 when ≥ 16 chars, else `•••• (set)`) plus the Console-only checklist. Exit 1 on any invalid value. `--only twilio,stripe` limits the run.
+3. `node scripts/seed-accounts-profile.js --apply --confirm-project shoutoutdemo-5b402` — writes, then redeploy the affected Functions from a clean `origin/main` export (copy `functions/.env` into the export — it is gitignored, so `git archive` does not carry it).
+
+## Targets (only the catalog decides; metadata in the local file is ignored)
+
+| Target | How | Secret? |
+|---|---|---|
+| `firebaseSecret` | `firebase functions:secrets:set NAME --project P --non-interactive`, value on **stdin** (never argv) | yes |
+| `githubSecret` | `gh secret set NAME --repo jadzadco/shoutout-demo`, stdin (Azure SWA deploy token) | yes |
+| `functionsEnv` | Replace / append only that key in `functions/.env` (other lines untouched; plain `process.env`, never `defineString`) | no |
+| `firestoreDoc` | `platformAccountsProfile/publicConfig` (Admin SDK) — non-secret identifiers only; secret-looking values (`sk_`/`rk_`/`whsec_`/`SG.`/PEM) are rejected | no |
+| manual | Console step; recorded only as `0\|1` | — |
+
+Status doc `platformAccountsProfile/current`: `{profileVersion, updatedAtMs, updatedBy, accounts: {id: {configured 0|1, fields: {key: {set, target, secret, last4?}}, manual: {key: 0|1}, updatedAtMs}}}`. `configured = 1` only when every required field is set **and** every manual step is ticked. Accounts not in this run keep their previous status; a failed secret write is not marked set. No rules change: the collection has no client rule, so only Admin SDK reads it (a Master Admin UI would need a callable).
+
+Credentials: Admin SDK uses `GOOGLE_APPLICATION_CREDENTIALS` if set, else a temporary ADC built from the Firebase CLI login (same pattern as `seed-temp-qa-venues.js`), deleted afterwards.
+
+## Accounts covered
+
+| Account | Fields → target |
+|---|---|
+| Twilio | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_WHATSAPP_FROM` (secrets) · `TWILIO_WHATSAPP_OTP_CONTENT_SID` (env, `HX` + 32 hex) · manual: Meta sender, Authentication template |
+| SendGrid | `SENDGRID_API_KEY` · env `FLOQR_EMAIL_OTP_FROM`, `FLOQR_RECEIPT_FROM` · sender domain · manual: domain authentication |
+| Stripe | mode live/test (keys must match) · `STRIPE_SECRET_KEY` (`sk_`/`rk_`), `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET` · publishable key, Connect `ca_` id · manual: return URLs on www.floqr.app, Connect platform profile |
+| Firebase Auth | manual only: disable Email/Password, authorized domains www.floqr.app + apex, SMS region US+CA |
+| Azure | subscription / tenant / resource group / SWA name / DNS zone · GitHub secret `AZURE_STATIC_WEB_APPS_API_TOKEN` · manual: custom domains www / admin / master / staging, apex 301 |
+| Domain | canonical origin `https://www.floqr.app`, admin / master / staging hosts, reCAPTCHA site key · env `FLOQR_PUBLIC_ORIGIN`, `FLOQR_DISPLAY_BASE_URL` (**cutover day only** — leave empty while Pages is staging) · manual: OAuth redirects, App Check |
+| floqCast TURN | env `FLOQCAST_TURN_URLS` · secrets `FLOQCAST_TURN_USERNAME`, `FLOQCAST_TURN_CREDENTIAL` |
+| Display token signer | runtime service account · manual: `roles/iam.serviceAccountTokenCreator` |
+| POS | Square / Toast / SpotOn / Clover: app or client ids + environment (env `POS_*`), secrets `POS_*_SECRET` / webhook keys (names from `reports/vip-pos-integrations.md`) · manual: redirect URIs on www.floqr.app |
+| TSA | provider digicert / sectigo (VIP-P-04) · env `VIP_TSA_URL` · optional secrets `VIP_TSA_USERNAME` / `VIP_TSA_PASSWORD` |
+| Meta Business | business id, WhatsApp Business Account id, display name · manual: business verification |
+
+Fields marked `readByCodeToday: false` (Connect, TURN, POS, TSA, App Check key, SWA token) are stored ahead of the code that will read them; wire `defineSecret` with the same name when that feature ships.
+
+## Never
+
+- Commit `config/accounts-profile.local.json` or paste its values into chat, commits, issues, or logs.
+- Put a secret value in argv, stdout, Firestore, or `functions/.env` (the script refuses secret-looking values on non-secret targets).
+- Run `--apply` against production from an agent session without the owner's explicit go-ahead.
+- Read existing `functions/.env` values in an agent session (key names only).
+
+## Follow-up (not built)
+
+Master Admin → Security → **Accounts** read-only panel: a callable (Master Admin + SOS2FA) that returns `platformAccountsProfile/current` (configured flags, masked last 4, manual checklist). No secret entry in the browser.
+
+## FIX PROMPT
+
+```
+Accounts profile: owner fills config/accounts-profile.local.json (gitignored) from config/accounts-profile.example.json; node scripts/seed-accounts-profile.js = masked dry run; --apply --confirm-project <id> sets Firebase secrets via stdin, GitHub secret for Azure SWA, plain keys in functions/.env, non-secret ids in platformAccountsProfile/publicConfig, status in platformAccountsProfile/current (configured 0|1, last4 only). Catalog in the script is the source of truth; --write-example after edits; node --test scripts/seed-accounts-profile.test.js. Never secrets in argv/logs/Firestore/git. Design notes: design-notes-accounts-profile.mdc
+```

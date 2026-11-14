@@ -112,28 +112,28 @@
     return isNaN(d) ? "-" : d.toLocaleString();
   };
 
+  function currentEditLocale() {
+    return {
+      country: byId("editCountry")?.value || currentProfile?.country || "",
+      ...profileLocaleHint
+    };
+  }
+
   function countryUsesFeetInches(country = "") {
-    const value = String(country || "").trim().toLowerCase();
-    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "canada", "ca"].includes(value);
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
-    return countryUsesFeetInches(country) ? "ftin" : "m";
+    return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyEditHeightUnit(force = false) {
-    const unit = byId("editHeightUnit");
-    const height = byId("editHeight");
-    if (!unit || !height) return;
-    if (force || !unit.dataset.userSelected) unit.value = preferredHeightUnit(byId("editCountry")?.value || "");
-    height.placeholder = unit.value === "ftin" ? "5'10\"" : "1.78";
+  function applyEditHeightUnit() {
+    editHeightCtl?.setLocale?.(currentEditLocale());
+    editPickupCtl?.paintPostal?.();
   }
 
   function heightDisplay(profile = {}) {
-    const value = String(profile.height || "").trim();
-    if (!value) return "";
-    const unit = profile.heightUnit || preferredHeightUnit(profile.country);
-    return unit === "m" ? `${value} m` : value;
+    return window.FLOQRProfileLocale?.heightDisplay?.(profile) || String(profile.height || "").trim();
   }
 
   function minglUploadErrorMessage(error) {
@@ -217,6 +217,9 @@
   const db = firebase.firestore();
   const storage = firebase.storage();
   let currentProfile = {};
+  let profileLocaleHint = {};
+  let editHeightCtl = null;
+  let editPickupCtl = null;
   let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
@@ -675,14 +678,10 @@
   async function loginGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     try { provider.setCustomParameters({prompt: "select_account"}); } catch (_) {}
-    const ua = String(navigator.userAgent || "");
-    const touch = Number(navigator.maxTouchPoints || 0) > 0;
-    const popupsBad = /iPhone|iPod|iPad|Android/i.test(ua) || (/Macintosh/i.test(ua) && touch)
-      || /\bwv\b|; wv\)|FBAN|FBAV|Instagram/i.test(ua);
+    /* Prefer popup on every device — GitHub Pages ↔ firebaseapp.com redirect often loses session. */
     try {
-      setText("portalStatus", popupsBad ? "Opening Google secure sign-in…" : "Opening Google sign-in...");
-      if (popupsBad) await auth.signInWithRedirect(provider);
-      else await auth.signInWithPopup(provider);
+      setText("portalStatus", "Opening Google sign-in...");
+      await auth.signInWithPopup(provider);
     } catch (e) {
       const code = e?.code || "";
       if (code === "auth/popup-blocked") {
@@ -691,7 +690,7 @@
           await auth.signInWithRedirect(provider);
           return;
         } catch (redirectErr) {
-          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          setText("portalStatus", `${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}. Allow popups for jadzadco.github.io, or use Email OTP on Search.`);
           return;
         }
       }
@@ -725,7 +724,10 @@
     try {
       const snap = await db.collection(name).where(field, "==", value).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
-    } catch (e) { return window.FLOQRAccessNotice?.report(name, e) || []; }
+    } catch (e) {
+      console.warn(`FLOQR portal query failed: ${name}.${field}`, e?.code || "", e?.message || e);
+      return window.FLOQRAccessNotice?.report(name, e) || [];
+    }
   }
 
   async function getDocsByIdsSafe(name, ids = [], limit=150) {
@@ -1130,6 +1132,11 @@
         setText("portalStatus", err.message || "Could not re-use this ShoutOut.");
       }));
     });
+    root?.querySelectorAll(".continue-saved-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => continueSavedShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not continue this saved ShoutOut.");
+      }));
+    });
     root?.querySelectorAll(".save-pending-shoutout-btn").forEach(btn => {
       btn.addEventListener("click", () => savePendingShoutoutAsDraft(btn.dataset.shoutoutId || "").catch(err => {
         setText("portalStatus", err.message || "Could not save this ShoutOut.");
@@ -1162,15 +1169,13 @@
     const mediaBadge = shoutoutHasMedia(x) || mediaThumb
       ? ` - ${esc(tt("portal.hasMedia", {}, "Media"))}`
       : "";
-    const continueHref = window.FLOQRNav?.portalLink?.("./", {start: "editor", savedId: x.id || ""})
-      || `./?start=editor&savedId=${encodeURIComponent(x.id || "")}`;
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
       ${mediaThumb && (mode === "archive" || mode === "completed") ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
       <strong>${esc(x.mainText || "ShoutOut")}</strong>
       <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}${mediaBadge}</p>
       <small>${esc(fmtDate(x.savedAt || x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}${x.screenFormatId ? ` · ${esc(x.screenFormatLabel || x.screenFormatId)}` : ""}</small>
       <p class="queue-actions">
-        ${canContinueSaved ? `<a class="buttonlike continue-saved-shoutout-btn" href="${esc(continueHref)}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</a>` : ""}
+        ${canContinueSaved ? `<button class="buttonlike continue-saved-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.continueSavedShoutout", {}, "Continue editing"))}</button>` : ""}
         ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
         ${canPreview ? `<button class="buttonlike preview-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.previewShoutout", {}, "Preview"))}</button>` : ""}
         ${canReuse ? `<button class="buttonlike reuse-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.reuseShoutout", {}, "Re-Use ShoutOut"))}</button>` : ""}
@@ -1372,33 +1377,70 @@
     showShoutoutPane("shoutoutArchivePane");
   }
 
-  async function reuseCompletedShoutout(shoutoutId) {
-    const user = auth.currentUser;
-    const row = currentShoutouts.find(item => item.id === shoutoutId)
-      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
-    if (!user || !row) return;
-    const draft = {
+  function shoutoutResumeDraft(row = {}, { resumeMode = "reuse" } = {}) {
+    return {
       mainText: row.mainText || "",
       subText: row.subText || "",
       template: row.template || row.templateId || "blackwhite",
       templateName: row.templateName || "",
       locationId: row.clubLocationId || row.location || "",
       locationName: row.locationName || row.clubName || "",
+      screenFormatId: row.screenFormatId || "",
       mediaUrl: row.mediaUrl || row.archivedMediaUrl || row.originalMediaUrl || "",
       mediaType: row.mediaType || "",
       backgroundUrl: row.backgroundUrl || "",
       attribution: row.attribution || "",
       includeAttribution: !!row.includeAttribution || !!row.attribution,
+      attributionChoice: row.attributionChoice || "",
+      soccerNameSource: row.soccerNameSource || "",
+      jerseyPatronName: row.jerseyPatronName || row.jerseyName || "",
+      jerseyNumber: row.subText || row.jerseyNumber || "",
+      jerseyTeamId: row.jerseyTeamId || "",
+      jerseyTeamLabel: row.jerseyTeamLabel || row.jerseyPlateLabel || "",
+      jerseyPrimary: row.jerseyPrimary || "",
+      jerseySecondary: row.jerseySecondary || "",
+      jerseyAccent: row.jerseyAccent || "",
+      sport: row.sport || "",
+      nflDualLayout: !!row.nflDualLayout,
       sourceShoutoutId: row.id || "",
+      savedShoutoutId: resumeMode === "saved" ? (row.id || "") : "",
       referenceNumber: row.referenceNumber || "",
+      resumeMode,
+      openEditor: true,
       createdAt: Date.now()
     };
+  }
+
+  async function reuseCompletedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId)
+      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row) return;
+    const draft = shoutoutResumeDraft(row, { resumeMode: "reuse" });
     try {
       sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
     } catch (_e) {}
     const params = new URLSearchParams({ start: "shoutout", from: "portal-reuse" });
     if (draft.locationId) params.set("location", draft.locationId);
     if (draft.template) params.set("template", draft.template);
+    window.location.href = `./?${params.toString()}`;
+  }
+
+  async function continueSavedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row || !isSavedShoutout(row)) {
+      setText("portalStatus", tt("portal.shoutoutMissing", {}, "ShoutOut not found."));
+      return;
+    }
+    const draft = shoutoutResumeDraft(row, { resumeMode: "saved" });
+    try {
+      sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
+    } catch (_e) {}
+    const params = new URLSearchParams({ start: "shoutout", from: "portal-saved" });
+    if (draft.locationId) params.set("location", draft.locationId);
+    if (draft.template) params.set("template", draft.template);
+    if (draft.savedShoutoutId) params.set("savedId", draft.savedShoutoutId);
     window.location.href = `./?${params.toString()}`;
   }
 
@@ -2021,9 +2063,22 @@
     byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
     byId("editGender").value = profile.gender || "";
-    byId("editHeight").value = profile.height || "";
-    if (byId("editHeightUnit")) byId("editHeightUnit").value = profile.heightUnit || preferredHeightUnit(profile.country || "");
-    applyEditHeightUnit(true);
+    editHeightCtl?.fill?.({
+      unit: profile.heightUnit,
+      value: profile.height || "",
+      locale: {country: profile.country || "", ...profileLocaleHint}
+    });
+    if (!editHeightCtl) {
+      byId("editHeight").value = profile.height || "";
+      if (byId("editHeightUnit")) {
+        const unit = window.FLOQRProfileLocale?.normalizeHeightUnit?.(profile.heightUnit) || preferredHeightUnit(profile.country || "");
+        byId("editHeightUnit").value = unit;
+        byId("editHeightUnit").dataset.prevUnit = unit;
+        if (profile.heightUnit) byId("editHeightUnit").dataset.userSelected = "true";
+      }
+    }
+    editPickupCtl?.fill?.(window.FLOQRProfileLocale?.pickupFromProfile?.(profile) || {});
+    applyEditHeightUnit();
     if (byId("editBirthMonth")) byId("editBirthMonth").value = profile.birthMonth || "";
     if (byId("editBirthDay")) byId("editBirthDay").value = profile.birthDay || "";
     byId("editInstagram").value = profile.instagramHandle || "";
@@ -2122,9 +2177,7 @@
   }
 
   function publicMinglDatapoints(profile = {}) {
-    if (Array.isArray(profile.publicMinglDatapoints) && profile.publicMinglDatapoints.length) {
-      return profile.publicMinglDatapoints;
-    }
+    if (Array.isArray(profile.publicMinglDatapoints)) return profile.publicMinglDatapoints;
     return PUBLIC_MINGL_DATAPOINTS.map(point => point.key);
   }
 
@@ -2313,6 +2366,20 @@
       return;
     }
     const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
+    const heightCheck = editHeightCtl?.validate?.(false) || window.FLOQRProfileLocale?.validateHeight?.(
+      byId("editHeight")?.value || "",
+      byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value)
+    );
+    if (heightCheck && !heightCheck.ok && !heightCheck.empty) {
+      setText("portalStatus", heightCheck.error);
+      return;
+    }
+    const pickupCheck = editPickupCtl?.validate?.(false);
+    if (pickupCheck && !pickupCheck.ok) {
+      setText("portalStatus", pickupCheck.error);
+      return;
+    }
+    const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? pickupCheck.parts : null;
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
@@ -2320,13 +2387,14 @@
       floqrHandle,
       username,
       phone: byId("editPhone").value.trim(),
-      taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
       preferredLanguage,
       gender: byId("editGender").value,
-      height: byId("editHeight").value.trim(),
-      heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
+      height: heightCheck?.empty ? (currentProfile?.height || "") : (heightCheck?.normalized || byId("editHeight").value.trim()),
+      heightUnit: heightCheck?.empty
+        ? (window.FLOQRProfileLocale?.normalizeHeightUnit?.(currentProfile?.heightUnit) || preferredHeightUnit(byId("editCountry").value))
+        : (heightCheck?.unit || window.FLOQRProfileLocale?.normalizeHeightUnit?.(byId("editHeightUnit")?.value) || preferredHeightUnit(byId("editCountry").value)),
       birthMonth: byId("editBirthMonth")?.value || "",
       birthDay: byId("editBirthDay")?.value || "",
       instagramHandle: window.FLOQRIdentity?.normalizeInstagramHandle?.(byId("editInstagram").value) || "",
@@ -2355,6 +2423,14 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     updates.fullName = `${updates.firstName} ${updates.lastName}`.trim();
+    if (pickupParts) {
+      updates.taxiStreetNumber = pickupParts.streetNumber || "";
+      updates.taxiStreetName = pickupParts.streetName || "";
+      updates.taxiCity = pickupParts.city || "";
+      updates.taxiPostalCode = pickupParts.postalCode || "";
+      updates.taxiPostalKind = pickupParts.postalKind || "";
+      updates.taxiPickupAddress = pickupCheck.composed;
+    }
     if (byId("editCommerceEnabled")?.checked && !isUsMarketplaceEligible(updates)) {
       setText("portalStatus", "BartR seller store is limited to U.S.-based patrons and service members.");
       return;
@@ -4950,6 +5026,21 @@
         : `<p class="sub">${esc(tt("portal.noCompletedShoutouts", {}, "No completed ShoutOuts yet."))}</p>`;
       bindShoutoutListActions(completedHost);
     }
+    // Paid throws land in Completed, not Saved. If Saved is the default empty tab and
+    // Completed has history, open Completed so patrons see their past ShoutOuts.
+    {
+      const paramsEarly = new URL(window.location.href).searchParams;
+      // `sub` is an alias for `pane` in Feature & Orders deep links — honor it too.
+      const deepLinked = !!(paramsEarly.get("id") || paramsEarly.get("ref") || paramsEarly.get("pane") || paramsEarly.get("sub"));
+      const activeSo = document.querySelector("#shoutoutSubtabs .admin-subtab.active")?.getAttribute("data-so-pane") || "";
+      if (!deepLinked
+        && activeSo === "shoutoutSavedPane"
+        && !savedShoutouts.length
+        && !pendingShoutouts.length
+        && completedShoutouts.length) {
+        showShoutoutPane("shoutoutCompletedPane");
+      }
+    }
     if (archiveHost) {
       archiveHost.innerHTML = currentArchivedShoutouts.length
         ? currentArchivedShoutouts.map(x => renderShoutoutQueueItem(x, 0, "archive")).join("")
@@ -4963,6 +5054,7 @@
       || currentArchivedShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
     if (requestedItem) {
       if (requestedItem.complianceArchived || requestedItem._fromArchive) showShoutoutPane("shoutoutArchivePane");
+      else if (isSavedShoutout(requestedItem)) showShoutoutPane("shoutoutSavedPane");
       else if (isCompletedShoutout(requestedItem) && !isPendingShoutout(requestedItem)) showShoutoutPane("shoutoutCompletedPane");
       else showShoutoutPane("shoutoutPendingPane");
     }
@@ -5155,12 +5247,31 @@
       renderRecipientSearchResults();
     });
     byId("portalMinglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    editHeightCtl = window.FLOQRProfileLocale?.bindHeightFields?.({
+      unit: "editHeightUnit",
+      height: "editHeight",
+      hint: "editHeightHint",
+      locale: currentEditLocale
+    }) || null;
+    editPickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
+      ids: {
+        streetNumber: "editTaxiStreetNumber",
+        streetName: "editTaxiStreetName",
+        city: "editTaxiCity",
+        citySource: "editCity",
+        postal: "editTaxiPostal",
+        postalLabel: "editTaxiPostalLabel",
+        composed: "editTaxiPickupAddress",
+        hint: "editTaxiHint"
+      },
+      locale: currentEditLocale
+    }) || null;
+    window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
+      profileLocaleHint = hint || {};
+      applyEditHeightUnit();
+    }).catch(() => {});
     byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit());
     byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit());
-    byId("editHeightUnit")?.addEventListener("change", event => {
-      event.currentTarget.dataset.userSelected = "true";
-      applyEditHeightUnit(true);
-    });
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {

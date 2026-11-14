@@ -15,6 +15,7 @@
   let confirmAttempts = 0;
   let closeArmed = false;
   let subscriptionPersisted = false;
+  let shoutoutReturnLogged = false;
 
   function money(cents) {
     return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
@@ -98,6 +99,17 @@
   function render(order = {}) {
     const paid = order.paymentStatus === "paid";
     const isShoutout = order.orderType === "shoutout";
+    if (!shoutoutReturnLogged && (isShoutout || window.FLOQRLog?.readShoutoutTrailId?.())) {
+      shoutoutReturnLogged = true;
+      const shoutout = order.payload?.shoutout || order.shoutout || {};
+      window.FLOQRLog?.shoutoutPageCall?.("paymentReturn", {
+        locationId: order.clubLocationId || shoutout.clubLocationId || "",
+        template: shoutout.template || order.template || "",
+        screenFormatId: shoutout.screenFormatId || "",
+        sourcePage: "checkoutRedirect",
+        source: "payment-return"
+      });
+    }
     const isFloqCast = order.orderType === "suprstarRequest" || order.orderType === "suprstrSlot";
     const receipt = order.receipt || {};
     byId("paymentReturnTitle").textContent = paid

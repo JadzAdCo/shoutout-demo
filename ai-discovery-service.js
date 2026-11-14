@@ -855,38 +855,49 @@
     if (el) el.textContent = value || "";
   }
 
+  let masterPanelBound = false;
+  let masterPanelLoading = null;
   async function mountMasterAdminPanel(options = {}) {
     db = options.db || db;
     auth = options.auth || auth;
     if (!db || !auth || !byId("aiCrawling")) return;
-    await ensureDiscoveryDefaults();
-    byId("aiDiscoverySummary").innerHTML = simpleRows([
-      ["How it works", "Search → review cards → Approve or Needs research → live listing"],
-      ["Publish rule", "Approve only when Name, Genre, DJs, Promoters, Address, City, Country, Phone, Email, and Instagram are filled"],
-      ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
-      ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
-    ]);
-    byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
-    byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);
-    byId("aiDiscoveryReadinessFilter")?.addEventListener("change", renderQueueCards);
-    byId("aiDiscoveryCityFilter")?.addEventListener("input", loadDiscoveryQueue);
-    byId("aiDiscoverySelectReadyBtn")?.addEventListener("click", selectAllReadyForOnboard);
-    byId("aiDiscoveryClearSelectionBtn")?.addEventListener("click", clearOnboardSelection);
-    byId("aiDiscoveryMassOnboardBtn")?.addEventListener("click", massOnboardSelected);
-    byId("saveAiDiscoveryCriteriaBtn")?.addEventListener("click", saveCriteria);
-    byId("aiDiscoveryCriteriaJson")?.addEventListener("change", () => {
-      try {
-        syncCriteriaWeightsToForm(JSON.parse(byId("aiDiscoveryCriteriaJson").value || "{}"));
-      } catch (_e) { /* keep form values if advanced dump is invalid */ }
-    });
-    document.querySelectorAll("[data-weight-key]").forEach(input => {
-      input.addEventListener("input", readCriteriaWeightsFromForm);
-    });
-    byId("listingDeleteSearch")?.addEventListener("input", loadListingDeleteTool);
-    byId("listingIncludeDeleted")?.addEventListener("change", loadListingDeleteTool);
-    await loadCriteria();
-    await loadDiscoveryQueue();
-    await loadListingDeleteTool();
+    if (masterPanelLoading) return masterPanelLoading;
+    masterPanelLoading = (async () => {
+      await ensureDiscoveryDefaults();
+      /* Counts live in #aiCrawlingSummary from masterAdminRollups; keep operator how-to here. */
+      byId("aiDiscoverySummary").innerHTML = simpleRows([
+        ["How it works", "Search → review cards → Approve or Needs research → live listing"],
+        ["Publish rule", "Approve only when Name, Genre, DJs, Promoters, Address, City, Country, Phone, Email, and Instagram are filled"],
+        ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
+        ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
+      ]);
+      window.FLOQRMasterAdminRollup?.paintForPanel?.("aiCrawling");
+      if (!masterPanelBound) {
+        masterPanelBound = true;
+        byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
+        byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);
+        byId("aiDiscoveryReadinessFilter")?.addEventListener("change", renderQueueCards);
+        byId("aiDiscoveryCityFilter")?.addEventListener("input", loadDiscoveryQueue);
+        byId("aiDiscoverySelectReadyBtn")?.addEventListener("click", selectAllReadyForOnboard);
+        byId("aiDiscoveryClearSelectionBtn")?.addEventListener("click", clearOnboardSelection);
+        byId("aiDiscoveryMassOnboardBtn")?.addEventListener("click", massOnboardSelected);
+        byId("saveAiDiscoveryCriteriaBtn")?.addEventListener("click", saveCriteria);
+        byId("aiDiscoveryCriteriaJson")?.addEventListener("change", () => {
+          try {
+            syncCriteriaWeightsToForm(JSON.parse(byId("aiDiscoveryCriteriaJson").value || "{}"));
+          } catch (_e) { /* keep form values if advanced dump is invalid */ }
+        });
+        document.querySelectorAll("[data-weight-key]").forEach(input => {
+          input.addEventListener("input", readCriteriaWeightsFromForm);
+        });
+        byId("listingDeleteSearch")?.addEventListener("input", loadListingDeleteTool);
+        byId("listingIncludeDeleted")?.addEventListener("change", loadListingDeleteTool);
+      }
+      await loadCriteria();
+      await loadDiscoveryQueue();
+      await loadListingDeleteTool();
+    })().finally(() => { masterPanelLoading = null; });
+    return masterPanelLoading;
   }
 
   window.FLOQRAIDiscovery = {

@@ -120,5 +120,5 @@ test("patron listings sort nearest first and re-sort when GPS arrives late", () 
   const src = fs.readFileSync(path.join(root, "patron-app.js"), "utf8");
   assert.match(src, /function sortListingNearest/);
   assert.match(src, /floqr:location-updated/);
-  assert.match(src, /cat\.floqaiNearYou/);
+  assert.match(src, /cat\.botdeeNearYou/);
 });

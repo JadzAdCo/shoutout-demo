@@ -11,9 +11,9 @@
     "title": "Αρχειοθετημένα ShoutOuts",
     "body": "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
   },
-  "floqai-ask-floqr": {
-    "title": "Ρωτήστε το FloqR με το FloqAi",
-    "body": "Ρωτήστε το FloqR με το FloqAi — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
+  "botdee-ask-floqr": {
+    "title": "Ρωτήστε το FloqR με το BOT DEE",
+    "body": "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
   },
   "help-soccer-jersey": {
     "title": "Ποδοσφαιρική φανέλα ShoutOut",
@@ -85,7 +85,7 @@
   },
   "help-create-publish-schedule": {
     "title": "Δημιουργήστε και δημοσιεύστε ένα πρόγραμμα προσωπικού",
-    "body": "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. FloqAi: create a schedule, publish schedule, how to schedule staff."
+    "body": "Προσθέστε αλλαγές πρόχειρων στο πλέγμα ατόμων × ημερών, ελέγξτε τις μάρκες και μετά Publish schedule. Οι εργαζόμενοι πρέπει να επιβεβαιώσουν πριν επιβεβαιωθεί μια βάρδια. BOT DEE: create a schedule, publish schedule, how to schedule staff."
   },
   "help-multi-delete-shifts": {
     "title": "Διαγράψτε πολλές προγραμματισμένες ή πρόχειρες βάρδιες",
@@ -133,11 +133,11 @@
   },
   "help-default-template": {
     "title": "Προεπιλεγμένο πρότυπο",
-    "body": "Δωρεάν Παραδοσιακό Ασπρόμαυρο Κλασικό. Χρησιμοποιήστε το FloqAi παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
+    "body": "Δωρεάν Παραδοσιακό Ασπρόμαυρο Κλασικό. Χρησιμοποιήστε το BOT DEE παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
   },
-  "help-floqai-template-search": {
-    "title": "FloqAi αναζήτηση προτύπου",
-    "body": "Αγγίξτε την κινούμενη ένδειξη FloqAi (ή περιμένετε τα συννεφάκια ομιλίας του), μετά ζητήστε Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures ή Ballers."
+  "help-botdee-template-search": {
+    "title": "BOT DEE αναζήτηση προτύπου",
+    "body": "Αγγίξτε την κινούμενη ένδειξη BOT DEE (ή περιμένετε τα συννεφάκια ομιλίας του), μετά ζητήστε Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures ή Ballers."
   },
   "help-mingl-requests": {
     "title": "Περίπου Mingl Αιτήματα",
@@ -162,5 +162,13 @@
   "help-public-media-sharing": {
     "title": "Δημόσια Μέσα και Κοινοποίηση Δεδομένων",
     "body": "Επιλέξτε πολλές εικόνες ή σύντομα βίντεο μαζί και στη συνέχεια ρυθμίστε τη σειρά τους στο δημόσιο προφίλ. Τα προφίλ υποστηρίζουν έως 8 εικόνες και 2 σύντομα βίντεο."
+  },
+  "help-black-card": {
+    "title": "Black Card",
+    "body": "$75 Black Card — a photoreal Baller's Express BUSINESS metal card on every LED size. Choose how your name appears (FloqR display name, @handle, or custom) and a company line (WE'RE OUTSIDE LLC, Bad Boy Inc., BaddB$ches Only Corp, or custom). Pay $75 and the board shows your embossed name and company."
+  },
+  "help-ballers-alert": {
+    "title": "Baller's Alert",
+    "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
   }
 }

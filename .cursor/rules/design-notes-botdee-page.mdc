@@ -1,0 +1,50 @@
+---
+description: BOT DEE page botdee.html — chat via executeBotSession; feature-guarded; audience-filtered
+alwaysApply: false
+---
+
+# BOT DEE page (`botdee.html`)
+
+Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc`.
+
+## Product shape
+
+`botdee.html` is the **BOT DEE** chat shell wired to Cloud Function `executeBotSession`. Catalog / feature key is **`botDee`** (one-release dual-read from legacy `floqAi`). There is **no** `floqai.html` or `floqai-search.html` — those paths are removed (404). **Quick intent search was removed from this page (s3.3.014)** — product cards stay on Search / other landings; BOT DEE is chat-only. **No `?` help popout / no “Showing answers for…” scope line** — type **help** (same local path as **version**) for BOT DEE’s own help + “what are you interested in?”.
+
+| Piece | Role |
+|---|---|
+| Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo |
+| Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css` |
+
+## Routing
+
+| Entry | Target |
+|---|---|
+| Profile card BOT DEE (`FLOQRNav.intentSearchHome()`) | `./botdee.html` |
+| Search tile `#intentSearchBtnCard` | `./botdee.html?from=search` |
+| Feature catalog route | `./botdee.html` |
+| Old `./?start=intent|ask|wish[&q=]` | `location.replace(./botdee.html[?q=])` — `q` pre-fills the chat composer |
+| `floqai.html` / `floqai-search.html` | **removed** (404) |
+
+## Access
+
+`<body data-floqr-feature="botDee">` — off / not granted → not-available card + Back. Satellite session shell. Chat callable requires signed-in + feature gate.
+
+## Backend
+
+- `functions/bot-dee-functions.js` — `executeBotSession`, `getBotDeeThread`, `setBotDeeSettings`
+- `functions/bot-dee-thread.js` — Firestore persist under `botDeeThreads/{uid}`
+- `functions/bot-dee-core.js` — tools, scoring, sanitization, thread helpers
+- `functions/data-classification-functions.js` — `getBotDeeAccess` (+ `getFloqAiAccess` alias)
+- Catalog: `node scripts/build-bot-dee-search-catalog.js` (server-side intent catalog; not a page UI)
+
+## Durable resume (s3.3.006)
+
+Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the conversation pause (`conversationIdleSeconds`; Master Admin; packaged default 300 / 5 minutes). Pause / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
+
+## Owner action
+
+BOT DEE stays gated until Master Admin → Features & Services sets **botDee** Live/Test (UI label **BOT DEE**). `seedFeatureServices` copies flags from legacy `featureServices/floqAi` when creating `botDee`. Deploy Functions when callables / classification change.
+
+Tests: `functions/botdee-page.test.js`, `functions/bot-dee-core.test.js`, `functions/botdee-help-access.test.js`.

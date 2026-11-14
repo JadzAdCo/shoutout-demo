@@ -1,0 +1,335 @@
+/* Shared feature landing chrome — product icon (no FloqR), Choose a venue, fact cards.
+   Resume: @feature-landing$ */
+
+/* —— Site chrome body wash (floqCast / ShoutOut / VIP landings) ——
+   Feature CSS used to pin Nightlife with !important; that ignored the patron’s
+   selected chrome. Mirror styles.css body washes for these body classes. */
+body.floqcast-page,
+body.shoutout-search-page,
+body.vip-page {
+  min-height: 100vh;
+  color: var(--text);
+}
+
+html:not([data-floqr-chrome]) body.floqcast-page,
+html:not([data-floqr-chrome]) body.shoutout-search-page,
+html:not([data-floqr-chrome]) body.vip-page,
+html[data-floqr-chrome="nightlife"] body.floqcast-page,
+html[data-floqr-chrome="nightlife"] body.shoutout-search-page,
+html[data-floqr-chrome="nightlife"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 46, 184, 0.34), transparent 32%),
+    radial-gradient(circle at 82% 18%, rgba(0, 200, 255, 0.36), transparent 36%),
+    radial-gradient(circle at 50% 70%, rgba(91, 45, 255, 0.22), transparent 42%),
+    linear-gradient(135deg, #000000, #07101c 42%, #0a1238 68%, #090b12) !important;
+}
+
+html[data-floqr-chrome="traditional"] body.floqcast-page,
+html[data-floqr-chrome="traditional"] body.shoutout-search-page,
+html[data-floqr-chrome="traditional"] body.vip-page {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(0, 200, 255, 0.10), transparent 34%),
+    radial-gradient(circle at 84% 18%, rgba(255, 46, 184, 0.08), transparent 38%),
+    linear-gradient(165deg, #3a3a3a 0%, #2a2a2a 42%, #141414 100%) !important;
+}
+
+html[data-floqr-chrome="blackTiffany"] body.floqcast-page,
+html[data-floqr-chrome="blackTiffany"] body.shoutout-search-page,
+html[data-floqr-chrome="blackTiffany"] body.vip-page {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(0, 200, 255, 0.22), transparent 36%),
+    radial-gradient(circle at 80% 70%, rgba(26, 122, 255, 0.16), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page,
+html[data-floqr-chrome="whiteBlack"] body.vip-page {
+  background: #ffffff !important;
+  color: #0a0a0a !important;
+}
+
+html[data-floqr-chrome="purpleWhite"] body.floqcast-page,
+html[data-floqr-chrome="purpleWhite"] body.shoutout-search-page,
+html[data-floqr-chrome="purpleWhite"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(91, 45, 255, 0.28), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(255, 77, 106, 0.18), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="blackDarkGreen"] body.floqcast-page,
+html[data-floqr-chrome="blackDarkGreen"] body.shoutout-search-page,
+html[data-floqr-chrome="blackDarkGreen"] body.vip-page {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(34, 110, 68, 0.32), transparent 36%),
+    radial-gradient(circle at 82% 72%, rgba(45, 138, 90, 0.18), transparent 40%),
+    #000 !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .floqcast-shell,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .floqcast-product-page,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .floqcast-shell,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .shoutout-product-page,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .admin-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-shell,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .vip-product-page {
+  background: transparent !important;
+}
+
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page h1,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page h2,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.floqcast-page .status,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page h1,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page h2,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.shoutout-search-page .status,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h1,
+html[data-floqr-chrome="whiteBlack"] body.vip-page h2,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .sub,
+html[data-floqr-chrome="whiteBlack"] body.vip-page .status {
+  color: #0a0a0a !important;
+}
+
+.product-page.feature-landing-page .product-brand-stack > .product-parent-logo,
+.product-page[data-feature-landing="1"] .product-brand-stack > .product-parent-logo,
+body[data-floqr-feature] .product-page .product-brand-stack > .product-parent-logo {
+  display: none !important;
+}
+
+.product-page .product-brand-stack {
+  display: grid;
+  justify-items: center;
+  margin: 4px 0 8px;
+}
+
+.product-page .product-logo,
+.feature-landing-hero-logo {
+  width: min(160px, 42vw);
+  max-height: 120px;
+  margin: 4px 0 8px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 10px rgba(244, 58, 191, 0.55))
+    drop-shadow(0 0 22px rgba(38, 216, 255, 0.45));
+}
+
+html[data-floqr-chrome="traditional"] .product-page .product-logo,
+html[data-floqr-chrome="traditional"] .feature-landing-hero-logo {
+  filter: drop-shadow(0 0 8px rgba(0, 200, 255, 0.28)) drop-shadow(0 0 14px rgba(255, 46, 184, 0.18));
+}
+
+html[data-floqr-chrome="whiteBlack"] .product-page .product-logo,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .floqcast-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .shoutout-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .vip-hero-logo {
+  background: #fff;
+  border: 1px solid rgba(10, 10, 10, 0.28);
+  border-radius: 18px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14));
+}
+
+.feature-landing-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.feature-landing-section-head h2 {
+  margin: 0;
+}
+
+/*
+ * Feature search title schema (same as Appearance h2 / Profile & Settings).
+ * Class: .floqr-page-title inside .feature-landing-title-row / .floqr-page-title-row
+ */
+.floqr-page-title-row,
+.feature-landing-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+
+.floqr-page-title,
+.feature-landing-title-row h1,
+.feature-landing-title-row h1.floqr-page-title,
+body.floqcast-page .floqcast-hero h1,
+body.vip-page .vip-hero h1,
+body.shoutout-search-page .feature-landing-title-row h1,
+body.shoutout-search-page .topbar h1 {
+  margin: 0;
+  font-size: var(--floqr-page-title-size, var(--floqr-title-size, clamp(1.75rem, 5.2vw, 2.125rem))) !important;
+  line-height: var(--floqr-page-title-line, var(--floqr-title-line, 1.12)) !important;
+  letter-spacing: var(--floqr-page-title-tracking, var(--floqr-title-tracking, -0.035em));
+  font-weight: var(--floqr-page-title-weight, var(--floqr-title-weight, 800));
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floqr-page-title .help-label-text,
+.feature-landing-title-row h1,
+.feature-landing-title-row .help-label-text {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit;
+  font-weight: inherit;
+}
+
+.floqr-page-title-row .help-popout summary,
+.feature-landing-title-row .help-popout summary {
+  font-size: 11px !important;
+  font-weight: 1000;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.feature-landing-venue-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.feature-landing-venue-card .search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 24, 0.72);
+  color: inherit;
+  font: inherit;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-venue-card .search,
+html[data-floqr-chrome="whiteBlack"] .floqcast-venue-card .search {
+  border: 1px solid rgba(40, 40, 40, 0.5);
+  background: #fff;
+  color: #2a2a2a;
+  box-shadow: none;
+}
+
+.feature-landing-venue-grid,
+.club-grid.feature-landing-venue-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.feature-landing-card {
+  padding: 16px !important;
+  border-radius: 18px !important;
+  text-align: left;
+}
+
+.feature-landing-card.is-selected {
+  border-color: rgba(38, 216, 255, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(38, 216, 255, 0.35), 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.feature-landing-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feature-landing-card-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.feature-landing-place {
+  margin: 4px 0 0;
+}
+
+.feature-landing-product-badge {
+  color: var(--lime, #dfff5a);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.feature-landing-facts {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.feature-landing-facts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: rgba(244, 246, 255, 0.88);
+}
+
+.feature-landing-fact-label {
+  opacity: 0.72;
+  min-width: 5.5rem;
+}
+
+.feature-landing-fact-value {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.feature-landing-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feature-landing-actions .buttonlike,
+.feature-landing-actions .primary {
+  flex: 1 1 auto;
+  min-width: 7rem;
+  text-align: center;
+}
+
+html[data-floqr-chrome="traditional"] .feature-landing-product-badge,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-product-badge {
+  color: var(--accent, #00c8ff);
+}
+
+html[data-floqr-chrome="traditional"] .feature-landing-facts li,
+html[data-floqr-chrome="whiteBlack"] .feature-landing-facts li {
+  color: inherit;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-fact-value {
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-card.is-selected {
+  border-color: rgba(10, 10, 10, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.25), 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+html[data-floqr-chrome="whiteBlack"] .feature-landing-venue-card,
+html[data-floqr-chrome="whiteBlack"] .floqcast-venue-card,
+html[data-floqr-chrome="whiteBlack"] .floqcast-gate {
+  background: #fff !important;
+  border: 1px solid rgba(10, 10, 10, 0.35) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08) !important;
+  color: #0a0a0a !important;
+  backdrop-filter: none;
+}
+
+html[data-floqr-chrome="whiteBlack"] .floqcast-hero-logo,
+html[data-floqr-chrome="whiteBlack"] .floqcast-page .floqcast-hero-logo {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14));
+}
