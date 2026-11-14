@@ -3166,15 +3166,15 @@
   }
 
   function countryUsesFeetInches(country = "") {
-    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "u.s", "u.s.", "united states"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
     return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyProfileHeightUnit() {
-    profileHeightCtl?.setLocale?.(currentProfileLocale());
+  function applyProfileHeightUnit(opts = {}) {
+    profileHeightCtl?.setLocale?.(currentProfileLocale(), opts);
     profilePickupCtl?.paintPostal?.();
   }
 
@@ -6396,8 +6396,8 @@
       profileLocaleHint = hint || {};
       applyProfileHeightUnit();
     }).catch(() => {});
-    byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit());
-    byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit());
+    byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit({fromCountry: true}));
+    byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit({fromCountry: true}));
     applyProfileHeightUnit();
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);

@@ -27,12 +27,20 @@ Unit-first height and structured taxi pickup. Profile country wins; if empty, IP
 | Piece | Wiring |
 |---|---|
 | Module | `floqr-profile-locale.js` (`window.FLOQRProfileLocale`) — `bindHeightFields`, `bindPickupFields`, `validateHeight`, `usesZip` |
-| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. US/Canada default ft; other countries / non-US IP default m. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
+| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. **United States defaults to ft.** Every other country (including Canada) and a non-US IP default to **m**. Typing the country field applies that default. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
 | Pickup | Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Composed `taxiPickupAddress` for RydR/commerce. Private on `users/{uid}` — not a Mingl public datapoint |
 | Surfaces | Search welcome (`index.html`), My Profile (`patron-portal.html`), RydR (`pickup.html`) |
 | Data | `users.taxiStreetNumber` / `taxiStreetName` / `taxiCity` / `taxiPostalCode` / `taxiPostalKind` / `taxiPickupAddress` — ownMaster PII, self-write |
 | Help | `help-profile-height`, `help-taxi-pickup-address` (patron) |
 | Tests | `functions/profile-locale.test.js` |
+
+**Save Profile crash (s3.3.013):** My Profile **Save Profile** reloads the portal after the Firestore write. `renderPolicies` called `FLOQRI18n.t(key, null)`, and `t()` did `Object.keys(null)` → `Cannot convert undefined or null to object`. `t` / `tIn` now coerce non-object vars to `{}`. Portal policy helper uses `vars || {}`. A failed reload after a successful write no longer reports the save as failed.
+
+| Piece | Wiring |
+|---|---|
+| Surfaces | `patron-portal.html` → **Save Profile** (`#saveProfileBtn`) |
+| Client | `floqr-i18n.js` `interpolationVars` · `patron-portal-app.js` `saveProfile` / `renderPolicies` |
+| Tests | `functions/i18n-t-vars.test.js` |
 
 ---
 

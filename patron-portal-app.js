@@ -120,15 +120,15 @@
   }
 
   function countryUsesFeetInches(country = "") {
-    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "u.s", "u.s.", "united states"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
     return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyEditHeightUnit() {
-    editHeightCtl?.setLocale?.(currentEditLocale());
+  function applyEditHeightUnit(opts = {}) {
+    editHeightCtl?.setLocale?.(currentEditLocale(), opts);
     editPickupCtl?.paintPostal?.();
   }
 
@@ -2441,7 +2441,12 @@
     }
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
     setText("portalStatus", "Profile updated.");
-    await loadPortal(user);
+    try {
+      await loadPortal(user);
+    } catch (reloadError) {
+      console.warn("Profile saved; portal reload failed", reloadError);
+      setText("portalStatus", "Profile updated.");
+    }
     });
   }
 
@@ -3025,7 +3030,7 @@
   }
 
   function smStatusText(key, vars = {}, fallback = "") {
-    const text = window.FLOQRI18n?.t?.(`portal.serviceMembers.${key}`, vars);
+    const text = window.FLOQRI18n?.t?.(`portal.serviceMembers.${key}`, vars || {});
     return text && text !== `portal.serviceMembers.${key}` ? text : fallback;
   }
 
@@ -4378,7 +4383,7 @@
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
     const tt = (key, vars, fallback) => {
-      const value = window.FLOQRI18n?.t?.(key, vars);
+      const value = window.FLOQRI18n?.t?.(key, vars || {});
       return value && value !== key ? value : (fallback || key);
     };
     const roleText = esc(roles.join(", ") || "Patron");
@@ -4399,11 +4404,13 @@
         <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
       </ul>`;
     }
-    byId("composePolicyNote").textContent = canDirect ? tt("inbox.composeNoteStaff") : tt("inbox.composeNotePatron");
-    byId("sendMessageBtn").disabled = false;
-    byId("composeRecipientSearch").disabled = false;
-    byId("composeSubject").disabled = false;
-    byId("composeBody").disabled = false;
+    if (byId("composePolicyNote")) {
+      byId("composePolicyNote").textContent = canDirect ? tt("inbox.composeNoteStaff") : tt("inbox.composeNotePatron");
+    }
+    if (byId("sendMessageBtn")) byId("sendMessageBtn").disabled = false;
+    if (byId("composeRecipientSearch")) byId("composeRecipientSearch").disabled = false;
+    if (byId("composeSubject")) byId("composeSubject").disabled = false;
+    if (byId("composeBody")) byId("composeBody").disabled = false;
   }
 
   const SERVICE_ROLE_LABELS = {
@@ -5270,8 +5277,8 @@
       profileLocaleHint = hint || {};
       applyEditHeightUnit();
     }).catch(() => {});
-    byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit());
-    byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit());
+    byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit({fromCountry: true}));
+    byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit({fromCountry: true}));
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {

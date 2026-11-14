@@ -9,11 +9,15 @@ const root = path.join(__dirname, "..");
 const Locale = require(path.join(root, "floqr-profile-locale.js"));
 const Geo = require(path.join(root, "floqr-geo-search.js"));
 
-test("US and Canada default to ft; other countries and non-US IP default to m", () => {
+test("United States defaults to ft; every other country and non-US IP default to m", () => {
   assert.equal(Locale.preferredHeightUnit({country: "United States"}), "ft");
-  assert.equal(Locale.preferredHeightUnit({country: "Canada"}), "ft");
+  assert.equal(Locale.preferredHeightUnit({country: "U.S"}), "ft");
+  assert.equal(Locale.preferredHeightUnit({country: "U.S."}), "ft");
+  assert.equal(Locale.preferredHeightUnit({country: "USA"}), "ft");
+  assert.equal(Locale.preferredHeightUnit({country: "Canada"}), "m");
   assert.equal(Locale.preferredHeightUnit({country: "France"}), "m");
   assert.equal(Locale.preferredHeightUnit({ipCountryCode: "US"}), "ft");
+  assert.equal(Locale.preferredHeightUnit({ipCountryCode: "CA"}), "m");
   assert.equal(Locale.preferredHeightUnit({ipCountryCode: "FR"}), "m");
   assert.equal(Locale.preferredHeightUnit({country: "France", ipCountryCode: "US"}), "m");
   assert.equal(Locale.preferredHeightUnit({country: "United Kingdom"}), "m");
@@ -99,6 +103,32 @@ test("IP geo payload keeps country code and never stores the IP", () => {
   assert.equal(parsed.countryCode, "US");
   assert.equal(parsed.country, "United States");
   assert.ok(!JSON.stringify(parsed).includes("203.0.113.9"));
+});
+
+test("typing United States sets ft even after a saved m unit", () => {
+  const unitEl = {
+    value: "m",
+    dataset: {userSelected: "true", prevUnit: "m"},
+    addEventListener() {},
+    placeholder: "",
+    disabled: false
+  };
+  const heightEl = {
+    value: "1.78",
+    addEventListener() {},
+    placeholder: "",
+    disabled: false
+  };
+  const ctl = Locale.bindHeightFields({
+    unit: unitEl,
+    height: heightEl,
+    locale: () => ({country: "France"})
+  });
+  assert.equal(unitEl.value, "m");
+  ctl.setLocale({country: "United States"}, {fromCountry: true});
+  assert.equal(unitEl.value, "ft");
+  ctl.setLocale({country: "Canada"}, {fromCountry: true});
+  assert.equal(unitEl.value, "m");
 });
 
 test("Search, Profile, and RydR load the locale helper and structured pickup fields", () => {

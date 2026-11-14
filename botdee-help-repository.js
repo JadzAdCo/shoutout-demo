@@ -1549,7 +1549,7 @@
     {
       id: "help-profile-height",
       title: "Height",
-      body: "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can still switch the unit.",
+      body: "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. United States defaults to ft. Every other country, and a non-U.S. internet location, defaults to m. You can still switch the unit.",
       searchPhrases: [
         "height", "how tall", "feet", "meters", "ft", "height unit", "6'0", "1.78"
       ],

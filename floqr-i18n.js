@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.3.012";
+  const VERSION = "s3.3.013";
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
     {code: "de", label: "German", native: "Deutsch", dir: "ltr"},
@@ -15587,23 +15587,29 @@
     return {...base};
   }
 
-  function t(key, vars = {}) {
+  function interpolationVars(vars) {
+    return vars && typeof vars === "object" && !Array.isArray(vars) ? vars : {};
+  }
+
+  function t(key, vars) {
     const pack = STRINGS[current] || STRINGS.en;
     const overridePack = overrides[current] || {};
     let text = overridePack[key] || pack[key] || STRINGS.en[key] || key;
-    Object.keys(vars).forEach(name => {
-      text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(vars[name]));
+    const dict = interpolationVars(vars);
+    Object.keys(dict).forEach(name => {
+      text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(dict[name]));
     });
     return text;
   }
 
-  function tIn(lang, key, vars = {}) {
+  function tIn(lang, key, vars) {
     const code = normalizeCode(lang) || "en";
     const pack = STRINGS[code] || STRINGS.en;
     const overridePack = overrides[code] || {};
     let text = overridePack[key] || pack[key] || STRINGS.en[key] || key;
-    Object.keys(vars).forEach(name => {
-      text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(vars[name]));
+    const dict = interpolationVars(vars);
+    Object.keys(dict).forEach(name => {
+      text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(dict[name]));
     });
     return text;
   }

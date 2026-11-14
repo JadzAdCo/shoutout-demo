@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.012";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.012";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.013";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.013";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.013",
+      title: "s3.3.013 — United States height defaults to ft; other countries default to m",
+      checks: [
+        {label:"US-only ft default", file:"floqr-profile-locale.js", includes:["return profile === \"US\"", "fromCountry"]},
+        {label:"Country field drives unit Search", file:"patron-app.js", includes:["applyProfileHeightUnit({fromCountry: true})"]},
+        {label:"Country field drives unit Profile", file:"patron-portal-app.js", includes:["applyEditHeightUnit({fromCountry: true})"]},
+        {label:"Save Profile null i18n vars", file:"floqr-i18n.js", includes:["function interpolationVars(vars)"]},
+        {label:"Portal policy helper null-safe", file:"patron-portal-app.js", includes:["vars || {}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-013-save-profile"]}
+      ]
+    },
     {
       version: "s3.3.012",
       title: "s3.3.012 — Height unit-first + structured RydR pickup",
@@ -3020,13 +3032,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-013-save-profile",
+      area:"My Profile",
+      feature:"Save Profile",
+      changed:"s3.3.013 — Save Profile no longer throws Cannot convert undefined or null to object. Inbox policy copy was calling FLOQRI18n.t(key, null) during the post-save reload.",
+      howToTest:"1) Hard-refresh My Profile (patron-portal.html s3.3.013). 2) Sign in. 3) Change a harmless field (display name or city) and tap Save Profile. 4) Confirm the overlay says Profile saved (not the TypeError). 5) Reload My Profile and confirm the field stuck. 6) Mark Succeed/Failed.",
+      expected:"Save Profile succeeds. Overlay does not show Cannot convert undefined or null to object. The edited field is still there after reload.",
+      troubleshoot:"Still TypeError → hard-refresh floqr-i18n.js and patron-portal-app.js s3.3.013. Confirm interpolationVars is in floqr-i18n.js. If Firestore permission-denied appears instead, that is a rules/auth issue, not this i18n crash."
+    },
+    {
       id:"s3-3-012-height-pickup-locale",
       area:"Profile / RydR",
       feature:"Height unit-first + structured taxi pickup",
-      changed:"s3.3.012 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. US/Canada default ft; other countries and non-US IP default m. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
-      howToTest:"1) Hard-refresh Search and My Profile s3.3.012. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States — ZIP. Canada — ft + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
-      expected:"ft and m cannot be mixed. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
-      troubleshoot:"Still a single height box → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.012. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
+      changed:"s3.3.013 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. United States defaults to ft; every other country (including Canada) and a non-US IP default to m. Typing U.S. / USA / United States in Country sets ft. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
+      howToTest:"1) Hard-refresh Search and My Profile s3.3.013. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States or U.S. — height unit becomes ft and pickup is ZIP. Set country to Canada — height unit is m + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
+      expected:"ft and m cannot be mixed. Selecting United States sets height to ft. Any other country sets m. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
+      troubleshoot:"Still m after typing United States → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.013. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
     },
     {
       id:"s3-3-011-shoutout-page-trail",

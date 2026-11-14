@@ -7,7 +7,8 @@
   "use strict";
 
   const US_NAMES = new Set([
-    "us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "america"
+    "us", "usa", "u.s", "u.s.", "u.s.a", "u.s.a.", "u s", "u s a",
+    "united states", "united states of america", "the united states", "the usa", "america"
   ]);
   const CA_NAMES = new Set(["ca", "can", "canada"]);
   const ZIP_RE = /^\d{5}(?:-\d{4})?$/;
@@ -42,7 +43,8 @@
     const raw = text(value).toUpperCase();
     if (/^[A-Z]{2}$/.test(raw)) return raw;
     const name = keyCountry(value);
-    if (US_NAMES.has(name)) return "US";
+    const compact = name.replace(/[^a-z]/g, "");
+    if (US_NAMES.has(name) || compact === "us" || compact === "usa" || compact === "unitedstates" || compact === "unitedstatesofamerica") return "US";
     if (CA_NAMES.has(name)) return "CA";
     return "";
   }
@@ -58,10 +60,10 @@
   function usesFeetInches(input = {}) {
     const profileRaw = text(input.country || input.profileCountry);
     const profile = countryCodeOf(profileRaw);
-    if (profile) return profile === "US" || profile === "CA";
+    if (profile) return profile === "US";
     if (profileRaw) return false;
     const ip = countryCodeOf(input.ipCountry || input.ipCountryCode);
-    return ip === "US" || ip === "CA";
+    return ip === "US";
   }
 
   function usesZip(input = {}) {
@@ -450,12 +452,16 @@
         return result;
       },
       syncPlaceholder,
-      setLocale(next) {
-        if (unitEl.dataset.userSelected) {
+      setLocale(next, opts = {}) {
+        const loc = next || locale();
+        const countryRaw = text(loc.country || loc.profileCountry);
+        // Country typing always drives the default (US → ft, else m).
+        // Skip only a late IP lookup after the patron already picked a unit with no country yet.
+        if (!opts.fromCountry && unitEl.dataset.userSelected && !countryRaw) {
           syncPlaceholder();
           return;
         }
-        const nextUnit = preferredHeightUnit(next || locale());
+        const nextUnit = preferredHeightUnit(loc);
         const prevUnit = normalizeHeightUnit(unitEl.value);
         if (prevUnit && nextUnit && prevUnit !== nextUnit && text(heightEl.value)) {
           const converted = convertHeight(heightEl.value, prevUnit, nextUnit);

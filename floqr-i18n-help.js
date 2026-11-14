@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.012";
+  const VERSION = "s3.3.013";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -223,7 +223,7 @@
       },
       "help-profile-height": {
         title: "Рост",
-        body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США и Канада по умолчанию ft; другие страны и интернет-место вне США — m. Единицу всё равно можно переключить."
+        body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США по умолчанию ft. Все остальные страны и интернет-место вне США — m. Единицу всё равно можно переключить."
       },
       "help-taxi-pickup-address": {
         title: "Адрес подачи такси",
@@ -561,7 +561,7 @@
       },
       "help-profile-height": {
         title: "Lengte",
-        body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. VS en Canada starten op ft; andere landen en een niet-Amerikaanse internetlocatie op m. Je kunt de eenheid nog wisselen."
+        body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. De VS starten op ft. Alle andere landen en een niet-Amerikaanse internetlocatie starten op m. Je kunt de eenheid nog wisselen."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-ophaaladres",
@@ -899,7 +899,7 @@
       },
       "help-profile-height": {
         title: "Taille",
-        body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. États-Unis et Canada : ft par défaut ; autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
+        body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. Les États-Unis : ft par défaut. Tous les autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
       },
       "help-taxi-pickup-address": {
         title: "Adresse de prise en charge taxi",
@@ -1237,7 +1237,7 @@
       },
       "help-profile-height": {
         title: "Größe",
-        body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. USA und Kanada starten mit ft; andere Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
+        body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. Die USA starten mit ft. Alle anderen Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-Abholadresse",
@@ -1575,7 +1575,7 @@
       },
       "help-profile-height": {
         title: "Estatura",
-        body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. y Canadá usan ft; otros países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
+        body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. usa ft. Todos los demás países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
       },
       "help-taxi-pickup-address": {
         title: "Dirección de recogida de taxi",
@@ -1913,7 +1913,7 @@
       },
       "help-profile-height": {
         title: "Altezza",
-        body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Stati Uniti e Canada partono da ft; altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
+        body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Gli Stati Uniti partono da ft. Tutti gli altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
       },
       "help-taxi-pickup-address": {
         title: "Indirizzo di ritiro taxi",
@@ -2251,7 +2251,7 @@
       },
       "help-profile-height": {
         title: "Altura",
-        body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. EUA e Canadá começam em ft; outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
+        body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. Os EUA começam em ft. Todos os outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
       },
       "help-taxi-pickup-address": {
         title: "Morada de recolha de táxi",
@@ -2589,7 +2589,7 @@
       },
       "help-profile-height": {
         title: "Ύψος",
-        body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. ΗΠΑ και Καναδάς ξεκινούν σε ft· άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
+        body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. Οι ΗΠΑ ξεκινούν σε ft. Όλες οι άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
       },
       "help-taxi-pickup-address": {
         title: "Διεύθυνση παραλαβής ταξί",
@@ -2927,7 +2927,7 @@
       },
       "help-profile-height": {
         title: "Wzrost",
-        body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA i Kanada startują od ft; inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
+        body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA startują od ft. Wszystkie inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
       },
       "help-taxi-pickup-address": {
         title: "Adres odbioru taksówki",
@@ -3265,7 +3265,7 @@
       },
       "help-profile-height": {
         title: "الطول",
-        body: "اختر ft أو m أولاً ثم أدخل طولك بهذه الوحدة. الأقدام: 6'0\". الأمتار: 1.78. الخلط ممنوع — لا يُحفظ 1.78 كـ ft ولا 6'0\" كـ m. الولايات المتحدة وكندا تبدآن بـ ft؛ البلدان الأخرى وموقع الإنترنت غير الأمريكي بـ m. يمكنك تبديل الوحدة."
+        body: "اختر ft أو m أولاً ثم أدخل طولك بهذه الوحدة. الأقدام: 6'0\". الأمتار: 1.78. الخلط ممنوع — لا يُحفظ 1.78 كـ ft ولا 6'0\" كـ m. الولايات المتحدة تبدأ بـ ft. كل البلدان الأخرى وموقع الإنترنت غير الأمريكي بـ m. يمكنك تبديل الوحدة."
       },
       "help-taxi-pickup-address": {
         title: "عنوان التقاط سيارة الأجرة",
