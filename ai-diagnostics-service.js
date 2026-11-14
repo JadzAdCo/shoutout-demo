@@ -233,6 +233,16 @@
       ]
     },
     {
+      version: "s3.3.012",
+      title: "s3.3.012 — retire PHILA front+back pair; keep 76ers",
+      checks: [
+        {label:"PHILA pair removed", file:"jersey-catalog.js", includes:["Retired: nbaPhiladelphia76ersPhila"]},
+        {label:"76ers back-only kept", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
+        {label:"Pair engine kept for Terps", file:"display-app.js", includes:["paintIndependentPairFace", "nba-pair-kit-stack"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-phila-pair-retired"]}
+      ]
+    },
+    {
       version: "s3.3.011",
       title: "s3.3.011 — ShoutOut page trail + checkout one-tap + BOT DEE photo pop-out",
       checks: [
@@ -350,7 +360,7 @@
         {label:"Maryland message theme CSS", file:"display.css", includes:["data-pair-message-theme=\"maryland\""]},
         {label:"Pair requires front plate", file:"display-app.js", includes:["productionAssetsReady !== false"]},
         {label:"Package brief", file:"reports/maryland-terps-jersey-v2/INTEGRATION.md", includes:["productionAssetsReady: false", "ncaa-umd-2026-27-2002-throwback-white-v2"]},
-        {label:"PHILA pair still present", file:"jersey-catalog.js", includes:["nba-phi-phila-white-reference-v1"]},
+        {label:"76ers back-only present", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-002-maryland-terps-pair-v2"]}
       ]
     },
@@ -360,7 +370,7 @@
       checks: [
         {label:"Jersey scene helper", file:"floqr-jersey-scene.js", includes:["sceneAt", "JERSEY_MS", "7000"]},
         {label:"FrameLoop asymmetric holds", file:"floqr-frame-loop.js", includes:["holdMsByPhase", "includeCopy"]},
-        {label:"PHILA pair catalog", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nba-phi-phila-white-reference-v1"]},
+        {label:"Terps pair timing flags", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nbaMarylandTerpsThrowbackPair"]},
         {label:"Pair stage display", file:"display-app.js", includes:["paintNbaPairStage", "nba-jersey-pair", "displayNbaPairShoutPanel"]},
         {label:"Pair CSS", file:"display.css", includes:["nba-pair-stage", "nba-pair-shout-panel"]},
         {label:"Package brief", file:"reports/nba-phila-jersey-v1/IMPLEMENTATION_CONTRACT.md", includes:["7,000 ms", "5,000 ms"]},
@@ -375,7 +385,7 @@
         {label:"Diagnostics ShoutOut subtab", file:"master-admin.html", includes:["diagnosticsShoutOut", "master.diagnosticsShoutOut", "master-shoutout-logging.js"]},
         {label:"Page trail logger", file:"patron-app.js", includes:["logShoutoutPageCall", "page_call", "openBallerFaceCameraCapture", "ballerUploadChooser"]},
         {label:"No duplicate Take photo button", file:"patron-app.js", notIncludes:["id=\"ballerTakePhotoBtn\""]},
-        {label:"PHILA dual catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ersPhila", "nbaDualFaces", "PHILA"]},
+        {label:"76ers catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers", "76ERS"]},
         {label:"NBA dual faces display", file:"display-app.js", includes:["applyNbaDualFacePhase", "nbaDualFaces"]},
         {label:"Portrait JSON repair", file:"functions/gemini-portrait-mask.js", includes:["repairJsonCandidate", "parseSegmentationJson"]},
         {label:"Black Card removed from catalog", file:"shared-data.js", includes:["ballersAlert:"], notIncludes:["blackCard: {", "blackCardAmex: {"]},
@@ -3029,6 +3039,15 @@
       troubleshoot:"Still a single height box → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.012. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
     },
     {
+      id:"s3-3-012-phila-pair-retired",
+      area:"ShoutOut / Display / NBA",
+      feature:"PHILA front+back pair removed; 76ers back-only kept",
+      changed:"s3.3.012 — delete nbaPhiladelphia76ersPhila (front+back). Keep nbaPhiladelphia76ers (76ERS plate).",
+      howToTest:"1) Hard-refresh Search. 2) Template list must NOT show NBA Philadelphia 76ers PHILA. 3) NBA Philadelphia 76ers (back-only) still available. 4) Mark Succeed/Failed.",
+      expected:"No PHILA pair in picker; regular 76ers jersey still composes.",
+      troubleshoot:"PHILA pair still listed → hard-refresh jersey-catalog.js. 76ers missing → restore nbaPhiladelphia76ers row."
+    },
+    {
       id:"s3-3-011-shoutout-page-trail",
       area:"ShoutOut / Diagnostics",
       feature:"ShoutOut page trail matches patron steps",
@@ -3115,9 +3134,9 @@
       area:"ShoutOut / Display / NCAA",
       feature:"Maryland Terps throwback pair v2 — registered unpublished until front plate",
       changed:"s3.3.002 — nbaMarylandTerpsThrowbackPair (ncaa-umd-2026-27-2002-throwback-white-v2) shares PHILA pair engine; catalogPublished/productionAssetsReady false; frontBackgroundUrl empty; Maryland message theme CSS ready; live patrons still use nbaMarylandTerps back-only.",
-      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) PHILA pair still works (7s/5s). 4) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
-      expected:"No unpublished Terps pair in patron picker; PHILA pair unchanged; prep entry exists in jersey-catalog with empty front URL.",
-      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. PHILA broken → do not remove nbaPhiladelphia76ersPhila. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
+      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
+      expected:"No unpublished Terps pair in patron picker; prep entry exists in jersey-catalog with empty front URL.",
+      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
     },
     {
       id:"s3-3-001-phila-jersey-pair",

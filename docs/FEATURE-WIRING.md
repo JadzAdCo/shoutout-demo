@@ -47,7 +47,16 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 
 ---
 
-## PHILA White/Blue colorways (s3.3.004)
+## PHILA front+back pair retired (s3.3.012)
+
+| Piece | Wiring |
+|---|---|
+| Removed | `nbaPhiladelphia76ersPhila` (front+back / `nbaJerseyPair`) — no longer in catalog or picker |
+| Kept | `nbaPhiladelphia76ers` — back-only 76ERS plate |
+| Pair engine | Display `.nba-pair-kit-stack` / `paintIndependentPairFace` remains for unpublished Terps throwback pair |
+| Test | `functions/phila-independent-pair.test.js` asserts pair gone + 76ers kept |
+
+## PHILA White/Blue colorways (s3.3.004) — historical (pair retired)
 
 | Piece | Wiring |
 |---|---|

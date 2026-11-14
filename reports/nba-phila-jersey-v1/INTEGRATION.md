@@ -4,8 +4,8 @@
 
 | Surface | Change |
 |---|---|
-| Catalog | `nbaPhiladelphia76ersPhila` → `nbaJerseyPair`, 7s/5s, `seasonStatus: reference-specific-unverified`, stable id `nba-phi-phila-white-reference-v1` |
-| Display | Pair stage: back left + front right; optional ShoutOut panel; `FLOQRFrameLoop` asymmetric holds |
+| Catalog | **Retired (s3.3.012):** `nbaPhiladelphia76ersPhila` removed from picker. Keep `nbaPhiladelphia76ers` (back-only 76ERS). |
+| Display | Pair kit-stack engine remains for unpublished Terps throwback pair only — not a live PHILA product path |
 | Timing | `floqr-jersey-scene.js` (`sceneAt`) + FrameLoop `holdMsByPhase` / `includeCopy` |
 | Editor | PHILA uses Name + Number + optional ShoutOut (blank = jersey-only 7s) |
 | Package | This folder = Cursor implementation brief + reference image |
