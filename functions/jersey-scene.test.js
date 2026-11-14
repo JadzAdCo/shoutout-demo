@@ -33,13 +33,14 @@ test("hasMessageText trims whitespace", () => {
   assert.equal(scene.hasMessageText(""), false);
 });
 
-test("PHILA catalog is pair mode with 7s/5s and unverified season", () => {
+test("PHILA front+back pair catalog entry is retired; Terps pair keeps 7s/5s", () => {
   const catalog = fs.readFileSync(path.join(root, "jersey-catalog.js"), "utf8");
+  assert.doesNotMatch(catalog, /id:\s*"nbaPhiladelphia76ersPhila"/);
+  assert.doesNotMatch(catalog, /nba-phi-phila-white-reference-v1/);
   assert.match(catalog, /nbaJerseyPair:\s*true/);
   assert.match(catalog, /jerseySceneMs:\s*7000/);
   assert.match(catalog, /messageSceneMs:\s*5000/);
-  assert.match(catalog, /seasonStatus:\s*"reference-specific-unverified"/);
-  assert.match(catalog, /nba-phi-phila-white-reference-v1/);
+  assert.match(catalog, /nbaMarylandTerpsThrowbackPair/);
 });
 
 test("Maryland Terps throwback pair v2 is registered unpublished without front plate", () => {

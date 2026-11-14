@@ -1619,6 +1619,12 @@ service cloud.firestore {
  allow read, write: if isMasterAdmin();
  }
 
+ // Precomputed Master Admin summary datapoints (Functions write every 5 min).
+ match /masterAdminRollups/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
  match /aiAssistantSessions/{uid} {
  allow read, write: if isSelf(uid);
  }

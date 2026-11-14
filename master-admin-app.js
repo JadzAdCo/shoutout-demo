@@ -342,23 +342,29 @@
       }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
-        /* Heavy: 27 collection reads + package file fetches — only when Diagnostics is opened. */
+        /* Summary strip from 5-min rollup first; full 27-collection refresh only via Run/Refresh. */
+        window.FLOQRMasterAdminRollup?.paintForPanel?.(panelId);
         window.FLOQRDiagnostics?.mount?.({db, auth, storage});
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
       }
       if (panelId === "aiCrawling") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("aiCrawling");
         window.FLOQRAIDiscovery?.mountMasterAdminPanel?.({db, auth});
       }
       if (panelId === "duplicateRecords") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("duplicateRecords");
         window.FLOQRDuplicateRecords?.mount?.({db, auth});
       }
       if (panelId === "servicesCommerce") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("servicesCommerce");
         window.FLOQRMasterServices?.mount?.();
       }
       if (panelId === "templateManagement") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("templateManagement");
         loadManagedTemplates().catch(() => {});
       }
       if (panelId === "recommendationModeration") {
+        window.FLOQRMasterAdminRollup?.paintForPanel?.("recommendationModeration");
         loadRecommendationModeration().catch(() => {});
       }
       if (panelId === "translationOverrides") {
@@ -2396,7 +2402,10 @@
       /* Do not pull 1000 users/shoutouts on every sign-in — that freezes Master Admin
          (Features / Svc, Entity Mgmt, deep links). Also do not pull Diagnostics
          (27 collections + package file fetches), AI crawl queues, duplicate scans,
-         commerce orders, templates, or recommendations. Those mount when their panel opens. */
+         commerce orders, templates, or recommendations. Those mount when their panel opens.
+         Summary strips read masterAdminRollups/current (5-min schedule). */
+      window.FLOQRMasterAdminRollup?.bind?.({db, auth});
+      window.FLOQRMasterAdminRollup?.load?.({showEmpty: true}).catch(() => {});
       loadLightLocations().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});

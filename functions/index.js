@@ -8,6 +8,7 @@ const adFns = require("./ad-functions");
 
 module.exports = {
   ...require("./ai-discovery-functions"),
+  ...require("./master-admin-rollup-functions"),
   ...require("./commerce-functions"),
   ...require("./messaging-functions"),
   ...require("./marketing-campaign-functions"),

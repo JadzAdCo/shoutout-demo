@@ -47,7 +47,31 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 
 ---
 
-## PHILA White/Blue colorways (s3.3.004)
+## Master Admin 5-min rollup (s3.3.013)
+
+| | |
+|---|---|
+| **Purpose** | Precompute panel summary datapoints every 5 minutes so Master Admin strips do not run 27 collection counts / 1200-club duplicate scans / 750×3 commerce pulls on every panel open |
+| **Schedule** | `scheduledMasterAdminRollup` — `every 5 minutes` UTC (`functions/master-admin-rollup-functions.js`) |
+| **Callable** | `refreshMasterAdminRollup` — Master Admin only (`isServerAdminAuth`); writes same doc |
+| **Doc** | `masterAdminRollups/current` — `diagnostics.collectionCounts`, `aiCrawl` status counts + last run, `duplicates` clusters, `commerce` paid aggregates, `templates`, `recommendations` |
+| **Rules** | Master Admin read; client write `false` (Functions Admin SDK only) |
+| **Client** | `master-admin-rollup.js` → `FLOQRMasterAdminRollup` — bind + load on sign-in; `paintForPanel` from `activatePanel`; Diagnostics **Refresh rollup** button |
+| **Panel behavior** | Diagnostics mount paints rollup only (Run/Refresh Diagnostics = full live scan). Duplicate Records mount paints rollup; Refresh = live 1200 scan. AI Crawling `#aiCrawlingSummary` = rollup; `#aiDiscoverySummary` keeps how-to. Commerce/templates/recs metric cards from rollup |
+| **Classification** | `floqr-data-classification.js` register + `masterAdminRollup` job collections |
+| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-data-classification.js` `?v=s3.3.013` |
+| **Deploy** | Functions + Firestore rules required for live schedule/callable; Pages for client strips |
+
+## PHILA front+back pair retired (s3.3.012)
+
+| Piece | Wiring |
+|---|---|
+| Removed | `nbaPhiladelphia76ersPhila` (front+back / `nbaJerseyPair`) — no longer in catalog or picker |
+| Kept | `nbaPhiladelphia76ers` — back-only 76ERS plate |
+| Pair engine | Display `.nba-pair-kit-stack` / `paintIndependentPairFace` remains for unpublished Terps throwback pair |
+| Test | `functions/phila-independent-pair.test.js` asserts pair gone + 76ers kept |
+
+## PHILA White/Blue colorways (s3.3.004) — historical (pair retired)
 
 | Piece | Wiring |
 |---|---|
@@ -566,7 +590,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / BOT DEE (`index.html` intent panel); `botdee.html` collapsible **Quick intent search** |
+| UI | Search still hosts the intent panel on `index.html` when used; `botdee.html` is **chat only** (Quick intent search removed s3.3.014). No `?` help bubble / no “Showing answers for…” scope line — type **help** (like **version**) for a local BOT DEE help reply |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
 | Help seed | `botdee-help-repository.js` (loaded before `intent-search.js`) |
 | Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
@@ -580,7 +604,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Layer | Wiring |
 |---|---|
 | UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
-| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat + intent fallback; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) gate intent cards |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) for audience scope |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
 | Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
@@ -598,7 +622,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
 | Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
 | Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring) |
-| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `botdee.helpComposer` |
+| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood); page popout `botdee.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |
 | BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (never FloqAi). Catalog key `botDee` with one-release dual-read from `floqAi`. Page file is `botdee.html`. Legacy `floqai.html` removed (s3.2.75). See `design-notes-botdee-rename.mdc`. |
@@ -689,7 +713,7 @@ When adding a section, use this skeleton:
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
 | **Standing rule** | `.cursor/rules/feature-data-classification-security.mdc` — classify + harden rules on every feature (like translation) |
-| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand. **s3.3.010:** sign-in also defers Diagnostics (`refreshDiagnostics` = 27 collections + package file fetches), AI Crawling queue + listing delete (1000 clubs/events), Duplicate Records scan, Services & Commerce (750×3 orders/campaigns/pickups), Template Management, and Recommendation Moderation until those panels open (`activatePanel`). |
+| **Load perf** | Sub-tabs lazy-load; Master Admin sign-in no longer scans 1000 users; Network Dashboard loads on demand. **s3.3.010:** sign-in also defers Diagnostics / AI crawl / duplicates / commerce / templates / recs until panel open. **s3.3.013:** those panels paint from `masterAdminRollups/current` (5-min schedule + Refresh rollup); full live scans only on Run/Refresh. |
 | **Beta invite consent (s3.1.56 / clean UI s3.1.70)** | `beta-invite.html` + `beta-invite-app.js` — scrollable FloqR Beta Test & Prerelease Agreement; Booking Disclaimer body in `?` (`help-beta-booking-disclaimer`); invite intro in title `?` (`help-beta-tester`); no green “FLOQR Beta” eyebrow / “Signed in…” status. Required `checks.betaAgreement` + `checks.bookingDisclaimer`; success card after join. Server: `acceptBetaInvite` stores `consent` (`BETA_AGREEMENT` v2 — reverse-payments / non-refundable). Profile card via `global-profile-status.js`. |
 | **Profile menu fail-closed** | Search `#userDropdown` + `global-profile-status` mint feature links hidden; `FLOQRFeatureServices.applyFeatureLinks` reveals only granted Live/Beta. CSS: `.user-dropdown … .hidden` / `[hidden]` must beat `display:block!important` (also injected in `ensureLinkStyles`). |
 | **Profile card close (s3.2.61)** | In-card `.profile-menu-link` / `data-patron-menu` click closes the open card before navigate. `showPage` / `pageshow` / `popstate` / sign-out also close. Toggle refuses empty slim box until menu content is rendered (`menuReady` / `userDropdownHasContent`). |

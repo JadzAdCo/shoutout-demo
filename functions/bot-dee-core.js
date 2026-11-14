@@ -399,6 +399,23 @@ function isVersionPrompt(raw) {
   return false;
 }
 
+/** Bare help / how-to-use-BOT-DEE — local reply like version; never dump search cards.
+ *  Do NOT match “help with ShoutOut / VIP / …” product questions. */
+function isHelpPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 120) return false;
+  if (/\b(?:shout\s*out|vip|floq\s*cast|floqcast|mingl|rydr|bartr|schedule|jersey|baller|template|checkout)\b/.test(q)) {
+    return false;
+  }
+  if (/^(?:help|aide|ayuda|hilfe|aiuto|ajuda|помощь|βοήθεια|pomoc|مساعدة)\??$/.test(q)) return true;
+  if (/^(?:\?|help me|need help|i need help)\??$/.test(q)) return true;
+  if (/^(?:how (?:do|can|to) (?:i|you) (?:use|get help(?: from)?|ask)(?: (?:you|bot\s*dee|floqr))?)\??$/.test(q)) return true;
+  if (/^(?:what can (?:you|bot\s*dee) (?:do|help(?: me)? with))\??$/.test(q)) return true;
+  if (/^(?:bot\s*dee help|help bot\s*dee|show help|get help)\??$/.test(q)) return true;
+  if (/\b(?:how (?:do|can) i use (?:you|bot\s*dee)|what (?:are you|can you) (?:for|help with))\b/.test(q)) return true;
+  return false;
+}
+
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
 const DEFAULT_IDLE_SECONDS = 300;
 const MIN_IDLE_SECONDS = 15;
@@ -606,11 +623,15 @@ function clipModelText(raw) {
 }
 
 /** Canonical stored miss copy — must match `botdee.chatEmpty` English. Client localizes it. */
-const SEARCH_MISS_FALLBACK = "No answer yet — try quick intent search.";
+const SEARCH_MISS_FALLBACK = "No answer yet — try asking another way.";
+const SEARCH_MISS_FALLBACK_LEGACY = "No answer yet — try quick intent search.";
 
 function isSearchMissReply(raw) {
   const text = String(raw || "").trim();
-  return !text || /could not find a clear match/i.test(text) || text === SEARCH_MISS_FALLBACK;
+  return !text
+    || /could not find a clear match/i.test(text)
+    || text === SEARCH_MISS_FALLBACK
+    || text === SEARCH_MISS_FALLBACK_LEGACY;
 }
 
 function sanitizeBotReply(raw) {
@@ -630,6 +651,10 @@ function identityReply() {
 
 function versionReply() {
   return `I'm BOT DEE on FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}).`;
+}
+
+function helpReply() {
+  return "I'm BOT DEE — ask me anything about FLOQR in plain words (events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, Club Admin). Enter sends; Shift+Enter is a new line. What are you interested in getting help with?";
 }
 
 /** Offer-help CTA — conversation start / idle resume only (not every mid-chat turn). */
@@ -906,7 +931,7 @@ function formatSearchFallback(search, lang, allowedFeatures) {
   if (!rows.length) {
     const pitch = productPitchLabels(allowedFeatures).join(", ");
     return pack?.fallback?.noMatch
-      || `I could not find a clear match for your account yet. Try the quick intent search below, or ask about ${pitch || "FLOQR"}, or scheduling.`;
+      || `I could not find a clear match for your account yet. Ask about ${pitch || "FLOQR"}, or scheduling.`;
   }
   const header = pack?.fallback?.foundHeader || "Here is what I found for your account:";
   const lines = [header];
@@ -970,10 +995,12 @@ module.exports = {
   isMoodPrompt,
   isIdentityPrompt,
   isVersionPrompt,
+  isHelpPrompt,
   isAckPrompt,
   isFarewellPrompt,
   identityReply,
   versionReply,
+  helpReply,
   PACKAGE_VERSION,
   PACKAGE_LABEL,
   chitchatReply,

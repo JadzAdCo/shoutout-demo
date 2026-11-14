@@ -25,25 +25,26 @@ test("BOT DEE page is botdee.html and every entry point goes there", () => {
   assert.match(read("global-profile-status.js"), /intentSearchHome/);
 });
 
-test("BOT DEE header uses title-row + ? beside title; scope note full width", () => {
+test("BOT DEE header is title only — no ? bubble or Showing answers for…", () => {
   const html = read("botdee.html");
   assert.match(html, /botdee-chat-header-main/);
   assert.match(html, /botdee-title-row feature-landing-title-row/);
   assert.match(html, /floqr-page-title"[^>]*data-i18n="page\.botdee\.title"/);
-  // ? sits inside the title row (not a lone flex sibling that parks far-right / squeezes scope text).
-  assert.match(html, /botdee-title-row[\s\S]*?help-popout botdee-help-popout[\s\S]*?botDeeScopeNote/);
-  const css = read("bot-dee-chat.css");
-  assert.match(css, /\.botdee-chat-header\s*\{[^}]*flex-direction:\s*column/s);
-  assert.match(css, /\.botdee-scope-note\s*\{[^}]*width:\s*100%/s);
-  assert.match(css, /justify-content:\s*flex-start/);
-  assert.match(css, /--help-anchor:\s*end/);
-  assert.match(css, /\.botdee-help-popout > \.help-popout-body[\s\S]*?right:\s*0/s);
+  assert.doesNotMatch(html, /help-popout|botdee-help-popout|botDeeScopeNote|Showing answers for/);
+  assert.doesNotMatch(html, /aria-label="Help"|summary[^>]*>\?</);
   assert.match(read("bot-dee-chat.js"), /isVersionPrompt/);
   assert.match(read("bot-dee-chat.js"), /versionReply/);
+  assert.match(read("bot-dee-chat.js"), /isHelpPrompt/);
+  assert.match(read("bot-dee-chat.js"), /helpReply/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatVersion"/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatHelp"/);
+  assert.match(read("functions/bot-dee-core.js"), /function isHelpPrompt/);
+  assert.match(read("functions/bot-dee-core.js"), /function helpReply/);
+  assert.match(read("functions/bot-dee-functions.js"), /isHelpPrompt\(userPrompt\)/);
+  assert.doesNotMatch(read("botdee-page.js"), /showScope|botDeeScopeNote|Showing answers/);
 });
 
-test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
+test("BOT DEE page is a guarded satellite with chat only (no Quick intent search)", () => {
   const html = read("botdee.html");
   assert.match(html, /<body class="botdee-standalone botdee-page" data-floqr-feature="botDee">/, "off/test feature shows the not-available card, no bounce to event search");
   assert.doesNotMatch(html, /data-floqr-public/);
@@ -52,26 +53,23 @@ test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   assert.match(html, /id="botDeeChatPage"/);
   assert.match(html, /id="botDeeTranscript"/);
   assert.match(html, /id="botDeeChatForm"/);
-  assert.match(html, /id="botDeeIntentFallback"/);
+  assert.doesNotMatch(html, /botDeeIntentFallback|Quick intent search|intentSearchPage|intentSearchInput/);
+  assert.doesNotMatch(html, /intent-search\.js|botdee-search\.js/);
   const order = [
     "firebase-config.js",
     "floqr-session-shell.js",
     "botdee-help-repository.js",
-    "intent-search.js",
     "floqr-feature-services.js",
     "bot-dee-chat.js",
     "botdee-page.js"
   ].map(file => html.indexOf(`./${file}`));
   assert.ok(order.every(i => i > 0), "scripts present");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "script order");
-  ["intentSearchPage", "intentSearchInput", "intentSearchResults", "botDeeSearchPanel", "botDeeAgent", "botDeeMark", "botDeeScopeNote"]
-    .forEach(id => assert.match(html, new RegExp(`id="${id}"`)));
+  assert.doesNotMatch(html, /botDeeScopeNote|help-popout/);
   const page = read("botdee-page.js");
-  assert.match(page, /bindIntentSearch\(/);
+  assert.doesNotMatch(page, /bindIntentSearch\(|showScope/);
   assert.match(page, /FLOQRBotDeeChat\?\.bind/);
-  assert.match(page, /syncHelpAudienceFromAuth/);
-  assert.match(page, /getViewerAudience/);
-  assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
+  assert.match(page, /botDeeChatInput/);
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
   assert.match(read("bot-dee-chat.js"), /getBotDeeThread/);
   assert.match(read("bot-dee-chat.js"), /Restoring your conversation/);
@@ -85,17 +83,18 @@ test("BOT DEE page is a guarded satellite with chat + intent fallback", () => {
   assert.match(read("bot-dee-chat.js"), /playPhotoFlyout/);
   assert.match(read("bot-dee-chat.js"), /animatePhotoPopout/);
   assert.match(read("bot-dee-chat.js"), /popup=yes/);
+  assert.doesNotMatch(read("bot-dee-chat.js"), /openIntentFallback|botDeeIntentFallback/);
   assert.match(read("bot-dee-chat.css"), /\.botdee-photo-gallery/);
   assert.match(read("bot-dee-chat.css"), /\.botdee-photo-flyout/);
   assert.match(read("bot-dee-chat.css"), /body\.botdee-photo-popout-page/);
-  assert.match(read("botdee.html"), /botdee\.helpPhotos/);
   const popout = read("botdee-photo-popout.html");
   assert.match(popout, /data-floqr-public/);
   assert.match(popout, /botdee-photo-popout-x/);
   assert.match(popout, /window\.close/);
   assert.doesNotMatch(popout, /floqr-session-shell/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatEmpty/);
-  assert.match(read("bot-dee-chat.js"), /No answer yet — try quick intent search/);
+  assert.match(read("bot-dee-chat.js"), /No answer yet — try asking another way/);
+  assert.match(read("functions/bot-dee-core.js"), /SEARCH_MISS_FALLBACK = "No answer yet — try asking another way\."/);
   assert.match(read("functions/bot-dee-functions.js"), /receivedAtMs/);
   assert.match(read("functions/bot-dee-functions.js"), /storedUserText/);
   assert.match(read("functions/bot-dee-functions.js"), /clipStoredText\(rawMessage/);
@@ -136,22 +135,19 @@ test("floating BOT DEE agent is not shown on template select", () => {
 
 test("BOT DEE page chrome is localized", () => {
   const html = read("botdee.html");
-  ["page.botdee.title", "botdee.helpIntro", "botdee.helpComposer", "botdee.helpScope", "botdee.prompt", "botdee.hint", "botdee.intentFallback", "botdee.chatSend"]
+  ["page.botdee.title", "botdee.prompt", "botdee.chatSend"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
-  assert.match(html, /data-i18n-placeholder="botdee\.placeholder"/);
+  assert.doesNotMatch(html, /botdee\.helpIntro|botdee\.intentFallback|botdee\.hint|botdee\.placeholder|botdee\.scope/);
   assert.match(html, /data-i18n-placeholder="botdee\.chatPlaceholder"/);
-  const search = read("intent-search.js");
-  assert.match(search, /tr\("botdee\.noMatch"/);
-  assert.match(search, /tr\("botdee\.wantTo"/);
   const helpRepo = read("botdee-help-repository.js");
   assert.match(helpRepo, /id: "help-botdee-page"/);
   assert.match(helpRepo, /Press Enter to send a message/);
   assert.match(helpRepo, /Shift\+Enter starts a new line/);
-  assert.doesNotMatch(helpRepo, /FloqAi/);
+  assert.doesNotMatch(helpRepo, /Quick intent search|FloqAi/);
   assert.match(helpRepo, /title: "BOT DEE"/);
   assert.match(helpRepo, /Ask FloqR with BOT DEE/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatWelcome"/);
-  assert.match(read("floqr-i18n.js"), /"botdee\.helpComposer"/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatHelp"/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatRestoring"/);
   assert.match(helpRepo, /refresh or open another phone/);
   assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
