@@ -1,6 +1,6 @@
 {
   "name": "floqr-ai-functions",
-  "version": "3.3.010",
+  "version": "3.3.011",
   "private": true,
   "main": "index.js",
   "engines": {
