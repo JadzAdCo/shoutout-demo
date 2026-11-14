@@ -227,7 +227,8 @@ test("Master Admin Security → Data classification panel is wired and SOS2FA-ga
   assert.ok(/"dataClassification"/.test(read("sos2fa.js")));
   assert.ok(read("master-admin-app.js").includes("FLOQRMasterDataClassification"));
   const botdee = read("botdee.html");
-  assert.ok(/floqr-data-classification\.js[\s\S]*botdee-access\.js[\s\S]*intent-search\.js/.test(botdee));
+  assert.ok(/floqr-data-classification\.js[\s\S]*botdee-access\.js[\s\S]*botdee-page\.js/.test(botdee));
+  assert.doesNotMatch(botdee, /intent-search\.js/, "BOT DEE is chat-only; intent search stays off the page");
   assert.ok(botdee.includes('data-floqr-feature="botDee"'));
   assert.equal(fs.existsSync(path.join(ROOT, "floqai.html")), false, "floqai.html removed");
   assert.ok(fs.existsSync(path.join(ROOT, "botdee.html")), "botdee.html present");

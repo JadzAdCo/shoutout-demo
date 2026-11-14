@@ -54,6 +54,7 @@
     ["aiCrawlerSchedules", "master", 0, "AI Crawling schedule"],
     ["aiCrawlRuns", "master", 0, "AI Crawling run history"],
     ["aiDiagnosticsReports", "master", 0, "Diagnostics reports"],
+    ["masterAdminRollups", "master", 0, "Precomputed Master Admin summary datapoints (5 min schedule; counts only)"],
     ["aiDiscoveryQueue", "master", 1, "AI Crawling review queue (venue contacts)"],
     ["aiDiscoveryRatingCriteria", "master", 0, "AI Crawling rating weights"],
     ["aiDiscoverySources", "master", 0, "AI Crawling source websites"],
@@ -551,6 +552,7 @@
     botDeeAccess: {purpose: "Resolve the caller's tier so BOT DEE shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "botDeeAccessThrottle", "floqAiAccessThrottle", "betaTesters"]},
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
     dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]},
+    masterAdminRollup: {purpose: "Precompute Master Admin panel summary counts every 5 minutes", collections: ["masterAdminRollups", "users", "shoutouts", "liveContent", "guestListRequests", "messages", "inboxNotifications", "clubLocations", "clubLocationAliases", "events", "templates", "minglConnections", "minglAudit", "chatRooms", "chatMessages", "roleRequests", "clubEmployeeDesignations", "patronTemplateVariants", "aiIndex", "aiUserNotificationPreferences", "aiSearchLogs", "aiRecommendations", "aiDiscoverySources", "aiDiscoveryQueue", "aiDiscoveryRatingCriteria", "aiCrawlRuns", "aiCrawlerSchedules", "aiDiagnosticsReports", "serviceOrders", "audienceCampaigns", "pickupRequests", "shoutoutRecommendations"]},
     peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
     shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]}
   };
