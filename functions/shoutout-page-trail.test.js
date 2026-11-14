@@ -9,6 +9,7 @@ const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 test("ShoutOut trail logs button → choose venue → throw here → splash, not Search defaults", () => {
+  // s3.3.011: Search categoryPage + packaged Zebbies/blackwhite must never appear on this trail.
   const logger = read("floqr-logger.js");
   const patron = read("patron-app.js");
   const nav = read("floqr-nav.js");
