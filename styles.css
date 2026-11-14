@@ -811,8 +811,16 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .height-input-row{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center}
 .height-input-row input,.height-input-row select{width:100%}
 .height-input-row input:disabled{opacity:.55;cursor:not-allowed}
+.profile-grid > label{align-self:start}
+.profile-grid > label > input,
+.profile-grid > label > select{min-height:44px;height:44px;width:100%;box-sizing:border-box}
+.phone-input-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:center;width:100%}
+.phone-input-row input{min-height:44px;height:44px;width:100%;box-sizing:border-box}
+.phone-dial{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--line,rgba(255,255,255,.12));font-weight:700;white-space:nowrap;letter-spacing:.02em}
 .pickup-address-grid{display:grid;grid-template-columns:minmax(88px,120px) minmax(0,1fr);gap:10px}
-.pickup-address-grid label{display:flex;flex-direction:column;gap:6px;margin:0}
+.pickup-address-grid label{display:flex;flex-direction:column;gap:6px;margin:0;align-self:start}
+.pickup-address-grid input,.pickup-address-grid select{min-height:44px;height:44px;width:100%;box-sizing:border-box}
+.pickup-address-grid .pickup-postal{grid-column:1/-1;max-width:220px}
 .field-hint{margin:8px 0 0;font-size:13px;color:var(--muted,#9aa3c7)}
 .field-hint.is-error{color:#ff8d9a}
 @media (max-width:600px){

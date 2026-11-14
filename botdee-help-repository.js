@@ -1559,12 +1559,36 @@
       page: "patron-portal.html"
     },
     {
+      id: "help-profile-country",
+      title: "Country",
+      body: "Choose your country from the list. United States is first, then Canada, then featured nightlife markets, then every other country. The list is stored on this page so Profile loads quickly — it is not fetched from a database. Country sets your mobile calling code (+1 for the United States), the height unit default, and ZIP vs postal on taxi pickup.",
+      searchPhrases: [
+        "country", "country dropdown", "united states", "canada", "select country", "state list"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-profile-mobile",
+      title: "Mobile",
+      body: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      searchPhrases: [
+        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
       id: "help-taxi-pickup-address",
       title: "Taxi pickup address",
-      body: "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint.",
+      body: "RydR pickup needs a street number, street name, city, state or province (for the listed countries), and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint.",
       searchPhrases: [
         "taxi pickup", "pickup address", "rydr address", "zip code", "postal code",
-        "street number", "hail a ride address"
+        "street number", "hail a ride address", "state", "province"
       ],
       links: [
         {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})},

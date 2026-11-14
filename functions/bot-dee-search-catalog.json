@@ -1615,6 +1615,25 @@
       ]
     },
     {
+      "sourceId": "help:help-profile-country",
+      "id": "help-profile-country",
+      "kind": "help",
+      "label": "Country",
+      "blurb": "Choose your country from the list. United States is first, then Canada, then featured nightlife markets, then every other country. The list is stored on this page so Profile loads quickly — it is not fetched from a database. Country sets your mobile calling code (+1 for the Unite",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
+      "phrases": [
+        "country",
+        "choose your country from the list. united states is first then canada then featured nightlife markets then every other country. the list is stored on this page ",
+        "country dropdown",
+        "united states",
+        "canada",
+        "select country",
+        "state list",
+        "profile settings",
+        "help-profile-country"
+      ]
+    },
+    {
       "sourceId": "help:help-profile-height",
       "id": "help-profile-height",
       "kind": "help",
@@ -1633,6 +1652,26 @@
         "1.78",
         "profile settings",
         "help-profile-height"
+      ]
+    },
+    {
+      "sourceId": "help:help-profile-mobile",
+      "id": "help-profile-mobile",
+      "kind": "help",
+      "label": "Mobile",
+      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
+      "phrases": [
+        "mobile",
+        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states. enter only the rest of your mobile number. we s",
+        "phone number",
+        "sms",
+        "whatsapp",
+        "country code",
+        "1",
+        "calling code",
+        "profile settings",
+        "help-profile-mobile"
       ]
     },
     {
@@ -2066,11 +2105,11 @@
       "id": "help-taxi-pickup-address",
       "kind": "help",
       "label": "Taxi pickup address",
-      "blurb": "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. Th",
+      "blurb": "RydR pickup needs a street number, street name, city, state or province (for the listed countries), and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label auto",
       "href": "./patron-portal.html?from=botdee&tab=profile",
       "phrases": [
         "taxi pickup address",
-        "rydr pickup needs a street number street name city and zip or postal code. u.s. residents enter a zip 12345 or 12345-6789 . canada and other countries or a non-",
+        "rydr pickup needs a street number street name city state or province for the listed countries and zip or postal code. u.s. residents enter a zip 12345 or 12345-",
         "taxi pickup",
         "pickup address",
         "rydr address",
@@ -2078,6 +2117,8 @@
         "postal code",
         "street number",
         "hail a ride address",
+        "state",
+        "province",
         "profile settings",
         "rydr",
         "help-taxi-pickup-address"
@@ -3196,6 +3237,24 @@
       ]
     },
     {
+      "sourceId": "intent:help-profile-country",
+      "id": "help-profile-country",
+      "kind": "help",
+      "label": "Country",
+      "blurb": "United States is first, then Canada, then featured markets, then every other country. Country sets the mobile calling code and ZIP vs postal.",
+      "href": "./botdee.html",
+      "phrases": [
+        "country",
+        "united states is first then canada then featured markets then every other country. country sets the mobile calling code and zip vs postal.",
+        "country dropdown",
+        "united states",
+        "canada",
+        "select country",
+        "state list",
+        "help-profile-country"
+      ]
+    },
+    {
       "sourceId": "intent:help-profile-height",
       "id": "help-profile-height",
       "kind": "help",
@@ -3213,6 +3272,25 @@
         "6 0",
         "1.78",
         "help-profile-height"
+      ]
+    },
+    {
+      "sourceId": "intent:help-profile-mobile",
+      "id": "help-profile-mobile",
+      "kind": "help",
+      "label": "Mobile",
+      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      "href": "./botdee.html",
+      "phrases": [
+        "mobile",
+        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states.",
+        "phone number",
+        "sms",
+        "whatsapp",
+        "country code",
+        "1",
+        "calling code",
+        "help-profile-mobile"
       ]
     },
     {

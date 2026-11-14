@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.013";
+  const VERSION = "s3.3.014";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -225,9 +225,17 @@
         title: "Рост",
         body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США по умолчанию ft. Все остальные страны и интернет-место вне США — m. Единицу всё равно можно переключить."
       },
+      "help-profile-country": {
+        title: "Страна",
+        body: "Выберите страну из списка. Сначала США, затем Канада, затем основные рынки и остальные страны. Список встроен в страницу, чтобы профиль открывался быстро. Страна задаёт код мобильного (для США +1), единицы роста и ZIP или почтовый индекс для адреса подачи такси."
+      },
+      "help-profile-mobile": {
+        title: "Мобильный",
+        body: "FLOQR использует этот номер для SMS и WhatsApp. Страна подставляет код, например (+1) для США. Введите остальную часть мобильного номера. Мы сохраняем его в международном формате, чтобы сообщения доходили."
+      },
       "help-taxi-pickup-address": {
         title: "Адрес подачи такси",
-        body: "Для RydR нужны номер дома, улица, город и ZIP или почтовый индекс. Жители США вводят ZIP (12345 или 12345-6789). Канада и другие страны, либо интернет-место вне США, используют почтовый индекс. FLOQR подставляет подпись из страны профиля и IP. Адрес остаётся частным — это не публичный пункт Mingl."
+        body: "Для RydR нужны номер дома, улица, город, штат или провинция (для стран из списка) и ZIP или почтовый индекс. Жители США вводят ZIP (12345 или 12345-6789). Канада и другие страны, либо интернет-место вне США, используют почтовый индекс. FLOQR подставляет подпись из страны профиля и IP. Адрес остаётся частным — это не публичный пункт Mingl."
       },
       "help-onboarding": {
         title: "Онбординг",
@@ -563,9 +571,17 @@
         title: "Lengte",
         body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. De VS starten op ft. Alle andere landen en een niet-Amerikaanse internetlocatie starten op m. Je kunt de eenheid nog wisselen."
       },
+      "help-profile-country": {
+        title: "Land",
+        body: "Kies je land uit de lijst. Eerst de Verenigde Staten, dan Canada, dan de uitgelichte markten en daarna de rest. De lijst staat op deze pagina zodat Profiel snel laadt. Land bepaalt je mobiele landcode (+1 voor de VS), de standaard voor lengte, en ZIP of postcode bij taxi-ophaal."
+      },
+      "help-profile-mobile": {
+        title: "Mobiel",
+        body: "FLOQR gebruikt dit nummer voor SMS en WhatsApp. Land vult de landcode, bijvoorbeeld (+1) voor de Verenigde Staten. Vul alleen de rest van je mobiele nummer in. We slaan het internationaal op zodat berichten aankomen."
+      },
       "help-taxi-pickup-address": {
         title: "Taxi-ophaaladres",
-        body: "RydR-ophaal vraagt huisnummer, straatnaam, stad en ZIP of postcode. VS-inwoners vullen ZIP in (12345 of 12345-6789). Canada en andere landen, of een niet-Amerikaanse internetlocatie, gebruiken een postcode. FLOQR zet het label automatisch vanuit je profielland en IP. Dit adres blijft privé — geen openbaar Mingl-datapunt."
+        body: "RydR-ophaal heeft een huisnummer, straatnaam, stad, staat of provincie (voor de vermelde landen) en ZIP of postcode nodig. Inwoners van de VS vullen een ZIP in (12345 of 12345-6789). Canada en andere landen, of een niet-Amerikaanse internetlocatie, gebruiken een postcode. FLOQR vult het label uit je profielland en IP. Dit adres blijft privé — het is geen openbaar Mingl-datapunt."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -901,9 +917,17 @@
         title: "Taille",
         body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. Les États-Unis : ft par défaut. Tous les autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
       },
+      "help-profile-country": {
+        title: "Pays",
+        body: "Choisissez votre pays dans la liste. Les États-Unis d’abord, puis le Canada, puis les marchés mis en avant, puis les autres pays. La liste est dans la page pour que le profil s’ouvre vite. Le pays fixe l’indicatif mobile (+1 pour les États-Unis), l’unité de taille et ZIP ou code postal pour la prise en charge taxi."
+      },
+      "help-profile-mobile": {
+        title: "Mobile",
+        body: "FLOQR utilise ce numéro pour SMS et WhatsApp. Le pays remplit l’indicatif, par exemple (+1) pour les États-Unis. Saisissez seulement le reste du numéro mobile. Nous le stockons au format international pour que les messages arrivent."
+      },
       "help-taxi-pickup-address": {
         title: "Adresse de prise en charge taxi",
-        body: "RydR a besoin du numéro, du nom de rue, de la ville et d'un ZIP ou code postal. Les résidents américains saisissent un ZIP (12345 ou 12345-6789). Le Canada, les autres pays, ou une localisation internet hors USA, utilisent un code postal. FLOQR choisit le libellé d'après le pays du profil et l'IP. Cette adresse reste privée — ce n'est pas un datapoint Mingl public."
+        body: "RydR a besoin d’un numéro de rue, d’un nom de rue, d’une ville, d’un État ou d’une province (pour les pays listés) et d’un ZIP ou code postal. Les résidents des États-Unis saisissent un ZIP (12345 ou 12345-6789). Le Canada et les autres pays, ou un lieu internet hors États-Unis, utilisent un code postal. FLOQR remplit le libellé d’après le pays du profil et l’IP. L’adresse reste privée — ce n’est pas un point Mingl public."
       },
       "help-onboarding": {
         title: "Intégration",
@@ -1239,9 +1263,17 @@
         title: "Größe",
         body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. Die USA starten mit ft. Alle anderen Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
       },
+      "help-profile-country": {
+        title: "Land",
+        body: "Wählen Sie Ihr Land aus der Liste. Zuerst die Vereinigten Staaten, dann Kanada, dann die hervorgehobenen Märkte, dann alle anderen. Die Liste liegt auf dieser Seite, damit das Profil schnell lädt. Das Land setzt die Mobilvorwahl (+1 für die USA), die Größen-Vorgabe und ZIP oder Postleitzahl für die Taxi-Abholung."
+      },
+      "help-profile-mobile": {
+        title: "Mobil",
+        body: "FLOQR nutzt diese Nummer für SMS und WhatsApp. Das Land füllt die Vorwahl, zum Beispiel (+1) für die Vereinigten Staaten. Geben Sie nur den Rest der Mobilnummer ein. Wir speichern sie im internationalen Format, damit Nachrichten ankommen."
+      },
       "help-taxi-pickup-address": {
         title: "Taxi-Abholadresse",
-        body: "RydR braucht Hausnummer, Straße, Stadt und ZIP oder Postleitzahl. US-Einwohner geben ZIP ein (12345 oder 12345-6789). Kanada und andere Länder oder ein nicht-US-Internetstandort nutzen eine Postleitzahl. FLOQR setzt die Beschriftung aus Profilland und IP. Die Adresse bleibt privat — kein öffentlicher Mingl-Datenpunkt."
+        body: "RydR braucht Hausnummer, Straßenname, Stadt, Bundesland oder Provinz (für die genannten Länder) und ZIP oder Postleitzahl. US-Bewohner geben eine ZIP ein (12345 oder 12345-6789). Kanada und andere Länder oder ein nicht-US-Internetstandort nutzen eine Postleitzahl. FLOQR füllt die Beschriftung aus Profilland und IP. Die Adresse bleibt privat — kein öffentlicher Mingl-Datenpunkt."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -1577,9 +1609,17 @@
         title: "Estatura",
         body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. usa ft. Todos los demás países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
       },
+      "help-profile-country": {
+        title: "País",
+        body: "Elige tu país en la lista. Primero Estados Unidos, luego Canadá, luego los mercados destacados y el resto. La lista va en la página para que el perfil cargue rápido. El país fija el código móvil (+1 para Estados Unidos), la unidad de altura y ZIP o código postal en la recogida de taxi."
+      },
+      "help-profile-mobile": {
+        title: "Móvil",
+        body: "FLOQR usa este número para SMS y WhatsApp. El país rellena el código, por ejemplo (+1) para Estados Unidos. Introduce solo el resto del número móvil. Lo guardamos en formato internacional para que lleguen los mensajes."
+      },
       "help-taxi-pickup-address": {
         title: "Dirección de recogida de taxi",
-        body: "RydR pide número, calle, ciudad y ZIP o código postal. Los residentes de EE. UU. usan ZIP (12345 o 12345-6789). Canadá y otros países, o una ubicación de internet no estadounidense, usan código postal. FLOQR elige la etiqueta con el país del perfil y la IP. La dirección es privada: no es un dato público de Mingl."
+        body: "RydR necesita número, calle, ciudad, estado o provincia (para los países de la lista) y ZIP o código postal. Quienes viven en EE. UU. ponen un ZIP (12345 o 12345-6789). Canadá y otros países, o una ubicación de internet fuera de EE. UU., usan código postal. FLOQR rellena la etiqueta con el país del perfil y la IP. La dirección es privada — no es un dato público de Mingl."
       },
       "help-onboarding": {
         title: "Incorporación",
@@ -1915,9 +1955,17 @@
         title: "Altezza",
         body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Gli Stati Uniti partono da ft. Tutti gli altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
       },
+      "help-profile-country": {
+        title: "Paese",
+        body: "Scegli il paese dall’elenco. Prima gli Stati Uniti, poi il Canada, poi i mercati in evidenza e gli altri. L’elenco è nella pagina così il profilo si apre in fretta. Il paese imposta il prefisso mobile (+1 per gli Stati Uniti), l’unità di altezza e ZIP o CAP per il ritiro taxi."
+      },
+      "help-profile-mobile": {
+        title: "Cellulare",
+        body: "FLOQR usa questo numero per SMS e WhatsApp. Il paese inserisce il prefisso, ad esempio (+1) per gli Stati Uniti. Inserisci solo il resto del numero. Lo salviamo in formato internazionale così i messaggi arrivano."
+      },
       "help-taxi-pickup-address": {
         title: "Indirizzo di ritiro taxi",
-        body: "RydR richiede numero civico, via, città e ZIP o CAP. I residenti USA inseriscono lo ZIP (12345 o 12345-6789). Canada e altri Paesi, o una posizione internet non USA, usano il codice postale. FLOQR imposta l'etichetta da Paese del profilo e IP. L'indirizzo resta privato: non è un datapoint Mingl pubblico."
+        body: "RydR richiede numero civico, via, città, stato o provincia (per i paesi in elenco) e ZIP o CAP. I residenti negli Stati Uniti inseriscono uno ZIP (12345 o 12345-6789). Canada e altri paesi, o una posizione internet non USA, usano il CAP. FLOQR riempie l’etichetta dal paese del profilo e dall’IP. L’indirizzo resta privato — non è un dato pubblico Mingl."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -2253,9 +2301,17 @@
         title: "Altura",
         body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. Os EUA começam em ft. Todos os outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
       },
+      "help-profile-country": {
+        title: "País",
+        body: "Escolha o país na lista. Primeiro os Estados Unidos, depois o Canadá, depois os mercados em destaque e os restantes. A lista está na página para o perfil abrir depressa. O país define o indicativo móvel (+1 para os Estados Unidos), a unidade de altura e ZIP ou código postal na recolha de táxi."
+      },
+      "help-profile-mobile": {
+        title: "Telemóvel",
+        body: "A FLOQR usa este número para SMS e WhatsApp. O país preenche o indicativo, por exemplo (+1) para os Estados Unidos. Introduza só o resto do número. Guardamo-lo em formato internacional para as mensagens chegarem."
+      },
       "help-taxi-pickup-address": {
         title: "Morada de recolha de táxi",
-        body: "O RydR precisa de número, rua, cidade e ZIP ou código postal. Residentes dos EUA usam ZIP (12345 ou 12345-6789). Canadá e outros países, ou uma localização de internet fora dos EUA, usam código postal. O FLOQR escolhe o rótulo pelo país do perfil e pelo IP. A morada fica privada — não é um datapoint público do Mingl."
+        body: "O RydR precisa de número de porta, rua, cidade, estado ou província (para os países da lista) e ZIP ou código postal. Residentes nos EUA introduzem um ZIP (12345 ou 12345-6789). Canadá e outros países, ou uma localização de internet fora dos EUA, usam código postal. A FLOQR preenche o rótulo a partir do país do perfil e do IP. A morada fica privada — não é um dado público Mingl."
       },
       "help-onboarding": {
         title: "Integração",
@@ -2591,9 +2647,17 @@
         title: "Ύψος",
         body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. Οι ΗΠΑ ξεκινούν σε ft. Όλες οι άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
       },
+      "help-profile-country": {
+        title: "Χώρα",
+        body: "Επιλέξτε χώρα από τη λίστα. Πρώτα οι Ηνωμένες Πολιτείες, μετά ο Καναδάς, μετά οι προβεβλημένες αγορές και οι υπόλοιπες. Η λίστα είναι στη σελίδα ώστε το προφίλ να φορτώνει γρήγορα. Η χώρα ορίζει τον κωδικό κινητού (+1 για τις ΗΠΑ), τη μονάδα ύψους και ZIP ή ταχυδρομικό κώδικα στην παραλαβή ταξί."
+      },
+      "help-profile-mobile": {
+        title: "Κινητό",
+        body: "Το FLOQR χρησιμοποιεί αυτόν τον αριθμό για SMS και WhatsApp. Η χώρα συμπληρώνει τον κωδικό, π.χ. (+1) για τις Ηνωμένες Πολιτείες. Εισαγάγετε μόνο το υπόλοιπο του κινητού. Το αποθηκεύουμε σε διεθνή μορφή ώστε να φτάνουν τα μηνύματα."
+      },
       "help-taxi-pickup-address": {
         title: "Διεύθυνση παραλαβής ταξί",
-        body: "Το RydR θέλει αριθμό, οδό, πόλη και ZIP ή ταχυδρομικό κώδικα. Κάτοικοι ΗΠΑ βάζουν ZIP (12345 ή 12345-6789). Καναδάς και άλλες χώρες, ή μη αμερικανική θέση διαδικτύου, χρησιμοποιούν ταχυδρομικό κώδικα. Το FLOQR βάζει την ετικέτα από τη χώρα προφίλ και την IP. Η διεύθυνση μένει ιδιωτική — δεν είναι δημόσιο datapoint Mingl."
+        body: "Το RydR χρειάζεται αριθμό οδού, όνομα οδού, πόλη, πολιτεία ή επαρχία (για τις χώρες της λίστας) και ZIP ή ταχυδρομικό κώδικα. Κάτοικοι ΗΠΑ εισάγουν ZIP (12345 ή 12345-6789). Καναδάς και άλλες χώρες, ή μη αμερικανική θέση διαδικτύου, χρησιμοποιούν ταχυδρομικό κώδικα. Το FLOQR γεμίζει την ετικέτα από τη χώρα προφίλ και την IP. Η διεύθυνση μένει ιδιωτική — δεν είναι δημόσιο σημείο Mingl."
       },
       "help-onboarding": {
         title: "Ενσωμάτωση",
@@ -2929,9 +2993,17 @@
         title: "Wzrost",
         body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA startują od ft. Wszystkie inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
       },
+      "help-profile-country": {
+        title: "Kraj",
+        body: "Wybierz kraj z listy. Najpierw Stany Zjednoczone, potem Kanada, potem wyróżnione rynki i reszta. Lista jest na stronie, żeby profil ładował się szybko. Kraj ustawia numer kierunkowy (+1 dla USA), jednostkę wzrostu oraz ZIP lub kod pocztowy przy adresie taksówki."
+      },
+      "help-profile-mobile": {
+        title: "Telefon komórkowy",
+        body: "FLOQR używa tego numeru do SMS i WhatsApp. Kraj uzupełnia kierunkowy, np. (+1) dla Stanów Zjednoczonych. Wpisz tylko resztę numeru. Zapisujemy go w formacie międzynarodowym, żeby wiadomości dochodziły."
+      },
       "help-taxi-pickup-address": {
         title: "Adres odbioru taksówki",
-        body: "RydR wymaga numeru, ulicy, miasta oraz ZIP lub kodu pocztowego. Mieszkańcy USA podają ZIP (12345 lub 12345-6789). Kanada i inne kraje albo nielokacja internetowa spoza USA używają kodu pocztowego. FLOQR ustawia etykietę z kraju profilu i IP. Adres zostaje prywatny — to nie publiczny punkt Mingl."
+        body: "RydR wymaga numeru, nazwy ulicy, miasta, stanu lub prowincji (dla krajów z listy) oraz ZIP lub kodu pocztowego. Mieszkańcy USA wpisują ZIP (12345 lub 12345-6789). Kanada i inne kraje albo lokalizacja internetowa poza USA używają kodu pocztowego. FLOQR uzupełnia etykietę z kraju profilu i IP. Adres zostaje prywatny — to nie publiczny punkt Mingl."
       },
       "help-onboarding": {
         title: "Wprowadzenie",
@@ -3267,9 +3339,17 @@
         title: "الطول",
         body: "اختر ft أو m أولاً ثم أدخل طولك بهذه الوحدة. الأقدام: 6'0\". الأمتار: 1.78. الخلط ممنوع — لا يُحفظ 1.78 كـ ft ولا 6'0\" كـ m. الولايات المتحدة تبدأ بـ ft. كل البلدان الأخرى وموقع الإنترنت غير الأمريكي بـ m. يمكنك تبديل الوحدة."
       },
+      "help-profile-country": {
+        title: "البلد",
+        body: "اختر بلدك من القائمة. الولايات المتحدة أولاً ثم كندا ثم الأسواق المميزة ثم بقية البلدان. القائمة مضمّنة في الصفحة حتى يفتح الملف الشخصي بسرعة. البلد يضبط رمز الجوّال (+1 للولايات المتحدة) ووحدة الطول وZIP أو الرمز البريدي لعنوان التاكسي."
+      },
+      "help-profile-mobile": {
+        title: "الجوّال",
+        body: "تستخدم FLOQR هذا الرقم لـ SMS و WhatsApp. البلد يملأ رمز الاتصال، مثل (+1) للولايات المتحدة. أدخل بقية رقم الجوّال فقط. نخزّنه بالصيغة الدولية حتى تصل الرسائل."
+      },
       "help-taxi-pickup-address": {
         title: "عنوان التقاط سيارة الأجرة",
-        body: "يحتاج RydR إلى رقم الشارع واسمه والمدينة وZIP أو الرمز البريدي. المقيمون في الولايات المتحدة يدخلون ZIP (12345 أو 12345-6789). كندا والبلدان الأخرى أو موقع إنترنت غير أمريكي يستخدمون الرمز البريدي. يضع FloqR التسمية من بلد الملف وIP. العنوان يبقى خاصًا — ليس نقطة بيانات Mingl عامة."
+        body: "يحتاج RydR رقم الشارع واسم الشارع والمدينة والولاية أو المقاطعة (للبلدان المذكورة) وZIP أو الرمز البريدي. سكان الولايات المتحدة يدخلون ZIP (12345 أو 12345-6789). كندا والبلدان الأخرى أو موقع إنترنت خارج الولايات المتحدة تستخدم رمزاً بريدياً. تملأ FLOQR التسمية من بلد الملف وIP. العنوان يبقى خاصاً — ليس نقطة Mingl عامة."
       },
       "help-onboarding": {
         title: "الإعداد",

@@ -53,6 +53,7 @@
   let profileLocaleHint = {};
   let profileHeightCtl = null;
   let profilePickupCtl = null;
+  let profileGeoCtl = null;
   let lastProfileReadError = null;
   let minglCandidates = [];
   let minglConnections = [];
@@ -2141,7 +2142,21 @@
         status.textContent = pickupCheck.error;
         return;
       }
-      const pickupParts = pickupCheck?.parts || {};
+      const phoneCheck = profileGeoCtl?.validateMobile?.({required: false})
+        || window.FLOQRGeoCatalog?.validateMobile?.(
+          byId("profileCountry")?.value,
+          byId("profilePhoneNational")?.value,
+          {required: false}
+        );
+      if (phoneCheck && !phoneCheck.ok) {
+        status.textContent = phoneCheck.error || "Enter a valid mobile number for SMS and WhatsApp.";
+        return;
+      }
+      const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? (pickupCheck.parts || {}) : {};
+      const countryCode = profileGeoCtl?.countryCode?.() || byId("profileCountry")?.value || "";
+      const countryName = profileGeoCtl?.countryName?.() || window.FLOQRGeoCatalog?.countryNameOf?.(countryCode) || byId("profileCountry")?.value.trim() || "";
+      const regionCode = pickupParts.regionCode || profileGeoCtl?.regionCode?.() || "";
+      const regionName = pickupParts.region || profileGeoCtl?.regionName?.() || "";
       const profile = {
         uid: currentUser.uid,
         floqrHandle,
@@ -2151,12 +2166,17 @@
         phoneNumber: currentUser.phoneNumber || "",
         photoURL: currentUser.photoURL || "",
         providerIds: (currentUser.providerData || []).map(p => p.providerId),
-        country: byId("profileCountry").value.trim(),
-        region: byId("profileRegion").value.trim(),
-        city: byId("profileCity").value.trim(),
+        phone: phoneCheck?.e164 || profileGeoCtl?.e164?.() || "",
+        country: countryName,
+        countryCode,
+        region: regionName,
+        regionCode,
+        city: pickupParts.city || byId("profileTaxiCity")?.value.trim() || "",
         taxiStreetNumber: pickupParts.streetNumber || "",
         taxiStreetName: pickupParts.streetName || "",
         taxiCity: pickupParts.city || "",
+        taxiRegion: pickupParts.region || regionName,
+        taxiRegionCode: pickupParts.regionCode || regionCode,
         taxiPostalCode: pickupParts.postalCode || "",
         taxiPostalKind: pickupParts.postalKind || "",
         taxiPickupAddress: pickupCheck?.composed || byId("profileTaxiPickupAddress")?.value.trim() || "",
@@ -6379,12 +6399,27 @@
       hint: "profileHeightHint",
       locale: currentProfileLocale
     }) || null;
+    profileGeoCtl = window.FLOQRGeoCatalog?.bind?.({
+      countryEl: byId("profileCountry"),
+      regionEl: byId("profileTaxiRegion"),
+      regionTextEl: byId("profileTaxiRegionText"),
+      regionLabelEl: byId("profileTaxiRegionLabel"),
+      dialEl: byId("profilePhoneDial"),
+      nationalEl: byId("profilePhoneNational"),
+      hiddenEl: byId("profilePhone"),
+      onCountry: () => {
+        applyProfileHeightUnit({fromCountry: true});
+        profilePickupCtl?.paintPostal?.();
+        profilePickupCtl?.validate?.(false);
+      }
+    }) || null;
     profilePickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "profileTaxiStreetNumber",
         streetName: "profileTaxiStreetName",
         city: "profileTaxiCity",
-        citySource: "profileCity",
+        region: "profileTaxiRegion",
+        regionText: "profileTaxiRegionText",
         postal: "profileTaxiPostal",
         postalLabel: "profileTaxiPostalLabel",
         composed: "profileTaxiPickupAddress",
@@ -6394,10 +6429,12 @@
     }) || null;
     window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
       profileLocaleHint = hint || {};
+      if (!byId("profileCountry")?.value && (hint.ipCountryCode || hint.ipCountry)) {
+        profileGeoCtl?.setCountry?.(hint.ipCountryCode || hint.ipCountry, {silent: true});
+      }
       applyProfileHeightUnit();
     }).catch(() => {});
     byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit({fromCountry: true}));
-    byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit({fromCountry: true}));
     applyProfileHeightUnit();
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);

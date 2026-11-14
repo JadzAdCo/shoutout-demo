@@ -220,6 +220,7 @@
   let profileLocaleHint = {};
   let editHeightCtl = null;
   let editPickupCtl = null;
+  let editGeoCtl = null;
   let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
@@ -2057,10 +2058,14 @@
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
     byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
-    byId("editPhone").value = profile.phone || user.phoneNumber || "";
+    editGeoCtl?.fill?.({
+      country: profile.countryCode || profile.country || "",
+      countryCode: profile.countryCode || "",
+      region: profile.regionCode || profile.region || profile.taxiRegion || "",
+      regionCode: profile.regionCode || profile.taxiRegionCode || "",
+      phone: profile.phone || user.phoneNumber || ""
+    });
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
-    byId("editCity").value = profile.city || "";
-    byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
     byId("editGender").value = profile.gender || "";
     editHeightCtl?.fill?.({
@@ -2379,16 +2384,41 @@
       setText("portalStatus", pickupCheck.error);
       return;
     }
+    const phoneCheck = editGeoCtl?.validateMobile?.({required: false})
+      || window.FLOQRGeoCatalog?.validateMobile?.(
+        byId("editCountry")?.value,
+        byId("editPhoneNational")?.value,
+        {required: false}
+      );
+    if (phoneCheck && !phoneCheck.ok) {
+      setText("portalStatus", phoneCheck.error || (window.FLOQRI18n?.t?.("portal.phone.invalid") || "Enter a valid mobile number for SMS and WhatsApp."));
+      const hint = byId("editPhoneHint");
+      if (hint) {
+        hint.textContent = phoneCheck.error || hint.textContent;
+        hint.classList.add("is-error");
+        hint.hidden = false;
+      }
+      return;
+    }
     const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? pickupCheck.parts : null;
+    const countryCode = editGeoCtl?.countryCode?.() || byId("editCountry")?.value || "";
+    const countryName = editGeoCtl?.countryName?.() || window.FLOQRGeoCatalog?.countryNameOf?.(countryCode) || "";
+    const regionCode = pickupParts?.regionCode || editGeoCtl?.regionCode?.() || "";
+    const regionName = pickupParts?.region || editGeoCtl?.regionName?.() || "";
+    const cityValue = pickupParts?.city || byId("editTaxiCity")?.value.trim() || "";
+    const phoneE164 = phoneCheck?.e164 || editGeoCtl?.e164?.() || "";
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
       floqrHandle,
       username,
-      phone: byId("editPhone").value.trim(),
-      city: byId("editCity").value.trim(),
-      country: byId("editCountry").value.trim(),
+      phone: phoneE164,
+      city: cityValue,
+      country: countryName,
+      countryCode,
+      region: regionName,
+      regionCode,
       preferredLanguage,
       gender: byId("editGender").value,
       height: heightCheck?.empty ? (currentProfile?.height || "") : (heightCheck?.normalized || byId("editHeight").value.trim()),
@@ -2427,6 +2457,8 @@
       updates.taxiStreetNumber = pickupParts.streetNumber || "";
       updates.taxiStreetName = pickupParts.streetName || "";
       updates.taxiCity = pickupParts.city || "";
+      updates.taxiRegion = pickupParts.region || regionName;
+      updates.taxiRegionCode = pickupParts.regionCode || regionCode;
       updates.taxiPostalCode = pickupParts.postalCode || "";
       updates.taxiPostalKind = pickupParts.postalKind || "";
       updates.taxiPickupAddress = pickupCheck.composed;
@@ -4239,6 +4271,9 @@
   }
 
   function isUsMarketplaceEligible(profile = {}) {
+    if (window.FLOQRProfileLocale?.isUnitedStates?.(profile.country || profile.countryCode)) return true;
+    const iso = window.FLOQRGeoCatalog?.countryCodeOf?.(profile.countryCode || profile.country);
+    if (iso === "US") return true;
     const value = String(profile.country || "").trim().toLowerCase();
     return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america"].includes(value);
   }
@@ -5260,12 +5295,27 @@
       hint: "editHeightHint",
       locale: currentEditLocale
     }) || null;
+    editGeoCtl = window.FLOQRGeoCatalog?.bind?.({
+      countryEl: byId("editCountry"),
+      regionEl: byId("editTaxiRegion"),
+      regionTextEl: byId("editTaxiRegionText"),
+      regionLabelEl: byId("editTaxiRegionLabel"),
+      dialEl: byId("editPhoneDial"),
+      nationalEl: byId("editPhoneNational"),
+      hiddenEl: byId("editPhone"),
+      onCountry: () => {
+        applyEditHeightUnit({fromCountry: true});
+        editPickupCtl?.paintPostal?.();
+        editPickupCtl?.validate?.(false);
+      }
+    }) || null;
     editPickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "editTaxiStreetNumber",
         streetName: "editTaxiStreetName",
         city: "editTaxiCity",
-        citySource: "editCity",
+        region: "editTaxiRegion",
+        regionText: "editTaxiRegionText",
         postal: "editTaxiPostal",
         postalLabel: "editTaxiPostalLabel",
         composed: "editTaxiPickupAddress",
@@ -5275,10 +5325,12 @@
     }) || null;
     window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
       profileLocaleHint = hint || {};
+      if (!byId("editCountry")?.value && (hint.ipCountryCode || hint.ipCountry)) {
+        editGeoCtl?.setCountry?.(hint.ipCountryCode || hint.ipCountry, {silent: true});
+      }
       applyEditHeightUnit();
     }).catch(() => {});
     byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit({fromCountry: true}));
-    byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit({fromCountry: true}));
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {

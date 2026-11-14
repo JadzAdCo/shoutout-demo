@@ -42,6 +42,8 @@
   function countryCodeOf(value) {
     const raw = text(value).toUpperCase();
     if (/^[A-Z]{2}$/.test(raw)) return raw;
+    const fromCatalog = root?.FLOQRGeoCatalog?.countryCodeOf?.(value);
+    if (fromCatalog) return fromCatalog;
     const name = keyCountry(value);
     const compact = name.replace(/[^a-z]/g, "");
     if (US_NAMES.has(name) || compact === "us" || compact === "usa" || compact === "unitedstates" || compact === "unitedstatesofamerica") return "US";
@@ -234,26 +236,37 @@
     return {ok: true, normalized: value};
   }
 
+  function regionRequired(locale = {}) {
+    const iso = countryCodeOf(locale.country || locale.profileCountry)
+      || countryCodeOf(locale.ipCountryCode || locale.ipCountry);
+    const list = root?.FLOQRGeoCatalog?.subdivisionsOf?.(iso) || [];
+    return list.length > 0;
+  }
+
   function validatePickupParts(parts = {}, locale = {}) {
     const zipMode = usesZip(locale);
     const streetNumber = validateStreetNumber(parts.streetNumber);
     const streetName = text(parts.streetName);
     const city = text(parts.city);
+    const region = text(parts.regionCode || parts.region);
     const postal = validatePostal(parts.postalCode, zipMode);
-    const missing = !streetNumber.ok || !streetName || !city || !postal.ok;
+    const needRegion = regionRequired(locale);
+    const missing = !streetNumber.ok || !streetName || !city || !postal.ok || (needRegion && !region);
     if (missing) {
       return {
         ok: false,
         usesZip: zipMode,
         error: !postal.ok && text(parts.postalCode)
           ? postal.error
-          : t("portal.pickup.addressIncomplete", "Enter street number, street name, city, and ZIP or postal code.")
+          : t("portal.pickup.addressIncomplete", "Enter street number, street name, city, state or province, and ZIP or postal code.")
       };
     }
     const composed = composePickupAddress({
       streetNumber: streetNumber.normalized,
       streetName,
       city,
+      region,
+      regionCode: text(parts.regionCode),
       postalCode: postal.normalized
     });
     return {
@@ -263,6 +276,8 @@
         streetNumber: streetNumber.normalized,
         streetName,
         city,
+        region,
+        regionCode: text(parts.regionCode) || region,
         postalCode: postal.normalized,
         postalKind: postal.kind
       },
@@ -272,12 +287,18 @@
 
   function composePickupAddress(parts = {}) {
     const line = [text(parts.streetNumber), text(parts.streetName)].filter(Boolean).join(" ");
-    return [line, text(parts.city), text(parts.postalCode)].filter(Boolean).join(", ");
+    const region = text(parts.regionCode || parts.region);
+    const postal = text(parts.postalCode);
+    const city = text(parts.city);
+    if (region && postal) {
+      return [line, [city, [region, postal].filter(Boolean).join(" ")].filter(Boolean).join(", ")].filter(Boolean).join(", ");
+    }
+    return [line, [city, region].filter(Boolean).join(", "), postal].filter(Boolean).join(", ");
   }
 
   function splitPickupAddress(raw) {
     const value = text(raw);
-    if (!value) return {streetNumber: "", streetName: "", city: "", postalCode: ""};
+    if (!value) return {streetNumber: "", streetName: "", city: "", region: "", postalCode: ""};
     const chunks = value.split(",").map(part => part.trim()).filter(Boolean);
     const first = chunks.shift() || "";
     const numberMatch = first.match(/^(\d+[A-Za-z]?(?:-\d+[A-Za-z]?)?)\s+(.*)$/);
@@ -285,6 +306,7 @@
     const streetName = numberMatch ? numberMatch[2] : first;
     let postalCode = "";
     let city = chunks.join(", ");
+    let region = "";
     if (chunks.length) {
       const last = chunks[chunks.length - 1];
       const zipMatch = last.match(/(\d{5}(?:-\d{4})?)\s*$/);
@@ -292,7 +314,14 @@
       const generic = last.match(/\b([A-Z0-9][A-Z0-9 \-]{2,11})\s*$/i);
       if (zipMatch) {
         postalCode = zipMatch[1];
-        city = [chunks.slice(0, -1).join(", "), last.slice(0, zipMatch.index).replace(/[,\s]+$/, "")].filter(Boolean).join(", ");
+        const leftover = last.slice(0, zipMatch.index).replace(/[,\s]+$/, "").trim();
+        const prior = chunks.slice(0, -1);
+        if (/^[A-Z]{2}$/.test(leftover) && prior.length) {
+          region = leftover;
+          city = prior.join(", ");
+        } else {
+          city = [prior.join(", "), leftover].filter(Boolean).join(", ");
+        }
       } else if (postalMatch) {
         postalCode = postalMatch[1].toUpperCase();
         city = [chunks.slice(0, -1).join(", "), last.slice(0, postalMatch.index).replace(/[,\s]+$/, "")].filter(Boolean).join(", ");
@@ -301,7 +330,7 @@
         city = chunks.slice(0, -1).join(", ");
       }
     }
-    return {streetNumber, streetName, city, postalCode};
+    return {streetNumber, streetName, city, region, postalCode};
   }
 
   function pickupFromProfile(profile = {}) {
@@ -309,6 +338,8 @@
       streetNumber: text(profile.taxiStreetNumber),
       streetName: text(profile.taxiStreetName),
       city: text(profile.taxiCity || profile.city),
+      region: text(profile.taxiRegion || profile.region),
+      regionCode: text(profile.taxiRegionCode || profile.regionCode),
       postalCode: text(profile.taxiPostalCode)
     };
     if (structured.streetNumber || structured.streetName) return structured;
@@ -490,6 +521,8 @@
     const numberEl = byId(ids.streetNumber);
     const nameEl = byId(ids.streetName);
     const cityEl = byId(ids.city);
+    const regionEl = ids.region ? byId(ids.region) : null;
+    const regionTextEl = ids.regionText ? byId(ids.regionText) : null;
     const postalEl = byId(ids.postal);
     const composedEl = ids.composed ? byId(ids.composed) : null;
     const labelEl = ids.postalLabel ? byId(ids.postalLabel) : (postalEl?.previousElementSibling || null);
@@ -506,11 +539,25 @@
       applyPostalLabel(labelEl, postalEl, usesZip(locale()));
     }
 
+    function readRegion() {
+      if (regionEl && !regionEl.hidden && regionEl.options && regionEl.options.length) {
+        const code = text(regionEl.value);
+        const iso = countryCodeOf(locale().country || locale().profileCountry);
+        const hit = root?.FLOQRGeoCatalog?.regionOf?.(iso, code);
+        return {regionCode: code, region: hit ? hit[1] : code};
+      }
+      const typed = text(regionTextEl?.value);
+      return {regionCode: "", region: typed};
+    }
+
     function read() {
+      const region = readRegion();
       return {
         streetNumber: numberEl.value,
         streetName: nameEl.value,
         city: cityEl.value,
+        region: region.region,
+        regionCode: region.regionCode,
         postalCode: postalEl.value
       };
     }
@@ -520,6 +567,8 @@
         streetNumber: text(parts.streetNumber),
         streetName: text(parts.streetName),
         city: text(parts.city),
+        region: text(parts.region || parts.regionCode),
+        regionCode: text(parts.regionCode),
         postalCode: text(parts.postalCode)
       };
       if (!next.streetNumber && !next.streetName && parts.address) {
@@ -529,40 +578,45 @@
       nameEl.value = next.streetName;
       cityEl.value = next.city;
       postalEl.value = next.postalCode;
+      const iso = countryCodeOf(locale().country || locale().profileCountry);
+      if (regionEl && regionEl.options && regionEl.options.length) {
+        const hit = root?.FLOQRGeoCatalog?.regionOf?.(iso, next.regionCode || next.region);
+        regionEl.value = hit ? hit[0] : "";
+      }
+      if (regionTextEl && (regionTextEl.hidden === false || regionEl?.hidden)) {
+        regionTextEl.value = next.region || next.regionCode;
+      }
       if (composedEl) composedEl.value = composePickupAddress(next);
     }
 
     function validate(required) {
       paintPostal();
-      const result = validatePickupParts(read(), locale());
-      if (!required && !text(numberEl.value) && !text(nameEl.value) && !text(postalEl.value) && !text(cityEl.value)) {
+      const snapshot = read();
+      const blank = !text(numberEl.value) && !text(nameEl.value) && !text(postalEl.value) && !text(cityEl.value)
+        && !text(snapshot.region) && !text(snapshot.regionCode);
+      const result = validatePickupParts(snapshot, locale());
+      if (!required && blank) {
         setHint(hintEl, "", false);
         if (composedEl) composedEl.value = "";
-        return {ok: true, empty: true, composed: "", parts: read()};
+        return {ok: true, empty: true, composed: "", parts: snapshot};
       }
       setHint(hintEl, result.ok ? "" : result.error, !result.ok);
-      if (composedEl) composedEl.value = result.ok ? result.composed : composePickupAddress(read());
+      if (composedEl) composedEl.value = result.ok ? result.composed : composePickupAddress(snapshot);
       return result;
     }
 
-    [numberEl, nameEl, cityEl, postalEl].forEach(el => {
+    [numberEl, nameEl, cityEl, postalEl, regionEl, regionTextEl].filter(Boolean).forEach(el => {
       el.addEventListener("input", () => validate(false));
+      el.addEventListener("change", () => validate(false));
       el.addEventListener("blur", () => validate(false));
     });
-    const citySource = typeof ids.citySource === "string" ? byId(ids.citySource) : ids.citySource;
-    if (citySource) {
-      citySource.addEventListener("input", () => {
-        copyCityIfEmpty(cityEl, citySource);
-        validate(false);
-      });
-      copyCityIfEmpty(cityEl, citySource);
-    }
     paintPostal();
 
     return {validate, read, fill, paintPostal};
   }
 
   return {
+    countryCodeOf,
     isUnitedStates,
     isCanada,
     usesFeetInches,

@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.013"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.013"/>
+<link rel="stylesheet" href="./styles.css?v=s3.3.014"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.014"/>
   <script>
     /* Paint Site chrome before CSS so the closed profile card matches the chosen theme. */
     try{
@@ -35,7 +35,7 @@
       <div>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.013" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+            <img src="./images/floqr-color.png?v=s3.3.014" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           </a>
         </div>
         <div class="floqr-page-title-row">
@@ -123,8 +123,26 @@
             <label>FloqR / Mingl handle
               <span class="label-inline-row"><input id="editFloqrHandle" maxlength="28" placeholder="@your_handle"/><button type="button" id="editFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button></span>
             </label>
-            <label>Phone Number <input id="editPhone"/></label>
-            <label class="span-2">
+            <label>
+              <span class="label-inline-row">
+                <span data-i18n="portal.field.country">Country</span>
+                <button type="button" class="floqr-help-popout" data-floqr-help-id="help-profile-country" aria-label="Help">?</button>
+              </span>
+              <select id="editCountry" autocomplete="country"></select>
+            </label>
+            <label>
+              <span class="label-inline-row">
+                <span data-i18n="portal.field.mobile">Mobile</span>
+                <button type="button" class="floqr-help-popout" data-floqr-help-id="help-profile-mobile" aria-label="Help">?</button>
+              </span>
+              <div class="phone-input-row">
+                <span id="editPhoneDial" class="phone-dial" aria-hidden="true">(+)</span>
+                <input id="editPhoneNational" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="202-733-0274"/>
+              </div>
+              <input id="editPhone" class="hidden" type="tel" autocomplete="tel"/>
+              <p id="editPhoneHint" class="field-hint" data-i18n="portal.phone.hint">Used for SMS and WhatsApp.</p>
+            </label>
+            <label class="profile-grid-wide">
               <span class="label-inline-row">
                 <span data-i18n="portal.field.taxiPickup">Taxi pickup address</span>
                 <button type="button" class="floqr-help-popout" data-floqr-help-id="help-taxi-pickup-address" aria-label="Help">?</button>
@@ -139,15 +157,18 @@
                 <label><span data-i18n="portal.field.city">City</span>
                   <input id="editTaxiCity" autocomplete="address-level2"/>
                 </label>
-                <label><span id="editTaxiPostalLabel" data-i18n="portal.field.zip">ZIP</span>
+                <label>
+                  <span id="editTaxiRegionLabel" data-i18n="portal.field.state">State</span>
+                  <select id="editTaxiRegion" autocomplete="address-level1"></select>
+                  <input id="editTaxiRegionText" autocomplete="address-level1" hidden/>
+                </label>
+                <label class="pickup-postal"><span id="editTaxiPostalLabel" data-i18n="portal.field.zip">ZIP</span>
                   <input id="editTaxiPostal" autocomplete="postal-code" placeholder="20005"/>
                 </label>
               </div>
               <input id="editTaxiPickupAddress" class="hidden" autocomplete="street-address"/>
               <p id="editTaxiHint" class="field-hint" role="status" hidden></p>
             </label>
-            <label><span data-i18n="portal.field.city">City</span> <input id="editCity"/></label>
-            <label><span data-i18n="portal.field.country">Country</span> <input id="editCountry"/></label>
             <label><span data-i18n="portal.field.preferredLanguage">Preferred Language</span>
               <select id="editLanguage">
                 <option value="">Select language</option>
@@ -935,55 +956,56 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.013"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.013"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.013"></script>
-<script src="./floqr-people-directory.js?v=s3.3.013"></script>
-<script src="./floqr-app-check.js?v=s3.3.013"></script>
-<script src="./floqr-nav.js?v=s3.3.013"></script>
-<script src="./floqr-qrcode-lib.js?v=s3.3.013"></script>
-<script src="./floqr-qr.js?v=s3.3.013"></script>
-<script src="./global-profile-status.js?v=s3.3.013"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.013"></script>
-<script src="./shared-data.js?v=s3.3.013"></script>
-<script src="./url-media-field.js?v=s3.3.013"></script>
-<script src="./ai-service.js?v=s3.3.013"></script>
-<script src="./ai-index-service.js?v=s3.3.013"></script>
-<script src="./ai-search-service.js?v=s3.3.013"></script>
-<script src="./ai-notification-service.js?v=s3.3.013"></script>
-<script src="./ai-template-studio.js?v=s3.3.013"></script>
-<script src="./ai-grammar-service.js?v=s3.3.013"></script>
-  <script src="./floqr-action-feedback.js?v=s3.3.013"></script>
-<script src="./floqr-tab-gates.js?v=s3.3.013"></script>
-<script src="./floqr-feature-services.js?v=s3.3.013"></script>
-<script src="./floqr-i18n.js?v=s3.3.013"></script>
-<script src="./floqr-geo-search.js?v=s3.3.013"></script>
-<script src="./floqr-profile-locale.js?v=s3.3.013"></script>
-<script src="./botdee-help-repository.js?v=s3.3.013"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.013"></script>
-<script src="./help-attach.js?v=s3.3.013"></script>
-<script src="./helper-popouts.js?v=s3.3.013"></script>
-<script src="./floqr-identity.js?v=s3.3.013"></script>
-<script src="./floqr-blocks.js?v=s3.3.013"></script>
-<script src="./payment-service.js?v=s3.3.013"></script>
-<script src="./dj-commerce-policy.js?v=s3.3.013"></script>
-<script src="./floqr-service-access.js?v=s3.3.013"></script>
-<script src="./floqr-venue-picker.js?v=s3.3.013"></script>
-<script src="./floqr-employee-network.js?v=s3.3.013"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.3.013"></script>
-<script src="./floqr-canonical.js?v=s3.3.013"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.013"></script>
-<script src="./floqr-consent-mode.js?v=s3.3.013"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.013"></script>
-<script src="./ad-campaigns.js?v=s3.3.013"></script>
-<script src="./floqr-ad-composer.js?v=s3.3.013"></script>
-<script src="./patron-ad-campaigns.js?v=s3.3.013"></script>
-<script src="./floqr-access-notice.js?v=s3.3.013"></script>
-<script src="./floqr-safe-render.js?v=s3.3.013"></script>
-<script src="./floqr-board-frame.js?v=s3.3.013"></script>
-<script src="./floqr-template-preview.js?v=s3.3.013"></script>
-<script src="./patron-portal-app.js?v=s3.3.013"></script>
-  <script src="./profile-access-guard.js?v=s3.3.013"></script>
+<script src="./firebase-config.js?v=s3.3.014"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.014"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.014"></script>
+<script src="./floqr-people-directory.js?v=s3.3.014"></script>
+<script src="./floqr-app-check.js?v=s3.3.014"></script>
+<script src="./floqr-nav.js?v=s3.3.014"></script>
+<script src="./floqr-qrcode-lib.js?v=s3.3.014"></script>
+<script src="./floqr-qr.js?v=s3.3.014"></script>
+<script src="./global-profile-status.js?v=s3.3.014"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.014"></script>
+<script src="./shared-data.js?v=s3.3.014"></script>
+<script src="./url-media-field.js?v=s3.3.014"></script>
+<script src="./ai-service.js?v=s3.3.014"></script>
+<script src="./ai-index-service.js?v=s3.3.014"></script>
+<script src="./ai-search-service.js?v=s3.3.014"></script>
+<script src="./ai-notification-service.js?v=s3.3.014"></script>
+<script src="./ai-template-studio.js?v=s3.3.014"></script>
+<script src="./ai-grammar-service.js?v=s3.3.014"></script>
+  <script src="./floqr-action-feedback.js?v=s3.3.014"></script>
+<script src="./floqr-tab-gates.js?v=s3.3.014"></script>
+<script src="./floqr-feature-services.js?v=s3.3.014"></script>
+<script src="./floqr-i18n.js?v=s3.3.014"></script>
+<script src="./floqr-geo-search.js?v=s3.3.014"></script>
+<script src="./floqr-geo-catalog.js?v=s3.3.014"></script>
+<script src="./floqr-profile-locale.js?v=s3.3.014"></script>
+<script src="./botdee-help-repository.js?v=s3.3.014"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.014"></script>
+<script src="./help-attach.js?v=s3.3.014"></script>
+<script src="./helper-popouts.js?v=s3.3.014"></script>
+<script src="./floqr-identity.js?v=s3.3.014"></script>
+<script src="./floqr-blocks.js?v=s3.3.014"></script>
+<script src="./payment-service.js?v=s3.3.014"></script>
+<script src="./dj-commerce-policy.js?v=s3.3.014"></script>
+<script src="./floqr-service-access.js?v=s3.3.014"></script>
+<script src="./floqr-venue-picker.js?v=s3.3.014"></script>
+<script src="./floqr-employee-network.js?v=s3.3.014"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.3.014"></script>
+<script src="./floqr-canonical.js?v=s3.3.014"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.014"></script>
+<script src="./floqr-consent-mode.js?v=s3.3.014"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.014"></script>
+<script src="./ad-campaigns.js?v=s3.3.014"></script>
+<script src="./floqr-ad-composer.js?v=s3.3.014"></script>
+<script src="./patron-ad-campaigns.js?v=s3.3.014"></script>
+<script src="./floqr-access-notice.js?v=s3.3.014"></script>
+<script src="./floqr-safe-render.js?v=s3.3.014"></script>
+<script src="./floqr-board-frame.js?v=s3.3.014"></script>
+<script src="./floqr-template-preview.js?v=s3.3.014"></script>
+<script src="./patron-portal-app.js?v=s3.3.014"></script>
+  <script src="./profile-access-guard.js?v=s3.3.014"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

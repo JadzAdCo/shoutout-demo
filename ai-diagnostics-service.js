@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.013";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.013";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.014";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.014";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.014",
+      title: "s3.3.014 — Profile country dropdown, mobile (+dial), taxi State",
+      checks: [
+        {label:"Static geo catalog", file:"floqr-geo-catalog.js", includes:["FEATURED_HEAD", "United States", "toE164"]},
+        {label:"Profile country select", file:"patron-portal.html", includes:["editCountry", "editPhoneNational", "editTaxiRegion"]},
+        {label:"No redundant City", file:"patron-portal.html", notIncludes:["id=\"editCity\""]},
+        {label:"Search country select", file:"index.html", includes:["profileCountry", "profilePhoneNational", "profileTaxiRegion"]},
+        {label:"RydR taxi State", file:"pickup.html", includes:["pickupRegion"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-profile-geo"]}
+      ]
+    },
     {
       version: "s3.3.013",
       title: "s3.3.013 — United States height defaults to ft; other countries default to m",
@@ -3031,6 +3043,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-014-profile-geo",
+      area:"My Profile",
+      feature:"Country dropdown, mobile calling code, taxi State",
+      changed:"s3.3.014 — Country is a static in-page list (US, Canada, featured markets, then the rest). Featured countries have State/Province lists. Country fills Mobile (+1 for the United States). Taxi includes State; the extra City field is gone. Country sits above taxi. Phone is a compact (+dial) + national box for SMS/WhatsApp.",
+      howToTest:"1) Hard-refresh My Profile s3.3.014. 2) Open Country: United States first, Canada second, a ----, then France/Germany/Italy/Russia/Spain/Turkey/UAE/UK, another ----, then the rest A–Z. 3) Pick United States — Mobile shows (+1); taxi State is a 50-state + DC list; ZIP stays ZIP. 4) Type 2027330274 — it formats and Save Profile stores +12027330274. Type 123 and Save — blocked. 5) Pick France — Mobile (+33), height defaults to m, pickup label is Postal code, Region list appears. 6) Confirm there is only one City (inside taxi) and Country is above taxi. 7) Mark Succeed/Failed.",
+      expected:"Country list order matches the spec. US sets (+1) and State. Invalid mobile cannot save. No giant phone box. No second City field.",
+      troubleshoot:"Still a text Country box or huge phone input → hard-refresh patron-portal.html + floqr-geo-catalog.js + styles.css s3.3.014. Empty State list → country not one of the featured ten. Save rejects a good US number → enter 10 digits after (+1), not +1 again."
+    },
     {
       id:"s3-3-013-save-profile",
       area:"My Profile",

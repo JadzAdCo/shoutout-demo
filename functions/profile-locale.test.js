@@ -60,11 +60,11 @@ test("switching units converts a valid height instead of mixing formats", () => 
 
 test("pickup ZIP vs postal validation and compose", () => {
   const us = Locale.validatePickupParts(
-    {streetNumber: "1411", streetName: "K Street NW", city: "Washington", postalCode: "20005"},
+    {streetNumber: "1411", streetName: "K Street NW", city: "Washington", region: "DC", regionCode: "DC", postalCode: "20005"},
     {country: "United States"}
   );
   assert.equal(us.ok, true);
-  assert.equal(us.composed, "1411 K Street NW, Washington, 20005");
+  assert.equal(us.composed, "1411 K Street NW, Washington, DC 20005");
   const badZip = Locale.validatePickupParts(
     {streetNumber: "1411", streetName: "K Street NW", city: "Washington", postalCode: "ABC"},
     {country: "US"}
@@ -84,10 +84,11 @@ test("pickup ZIP vs postal validation and compose", () => {
 });
 
 test("splitPickupAddress recovers structured fields from a saved one-liner", () => {
-  const parts = Locale.splitPickupAddress("1411 K Street NW, Washington, 20005");
+  const parts = Locale.splitPickupAddress("1411 K Street NW, Washington, DC 20005");
   assert.equal(parts.streetNumber, "1411");
   assert.equal(parts.streetName, "K Street NW");
   assert.match(parts.city, /Washington/i);
+  assert.equal(parts.region, "DC");
   assert.equal(parts.postalCode, "20005");
 });
 
@@ -145,9 +146,14 @@ test("Search, Profile, and RydR load the locale helper and structured pickup fie
   assert.ok(index.indexOf("profileHeightUnit") < index.indexOf("id=\"profileHeight\""));
   assert.match(index, /<option value="" data-i18n="portal.field.heightUnit">Unit<\/option>/);
   assert.ok(index.indexOf('option value=""') < index.indexOf('option value="ft"'));
+  assert.match(index, /floqr-geo-catalog\.js/);
+  assert.match(portal, /floqr-geo-catalog\.js/);
+  assert.match(pickup, /floqr-geo-catalog\.js/);
   assert.match(index, /id="profileTaxiStreetNumber"/);
   assert.match(portal, /id="editTaxiStreetNumber"/);
+  assert.match(portal, /id="editTaxiRegion"/);
   assert.match(pickup, /id="pickupStreetNumber"/);
+  assert.match(pickup, /id="pickupRegion"/);
   assert.match(patron, /FLOQRProfileLocale/);
   assert.match(portalApp, /FLOQRProfileLocale/);
   assert.match(pickupApp, /FLOQRProfileLocale/);

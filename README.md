@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.013 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.014 (stable)
 
+- s3.3.014: United States height defaults to ft; every other country defaults to m
 - s3.3.013: United States height defaults to ft; every other country defaults to m
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)
 - s3.3.011: ShoutOut page trail (button → venue → splash → checkout), Continue to Checkout one-tap lock, BOT DEE frameless photo pop-out

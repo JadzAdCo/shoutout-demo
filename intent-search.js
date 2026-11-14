@@ -635,6 +635,28 @@
       patterns: [/\bheight\b/, /\bhow\s+tall\b/, /\bfeet\s*(and\s*)?(inches)?\b/, /\bmeters?\b/, /6'\s*0/]
     },
     {
+      id: "help-profile-country",
+      kind: "help",
+      label: "Country",
+      blurb: "United States is first, then Canada, then featured markets, then every other country. Country sets the mobile calling code and ZIP vs postal.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["country", "country dropdown", "united states", "canada", "select country", "state list"],
+      patterns: [/\bcountry\b/, /united\s+states/, /\bcanada\b/, /select\s+country/]
+    },
+    {
+      id: "help-profile-mobile",
+      kind: "help",
+      label: "Mobile",
+      blurb: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"],
+      patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/]
+    },
+    {
       id: "help-taxi-pickup-address",
       kind: "help",
       label: "Taxi pickup address",
@@ -950,7 +972,7 @@
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
-    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-taxi-pickup-address": ["patron"],
+    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],

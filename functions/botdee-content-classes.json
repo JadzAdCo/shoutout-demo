@@ -215,7 +215,13 @@
     "help-onboarding": [
       "masterAdmin"
     ],
+    "help-profile-country": [
+      "patron"
+    ],
     "help-profile-height": [
+      "patron"
+    ],
+    "help-profile-mobile": [
       "patron"
     ],
     "help-public-media-sharing": [
@@ -463,7 +469,13 @@
     "help-post-ad": [
       "patron"
     ],
+    "help-profile-country": [
+      "patron"
+    ],
     "help-profile-height": [
+      "patron"
+    ],
+    "help-profile-mobile": [
       "patron"
     ],
     "help-promoter": [
