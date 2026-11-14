@@ -44,6 +44,16 @@ Unit-first height and structured taxi pickup. Profile country wins; if empty, IP
 | Data | `users.country` (English name) + `countryCode`; `region` / `regionCode`; `phone` E.164; taxi region fields |
 | Help | `help-profile-country`, `help-profile-mobile` |
 
+**Portal tab restore + ShoutOut editor first field (s3.3.015):** Clicking **My Profile** (and every other portal tab) writes `?tab=` + `#panelId` via `history.replaceState`, same idea as Club Admin hashes. Hard refresh on My Profile reopens My Profile instead of Overview. SessionStorage is a reload-only fallback (a fresh Search → Portal navigate still lands on Overview unless `?tab=` is set). After Throw a ShoutOut → Use a template, `goToEditor` scrolls to and focuses the first visible composer field (`#mainText` Message, or Team / jersey fields when Message is hidden).
+
+| Piece | Wiring |
+|---|---|
+| Module | `floqr-portal-tabs.js` (`window.FLOQRPortalTabs`) — `resolve` / `persistHref` |
+| Surfaces | `patron-portal.html` tabs; Search `index.html` ShoutOut editor |
+| Client | `patron-portal-app.js` `persistPortalTab` / `restorePortalTabFromUrl`; `patron-app.js` `focusFirstEditorInput` |
+| URL | `patron-portal.html?tab=profile#portalProfile` (Overview drops `tab` and uses `#portalOverview`) |
+| Tests | `functions/portal-tab-persist.test.js`, `functions/editor-first-field.test.js` |
+
 **Save Profile crash (s3.3.013):** My Profile **Save Profile** reloads the portal after the Firestore write. `renderPolicies` called `FLOQRI18n.t(key, null)`, and `t()` did `Object.keys(null)` → `Cannot convert undefined or null to object`. `t` / `tIn` now coerce non-object vars to `{}`. Portal policy helper uses `vars || {}`. A failed reload after a successful write no longer reports the save as failed.
 
 | Piece | Wiring |

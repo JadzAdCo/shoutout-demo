@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.014 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.015 (stable)
 
+- s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
 - s3.3.014: United States height defaults to ft; every other country defaults to m
 - s3.3.013: United States height defaults to ft; every other country defaults to m
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)

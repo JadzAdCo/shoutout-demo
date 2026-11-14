@@ -400,6 +400,17 @@
     parent?.classList.add("active");
   }
 
+  function persistPortalTab(panelId, extra = {}) {
+    const Tabs = window.FLOQRPortalTabs;
+    if (!Tabs?.persistHref || !panelId) return;
+    try { sessionStorage.setItem(Tabs.STORAGE_KEY, panelId); } catch (_) { /* ignore */ }
+    try {
+      const next = Tabs.persistHref(window.location.href, panelId, extra);
+      const cur = window.location.pathname + window.location.search + window.location.hash;
+      if (next && next !== cur) history.replaceState(null, "", next);
+    } catch (_) { /* ignore */ }
+  }
+
   function showPortalPanel(panelId, tabPanelId = "") {
     let resolved = panelId;
     let foPane = "";
@@ -425,6 +436,9 @@
       hidePortalFoSubtabs();
     }
     syncInboxComposeChrome();
+    persistPortalTab(resolved, {
+      sub: resolved === "portalFeatureOrders" ? (window.FLOQRPortalTabs?.subForFoPane?.(foPane) || "") : ""
+    });
   }
 
   function showFeatureOrdersPane(paneId) {
@@ -448,6 +462,9 @@
       const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
       if (!activeSub) showShoutoutPane("shoutoutSavedPane");
     }
+    persistPortalTab("portalFeatureOrders", {
+      sub: window.FLOQRPortalTabs?.subForFoPane?.(target) || ""
+    });
   }
 
   function renderFeatureOrdersStatus() {
@@ -586,92 +603,51 @@
       if (!btn) return;
       showShoutoutPane(btn.dataset.soPane);
     });
-    const tab = new URL(window.location.href).searchParams.get("tab");
-    if (tab) {
-      if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({from:"portal"});
-        const room = new URL(window.location.href).searchParams.get("room");
-        if (room) params.set("room", room);
-        window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
-        return;
+    restorePortalTabFromUrl();
+    window.addEventListener("hashchange", () => {
+      const hash = String(location.hash.replace(/^#/, "") || "").trim();
+      if (hash && window.FLOQRPortalTabs?.knownPanel?.(hash) && byId(hash)) {
+        showPortalPanel(hash, hash);
       }
-      const map = {
-        messages:"portalMessages",
-        inbox:"portalMessages",
-        help:"portalHelp",
-        profile:"portalProfile",
-        public:"portalPublicProfile",
-        media:"portalPublicProfile",
-        settings:"portalProfile",
-        language:"portalLanguageSettings",
-        "language-settings":"portalLanguageSettings",
-        appearance:"portalAppearance",
-        chrome:"portalAppearance",
-        "site-chrome":"portalAppearance",
-        "sitechrome":"portalAppearance",
-        theme:"portalAppearance",
-        "my-privacy":"portalPrivacy",
-        "ai-notifications":"portalAiNotifications",
-        templates:"portalFeatureOrders",
-        "my-templates":"portalFeatureOrders",
-        privacy:"portalPrivacy",
-        bartr:"portalBartrStore",
-        commerce:"portalBartrStore",
-        store:"portalBartrStore",
-        "ad-campaigns":"portalAdCampaigns",
-        adcampaigns:"portalAdCampaigns",
-        advertise:"portalAdCampaigns",
-        ads:"portalAdCampaigns",
-        "mingl-friends":"portalMinglFriends",
-        friends:"portalMinglFriends",
-        unmingl:"portalMinglFriends",
-        "work-calendar":"portalWorkCalendar",
-        workcalendar:"portalWorkCalendar",
-        "staff-calendar":"portalWorkCalendar",
-        "service-members":"portalServiceMembers",
-        servicemembers:"portalServiceMembers",
-        "role-request":"portalServiceMembers",
-        shoutouts:"portalFeatureOrders",
-        myshoutouts:"portalFeatureOrders",
-        "my-shoutouts":"portalFeatureOrders",
-        shoutout:"portalFeatureOrders",
-        "feature-orders":"portalFeatureOrders",
-        featureorders:"portalFeatureOrders",
-        "paid-services":"portalFeatureOrders",
-        invoices:"portalFeatureOrders",
-        reservations:"portalFeatureOrders",
-        "guest-list-reserv":"portalFeatureOrders",
-        vip:"portalFeatureOrders",
-        "vip-reservations":"portalFeatureOrders",
-        vipreservations:"portalFeatureOrders",
-        passes:"portalFeatureOrders",
-        pass:"portalFeatureOrders",
-        "door-pass":"portalFeatureOrders",
-        doorpass:"portalFeatureOrders"
-      };
-      const mapped = map[tab] || "";
-      const btn = document.querySelector(`[data-panel='${mapped}']`);
-      if (btn) btn.click();
-      else if (mapped) showPortalPanel(mapped, mapped);
-      if (mapped === "portalFeatureOrders") {
-        const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
-        if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations", "passes", "pass", "door-pass", "doorpass"].includes(tab) || sub === "vip" || sub === "reserv" || sub === "passes") {
-          showFeatureOrdersPane("foVipPane");
-        } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
-          showFeatureOrdersPane("foShoutoutsPane");
-          if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
-          else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
-          else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
-          else if (sub === "saved") showShoutoutPane("shoutoutSavedPane");
-          else if (sub === "pending") showShoutoutPane("shoutoutPendingPane");
-          else showShoutoutPane("shoutoutSavedPane");
-        } else if (["paid-services", "invoices"].includes(tab) || sub === "invoices") {
-          showFeatureOrdersPane("foInvoicesPane");
-        } else if (sub === "floqcast" || sub === "floqcasts") {
-          showFeatureOrdersPane("foFloqCastsPane");
-        } else {
-          showFeatureOrdersPane("foStatusPane");
-        }
+    });
+  }
+
+  function restorePortalTabFromUrl() {
+    const Tabs = window.FLOQRPortalTabs;
+    let stored = "";
+    try { stored = sessionStorage.getItem(Tabs?.STORAGE_KEY || "floqr.portalPanel") || ""; } catch (_) { /* ignore */ }
+    const found = Tabs?.resolve?.({ href: window.location.href, stored }) || {};
+    const tab = String(found.tab || new URL(window.location.href).searchParams.get("tab") || "").trim().toLowerCase();
+    if (found.redirectMingl || ["chats","mingl","mingl-chat"].includes(tab)) {
+      const params = new URLSearchParams({from:"portal"});
+      const room = new URL(window.location.href).searchParams.get("room");
+      if (room) params.set("room", room);
+      window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
+      return;
+    }
+    const mapped = found.panelId || "";
+    if (!mapped) return;
+    const btn = document.querySelector(`[data-panel='${mapped}']`);
+    if (btn) btn.click();
+    else showPortalPanel(mapped, mapped);
+    if (mapped === "portalFeatureOrders") {
+      const sub = String(new URL(window.location.href).searchParams.get("sub") || new URL(window.location.href).searchParams.get("pane") || "").trim().toLowerCase();
+      if (["reservations", "vip", "vip-reservations", "guest-list-reserv", "vipreservations", "passes", "pass", "door-pass", "doorpass"].includes(tab) || sub === "vip" || sub === "reserv" || sub === "passes") {
+        showFeatureOrdersPane("foVipPane");
+      } else if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(tab) || sub === "shoutouts") {
+        showFeatureOrdersPane("foShoutoutsPane");
+        if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
+        else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+        else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
+        else if (sub === "saved") showShoutoutPane("shoutoutSavedPane");
+        else if (sub === "pending") showShoutoutPane("shoutoutPendingPane");
+        else showShoutoutPane("shoutoutSavedPane");
+      } else if (["paid-services", "invoices"].includes(tab) || sub === "invoices") {
+        showFeatureOrdersPane("foInvoicesPane");
+      } else if (sub === "floqcast" || sub === "floqcasts") {
+        showFeatureOrdersPane("foFloqCastsPane");
+      } else {
+        showFeatureOrdersPane("foStatusPane");
       }
     }
   }

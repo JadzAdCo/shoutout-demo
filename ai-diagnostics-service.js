@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.014";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.014";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.015";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.015";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.015",
+      title: "s3.3.015 — My Profile refresh stays on My Profile; ShoutOut editor focuses Message",
+      checks: [
+        {label:"Portal tab persist helper", file:"floqr-portal-tabs.js", includes:["persistHref", "tab=profile", "STORAGE_KEY"]},
+        {label:"Portal restore on load", file:"patron-portal-app.js", includes:["persistPortalTab", "restorePortalTabFromUrl"]},
+        {label:"Editor first field", file:"patron-app.js", includes:["focusFirstEditorInput", "firstEditorInput"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-015-portal-tab-editor-focus"]}
+      ]
+    },
     {
       version: "s3.3.014",
       title: "s3.3.014 — Profile country dropdown, mobile (+dial), taxi State",
@@ -3043,6 +3053,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-015-portal-tab-editor-focus",
+      area:"My Profile / ShoutOut",
+      feature:"Portal tab restore + editor first field",
+      changed:"s3.3.015 — Hard refresh on My Profile stays on My Profile (URL ?tab=profile). Throw a ShoutOut → Use a template opens the editor on the first input (Message).",
+      howToTest:"1) Hard-refresh My Profile s3.3.015, sign in, open My Profile. Confirm the address bar has tab=profile. 2) Hard refresh that tab. Confirm Edit Profile is still showing — not Overview. 3) Open Search → Throw a ShoutOut → pick a venue → Use a classic template. Confirm the caret is in Enter ShoutOut Here (Message) and that box is in view. 4) Mark Succeed/Failed.",
+      expected:"Refresh keeps My Profile. Template Use lands on the Message box (or the first jersey field when Message is hidden).",
+      troubleshoot:"Refresh still Overview → hard-refresh patron-portal.html + floqr-portal-tabs.js + patron-portal-app.js s3.3.015 and confirm ?tab=profile after clicking My Profile. Editor opens mid-preview → hard-refresh index.html + patron-app.js; confirm goToEditor calls focusFirstEditorInput."
+    },
     {
       id:"s3-3-014-profile-geo",
       area:"My Profile",

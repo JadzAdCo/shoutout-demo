@@ -6142,6 +6142,47 @@
     screenSelect.disabled = !supported.length;
   }
 
+  function editorFieldIsVisible(el) {
+    if (!el || el.disabled) return false;
+    const type = String(el.type || "").toLowerCase();
+    if (["hidden", "file", "button", "submit", "checkbox", "radio", "reset", "image"].includes(type)) return false;
+    let node = el;
+    while (node && node !== document.documentElement) {
+      if (node.hidden) return false;
+      if (node.classList?.contains("hidden")) return false;
+      node = node.parentElement;
+    }
+    return true;
+  }
+
+  function firstEditorInput(page) {
+    if (!page) return null;
+    const main = page.querySelector("#mainText") || byId("mainText");
+    if (main && editorFieldIsVisible(main)) return main;
+    const nodes = page.querySelectorAll("textarea, input, select");
+    for (const el of nodes) {
+      if (editorFieldIsVisible(el)) return el;
+    }
+    return null;
+  }
+
+  function focusFirstEditorInput() {
+    const page = byId("editorPage");
+    const target = firstEditorInput(page);
+    if (!target) return;
+    try { window.scrollTo(0, 0); } catch (_) { /* ignore */ }
+    try {
+      const topbar = page?.querySelector?.(".topbar");
+      const offset = (topbar?.getBoundingClientRect?.().height || topbar?.offsetHeight || 0) + 12;
+      const top = window.scrollY + target.getBoundingClientRect().top - offset;
+      window.scrollTo(0, Math.max(0, top));
+    } catch (_) {
+      try { target.scrollIntoView({ block: "start", inline: "nearest" }); } catch (_) { /* ignore */ }
+    }
+    try { target.focus({ preventScroll: true }); }
+    catch (_) { try { target.focus(); } catch (_) { /* ignore */ } }
+  }
+
   function goToEditor() {
     shoutoutTemplateChosen = true;
     const l=getLocation(), t=getTemplate();
@@ -6158,6 +6199,9 @@
     applyReuseShoutoutDraft({ clear: true });
     updatePreview();
     showPage("editorPage");
+    const focus = () => focusFirstEditorInput();
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => requestAnimationFrame(focus));
+    else setTimeout(focus, 0);
     try { window.FLOQRClientIp?.ensure?.(); } catch (_) {}
   }
 
