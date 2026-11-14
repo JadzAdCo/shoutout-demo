@@ -2393,9 +2393,10 @@
       } else if (resumed) {
         setText("masterActionFeedback", `Opened ${panelLabel(resumed)}.`);
       }
-      /* Do not pull Diagnostics (27 collections + package file fetches), AI crawl
-         queues, duplicate scans, commerce orders, templates, or recommendations on
-         every sign-in — that freezes Master Admin. Those mount when their panel opens. */
+      /* Do not pull 1000 users/shoutouts on every sign-in — that freezes Master Admin
+         (Features / Svc, Entity Mgmt, deep links). Also do not pull Diagnostics
+         (27 collections + package file fetches), AI crawl queues, duplicate scans,
+         commerce orders, templates, or recommendations. Those mount when their panel opens. */
       loadLightLocations().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});

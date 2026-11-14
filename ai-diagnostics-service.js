@@ -3000,9 +3000,9 @@
       area:"Master Admin",
       feature:"Sign-in load — defer heavy Diagnostics / crawl / commerce",
       changed:"s3.3.010 — Master Admin sign-in no longer runs Diagnostics refresh (27 collections + package file fetches), AI Crawling queue + listing delete, Duplicate Records scan, Services & Commerce 750×3, templates, or recommendations. Those mount when their panel opens.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.3.010 and sign in. 2) Network Dashboard should appear usable within a few seconds (not a long freeze). 3) Open Diagnostics → Run Diagnostics — then the heavy refresh runs. 4) Open AI Crawling / Services & Commerce / Duplicate Records only when needed. 5) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html (package s3.3.010) and sign in. 2) Network Dashboard should appear usable within a few seconds (not a long freeze). 3) Open Diagnostics → Run Diagnostics — then the heavy refresh runs. 4) Open AI Crawling / Services & Commerce / Duplicate Records only when needed. 5) Mark Succeed/Failed.",
       expected:"Sign-in is responsive; heavy Firestore/file work starts only after opening those panels.",
-      troubleshoot:"Still freezes on sign-in → hard-refresh master-admin-app.js s3.3.010; confirm onAuth no longer calls FLOQRDiagnostics.mount. Empty Diagnostics until opened is expected — press Refresh there."
+      troubleshoot:"Still freezes on sign-in → hard-refresh Master Admin (cache-bust master-admin-app.js); confirm onAuth no longer calls FLOQRDiagnostics.mount. Empty Diagnostics until opened is expected — press Refresh there."
     },
     {
       id:"s3-3-009-botdee-public-datapoints",
