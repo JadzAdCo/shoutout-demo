@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.012 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.014 (stable)
 
+- s3.3.014: PHILA retire + Master Admin 5-min rollup + BOT DEE chat-only
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)
 - s3.3.012: retire PHILA front+back pair template; keep nbaPhiladelphia76ers (76ERS)
 - s3.3.011: ShoutOut page trail (button → venue → splash → checkout), Continue to Checkout one-tap lock, BOT DEE frameless photo pop-out
