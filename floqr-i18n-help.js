@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.009";
+  const VERSION = "s3.3.010";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {

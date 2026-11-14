@@ -673,20 +673,27 @@
     await mergePairByIds(primaryId, duplicateIds);
   }
 
+  let duplicatePanelBound = false;
+  let duplicatePanelLoading = null;
   async function mount(options = {}) {
     db = options.db || db;
     auth = options.auth || auth;
     if (!db || !auth || !byId("duplicateRecords")) return;
-    byId("refreshDuplicateRecordsBtn")?.addEventListener("click", refreshDuplicateDiagnostics);
-    byId("duplicateRecordSearch")?.addEventListener("input", () => {
-      renderDuplicateGroups();
-      const query = byId("duplicateRecordSearch")?.value.trim() || "";
-      const visible = filterGroups(duplicateGroups).length;
-      setStatus(query ? `Search filter applied to last live scan: "${query}" (${visible} visible group(s)).` : `Search cleared. Showing ${visible} duplicate group(s) from the last live scan.`);
-    });
-    byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
-    byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
-    await refreshDuplicateDiagnostics();
+    if (duplicatePanelLoading) return duplicatePanelLoading;
+    if (!duplicatePanelBound) {
+      duplicatePanelBound = true;
+      byId("refreshDuplicateRecordsBtn")?.addEventListener("click", refreshDuplicateDiagnostics);
+      byId("duplicateRecordSearch")?.addEventListener("input", () => {
+        renderDuplicateGroups();
+        const query = byId("duplicateRecordSearch")?.value.trim() || "";
+        const visible = filterGroups(duplicateGroups).length;
+        setStatus(query ? `Search filter applied to last live scan: "${query}" (${visible} visible group(s)).` : `Search cleared. Showing ${visible} duplicate group(s) from the last live scan.`);
+      });
+      byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
+      byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
+    }
+    duplicatePanelLoading = refreshDuplicateDiagnostics().finally(() => { duplicatePanelLoading = null; });
+    return duplicatePanelLoading;
   }
 
   window.FLOQRDuplicateRecords = {
