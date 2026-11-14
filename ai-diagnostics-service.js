@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.009";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.009";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.010";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.010";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.010",
+      title: "s3.3.010 — Master Admin sign-in load perf (defer heavy panels)",
+      checks: [
+        {label:"Sign-in skips Diagnostics mount", file:"master-admin-app.js", includes:["Do not pull Diagnostics", "loadLightLocations"]},
+        {label:"activatePanel mounts Diagnostics", file:"master-admin-app.js", includes:["FLOQRDiagnostics?.mount", "FLOQRMasterServices?.mount"]},
+        {label:"Services lazy mount", file:"master-services-extension.js", includes:["FLOQRMasterServices", "async function mount("]},
+        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "never on Master Admin sign-in"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-010-master-admin-load-perf"]}
+      ]
+    },
     {
       version: "s3.3.009",
       title: "s3.3.009 — BOT DEE public profile datapoints + photo gallery",
@@ -2984,6 +2995,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-010-master-admin-load-perf",
+      area:"Master Admin",
+      feature:"Sign-in load — defer heavy Diagnostics / crawl / commerce",
+      changed:"s3.3.010 — Master Admin sign-in no longer runs Diagnostics refresh (27 collections + package file fetches), AI Crawling queue + listing delete, Duplicate Records scan, Services & Commerce 750×3, templates, or recommendations. Those mount when their panel opens.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.3.010 and sign in. 2) Network Dashboard should appear usable within a few seconds (not a long freeze). 3) Open Diagnostics → Run Diagnostics — then the heavy refresh runs. 4) Open AI Crawling / Services & Commerce / Duplicate Records only when needed. 5) Mark Succeed/Failed.",
+      expected:"Sign-in is responsive; heavy Firestore/file work starts only after opening those panels.",
+      troubleshoot:"Still freezes on sign-in → hard-refresh master-admin-app.js s3.3.010; confirm onAuth no longer calls FLOQRDiagnostics.mount. Empty Diagnostics until opened is expected — press Refresh there."
+    },
     {
       id:"s3-3-009-botdee-public-datapoints",
       area:"BOT DEE / Profiles / Mingl",
@@ -9756,27 +9776,36 @@
     }));
   }
 
+  let mountInFlight = null;
   async function mount(options = {}) {
-    state.db = options.db;
-    state.auth = options.auth;
-    state.storage = options.storage || (window.firebase?.storage ? firebase.storage() : null);
+    state.db = options.db || state.db;
+    state.auth = options.auth || state.auth;
+    state.storage = options.storage || state.storage || (window.firebase?.storage ? firebase.storage() : null);
     if (!state.db) {
       setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
       return;
     }
-    if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
-    hydrateDefaultControls();
-    if (!state.mounted) {
-      state.mounted = true;
-      bindControls();
-    }
-    const schedule = await readScheduleSafe();
-    if (schedule) applyScheduleToControls(schedule);
-    renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
-    renderSourceExtractionReport();
-    renderCrawlContactExport();
-    renderPackageDiagnosticsArchives();
-    await refreshDiagnostics();
+    /* Idempotent: panel activate + deep-link must not re-run the full suite every click. */
+    if (state.diagnosticsReady) return state.lastFeatures ? {cached: true} : null;
+    if (mountInFlight) return mountInFlight;
+    mountInFlight = (async () => {
+      if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
+      hydrateDefaultControls();
+      if (!state.mounted) {
+        state.mounted = true;
+        bindControls();
+      }
+      const schedule = await readScheduleSafe();
+      if (schedule) applyScheduleToControls(schedule);
+      renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+      renderSourceExtractionReport();
+      renderCrawlContactExport();
+      renderPackageDiagnosticsArchives();
+      /* Full refresh (27 collections + package file fetches) only when Diagnostics opens — never on Master Admin sign-in. */
+      await refreshDiagnostics();
+      state.diagnosticsReady = true;
+    })().finally(() => { mountInFlight = null; });
+    return mountInFlight;
   }
 
   window.FLOQRDiagnostics = {

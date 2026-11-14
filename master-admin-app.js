@@ -342,7 +342,24 @@
       }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
+        /* Heavy: 27 collection reads + package file fetches — only when Diagnostics is opened. */
+        window.FLOQRDiagnostics?.mount?.({db, auth, storage});
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
+      }
+      if (panelId === "aiCrawling") {
+        window.FLOQRAIDiscovery?.mountMasterAdminPanel?.({db, auth});
+      }
+      if (panelId === "duplicateRecords") {
+        window.FLOQRDuplicateRecords?.mount?.({db, auth});
+      }
+      if (panelId === "servicesCommerce") {
+        window.FLOQRMasterServices?.mount?.();
+      }
+      if (panelId === "templateManagement") {
+        loadManagedTemplates().catch(() => {});
+      }
+      if (panelId === "recommendationModeration") {
+        loadRecommendationModeration().catch(() => {});
       }
       if (panelId === "translationOverrides") {
         window.FLOQRMasterTranslationOverrides?.mount?.();
@@ -2376,8 +2393,9 @@
       } else if (resumed) {
         setText("masterActionFeedback", `Opened ${panelLabel(resumed)}.`);
       }
-      /* Do not pull 1000 users/shoutouts on every sign-in — that freezes Master Admin
-         (Features / Svc, Entity Mgmt, deep links). Dashboard stats load on demand. */
+      /* Do not pull Diagnostics (27 collections + package file fetches), AI crawl
+         queues, duplicate scans, commerce orders, templates, or recommendations on
+         every sign-in — that freezes Master Admin. Those mount when their panel opens. */
       loadLightLocations().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});
@@ -2386,11 +2404,8 @@
       if (hashPanelId() === "networkDashboard" || resumed === "networkDashboard") {
         loadNetworkReports({force: false});
       }
-      loadManagedTemplates();
-      loadRecommendationModeration();
-      if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
-      if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
-      if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});
+      /* Wire ShoutOut compliance button handlers only (no venue/log fetch until panel).
+         Deep-linked heavy panels are mounted by resumeDeepLinkPanel → activatePanel. */
       if (window.FLOQRMasterShoutouts) window.FLOQRMasterShoutouts.mount();
       if (window.FLOQRAppLogging) window.FLOQRLog?.write?.({
         level: "info",

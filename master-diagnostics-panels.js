@@ -240,7 +240,18 @@
   }
 
   function ensureMounted() {
-    // Placeholder for future lazy mounts; diagnostics core still boots from master-admin-app.
+    /* Diagnostics core mounts lazily from activatePanel (Run Diagnostics / Manual Tests / Archives). */
+    try {
+      const auth = window.firebase?.auth?.();
+      const db = window.firebase?.firestore?.();
+      if (auth?.currentUser && db && window.FLOQRDiagnostics?.mount) {
+        window.FLOQRDiagnostics.mount({
+          db,
+          auth,
+          storage: window.firebase?.storage?.() || null
+        });
+      }
+    } catch (_) { /* ignore */ }
   }
 
   function bind() {
