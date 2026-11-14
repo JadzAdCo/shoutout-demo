@@ -73,9 +73,21 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
 
 .botdee-chat-header {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Icon + title + ? on one row (feature-landing title-row pattern). */
+.botdee-chat-header-main {
+  display: flex;
   align-items: center;
   gap: 12px;
-  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .botdee-chat-icon {
@@ -87,9 +99,12 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   box-shadow: 0 0 0 1px rgba(0, 212, 254, 0.35);
 }
 
-.botdee-chat-heading {
+.botdee-chat-header .botdee-title-row {
   flex: 1 1 auto;
   min-width: 0;
+  justify-content: flex-start; /* beside title, not centered across the page */
+  width: auto;
+  max-width: 100%;
 }
 
 .botdee-chat-title {
@@ -99,15 +114,27 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1.15;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Full-width under the title row — never squeeze into a 1-char column on mobile. */
 .botdee-scope-note {
-  margin: 2px 0 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
   opacity: 0.85;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.35;
 }
 
 .botdee-chat-header,
-.botdee-chat-heading,
+.botdee-chat-header-main,
 .botdee-shell,
 .botdee-chat-page {
   overflow: visible;
@@ -117,7 +144,8 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   flex: 0 0 auto;
   position: relative;
   z-index: 30;
-  /* ? sits on the right of the header — open the panel leftward by default */
+  /* Prefer open leftward — ? is near the left; left:0 would push a 320px panel off-screen on phone.
+     helper-popouts.js fitHelpPopoutInViewport still flips via data-help-align when needed. */
   --help-anchor: end;
 }
 
@@ -127,6 +155,7 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   right: 0;
   width: min(320px, calc(100vw - 28px));
   max-width: calc(100vw - 28px);
+  box-sizing: border-box;
 }
 
 .botdee-transcript {

@@ -196,6 +196,16 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = 
       uiLanguage: lang
     };
   }
+  if (bot.isVersionPrompt(userPrompt)) {
+    return {
+      reply: bot.versionReply(),
+      results: [],
+      provider: "local-version",
+      model: "version",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
   const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
   return {
     reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(search, lang, allowed), allowed),

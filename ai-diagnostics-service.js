@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.007";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.007";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.008";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.008";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.008",
+      title: "s3.3.008 — BOT DEE mobile header, about-me/friends public profiles, version",
+      checks: [
+        {label:"Title-row header", file:"botdee.html", includes:["botdee-chat-header-main", "feature-landing-title-row", "botDeeScopeNote"]},
+        {label:"Scope note full width", file:"bot-dee-chat.css", includes:["flex-direction: column", ".botdee-scope-note"]},
+        {label:"Self + connections lookup", file:"functions/bot-dee-tools.js", includes:["isSelfProfileQuery", "loadConnectedUids", "relation: \"self\""]},
+        {label:"Version local reply", file:"functions/bot-dee-core.js", includes:["isVersionPrompt", "versionReply", "PACKAGE_LABEL"]},
+        {label:"Client version mirror", file:"bot-dee-chat.js", includes:["isVersionPrompt", "versionReply", "botdee.chatVersion"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-008-botdee-mobile-profile-version"]}
+      ]
+    },
     {
       version: "s3.3.007",
       title: "s3.3.007 — Stripe sandbox wiring (Connect → VIP + destination charges)",
@@ -2962,6 +2974,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-008-botdee-mobile-profile-version",
+      area:"BOT DEE",
+      feature:"Mobile header + public me/friends + version",
+      changed:"botdee.html / bot-dee-chat.css title-row ?; lookupPublicProfiles self+connections; versionReply",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.008) on a phone-width viewport signed in with botDee. 2) Confirm BOT DEE title has ? immediately beside it (not a mid-screen bar) and “Showing answers for …” wraps normally as a full-width line (not vertical one-letter columns). 3) Ask “what do you know about me?” — BOT DEE summarizes your public-facing profile fields/photos. 4) Ask “what do you know about my friend <Name>” for a Mingl/chat connection with a public profile — answers from that public card. 5) Ask “what is your version?” / “version info” — reply names package s3.3.008. 6) Mark Succeed/Failed.",
+      expected:"Mobile title+? layout correct; about-me and friend public profiles work; version stamp spoken.",
+      troubleshoot:"If scope text is still vertical, confirm bot-dee-chat.css has .botdee-chat-header flex-direction:column and #botDeeScopeNote is outside the title row. If about-me fails, redeploy executeBotSession from origin/main and confirm lookupPublicProfiles selfQuery path. If version missing, check isVersionPrompt local path + PACKAGE_LABEL in bot-dee-core.js."
+    },
     {
       id:"s3-3-007-stripe-sandbox-wire",
       area:"Stripe / Checkout / VIP / Connect",

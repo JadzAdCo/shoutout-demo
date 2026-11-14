@@ -157,6 +157,43 @@ test("Name / pronunciation is identity — not a search dump", () => {
   assert.match(local.reply, /bot/i);
 });
 
+test("Version / package questions answer with FLOQR stamp", () => {
+  assert.equal(bot.isVersionPrompt("what is your version?"), true);
+  assert.equal(bot.isVersionPrompt("version info"), true);
+  assert.equal(bot.isVersionPrompt("what package are you on"), true);
+  assert.equal(bot.isVersionPrompt("name your version info"), true);
+  assert.equal(bot.isVersionPrompt("what version of FLOQR"), true);
+  assert.equal(bot.isVersionPrompt("what version of the app"), true);
+  assert.equal(bot.isVersionPrompt("what version"), true);
+  assert.equal(bot.isVersionPrompt("who are you"), false);
+  assert.equal(bot.isVersionPrompt("throw a shoutout"), false);
+  assert.equal(bot.isVersionPrompt("what is the VIP package"), false);
+  assert.equal(bot.isVersionPrompt("tell me about the ShoutOut package"), false);
+  assert.equal(bot.isVersionPrompt("what package for baller alert"), false);
+
+  const reply = bot.versionReply();
+  assert.match(reply, /BOT DEE/i);
+  assert.match(reply, new RegExp(bot.PACKAGE_LABEL.replace(/\./g, "\\."), "i"));
+  assert.doesNotMatch(reply, /Here is what I found/i);
+
+  assert.match(bot.systemInstruction("patron"), new RegExp(bot.PACKAGE_LABEL.replace(/\./g, "\\.")));
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("patron", "what is your version info?");
+  assert.equal(local.provider, "local-version");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /package/i);
+});
+
+test("lookupPublicProfiles tool covers me + friends in description", () => {
+  const decl = bot.toolDeclarations().find(t => t.name === "lookupPublicProfiles");
+  assert.ok(decl);
+  assert.match(String(decl.description), /me|myself/i);
+  assert.match(String(decl.description), /friend|connection|Mingl/i);
+  assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with query "me"/i);
+  assert.match(bot.systemInstruction("patron"), /friend or connection/i);
+});
+
 test("Gemini toolConfig uses AUTO without allowedFunctionNames", () => {
   const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-functions.js"), "utf8");
   assert.match(src, /FunctionCallingConfigMode\.AUTO/);

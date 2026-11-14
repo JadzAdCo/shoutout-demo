@@ -207,6 +207,42 @@
     return false;
   }
 
+  function packageLabel() {
+    try {
+      const nav = global.FLOQRNav;
+      const v = String(nav?.appVersion || (typeof nav?.currentVersion === "function" ? nav.currentVersion() : "") || "").trim();
+      if (v) return v.startsWith("s") ? v : `s${v}`;
+    } catch (_) {}
+    try {
+      const scripts = document.querySelectorAll("script[src*='bot-dee-chat.js']");
+      for (const el of scripts) {
+        const m = String(el.getAttribute("src") || "").match(/[?&]v=([^&#]+)/);
+        if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
+      }
+    } catch (_) {}
+    return "s3.3.008";
+  }
+
+  function isVersionPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 140) return false;
+    // Product commerce / feature wording — never hijack as FLOQR stamp.
+    if (/\b(?:shout\s*out|vip|floq\s*cast|floqcast|baller|jersey|template|checkout|stripe|deposit|table)\b/.test(q)) {
+      return false;
+    }
+    if (/\b(?:your|bot\s*dee|floqr|app|software)\s+(?:version|build|package|release)\b/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is)\s+(?:your|the)\s+(?:version|build)(?:\s+info|\s+number)?\b/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is)\s+(?:version|build)\s+of\s+(?:floqr|bot\s*dee|the\s+app|this\s+app|the\s+software)\b/.test(q)) return true;
+    if (/\b(?:version|build)\s+of\s+(?:floqr|bot\s*dee|the\s+app|this\s+app)\b/.test(q)) return true;
+    if (/^(?:what|which)\s+(?:version|build)\??$/.test(q)) return true;
+    if (/\b(?:what|which|whats|what s|what is|tell me|name)\b.{0,24}\b(?:your|bot\s*dee|floqr)\b.{0,20}\b(?:version|build|package|release)\b/.test(q)) return true;
+    if (/\b(?:what|which)\s+(?:package|release)\s+(?:are you|is this|is floqr|am i on)\b/.test(q)) return true;
+    if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;
+    if (/^(?:package|release)\s+(?:info|version|number)\??$/.test(q)) return true;
+    if (/\bversion\s+info\b/.test(q)) return true;
+    return false;
+  }
+
   function clampIdleSeconds(raw) {
     const n = Math.round(Number(raw));
     if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
@@ -266,6 +302,12 @@
       "botdee.chatIdentity",
       "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper."
     );
+  }
+
+  function versionReply() {
+    const label = packageLabel();
+    const template = t("botdee.chatVersion", "I'm BOT DEE on FLOQR package {version}.");
+    return String(template).replace(/\{version\}/g, label);
   }
 
   function stillHereReply() {
@@ -463,6 +505,7 @@
 
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
+    if (isVersionPrompt(text)) return versionReply();
     if (isAckPrompt(text)) return ackReply(text);
     if (isMoodPrompt(text)) return moodReply();
     if (isChitchatPrompt(text)) {
@@ -497,7 +540,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
       const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
@@ -512,7 +555,7 @@
     }
 
     // Substantive restart after idle (memory-only): one short welcome-back, then answer.
-    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text))) {
+    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
       const hello = resumeReply();
       appendBubble("bot", hello);
       pushHistory("model", hello);
