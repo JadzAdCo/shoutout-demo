@@ -2,9 +2,10 @@
 
 - s3.3.016: Site chrome applies on Back to Search and login without a manual refresh
 - s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
-- s3.3.014: United States height defaults to ft; every other country defaults to m
+- s3.3.014: Profile country dropdown + PHILA retire + Master Admin 5-min rollup + BOT DEE chat-only
 - s3.3.013: United States height defaults to ft; every other country defaults to m
 - s3.3.012: Height unit-first (ft/m guardrails) + structured RydR pickup (ZIP vs postal)
+- s3.3.012: retire PHILA front+back pair template; keep nbaPhiladelphia76ers (76ERS)
 - s3.3.011: ShoutOut page trail (button → venue → splash → checkout), Continue to Checkout one-tap lock, BOT DEE frameless photo pop-out
 - s3.3.010: Master Admin sign-in load — defer Diagnostics / AI crawl / commerce / duplicates until panel open
 - s3.3.009: BOT DEE public profile datapoints — opted-in music / food / travel / hobbies; photos as a gallery not storage URLs

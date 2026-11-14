@@ -38,19 +38,8 @@
         <img data-floqr-chrome-icon="botDee" src="./images/chrome/botdee-nightlife.jpg" alt="" class="botdee-chat-icon" width="56" height="56"/>
         <div class="botdee-title-row feature-landing-title-row">
           <h1 class="botdee-chat-title floqr-page-title" data-i18n="page.botdee.title">BOT DEE</h1>
-          <details class="help-popout botdee-help-popout" data-floqr-help-id="help-botdee-page">
-            <summary aria-label="Help" title="BOT DEE help">?</summary>
-            <div class="help-popout-body">
-              <strong data-i18n="page.botdee.title">BOT DEE</strong>
-              <p data-i18n="botdee.helpIntro">Ask BOT DEE anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools.</p>
-              <p data-i18n="botdee.helpComposer">Press Enter to send a message. Shift+Enter starts a new line. BOT DEE chats like a person — try “How are you?” — and only looks things up when you ask how to do something in FLOQR.</p>
-              <p class="sub small" data-i18n="botdee.helpScope">Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.</p>
-              <p class="sub small" data-i18n="botdee.helpPhotos">Signed-in BOT DEE uses the same public volunteered profile datapoints you can see. Tap a photo in the chat to pop it out. Close with X or Close to return to the chat.</p>
-            </div>
-          </details>
         </div>
       </div>
-      <p id="botDeeScopeNote" class="sub small botdee-scope-note" role="status"></p>
     </header>
 
     <div id="botDeeTranscript" class="botdee-transcript" aria-live="polite" aria-relevant="additions"></div>
@@ -64,58 +53,28 @@
       <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="botdee.chatSend">Send</button>
     </form>
   </section>
-
-  <!-- Intent search stays as a fast path / feature-optimized fallback -->
-  <details id="botDeeIntentFallback" class="botdee-intent-fallback">
-    <summary data-i18n="botdee.intentFallback">Quick intent search</summary>
-    <section id="intentSearchPage" class="page intent-search-page botdee-intent-page">
-      <div class="intent-search-shell botdee-top-stack">
-        <div class="botdee-search-main intent-search-main">
-          <div id="botDeeSearchPanel" class="botdee-search-panel open" aria-hidden="false">
-            <label class="intent-search-label" for="intentSearchInput">
-              <span id="botDeeHelpText" class="intent-help" data-i18n="botdee.prompt">Tell me what you want to do</span>
-              <input id="intentSearchInput" type="search" autocomplete="off" data-i18n-placeholder="botdee.placeholder" placeholder="Clubs near me · Create a schedule · Club website feed · ShoutOut" aria-describedby="intentSearchHint"/>
-            </label>
-            <p id="intentSearchHint" class="sub small intent-hint" data-i18n="botdee.hint">Try: clubs near me · create a schedule · club website feed · make me a superstar · I want to be a Club Admin</p>
-            <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </details>
-
-  <button id="botDeeAgent" class="botdee-agent hidden" type="button" aria-label="BOT DEE - open contextual search" title="BOT DEE">
-    <span id="botDeeMark" class="botdee-mark" aria-hidden="true">
-      <img class="botdee-mark-img" data-floqr-chrome-icon="botDee" src="./images/chrome/botdee-nightlife.jpg" alt="" width="96" height="96"/>
-    </span>
-  </button>
-  <div id="botDeeSpeech" class="botdee-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
-    <span id="botDeeSpeechText"></span>
-  </div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.016"></script>
-<script src="./floqr-app-check.js?v=s3.3.016"></script>
-<script src="./floqr-session-shell.js?v=s3.3.016"></script>
-<script src="./floqr-nav.js?v=s3.3.016"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.016"></script>
-<script src="./floqr-i18n.js?v=s3.3.016"></script>
-<script src="./floqr-place-i18n.js?v=s3.3.016"></script>
-<script src="./botdee-help-repository.js?v=s3.3.016"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.016"></script>
-<script src="./floqr-venue-query.js?v=s3.3.016"></script>
-<script src="./floqr-data-classification.js?v=s3.3.016"></script>
-<script src="./botdee-access.js?v=s3.3.016"></script>
-<script src="./intent-search.js?v=s3.3.016"></script>
-<script src="./botdee-search.js?v=s3.3.016"></script>
-<script src="./feature-gates.js?v=s3.3.016"></script>
-<script src="./floqr-feature-services.js?v=s3.3.016"></script>
-<script src="./helper-popouts.js?v=s3.3.016"></script>
-<script src="./bot-dee-chat.js?v=s3.3.016"></script>
-<script src="./botdee-page.js?v=s3.3.016"></script>
+<script src="./firebase-config.js?v=s3.3.014"></script>
+<script src="./floqr-app-check.js?v=s3.3.014"></script>
+<script src="./floqr-session-shell.js?v=s3.3.014"></script>
+<script src="./floqr-nav.js?v=s3.3.014"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.014"></script>
+<script src="./floqr-i18n.js?v=s3.3.014"></script>
+<script src="./floqr-place-i18n.js?v=s3.3.014"></script>
+<script src="./botdee-help-repository.js?v=s3.3.014"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.014"></script>
+<script src="./floqr-venue-query.js?v=s3.3.014"></script>
+<script src="./floqr-data-classification.js?v=s3.3.014"></script>
+<script src="./botdee-access.js?v=s3.3.014"></script>
+<script src="./feature-gates.js?v=s3.3.014"></script>
+<script src="./floqr-feature-services.js?v=s3.3.014"></script>
+<script src="./helper-popouts.js?v=s3.3.014"></script>
+<script src="./bot-dee-chat.js?v=s3.3.014"></script>
+<script src="./botdee-page.js?v=s3.3.014"></script>
 </body>
 </html>

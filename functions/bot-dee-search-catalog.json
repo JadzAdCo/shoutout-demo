@@ -361,7 +361,7 @@
       "id": "help-botdee-page",
       "kind": "help",
       "label": "BOT DEE",
-      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and onl",
+      "blurb": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself a",
       "href": "./botdee.html",
       "phrases": [
         "bot dee",
@@ -370,6 +370,9 @@
         "ask bot dee",
         "bot dee page",
         "chat with bot dee",
+        "help",
+        "bot dee help",
+        "what can you do",
         "resume chat",
         "refresh bot dee",
         "other phone",
@@ -384,10 +387,7 @@
         "ask floqai",
         "public profile",
         "enlarge photo",
-        "tap photo",
-        "pop out photo",
-        "photo window",
-        "open bot dee"
+        "tap photo"
       ]
     },
     {

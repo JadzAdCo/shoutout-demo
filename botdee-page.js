@@ -1,4 +1,4 @@
-/* BOT DEE standalone page — chat via executeBotSession + intent-search fallback.
+/* BOT DEE standalone page — chat via executeBotSession.
    Design notes: .cursor/rules/design-notes-botdee-page.mdc */
 (function () {
   "use strict";
@@ -10,19 +10,6 @@
     const qs = new URLSearchParams(params).toString();
     return qs ? `${path}?${qs}` : path;
   };
-  const t = (key, fallback) => {
-    const value = window.FLOQRI18n?.t?.(key);
-    return value && value !== key ? value : fallback;
-  };
-
-  const SCOPE_KEYS = {
-    masterAdmin: ["botdee.scopeMasterAdmin", "Showing answers for Master Admin (all areas)."],
-    venueAdmin: ["botdee.scopeVenueAdmin", "Showing answers for Club Admin, staff, and patrons."],
-    serviceMember: ["botdee.scopeServiceMember", "Showing answers for staff and patrons."],
-    patron: ["botdee.scopePatron", "Showing answers for patrons."],
-    anonymous: ["botdee.scopePublic", "Showing public answers. Sign in to see answers for your account."]
-  };
-  const SERVER_ROLE_SCOPE = {master: "masterAdmin", clubAdmin: "venueAdmin", privileged: "serviceMember", regular: "serviceMember", patron: "patron", anonymous: "anonymous"};
   const access = () => window.FLOQRBotDeeAccess;
 
   function ensureFirebase() {
@@ -33,49 +20,23 @@
     }
   }
 
-  function showScope() {
-    const audience = SERVER_ROLE_SCOPE[access()?.role?.()] || window.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
-    const [key, fallback] = SCOPE_KEYS[audience] || SCOPE_KEYS.patron;
-    const el = byId("botDeeScopeNote");
-    if (el) el.textContent = t(key, fallback);
-  }
-
-  function rerunIntent() {
-    const input = byId("intentSearchInput");
-    if (input?.value) input.dispatchEvent(new Event("input"));
-  }
-
   document.addEventListener("DOMContentLoaded", () => {
     ensureFirebase();
     access()?.activate?.();
-    access()?.onChange?.(() => { showScope(); rerunIntent(); });
     nav()?.applyGlobalBack?.("floqrGlobalBack");
     window.FLOQRChromeScheme?.applyDocument?.();
     window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
-    window.FLOQRIntentSearch?.bindIntentSearch({
-      onShoutout: () => window.showShoutoutLanding(),
-      onMingl: () => { location.href = href("./", {start: "mingl"}); }
-    });
-    window.FLOQRBotDee?.bindBotDee({
-      mode: "intent",
-      onOpenSearch() { byId("intentSearchInput")?.focus(); }
-    });
     window.FLOQRBotDeeChat?.bind({});
     const q = new URL(location.href).searchParams.get("q");
     if (q) {
-      const intentInput = byId("intentSearchInput");
-      if (intentInput) {
-        intentInput.value = q.slice(0, 200);
-        rerunIntent();
+      const chatInput = byId("botDeeChatInput");
+      if (chatInput) {
+        chatInput.value = q.slice(0, 2000);
+        chatInput.focus();
       }
     }
-    showScope();
-    window.firebase?.auth?.().onAuthStateChanged(async () => {
+    window.firebase?.auth?.().onAuthStateChanged(() => {
       access()?.reset?.();
-      try { await window.FLOQRIntentSearch?.syncHelpAudienceFromAuth?.(); } catch (_) {}
-      showScope();
-      rerunIntent();
     });
-    window.addEventListener("floqr:ui-language", () => { showScope(); rerunIntent(); });
   });
 })();

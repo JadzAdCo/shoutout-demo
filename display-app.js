@@ -1254,27 +1254,41 @@
     canvas.style.setProperty("--nba-pair-ink", ink);
     canvas.style.setProperty("--nba-pair-outline", outline);
     canvas.style.setProperty("--nba-pair-underlay", underlay);
-    const back = stage.querySelector(".nba-pair-back");
-    const front = stage.querySelector(".nba-pair-front");
-    const backKit = back?.querySelector(".nba-pair-kit");
-    const frontKit = front?.querySelector(".nba-pair-kit");
-    if (backKit) {
-      const css = safeRender.cssUrl?.(backUrl) || "";
-      backKit.style.backgroundImage = css || "none";
-    }
-    if (frontKit) {
-      const css = safeRender.cssUrl?.(frontUrl) || "";
-      frontKit.style.backgroundImage = css || "none";
-    }
-    const nameEl = back?.querySelector(".nba-pair-name");
-    const teamEl = front?.querySelector(".nba-pair-team");
-    const backNum = back?.querySelector(".nba-pair-number");
-    const frontNum = front?.querySelector(".nba-pair-number");
-    if (nameEl) nameEl.textContent = String(nameText || "").trim().toUpperCase();
-    if (teamEl) teamEl.textContent = String(teamText || "").trim().toUpperCase();
-    const num = String(numberText || "").trim();
-    if (backNum) backNum.textContent = num;
-    if (frontNum) frontNum.textContent = num;
+
+    const faceOut = pairFaceOutput || {};
+    const fill = safeRender.safeColor?.(jerseySecondary || ink, ink) || ink;
+    const accent = safeRender.safeColor?.(jerseyAccent || outline, outline) || outline;
+    const primary = safeRender.safeColor?.(jerseyPrimary || underlay, underlay) || underlay;
+    const numOutline = window.FLOQRVarsityNumbers
+      ? window.FLOQRVarsityNumbers.outline(fill, accent, primary)
+      : outline;
+
+    paintIndependentPairFace(stage.querySelector(".nba-pair-back"), {
+      kitUrl: backUrl,
+      faceOutput: faceOut.back || faceOut,
+      nameText,
+      numberText,
+      fillColor: fill,
+      outlineColor: numOutline,
+      mode: "back"
+    });
+    paintIndependentPairFace(stage.querySelector(".nba-pair-front"), {
+      kitUrl: frontUrl,
+      faceOutput: faceOut.front || faceOut,
+      teamText,
+      numberText,
+      fillColor: fill,
+      outlineColor: numOutline,
+      mode: "front"
+    });
+    // Pair kit stacks own the lettering — keep single-face soccer overlays empty + hidden.
+    ["displayMain", "displaySub", "displayJerseyTeam"].forEach((id) => {
+      const el = byId(id);
+      if (!el) return;
+      el.classList.add("hidden");
+      el.setAttribute("aria-hidden", "true");
+      if (id !== "displayJerseyTeam") el.textContent = "";
+    });
   }
 
   function applyNbaJerseyPairPhase(phase, canvas, urls = {}) {
@@ -2722,7 +2736,11 @@
             teamText: pairTeam,
             numberText: subText || "",
             overlayInk: data.overlayInk || cw?.overlayInk || t.overlayInk || "#006BB6",
-            overlayOutline: data.overlayOutline || cw?.overlayOutline || t.overlayOutline || "#ED174C"
+            overlayOutline: data.overlayOutline || cw?.overlayOutline || t.overlayOutline || "#ED174C",
+            pairFaceOutput: t.pairFaceOutput || data.pairFaceOutput || null,
+            jerseySecondary: data.jerseySecondary || cw?.jerseySecondary || t.jerseySecondary || "",
+            jerseyAccent: data.jerseyAccent || cw?.jerseyAccent || t.jerseyAccent || "",
+            jerseyPrimary: data.jerseyPrimary || cw?.jerseyPrimary || t.jerseyPrimary || ""
           });
           let shoutPanel = byId("displayNbaPairShoutPanel");
           if (!shoutPanel) {

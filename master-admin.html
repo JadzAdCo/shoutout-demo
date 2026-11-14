@@ -756,6 +756,7 @@
       </section>
 
       <section id="templateManagement" class="admin-panel-section">
+        <div id="templateManagementRollup" class="report-block" aria-live="polite"></div>
         <div class="card">
           <p class="eyebrow">Entity management · templates</p>
           <h2>ShoutOut Template Management</h2>
@@ -894,6 +895,7 @@
       </section>
 
       <section id="servicesCommerce" class="admin-panel-section">
+        <div id="servicesCommerceRollup" class="report-block" aria-live="polite"></div>
         <div class="metric-grid"><div class="metric-card"><span>Paid Services</span><strong id="serviceOrderCount">0</strong></div><div class="metric-card"><span>Gross Revenue</span><strong id="serviceGrossRevenue">$0</strong></div><div class="metric-card"><span>FloqR Share</span><strong id="serviceFloqrShare">$0</strong></div><div class="metric-card"><span>Seller / Club Payable</span><strong id="serviceEntityPayable">$0</strong></div></div>
         <div class="card"><h2>Service Orders, Invoices & Shipping</h2><p class="sub small">Track ShoutOuts, targeted distribution, SMS services, and Commerce orders through payment and fulfillment.</p><div id="serviceOrdersReport" class="report-block"></div></div>
         <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
@@ -1762,9 +1764,10 @@
             </details>
           </h2>
           <p class="sub small">System-wide health, feature status, package checks, and Firebase rules compatibility. After every webapp change, use <strong>Email mobile preview links</strong> so testers can open the live URLs on iPhone.</p>
-          <div id="diagnosticsSummary" class="report-block"></div>
+          <div id="diagnosticsSummary" class="report-block" aria-live="polite"></div>
           <button id="runFeatureDiagnosticsBtn" class="primary" type="button">Run Diagnostics</button>
           <button id="diagnosticsRefreshBtn" type="button">Refresh Diagnostics</button>
+          <button id="refreshMasterAdminRollupBtn" type="button">Refresh rollup</button>
           <button id="exportDiagnosticsTxtBtn" type="button">Export Diagnostics TXT</button>
           <button id="emailPreviewLinksBtn" type="button">Email mobile preview links</button>
           <p id="diagnosticsStatus" class="status"></p>
@@ -2011,6 +2014,7 @@
 <script src="./floqr-privacy-prefs.js?v=s3.3.016"></script>
 <script src="./ad-campaigns.js?v=s3.3.016"></script>
 <script src="./ai-diagnostics-service.js?v=s3.3.016"></script>
+<script src="./master-admin-rollup.js?v=s3.3.016"></script>
 <script src="./duplicate-record-service.js?v=s3.3.016"></script>
 <script src="./floqr-logger.js?v=s3.3.016"></script>
 <script src="./payment-service.js?v=s3.3.016"></script>

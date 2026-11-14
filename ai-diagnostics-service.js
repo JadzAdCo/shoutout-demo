@@ -254,6 +254,17 @@
       ]
     },
     {
+      version: "s3.3.014",
+      title: "s3.3.014 — BOT DEE chat-only: no ? / scope; help like version; no Quick intent",
+      checks: [
+        {label:"No ? bubble or scope line", file:"botdee.html", notIncludes:["botdee-help-popout", "botDeeScopeNote", "botDeeIntentFallback", "intent-search.js"]},
+        {label:"Help local reply", file:"bot-dee-chat.js", includes:["isHelpPrompt", "helpReply", "botdee.chatHelp"]},
+        {label:"Server help", file:"functions/bot-dee-core.js", includes:["function isHelpPrompt", "function helpReply"]},
+        {label:"Callable local help", file:"functions/bot-dee-functions.js", includes:["isHelpPrompt(userPrompt)", "local-help"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-botdee-help-chat"]}
+      ]
+    },
+    {
       version: "s3.3.013",
       title: "s3.3.013 — United States height defaults to ft; other countries default to m",
       checks: [
@@ -266,6 +277,19 @@
       ]
     },
     {
+      version: "s3.3.013",
+      title: "s3.3.013 — Master Admin 5-min rollup + summary strips",
+      checks: [
+        {label:"Rollup Functions", file:"functions/master-admin-rollup-functions.js", includes:["scheduledMasterAdminRollup", "refreshMasterAdminRollup", "masterAdminRollups/current"]},
+        {label:"Index export", file:"functions/index.js", includes:["master-admin-rollup-functions"]},
+        {label:"Rules", file:"firestore.rules", includes:["match /masterAdminRollups/{id}"]},
+        {label:"Client module", file:"master-admin-rollup.js", includes:["FLOQRMasterAdminRollup", "paintForPanel", "refreshMasterAdminRollup"]},
+        {label:"HTML strips", file:"master-admin.html", includes:["refreshMasterAdminRollupBtn", "servicesCommerceRollup", "templateManagementRollup", "aiCrawlingSummary"]},
+        {label:"Sign-in bind", file:"master-admin-app.js", includes:["FLOQRMasterAdminRollup?.bind", "FLOQRMasterAdminRollup?.paintForPanel"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-013-master-admin-rollup"]}
+      ]
+    },
+    {
       version: "s3.3.012",
       title: "s3.3.012 — Height unit-first + structured RydR pickup",
       checks: [
@@ -274,6 +298,16 @@
         {label:"Unit before height Profile", file:"patron-portal.html", includes:["editHeightUnit", "editTaxiStreetNumber"]},
         {label:"RydR structured pickup", file:"pickup.html", includes:["pickupStreetNumber", "pickupPostal"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-height-pickup-locale"]}
+      ]
+    },
+    {
+      version: "s3.3.012",
+      title: "s3.3.012 — retire PHILA front+back pair; keep 76ers",
+      checks: [
+        {label:"PHILA pair removed", file:"jersey-catalog.js", includes:["Retired: nbaPhiladelphia76ersPhila"]},
+        {label:"76ers back-only kept", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
+        {label:"Pair engine kept for Terps", file:"display-app.js", includes:["paintIndependentPairFace", "nba-pair-kit-stack"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-phila-pair-retired"]}
       ]
     },
     {
@@ -296,7 +330,7 @@
         {label:"Sign-in skips Diagnostics mount", file:"master-admin-app.js", includes:["Do not pull Diagnostics", "loadLightLocations"]},
         {label:"activatePanel mounts Diagnostics", file:"master-admin-app.js", includes:["FLOQRDiagnostics?.mount", "FLOQRMasterServices?.mount"]},
         {label:"Services lazy mount", file:"master-services-extension.js", includes:["FLOQRMasterServices", "async function mount("]},
-        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "never on Master Admin sign-in"]},
+        {label:"Diagnostics mount idempotent", file:"ai-diagnostics-service.js", includes:["diagnosticsReady", "Rollup summary loaded"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-010-master-admin-load-perf"]}
       ]
     },
@@ -394,7 +428,7 @@
         {label:"Maryland message theme CSS", file:"display.css", includes:["data-pair-message-theme=\"maryland\""]},
         {label:"Pair requires front plate", file:"display-app.js", includes:["productionAssetsReady !== false"]},
         {label:"Package brief", file:"reports/maryland-terps-jersey-v2/INTEGRATION.md", includes:["productionAssetsReady: false", "ncaa-umd-2026-27-2002-throwback-white-v2"]},
-        {label:"PHILA pair still present", file:"jersey-catalog.js", includes:["nba-phi-phila-white-reference-v1"]},
+        {label:"76ers back-only present", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-002-maryland-terps-pair-v2"]}
       ]
     },
@@ -404,7 +438,7 @@
       checks: [
         {label:"Jersey scene helper", file:"floqr-jersey-scene.js", includes:["sceneAt", "JERSEY_MS", "7000"]},
         {label:"FrameLoop asymmetric holds", file:"floqr-frame-loop.js", includes:["holdMsByPhase", "includeCopy"]},
-        {label:"PHILA pair catalog", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nba-phi-phila-white-reference-v1"]},
+        {label:"Terps pair timing flags", file:"jersey-catalog.js", includes:["nbaJerseyPair: true", "jerseySceneMs: 7000", "nbaMarylandTerpsThrowbackPair"]},
         {label:"Pair stage display", file:"display-app.js", includes:["paintNbaPairStage", "nba-jersey-pair", "displayNbaPairShoutPanel"]},
         {label:"Pair CSS", file:"display.css", includes:["nba-pair-stage", "nba-pair-shout-panel"]},
         {label:"Package brief", file:"reports/nba-phila-jersey-v1/IMPLEMENTATION_CONTRACT.md", includes:["7,000 ms", "5,000 ms"]},
@@ -419,7 +453,7 @@
         {label:"Diagnostics ShoutOut subtab", file:"master-admin.html", includes:["diagnosticsShoutOut", "master.diagnosticsShoutOut", "master-shoutout-logging.js"]},
         {label:"Page trail logger", file:"patron-app.js", includes:["logShoutoutPageCall", "page_call", "openBallerFaceCameraCapture", "ballerUploadChooser"]},
         {label:"No duplicate Take photo button", file:"patron-app.js", notIncludes:["id=\"ballerTakePhotoBtn\""]},
-        {label:"PHILA dual catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ersPhila", "nbaDualFaces", "PHILA"]},
+        {label:"76ers catalog", file:"jersey-catalog.js", includes:["nbaPhiladelphia76ers", "76ERS"]},
         {label:"NBA dual faces display", file:"display-app.js", includes:["applyNbaDualFacePhase", "nbaDualFaces"]},
         {label:"Portrait JSON repair", file:"functions/gemini-portrait-mask.js", includes:["repairJsonCandidate", "parseSegmentationJson"]},
         {label:"Black Card removed from catalog", file:"shared-data.js", includes:["ballersAlert:"], notIncludes:["blackCard: {", "blackCardAmex: {"]},
@@ -3091,6 +3125,15 @@
       troubleshoot:"Still a text Country box or huge phone input → hard-refresh patron-portal.html + floqr-geo-catalog.js + styles.css s3.3.014. Empty State list → country not one of the featured ten. Save rejects a good US number → enter 10 digits after (+1), not +1 again."
     },
     {
+      id:"s3-3-014-botdee-help-chat",
+      area:"BOT DEE",
+      feature:"No ? bubble / scope line; type help like version",
+      changed:"s3.3.014 — botdee.html header is title only (no ? help popout, no Showing answers for…). Quick intent search removed. Typing help / what can you do returns a local BOT DEE help reply and asks what you want help with (same path as version).",
+      howToTest:"1) Hard-refresh botdee.html s3.3.014 signed in with botDee. 2) Confirm no ? next to the title and no Showing answers for… line. 3) Type help — BOT DEE explains itself and asks what you want help with (no product-card dump). 4) Type version — still gets the package stamp. 5) Mark Succeed/Failed.",
+      expected:"Clean title header; help and version answer in chat without opening a ? bubble or intent strip.",
+      troubleshoot:"? still visible → hard-refresh botdee.html. Showing answers… → stale botdee-page.js. help dumps search cards → Functions not redeployed with isHelpPrompt / local-help."
+    },
+    {
       id:"s3-3-013-save-profile",
       area:"My Profile",
       feature:"Save Profile",
@@ -3100,6 +3143,15 @@
       troubleshoot:"Still TypeError → hard-refresh floqr-i18n.js and patron-portal-app.js s3.3.013. Confirm interpolationVars is in floqr-i18n.js. If Firestore permission-denied appears instead, that is a rules/auth issue, not this i18n crash."
     },
     {
+      id:"s3-3-013-master-admin-rollup",
+      area:"Master Admin",
+      feature:"5-min rollup summary strips (Diagnostics / AI / Duplicates / Commerce)",
+      changed:"s3.3.013 — scheduledMasterAdminRollup every 5 min writes masterAdminRollups/current; Refresh rollup callable; panels paint strips without 27×750 live pulls. Diagnostics mount no longer auto-runs full refresh; Duplicate Records waits for Refresh.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.013 and sign in (Functions must be deployed with refreshMasterAdminRollup). 2) Open Diagnostics — summary strip shows collection counts from rollup; status says press Run/Refresh for full scan. 3) Press Refresh rollup — strip timestamps update. 4) Open AI Crawling / Duplicate Records / Services & Commerce — strips show queue/cluster/order counts. 5) Mark Succeed/Failed.",
+      expected:"Sign-in stays light; each heavy panel shows rollup metrics immediately; full scans only on explicit Refresh/Run.",
+      troubleshoot:"No rollup yet → press Refresh rollup (needs Functions deploy). Permission denied → Master Admin only. Empty strip after refresh → check Cloud Scheduler / scheduledMasterAdminRollup logs. Still freezes opening Diagnostics → confirm mount no longer awaits refreshDiagnostics."
+    },
+    {
       id:"s3-3-012-height-pickup-locale",
       area:"Profile / RydR",
       feature:"Height unit-first + structured taxi pickup",
@@ -3107,6 +3159,15 @@
       howToTest:"1) Hard-refresh Search and My Profile s3.3.013. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States or U.S. — height unit becomes ft and pickup is ZIP. Set country to Canada — height unit is m + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
       expected:"ft and m cannot be mixed. Selecting United States sets height to ft. Any other country sets m. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
       troubleshoot:"Still m after typing United States → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.013. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
+    },
+    {
+      id:"s3-3-012-phila-pair-retired",
+      area:"ShoutOut / Display / NBA",
+      feature:"PHILA front+back pair removed; 76ers back-only kept",
+      changed:"s3.3.012 — delete nbaPhiladelphia76ersPhila (front+back). Keep nbaPhiladelphia76ers (76ERS plate).",
+      howToTest:"1) Hard-refresh Search. 2) Template list must NOT show NBA Philadelphia 76ers PHILA. 3) NBA Philadelphia 76ers (back-only) still available. 4) Mark Succeed/Failed.",
+      expected:"No PHILA pair in picker; regular 76ers jersey still composes.",
+      troubleshoot:"PHILA pair still listed → hard-refresh jersey-catalog.js. 76ers missing → restore nbaPhiladelphia76ers row."
     },
     {
       id:"s3-3-011-shoutout-page-trail",
@@ -3195,9 +3256,9 @@
       area:"ShoutOut / Display / NCAA",
       feature:"Maryland Terps throwback pair v2 — registered unpublished until front plate",
       changed:"s3.3.002 — nbaMarylandTerpsThrowbackPair (ncaa-umd-2026-27-2002-throwback-white-v2) shares PHILA pair engine; catalogPublished/productionAssetsReady false; frontBackgroundUrl empty; Maryland message theme CSS ready; live patrons still use nbaMarylandTerps back-only.",
-      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) PHILA pair still works (7s/5s). 4) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
-      expected:"No unpublished Terps pair in patron picker; PHILA pair unchanged; prep entry exists in jersey-catalog with empty front URL.",
-      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. PHILA broken → do not remove nbaPhiladelphia76ersPhila. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
+      howToTest:"1) Hard-refresh Search (s3.3.002+). 2) Template list shows Maryland Terps (back-only) — does NOT list Throwback Pair. 3) Confirm reports/maryland-terps-jersey-v2/INTEGRATION.md lists missing front plate. Mark Succeed/Failed.",
+      expected:"No unpublished Terps pair in patron picker; prep entry exists in jersey-catalog with empty front URL.",
+      troubleshoot:"Pair appears in picker → catalogPublished false / mergeIntoShoutOutTemplates gate. Enabling publish without front → display requires frontBackgroundUrl + productionAssetsReady."
     },
     {
       id:"s3-3-001-phila-jersey-pair",
@@ -9932,8 +9993,9 @@
       renderSourceExtractionReport();
       renderCrawlContactExport();
       renderPackageDiagnosticsArchives();
-      /* Full refresh (27 collections + package file fetches) only when Diagnostics opens — never on Master Admin sign-in. */
-      await refreshDiagnostics();
+      /* Summary strip comes from masterAdminRollups/current (5-min schedule).
+         Full refresh (27 collections + package file fetches) only on Run / Refresh Diagnostics. */
+      setText("diagnosticsStatus", "Rollup summary loaded. Press Run Diagnostics or Refresh Diagnostics for a full live scan.");
       state.diagnosticsReady = true;
     })().finally(() => { mountInFlight = null; });
     return mountInFlight;

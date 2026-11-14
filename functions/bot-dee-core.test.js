@@ -185,6 +185,24 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.match(local.reply, /package/i);
 });
 
+test("Help questions answer locally like version (no search dump)", () => {
+  assert.equal(bot.isHelpPrompt("help"), true);
+  assert.equal(bot.isHelpPrompt("Help?"), true);
+  assert.equal(bot.isHelpPrompt("what can you do"), true);
+  assert.equal(bot.isHelpPrompt("how do I use BOT DEE"), true);
+  assert.equal(bot.isHelpPrompt("need help"), true);
+  assert.equal(bot.isHelpPrompt("help with ShoutOut"), false);
+  assert.equal(bot.isHelpPrompt("VIP help"), false);
+  assert.match(bot.helpReply(), /What are you interested in getting help with/i);
+  assert.doesNotMatch(bot.helpReply(), /Here is what I found/i);
+
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("patron", "help");
+  assert.equal(local.provider, "local-help");
+  assert.equal(local.results.length, 0);
+  assert.match(local.reply, /BOT DEE/i);
+});
+
 test("lookupPublicProfiles tool covers me + friends in description", () => {
   const decl = bot.toolDeclarations().find(t => t.name === "lookupPublicProfiles");
   assert.ok(decl);

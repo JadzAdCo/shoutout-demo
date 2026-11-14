@@ -423,85 +423,9 @@
   if (nbaNflTemplates.nbaMarylandTerps) {
     nbaNflTemplates.nbaMarylandTerps.description = "$30 Maryland Terps basketball jersey ShoutOut — 2026 LED back (96×48, 64×48, 64×32). State, name, and number are typed on the kit. Output: arch the state at the regular size; two-word places such as LOS ANGELES and OKLAHOMA CITY wrap onto two lines at that same size; a single word of 10+ letters uses the smaller arch; the number is 49.7% of the jersey width for one digit and 36.4% for two (+20% vertical), with its tip 5cm below the name. Numbers are collegiate varsity block numerals with open counters: team-color fill, contrasting outline, angular corners.";
   }
-  // PHILA pair (v1): back left + front right 7s, optional ShoutOut 5s.
-  // Patron picks jersey color on the composer (White Association | Blue Icon).
-  // Stable id nba-phi-phila-white-reference-v1; seasonStatus reference-specific-unverified until edition confirmed.
-  if (!nbaNflTemplates.nbaPhiladelphia76ersPhila) {
-    const base = nbaNflTemplates.nbaPhiladelphia76ers;
-    if (base) {
-      const philaColorways = [
-        {
-          id: "white",
-          label: "White (Association)",
-          i18nKey: "editor.jerseyColorWhite",
-          swatch: "#FFFFFF",
-          frontBackgroundUrl: "./images/basketball/nba-76ers-phila-front-blank.png",
-          defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
-          backBackgroundUrl: "./images/basketball/nba-76ers-phila-back-blank.png",
-          jerseyPrimary: "#FFFFFF",
-          jerseySecondary: "#006BB6",
-          jerseyAccent: "#ED174C",
-          overlayInk: "#006BB6",
-          overlayOutline: "#ED174C",
-          pairMessageTheme: "phila"
-        },
-        {
-          id: "blue",
-          label: "Blue (Icon)",
-          i18nKey: "editor.jerseyColorBlue",
-          swatch: "#006BB6",
-          frontBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-front-blank.png",
-          defaultBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-back-blank.png",
-          backBackgroundUrl: "./images/basketball/nba-76ers-phila-blue-back-blank.png",
-          jerseyPrimary: "#006BB6",
-          jerseySecondary: "#FFFFFF",
-          jerseyAccent: "#ED174C",
-          overlayInk: "#FFFFFF",
-          overlayOutline: "#ED174C",
-          pairMessageTheme: "phila"
-        }
-      ];
-      const whiteCw = philaColorways[0];
-      const phila = {
-        ...base,
-        id: "nbaPhiladelphia76ersPhila",
-        stableTemplateId: "nba-phi-phila-white-reference-v1",
-        name: "NBA Philadelphia 76ers PHILA",
-        teamName: "Philadelphia 76ers PHILA",
-        jerseyTeamLabel: "PHILA",
-        jerseyPlateLabel: "PHILA",
-        nbaDualFaces: true,
-        nbaJerseyPair: true,
-        jerseySceneMs: 7000,
-        messageSceneMs: 5000,
-        catalogPublished: true,
-        productionAssetsReady: true,
-        seasonStatus: "reference-specific-unverified",
-        packageContract: "reports/nba-phila-jersey-v1",
-        pairMessageTheme: "phila",
-        jerseyCssBack: false,
-        jerseyOnHanger: false,
-        requiresColorwaySelect: true,
-        defaultJerseyColorway: "white",
-        jerseyColorways: philaColorways,
-        // Default = White Association blanks; Blue Icon via composer color select.
-        frontBackgroundUrl: whiteCw.frontBackgroundUrl,
-        defaultBackgroundUrl: whiteCw.defaultBackgroundUrl,
-        backBackgroundUrl: whiteCw.backBackgroundUrl,
-        jerseyPrimary: whiteCw.jerseyPrimary,
-        jerseySecondary: whiteCw.jerseySecondary,
-        jerseyAccent: whiteCw.jerseyAccent,
-        overlayInk: whiteCw.overlayInk,
-        overlayOutline: whiteCw.overlayOutline,
-        tags: Array.from(new Set([...(base.tags || []), "PHILA", "front", "back", "pair", "reference-v1", "white-blank", "blue-icon", "colorway"])),
-        description: "$30 Philadelphia 76ers PHILA pair — pick White (Association) or Blue (Icon) on the ShoutOut screen; back + front together 7s, optional ShoutOut 5s. Fixed PHILA wordmark; typed name/number."
-      };
-      nbaNflTemplates.nbaPhiladelphia76ersPhila = phila;
-      nbaNflIds.push("nbaPhiladelphia76ersPhila");
-    }
-  }
-  // Maryland Terps throwback pair (v2): same engine as PHILA. Front blank plate not ready → unpublished.
-  // Stable id ncaa-umd-2026-27-2002-throwback-white-v2. Do not remove PHILA; do not invent front art.
+  // Retired: nbaPhiladelphia76ersPhila (front+back pair). Keep nbaPhiladelphia76ers (back-only 76ERS).
+  // Maryland Terps throwback pair (v2): unpublished until front blank plate is ready.
+  // Stable id ncaa-umd-2026-27-2002-throwback-white-v2. Do not invent front art.
   if (!nbaNflTemplates.nbaMarylandTerpsThrowbackPair) {
     const base = nbaNflTemplates.nbaMarylandTerps;
     if (base) {
