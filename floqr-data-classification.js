@@ -214,6 +214,11 @@
     ["users", "taxiRegionCode", "ownMaster", 0, "Private RydR state / province / region code"],
     ["users", "taxiPostalCode", "ownMaster", 1, "Private RydR ZIP or postal code"],
     ["users", "taxiPostalKind", "ownMaster", 0, "Private RydR postal kind (zip vs postal)"],
+    ["users", "priorTravels", "ownMaster", 1, "Patron prior travel cities/countries (Mingl travel datapoint when opted in)"],
+    ["users", "travelInterests", "ownMaster", 1, "Legacy prior travel list (dual-read with priorTravels)"],
+    ["users", "futureTravelDestinations", "ownMaster", 1, "Patron future travel cities/countries (Mingl travel datapoint when opted in)"],
+    ["users", "preferredLanguage", "ownMaster", 0, "Patron preferred language (grammar / bio / site default)"],
+    ["users", "uiLanguage", "ownMaster", 0, "Patron FloqR chrome language"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];

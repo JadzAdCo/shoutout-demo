@@ -11,6 +11,32 @@
     "united states", "united states of america", "the united states", "the usa", "america"
   ]);
   const CA_NAMES = new Set(["ca", "can", "canada"]);
+  const ES_NAMES = new Set(["es", "esp", "spain", "espana", "españa", "mexico", "méxico"]);
+  const DE_NAMES = new Set(["de", "deu", "germany", "deutschland"]);
+  const TR_NAMES = new Set(["tr", "tur", "turkey", "turkiye", "türkiye"]);
+  const AE_NAMES = new Set(["ae", "are", "uae", "dubai", "united arab emirates", "the united arab emirates"]);
+  /** Unambiguous IP/profile country → site language. Gulf AE is a prompt (Arabic vs English), not auto-Arabic. */
+  const LANG_BY_COUNTRY = {
+    es: ["ES", "MX", "AR", "CO", "CL", "PE", "VE", "EC", "GT", "CU", "BO", "DO", "HN", "PY", "SV", "NI", "CR", "PA", "UY", "GQ", "PR"],
+    fr: ["FR", "MC", "SN", "CI", "ML", "HT", "NE", "BF", "BJ", "TG", "GA", "CG", "CD", "GN", "CM"],
+    de: ["DE", "AT", "LI"],
+    it: ["IT", "SM", "VA"],
+    pt: ["PT", "BR", "AO", "MZ", "CV", "GW", "ST", "TL"],
+    nl: ["NL", "SR", "AW", "CW"],
+    el: ["GR", "CY"],
+    pl: ["PL"],
+    ru: ["RU", "BY"],
+    ar: ["SA", "EG", "MA", "DZ", "TN", "IQ", "JO", "LB", "OM", "YE", "LY", "SD", "SY", "PS"],
+    en: ["US", "GB", "AU", "NZ", "IE", "NG", "GH", "KE", "JM", "TT", "BB", "BS", "BZ", "GY", "ZA"]
+  };
+  /** Ask the patron which language to use (do not auto-pick). Dubai / UAE → Arabic or English. */
+  const LANGUAGE_PROMPT_COUNTRIES = {
+    AE: {codes: ["ar", "en"], region: "uae"}
+  };
+  const COUNTRY_TO_LANG = Object.create(null);
+  Object.keys(LANG_BY_COUNTRY).forEach(lang => {
+    LANG_BY_COUNTRY[lang].forEach(cc => { COUNTRY_TO_LANG[cc] = lang; });
+  });
   const ZIP_RE = /^\d{5}(?:-\d{4})?$/;
   const CA_POSTAL_RE = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
   const OTHER_POSTAL_RE = /^[A-Z0-9][A-Z0-9 \-]{1,11}$/i;
@@ -39,6 +65,18 @@
     return text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
 
+  const NAME_TO_CC = {
+    france: "FR", frankreich: "FR", francia: "FR",
+    italy: "IT", italia: "IT", italien: "IT",
+    portugal: "PT", brazil: "BR", brasil: "BR",
+    netherlands: "NL", holland: "NL", nederland: "NL",
+    greece: "GR", ellada: "GR",
+    poland: "PL", polska: "PL",
+    russia: "RU",
+    egypt: "EG", morocco: "MA", "saudi arabia": "SA",
+    "united kingdom": "GB", uk: "GB", england: "GB", britain: "GB"
+  };
+
   function countryCodeOf(value) {
     const raw = text(value).toUpperCase();
     if (/^[A-Z]{2}$/.test(raw)) return raw;
@@ -48,6 +86,11 @@
     const compact = name.replace(/[^a-z]/g, "");
     if (US_NAMES.has(name) || compact === "us" || compact === "usa" || compact === "unitedstates" || compact === "unitedstatesofamerica") return "US";
     if (CA_NAMES.has(name)) return "CA";
+    if (ES_NAMES.has(name)) return name === "mexico" || name === "méxico" ? "MX" : "ES";
+    if (DE_NAMES.has(name)) return "DE";
+    if (TR_NAMES.has(name)) return "TR";
+    if (AE_NAMES.has(name)) return "AE";
+    if (NAME_TO_CC[name]) return NAME_TO_CC[name];
     return "";
   }
 
@@ -80,6 +123,52 @@
   function preferredHeightUnit(input) {
     if (typeof input === "string") return usesFeetInches({country: input}) ? "ft" : "m";
     return usesFeetInches(input || {}) ? "ft" : "m";
+  }
+
+  function languageFromCountryCode(value) {
+    const code = countryCodeOf(value) || text(value).toUpperCase();
+    if (/^[A-Z]{2}$/.test(code) && COUNTRY_TO_LANG[code]) return COUNTRY_TO_LANG[code];
+    return "";
+  }
+
+  function resolvedCountryCode(input = {}) {
+    const profileRaw = text(input.country || input.profileCountry);
+    const profile = countryCodeOf(profileRaw);
+    if (profile) return profile;
+    const ip = countryCodeOf(input.ipCountry || input.ipCountryCode) || text(input.ipCountryCode).toUpperCase();
+    return /^[A-Z]{2}$/.test(ip) ? ip : "";
+  }
+
+  /**
+   * How a new patron's site language is chosen.
+   * Unambiguous countries auto-map (Germany → de, Spain → es). Turkey stays on the browser until a Turkish pack ships.
+   * Dubai / UAE prompts Arabic vs English. Mixed CA/BE/CH fall through to the browser.
+   * IP is never stored.
+   */
+  function languagePlan(input = {}) {
+    const countryCode = resolvedCountryCode(input);
+    const prompt = countryCode && LANGUAGE_PROMPT_COUNTRIES[countryCode];
+    if (prompt) return {mode: "prompt", countryCode, codes: prompt.codes.slice(), region: prompt.region};
+    const code = languageFromCountryCode(countryCode);
+    if (code) return {mode: "auto", code, countryCode, codes: [code]};
+    return {mode: "none", code: "", countryCode, codes: []};
+  }
+
+  /**
+   * Site + Preferred Language default for a new patron (auto countries only).
+   * Dubai/UAE returns "" so the UI can ask Arabic vs English.
+   */
+  function preferredUiLanguage(input = {}) {
+    const plan = languagePlan(input);
+    return plan.mode === "auto" ? plan.code : "";
+  }
+
+  function isNewLanguageUser(profile = {}, stored) {
+    const saved = text(stored);
+    if (saved) return false;
+    if (text(profile.uiLanguage) || text(profile.preferredLanguage) || text(profile.languageSettings?.preferredLanguage)) return false;
+    if (profile.profileCompleted || profile.createdAt) return false;
+    return true;
   }
 
   function normalizeHeightUnit(unit) {
@@ -622,6 +711,12 @@
     usesFeetInches,
     usesZip,
     preferredHeightUnit,
+    preferredUiLanguage,
+    languagePlan,
+    languageFromCountryCode,
+    isNewLanguageUser,
+    LANG_BY_COUNTRY,
+    LANGUAGE_PROMPT_COUNTRIES,
     normalizeHeightUnit,
     validateHeight,
     convertHeight,

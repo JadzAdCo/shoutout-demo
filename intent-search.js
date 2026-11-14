@@ -115,8 +115,8 @@
       id: "floqcast",
       kind: "product",
       featureKey: "floqCast",
-      label: "floqCast — go live / be a superstar",
-      blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the floqCast board.",
+      label: "FloqCAST — go live / be a superstar",
+      blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the FloqCAST board.",
       href: pageUrl("./floqcast-search.html", {from: "botdee"}),
       patterns: [
         /floq\s*cast/, /floqcast/,
@@ -186,18 +186,18 @@
     {
       id: "help-floqcast",
       kind: "help",
-      label: "Make me a floqCast / superstar",
-      blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the floqCast Queue → Go live on the floqCast board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
+      label: "Make me a FloqCAST / superstar",
+      blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the FloqCAST Queue → Go live on the FloqCAST board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
       steps: [
-        "Open floqCast from Search or BOT DEE.",
-        "Choose a venue that has floqCast enabled.",
-        "Tap Go live, be a floqCast — a private preview page opens (camera only, not on the board yet).",
+        "Open FloqCAST from Search or BOT DEE.",
+        "Choose a venue that has FloqCAST enabled.",
+        "Tap Go live, be a FloqCAST — a private preview page opens (camera only, not on the board yet).",
         "Pay $20 in the Stripe pop-out while the preview stays open.",
-        "Wait for Club Admin to Approve in Club Admin → floqCast Queue.",
+        "Wait for Club Admin to Approve in Club Admin → FloqCAST Queue.",
         "When approved, tap Go live on your preview page."
       ],
       links: [
-        {label: "Open floqCast", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
+        {label: "Open FloqCAST", href: pageUrl("./floqcast-search.html", {from: "botdee"})}
       ],
       searchPhrases: [
         "floqcast", "floq cast", "floqCast", "make me a floqcast", "make me a floq cast",
@@ -635,6 +635,17 @@
       patterns: [/\bheight\b/, /\bhow\s+tall\b/, /\bfeet\s*(and\s*)?(inches)?\b/, /\bmeters?\b/, /6'\s*0/]
     },
     {
+      id: "help-floqr-handle",
+      kind: "help",
+      label: "FloqR / Mingl handle",
+      blurb: "Letters, numbers, underscores, and dashes only. Shown as @your_handle on public profiles.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["floqr handle", "mingl handle", "username", "@handle", "your_handle"],
+      patterns: [/floqr\s*handle/, /mingl\s*handle/, /@handle/, /your_handle/]
+    },
+    {
       id: "help-profile-country",
       kind: "help",
       label: "Country",
@@ -655,6 +666,28 @@
       ],
       searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"],
       patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/]
+    },
+    {
+      id: "help-prior-travels",
+      kind: "help",
+      label: "Prior Travels (City or Country)",
+      blurb: "List cities or countries you have visited. FLOQR suggests spelling from a catalog, then Gemini when you are signed in.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["prior travels", "travel interest", "travel interests", "cities I visited", "spell city"],
+      patterns: [/prior\s*travels?/, /travel\s*interests?/, /cities?\s+i\s+visited/]
+    },
+    {
+      id: "help-future-travel",
+      kind: "help",
+      label: "Future Travel Destination (City or Country)",
+      blurb: "List cities or countries you want to visit next. Enter a city or country name; FLOQR suggests spelling.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["future travel", "future destination", "where I want to go", "next trip"],
+      patterns: [/future\s*travel/, /future\s*destination/, /next\s*trip/]
     },
     {
       id: "help-taxi-pickup-address",
@@ -972,7 +1005,7 @@
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
-    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-taxi-pickup-address": ["patron"],
+    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],

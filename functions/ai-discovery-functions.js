@@ -2284,6 +2284,78 @@ exports.aiSuggestGrammarCorrection = onCall({
   }
 });
 
+const PLACE_NAME_ALIASES = {
+  barclona: "Barcelona",
+  barcelone: "Barcelona",
+  barcellona: "Barcelona",
+  espana: "Spain",
+  "españa": "Spain",
+  lisboa: "Lisbon",
+  milano: "Milan",
+  roma: "Rome",
+  "nueva york": "New York",
+  "ciudad de mexico": "Mexico City",
+  cdmx: "Mexico City",
+  munchen: "Munich"
+};
+
+function fallbackPlaceNames(tokens = []) {
+  return (Array.isArray(tokens) ? tokens : []).slice(0, 8).map(raw => {
+    const input = clampText(raw, 80);
+    const key = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    const suggestion = PLACE_NAME_ALIASES[key] || "";
+    return {
+      input,
+      suggestion: suggestion || input,
+      kind: suggestion ? "place" : "unknown",
+      confidence: suggestion ? 0.9 : 0.2,
+      source: suggestion ? "local-alias" : "local-fallback"
+    };
+  }).filter(item => item.input);
+}
+
+exports.aiSuggestPlaceNames = onCall({
+  region:"us-central1",
+  secrets:[GEMINI_API_KEY],
+  timeoutSeconds:20,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const tokens = Array.isArray(request.data?.tokens) ? request.data.tokens : [];
+  const fallback = {places: fallbackPlaceNames(tokens), provider:"local-fallback"};
+  if (!optionalGeminiSecretValue()) return fallback;
+  const names = tokens.map(value => clampText(value, 80)).filter(Boolean).slice(0, 8);
+  if (!names.length) return fallback;
+  const prompt = [
+    "You are FLOQR helping a signed-in patron spell city or country names for travel profile fields.",
+    "Return only JSON with key places: an array of {input, suggestion, kind, confidence}.",
+    "kind must be city or country. suggestion is the canonical English place name (Barcelona, Spain, Mexico City).",
+    "If the input is already a real city or country, suggestion equals the canonical spelling.",
+    "Do not invent neighborhoods, venues, or people. Do not translate FLOQR, ShoutOut, Mingl, or VIP reserV.",
+    "This draft is private and must not be indexed.",
+    `Preferred language: ${clampText(request.data?.preferredLanguage || "auto", 8)}`,
+    `Tokens: ${JSON.stringify(names)}`
+  ].join("\n");
+  try {
+    const json = await callGeminiJson(prompt, "Place name spelling");
+    const places = Array.isArray(json?.places) ? json.places.slice(0, 8).map(item => ({
+      input: clampText(item?.input || "", 80),
+      suggestion: clampText(item?.suggestion || item?.name || "", 80),
+      kind: /country/i.test(item?.kind || "") ? "country" : "city",
+      confidence: Math.max(0, Math.min(Number(item?.confidence || 0.7), 1)),
+      source: "gemini"
+    })).filter(item => item.input && item.suggestion) : fallback.places;
+    return {
+      places: places.length ? places : fallback.places,
+      provider: places.length ? "gemini" : "local-fallback",
+      model: GEMINI_TEXT_MODEL
+    };
+  } catch (error) {
+    console.warn("Gemini place-name fallback:", error.message);
+    return fallback;
+  }
+});
+
 exports.aiRankLocations = onCall({
   region:"us-central1",
   secrets:[GEMINI_API_KEY],

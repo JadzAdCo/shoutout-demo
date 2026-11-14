@@ -131,6 +131,10 @@
     "title": "Height",
     "body": "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. United States defaults to ft. Every other country, and a non-U.S. internet location, defaults to m. You can still switch the unit."
   },
+  "help-floqr-handle": {
+    "title": "FloqR / Mingl handle",
+    "body": "FloqR / Mingl handle: letters, numbers, underscores (_), and dashes (-) only. No spaces, emoji, or other symbols. Shown as @your_handle on public profiles."
+  },
   "help-profile-country": {
     "title": "Country",
     "body": "Choose your country from the list. United States is first, then Canada, then featured nightlife markets, then every other country. The list is stored on this page so Profile loads quickly — it is not fetched from a database. Country sets your mobile calling code (+1 for the United States), the height unit default, and ZIP vs postal on taxi pickup."
@@ -138,6 +142,14 @@
   "help-profile-mobile": {
     "title": "Mobile",
     "body": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved."
+  },
+  "help-prior-travels": {
+    "title": "Prior Travels (City or Country)",
+    "body": "List cities or countries you have already visited, comma-separated (Barcelona, Miami, Spain). Use real place names — FLOQR suggests spelling from a city/country catalog, then Google AI Studio (Gemini) when you are signed in. This is the public Mingl travel datapoint when you opt in under Privacy."
+  },
+  "help-future-travel": {
+    "title": "Future Travel Destination (City or Country)",
+    "body": "List cities or countries you want to visit next, comma-separated (Lisbon, Japan). Enter a city or a country, not a venue or neighborhood. FLOQR suggests standard spelling. When you opt travel in under Privacy, BOT DEE can use these destinations the same way as prior travels."
   },
   "help-taxi-pickup-address": {
     "title": "Taxi pickup address",

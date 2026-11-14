@@ -1853,7 +1853,8 @@
       Food: profile.foodChoices || profile.favoriteFoods,
       Music: profile.musicInterests || profile.favoriteGenres,
       Hobbies: profile.hobbies || profile.generalHobbies,
-      Travel: profile.travelInterests,
+      Travel: profile.priorTravels || profile.travelInterests,
+      FutureTravel: profile.futureTravelDestinations,
       Events: profile.nightlifeInterests || profile.nightlifeStyle,
       Beverages: profile.favoriteBeverages || profile.beverageChoices,
       Meet: profile.lookingToMeet

@@ -1538,11 +1538,27 @@
     });
   }
 
+  function resetPageScroll() {
+    const jump = () => {
+      try { window.scrollTo(0, 0); } catch (_) {}
+      try { document.documentElement.scrollTop = 0; } catch (_) {}
+      try { document.body.scrollTop = 0; } catch (_) {}
+      try {
+        const page = document.querySelector(".page.active");
+        if (page) page.scrollTop = 0;
+      } catch (_) {}
+    };
+    jump();
+    return jump;
+  }
+
   function showPage(id) {
     if (!id || !byId(id)) return;
+    document.documentElement.classList.remove("floqr-shoutout-direct");
     closeUserDropdown();
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
+    resetPageScroll();
     if (SHOUTOUT_TRAIL_PAGES.has(id)) logShoutoutPageCall(id);
     if (id === "landingPage" || id === "categoryPage") {
       try { window.FLOQRChromeScheme?.syncFromStorage?.({force: true}); } catch (_) {}
@@ -1555,6 +1571,13 @@
       window.FLOQRBotDee?.syncVisibility?.();
     } else {
       window.FLOQRBotDee?.syncVisibility?.();
+    }
+    if (id === "editorPage") {
+      const focus = () => focusFirstEditorInput();
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => requestAnimationFrame(focus));
+      else setTimeout(focus, 0);
+      setTimeout(focus, 50);
+      setTimeout(focus, 200);
     }
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -1745,7 +1768,16 @@
     const venuePicked = !!options.venue && !!(selectedLocationId || pendingDirectLocation);
     applySplashHeader(venuePicked);
     if (venuePicked) renderSplashVenue();
-    startSplash(type, venuePicked ? locationId() : "");
+    showPage("adSplashPage");
+    const ad = renderSplashAd(type, venuePicked ? locationId() : "");
+    /* Paid/house splash still holds. Venue-picked with no creative continues as soon as templates are ready. */
+    if (ad || !venuePicked) {
+      startSplashHold();
+      return;
+    }
+    const fn = pendingCategoryAfterAd;
+    pendingCategoryAfterAd = null;
+    if (typeof fn === "function") Promise.resolve().then(fn);
   }
 
   function renderSplashVenue() {
@@ -1778,18 +1810,16 @@
     }
   }
 
-  function startSplash(type, venueId) {
+  function startSplashHold(durationMs) {
     const statementPrimary = byId("splashStatementPrimary");
     const statementSecondary = byId("splashStatementSecondary");
     statementPrimary?.classList.remove("is-hidden");
     statementSecondary?.classList.remove("is-hidden");
-    showPage("adSplashPage");
     clearAdSplashTimers();
-    renderSplashAd(type, venueId);
-    const durationMs = splashDurationMs();
+    const ms = Number(durationMs) > 0 ? Number(durationMs) : splashDurationMs();
     adStatementTimers = [
-      setTimeout(() => statementPrimary?.classList.add("is-hidden"), durationMs * 0.4),
-      setTimeout(() => statementSecondary?.classList.add("is-hidden"), durationMs * 0.7)
+      setTimeout(() => statementPrimary?.classList.add("is-hidden"), ms * 0.4),
+      setTimeout(() => statementSecondary?.classList.add("is-hidden"), ms * 0.7)
     ];
     adTimer = setTimeout(() => {
       clearAdSplashTimers();
@@ -1797,7 +1827,7 @@
       const fn = pendingCategoryAfterAd;
       pendingCategoryAfterAd = null;
       if (typeof fn === "function") fn();
-    }, durationMs);
+    }, ms);
   }
 
   function clearAdSplashTimers() {
@@ -2197,6 +2227,11 @@
         analyticsConsent: byId("profileAnalyticsConsent").checked,
         marketingConsent: byId("profileMarketingConsent").checked,
         referredByPromoterId: new URL(window.location.href).searchParams.get("promoter") || "",
+        preferredLanguage: window.FLOQRI18n?.getLanguage?.() || "",
+        uiLanguage: window.FLOQRI18n?.getLanguage?.() || "",
+        languageSettings: {
+          preferredLanguage: window.FLOQRI18n?.getLanguage?.() || "auto"
+        },
         profileCompleted: true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -3001,7 +3036,10 @@
       ...(publicDatapointAllowed(profile, "events") ? [profile.nightlifeStyle, ...(profile.nightlifeInterests || [])] : []),
       ...(publicDatapointAllowed(profile, "meet") ? [profile.lookingToMeet] : []),
       ...(publicDatapointAllowed(profile, "music") ? (profile.musicInterests || profile.favoriteGenres || []) : []),
-      ...(publicDatapointAllowed(profile, "travel") ? (profile.travelInterests || []) : []),
+      ...(publicDatapointAllowed(profile, "travel") ? [
+        ...(profile.priorTravels?.length ? profile.priorTravels : (profile.travelInterests || [])),
+        ...(profile.futureTravelDestinations || [])
+      ] : []),
       ...(publicDatapointAllowed(profile, "hobbies") ? (profile.hobbies || profile.generalHobbies || []) : []),
       ...(publicDatapointAllowed(profile, "food") ? (profile.foodChoices || []) : []),
       ...(publicDatapointAllowed(profile, "beverage") ? (profile.favoriteBeverages || []) : [])
@@ -3062,7 +3100,10 @@
     {key:"height", label:"Height", get:p => heightDisplay(p) || p.height},
     {key:"music", label:"Music", get:p => p.musicInterests || p.favoriteGenres},
     {key:"events", label:"Events", get:p => p.nightlifeInterests || p.nightlifeStyle},
-    {key:"travel", label:"Travel", get:p => p.travelInterests},
+    {key:"travel", label:"Travel", get:p => [
+      ...(Array.isArray(p.priorTravels) && p.priorTravels.length ? p.priorTravels : (p.travelInterests || [])),
+      ...(p.futureTravelDestinations || [])
+    ]},
     {key:"hobbies", label:"Hobbies", get:p => p.hobbies || p.generalHobbies},
     {key:"food", label:"Food", get:p => p.foodChoices},
     {key:"beverage", label:"Beverages", get:p => p.favoriteBeverages},
@@ -4443,7 +4484,7 @@
       if (FL?.normalizeVenue && FL?.renderVenueCardHtml) {
         const venue = FL.normalizeVenue(id, l);
         const productBadge = featureKey === "shoutOut" ? "ShoutOut"
-          : featureKey === "floqCast" ? "floqCast"
+          : featureKey === "floqCast" ? "FloqCAST"
             : featureKey === "vipReservations" ? "VIP reserV"
               : (countryLabel || "Club");
         const actions = `<a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}">${viewClubLabel}</a>`
@@ -5211,7 +5252,7 @@
       displayName:profile.displayName || currentUser?.displayName || "",
       city:profile.city || profile.locationCity || "",
       country:profile.country || "",
-      interests:unique(splitSuggestionValues([profile.interests, profile.hobbies, profile.musicGenres, profile.favoriteMusic, profile.eventInterests, profile.favoriteBeverages, profile.travelInterests, profile.favoriteVenueTypes])).slice(0, 12)
+      interests:unique(splitSuggestionValues([profile.interests, profile.hobbies, profile.musicGenres, profile.favoriteMusic, profile.eventInterests, profile.favoriteBeverages, profile.priorTravels, profile.travelInterests, profile.futureTravelDestinations, profile.favoriteVenueTypes])).slice(0, 12)
     };
   }
 
@@ -6178,18 +6219,11 @@
   function focusFirstEditorInput() {
     const page = byId("editorPage");
     const target = firstEditorInput(page);
+    const jump = resetPageScroll();
     if (!target) return;
-    try { window.scrollTo(0, 0); } catch (_) { /* ignore */ }
-    try {
-      const topbar = page?.querySelector?.(".topbar");
-      const offset = (topbar?.getBoundingClientRect?.().height || topbar?.offsetHeight || 0) + 12;
-      const top = window.scrollY + target.getBoundingClientRect().top - offset;
-      window.scrollTo(0, Math.max(0, top));
-    } catch (_) {
-      try { target.scrollIntoView({ block: "start", inline: "nearest" }); } catch (_) { /* ignore */ }
-    }
     try { target.focus({ preventScroll: true }); }
     catch (_) { try { target.focus(); } catch (_) { /* ignore */ } }
+    jump();
   }
 
   function goToEditor() {
@@ -6261,7 +6295,7 @@
     const featureItems = [
       ["bartr", window.FLOQRNav?.stampCurrentVersion?.("./commerce.html", {from: "search"}) || "./commerce.html?from=search", tt("nav.bartr", {}, "BartR")],
       ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
-      ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "floqCast")],
+      ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "FloqCAST")],
       ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
       ["botDee", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.botdee", {}, "dj BOT")]
     ];
@@ -6538,7 +6572,6 @@
     bind("saveProfileBtn", saveProfile);
     floqrId().bindInstagramInput?.(byId("profileInstagram"));
     floqrId().bindFloqrHandleInput?.(byId("profileUsername"));
-    floqrId().attachHelpPopout?.(byId("profileFloqrHandleHelp"), floqrId().FLOQR_HANDLE_HELP);
     byId("templateSearch")?.addEventListener("input", () => { renderTemplates(); });
     byId("templateSearchForm")?.addEventListener("submit", event => {
       event.preventDefault();

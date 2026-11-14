@@ -30,6 +30,22 @@ test("Club Admin Feature Mgmt nests ShoutOut / floqCast / VIP reserV", () => {
   assert.doesNotMatch(html, /<button class="admin-tab"[^>]*data-panel="panelTemplateBackgrounds"/);
 });
 
+test("VCC Dashboard Pending ShoutOuts and FloqCAST become queue links when count > 1", () => {
+  const html = read("admin.html");
+  assert.match(html, /id="metricPendingCard"[^>]*data-queue-panel="panelQueue"/);
+  assert.match(html, /data-i18n="admin\.pendingShoutouts">Pending ShoutOuts/);
+  assert.match(html, /id="metricFloqCastDashCard"[^>]*data-queue-panel="panelFloqCast"/);
+  assert.match(html, /data-i18n="admin\.pendingFloqCast">Pending FloqCAST/);
+  assert.match(html, /data-i18n="admin\.floqcastQueue">FloqCAST/);
+  const app = read("admin-app.js");
+  assert.match(app, /function setDashboardQueueLink/);
+  assert.match(app, /const linked = n > 1/);
+  assert.match(app, /setDashboardQueueLink\("metricPendingCard"/);
+  assert.match(app, /setDashboardQueueLink\("metricFloqCastDashCard"/);
+  assert.match(app, /bindDashboardQueueCards\(activatePanel\)/);
+  assert.match(read("admin.css"), /\.metric-card\.is-queue-link/);
+});
+
 test("admin-app activates nested Feature Mgmt / ShoutOut parents", () => {
   const app = read("admin-app.js");
   assert.match(app, /admin-subtab-parent/);

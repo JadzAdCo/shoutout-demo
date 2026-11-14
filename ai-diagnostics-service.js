@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.016";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.016";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.017";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.017";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,23 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.017",
+      title: "s3.3.017 — Calendar nights, no blank ShoutOut splash, handle ? beside the label",
+      checks: [
+        {label:"Weekday sort + and", file:"floqr-feature-landing.js", includes:["joinAndList", "featureLanding.list.and"]},
+        {label:"Direct splash paint", file:"index.html", includes:["floqr-shoutout-direct"]},
+        {label:"Skip unpaid venue hold", file:"patron-app.js", includes:["if (ad || !venuePicked)"]},
+        {label:"Handle help on label", file:"patron-portal.html", includes:["help-floqr-handle", "label-inline-row"]},
+        {label:"Hydrate field ? buttons", file:"help-attach.js", includes:["hydrateInlineHelpButtons"]},
+        {label:"VCC queue links", file:"admin-app.js", includes:["setDashboardQueueLink", "n > 1"]},
+        {label:"FloqCAST dashboard label", file:"admin.html", includes:["Pending FloqCAST"]},
+        {label:"AI crawl KPI filters", file:"master-admin-rollup.js", includes:["data-ai-status-filter", "needsResearch"]},
+        {label:"IP preferred language", file:"floqr-profile-locale.js", includes:["languagePlan", "LANGUAGE_PROMPT_COUNTRIES"]},
+        {label:"Prior / future travel", file:"patron-portal.html", includes:["help-prior-travels", "editFutureTravel"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-017-nights-splash-handle", "s3-3-017-vcc-queue-floqcast", "s3-3-017-ai-crawl-kpi", "s3-3-017-lang-travel"]}
+      ]
+    },
     {
       version: "s3.3.016",
       title: "s3.3.016 — Site chrome applies on Back to Search and on login without a manual refresh",
@@ -1546,7 +1563,7 @@
       version: "s3.1.89",
       title: "Search Select follows floqCast/VIP intent",
       checks: [
-        {label:"Venue actions registry", file:"floqr-venue-actions.js", includes:["FLOQRVenueActions", "Go floqCast", "buildUrl"]},
+        {label:"Venue actions registry", file:"floqr-venue-actions.js", includes:["FLOQRVenueActions", "Go FloqCAST", "buildUrl"]},
         {label:"index loads venue-actions", file:"index.html", includes:["floqr-venue-actions.js"]},
         {label:"Listing activateListingVenue", file:"patron-app.js", includes:["activateListingVenue", "listingVenueAction"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.89\""]}
@@ -3097,6 +3114,42 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-017-nights-splash-handle",
+      area:"ShoutOut / My Profile",
+      feature:"Calendar nights, skip unpaid splash, handle ? beside the label",
+      changed:"s3.3.017 — Venue Nights read Wed, Thu, Fri, and Sat. Venue ShoutOut links never flash a blank Search page; the 5s splash only holds when a paid/house creative is showing. Use a template opens at Message. FloqR / Mingl handle ? sits next to the label (not in a bubble on the input).",
+      howToTest:"1) Hard-refresh Search s3.3.017. Throw a ShoutOut, pick a venue whose nights were out of order — card must list calendar order with and. 2) From a club page tap Throw a ShoutOut. Confirm no blank wash; splash is brief unless an ad creative is on screen. 3) Use a template — editor is at the top with the caret in Message. 4) My Profile → FloqR / Mingl handle: ? is beside the label, same as Taxi pickup, and tapping it opens handle rules. 5) Mark Succeed/Failed.",
+      expected:"Nights are calendar-ordered. No 5s branding hold without an ad. Editor opens on Message. Handle ? is on the label, not the right edge of @handle.",
+      troubleshoot:"Nights still wed, fri, sat, thu → hard-refresh shoutout-search.html + floqr-feature-landing.js s3.3.017. Blank page / 5s splash → index.html early-paint + patron-app.js showAdSplash. Handle ? still on the input → patron-portal.html + help-attach.js hydrateInlineHelpButtons; the ? must not share a flex row with the input."
+    },
+    {
+      id:"s3-3-017-vcc-queue-floqcast",
+      area:"Club Admin",
+      feature:"Dashboard queue links + FloqCAST label",
+      changed:"s3.3.017 — Venue Command Center Dashboard Pending ShoutOuts and Pending FloqCAST become links to those queues when the count is greater than 1. Visible product name is FloqCAST (feature key stays floqCast).",
+      howToTest:"1) Hard-refresh admin.html s3.3.017 as a Club Admin. 2) On Dashboard, with 0 or 1 pending ShoutOut, the Pending ShoutOuts card is not a link. With 2+, tap it — Queue Mgmt opens. 3) Same for Pending FloqCAST → FloqCAST queue. 4) Confirm the card and Feature Mgmt tab say FloqCAST, not floqCast. 5) Mark Succeed/Failed.",
+      expected:"Count 0–1 stays a static card. Count 2+ jumps to the matching queue. Label is exactly FloqCAST.",
+      troubleshoot:"Card never links → admin-app.js setDashboardQueueLink and n > 1. Still floqCast → hard-refresh admin.html + floqr-i18n.js s3.3.017."
+    },
+    {
+      id:"s3-3-017-ai-crawl-kpi",
+      area:"Master Admin",
+      feature:"AI Crawling Needs research / Approved KPI cards",
+      changed:"s3.3.017 — AI Crawling rollup cards for Needs research and Approved jump to Review Discovery Queue with that status filter.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.017, sign in, open AI Crawling. 2) Tap Needs research — the Review Discovery Queue filter becomes Needs research and the list scrolls into view. 3) Tap Approved — filter becomes Approved. 4) Mark Succeed/Failed.",
+      expected:"Those two KPI cards (and Pending review) change the queue filter and scroll to the cards. Queue total / Schedule on stay static.",
+      troubleshoot:"Cards not clickable → master-admin-rollup.js data-ai-status-filter + FLOQRAIDiscovery.jumpToStatus. Filter does not change → ai-discovery-service.js jumpToStatus / #aiDiscoveryStatusFilter."
+    },
+    {
+      id:"s3-3-017-lang-travel",
+      area:"My Profile",
+      feature:"IP preferred language + Prior / Future travel",
+      changed:"s3.3.017 — New patrons get a site language from IP/country (Spain → Spanish, Germany → German). Dubai / UAE asks Arabic vs English. Travel Interest is Prior Travels plus Future Travel Destination, with city/country spelling help.",
+      howToTest:"1) Hard-refresh My Profile s3.3.017. 2) Confirm Prior Travels and Future Travel Destination fields with ? help. Type Barclona — a Barcelona suggestion appears. 3) On a new session with a Spanish IP (or Country = Spain) and no saved language, the site is Spanish. Germany → German. UAE/Dubai shows Arabic vs English. 4) Mark Succeed/Failed.",
+      expected:"Travel fields save comma-separated cities/countries. Language follows country/IP for new patrons; UAE prompts. Turkish is not auto-selected.",
+      troubleshoot:"Old Travel Interests box → patron-portal.html s3.3.017 + floqr-place-suggest.js. Wrong language → floqr-profile-locale.js languagePlan + floqr-i18n.js maybePromptReturningPatron. IP is never stored."
+    },
     {
       id:"s3-3-016-chrome-back-login",
       area:"Site chrome",

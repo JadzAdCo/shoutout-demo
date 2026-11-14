@@ -52,21 +52,82 @@
     return out;
   }
 
+  const WEEKDAY_INDEX = Object.freeze({
+    sun: 0, sunday: 0,
+    mon: 1, monday: 1,
+    tue: 2, tues: 2, tuesday: 2,
+    wed: 3, wednesday: 3,
+    thu: 4, thur: 4, thurs: 4, thursday: 4,
+    fri: 5, friday: 5,
+    sat: 6, saturday: 6
+  });
+  const WEEKDAY_SHORT = Object.freeze(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+
+  function weekdayIndex(token) {
+    const raw = String(token || "").toLowerCase();
+    const compact = raw.replace(/[^a-z]/g, "");
+    if (compact && WEEKDAY_INDEX[compact] != null) return WEEKDAY_INDEX[compact];
+    const word = raw.match(/\b(sun(?:day)?|mon(?:day)?|tue(?:s(?:day)?)?|wed(?:nesday)?|thu(?:r(?:s(?:day)?)?)?|fri(?:day)?|sat(?:urday)?)\b/i);
+    if (!word) return -1;
+    const key = word[1].toLowerCase().replace(/[^a-z]/g, "");
+    if (WEEKDAY_INDEX[key] != null) return WEEKDAY_INDEX[key];
+    const names = Object.keys(WEEKDAY_INDEX);
+    for (let i = 0; i < names.length; i += 1) {
+      const name = names[i];
+      if (key.startsWith(name) || (key.length >= 3 && name.startsWith(key))) return WEEKDAY_INDEX[name];
+    }
+    return -1;
+  }
+
+  function hoursRowIsOpen(row) {
+    if (row == null) return false;
+    if (typeof row === "string") return !/closed/i.test(row) && row.trim() !== "";
+    if (Array.isArray(row)) return row.length > 0;
+    if (typeof row === "object") return !row.closed && !!(row.open || row.from || row.start);
+    return !!row;
+  }
+
+  function joinAndList(items) {
+    const labels = (items || []).map((x) => String(x || "").trim()).filter(Boolean);
+    if (!labels.length) return "";
+    if (labels.length === 1) return labels[0];
+    const andWord = t("featureLanding.list.and", "and");
+    if (labels.length === 2) return `${labels[0]} ${andWord} ${labels[1]}`;
+    return `${labels.slice(0, -1).join(", ")}, ${andWord} ${labels[labels.length - 1]}`;
+  }
+
+  function sortWeekdayEntries(entries) {
+    return (entries || [])
+      .map((row, i) => ({
+        idx: Number.isInteger(row?.idx) && row.idx >= 0 ? row.idx : 100 + i,
+        label: String(row?.label || "").trim()
+      }))
+      .filter((row) => row.label)
+      .sort((a, b) => a.idx - b.idx || a.label.localeCompare(b.label))
+      .map((row) => row.label);
+  }
+
   function openDaysLabel(club) {
     const hours = club?.hoursStructured || club?.openingHours || null;
     if (hours && typeof hours === "object" && !Array.isArray(hours)) {
-      const days = Object.keys(hours).filter((d) => {
-        const row = hours[d];
-        if (row == null) return false;
-        if (typeof row === "string") return !/closed/i.test(row) && row.trim() !== "";
-        if (Array.isArray(row)) return row.length > 0;
-        if (typeof row === "object") return !row.closed && (row.open || row.from || row.start);
-        return !!row;
+      const days = [];
+      Object.keys(hours).forEach((d) => {
+        if (!hoursRowIsOpen(hours[d])) return;
+        const idx = weekdayIndex(d);
+        days.push({ idx, label: idx >= 0 ? WEEKDAY_SHORT[idx] : String(d) });
       });
-      if (days.length) return days.join(", ");
+      if (days.length) return joinAndList(sortWeekdayEntries(days));
     }
-    const activity = listOf(club?.activityDates).slice(0, 4);
-    if (activity.length) return activity.join(" · ");
+    const activity = listOf(club?.activityDates);
+    if (activity.length) {
+      const days = activity.map((s) => {
+        const idx = weekdayIndex(s);
+        const raw = String(s || "").trim();
+        const label = idx >= 0 && /^[a-z]{3,9}$/i.test(raw) ? WEEKDAY_SHORT[idx] : raw;
+        return { idx, label };
+      });
+      return joinAndList(sortWeekdayEntries(days));
+    }
     const hoursText = String(club?.hours || "").trim();
     if (hoursText) return hoursText.length > 72 ? `${hoursText.slice(0, 70)}…` : hoursText;
     return "";
@@ -361,7 +422,7 @@
   function productLabel(feature) {
     if (feature === FEATURES.SHOUTOUT) return "ShoutOut";
     if (feature === FEATURES.VIP) return "VIP reserV";
-    if (feature === FEATURES.FLOQCAST) return "floqCast";
+    if (feature === FEATURES.FLOQCAST) return "FloqCAST";
     return t("featureLanding.club", "Club");
   }
 
@@ -435,6 +496,8 @@
     stripParentLogos,
     ledSizes,
     openDaysLabel,
+    joinAndList,
+    weekdayIndex,
     locationSourceLabel
   };
 

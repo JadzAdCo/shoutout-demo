@@ -138,12 +138,18 @@
     "help-floqcast-choose-venue": [
       "patron"
     ],
+    "help-floqr-handle": [
+      "patron"
+    ],
     "help-floqr-inbox-rules": [
       "patron",
       "serviceMember",
       "venueAdmin"
     ],
     "help-football-intro": [
+      "patron"
+    ],
+    "help-future-travel": [
       "patron"
     ],
     "help-general-notifications": [
@@ -214,6 +220,9 @@
     ],
     "help-onboarding": [
       "masterAdmin"
+    ],
+    "help-prior-travels": [
+      "patron"
     ],
     "help-profile-country": [
       "patron"
@@ -436,6 +445,12 @@
     "help-floqcast": [
       "patron"
     ],
+    "help-floqr-handle": [
+      "patron"
+    ],
+    "help-future-travel": [
+      "patron"
+    ],
     "help-general": [
       "patron"
     ],
@@ -467,6 +482,9 @@
       "patron"
     ],
     "help-post-ad": [
+      "patron"
+    ],
+    "help-prior-travels": [
       "patron"
     ],
     "help-profile-country": [

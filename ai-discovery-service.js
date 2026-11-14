@@ -733,6 +733,13 @@
     await loadDiscoveryQueue();
   }
 
+  function jumpToStatus(status) {
+    const sel = byId("aiDiscoveryStatusFilter");
+    if (sel && status) sel.value = status;
+    byId("aiDiscoveryQueueList")?.scrollIntoView({behavior: "smooth", block: "start"});
+    return loadDiscoveryQueue();
+  }
+
   async function loadDiscoveryQueue() {
     const status = byId("aiDiscoveryStatusFilter")?.value || "pendingReview";
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
@@ -905,6 +912,7 @@
     DEFAULT_CRITERIA,
     mountMasterAdminPanel,
     loadDiscoveryQueue,
+    jumpToStatus,
     loadListingDeleteTool
   };
 })();

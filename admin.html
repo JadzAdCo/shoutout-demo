@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.016"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.016"/>
+<link rel="stylesheet" href="./styles.css?v=s3.3.017"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.017"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html">&lt; Back</a>
@@ -83,7 +83,7 @@
                 <button class="admin-subtab" data-panel="panelTemplateBackgrounds" type="button" data-i18n="admin.templateMgmt">Template Mgmt</button>
               </div>
             </div>
-            <button class="admin-subtab" data-panel="panelFloqCast" type="button" data-i18n="admin.floqcastQueue">floqCast</button>
+            <button class="admin-subtab" data-panel="panelFloqCast" type="button" data-i18n="admin.floqcastQueue">FloqCAST</button>
             <button class="admin-subtab" data-panel="panelVipReserv" type="button" data-i18n="admin.vipReserv">VIP reserV</button>
             <button class="admin-subtab" data-panel="panelPasses" type="button" data-i18n="admin.passes">Passes</button>
           </div>
@@ -110,9 +110,15 @@
 
       <section id="panelDashboard" class="admin-panel-section active">
         <div class="metric-grid">
-          <div class="metric-card"><span>Pending ShoutOuts</span><strong id="metricPending">0</strong></div>
+          <div class="metric-card" id="metricPendingCard" data-queue-panel="panelQueue">
+            <span data-i18n="admin.pendingShoutouts">Pending ShoutOuts</span>
+            <strong id="metricPending">0</strong>
+          </div>
           <div class="metric-card"><span>Live ShoutOut</span><strong id="metricLive">0</strong></div>
-          <div class="metric-card"><span>Pending floqCast</span><strong id="metricFloqCastDash">0</strong></div>
+          <div class="metric-card" id="metricFloqCastDashCard" data-queue-panel="panelFloqCast">
+            <span data-i18n="admin.pendingFloqCast">Pending FloqCAST</span>
+            <strong id="metricFloqCastDash">0</strong>
+          </div>
           <div class="metric-card"><span>Estimated ShoutOut Revenue</span><strong id="metricRevenue">$0</strong></div>
           <div class="metric-card"><span>Ad Impressions</span><strong id="metricAdImpressions">0</strong></div>
         </div>
@@ -389,15 +395,15 @@
 
       <section id="panelFloqCast" class="admin-panel-section">
         <div class="card">
-          <h2>Pending floqCast Queue</h2>
-          <p class="sub small">Patrons pay $20 first, then wait here for venue approval before their camera can go live on the floqCast board (<code>display2.html</code>). Same idea as ShoutOut approval.</p>
+          <h2>Pending FloqCAST Queue</h2>
+          <p class="sub small">Patrons pay $20 first, then wait here for venue approval before their camera can go live on the FloqCAST board (<code>display2.html</code>). Same idea as ShoutOut approval.</p>
           <div class="metric-grid" style="margin-bottom:12px">
             <div class="metric-card"><span>Awaiting approval</span><strong id="metricFloqCastPending">0</strong></div>
             <div class="metric-card"><span>Live now</span><strong id="metricFloqCastLive">0</strong></div>
           </div>
           <p id="floqcastQueueStatus" class="status"></p>
           <p style="margin:8px 0 12px"><button id="floqcastRepairBtn" class="buttonlike" type="button">Repair paid requests</button></p>
-          <div id="floqcastQueueList"><p class="sub">Loading pending floqCast requests...</p></div>
+          <div id="floqcastQueueList"><p class="sub">Loading pending FloqCAST requests...</p></div>
         </div>
       </section>
 
@@ -1151,57 +1157,57 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.016"></script>
-<script src="./floqr-people-directory.js?v=s3.3.016"></script>
-<script src="./floqr-app-check.js?v=s3.3.016"></script>
-<script src="./floqr-nav.js?v=s3.3.016"></script>
-<script src="./global-profile-status.js?v=s3.3.016"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.016"></script>
-<script src="./shared-data.js?v=s3.3.016"></script>
-<script src="./feature-gates.js?v=s3.3.016"></script>
-<script src="./url-media-field.js?v=s3.3.016"></script>
-<script src="./media-source-picker.js?v=s3.3.016"></script>
-<script src="./ai-service.js?v=s3.3.016"></script>
-<script src="./ai-index-service.js?v=s3.3.016"></script>
-<script src="./ai-template-studio.js?v=s3.3.016"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.016"></script>
-<script src="./floqr-i18n.js?v=s3.3.016"></script>
-<script src="./botdee-help-repository.js?v=s3.3.016"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.016"></script>
-<script src="./help-attach.js?v=s3.3.016"></script>
-<script src="./helper-popouts.js?v=s3.3.016"></script>
-<script src="./floqr-identity.js?v=s3.3.016"></script>
-<script src="./floqr-logger.js?v=s3.3.016"></script>
-<script src="./payment-service.js?v=s3.3.016"></script>
-<script src="./messaging-credits.js?v=s3.3.016"></script>
-<script src="./marketing-templates.js?v=s3.3.016"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.016"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.016"></script>
-<script src="./ad-campaigns.js?v=s3.3.016"></script>
-<script src="./floqr-ad-composer.js?v=s3.3.016"></script>
-<script src="./floqr-tab-gates.js?v=s3.3.016"></script>
-<script src="./floqr-venue-calendar.js?v=s3.3.016"></script>
-<script src="./floqr-employee-network.js?v=s3.3.016"></script>
-<script src="./floqr-featured-staff.js?v=s3.3.016"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.3.016"></script>
-<script src="./floqr-access-notice.js?v=s3.3.016"></script>
-<script src="./floqr-board-frame.js?v=s3.3.016"></script>
-<script src="./floqr-safe-render.js?v=s3.3.016"></script>
-<script src="./floqr-qrcode-lib.js?v=s3.3.016"></script>
-<script src="./floqr-qr.js?v=s3.3.016"></script>
-<script src="./admin-passes.js?v=s3.3.016"></script>
-<script src="./admin-app.js?v=s3.3.016"></script>
-<script src="./admin-venue-hours.js?v=s3.3.016"></script>
-<script src="./floqr-template-tags.js?v=s3.3.016"></script>
-<script src="./admin-rep-extension.js?v=s3.3.016"></script>
-<script src="./admin-notifications.js?v=s3.3.016"></script>
-<script src="./admin-marketing.js?v=s3.3.016"></script>
-<script src="./master-twilio-logging.js?v=s3.3.016"></script>
-<script src="./admin-spot-ads.js?v=s3.3.016"></script>
-<script src="./assignment-card.js?v=s3.3.016"></script>
-<script src="./admin-scheduling.js?v=s3.3.016"></script>
-<script src="./notification-center.js?v=s3.3.016"></script>
-<script src="./profile-access-guard.js?v=s3.3.016"></script><script>
+<script src="./firebase-config.js?v=s3.3.017"></script>
+<script src="./floqr-people-directory.js?v=s3.3.017"></script>
+<script src="./floqr-app-check.js?v=s3.3.017"></script>
+<script src="./floqr-nav.js?v=s3.3.017"></script>
+<script src="./global-profile-status.js?v=s3.3.017"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.017"></script>
+<script src="./shared-data.js?v=s3.3.017"></script>
+<script src="./feature-gates.js?v=s3.3.017"></script>
+<script src="./url-media-field.js?v=s3.3.017"></script>
+<script src="./media-source-picker.js?v=s3.3.017"></script>
+<script src="./ai-service.js?v=s3.3.017"></script>
+<script src="./ai-index-service.js?v=s3.3.017"></script>
+<script src="./ai-template-studio.js?v=s3.3.017"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.017"></script>
+<script src="./floqr-i18n.js?v=s3.3.017"></script>
+<script src="./botdee-help-repository.js?v=s3.3.017"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.017"></script>
+<script src="./help-attach.js?v=s3.3.017"></script>
+<script src="./helper-popouts.js?v=s3.3.017"></script>
+<script src="./floqr-identity.js?v=s3.3.017"></script>
+<script src="./floqr-logger.js?v=s3.3.017"></script>
+<script src="./payment-service.js?v=s3.3.017"></script>
+<script src="./messaging-credits.js?v=s3.3.017"></script>
+<script src="./marketing-templates.js?v=s3.3.017"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.017"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.017"></script>
+<script src="./ad-campaigns.js?v=s3.3.017"></script>
+<script src="./floqr-ad-composer.js?v=s3.3.017"></script>
+<script src="./floqr-tab-gates.js?v=s3.3.017"></script>
+<script src="./floqr-venue-calendar.js?v=s3.3.017"></script>
+<script src="./floqr-employee-network.js?v=s3.3.017"></script>
+<script src="./floqr-featured-staff.js?v=s3.3.017"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.3.017"></script>
+<script src="./floqr-access-notice.js?v=s3.3.017"></script>
+<script src="./floqr-board-frame.js?v=s3.3.017"></script>
+<script src="./floqr-safe-render.js?v=s3.3.017"></script>
+<script src="./floqr-qrcode-lib.js?v=s3.3.017"></script>
+<script src="./floqr-qr.js?v=s3.3.017"></script>
+<script src="./admin-passes.js?v=s3.3.017"></script>
+<script src="./admin-app.js?v=s3.3.017"></script>
+<script src="./admin-venue-hours.js?v=s3.3.017"></script>
+<script src="./floqr-template-tags.js?v=s3.3.017"></script>
+<script src="./admin-rep-extension.js?v=s3.3.017"></script>
+<script src="./admin-notifications.js?v=s3.3.017"></script>
+<script src="./admin-marketing.js?v=s3.3.017"></script>
+<script src="./master-twilio-logging.js?v=s3.3.017"></script>
+<script src="./admin-spot-ads.js?v=s3.3.017"></script>
+<script src="./assignment-card.js?v=s3.3.017"></script>
+<script src="./admin-scheduling.js?v=s3.3.017"></script>
+<script src="./notification-center.js?v=s3.3.017"></script>
+<script src="./profile-access-guard.js?v=s3.3.017"></script><script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>
 </body>

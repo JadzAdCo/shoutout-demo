@@ -9,6 +9,16 @@ const root = path.join(__dirname, "..");
 const Locale = require(path.join(root, "floqr-profile-locale.js"));
 const Geo = require(path.join(root, "floqr-geo-search.js"));
 
+test("IP/country maps preferred language; UAE prompts Arabic vs English", () => {
+  assert.equal(Locale.languagePlan({country: "Spain"}).mode, "auto");
+  assert.equal(Locale.languagePlan({country: "Spain"}).code, "es");
+  assert.equal(Locale.preferredUiLanguage({ipCountryCode: "DE"}), "de");
+  assert.equal(Locale.languagePlan({country: "United Arab Emirates"}).mode, "prompt");
+  assert.deepEqual(Locale.languagePlan({ipCountryCode: "AE"}).codes, ["ar", "en"]);
+  assert.equal(Locale.preferredUiLanguage({country: "Dubai"}), "");
+  assert.equal(Locale.preferredUiLanguage({country: "Turkey"}), "");
+});
+
 test("United States defaults to ft; every other country and non-US IP default to m", () => {
   assert.equal(Locale.preferredHeightUnit({country: "United States"}), "ft");
   assert.equal(Locale.preferredHeightUnit({country: "U.S"}), "ft");

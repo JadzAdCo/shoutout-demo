@@ -42,6 +42,19 @@ test("firestore.rules lock masterAdminRollups to Master Admin read / Functions w
   assert.match(snippet, /allow write:\s*if false/);
 });
 
+test("AI Crawling Needs research and Approved KPI cards jump to queue filters", () => {
+  const src = read("master-admin-rollup.js");
+  assert.match(src, /Needs research[\s\S]*filter:\s*"needsResearch"/);
+  assert.match(src, /Approved[\s\S]*filter:\s*"approved"/);
+  assert.match(src, /data-ai-status-filter/);
+  assert.match(src, /FLOQRAIDiscovery\?\.jumpToStatus/);
+  const discovery = read("ai-discovery-service.js");
+  assert.match(discovery, /function jumpToStatus/);
+  assert.match(discovery, /aiDiscoveryStatusFilter/);
+  assert.match(discovery, /aiDiscoveryQueueList/);
+  assert.match(discovery, /jumpToStatus,/);
+});
+
 test("client rollup module paints strips and calls refreshMasterAdminRollup", () => {
   const src = read("master-admin-rollup.js");
   assert.match(src, /masterAdminRollups\/current/);

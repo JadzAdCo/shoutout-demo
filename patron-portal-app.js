@@ -13,6 +13,20 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const splitCSV = value => String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   const joinCSV = value => Array.isArray(value) ? value.join(", ") : String(value || "");
+  const priorTravelsOf = profile => {
+    if (Array.isArray(profile?.priorTravels) && profile.priorTravels.length) return profile.priorTravels;
+    return Array.isArray(profile?.travelInterests) ? profile.travelInterests : splitCSV(profile?.travelInterests);
+  };
+  const futureTravelsOf = profile => (
+    Array.isArray(profile?.futureTravelDestinations)
+      ? profile.futureTravelDestinations
+      : splitCSV(profile?.futureTravelDestinations)
+  );
+  const defaultPreferredLanguage = profile => {
+    const saved = profile?.preferredLanguage || profile?.languageSettings?.preferredLanguage || "";
+    if (saved && saved !== "auto") return saved;
+    return window.FLOQRI18n?.getLanguage?.() || "";
+  };
   function parsePersonalCorrections(value = "") {
     const seen = new Set();
     return String(value || "")
@@ -249,7 +263,7 @@
     {key:"height", label:"Height"},
     {key:"music", label:"Music interests"},
     {key:"events", label:"Event and nightlife interests"},
-    {key:"travel", label:"Travel interests"},
+    {key:"travel", label:"Prior travels and future destinations"},
     {key:"hobbies", label:"General hobbies"},
     {key:"food", label:"Food choices"},
     {key:"beverage", label:"Favorite beverage choices"},
@@ -483,7 +497,7 @@
     const rows = [
       {label: t("nav.myShoutouts", "My ShoutOuts"), status: shoutStatus, pane: "foShoutoutsPane"},
       vipOn ? {label: t("nav.guestListReserv", "Guest List & reserV"), status: t("portal.fo.periodActive", "Active this period"), pane: "foVipPane"} : null,
-      castOn ? {label: t("nav.myFloqCasts", "My FloqCasts"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
+      castOn ? {label: t("nav.myFloqCasts", "My FloqCAST"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
       {label: t("nav.myInvoices", "My Invoices"), status: t("portal.fo.invoicesHint", "Open for paid receipts"), pane: "foInvoicesPane"}
     ].filter(Boolean);
     host.innerHTML = rows.map(r =>
@@ -1517,7 +1531,7 @@
       correctionMode:profile.languageSettings?.correctionMode || "approvalRequired",
       highlightSpellingErrors:profile.languageSettings?.highlightSpellingErrors !== false,
       highlightGrammarSuggestions:profile.languageSettings?.highlightGrammarSuggestions !== false,
-      preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || "auto",
+      preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || defaultPreferredLanguage(profile) || "auto",
       tonePreference:profile.languageSettings?.tonePreference || "keepTone",
       emojiSkinTone:profile.languageSettings?.emojiSkinTone || "yellow",
       personalDictionary:Array.isArray(profile.languageSettings?.personalDictionary) ? profile.languageSettings.personalDictionary : [],
@@ -2042,7 +2056,7 @@
       phone: profile.phone || user.phoneNumber || ""
     });
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
-    byId("editLanguage").value = profile.preferredLanguage || "";
+    byId("editLanguage").value = profile.preferredLanguage || defaultPreferredLanguage(profile) || "";
     byId("editGender").value = profile.gender || "";
     editHeightCtl?.fill?.({
       unit: profile.heightUnit,
@@ -2076,7 +2090,8 @@
     byId("editProfileVisibility").value = profile.publicProfileVisibility || "followers";
     byId("editPublicProfileLanguageMode").value = profile.publicProfileLanguageMode || "preferred";
     byId("editMusicInterests").value = joinCSV(profile.musicInterests || profile.favoriteGenres);
-    byId("editTravelInterests").value = joinCSV(profile.travelInterests);
+    byId("editTravelInterests").value = joinCSV(priorTravelsOf(profile));
+    if (byId("editFutureTravel")) byId("editFutureTravel").value = joinCSV(futureTravelsOf(profile));
     byId("editHobbies").value = joinCSV(profile.hobbies || profile.generalHobbies);
     byId("editFoodChoices").value = joinCSV(profile.foodChoices) || "Sushi, Tapas, Steakhouse";
     byId("editFavoriteBeverages").value = joinCSV(profile.favoriteBeverages) || "Champagne, Tequila, Mocktails";
@@ -2395,7 +2410,8 @@
       countryCode,
       region: regionName,
       regionCode,
-      preferredLanguage,
+      preferredLanguage: preferredLanguage || defaultPreferredLanguage(currentProfile),
+      uiLanguage: window.FLOQRI18n?.normalizeCode?.(preferredLanguage) || window.FLOQRI18n?.getLanguage?.() || currentProfile?.uiLanguage || "",
       gender: byId("editGender").value,
       height: heightCheck?.empty ? (currentProfile?.height || "") : (heightCheck?.normalized || byId("editHeight").value.trim()),
       heightUnit: heightCheck?.empty
@@ -2415,6 +2431,8 @@
       publicProfileLanguageMode: byId("editPublicProfileLanguageMode").value,
       musicInterests: splitCSV(byId("editMusicInterests").value),
       travelInterests: splitCSV(byId("editTravelInterests").value),
+      priorTravels: splitCSV(byId("editTravelInterests").value),
+      futureTravelDestinations: splitCSV(byId("editFutureTravel")?.value || ""),
       hobbies: splitCSV(byId("editHobbies").value),
       foodChoices: splitCSV(byId("editFoodChoices").value || "Sushi, Tapas, Steakhouse"),
       favoriteBeverages: splitCSV(byId("editFavoriteBeverages").value || "Champagne, Tequila, Mocktails"),
@@ -2773,7 +2791,8 @@
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (travelMetadata.length) {
-        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), travelMetadata));
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(priorTravelsOf(currentProfile)), travelMetadata));
+        update.priorTravels = update.travelInterests;
         byId("editTravelInterests").value = joinCSV(update.travelInterests);
       }
       await db.collection("users").doc(user.uid).set(update, {merge:true});
@@ -2855,7 +2874,8 @@
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (addTravel && metadata) {
-        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), [metadata]));
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(priorTravelsOf(currentProfile)), [metadata]));
+        update.priorTravels = update.travelInterests;
         byId("editTravelInterests").value = joinCSV(update.travelInterests);
       }
       await db.collection("users").doc(user.uid).set(update, {merge:true});
@@ -2991,7 +3011,8 @@
         <p>${esc(displayBio)}</p>
         <div class="profile-section"><strong>Height</strong><p>${esc(heightDisplay(profile) || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
-        <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
+        <div class="profile-section"><strong>Prior Travels</strong>${chips(priorTravelsOf(profile))}</div>
+        <div class="profile-section"><strong>Future Travel</strong>${chips(futureTravelsOf(profile))}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
         <div class="profile-section"><strong>Food Choices</strong>${chips(profile.foodChoices)}</div>
         <div class="profile-section"><strong>Favorite Beverages</strong>${chips(profile.favoriteBeverages)}</div>
@@ -5168,7 +5189,6 @@
     });
     window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
     window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
-    window.FLOQRIdentity?.attachHelpPopout?.(byId("editFloqrHandleHelp"), window.FLOQRIdentity?.FLOQR_HANDLE_HELP);
     bind("memberStripeConnectBtn", startMemberConnectOnboarding);
     bind("memberStripeConnectRefreshBtn", refreshMemberConnectStatus);
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);
@@ -5285,6 +5305,16 @@
         editPickupCtl?.validate?.(false);
       }
     }) || null;
+    window.FLOQRPlaceSuggest?.bindPlaceField?.({
+      input: "editTravelInterests",
+      hint: "editPriorTravelHint",
+      suggest: "editPriorTravelSuggest"
+    });
+    window.FLOQRPlaceSuggest?.bindPlaceField?.({
+      input: "editFutureTravel",
+      hint: "editFutureTravelHint",
+      suggest: "editFutureTravelSuggest"
+    });
     editPickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
       ids: {
         streetNumber: "editTaxiStreetNumber",

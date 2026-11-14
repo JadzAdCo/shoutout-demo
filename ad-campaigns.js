@@ -25,7 +25,8 @@
     {id: "favoriteBeverages", label: "Favorite beverages"},
     {id: "hobbies", label: "Hobbies"},
     {id: "generalHobbies", label: "General hobbies"},
-    {id: "travelInterests", label: "Travel"},
+    {id: "travelInterests", label: "Prior travels"},
+    {id: "futureTravelDestinations", label: "Future travel"},
     {id: "lookingToMeet", label: "Looking to meet"}
   ];
 
@@ -550,6 +551,8 @@
       profile.hobbies,
       profile.generalHobbies,
       profile.travelInterests,
+      profile.priorTravels,
+      profile.futureTravelDestinations,
       profile.lookingToMeet
     ].flat().join(","));
   }

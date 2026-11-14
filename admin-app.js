@@ -4,6 +4,37 @@
 
   const byId = id => document.getElementById(id);
   const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  function setDashboardQueueLink(cardId, count) {
+    const card = byId(cardId);
+    if (!card) return;
+    const n = Number(count) || 0;
+    card.dataset.queueCount = String(n);
+    const linked = n > 1;
+    card.classList.toggle("is-queue-link", linked);
+    if (linked) {
+      card.setAttribute("role", "link");
+      card.tabIndex = 0;
+    } else {
+      card.removeAttribute("role");
+      card.removeAttribute("tabindex");
+    }
+  }
+  function bindDashboardQueueCards(activatePanel) {
+    document.querySelectorAll("[data-queue-panel]").forEach(card => {
+      if (card.dataset.queueBound === "1") return;
+      card.dataset.queueBound = "1";
+      const go = () => {
+        if (Number(card.dataset.queueCount) > 1) activatePanel?.(card.dataset.queuePanel);
+      };
+      card.addEventListener("click", go);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          go();
+        }
+      });
+    });
+  }
   const qs = (name, fallback = "") => new URL(window.location.href).searchParams.get(name) || fallback;
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
@@ -193,8 +224,8 @@
     if (shoutOutParent) shoutOutParent.classList.toggle("hidden", !shoutOk);
     if (floqCastTab) {
       floqCastTab.classList.toggle("hidden", !floqCastOk);
-      /* Never show legacy supRstar chrome — product brand is floqCast. */
-      floqCastTab.textContent = "floqCast";
+      /* Never show legacy supRstar chrome — product brand is FloqCAST. */
+      floqCastTab.textContent = "FloqCAST";
     }
     if (vipTab) vipTab.classList.toggle("hidden", !vipOk);
     if (passesTab) passesTab.classList.toggle("hidden", !passesOk);
@@ -421,7 +452,7 @@
   }
 
   function connectStatusMessage(result = {}) {
-    if (result.transfersReady) return `Club Stripe ready (${result.livemode ? "live mode" : "test mode"}). Paid ShoutOuts, floqCast, and VIP Club Stripe destination-charge this account when ready. Without Connect, FloqR still charges patrons.`;
+    if (result.transfersReady) return `Club Stripe ready (${result.livemode ? "live mode" : "test mode"}). Paid ShoutOuts, FloqCAST, and VIP Club Stripe destination-charge this account when ready. Without Connect, FloqR still charges patrons.`;
     if (!result.connected || result.capabilityStatus === "not-started") return "Club Stripe onboarding has not started (optional). Finish it here so VIP Club Stripe and destination charges can use this venue.";
     const due = Number(result.requirementsDue || 0);
     return `Club Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""} Patron ShoutOuts still work on FloqR Stripe until Connect is ready.`;
@@ -1246,6 +1277,7 @@
       }
     }
 
+    bindDashboardQueueCards(activatePanel);
     window.FLOQRAdminTabs = {activatePanel};
     window.FLOQRAdmin = Object.assign(window.FLOQRAdmin || {}, {
       getLocationId: () => locationId,
@@ -1608,7 +1640,7 @@
   function renderFloqCastQueue() {
     const list = byId("floqcastQueueList");
     if (!list) return;
-    list.innerHTML = "<p class='sub'>Loading pending floqCast requests...</p>";
+    list.innerHTML = "<p class='sub'>Loading pending FloqCAST requests...</p>";
     if (suprstarQueueUnsub) {
       suprstarQueueUnsub();
       suprstarQueueUnsub = null;
@@ -1633,8 +1665,9 @@
         setText("metricFloqCastPending", String(pending.length));
         setText("metricFloqCastLive", String(live.length));
         setText("metricFloqCastDash", String(pending.length));
+        setDashboardQueueLink("metricFloqCastDashCard", pending.length);
         if (!rows.length) {
-          list.innerHTML = "<p class='sub'>No paid floqCast requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
+          list.innerHTML = "<p class='sub'>No paid FloqCAST requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
           return;
         }
         list.innerHTML = "";
@@ -1644,8 +1677,8 @@
           const status = String(item.status || "");
           const paid = item.paymentStatus === "paid";
           div.innerHTML = `
-            <strong>floqCast · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
-            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: floqCast (display2)</p>
+            <strong>FloqCAST · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
+            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: FloqCAST (display2)</p>
             <small>
               Status: ${esc(status)}
               · Payment: ${esc(paid ? "paid $20" : "unpaid")}
@@ -1654,7 +1687,7 @@
             <div class="queue-actions">
               ${status === "pending_approval" || (paid && (status === "awaiting_payment" || status === "preview")) ? `<button class="approve" type="button">Approve — allow go live</button>
               <button class="reject" type="button">Reject</button>` : ""}
-              ${status === "live" ? `<span class="sub small">Live on venue floqCast board</span>` : ""}
+              ${status === "live" ? `<span class="sub small">Live on venue FloqCAST board</span>` : ""}
               ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
             </div>`;
           div.querySelector(".approve")?.addEventListener("click", async () => {
@@ -1668,7 +1701,7 @@
             }
           });
           div.querySelector(".reject")?.addEventListener("click", async () => {
-            if (!confirm("Reject this paid floqCast request?")) return;
+            if (!confirm("Reject this paid FloqCAST request?")) return;
             try {
               setText("floqcastQueueStatus", "Rejecting…");
               if (status !== "pending_approval") await callable("repairFloqCastPaidOrders")({locationId});
@@ -2904,6 +2937,7 @@
       .onSnapshot(snapshot => {
         queueList.innerHTML = "";
         setText("metricPending", String(snapshot.size));
+        setDashboardQueueLink("metricPendingCard", snapshot.size);
 
         if (snapshot.empty) {
           queueList.innerHTML = "<p class='sub'>No pending ShoutOuts yet.</p>";

@@ -327,11 +327,56 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
   }
 
   /** Declarative: elements with data-floqr-help-body (and optional data-floqr-help-title). */
+  function helpEntryById(id) {
+    const helpId = textOf(id);
+    if (!helpId) return null;
+    try {
+      return (global.FLOQRHelpRepository?.entries?.() || []).find((entry) => entry && entry.id === helpId) || null;
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  /**
+   * Profile field `button.floqr-help-popout` is a leftover bubble on the input row.
+   * Replace it with the standard `details.help-popout` beside the label.
+   */
+  function hydrateInlineHelpButtons(root = document) {
+    const buttons = root.querySelectorAll
+      ? [...root.querySelectorAll("button.floqr-help-popout[data-floqr-help-id]")]
+      : [];
+    if (root.matches?.("button.floqr-help-popout[data-floqr-help-id]")) buttons.unshift(root);
+    buttons.forEach((btn) => {
+      if (!btn?.isConnected) return;
+      const row = btn.closest?.(".label-inline-row");
+      if (!row) return;
+      const id = textOf(btn.getAttribute("data-floqr-help-id"));
+      if (!id) return;
+      const entry = helpEntryById(id);
+      const title = textOf(btn.getAttribute("data-floqr-help-title")) || textOf(entry?.title) || id;
+      const body = textOf(btn.getAttribute("data-floqr-help-body")) || textOf(entry?.body);
+      const search = String(btn.getAttribute("data-floqr-help-search") || "")
+        .split("|")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      btn.remove();
+      attach({
+        target: row,
+        id,
+        title,
+        body,
+        searchPhrases: search.length ? search : (entry?.searchPhrases || [title])
+      });
+    });
+  }
+
   function mountAll(root = document) {
     ensureCss();
     bindPanelPosition();
     glueOrphanPopouts(root);
+    hydrateInlineHelpButtons(root);
     root.querySelectorAll?.("[data-floqr-help-body]").forEach(node => {
+      if (node.matches?.("button.floqr-help-popout")) return;
       if (node.dataset.floqrHelpMounted === "1") return;
       node.dataset.floqrHelpMounted = "1";
       attach({

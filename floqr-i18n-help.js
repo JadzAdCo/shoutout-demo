@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.016";
+  const VERSION = "s3.3.017";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -15,7 +15,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, floqCast, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
+        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -79,19 +79,19 @@
       },
       "botdee-ask-floqr": {
         title: "Спросите FloqR через BOT DEE",
-        body: "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
+        body: "Спросите FloqR через BOT DEE — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
       },
       "help-soccer-jersey": {
         title: "ShoutOut в футбольной майке",
         body: "Ищите Soccer, Jersey или страну/клуб (Tanzania, Chelsea). Каждая карточка фото-кита — это спина LED, которую вы увидите в ShoutOut — Soccer · Jersey · Country или Club. Размеры 96×48, 64×48, 64×32. Имя и 2-символьная метка накладываются на кит; номера остаются по центру."
       },
       "help-floqcast": {
-        title: "Сделать меня floqCast / superstar",
-        body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди floqCast → Go live на доске floqCast. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
+        title: "Сделать меня FloqCAST / superstar",
+        body: "Выберите площадку → приватный превью камеры → оплата $20 (окно Stripe) → Club Admin одобряет в очереди FloqCAST → Go live на доске FloqCAST. Как ShoutOut, но с живым видео. Ссылки превью используют секретные токены — их нельзя угадать по URL клуба."
       },
       "help-floqcast-choose-venue": {
-        title: "Выберите площадку floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Выберите площадку FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -207,7 +207,7 @@
       },
       "help-app-language": {
         title: "Язык приложения",
-        body: "При первом запуске FloqR читает язык браузера (например nl-NL → Dutch / Nederlands) и переключает интерфейс и меню, если язык поддерживается — категории Search, вкладки My Profile, Club Admin и Master Admin. Неподдерживаемые языки остаются на английском. После этого побеждают My Profile → App language и сохранённый язык профиля. Сохранение App language переводит каждую страницу с FLOQRI18n, не только эту карточку."
+        body: "Новый посетитель с испанским интернет-адресом начинает FloqR на испанском, и Preferred Language становится Spanish. Другие страны с привязкой работают так же (французский IP — французский). После первого визита побеждают этот параметр и сохранённый язык профиля. Меняйте в любой момент в My Profile → Language Settings. Неподдерживаемые языки остаются английскими. Чтобы исправить формулировки для всех, Master Admin использует Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Тема сайта",
@@ -236,6 +236,18 @@
       "help-taxi-pickup-address": {
         title: "Адрес подачи такси",
         body: "Для RydR нужны номер дома, улица, город, штат или провинция (для стран из списка) и ZIP или почтовый индекс. Жители США вводят ZIP (12345 или 12345-6789). Канада и другие страны, либо интернет-место вне США, используют почтовый индекс. FLOQR подставляет подпись из страны профиля и IP. Адрес остаётся частным — это не публичный пункт Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Ник FloqR / Mingl",
+        body: "Ник FloqR / Mingl: только буквы, цифры, подчёркивания (_) и дефисы (-). Без пробелов, эмодзи и других символов. На публичных профилях показывается как @your_handle."
+      },
+      "help-prior-travels": {
+        title: "Прошлые поездки (город или страна)",
+        body: "Перечислите уже посещённые города или страны через запятую (Барселона, Майами, Испания). Настоящие топонимы — FLOQR предлагает написание из каталога, затем Google AI Studio (Gemini), если вы вошли. Это публичная точка Mingl о путешествиях, если вы включили её в разделе Конфиденциальность."
+      },
+      "help-future-travel": {
+        title: "Будущее направление (город или страна)",
+        body: "Перечислите города или страны, куда хотите поехать, через запятую (Лиссабон, Япония). Город или страна, не клуб и не район. FLOQR предлагает стандартное написание. Если путешествия открыты в Конфиденциальности, BOT DEE может использовать эти направления так же, как прошлые поездки."
       },
       "help-onboarding": {
         title: "Онбординг",
@@ -361,7 +373,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, floqCast, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
+        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
       },
       "help-search-settings-appearance": {
         title: "Settings op Search",
@@ -425,19 +437,19 @@
       },
       "botdee-ask-floqr": {
         title: "Vraag FloqR met BOT DEE",
-        body: "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
+        body: "Vraag FloqR met BOT DEE — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
       },
       "help-soccer-jersey": {
         title: "Voetbalshirt ShoutOut",
         body: "Zoek Soccer, Jersey of een land/club (Tanzania, Chelsea). Elke foto-kitkaart is de LED-rug die je op ShoutOut ziet — Soccer · Jersey · Country of Club. Formaten 96×48, 64×48, 64×32. Naam en 2-tekenmarkering liggen over de kit; nummers blijven gecentreerd."
       },
       "help-floqcast": {
-        title: "Maak me een floqCast / superstar",
-        body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de floqCast Queue → Go live op het floqCast-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
+        title: "Maak me een FloqCAST / superstar",
+        body: "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de FloqCAST Queue → Go live op het FloqCAST-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
       },
       "help-floqcast-choose-venue": {
-        title: "Kies een floqCast-venue",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Kies een FloqCAST-venue",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -553,7 +565,7 @@
       },
       "help-app-language": {
         title: "App-taal",
-        body: "Bij eerste gebruik leest FloqR de browsertaal (bijvoorbeeld nl-NL → Dutch / Nederlands) en schakelt chrome en menu’s over wanneer die taal wordt ondersteund — Search-categorieën, My Profile-tabbladen, Club Admin-tabbladen en Master Admin-tabbladen. Niet-ondersteunde talen blijven Engels. Daarna winnen My Profile → App language en de opgeslagen profieltaal. App language opslaan vertaalt elke pagina die FLOQRI18n laadt, niet alleen deze kaart."
+        body: "Een nieuwe bezoeker met een Spaanse internetlocatie start FloqR in het Spaans, en Preferred Language wordt Spanish. Andere gekoppelde landen volgen dezelfde regel (een Frans IP start in het Frans). Na het eerste bezoek winnen deze instelling en je opgeslagen profieltaal. Wijzig het altijd onder My Profile → Language Settings. Niet-ondersteunde talen blijven Engels. Om teksten voor iedereen te corrigeren gebruikt Master Admin Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Sitethema",
@@ -582,6 +594,18 @@
       "help-taxi-pickup-address": {
         title: "Taxi-ophaaladres",
         body: "RydR-ophaal heeft een huisnummer, straatnaam, stad, staat of provincie (voor de vermelde landen) en ZIP of postcode nodig. Inwoners van de VS vullen een ZIP in (12345 of 12345-6789). Canada en andere landen, of een niet-Amerikaanse internetlocatie, gebruiken een postcode. FLOQR vult het label uit je profielland en IP. Dit adres blijft privé — het is geen openbaar Mingl-datapunt."
+      },
+      "help-floqr-handle": {
+        title: "FloqR- / Mingl-handle",
+        body: "FloqR- / Mingl-handle: alleen letters, cijfers, underscores (_) en streepjes (-). Geen spaties, emoji of andere symbolen. Wordt op openbare profielen getoond als @your_handle."
+      },
+      "help-prior-travels": {
+        title: "Eerdere reizen (stad of land)",
+        body: "Lijst steden of landen die u al bezocht, kommagescheiden (Barcelona, Miami, Spanje). Echte plaatsnamen — FLOQR stelt spelling voor uit een catalogus, daarna Google AI Studio (Gemini) als u bent ingelogd. Dit is het openbare Mingl-reisdatapunt als u het onder Privacy inschakelt."
+      },
+      "help-future-travel": {
+        title: "Toekomstige bestemming (stad of land)",
+        body: "Lijst steden of landen die u hierna wilt bezoeken, kommagescheiden (Lissabon, Japan). Stad of land, geen club of buurt. FLOQR stelt de standaardspelling voor. Als reizen openbaar is onder Privacy, kan BOT DEE deze bestemmingen gebruiken zoals eerdere reizen."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -707,7 +731,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, floqCast, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
+        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -771,19 +795,19 @@
       },
       "botdee-ask-floqr": {
         title: "Demandez FloqR avec BOT DEE",
-        body: "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
+        body: "Demandez FloqR avec BOT DEE — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
       },
       "help-soccer-jersey": {
         title: "Maillot de football ShoutOut",
         body: "Recherchez Football, Jersey ou un pays/club (Tanzanie, Chelsea). Chaque carte du kit photo est le dos LED que vous verrez sur ShoutOut — Football · Maillot · Pays ou Club. Tailles 96×48, 64×48, 64×32. Le nom et la marque à 2 caractères superposent le kit ; les nombres restent justifiés au centre."
       },
       "help-floqcast": {
-        title: "Fais de moi une floqCast / superstar",
-        body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente floqCast → Go live sur le tableau floqCast. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
+        title: "Fais de moi une FloqCAST / superstar",
+        body: "Choisissez un lieu → aperçu par caméra privée → payez 20 $ (Stripe pop-out) → Club Admin approuve dans la file d'attente FloqCAST → Go live sur le tableau FloqCAST. Comme un ShoutOut, mais en vidéo en direct. Les liens de prévisualisation utilisent des jetons secrets afin qu'ils ne puissent pas être devinés à partir de l'URL d'un club."
       },
       "help-floqcast-choose-venue": {
-        title: "Choisir un lieu floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Choisir un lieu FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -899,7 +923,7 @@
       },
       "help-app-language": {
         title: "Langue de l'application",
-        body: "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
+        body: "Un nouveau visiteur dont la localisation internet est l'Espagne démarre FloqR en espagnol, et Preferred Language est défini sur Spanish. Les autres pays mappés suivent la même règle (une IP française démarre en français). Après la première visite, ce réglage et la langue enregistrée du profil l'emportent. Modifiez-le à tout moment dans My Profile → Language Settings. Les langues non prises en charge restent en anglais. Pour corriger les formulations pour tout le monde, Master Admin utilise Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Thème du site",
@@ -928,6 +952,18 @@
       "help-taxi-pickup-address": {
         title: "Adresse de prise en charge taxi",
         body: "RydR a besoin d’un numéro de rue, d’un nom de rue, d’une ville, d’un État ou d’une province (pour les pays listés) et d’un ZIP ou code postal. Les résidents des États-Unis saisissent un ZIP (12345 ou 12345-6789). Le Canada et les autres pays, ou un lieu internet hors États-Unis, utilisent un code postal. FLOQR remplit le libellé d’après le pays du profil et l’IP. L’adresse reste privée — ce n’est pas un point Mingl public."
+      },
+      "help-floqr-handle": {
+        title: "Identifiant FloqR / Mingl",
+        body: "Identifiant FloqR / Mingl : lettres, chiffres, tirets bas (_) et tirets (-) uniquement. Pas d’espaces, d’emoji ni d’autres symboles. Affiché comme @your_handle sur les profils publics."
+      },
+      "help-prior-travels": {
+        title: "Voyages précédents (ville ou pays)",
+        body: "Listez les villes ou pays déjà visités, séparés par des virgules (Barcelone, Miami, Espagne). Utilisez de vrais noms de lieux — FLOQR suggère l’orthographe depuis un catalogue, puis Google AI Studio (Gemini) lorsque vous êtes connecté. C’est le datapoint voyage Mingl public si vous l’activez dans Confidentialité."
+      },
+      "help-future-travel": {
+        title: "Destination future (ville ou pays)",
+        body: "Listez les villes ou pays que vous voulez visiter ensuite, séparés par des virgules (Lisbonne, Japon). Entrez une ville ou un pays, pas un club ni un quartier. FLOQR suggère l’orthographe standard. Si le voyage est public dans Confidentialité, BOT DEE peut utiliser ces destinations comme les voyages précédents."
       },
       "help-onboarding": {
         title: "Intégration",
@@ -1053,7 +1089,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, floqCast, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
+        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
       },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
@@ -1117,19 +1153,19 @@
       },
       "botdee-ask-floqr": {
         title: "Fragen Sie FloqR mit BOT DEE",
-        body: "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, floqCast (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
+        body: "Fragen Sie FloqR mit BOT DEE – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, FloqCAST (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
       },
       "help-soccer-jersey": {
         title: "Fußballtrikot ShoutOut",
         body: "Suchen Sie nach Fußball, Trikot oder einem Land/Verein (Tansania, Chelsea). Jede Foto-Kit-Karte ist die LED-Rückseite, die Sie auf ShoutOut sehen – Fußball · Trikot · Land oder Verein. Größen 96×48, 64×48, 64×32. Name und zweistellige Markierung liegen über dem Kit; Zahlen bleiben mittig ausgerichtet."
       },
       "help-floqcast": {
-        title: "Mach mich zu einem floqCast/Superstar",
-        body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der floqCast-Warteschlange → Go live auf der floqCast-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
+        title: "Mach mich zu einem FloqCAST/Superstar",
+        body: "Wählen Sie einen Veranstaltungsort → private Kameravorschau → zahlen Sie 20 $ (5 Pop-out) → Club Admin Genehmigungen in der FloqCAST-Warteschlange → Go live auf der FloqCAST-Tafel. Wie ein ShoutOut, aber Live-Video. Vorschau-Links verwenden geheime Token, sodass sie nicht anhand einer Club-URL erraten werden können."
       },
       "help-floqcast-choose-venue": {
-        title: "floqCast-Venue wählen",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "FloqCAST-Venue wählen",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -1245,7 +1281,7 @@
       },
       "help-app-language": {
         title: "App-Sprache",
-        body: "Bei der ersten Verwendung liest FloqR die Browsersprache (zum Beispiel nl-NL → Niederländisch / Nederlands) und schaltet Chrome und Menüs auf diese Sprache um, sofern diese unterstützt wird – Suchkategorien, Registerkarten „Mein Profil“, Club Admin-Registerkarten und Master Admin-Registerkarten. Nicht unterstützte Sprachen bleiben auf Englisch. Danach gewinnen Mein Profil → App-Sprache und die gespeicherte Profilsprache. Beim Speichern der App-Sprache wird jede Seite, die FLOQRI18n lädt, neu übersetzt, nicht nur diese Karte."
+        body: "Ein neuer Besucher mit spanischem Internetstandort startet FloqR auf Spanisch, und Preferred Language wird auf Spanish gesetzt. Andere zugeordnete Länder folgen derselben Regel (eine französische IP startet auf Französisch). Nach dem ersten Besuch gewinnen diese Einstellung und deine gespeicherte Profilsprache. Ändere sie jederzeit unter My Profile → Language Settings. Nicht unterstützte Sprachen bleiben auf Englisch. Um Formulierungen für alle zu korrigieren, nutzt Master Admin Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Site-Theme",
@@ -1274,6 +1310,18 @@
       "help-taxi-pickup-address": {
         title: "Taxi-Abholadresse",
         body: "RydR braucht Hausnummer, Straßenname, Stadt, Bundesland oder Provinz (für die genannten Länder) und ZIP oder Postleitzahl. US-Bewohner geben eine ZIP ein (12345 oder 12345-6789). Kanada und andere Länder oder ein nicht-US-Internetstandort nutzen eine Postleitzahl. FLOQR füllt die Beschriftung aus Profilland und IP. Die Adresse bleibt privat — kein öffentlicher Mingl-Datenpunkt."
+      },
+      "help-floqr-handle": {
+        title: "FloqR- / Mingl-Handle",
+        body: "FloqR- / Mingl-Handle: nur Buchstaben, Zahlen, Unterstriche (_) und Bindestriche (-). Keine Leerzeichen, Emojis oder andere Zeichen. Auf öffentlichen Profilen als @your_handle angezeigt."
+      },
+      "help-prior-travels": {
+        title: "Frühere Reisen (Stadt oder Land)",
+        body: "Listen Sie bereits besuchte Städte oder Länder kommagetrennt (Barcelona, Miami, Spanien). Echte Ortsnamen — FLOQR schlägt Schreibweisen aus einem Katalog vor, dann Google AI Studio (Gemini), wenn Sie angemeldet sind. Das ist der öffentliche Mingl-Reisedatenpunkt, wenn Sie ihn unter Datenschutz freigeben."
+      },
+      "help-future-travel": {
+        title: "Nächstes Reiseziel (Stadt oder Land)",
+        body: "Listen Sie Städte oder Länder, die Sie als Nächstes besuchen möchten, kommagetrennt (Lissabon, Japan). Stadt oder Land, kein Club und kein Stadtteil. FLOQR schlägt die Standardschreibweise vor. Wenn Reisen unter Datenschutz öffentlich sind, kann BOT DEE diese Ziele wie frühere Reisen nutzen."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -1399,7 +1447,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, floqCast, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
+        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1463,19 +1511,19 @@
       },
       "botdee-ask-floqr": {
         title: "Pregunta FloqR con BOT DEE",
-        body: "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, floqCast (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
+        body: "Pregunta FloqR con BOT DEE: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, FloqCAST (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
       },
       "help-soccer-jersey": {
         title: "Camiseta de fútbol ShoutOut",
         body: "Busque fútbol, ​​camiseta o un país/club (Tanzania, Chelsea). Cada tarjeta del kit fotográfico es el LED posterior que verás en ShoutOut — Fútbol · Camiseta · País o Club. Medidas 96×48, 64×48, 64×32. El nombre y la marca de 2 caracteres se superponen en el kit; los números permanecen justificados en el centro."
       },
       "help-floqcast": {
-        title: "Hazme un floqCast / superestrella",
-        body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola floqCast → Go live en el tablero floqCast. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
+        title: "Hazme un FloqCAST / superestrella",
+        body: "Elija un lugar → vista previa de cámara privada → pague $20 (Stripe ventana emergente) → Club Admin aprueba en la cola FloqCAST → Go live en el tablero FloqCAST. Como un ShoutOut, pero vídeo en directo. Los enlaces de vista previa utilizan tokens secretos para que no se puedan adivinar a partir de la URL de un club."
       },
       "help-floqcast-choose-venue": {
-        title: "Elige un local floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Elige un local FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -1591,7 +1639,7 @@
       },
       "help-app-language": {
         title: "Idioma de la aplicación",
-        body: "En el primer uso, FloqR lee el idioma del navegador (por ejemplo, nl-NL → Holandés/Nederlands) y cambia Chrome y los menús a ese idioma cuando sea compatible: categorías de búsqueda, pestañas Mi perfil, pestañas Club Admin y pestañas Master Admin. Los idiomas no admitidos permanecen en inglés. Después de eso, ganan Mi perfil → Idioma de la aplicación y el idioma del perfil guardado. Al guardar el idioma de la aplicación, se vuelve a traducir cada página que se carga FLOQRI18n, no solo esta tarjeta."
+        body: "Un visitante nuevo con ubicación de internet en España empieza FloqR en español, y Preferred Language se establece en Spanish. Otros países asignados siguen la misma regla (una IP francesa empieza en francés). Tras la primera visita ganan este ajuste y el idioma guardado del perfil. Cámbialo cuando quieras en My Profile → Language Settings. Los idiomas no admitidos siguen en inglés. Para corregir el texto para todos, Master Admin usa Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Tema del sitio",
@@ -1620,6 +1668,18 @@
       "help-taxi-pickup-address": {
         title: "Dirección de recogida de taxi",
         body: "RydR necesita número, calle, ciudad, estado o provincia (para los países de la lista) y ZIP o código postal. Quienes viven en EE. UU. ponen un ZIP (12345 o 12345-6789). Canadá y otros países, o una ubicación de internet fuera de EE. UU., usan código postal. FLOQR rellena la etiqueta con el país del perfil y la IP. La dirección es privada — no es un dato público de Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Identificador FloqR / Mingl",
+        body: "Identificador FloqR / Mingl: solo letras, números, guiones bajos (_) y guiones (-). Sin espacios, emoji ni otros símbolos. Se muestra como @your_handle en perfiles públicos."
+      },
+      "help-prior-travels": {
+        title: "Viajes anteriores (ciudad o país)",
+        body: "Liste ciudades o países que ya visitó, separados por comas (Barcelona, Miami, España). Use nombres reales — FLOQR sugiere la grafía de un catálogo y luego Google AI Studio (Gemini) si ha iniciado sesión. Es el datapoint de viaje Mingl público si lo activa en Privacidad."
+      },
+      "help-future-travel": {
+        title: "Destino futuro (ciudad o país)",
+        body: "Liste ciudades o países que quiera visitar, separados por comas (Lisboa, Japón). Ciudad o país, no un local ni un barrio. FLOQR sugiere la grafía estándar. Si el viaje está público en Privacidad, BOT DEE puede usar estos destinos igual que los viajes anteriores."
       },
       "help-onboarding": {
         title: "Incorporación",
@@ -1745,7 +1805,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, floqCast, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
+        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
       },
       "help-search-settings-appearance": {
         title: "Settings su Search",
@@ -1809,19 +1869,19 @@
       },
       "botdee-ask-floqr": {
         title: "Chiedi FloqR con BOT DEE",
-        body: "Chiedi FloqR con BOT DEE: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
+        body: "Chiedi FloqR con BOT DEE: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
       },
       "help-soccer-jersey": {
         title: "Maglia da calcio ShoutOut",
         body: "Cerca calcio, maglia o un paese/club (Tanzania, Chelsea). Ogni scheda del kit fotografico è il retro LED che vedrai su ShoutOut — Calcio · Maglia · Nazione o Club. Formati 96×48, 64×48, 64×32. Nome e marchio di 2 caratteri sovrapposti al kit; i numeri rimangono giustificati al centro."
       },
       "help-floqcast": {
-        title: "Fammi un floqCast / superstar",
-        body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda floqCast → Go live sulla bacheca floqCast. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
+        title: "Fammi un FloqCAST / superstar",
+        body: "Scegli un luogo → anteprima tramite telecamera privata → paga $ 20 (Stripe pop-out) → Club Admin approva nella coda FloqCAST → Go live sulla bacheca FloqCAST. Come un ShoutOut, ma video dal vivo. I collegamenti di anteprima utilizzano token segreti in modo che non possano essere indovinati dall'URL di un club."
       },
       "help-floqcast-choose-venue": {
-        title: "Scegli un locale floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Scegli un locale FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -1937,7 +1997,7 @@
       },
       "help-app-language": {
         title: "Lingua dell'app",
-        body: "Al primo utilizzo, FloqR legge la lingua del browser (ad esempio nl-NL → olandese/olandese) e imposta Chrome e i menu su quella lingua quando è supportata: categorie di ricerca, schede Il mio profilo, schede Club Admin e schede Master Admin. Le lingue non supportate rimangono l'inglese. Successivamente prevalgono Il mio profilo → Lingua dell'app e la lingua del profilo salvata. Il salvataggio della lingua dell'app traduce nuovamente ogni pagina che carica FLOQRI18n, non solo questa scheda."
+        body: "Un nuovo visitatore con località internet in Spagna avvia FloqR in spagnolo e Preferred Language è impostato su Spanish. Gli altri Paesi mappati seguono la stessa regola (un IP francese parte in francese). Dopo la prima visita vincono questa impostazione e la lingua salvata del profilo. Cambiala in qualsiasi momento in My Profile → Language Settings. Le lingue non supportate restano in inglese. Per correggere i testi per tutti, Master Admin usa Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Tema del sito",
@@ -1966,6 +2026,18 @@
       "help-taxi-pickup-address": {
         title: "Indirizzo di ritiro taxi",
         body: "RydR richiede numero civico, via, città, stato o provincia (per i paesi in elenco) e ZIP o CAP. I residenti negli Stati Uniti inseriscono uno ZIP (12345 o 12345-6789). Canada e altri paesi, o una posizione internet non USA, usano il CAP. FLOQR riempie l’etichetta dal paese del profilo e dall’IP. L’indirizzo resta privato — non è un dato pubblico Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Handle FloqR / Mingl",
+        body: "Handle FloqR / Mingl: solo lettere, numeri, underscore (_) e trattini (-). Niente spazi, emoji o altri simboli. Sui profili pubblici compare come @your_handle."
+      },
+      "help-prior-travels": {
+        title: "Viaggi precedenti (città o paese)",
+        body: "Elenca città o paesi già visitati, separati da virgole (Barcellona, Miami, Spagna). Nomi di luoghi reali — FLOQR suggerisce l’ortografia da un catalogo, poi Google AI Studio (Gemini) se hai effettuato l’accesso. È il datapoint di viaggio Mingl pubblico se lo attivi in Privacy."
+      },
+      "help-future-travel": {
+        title: "Destinazione futura (città o paese)",
+        body: "Elenca città o paesi che vuoi visitare, separati da virgole (Lisbona, Giappone). Città o paese, non un locale né un quartiere. FLOQR suggerisce l’ortografia standard. Se i viaggi sono pubblici in Privacy, BOT DEE può usare queste destinazioni come i viaggi precedenti."
       },
       "help-onboarding": {
         title: "Onboarding",
@@ -2091,7 +2163,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, floqCast, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
+        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2155,19 +2227,19 @@
       },
       "botdee-ask-floqr": {
         title: "Pergunte FloqR com BOT DEE",
-        body: "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, floqCast (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+        body: "Pergunte FloqR com BOT DEE — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, FloqCAST (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
       },
       "help-soccer-jersey": {
         title: "Camisa de futebol ShoutOut",
         body: "Pesquise Futebol, Jersey ou um país/clube (Tanzânia, Chelsea). Cada cartão de kit fotográfico é o LED traseiro que você verá em ShoutOut — Futebol · Camisa · País ou Clube. Tamanhos 96×48, 64×48, 64×32. O nome e a marca de 2 caracteres sobrepõem o kit; os números permanecem justificados ao centro."
       },
       "help-floqcast": {
-        title: "Faça de mim um floqCast / superstar",
-        body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila floqCast → Go live no quadro floqCast. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+        title: "Faça de mim um FloqCAST / superstar",
+        body: "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila FloqCAST → Go live no quadro FloqCAST. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
       },
       "help-floqcast-choose-venue": {
-        title: "Escolher um local floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Escolher um local FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -2283,7 +2355,7 @@
       },
       "help-app-language": {
         title: "Idioma do aplicativo",
-        body: "Na primeira utilização, FloqR lê o idioma do navegador (por exemplo, nl-NL → Holandês / Nederlands) e alterna o cromo e os menus para esse idioma quando é suportado – categorias de pesquisa, guias Meu perfil, guias Club Admin e guias Master Admin. Os idiomas não suportados permanecem em inglês. Depois disso, Meu Perfil → Idioma do aplicativo e o idioma do perfil salvo vencem. Salvar o idioma do aplicativo traduz novamente todas as páginas que carregam FLOQRI18n, não apenas este cartão."
+        body: "Um visitante novo com localização de internet em Espanha inicia o FloqR em espanhol, e Preferred Language fica Spanish. Outros países mapeados seguem a mesma regra (um IP francês começa em francês). Depois da primeira visita, esta definição e o idioma guardado do perfil prevalecem. Altere a qualquer momento em My Profile → Language Settings. Idiomas não suportados ficam em inglês. Para corrigir o texto para todos, o Master Admin usa Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Tema do site",
@@ -2312,6 +2384,18 @@
       "help-taxi-pickup-address": {
         title: "Morada de recolha de táxi",
         body: "O RydR precisa de número de porta, rua, cidade, estado ou província (para os países da lista) e ZIP ou código postal. Residentes nos EUA introduzem um ZIP (12345 ou 12345-6789). Canadá e outros países, ou uma localização de internet fora dos EUA, usam código postal. A FLOQR preenche o rótulo a partir do país do perfil e do IP. A morada fica privada — não é um dado público Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Identificador FloqR / Mingl",
+        body: "Identificador FloqR / Mingl: apenas letras, números, underscores (_) e hífens (-). Sem espaços, emoji ou outros símbolos. Aparece como @your_handle nos perfis públicos."
+      },
+      "help-prior-travels": {
+        title: "Viagens anteriores (cidade ou país)",
+        body: "Liste cidades ou países já visitados, separados por vírgulas (Barcelona, Miami, Espanha). Nomes reais — a FLOQR sugere a grafia de um catálogo e depois o Google AI Studio (Gemini) quando você está conectado. É o datapoint de viagem Mingl público se você ativar em Privacidade."
+      },
+      "help-future-travel": {
+        title: "Destino futuro (cidade ou país)",
+        body: "Liste cidades ou países que quer visitar a seguir, separados por vírgulas (Lisboa, Japão). Cidade ou país, não um clube nem um bairro. A FLOQR sugere a grafia padrão. Se a viagem estiver pública em Privacidade, a BOT DEE pode usar esses destinos como as viagens anteriores."
       },
       "help-onboarding": {
         title: "Integração",
@@ -2437,7 +2521,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, floqCast, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
+        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
       },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
@@ -2501,19 +2585,19 @@
       },
       "botdee-ask-floqr": {
         title: "Ρωτήστε το FloqR με το BOT DEE",
-        body: "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, floqCast (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
+        body: "Ρωτήστε το FloqR με το BOT DEE — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, FloqCAST (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
       },
       "help-soccer-jersey": {
         title: "Ποδοσφαιρική φανέλα ShoutOut",
         body: "Αναζητήστε Ποδόσφαιρο, Τζέρσεϊ ή χώρα/σύλλογο (Τανζανία, Τσέλσι). Κάθε κάρτα κιτ φωτογραφιών είναι το LED πίσω που θα δείτε στο ShoutOut — Ποδόσφαιρο · Τζέρσεϊ · Χώρα ή Σύλλογος. Μεγέθη 96×48, 64×48, 64×32. Το όνομα και το σημάδι 2 χαρακτήρων επικαλύπτουν το κιτ. οι αριθμοί παραμένουν στο κέντρο-δικαιολογημένοι."
       },
       "help-floqcast": {
-        title: "Κάνε με floqCast / σούπερ σταρ",
-        body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά floqCast → Go live στον πίνακα floqCast. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
+        title: "Κάνε με FloqCAST / σούπερ σταρ",
+        body: "Επιλέξτε έναν χώρο → προεπισκόπηση ιδιωτικής κάμερας → πληρώστε $20 (Stripe αναδυόμενο παράθυρο) → Club Admin εγκρίνει στην ουρά FloqCAST → Go live στον πίνακα FloqCAST. Όπως ένα ShoutOut, αλλά ζωντανό βίντεο. Οι σύνδεσμοι προεπισκόπησης χρησιμοποιούν μυστικά διακριτικά, ώστε να μην μπορούν να μαντευτούν από μια διεύθυνση URL συλλόγου."
       },
       "help-floqcast-choose-venue": {
-        title: "Επιλέξτε χώρο floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Επιλέξτε χώρο FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -2629,7 +2713,7 @@
       },
       "help-app-language": {
         title: "Γλώσσα εφαρμογής",
-        body: "Κατά την πρώτη χρήση, το FloqR διαβάζει τη γλώσσα του προγράμματος περιήγησης (για παράδειγμα nl-NL → Ολλανδικά / Ολλανδικά) και αλλάζει το chrome και τα μενού σε αυτήν τη γλώσσα όταν υποστηρίζεται — Κατηγορίες αναζήτησης, καρτέλες Το προφίλ μου, καρτέλες Club Admin και καρτέλες Master Admin. Οι μη υποστηριζόμενες γλώσσες παραμένουν στα Αγγλικά. Μετά από αυτό, το προφίλ μου → Γλώσσα εφαρμογής και η αποθηκευμένη γλώσσα προφίλ κερδίζουν. Η αποθήκευση της γλώσσας εφαρμογής μεταφράζει εκ νέου κάθε σελίδα που φορτώνει το FLOQRI18n, όχι μόνο αυτήν την κάρτα."
+        body: "Ένας νέος επισκέπτης με τοποθεσία διαδικτύου στην Ισπανία ξεκινά το FloqR στα ισπανικά και το Preferred Language ορίζεται σε Spanish. Άλλες αντιστοιχισμένες χώρες ακολουθούν τον ίδιο κανόνα (γαλλική IP ξεκινά στα γαλλικά). Μετά την πρώτη επίσκεψη υπερισχύουν αυτή η ρύθμιση και η αποθηκευμένη γλώσσα προφίλ. Αλλάξτε την οποιαδήποτε στιγμή στο My Profile → Language Settings. Οι μη υποστηριζόμενες γλώσσες μένουν στα αγγλικά. Για να διορθωθούν τα κείμενα για όλους, ο Master Admin χρησιμοποιεί Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Θέμα ιστότοπου",
@@ -2658,6 +2742,18 @@
       "help-taxi-pickup-address": {
         title: "Διεύθυνση παραλαβής ταξί",
         body: "Το RydR χρειάζεται αριθμό οδού, όνομα οδού, πόλη, πολιτεία ή επαρχία (για τις χώρες της λίστας) και ZIP ή ταχυδρομικό κώδικα. Κάτοικοι ΗΠΑ εισάγουν ZIP (12345 ή 12345-6789). Καναδάς και άλλες χώρες, ή μη αμερικανική θέση διαδικτύου, χρησιμοποιούν ταχυδρομικό κώδικα. Το FLOQR γεμίζει την ετικέτα από τη χώρα προφίλ και την IP. Η διεύθυνση μένει ιδιωτική — δεν είναι δημόσιο σημείο Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Handle FloqR / Mingl",
+        body: "Handle FloqR / Mingl: μόνο γράμματα, αριθμοί, κάτω παύλες (_) και παύλες (-). Χωρίς κενά, emoji ή άλλα σύμβολα. Στα δημόσια προφίλ εμφανίζεται ως @your_handle."
+      },
+      "help-prior-travels": {
+        title: "Προηγούμενα ταξίδια (πόλη ή χώρα)",
+        body: "Καταγράψτε πόλεις ή χώρες που έχετε ήδη επισκεφθεί, χωρισμένες με κόμμα (Βαρκελώνη, Μαϊάμι, Ισπανία). Πραγματικά τοπωνύμια — η FLOQR προτείνει ορθογραφία από κατάλογο και μετά το Google AI Studio (Gemini) όταν είστε συνδεδεμένοι. Είναι το δημόσιο σημείο δεδομένων ταξιδιού Mingl αν το ενεργοποιήσετε στο Απόρρητο."
+      },
+      "help-future-travel": {
+        title: "Μελλοντικός προορισμός (πόλη ή χώρα)",
+        body: "Καταγράψτε πόλεις ή χώρες που θέλετε να επισκεφθείτε, χωρισμένες με κόμμα (Λισαβόνα, Ιαπωνία). Πόλη ή χώρα, όχι club ούτε γειτονιά. Η FLOQR προτείνει την τυπική ορθογραφία. Αν το ταξίδι είναι δημόσιο στο Απόρρητο, η BOT DEE μπορεί να χρησιμοποιήσει αυτούς τους προορισμούς όπως τα προηγούμενα ταξίδια."
       },
       "help-onboarding": {
         title: "Ενσωμάτωση",
@@ -2783,7 +2879,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, floqCast, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
+        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2847,19 +2943,19 @@
       },
       "botdee-ask-floqr": {
         title: "Zapytaj FloqR z BOT DEE",
-        body: "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, floqCast (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
+        body: "Zapytaj FloqR z BOT DEE — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, FloqCAST (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
       },
       "help-soccer-jersey": {
         title: "Koszulka piłkarska ShoutOut",
         body: "Wyszukaj Soccer, Jersey lub kraj/klub (Tanzania, Chelsea). Każda karta z zestawem zdjęć to podświetlenie LED, które zobaczysz na ShoutOut — Soccer · Jersey · Country or Club. Rozmiary 96×48, 64×48, 64×32. Nazwa i 2-znakowa ikona nałożone na zestaw; numery pozostają wyśrodkowane."
       },
       "help-floqcast": {
-        title: "Zrób mi floqCast / supergwiazdę",
-        body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce floqCast → Go live na tablicy floqCast. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
+        title: "Zrób mi FloqCAST / supergwiazdę",
+        body: "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce FloqCAST → Go live na tablicy FloqCAST. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
       },
       "help-floqcast-choose-venue": {
-        title: "Wybierz lokal floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "Wybierz lokal FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -2975,7 +3071,7 @@
       },
       "help-app-language": {
         title: "Język aplikacji",
-        body: "Przy pierwszym użyciu, FloqR odczytuje język przeglądarki (na przykład nl-NL → holenderski / Nederlands) i zmienia język Chrome i menu na ten język, jeśli jest obsługiwany — Kategorie wyszukiwania, zakładki Mój profil, zakładki Club Admin i zakładki Master Admin. Języki nieobsługiwane pozostają w języku angielskim. Następnie Mój profil → Język aplikacji i zapisany język profilu mają pierwszeństwo. Zapisanie języka aplikacji powoduje ponowne tłumaczenie każdej wczytywanej strony FLOQRI18n, nie tylko tej karty."
+        body: "Nowy gość z hiszpańską lokalizacją internetową uruchamia FloqR po hiszpańsku, a Preferred Language zostaje ustawione na Spanish. Inne zmapowane kraje działają tak samo (francuskie IP startuje po francusku). Po pierwszej wizycie wygrywa to ustawienie i zapisany język profilu. Zmień w dowolnym momencie w My Profile → Language Settings. Nieobsługiwane języki zostają po angielsku. Aby poprawić treść dla wszystkich, Master Admin używa Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "Motyw strony",
@@ -3004,6 +3100,18 @@
       "help-taxi-pickup-address": {
         title: "Adres odbioru taksówki",
         body: "RydR wymaga numeru, nazwy ulicy, miasta, stanu lub prowincji (dla krajów z listy) oraz ZIP lub kodu pocztowego. Mieszkańcy USA wpisują ZIP (12345 lub 12345-6789). Kanada i inne kraje albo lokalizacja internetowa poza USA używają kodu pocztowego. FLOQR uzupełnia etykietę z kraju profilu i IP. Adres zostaje prywatny — to nie publiczny punkt Mingl."
+      },
+      "help-floqr-handle": {
+        title: "Handle FloqR / Mingl",
+        body: "Handle FloqR / Mingl: tylko litery, cyfry, podkreślenia (_) i myślniki (-). Bez spacji, emoji i innych znaków. Na profilach publicznych wyświetlany jako @your_handle."
+      },
+      "help-prior-travels": {
+        title: "Wcześniejsze podróże (miasto lub kraj)",
+        body: "Wymień już odwiedzone miasta lub kraje, oddzielone przecinkami (Barcelona, Miami, Hiszpania). Prawdziwe nazwy miejsc — FLOQR podpowiada pisownię z katalogu, a potem Google AI Studio (Gemini), gdy jesteś zalogowany. To publiczny punkt danych podróży Mingl, jeśli włączysz go w Prywatności."
+      },
+      "help-future-travel": {
+        title: "Przyszły kierunek (miasto lub kraj)",
+        body: "Wymień miasta lub kraje, które chcesz odwiedzić, oddzielone przecinkami (Lizbona, Japonia). Miasto lub kraj, nie klub i nie dzielnica. FLOQR podpowiada standardową pisownię. Jeśli podróże są publiczne w Prywatności, BOT DEE może używać tych kierunków tak jak wcześniejszych podróży."
       },
       "help-onboarding": {
         title: "Wprowadzenie",
@@ -3129,7 +3237,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وfloqCast وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
+        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",
@@ -3193,19 +3301,19 @@
       },
       "botdee-ask-floqr": {
         title: "اسأل FloqR مع BOT DEE",
-        body: "اسأل FloqR مع BOT DEE — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، floqCast (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
+        body: "اسأل FloqR مع BOT DEE — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، FloqCAST (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
       },
       "help-soccer-jersey": {
         title: "قميص كرة القدم ShoutOut",
         body: "ابحث عن كرة القدم، القميص، أو دولة/نادي (تنزانيا، تشيلسي). كل بطاقة مجموعة الصور هي الخلفية LED التي ستراها على ShoutOut — كرة القدم · القميص · الدولة أو النادي. المقاسات 96×48، 64×48، 64×32. الاسم وعلامة من حرفين فوق المجموعة؛ الأرقام تبقى في مركز التوسيط."
       },
       "help-floqcast": {
-        title: "اصنع لي floqCast / نجمة مشهورة",
-        body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة floqCast → Go live على لوح floqCast. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
+        title: "اصنع لي FloqCAST / نجمة مشهورة",
+        body: "اختر مكانًا → معاينة الكاميرا الخاصة → دفع 20 دولارًا (نافذة منبثقة Stripe) → موافقة Club Admin في قائمة FloqCAST → Go live على لوح FloqCAST. مثل ShoutOut، ولكن فيديو مباشر. روابط المعاينة تستخدم رموزًا سرية بحيث لا يمكن التخمين منها من عنوان URL للنادي."
       },
       "help-floqcast-choose-venue": {
-        title: "اختر مكان floqCast",
-        body: "Search or choose a venue. The first four clubs are the nearest floqCast venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with floqCast enabled appear here."
+        title: "اختر مكان FloqCAST",
+        body: "Search or choose a venue. The first four clubs are the nearest FloqCAST venues (GPS / localization). Cards show screen size and whether sound is supported. Type a club or event name to find more. Only clubs with FloqCAST enabled appear here."
       },
       "help-shoutout-choose-venue": {
         title: "Choose a ShoutOut venue",
@@ -3321,7 +3429,7 @@
       },
       "help-app-language": {
         title: "لغة التطبيق",
-        body: "عند الاستخدام الأول، يقرأ FloqR لغة المتصفح (على سبيل المثال nl-NL → الهولندية / Nederlands) ويحوّل كروم والقوائم إلى تلك اللغة عندما تكون مدعومة — فئات البحث، تبويبات ملفي الشخصي، تبويبات Club Admin، وتبويبات Master Admin. اللغات غير المدعومة تبقى بالإنجليزية. بعد ذلك، يكون لملفي الشخصي → لغة التطبيق ولغة الملف الشخصي المحفوظة الأسبقية. حفظ لغة التطبيق يُعيد ترجمة كل صفحة يتم تحميلها FLOQRI18n، وليس هذه البطاقة فقط."
+        body: "زائر جديد بموقع إنترنت في إسبانيا يبدأ FloqR بالإسبانية، ويُضبط Preferred Language على Spanish. البلدان المعيَّنة الأخرى تتبع القاعدة نفسها (عنوان IP فرنسي يبدأ بالفرنسية). بعد الزيارة الأولى يفوز هذا الإعداد ولغة الملف الشخصي المحفوظة. غيّرها في أي وقت من My Profile → Language Settings. اللغات غير المدعومة تبقى بالإنجليزية. لتصحيح الصياغة للجميع يستخدم Master Admin Translation Overrides."
       },
       "help-chrome-scheme": {
         title: "سمة الموقع",
@@ -3350,6 +3458,18 @@
       "help-taxi-pickup-address": {
         title: "عنوان التقاط سيارة الأجرة",
         body: "يحتاج RydR رقم الشارع واسم الشارع والمدينة والولاية أو المقاطعة (للبلدان المذكورة) وZIP أو الرمز البريدي. سكان الولايات المتحدة يدخلون ZIP (12345 أو 12345-6789). كندا والبلدان الأخرى أو موقع إنترنت خارج الولايات المتحدة تستخدم رمزاً بريدياً. تملأ FLOQR التسمية من بلد الملف وIP. العنوان يبقى خاصاً — ليس نقطة Mingl عامة."
+      },
+      "help-floqr-handle": {
+        title: "معرّف FloqR / Mingl",
+        body: "معرّف FloqR / Mingl: أحرف وأرقام وشرطات سفلية (_) وشرطات (-) فقط. بدون مسافات أو إيموجي أو رموز أخرى. يظهر كـ @your_handle في الملفات العامة."
+      },
+      "help-prior-travels": {
+        title: "رحلات سابقة (مدينة أو بلد)",
+        body: "أدرج مدناً أو بلداناً زرتها، مفصولة بفواصل (برشلونة، ميامي، إسبانيا). أسماء أماكن حقيقية — تقترح FLOQR الإملاء من كتالوج ثم Google AI Studio (Gemini) عند تسجيل الدخول. هذه نقطة بيانات سفر Mingl العامة إذا فعّلتها في الخصوصية."
+      },
+      "help-future-travel": {
+        title: "وجهة السفر القادمة (مدينة أو بلد)",
+        body: "أدرج مدناً أو بلداناً تريد زيارتها لاحقاً، مفصولة بفواصل (لشبونة، اليابان). مدينة أو بلد، وليس نادياً أو حياً. تقترح FLOQR الإملاء القياسي. إذا كان السفر عاماً في الخصوصية، يمكن لـ BOT DEE استخدام هذه الوجهات كما تستخدم الرحلات السابقة."
       },
       "help-onboarding": {
         title: "الإعداد",

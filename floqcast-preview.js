@@ -198,7 +198,7 @@
         ? Number(armed.data.liveDurationSeconds)
         : durationSeconds;
       scheduleLiveExpire(ends);
-      setStatus(`LIVE on the venue floqCast board for ${venueLiveSeconds}s. Keep this tab open.`);
+      setStatus(`LIVE on the venue FloqCAST board for ${venueLiveSeconds}s. Keep this tab open.`);
       liveDiag("live_timer_arm_ok", "Server armed live duration", {
         source,
         alreadyArmed: !!armed?.data?.alreadyArmed,
@@ -208,7 +208,7 @@
       return ends;
     } catch (err) {
       scheduleLiveExpire(Date.now() + durationSeconds * 1000);
-      setStatus(`LIVE on the venue floqCast board for ${durationSeconds}s. Keep this tab open.`);
+      setStatus(`LIVE on the venue FloqCAST board for ${durationSeconds}s. Keep this tab open.`);
       liveDiag("live_timer_arm_fallback", err?.message || "armFloqCastLiveDuration failed; local fallback", {
         source,
         durationSeconds,
@@ -293,14 +293,14 @@
 
     if (status === "rejected") {
       btn.disabled = true;
-      btn.textContent = "Not approved — start a new floqCast";
+      btn.textContent = "Not approved — start a new FloqCAST";
       btn.dataset.stage = "done";
       return;
     }
 
     if (status === "ended" && !live) {
       btn.disabled = true;
-      btn.textContent = "Session ended — start a new floqCast";
+      btn.textContent = "Session ended — start a new FloqCAST";
       btn.dataset.stage = "done";
       return;
     }
@@ -316,7 +316,7 @@
 
     if (paid && status === "approved") {
       btn.disabled = false;
-      btn.textContent = "Go live, be a floqCast";
+      btn.textContent = "Go live, be a FloqCAST";
       btn.dataset.stage = "live";
       return;
     }
@@ -336,7 +336,7 @@
         return;
       }
       btn.disabled = false;
-      btn.textContent = "Go pay $20 — become a floqCast";
+      btn.textContent = "Go pay $20 — become a FloqCAST";
       btn.dataset.stage = "pay";
       return;
     }
@@ -374,13 +374,13 @@
       setStatus("If you already paid, this page will update automatically.");
       maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
-      setGate("Payment received. Waiting for Club Admin approval in the floqCast Queue.");
+      setGate("Payment received. Waiting for Club Admin approval in the FloqCAST Queue.");
       setStatus("Do not close this tab. Go live unlocks when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! Tap Go live — your stream will reach the venue floqCast board.");
+      setGate("Approved! Tap Go live — your stream will reach the venue FloqCAST board.");
       setStatus("Club Admin approved. Tap Go live when ready.");
     } else if (status === "live") {
-      setGate("You are live on the venue floqCast board.");
+      setGate("You are live on the venue FloqCAST board.");
       setStatus("Keep this tab open while streaming.");
     } else if (status === "rejected") {
       setGate("This request was not approved by the venue.");
@@ -660,7 +660,7 @@
           }
         }
       });
-      setStatus("LIVE — waiting for the venue floqCast board to connect (timer starts then)…");
+      setStatus("LIVE — waiting for the venue FloqCAST board to connect (timer starts then)…");
       updateButtons();
       if (connectWaitDiagTimer) clearTimeout(connectWaitDiagTimer);
       connectWaitDiagTimer = setTimeout(() => {
@@ -672,7 +672,7 @@
             webrtc: lastWebrtcStatus,
             meta: lastWebrtcMeta
           }, "warn");
-          setStatus("LIVE — still waiting for the venue board link. Timer has not started yet. Confirm display2.html?location= is open on the floqCast LED.");
+          setStatus("LIVE — still waiting for the venue board link. Timer has not started yet. Confirm display2.html?location= is open on the FloqCAST LED.");
         }
       }, CONNECT_WAIT_DIAG_MS);
     } catch (err) {
@@ -810,7 +810,7 @@
     bindUi();
     accessToken = recoverAccessToken();
     if (!accessToken || accessToken.length < 24) {
-      setGate("Missing private preview token. Start again from Search → floqCast, or open the preview link from your payment receipt.");
+      setGate("Missing private preview token. Start again from Search → FloqCAST, or open the preview link from your payment receipt.");
       byId("floqcastRecoverActions")?.classList.remove("hidden");
       updateButtons();
       return;
