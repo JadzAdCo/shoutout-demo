@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.017";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.017";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.018";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.018";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.018",
+      title: "s3.3.018 — AI crawl import datapoints, duplicates, club vs event",
+      checks: [
+        {label:"Import datapoints card", file:"master-admin.html", includes:["Import datapoints", "saveAiDiscoveryImportGatesBtn", "Possible duplicates"]},
+        {label:"Discovery gates browser mirror", file:"floqr-discovery-gates.js", includes:["FLOQRDiscoveryGates", "monaco-monte-carlo"]},
+        {label:"Server import gates", file:"functions/discovery-gates-core.js", includes:["defaultImportGates", "sameEstablishment"]},
+        {label:"Crawl stamps duplicates", file:"functions/ai-discovery-functions.js", includes:["stampDiscoveryClassification", "beginCrawlContext"]},
+        {label:"Auto-approve blocks duplicates", file:"functions/discovery-auto-approve.js", includes:["possible_duplicate"]},
+        {label:"Queue uses Master Admin ticks", file:"ai-discovery-service.js", includes:["saveImportGates", "duplicateFlag"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-018-ai-crawl-import-gates"]}
+      ]
+    },
     {
       version: "s3.3.017",
       title: "s3.3.017 — Calendar nights, no blank ShoutOut splash, handle ? beside the label",
@@ -3115,6 +3128,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-018-ai-crawl-import-gates",
+      area:"Master Admin",
+      feature:"AI crawl import datapoints + duplicates",
+      changed:"s3.3.018 — Master Admin ticks which discovery fields must be present before Approve / Onboard. Promoter(s) and Email are off unless ticked. Same phone, same address, or same club name flags a duplicate (Monaco = Monte Carlo). Cards show club vs event vs beach club.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.018, sign in, open AI Crawling. 2) Confirm Import datapoints: venue Name/Address/City/Country/Phone ticked; Promoter(s) and Email off. 3) Save import datapoints, then Instant Crawl Now. 4) A card missing only Promoter(s)/Email is Ready. 5) Two Jimmy'z rows (Monaco vs Monte Carlo, or same phone) show Possible duplicate and cannot Onboard selected as a new club. Live matches stay Updates only. 6) Kind line reads Club · Nightclub / Beach Club or Event · …. 7) Mark Succeed/Failed.",
+      expected:"Approve follows the ticks, not a hardcoded Promoter/Email list. Duplicates are flagged and blocked from creating a second club. Kind is club vs event.",
+      troubleshoot:"Still blocked on Promoter(s)/Email → save Import datapoints (Promoter/Email unticked) and hard-refresh ai-discovery-service.js + floqr-discovery-gates.js. Duplicate missed → Functions deploy of discovery-gates-core.js / ai-discovery-functions.js. Monaco vs Monte Carlo still two clubs → city alias monaco-monte-carlo in FLOQRDiscoveryGates."
+    },
+    {
       id:"s3-3-017-nights-splash-handle",
       area:"ShoutOut / My Profile",
       feature:"Calendar nights, skip unpaid splash, handle ? beside the label",
@@ -5745,11 +5767,21 @@
   }
 
   function requiredDatapointLabels(type = "") {
-    // Daytime flea/festival: organizers matter; DJs usually do not. Date/time required.
-    if (isDaytimeEventType(type)) {
-      return ["name", "genres", "promoters", "address", "city", "country", "telephone", "email", "instagram", "date", "time"];
+    const api = window.FLOQRDiscoveryGates;
+    if (api?.IMPORT_GATE_FIELDS) {
+      const event = isDaytimeEventType(type) || isComedyEventType(type);
+      const gates = api.normalizeImportGates ? api.normalizeImportGates(api.defaultImportGates()) : api.defaultImportGates();
+      const map = event ? (gates.event || {}) : (gates.venue || {});
+      return api.IMPORT_GATE_FIELDS.filter(field => {
+        if (field.appliesTo === "venue" && event) return false;
+        if (field.appliesTo === "event" && !event) return false;
+        return map[field.key] === 1;
+      }).map(field => field.key === "phone" ? "telephone" : field.key);
     }
-    const base = ["name", "genres", "artistsOrDjs", "promoters", "address", "city", "country", "telephone", "email", "instagram"];
+    if (isDaytimeEventType(type)) {
+      return ["name", "address", "city", "country", "date", "time"];
+    }
+    const base = ["name", "address", "city", "country", "telephone"];
     if (isComedyEventType(type)) return [...base, "date", "time"];
     return base;
   }
@@ -5933,35 +5965,25 @@
   }
 
   function sourceRecordMissingDatapoints(record = {}) {
+    if (window.FLOQRDiscoveryGates?.missingDatapoints) {
+      return window.FLOQRDiscoveryGates.missingDatapoints(record);
+    }
     const required = requiredDatapointLabels(record.proposedType || "");
     const has = {
       name: !!record.proposedTitle,
-      genres: !!(record.genres || []).length,
-      artistsOrDjs: !!(record.artistsOrDjs || []).length || !!(record.artists || []).length || !!(record.djs || []).length || !!String(record.artistsOrDjs || record.artists || record.djs || "").trim(),
-      promoters: !!(record.promoters || []).length || !!String(record.promoters || record.promotionGroup || "").trim(),
       address: !!record.proposedAddress,
       city: !!record.city,
       country: !!record.country,
       telephone: !!(record.telephone || record.phone),
-      email: !!record.email,
-      instagram: !!(record.socialMediaHandles?.instagram || record.instagramHandle),
       date: !!record.proposedDate,
       time: !!record.proposedTime
     };
-    const daytime = isDaytimeEventType(record.proposedType || "")
-      || isDaytimeEventType((record.categories || []).join(" "))
-      || isDaytimeEventType(record.proposedTitle || "");
     return required.filter(key => !has[key]).map(key => ({
       name:"Name",
-      genres:"Genre",
-      artistsOrDjs:"DJ(s)/Artist(s)",
-      promoters: daytime ? "Organizer(s) / Promoter(s)" : "Promoter(s)",
       address:"Address",
       city:"City",
       country:"Country",
       telephone:"Phone",
-      email:"Email",
-      instagram:"Instagram",
       date:"Date",
       time:"Time"
     }[key] || key));
@@ -8383,22 +8405,18 @@
     const query = override.query || crawlQueryForJob({eventType, genre, city, country});
     const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, country, genre, eventType});
     const requiredDatapoints = requiredDatapointLabels(eventType);
-    const defaultMissing = isDaytimeEventType(eventType)
-      ? ["Genre", "Organizer(s) / Promoter(s)", "Phone", "Email", "Instagram", "Address", "Date", "Time"]
-      : [
-        "Genre",
-        "DJ(s)/Artist(s)",
-        "Promoter(s)",
-        "Phone",
-        "Email",
-        "Instagram",
-        "Address",
-        ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
-      ];
+    const placeholder = {
+      proposedType: eventTypeToProposedType(eventType),
+      entityKind: isDaytimeEventType(eventType) || isComedyEventType(eventType) ? "event" : "venue",
+      proposedTitle: title,
+      city,
+      country
+    };
+    const defaultMissing = sourceRecordMissingDatapoints(placeholder);
     const record = {
       proposedType,
       proposedTitle: title,
-      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete impactful datapoints (genre, DJ/artist, promoter, contacts) before approval.`,
+      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Approve when the Import datapoints Master Admin ticked are present.`,
       proposedDate: "",
       proposedTime: "",
       proposedLocationName: override.locationName || title,

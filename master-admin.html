@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.017"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.017"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.017"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.017"/>  <script>
+<link rel="stylesheet" href="./styles.css?v=s3.3.018"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.018"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.018"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.018"/>  <script>
     try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
@@ -1565,6 +1565,21 @@
           <button id="saveAiDiscoveryCriteriaBtn" class="primary" type="button">Save Criteria</button>
         </div>
         <div class="card">
+          <h2 class="help-label">
+            <span>Import datapoints</span>
+            <details class="help-popout inline-help-popout" data-help-id="help-venue-crawl-datapoints">
+              <summary aria-label="Help">?</summary>
+              <div class="help-popout-body">Tick the fields a discovery card must have before Approve or Onboard selected. Unticked fields stay on the card for research but do not block import. Promoter(s) and Email are off unless you turn them on — Places and club homepages rarely publish them.</div>
+            </details>
+          </h2>
+          <p class="sub small">These ticks are the workflow yes/no for importing a discovered club or event. The crawler still collects every field it can; missing unticked fields do not stop onboard. Same physical address, same club name, or same phone flags a duplicate (Monaco and Monte Carlo count as the same city).</p>
+          <h3 class="sub">Clubs / venues</h3>
+          <div class="import-gate-grid" id="aiDiscoveryVenueGates"></div>
+          <h3 class="sub">Events</h3>
+          <div class="import-gate-grid" id="aiDiscoveryEventGates"></div>
+          <button id="saveAiDiscoveryImportGatesBtn" class="primary" type="button">Save import datapoints</button>
+        </div>
+        <div class="card">
           <h2>Review Discovery Queue</h2>
           <p class="sub small">Fill in missing details on the card, then Approve when ready — or Needs research if someone must look up contacts later. You do not need to edit technical data dumps.</p>
           <div id="aiDiscoveryCountryTabs" class="admin-subtabs discovery-country-tabs" role="tablist" aria-label="Filter by country"></div>
@@ -1582,6 +1597,7 @@
             <label>Onboard readiness
               <select id="aiDiscoveryReadinessFilter">
                 <option value="all">All</option>
+                <option value="duplicates">Possible duplicates</option>
                 <option value="ready">Ready to onboard</option>
                 <option value="notReady">Not ready (show missing)</option>
               </select>
@@ -1594,7 +1610,7 @@
             <button id="aiDiscoveryClearSelectionBtn" type="button">Clear selection</button>
             <button id="aiDiscoveryMassOnboardBtn" class="primary" type="button">Onboard selected (ready only)</button>
           </div>
-          <p class="sub small">Mass onboard publishes only selected cards that already pass Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, and Instagram. Cards that are not ready stay listed with their missing datapoints.</p>
+          <p class="sub small">Mass onboard publishes only selected cards that already pass the Import datapoints you ticked (Promoter(s) and Email are not required unless ticked). Possible duplicates cannot onboard as a new club. Cards that are not ready stay listed with their missing datapoints.</p>
           <div id="aiDiscoveryOnboardReport" class="report-block"></div>
           <div id="aiDiscoveryQueueList" class="report-block"></div>
         </div>
@@ -1987,59 +2003,60 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.3.017"></script>
-<script src="./firebase-config.js?v=s3.3.017"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.017"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.017"></script>
-<script src="./floqr-app-check.js?v=s3.3.017"></script>
-<script src="./floqr-nav.js?v=s3.3.017"></script>
-<script src="./global-profile-status.js?v=s3.3.017"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.017"></script>
-<script src="./shared-data.js?v=s3.3.017"></script>
-<script src="./feature-gates.js?v=s3.3.017"></script>
-<script src="./sos2fa.js?v=s3.3.017"></script>
-<script src="./entity-management.js?v=s3.3.017"></script>
-<script src="./ai-service.js?v=s3.3.017"></script>
-<script src="./ai-index-service.js?v=s3.3.017"></script>
-<script src="./ai-search-service.js?v=s3.3.017"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.3.017"></script>
-<script src="./ai-discovery-service.js?v=s3.3.017"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.017"></script>
-<script src="./botdee-help-repository.js?v=s3.3.017"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.017"></script>
-<script src="./help-attach.js?v=s3.3.017"></script>
-<script src="./helper-popouts.js?v=s3.3.017"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.017"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.017"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.017"></script>
-<script src="./ad-campaigns.js?v=s3.3.017"></script>
-<script src="./ai-diagnostics-service.js?v=s3.3.017"></script>
-<script src="./master-admin-rollup.js?v=s3.3.017"></script>
-<script src="./duplicate-record-service.js?v=s3.3.017"></script>
-<script src="./floqr-logger.js?v=s3.3.017"></script>
-<script src="./payment-service.js?v=s3.3.017"></script>
-<script src="./floqr-access-notice.js?v=s3.3.017"></script>
-<script src="./master-admin-app.js?v=s3.3.017"></script>
-<script src="./master-ad-management.js?v=s3.3.017"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.3.017"></script>
-<script src="./floqr-feature-services.js?v=s3.3.017"></script>
-<script src="./floqr-reason-prompt.js?v=s3.3.017"></script>
-<script src="./master-feature-services.js?v=s3.3.017"></script>
-<script src="./master-demo-employees.js?v=s3.3.017"></script>
-<script src="./floqr-data-classification.js?v=s3.3.017"></script>
-<script src="./master-data-classification.js?v=s3.3.017"></script>
-<script src="./master-admin-shoutouts.js?v=s3.3.017"></script>
-<script src="./floqr-critical-log-blink.js?v=s3.3.017"></script>
-<script src="./master-display-security.js?v=s3.3.017"></script>
-<script src="./master-diagnostics-panels.js?v=s3.3.017"></script>
-<script src="./master-services-extension.js?v=s3.3.017"></script>
-<script src="./master-logging-extension.js?v=s3.3.017"></script>
-<script src="./master-floqcast-logging.js?v=s3.3.017"></script>
-<script src="./master-shoutout-logging.js?v=s3.3.017"></script>
-<script src="./master-mail-logging.js?v=s3.3.017"></script>
-<script src="./master-twilio-logging.js?v=s3.3.017"></script>
-<script src="./notification-center.js?v=s3.3.017"></script>
-<script src="./profile-access-guard.js?v=s3.3.017"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+<script src="./floqr-i18n.js?v=s3.3.018"></script>
+<script src="./firebase-config.js?v=s3.3.018"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.018"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.018"></script>
+<script src="./floqr-app-check.js?v=s3.3.018"></script>
+<script src="./floqr-nav.js?v=s3.3.018"></script>
+<script src="./global-profile-status.js?v=s3.3.018"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.018"></script>
+<script src="./shared-data.js?v=s3.3.018"></script>
+<script src="./feature-gates.js?v=s3.3.018"></script>
+<script src="./sos2fa.js?v=s3.3.018"></script>
+<script src="./entity-management.js?v=s3.3.018"></script>
+<script src="./ai-service.js?v=s3.3.018"></script>
+<script src="./ai-index-service.js?v=s3.3.018"></script>
+<script src="./ai-search-service.js?v=s3.3.018"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.3.018"></script>
+<script src="./floqr-discovery-gates.js?v=s3.3.018"></script>
+<script src="./ai-discovery-service.js?v=s3.3.018"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.018"></script>
+<script src="./botdee-help-repository.js?v=s3.3.018"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.018"></script>
+<script src="./help-attach.js?v=s3.3.018"></script>
+<script src="./helper-popouts.js?v=s3.3.018"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.018"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.018"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.018"></script>
+<script src="./ad-campaigns.js?v=s3.3.018"></script>
+<script src="./ai-diagnostics-service.js?v=s3.3.018"></script>
+<script src="./master-admin-rollup.js?v=s3.3.018"></script>
+<script src="./duplicate-record-service.js?v=s3.3.018"></script>
+<script src="./floqr-logger.js?v=s3.3.018"></script>
+<script src="./payment-service.js?v=s3.3.018"></script>
+<script src="./floqr-access-notice.js?v=s3.3.018"></script>
+<script src="./master-admin-app.js?v=s3.3.018"></script>
+<script src="./master-ad-management.js?v=s3.3.018"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.3.018"></script>
+<script src="./floqr-feature-services.js?v=s3.3.018"></script>
+<script src="./floqr-reason-prompt.js?v=s3.3.018"></script>
+<script src="./master-feature-services.js?v=s3.3.018"></script>
+<script src="./master-demo-employees.js?v=s3.3.018"></script>
+<script src="./floqr-data-classification.js?v=s3.3.018"></script>
+<script src="./master-data-classification.js?v=s3.3.018"></script>
+<script src="./master-admin-shoutouts.js?v=s3.3.018"></script>
+<script src="./floqr-critical-log-blink.js?v=s3.3.018"></script>
+<script src="./master-display-security.js?v=s3.3.018"></script>
+<script src="./master-diagnostics-panels.js?v=s3.3.018"></script>
+<script src="./master-services-extension.js?v=s3.3.018"></script>
+<script src="./master-logging-extension.js?v=s3.3.018"></script>
+<script src="./master-floqcast-logging.js?v=s3.3.018"></script>
+<script src="./master-shoutout-logging.js?v=s3.3.018"></script>
+<script src="./master-mail-logging.js?v=s3.3.018"></script>
+<script src="./master-twilio-logging.js?v=s3.3.018"></script>
+<script src="./notification-center.js?v=s3.3.018"></script>
+<script src="./profile-access-guard.js?v=s3.3.018"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>
 </body>
 </html>

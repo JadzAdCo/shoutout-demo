@@ -38,6 +38,8 @@ Unit-first height and structured taxi pickup. Profile country wins; if empty, IP
 
 **VCC Dashboard queue links + FloqCAST label (s3.3.017):** Club Admin Dashboard `#metricPendingCard` / `#metricFloqCastDashCard` call `activatePanel("panelQueue"|"panelFloqCast")` when the count is **greater than 1**. Visible product name is **FloqCAST** (chrome `admin.floqcastQueue` / `cat.floqcast`); catalog key, files, and callables stay `floqCast`.
 
+**AI Crawling import gates + duplicates (s3.3.018):** Master Admin → AI Crawling → **Import datapoints** ticks which fields must be present before Approve / Onboard (`aiDiscoveryRatingCriteria/defaultNightlifeRating.importGates`). Packaged venue defaults are Name, Address, City, Country, Phone — Promoter(s) and Email are off. Crawler stamps `entityKind` / `venueCategory` / `eventCategory` (club vs event vs beach club). Same phone, same address, or same club name flags `duplicateFlag` (Monaco ≡ Monte Carlo). Live matches stay `updates-only`. Modules: `functions/discovery-gates-core.js`, `floqr-discovery-gates.js`.
+
 **AI Crawling KPI jump (s3.3.017):** Rollup cards Needs research / Approved / Pending review are buttons (`data-ai-status-filter`) that call `FLOQRAIDiscovery.jumpToStatus` → `#aiDiscoveryStatusFilter` + scroll `#aiDiscoveryQueueList`.
 
 **IP preferred language + Prior / Future travel (s3.3.017):** `FLOQRProfileLocale.languagePlan` maps country/IP to a supported site language (Spain→es, Germany→de). UAE/Dubai prompts Arabic vs English. IP is never stored. Travel Interest split into Prior Travels + Future Travel Destination with `floqr-place-suggest.js` catalog then Gemini. Help: `help-prior-travels`, `help-future-travel`. Turkish pack not added this pass.
@@ -113,7 +115,7 @@ Stay on Stripe **test/sandbox keys**. Do not switch `STRIPE_SECRET_KEY` to live.
 | **Client** | `master-admin-rollup.js` → `FLOQRMasterAdminRollup` — bind + load on sign-in; `paintForPanel` from `activatePanel`; Diagnostics **Refresh rollup** button |
 | **Panel behavior** | Diagnostics mount paints rollup only (Run/Refresh Diagnostics = full live scan). Duplicate Records mount paints rollup; Refresh = live 1200 scan. AI Crawling `#aiCrawlingSummary` = rollup; `#aiDiscoverySummary` keeps how-to. Commerce/templates/recs metric cards from rollup |
 | **Classification** | `floqr-data-classification.js` register + `masterAdminRollup` job collections |
-| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-data-classification.js` `?v=s3.3.013` |
+| **Cache-bust** | `master-admin.html` / `master-admin-app.js` / `master-admin-rollup.js` / `ai-diagnostics-service.js` / `ai-discovery-service.js` / `duplicate-record-service.js` / `floqr-discovery-gates.js` / `floqr-data-classification.js` `?v=s3.3.018` |
 | **Deploy** | Functions + Firestore rules required for live schedule/callable; Pages for client strips |
 
 ## PHILA front+back pair retired (s3.3.012)

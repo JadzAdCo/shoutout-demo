@@ -1097,10 +1097,12 @@
     },
     {
       id: "help-venue-crawl-datapoints",
+      audiences: ["masterAdmin"],
       title: "AI crawl venue datapoints",
-      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Crawls also check venue website footers and contact pages for social handles. Each card shows when it was collected. Already-onboarded venues are scanned for lineup/event updates only. Use the country tabs to filter the queue. Approve when ready, or choose Needs research.",
+      body: "On Master Admin → AI Crawling, use Import datapoints to tick which fields must be present before Approve or Onboard selected. Promoter(s) and Email do not block import unless you tick them. Cards show whether the listing is a club (nightclub, beach club, lounge) or an event. The crawler flags duplicates when two rows share a phone, a physical address, or a club name — Monaco and Monte Carlo count as the same city. Already-onboarded venues stay updates-only. Use Needs research when a ticked field is still missing.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
+        "import datapoints", "duplicate venue", "monaco monte carlo",
         "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
         "club admin imports"
       ],

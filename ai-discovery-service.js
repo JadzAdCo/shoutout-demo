@@ -21,6 +21,7 @@
       sourceCredibility:15,
       patronInterestMatch:10
     },
+    importGates: (window.FLOQRDiscoveryGates && window.FLOQRDiscoveryGates.defaultImportGates()) || {venue:{}, event:{}},
     notes:"Editable by Super Admin"
   };
 
@@ -34,6 +35,7 @@
   let allQueueRows = [];
   let listingRows = [];
   let countryFilter = "all";
+  let importGates = DEFAULT_CRITERIA.importGates;
 
   function nowField() {
     return firebase.firestore.FieldValue.serverTimestamp();
@@ -52,13 +54,18 @@
   }
 
   function crawlScopeBadge(item = {}) {
+    const bits = [];
+    if (item.duplicateFlag) {
+      const why = (item.duplicateReasons || []).join(", ") || "same establishment";
+      const who = item.duplicateMatch?.matchName || item.duplicateMatch?.matchId || "another listing";
+      bits.push(`<span class="status-pill dup">Possible duplicate · ${esc(why)} · ${esc(who)}</span>`);
+    }
     if (item.crawlScope === "updates-only" || item.discoveryMode === "onboarded-update-scan") {
-      return `<span class="status-pill">Updates only · already onboarded</span>`;
+      bits.push(`<span class="status-pill">Updates only · already onboarded</span>`);
+    } else if (item.crawlScope === "full-new-listing") {
+      bits.push(`<span class="status-pill">New listing crawl</span>`);
     }
-    if (item.crawlScope === "full-new-listing") {
-      return `<span class="status-pill">New listing crawl</span>`;
-    }
-    return "";
+    return bits.join(" ");
   }
 
   function countryKey(item = {}) {
@@ -113,18 +120,23 @@
   }
 
   function recordKind(item = {}) {
+    if (item.kindLabel) return item.entityKind === "event" ? `Event · ${item.kindLabel}` : `Club · ${item.kindLabel}`;
+    const classified = window.FLOQRDiscoveryGates?.classifyEntity?.(item);
+    if (classified?.kindLabel) {
+      return classified.entityKind === "event" ? `Event · ${classified.kindLabel}` : `Club · ${classified.kindLabel}`;
+    }
     const text = String(item.proposedType || "").replace(/([a-z])([A-Z])/g, "$1 $2").trim();
-    if (/rooftop/i.test(text) && /bar/i.test(text)) return "Rooftop Bar";
-    if (/rooftop/i.test(text)) return "Rooftop Lounge";
-    if (/beach/i.test(text)) return "Beach Club";
-    if (/lounge/i.test(text)) return "Lounge";
-    if (/club/i.test(text)) return "Club";
-    if (isComedyRecord(item)) return "Comedy Show";
+    if (/rooftop/i.test(text) && /bar/i.test(text)) return "Club · Rooftop Bar";
+    if (/rooftop/i.test(text)) return "Club · Rooftop Lounge";
+    if (/beach/i.test(text)) return "Club · Beach Club";
+    if (/lounge/i.test(text)) return "Club · Lounge";
+    if (/club/i.test(text)) return "Club · Nightclub";
+    if (isComedyRecord(item)) return "Event · Comedy Show";
     if (isDaytimeRecord(item)) {
-      if (/flea/i.test(text + (item.proposedTitle || ""))) return "Flea Market";
-      if (/farmers/i.test(text + (item.proposedTitle || ""))) return "Farmers Market";
-      if (/festival/i.test(text + (item.proposedTitle || ""))) return "Daytime Festival";
-      return "Daytime Event";
+      if (/flea/i.test(text + (item.proposedTitle || ""))) return "Event · Flea Market";
+      if (/farmers/i.test(text + (item.proposedTitle || ""))) return "Event · Farmers Market";
+      if (/festival/i.test(text + (item.proposedTitle || ""))) return "Event · Festival";
+      return "Event · Daytime Event";
     }
     return "Event";
   }
@@ -165,46 +177,25 @@
   }
 
   function requiredDatapoints(item = {}) {
-    const genres = Array.isArray(item.genres) ? item.genres : splitCSV(item.genres);
-    if (isDaytimeRecord(item)) {
-      // Daytime flea/festival: organizers + schedule; DJs usually N/A.
-      return [
-        ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
-        ["genres", "Genre", hasAny(genres)],
-        ["promoters", "Organizer(s) / Promoter(s)", hasPromoters(item)],
-        ["address", "Address", hasAny(item.proposedAddress || item.address)],
-        ["city", "City", hasAny(item.city)],
-        ["country", "Country", hasAny(item.country)],
-        ["phone", "Phone", hasAny(item.telephone || item.phone)],
-        ["email", "Email", hasAny(item.email)],
-        ["instagram", "Instagram", hasInstagram(item)],
-        ["date", "Date", hasAny(item.proposedDate)],
-        ["time", "Time", hasAny(item.proposedTime)]
-      ];
-    }
-    const base = [
-      ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
-      ["genres", "Genre", hasAny(genres)],
-      ["artistsOrDjs", "DJ(s)/Artist(s)", hasArtistsOrDjs(item)],
-      ["promoters", "Promoter(s)", hasPromoters(item)],
-      ["address", "Address", hasAny(item.proposedAddress || item.address)],
-      ["city", "City", hasAny(item.city)],
-      ["country", "Country", hasAny(item.country)],
-      ["phone", "Phone", hasAny(item.telephone || item.phone)],
-      ["email", "Email", hasAny(item.email)],
-      ["instagram", "Instagram", hasInstagram(item)]
-    ];
-    if (isComedyRecord(item)) {
-      return [
-        ...base,
-        ["date", "Date", hasAny(item.proposedDate)],
-        ["time", "Time", hasAny(item.proposedTime)]
-      ];
-    }
-    return base;
+    const api = window.FLOQRDiscoveryGates;
+    const catalog = api?.IMPORT_GATE_FIELDS || [];
+    const event = api?.isEventRecord ? api.isEventRecord(item) : isDaytimeRecord(item) || isComedyRecord(item);
+    const map = event ? (importGates.event || {}) : (importGates.venue || {});
+    return catalog.filter(field => {
+      if (field.appliesTo === "venue" && event) return false;
+      if (field.appliesTo === "event" && !event) return false;
+      return map[field.key] === 1;
+    }).map(field => {
+      const ok = api?.datapointPresent ? api.datapointPresent(item, field.key) : false;
+      const label = event && field.key === "promoters" ? "Organizer(s) / Promoter(s)" : field.label;
+      return [field.key, label, ok];
+    });
   }
 
   function missingDatapoints(item = {}) {
+    if (window.FLOQRDiscoveryGates?.missingDatapoints) {
+      return window.FLOQRDiscoveryGates.missingDatapoints(item, importGates);
+    }
     return requiredDatapoints(item).filter(([, , ok]) => !ok).map(([, label]) => label);
   }
 
@@ -241,7 +232,11 @@
     try {
       const criteriaRef = db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating");
       const criteriaSnap = await criteriaRef.get();
-      if (!criteriaSnap.exists) await criteriaRef.set({...DEFAULT_CRITERIA, createdAt:nowField(), updatedAt:nowField()});
+      if (!criteriaSnap.exists) {
+        await criteriaRef.set({...DEFAULT_CRITERIA, createdAt:nowField(), updatedAt:nowField()});
+      } else if (!criteriaSnap.data()?.importGates) {
+        await criteriaRef.set({importGates: DEFAULT_CRITERIA.importGates, updatedAt:nowField()}, {merge:true});
+      }
       for (const source of DEFAULT_SOURCES) {
         const id = slug(source.sourceName);
         await db.collection("aiDiscoverySources").doc(id).set({
@@ -363,16 +358,18 @@
   function queueCard(item, index) {
     item = {...parsedDataFallback(item), ...item};
     const missing = missingDatapoints(item);
-    const ready = missing.length === 0 && String(item.status || "pendingReview") !== "approved";
+    const duplicateBlocks = item.duplicateFlag && item.crawlScope !== "updates-only";
+    const ready = missing.length === 0 && !duplicateBlocks && String(item.status || "pendingReview") !== "approved";
     const collected = formatCollectedAt(item);
-    return `<div class="queue-item ai-discovery-item" data-queue-index="${index}" data-queue-id="${esc(item.id || "")}" data-onboard-ready="${ready ? "1" : "0"}">
+    return `<div class="queue-item ai-discovery-item${item.duplicateFlag ? " is-duplicate" : ""}" data-queue-index="${index}" data-queue-id="${esc(item.id || "")}" data-onboard-ready="${ready ? "1" : "0"}">`
       <div class="club-option-head">
         <div>
           <label class="consent-line"><input type="checkbox" data-onboard-select ${ready ? "" : "disabled"} aria-label="Select for mass onboard"/> ${ready ? "Ready — select to onboard" : "Not ready to onboard"}</label>
           <strong>${esc(item.proposedTitle || item.proposedLocationName || "Untitled discovery")}</strong>
           <p>${esc(recordKind(item))} - ${esc(window.FLOQRAddress?.publicLocation(item) || [item.city, item.country].filter(Boolean).join(", "))}</p>
           <p class="discovery-meta">${collected ? `Collected ${esc(collected)}` : "Collected time unavailable"}${item.socialPagesFetched?.length ? ` · Social pages checked: ${esc(item.socialPagesFetched.length)}` : ""}</p>
-          ${missing.length ? `<p class="sub small"><strong>Missing datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Onboard ready</strong> — all required datapoints present.</p>`}
+          ${duplicateBlocks ? `<p class="sub small"><strong>Do not import as a new club.</strong> Same establishment as ${esc(item.duplicateMatch?.matchName || item.duplicateMatch?.matchId || "an existing listing")} (${esc((item.duplicateReasons || []).join(", ") || "address, name, or phone")}). Use Updates only or Mark Duplicate.</p>` : ""}
+          ${missing.length ? `<p class="sub small"><strong>Missing datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Onboard ready</strong> — import datapoints Master Admin selected are present.</p>`}`
         </div>
         <div>
           <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
@@ -425,7 +422,7 @@
       ${auditDetailsHtml(item)}
       ${item.aiRatingReasons?.length ? `<div class="tag-row">${item.aiRatingReasons.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
       <div class="queue-actions">
-        <button type="button" class="primary" data-discovery-action="approve"${missing.length ? " disabled" : ""}>Approve</button>
+        <button type="button" class="primary" data-discovery-action="approve"${(missing.length || duplicateBlocks) ? " disabled" : ""}>Approve</button>
         <button type="button" data-discovery-action="needs-research">Needs research</button>
         <button type="button" data-discovery-action="reject">Reject</button>
         <button type="button" data-discovery-action="duplicate">Mark Duplicate</button>
@@ -452,7 +449,7 @@
       return {
         item: merged,
         missing,
-        ready: missing.length === 0,
+        ready: missing.length === 0 && !(merged.duplicateFlag && merged.crawlScope !== "updates-only"),
         country: merged.country || "—",
         city: merged.city || "—",
         genre: Array.isArray(merged.genres) ? merged.genres.join(", ") : String(merged.genres || "—"),
@@ -500,9 +497,13 @@
     queueRows = allQueueRows.filter(item => {
       if (countryFilter !== "all" && countryKey(item) !== countryFilter) return false;
       if (readiness === "all") return true;
-      const missing = missingDatapoints({...parsedDataFallback(item), ...item});
-      if (readiness === "ready") return missing.length === 0;
-      return missing.length > 0;
+      const merged = {...parsedDataFallback(item), ...item};
+      if (readiness === "duplicates") return !!merged.duplicateFlag;
+      const missing = missingDatapoints(merged);
+      const duplicateBlocks = merged.duplicateFlag && merged.crawlScope !== "updates-only";
+      if (readiness === "ready") return missing.length === 0 && !duplicateBlocks;
+      if (readiness === "notReady") return missing.length > 0 || duplicateBlocks;
+      return true;
     });
     renderOnboardReport(allQueueRows);
     wrap.innerHTML = queueRows.length ? queueRows.map(queueCard).join("") : "<p class='sub'>No discovery records matched.</p>";
@@ -514,7 +515,7 @@
         if (action === "approve") return approveQueueItem(card, item);
         if (action === "needs-research") return markNeedsResearch(card, item);
         if (action === "reject") return setQueueStatus(item, "rejected");
-        if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
+        if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, duplicateFlag:true, crawlResultStatus:"possible-duplicate", aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
         if (action === "delete" && confirm("Remove this discovery card from active review?")) return setQueueStatus(item, "deleted");
       });
     });
@@ -559,9 +560,15 @@
     if (missing.length) {
       return { ok: false, missing };
     }
+    if (edited.duplicateFlag && edited.crawlScope !== "updates-only") {
+      const who = edited.duplicateMatch?.matchName || edited.duplicateMatch?.matchId || "another listing";
+      return { ok: false, missing: [`Possible duplicate of ${who}`] };
+    }
     const proposedType = String(edited.proposedType || "").toLowerCase();
-    const isVenue = /club|venue|lounge|beach|bar|rooftop/.test(proposedType);
-    const id = slug(`${edited.proposedTitle || edited.proposedLocationName || "listing"}-${edited.city || ""}-${edited.country || ""}`);
+    const isVenue = edited.entityKind === "venue" || /club|venue|lounge|beach|bar|rooftop/.test(proposedType);
+    const id = (edited.crawlScope === "updates-only" && edited.onboardedListingId)
+      ? edited.onboardedListingId
+      : slug(`${edited.proposedTitle || edited.proposedLocationName || "listing"}-${edited.city || ""}-${edited.country || ""}`);
     const venueType = proposedType.includes("beach") ? "beach-club" : proposedType.includes("rooftop") ? (proposedType.includes("bar") ? "rooftop-bar" : "rooftop-lounge") : proposedType.includes("lounge") ? "lounge" : proposedType.includes("bar") ? "bar" : "club";
     const enriched = window.FLOQRVenueDatapoints?.enrichVenueRecord?.(edited, {html: "", text: `${edited.proposedDescription || ""} ${edited.hours || ""}`}) || edited;
     const venueCore = window.FLOQRVenueDatapoints?.clubLocationPayloadFromDiscovery?.(enriched, {type: venueType}) || {};
@@ -740,10 +747,44 @@
     return loadDiscoveryQueue();
   }
 
+  function applyClientDiscoveryStamp(item, universe) {
+    const api = window.FLOQRDiscoveryGates;
+    if (!api) return item;
+    const classified = api.classifyEntity ? api.classifyEntity(item) : {};
+    let next = {
+      ...item,
+      entityKind: item.entityKind || classified.entityKind,
+      venueCategory: item.venueCategory || classified.venueCategory,
+      eventCategory: item.eventCategory || classified.eventCategory,
+      kindLabel: item.kindLabel || classified.kindLabel,
+      listingClass: item.listingClass || classified.listingClass,
+      proposedType: item.proposedType || classified.proposedType
+    };
+    if (api.findDuplicates && api.applyDuplicateStamp) {
+      next = api.applyDuplicateStamp(next, api.findDuplicates(next, universe));
+    }
+    next.missingDatapoints = missingDatapoints(next);
+    if (next.duplicateFlag && next.crawlScope !== "updates-only") {
+      next.crawlResultStatus = "possible-duplicate";
+    } else {
+      next.crawlResultStatus = next.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    }
+    return next;
+  }
+
   async function loadDiscoveryQueue() {
     const status = byId("aiDiscoveryStatusFilter")?.value || "pendingReview";
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
-    const rows = await getCollectionSafe("aiDiscoveryQueue", 500, "createdAt");
+    const [rows, clubs, events] = await Promise.all([
+      getCollectionSafe("aiDiscoveryQueue", 500, "createdAt"),
+      getCollectionSafe("clubLocations", 800),
+      getCollectionSafe("events", 400)
+    ]);
+    const universe = [
+      ...clubs.map(row => ({...row, collection: "clubLocations"})),
+      ...events.map(row => ({...row, collection: "events", entityKind: row.entityKind || "event"})),
+      ...rows.map(row => ({...row, collection: "aiDiscoveryQueue"}))
+    ];
     allQueueRows = rows.filter(item => {
       const rowStatus = String(item.status || "pendingReview");
       if (status === "pendingReview") {
@@ -753,7 +794,7 @@
       }
       if (city && !String(item.city || "").toLowerCase().includes(city)) return false;
       return true;
-    });
+    }).map(item => applyClientDiscoveryStamp(item, universe));
     renderCountryTabs(allQueueRows);
     renderQueueCards();
   }
@@ -838,23 +879,67 @@
     return weights;
   }
 
+  function renderImportGateCheckboxes(gates = DEFAULT_CRITERIA.importGates) {
+    const api = window.FLOQRDiscoveryGates;
+    const fields = api?.IMPORT_GATE_FIELDS || [];
+    const normalized = api?.normalizeImportGates ? api.normalizeImportGates(gates) : gates;
+    importGates = normalized;
+    const paint = (elId, map, applies) => {
+      const wrap = byId(elId);
+      if (!wrap) return;
+      wrap.innerHTML = fields.filter(field => field.appliesTo === applies || field.appliesTo === "both").map(field => {
+        const checked = map[field.key] === 1 ? " checked" : "";
+        return `<label><input type="checkbox" data-import-gate="${esc(field.key)}" data-import-gate-kind="${applies === "event" ? "event" : "venue"}"${checked}/> ${esc(field.label)}</label>`;
+      }).join("");
+    };
+    paint("aiDiscoveryVenueGates", normalized.venue, "venue");
+    paint("aiDiscoveryEventGates", normalized.event, "event");
+  }
+
+  function readImportGatesFromForm() {
+    const api = window.FLOQRDiscoveryGates;
+    const next = api?.defaultImportGates ? api.defaultImportGates() : {venue:{}, event:{}};
+    document.querySelectorAll("[data-import-gate]").forEach(input => {
+      const key = input.dataset.importGate;
+      const kind = input.dataset.importGateKind === "event" ? "event" : "venue";
+      if (!key || !next[kind]) return;
+      next[kind][key] = input.checked ? 1 : 0;
+    });
+    importGates = api?.normalizeImportGates ? api.normalizeImportGates(next) : next;
+    return importGates;
+  }
+
   async function loadCriteria() {
     const snap = await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").get();
     const criteria = snap.exists ? snap.data() : DEFAULT_CRITERIA;
     syncCriteriaWeightsToForm(criteria.weights || DEFAULT_CRITERIA.weights);
-    byId("aiDiscoveryCriteriaNotes").value = criteria.notes || "";
+    if (byId("aiDiscoveryCriteriaNotes")) byId("aiDiscoveryCriteriaNotes").value = criteria.notes || "";
+    renderImportGateCheckboxes(criteria.importGates || DEFAULT_CRITERIA.importGates);
   }
 
   async function saveCriteria() {
     const weights = readCriteriaWeightsFromForm();
+    const gates = readImportGatesFromForm();
     await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").set({
       active:true,
       criteriaName:"Default Nightlife Rating",
       weights,
-      notes:byId("aiDiscoveryCriteriaNotes").value || "",
+      importGates: gates,
+      notes:byId("aiDiscoveryCriteriaNotes")?.value || "",
       updatedAt:nowField()
     }, {merge:true});
-    setStatus("AI discovery rating criteria saved.");
+    setStatus("AI discovery rating criteria and import datapoints saved.");
+    renderQueueCards();
+  }
+
+  async function saveImportGates() {
+    const gates = readImportGatesFromForm();
+    await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").set({
+      importGates: gates,
+      updatedAt:nowField()
+    }, {merge:true});
+    setStatus("Import datapoints saved. Approve / Onboard selected now use these ticks.");
+    renderQueueCards();
   }
 
   function setStatus(value) {
@@ -874,7 +959,8 @@
       /* Counts live in #aiCrawlingSummary from masterAdminRollups; keep operator how-to here. */
       byId("aiDiscoverySummary").innerHTML = simpleRows([
         ["How it works", "Search → review cards → Approve or Needs research → live listing"],
-        ["Publish rule", "Approve only when Name, Genre, DJs, Promoters, Address, City, Country, Phone, Email, and Instagram are filled"],
+        ["Publish rule", "Approve when the Import datapoints you ticked are present. Promoter(s) and Email block import only if you tick them."],
+        ["Duplicates", "Same phone, same address, or same club name = one establishment. Monaco and Monte Carlo are treated as the same city."],
         ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
         ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
       ]);
@@ -889,6 +975,7 @@
         byId("aiDiscoveryClearSelectionBtn")?.addEventListener("click", clearOnboardSelection);
         byId("aiDiscoveryMassOnboardBtn")?.addEventListener("click", massOnboardSelected);
         byId("saveAiDiscoveryCriteriaBtn")?.addEventListener("click", saveCriteria);
+        byId("saveAiDiscoveryImportGatesBtn")?.addEventListener("click", saveImportGates);
         byId("aiDiscoveryCriteriaJson")?.addEventListener("change", () => {
           try {
             syncCriteriaWeightsToForm(JSON.parse(byId("aiDiscoveryCriteriaJson").value || "{}"));

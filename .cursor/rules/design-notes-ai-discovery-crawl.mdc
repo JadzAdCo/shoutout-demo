@@ -49,7 +49,7 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 | `aiCrawlRuns` | Manual / scheduled run lifecycle |
 | `aiDiscoveryQueue` | Review-only candidates (+ `profile-import-draft`) |
 | `aiDiscoverySources` | Enabled public source URLs |
-| `aiDiscoveryRatingCriteria` | Star/confidence weights |
+| `aiDiscoveryRatingCriteria` | Star/confidence weights + Master Admin `importGates` ticks |
 | `clubLocations` / `events` | Live after Approve |
 | `aiIndex` | Upsert on approve |
 
@@ -63,13 +63,23 @@ Manual **Run Discovery Crawl** / **Instant Crawl Now** call `runFloqrDiscoveryCr
 - **Stale Record Cleanup**: soft-clear ~**4 days** (`stale-cache-cleared`). Approved listings, profiles, ShoutOuts, guest lists, audit history **untouched**.
 - Profile import: `missingOnly` / never overwrite existing public-profile fields.
 
-## Approval datapoints (impactful)
+## Approval datapoints (Master Admin ticks)
 
-**Nightlife / ticketed:** Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy).
+Master Admin → AI Crawling → **Import datapoints** chooses which fields must be present before Approve / Onboard selected. Stored on `aiDiscoveryRatingCriteria/defaultNightlifeRating.importGates` `{venue:{key:0|1}, event:{key:0|1}}`. Unticked fields stay on the card for research but **do not** block import.
 
-**Daytime** (`daytimeEvent` / flea / farmers / community market / fall or daytime festival): Name, Genre, Organizer(s)/Promoter(s), Address, City, Country, Phone, Email, Instagram, **Date**, **Time**. DJ(s) not required.
+**Packaged defaults (venues):** Name, Address, City, Country, Phone. **Off:** Genre, DJ(s)/Artist(s), Promoter(s), Email, Instagram.
 
-Incomplete → cannot Approve; use **Needs research** (`status: needsResearch`).
+**Packaged defaults (events):** Name, City, Country, Date, Time. **Off:** Genre, Organizer(s)/Promoter(s), Address, Phone, Email, Instagram.
+
+Incomplete against the **ticked** list → cannot Approve; use **Needs research** (`status: needsResearch`).
+
+## Establishment duplicates
+
+Same **phone** OR same **physical address** OR same **club name** (city aliases applied) = the same establishment. Monaco / Monte Carlo / Monaco-Ville share city alias `monaco-monte-carlo`. Live `clubLocations` matches become `updates-only`. Other queue matches get `duplicateFlag` + `duplicateMatch` and cannot mass-onboard as a new club.
+
+## Club vs event
+
+Each queue row is classified `entityKind` `venue` | `event` with `venueCategory` (nightclub, beachClub, lounge, rooftopLounge, rooftopBar, dayClub, bar) or `eventCategory` (comedyShow, daytimeEvent, fleaMarket, festival, …). Review cards show **Club · Beach Club** vs **Event · Comedy Show**. Dated JSON-LD children stay events; Places businesses stay venues.
 
 ## Security
 
@@ -109,9 +119,9 @@ Review Discovery Queue shows dynamic **country tabs** (All + each country presen
 
 ## Onboard readiness blockers (engine gaps)
 
-Approve / mass onboard require nightlife checklist above, or the daytime checklist (no DJ; Date/Time required).
+Approve / mass onboard require the **ticked** Import datapoints for that card (club vs event). Possible duplicates cannot onboard as a new club.
 
-Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages. Daytime markets need **organizer** + schedule from the event page.
+Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages. Those fields are **not** import gates unless Master Admin ticks them.
 
 **Next crawl improvements (priority):**
 
@@ -123,7 +133,7 @@ Places + website enrich usually fills Name / Address / City / Country / Genre (f
 ## FIX PROMPT
 
 ```
-AI crawl: aggregator brand-domain preferencer + WhatsApp phone + href socials + secondary contact pages; collectedAt; updates-only; country tabs. Design notes: design-notes-ai-discovery-crawl.mdc
+AI crawl: Master Admin Import datapoints (Promoter/Email off unless ticked); same phone/address/name = one establishment (Monaco ≡ Monte Carlo); classify club vs event vs beach club. Design notes: design-notes-ai-discovery-crawl.mdc
 ```
 
-Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-venue-datapoints.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.
+Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-discovery-gates.js`, `floqr-venue-datapoints.js`, `functions/discovery-gates-core.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.

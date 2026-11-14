@@ -91,7 +91,7 @@ test("crawler includes daytime event types and relaxes DJ requirement", () => {
   assert.match(fn, /daytimeEvent/);
   assert.match(fn, /isDaytimeEventType/);
   assert.match(fn, /proposedTypeFromJobEventType/);
-  assert.match(fn, /Organizer\(s\) \/ Promoter\(s\)/);
+  assert.match(read("functions/discovery-gates-core.js"), /Organizer\(s\) \/ Promoter\(s\)/);
   assert.match(fn, /placesLocationBiasForJob/);
   assert.match(fn, /normalizePlacesTextQuery/);
   assert.match(fn, /isWashingtonDcJob/);
@@ -119,6 +119,29 @@ test("runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud withou
   assert.match(diagnostics, /Ticketmaster \(later\)/);
   assert.match(diagnostics, /buildManualCrawlCandidates/);
   assert.doesNotMatch(diagnostics, /Local fallback:.*structured review record/);
+});
+
+test("Master Admin Import datapoints and duplicate filters are wired", () => {
+  const html = read("master-admin.html");
+  const discovery = read("ai-discovery-service.js");
+  const diagnostics = read("ai-diagnostics-service.js");
+  const fn = read("functions/ai-discovery-functions.js");
+  const auto = read("functions/discovery-auto-approve.js");
+  assert.match(html, /Import datapoints/);
+  assert.match(html, /saveAiDiscoveryImportGatesBtn/);
+  assert.match(html, /Possible duplicates/);
+  assert.match(html, /floqr-discovery-gates\.js\?v=(?:s)?\d+\.\d+\.\d+/);
+  assert.match(discovery, /saveImportGates/);
+  assert.match(discovery, /duplicateFlag/);
+  assert.match(discovery, /FLOQRDiscoveryGates/);
+  assert.match(discovery, /applyClientDiscoveryStamp/);
+  assert.match(discovery, /missing\.length \|\| duplicateBlocks/);
+  assert.match(diagnostics, /FLOQRDiscoveryGates\?\.missingDatapoints/);
+  assert.match(read("duplicate-record-service.js"), /cityCanonical/);
+  assert.match(fn, /beginCrawlContext/);
+  assert.match(fn, /stampDiscoveryClassification/);
+  assert.match(auto, /possible_duplicate/);
+  assert.match(read("functions/discovery-gates-core.js"), /monaco-monte-carlo/);
 });
 
 test("discovery review UX is form-first with Needs research", () => {

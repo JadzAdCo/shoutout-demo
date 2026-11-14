@@ -66,7 +66,10 @@
   }
 
   function locationKey(row = {}) {
-    return [normalized(row.city), normalized(row.country)].filter(Boolean).join("|");
+    const gates = window.FLOQRDiscoveryGates;
+    const city = gates?.cityCanonical ? gates.cityCanonical(row.city) : normalized(row.city);
+    const country = gates?.countryCanonical ? gates.countryCanonical(row.country) : normalized(row.country);
+    return [city, country].filter(Boolean).join("|");
   }
 
   function activeForDuplicateScan(row = {}) {
@@ -118,6 +121,27 @@
     if (normalized(a.address) && normalized(a.address) === normalized(b.address)) {
       score += 20;
       reasons.push("same address");
+    }
+    const establishment = window.FLOQRDiscoveryGates?.sameEstablishment?.(a, {
+      ...b,
+      proposedLocationName: b.locationName || b.brandName,
+      proposedAddress: b.fullAddress || b.address || b.streetAddress,
+      telephone: b.telephone || b.phone
+    });
+    if (establishment?.match) {
+      if (establishment.reasons.includes("same-phone")) {
+        score += 70;
+        reasons.push("same phone");
+      }
+      if (establishment.reasons.includes("same-address")) {
+        score += 70;
+        reasons.push("same physical address");
+      }
+      if (establishment.reasons.includes("same-name")) {
+        score += 70;
+        reasons.push("same club name");
+      }
+      if (establishment.cityAliasApplied) reasons.push(`city alias ${establishment.cityAliasApplied}`);
     }
     return {score, reasons: unique(reasons)};
   }

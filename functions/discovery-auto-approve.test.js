@@ -112,6 +112,33 @@ test("past event lifecycle classification", () => {
   assert.equal(past.classifyLifecycle({lifecycleStatus: "retired", eventStartIso: "2020-01-01T00:00:00.000Z"}), "retired");
 });
 
+test("possible duplicates never auto-publish as a new listing", () => {
+  const future = new Date(Date.now() + 7 * 86400000).toISOString();
+  const decision = auto.processCrawledItem({
+    proposedType: "nightclub",
+    entityKind: "venue",
+    placesId: "ChIJ_dup_place",
+    proposedTitle: "Jimmy'z Monte-Carlo Nightclub",
+    proposedDescription: "Resident DJs and guest performers on the main floor. Doors at eleven. Table service available.",
+    latitude: 43.746,
+    longitude: 7.427,
+    email: "vip@jimmyzmontecarlo.com",
+    telephone: "+37798067000",
+    instagramHandle: "jimmyzmontecarlo",
+    socialMediaHandles: {instagram: "jimmyzmontecarlo"},
+    officialWebsite: "https://www.montecarlosbm.com/jimmyz",
+    sourceConfirmations: {googlePlaces: true},
+    sourceName: "Google Places API",
+    city: "Monte Carlo",
+    country: "Monaco",
+    duplicateFlag: true,
+    crawlScope: "updates-only",
+    onboardedListingId: "jimmyz-monaco"
+  });
+  assert.equal(decision.route, "ADMIN_QUEUE");
+  assert.ok(decision.failures.includes("possible_duplicate"));
+});
+
 test("mapPool runs with bounded concurrency", async () => {
   let active = 0;
   let maxActive = 0;

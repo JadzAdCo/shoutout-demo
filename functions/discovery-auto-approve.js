@@ -20,6 +20,7 @@ const {
   normalizedKey,
   toIsoStart
 } = require("./discovery-crawl-core");
+const gatesCore = require("./discovery-gates-core");
 
 const AUTO_APPROVE_THRESHOLD = 0.92;
 
@@ -255,7 +256,11 @@ function processCrawledItem(raw = {}) {
   const instagram = normalizeInstagram(raw.instagramHandle || raw.socialMediaHandles?.instagram || "");
   const agePolicy = normalizeAgePolicy(raw.agePolicy || "");
 
+  if (raw.duplicateFlag) failures.push("possible_duplicate");
   if (!hasIdentityAnchor(raw, kind)) failures.push("identity_anchor_missing");
+  gatesCore.missingDatapoints(raw, raw.importGatesSnapshot).forEach(label => {
+    failures.push(`import_gate_${String(label).replace(/\s+/g, "_").toLowerCase()}`);
+  });
   if (!email) failures.push("email_invalid");
   if (!phone) failures.push("phone_not_e164");
   if (!instagram) failures.push("instagram_invalid");

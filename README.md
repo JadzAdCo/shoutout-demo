@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.017 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.018 (stable)
 
+- s3.3.018: AI crawl Import datapoints, duplicate establishment check, club vs event
 - s3.3.017: VCC queue links, FloqCAST label, AI crawl KPI jump, IP language, Prior/Future travel, nights/splash/handle
 - s3.3.016: Site chrome applies on Back to Search and login without a manual refresh
 - s3.3.015: My Profile hard refresh stays on My Profile; ShoutOut editor opens on Message
