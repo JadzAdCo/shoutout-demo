@@ -16,6 +16,7 @@ When you **add, change, or fix** a FLOQR product feature (UI, callables, Firesto
 3. **Server enforcement** — page/client guards are UX only. Callables that mutate or reveal gated data must re-check auth, feature flags (`assertFeatureAccess` / equivalent), and role.
 4. **Audit / observability** — privileged or denial paths that matter for abuse get audit or Security System Message coverage when the feature already has that pattern (Features & Services, SOS2FA, display tokens, etc.).
 5. **Agent traffic** — automated / Cursor / curl / headless probes against gated callables must attribute audit `actorRole` / `actorEmail` as **`agent`** (not blank “patron”). See `design-notes-feature-services.mdc` § Agent audit attribution.
+6. **GDPR residency** — EU / EEA / UK patron PII must be hostable in European Firebase/Firestore. US `us-central1` is the live default, not the compliance end state. Middle East region TBD. Never persist client IP. See `gdpr-data-residency.mdc`.
 
 ## Same gate as translation
 
@@ -28,3 +29,4 @@ Incomplete classification or “rules later” is a **product bug**, not a follo
 - [ ] Callables enforce access (not only HTML/CSS hide)
 - [ ] Denial/privilege paths attributable (incl. **agent** for automation)
 - [ ] `docs/FEATURE-WIRING.md` notes data + security contracts
+- [ ] EU patron PII remains movable in-region (`gdpr-data-residency.mdc`)

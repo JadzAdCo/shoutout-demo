@@ -12,6 +12,14 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## GDPR data residency (security compliance — not migrated yet)
+
+Owner requirement: **EU / EEA / UK patron PII must live on European Firebase/Firestore hosting** (GDPR). Live today is **`us-central1` only** — that is not the compliance end state. **Middle East location is undecided** (do not invent `me-central1` / `me-west1` / Europe). Do not run the split until the owner schedules it. Do not persist client IP. New PII stores must stay movable in-region.
+
+Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`. Technical Bible §1.16 / §11.3.
+
+---
+
 ## Height unit + RydR pickup locale (s3.3.012)
 
 Unit-first height and structured taxi pickup. Profile country wins; if empty, IP country (never stored) from `FLOQRGeoSearch.ipLocation`.

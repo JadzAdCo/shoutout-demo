@@ -1,0 +1,50 @@
+---
+description: GDPR data residency is a security compliance requirement — EU patron PII must be hostable in Europe; Middle East region TBD
+alwaysApply: true
+---
+
+# GDPR / data residency (always — security compliance)
+
+Resume: `@gdpr$` / `$residency$`. Same standing as `feature-data-classification-security.mdc`: **do not wait for the owner to ask.**
+
+Owner (14 Nov 2026): European user data must move to **Firebase/Firestore hosting in Europe** to respect GDPR. Middle East data location is **undecided**. This is a **security compliance requirement**.
+
+## Current vs required
+
+| Now | Required |
+|---|---|
+| Project `shoutoutdemo-5b402`, Functions + Firestore **`us-central1`** | EU / EEA / UK patron PII system of record in Europe (`eur3` or `europe-west1` / `europe-west3`) |
+| US-only is the live default | US may stay US; **EU PII must not remain US-only as the end state** |
+| Middle East | **TBD** — `me-central1` (Doha), `me-west1`, or Europe. Ask the owner. Do not pick. |
+
+Do **not** run the region migration until the owner schedules it. Do **not** treat US-only as finished compliance.
+
+## Every feature that stores patron PII
+
+1. Classify the fields (existing data-classification gate).
+2. Keep the store **movable in-region** — no new US-hardcoded region assumptions in client code, no “this collection can only live in us-central1.”
+3. **Do not persist client IP** on `users/{uid}` or other patron docs. IP may inform language/locale in memory only.
+4. **Do not** ship EU PII to US-only logs, analytics, email debug, or vendors that cannot stay in-region.
+5. Functions that read/write that PII must be deployable in the same region as the data (today us-central1; EU Functions when the EU Firestore exists).
+6. Record the contract in `docs/FEATURE-WIRING.md` when you add PII.
+
+## When the owner schedules the migration
+
+- Move or dual-write EU patron PII (`users` and related) to European Firestore.
+- Point EU traffic at EU Functions; keep a region pointer (Technical Bible §1.16).
+- Update `docs/FEATURE-WIRING.md`, Technical Bible §1.16 and §11.3, and the classification register.
+- Legal basis + retention stay with the privacy/DSAR path — residency is additional, not a substitute.
+
+## Checklist (mental, every PII iteration)
+
+- [ ] New/changed patron PII can live in an EU Firestore later
+- [ ] No stored IP address
+- [ ] No US-only dead-end for EU personal data
+- [ ] Middle East region not invented
+- [ ] Migration itself only when the owner schedules it
+
+## FIX PROMPT
+
+```
+GDPR residency (security compliance): EU/EEA/UK patron PII must be hostable in European Firebase/Firestore (eur3 / europe-west). Today live is us-central1 — do not treat that as the end state. Do not persist IP. Do not copy EU PII to US-only tools. Middle East location TBD (ask owner). Do not run the region split until scheduled. Resume: @gdpr$ / $residency$
+```

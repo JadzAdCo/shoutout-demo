@@ -328,7 +328,7 @@ See Section 12. Philosophy: **every money, approval, and device state change is 
 |---|---|
 | Phase 1 | `us-central1` + `us-east1` |
 | Phase 2 | Add `europe-west1`, `asia-southeast1` |
-| Data residency | Venue org chooses region; PII stays in-region where required |
+| Data residency | **GDPR security compliance (owner 14 Nov 2026):** EU / EEA / UK patron PII must move to European Firebase/Firestore (`eur3` or `europe-west1` / `europe-west3`). Live today is `us-central1` — not the end state. Middle East region **TBD** (ask owner). Do not persist client IP. Do not run the split until scheduled. |
 
 Traffic: Geo DNS / Anycast CDN → nearest gateway → regional services. Shared global directory of venue IDs with region pointers.
 
@@ -1056,7 +1056,8 @@ Versioned REST/gRPC; idempotency keys; signed webhooks; Secret Manager; OpenAPI 
 
 ## 11.3 GDPR / CCPA / SOC2 / PCI
 
-- Consents (`privacyConsents`); export/delete runbooks; residency options.
+- Consents (`privacyConsents`); export/delete runbooks.
+- **Residency (GDPR security compliance):** EU / EEA / UK patron PII must be hosted in Europe; Middle East location TBD. See `.cursor/rules/gdpr-data-residency.mdc`.
 - SOC2 controls: access, change management, logging, vendors.
 - PCI **SAQ-A** via Stripe Checkout — never store PAN/CVV.
 
