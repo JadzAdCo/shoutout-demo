@@ -220,7 +220,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.012";
+    return "s3.3.014";
   }
 
   function isVersionPrompt(raw) {
@@ -240,6 +240,22 @@
     if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;
     if (/^(?:package|release)\s+(?:info|version|number)\??$/.test(q)) return true;
     if (/\bversion\s+info\b/.test(q)) return true;
+    return false;
+  }
+
+  /** Bare help / how-to-use-BOT-DEE — answer locally like version; do not dump search cards. */
+  function isHelpPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 120) return false;
+    if (/\b(?:shout\s*out|vip|floq\s*cast|floqcast|mingl|rydr|bartr|schedule|jersey|baller|template|checkout)\b/.test(q)) {
+      return false;
+    }
+    if (/^(?:help|aide|ayuda|hilfe|aiuto|ajuda|помощь|βοήθεια|pomoc|مساعدة)\??$/.test(q)) return true;
+    if (/^(?:\?|help me|need help|i need help)\??$/.test(q)) return true;
+    if (/^(?:how (?:do|can|to) (?:i|you) (?:use|get help(?: from)?|ask)(?: (?:you|bot\s*dee|floqr))?)\??$/.test(q)) return true;
+    if (/^(?:what can (?:you|bot\s*dee) (?:do|help(?: me)? with))\??$/.test(q)) return true;
+    if (/^(?:bot\s*dee help|help bot\s*dee|show help|get help)\??$/.test(q)) return true;
+    if (/\b(?:how (?:do|can) i use (?:you|bot\s*dee)|what (?:are you|can you) (?:for|help with))\b/.test(q)) return true;
     return false;
   }
 
@@ -308,6 +324,16 @@
     const label = packageLabel();
     const template = t("botdee.chatVersion", "I'm BOT DEE on FLOQR package {version}.");
     return String(template).replace(/\{version\}/g, label);
+  }
+
+  function helpReply() {
+    const localized = t("botdee.chatHelp", "");
+    if (localized && localized !== "botdee.chatHelp") {
+      return scrubGatedBrands(localized);
+    }
+    return scrubGatedBrands(
+      `I'm BOT DEE — ask me anything about FLOQR in plain words (events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, Club Admin). Enter sends; Shift+Enter is a new line. What are you interested in getting help with?`
+    );
   }
 
   function stillHereReply() {
@@ -790,6 +816,7 @@
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
     if (isVersionPrompt(text)) return versionReply();
+    if (isHelpPrompt(text)) return helpReply();
     if (isAckPrompt(text)) return ackReply(text);
     if (isMoodPrompt(text)) return moodReply();
     if (isChitchatPrompt(text)) {
@@ -824,7 +851,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text))) {
       const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
@@ -839,7 +866,7 @@
     }
 
     // Substantive restart after idle (memory-only): one short welcome-back, then answer.
-    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text))) {
+    if (!durableEnabled && resuming && !(isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text))) {
       const hello = resumeReply();
       appendBubble("bot", hello);
       pushHistory("model", hello);
@@ -853,9 +880,8 @@
     if (!fn) {
       setBusy(false);
       setStatus("");
-      const fallback = t("botdee.chatOffline", "Chat is unavailable right now. Use quick intent search below.");
+      const fallback = t("botdee.chatOffline", "Chat is unavailable right now. Try again in a moment.");
       appendBubble("bot", fallback);
-      openIntentFallback();
       return;
     }
 
@@ -883,7 +909,7 @@
       }
     } catch (error) {
       const code = String(error?.code || "");
-      let msg = t("botdee.chatError", "BOT DEE could not answer. Try quick intent search.");
+      let msg = t("botdee.chatError", "BOT DEE could not answer. Try again in a moment.");
       if (code.includes("unauthenticated")) {
         msg = t("botdee.chatSignIn", "Sign in to chat with BOT DEE.");
       } else if (code.includes("failed-precondition")) {
@@ -891,18 +917,11 @@
       }
       appendBubble("bot", msg);
       setStatus("");
-      openIntentFallback();
       console.warn("BOT DEE chat failed", code || error?.message || error);
     } finally {
       setBusy(false);
       input?.focus();
     }
-  }
-
-  function openIntentFallback() {
-    const details = byId("botDeeIntentFallback");
-    if (details) details.open = true;
-    byId("intentSearchInput")?.focus();
   }
 
   function bindForm() {
@@ -940,9 +959,10 @@
     if (
       !text
       || /could not find a clear match/i.test(text)
+      || text === "No answer yet — try asking another way."
       || text === "No answer yet — try quick intent search."
     ) {
-      return t("botdee.chatEmpty", "No answer yet — try quick intent search.");
+      return t("botdee.chatEmpty", "No answer yet — try asking another way.");
     }
     return scrubGatedBrands(stripBackendLinks(text));
   }
@@ -1007,16 +1027,15 @@
       if (input) input.value = String(q).slice(0, 200);
     }
     restoreOrWelcome();
-    return {sendMessage, openIntentFallback, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
-  }
+        return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
+      }
 
-  global.FLOQRBotDeeChat = {
-    bind,
-    sendMessage,
-    openIntentFallback,
-    openPhotoViewer,
-    closePhotoViewer,
-    DEFAULT_IDLE_SECONDS,
-    clampIdleSeconds
-  };
+      global.FLOQRBotDeeChat = {
+        bind,
+        sendMessage,
+        openPhotoViewer,
+        closePhotoViewer,
+        DEFAULT_IDLE_SECONDS,
+        clampIdleSeconds
+      };
 })(typeof window !== "undefined" ? window : global);

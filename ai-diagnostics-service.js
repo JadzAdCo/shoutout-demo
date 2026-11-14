@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.013";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.013";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.014";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.014";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.014",
+      title: "s3.3.014 — BOT DEE chat-only: no ? / scope; help like version; no Quick intent",
+      checks: [
+        {label:"No ? bubble or scope line", file:"botdee.html", notIncludes:["botdee-help-popout", "botDeeScopeNote", "botDeeIntentFallback", "intent-search.js"]},
+        {label:"Help local reply", file:"bot-dee-chat.js", includes:["isHelpPrompt", "helpReply", "botdee.chatHelp"]},
+        {label:"Server help", file:"functions/bot-dee-core.js", includes:["function isHelpPrompt", "function helpReply"]},
+        {label:"Callable local help", file:"functions/bot-dee-functions.js", includes:["isHelpPrompt(userPrompt)", "local-help"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-014-botdee-help-chat"]}
+      ]
+    },
     {
       version: "s3.3.013",
       title: "s3.3.013 — Master Admin 5-min rollup + summary strips",
@@ -3042,6 +3053,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-014-botdee-help-chat",
+      area:"BOT DEE",
+      feature:"No ? bubble / scope line; type help like version",
+      changed:"s3.3.014 — botdee.html header is title only (no ? help popout, no Showing answers for…). Quick intent search removed. Typing help / what can you do returns a local BOT DEE help reply and asks what you want help with (same path as version).",
+      howToTest:"1) Hard-refresh botdee.html s3.3.014 signed in with botDee. 2) Confirm no ? next to the title and no Showing answers for… line. 3) Type help — BOT DEE explains itself and asks what you want help with (no product-card dump). 4) Type version — still gets the package stamp. 5) Mark Succeed/Failed.",
+      expected:"Clean title header; help and version answer in chat without opening a ? bubble or intent strip.",
+      troubleshoot:"? still visible → hard-refresh botdee.html. Showing answers… → stale botdee-page.js. help dumps search cards → Functions not redeployed with isHelpPrompt / local-help."
+    },
     {
       id:"s3-3-013-master-admin-rollup",
       area:"Master Admin",

@@ -590,7 +590,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 | Layer | Wiring |
 |---|---|
-| UI | Search / BOT DEE (`index.html` intent panel); `botdee.html` collapsible **Quick intent search** |
+| UI | Search still hosts the intent panel on `index.html` when used; `botdee.html` is **chat only** (Quick intent search removed s3.3.014). No `?` help bubble / no “Showing answers for…” scope line — type **help** (like **version**) for a local BOT DEE help reply |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
 | Help seed | `botdee-help-repository.js` (loaded before `intent-search.js`) |
 | Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
@@ -604,7 +604,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Layer | Wiring |
 |---|---|
 | UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
-| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat + intent fallback; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) gate intent cards |
+| Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) for audience scope |
 | Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
 | Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
@@ -622,7 +622,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
 | Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
 | Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring) |
-| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood + intent fallback); page popout `botdee.helpComposer` |
+| Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood); page popout `botdee.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |
 | BOT DEE verbiage (s3.2.60+) | Patron-facing chat/Search/help say **BOT DEE** (never FloqAi). Catalog key `botDee` with one-release dual-read from `floqAi`. Page file is `botdee.html`. Legacy `floqai.html` removed (s3.2.75). See `design-notes-botdee-rename.mdc`. |

@@ -767,7 +767,7 @@
         "vipTerms": "VIP-Bedingungen fortsetzen"
       },
       "fallback": {
-        "noMatch": "Ich habe noch keine klare Übereinstimmung für dein Konto gefunden. Nutze die schnelle Intent-Suche unten oder frag nach ShoutOut, VIP reserV, floqCast oder Schichtplan.",
+        "noMatch": "Ich habe noch keine klare Übereinstimmung für dein Konto gefunden. Frag nach ShoutOut, VIP reserV, floqCast oder Schichtplan.",
         "foundHeader": "Das habe ich für dein Konto gefunden:"
       }
     },
@@ -1509,7 +1509,7 @@
         "vipTerms": "Continuer les conditions VIP"
       },
       "fallback": {
-        "noMatch": "Je n’ai pas encore trouvé de correspondance claire pour votre compte. Utilisez la recherche d’intention rapide ci-dessous, ou demandez ShoutOut, VIP reserV, floqCast ou le planning.",
+        "noMatch": "Je n’ai pas encore trouvé de correspondance claire pour votre compte. Demandez ShoutOut, VIP reserV, floqCast ou le planning.",
         "foundHeader": "Voici ce que j’ai trouvé pour votre compte :"
       }
     },
@@ -2251,7 +2251,7 @@
         "vipTerms": "Continuar con los términos VIP"
       },
       "fallback": {
-        "noMatch": "Aún no encontré una coincidencia clara para tu cuenta. Usa la búsqueda rápida de intención abajo, o pregunta por ShoutOut, VIP reserV, floqCast o horarios.",
+        "noMatch": "Aún no encontré una coincidencia clara para tu cuenta. Pregunta por ShoutOut, VIP reserV, floqCast o horarios.",
         "foundHeader": "Esto es lo que encontré para tu cuenta:"
       }
     },
@@ -2993,7 +2993,7 @@
         "vipTerms": "Continua i Termini VIP"
       },
       "fallback": {
-        "noMatch": "Non ho ancora trovato una corrispondenza chiara per il tuo account. Usa la ricerca rapida di intent qui sotto, oppure chiedi di ShoutOut, VIP reserV, floqCast o turni.",
+        "noMatch": "Non ho ancora trovato una corrispondenza chiara per il tuo account. Chiedi di ShoutOut, VIP reserV, floqCast o turni.",
         "foundHeader": "Ecco cosa ho trovato per il tuo account:"
       }
     },
@@ -3735,7 +3735,7 @@
         "vipTerms": "Continuar os Termos VIP"
       },
       "fallback": {
-        "noMatch": "Ainda não encontrei uma correspondência clara para a sua conta. Use a pesquisa rápida de intenção abaixo, ou pergunte sobre ShoutOut, VIP reserV, floqCast ou escalas.",
+        "noMatch": "Ainda não encontrei uma correspondência clara para a sua conta. Pergunte sobre ShoutOut, VIP reserV, floqCast ou escalas.",
         "foundHeader": "Isto é o que encontrei para a sua conta:"
       }
     },
@@ -4477,7 +4477,7 @@
         "vipTerms": "Продолжить условия VIP"
       },
       "fallback": {
-        "noMatch": "Пока нет явного совпадения для вашего аккаунта. Используйте быстрый поиск намерений ниже или спросите про ShoutOut, VIP reserV, floqCast или расписание.",
+        "noMatch": "Пока нет явного совпадения для вашего аккаунта. Спросите про ShoutOut, VIP reserV, floqCast или расписание.",
         "foundHeader": "Вот что я нашёл для вашего аккаунта:"
       }
     },
@@ -5219,7 +5219,7 @@
         "vipTerms": "Συνέχεια όρων VIP"
       },
       "fallback": {
-        "noMatch": "Δεν βρήκα ακόμη καθαρή αντιστοιχία για τον λογαριασμό σας. Χρησιμοποιήστε τη γρήγορη αναζήτηση πρόθεσης παρακάτω ή ρωτήστε για ShoutOut, VIP reserV, floqCast ή πρόγραμμα.",
+        "noMatch": "Δεν βρήκα ακόμη καθαρή αντιστοιχία για τον λογαριασμό σας. Ρωτήστε για ShoutOut, VIP reserV, floqCast ή πρόγραμμα.",
         "foundHeader": "Αυτό βρήκα για τον λογαριασμό σας:"
       }
     },
@@ -5961,7 +5961,7 @@
         "vipTerms": "Kontynuuj warunki VIP"
       },
       "fallback": {
-        "noMatch": "Nie znalazłem jeszcze jasnego dopasowania do Twojego konta. Użyj szybkiego wyszukiwania intencji poniżej albo zapytaj o ShoutOut, VIP reserV, floqCast lub grafikę.",
+        "noMatch": "Nie znalazłem jeszcze jasnego dopasowania do Twojego konta. Zapytaj o ShoutOut, VIP reserV, floqCast lub grafikę.",
         "foundHeader": "Oto co znalazłem dla Twojego konta:"
       }
     },
@@ -6703,7 +6703,7 @@
         "vipTerms": "VIP-voorwaarden voortzetten"
       },
       "fallback": {
-        "noMatch": "Ik vond nog geen duidelijke match voor je account. Gebruik de snelle intent-zoekactie hieronder, of vraag naar ShoutOut, VIP reserV, floqCast of roosters.",
+        "noMatch": "Ik vond nog geen duidelijke match voor je account. Vraag naar ShoutOut, VIP reserV, floqCast of roosters.",
         "foundHeader": "Dit vond ik voor je account:"
       }
     },
@@ -7445,7 +7445,7 @@
         "vipTerms": "متابعة شروط VIP"
       },
       "fallback": {
-        "noMatch": "لم أجد تطابقًا واضحًا لحسابك بعد. استخدم البحث السريع عن النية أدناه، أو اسأل عن ShoutOut أو VIP reserV أو floqCast أو الجداول.",
+        "noMatch": "لم أجد تطابقًا واضحًا لحسابك بعد. اسأل عن ShoutOut أو VIP reserV أو floqCast أو الجداول.",
         "foundHeader": "هذا ما وجدته لحسابك:"
       }
     }

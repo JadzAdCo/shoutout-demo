@@ -212,6 +212,16 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = 
       uiLanguage: lang
     };
   }
+  if (bot.isHelpPrompt(userPrompt)) {
+    return {
+      reply: bot.helpReply(),
+      results: [],
+      provider: "local-help",
+      model: "help",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
   const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
   return {
     reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(search, lang, allowed), allowed),
@@ -285,6 +295,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isMoodPrompt(userPrompt)
       || bot.isChitchatPrompt(userPrompt)
       || bot.isIdentityPrompt(userPrompt)
+      || bot.isVersionPrompt(userPrompt)
+      || bot.isHelpPrompt(userPrompt)
     ) {
       outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
     } else if (apiKey) {
