@@ -18,7 +18,7 @@ const DEFAULT_DURABLE_THREADS = 1;
 const THREAD_SCHEMA_VERSION = 1;
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const SUPPORTED_UI_LANGS = new Set(["en", "de", "fr", "es", "it", "pt", "ru", "el", "pl", "nl", "ar"]);
-/** FLOQR package stamp — keep in sync with functions/package.json version. */
+/** FLOQR package stamp — keep in sync with functions/package.json version (s3.3.009). */
 const PACKAGE_VERSION = (() => {
   try {
     return String(require("./package.json").version || "").trim() || "0.0.0";
