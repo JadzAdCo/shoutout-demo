@@ -8,7 +8,23 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-13 |
+| Last registry touch | 2026-11-14 |
+
+---
+
+## Height unit + RydR pickup locale (s3.3.012)
+
+Unit-first height and structured taxi pickup. Profile country wins; if empty, IP country (never stored) from `FLOQRGeoSearch.ipLocation`.
+
+| Piece | Wiring |
+|---|---|
+| Module | `floqr-profile-locale.js` (`window.FLOQRProfileLocale`) — `bindHeightFields`, `bindPickupFields`, `validateHeight`, `usesZip` |
+| Height | Choose **ft** or **m** first, then type. ft = `6'0"` (3'0–8'11); m = `1.78` (1.20–2.51). Mixing blocked. US/Canada default ft; other countries / non-US IP default m. Switching a valid value converts. Dual-read `heightUnit` `ftin`→`ft` |
+| Pickup | Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Composed `taxiPickupAddress` for RydR/commerce. Private on `users/{uid}` — not a Mingl public datapoint |
+| Surfaces | Search welcome (`index.html`), My Profile (`patron-portal.html`), RydR (`pickup.html`) |
+| Data | `users.taxiStreetNumber` / `taxiStreetName` / `taxiCity` / `taxiPostalCode` / `taxiPostalKind` / `taxiPickupAddress` — ownMaster PII, self-write |
+| Help | `help-profile-height`, `help-taxi-pickup-address` (patron) |
+| Tests | `functions/profile-locale.test.js` |
 
 ---
 

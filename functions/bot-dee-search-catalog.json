@@ -1615,6 +1615,27 @@
       ]
     },
     {
+      "sourceId": "help:help-profile-height",
+      "id": "help-profile-height",
+      "kind": "help",
+      "label": "Height",
+      "blurb": "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can st",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
+      "phrases": [
+        "height",
+        "choose ft or m first then type your height in that unit. feet uses 6 0 . meters uses 1.78. mixing them is blocked 1.78 cannot be saved as ft and 6 0 cannot be s",
+        "how tall",
+        "feet",
+        "meters",
+        "ft",
+        "height unit",
+        "6 0",
+        "1.78",
+        "profile settings",
+        "help-profile-height"
+      ]
+    },
+    {
       "sourceId": "help:help-public-media-sharing",
       "id": "help-public-media-sharing",
       "kind": "help",
@@ -2038,6 +2059,28 @@
         "my assigned shifts",
         "work calendar tab",
         "help-staff-worksheet"
+      ]
+    },
+    {
+      "sourceId": "help:help-taxi-pickup-address",
+      "id": "help-taxi-pickup-address",
+      "kind": "help",
+      "label": "Taxi pickup address",
+      "blurb": "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. Th",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
+      "phrases": [
+        "taxi pickup address",
+        "rydr pickup needs a street number street name city and zip or postal code. u.s. residents enter a zip 12345 or 12345-6789 . canada and other countries or a non-",
+        "taxi pickup",
+        "pickup address",
+        "rydr address",
+        "zip code",
+        "postal code",
+        "street number",
+        "hail a ride address",
+        "profile settings",
+        "rydr",
+        "help-taxi-pickup-address"
       ]
     },
     {
@@ -3153,6 +3196,26 @@
       ]
     },
     {
+      "sourceId": "intent:help-profile-height",
+      "id": "help-profile-height",
+      "kind": "help",
+      "label": "Height",
+      "blurb": "Choose ft or m first, then type your height in that unit. Mixing 6'0\" with m or 1.78 with ft is blocked.",
+      "href": "./botdee.html",
+      "phrases": [
+        "height",
+        "choose ft or m first then type your height in that unit. mixing 6 0 with m or 1.78 with ft is blocked.",
+        "how tall",
+        "feet",
+        "meters",
+        "ft",
+        "height unit",
+        "6 0",
+        "1.78",
+        "help-profile-height"
+      ]
+    },
+    {
       "sourceId": "intent:help-promoter",
       "id": "help-promoter",
       "kind": "help",
@@ -3351,6 +3414,25 @@
         "confirm shift",
         "approve selected",
         "help-staff-worksheet"
+      ]
+    },
+    {
+      "sourceId": "intent:help-taxi-pickup-address",
+      "id": "help-taxi-pickup-address",
+      "kind": "help",
+      "label": "Taxi pickup address",
+      "blurb": "RydR pickup needs street number, street name, city, and a U.S. ZIP or a postal code. The label is chosen from your profile country and IP.",
+      "href": "./botdee.html",
+      "phrases": [
+        "taxi pickup address",
+        "rydr pickup needs street number street name city and a u.s. zip or a postal code. the label is chosen from your profile country and ip.",
+        "taxi pickup",
+        "pickup address",
+        "rydr address",
+        "zip code",
+        "postal code",
+        "street number",
+        "help-taxi-pickup-address"
       ]
     },
     {

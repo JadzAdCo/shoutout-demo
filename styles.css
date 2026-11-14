@@ -808,8 +808,16 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .mingl-compose-menu-panel strong{color:var(--lime);font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin-top:4px}
 .mingl-compose-menu-panel button,.mingl-compose-menu-panel .chat-file-button{width:100%;min-height:42px;text-align:left;justify-content:flex-start}
 .compact-emoji-row{margin:0}.compact-emoji-row button{width:38px!important;height:38px!important;text-align:center!important;justify-content:center!important}
-.height-input-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
+.height-input-row{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center}
 .height-input-row input,.height-input-row select{width:100%}
+.height-input-row input:disabled{opacity:.55;cursor:not-allowed}
+.pickup-address-grid{display:grid;grid-template-columns:minmax(88px,120px) minmax(0,1fr);gap:10px}
+.pickup-address-grid label{display:flex;flex-direction:column;gap:6px;margin:0}
+.field-hint{margin:8px 0 0;font-size:13px;color:var(--muted,#9aa3c7)}
+.field-hint.is-error{color:#ff8d9a}
+@media (max-width:600px){
+  .pickup-address-grid{grid-template-columns:1fr}
+}
 .visually-hidden-file{position:absolute!important;width:1px;height:1px;opacity:0;pointer-events:none}
 .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* Brand names that must keep mixed case (BartR, FloqR, Mingl) */

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.011";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.011";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.012";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.012";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.012",
+      title: "s3.3.012 — Height unit-first + structured RydR pickup",
+      checks: [
+        {label:"Locale helper", file:"floqr-profile-locale.js", includes:["bindHeightFields", "bindPickupFields", "usesZip"]},
+        {label:"Unit before height Search", file:"index.html", includes:["profileHeightUnit", "profileTaxiStreetNumber"]},
+        {label:"Unit before height Profile", file:"patron-portal.html", includes:["editHeightUnit", "editTaxiStreetNumber"]},
+        {label:"RydR structured pickup", file:"pickup.html", includes:["pickupStreetNumber", "pickupPostal"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-012-height-pickup-locale"]}
+      ]
+    },
     {
       version: "s3.3.011",
       title: "s3.3.011 — ShoutOut page trail + checkout one-tap + BOT DEE photo pop-out",
@@ -3008,6 +3019,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-012-height-pickup-locale",
+      area:"Profile / RydR",
+      feature:"Height unit-first + structured taxi pickup",
+      changed:"s3.3.012 — Choose ft or m first, then height. 6'0 with m and 1.78 with ft are blocked. US/Canada default ft; other countries and non-US IP default m. Taxi pickup is Street #, street name, city, ZIP (US resident) or postal (Canada / other / non-US IP). Address stays private.",
+      howToTest:"1) Hard-refresh Search and My Profile s3.3.012. 2) On Height, pick ft then enter 6'0 — save works; switch to m and the value converts (~1.83). Enter 1.78 while ft is selected — error. 3) Set country to France (or use a non-US IP with empty country) — unit defaults to m and pickup label is Postal code. Set country to United States — ZIP. Canada — ft + postal. 4) Open RydR pickup and fill Street # / name / city / ZIP or postal; continue uses the composed line. 5) Mark Succeed/Failed.",
+      expected:"ft and m cannot be mixed. ZIP vs postal follows US resident vs Canada/other/IP. Pickup will not continue on a one-line stub.",
+      troubleshoot:"Still a single height box → hard-refresh index.html / patron-portal.html / floqr-profile-locale.js s3.3.012. ZIP on a French profile → country field must be France (profile country wins over US IP). RydR still one box → pickup.html not cache-busted."
+    },
     {
       id:"s3-3-011-shoutout-page-trail",
       area:"ShoutOut / Diagnostics",

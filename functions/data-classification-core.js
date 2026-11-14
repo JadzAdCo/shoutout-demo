@@ -203,6 +203,12 @@
     ["users", "marketingMediaConsent", "ownClubAdmin", 1, "Staff consent to appear in a club's marketing media (Club Admins of the affiliated club)"],
     ["users", "email", "ownMaster", 1, "Account email"],
     ["users", "phone", "ownMaster", 1, "Account phone number"],
+    ["users", "taxiPickupAddress", "ownMaster", 1, "Private RydR pickup line (composed street + city + ZIP/postal)"],
+    ["users", "taxiStreetNumber", "ownMaster", 1, "Private RydR street number"],
+    ["users", "taxiStreetName", "ownMaster", 1, "Private RydR street name"],
+    ["users", "taxiCity", "ownMaster", 1, "Private RydR pickup city"],
+    ["users", "taxiPostalCode", "ownMaster", 1, "Private RydR ZIP or postal code"],
+    ["users", "taxiPostalKind", "ownMaster", 0, "Private RydR postal kind (zip vs postal)"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];

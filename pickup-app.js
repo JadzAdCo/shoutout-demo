@@ -16,6 +16,8 @@
   const locationId = qs("location") || "zebbies-garden-washington-dc";
   let destination = "";
   let userProfile = {};
+  let pickupLocaleHint = {};
+  let pickupAddressCtl = null;
   let savedPickupAddresses = [];
   let selectedSaveLabel = "Home";
   let rideTimer = 0;
@@ -73,6 +75,49 @@
 
   function clearPending() {
     sessionStorage.removeItem(PENDING_KEY);
+  }
+
+  function currentPickupLocale() {
+    return {
+      country: userProfile.country || "",
+      ...pickupLocaleHint
+    };
+  }
+
+  function fillPickupAddress(addressOrParts) {
+    const parts = addressOrParts && typeof addressOrParts === "object" && !Array.isArray(addressOrParts)
+      ? addressOrParts
+      : window.FLOQRProfileLocale?.splitPickupAddress?.(addressOrParts || "") || {};
+    pickupAddressCtl?.fill?.(parts);
+    if (!pickupAddressCtl && byId("pickupAddress") && typeof addressOrParts === "string") {
+      byId("pickupAddress").value = addressOrParts;
+    }
+    updateMapsLink();
+  }
+
+  function requirePickupAddress() {
+    const result = pickupAddressCtl?.validate?.(true);
+    if (result) {
+      if (!result.ok || result.empty) throw new Error(result.error || "Pickup and verified destination addresses are required.");
+      return result.composed;
+    }
+    const address = byId("pickupAddress")?.value.trim() || "";
+    if (!address) throw new Error("Pickup and verified destination addresses are required.");
+    return address;
+  }
+
+  function pickupStructuredFields(address) {
+    const parts = pickupAddressCtl?.read?.() || window.FLOQRProfileLocale?.splitPickupAddress?.(address) || {};
+    const locale = currentPickupLocale();
+    const zipMode = window.FLOQRProfileLocale?.usesZip?.(locale);
+    return {
+      taxiStreetNumber: parts.streetNumber || "",
+      taxiStreetName: parts.streetName || "",
+      taxiCity: parts.city || "",
+      taxiPostalCode: parts.postalCode || "",
+      taxiPostalKind: zipMode ? "zip" : "postal",
+      taxiPickupAddress: address
+    };
   }
 
   function updateMapsLink() {
@@ -180,8 +225,7 @@
       btn.addEventListener("click", () => {
         const row = savedPickupAddresses.find(item => item.id === btn.getAttribute("data-saved-id"));
         if (!row) return;
-        byId("pickupAddress").value = row.address;
-        updateMapsLink();
+        fillPickupAddress(row.address);
         setStatus(`Using saved pickup: ${row.label}.`);
       });
     });
@@ -190,7 +234,7 @@
   async function saveCurrentPickup() {
     const user = auth.currentUser;
     if (!user) throw new Error("Sign in before saving a pickup address.");
-    const address = byId("pickupAddress").value.trim();
+    const address = requirePickupAddress();
     if (!address) throw new Error("Enter a pickup address before saving.");
     let label = selectedSaveLabel || "Home";
     if (label === "Other") {
@@ -204,7 +248,7 @@
     savedPickupAddresses = next;
     await db.collection("users").doc(user.uid).set({
       savedPickupAddresses:next,
-      taxiPickupAddress:address,
+      ...pickupStructuredFields(address),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
     renderSavedChips();
@@ -369,7 +413,7 @@
     const pickupAddress = (paymentMeta.pickupAddress || byId("pickupAddress")?.value || "").trim();
     const destinationAddress = paymentMeta.destinationAddress || destination;
     await db.collection("users").doc(user.uid).set({
-      taxiPickupAddress:pickupAddress,
+      ...pickupStructuredFields(pickupAddress),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
     const ref = db.collection("pickupRequests").doc();
@@ -427,7 +471,7 @@
     setStatus("Payment confirmed. Starting simulated hail…");
     const pending = readPending() || {};
     const booking = pending.booking || {mode:"onDemand", payerChoice:"organizer"};
-    if (pending.pickupAddress && byId("pickupAddress")) byId("pickupAddress").value = pending.pickupAddress;
+    if (pending.pickupAddress) fillPickupAddress(pending.pickupAddress);
     await createPickupRequest(user, booking, {
       orderId,
       pickupAddress:pending.pickupAddress || byId("pickupAddress")?.value,
@@ -477,13 +521,13 @@
   }
 
   async function continueFromAddress() {
-    const pickupAddress = byId("pickupAddress").value.trim();
+    const pickupAddress = requirePickupAddress();
     bookingDetails();
     if (!pickupAddress || !destination) throw new Error("Pickup and verified destination addresses are required.");
     const user = auth.currentUser;
     if (user) {
       await db.collection("users").doc(user.uid).set({
-        taxiPickupAddress:pickupAddress,
+        ...pickupStructuredFields(pickupAddress),
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
     }
@@ -495,7 +539,7 @@
     const user = auth.currentUser;
     if (!user) throw new Error("Sign in before using Pickup.");
     if (!window.FLOQRPayments?.startCheckout) throw new Error("Stripe checkout is not loaded.");
-    const pickupAddress = byId("pickupAddress").value.trim();
+    const pickupAddress = requirePickupAddress();
     const booking = bookingDetails();
     if (!pickupAddress || !destination) throw new Error("Pickup and verified destination addresses are required.");
     byId("pickupRequestBtn").disabled = true;
@@ -508,7 +552,7 @@
       createdAt:Date.now()
     });
     await db.collection("users").doc(user.uid).set({
-      taxiPickupAddress:pickupAddress,
+      ...pickupStructuredFields(pickupAddress),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
     setStatus("Opening FloqR Stripe Checkout for trip fare…");
@@ -554,7 +598,7 @@
       ? {...((window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {}), ...clubSnap.data()}
       : (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
     destination = addressOf(club);
-    byId("pickupAddress").value = userProfile.taxiPickupAddress || userProfile.pickupAddress || "";
+    fillPickupAddress(window.FLOQRProfileLocale?.pickupFromProfile?.(userProfile) || userProfile.taxiPickupAddress || userProfile.pickupAddress || "");
     byId("pickupDestination").value = destination;
     updateMapsLink();
     renderVehicle();
@@ -646,6 +690,22 @@
     byId("pickupForAnotherPayment")?.addEventListener("change", updatePaymentPlan);
     byId("pickupSharedPayment")?.addEventListener("change", updatePaymentPlan);
     updateBookingMode();
+    pickupAddressCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
+      ids: {
+        streetNumber: "pickupStreetNumber",
+        streetName: "pickupStreetName",
+        city: "pickupCity",
+        postal: "pickupPostal",
+        postalLabel: "pickupPostalLabel",
+        composed: "pickupAddress",
+        hint: "pickupAddressHint"
+      },
+      locale: currentPickupLocale
+    }) || null;
+    window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
+      pickupLocaleHint = hint || {};
+      pickupAddressCtl?.paintPostal?.();
+    }).catch(() => {});
     byId("pickupAddress")?.addEventListener("change", updateMapsLink);
     showWizardStep("a");
     auth.onAuthStateChanged(user => {

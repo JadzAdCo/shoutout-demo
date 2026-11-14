@@ -392,7 +392,11 @@ function datapointAllowed(data, key) {
 
 function heightDisplay(data = {}) {
   const labeled = text(data.heightDisplay || data.height, 40);
-  if (labeled) return labeled;
+  const unit = String(data.heightUnit || "").toLowerCase();
+  if (labeled) {
+    if ((unit === "m" || unit === "metric") && !/\bm\b/i.test(labeled)) return text(`${labeled} m`, 40);
+    return labeled;
+  }
   const feet = data.heightFeet;
   const inches = data.heightInches;
   if (feet != null && String(feet).trim() !== "") return text(`${feet}'${inches || 0}"`, 20);

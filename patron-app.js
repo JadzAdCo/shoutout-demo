@@ -50,6 +50,9 @@
   let directVenueShoutoutOpened = false;
   let pendingReturnTo = qs("returnTo", "");
   let cachedUserProfile = null;
+  let profileLocaleHint = {};
+  let profileHeightCtl = null;
+  let profilePickupCtl = null;
   let lastProfileReadError = null;
   let minglCandidates = [];
   let minglConnections = [];
@@ -2125,6 +2128,20 @@
       }
       const username = floqrId().normalizeFloqrHandle?.(rawHandle, {requireAt:false}) || floqrHandle.replace(/^@+/, "");
 
+      const heightCheck = profileHeightCtl?.validate?.(false) || window.FLOQRProfileLocale?.validateHeight?.(
+        byId("profileHeight")?.value || "",
+        byId("profileHeightUnit")?.value || preferredHeightUnit(byId("profileCountry")?.value || "")
+      );
+      if (heightCheck && !heightCheck.ok && !heightCheck.empty) {
+        status.textContent = heightCheck.error;
+        return;
+      }
+      const pickupCheck = profilePickupCtl?.validate?.(false);
+      if (pickupCheck && !pickupCheck.ok) {
+        status.textContent = pickupCheck.error;
+        return;
+      }
+      const pickupParts = pickupCheck?.parts || {};
       const profile = {
         uid: currentUser.uid,
         floqrHandle,
@@ -2137,11 +2154,16 @@
         country: byId("profileCountry").value.trim(),
         region: byId("profileRegion").value.trim(),
         city: byId("profileCity").value.trim(),
-        taxiPickupAddress:byId("profileTaxiPickupAddress")?.value.trim() || "",
+        taxiStreetNumber: pickupParts.streetNumber || "",
+        taxiStreetName: pickupParts.streetName || "",
+        taxiCity: pickupParts.city || "",
+        taxiPostalCode: pickupParts.postalCode || "",
+        taxiPostalKind: pickupParts.postalKind || "",
+        taxiPickupAddress: pickupCheck?.composed || byId("profileTaxiPickupAddress")?.value.trim() || "",
         ageRange: byId("profileAgeRange").value,
         gender: byId("profileGender")?.value || "",
-        height: byId("profileHeight")?.value.trim() || "",
-        heightUnit: byId("profileHeightUnit")?.value || preferredHeightUnit(byId("profileCountry")?.value || ""),
+        height: heightCheck?.normalized || byId("profileHeight")?.value.trim() || "",
+        heightUnit: heightCheck?.unit || window.FLOQRProfileLocale?.normalizeHeightUnit?.(byId("profileHeightUnit")?.value) || preferredHeightUnit(byId("profileCountry")?.value || ""),
         favoriteGenres: splitCSV(byId("profileGenres").value),
         nightlifeInterests: splitCSV(byId("profileInterests").value),
         musicInterests: splitCSV(byId("profileGenres").value),
@@ -3136,28 +3158,28 @@
     return Array.isArray(value) ? value.slice(0, 4).join(", ") : String(value || "");
   }
 
+  function currentProfileLocale() {
+    return {
+      country: byId("profileCountry")?.value || cachedUserProfile?.country || "",
+      ...profileLocaleHint
+    };
+  }
+
   function countryUsesFeetInches(country = "") {
-    const value = String(country || "").trim().toLowerCase();
-    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "canada", "ca"].includes(value);
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
-    return countryUsesFeetInches(country) ? "ftin" : "m";
+    return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyProfileHeightUnit(force = false) {
-    const unit = byId("profileHeightUnit");
-    const height = byId("profileHeight");
-    if (!unit || !height) return;
-    if (force || !unit.dataset.userSelected) unit.value = preferredHeightUnit(byId("profileCountry")?.value || "");
-    height.placeholder = unit.value === "ftin" ? "5'10\"" : "1.78";
+  function applyProfileHeightUnit() {
+    profileHeightCtl?.setLocale?.(currentProfileLocale());
+    profilePickupCtl?.paintPostal?.();
   }
 
   function heightDisplay(profile = {}) {
-    const value = String(profile.height || "").trim();
-    if (!value) return "";
-    const unit = profile.heightUnit || preferredHeightUnit(profile.country);
-    return unit === "m" ? `${value} m` : value;
+    return window.FLOQRProfileLocale?.heightDisplay?.(profile) || String(profile.height || "").trim();
   }
 
   function portalChatUrl(roomId = "") {
@@ -6351,12 +6373,31 @@
     bind("backToWelcomeBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
     bind("backToCategoriesFromMinglBtn", () => showPage("categoryPage"));
     byId("minglSearch")?.addEventListener("input", renderMinglPeople);
+    profileHeightCtl = window.FLOQRProfileLocale?.bindHeightFields?.({
+      unit: "profileHeightUnit",
+      height: "profileHeight",
+      hint: "profileHeightHint",
+      locale: currentProfileLocale
+    }) || null;
+    profilePickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
+      ids: {
+        streetNumber: "profileTaxiStreetNumber",
+        streetName: "profileTaxiStreetName",
+        city: "profileTaxiCity",
+        citySource: "profileCity",
+        postal: "profileTaxiPostal",
+        postalLabel: "profileTaxiPostalLabel",
+        composed: "profileTaxiPickupAddress",
+        hint: "profileTaxiHint"
+      },
+      locale: currentProfileLocale
+    }) || null;
+    window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
+      profileLocaleHint = hint || {};
+      applyProfileHeightUnit();
+    }).catch(() => {});
     byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit());
     byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit());
-    byId("profileHeightUnit")?.addEventListener("change", event => {
-      event.currentTarget.dataset.userSelected = "true";
-      applyProfileHeightUnit(true);
-    });
     applyProfileHeightUnit();
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);

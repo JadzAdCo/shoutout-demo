@@ -1547,6 +1547,34 @@
       page: "patron-portal.html"
     },
     {
+      id: "help-profile-height",
+      title: "Height",
+      body: "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can still switch the unit.",
+      searchPhrases: [
+        "height", "how tall", "feet", "meters", "ft", "height unit", "6'0", "1.78"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-taxi-pickup-address",
+      title: "Taxi pickup address",
+      body: "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint.",
+      searchPhrases: [
+        "taxi pickup", "pickup address", "rydr address", "zip code", "postal code",
+        "street number", "hail a ride address"
+      ],
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})},
+        {label: "RydR", href: pageUrl("./pickup.html", {from: "botdee"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "pickup.html"
+    },
+    {
       id: "help-onboarding",
       title: "Onboarding",
       body: "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues.",

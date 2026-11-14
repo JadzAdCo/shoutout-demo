@@ -215,6 +215,9 @@
     "help-onboarding": [
       "masterAdmin"
     ],
+    "help-profile-height": [
+      "patron"
+    ],
     "help-public-media-sharing": [
       "patron"
     ],
@@ -274,6 +277,9 @@
     ],
     "help-staff-worksheet": [
       "venueAdmin"
+    ],
+    "help-taxi-pickup-address": [
+      "patron"
     ],
     "help-template-catalog-report": [
       "venueAdmin"
@@ -457,6 +463,9 @@
     "help-post-ad": [
       "patron"
     ],
+    "help-profile-height": [
+      "patron"
+    ],
     "help-promoter": [
       "patron"
     ],
@@ -492,6 +501,9 @@
     ],
     "help-staff-worksheet": [
       "serviceMember"
+    ],
+    "help-taxi-pickup-address": [
+      "patron"
     ],
     "help-template-catalog-report": [
       "masterAdmin"

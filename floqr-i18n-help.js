@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.011";
+  const VERSION = "s3.3.012";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -220,6 +220,14 @@
       "help-my-profile": {
         title: "Профиль и настройки",
         body: "Управляйте профилем, My Privacy, уведомлениями AI, шаблонами ShoutOut, публичными медиа, ShoutOuts, списками гостей, FloqR Inbox и Mingl. Откройте Профиль и настройки для ролей, инструментов продавца и параметров аккаунта."
+      },
+      "help-profile-height": {
+        title: "Рост",
+        body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США и Канада по умолчанию ft; другие страны и интернет-место вне США — m. Единицу всё равно можно переключить."
+      },
+      "help-taxi-pickup-address": {
+        title: "Адрес подачи такси",
+        body: "Для RydR нужны номер дома, улица, город и ZIP или почтовый индекс. Жители США вводят ZIP (12345 или 12345-6789). Канада и другие страны, либо интернет-место вне США, используют почтовый индекс. FLOQR подставляет подпись из страны профиля и IP. Адрес остаётся частным — это не публичный пункт Mingl."
       },
       "help-onboarding": {
         title: "Онбординг",
@@ -551,6 +559,14 @@
         title: "Profiel & instellingen",
         body: "Beheer je profiel, My Privacy, AI-meldingen, ShoutOut-templates, openbare media, ShoutOuts, gastenlijsten, FloqR Inbox en Mingl. Open Profiel & instellingen voor rollen, verkoperstools en accountopties."
       },
+      "help-profile-height": {
+        title: "Lengte",
+        body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. VS en Canada starten op ft; andere landen en een niet-Amerikaanse internetlocatie op m. Je kunt de eenheid nog wisselen."
+      },
+      "help-taxi-pickup-address": {
+        title: "Taxi-ophaaladres",
+        body: "RydR-ophaal vraagt huisnummer, straatnaam, stad en ZIP of postcode. VS-inwoners vullen ZIP in (12345 of 12345-6789). Canada en andere landen, of een niet-Amerikaanse internetlocatie, gebruiken een postcode. FLOQR zet het label automatisch vanuit je profielland en IP. Dit adres blijft privé — geen openbaar Mingl-datapunt."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Patron- / service-member-onboarding — vraag Club Admin-, DJ-, Promoter- of hospitality-toegang aan. Master Admins kunnen ook venues onboarden."
@@ -880,6 +896,14 @@
       "help-my-profile": {
         title: "Profil et paramètres",
         body: "Gérez votre profil, My Privacy, les notifications AI, les modèles ShoutOut, les médias publics, les ShoutOuts, les listes d’invités, FloqR Inbox et Mingl. Ouvrez Profil et paramètres pour les rôles, les outils vendeur et les options de compte."
+      },
+      "help-profile-height": {
+        title: "Taille",
+        body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. États-Unis et Canada : ft par défaut ; autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
+      },
+      "help-taxi-pickup-address": {
+        title: "Adresse de prise en charge taxi",
+        body: "RydR a besoin du numéro, du nom de rue, de la ville et d'un ZIP ou code postal. Les résidents américains saisissent un ZIP (12345 ou 12345-6789). Le Canada, les autres pays, ou une localisation internet hors USA, utilisent un code postal. FLOQR choisit le libellé d'après le pays du profil et l'IP. Cette adresse reste privée — ce n'est pas un datapoint Mingl public."
       },
       "help-onboarding": {
         title: "Intégration",
@@ -1211,6 +1235,14 @@
         title: "Profil & Einstellungen",
         body: "Verwalte dein Profil, My Privacy, AI-Benachrichtigungen, ShoutOut-Vorlagen, öffentliche Medien, ShoutOuts, Gästelisten, FloqR Inbox und Mingl. Öffne Profil & Einstellungen für Rollen, Verkäufer-Tools und Kontooptionen."
       },
+      "help-profile-height": {
+        title: "Größe",
+        body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. USA und Kanada starten mit ft; andere Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
+      },
+      "help-taxi-pickup-address": {
+        title: "Taxi-Abholadresse",
+        body: "RydR braucht Hausnummer, Straße, Stadt und ZIP oder Postleitzahl. US-Einwohner geben ZIP ein (12345 oder 12345-6789). Kanada und andere Länder oder ein nicht-US-Internetstandort nutzen eine Postleitzahl. FLOQR setzt die Beschriftung aus Profilland und IP. Die Adresse bleibt privat — kein öffentlicher Mingl-Datenpunkt."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Onboarding von Gönnern/Service-Mitgliedern – Fordern Sie Club Admin, DJ, Promoter oder Hospitality-Zugang an. Master Admins können auch Veranstaltungsorte an Bord nehmen."
@@ -1540,6 +1572,14 @@
       "help-my-profile": {
         title: "Perfil y ajustes",
         body: "Gestiona tu perfil, My Privacy, notificaciones AI, plantillas ShoutOut, medios públicos, ShoutOuts, listas de invitados, FloqR Inbox y Mingl. Abre Perfil y ajustes para roles, herramientas de vendedor y opciones de cuenta."
+      },
+      "help-profile-height": {
+        title: "Estatura",
+        body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. y Canadá usan ft; otros países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
+      },
+      "help-taxi-pickup-address": {
+        title: "Dirección de recogida de taxi",
+        body: "RydR pide número, calle, ciudad y ZIP o código postal. Los residentes de EE. UU. usan ZIP (12345 o 12345-6789). Canadá y otros países, o una ubicación de internet no estadounidense, usan código postal. FLOQR elige la etiqueta con el país del perfil y la IP. La dirección es privada: no es un dato público de Mingl."
       },
       "help-onboarding": {
         title: "Incorporación",
@@ -1871,6 +1911,14 @@
         title: "Profilo e impostazioni",
         body: "Gestisci il tuo profilo, My Privacy, notifiche AI, modelli ShoutOut, media pubblici, ShoutOuts, liste ospiti, FloqR Inbox e Mingl. Apri Profilo e impostazioni per ruoli, strumenti venditore e opzioni account."
       },
+      "help-profile-height": {
+        title: "Altezza",
+        body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Stati Uniti e Canada partono da ft; altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
+      },
+      "help-taxi-pickup-address": {
+        title: "Indirizzo di ritiro taxi",
+        body: "RydR richiede numero civico, via, città e ZIP o CAP. I residenti USA inseriscono lo ZIP (12345 o 12345-6789). Canada e altri Paesi, o una posizione internet non USA, usano il codice postale. FLOQR imposta l'etichetta da Paese del profilo e IP. L'indirizzo resta privato: non è un datapoint Mingl pubblico."
+      },
       "help-onboarding": {
         title: "Onboarding",
         body: "Onboarding utente/membro del servizio: richiedi Club Admin, DJ, Promoter o accesso all'ospitalità. Anche gli utenti possono partecipare alle sedi."
@@ -2200,6 +2248,14 @@
       "help-my-profile": {
         title: "Perfil e configurações",
         body: "Gerencie seu perfil, My Privacy, notificações AI, modelos ShoutOut, mídia pública, ShoutOuts, listas de convidados, FloqR Inbox e Mingl. Abra Perfil e configurações para funções, ferramentas de vendedor e opções de conta."
+      },
+      "help-profile-height": {
+        title: "Altura",
+        body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. EUA e Canadá começam em ft; outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
+      },
+      "help-taxi-pickup-address": {
+        title: "Morada de recolha de táxi",
+        body: "O RydR precisa de número, rua, cidade e ZIP ou código postal. Residentes dos EUA usam ZIP (12345 ou 12345-6789). Canadá e outros países, ou uma localização de internet fora dos EUA, usam código postal. O FLOQR escolhe o rótulo pelo país do perfil e pelo IP. A morada fica privada — não é um datapoint público do Mingl."
       },
       "help-onboarding": {
         title: "Integração",
@@ -2531,6 +2587,14 @@
         title: "Προφίλ και ρυθμίσεις",
         body: "Διαχειριστείτε το προφίλ σας, My Privacy, ειδοποιήσεις AI, πρότυπα ShoutOut, δημόσια μέσα, ShoutOuts, λίστες επισκεπτών, FloqR Inbox και Mingl. Ανοίξτε Προφίλ και ρυθμίσεις για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
       },
+      "help-profile-height": {
+        title: "Ύψος",
+        body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. ΗΠΑ και Καναδάς ξεκινούν σε ft· άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
+      },
+      "help-taxi-pickup-address": {
+        title: "Διεύθυνση παραλαβής ταξί",
+        body: "Το RydR θέλει αριθμό, οδό, πόλη και ZIP ή ταχυδρομικό κώδικα. Κάτοικοι ΗΠΑ βάζουν ZIP (12345 ή 12345-6789). Καναδάς και άλλες χώρες, ή μη αμερικανική θέση διαδικτύου, χρησιμοποιούν ταχυδρομικό κώδικα. Το FLOQR βάζει την ετικέτα από τη χώρα προφίλ και την IP. Η διεύθυνση μένει ιδιωτική — δεν είναι δημόσιο datapoint Mingl."
+      },
       "help-onboarding": {
         title: "Ενσωμάτωση",
         body: "Επιβίβαση προστάτη/μέλους υπηρεσίας — αίτημα Club Admin, DJ, Promoter ή πρόσβαση φιλοξενίας. Τα Master Admin μπορούν επίσης να επιβιβαστούν σε χώρους."
@@ -2861,6 +2925,14 @@
         title: "Profil i ustawienia",
         body: "Zarządzaj profilem, My Privacy, powiadomieniami AI, szablonami ShoutOut, mediami publicznymi, ShoutOuts, listami gości, FloqR Inbox i Mingl. Otwórz Profil i ustawienia, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
       },
+      "help-profile-height": {
+        title: "Wzrost",
+        body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA i Kanada startują od ft; inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
+      },
+      "help-taxi-pickup-address": {
+        title: "Adres odbioru taksówki",
+        body: "RydR wymaga numeru, ulicy, miasta oraz ZIP lub kodu pocztowego. Mieszkańcy USA podają ZIP (12345 lub 12345-6789). Kanada i inne kraje albo nielokacja internetowa spoza USA używają kodu pocztowego. FLOQR ustawia etykietę z kraju profilu i IP. Adres zostaje prywatny — to nie publiczny punkt Mingl."
+      },
       "help-onboarding": {
         title: "Wprowadzenie",
         body: "Onboarding patrona / członka obsługi — żądanie dostępu do Club Admin, DJ, Promoter lub usług hotelarskich. Master Admin może również wdrażać obiekty."
@@ -3190,6 +3262,14 @@
       "help-my-profile": {
         title: "الملف والإعدادات",
         body: "أدِر ملفك وMy Privacy وإشعارات AI وقوالب ShoutOut والوسائط العامة وShoutOuts وقوائم الضيوف وFloqR Inbox وMingl. افتح الملف والإعدادات للأدوار وأدوات البائع وخيارات الحساب."
+      },
+      "help-profile-height": {
+        title: "الطول",
+        body: "اختر ft أو m أولاً ثم أدخل طولك بهذه الوحدة. الأقدام: 6'0\". الأمتار: 1.78. الخلط ممنوع — لا يُحفظ 1.78 كـ ft ولا 6'0\" كـ m. الولايات المتحدة وكندا تبدآن بـ ft؛ البلدان الأخرى وموقع الإنترنت غير الأمريكي بـ m. يمكنك تبديل الوحدة."
+      },
+      "help-taxi-pickup-address": {
+        title: "عنوان التقاط سيارة الأجرة",
+        body: "يحتاج RydR إلى رقم الشارع واسمه والمدينة وZIP أو الرمز البريدي. المقيمون في الولايات المتحدة يدخلون ZIP (12345 أو 12345-6789). كندا والبلدان الأخرى أو موقع إنترنت غير أمريكي يستخدمون الرمز البريدي. يضع FloqR التسمية من بلد الملف وIP. العنوان يبقى خاصًا — ليس نقطة بيانات Mingl عامة."
       },
       "help-onboarding": {
         title: "الإعداد",

@@ -127,6 +127,14 @@
     "title": "Profile & Settings",
     "body": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options."
   },
+  "help-profile-height": {
+    "title": "Height",
+    "body": "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. U.S. and Canada default to ft; other countries and a non-U.S. internet location default to m. You can still switch the unit."
+  },
+  "help-taxi-pickup-address": {
+    "title": "Taxi pickup address",
+    "body": "RydR pickup needs a street number, street name, city, and ZIP or postal code. U.S. residents enter a ZIP (12345 or 12345-6789). Canada and other countries, or a non-U.S. internet location, use a postal code. FLOQR fills the label automatically from your profile country and IP. This address stays private on your account — it is not a public Mingl datapoint."
+  },
   "help-onboarding": {
     "title": "Onboarding",
     "body": "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues."

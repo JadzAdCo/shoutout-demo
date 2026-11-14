@@ -624,6 +624,29 @@
       patterns: [/my\s+profile/, /profile\s*(and\s*)?settings/, /\bsettings\b/, /\baccount\b/]
     },
     {
+      id: "help-profile-height",
+      kind: "help",
+      label: "Height",
+      blurb: "Choose ft or m first, then type your height in that unit. Mixing 6'0\" with m or 1.78 with ft is blocked.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["height", "how tall", "feet", "meters", "ft", "height unit", "6'0", "1.78"],
+      patterns: [/\bheight\b/, /\bhow\s+tall\b/, /\bfeet\s*(and\s*)?(inches)?\b/, /\bmeters?\b/, /6'\s*0/]
+    },
+    {
+      id: "help-taxi-pickup-address",
+      kind: "help",
+      label: "Taxi pickup address",
+      blurb: "RydR pickup needs street number, street name, city, and a U.S. ZIP or a postal code. The label is chosen from your profile country and IP.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})},
+        {label: "RydR", href: pageUrl("./pickup.html", {from: "botdee"})}
+      ],
+      searchPhrases: ["taxi pickup", "pickup address", "rydr address", "zip code", "postal code", "street number"],
+      patterns: [/taxi\s*pickup/, /pickup\s*address/, /zip\s*code/, /postal\s*code/, /street\s*number/]
+    },
+    {
       id: "help-dj",
       kind: "help",
       label: "Become a DJ on FLOQR",
@@ -927,7 +950,8 @@
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
-    "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
+    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-taxi-pickup-address": ["patron"],
+    "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],
     "help-nfl-jersey": ["patron"], "help-soccer-jersey": ["patron"], "help-sell-bartr": ["patron"],

@@ -112,28 +112,28 @@
     return isNaN(d) ? "-" : d.toLocaleString();
   };
 
+  function currentEditLocale() {
+    return {
+      country: byId("editCountry")?.value || currentProfile?.country || "",
+      ...profileLocaleHint
+    };
+  }
+
   function countryUsesFeetInches(country = "") {
-    const value = String(country || "").trim().toLowerCase();
-    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "canada", "ca"].includes(value);
+    return !!(window.FLOQRProfileLocale?.usesFeetInches?.({country}) ?? ["us", "usa", "canada", "ca"].includes(String(country || "").trim().toLowerCase()));
   }
 
   function preferredHeightUnit(country = "") {
-    return countryUsesFeetInches(country) ? "ftin" : "m";
+    return window.FLOQRProfileLocale?.preferredHeightUnit?.({country, ...profileLocaleHint}) || (countryUsesFeetInches(country) ? "ft" : "m");
   }
 
-  function applyEditHeightUnit(force = false) {
-    const unit = byId("editHeightUnit");
-    const height = byId("editHeight");
-    if (!unit || !height) return;
-    if (force || !unit.dataset.userSelected) unit.value = preferredHeightUnit(byId("editCountry")?.value || "");
-    height.placeholder = unit.value === "ftin" ? "5'10\"" : "1.78";
+  function applyEditHeightUnit() {
+    editHeightCtl?.setLocale?.(currentEditLocale());
+    editPickupCtl?.paintPostal?.();
   }
 
   function heightDisplay(profile = {}) {
-    const value = String(profile.height || "").trim();
-    if (!value) return "";
-    const unit = profile.heightUnit || preferredHeightUnit(profile.country);
-    return unit === "m" ? `${value} m` : value;
+    return window.FLOQRProfileLocale?.heightDisplay?.(profile) || String(profile.height || "").trim();
   }
 
   function minglUploadErrorMessage(error) {
@@ -217,6 +217,9 @@
   const db = firebase.firestore();
   const storage = firebase.storage();
   let currentProfile = {};
+  let profileLocaleHint = {};
+  let editHeightCtl = null;
+  let editPickupCtl = null;
   let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
@@ -2060,9 +2063,22 @@
     byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
     byId("editGender").value = profile.gender || "";
-    byId("editHeight").value = profile.height || "";
-    if (byId("editHeightUnit")) byId("editHeightUnit").value = profile.heightUnit || preferredHeightUnit(profile.country || "");
-    applyEditHeightUnit(true);
+    editHeightCtl?.fill?.({
+      unit: profile.heightUnit,
+      value: profile.height || "",
+      locale: {country: profile.country || "", ...profileLocaleHint}
+    });
+    if (!editHeightCtl) {
+      byId("editHeight").value = profile.height || "";
+      if (byId("editHeightUnit")) {
+        const unit = window.FLOQRProfileLocale?.normalizeHeightUnit?.(profile.heightUnit) || preferredHeightUnit(profile.country || "");
+        byId("editHeightUnit").value = unit;
+        byId("editHeightUnit").dataset.prevUnit = unit;
+        if (profile.heightUnit) byId("editHeightUnit").dataset.userSelected = "true";
+      }
+    }
+    editPickupCtl?.fill?.(window.FLOQRProfileLocale?.pickupFromProfile?.(profile) || {});
+    applyEditHeightUnit();
     if (byId("editBirthMonth")) byId("editBirthMonth").value = profile.birthMonth || "";
     if (byId("editBirthDay")) byId("editBirthDay").value = profile.birthDay || "";
     byId("editInstagram").value = profile.instagramHandle || "";
@@ -2350,6 +2366,20 @@
       return;
     }
     const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
+    const heightCheck = editHeightCtl?.validate?.(false) || window.FLOQRProfileLocale?.validateHeight?.(
+      byId("editHeight")?.value || "",
+      byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value)
+    );
+    if (heightCheck && !heightCheck.ok && !heightCheck.empty) {
+      setText("portalStatus", heightCheck.error);
+      return;
+    }
+    const pickupCheck = editPickupCtl?.validate?.(false);
+    if (pickupCheck && !pickupCheck.ok) {
+      setText("portalStatus", pickupCheck.error);
+      return;
+    }
+    const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? pickupCheck.parts : null;
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
@@ -2357,13 +2387,14 @@
       floqrHandle,
       username,
       phone: byId("editPhone").value.trim(),
-      taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
       preferredLanguage,
       gender: byId("editGender").value,
-      height: byId("editHeight").value.trim(),
-      heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
+      height: heightCheck?.empty ? (currentProfile?.height || "") : (heightCheck?.normalized || byId("editHeight").value.trim()),
+      heightUnit: heightCheck?.empty
+        ? (window.FLOQRProfileLocale?.normalizeHeightUnit?.(currentProfile?.heightUnit) || preferredHeightUnit(byId("editCountry").value))
+        : (heightCheck?.unit || window.FLOQRProfileLocale?.normalizeHeightUnit?.(byId("editHeightUnit")?.value) || preferredHeightUnit(byId("editCountry").value)),
       birthMonth: byId("editBirthMonth")?.value || "",
       birthDay: byId("editBirthDay")?.value || "",
       instagramHandle: window.FLOQRIdentity?.normalizeInstagramHandle?.(byId("editInstagram").value) || "",
@@ -2392,6 +2423,14 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     updates.fullName = `${updates.firstName} ${updates.lastName}`.trim();
+    if (pickupParts) {
+      updates.taxiStreetNumber = pickupParts.streetNumber || "";
+      updates.taxiStreetName = pickupParts.streetName || "";
+      updates.taxiCity = pickupParts.city || "";
+      updates.taxiPostalCode = pickupParts.postalCode || "";
+      updates.taxiPostalKind = pickupParts.postalKind || "";
+      updates.taxiPickupAddress = pickupCheck.composed;
+    }
     if (byId("editCommerceEnabled")?.checked && !isUsMarketplaceEligible(updates)) {
       setText("portalStatus", "BartR seller store is limited to U.S.-based patrons and service members.");
       return;
@@ -5208,12 +5247,31 @@
       renderRecipientSearchResults();
     });
     byId("portalMinglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    editHeightCtl = window.FLOQRProfileLocale?.bindHeightFields?.({
+      unit: "editHeightUnit",
+      height: "editHeight",
+      hint: "editHeightHint",
+      locale: currentEditLocale
+    }) || null;
+    editPickupCtl = window.FLOQRProfileLocale?.bindPickupFields?.({
+      ids: {
+        streetNumber: "editTaxiStreetNumber",
+        streetName: "editTaxiStreetName",
+        city: "editTaxiCity",
+        citySource: "editCity",
+        postal: "editTaxiPostal",
+        postalLabel: "editTaxiPostalLabel",
+        composed: "editTaxiPickupAddress",
+        hint: "editTaxiHint"
+      },
+      locale: currentEditLocale
+    }) || null;
+    window.FLOQRProfileLocale?.resolveIpCountry?.().then(hint => {
+      profileLocaleHint = hint || {};
+      applyEditHeightUnit();
+    }).catch(() => {});
     byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit());
     byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit());
-    byId("editHeightUnit")?.addEventListener("change", event => {
-      event.currentTarget.dataset.userSelected = "true";
-      applyEditHeightUnit(true);
-    });
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {
