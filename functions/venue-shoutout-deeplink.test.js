@@ -121,7 +121,7 @@ test("unknown or hidden venue never falls back to Zebbies: Search with a status 
 test("Search entry uses the deep-link path instead of the old splash + 400 ms race", () => {
   const src = read("patron-app.js");
   const entry = sliceFn(src, "async function continueToMainCategories", "function rememberSignedInHint");
-  assert.match(entry, /if \(pendingDirectLocation \|\| pendingDirectEvent\) \{\s*await openDirectVenueShoutout\(\);\s*return;/);
+  assert.match(entry, /if \(isShoutoutDeepLink\(\)\) \{\s*byId\("landingPage"\)\?\.classList\.remove\("active"\);\s*await openDirectVenueShoutout\(\);\s*return;/);
   assert.doesNotMatch(entry, /setTimeout\(\(\) => selectLocationForShoutOut/);
   assert.match(src, /let pendingDirectEvent = qs\("event", ""\);/);
   const select = sliceFn(src, "async function selectLocationForShoutOut", "function showTemplateSelection");

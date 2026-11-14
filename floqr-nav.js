@@ -68,11 +68,12 @@
       return buildUrl("./shoutout-search.html", { from: "search", ...extra });
     },
     /** Throw a ShoutOut at one venue or event: Search shows that venue's ad splash, then templates. */
-    shoutoutLink({ locationId = "", eventId = "" } = {}) {
+    shoutoutLink({ locationId = "", eventId = "", shoutoutTrailId = "" } = {}) {
       const location = String(locationId || "").trim();
       const event = String(eventId || "").trim();
-      if (!location && !event) return this.shoutoutHome();
-      return buildUrl("./", { start: "shoutout", location, event });
+      const trail = String(shoutoutTrailId || global.FLOQRLog?.readShoutoutTrailId?.() || "").trim();
+      if (!location && !event) return this.shoutoutHome({ shoutoutTrailId: trail });
+      return buildUrl("./", { start: "shoutout", location, event, shoutoutTrailId: trail });
     },
     /** Absolute form of shoutoutLink for iframes on club websites and copied links. */
     shoutoutUrl(target = {}) {
@@ -258,7 +259,7 @@
         });
       });
     },
-    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */
+    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent|shoutout */
     applyStartPage(showPage) {
       if (typeof showPage !== "function") return;
       const start = String(qs("start") || "").toLowerCase();
@@ -266,6 +267,7 @@
         const q = qs("q");
         global.location.replace(buildUrl("./botdee.html", q ? { q } : {}));
       }
+      else if (start === "shoutout") return;
       else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
       else if (start === "mingl") showPage("minglLandingPage");
     },

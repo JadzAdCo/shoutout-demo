@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>Enlarged photo</title>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.010"/>
+</head>
+<body class="botdee-photo-popout-page" data-floqr-public>
+<main class="botdee-photo-popout">
+  <div class="botdee-photo-popout-bar">
+    <button type="button" id="botDeePhotoX" class="botdee-photo-popout-x" aria-label="Close">×</button>
+    <button type="button" id="botDeePhotoClose" class="botdee-photo-popout-close">Close</button>
+  </div>
+  <div class="botdee-photo-popout-stage">
+    <button type="button" id="botDeePhotoPrev" class="botdee-photo-popout-prev" hidden>‹</button>
+    <img id="botDeePhotoImg" class="botdee-photo-popout-img" alt="" referrerpolicy="no-referrer"/>
+    <button type="button" id="botDeePhotoNext" class="botdee-photo-popout-next" hidden>›</button>
+  </div>
+  <p id="botDeePhotoStatus" class="botdee-photo-popout-status" role="status"></p>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  function hostEndsWith(host, suffix) {
+    return host === suffix || host.endsWith("." + suffix);
+  }
+
+  function isAllowedPhotoUrl(raw) {
+    var parsed;
+    try { parsed = new URL(String(raw || "").trim()); } catch (_) { return false; }
+    var sameOrigin = parsed.origin === location.origin;
+    if (parsed.protocol !== "https:" && !sameOrigin) return false;
+    if (parsed.username || parsed.password) return false;
+    var host = parsed.hostname.toLowerCase();
+    if (hostEndsWith(host, "stripe.com") || hostEndsWith(host, "stripe.network")) return false;
+    if (host === "firebasestorage.googleapis.com" || hostEndsWith(host, "firebasestorage.app")) return true;
+    if (hostEndsWith(host, "googleusercontent.com")) return true;
+    var path = (parsed.pathname || "") + (parsed.search || "");
+    if (/\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:$|[?#])/i.test(path)) return true;
+    if (/\/o\//.test(parsed.pathname || "") && /alt=media/i.test(parsed.search || "")) return true;
+    return false;
+  }
+
+  function readPayload() {
+    try {
+      if (window.opener && window.opener.__floqrBotDeePhotoPopout) return window.opener.__floqrBotDeePhotoPopout;
+    } catch (_) {}
+    try { return JSON.parse(sessionStorage.getItem("floqr.botdeePhotoPopout") || "null"); } catch (_) {}
+    return null;
+  }
+
+  var img = document.getElementById("botDeePhotoImg");
+  var statusEl = document.getElementById("botDeePhotoStatus");
+  var prevBtn = document.getElementById("botDeePhotoPrev");
+  var nextBtn = document.getElementById("botDeePhotoNext");
+  var closeBtn = document.getElementById("botDeePhotoClose");
+  var xBtn = document.getElementById("botDeePhotoX");
+  var state = {items: [], index: 0, labels: {}};
+
+  function closePopout() {
+    try { window.close(); } catch (_) {}
+    statusEl.textContent = "You can close this window to return to BOT DEE.";
+  }
+
+  function render() {
+    var items = state.items;
+    var item = items[state.index] || {};
+    var labels = state.labels || {};
+    var title = labels.title || "Enlarged photo";
+    document.title = items.length > 1 ? title + " (" + (state.index + 1) + " / " + items.length + ")" : title;
+    closeBtn.textContent = labels.close || "Close";
+    closeBtn.setAttribute("aria-label", labels.close || "Close");
+    xBtn.setAttribute("aria-label", labels.close || "Close");
+    prevBtn.setAttribute("aria-label", labels.prev || "Previous photo");
+    nextBtn.setAttribute("aria-label", labels.next || "Next photo");
+    var many = items.length > 1;
+    prevBtn.hidden = !many;
+    nextBtn.hidden = !many;
+    if (!isAllowedPhotoUrl(item.url)) {
+      img.removeAttribute("src");
+      statusEl.textContent = "Open a photo from BOT DEE chat.";
+      return;
+    }
+    img.src = item.url;
+    img.alt = item.alt || title;
+    statusEl.textContent = many ? (state.index + 1) + " / " + items.length : "";
+  }
+
+  function step(delta) {
+    if (state.items.length < 2) return;
+    state.index = (state.index + delta + state.items.length) % state.items.length;
+    render();
+  }
+
+  var payload = readPayload() || {};
+  state.items = (Array.isArray(payload.items) ? payload.items : []).filter(function (item) {
+    return isAllowedPhotoUrl(item && item.url);
+  });
+  state.index = Math.max(0, Math.min(Number(payload.index) || 0, Math.max(0, state.items.length - 1)));
+  state.labels = payload.labels && typeof payload.labels === "object" ? payload.labels : {};
+  closeBtn.addEventListener("click", closePopout);
+  xBtn.addEventListener("click", closePopout);
+  prevBtn.addEventListener("click", function () { step(-1); });
+  nextBtn.addEventListener("click", function () { step(1); });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") { event.preventDefault(); closePopout(); return; }
+    if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); return; }
+    if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

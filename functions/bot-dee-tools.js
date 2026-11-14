@@ -357,47 +357,33 @@ function imageUrlsFromClub(data = {}) {
   return urls;
 }
 
-/** Public-facing patron fields BOT DEE may summarize (no email/phone/payment/coords). */
+/** Public identity chrome BOT DEE may summarize (never email/phone/payment/GPS). */
 const PUBLIC_USER_FACT_KEYS = Object.freeze([
-  "displayName", "publicName", "fullName", "username", "floqrHandle", "minglHandle",
+  "displayName", "publicName", "username", "floqrHandle", "minglHandle",
   "publicBio", "bio", "tagline", "about", "headline", "pronouns",
-  "city", "publicCity", "country", "publicCountry",
-  "approvedRoles", "genres", "interests", "skills",
+  "approvedRoles",
   "instagram", "instagramHandle", "tiktok", "facebook", "twitter", "xHandle", "x",
-  "website", "publicWebsite", "linkedin"
+  "website", "publicWebsite"
 ]);
-
-function publicUserFacts(data = {}) {
-  const facts = {};
-  PUBLIC_USER_FACT_KEYS.forEach(key => {
-    const value = data[key];
-    if (value == null || value === "") return;
-    if (Array.isArray(value)) {
-      const list = value.filter(Boolean).slice(0, 12).map(item => text(item, 60)).filter(Boolean);
-      if (list.length) facts[key] = list;
-      return;
-    }
-    const str = text(value, key === "publicBio" || key === "bio" || key === "about" ? 400 : 160);
-    if (str) facts[key] = str;
-  });
-  return facts;
-}
 
 /** Same keys as My Profile → Privacy datapoint sharing / Mingl `PUBLIC_MINGL_DATAPOINTS`. */
 const PUBLIC_MINGL_DATAPOINT_KEYS = Object.freeze([
   "location", "gender", "height", "music", "events", "travel", "hobbies", "food", "beverage", "meet", "media"
 ]);
 
-function listField(value, maxItems = 12, maxEach = 80) {
+const VOLUNTEERED_LIST_MAX = 40;
+const VOLUNTEERED_ITEM_CHARS = 160;
+
+function listField(value, maxItems = VOLUNTEERED_LIST_MAX, maxEach = VOLUNTEERED_ITEM_CHARS) {
   const items = Array.isArray(value) ? value : String(value || "").split(/[,;|/]+/);
   return items.map(item => text(item, maxEach)).filter(Boolean).slice(0, maxItems);
 }
 
 function publicMinglKeys(data = {}) {
-  if (Array.isArray(data.publicMinglDatapoints) && data.publicMinglDatapoints.length) {
-    return data.publicMinglDatapoints.map(key => String(key || "").trim()).filter(Boolean);
-  }
-  return PUBLIC_MINGL_DATAPOINT_KEYS.slice();
+  // Missing field → default all. Explicit [] → share none (patron chose nothing).
+  if (!Array.isArray(data.publicMinglDatapoints)) return PUBLIC_MINGL_DATAPOINT_KEYS.slice();
+  const known = new Set(PUBLIC_MINGL_DATAPOINT_KEYS);
+  return [...new Set(data.publicMinglDatapoints.map(key => String(key || "").trim()).filter(key => known.has(key)))];
 }
 
 function datapointAllowed(data, key) {
@@ -413,11 +399,91 @@ function heightDisplay(data = {}) {
   return "";
 }
 
+function volunteeredLocation(data = {}) {
+  const location = {
+    city: text(data.city || data.publicCity || "", 80),
+    region: text(data.state || data.region || data.province || data.stateRegionProvince || "", 80),
+    country: text(data.country || data.publicCountry || "", 80)
+  };
+  Object.keys(location).forEach(key => {
+    if (!location[key]) delete location[key];
+  });
+  return Object.keys(location).length ? location : null;
+}
+
+/** Full public volunteered keys + filled values (not PII/PCI). Empty opted-in keys stay in sharedDatapoints. */
+function volunteeredPublicDatapoints(data = {}) {
+  const sharedDatapoints = publicMinglKeys(data);
+  const allowed = key => sharedDatapoints.includes(key);
+  const datapoints = {};
+  if (allowed("location")) {
+    const location = volunteeredLocation(data);
+    if (location) datapoints.location = location;
+  }
+  if (allowed("gender")) {
+    const gender = text(data.gender || "", 40);
+    if (gender) datapoints.gender = gender;
+  }
+  if (allowed("height")) {
+    const height = heightDisplay(data);
+    if (height) datapoints.height = height;
+  }
+  if (allowed("music")) {
+    const music = listField(data.musicInterests || data.favoriteGenres);
+    if (music.length) datapoints.music = music;
+  }
+  if (allowed("events")) {
+    const nightlifeStyle = text(data.nightlifeStyle || "", 160);
+    const events = listField(data.nightlifeInterests);
+    if (nightlifeStyle) datapoints.nightlifeStyle = nightlifeStyle;
+    if (events.length) datapoints.events = events;
+  }
+  if (allowed("travel")) {
+    const travel = listField(data.travelInterests);
+    if (travel.length) datapoints.travel = travel;
+  }
+  if (allowed("hobbies")) {
+    const hobbies = listField(data.hobbies || data.generalHobbies);
+    if (hobbies.length) datapoints.hobbies = hobbies;
+  }
+  if (allowed("food")) {
+    const food = listField(data.foodChoices);
+    if (food.length) datapoints.food = food;
+  }
+  if (allowed("beverage")) {
+    const beverages = listField(data.favoriteBeverages);
+    if (beverages.length) datapoints.beverages = beverages;
+  }
+  if (allowed("meet")) {
+    const lookingToMeet = text(data.lookingToMeet || "", 200);
+    if (lookingToMeet) datapoints.lookingToMeet = lookingToMeet;
+  }
+  if (allowed("media")) datapoints.photoCount = imageUrlsFromUser(data).length;
+  return {sharedDatapoints, datapoints};
+}
+
+function publicUserFacts(data = {}) {
+  const facts = {};
+  PUBLIC_USER_FACT_KEYS.forEach(key => {
+    const value = data[key];
+    if (value == null || value === "") return;
+    if (Array.isArray(value)) {
+      const list = value.filter(Boolean).slice(0, VOLUNTEERED_LIST_MAX).map(item => text(item, VOLUNTEERED_ITEM_CHARS)).filter(Boolean);
+      if (list.length) facts[key] = list;
+      return;
+    }
+    const str = text(value, key === "publicBio" || key === "bio" || key === "about" ? 400 : 160);
+    if (str) facts[key] = str;
+  });
+  return facts;
+}
+
 function publicUserCard(uid, data = {}, score, extras = {}) {
   const handle = text(data.floqrHandle || data.username || data.minglHandle, 80).replace(/^@+/, "");
   const allowed = key => datapointAllowed(data, key);
   const images = allowed("media") ? imageUrlsFromUser(data) : [];
   const instagram = text(data.instagram || data.instagramHandle, 80).replace(/^@+/, "");
+  const volunteered = volunteeredPublicDatapoints(data);
   const relation = extras.relation === "self" || extras.relation === "connection" ? extras.relation : "public";
   const card = {
     kind: "user",
@@ -428,9 +494,11 @@ function publicUserCard(uid, data = {}, score, extras = {}) {
     instagram: instagram ? `@${instagram}` : "",
     instagramHandle: instagram ? `@${instagram}` : "",
     bio: text(data.publicBio || data.publicProfileBioOriginal || data.publicProfileBioEnglish || data.bio || data.tagline || data.about || "", 400),
-    roles: Array.isArray(data.approvedRoles) ? data.approvedRoles.filter(Boolean).slice(0, 8).map(r => text(r, 40)) : [],
+    roles: Array.isArray(data.approvedRoles) ? data.approvedRoles.filter(Boolean).slice(0, 12).map(r => text(r, 40)) : [],
     website: text(data.website || data.publicWebsite || "", 240),
     visibility: text(data.publicProfileVisibility || "followers", 24),
+    sharedDatapoints: volunteered.sharedDatapoints,
+    datapoints: volunteered.datapoints,
     facts: publicUserFacts(data),
     photoURL: images[0] || "",
     imageUrls: images,
@@ -438,23 +506,22 @@ function publicUserCard(uid, data = {}, score, extras = {}) {
     score,
     ...extras
   };
-  if (allowed("location")) {
-    card.city = text(data.city || data.publicCity || "", 80);
-    card.region = text(data.state || data.region || data.province || data.stateRegionProvince || "", 80);
-    card.country = text(data.country || data.publicCountry || "", 80);
+  const dp = volunteered.datapoints;
+  if (dp.location) {
+    if (dp.location.city) card.city = dp.location.city;
+    if (dp.location.region) card.region = dp.location.region;
+    if (dp.location.country) card.country = dp.location.country;
   }
-  if (allowed("gender")) card.gender = text(data.gender || "", 40);
-  if (allowed("height")) card.height = heightDisplay(data);
-  if (allowed("music")) card.music = listField(data.musicInterests || data.favoriteGenres);
-  if (allowed("events")) {
-    card.nightlifeStyle = text(data.nightlifeStyle || "", 120);
-    card.events = listField(data.nightlifeInterests);
-  }
-  if (allowed("travel")) card.travel = listField(data.travelInterests);
-  if (allowed("hobbies")) card.hobbies = listField(data.hobbies || data.generalHobbies);
-  if (allowed("food")) card.food = listField(data.foodChoices);
-  if (allowed("beverage")) card.beverages = listField(data.favoriteBeverages);
-  if (allowed("meet")) card.lookingToMeet = text(data.lookingToMeet || "", 160);
+  if (dp.gender) card.gender = dp.gender;
+  if (dp.height) card.height = dp.height;
+  if (dp.music) card.music = dp.music;
+  if (dp.nightlifeStyle) card.nightlifeStyle = dp.nightlifeStyle;
+  if (dp.events) card.events = dp.events;
+  if (dp.travel) card.travel = dp.travel;
+  if (dp.hobbies) card.hobbies = dp.hobbies;
+  if (dp.food) card.food = dp.food;
+  if (dp.beverages) card.beverages = dp.beverages;
+  if (dp.lookingToMeet) card.lookingToMeet = dp.lookingToMeet;
   ["gender", "height", "nightlifeStyle", "lookingToMeet", "city", "region", "country", "instagram", "instagramHandle", "website"].forEach(key => {
     if (!card[key]) delete card[key];
   });
@@ -507,7 +574,7 @@ function unpublishedSelfCard(uid, data = {}, score, extra = {}) {
     visibility: text(data.publicProfileVisibility || "followers", 24),
     displayName: text(data.displayName || data.publicName || handle || "Member", 120),
     handle: handle ? `@${handle}` : "",
-    note: "This FLOQR profile is not public. Other people cannot see Mingl datapoints (music, food, travel, hobbies, location). Do not describe those fields as public.",
+    note: "This FLOQR profile is not public. Other people cannot see volunteered public datapoints (music, food, travel, hobbies, location). Do not describe those fields as public.",
     score,
     ...extra
   };
@@ -620,12 +687,13 @@ function userHaystack(data = {}) {
     parts.push(data.city, data.publicCity, data.state, data.region, data.country, data.publicCountry);
   }
   if (datapointAllowed(data, "gender")) parts.push(data.gender);
-  if (datapointAllowed(data, "music")) parts.push(...listField(data.musicInterests || data.favoriteGenres, 20, 60));
-  if (datapointAllowed(data, "events")) parts.push(data.nightlifeStyle, ...listField(data.nightlifeInterests, 20, 60));
-  if (datapointAllowed(data, "travel")) parts.push(...listField(data.travelInterests, 20, 60));
-  if (datapointAllowed(data, "hobbies")) parts.push(...listField(data.hobbies || data.generalHobbies, 20, 60));
-  if (datapointAllowed(data, "food")) parts.push(...listField(data.foodChoices, 20, 60));
-  if (datapointAllowed(data, "beverage")) parts.push(...listField(data.favoriteBeverages, 20, 60));
+  if (datapointAllowed(data, "height")) parts.push(heightDisplay(data));
+  if (datapointAllowed(data, "music")) parts.push(...listField(data.musicInterests || data.favoriteGenres));
+  if (datapointAllowed(data, "events")) parts.push(data.nightlifeStyle, ...listField(data.nightlifeInterests));
+  if (datapointAllowed(data, "travel")) parts.push(...listField(data.travelInterests));
+  if (datapointAllowed(data, "hobbies")) parts.push(...listField(data.hobbies || data.generalHobbies));
+  if (datapointAllowed(data, "food")) parts.push(...listField(data.foodChoices));
+  if (datapointAllowed(data, "beverage")) parts.push(...listField(data.favoriteBeverages));
   if (datapointAllowed(data, "meet")) parts.push(data.lookingToMeet);
   return parts.filter(Boolean).join(" ");
 }
@@ -755,7 +823,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   });
   let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
   if (profiles.length) {
-    note = "Public opted-in datapoints only (publicMinglDatapoints: music, travel, food, hobbies, beverages, events, looking-to-meet, location, media) plus the viewer's own public-facing card when the query is about them. Missing music/food/travel means not filled or not opted public — do not claim FLOQR never stores them. photoCount photos are shown by the FLOQR app — never print URLs, tokens, or storage paths. Never invent private details (email, phone, GPS).";
+    note = "Viewer-context public volunteered datapoints (not PII/PCI — never email, phone, PAN, GPS). sharedDatapoints = keys this patron opted to publish. datapoints = every filled value for those keys — use ALL of them. A missing key is opted out or empty, not “FLOQR doesn’t track that.” photoCount photos are shown by the FLOQR app — never print URLs, tokens, or storage paths.";
   } else if (selfQuery) {
     note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
   } else if (friendContext) {
@@ -814,6 +882,7 @@ module.exports = {
   friendNameFromQuery,
   publicUserCard,
   publicUserFacts,
+  volunteeredPublicDatapoints,
   PUBLIC_MINGL_DATAPOINT_KEYS,
   publicMinglKeys,
   datapointAllowed,

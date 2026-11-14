@@ -87,8 +87,17 @@
 
   function beginShoutOut(locationId) {
     if (!locationId) return;
+    const trail = global.FLOQRLog?.ensureShoutoutTrail?.("throwShoutoutHere");
+    global.FLOQRLog?.shoutoutPageCall?.("throwShoutoutHere", {
+      locationId,
+      sourcePage: "shoutoutSearchPage",
+      source: "shoutout-search"
+    });
     const href = global.FLOQRNav?.shoutoutLink
-      ? global.FLOQRNav.shoutoutLink({locationId})
+      ? global.FLOQRNav.shoutoutLink({
+        locationId,
+        shoutoutTrailId: trail?.correlationId || global.FLOQRLog?.readShoutoutTrailId?.() || ""
+      })
       : `./?start=shoutout&location=${encodeURIComponent(locationId)}`;
     const withFrom = href.includes("?") ? `${href}&from=search` : `${href}?from=search`;
     location.assign(withFrom);
@@ -211,6 +220,11 @@
       }
       setStatus("");
       showGate(false);
+      global.FLOQRLog?.ensureShoutoutTrail?.("shoutoutSearchPage");
+      global.FLOQRLog?.shoutoutPageCall?.("shoutoutSearchPage", {
+        sourcePage: "shoutoutButton",
+        source: "shoutout-search"
+      });
       await loadVenues();
     });
   }

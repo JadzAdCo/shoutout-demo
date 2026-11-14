@@ -1,5 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.010 (stable)
 
+- s3.3.011: ShoutOut page trail (button → venue → splash → checkout), Continue to Checkout one-tap lock, BOT DEE frameless photo pop-out
 - s3.3.010: Master Admin sign-in load — defer Diagnostics / AI crawl / commerce / duplicates until panel open
 - s3.3.009: BOT DEE public profile datapoints — opted-in music / food / travel / hobbies; photos as a gallery not storage URLs
 - s3.3.008: BOT DEE mobile title+?, about-me/friends public profiles, version stamp

@@ -120,6 +120,22 @@ test("publicUserCard includes opted-in Mingl datapoints and never email/phone", 
   assert.ok(card.imageUrls.includes("https://example.com/don.jpg"));
   assert.equal(card.email, undefined);
   assert.equal(card.phone, undefined);
+  assert.ok(card.sharedDatapoints.includes("food"));
+  assert.deepEqual(card.datapoints.food, ["Jollof", "oysters"]);
+  assert.equal(card.facts.city, undefined);
+  assert.equal(card.facts.email, undefined);
+});
+
+test("publicUserCard passes every volunteered list value and treats empty opt-in as none", () => {
+  const manyFoods = Array.from({length: 20}, (_, i) => `Dish ${i + 1}`);
+  const full = tools.publicUserCard("uid1", {...SAMPLE_PUBLIC, foodChoices: manyFoods}, 10);
+  assert.equal(full.datapoints.food.length, 20);
+  assert.equal(full.food.length, 20);
+  const none = tools.publicUserCard("uid1", {...SAMPLE_PUBLIC, publicMinglDatapoints: []}, 10);
+  assert.deepEqual(none.sharedDatapoints, []);
+  assert.equal(none.food, undefined);
+  assert.equal(none.datapoints.food, undefined);
+  assert.equal(none.city, undefined);
 });
 
 test("publicUserCard omits datapoints the patron opted out of", () => {

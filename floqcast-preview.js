@@ -263,10 +263,18 @@
     return venueLiveSeconds;
   }
 
+  let paymentBusy = false;
+
   /** One CTA that advances: camera → pay → wait → go live → end. */
   function updateButtons() {
     const btn = byId("floqcastStageBtn");
     if (!btn) return;
+    if (paymentBusy) {
+      btn.disabled = true;
+      btn.classList.add("is-critical-busy");
+      btn.setAttribute("aria-busy", "true");
+      return;
+    }
     const row = requestDoc || {};
     const status = String(row.status || "");
     const paid = row.paymentStatus === "paid";
@@ -498,6 +506,7 @@
   }
 
   async function startPayment() {
+    if (paymentBusy) return;
     if (!requestDoc?.requestId) return;
     if (!cameraReady()) {
       setStatus("Start camera preview before paying.");
@@ -506,6 +515,13 @@
     }
     if (!global.FLOQRPayments?.startCheckout) {
       setStatus("Payment service failed to load.");
+      return;
+    }
+    paymentBusy = true;
+    const stageBtn = byId("floqcastStageBtn");
+    const unlockPay = global.FLOQRPayments.lockCriticalButton?.(stageBtn, {busyLabel: "Opening checkout…"});
+    if (unlockPay === null) {
+      paymentBusy = false;
       return;
     }
     // Open popup synchronously on click — before any await — or browsers block it.
@@ -551,9 +567,12 @@
       setStatus("Pop-up unavailable — opening Stripe in this tab. Use Return to preview after payment.");
       window.location.assign(url);
     } catch (err) {
+      paymentBusy = false;
+      try { unlockPay?.(); } catch (_) {}
       try { checkoutPopup?.close(); } catch (_) {}
       setStatus(err?.message || "Checkout failed.");
       await logPopup("checkout_failed", err?.message || "Checkout failed.", {requestId: requestDoc?.requestId || ""});
+      updateButtons();
     }
   }
 

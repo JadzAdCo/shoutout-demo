@@ -1038,11 +1038,11 @@
             <span class="help-label-text" data-i18n="master.diagnosticsShoutOut">ShoutOut</span>
             <details class="help-popout inline-help-popout" data-help-id="help-master-shoutout-diagnostics">
               <summary>?</summary>
-              <div>Consolidated ShoutOut operational logs from <code>appLogs</code> (category <code>shoutout</code>): submit/save, media, Baller portrait mask, and temporary <code>page_call</code> rows for every composer page visited during a ShoutOut. Each trail shares one correlation / shoutoutTrailId with timestamps. Patron must be signed in for rows to persist.</div>
+              <div>Consolidated ShoutOut operational logs from <code>appLogs</code> (category <code>shoutout</code>): submit/save, media, Baller portrait mask, and <code>page_call</code> rows for the patron path (ShoutOut button → Choose a venue → Throw ShoutOut Here → splash → template → editor → Continue to Checkout → payment return). Trails share one shoutoutTrailId. Venue/template are blank until chosen — Search is not a ShoutOut step. Patron must be signed in for rows to persist.</div>
             </details>
           </h2>
           <p class="sub small">
-            All ShoutOut client logs live here (not only Application Logging). Use the page-trail subsection below to see which pages ran for a unique ShoutOut identity.
+            All ShoutOut client logs live here (not only Application Logging). Use the page-trail subsection below to see which pages ran for a unique ShoutOut identity. Empty venue/template means not chosen yet.
           </p>
           <div class="profile-grid">
             <label>Level

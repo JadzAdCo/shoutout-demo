@@ -120,7 +120,7 @@ test("Throw a ShoutOut opens standardized feature landing (shoutout-search)", ()
   assert.doesNotMatch(fn, /openCategory\("shoutout"\);/);
   assert.match(fn, /shoutout-search\.html|shoutoutHome/);
   assert.match(fn, /await selectLocationForShoutOut\(draft\.locationId\);\s*return;/);
-  assert.match(app, /bind\("shoutoutBtnCard", showShoutoutLanding\)/);
+  assert.match(app, /bind\("shoutoutBtnCard"/);
   const index = read("index.html");
   assert.match(index, /id="shoutoutBtnCard"[^>]*href="\.\/shoutout-search\.html/);
   const landing = read("shoutout-search.html");

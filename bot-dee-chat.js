@@ -391,7 +391,8 @@
     } catch (_) {
       return false;
     }
-    if (parsed.protocol !== "https:") return false;
+    const sameOrigin = typeof location !== "undefined" && parsed.origin === location.origin;
+    if (parsed.protocol !== "https:" && !sameOrigin) return false;
     if (parsed.username || parsed.password) return false;
     const host = parsed.hostname.toLowerCase();
     if (hostEndsWith(host, "stripe.com") || hostEndsWith(host, "stripe.network")) return false;
@@ -444,22 +445,217 @@
     return out.slice(0, 8);
   }
 
+  const PHOTO_POPOUT_NAME = "botdeePhotoPopout";
+  const PHOTO_FLY_MS = 420;
+  const PHOTO_GROW_MS = 360;
+  let photoPopoutWin = null;
+
+  function prefersReducedMotion() {
+    try {
+      return !!(global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function chromeOffset() {
+    return {
+      x: Math.max(0, (window.outerWidth || 0) - (window.innerWidth || 0)),
+      y: Math.max(0, (window.outerHeight || 0) - (window.innerHeight || 0))
+    };
+  }
+
+  function sourceBox(sourceEl) {
+    const rect = sourceEl && typeof sourceEl.getBoundingClientRect === "function"
+      ? sourceEl.getBoundingClientRect()
+      : {left: window.innerWidth / 2 - 48, top: window.innerHeight / 2 - 48, width: 96, height: 96};
+    const w = Math.max(48, rect.width || 96);
+    const h = Math.max(48, rect.height || 96);
+    const chrome = chromeOffset();
+    return {
+      left: rect.left,
+      top: rect.top,
+      w,
+      h,
+      x: Math.round((window.screenX || 0) + chrome.x + rect.left),
+      y: Math.round((window.screenY || 0) + chrome.y + rect.top)
+    };
+  }
+
+  function targetPopupBox() {
+    const availW = window.screen?.availWidth || window.innerWidth || 980;
+    const availH = window.screen?.availHeight || window.innerHeight || 860;
+    const w = Math.min(980, Math.max(480, Math.round(availW * 0.72)));
+    const h = Math.min(860, Math.max(480, Math.round(availH * 0.82)));
+    const availLeft = window.screen?.availLeft || 0;
+    const availTop = window.screen?.availTop || 0;
+    return {
+      w,
+      h,
+      x: Math.round(availLeft + (availW - w) / 2),
+      y: Math.round(availTop + (availH - h) / 2)
+    };
+  }
+
+  function targetViewBox(to) {
+    const chrome = chromeOffset();
+    return {
+      left: to.x - (window.screenX || 0) - chrome.x,
+      top: to.y - (window.screenY || 0) - chrome.y,
+      w: to.w,
+      h: to.h
+    };
+  }
+
+  function photoPopoutFeatures(from) {
+    const w = Math.max(160, Math.round(from.w));
+    const h = Math.max(160, Math.round(from.h));
+    return [
+      "popup=yes",
+      "toolbar=no",
+      "menubar=no",
+      "location=no",
+      "personalbar=no",
+      "status=no",
+      "scrollbars=no",
+      "resizable=yes",
+      `width=${w}`,
+      `height=${h}`,
+      `left=${Math.max(0, from.x)}`,
+      `top=${Math.max(0, from.y)}`
+    ].join(",");
+  }
+
+  function storePhotoPopoutPayload(payload) {
+    global.__floqrBotDeePhotoPopout = payload;
+    try { sessionStorage.setItem("floqr.botdeePhotoPopout", JSON.stringify(payload)); } catch (_) {}
+  }
+
+  function playPhotoFlyout(from, toView, url) {
+    if (prefersReducedMotion() || !from || !url) return;
+    document.querySelectorAll(".botdee-photo-flyout").forEach(node => node.remove());
+    const fly = document.createElement("div");
+    fly.className = "botdee-photo-flyout";
+    fly.setAttribute("aria-hidden", "true");
+    Object.assign(fly.style, {
+      left: `${Math.round(from.left)}px`,
+      top: `${Math.round(from.top)}px`,
+      width: `${Math.round(from.w)}px`,
+      height: `${Math.round(from.h)}px`
+    });
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    fly.appendChild(img);
+    document.body.appendChild(fly);
+    const finish = () => { try { fly.remove(); } catch (_) {} };
+    if (typeof fly.animate === "function") {
+      const anim = fly.animate([
+        {left: `${Math.round(from.left)}px`, top: `${Math.round(from.top)}px`, width: `${Math.round(from.w)}px`, height: `${Math.round(from.h)}px`, opacity: 1, offset: 0},
+        {left: `${Math.round(toView.left)}px`, top: `${Math.round(toView.top)}px`, width: `${Math.round(toView.w)}px`, height: `${Math.round(toView.h)}px`, opacity: 0.15, offset: 1}
+      ], {duration: PHOTO_FLY_MS, easing: "cubic-bezier(0.2, 0.85, 0.2, 1)", fill: "forwards"});
+      anim.addEventListener("finish", finish);
+      anim.addEventListener("cancel", finish);
+    } else {
+      fly.classList.add("is-popping");
+    }
+    setTimeout(finish, PHOTO_FLY_MS + 80);
+  }
+
+  function animatePhotoPopout(win, from, to) {
+    if (!win || win.closed) return;
+    const reduced = prefersReducedMotion();
+    const apply = (box) => {
+      try {
+        win.resizeTo(Math.max(160, Math.round(box.w)), Math.max(160, Math.round(box.h)));
+        win.moveTo(Math.round(box.x), Math.round(box.y));
+      } catch (_) {}
+    };
+    if (reduced) {
+      apply(to);
+      return;
+    }
+    const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    const ease = p => 1 - Math.pow(1 - p, 3);
+    const frame = now => {
+      if (!win || win.closed) return;
+      const elapsed = Math.max(0, now - t0);
+      const p = ease(Math.min(1, elapsed / PHOTO_GROW_MS));
+      apply({
+        w: from.w + (to.w - from.w) * p,
+        h: from.h + (to.h - from.h) * p,
+        x: from.x + (to.x - from.x) * p,
+        y: from.y + (to.y - from.y) * p
+      });
+      if (p < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  function closePhotoViewer() {
+    document.querySelectorAll(".botdee-photo-flyout").forEach(node => node.remove());
+    const win = photoPopoutWin;
+    photoPopoutWin = null;
+    if (win && !win.closed) {
+      try { win.close(); } catch (_) {}
+    }
+  }
+
+  function openPhotoViewer(items, startIndex, sourceEl) {
+    const list = (Array.isArray(items) ? items : []).filter(item => isAllowedPhotoUrl(item?.url));
+    if (!list.length) return;
+    const index = Math.max(0, Math.min(Number(startIndex) || 0, list.length - 1));
+    const from = sourceBox(sourceEl);
+    const to = targetPopupBox();
+    const payload = {
+      items: list.map(item => ({url: item.url, alt: String(item.alt || "").slice(0, 80)})),
+      index,
+      labels: {
+        title: t("botdee.photoDialog", "Enlarged photo"),
+        close: t("botdee.photoClose", "Close"),
+        prev: t("botdee.photoPrev", "Previous photo"),
+        next: t("botdee.photoNext", "Next photo")
+      }
+    };
+    storePhotoPopoutPayload(payload);
+    let href = "./botdee-photo-popout.html";
+    try { href = new URL("botdee-photo-popout.html", location.href).href; } catch (_) {}
+    closePhotoViewer();
+    let win = null;
+    try { win = window.open(href, PHOTO_POPOUT_NAME, photoPopoutFeatures(from)); } catch (_) { win = null; }
+    playPhotoFlyout(from, targetViewBox(to), list[index].url);
+    if (!win) {
+      setStatus(t("botdee.photoPopoutBlocked", "Allow pop-up windows to enlarge the photo. The chat stays behind."));
+      return;
+    }
+    photoPopoutWin = win;
+    animatePhotoPopout(win, from, to);
+    try { win.focus(); } catch (_) {}
+  }
+
   function appendPhotoGallery(article, media) {
     if (!Array.isArray(media) || !media.length) return;
     const gallery = document.createElement("div");
     gallery.className = "botdee-photo-gallery";
     gallery.setAttribute("role", "list");
-    media.forEach(item => {
+    media.forEach((item, index) => {
       const figure = document.createElement("figure");
       figure.className = "botdee-photo";
       figure.setAttribute("role", "listitem");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "botdee-photo-open";
+      button.setAttribute("aria-label", t("botdee.photoEnlarge", "Enlarge photo"));
       const img = document.createElement("img");
       img.src = item.url;
       img.alt = item.alt || "";
       img.loading = "lazy";
       img.decoding = "async";
       img.referrerPolicy = "no-referrer";
-      figure.appendChild(img);
+      button.appendChild(img);
+      button.addEventListener("click", event => openPhotoViewer(media, index, event.currentTarget));
+      figure.appendChild(button);
       gallery.appendChild(figure);
     });
     article.appendChild(gallery);
@@ -818,6 +1014,8 @@
     bind,
     sendMessage,
     openIntentFallback,
+    openPhotoViewer,
+    closePhotoViewer,
     DEFAULT_IDLE_SECONDS,
     clampIdleSeconds
   };

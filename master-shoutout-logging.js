@@ -69,13 +69,19 @@
     });
     return Array.from(map.entries()).map(([id, items]) => {
       items.sort((a, b) => Number(a.createdAtMs || 0) - Number(b.createdAtMs || 0));
-      const first = items[0]?.details || {};
-      const last = items[items.length - 1]?.details || {};
+      const detailsList = items.map((row) => row.details || {});
+      const lastFilled = (key) => {
+        for (let i = detailsList.length - 1; i >= 0; i -= 1) {
+          const value = String(detailsList[i][key] || "").trim();
+          if (value) return value;
+        }
+        return "";
+      };
       return {
         trailId: id,
         count: items.length,
-        template: last.template || first.template || "—",
-        locationId: last.locationId || first.locationId || "—",
+        template: lastFilled("template") || "template not selected",
+        locationId: lastFilled("locationId") || "venue not selected",
         startedAt: items[0]?.createdAt || items[0]?.createdAtMs,
         endedAt: items[items.length - 1]?.createdAt || items[items.length - 1]?.createdAtMs,
         pages: items.map((r) => ({
@@ -104,7 +110,10 @@
         const hintParts = [];
         if (d.pageId) hintParts.push(`page ${d.pageId}`);
         if (d.template) hintParts.push(d.template);
+        else if (d.templateChosen === false) hintParts.push("template not selected");
         if (d.locationId) hintParts.push(d.locationId);
+        else if (d.venueChosen === false) hintParts.push("venue not selected");
+        if (d.destHost) hintParts.push(d.destHost);
         if (d.shoutoutTrailId || row.correlationId) hintParts.push(`id ${d.shoutoutTrailId || row.correlationId}`);
         const details = row.details
           ? `<details class="audit-change"><summary>Details</summary><pre class="log-details">${esc(JSON.stringify(row.details, null, 2))}</pre></details>`

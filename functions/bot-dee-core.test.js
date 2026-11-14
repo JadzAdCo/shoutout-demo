@@ -196,7 +196,7 @@ test("lookupPublicProfiles tool covers me + friends in description", () => {
 
 test("lookupPublicProfiles prompt and card cover opted-in public datapoints", () => {
   const core = read("functions/bot-dee-core.js");
-  assert.match(core, /publicMinglDatapoints/);
+  assert.match(core, /volunteered public datapoints/);
   assert.match(core, /Never say FLOQR does not track music/);
   const toolsSrc = read("functions/bot-dee-tools.js");
   assert.match(toolsSrc, /foodChoices/);

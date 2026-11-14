@@ -47,6 +47,43 @@
    * Do NOT pass noopener — modern browsers return null even when the window opens,
    * which makes callers think the popup was blocked.
    */
+  /**
+   * One-tap lock for checkout / submit. Greys the button on the first click
+   * so a slow Stripe round-trip cannot be double-fired. Returns unlock(),
+   * or null when the control is already busy (caller should abort).
+   */
+  function lockCriticalButton(button, {busyLabel, also = []} = {}) {
+    const list = [];
+    [button, ...(Array.isArray(also) ? also : [])].forEach(btn => {
+      if (btn && !list.includes(btn)) list.push(btn);
+    });
+    if (!list.length) return () => {};
+    if (list.some(btn => btn.dataset.criticalBusy === "1")) return null;
+    const snap = list.map(btn => ({
+      btn,
+      text: btn.textContent,
+      disabled: !!btn.disabled
+    }));
+    list.forEach(btn => {
+      btn.dataset.criticalBusy = "1";
+      btn.disabled = true;
+      btn.setAttribute("aria-busy", "true");
+      btn.setAttribute("aria-disabled", "true");
+      btn.classList.add("is-critical-busy");
+    });
+    if (button && busyLabel) button.textContent = busyLabel;
+    return function unlock() {
+      snap.forEach(({btn, text, disabled}) => {
+        btn.dataset.criticalBusy = "";
+        btn.removeAttribute("aria-busy");
+        btn.removeAttribute("aria-disabled");
+        btn.classList.remove("is-critical-busy");
+        btn.disabled = disabled;
+        btn.textContent = text;
+      });
+    };
+  }
+
   function openUserGesturePopup(name = "floqr_checkout", features = "width=540,height=780") {
     const popup = window.open("about:blank", name, features);
     if (popup) {
@@ -90,7 +127,8 @@
       orderType,
       clubLocationId: checkoutPayload?.clubLocationId || checkoutPayload?.shoutout?.clubLocationId || "",
       template: checkoutPayload?.shoutout?.template || "",
-      clientIp: sessionIp.clientIp || checkoutPayload?.shoutout?.clientIp || ""
+      clientIp: sessionIp.clientIp || checkoutPayload?.shoutout?.clientIp || "",
+      shoutoutTrailId: window.FLOQRLog?.readShoutoutTrailId?.() || ""
     }, correlationId);
     try {
       const returnBase = new URL(".", window.location.href).href;
@@ -250,6 +288,7 @@
     publishFollowerCampaign,
     requestTeslaPickup,
     openUserGesturePopup,
+    lockCriticalButton,
     logPopupEvent
   };
 })();

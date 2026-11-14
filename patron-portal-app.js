@@ -2161,9 +2161,7 @@
   }
 
   function publicMinglDatapoints(profile = {}) {
-    if (Array.isArray(profile.publicMinglDatapoints) && profile.publicMinglDatapoints.length) {
-      return profile.publicMinglDatapoints;
-    }
+    if (Array.isArray(profile.publicMinglDatapoints)) return profile.publicMinglDatapoints;
     return PUBLIC_MINGL_DATAPOINTS.map(point => point.key);
   }
 

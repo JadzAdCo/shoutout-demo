@@ -111,5 +111,115 @@
     });
   }
 
-  window.FLOQRLog = { write, fromError, correlationId, ensureSessionId };
+  const SHOUTOUT_TRAIL_KEY = "floqrShoutoutTrailId";
+  const SHOUTOUT_TRAIL_STARTED_KEY = "floqrShoutoutTrailStartedAtMs";
+  const SHOUTOUT_TRAIL_LAST_KEY = "floqrShoutoutTrailLastPage";
+  let lastShoutoutPage = { trailId: "", pageId: "", atMs: 0 };
+
+  function queryParam(name) {
+    try {
+      return new URL(typeof location !== "undefined" ? location.href : "").searchParams.get(name) || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function readShoutoutTrailId() {
+    try { return sessionStorage.getItem(SHOUTOUT_TRAIL_KEY) || ""; } catch (_) { return ""; }
+  }
+
+  function persistShoutoutTrail(id, startedAtMs) {
+    try {
+      sessionStorage.setItem(SHOUTOUT_TRAIL_KEY, id);
+      if (startedAtMs) sessionStorage.setItem(SHOUTOUT_TRAIL_STARTED_KEY, String(startedAtMs));
+    } catch (_) {}
+  }
+
+  function startShoutoutTrail(reason = "start") {
+    const startedAtMs = Date.now();
+    const id = correlationId("so");
+    persistShoutoutTrail(id, startedAtMs);
+    lastShoutoutPage = { trailId: "", pageId: "", atMs: 0 };
+    try { sessionStorage.removeItem(SHOUTOUT_TRAIL_LAST_KEY); } catch (_) {}
+    return {
+      correlationId: id,
+      startedAtMs,
+      reason: String(reason || "start").slice(0, 40)
+    };
+  }
+
+  function ensureShoutoutTrail(reason = "flow") {
+    const fromUrl = queryParam("shoutoutTrailId") || queryParam("trail");
+    const stored = readShoutoutTrailId();
+    const id = String(fromUrl || stored || "").trim();
+    if (!id) return startShoutoutTrail(reason);
+    if (fromUrl && fromUrl !== stored) persistShoutoutTrail(fromUrl, Date.now());
+    let startedAtMs = Date.now();
+    try { startedAtMs = Number(sessionStorage.getItem(SHOUTOUT_TRAIL_STARTED_KEY) || 0) || startedAtMs; } catch (_) {}
+    return {
+      correlationId: id,
+      startedAtMs,
+      reason: String(reason || "flow").slice(0, 40)
+    };
+  }
+
+  function clearShoutoutTrail() {
+    try {
+      sessionStorage.removeItem(SHOUTOUT_TRAIL_KEY);
+      sessionStorage.removeItem(SHOUTOUT_TRAIL_STARTED_KEY);
+      sessionStorage.removeItem(SHOUTOUT_TRAIL_LAST_KEY);
+    } catch (_) {}
+    lastShoutoutPage = { trailId: "", pageId: "", atMs: 0 };
+  }
+
+  function shoutoutPageCall(pageId, details = {}) {
+    const page = String(pageId || "").trim();
+    if (!page) return null;
+    const trail = ensureShoutoutTrail(page);
+    const now = Date.now();
+    if (trail.correlationId === lastShoutoutPage.trailId && page === lastShoutoutPage.pageId && (now - lastShoutoutPage.atMs) < 2500) {
+      return trail;
+    }
+    lastShoutoutPage = { trailId: trail.correlationId, pageId: page, atMs: now };
+    try { sessionStorage.setItem(SHOUTOUT_TRAIL_LAST_KEY, `${trail.correlationId}|${page}|${now}`); } catch (_) {}
+    const locationId = String(details.locationId || "").trim();
+    const template = String(details.template || "").trim();
+    const screenFormatId = String(details.screenFormatId || "").trim();
+    write({
+      level: "info",
+      category: "shoutout",
+      action: "page_call",
+      message: `ShoutOut page ${page}`,
+      correlationId: trail.correlationId,
+      source: details.source || "client",
+      details: {
+        shoutoutTrailId: trail.correlationId,
+        pageId: page,
+        locationId,
+        template,
+        screenFormatId,
+        venueChosen: !!locationId,
+        templateChosen: !!template,
+        destHost: String(details.destHost || "").slice(0, 120),
+        sourcePage: String(details.sourcePage || "").slice(0, 80),
+        pageIndex: details.pageIndex || 0,
+        atMs: now,
+        atIso: new Date(now).toISOString(),
+        trailStartedAtMs: trail.startedAtMs
+      }
+    });
+    return trail;
+  }
+
+  window.FLOQRLog = {
+    write,
+    fromError,
+    correlationId,
+    ensureSessionId,
+    startShoutoutTrail,
+    ensureShoutoutTrail,
+    clearShoutoutTrail,
+    shoutoutPageCall,
+    readShoutoutTrailId
+  };
 })();

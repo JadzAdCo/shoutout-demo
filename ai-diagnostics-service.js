@@ -222,6 +222,19 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.011",
+      title: "s3.3.011 — ShoutOut page trail + checkout one-tap + BOT DEE photo pop-out",
+      checks: [
+        {label:"ShoutOut trail helper", file:"floqr-logger.js", includes:["shoutoutPageCall", "startShoutoutTrail", "venueChosen"]},
+        {label:"Deep link skips Search", file:"patron-app.js", includes:["isShoutoutDeepLink", "checkoutRedirect", "shoutoutButton"]},
+        {label:"Choose a venue logs", file:"shoutout-search.js", includes:["shoutoutSearchPage", "throwShoutoutHere"]},
+        {label:"Leftover landing removed", file:"index.html", notIncludes:["id=\"shoutoutLandingPage\""]},
+        {label:"Checkout one-tap lock", file:"payment-service.js", includes:["lockCriticalButton"]},
+        {label:"Photo pop-out", file:"bot-dee-chat.js", includes:["botdee-photo-popout.html", "playPhotoFlyout"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-011-shoutout-page-trail"]}
+      ]
+    },
+    {
       version: "s3.3.010",
       title: "s3.3.010 — Master Admin sign-in load perf (defer heavy panels)",
       checks: [
@@ -237,7 +250,7 @@
       title: "s3.3.009 — BOT DEE public profile datapoints + photo gallery",
       checks: [
         {label:"Opted-in Mingl datapoints on card", file:"functions/bot-dee-tools.js", includes:["PUBLIC_MINGL_DATAPOINT_KEYS", "foodChoices", "travelInterests", "isSelfQuery"]},
-        {label:"Prompt forbids doesn't-track claim", file:"functions/bot-dee-core.js", includes:["Never say FLOQR does not track music", "publicMinglDatapoints", "stripMediaFromToolResult"]},
+        {label:"Prompt forbids doesn't-track claim", file:"functions/bot-dee-core.js", includes:["Never say FLOQR does not track music", "stripMediaFromToolResult"]},
         {label:"Chat gallery", file:"bot-dee-chat.js", includes:["botdee-photo-gallery", "stripBackendLinks"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-009-botdee-public-datapoints"]}
       ]
@@ -2996,6 +3009,24 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-011-shoutout-page-trail",
+      area:"ShoutOut / Diagnostics",
+      feature:"ShoutOut page trail matches patron steps",
+      changed:"s3.3.011 — Diagnostics → ShoutOut logs ShoutOut button, Choose a venue, Throw ShoutOut Here, splash, template, editor, Continue to Checkout, payment return. Search is not a step. Venue/template empty until chosen (no Zebbies/blackwhite defaults). Leftover in-page shoutoutLandingPage removed.",
+      howToTest:"1) Hard-refresh Search s3.3.011 signed in. 2) Tap ShoutOut → Choose a venue → Aurelia Throw ShoutOut Here. Confirm Search tiles do not flash. 3) Splash → Shiloh → Continue to Checkout (one tap greys the button). 4) Master Admin → Diagnostics → ShoutOut: one trail with shoutoutButton, shoutoutSearchPage, throwShoutoutHere, adSplashPage, templateSelectPage, editorPage, confirmationPage, checkoutRedirect, paymentReturn. Location temp-democlub-1; template shiloh on editor+. 5) Mark Succeed/Failed.",
+      expected:"Trail matches the patron path. No categoryPage. No zebbies-garden-washington-dc unless that club was chosen.",
+      troubleshoot:"Search still in the trail → hard-refresh patron-app.js / floqr-nav.js; confirm ?start=shoutout skips categoryPage. Zebbies with no throw → old rows from before this fix; look at created time. Missing Choose a venue → shoutout-search.js + floqr-logger.js not cache-busted."
+    },
+    {
+      id:"s3-3-010-checkout-one-tap",
+      area:"ShoutOut / Checkout",
+      feature:"Continue to Checkout locks after one tap",
+      changed:"s3.3.011 — Continue to Checkout / Submit / Save ShoutOut grey out on the first tap (is-critical-busy). VIP Pay deposit and floqCast pay use the same one-tap lock.",
+      howToTest:"1) Hard-refresh Search, sign in, Throw a priced ShoutOut to the editor. 2) Tap Continue to Checkout once. The button must grey out immediately (Opening checkout…) and ignore a second tap. 3) If checkout fails, the button returns. 4) Mark Succeed/Failed.",
+      expected:"One tap starts checkout. No double Stripe sessions from impatient extra taps.",
+      troubleshoot:"Still clickable → hard-refresh patron-app.js + payment-service.js + styles.css s3.3.011. Two Stripe tabs → Functions still slow but the second click should no-op; confirm dataset.criticalBusy=1 in inspector."
+    },
+    {
       id:"s3-3-010-master-admin-load-perf",
       area:"Master Admin",
       feature:"Sign-in load — defer heavy Diagnostics / crawl / commerce",
@@ -3008,10 +3039,10 @@
       id:"s3-3-009-botdee-public-datapoints",
       area:"BOT DEE / Profiles / Mingl",
       feature:"BOT DEE reads opted-in public profile datapoints",
-      changed:"s3.3.009 — lookupPublicProfiles returns the same public Mingl datapoints a patron opted to share (music, travel, food, hobbies, beverages, events, looking-to-meet, location, media), including the signed-in user's own public projection for “my public profile”. Chat renders public photos as a gallery and strips storage URLs. Needs Functions deploy.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html (s3.3.009) signed in with botDee access and a public FLOQR profile that has music/food/travel filled and opted public (My Profile → Privacy datapoint sharing). 2) Ask: do you have access to what people see on my public profile, like food, music, or travel? 3) BOT DEE must summarize those public datapoints — not say FLOQR doesn't track them. 4) Ask to show public photos — images appear in the chat, not firebasestorage / token= links. 5) Ask about another public @handle — only opted-in fields. 6) Mark Succeed/Failed.",
-      expected:"BOT DEE lists the patron's public music / food / travel from the live profile. Photos render as a gallery. Missing field = not filled or not opted public. Never email/phone/GPS. Functions deploy required.",
-      troubleshoot:"Still says FLOQR doesn't track music/food/travel → Functions not redeployed (Pages-only is not enough) or publicMinglDatapoints omitted that key. Raw storage URLs → hard-refresh bot-dee-chat.js s3.3.009 and confirm executeBotSession media stripping. Empty lists → fill the datapoints on My Profile and tick them under Privacy."
+      changed:"s3.3.010 — lookupPublicProfiles returns every volunteered public datapoint the signed-in viewer can see (sharedDatapoints + full datapoints values, not PII/PCI). Chat thumbnails fly out into a frameless photo window (X / Close); BOT DEE chat stays visible.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html signed in with botDee and a public profile that has music/food/travel filled and opted public. 2) Ask: do you have access to what people see on my public profile, like food, music, or travel? 3) BOT DEE must list those volunteered values — not say FLOQR doesn't track them. 4) Ask to show public photos — tap a thumbnail; the photo animates out into a separate frameless window. Close with X or Close and confirm the chat is still behind. 5) Ask about another public @handle — only volunteered public fields. 6) Mark Succeed/Failed.",
+      expected:"BOT DEE uses every public volunteered key/value the viewer can see. Photos pop out in an animated frameless window. Never email/phone/PAN/GPS.",
+      troubleshoot:"Still says FLOQR doesn't track music/food/travel → Functions not redeployed or the field is empty/opted out. Tap does nothing → allow pop-ups, hard-refresh bot-dee-chat.js, confirm .botdee-photo-open buttons. Overlay covering chat → stale cache of the old in-page viewer. Raw storage URLs → executeBotSession media stripping."
     },
     {
       id:"s3-3-008-botdee-mobile-profile-version",

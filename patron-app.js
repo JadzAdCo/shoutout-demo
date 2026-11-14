@@ -37,6 +37,7 @@
   let currentUser = null;
   let selectedLocationId = null;
   let selectedTemplate = "blackwhite";
+  let shoutoutTemplateChosen = false;
   let selectedScreenFormatId = "led-96x48";
   let selectedTemplateVariant = null;
   let confirmationResult = null;
@@ -1444,21 +1445,60 @@
   }
 
   const SHOUTOUT_TRAIL_PAGES = new Set([
-    "shoutoutLandingPage", "categoryPage", "clubActionsPage", "listingPage",
-    "templateSelectPage", "editorPage", "confirmationPage", "adSplashPage"
+    "clubActionsPage", "templateSelectPage", "editorPage", "confirmationPage", "adSplashPage"
   ]);
   let activeShoutoutTrail = null;
+  (function restoreShoutoutTrailFromUrl() {
+    const trailId = String(qs("shoutoutTrailId", "") || "").trim();
+    if (!trailId) return;
+    activeShoutoutTrail = {
+      correlationId: trailId,
+      startedAtMs: Date.now(),
+      reason: "deeplink",
+      pages: []
+    };
+    try { sessionStorage.setItem("floqrShoutoutTrailId", trailId); } catch (_) {}
+    window.FLOQRLog?.ensureShoutoutTrail?.("deeplink");
+  })();
+
+  function isShoutoutDeepLink() {
+    const start = String(qs("start") || "").toLowerCase();
+    return start === "shoutout" || !!(pendingDirectLocation || pendingDirectEvent);
+  }
+
+  function chosenShoutoutLocationId() {
+    return String(selectedLocationId || pendingDirectLocation || "").trim();
+  }
+
+  function chosenShoutoutTemplateId() {
+    return shoutoutTemplateChosen ? String(selectedTemplate || "").trim() : "";
+  }
 
   function resetShoutoutTrail() {
     activeShoutoutTrail = null;
+    shoutoutTemplateChosen = false;
     try { sessionStorage.removeItem("floqrShoutoutTrailId"); } catch (_) {}
+    window.FLOQRLog?.clearShoutoutTrail?.();
+  }
+
+  function beginNewShoutoutTrail(reason = "shoutout_button") {
+    const shared = window.FLOQRLog?.startShoutoutTrail?.(reason);
+    activeShoutoutTrail = {
+      correlationId: shared?.correlationId || window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`,
+      startedAtMs: shared?.startedAtMs || Date.now(),
+      reason: String(reason || "shoutout_button").slice(0, 40),
+      pages: []
+    };
+    try { sessionStorage.setItem("floqrShoutoutTrailId", activeShoutoutTrail.correlationId); } catch (_) {}
+    return activeShoutoutTrail;
   }
 
   function ensureShoutoutTrail(reason = "flow") {
     if (activeShoutoutTrail?.correlationId) return activeShoutoutTrail;
+    const shared = window.FLOQRLog?.ensureShoutoutTrail?.(reason);
     activeShoutoutTrail = {
-      correlationId: window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`,
-      startedAtMs: Date.now(),
+      correlationId: shared?.correlationId || window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`,
+      startedAtMs: shared?.startedAtMs || Date.now(),
       reason: String(reason || "flow").slice(0, 40),
       pages: []
     };
@@ -1466,37 +1506,31 @@
     return activeShoutoutTrail;
   }
 
-  function logShoutoutPageCall(pageId) {
-    if (!SHOUTOUT_TRAIL_PAGES.has(pageId)) return;
+  function logShoutoutPageCall(pageId, extra = {}) {
+    if (!pageId) return;
+    if (SHOUTOUT_TRAIL_PAGES.has(pageId) === false && !extra.force) return;
     const trail = ensureShoutoutTrail(pageId);
     const atMs = Date.now();
     const step = {
       pageId,
       atMs,
       atIso: new Date(atMs).toISOString(),
-      template: selectedTemplate || "",
-      locationId: selectedLocationId || locationId?.() || "",
-      screenFormatId: selectedScreenFormatId || ""
+      template: extra.template != null ? extra.template : chosenShoutoutTemplateId(),
+      locationId: extra.locationId != null ? extra.locationId : chosenShoutoutLocationId(),
+      screenFormatId: extra.screenFormatId != null ? extra.screenFormatId : (chosenShoutoutLocationId() ? selectedScreenFormatId || "" : ""),
+      destHost: extra.destHost || ""
     };
+    const prev = trail.pages[trail.pages.length - 1];
+    if (prev?.pageId === pageId && (atMs - Number(prev.atMs || 0)) < 2500) return;
     trail.pages.push(step);
-    if (!window.FLOQRLog?.write) return;
-    window.FLOQRLog.write({
-      level: "info",
-      category: "shoutout",
-      action: "page_call",
-      message: `ShoutOut page ${pageId}`,
-      correlationId: trail.correlationId,
-      details: {
-        shoutoutTrailId: trail.correlationId,
-        pageId,
-        pageIndex: trail.pages.length,
-        template: step.template,
-        locationId: step.locationId,
-        screenFormatId: step.screenFormatId,
-        atMs,
-        atIso: step.atIso,
-        trailStartedAtMs: trail.startedAtMs
-      }
+    window.FLOQRLog?.shoutoutPageCall?.(pageId, {
+      locationId: step.locationId,
+      template: step.template,
+      screenFormatId: step.screenFormatId,
+      destHost: step.destHost,
+      sourcePage: extra.sourcePage || "",
+      pageIndex: trail.pages.length,
+      source: extra.source || "patron-app"
     });
   }
 
@@ -2165,14 +2199,15 @@
       console.warn("Search feature visibility failed", e?.message || e);
     }
     setStatus("");
+    if (isShoutoutDeepLink()) {
+      byId("landingPage")?.classList.remove("active");
+      await openDirectVenueShoutout();
+      return;
+    }
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
     if (byId("minglLandingPage")?.classList.contains("active") && !featureServiceAllows("mingl")) showPage("categoryPage");
     if (byId("intentSearchPage")?.classList.contains("active") && !featureServiceAllows("botDee")) showPage("categoryPage");
-    if (pendingDirectLocation || pendingDirectEvent) {
-      await openDirectVenueShoutout();
-      return;
-    }
     runStartVenueQuery();
   }
 
@@ -2991,9 +3026,7 @@
   }
 
   function publicMinglDatapoints(profile = {}) {
-    if (Array.isArray(profile.publicMinglDatapoints) && profile.publicMinglDatapoints.length) {
-      return profile.publicMinglDatapoints;
-    }
+    if (Array.isArray(profile.publicMinglDatapoints)) return profile.publicMinglDatapoints;
     return PROFILE_DATAPOINTS.map(point => point.key).concat("media");
   }
 
@@ -3154,10 +3187,12 @@
       }
     }
     shoutoutTemplateVenueIds = null;
+    const trail = beginNewShoutoutTrail("shoutout_button");
+    logShoutoutPageCall("shoutoutButton", { force: true, sourcePage: "categoryPage", source: "search-tile" });
     /* Standardized feature landing (GPS + top 4 + ShoutOut facts) — not FloqR listing. */
     const href = window.FLOQRNav?.shoutoutHome
-      ? window.FLOQRNav.shoutoutHome({from: "search"})
-      : "./shoutout-search.html?from=search";
+      ? window.FLOQRNav.shoutoutHome({from: "search", shoutoutTrailId: trail.correlationId})
+      : `./shoutout-search.html?from=search&shoutoutTrailId=${encodeURIComponent(trail.correlationId)}`;
     location.assign(href);
   }
 
@@ -4425,6 +4460,7 @@
     setText("selectedClubMeta", [eventLine, `${metaPlace} • ${metaGenres}`].filter(Boolean).join(" • "));
     const draft = readReuseShoutoutDraft();
     selectedTemplate = draft?.template || qs("template") || "blackwhite";
+    shoutoutTemplateChosen = !!(draft?.template || qs("template"));
     selectedScreenFormatId = draft?.screenFormatId
       || loc.primaryDisplayScreenFormatId
       || loc.displayScreenFormatIds?.[0]
@@ -4993,9 +5029,19 @@
     if (pendingCheckoutUrl) {
       const url = pendingCheckoutUrl;
       pendingCheckoutUrl = "";
+      let destHost = "";
+      try { destHost = new URL(url, window.location.href).host; } catch (_) { destHost = "checkout"; }
+      logShoutoutPageCall("checkoutRedirect", {
+        force: true,
+        destHost,
+        locationId: chosenShoutoutLocationId(),
+        template: chosenShoutoutTemplateId() || selectedTemplate || "",
+        sourcePage: "confirmationPage"
+      });
       window.location.assign(url);
       return;
     }
+    resetShoutoutTrail();
     showPage("categoryPage");
   }
 
@@ -5611,11 +5657,34 @@
     return commitShoutout({mode: "submit"});
   }
 
+  let shoutoutCommitUnlock = null;
+
+  function releaseShoutoutCommitLock() {
+    try { shoutoutCommitUnlock?.(); } catch (_) {}
+    shoutoutCommitUnlock = null;
+  }
+
   async function commitShoutout({mode = "submit"} = {}) {
     const saveOnly = mode === "saved";
     const status=byId("submitStatus");
+    const submitBtn = byId("submitShoutoutBtn");
+    const saveBtn = byId("saveShoutoutDraftBtn");
+    if (submitBtn?.dataset.criticalBusy === "1" || saveBtn?.dataset.criticalBusy === "1") return;
+    const priced = Math.max(0, Math.round(Number(getTemplate()?.priceCents || 0))) > 0;
+    const busyLabel = saveOnly
+      ? tt("page.shoutout.savingDraft", null, "Saving ShoutOut draft…")
+      : priced
+        ? tt("page.shoutout.openingCheckout", null, "Opening checkout…")
+        : tt("page.shoutout.submitting", null, "Submitting…");
+    const locker = window.FLOQRPayments?.lockCriticalButton;
+    const unlock = typeof locker === "function"
+      ? locker(saveOnly ? saveBtn : submitBtn, {busyLabel, also: [submitBtn, saveBtn]})
+      : null;
+    if (unlock === null && (submitBtn?.dataset.criticalBusy === "1" || saveBtn?.dataset.criticalBusy === "1")) return;
+    shoutoutCommitUnlock = unlock;
     const trail = ensureShoutoutTrail(saveOnly ? "save" : "submit");
     const correlationId = trail.correlationId;
+    let stayLocked = false;
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
@@ -5854,6 +5923,7 @@
           }
         });
         resetShoutoutTrail();
+        stayLocked = true;
         return;
       }
       const priceCents = Math.max(0, Math.round(Number(canonicalTemplate.priceCents || t.priceCents || mediaPayload.priceCents || 0)));
@@ -5877,10 +5947,20 @@
             clearConfirmationTimers();
             const url = pendingCheckoutUrl || checkout.checkoutUrl;
             pendingCheckoutUrl = "";
+            let destHost = "";
+            try { destHost = new URL(url, window.location.href).host; } catch (_) { destHost = "checkout"; }
+            logShoutoutPageCall("checkoutRedirect", {
+              force: true,
+              destHost,
+              locationId: chosenShoutoutLocationId(),
+              template: chosenShoutoutTemplateId() || selectedTemplate || "",
+              screenFormatId: selectedScreenFormatId || "",
+              sourcePage: "confirmationPage"
+            });
             window.location.assign(url);
           }
         });
-        resetShoutoutTrail();
+        stayLocked = true;
         return;
       }
       const shoutoutRef = await db.collection("shoutouts").add(payload);
@@ -5898,6 +5978,7 @@
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
       resetShoutoutTrail();
+      stayLocked = true;
     } catch(e) {
       status.textContent=e.message;
       if (window.FLOQRLog) {
@@ -5912,9 +5993,11 @@
           }
         });
       }
+    } finally {
+      if (!stayLocked) releaseShoutoutCommitLock();
     }
   }
-  function startAnother(){ resetShoutoutTrail(); selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("jerseyColorway"))byId("jerseyColorway").value=getTemplate()?.defaultJerseyColorway||"white"; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ releaseShoutoutCommitLock(); resetShoutoutTrail(); selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("jerseyColorway"))byId("jerseyColorway").value=getTemplate()?.defaultJerseyColorway||"white"; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -5953,7 +6036,7 @@
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
     byId("footballTeamIntroCard")?.classList.toggle("hidden", !footballIntro);
-    if (byId("submitShoutoutBtn")) {
+    if (byId("submitShoutoutBtn") && byId("submitShoutoutBtn").dataset.criticalBusy !== "1") {
       const priced = Math.max(0, Math.round(Number(t.priceCents || 0))) > 0;
       byId("submitShoutoutBtn").textContent = footballIntro
         ? "Continue to $30 FloqR Checkout"
@@ -6018,6 +6101,7 @@
   }
 
   function goToEditor() {
+    shoutoutTemplateChosen = true;
     const l=getLocation(), t=getTemplate();
     const screenSelect = byId("shoutoutScreenFormat");
     if (screenSelect) configureTemplateScreenFormats(screenSelect, t, l);
@@ -6237,7 +6321,10 @@
         return;
       }
       hadSignedInUser = true;
-      if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
+      if (byId("landingPage")?.classList.contains("active")) {
+        if (isShoutoutDeepLink()) byId("landingPage").classList.remove("active");
+        else showPage("categoryPage");
+      }
       await afterLogin();
         applyMenuFeatureLinks(currentUser);
     });
@@ -6254,7 +6341,7 @@
     });
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
-    bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
+    bind("shoutoutBtnCard", (event) => { event?.preventDefault?.(); showShoutoutLanding(); }); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
     const settingsCard = byId("settingsBtnCard");
     if (settingsCard) {
       settingsCard.href = window.FLOQRNav?.portalHome?.({from: "search", tab: "appearance"})
@@ -6262,9 +6349,6 @@
     }
     bind("backToWelcomeFromProfileBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
     bind("backToWelcomeBtn", () => floqrHistoryBackOr(() => showPage("landingPage")));
-    bind("backToCategoriesFromShoutoutLandingBtn", () => showPage("categoryPage"));
-    bind("backToCategoriesFromShoutoutLandingBtn2", () => showPage("categoryPage"));
-    bind("startShoutoutFlowBtn", () => openCategory("shoutout"));
     bind("backToCategoriesFromMinglBtn", () => showPage("categoryPage"));
     byId("minglSearch")?.addEventListener("input", renderMinglPeople);
     byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit());

@@ -86,6 +86,10 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
   assert.match(backend, /members\.length !== 4/);
   assert.match(patronApp, /priceCents > 0/);
   assert.match(patronApp, /Continue to \$30 FloqR Checkout/);
+  assert.match(patronApp, /lockCriticalButton/);
+  assert.match(patronApp, /page\.shoutout\.openingCheckout/);
+  assert.match(fs.readFileSync(path.join(root, "styles.css"), "utf8"), /button\.is-critical-busy/);
+  assert.match(fs.readFileSync(path.join(root, "payment-service.js"), "utf8"), /function lockCriticalButton/);
 });
 
 test("Traditional Black and White keeps a global fixed identity rail", () => {
