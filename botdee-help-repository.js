@@ -470,7 +470,7 @@
       id: "help-botdee-page",
       title: "BOT DEE",
       body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself and asks what you want help with. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone, until the pause timer ends. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Signed-in BOT DEE uses the same public volunteered profile datapoints you can see (music, food, travel, hobbies, and the rest of Privacy datapoint sharing) — never email, phone, card numbers, or GPS. Saved chats, memories, and approved facts live in My Profile → Feature & Orders → My BOT DEE. Tap a photo in the chat to pop it out into a separate window. Close with X or Close to see the chat again.",
-      searchPhrases: ["bot dee", "botdee", "ask bot dee", "bot dee page", "chat with bot dee", "help", "bot dee help", "what can you do", "resume chat", "refresh bot dee", "other phone", "general search", "search everything", "what can i search", "enter to send", "shift enter", "how are you bot dee", "floqai", "floqai page", "ask floqai", "public profile", "enlarge photo", "tap photo", "pop out photo", "photo window", "my bot dee", "saved chats"],
+      searchPhrases: ["bot dee", "botdee", "ask bot dee", "bot dee page", "chat with bot dee", "help", "bot dee help", "what can you do", "resume chat", "refresh bot dee", "other phone", "general search", "search everything", "what can i search", "enter to send", "shift enter", "how are you bot dee", "floqai", "floqai page", "ask floqai", "public profile", "enlarge photo", "tap photo", "pop out photo", "photo window", "my bot dee", "saved chats", "privacy", "session pause", "keyboard"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}
@@ -478,6 +478,19 @@
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-privacy-session",
+      title: "BOT DEE privacy and session",
+      body: "The five-minute pause ends this live BOT DEE chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send a message; Shift+Enter starts a new line. Type help or privacy on the BOT DEE page. Tap Settings to choose what BOT DEE calls you, the tone (Socially Cool, Professional, or Balanced), and whether BOT DEE reminds you where you left off. Closing Settings without saving does not loop the same questions during this visit.",
+      searchPhrases: ["privacy", "session", "pause", "five minute pause", "5 minute pause", "keyboard", "enter sends", "shift enter", "bot dee settings", "call me", "demeanor", "socially cool", "remind me where we left off"],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
+        {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeePersonalizationDialog"
     },
     {
       id: "help-bot-dee-mgmt",

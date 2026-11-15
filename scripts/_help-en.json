@@ -283,6 +283,10 @@
     "title": "BOT DEE",
     "body": "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. Results only include what your account can use. Quick intent search stays available as a fast path when you want product cards without chat."
   },
+  "help-botdee-privacy-session": {
+    "title": "BOT DEE privacy and session",
+    "body": "The five-minute pause ends this live BOT DEE chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send a message; Shift+Enter starts a new line. Type help or privacy on the BOT DEE page. Tap Settings to choose what BOT DEE calls you, the tone (Socially Cool, Professional, or Balanced), and whether BOT DEE reminds you where you left off. Closing Settings without saving does not loop the same questions during this visit."
+  },
   "help-scheduling-schedule-for": {
     "title": "Staff Scheduling",
     "body": "Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each calendar has its own $20/month subscription. Shifts sent to you appear under My assignments, where you confirm or decline them."

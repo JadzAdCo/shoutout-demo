@@ -47,6 +47,14 @@
           "label": "Marketing-Einwilligung für Personal",
           "blurb": "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf "
         },
+        "help:help-botdee-privacy-session": {
+          "label": "BOT DEE Datenschutz und Sitzung",
+          "blurb": "Die fünfminütige Pause beendet den Live-Chat. Gespeicherter Verlauf unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleibt. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet; Umschalt+Enter beginnt eine neue Zeile. Name und Ton stellst du unter "
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "BOT DEE Datenschutz und Sitzung",
+          "blurb": "Die fünfminütige Pause beendet den Live-Chat. Gespeicherter Verlauf unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleibt. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet; Umschalt+Enter beginnt eine neue Zeile. Name und Ton stellst du unter "
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (ver"
@@ -892,6 +900,14 @@
         "intent:help-staff-marketing-consent": {
           "label": "Consentement marketing du personnel",
           "blurb": "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées s"
+        },
+        "help:help-botdee-privacy-session": {
+          "label": "Confidentialité et session BOT DEE",
+          "blurb": "La pause de cinq minutes termine le chat BOT DEE en direct. Elle ne supprime pas l’historique enregistré dans Mon profil → Fonctions et commandes → My BOT DEE. Les invités restent éphémères. Les discussions Mingl ne sont jamais copiées ici. Entrée envoie ; Maj+Entrée commence une"
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Confidentialité et session BOT DEE",
+          "blurb": "La pause de cinq minutes termine le chat BOT DEE en direct. Elle ne supprime pas l’historique enregistré dans Mon profil → Fonctions et commandes → My BOT DEE. Les invités restent éphémères. Les discussions Mingl ne sont jamais copiées ici. Entrée envoie ; Maj+Entrée commence une"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -1739,6 +1755,14 @@
           "label": "Consentimiento de marketing del personal",
           "blurb": "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales"
         },
+        "help:help-botdee-privacy-session": {
+          "label": "Privacidad y sesión de BOT DEE",
+          "blurb": "La pausa de cinco minutos termina el chat en vivo. No borra el historial guardado en Mi perfil → Funciones y pedidos → My BOT DEE. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. Intro envía; Mayús+Intro empieza una línea nueva. Nombre y tono se eli"
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Privacidad y sesión de BOT DEE",
+          "blurb": "La pausa de cinco minutos termina el chat en vivo. No borra el historial guardado en Mi perfil → Funciones y pedidos → My BOT DEE. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. Intro envía; Mayús+Intro empieza una línea nueva. Nombre y tono se eli"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (pr"
@@ -2584,6 +2608,14 @@
         "intent:help-staff-marketing-consent": {
           "label": "Consenso marketing del personale",
           "blurb": "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volanti"
+        },
+        "help:help-botdee-privacy-session": {
+          "label": "Privacy e sessione BOT DEE",
+          "blurb": "La pausa di cinque minuti termina la chat dal vivo. Non cancella la cronologia salvata in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiusc+Invio inizia una nuova riga. Nome e tono sono in "
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Privacy e sessione BOT DEE",
+          "blurb": "La pausa di cinque minuti termina la chat dal vivo. Non cancella la cronologia salvata in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiusc+Invio inizia una nuova riga. Nome e tono sono in "
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -3431,6 +3463,14 @@
           "label": "Consentimento de marketing da equipe",
           "blurb": "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes socia"
         },
+        "help:help-botdee-privacy-session": {
+          "label": "Privacidade e sessão BOT DEE",
+          "blurb": "A pausa de cinco minutos termina o chat ao vivo. Não apaga o histórico guardado em O meu perfil → Funções e encomendas → My BOT DEE. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; Shift+Enter começa uma nova linha. Nome e tom estão em "
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Privacidade e sessão BOT DEE",
+          "blurb": "A pausa de cinco minutos termina o chat ao vivo. Não apaga o histórico guardado em O meu perfil → Funções e encomendas → My BOT DEE. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; Shift+Enter começa uma nova linha. Nome e tom estão em "
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa ("
@@ -4276,6 +4316,14 @@
         "intent:help-staff-marketing-consent": {
           "label": "Согласие персонала на маркетинг",
           "blurb": "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в со"
+        },
+        "help:help-botdee-privacy-session": {
+          "label": "Конфиденциальность и сессия BOT DEE",
+          "blurb": "Пауза в пять минут завершает живой чат BOT DEE. Она не удаляет историю, которую вы сохранили в «Мой профиль» → «Функции и заказы» → My BOT DEE. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправляет сообщение; Shift+Enter начинает новую строку. Настройки имени"
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Конфиденциальность и сессия BOT DEE",
+          "blurb": "Пауза в пять минут завершает живой чат BOT DEE. Она не удаляет историю, которую вы сохранили в «Мой профиль» → «Функции и заказы» → My BOT DEE. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправляет сообщение; Shift+Enter начинает новую строку. Настройки имени"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -5123,6 +5171,14 @@
           "label": "Συγκατάθεση μάρκετινγκ προσωπικού",
           "blurb": "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογρα"
         },
+        "help:help-botdee-privacy-session": {
+          "label": "Απόρρητο και συνεδρία BOT DEE",
+          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνομιλία. Δεν διαγράφει το ιστορικό στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες Mingl δεν αντιγράφονται εδώ. Enter στέλνει· Shift+Enter ξεκινά νέα γραμμή. Όνομα και ύφος ε"
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Απόρρητο και συνεδρία BOT DEE",
+          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνομιλία. Δεν διαγράφει το ιστορικό στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες Mingl δεν αντιγράφονται εδώ. Enter στέλνει· Shift+Enter ξεκινά νέα γραμμή. Όνομα και ύφος ε"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκ"
@@ -5968,6 +6024,14 @@
         "intent:help-staff-marketing-consent": {
           "label": "Zgoda marketingowa personelu",
           "blurb": "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach "
+        },
+        "help:help-botdee-privacy-session": {
+          "label": "Prywatność i sesja BOT DEE",
+          "blurb": "Pięciominutowa pauza kończy czat na żywo. Nie usuwa historii w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna nową linię. Imię i ton ustawisz w Settings na stronie BOT DEE."
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "Prywatność i sesja BOT DEE",
+          "blurb": "Pięciominutowa pauza kończy czat na żywo. Nie usuwa historii w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna nową linię. Imię i ton ustawisz w Settings na stronie BOT DEE."
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -6815,6 +6879,14 @@
           "label": "Marketingtoestemming voor personeel",
           "blurb": "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flye"
         },
+        "help:help-botdee-privacy-session": {
+          "label": "BOT DEE privacy en sessie",
+          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-chat. Opgeslagen geschiedenis in Mijn profiel → Functies en bestellingen → My BOT DEE blijft. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieerd. Enter verstuurt; Shift+Enter begint een nieuwe regel. Naam en toon"
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "BOT DEE privacy en sessie",
+          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-chat. Opgeslagen geschiedenis in Mijn profiel → Functies en bestellingen → My BOT DEE blijft. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieerd. Enter verstuurt; Shift+Enter begint een nieuwe regel. Naam en toon"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How ar"
@@ -7660,6 +7732,14 @@
         "intent:help-staff-marketing-consent": {
           "label": "موافقة الطاقم على التسويق",
           "blurb": "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikT"
+        },
+        "help:help-botdee-privacy-session": {
+          "label": "خصوصية وجلسة BOT DEE",
+          "blurb": "توقف الخمس دقائق ينهي محادثة BOT DEE المباشرة. لا يحذف السجل المحفوظ في ملفي → الميزات والطلبات → My BOT DEE. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاسم والأسلوب من Settings في صفحة BOT DEE."
+        },
+        "intent:help-botdee-privacy-session": {
+          "label": "خصوصية وجلسة BOT DEE",
+          "blurb": "توقف الخمس دقائق ينهي محادثة BOT DEE المباشرة. لا يحذف السجل المحفوظ في ملفي → الميزات والطلبات → My BOT DEE. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاسم والأسلوب من Settings في صفحة BOT DEE."
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",

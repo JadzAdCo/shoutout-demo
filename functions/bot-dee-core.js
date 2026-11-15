@@ -314,8 +314,9 @@ function hasWord(hay, word) {
 
 const MIN_SEARCH_SCORE = 3;
 
-/** Soft name / filler after a greeting (bot dee, there, friend, …). */
-const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
+/** Soft name / filler after a greeting (sir, bot dee, there, friend, …). Repeatable. */
+const CHITCHAT_TAIL =
+  "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|ma'?am|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
 
 /**
  * Short acknowledgments mid-chat ("cool", "ok", "thanks") — conversational continue,
@@ -419,6 +420,21 @@ function isHelpPrompt(raw) {
   if (/^(?:bot\s*dee help|help bot\s*dee|show help|get help)\??$/.test(q)) return true;
   if (/\b(?:how (?:do|can) i use (?:you|bot\s*dee)|what (?:are you|can you) (?:for|help with))\b/.test(q)) return true;
   return false;
+}
+
+/** Privacy / session / keyboard — local help, never a product catalog. */
+function isPrivacyPrompt(raw) {
+  const q = normalize(raw);
+  if (!q || q.length > 140) return false;
+  if (/^(?:privacy|session|pause|keyboard)\??$/.test(q)) return true;
+  if (/^(?:privacy (?:and|&)? session|session (?:pause|privacy)|five minute(?:s)?(?: pause)?|5 minute(?:s)?(?: pause)?)\??$/.test(q)) return true;
+  if (/\b(?:enter sends|shift enter|shift\+enter|keyboard shortcuts?)\b/.test(q)) return true;
+  if (/\b(?:five.?minute pause|session pause|live chat pause|privacy and session)\b/.test(q)) return true;
+  return false;
+}
+
+function privacyReply() {
+  return "The five-minute pause ends this live chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line.";
 }
 
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
@@ -663,15 +679,18 @@ function versionReply(role) {
 }
 
 function helpReply() {
-  return "I'm BOT DEE — ask me anything about FLOQR in plain words (events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, Club Admin). Enter sends; Shift+Enter is a new line. What are you interested in getting help with?";
+  return "I'm BOT DEE — ask me anything about FLOQR in plain words. Press Enter to send; Shift+Enter starts a new line. Type privacy for pause and session details. What are you interested in getting help with?";
 }
 
-/** Offer-help CTA — conversation start / idle resume only (not every mid-chat turn). */
-function chitchatReply(role, allowedFeatures) {
+/** Time-aware greeting — never a product catalog. Personalization optional. */
+function chitchatReply(role, allowedFeatures, personalization) {
+  void allowedFeatures;
+  const prefs = require("./botdee-personalization");
   const roleHint = role && role !== "anonymous" && role !== "patron"
     ? ` I can see you as ${role}.`
     : "";
-  return `Hey — BOT DEE here.${roleHint} What do you want to do in FLOQR? ${productPitchSentence(allowedFeatures)}`;
+  const greet = prefs.greetingFor(personalization);
+  return roleHint ? `${greet}${roleHint}` : greet;
 }
 
 /** Friendly mood reply — chat first, light invite to keep going (not a search dump). */
@@ -694,8 +713,8 @@ function stillHereReply() {
 }
 
 /** After idle end, when the patron comes back with a greeting. */
-function resumeReply(role, allowedFeatures) {
-  return chitchatReply(role, allowedFeatures);
+function resumeReply(role, allowedFeatures, personalization) {
+  return chitchatReply(role, allowedFeatures, personalization);
 }
 
 /** Shown when the idle timer ends the conversation. */
@@ -870,7 +889,7 @@ function localizeActionLink(link, lang) {
   return next;
 }
 
-function systemInstruction(role, uiLanguage, allowedFeatures) {
+function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
   const lang = normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatureSet(allowedFeatures);
   const allowedLabels = productPitchLabels(allowedFeatures).filter(x => x !== "scheduling");
@@ -888,7 +907,9 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
       `If they ask for a product not on their allowed list, say it is not available on their account yet — do not name other products they also lack.`
     )
     : "Only discuss features returned by tools for this viewer.";
-  const pitchLine = `Ask "what do you want to do" / list ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}) ONLY on the first turn or after a clear restart — never every reply. Include granted betas; omit everything else.`;
+  const pitchLine = `Do not list products on a greeting or first turn. When they ask how to do something, mention ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}). Include granted betas; omit everything else.`;
+  const prefs = require("./botdee-personalization");
+  const personaLine = prefs.personalizationInstruction(personalization);
   return [
     "You are BOT DEE, FLOQR's in-app chatbot and authorized execution agent. Talk like a helpful friend first — warm, brief, human. You are not a search box and not a FAQ dump. Introduce yourself as BOT DEE when useful.",
     langLine,
@@ -897,7 +918,8 @@ function systemInstruction(role, uiLanguage, allowedFeatures) {
     "Act only within the identity, role, and tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public volunteered datapoints from lookupPublicProfiles are the same keys and values the signed-in viewer can already see — use every returned value (they are not PII/PCI).",
     "Never request card numbers, CVVs, passwords, or OTP codes. If supplied, do not repeat them; direct the user to approved secure flows.",
     pitchLine,
-    "Greetings on a fresh/restarted chat: reply in 1–2 short sentences, introduce yourself as BOT DEE, ask what they want to do, and do NOT call any tools.",
+    personaLine,
+    "Greetings on a fresh/restarted chat: reply in 1–2 short sentences with a time-of-day hello, ask how you can help, and do NOT call any tools and do NOT list products.",
     "Greetings mid-chat while already talking: one short line (e.g. \"Hey — still here.\") — do NOT re-list products, do NOT call tools.",
     "Mood / how-are-you / how's it going / how's your day / what's new: answer as a person in 1–2 friendly sentences (e.g. you're doing great, thanks for asking), optionally invite what they need in FLOQR — do NOT call any tools, do NOT dump search results.",
     "Acknowledgments mid-chat (cool, ok, okay, nice, thanks, great, awesome, got it, sounds good, yeah): one short line only (Cool. / You're welcome.) — do NOT re-introduce yourself, do NOT ask what they want to do, do NOT dump search results, do NOT call any tools.",
@@ -1005,11 +1027,13 @@ module.exports = {
   isIdentityPrompt,
   isVersionPrompt,
   isHelpPrompt,
+  isPrivacyPrompt,
   isAckPrompt,
   isFarewellPrompt,
   identityReply,
   versionReply,
   helpReply,
+  privacyReply,
   PACKAGE_VERSION,
   PACKAGE_LABEL,
   chitchatReply,

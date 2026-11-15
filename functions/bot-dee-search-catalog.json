@@ -497,6 +497,34 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-privacy-session",
+      "id": "help-botdee-privacy-session",
+      "kind": "help",
+      "label": "BOT DEE privacy and session",
+      "blurb": "The five-minute pause ends this live BOT DEE chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send a message; Shift+Enter starts a new line. Type help or priv",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee privacy and session",
+        "the five-minute pause ends this live bot dee chat. it does not delete history you opted to save in my profile feature orders my bot dee. guests stay ephemeral. ",
+        "privacy",
+        "session",
+        "pause",
+        "five minute pause",
+        "5 minute pause",
+        "keyboard",
+        "enter sends",
+        "shift enter",
+        "bot dee settings",
+        "call me",
+        "demeanor",
+        "socially cool",
+        "remind me where we left off",
+        "open bot dee",
+        "my bot dee",
+        "help-botdee-privacy-session"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-research-library",
       "id": "help-botdee-research-library",
       "kind": "help",

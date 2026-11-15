@@ -23,10 +23,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.3.022"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.022"/>
-  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.022"/>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.023"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.023"/>
+  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.023"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.023"/>
 </head>
 <body class="botdee-standalone botdee-page" data-floqr-feature="botDee">
 <main class="botdee-standalone-main botdee-shell">
@@ -48,10 +48,38 @@
     <form id="botDeeChatForm" class="botdee-chat-form" autocomplete="off">
       <label class="botdee-chat-label" for="botDeeChatInput">
         <span class="visually-hidden" data-i18n="botdee.prompt">Tell me what you want to do</span>
-        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="botdee.chatPlaceholder" placeholder="Ask BOT DEE… Enter sends · Shift+Enter new line" aria-describedby="botDeeChatStatus" title="Enter sends · Shift+Enter new line"></textarea>
+        <textarea id="botDeeChatInput" rows="2" maxlength="2000" data-i18n-placeholder="botdee.chatPlaceholder" placeholder="Ask BOT DEE…" aria-describedby="botDeeChatStatus botDeeComposerHint"></textarea>
       </label>
       <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="botdee.chatSend">Send</button>
     </form>
+    <p id="botDeeComposerHint" class="visually-hidden">Press Enter to send a message. Shift+Enter starts a new line. Type help or privacy for more.</p>
+    <p class="botdee-prefs-row">
+      <button id="botDeePrefsOpen" class="buttonlike botdee-prefs-open" type="button" data-i18n="botdee.prefsOpen">Settings</button>
+    </p>
+    <div id="botDeePersonalizationDialog" class="botdee-pref-dialog" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="botDeePrefTitle">
+      <div class="botdee-pref-card">
+        <h2 id="botDeePrefTitle" class="botdee-pref-title" data-i18n="botdee.prefsTitle">BOT DEE settings</h2>
+        <label class="botdee-pref-field" for="botDeePrefName">
+          <span data-i18n="botdee.callMe">What should I call you?</span>
+          <input id="botDeePrefName" type="text" maxlength="40" autocomplete="nickname"/>
+        </label>
+        <fieldset class="botdee-pref-field">
+          <legend data-i18n="botdee.demeanorAsk">What demeanor would you prefer: Socially Cool, Professional or Balanced?</legend>
+          <label><input type="radio" name="botDeePrefDemeanor" value="sociallyCool"/> <span data-i18n="botdee.demeanorCool">Socially Cool</span></label>
+          <label><input type="radio" name="botDeePrefDemeanor" value="professional"/> <span data-i18n="botdee.demeanorPro">Professional</span></label>
+          <label><input type="radio" name="botDeePrefDemeanor" value="balanced" checked/> <span data-i18n="botdee.demeanorBalanced">Balanced</span></label>
+        </fieldset>
+        <label class="botdee-pref-check" for="botDeePrefRecap">
+          <input id="botDeePrefRecap" type="checkbox" checked/>
+          <span data-i18n="botdee.prefsRecap">Remind me where we left off</span>
+        </label>
+        <p id="botDeePrefStatus" class="sub small" role="status"></p>
+        <div class="botdee-pref-actions">
+          <button id="botDeePrefSave" class="buttonlike" type="button" data-i18n="botdee.prefsSave">Save &amp; Close</button>
+          <button id="botDeePrefCancel" class="buttonlike" type="button" data-i18n="botdee.prefsCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -59,22 +87,23 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.022"></script>
-<script src="./floqr-app-check.js?v=s3.3.022"></script>
-<script src="./floqr-session-shell.js?v=s3.3.022"></script>
-<script src="./floqr-nav.js?v=s3.3.022"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.022"></script>
-<script src="./floqr-i18n.js?v=s3.3.022"></script>
-<script src="./floqr-place-i18n.js?v=s3.3.022"></script>
-<script src="./botdee-help-repository.js?v=s3.3.022"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.022"></script>
-<script src="./floqr-venue-query.js?v=s3.3.022"></script>
-<script src="./floqr-data-classification.js?v=s3.3.022"></script>
-<script src="./botdee-access.js?v=s3.3.022"></script>
-<script src="./feature-gates.js?v=s3.3.022"></script>
-<script src="./floqr-feature-services.js?v=s3.3.022"></script>
-<script src="./helper-popouts.js?v=s3.3.022"></script>
-<script src="./bot-dee-chat.js?v=s3.3.022"></script>
-<script src="./botdee-page.js?v=s3.3.022"></script>
+<script src="./firebase-config.js?v=s3.3.023"></script>
+<script src="./floqr-app-check.js?v=s3.3.023"></script>
+<script src="./floqr-session-shell.js?v=s3.3.023"></script>
+<script src="./floqr-nav.js?v=s3.3.023"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.023"></script>
+<script src="./floqr-i18n.js?v=s3.3.023"></script>
+<script src="./floqr-place-i18n.js?v=s3.3.023"></script>
+<script src="./botdee-help-repository.js?v=s3.3.023"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.023"></script>
+<script src="./floqr-venue-query.js?v=s3.3.023"></script>
+<script src="./floqr-data-classification.js?v=s3.3.023"></script>
+<script src="./botdee-access.js?v=s3.3.023"></script>
+<script src="./feature-gates.js?v=s3.3.023"></script>
+<script src="./floqr-feature-services.js?v=s3.3.023"></script>
+<script src="./helper-popouts.js?v=s3.3.023"></script>
+<script src="./botdee-personalization-ui.js?v=s3.3.023"></script>
+<script src="./bot-dee-chat.js?v=s3.3.023"></script>
+<script src="./botdee-page.js?v=s3.3.023"></script>
 </body>
 </html>

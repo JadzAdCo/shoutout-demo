@@ -5,6 +5,7 @@
 
 const admin = require("firebase-admin");
 const bot = require("./bot-dee-core");
+const prefs = require("./botdee-personalization");
 const memory = require("./botdee-memory");
 const execution = require("./botdee-execution");
 
@@ -32,7 +33,9 @@ function emptyState(settings) {
     revision: 0,
     consent: memory.normalizeConsent({}),
     archiveRetained: false,
-    hasUsedBotDee: 0
+    hasUsedBotDee: 0,
+    personalization: prefs.normalizePersonalization({}),
+    [prefs.LAST_USED_FIELD]: 0
   };
 }
 
@@ -67,7 +70,9 @@ function snapshotToState(snap, uid, settings, nowMs) {
     firstSeq: Math.max(0, Math.floor(Number(data.firstSeq) || 0)),
     consent,
     archiveRetained: memory.consentAllows(consent, "archive"),
-    hasUsedBotDee: memory.hasUsedFromThread(data)
+    hasUsedBotDee: memory.hasUsedFromThread(data),
+    personalization: prefs.fromThread(data),
+    [prefs.LAST_USED_FIELD]: Number(data[prefs.LAST_USED_FIELD]) || 0
   };
 }
 
@@ -91,6 +96,20 @@ async function markHasUsedBotDee(uid, nowMs) {
     updatedAtMs: now
   }, {merge: true});
   return {ok: true, hasUsedBotDee: 1};
+}
+
+async function savePersonalization(uid, input, nowMs) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  const personalization = prefs.writePayload(input);
+  await ref.set({
+    uid,
+    threadId: bot.threadIdForUid(uid),
+    personalization,
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, personalization};
 }
 
 async function loadSettings() {
@@ -188,7 +207,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       firstSeq,
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
-      updatedAtMs: now
+      updatedAtMs: now,
+      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs)
     }, {merge: true});
   });
   return {ok: true};
@@ -293,7 +313,8 @@ async function persistUserTurn(uid, settings, userText, opts) {
       firstSeq,
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
-      updatedAtMs: now
+      updatedAtMs: now,
+      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs)
     }, {merge: true});
     written = {seq: userSeq, epoch, receivedAtMs, userStored};
   });
@@ -404,6 +425,7 @@ module.exports = {
   markIdleEnded,
   readHasUsedBotDee,
   markHasUsedBotDee,
+  savePersonalization,
   snapshotToState,
   nextTranscript,
   emptyState

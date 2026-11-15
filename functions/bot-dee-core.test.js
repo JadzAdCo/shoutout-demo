@@ -41,6 +41,8 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isChitchatPrompt("Hello"), true);
   assert.equal(bot.isChitchatPrompt("hello!"), true);
   assert.equal(bot.isChitchatPrompt("Hi BOT DEE"), true);
+  assert.equal(bot.isChitchatPrompt("Hello sir"), true);
+  assert.equal(bot.isChitchatPrompt("hello, sir"), true);
   assert.equal(bot.isChitchatPrompt("hello how are you"), true);
   assert.equal(bot.isMoodPrompt("How are you?"), true);
   assert.equal(bot.isMoodPrompt("hello how are you"), true);
@@ -55,18 +57,20 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.contextualSearch("Hello", "master").results.length, 0);
 
   const reply = bot.chitchatReply("master");
-  assert.match(reply, /BOT DEE here/i);
+  assert.match(reply, /Good afternoon|Wassup|How can I help|working on/i);
+  assert.doesNotMatch(reply, /ShoutOut|VIP|floqCast/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
   assert.match(bot.moodReply(), /thanks for asking|doing great/i);
   assert.doesNotMatch(bot.moodReply(), /Here is what I found/i);
 
   const fns = require("./bot-dee-functions");
-  for (const prompt of ["Hey", "Hello"]) {
+  for (const prompt of ["Hey", "Hello", "Hello sir"]) {
     const local = fns.__botDeeHelpers.localSession("master", prompt);
     assert.equal(local.provider, "local-chitchat", prompt);
     assert.equal(local.results.length, 0, prompt);
-    assert.match(local.reply, /What do you want to do/i);
+    assert.match(local.reply, /How can I help|working on|Wassup|Good (morning|afternoon|evening)/i);
+    assert.doesNotMatch(local.reply, /ShoutOut|VIP table|floqCast/i, prompt);
   }
   for (const prompt of ["How are you?", "hello how are you", "how's it going"]) {
     const local = fns.__botDeeHelpers.localSession("master", prompt);
@@ -116,9 +120,9 @@ test("idle settings clamp + soft mid-chat copy helpers", () => {
   assert.equal(bot.normalizeBotDeeSettings({conversationIdleSeconds: 90}).conversationIdleSeconds, 90);
   assert.match(bot.stillHereReply(), /still here/i);
   assert.match(bot.idleEndedReply(), /pause|Say hi/i);
-  assert.match(bot.resumeReply("patron"), /What do you want to do/i);
+  assert.match(bot.resumeReply("patron"), /How can I help|working on|Wassup|Good afternoon/i);
   assert.doesNotMatch(bot.identityReply(), /What do you want to do/i);
-  assert.match(bot.systemInstruction("patron"), /ONLY on the first turn/i);
+  assert.match(bot.systemInstruction("patron"), /Do not list products on a greeting/i);
   assert.match(bot.systemInstruction("patron"), /Mood \/ how-are-you|helpful friend/i);
 });
 
@@ -195,12 +199,19 @@ test("Help questions answer locally like version (no search dump)", () => {
   assert.equal(bot.isHelpPrompt("VIP help"), false);
   assert.match(bot.helpReply(), /What are you interested in getting help with/i);
   assert.doesNotMatch(bot.helpReply(), /Here is what I found/i);
+  assert.equal(bot.isPrivacyPrompt("privacy"), true);
+  assert.equal(bot.isPrivacyPrompt("session"), true);
+  assert.match(bot.privacyReply(), /five-minute pause/i);
+  assert.match(bot.privacyReply(), /Enter/i);
 
   const fns = require("./bot-dee-functions");
   const local = fns.__botDeeHelpers.localSession("patron", "help");
   assert.equal(local.provider, "local-help");
   assert.equal(local.results.length, 0);
   assert.match(local.reply, /BOT DEE/i);
+  const privacy = fns.__botDeeHelpers.localSession("patron", "privacy");
+  assert.equal(privacy.model, "privacy");
+  assert.doesNotMatch(privacy.reply, /ShoutOut, VIP/i);
 });
 
 test("lookupPublicProfiles tool covers me + friends in description", () => {
@@ -393,9 +404,11 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.ok(!tools.includes("createVipHold"));
   assert.ok(!tools.includes("createFloqCastRequest"));
 
-  const pitch = bot.chitchatReply("patron", allowed);
+  const pitch = bot.productPitchSentence(allowed);
   assert.match(pitch, /ShoutOut/);
   assert.doesNotMatch(pitch, /floqCast|VIP reserV|VIP table|Mingl/i);
+  const greet = bot.chitchatReply("patron", allowed);
+  assert.doesNotMatch(greet, /ShoutOut|floqCast|VIP/i);
 
   const deniedNames = bot.deniedBrandNames(allowed);
   assert.ok(deniedNames.includes("floqCast"));

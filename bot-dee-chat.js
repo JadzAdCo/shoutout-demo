@@ -161,7 +161,8 @@
       .trim();
   }
 
-  const CHITCHAT_TAIL = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all))?";
+  const CHITCHAT_TAIL =
+    "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|ma'?am|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
 
   function isAckPrompt(raw) {
     const q = normalizeChat(raw);
@@ -220,7 +221,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.022";
+    return "s3.3.023";
   }
 
   function isVersionPrompt(raw) {
@@ -264,6 +265,16 @@
     return false;
   }
 
+  function isPrivacyPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 140) return false;
+    if (/^(?:privacy|session|pause|keyboard)\??$/.test(q)) return true;
+    if (/^(?:privacy (?:and|&)? session|session (?:pause|privacy)|five minute(?:s)?(?: pause)?|5 minute(?:s)?(?: pause)?)\??$/.test(q)) return true;
+    if (/\b(?:enter sends|shift enter|shift\+enter|keyboard shortcuts?)\b/.test(q)) return true;
+    if (/\b(?:five.?minute pause|session pause|live chat pause|privacy and session)\b/.test(q)) return true;
+    return false;
+  }
+
   function clampIdleSeconds(raw) {
     const n = Math.round(Number(raw));
     if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
@@ -290,12 +301,13 @@
   }
 
   function chitchatReply() {
+    const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
+    if (fromPrefs) return fromPrefs;
     const localized = t("botdee.chatHello", "");
-    // Keep locale; scrub brands the viewer cannot access (do not force English).
     if (localized && localized !== "botdee.chatHello") {
       return scrubGatedBrands(localized);
     }
-    return `Hey — BOT DEE here. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
+    return "Good afternoon. How can I help?";
   }
 
   /** Soft mid-chat ack — no product pitch. */
@@ -336,8 +348,13 @@
     if (localized && localized !== "botdee.chatHelp") {
       return scrubGatedBrands(localized);
     }
-    return scrubGatedBrands(
-      `I'm BOT DEE — ask me anything about FLOQR in plain words (events and clubs, ShoutOut, Mingl, RydR, BartR, floqCast, your profile, staff schedules, Club Admin). Enter sends; Shift+Enter is a new line. What are you interested in getting help with?`
+    return "I'm BOT DEE — ask me anything about FLOQR in plain words. Press Enter to send; Shift+Enter starts a new line. Type privacy for pause and session details. What are you interested in getting help with?";
+  }
+
+  function privacyReply() {
+    return t(
+      "botdee.privacyReply",
+      "The five-minute pause ends this live chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line."
     );
   }
 
@@ -353,11 +370,13 @@
   }
 
   function resumeReply() {
+    const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
+    if (fromPrefs) return fromPrefs;
     const localized = t("botdee.chatResume", "");
     if (localized && localized !== "botdee.chatResume") {
       return scrubGatedBrands(localized);
     }
-    return `Welcome back. What do you want to do in FLOQR? ${accessibleProductPitch()}`;
+    return "Welcome back. How can I help?";
   }
 
   function callable(name) {
@@ -827,6 +846,7 @@
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
     if (isVersionPrompt(text)) return versionReply();
+    if (isPrivacyPrompt(text)) return privacyReply();
     if (isHelpPrompt(text)) return helpReply();
     if (isAckPrompt(text)) return ackReply(text);
     if (isMoodPrompt(text)) return moodReply();
@@ -848,6 +868,11 @@
       .trim()
       .slice(0, 2000);
     if (!text) return;
+    if (global.FLOQRBotDeePersonalization?.interceptSend?.(text)) {
+      const inputEl = byId("botDeeChatInput");
+      if (inputEl) inputEl.value = "";
+      return;
+    }
     const input = byId("botDeeChatInput");
     if (input) input.value = "";
 
@@ -862,7 +887,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text))) {
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text))) {
       const reply = localBotReply(text, {resuming});
       appendBubble("bot", reply);
       pushHistory("model", reply);
@@ -956,13 +981,15 @@
   function welcome() {
     const log = byId("botDeeTranscript");
     if (!log || log.childElementCount) return;
-    appendBubble("bot", t(
+    const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
+    appendBubble("bot", fromPrefs || t(
       "botdee.chatWelcome",
       "Hi, I am BOT DEE. How can I help you?"
     ));
     phase = "fresh";
     // Arm idle so an abandoned welcome also ends cleanly.
     armIdleTimer();
+    global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
   }
 
   function displayReply(raw) {
@@ -1010,17 +1037,22 @@
           if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
           if (data.threadId) threadId = String(data.threadId);
           applyHasUsed(data);
+          global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
           if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
             restoreTurns(data.turns);
             phase = "active";
             setStatus("");
             armIdleTimer(data.remainingMs);
+            maybeRecap(data.turns);
+            global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
             return;
           }
           if (durableEnabled && data.status === "idle_ended" && Array.isArray(data.archiveTurns) && data.archiveTurns.length) {
             restoreTurns(data.archiveTurns);
             phase = "ended";
-            setStatus(t("botdee.memoryTimeoutNote", "Live chat paused. Saved history is still here if you opted in."));
+            setStatus(t("botdee.sessionPaused", "Session paused. Continue chatting."));
+            maybeRecap(data.archiveTurns);
+            global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
             return;
           }
         } catch (error) {
@@ -1038,8 +1070,17 @@
     }
   }
 
+  function maybeRecap(turns) {
+    const prefs = global.FLOQRBotDeePersonalization;
+    if (!prefs || prefs.get?.().remindWhereLeftOff === 0) return;
+    const recap = prefs.recapFromTurns?.(turns);
+    if (!recap) return;
+    appendBubble("bot", `${t("botdee.recapLead", "Last time:")} ${recap}`);
+  }
+
   function bind(opts = {}) {
     bindForm();
+    global.FLOQRBotDeePersonalization?.bind?.();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");

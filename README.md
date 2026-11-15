@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.022 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.023 (stable)
 
+- s3.3.023: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help
 - s3.3.022: BOT DEE chat-only; My BOT DEE on Feature & Orders; Master Admin BOT DEE subtabs (Pause / Legal / SMARTviews)
 - s3.3.021: BOT DEE Settings bubble + hasUsedBotDee 0|1 first-use popout (saved chats no longer an inline card)
 - s3.3.020: BOT DEE six-phase upgrade (opt-in memory, mock SmartViews, legal gates) + AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner

@@ -105,7 +105,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
-    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1); Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime); Functions-write"],
     ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeThreads/archive", "ownMaster", 1, "Opt-in BOT DEE durable messages; survives idle pause; Functions-write; no IP"],
     ["botDeeThreads/memories", "ownMaster", 1, "User-controlled BOT DEE memories; Functions-write; opt-in"],
@@ -233,6 +233,11 @@
     ["users", "preferredLanguage", "ownMaster", 0, "Patron preferred language (grammar / bio / site default)"],
     ["users", "uiLanguage", "ownMaster", 0, "Patron FloqR chrome language"],
     ["botDeeThreads", "hasUsedBotDee", "ownMaster", 0, "0 never used BOT DEE (first attempt); 1 has used; integer 0|1 not boolean; Functions-write on botDeeThreads/{uid}"],
+    ["botDeeThreads", "userbotdeelastUsedtime", "ownMaster", 0, "Last meaningful BOT DEE send time (ms); read-before-write; not updated on page open alone; Functions-write"],
+    ["botDeeThreads", "personalization.preferredAddressName", "ownMaster", 1, "What BOT DEE should call the signed-in patron (chosen name or title); Functions-write"],
+    ["botDeeThreads", "personalization.demeanor", "ownMaster", 0, "BOT DEE tone: sociallyCool | professional | balanced; Functions-write"],
+    ["botDeeThreads", "personalization.remindWhereLeftOff", "ownMaster", 0, "0|1 recap last two meaningful turns on return; default 1 for this experience; Functions-write"],
+    ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use marker; 0 = ask name/demeanor once; bump does not wipe history"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];
