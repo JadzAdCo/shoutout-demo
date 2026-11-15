@@ -40,7 +40,7 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   assert.match(oidcHtml, /floqr-session-shell\.js/);
   assert.match(oidcHtml, /data-floqr-auth-chrome/);
   assert.match(oidcHtml, /id="oidcConsentStatus"/);
-  assert.match(oidcHtml, /floqr-oidc-authorize\.js\?v=s3\.3\.020/);
+  assert.match(oidcHtml, /floqr-oidc-authorize\.js\?v=s3\.3\.020-studio/);
   assert.doesNotMatch(oidcHtml, /data-floqr-feature=/);
   assert.doesNotMatch(oidcHtml, /Create an account|Sign up with FloqMedia|floqmedia signup/i);
 
@@ -51,6 +51,8 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   assert.match(oidcJs, /setContinueBusy/);
   assert.match(oidcJs, /page\.oidc\.statusUnavailable/);
   assert.match(oidcJs, /not-found\|unimplemented\|internal/);
+  assert.match(oidcJs, /studio\.floqmedia\.com/);
+  assert.match(oidcJs, /\/auth\/callback/);
   assert.doesNotMatch(oidcJs, /createUserWithEmailAndPassword/);
 
   const sinemaHtml = read("sinema.html");
@@ -66,13 +68,15 @@ test("OIDC public client: PKCE S256, JWT sub/iss/exp, localhost off by default",
   assert.equal(reg.NEXT_PUBLIC_FLOQR_AUTHORIZE_URL, "https://jadzadco.github.io/shoutout-demo/floqr-oidc-authorize.html");
   assert.equal(reg.NEXT_PUBLIC_FLOQR_TOKEN_URL, oidc.TOKEN_URL);
   assert.equal(reg.code_challenge_method, "S256");
-  assert.ok(reg.redirect_uris.every((uri) => uri.endsWith("/spatial-studio/auth/callback")));
+  assert.ok(reg.redirect_uris.includes("https://studio.floqmedia.com/auth/callback"));
+  assert.ok(reg.redirect_uris.includes("https://www.floqmedia.com/spatial-studio/auth/callback"));
+  assert.ok(reg.redirect_uris.every((uri) => uri.startsWith("https://") && uri.includes("floqmedia.com")));
   assert.ok(reg.redirect_uris.every((uri) => !uri.includes("localhost")));
 
   const { verifier, challenge } = pkce();
   const query = {
     client_id: oidc.CLIENT_ID,
-    redirect_uri: "https://www.floqmedia.com/spatial-studio/auth/callback",
+    redirect_uri: "https://studio.floqmedia.com/auth/callback",
     response_type: "code",
     scope: "openid",
     code_challenge: challenge,
@@ -81,6 +85,18 @@ test("OIDC public client: PKCE S256, JWT sub/iss/exp, localhost off by default",
   };
   const ok = oidc.validateAuthorizeRequest(query);
   assert.equal(ok.ok, true);
+
+  const legacyWww = oidc.validateAuthorizeRequest({
+    ...query,
+    redirect_uri: "https://www.floqmedia.com/spatial-studio/auth/callback"
+  });
+  assert.equal(legacyWww.ok, true);
+
+  const studioNested = oidc.validateAuthorizeRequest({
+    ...query,
+    redirect_uri: "https://studio.floqmedia.com/spatial-studio/auth/callback"
+  });
+  assert.equal(studioNested.ok, true);
 
   const badClient = oidc.validateAuthorizeRequest({ ...query, client_id: "other" });
   assert.equal(badClient.ok, false);
@@ -95,7 +111,7 @@ test("OIDC public client: PKCE S256, JWT sub/iss/exp, localhost off by default",
 
   const localOk = oidc.validateAuthorizeRequest({
     ...query,
-    redirect_uri: "http://localhost:3000/spatial-studio/auth/callback"
+    redirect_uri: "http://localhost:3000/auth/callback"
   }, { allowLocalhost: true });
   assert.equal(localOk.ok, true);
 

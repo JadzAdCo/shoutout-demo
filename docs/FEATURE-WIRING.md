@@ -21,7 +21,7 @@ Pages `floqr-oidc-authorize.html` / `sinema.html` are live. OIDC + grant + Si-ne
 | Layer | Wiring |
 |---|---|
 | Identity | Existing Firebase Auth + `floqr-auth-gate.js` / `floqr-session-shell.js`. Authorize page `floqr-oidc-authorize.html` + `floqr-oidc-authorize.js`. `sub` = uid. No FloqMedia signup. |
-| OIDC | Public client `floqmedia-spatial-studio`. Callable `issueFloqrOidcAuthCode`; HTTP `floqrOidcToken`. JWT HMAC `FLOQR_OIDC_JWT_SECRET`. Redirect `{floqmedia-origin}/spatial-studio/auth/callback`. |
+| OIDC | Public client `floqmedia-spatial-studio`. Callable `issueFloqrOidcAuthCode`; HTTP `floqrOidcToken`. JWT HMAC `FLOQR_OIDC_JWT_SECRET`. Redirect `https://studio.floqmedia.com/auth/callback` (legacy www/apex `/spatial-studio/auth/callback` still allowed). |
 | Grants | Collections `spatialGrantRefs`, `oidcAuthCodes` (Functions-write). HTTP `floqrSpatialGrant` (Bearer JWT). Callables `recordSpatialGrantRef`, `listMySpatialGrants`, `revokeSpatialGrantRef`, `attachGuestDraftToSubject` (confirm required). `editableUntil` always null on the grant. |
 | Si-nema | Feature key `sinema` (off/test, **no Search tile**). Satellite `sinema.html` + `sinema-app.js`. Callables `createSinemaScene`, `saveSinemaScene`, `loadSinemaScene`. Pin `projectId` + `pinRevisionId`. 48h from `originalSavedAtMs`. Geometry preservation `not_exact`. Enable in Features Mgmt only after `setFeatureServiceFlags` is live (`[firebase-deploy-features]`) so the row is not Packaged default. |
 | Help | `help-sinema-virtual-set`, `help-floqr-oidc-floqmedia` (patron) + BOT DEE intent `sinema` |

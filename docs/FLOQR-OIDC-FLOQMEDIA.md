@@ -24,12 +24,14 @@ NEXT_PUBLIC_FLOQR_AUTHORIZE_URL=https://jadzadco.github.io/shoutout-demo/floqr-o
 NEXT_PUBLIC_FLOQR_TOKEN_URL=https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/floqrOidcToken
 ```
 
-Authorize query (FloqMedia already sends): `response_type=code`, `scope=openid`, `code_challenge_method=S256`, `redirect_uri={floqmedia-origin}/spatial-studio/auth/callback`.
+Authorize query (FloqMedia already sends): `response_type=code`, `scope=openid`, `code_challenge_method=S256`, `redirect_uri=https://studio.floqmedia.com/auth/callback`.
 
 Allowed production redirects:
 
-- `https://www.floqmedia.com/spatial-studio/auth/callback`
-- `https://floqmedia.com/spatial-studio/auth/callback`
+- `https://studio.floqmedia.com/auth/callback` (canonical; dedicated Spatial Studio host)
+- `https://studio.floqmedia.com/spatial-studio/auth/callback`
+- `https://www.floqmedia.com/spatial-studio/auth/callback` (legacy)
+- `https://floqmedia.com/spatial-studio/auth/callback` (legacy)
 
 Localhost redirects are **off** unless Functions env `FLOQR_OIDC_ALLOW_LOCALHOST=1`.
 

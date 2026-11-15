@@ -95,9 +95,14 @@
     try {
       const url = new URL(q.redirect_uri);
       const host = url.hostname;
-      const allowed = host === "www.floqmedia.com" || host === "floqmedia.com"
-        || ((host === "localhost" || host === "127.0.0.1") && url.pathname === "/spatial-studio/auth/callback");
-      if (!allowed || url.pathname !== "/spatial-studio/auth/callback") {
+      const pathOk = url.pathname === "/auth/callback" || url.pathname === "/spatial-studio/auth/callback";
+      const studioHost = host === "studio.floqmedia.com";
+      const legacyHost = host === "www.floqmedia.com" || host === "floqmedia.com";
+      const localHost = host === "localhost" || host === "127.0.0.1";
+      const allowed = pathOk && (
+        ((studioHost || legacyHost) && url.protocol === "https:") || localHost
+      );
+      if (!allowed) {
         location.replace("./");
         return;
       }

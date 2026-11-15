@@ -16,6 +16,8 @@ const ACCESS_TTL_SEC = 3600;
 const PKCE_CHAR = /^[A-Za-z0-9\-._~]{43,128}$/;
 
 const PRODUCTION_REDIRECTS = Object.freeze([
+  "https://studio.floqmedia.com/auth/callback",
+  "https://studio.floqmedia.com/spatial-studio/auth/callback",
   "https://www.floqmedia.com/spatial-studio/auth/callback",
   "https://floqmedia.com/spatial-studio/auth/callback"
 ]);
@@ -31,6 +33,8 @@ function issuerOf(value) {
 function allowedRedirects({ allowLocalhost = false, extra = [] } = {}) {
   const out = [...PRODUCTION_REDIRECTS];
   if (allowLocalhost) {
+    out.push("http://localhost:3000/auth/callback");
+    out.push("http://127.0.0.1:3000/auth/callback");
     out.push("http://localhost:3000/spatial-studio/auth/callback");
     out.push("http://127.0.0.1:3000/spatial-studio/auth/callback");
   }
