@@ -1,0 +1,17 @@
+---
+description: FloqMedia Spatial Studio and FloqR cross-repository architecture
+alwaysApply: true
+---
+- Only Guest and FloqR Authenticated user modes; no independent FloqMedia signup.
+- FloqR authenticates; FloqMedia owns projects and photo-to-3D assets.
+- Require service, user and per-project authorization for federated access.
+- Guided capture must yield editable semantic geometry plus camera pose metadata; never equate visual splats with editable geometry.
+- Preserve confidence and calibration provenance; never fabricate measured dimensions.
+- Source photos and virtual cameras are separate camera types.
+- Si-nema pins source revision; scene edit deadline is 48h after original server save.
+- No ads in active editor; no floorplan content on FloqMedia corporate homepage.
+- Audit code first; never deploy production security changes without approval.
+- FloqR stores grant references only. Do not copy project masters, photos, poses, meshes, or semantic geometry into this repo.
+- Reconstruction on FloqMedia is an honest prototype (semantic boxes, estimated poses) — not COLMAP, not splats, not a survey.
+- Grant `revisionPolicy.editableUntil` stays null; FloqR scene `originalSavedAtMs` owns the 48h clock.
+- Production `firestore.rules` / `storage.rules` / Functions deploy wait for owner approval.

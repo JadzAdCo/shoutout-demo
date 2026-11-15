@@ -179,6 +179,9 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-floqr-oidc-floqmedia": [
+      "patron"
+    ],
     "help-football-intro": [
       "patron"
     ],
@@ -301,6 +304,9 @@
       "patron"
     ],
     "help-shoutout-recommendations": [
+      "patron"
+    ],
+    "help-sinema-virtual-set": [
       "patron"
     ],
     "help-soccer-jersey": [
@@ -599,6 +605,9 @@
       "patron"
     ],
     "shoutout": [
+      "patron"
+    ],
+    "sinema": [
       "patron"
     ],
     "tengo-muchos-dolares": [

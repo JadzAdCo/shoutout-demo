@@ -61,7 +61,9 @@ test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
     "pickup.html",
     "payment-return.html",
     "floqcast-search.html",
-    "floqcast-preview.html"
+    "floqcast-preview.html",
+    "sinema.html",
+    "floqr-oidc-authorize.html"
   ];
   for (const file of pages) {
     const html = readReleaseFile(file);
@@ -81,7 +83,9 @@ test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
     "pickup-app.js",
     "payment-return-app.js",
     "floqcast-search.js",
-    "floqcast-preview.js"
+    "floqcast-preview.js",
+    "sinema-app.js",
+    "floqr-oidc-authorize.js"
   ];
   for (const file of apps) {
     const js = readReleaseFile(file);

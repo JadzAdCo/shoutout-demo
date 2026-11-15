@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title data-i18n="page.oidc.title">Continue to FloqMedia Spatial Studio | FLOQR</title>
+  <script>
+    try{
+      var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
+      var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
+      var __floqrChrome=__floqrChromeMap[__floqrChromeRaw];
+      if(!__floqrChrome){
+        var __legacy=String(localStorage.getItem("floqr.uiChrome")||"").trim();
+        if(__legacy==="traditional"||__legacy==="nightlife"||__legacy==="blackTiffany"||__legacy==="whiteBlack"||__legacy==="blackDarkGreen"||__legacy==="purpleWhite") __floqrChrome=__legacy;
+      }
+      if(__floqrChrome){
+        document.documentElement.setAttribute("data-floqr-chrome",__floqrChrome);
+        document.documentElement.setAttribute("data-is-site-chrome",String(__floqrChromeRaw!=null&&__floqrChromeRaw!==""?__floqrChromeRaw:({nightlife:0,traditional:1,blackTiffany:2,whiteBlack:3,purpleWhite:4,blackDarkGreen:5})[__floqrChrome]));
+      }
+    }catch(_){}
+  </script>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.020"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.020"/>
+</head>
+<body class="oidc-page">
+<main class="app admin-shell">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./">&lt; Back</a>
+  <section class="page active product-page">
+    <header class="topbar">
+      <div class="floqr-page-title-row">
+        <h1 class="floqr-page-title" data-i18n="page.oidc.title">Continue to FloqMedia Spatial Studio</h1>
+        <details class="help-popout" data-floqr-help-id="help-floqr-oidc-floqmedia">
+          <summary aria-label="Help">?</summary>
+          <div class="help-popout-body">
+            <strong>FloqR account for Spatial Studio</strong>
+            <p data-i18n="page.oidc.sub">FloqR is your account. Spatial Studio on FloqMedia will use this session. Nothing from your project is copied here.</p>
+          </div>
+        </details>
+      </div>
+    </header>
+    <p id="oidcStatus" class="status" aria-live="polite"></p>
+    <div id="oidcGate" class="card" data-floqr-auth-chrome>
+      <p data-i18n="page.sinema.signInHint">Sign in on Search / My Profile to continue. This page reuses your FloqR session — there is no second signup.</p>
+      <button type="button" class="primary" data-floqr-login-btn data-i18n="page.sinema.googleSignIn">Google sign-in</button>
+      <p class="sub small"><a href="./patron-portal.html?tab=profile" data-i18n="page.sinema.openProfile">Open My Profile &amp; Settings</a></p>
+    </div>
+    <div id="oidcConsent" class="card hidden">
+      <p data-i18n="page.oidc.sub">FloqR is your account. Spatial Studio on FloqMedia will use this session. Nothing from your project is copied here.</p>
+      <p class="sub small" id="oidcUserLine"></p>
+      <label class="sub small">
+        <input type="checkbox" id="oidcGuestConfirm"/>
+        <span data-i18n="page.oidc.guestConfirm">Attach this guest draft to my FloqR account</span>
+      </label>
+      <div class="button-row">
+        <button type="button" id="oidcContinueBtn" class="primary" data-i18n="page.oidc.continue">Continue</button>
+        <button type="button" id="oidcDenyBtn" class="ghost" data-i18n="page.oidc.deny">Cancel</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.3.020"></script>
+<script src="./floqr-i18n.js?v=s3.3.020"></script>
+<script src="./floqr-session-shell.js?v=s3.3.020"></script>
+<script src="./floqr-nav.js?v=s3.3.020"></script>
+<script src="./botdee-help-repository.js?v=s3.3.020"></script>
+<script src="./helper-popouts.js?v=s3.3.020"></script>
+<script src="./floqr-oidc-authorize.js?v=s3.3.020"></script>
+</body>
+</html>

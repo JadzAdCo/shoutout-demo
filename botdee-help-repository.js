@@ -363,6 +363,34 @@
       page: "index.html#botDeeHelpPopout"
     },
     {
+      id: "help-sinema-virtual-set",
+      title: "Si-nema virtual set",
+      body: "Si-nema loads a granted FloqMedia Spatial Studio project as a virtual set. FloqR stores the project id and the pinned revision only — photos, poses, meshes, and semantic geometry stay on FloqMedia. The first FloqR scene save starts a 48-hour edit window from that original server timestamp; later saves do not reset it. After 48 hours, edits need a separate authorization. A video model cannot preserve this geometry exactly.",
+      searchPhrases: [
+        "si-nema", "sinema", "virtual set", "spatial studio", "pin revision",
+        "48 hour", "48-hour", "floqmedia grant", "granted geometry"
+      ],
+      links: [
+        {label: "Open Si-nema", href: pageUrl("./sinema.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron"]
+    },
+    {
+      id: "help-floqr-oidc-floqmedia",
+      title: "FloqR account for Spatial Studio",
+      body: "Spatial Studio on FloqMedia uses your existing FloqR account. There is no FloqMedia signup. Guest drafts stay in the FloqMedia browser until you confirm attaching them to this FloqR account. FloqR issues a one-time authorization code (PKCE). Access tokens are not stored in the spatial project file.",
+      searchPhrases: [
+        "spatial studio login", "floqmedia sign in", "floqr oidc", "attach guest draft",
+        "no floqmedia signup", "pkce", "authorization code"
+      ],
+      links: [
+        {label: "Continue to FloqMedia Spatial Studio", href: pageUrl("./floqr-oidc-authorize.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron"]
+    },
+    {
       id: "help-search-settings-appearance",
       title: "Settings on Search",
       body: "On the Home Search screen, tap Settings to open Profile & Settings on the Appearance tab — Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) lives there. The Settings tile uses the same chrome icon pack as the other Search marks.",

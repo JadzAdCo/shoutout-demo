@@ -236,7 +236,10 @@
         {label:"Instant Crawl always visible", file:"master-admin.html", includes:["ai-crawl-primary-actions", "data-ai-crawl-action=\"instant\""]},
         {label:"Action feedback skip", file:"master-admin-app.js", includes:["skipLiveStatus", "data-ai-label"]},
         {label:"Manual test crawl", file:"ai-diagnostics-service.js", includes:["s3-3-020-ai-crawl-workspace"]},
-        {label:"Manual test BOT DEE", file:"ai-diagnostics-service.js", includes:["s3-3-020-botdee-six-phase"]}
+        {label:"Manual test BOT DEE", file:"ai-diagnostics-service.js", includes:["s3-3-020-botdee-six-phase"]},
+        {label:"Si-nema satellite (no Search tile)", file:"sinema.html", includes:["data-floqr-feature=\"sinema\"", "help-sinema-virtual-set"]},
+        {label:"OIDC authorize reuses FloqR session", file:"floqr-oidc-authorize.html", includes:["floqr-session-shell.js", "help-floqr-oidc-floqmedia"]},
+        {label:"Spatial Studio FloqR tests", file:"functions/spatial-studio-floqr.test.js", includes:["OIDC public client", "grant references only", "48h clock"]}
       ]
     },
     {
@@ -3185,6 +3188,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-020-spatial-studio-floqr",
+      area:"Si-nema / identity",
+      feature:"FloqR OIDC + Spatial Studio grant refs + Si-nema pin",
+      changed:"FloqR-only Spatial Studio federation: reuse Firebase Auth (no FloqMedia signup), public OIDC client floqmedia-spatial-studio (code + PKCE S256), grant references only, Si-nema virtual set pins projectId+pinRevisionId, 48h clock from original FloqR scene save. Production rules/Functions not deployed.",
+      howToTest:"1) Do not expect live FloqMedia login until Functions deploy + FloqMedia env is set. 2) Open floqr-oidc-authorize.html while signed out — must go to Search general sign-in (returnTo preserves OAuth query), not a second signup. 3) After sign-in, Continue calls issueFloqrOidcAuthCode (will fail until Functions deploy — that is expected). 4) Open sinema.html — satellite shell, no Search tile, no FloqR parent logo, help ? explains pin + 48h + geometry not exact. 5) Confirm VIP reserV floor map and ShoutOut composer still load; vip-floor-viewer.js unchanged. 6) Mark Succeed/Failed. Do not deploy firestore.rules.",
+      expected:"Authorize reuses the FloqR session. Si-nema has no Search tile and does not copy geometry. VIP/ShoutOut unchanged. Token URL is documented, not live until deploy.",
+      troubleshoot:"Google-only card on authorize → missing floqr-session-shell.js. Search tile for Si-nema → buttonIds must stay []. Token 404 → Functions not deployed (expected). Grant editableUntil set → must stay null; clock is originalSavedAtMs on sinemaScenes."
+    },
     {
       id:"s3-3-020-ai-crawl-workspace",
       area:"Master Admin",

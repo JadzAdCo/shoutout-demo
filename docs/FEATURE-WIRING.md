@@ -8,7 +8,26 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-14 |
+| Last registry touch | 2026-11-15 |
+
+---
+
+## Spatial Studio federation + Si-nema (FloqR side only)
+
+**Purpose:** FloqMedia Spatial Studio already exists (`Jadz-Holdings/floqmedia.com`). FloqR reuses the current Firebase user, issues OIDC (code + PKCE S256) to that public client, stores **grant references** only, and loads a pinned revision as a Si-nema virtual set. Geometry stays on FloqMedia.
+
+**Stop before production** Firebase rules, storage rules, or a Functions/Pages deploy until the owner approves the auth audit and FloqMedia registration values (`docs/FLOQR-OIDC-FLOQMEDIA.md`, `docs/spatial-studio-floqr-rules-draft.md`).
+
+| Layer | Wiring |
+|---|---|
+| Identity | Existing Firebase Auth + `floqr-auth-gate.js` / `floqr-session-shell.js`. Authorize page `floqr-oidc-authorize.html` + `floqr-oidc-authorize.js`. `sub` = uid. No FloqMedia signup. |
+| OIDC | Public client `floqmedia-spatial-studio`. Callable `issueFloqrOidcAuthCode`; HTTP `floqrOidcToken`. JWT HMAC `FLOQR_OIDC_JWT_SECRET`. Redirect `{floqmedia-origin}/spatial-studio/auth/callback`. |
+| Grants | Collections `spatialGrantRefs`, `oidcAuthCodes` (Functions-write). HTTP `floqrSpatialGrant` (Bearer JWT). Callables `recordSpatialGrantRef`, `listMySpatialGrants`, `revokeSpatialGrantRef`, `attachGuestDraftToSubject` (confirm required). `editableUntil` always null on the grant. |
+| Si-nema | Feature key `sinema` (off/test, **no Search tile**). Satellite `sinema.html` + `sinema-app.js`. Callables `createSinemaScene`, `saveSinemaScene`, `loadSinemaScene`. Pin `projectId` + `pinRevisionId`. 48h from `originalSavedAtMs`. Geometry preservation `not_exact`. |
+| Help | `help-sinema-virtual-set`, `help-floqr-oidc-floqmedia` (patron) + BOT DEE intent `sinema` |
+| Out of scope | Spatial Studio UI, COLMAP/splats/survey, copying masters into FloqR, ads/floor plans on FloqR marketing, production rules |
+
+Resume: `@spatial-studio$` / `$sinema$`. Rule: `.cursor/rules/spatial-studio-architecture.mdc`.
 
 ---
 

@@ -1221,6 +1221,27 @@
       ]
     },
     {
+      "sourceId": "help:help-floqr-oidc-floqmedia",
+      "id": "help-floqr-oidc-floqmedia",
+      "kind": "help",
+      "label": "FloqR account for Spatial Studio",
+      "blurb": "Spatial Studio on FloqMedia uses your existing FloqR account. There is no FloqMedia signup. Guest drafts stay in the FloqMedia browser until you confirm attaching them to this FloqR account. FloqR issues a one-time authorization code (PKCE). Access tokens are not stored in the sp",
+      "href": "./floqr-oidc-authorize.html?from=botdee",
+      "phrases": [
+        "floqr account for spatial studio",
+        "spatial studio on floqmedia uses your existing floqr account. there is no floqmedia signup. guest drafts stay in the floqmedia browser until you confirm attachi",
+        "spatial studio login",
+        "floqmedia sign in",
+        "floqr oidc",
+        "attach guest draft",
+        "no floqmedia signup",
+        "pkce",
+        "authorization code",
+        "continue to floqmedia spatial studio",
+        "help-floqr-oidc-floqmedia"
+      ]
+    },
+    {
       "sourceId": "help:help-football-intro",
       "id": "help-football-intro",
       "kind": "help",
@@ -2097,6 +2118,29 @@
         "recommendation style",
         "search",
         "help-shoutout-recommendations"
+      ]
+    },
+    {
+      "sourceId": "help:help-sinema-virtual-set",
+      "id": "help-sinema-virtual-set",
+      "kind": "help",
+      "label": "Si-nema virtual set",
+      "blurb": "Si-nema loads a granted FloqMedia Spatial Studio project as a virtual set. FloqR stores the project id and the pinned revision only — photos, poses, meshes, and semantic geometry stay on FloqMedia. The first FloqR scene save starts a 48-hour edit window from that original server ",
+      "href": "./sinema.html?from=botdee",
+      "phrases": [
+        "si-nema virtual set",
+        "si-nema loads a granted floqmedia spatial studio project as a virtual set. floqr stores the project id and the pinned revision only photos poses meshes and sema",
+        "si-nema",
+        "sinema",
+        "virtual set",
+        "spatial studio",
+        "pin revision",
+        "48 hour",
+        "48-hour",
+        "floqmedia grant",
+        "granted geometry",
+        "open si-nema",
+        "help-sinema-virtual-set"
       ]
     },
     {
@@ -3956,6 +4000,25 @@
         "throw a shoutout",
         "send a live message to a floqr display.",
         "shoutout"
+      ]
+    },
+    {
+      "sourceId": "intent:sinema",
+      "id": "sinema",
+      "kind": "product",
+      "label": "Si-nema — virtual set from Spatial Studio",
+      "blurb": "Load a granted FloqMedia Spatial Studio project as a Si-nema virtual set. Geometry stays on FloqMedia; FloqR stores a pin, not a copy.",
+      "href": "./sinema.html?from=botdee",
+      "phrases": [
+        "si-nema virtual set from spatial studio",
+        "load a granted floqmedia spatial studio project as a si-nema virtual set. geometry stays on floqmedia floqr stores a pin not a copy.",
+        "si-nema",
+        "sinema",
+        "spatial studio",
+        "virtual set",
+        "floqmedia project",
+        "pin revision",
+        "granted geometry"
       ]
     },
     {

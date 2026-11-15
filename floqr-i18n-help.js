@@ -17,6 +17,14 @@
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
       },
+      "help-floqr-oidc-floqmedia": {
+        title: "Аккаунт FloqR для Spatial Studio",
+        body: "Spatial Studio на FloqMedia использует ваш существующий аккаунт FloqR. Отдельной регистрации FloqMedia нет. Гостевые черновики остаются в браузере FloqMedia, пока вы не подтвердите привязку к этому аккаунту FloqR. FloqR выдаёт одноразовый код авторизации (PKCE). Токены доступа не хранятся в файле spatial-проекта."
+      },
+      "help-sinema-virtual-set": {
+        title: "Виртуальный сет Si-nema",
+        body: "Si-nema загружает выданный проект FloqMedia Spatial Studio как виртуальный сет. FloqR хранит только id проекта и закреплённую ревизию — фото, позы, меши и семантическая геометрия остаются в FloqMedia. Первое сохранение сцены FloqR запускает 48 часов от этой серверной метки; следующие сохранения её не сбрасывают. После 48 часов нужна отдельная авторизация. Видеомодель не может точно сохранить эту геометрию."
+      },
       "help-botdee-privacy-assistant": {
         title: "Помощник конфиденциальности BOT DEE",
         body: "Меняйте видимость в «Моём профиле» — BOT DEE не добавляет второй публичный переключатель. Неверную веб-привязку можно оспорить, не меняя профиль. BOT DEE не обещает удаление на стороннем сайте."
@@ -394,6 +402,14 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
+      },
+      "help-floqr-oidc-floqmedia": {
+        title: "FloqR-account voor Spatial Studio",
+        body: "Spatial Studio op FloqMedia gebruikt uw bestaande FloqR-account. Er is geen FloqMedia-aanmelding. Gastconcepten blijven in de FloqMedia-browser tot u bevestigt ze aan dit FloqR-account te koppelen. FloqR geeft een eenmalige autorisatiecode (PKCE). Toegangstokens staan niet in het spatial-projectbestand."
+      },
+      "help-sinema-virtual-set": {
+        title: "Si-nema virtuele set",
+        body: "Si-nema laadt een toegekend FloqMedia Spatial Studio-project als virtuele set. FloqR bewaart alleen project-id en vastgezette revisie — foto’s, poses, meshes en semantische geometrie blijven op FloqMedia. De eerste FloqR-scène-opslag start 48 uur vanaf die servertijdstempel; latere opslagen resetten die niet. Daarna is aparte autorisatie nodig. Een videomodel kan deze geometrie niet exact bewaren."
       },
       "help-botdee-privacy-assistant": {
         title: "BOT DEE Privacy Assistant",
@@ -773,6 +789,14 @@
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
       },
+      "help-floqr-oidc-floqmedia": {
+        title: "Compte FloqR pour Spatial Studio",
+        body: "Spatial Studio sur FloqMedia utilise votre compte FloqR existant. Il n’y a pas d’inscription FloqMedia. Les brouillons invités restent dans le navigateur FloqMedia jusqu’à confirmation de rattachement à ce compte FloqR. FloqR émet un code d’autorisation unique (PKCE). Les jetons d’accès ne sont pas stockés dans le fichier de projet spatial."
+      },
+      "help-sinema-virtual-set": {
+        title: "Plateau virtuel Si-nema",
+        body: "Si-nema charge un projet Spatial Studio FloqMedia autorisé comme plateau virtuel. FloqR stocke seulement l’id projet et la révision épinglée — photos, poses, maillages et géométrie sémantique restent sur FloqMedia. Le premier enregistrement de scène FloqR démarre une fenêtre de 48 heures à partir de cet horodatage serveur ; les enregistrements suivants ne la réinitialisent pas. Après 48 heures, une autorisation séparée est requise. Un modèle vidéo ne peut pas préserver cette géométrie exactement."
+      },
       "help-botdee-privacy-assistant": {
         title: "Assistant confidentialité BOT DEE",
         body: "Changez ce que les autres utilisateurs FLOQR voient dans la visibilité de Mon profil — BOT DEE n’ajoute pas un second interrupteur public. Si la recherche web a lié la mauvaise personne, vous pouvez contester sans changer votre profil. BOT DEE ne promet pas qu’un site tiers supprimera la page d’origine."
@@ -1150,6 +1174,14 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
+      },
+      "help-floqr-oidc-floqmedia": {
+        title: "FloqR-Konto für Spatial Studio",
+        body: "Spatial Studio auf FloqMedia nutzt Ihr bestehendes FloqR-Konto. Es gibt keine FloqMedia-Anmeldung. Gastentwürfe bleiben im FloqMedia-Browser, bis Sie die Verknüpfung mit diesem FloqR-Konto bestätigen. FloqR stellt einen einmaligen Autorisierungscode (PKCE) aus. Zugriffstoken werden nicht in der Spatial-Projektdatei gespeichert."
+      },
+      "help-sinema-virtual-set": {
+        title: "Si-nema virtuelles Set",
+        body: "Si-nema lädt ein gewährtes FloqMedia Spatial Studio-Projekt als virtuelles Set. FloqR speichert nur Projekt-ID und angepinnte Revision — Fotos, Posen, Meshes und semantische Geometrie bleiben bei FloqMedia. Das erste FloqR-Szenenspeichern startet ein 48-Stunden-Fenster ab diesem Serverzeitstempel; spätere Speicherungen setzen ihn nicht zurück. Danach braucht es eine eigene Freigabe. Ein Videomodell kann diese Geometrie nicht exakt bewahren."
       },
       "help-botdee-privacy-assistant": {
         title: "BOT DEE Privacy Assistant",
@@ -1529,6 +1561,14 @@
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
       },
+      "help-floqr-oidc-floqmedia": {
+        title: "Cuenta FloqR para Spatial Studio",
+        body: "Spatial Studio en FloqMedia usa su cuenta FloqR existente. No hay registro FloqMedia. Los borradores de invitado quedan en el navegador FloqMedia hasta que confirme adjuntarlos a esta cuenta FloqR. FloqR emite un código de autorización de un solo uso (PKCE). Los tokens no se guardan en el archivo del proyecto espacial."
+      },
+      "help-sinema-virtual-set": {
+        title: "Set virtual Si-nema",
+        body: "Si-nema carga un proyecto concedido de FloqMedia Spatial Studio como set virtual. FloqR guarda solo el id del proyecto y la revisión anclada — fotos, poses, mallas y geometría semántica se quedan en FloqMedia. El primer guardado de escena FloqR inicia 48 horas desde esa marca de tiempo de servidor; los guardados posteriores no la reinician. Después hace falta otra autorización. Un modelo de vídeo no puede preservar esta geometría exactamente."
+      },
       "help-botdee-privacy-assistant": {
         title: "Asistente de privacidad BOT DEE",
         body: "Cambie lo que otros usuarios FLOQR ven en la visibilidad de Mi perfil — BOT DEE no añade un segundo interruptor público. Si la investigación web asoció a la persona equivocada, puede disputarlo sin cambiar su perfil. BOT DEE no promete que un sitio tercero borre la página original."
@@ -1906,6 +1946,14 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
+      },
+      "help-floqr-oidc-floqmedia": {
+        title: "Account FloqR per Spatial Studio",
+        body: "Spatial Studio su FloqMedia usa il tuo account FloqR esistente. Non c’è registrazione FloqMedia. Le bozze ospite restano nel browser FloqMedia finché non confermi il collegamento a questo account FloqR. FloqR emette un codice di autorizzazione monouso (PKCE). I token non sono salvati nel file del progetto spaziale."
+      },
+      "help-sinema-virtual-set": {
+        title: "Set virtuale Si-nema",
+        body: "Si-nema carica un progetto FloqMedia Spatial Studio concesso come set virtuale. FloqR memorizza solo id progetto e revisione fissata — foto, pose, mesh e geometria semantica restano su FloqMedia. Il primo salvataggio scena FloqR avvia 48 ore da quel timestamp server; i salvataggi successivi non lo azzerano. Dopo serve un’autorizzazione separata. Un modello video non può preservare esattamente questa geometria."
       },
       "help-botdee-privacy-assistant": {
         title: "Privacy Assistant BOT DEE",
@@ -2285,6 +2333,14 @@
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
       },
+      "help-floqr-oidc-floqmedia": {
+        title: "Conta FloqR para Spatial Studio",
+        body: "O Spatial Studio no FloqMedia usa a sua conta FloqR existente. Não há registo FloqMedia. Os rascunhos de convidado ficam no browser FloqMedia até confirmar a associação a esta conta FloqR. O FloqR emite um código de autorização único (PKCE). Os tokens não são guardados no ficheiro do projeto espacial."
+      },
+      "help-sinema-virtual-set": {
+        title: "Cenário virtual Si-nema",
+        body: "O Si-nema carrega um projeto concedido do FloqMedia Spatial Studio como cenário virtual. O FloqR guarda só o id do projeto e a revisão afixada — fotos, poses, malhas e geometria semântica ficam no FloqMedia. O primeiro guardar da cena FloqR inicia 48 horas a partir desse carimbo do servidor; guardados seguintes não o reiniciam. Depois é precisa autorização à parte. Um modelo de vídeo não consegue preservar esta geometria exatamente."
+      },
       "help-botdee-privacy-assistant": {
         title: "Assistente de privacidade BOT DEE",
         body: "Altere em O meu perfil o que outros utilizadores FLOQR veem — o BOT DEE não adiciona um segundo interruptor público. Se a pesquisa web associou a pessoa errada, pode contestar sem alterar o perfil. O BOT DEE não promete que um site terceiro apague a página original."
@@ -2662,6 +2718,14 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
+      },
+      "help-floqr-oidc-floqmedia": {
+        title: "Λογαριασμός FloqR για Spatial Studio",
+        body: "Το Spatial Studio στο FloqMedia χρησιμοποιεί τον υπάρχοντα λογαριασμό FloqR. Δεν υπάρχει εγγραφή FloqMedia. Τα προσχέδια επισκέπτη μένουν στο πρόγραμμα περιήγησης FloqMedia μέχρι να επιβεβαιώσετε τη σύνδεση σε αυτόν τον λογαριασμό FloqR. Το FloqR εκδίδει εφάπαξ κωδικό εξουσιοδότησης (PKCE). Τα διακριτικά πρόσβασης δεν αποθηκεύονται στο αρχείο χωρικού έργου."
+      },
+      "help-sinema-virtual-set": {
+        title: "Εικονικό σετ Si-nema",
+        body: "Το Si-nema φορτώνει ένα εγκεκριμένο έργο FloqMedia Spatial Studio ως εικονικό σετ. Το FloqR αποθηκεύει μόνο το id έργου και την καρφιτσωμένη αναθεώρηση — φωτογραφίες, πόζες, πλέγματα και σημασιολογική γεωμετρία μένουν στο FloqMedia. Η πρώτη αποθήκευση σκηνής FloqR ξεκινά 48 ώρες από εκείνη τη χρονοσφραγίδα διακομιστή· οι επόμενες δεν την μηδενίζουν. Μετά χρειάζεται ξεχωριστή έγκριση. Ένα μοντέλο βίντεο δεν μπορεί να διατηρήσει ακριβώς αυτή τη γεωμετρία."
       },
       "help-botdee-privacy-assistant": {
         title: "Βοηθός απορρήτου BOT DEE",
@@ -3041,6 +3105,14 @@
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
       },
+      "help-floqr-oidc-floqmedia": {
+        title: "Konto FloqR dla Spatial Studio",
+        body: "Spatial Studio na FloqMedia używa Twojego istniejącego konta FloqR. Nie ma rejestracji FloqMedia. Szkice gościa zostają w przeglądarce FloqMedia, dopóki nie potwierdzisz przypięcia do tego konta FloqR. FloqR wydaje jednorazowy kod autoryzacji (PKCE). Tokeny nie są zapisywane w pliku projektu przestrzennego."
+      },
+      "help-sinema-virtual-set": {
+        title: "Wirtualny set Si-nema",
+        body: "Si-nema wczytuje przyznany projekt FloqMedia Spatial Studio jako wirtualny set. FloqR zapisuje tylko id projektu i przypiętą rewizję — zdjęcia, pozy, siatki i geometria semantyczna zostają w FloqMedia. Pierwszy zapis sceny FloqR startuje 48 godzin od tego znacznika serwera; kolejne zapisy go nie resetują. Potem potrzebna jest osobna zgoda. Model wideo nie zachowa tej geometrii dokładnie."
+      },
       "help-botdee-privacy-assistant": {
         title: "Asystent prywatności BOT DEE",
         body: "W Mój profil zmień, co widzą inni użytkownicy FLOQR — BOT DEE nie dodaje drugiego przełącznika publicznego. Błędne powiązanie z sieci możesz zgłosić bez zmiany profilu. BOT DEE nie obiecuje usunięcia na stronie trzeciej."
@@ -3418,6 +3490,14 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
+      },
+      "help-floqr-oidc-floqmedia": {
+        title: "حساب FloqR لـ Spatial Studio",
+        body: "يستخدم Spatial Studio على FloqMedia حساب FloqR الحالي. لا يوجد تسجيل FloqMedia. تبقى مسودات الضيف في متصفح FloqMedia حتى تؤكد إرفاقها بهذا الحساب. يصدر FloqR رمز تفويض لمرة واحدة (PKCE). لا تُخزَّن رموز الوصول في ملف المشروع المكاني."
+      },
+      "help-sinema-virtual-set": {
+        title: "مجموعة Si-nema الافتراضية",
+        body: "يحمّل Si-nema مشروع FloqMedia Spatial Studio الممنوح كمجموعة افتراضية. يحفظ FloqR معرّف المشروع والمراجعة المثبّتة فقط — تبقى الصور والوضعيات والشبكات والهندسة الدلالية لدى FloqMedia. أول حفظ لمشهد FloqR يبدأ نافذة 48 ساعة من ذلك الختم الزمني للخادم؛ الحفظ اللاحق لا يعيد ضبطها. بعد 48 ساعة يلزم إذن منفصل. لا يستطيع نموذج فيديو الحفاظ على هذه الهندسة بدقة."
       },
       "help-botdee-privacy-assistant": {
         title: "مساعد خصوصية BOT DEE",

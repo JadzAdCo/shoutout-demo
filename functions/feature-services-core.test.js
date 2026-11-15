@@ -31,7 +31,7 @@ test("ShoutOut and Passes are live by default; botDee is Beta-enabled; others te
     assert.equal(row.IsFeatureEnabled, 0, row.key);
     assert.equal(row.IsTestFeature, 1, row.key);
   });
-  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "botDee", "vipReservations", "passes", "siteChrome"]);
+  assert.deepEqual(core.FEATURE_KEYS, ["shoutOut", "mingl", "bartr", "rydr", "floqCast", "botDee", "vipReservations", "passes", "siteChrome", "sinema"]);
   assert.equal(core.canonicalizeFeatureKey("traditionalTheme"), "siteChrome");
 });
 
@@ -303,7 +303,8 @@ test("test-feature satellite pages are guarded", () => {
     "floqcast-search.html": "floqCast", "floqcast-preview.html": "floqCast",
     "vip.html": "vipReservations",
     "vip-door.html": "vipReservations",
-    "mingl-chat.html": "mingl", "mingl-gist.html": "mingl"
+    "mingl-chat.html": "mingl", "mingl-gist.html": "mingl",
+    "sinema.html": "sinema"
   };
   const guard = read("floqr-feature-services.js");
   assert.match(guard, /if \(!fb\.apps\?\.length && root\.firebaseConfig\) fb\.initializeApp\(root\.firebaseConfig\)/, "guard must start Firebase on pages without an app script");

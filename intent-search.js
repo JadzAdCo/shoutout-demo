@@ -145,6 +145,21 @@
       ]
     },
     {
+      id: "sinema",
+      kind: "product",
+      featureKey: "sinema",
+      label: "Si-nema — virtual set from Spatial Studio",
+      blurb: "Load a granted FloqMedia Spatial Studio project as a Si-nema virtual set. Geometry stays on FloqMedia; FloqR stores a pin, not a copy.",
+      href: pageUrl("./sinema.html", {from: "botdee"}),
+      searchPhrases: [
+        "si-nema", "sinema", "spatial studio", "virtual set", "floqmedia project",
+        "pin revision", "granted geometry"
+      ],
+      patterns: [
+        /si-?nema/, /spatial\s*studio/, /virtual\s*set/, /floqmedia\s*(spatial|project)/
+      ]
+    },
+    {
       id: "clubs",
       kind: "product",
       label: "Clubs & venues",
@@ -1013,7 +1028,7 @@
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],
     "help-nfl-jersey": ["patron"], "help-soccer-jersey": ["patron"], "help-sell-bartr": ["patron"],
-    "help-vip": ["patron"], "vip-reserv": ["patron"], "help-onboarding": ["patron"], "help-general": ["patron"],
+    "help-vip": ["patron"], "vip-reserv": ["patron"], sinema: ["patron"], "help-onboarding": ["patron"], "help-general": ["patron"],
     "help-schedule-confirm": ["serviceMember"], "help-staff-worksheet": ["serviceMember"],
     "help-scheduling": ["serviceMember"], "help-staff-schedule-user-guide": ["serviceMember"],
     "help-create-publish-schedule": ["privilegedEmployee"], "help-multi-delete-shifts": ["privilegedEmployee"],

@@ -15,7 +15,9 @@ const FEATURE_CATALOG = Object.freeze([
   // Live: Club Admin Passes + patron door QR (VIP Show pass still uses vipReservations).
   {key: "passes", label: "Passes", patronGate: "", route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
   // Site chrome beta — Nightlife/Traditional theme; no Search tile. Preference datapoint: users.isSiteChrome.
-  {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=appearance", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1}
+  {key: "siteChrome", label: "Site chrome", patronGate: "", route: "./patron-portal.html?tab=appearance", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1},
+  // Si-nema virtual sets from FloqMedia Spatial Studio grants. No Search tile.
+  {key: "sinema", label: "Si-nema", patronGate: "", route: "./sinema.html?from=search", sortOrder: 85, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));
 
 const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));
