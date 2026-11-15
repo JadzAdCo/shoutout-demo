@@ -105,11 +105,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Gespeicherte BOT DEE-Chats",
-          "blurb": "Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+          "blurb": "Tippen Sie unter dem Chatfeld auf Einstellungen, um gespeicherte Chats und Erinnerungen zu öffnen. Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Schließen Sie Einstellungen mit X oder nach Speiche"
         },
         "intent:help-botdee-memory": {
           "label": "Gespeicherte BOT DEE-Chats",
-          "blurb": "Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+          "blurb": "Tippen Sie unter dem Chatfeld auf Einstellungen, um gespeicherte Chats und Erinnerungen zu öffnen. Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Schließen Sie Einstellungen mit X oder nach Speiche"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings auf Search",
@@ -943,11 +943,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Chats BOT DEE enregistrés",
-          "blurb": "La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
+          "blurb": "Touchez Réglages sous la zone de chat pour ouvrir les discussions et souvenirs enregistrés. La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Fermez Réglages avec X ou "
         },
         "intent:help-botdee-memory": {
           "label": "Chats BOT DEE enregistrés",
-          "blurb": "La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
+          "blurb": "Touchez Réglages sous la zone de chat pour ouvrir les discussions et souvenirs enregistrés. La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Fermez Réglages avec X ou "
         },
         "help:help-search-settings-appearance": {
           "label": "Settings sur Search",
@@ -1781,11 +1781,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Chats BOT DEE guardados",
-          "blurb": "La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Los invitados no se guardan. Mingl se queda en Mingl."
+          "blurb": "Toque Ajustes bajo el cuadro de chat para abrir chats y recuerdos guardados. La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Cierre Ajustes con X o después de Guardar, Exportar o Eliminar. Los invitados no s"
         },
         "intent:help-botdee-memory": {
           "label": "Chats BOT DEE guardados",
-          "blurb": "La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Los invitados no se guardan. Mingl se queda en Mingl."
+          "blurb": "Toque Ajustes bajo el cuadro de chat para abrir chats y recuerdos guardados. La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Cierre Ajustes con X o después de Guardar, Exportar o Eliminar. Los invitados no s"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings en Search",
@@ -2619,11 +2619,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Chat BOT DEE salvate",
-          "blurb": "La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+          "blurb": "Tocca Impostazioni sotto la casella di chat per aprire chat e memorie salvate. La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Chiudi Impostazioni con X o dopo Salva, Esporta o Elimina. Gli ospiti non ve"
         },
         "intent:help-botdee-memory": {
           "label": "Chat BOT DEE salvate",
-          "blurb": "La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+          "blurb": "Tocca Impostazioni sotto la casella di chat per aprire chat e memorie salvate. La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Chiudi Impostazioni con X o dopo Salva, Esporta o Elimina. Gli ospiti non ve"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings su Search",
@@ -3457,11 +3457,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Chats BOT DEE guardados",
-          "blurb": "A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Convidados não são guardados. Mingl fica no Mingl."
+          "blurb": "Toque em Definições abaixo da caixa de chat para abrir chats e memórias guardados. A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Feche Definições com X ou após Guardar, Exportar ou Apagar. Convidados não sã"
         },
         "intent:help-botdee-memory": {
           "label": "Chats BOT DEE guardados",
-          "blurb": "A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Convidados não são guardados. Mingl fica no Mingl."
+          "blurb": "Toque em Definições abaixo da caixa de chat para abrir chats e memórias guardados. A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Feche Definições com X ou após Guardar, Exportar ou Apagar. Convidados não sã"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings na Search",
@@ -4295,11 +4295,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Сохранённые чаты BOT DEE",
-          "blurb": "Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Гости не сохраняются. Mingl остаётся в Mingl."
+          "blurb": "Нажмите «Настройки» под полем чата, чтобы открыть сохранённые чаты и воспоминания. Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Закройте «Настройки» крестиком или после «Сохранить», «Экспорт» или «Удалить"
         },
         "intent:help-botdee-memory": {
           "label": "Сохранённые чаты BOT DEE",
-          "blurb": "Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Гости не сохраняются. Mingl остаётся в Mingl."
+          "blurb": "Нажмите «Настройки» под полем чата, чтобы открыть сохранённые чаты и воспоминания. Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Закройте «Настройки» крестиком или после «Сохранить», «Экспорт» или «Удалить"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings на Search",
@@ -5133,11 +5133,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Αποθηκευμένες συνομιλίες BOT DEE",
-          "blurb": "Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+          "blurb": "Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Κλείστε τις Ρυθμίσεις με X ή μετά από Αποθήκευση"
         },
         "intent:help-botdee-memory": {
           "label": "Αποθηκευμένες συνομιλίες BOT DEE",
-          "blurb": "Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+          "blurb": "Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Κλείστε τις Ρυθμίσεις με X ή μετά από Αποθήκευση"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings στην Search",
@@ -5971,11 +5971,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Zapisane czaty BOT DEE",
-          "blurb": "Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Goście nie są zapisywani. Mingl zostaje w Mingl."
+          "blurb": "Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Zamknij Ustawienia przez X albo po Zapisz, Eksportuj lub Usuń. Goście nie są zapisyw"
         },
         "intent:help-botdee-memory": {
           "label": "Zapisane czaty BOT DEE",
-          "blurb": "Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Goście nie są zapisywani. Mingl zostaje w Mingl."
+          "blurb": "Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Zamknij Ustawienia przez X albo po Zapisz, Eksportuj lub Usuń. Goście nie są zapisyw"
         },
         "help:help-search-settings-appearance": {
           "label": "Settings na Search",
@@ -6809,11 +6809,11 @@
         },
         "help:help-botdee-memory": {
           "label": "Opgeslagen BOT DEE-chats",
-          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
+          "blurb": "Tik op Instellingen onder het chatvak om opgeslagen chats en herinneringen te openen. De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Sluit Instellingen met X of na Opslaan, Exporteren of Wissen. Gasten "
         },
         "intent:help-botdee-memory": {
           "label": "Opgeslagen BOT DEE-chats",
-          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
+          "blurb": "Tik op Instellingen onder het chatvak om opgeslagen chats en herinneringen te openen. De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Sluit Instellingen met X of na Opslaan, Exporteren of Wissen. Gasten "
         },
         "help:help-search-settings-appearance": {
           "label": "Settings op Search",
@@ -7647,11 +7647,11 @@
         },
         "help:help-botdee-memory": {
           "label": "محادثات BOT DEE المحفوظة",
-          "blurb": "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
+          "blurb": "اضغط الإعدادات تحت صندوق الدردشة لفتح المحادثات والذكريات المحفوظة. توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. أغلق الإعدادات بـ X أو بعد حفظ أو تصدير أو حذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
         },
         "intent:help-botdee-memory": {
           "label": "محادثات BOT DEE المحفوظة",
-          "blurb": "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
+          "blurb": "اضغط الإعدادات تحت صندوق الدردشة لفتح المحادثات والذكريات المحفوظة. توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. أغلق الإعدادات بـ X أو بعد حفظ أو تصدير أو حذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
         },
         "help:help-search-settings-appearance": {
           "label": "Settings في Search",
