@@ -153,6 +153,25 @@ jobs:
               previewDiscoveryAutoApprove
             )
             echo "Crawl-only deploy: ${FNS[*]}"
+          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-botdee\]'; then
+            FNS=(
+              getBotDeeCapabilityManifest
+              getBotDeeConsent
+              setBotDeeConsent
+              listBotDeeMemories
+              upsertBotDeeMemory
+              deleteBotDeeMemory
+              exportBotDeeData
+              deleteBotDeeArchive
+              listBotDeeSmartViews
+              submitBotDeeEvidenceFeedback
+              disputeBotDeeIdentityMatch
+              getBotDeeLegalGates
+              setBotDeeLegalGate
+              getBotDeeProviderSlots
+              setBotDeeProviderSlot
+            )
+            echo "BOT DEE six-phase + later-fill slot deploy: ${FNS[*]}"
           else
             mapfile -t FNS < <(
               firebase functions:list --project shoutoutdemo-5b402 --json \
