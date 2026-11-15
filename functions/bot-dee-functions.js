@@ -10,6 +10,7 @@ const {defineSecret} = require("firebase-functions/params");
 const {GoogleGenAI, FunctionCallingConfigMode} = require("@google/genai");
 const core = require("./data-classification-core");
 const bot = require("./bot-dee-core");
+const prefs = require("./botdee-personalization");
 const threads = require("./bot-dee-thread");
 const memory = require("./botdee-memory");
 const smart = require("./botdee-smartview-core");
@@ -83,7 +84,7 @@ async function loadAllowedFeatures(auth) {
   return {keys, labels, viewer};
 }
 
-async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures}) {
+async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization}) {
   const lang = bot.normalizeUiLanguage(uiLanguage || session?.uiLanguage);
   const allowed = allowedFeatures || session?.allowedFeatures || null;
   const ai = new GoogleGenAI({apiKey});
@@ -100,7 +101,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       model: bot.TEXT_MODEL,
       contents,
       config: {
-        systemInstruction: bot.systemInstruction(role, lang, allowed),
+        systemInstruction: bot.systemInstruction(role, lang, allowed, personalization),
         tools,
         // AUTO must NOT set allowedFunctionNames — Gemini 400s with
         // "Please set allowed_function_names only when function calling mode is ANY"
@@ -119,7 +120,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       const text = bot.extractText(response);
       const replyRaw = text || bot.formatSearchFallback(lastSearch, lang, allowed);
       return {
-        reply: bot.sanitizeFeatureMentions(replyRaw, allowed),
+        reply: prefs.appendActionHistory(bot.sanitizeFeatureMentions(replyRaw, allowed), actionLinks),
         results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
         media: mediaItems.slice(0, 8),
         provider: "gemini",
@@ -157,7 +158,10 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   }
 
   return {
-    reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
+    reply: prefs.appendActionHistory(
+      bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
+      actionLinks
+    ),
     results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
     media: mediaItems.slice(0, 8),
     provider: "gemini",
@@ -168,7 +172,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
-function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = {}) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
@@ -194,7 +198,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = 
   }
   if (bot.isChitchatPrompt(userPrompt)) {
     return {
-      reply: isActive ? bot.stillHereReply() : bot.chitchatReply(role, allowed),
+      reply: isActive ? bot.stillHereReply() : bot.chitchatReply(role, allowed, personalization),
       results: [],
       provider: "local-chitchat",
       model: isActive ? "still-here" : "chitchat",
@@ -218,6 +222,16 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = 
       results: [],
       provider: "local-version",
       model: "version",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
+  if (bot.isPrivacyPrompt(userPrompt)) {
+    return {
+      reply: bot.privacyReply(),
+      results: [],
+      provider: "local-help",
+      model: "privacy",
       toolRounds: 0,
       uiLanguage: lang
     };
@@ -297,12 +311,14 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       console.warn("BOT DEE feature access load failed; fail closed to live defaults", error?.message || error);
       allowedFeatures = ["shoutOut", "botDee", "passes"];
     }
+    const personalization = prefs.fromThread(stored);
     const session = Object.freeze({
       userId: uid,
       role,
       uiLanguage,
       allowedFeatures,
       lastUserPrompt: userPrompt,
+      personalization,
       request
     });
 
@@ -333,18 +349,21 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isIdentityPrompt(userPrompt)
       || bot.isVersionPrompt(userPrompt)
       || bot.isHelpPrompt(userPrompt)
+      || bot.isPrivacyPrompt(userPrompt)
     ) {
-      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
+      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
     } else if (apiKey) {
       try {
-        outcome = await runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures});
+        outcome = await runGeminiSession({
+          apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization
+        });
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
-        outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
+        outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
     } else {
-      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures});
+      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
     }
     outcome.reply = bot.sanitizeBotReply(outcome.reply);
 
@@ -458,7 +477,32 @@ exports.setBotDeeSettings = onCall(ADMIN_CALL_OPTS, async request => {
   }
 });
 
+async function readProfileFirstName(uid) {
+  if (!uid) return "";
+  try {
+    const snap = await db.collection("users").doc(uid).get();
+    const data = snap.exists ? snap.data() : {};
+    return prefs.firstNameFromDisplayName(data.displayName || data.firstName || "");
+  } catch (_) {
+    return "";
+  }
+}
+
 const GET_THREAD_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB", maxInstances: 20};
+
+exports.saveBotDeePersonalization = onCall(GET_THREAD_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to save BOT DEE settings.");
+    }
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
+    const saved = await threads.savePersonalization(request.auth.uid, request.data || {});
+    if (!saved.ok) throw new HttpsError("invalid-argument", "Could not save BOT DEE settings.");
+    return {ok: true, personalization: saved.personalization};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
 
 exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
   try {
@@ -470,6 +514,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
     const settings = await threads.loadSettings();
     if (!settings.durableThreads) {
       const hasUsedBotDee = await threads.readHasUsedBotDee(uid);
+      const profileFirstName = await readProfileFirstName(uid);
       return {
         ok: true,
         durable: false,
@@ -479,7 +524,10 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         idleSeconds: settings.conversationIdleSeconds,
         remainingMs: settings.conversationIdleSeconds * 1000,
         consent: memory.normalizeConsent({}),
-        hasUsedBotDee
+        hasUsedBotDee,
+        personalization: prefs.normalizePersonalization({}, {profileFirstName}),
+        profileFirstName,
+        [prefs.LAST_USED_FIELD]: 0
       };
     }
     const state = await threads.loadThreadState(uid, settings);
@@ -489,6 +537,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         archiveTurns = await threads.loadArchiveHistory(uid, 12);
       } catch (_) {}
     }
+    const profileFirstName = await readProfileFirstName(uid);
     return {
       ok: true,
       durable: true,
@@ -501,7 +550,10 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       conversationEpoch: state.conversationEpoch,
       lastMessageAtMs: state.lastMessageAtMs,
       remainingMs: state.remainingMs,
-      idleSeconds: settings.conversationIdleSeconds
+      idleSeconds: settings.conversationIdleSeconds,
+      personalization: prefs.normalizePersonalization(state.personalization, {profileFirstName}),
+      profileFirstName,
+      [prefs.LAST_USED_FIELD]: Number(state[prefs.LAST_USED_FIELD]) || 0
     };
   } catch (error) {
     throw asHttps(error);

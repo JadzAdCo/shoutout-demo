@@ -81,6 +81,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-privacy-session": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-research-library": [
       "masterAdmin",
       "patron",

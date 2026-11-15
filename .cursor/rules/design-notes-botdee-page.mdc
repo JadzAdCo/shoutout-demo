@@ -13,8 +13,8 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 
 | Piece | Role |
 |---|---|
-| Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`). Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
+| Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` / `isPrivacyPrompt` |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`). Authorized **Settings** pop-out (`#botDeePersonalizationDialog`) for name / demeanor / recap — not a `?`. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing
@@ -35,12 +35,17 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 
 ## Backend
 
-- `functions/bot-dee-functions.js` — `executeBotSession`, `getBotDeeThread`, `setBotDeeSettings`
+- `functions/bot-dee-functions.js` — `executeBotSession`, `getBotDeeThread`, `saveBotDeePersonalization`, `setBotDeeSettings`
 - `functions/bot-dee-thread.js` — Firestore persist under `botDeeThreads/{uid}`
-- `functions/bot-dee-core.js` — tools, scoring, sanitization, thread helpers
+- `functions/botdee-personalization.js` — name, demeanor, recap, `userbotdeelastUsedtime`, versioned first-use
+- `functions/bot-dee-core.js` — tools, scoring, sanitization, thread helpers; greetings include “Hello sir” and stay product-free
 - `functions/data-classification-functions.js` — `getBotDeeAccess` (+ `getFloqAiAccess` alias)
 - `functions/botdee-upgrade-functions.js` — consent, export/delete, SmartViews, legal gates, capability manifest
 - Catalog: `node scripts/build-bot-dee-search-catalog.js` (server-side intent catalog; not a page UI)
+
+## Conversation personalization (s3.3.023)
+
+Versioned first-use (`personalization.botDeePersonalizationVersion`). Ask name (prefill profile first name) then demeanor (Socially Cool / Professional / Balanced) once per version. Save & Close on the Settings pop-out over the chat. Closing without saving does not loop the same visit (`sessionStorage`) and **clears name-capture** so later short messages send. Composer capture **never** treats greetings / `help` / `privacy` as a name. Guest prefs reload from `localStorage` on bind / signed-out restore; signed-in prefs persist on `botDeeThreads/{uid}`. Last meaningful send stamps `userbotdeelastUsedtime` (read-before-write; not on page open). Recap default on: last two meaningful turns. First bubble uses `botdee.chatWelcome`; later hellos use localized demeanor templates. Never list ShoutOut / VIP / floqCast. Pause status on restore: **Session paused. Continue chatting.** Idle remains 300s. Functions deploy required for save + last-used.
 
 ## Durable resume (s3.3.006)
 

@@ -33,9 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.024";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.024";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
-  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.025";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.025";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -221,6 +220,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.023",
+      title: "s3.3.023 — BOT DEE personalization + marked composer",
+      checks: [
+        {label:"Composer placeholder only", file:"botdee.html", includes:["placeholder=\"Ask BOT DEE…\"", "botDeeComposerHint", "botDeePrefsOpen", "botDeePersonalizationDialog"], notIncludes:["placeholder=\"Ask BOT DEE… Enter sends"]},
+        {label:"Personalization UI", file:"botdee-personalization-ui.js", includes:["saveBotDeePersonalization", "userbotdeelastUsedtime", "Socially Cool"]},
+        {label:"Hello sir is chitchat", file:"functions/bot-dee-core.js", includes:["sir|ma'?am", "function privacyReply", "botdee-personalization"]},
+        {label:"Last-used field", file:"functions/botdee-personalization.js", includes:["userbotdeelastUsedtime", "botDeePersonalizationVersion"]},
+        {label:"Privacy help", file:"botdee-help-repository.js", includes:["help-botdee-privacy-session", "five-minute pause"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-023-botdee-personalization"]}
+      ]
+    },
     {
       version: "s3.3.022",
       title: "s3.3.022 — BOT DEE chat-only + My BOT DEE portal + Master Admin subtabs",
@@ -3221,6 +3232,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-023-botdee-personalization",
+      area:"BOT DEE",
+      feature:"Marked composer + first-use name/demeanor",
+      changed:"s3.3.023 — Placeholder is Ask BOT DEE… only. Keyboard lives in Help (type help or privacy). Pause restore says Session paused. Continue chatting. Hello sir is a short time-of-day greeting, not a product catalog. First-use asks what to call you and demeanor (Socially Cool / Professional / Balanced), then Save & Close. Last used is userbotdeelastUsedtime. Recap default on. Functions deploy needed for save + last-used.",
+      howToTest:"1) Hard-refresh botdee.html s3.3.023, sign in with botDee access. 2) Composer shows Ask BOT DEE… — no Enter/Shift+Enter in the box. 3) Type Hello sir — short greeting, no ShoutOut/VIP/floqCast list. 4) Type privacy — pause vs saved history + keyboard. 5) First visit: BOT DEE asks what to call you, then demeanor; Save & Close. Reopen Settings, change name, Save. 6) If a paused archive restores, status is Session paused. Continue chatting. — not the five-minute paragraph on the composer. 7) Mark Succeed/Failed. Save/last-used need Functions deploy.",
+      expected:"Placeholder is short. Hello sir is conversational. Privacy is in Help. Settings pop-out covers the chat, not a ? . Pause copy is one short line. No product dump on greeting.",
+      troubleshoot:"Hello sir still lists products → Functions not deployed or cached bot-dee-chat.js. Hello sir saved as the preferred name → first-use capture still intercepting reserved chat; hard-refresh botdee-personalization-ui.js. Guest Settings empty after reload → guest localStorage not applied on bind. Mixed-language greeting (Hey, bon après-midi) → greeting templates missing from floqr-i18n.js. Placeholder still crowded → cached botdee.html. Long privacy paragraph under the box → restore still sets botdee.memoryTimeoutNote; hard-refresh bot-dee-chat.js. Settings missing → botdee-personalization-ui.js not loaded."
+    },
+    {
       id:"s3-3-022-sinema-search-tile",
       area:"Search",
       feature:"Si-nema Search chrome card",
@@ -3252,7 +3272,7 @@
       area:"BOT DEE",
       feature:"SmartView mock links (Master + My BOT DEE)",
       changed:"s3.3.024 — SmartView card actions resolve to same-origin ./club-profile.html, patron-portal, commerce (no ?v= on app pages). Mock catalog images use ./images/chrome/. Callable falls back to botdee-smartview-mock.json. Deep link #featuresBotDee-smartviews or #botDeeMasterSmartViewDemo opens SMARTviews subtab. Master Admin may list mocks without botDee feature gate.",
-      howToTest:"1) Hard-refresh master-admin.html?v=s3.3.024#featuresBotDee-smartviews (SOS2FA + sign in). 2) SMARTviews tab loads; Show mock SmartViews paints cards (or loads from mock JSON offline). 3) Open FLOQR Public Page → club-profile.html?location=temp-democlub-1 (200, no ?v=). Profile visibility → patron-portal.html?tab=profile. Commerce tee → commerce.html. 4) patron-portal.html → Feature & Orders → My BOT DEE → Show mock SmartViews — same link behavior. 5) master-admin.html#botDeeMasterSmartViewDemo opens SMARTviews host. 6) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh master-admin.html#featuresBotDee-smartviews (SOS2FA + sign in). 2) SMARTviews tab loads; Show mock SmartViews paints cards (or loads from mock JSON offline). 3) Open FLOQR Public Page → club-profile.html?location=temp-democlub-1 (200, no ?v=). Profile visibility → patron-portal.html?tab=profile. Commerce tee → commerce.html. 4) patron-portal.html → Feature & Orders → My BOT DEE → Show mock SmartViews — same link behavior. 5) master-admin.html#botDeeMasterSmartViewDemo opens SMARTviews host. 6) Mark Succeed/Failed.",
       expected:"No 404 on ./club-profile, patron-portal, commerce from cards. Images load from ./images/chrome/botdee-nightlife.jpg. Display boards never get ?v=. External menu links may stay https://www.floqr.app/.",
       troubleshoot:"Empty host → sign in + SOS2FA; check listBotDeeSmartViews or botdee-smartview-mock.json fetch. Wrong tab on #botDeeMasterSmartViewDemo → hard-refresh master-admin-app.js s3.3.024. floqr.app image → hard-refresh botdee-smartview.js + mock JSON."
     },

@@ -14,7 +14,7 @@ test("BOT DEE page is botdee.html and every entry point goes there", () => {
   assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/botdee\.html"/, "old ?start=intent links redirect");
   assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*botdee-icon-card[^"]*"[^>]*href="\.\/botdee\.html\?from=search"/);
   assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?botdee-(?:nightlife|traditional|whiteblack)\.jpg/);
-  assert.match(read("styles.css"), /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
+  assert.match(read("styles.css"), /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face(?:,\.sinema-icon-face)?\{[^}]*background:transparent/);
   assert.ok(fs.existsSync(path.join(root, "botdee.html")), "botdee.html is the canonical page");
   assert.equal(fs.existsSync(path.join(root, "floqai.html")), false, "floqai.html removed");
   assert.equal(fs.existsSync(path.join(root, "floqai-search.html")), false, "floqai-search.html removed");
@@ -60,6 +60,7 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
     "floqr-session-shell.js",
     "botdee-help-repository.js",
     "floqr-feature-services.js",
+    "botdee-personalization-ui.js",
     "bot-dee-chat.js",
     "botdee-page.js"
   ].map(file => html.indexOf(`./${file}`));
@@ -116,7 +117,14 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.match(read("bot-dee-chat.js"), /Local chatbot first only when durable threads are off/);
   assert.match(read("bot-dee-chat.js"), /Shift\+Enter|shiftKey/);
   assert.match(read("bot-dee-chat.js"), /event\.key !== "Enter"/);
-  assert.match(read("botdee.html"), /Enter sends/);
+  assert.match(read("botdee.html"), /placeholder="Ask BOT DEE…"/);
+  assert.doesNotMatch(read("botdee.html"), /placeholder="Ask BOT DEE… Enter sends/);
+  assert.match(read("botdee.html"), /botDeeComposerHint/);
+  assert.match(read("botdee.html"), /Press Enter to send a message/);
+  assert.match(read("botdee.html"), /id="botDeePrefsOpen"/);
+  assert.match(read("botdee.html"), /id="botDeePersonalizationDialog"/);
+  assert.match(read("botdee.html"), /botdee-personalization-ui\.js/);
+  assert.match(read("botdee-help-repository.js"), /id: "help-botdee-privacy-session"/);
   assert.match(read("bot-dee-chat.js"), /botdee-msg-avatar/);
   assert.match(read("bot-dee-chat.js"), /botdee-bubble-tail/);
   assert.match(read("bot-dee-chat.js"), /botdee-chat-avatar\.png/);

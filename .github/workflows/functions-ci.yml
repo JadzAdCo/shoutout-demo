@@ -212,6 +212,8 @@ jobs:
             add_fns \
               executeBotSession \
               getBotDeeThread \
+              saveBotDeePersonalization \
+              setBotDeeSettings \
               getBotDeeAccess \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \

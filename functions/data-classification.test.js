@@ -176,6 +176,8 @@ test("getBotDeeAccess resolves the tier server-side, keeps the botDee feature gu
   assert.ok(src.includes("readHasUsedBotDee"));
   assert.ok(!/enforceAppCheck:\s*true/.test(src), "App Check is recorded, not enforced yet");
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "hasUsedBotDee"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "userbotdeelastUsedtime"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "personalization.botDeePersonalizationVersion"));
   const index = fs.readFileSync(path.join(__dirname, "index.js"), "utf8");
   assert.ok(index.includes('require("./data-classification-functions")'));
 });
