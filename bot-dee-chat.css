@@ -503,6 +503,153 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chat-form textarea {
   align-self: stretch;
 }
 
+/* Settings bubble + memory popout (composer-below card; not a ? help popout). */
+.botdee-composer-below {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.botdee-settings-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 212, 254, 0.18);
+}
+
+.botdee-settings-bubble:focus-visible {
+  outline: 2px solid var(--floqr-tiffany, #00d4fe);
+  outline-offset: 2px;
+}
+
+.botdee-settings-bubble[aria-expanded="true"] {
+  background: rgba(0, 212, 254, 0.16);
+  border-color: rgba(0, 212, 254, 0.5);
+}
+
+.botdee-settings-bubble.is-first-use {
+  box-shadow: 0 0 0 2px rgba(0, 212, 254, 0.55);
+}
+
+.botdee-settings-first-use {
+  margin: 0 0 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.botdee-settings-first-use[hidden] {
+  display: none !important;
+}
+
+.botdee-settings-gear {
+  flex: 0 0 auto;
+  display: block;
+}
+
+.botdee-memory-popout[hidden] {
+  display: none !important;
+}
+
+/* Never leave Saved chats as a standalone card under the composer. */
+#botDeeChatForm + #botDeeMemoryPanel,
+#botDeeChatPage > #botDeeMemoryPanel,
+.botdee-chat-form + .botdee-upgrade-panel#botDeeMemoryPanel {
+  display: none !important;
+}
+
+.botdee-memory-popout {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  z-index: 40;
+}
+
+.botdee-memory-popout-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: min(62vh, 520px);
+  overflow: auto;
+  padding: 8px 8px 4px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: color-mix(in srgb, #0b0b0b 78%, transparent);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.botdee-memory-popout-card .botdee-upgrade-panel {
+  margin: 0;
+  padding: 0.55rem 2.6rem 0.7rem 0.7rem;
+  background: transparent;
+}
+
+.botdee-memory-popout-x {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.botdee-memory-popout-x:focus-visible {
+  outline: 2px solid var(--floqr-tiffany, #00d4fe);
+  outline-offset: 2px;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-settings-bubble {
+  background: #fff;
+  border-color: #111;
+  color: #0a0a0a;
+  box-shadow: none;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-settings-bubble[aria-expanded="true"] {
+  background: rgba(0, 212, 254, 0.12);
+  border-color: #00d4fe;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-memory-popout-card {
+  background: #fff;
+  border-color: #d0d0d0;
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-memory-popout-x {
+  background: #f3f3f3;
+  border-color: #111;
+  color: #0a0a0a;
+}
+
+@media (max-width: 600px) {
+  .botdee-memory-popout-card {
+    max-height: min(70dvh, 560px);
+  }
+}
+
 .botdee-intent-fallback {
   margin-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);

@@ -317,6 +317,12 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE persist user failed", err?.message || err);
         throw new HttpsError("unavailable", "BOT DEE could not save that message. Try again.");
       }
+    } else {
+      try {
+        await threads.markHasUsedBotDee(uid, receivedAtMs);
+      } catch (err) {
+        console.warn("BOT DEE mark used failed", err?.message || err);
+      }
     }
     let outcome;
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
@@ -389,6 +395,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       threadId: coercedThreadId || bot.threadIdForUid(uid),
       conversationIdleSeconds: settings.conversationIdleSeconds,
       consent,
+      hasUsedBotDee: 1,
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : []
     };
   } catch (error) {
@@ -462,6 +469,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
     const uid = request.auth.uid;
     const settings = await threads.loadSettings();
     if (!settings.durableThreads) {
+      const hasUsedBotDee = await threads.readHasUsedBotDee(uid);
       return {
         ok: true,
         durable: false,
@@ -470,7 +478,8 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         turns: [],
         idleSeconds: settings.conversationIdleSeconds,
         remainingMs: settings.conversationIdleSeconds * 1000,
-        consent: memory.normalizeConsent({})
+        consent: memory.normalizeConsent({}),
+        hasUsedBotDee
       };
     }
     const state = await threads.loadThreadState(uid, settings);
@@ -488,6 +497,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       turns: state.turns,
       archiveTurns,
       consent: state.consent,
+      hasUsedBotDee: state.hasUsedBotDee === 1 ? 1 : 0,
       conversationEpoch: state.conversationEpoch,
       lastMessageAtMs: state.lastMessageAtMs,
       remainingMs: state.remainingMs,

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.020 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.021 (stable)
 
+- s3.3.021: BOT DEE Settings bubble + hasUsedBotDee 0|1 first-use popout (saved chats no longer an inline card)
 - s3.3.020: BOT DEE six-phase upgrade (opt-in memory, mock SmartViews, legal gates) + AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner
 - s3.3.019: AI crawl publishing rules, CSV import/export, past-event cleanup, crawl diagnostics
 - s3.3.018: AI crawl Import datapoints, duplicate establishment check, club vs event

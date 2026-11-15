@@ -10,6 +10,8 @@
   const listeners = new Set();
   let mode = "idle"; // idle | server | local | denied
   let role = "";
+  let hasUsedBotDee = 0;
+  let usagePromise = null;
   let timer = null;
   let inFlight = 0;
   let generation = 0;
@@ -25,7 +27,7 @@
 
   function notify() {
     listeners.forEach(cb => {
-      try { cb({mode, role}); } catch (_) {}
+      try { cb({mode, role, hasUsedBotDee}); } catch (_) {}
     });
   }
 
@@ -69,6 +71,7 @@
       const data = (await fn({sourceIds: batch}))?.data || {};
       if (gen !== generation) return;
       role = String(data.role || "");
+      hasUsedBotDee = data.hasUsedBotDee === 1 ? 1 : 0;
       const allowed = new Set(Array.isArray(data.allowed) ? data.allowed : []);
       batch.forEach(id => verdicts.set(id, allowed.has(id) ? "allow" : "deny"));
     } catch (error) {
@@ -100,8 +103,46 @@
     if (timer) clearTimeout(timer);
     timer = null;
     role = "";
+    hasUsedBotDee = 0;
+    usagePromise = null;
     if (mode !== "idle") mode = callable() ? "server" : "local";
     notify();
+  }
+
+  function applyUsageFlag(value, opts) {
+    const force = !!(opts && opts.force);
+    const next = value === 1 || value === "1" ? 1 : 0;
+    if (!force && next === 0 && hasUsedBotDee === 1) return hasUsedBotDee;
+    if (hasUsedBotDee === next) return hasUsedBotDee;
+    hasUsedBotDee = next;
+    notify();
+    return hasUsedBotDee;
+  }
+
+  /** Every BOT DEE page must call this before serving chrome. Missing/fail → 0 (first attempt). */
+  function requireUsage() {
+    if (usagePromise) return usagePromise;
+    usagePromise = (async () => {
+      const fn = callable();
+      if (!fn) {
+        applyUsageFlag(0);
+        return hasUsedBotDee;
+      }
+      try {
+        const data = (await fn({sourceIds: []}))?.data || {};
+        role = String(data.role || role || "");
+        if (Object.prototype.hasOwnProperty.call(data, "hasUsedBotDee")) {
+          applyUsageFlag(data.hasUsedBotDee);
+        } else {
+          applyUsageFlag(0);
+        }
+      } catch (error) {
+        if (isFeatureDenied(error)) mode = "denied";
+        applyUsageFlag(0);
+      }
+      return hasUsedBotDee;
+    })();
+    return usagePromise;
   }
 
   function onChange(cb) {
@@ -117,6 +158,9 @@
     reset,
     onChange,
     hasPending,
+    requireUsage,
+    applyUsageFlag,
+    hasUsedBotDee: () => hasUsedBotDee,
     mode: () => mode,
     role: () => role
   };

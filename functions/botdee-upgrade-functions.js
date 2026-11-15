@@ -76,7 +76,12 @@ exports.getBotDeeConsent = onCall(CALL_OPTS, async request => {
   try {
     const uid = await requireBotDee(request);
     const snap = await threadRef(uid).get();
-    return {ok: true, consent: consentFromThread(snap.exists ? snap.data() : {})};
+    const data = snap.exists ? snap.data() : {};
+    return {
+      ok: true,
+      consent: consentFromThread(data),
+      hasUsedBotDee: memory.hasUsedFromThread(data)
+    };
   } catch (error) {
     throw asHttps(error);
   }

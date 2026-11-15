@@ -23,6 +23,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     ensureFirebase();
     access()?.activate?.();
+    access()?.requireUsage?.();
     nav()?.applyGlobalBack?.("floqrGlobalBack");
     window.FLOQRChromeScheme?.applyDocument?.();
     window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
@@ -36,8 +37,9 @@
         chatInput.focus();
       }
     }
-    window.firebase?.auth?.().onAuthStateChanged(() => {
+    window.firebase?.auth?.().onAuthStateChanged(user => {
       access()?.reset?.();
+      if (user) access()?.requireUsage?.();
     });
   });
 })();

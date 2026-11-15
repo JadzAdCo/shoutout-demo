@@ -220,7 +220,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.020";
+    return "s3.3.021";
   }
 
   function isVersionPrompt(raw) {
@@ -904,6 +904,7 @@
         uiLanguage: currentUiLanguage()
       };
       const data = (await fn(payload))?.data || {};
+      applyHasUsed(data, 1);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const reply = displayReply(data.reply);
       appendBubble("bot", reply, localizeResults(data.results), media, data.smartViews);
@@ -1008,6 +1009,7 @@
           durableEnabled = data.durable === true;
           if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
           if (data.threadId) threadId = String(data.threadId);
+          applyHasUsed(data);
           if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
             restoreTurns(data.turns);
             phase = "active";
@@ -1044,15 +1046,27 @@
       if (input) input.value = String(q).slice(0, 200);
     }
     restoreOrWelcome();
-        return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
-      }
+    return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
+  }
 
-      global.FLOQRBotDeeChat = {
-        bind,
-        sendMessage,
-        openPhotoViewer,
-        closePhotoViewer,
-        DEFAULT_IDLE_SECONDS,
-        clampIdleSeconds
-      };
+  function applyHasUsed(data, fallback) {
+    const row = data && typeof data === "object" ? data : {};
+    let flag = 0;
+    if (row.hasUsedBotDee === 1 || row.hasUsedBotDee === "1") flag = 1;
+    else if (Array.isArray(row.turns) && row.turns.length) flag = 1;
+    else if (Array.isArray(row.archiveTurns) && row.archiveTurns.length) flag = 1;
+    else if (fallback === 1) flag = 1;
+    global.FLOQRBotDeeAccess?.applyUsageFlag?.(flag);
+    global.FLOQRBotDeeUpgradeUi?.applyUsageFlag?.(flag);
+    return flag;
+  }
+
+  global.FLOQRBotDeeChat = {
+    bind,
+    sendMessage,
+    openPhotoViewer,
+    closePhotoViewer,
+    DEFAULT_IDLE_SECONDS,
+    clampIdleSeconds
+  };
 })(typeof window !== "undefined" ? window : global);

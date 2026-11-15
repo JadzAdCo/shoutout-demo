@@ -14,7 +14,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 | Piece | Role |
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Settings bubble** under the composer opens saved chats/memories (not a `?` help popout). |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing
@@ -30,6 +30,8 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 ## Access
 
 `<body data-floqr-feature="botDee">` — off / not granted → not-available card + Back. Satellite session shell. Chat callable requires signed-in + feature gate.
+
+**hasUsedBotDee (0\|1, not boolean)** lives on `botDeeThreads/{uid}` (Functions-write). 0 = never used (first-time Settings auto-open). 1 = has used, written after the first successful send. Every BOT DEE entry checks it before serving: `getBotDeeAccess` / `getBotDeeThread` / `getBotDeeConsent` / `executeBotSession`, plus client `FLOQRBotDeeAccess.requireUsage` on `guardPage`. Fail-closed → 0. `botdee-photo-popout.html` is public (no gate).
 
 ## Backend
 

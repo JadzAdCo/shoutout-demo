@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.020";
+  const VERSION = "s3.3.021";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -15,7 +15,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
+        body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите «Настройки» под полем чата для сохранённых чатов и воспоминаний. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Аккаунт FloqR для Spatial Studio",
@@ -43,7 +43,7 @@
       },
       "help-botdee-memory": {
         title: "Сохранённые чаты BOT DEE",
-        body: "Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Гости не сохраняются. Mingl остаётся в Mingl."
+        body: "Нажмите «Настройки» под полем чата, чтобы открыть сохранённые чаты и воспоминания. Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Закройте «Настройки» крестиком или после «Сохранить», «Экспорт» или «Удалить». Гости не сохраняются. Mingl остаётся в Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -401,7 +401,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
+        body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik op Instellingen onder het chatvak voor opgeslagen chats en herinneringen. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
       },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-account voor Spatial Studio",
@@ -429,7 +429,7 @@
       },
       "help-botdee-memory": {
         title: "Opgeslagen BOT DEE-chats",
-        body: "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
+        body: "Tik op Instellingen onder het chatvak om opgeslagen chats en herinneringen te openen. De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Sluit Instellingen met X of na Opslaan, Exporteren of Wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings op Search",
@@ -787,7 +787,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
+        body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez Réglages sous la zone de chat pour les discussions et souvenirs enregistrés. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Compte FloqR pour Spatial Studio",
@@ -815,7 +815,7 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE enregistrés",
-        body: "La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
+        body: "Touchez Réglages sous la zone de chat pour ouvrir les discussions et souvenirs enregistrés. La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Fermez Réglages avec X ou après Enregistrer, Exporter ou Supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -1173,7 +1173,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
+        body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe unter dem Chatfeld auf Einstellungen für gespeicherte Chats und Erinnerungen. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
       },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-Konto für Spatial Studio",
@@ -1201,7 +1201,7 @@
       },
       "help-botdee-memory": {
         title: "Gespeicherte BOT DEE-Chats",
-        body: "Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+        body: "Tippen Sie unter dem Chatfeld auf Einstellungen, um gespeicherte Chats und Erinnerungen zu öffnen. Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Schließen Sie Einstellungen mit X oder nach Speichern, Exportieren oder Löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
@@ -1559,7 +1559,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
+        body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca Ajustes bajo el cuadro de chat para chats y recuerdos guardados. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Cuenta FloqR para Spatial Studio",
@@ -1587,7 +1587,7 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
-        body: "La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Los invitados no se guardan. Mingl se queda en Mingl."
+        body: "Toque Ajustes bajo el cuadro de chat para abrir chats y recuerdos guardados. La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Cierre Ajustes con X o después de Guardar, Exportar o Eliminar. Los invitados no se guardan. Mingl se queda en Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1945,7 +1945,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
+        body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca Impostazioni sotto la casella di chat per chat e memorie salvate. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Account FloqR per Spatial Studio",
@@ -1973,7 +1973,7 @@
       },
       "help-botdee-memory": {
         title: "Chat BOT DEE salvate",
-        body: "La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+        body: "Tocca Impostazioni sotto la casella di chat per aprire chat e memorie salvate. La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Chiudi Impostazioni con X o dopo Salva, Esporta o Elimina. Gli ospiti non vengono salvati. Mingl resta in Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings su Search",
@@ -2331,7 +2331,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
+        body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque em Definições abaixo da caixa de chat para chats e memórias guardados. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Conta FloqR para Spatial Studio",
@@ -2359,7 +2359,7 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
-        body: "A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Convidados não são guardados. Mingl fica no Mingl."
+        body: "Toque em Definições abaixo da caixa de chat para abrir chats e memórias guardados. A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Feche Definições com X ou após Guardar, Exportar ou Apagar. Convidados não são guardados. Mingl fica no Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2717,7 +2717,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
+        body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Λογαριασμός FloqR για Spatial Studio",
@@ -2745,7 +2745,7 @@
       },
       "help-botdee-memory": {
         title: "Αποθηκευμένες συνομιλίες BOT DEE",
-        body: "Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+        body: "Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Κλείστε τις Ρυθμίσεις με X ή μετά από Αποθήκευση, Εξαγωγή ή Διαγραφή. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
@@ -3103,7 +3103,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
+        body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Konto FloqR dla Spatial Studio",
@@ -3131,7 +3131,7 @@
       },
       "help-botdee-memory": {
         title: "Zapisane czaty BOT DEE",
-        body: "Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Goście nie są zapisywani. Mingl zostaje w Mingl."
+        body: "Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Zamknij Ustawienia przez X albo po Zapisz, Eksportuj lub Usuń. Goście nie są zapisywani. Mingl zostaje w Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -3489,7 +3489,7 @@
       },
       "help-botdee-page": {
         title: "BOT DEE",
-        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
+        body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط الإعدادات تحت صندوق الدردشة للمحادثات والذكريات المحفوظة. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
       },
       "help-floqr-oidc-floqmedia": {
         title: "حساب FloqR لـ Spatial Studio",
@@ -3517,7 +3517,7 @@
       },
       "help-botdee-memory": {
         title: "محادثات BOT DEE المحفوظة",
-        body: "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
+        body: "اضغط الإعدادات تحت صندوق الدردشة لفتح المحادثات والذكريات المحفوظة. توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. أغلق الإعدادات بـ X أو بعد حفظ أو تصدير أو حذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",
