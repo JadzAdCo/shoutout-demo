@@ -1,5 +1,6 @@
-/* BOT DEE six-phase callables — consent, export/delete, legal gates, capability manifest.
-   Auth + botDee gate. Master Admin SOS2FA for legal-gate writes. No stored IP. */
+/* BOT DEE six-phase callables — consent, export/delete, legal gates, later-fill slots, capability manifest.
+   Auth + botDee gate. Master Admin SOS2FA for legal-gate and slot writes. No stored IP.
+   getBotDeeProviderSlots / setBotDeeProviderSlot stay mock-only (no live vendor HTTP). */
 "use strict";
 
 const admin = require("firebase-admin");
