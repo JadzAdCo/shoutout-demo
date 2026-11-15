@@ -161,6 +161,14 @@ const CATALOG = [
     manual: []
   },
   {
+    id: "floqrOidc",
+    label: "FloqR OIDC HMAC for FloqMedia Spatial Studio",
+    fields: [
+      f("jwtSecret", "OIDC JWT HMAC secret", {secret: true, format: "token", target: {type: "firebaseSecret", name: "FLOQR_OIDC_JWT_SECRET"}, where: "Generated once (32+ bytes). Signs id_token/access_token for floqrOidcToken / floqrSpatialGrant. Never in git, Pages, or FloqMedia NEXT_PUBLIC_*."})
+    ],
+    manual: []
+  },
+  {
     id: "botDeeProviders",
     label: "BOT DEE later-fill vendor keys (mock until slot enabled)",
     fields: [

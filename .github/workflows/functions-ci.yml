@@ -111,6 +111,29 @@ jobs:
             --project shoutoutdemo-5b402 \
             --non-interactive
 
+      - name: Ensure FLOQR_OIDC_JWT_SECRET
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+        run: |
+          # Create once if missing. Never print the value. Do not rotate an existing secret.
+          set -euo pipefail
+          set +x
+          set +e
+          LISTED=$(firebase functions:secrets:list --project shoutoutdemo-5b402 --non-interactive 2>/dev/null)
+          LIST_STATUS=$?
+          set -e
+          if [ "$LIST_STATUS" -ne 0 ]; then
+            echo "Could not list Firebase secrets (status $LIST_STATUS). Set FLOQR_OIDC_JWT_SECRET before deploying floqrOidcToken."
+            exit 1
+          fi
+          if printf '%s' "$LISTED" | grep -F -q "FLOQR_OIDC_JWT_SECRET"; then
+            echo "FLOQR_OIDC_JWT_SECRET already exists"
+            exit 0
+          fi
+          echo "Creating FLOQR_OIDC_JWT_SECRET (value not logged)"
+          openssl rand -base64 48 | firebase functions:secrets:set FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive
+
       - name: Deploy Functions in batches
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
@@ -120,60 +143,80 @@ jobs:
           # Full `firebase deploy --only functions` updates ~200 Gen2 services at once
           # and hits Cloud Run CPU + Cloud Functions mutation/minute quotas.
           # Batch like deploy-reconcile.ps1 (size 20, cool-down, 3 retries).
+          # Subset tags are independent (union): [firebase-deploy-spatial] and
+          # [firebase-deploy-features] in one commit deploy both lists.
           # [firebase-deploy-crawl] deploys only AI Crawling callables/schedules (includes
           # first-time scheduledRetirePastCrawledEvents, which functions:list cannot see yet).
           set -euo pipefail
           COMMIT_MSG="${{ github.event.head_commit.message }}"
+          FNS=()
+          add_fns() {
+            local f
+            for f in "$@"; do
+              if [ "${#FNS[@]}" -eq 0 ] || ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then
+                FNS+=("$f")
+              fi
+            done
+          }
+          SUBSET=0
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-sos2fa\]'; then
-            FNS=(
-              verifySos2faRecoveryCode
-            )
-            echo "SOS2FA recovery deploy: ${FNS[*]}"
-          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-spatial\]'; then
-            FNS=(
-              issueFloqrOidcAuthCode
-              floqrOidcToken
-              recordSpatialGrantRef
-              listMySpatialGrants
-              revokeSpatialGrantRef
-              attachGuestDraftToSubject
-              floqrSpatialGrant
-              createSinemaScene
-              saveSinemaScene
+            SUBSET=1
+            add_fns verifySos2faRecoveryCode
+            echo "SOS2FA recovery deploy tagged"
+          fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-spatial\]'; then
+            SUBSET=1
+            add_fns \
+              issueFloqrOidcAuthCode \
+              floqrOidcToken \
+              recordSpatialGrantRef \
+              listMySpatialGrants \
+              revokeSpatialGrantRef \
+              attachGuestDraftToSubject \
+              floqrSpatialGrant \
+              createSinemaScene \
+              saveSinemaScene \
               loadSinemaScene
-            )
-            echo "Spatial Studio FloqR-only deploy: ${FNS[*]}"
-          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
-            FNS=(
-              scheduledAiDiscoveryCrawl
-              scheduledRetirePastCrawledEvents
-              retirePastCrawledEvents
-              runFloqrDiscoveryCrawl
-              runInstantDiscoveryCrawl
+            echo "Spatial Studio FloqR-only deploy tagged"
+          fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-features\]'; then
+            SUBSET=1
+            add_fns setFeatureServiceFlags seedFeatureServices
+            echo "Features & Services catalog deploy tagged"
+          fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
+            SUBSET=1
+            add_fns \
+              scheduledAiDiscoveryCrawl \
+              scheduledRetirePastCrawledEvents \
+              retirePastCrawledEvents \
+              runFloqrDiscoveryCrawl \
+              runInstantDiscoveryCrawl \
               previewDiscoveryAutoApprove
-            )
-            echo "Crawl-only deploy: ${FNS[*]}"
-          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-botdee\]'; then
-            FNS=(
-              getBotDeeCapabilityManifest
-              getBotDeeConsent
-              setBotDeeConsent
-              listBotDeeMemories
-              upsertBotDeeMemory
-              deleteBotDeeMemory
-              exportBotDeeData
-              deleteBotDeeArchive
-              listBotDeeSmartViews
-              submitBotDeeEvidenceFeedback
-              disputeBotDeeIdentityMatch
-              getBotDeeLegalGates
-              setBotDeeLegalGate
-              getBotDeeProviderSlots
-              listBotDeeProviderSlots
+            echo "Crawl-only deploy tagged"
+          fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-botdee\]'; then
+            SUBSET=1
+            add_fns \
+              getBotDeeCapabilityManifest \
+              getBotDeeConsent \
+              setBotDeeConsent \
+              listBotDeeMemories \
+              upsertBotDeeMemory \
+              deleteBotDeeMemory \
+              exportBotDeeData \
+              deleteBotDeeArchive \
+              listBotDeeSmartViews \
+              submitBotDeeEvidenceFeedback \
+              disputeBotDeeIdentityMatch \
+              getBotDeeLegalGates \
+              setBotDeeLegalGate \
+              getBotDeeProviderSlots \
+              listBotDeeProviderSlots \
               setBotDeeProviderSlot
-            )
-            echo "BOT DEE six-phase + later-fill slot deploy: ${FNS[*]}"
-          else
+            echo "BOT DEE six-phase + later-fill slot deploy tagged"
+          fi
+          if [ "$SUBSET" = "0" ]; then
             mapfile -t FNS < <(
               firebase functions:list --project shoutoutdemo-5b402 --json \
                 | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{

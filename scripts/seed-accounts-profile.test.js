@@ -117,7 +117,7 @@ test("every target is a known type; secret fields never target Firestore or .env
       names.add(field.target.name);
     }
   }));
-  ["TWILIO_WHATSAPP_FROM", "TWILIO_WHATSAPP_OTP_CONTENT_SID", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "SENDGRID_API_KEY"].forEach(n => assert.ok(names.has(n), n));
+  ["TWILIO_WHATSAPP_FROM", "TWILIO_WHATSAPP_OTP_CONTENT_SID", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "SENDGRID_API_KEY", "FLOQR_OIDC_JWT_SECRET"].forEach(n => assert.ok(names.has(n), n));
 });
 
 test("updateEnvText replaces / appends only listed keys", () => {

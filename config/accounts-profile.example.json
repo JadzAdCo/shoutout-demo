@@ -427,6 +427,22 @@
       },
       "manual": {}
     },
+    "floqrOidc": {
+      "_label": "FloqR OIDC HMAC for FloqMedia Spatial Studio",
+      "fields": {
+        "jwtSecret": {
+          "value": "",
+          "description": "OIDC JWT HMAC secret",
+          "whereToGet": "Generated once (32+ bytes). Signs id_token/access_token for floqrOidcToken / floqrSpatialGrant. Never in git, Pages, or FloqMedia NEXT_PUBLIC_*.",
+          "secret": true,
+          "required": true,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret FLOQR_OIDC_JWT_SECRET",
+          "readByCodeToday": true
+        }
+      },
+      "manual": {}
+    },
     "botDeeProviders": {
       "_label": "BOT DEE later-fill vendor keys (mock until slot enabled)",
       "fields": {

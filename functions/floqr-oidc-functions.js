@@ -5,17 +5,23 @@
 
 const admin = require("firebase-admin");
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 const core = require("./floqr-oidc-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
+const FLOQR_OIDC_JWT_SECRET = defineSecret("FLOQR_OIDC_JWT_SECRET");
 const CALL_OPTS = { region: "us-central1", cors: true, timeoutSeconds: 30, memory: "256MiB" };
-const HTTP_OPTS = { region: "us-central1", cors: false, invoker: "public", timeoutSeconds: 30, memory: "256MiB" };
+const HTTP_OPTS = { region: "us-central1", cors: false, invoker: "public", timeoutSeconds: 30, memory: "256MiB", secrets: [FLOQR_OIDC_JWT_SECRET] };
 const CODES = "oidcAuthCodes";
 
 function jwtSecret() {
-  return String(process.env.FLOQR_OIDC_JWT_SECRET || "").trim();
+  try {
+    return String(FLOQR_OIDC_JWT_SECRET.value() || process.env.FLOQR_OIDC_JWT_SECRET || "").trim();
+  } catch (_) {
+    return String(process.env.FLOQR_OIDC_JWT_SECRET || "").trim();
+  }
 }
 
 function allowLocalhost() {

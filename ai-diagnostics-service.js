@@ -239,7 +239,8 @@
         {label:"Manual test BOT DEE", file:"ai-diagnostics-service.js", includes:["s3-3-020-botdee-six-phase"]},
         {label:"Si-nema satellite (no Search tile)", file:"sinema.html", includes:["data-floqr-feature=\"sinema\"", "help-sinema-virtual-set"]},
         {label:"OIDC authorize reuses FloqR session", file:"floqr-oidc-authorize.html", includes:["floqr-session-shell.js", "help-floqr-oidc-floqmedia"]},
-        {label:"Spatial Studio FloqR tests", file:"functions/spatial-studio-floqr.test.js", includes:["OIDC public client", "grant references only", "48h clock"]}
+        {label:"Spatial Studio FloqR tests", file:"functions/spatial-studio-floqr.test.js", includes:["OIDC public client", "grant references only", "48h clock"]},
+        {label:"OIDC HMAC Secret Manager", file:"functions/floqr-oidc-functions.js", includes:["defineSecret(\"FLOQR_OIDC_JWT_SECRET\")"]}
       ]
     },
     {
@@ -3194,8 +3195,8 @@
       feature:"FloqR OIDC + Spatial Studio grant refs + Si-nema pin",
       changed:"FloqR-only Spatial Studio federation: reuse Firebase Auth (no FloqMedia signup), public OIDC client floqmedia-spatial-studio (code + PKCE S256), grant references only, Si-nema virtual set pins projectId+pinRevisionId, 48h clock from original FloqR scene save. Pages live; OIDC Functions deploy via [firebase-deploy-spatial]. Continue greys out and shows a status if the callable is missing.",
       howToTest:"1) Hard-refresh floqr-oidc-authorize.html from Spatial Studio (live github.io URL with client_id + PKCE query). 2) Signed out → Search general sign-in (returnTo), not a second signup. 3) Signed in as Don Papi → Continue greys to Sending you to Spatial Studio… then redirects to FloqMedia callback with code=. A failure must show a sentence in the card (not a one-word internal). 4) Open sinema.html — satellite shell, no Search tile, no FloqR parent logo. 5) Confirm VIP reserV floor map and ShoutOut composer still load. 6) Mark Succeed/Failed. Do not deploy firestore.rules.",
-      expected:"Continue is busy while issueFloqrOidcAuthCode runs, then FloqMedia receives the auth code. Si-nema has no Search tile. VIP/ShoutOut unchanged. Token HMAC still needs FLOQR_OIDC_JWT_SECRET.",
-      troubleshoot:"Continue still does nothing → hard-refresh floqr-oidc-authorize.js; status must not stay blank. Status says not live → Functions CI [firebase-deploy-spatial] not finished. Redirect then FloqMedia token fails → set FLOQR_OIDC_JWT_SECRET. Google-only card → missing floqr-session-shell.js."
+      expected:"Continue is busy while issueFloqrOidcAuthCode runs, then FloqMedia receives the auth code. Si-nema has no Search tile. VIP/ShoutOut unchanged. Token HMAC uses Secret Manager FLOQR_OIDC_JWT_SECRET. Enable Si-nema only after Features Mgmt shows a live catalog row (not Packaged default).",
+      troubleshoot:"Continue still does nothing → hard-refresh floqr-oidc-authorize.js; status must not stay blank. Status says not live → Functions CI [firebase-deploy-spatial] not finished. Redirect then FloqMedia token fails → CI Ensure FLOQR_OIDC_JWT_SECRET / [firebase-deploy-spatial]. Si-nema Save says Unknown feature → [firebase-deploy-features] for setFeatureServiceFlags. Google-only card → missing floqr-session-shell.js."
     },
     {
       id:"s3-3-020-ai-crawl-workspace",
