@@ -242,6 +242,7 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(index, /exportBotDeeData/);
   assert.match(index, /getBotDeeLegalGates/);
   assert.match(index, /getBotDeeProviderSlots/);
+  assert.match(index, /listBotDeeProviderSlots/);
   assert.match(index, /setBotDeeProviderSlot/);
   assert.match(read("functions/botdee-upgrade-functions.js"), /invoker:\s*"public"/);
   const rules = read("firestore.rules");
@@ -258,6 +259,7 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(read("master-admin.html"), /id="botDeeLegalSave"/);
   assert.match(read("master-admin.html"), /id="botDeeSlotSave"/);
   assert.match(read("master-feature-services.js"), /setBotDeeLegalGate/);
+  assert.match(read("master-feature-services.js"), /listBotDeeProviderSlots/);
   assert.match(read("master-feature-services.js"), /setBotDeeProviderSlot/);
   assert.match(read("botdee.html"), /id="botDeeMemoryPanel"/);
   assert.match(read("botdee.html"), /floqr-session-shell\.js/);

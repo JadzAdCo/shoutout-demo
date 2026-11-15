@@ -1,6 +1,6 @@
 /* BOT DEE six-phase callables — consent, export/delete, legal gates, later-fill slots, capability manifest.
    Auth + botDee gate. Master Admin SOS2FA for legal-gate and slot writes. No stored IP.
-   getBotDeeProviderSlots / setBotDeeProviderSlot stay mock-only (no live vendor HTTP). */
+   getBotDeeProviderSlots / listBotDeeProviderSlots / setBotDeeProviderSlot stay mock-only (no live vendor HTTP). */
 "use strict";
 
 const admin = require("firebase-admin");
@@ -290,19 +290,32 @@ exports.getBotDeeLegalGates = onCall(CALL_OPTS, async request => {
   }
 });
 
+async function runGetBotDeeProviderSlots(request) {
+  if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+  if (!isServerAdminAuth(request.auth)) {
+    throw new HttpsError("permission-denied", "Master Admin only.");
+  }
+  const snap = await db.collection("botDeeProviderSlots").get();
+  const overrides = {};
+  snap.docs.forEach(doc => {
+    overrides[doc.id] = {id: doc.id, ...doc.data()};
+  });
+  const matrix = slots.slotMatrix(overrides, process.env, Date.now()).map(slots.publicSlot);
+  return {ok: true, slots: matrix};
+}
+
 exports.getBotDeeProviderSlots = onCall(CALL_OPTS, async request => {
   try {
-    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
-    if (!isServerAdminAuth(request.auth)) {
-      throw new HttpsError("permission-denied", "Master Admin only.");
-    }
-    const snap = await db.collection("botDeeProviderSlots").get();
-    const overrides = {};
-    snap.docs.forEach(doc => {
-      overrides[doc.id] = {id: doc.id, ...doc.data()};
-    });
-    const matrix = slots.slotMatrix(overrides, process.env, Date.now()).map(slots.publicSlot);
-    return {ok: true, slots: matrix};
+    return await runGetBotDeeProviderSlots(request);
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+/** Fresh Gen2 create: getBotDeeProviderSlots was left IAM-private after a cancelled batch. */
+exports.listBotDeeProviderSlots = onCall(CALL_OPTS, async request => {
+  try {
+    return await runGetBotDeeProviderSlots(request);
   } catch (error) {
     throw asHttps(error);
   }

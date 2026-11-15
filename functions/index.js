@@ -32,6 +32,7 @@ module.exports = {
   getBotDeeLegalGates: require("./botdee-upgrade-functions").getBotDeeLegalGates,
   setBotDeeLegalGate: require("./botdee-upgrade-functions").setBotDeeLegalGate,
   getBotDeeProviderSlots: require("./botdee-upgrade-functions").getBotDeeProviderSlots,
+  listBotDeeProviderSlots: require("./botdee-upgrade-functions").listBotDeeProviderSlots,
   setBotDeeProviderSlot: require("./botdee-upgrade-functions").setBotDeeProviderSlot,
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),

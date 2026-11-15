@@ -169,6 +169,7 @@ jobs:
               getBotDeeLegalGates
               setBotDeeLegalGate
               getBotDeeProviderSlots
+              listBotDeeProviderSlots
               setBotDeeProviderSlot
             )
             echo "BOT DEE six-phase + later-fill slot deploy: ${FNS[*]}"
@@ -202,6 +203,7 @@ jobs:
               getBotDeeLegalGates \
               setBotDeeLegalGate \
               getBotDeeProviderSlots \
+              listBotDeeProviderSlots \
               setBotDeeProviderSlot
             do
               if ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then

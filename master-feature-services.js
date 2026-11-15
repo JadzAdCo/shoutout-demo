@@ -835,7 +835,12 @@
         });
       }
       try {
-        const slotData = await call("getBotDeeProviderSlots", {});
+        let slotData;
+        try {
+          slotData = await call("listBotDeeProviderSlots", {});
+        } catch (slotErr) {
+          slotData = await call("getBotDeeProviderSlots", {});
+        }
         if (slotBody) {
           slotBody.innerHTML = (slotData.slots || []).map(row => `<tr>
           <td>${esc(row.label)}</td>
