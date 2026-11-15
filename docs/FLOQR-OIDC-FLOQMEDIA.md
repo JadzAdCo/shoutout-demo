@@ -2,7 +2,7 @@
 
 FloqR is the identity issuer. FloqMedia Spatial Studio is a **public** OIDC client (authorization code + PKCE S256). There is no FloqMedia signup and no second user database.
 
-**Not production-deployed in this pass.** Token URL and grant HTTP endpoints exist in source only until Functions deploy is approved.
+Authorize HTML is live on GitHub Pages. `issueFloqrOidcAuthCode` / `floqrOidcToken` deploy with `[firebase-deploy-spatial]`. Token HMAC still fails closed without `FLOQR_OIDC_JWT_SECRET`. Production Firestore/Storage rules are not applied (`docs/spatial-studio-floqr-rules-draft.md`).
 
 ## Auth audit (this repo)
 

@@ -16,7 +16,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 **Purpose:** FloqMedia Spatial Studio already exists (`Jadz-Holdings/floqmedia.com`). FloqR reuses the current Firebase user, issues OIDC (code + PKCE S256) to that public client, stores **grant references** only, and loads a pinned revision as a Si-nema virtual set. Geometry stays on FloqMedia.
 
-**Stop before production** Firebase rules, storage rules, or a Functions/Pages deploy until the owner approves the auth audit and FloqMedia registration values (`docs/FLOQR-OIDC-FLOQMEDIA.md`, `docs/spatial-studio-floqr-rules-draft.md`).
+Pages `floqr-oidc-authorize.html` / `sinema.html` are live. OIDC + grant + Si-nema Functions deploy with `[firebase-deploy-spatial]`. Production `firestore.rules` / `storage.rules` stay unchanged (draft only: `docs/spatial-studio-floqr-rules-draft.md`). Token HMAC still needs `FLOQR_OIDC_JWT_SECRET`.
 
 | Layer | Wiring |
 |---|---|

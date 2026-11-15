@@ -39,6 +39,8 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   const oidcHtml = read("floqr-oidc-authorize.html");
   assert.match(oidcHtml, /floqr-session-shell\.js/);
   assert.match(oidcHtml, /data-floqr-auth-chrome/);
+  assert.match(oidcHtml, /id="oidcConsentStatus"/);
+  assert.match(oidcHtml, /floqr-oidc-authorize\.js\?v=s3\.3\.020/);
   assert.doesNotMatch(oidcHtml, /data-floqr-feature=/);
   assert.doesNotMatch(oidcHtml, /Create an account|Sign up with FloqMedia|floqmedia signup/i);
 
@@ -46,6 +48,9 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   assert.match(oidcJs, /FLOQRSessionShell/);
   assert.match(oidcJs, /popupBlocked/);
   assert.match(oidcJs, /issueFloqrOidcAuthCode/);
+  assert.match(oidcJs, /setContinueBusy/);
+  assert.match(oidcJs, /page\.oidc\.statusUnavailable/);
+  assert.match(oidcJs, /not-found\|unimplemented\|internal/);
   assert.doesNotMatch(oidcJs, /createUserWithEmailAndPassword/);
 
   const sinemaHtml = read("sinema.html");
@@ -276,10 +281,14 @@ test("regression: ShoutOut display URLs, VIP floor viewer, no Search tile for Si
   assert.doesNotMatch(storage, /spatialGrantRefs|sinemaScenes|floqmedia-spatial/);
 });
 
-test("production rules and Functions deploy are not claimed complete", () => {
+test("production rules stay unpublished; OIDC Functions deploy is the Continue path", () => {
   const draft = read("docs/spatial-studio-floqr-rules-draft.md");
   assert.match(draft, /NOT APPLIED/);
   const wiring = read("docs/FEATURE-WIRING.md");
   assert.match(wiring, /Si-nema/);
-  assert.match(wiring, /Stop before production/);
+  assert.match(wiring, /firebase-deploy-spatial/);
+  assert.match(wiring, /firestore\.rules/);
+  const workflow = read(".github/workflows/functions-ci.yml");
+  assert.match(workflow, /firebase-deploy-spatial/);
+  assert.match(workflow, /issueFloqrOidcAuthCode/);
 });

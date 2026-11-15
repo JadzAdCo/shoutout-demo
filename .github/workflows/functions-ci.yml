@@ -124,7 +124,21 @@ jobs:
           # first-time scheduledRetirePastCrawledEvents, which functions:list cannot see yet).
           set -euo pipefail
           COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-spatial\]'; then
+            FNS=(
+              issueFloqrOidcAuthCode
+              floqrOidcToken
+              recordSpatialGrantRef
+              listMySpatialGrants
+              revokeSpatialGrantRef
+              attachGuestDraftToSubject
+              floqrSpatialGrant
+              createSinemaScene
+              saveSinemaScene
+              loadSinemaScene
+            )
+            echo "Spatial Studio FloqR-only deploy: ${FNS[*]}"
+          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
             FNS=(
               scheduledAiDiscoveryCrawl
               scheduledRetirePastCrawledEvents
