@@ -210,6 +210,9 @@ jobs:
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-botdee\]'; then
             SUBSET=1
             add_fns \
+              executeBotSession \
+              getBotDeeThread \
+              getBotDeeAccess \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \
               setBotDeeConsent \
@@ -226,7 +229,7 @@ jobs:
               getBotDeeProviderSlots \
               listBotDeeProviderSlots \
               setBotDeeProviderSlot
-            echo "BOT DEE six-phase + later-fill slot deploy tagged"
+            echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot deploy tagged"
           fi
           if [ "$SUBSET" = "0" ]; then
             mapfile -t FNS < <(
@@ -244,6 +247,9 @@ jobs:
             # First-time BOT DEE six-phase callables (functions:list cannot see them yet).
             # Redeploy from origin/main after Instant Crawl merge cancelled the first batch run.
             for f in \
+              executeBotSession \
+              getBotDeeThread \
+              getBotDeeAccess \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \
               setBotDeeConsent \
