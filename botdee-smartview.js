@@ -13,6 +13,96 @@
     }[c]));
   }
 
+  function isDisplayPath(pathname) {
+    const file = String(pathname || "").split("/").pop().toLowerCase();
+    return file === "display.html" || file === "display2.html";
+  }
+
+  /** Path under the Pages project root (e.g. ./club-profile.html or ./images/foo.jpg). */
+  function relativeRepoPath(pathname) {
+    const path = String(pathname || "");
+    const marker = "/shoutout-demo/";
+    const idx = path.indexOf(marker);
+    const tail = idx >= 0 ? path.slice(idx + marker.length) : path.replace(/^\//, "");
+    return tail ? `./${tail}` : "";
+  }
+
+  /** Same-origin app links as ./file?query — GitHub Pages /shoutout-demo/ safe. Never ?v= on page links. */
+  function resolveSameOriginHref(href) {
+    const raw = String(href || "").trim();
+    if (!raw || /javascript:/i.test(raw)) return "";
+    if (raw.startsWith("./") && !raw.startsWith("./http")) {
+      const nav = global.FLOQRNav;
+      if (nav?.stampCurrentVersion && !isDisplayPath(raw)) return nav.stampCurrentVersion(raw);
+      if (isDisplayPath(raw)) return nav?.stableDisplayUrl
+        ? nav.stableDisplayUrl(new URL(raw, global.location.href).searchParams.get("location") || "")
+        : raw.replace(/[?&]v=[^&#]+/g, "").replace(/\?&/, "?").replace(/\?$/, "");
+      return raw;
+    }
+    try {
+      const resolved = new URL(raw, global.location.href);
+      if (resolved.protocol !== "http:" && resolved.protocol !== "https:") return "";
+      if (resolved.origin !== global.location.origin) return resolved.href;
+      const nav = global.FLOQRNav;
+      if (isDisplayPath(resolved.pathname)) {
+        resolved.searchParams.delete("v");
+        const loc = resolved.searchParams.get("location") || "";
+        if (nav?.stableDisplayUrl) {
+          const board = resolved.pathname.split("/").pop() === "display2.html" ? "secondary" : "";
+          return nav.stableDisplayUrl(loc, board ? {board} : {});
+        }
+        const rel = relativeRepoPath(resolved.pathname);
+        const search = resolved.searchParams.toString();
+        return `${rel}${search ? `?${search}` : ""}${resolved.hash || ""}`;
+      }
+      const rel = `${relativeRepoPath(resolved.pathname)}${resolved.search || ""}${resolved.hash || ""}`;
+      if (nav?.stampCurrentVersion) return nav.stampCurrentVersion(rel);
+      return rel || raw;
+    } catch (_) {
+      return raw.startsWith("./") || raw.startsWith("/") ? raw : "";
+    }
+  }
+
+  function resolveImageSrc(url) {
+    const raw = String(url || "").trim();
+    if (!raw || /javascript:/i.test(raw)) return "";
+    if (raw.startsWith("./")) {
+      const v = global.FLOQRNav?.appVersion || "";
+      if (v && !/[?&]v=/.test(raw)) {
+        return `${raw}${raw.includes("?") ? "&" : "?"}v=${encodeURIComponent(v)}`;
+      }
+      return raw;
+    }
+    try {
+      const resolved = new URL(raw, global.location.href);
+      if (resolved.origin !== global.location.origin) {
+        const floqrPath = raw.replace(/^https?:\/\/[^/]+/i, "");
+        if (floqrPath.startsWith("/images/")) {
+          const v = global.FLOQRNav?.appVersion || "";
+          return `./${floqrPath.replace(/^\//, "")}${v ? `?v=${encodeURIComponent(v)}` : ""}`;
+        }
+        return resolved.href;
+      }
+      let rel = relativeRepoPath(resolved.pathname);
+      if (!rel) rel = `./${resolved.pathname.split("/").pop()}`;
+      if (rel.startsWith("./images/") && !resolved.searchParams.has("v")) {
+        const v = global.FLOQRNav?.appVersion || "";
+        if (v) return `${rel}`;
+      }
+      return `${rel}${resolved.search || ""}`;
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function wireActionLinks(rootEl) {
+    if (!rootEl) return;
+    rootEl.querySelectorAll("a[href]").forEach(anchor => {
+      const fixed = resolveSameOriginHref(anchor.getAttribute("href"));
+      if (fixed) anchor.setAttribute("href", fixed);
+    });
+  }
+
   function ratingRow(row) {
     if (!row || !row.provider) return "";
     const value = Number.isFinite(Number(row.value)) ? Number(row.value).toFixed(1) : "—";
@@ -41,7 +131,7 @@
       ${images.length ? `<div class="botdee-sv-images">${images.map(img => (
         img.licenseStatus === "blocked"
           ? `<p class="sub small">${esc(img.attribution || "Image blocked")}</p>`
-          : `<figure><img src="${esc(img.url)}" alt="" width="160" height="90"/>
+          : `<figure><img src="${esc(resolveImageSrc(img.url))}" alt="" width="160" height="90"/>
               <figcaption>${esc(img.attribution || "")}</figcaption></figure>`
       )).join("")}</div>` : ""}
       ${ratings.length ? `<div class="botdee-sv-ratings"><p>${esc(t("botdee.smartviewRatingsNote", "Ratings are shown separately by source."))}</p><ul>${ratings.map(ratingRow).join("")}</ul></div>` : ""}
@@ -57,7 +147,9 @@
           : (action.id === "menu-external" && !iframeOk
             ? t("botdee.smartviewMenuExternal", "Menu (opens outside FLOQR)")
             : esc(action.label || "Open"));
-        return `<li><a class="buttonlike" href="${esc(href)}">${label}</a></li>`;
+        const fixed = resolveSameOriginHref(href);
+        if (!fixed) return "";
+        return `<li><a class="buttonlike" href="${esc(fixed)}">${label}</a></li>`;
       }).join("")}</ul>
     </article>`;
   }
@@ -66,7 +158,8 @@
     if (!el) return;
     const list = Array.isArray(views) ? views : [];
     el.innerHTML = list.map(renderCard).join("") || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SmartViews yet."))}</p>`;
+    wireActionLinks(el);
   }
 
-  global.FLOQRBotDeeSmartView = {renderCard, mount};
+  global.FLOQRBotDeeSmartView = {renderCard, mount, resolveSameOriginHref, wireActionLinks};
 })(window);

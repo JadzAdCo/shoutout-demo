@@ -1059,7 +1059,17 @@
     if (id === "featuresBetaTesting") return loadBetaTesting();
     if (id === "featuresBotDee") {
       root.FLOQRBotDeeUpgradeUi?.bind?.();
-      showBotDeeMgmtPage("pause");
+      const sub = String(root.__floqrBotDeeMgmtPage || "pause").trim() || "pause";
+      delete root.__floqrBotDeeMgmtPage;
+      const focusId = String(root.__floqrBotDeeFocusId || "").trim();
+      delete root.__floqrBotDeeFocusId;
+      showBotDeeMgmtPage(sub);
+      if (focusId) {
+        requestAnimationFrame(() => {
+          const el = byId(focusId);
+          el?.scrollIntoView?.({block: "nearest", behavior: "smooth"});
+        });
+      }
       return;
     }
     if (id === "featuresAuditTrail") return loadAuditTrail();
@@ -1072,6 +1082,7 @@
     auditRowHtml,
     featureCell,
     flagChangeSummary,
+    showBotDeeMgmtPage,
     PANEL_IDS,
     activePanelId: () => activePanelId
   };
