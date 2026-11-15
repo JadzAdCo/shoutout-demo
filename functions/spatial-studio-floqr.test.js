@@ -295,6 +295,7 @@ test("production rules stay unpublished; OIDC Functions deploy is the Continue p
   assert.match(workflow, /Ensure FLOQR_OIDC_JWT_SECRET/);
   assert.match(workflow, /functions:secrets:get FLOQR_OIDC_JWT_SECRET/);
   assert.match(workflow, /functions:secrets:set FLOQR_OIDC_JWT_SECRET/);
+  assert.match(workflow, /functions:delete "\$fn"/);
   assert.doesNotMatch(workflow, /functions:secrets:list/);
   assert.doesNotMatch(workflow, /functions:secrets:access/);
   assert.ok(workflow.includes('if echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-spatial\\]\''), "spatial tag is an independent if");

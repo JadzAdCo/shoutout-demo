@@ -132,6 +132,20 @@ jobs:
           echo "Creating FLOQR_OIDC_JWT_SECRET (value not logged)"
           openssl rand -base64 48 | firebase functions:secrets:set FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive --data-file -
 
+      - name: Recreate OIDC HTTP functions without plaintext secret env
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+        run: |
+          # Cloud Run 400: "Secret environment variable overlaps non secret
+          # environment variable: FLOQR_OIDC_JWT_SECRET" when a leftover plaintext
+          # env (from an earlier process.env deploy) still sits on the service.
+          # Recreate the two HTTP functions so defineSecret can bind the name.
+          set -euo pipefail
+          for fn in floqrOidcToken floqrSpatialGrant; do
+            firebase functions:delete "$fn" --region us-central1 --project shoutoutdemo-5b402 --non-interactive --force || true
+          done
+
       - name: Deploy Functions in batches
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
