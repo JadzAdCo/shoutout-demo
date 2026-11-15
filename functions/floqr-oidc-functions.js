@@ -1,5 +1,6 @@
 /* FloqR OIDC endpoints for FloqMedia Spatial Studio.
-   Public client, authorization code + PKCE S256. Not deployed until owner approval. */
+   Public client, authorization code + PKCE S256.
+   Deployed with [firebase-deploy-spatial] so Continue can issue an auth code. */
 "use strict";
 
 const admin = require("firebase-admin");
