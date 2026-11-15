@@ -66,9 +66,16 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.ok(order.every(i => i > 0), "scripts present");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "script order");
   assert.doesNotMatch(html, /botDeeScopeNote|help-popout/);
+  assert.match(html, /id="botDeeSettingsBubble"/);
+  assert.match(html, /id="botDeeMemoryPopout"/);
+  assert.match(html, /id="botDeeSettingsFirstUse"/);
+  assert.match(html, /data-i18n="botdee.settingsBubble"/);
+  assert.match(html, /botdee-composer-below/);
+  assert.match(html, /id="botDeeMemoryPopout"[^>]*\bhidden\b/);
   const page = read("botdee-page.js");
   assert.doesNotMatch(page, /bindIntentSearch\(|showScope/);
   assert.match(page, /FLOQRBotDeeChat\?\.bind/);
+  assert.match(page, /requireUsage/);
   assert.match(page, /botDeeChatInput/);
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
   assert.match(read("bot-dee-chat.js"), /getBotDeeThread/);
@@ -135,7 +142,7 @@ test("floating BOT DEE agent is not shown on template select", () => {
 
 test("BOT DEE page chrome is localized", () => {
   const html = read("botdee.html");
-  ["page.botdee.title", "botdee.prompt", "botdee.chatSend"]
+  ["page.botdee.title", "botdee.prompt", "botdee.chatSend", "botdee.settingsBubble"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.doesNotMatch(html, /botdee\.helpIntro|botdee\.intentFallback|botdee\.hint|botdee\.placeholder|botdee\.scope/);
   assert.match(html, /data-i18n-placeholder="botdee\.chatPlaceholder"/);

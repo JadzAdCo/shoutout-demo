@@ -235,7 +235,25 @@ exports.getBotDeeAccess = onCall(BOTDEE_OPTS, async request => {
         }));
       }
     }
-    return {ok: true, role, clubCount: clubIds.length, allowed, denied: denied.map(row => row.id), appCheck};
+    let hasUsedBotDee = 0;
+    if (request.auth?.uid) {
+      try {
+        const threads = require("./bot-dee-thread");
+        hasUsedBotDee = await threads.readHasUsedBotDee(request.auth.uid);
+      } catch (err) {
+        console.warn("BOT DEE hasUsedBotDee read failed", err?.message || err);
+        hasUsedBotDee = 0;
+      }
+    }
+    return {
+      ok: true,
+      role,
+      clubCount: clubIds.length,
+      allowed,
+      denied: denied.map(row => row.id),
+      appCheck,
+      hasUsedBotDee: hasUsedBotDee === 1 ? 1 : 0
+    };
   } catch (error) {
     throw asHttps(error);
   }

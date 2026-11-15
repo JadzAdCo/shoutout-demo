@@ -105,7 +105,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
-    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent); Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1); Functions-write"],
     ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeThreads/archive", "ownMaster", 1, "Opt-in BOT DEE durable messages; survives idle pause; Functions-write; no IP"],
     ["botDeeThreads/memories", "ownMaster", 1, "User-controlled BOT DEE memories; Functions-write; opt-in"],
@@ -232,6 +232,7 @@
     ["users", "futureTravelDestinations", "ownMaster", 1, "Patron future travel cities/countries (Mingl travel datapoint when opted in)"],
     ["users", "preferredLanguage", "ownMaster", 0, "Patron preferred language (grammar / bio / site default)"],
     ["users", "uiLanguage", "ownMaster", 0, "Patron FloqR chrome language"],
+    ["botDeeThreads", "hasUsedBotDee", "ownMaster", 0, "0 never used BOT DEE (first attempt); 1 has used; integer 0|1 not boolean; Functions-write on botDeeThreads/{uid}"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];

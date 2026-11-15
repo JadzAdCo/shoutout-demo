@@ -459,6 +459,14 @@
           console.warn("Feature guard check failed", error?.message || error);
         }
         clearTimeout(timer);
+        if (ok && key === "botDee") {
+          try {
+            await root.FLOQRBotDeeAccess?.requireUsage?.();
+          } catch (error) {
+            console.warn("BOT DEE hasUsedBotDee check failed; treating as first use", error?.message || error);
+            root.FLOQRBotDeeAccess?.applyUsageFlag?.(0);
+          }
+        }
         if (ok) {
           showAllowed(doc);
         } else {

@@ -357,7 +357,7 @@
   },
   "help-botdee-memory": {
     "title": "BOT DEE saved chats",
-    "body": "The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Guests are not saved. Mingl conversations stay in Mingl."
+    "body": "Tap Settings under the chat box to open saved chats and memories. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Close Settings with X or after Save, Export, or Delete. Guests are not saved. Mingl conversations stay in Mingl."
   },
   "help-botdee-smartview": {
     "title": "BOT DEE SmartViews",

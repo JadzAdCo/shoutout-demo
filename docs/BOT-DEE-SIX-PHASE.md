@@ -21,7 +21,7 @@ Idle pause (Master Admin, packaged default **300 seconds**) ends the **active** 
 
 1. Leave Functions undeployed (this PR).
 2. If already deployed: set `botDeeSettings.durableThreads=0` and keep legal gates `blocked` / `mock_only`.
-3. Pages rollback: revert `botdee.html` upgrade panels.
+3. Pages rollback: revert `botdee.html` Settings bubble / memory popout.
 
 ## Owner decisions still required
 

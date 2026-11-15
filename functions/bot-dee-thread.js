@@ -31,14 +31,21 @@ function emptyState(settings) {
     idleEnded: false,
     revision: 0,
     consent: memory.normalizeConsent({}),
-    archiveRetained: false
+    archiveRetained: false,
+    hasUsedBotDee: 0
   };
 }
 
 function snapshotToState(snap, uid, settings, nowMs) {
   const threadId = bot.threadIdForUid(uid);
   if (!snap || !snap.exists) {
-    return {...emptyState(settings), threadId, durable: true, consent: memory.normalizeConsent({})};
+    return {
+      ...emptyState(settings),
+      threadId,
+      durable: true,
+      consent: memory.normalizeConsent({}),
+      hasUsedBotDee: 0
+    };
   }
   const data = snap.data() || {};
   const lastMessageAtMs = Number(data.lastMessageAtMs) || 0;
@@ -59,8 +66,31 @@ function snapshotToState(snap, uid, settings, nowMs) {
     eventCount: Math.max(0, Math.floor(Number(data.eventCount) || 0)),
     firstSeq: Math.max(0, Math.floor(Number(data.firstSeq) || 0)),
     consent,
-    archiveRetained: memory.consentAllows(consent, "archive")
+    archiveRetained: memory.consentAllows(consent, "archive"),
+    hasUsedBotDee: memory.hasUsedFromThread(data)
   };
+}
+
+async function readHasUsedBotDee(uid) {
+  const ref = threadRef(uid);
+  if (!ref) return 0;
+  const snap = await ref.get();
+  if (!snap.exists) return 0;
+  return memory.hasUsedFromThread(snap.data());
+}
+
+async function markHasUsedBotDee(uid, nowMs) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  await ref.set({
+    uid,
+    threadId: bot.threadIdForUid(uid),
+    hasUsedBotDee: 1,
+    hasUsedBotDeeAtMs: now,
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, hasUsedBotDee: 1};
 }
 
 async function loadSettings() {
@@ -156,6 +186,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       turns: nextTurns,
       eventCount,
       firstSeq,
+      hasUsedBotDee: 1,
+      hasUsedBotDeeAtMs: now,
       updatedAtMs: now
     }, {merge: true});
   });
@@ -259,6 +291,8 @@ async function persistUserTurn(uid, settings, userText, opts) {
       turns: nextTurns,
       eventCount,
       firstSeq,
+      hasUsedBotDee: 1,
+      hasUsedBotDeeAtMs: now,
       updatedAtMs: now
     }, {merge: true});
     written = {seq: userSeq, epoch, receivedAtMs, userStored};
@@ -368,6 +402,8 @@ module.exports = {
   loadArchiveHistory,
   writeExecutionReceipt,
   markIdleEnded,
+  readHasUsedBotDee,
+  markHasUsedBotDee,
   snapshotToState,
   nextTranscript,
   emptyState

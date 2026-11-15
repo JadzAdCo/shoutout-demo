@@ -21,6 +21,22 @@ function flag01(value, fallback) {
   return fallback === 0 || fallback === 1 ? fallback : 0;
 }
 
+/** Patron BOT DEE usage datapoint: integer 0|1 only (never boolean true/false). */
+function normalizeHasUsedBotDee(value) {
+  if (value === 1 || value === "1") return 1;
+  return 0;
+}
+
+function hasUsedFromThread(data) {
+  const row = data && typeof data === "object" ? data : {};
+  if (Object.prototype.hasOwnProperty.call(row, "hasUsedBotDee")) {
+    return normalizeHasUsedBotDee(row.hasUsedBotDee);
+  }
+  if (Array.isArray(row.turns) && row.turns.length) return 1;
+  if (Math.max(0, Math.floor(Number(row.eventCount) || 0)) > 0) return 1;
+  return 0;
+}
+
 function normalizeConsent(raw) {
   const row = raw && typeof raw === "object" ? raw : {};
   return {
@@ -139,6 +155,8 @@ module.exports = {
   MEMORY_SCOPES,
   RETENTION_DAYS_DEFAULT,
   flag01,
+  normalizeHasUsedBotDee,
+  hasUsedFromThread,
   normalizeConsent,
   consentAllows,
   archiveMessage,

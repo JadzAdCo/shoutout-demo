@@ -172,7 +172,10 @@ test("getBotDeeAccess resolves the tier server-side, keeps the botDee feature gu
   assert.ok(src.includes("botdee.content_denied"));
   assert.ok(src.includes("core.systemJob(BOTDEE_JOB, collection)"));
   assert.ok(src.includes('request.app ? "verified" : "missing"'));
+  assert.ok(src.includes("hasUsedBotDee"));
+  assert.ok(src.includes("readHasUsedBotDee"));
   assert.ok(!/enforceAppCheck:\s*true/.test(src), "App Check is recorded, not enforced yet");
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "hasUsedBotDee"));
   const index = fs.readFileSync(path.join(__dirname, "index.js"), "utf8");
   assert.ok(index.includes('require("./data-classification-functions")'));
 });
