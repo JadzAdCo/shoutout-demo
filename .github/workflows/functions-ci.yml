@@ -117,22 +117,20 @@ jobs:
           FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
         run: |
           # Create once if missing. Never print the value. Do not rotate an existing secret.
+          # firebase-tools@13 has secrets:get (metadata), not secrets:list.
           set -euo pipefail
           set +x
           set +e
-          LISTED=$(firebase functions:secrets:list --project shoutoutdemo-5b402 --non-interactive 2>/dev/null)
-          LIST_STATUS=$?
+          firebase functions:secrets:get FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive >/tmp/oidc-secret-meta.txt 2>/tmp/oidc-secret-meta.err
+          GET_STATUS=$?
           set -e
-          if [ "$LIST_STATUS" -ne 0 ]; then
-            echo "Could not list Firebase secrets (status $LIST_STATUS). Set FLOQR_OIDC_JWT_SECRET before deploying floqrOidcToken."
-            exit 1
-          fi
-          if printf '%s' "$LISTED" | grep -F -q "FLOQR_OIDC_JWT_SECRET"; then
+          rm -f /tmp/oidc-secret-meta.txt /tmp/oidc-secret-meta.err
+          if [ "$GET_STATUS" -eq 0 ]; then
             echo "FLOQR_OIDC_JWT_SECRET already exists"
             exit 0
           fi
           echo "Creating FLOQR_OIDC_JWT_SECRET (value not logged)"
-          openssl rand -base64 48 | firebase functions:secrets:set FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive
+          openssl rand -base64 48 | firebase functions:secrets:set FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive --data-file -
 
       - name: Deploy Functions in batches
         env:

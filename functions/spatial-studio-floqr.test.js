@@ -293,6 +293,10 @@ test("production rules stay unpublished; OIDC Functions deploy is the Continue p
   assert.match(workflow, /firebase-deploy-features/);
   assert.match(workflow, /setFeatureServiceFlags/);
   assert.match(workflow, /Ensure FLOQR_OIDC_JWT_SECRET/);
+  assert.match(workflow, /functions:secrets:get FLOQR_OIDC_JWT_SECRET/);
+  assert.match(workflow, /functions:secrets:set FLOQR_OIDC_JWT_SECRET/);
+  assert.doesNotMatch(workflow, /functions:secrets:list/);
+  assert.doesNotMatch(workflow, /functions:secrets:access/);
   assert.ok(workflow.includes('if echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-spatial\\]\''), "spatial tag is an independent if");
   assert.ok(workflow.includes('if echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-features\\]\''), "features tag is an independent if");
   assert.ok(!workflow.includes('elif echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-spatial\\]\''), "spatial is not elif-chained");
