@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.024";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.024";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.025";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.025";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -3272,7 +3272,7 @@
       area:"BOT DEE",
       feature:"SmartView mock links (Master + My BOT DEE)",
       changed:"s3.3.024 — SmartView card actions resolve to same-origin ./club-profile.html, patron-portal, commerce (no ?v= on app pages). Mock catalog images use ./images/chrome/. Callable falls back to botdee-smartview-mock.json. Deep link #featuresBotDee-smartviews or #botDeeMasterSmartViewDemo opens SMARTviews subtab. Master Admin may list mocks without botDee feature gate.",
-      howToTest:"1) Hard-refresh master-admin.html?v=s3.3.024#featuresBotDee-smartviews (SOS2FA + sign in). 2) SMARTviews tab loads; Show mock SmartViews paints cards (or loads from mock JSON offline). 3) Open FLOQR Public Page → club-profile.html?location=temp-democlub-1 (200, no ?v=). Profile visibility → patron-portal.html?tab=profile. Commerce tee → commerce.html. 4) patron-portal.html → Feature & Orders → My BOT DEE → Show mock SmartViews — same link behavior. 5) master-admin.html#botDeeMasterSmartViewDemo opens SMARTviews host. 6) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh master-admin.html#featuresBotDee-smartviews (SOS2FA + sign in). 2) SMARTviews tab loads; Show mock SmartViews paints cards (or loads from mock JSON offline). 3) Open FLOQR Public Page → club-profile.html?location=temp-democlub-1 (200, no ?v=). Profile visibility → patron-portal.html?tab=profile. Commerce tee → commerce.html. 4) patron-portal.html → Feature & Orders → My BOT DEE → Show mock SmartViews — same link behavior. 5) master-admin.html#botDeeMasterSmartViewDemo opens SMARTviews host. 6) Mark Succeed/Failed.",
       expected:"No 404 on ./club-profile, patron-portal, commerce from cards. Images load from ./images/chrome/botdee-nightlife.jpg. Display boards never get ?v=. External menu links may stay https://www.floqr.app/.",
       troubleshoot:"Empty host → sign in + SOS2FA; check listBotDeeSmartViews or botdee-smartview-mock.json fetch. Wrong tab on #botDeeMasterSmartViewDemo → hard-refresh master-admin-app.js s3.3.024. floqr.app image → hard-refresh botdee-smartview.js + mock JSON."
     },

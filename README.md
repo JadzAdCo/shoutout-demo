@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.024 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.025 (stable)
 
+- s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help
 - s3.3.024: BOT DEE SmartView link resolver + mock JSON fallback; Master hash #featuresBotDee-smartviews
 - s3.3.023: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help
 - s3.3.023: Master Admin BOT DEE subtabs always visible (showBotDeeMgmtPage cards-only)
