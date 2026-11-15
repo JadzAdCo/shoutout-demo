@@ -293,8 +293,14 @@ test("regression: ShoutOut display URLs, VIP floor viewer, Si-nema Search tile g
   assert.match(index, /id="sinemaBtnCard"[^>]*class="[^"]*\bhidden\b[^"]*"[^>]*data-feature-key="sinema"/);
   assert.match(index, /data-floqr-chrome-icon="sinema"/);
   assert.match(index, /sinema-nightlife\.jpg/);
+  assert.match(index, /class="sinema-icon-face chrome-photo-face"/);
   assert.match(index, /id="shoutoutBtnCard"/);
   assert.match(index, /id="vipReservBtnCard"/);
+  const official = path.join(root, "images/chrome/official/si-nema-blacktiffany.webp");
+  assert.ok(fs.existsSync(official), "approved Si-nema logo source");
+  const nightlife = path.join(root, "images/chrome/sinema-nightlife.jpg");
+  assert.ok(fs.existsSync(nightlife), "Si-nema nightlife chrome tile");
+  assert.ok(fs.statSync(nightlife).size > 80_000, "Si-nema nightlife is the approved clapper mark, not a stub");
 
   const rules = read("firestore.rules");
   assert.doesNotMatch(rules, /spatialGrantRefs|oidcAuthCodes|sinemaScenes/);
