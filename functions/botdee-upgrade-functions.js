@@ -312,7 +312,8 @@ exports.getBotDeeProviderSlots = onCall(CALL_OPTS, async request => {
   }
 });
 
-/** Fresh Gen2 create: getBotDeeProviderSlots was left IAM-private after a cancelled batch. */
+/** Fresh Gen2 create so Master Admin can load slots: getBotDeeProviderSlots
+ *  stayed IAM-private after a cancelled first create (GFE 403). */
 exports.listBotDeeProviderSlots = onCall(CALL_OPTS, async request => {
   try {
     return await runGetBotDeeProviderSlots(request);
