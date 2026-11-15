@@ -40,7 +40,7 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   assert.match(oidcHtml, /floqr-session-shell\.js/);
   assert.match(oidcHtml, /data-floqr-auth-chrome/);
   assert.match(oidcHtml, /id="oidcConsentStatus"/);
-  assert.match(oidcHtml, /floqr-oidc-authorize\.js\?v=s3\.3\.020-studio/);
+  assert.match(oidcHtml, /floqr-oidc-authorize\.js\?v=s3\.3\.020/);
   assert.doesNotMatch(oidcHtml, /data-floqr-feature=/);
   assert.doesNotMatch(oidcHtml, /Create an account|Sign up with FloqMedia|floqmedia signup/i);
 
