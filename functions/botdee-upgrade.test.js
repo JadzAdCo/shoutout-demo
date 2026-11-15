@@ -273,6 +273,10 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(read("master-admin.html"), /id="botDeeMasterSmartViewDemo"/);
   assert.doesNotMatch(read("master-admin.html"), /Save BOT DEE settings/);
   assert.match(read("master-feature-services.js"), /showBotDeeMgmtPage/);
+  assert.match(
+    read("master-feature-services.js"),
+    /#featuresBotDee \.botdee-mgmt-page\[data-botdee-page\]/
+  );
 });
 
 test("hasUsedBotDee is integer 0|1 on botDeeThreads and every BOT DEE gate returns it", () => {
