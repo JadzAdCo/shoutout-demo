@@ -243,6 +243,7 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(index, /getBotDeeLegalGates/);
   assert.match(index, /getBotDeeProviderSlots/);
   assert.match(index, /setBotDeeProviderSlot/);
+  assert.match(read("functions/botdee-upgrade-functions.js"), /invoker:\s*"public"/);
   const rules = read("firestore.rules");
   assert.match(rules, /match \/botDeeThreads\/\{threadId\}/);
   assert.match(rules, /match \/archive\/\{messageId\}/);

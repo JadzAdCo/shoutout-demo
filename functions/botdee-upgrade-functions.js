@@ -20,7 +20,12 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 const {FieldValue} = admin.firestore;
 
-const CALL_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
+const CALL_OPTS = {
+  region: "us-central1",
+  timeoutSeconds: 30,
+  memory: "256MiB",
+  invoker: "public"
+};
 const REASON_MIN = 8;
 
 function asHttps(error) {
