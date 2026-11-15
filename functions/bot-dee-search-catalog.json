@@ -95,6 +95,27 @@
       ]
     },
     {
+      "sourceId": "help:help-ai-crawl-gemini",
+      "id": "help-ai-crawl-gemini",
+      "kind": "help",
+      "label": "Gemini on AI Crawling",
+      "blurb": "Gemini should improve crawling by reading official event and venue pages FLOQR already found — for DJ(s), “presented by” / promoter, and contact — not by inventing names. Use Fill missing with Gemini on a Review card (needs a source URL), or paste one detail page on Import → Extr",
+      "href": "./master-admin.html?from=botdee#aiCrawling",
+      "phrases": [
+        "gemini on ai crawling",
+        "gemini should improve crawling by reading official event and venue pages floqr already found for dj s presented by / promoter and contact not by inventing names",
+        "gemini crawl",
+        "fill missing with gemini",
+        "extract dj promoter",
+        "gemini source extractor",
+        "ai crawling gemini",
+        "invent tba",
+        "lineup page",
+        "ai crawling",
+        "help-ai-crawl-gemini"
+      ]
+    },
+    {
       "sourceId": "help:help-ai-recommendations",
       "id": "help-ai-recommendations",
       "kind": "help",
@@ -2382,11 +2403,11 @@
       "id": "help-venue-crawl-datapoints",
       "kind": "help",
       "label": "AI crawl venue datapoints",
-      "blurb": "On Master Admin → AI Crawling, set a Publishing rule per crawl type. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. ",
+      "blurb": "Master Admin → AI Crawling is split into Overview, Review queue, Run & schedule, Rules, Import, and Insights. Set a Publishing rule per crawl type on Rules. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s",
       "href": "./master-admin.html?from=botdee",
       "phrases": [
         "ai crawl venue datapoints",
-        "on master admin ai crawling set a publishing rule per crawl type. nightclubs and beach clubs need name genre dj s address city country and a phone or email. day",
+        "master admin ai crawling is split into overview review queue run schedule rules import and insights. set a publishing rule per crawl type on rules. nightclubs a",
         "ai crawl",
         "discovery crawl",
         "venue datapoints",
@@ -2404,6 +2425,9 @@
         "club admin imports",
         "publish discovery",
         "save discovery card",
+        "ai crawling tabs",
+        "review queue",
+        "run and schedule",
         "master admin ai crawling",
         "help-venue-crawl-datapoints"
       ]

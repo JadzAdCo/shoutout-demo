@@ -1393,6 +1393,18 @@
       await ensureDiscoveryDefaults();
       /* Crawl run buttons live in diagnostics JS; bind them here so Instant Crawl works without opening Diagnostics. */
       window.FLOQRDiagnostics?.ensureCrawlReady?.({db, auth});
+      if (!window.FLOQRDiagnostics?.runInstantCrawl && !bindAiCrawlPages.instantFallback) {
+        bindAiCrawlPages.instantFallback = true;
+        byId("aiCrawling")?.addEventListener("click", event => {
+          const instant = event.target?.closest?.("[data-ai-crawl-action='instant'], #runInstantCrawlBtn");
+          if (!instant || instant.classList.contains("is-busy")) return;
+          instant.disabled = true;
+          instant.classList.add("is-busy");
+          instant.setAttribute("aria-busy", "true");
+          instant.textContent = "Sending Instant Crawl…";
+          setStatus("Instant Crawl is not wired — hard-refresh so ai-diagnostics-service.js loads, then click again.");
+        });
+      }
       /* Counts live in #aiCrawlingSummary from masterAdminRollups; keep operator how-to here. */
       bindAiCrawlPages();
       showAiCrawlPage("review");

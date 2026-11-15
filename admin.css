@@ -732,12 +732,25 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 }
 .ai-crawl-pages.hidden{display:flex!important}
 .ai-crawl-pages .admin-subtab{min-height:40px;padding:8px 14px}
+.ai-crawl-primary-actions{
+  margin:10px 0 8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+.ai-crawl-primary-actions .primary{
+  min-height:44px;
+}
 #aiCrawling button.is-busy,
 #aiCrawling button[aria-busy="true"]{
   opacity:.45;
-  filter:grayscale(.4);
+  filter:grayscale(1);
   cursor:progress;
   pointer-events:none;
+  background:#6b7280!important;
+  color:#e5e7eb!important;
+  box-shadow:none!important;
 }
 @media (max-width:700px){
   .ai-crawl-last-run-when,.ai-crawl-last-run-id{white-space:normal}

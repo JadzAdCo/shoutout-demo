@@ -1600,6 +1600,12 @@
           <div id="aiCrawlingSummary" class="report-block ai-crawl-kpis"></div>
           <div id="aiCrawlLastRun" class="ai-crawl-last-run" role="status">Last crawl — open Overview after sign-in.</div>
           <p id="aiDiscoveryStatus" class="status" role="status"></p>
+          <div class="queue-actions ai-crawl-primary-actions">
+            <button type="button" class="primary" id="runInstantCrawlBtn" data-ai-crawl-action="instant">Instant Crawl Now</button>
+            <button type="button" id="runManualCrawlBtn" data-ai-crawl-action="manual">Run Discovery Crawl</button>
+            <button type="button" data-ai-crawl-open="run">Schedule &amp; search plan</button>
+          </div>
+          <p class="sub small">Instant Crawl greys out as soon as you click, then says the function received the job. Stay signed in as Master Admin. Open <strong>Run &amp; schedule</strong> only to change cities or the automatic slots.</p>
           <div class="ai-crawl-pages" role="tablist" aria-label="AI Crawling sections">
             <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="overview" data-i18n="master.aiCrawlOverview">Overview</button>
             <button type="button" class="admin-subtab active" role="tab" aria-selected="true" data-ai-crawl-page="review" data-i18n="master.aiCrawlReview">Review queue</button>
@@ -1700,12 +1706,12 @@
           <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
           <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
           <div class="queue-actions">
-            <button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button>
-            <button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button>
-            <button id="runManualCrawlBtn" type="button">Run Discovery Crawl</button>
-            <button id="runInstantCrawlBtn" class="primary" type="button">Instant Crawl Now</button>
+            <button id="previewCrawlPlanBtn" type="button" data-ai-crawl-action="preview">Preview Search Plan</button>
+            <button id="saveCrawlScheduleBtn" class="primary" type="button" data-ai-crawl-action="save-schedule">Save Automatic Schedule</button>
+            <button type="button" data-ai-crawl-action="manual">Run Discovery Crawl</button>
+            <button type="button" class="primary" data-ai-crawl-action="instant">Instant Crawl Now</button>
           </div>
-          <p class="sub small">Instant Crawl Now uses the <strong>saved schedule</strong> (or current form) and runs immediately with a short job cap — no waiting for the next 00/04/08 slot.</p>
+          <p class="sub small">Instant Crawl Now uses the <strong>saved schedule</strong> (or current form) and runs immediately with a short job cap — no waiting for the next 00/04/08 slot. The same Instant Crawl button also sits at the top of this page so you do not have to open this tab first.</p>
           <p class="sub small"><strong>Expected output:</strong> Name/Title, Genre, DJ(s)/Artist(s) or Organizer(s) for daytime, Promoter(s), Phone, Email, Instagram, Physical address (+ Date/Time for comedy and daytime events).</p>
           <p class="sub small"><em>Ticketmaster confirmation: later</em></p>
           <div id="crawlSearchPlanReport" class="report-block"></div>

@@ -228,7 +228,8 @@
         {label:"AI Crawling inner tabs", file:"master-admin.html", includes:["data-ai-crawl-page=\"overview\"", "aiCrawlLastRun", "Gemini on this crawl"]},
         {label:"Last crawl banner not a KPI", file:"master-admin-rollup.js", includes:["paintAiCrawlLastRun", "metric-card-value"]},
         {label:"Review jump + Gemini fill", file:"ai-discovery-service.js", includes:["showAiCrawlPage(\"review\")", "geminiFillFromSource"]},
-        {label:"Instant Crawl from AI Crawling", file:"ai-diagnostics-service.js", includes:["ensureCrawlReady", "crawlNotice", "is-busy"]},
+        {label:"Instant Crawl from AI Crawling", file:"ai-diagnostics-service.js", includes:["ensureCrawlReady", "bindCrawlWorkspaceActions", "is-busy"]},
+        {label:"Instant Crawl always visible", file:"master-admin.html", includes:["ai-crawl-primary-actions", "data-ai-crawl-action=\"instant\""]},
         {label:"Action feedback skip", file:"master-admin-app.js", includes:["skipLiveStatus", "data-ai-label"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-020-ai-crawl-workspace"]}
       ]
@@ -3184,9 +3185,9 @@
       area:"Master Admin",
       feature:"AI Crawling workspace tabs + last-run banner",
       changed:"s3.3.020 — AI Crawling is one page with Overview, Review queue, Run & schedule, Rules, Import, and Insights. Last crawl is a status banner (not a wrapping 46px KPI). Review is the default tab. Instant Crawl Now binds when AI Crawling opens (no need to visit Diagnostics first); the button greys out until the function returns. Needs research / Approved KPIs open Review. Gemini fill uses the official page; it must not invent DJ names.",
-      howToTest:"1) Hard-refresh master-admin.html s3.3.020, sign in, AI Crawling. 2) Review queue is the first inner tab; last crawl is a one-line banner. 3) Open Run & schedule, tap Instant Crawl Now — the button greys out (Sending / function received) and #aiDiscoveryStatus updates. It must not stay blank. 4) Tap Needs research — Review opens and status is Showing Needs research (not Needs research2). 5) On a card with a source URL, Fill missing with Gemini opens Import. 6) Mark Succeed/Failed.",
-      expected:"Instant Crawl shows a status on this page. The button is grey while the callable runs. KPIs stay numeric. Last run does not wrap. Gemini extract never invents TBA.",
-      troubleshoot:"Instant Crawl does nothing → hard-refresh so AI Crawling mount calls FLOQRDiagnostics.ensureCrawlReady; do not require opening Diagnostics first. Button never greys → admin.css button.is-busy. Letters wrap → last crawl must be #aiCrawlLastRun. Empty queue after a successful crawl → set Status to All, then Refresh."
+      howToTest:"1) Hard-refresh master-admin.html s3.3.020, sign in, AI Crawling. 2) Instant Crawl Now is on the workspace header — you do not open Run & schedule first. 3) Tap Instant Crawl Now — it greys out immediately (Sending Instant Crawl… then Crawling — function received…) and #aiDiscoveryStatus updates. A second click must do nothing while it is grey. 4) Review queue is the first inner tab; last crawl is a one-line banner. 5) Tap Needs research — Review opens and status is Showing Needs research. 6) Mark Succeed/Failed.",
+      expected:"Instant Crawl is visible on the AI Crawling header. Click greys the button until the function returns. Status is never blank. KPIs stay numeric. Last run does not wrap.",
+      troubleshoot:"Instant Crawl does nothing → hard-refresh so AI Crawling mount calls FLOQRDiagnostics.ensureCrawlReady; do not require opening Diagnostics first. Button never greys → admin.css #aiCrawling button.is-busy. Letters wrap → last crawl must be #aiCrawlLastRun. Empty queue after a successful crawl → set Status to All, then Refresh."
     },
     {
       id:"s3-3-019-ai-crawl-csv-publish",
@@ -8263,35 +8264,85 @@
     state.auth = options.auth || state.auth;
     ensureCrawlDb();
     hydrateDefaultControls();
+    bindCrawlWorkspaceActions();
     if (!state.mounted) {
       state.mounted = true;
       bindControls();
     }
-    return {ready: !!state.db, bound: !!state.mounted};
+    return {ready: !!state.db, bound: true};
+  }
+
+  function asBusyButtons(button) {
+    if (!button) return [];
+    if (typeof button.length === "number" && typeof button.tagName !== "string") {
+      return [...button].filter(Boolean);
+    }
+    return [button];
+  }
+
+  function crawlActionButtons(action, extra) {
+    const found = [...document.querySelectorAll(`[data-ai-crawl-action="${action}"]`)];
+    if (extra && !found.includes(extra)) found.push(extra);
+    return found;
   }
 
   async function withBusyButton(button, work, labels = {}) {
-    if (!button) return work({});
-    if (button.classList.contains("is-busy")) return;
-    const original = button.textContent;
+    const buttons = asBusyButtons(button);
+    if (!buttons.length) return work({});
+    if (buttons.some(item => item.classList.contains("is-busy"))) return;
+    const original = buttons.map(item => item.textContent);
     const busyText = labels.busyText || "Working…";
     const receivedText = labels.receivedText || "Function received…";
-    button.disabled = true;
-    button.classList.add("is-busy");
-    button.setAttribute("aria-busy", "true");
-    button.textContent = busyText;
+    buttons.forEach(item => {
+      item.disabled = true;
+      item.classList.add("is-busy");
+      item.setAttribute("aria-busy", "true");
+      item.textContent = busyText;
+    });
     try {
       return await work({
         markReceived() {
-          button.textContent = receivedText;
+          buttons.forEach(item => { item.textContent = receivedText; });
         }
       });
     } finally {
-      button.disabled = false;
-      button.classList.remove("is-busy");
-      button.removeAttribute("aria-busy");
-      button.textContent = original;
+      buttons.forEach((item, index) => {
+        item.disabled = false;
+        item.classList.remove("is-busy");
+        item.removeAttribute("aria-busy");
+        item.textContent = original[index];
+      });
     }
+  }
+
+  function bindCrawlWorkspaceActions() {
+    const root = byId("aiCrawling");
+    if (!root || root.dataset.floqrCrawlActions === "1") return;
+    root.dataset.floqrCrawlActions = "1";
+    root.addEventListener("click", event => {
+      const target = event.target?.closest?.("[data-ai-crawl-action]");
+      if (!target || target.classList.contains("is-busy")) return;
+      const action = target.getAttribute("data-ai-crawl-action");
+      if (action === "instant") {
+        event.preventDefault();
+        runInstantCrawl({currentTarget: target});
+        return;
+      }
+      if (action === "manual") {
+        event.preventDefault();
+        runManualCrawl({currentTarget: target});
+        return;
+      }
+      if (action === "preview") {
+        event.preventDefault();
+        previewCrawlPlan({currentTarget: target});
+        return;
+      }
+      if (action === "save-schedule") {
+        event.preventDefault();
+        saveCrawlSchedule({event: {currentTarget: target}});
+      }
+    });
   }
 
   async function saveCrawlSchedule(options = {}) {
@@ -8646,8 +8697,9 @@
   }
 
   async function runInstantCrawl(event) {
-    const button = event?.currentTarget || byId("runInstantCrawlBtn");
-    return withBusyButton(button, async ({markReceived}) => {
+    const clicked = event?.currentTarget || byId("runInstantCrawlBtn");
+    const buttons = crawlActionButtons("instant", clicked);
+    return withBusyButton(buttons, async ({markReceived}) => {
       ensureCrawlReady();
       if (!ensureCrawlDb()) {
         crawlNotice("Instant crawl cannot run: Firestore is not ready. Stay signed in as Master Admin.");
@@ -8699,8 +8751,9 @@
   }
 
   async function runManualCrawl(event) {
-    const button = event?.currentTarget || byId("runManualCrawlBtn");
-    return withBusyButton(button, async ({markReceived}) => {
+    const clicked = event?.currentTarget || byId("runManualCrawlBtn");
+    const buttons = crawlActionButtons("manual", clicked);
+    return withBusyButton(buttons, async ({markReceived}) => {
     ensureCrawlReady();
     if (!ensureCrawlDb()) {
       crawlNotice("Discovery crawl cannot run: Firestore is not ready. Stay signed in as Master Admin.");
@@ -10188,10 +10241,23 @@
     byId("rulesSmokeTestFilter")?.addEventListener("change", renderRulesSmokeResults);
     byId("copyRulesSmokeFailuresBtn")?.addEventListener("click", copyRulesSmokeFailures);
     byId("downloadRulesSmokeJsonBtn")?.addEventListener("click", downloadRulesSmokeJson);
-    byId("saveCrawlScheduleBtn")?.addEventListener("click", event => saveCrawlSchedule({event}));
-    byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
-    byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
-    byId("runInstantCrawlBtn")?.addEventListener("click", runInstantCrawl);
+    bindCrawlWorkspaceActions();
+    byId("saveCrawlScheduleBtn")?.addEventListener("click", event => {
+      if (event.currentTarget?.closest?.("#aiCrawling [data-ai-crawl-action]")) return;
+      saveCrawlSchedule({event});
+    });
+    byId("previewCrawlPlanBtn")?.addEventListener("click", event => {
+      if (event.currentTarget?.closest?.("#aiCrawling [data-ai-crawl-action]")) return;
+      previewCrawlPlan(event);
+    });
+    byId("runManualCrawlBtn")?.addEventListener("click", event => {
+      if (event.currentTarget?.closest?.("#aiCrawling [data-ai-crawl-action]")) return;
+      runManualCrawl(event);
+    });
+    byId("runInstantCrawlBtn")?.addEventListener("click", event => {
+      if (event.currentTarget?.closest?.("#aiCrawling [data-ai-crawl-action]")) return;
+      runInstantCrawl(event);
+    });
     byId("searchStaleRecordsBtn")?.addEventListener("click", () => searchStaleRecords());
     byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
     byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);

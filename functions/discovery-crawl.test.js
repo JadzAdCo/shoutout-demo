@@ -33,13 +33,20 @@ test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
   const html = read("master-admin.html");
   assert.match(html, /runInstantCrawlBtn/);
   assert.match(html, /Instant Crawl Now/);
+  assert.match(html, /ai-crawl-primary-actions/);
+  assert.match(html, /id="runInstantCrawlBtn"[^>]*data-ai-crawl-action="instant"/);
+  const instantAt = html.indexOf('id="runInstantCrawlBtn"');
+  const runPageAt = html.indexOf('data-ai-crawl-page="run"');
+  assert.ok(instantAt > 0 && instantAt < runPageAt, "Instant Crawl Now must sit on the AI Crawling header, not only inside hidden Run & schedule");
   const diagnostics = read("ai-diagnostics-service.js");
   assert.match(diagnostics, /runInstantCrawl/);
   assert.match(diagnostics, /runInstantDiscoveryCrawl/);
   assert.match(diagnostics, /function ensureCrawlReady/);
+  assert.match(diagnostics, /function bindCrawlWorkspaceActions/);
   assert.match(diagnostics, /function crawlNotice/);
   assert.match(diagnostics, /classList.add\("is-busy"\)/);
   assert.match(diagnostics, /Crawling — function received/);
+  assert.match(diagnostics, /Sending Instant Crawl/);
   assert.doesNotMatch(diagnostics, /async function runInstantCrawl\([^)]*\) \{\s*if \(!state\.db\) return;/);
   const discovery = read("ai-discovery-service.js");
   assert.match(discovery, /ensureCrawlReady/);
@@ -50,6 +57,43 @@ test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
   const app = read("master-admin-app.js");
   assert.match(app, /\.admin-tabs \.admin-subtabs/);
   assert.match(app, /#runInstantCrawlBtn/);
+});
+
+test("withBusyButton greys Instant Crawl until the function returns", async () => {
+  const source = read("ai-diagnostics-service.js");
+  const start = source.indexOf("function asBusyButtons");
+  const end = source.indexOf("function bindCrawlWorkspaceActions");
+  assert.ok(start > 0 && end > start, "asBusyButtons / withBusyButton must stay next to bindCrawlWorkspaceActions");
+  const {withBusyButton} = eval(`(() => { ${source.slice(start, end)} return {asBusyButtons, withBusyButton}; })()`);
+  const btn = {
+    textContent: "Instant Crawl Now",
+    disabled: false,
+    classList: {
+      _s: new Set(),
+      add(name) { this._s.add(name); },
+      remove(name) { this._s.delete(name); },
+      contains(name) { return this._s.has(name); }
+    },
+    attrs: {},
+    setAttribute(key, value) { this.attrs[key] = value; },
+    removeAttribute(key) { delete this.attrs[key]; }
+  };
+  let received = "";
+  const pending = withBusyButton(btn, async ({markReceived}) => {
+    assert.equal(btn.disabled, true);
+    assert.equal(btn.classList.contains("is-busy"), true);
+    assert.equal(btn.textContent, "Sending Instant Crawl…");
+    markReceived();
+    received = btn.textContent;
+    await new Promise(resolve => setTimeout(resolve, 15));
+    return "ok";
+  }, {busyText: "Sending Instant Crawl…", receivedText: "Crawling — function received…"});
+  assert.equal(btn.classList.contains("is-busy"), true);
+  assert.equal(await pending, "ok");
+  assert.equal(received, "Crawling — function received…");
+  assert.equal(btn.disabled, false);
+  assert.equal(btn.classList.contains("is-busy"), false);
+  assert.equal(btn.textContent, "Instant Crawl Now");
 });
 
 test("runFloqrDiscoveryCrawl export exists in ai-discovery-functions", () => {
