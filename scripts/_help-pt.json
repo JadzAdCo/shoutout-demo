@@ -170,5 +170,9 @@
   "help-ballers-alert": {
     "title": "Baller's Alert",
     "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face in the upper-left medallion (about one-third of the upper half). A face photo is required. FLOQR may run a Gemini pass to fit your face onto the card; if AI is unavailable the LED still places your photo in the circle. Valid Thru shows year 50. Name and company work the same as Black Card."
+  },
+  "help-botdee-knows-of-me": {
+    "title": "O que o BOT DEE sabe de mim",
+    "body": "Factos guardados com a sua aprovação estão em Funcionalidades e encomendas → O meu BOT DEE. A lista fica vazia se a memória estiver desligada ou não houver dados. Exporte ou apague aqui. O BOT DEE não guarda IP. Mingl não é copiado."
   }
 }

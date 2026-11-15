@@ -1364,6 +1364,13 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
   #betaInviteSubmitBtn{width:100%}
 }
 
+.portal-botdee-panel label{display:flex;gap:.45rem;align-items:flex-start;margin:.4rem 0;font-size:.95rem}
+.portal-botdee-panel label input{margin-top:.2rem;flex:0 0 auto}
+.portal-botdee-fact{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.portal-botdee-fact .buttonlike{min-height:44px}
+.botdee-mgmt-subtabs{margin-top:10px}
+#featuresBotDee .botdee-mgmt-page.hidden{display:none!important}
+
 /* Diagnostics → ShoutOut page trails */
 .shoutout-page-trail{margin:8px 0 0;padding-left:1.2rem}
 .shoutout-page-trail li{margin:4px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}

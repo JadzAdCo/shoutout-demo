@@ -709,6 +709,11 @@
     byId("featureAuditVerifyBtn")?.addEventListener("click", () => verifyAudit());
     byId("botDeeSettingsSave")?.addEventListener("click", () => saveBotDeeSettings());
     byId("botDeeSettingsReload")?.addEventListener("click", () => loadBotDeeSettings());
+    byId("botDeeMgmtSubtabs")?.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-botdee-page]");
+      if (!btn) return;
+      showBotDeeMgmtPage(btn.dataset.botdeePage);
+    });
     byId("botDeeManifestReload")?.addEventListener("click", () => loadBotDeeManifest());
     byId("botDeeLegalSave")?.addEventListener("click", () => saveBotDeeLegalGate());
     byId("botDeeSlotSave")?.addEventListener("click", () => saveBotDeeProviderSlot());
@@ -787,6 +792,26 @@
     const n = Math.round(Number(raw));
     if (!Number.isFinite(n)) return DEFAULT_IDLE_SECONDS;
     return Math.min(MAX_IDLE_SECONDS, Math.max(MIN_IDLE_SECONDS, n));
+  }
+
+  function showBotDeeMgmtPage(page) {
+    const key = String(page || "pause").trim() || "pause";
+    document.querySelectorAll("#featuresBotDee [data-botdee-page]").forEach(el => {
+      const on = el.dataset.botdeePage === key;
+      el.classList.toggle("hidden", !on);
+      if (el.classList.contains("botdee-mgmt-page")) el.hidden = !on;
+    });
+    document.querySelectorAll("#botDeeMgmtSubtabs [data-botdee-page]").forEach(btn => {
+      const on = btn.dataset.botdeePage === key;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if (key === "legal") loadBotDeeManifest();
+    if (key === "smartviews") {
+      root.FLOQRBotDeeUpgradeUi?.bind?.();
+      root.FLOQRBotDeeUpgradeUi?.loadDemos?.("botDeeMasterSmartViewDemo");
+    }
+    if (key === "pause") loadBotDeeSettings();
   }
 
   function renderBotDeeMeta(row) {
@@ -1033,8 +1058,9 @@
     if (id === "featuresReleaseControl") return loadReleaseControl();
     if (id === "featuresBetaTesting") return loadBetaTesting();
     if (id === "featuresBotDee") {
-      loadBotDeeSettings();
-      return loadBotDeeManifest();
+      root.FLOQRBotDeeUpgradeUi?.bind?.();
+      showBotDeeMgmtPage("pause");
+      return;
     }
     if (id === "featuresAuditTrail") return loadAuditTrail();
   }

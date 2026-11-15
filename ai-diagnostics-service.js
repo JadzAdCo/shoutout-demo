@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.021";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.021";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.022";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.022";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.022",
+      title: "s3.3.022 — BOT DEE chat-only + My BOT DEE portal + Master Admin subtabs",
+      checks: [
+        {label:"Chat-only botdee.html", file:"botdee.html", notIncludes:["botDeeSettingsBubble", "botDeeMemoryPanel", "botdee-upgrade-ui.js"], includes:["botDeeChatForm", "botDeeTranscript"]},
+        {label:"My BOT DEE tab", file:"patron-portal.html", includes:["foBotDeePane", "nav.myBotDee", "botdee-upgrade-ui.js", "botDeeKnowsList"]},
+        {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo"]},
+        {label:"Save label", file:"master-admin.html", includes:["data-i18n=\"app.save\""], notIncludes:["Save BOT DEE settings"]},
+        {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews"], notIncludes:["botdee.settingsBubble"]},
+        {label:"Help knows-of-me", file:"botdee-help-repository.js", includes:["help-botdee-knows-of-me", "Feature & Orders → My BOT DEE"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-022-botdee-portal-mgmt"]}
+      ]
+    },
     {
       version: "s3.3.021",
       title: "s3.3.021 — BOT DEE Settings bubble for saved chats",
@@ -3220,6 +3233,15 @@
       howToTest:"1) Hard-refresh master-admin.html s3.3.020, sign in, AI Crawling. 2) Instant Crawl Now is on the workspace header — you do not open Run & schedule first. 3) Tap Instant Crawl Now — it greys out immediately (Sending Instant Crawl… then Crawling — function received…) and #aiDiscoveryStatus updates. A second click must do nothing while it is grey. 4) Review queue is the first inner tab; last crawl is a one-line banner. 5) Tap Needs research — Review opens and status is Showing Needs research. 6) Mark Succeed/Failed.",
       expected:"Instant Crawl is visible on the AI Crawling header. Click greys the button until the function returns. Status is never blank. KPIs stay numeric. Last run does not wrap.",
       troubleshoot:"Instant Crawl does nothing → hard-refresh so AI Crawling mount calls FLOQRDiagnostics.ensureCrawlReady; do not require opening Diagnostics first. Button never greys → admin.css #aiCrawling button.is-busy. Letters wrap → last crawl must be #aiCrawlLastRun. Empty queue after a successful crawl → set Status to All, then Refresh."
+    },
+    {
+      id:"s3-3-022-botdee-portal-mgmt",
+      area:"BOT DEE",
+      feature:"Chat-only + My BOT DEE + Master Admin subtabs",
+      changed:"s3.3.022 — botdee.html is transcript + composer only (no Settings bubble, memory popout, or SmartViews on chat). Saved chats, export/delete, and What BOT DEE knows of me live under My Profile → Feature & Orders → My BOT DEE. Master Admin → Features Mgmt → BOT DEE has three subtabs: Conversation Pause, Version & Legal Gates, SMARTviews (mock demo). Save uses the shared Save label. Adapters stay mock.",
+      howToTest:"1) Hard-refresh botdee.html s3.3.022, sign in with botDee access — confirm no Settings under the composer and no library panel. 2) patron-portal.html → Feature & Orders → My BOT DEE — saved chats checkboxes + knows list; Save uses Save. 3) master-admin.html#featuresBotDee — three subtabs; no redundant BOT DEE kickers on cards; Conversation Pause Save says Save; SMARTviews Show mock SmartViews works. 4) Mark Succeed/Failed.",
+      expected:"Chat canvas is chat-only. Portal My BOT DEE has both sections. Master Admin has three submenu pages. Green Save is Save only. No live vendor HTTP.",
+      troubleshoot:"Settings bubble still visible → cached botdee.html. My BOT DEE tab missing → botDee feature gate off for account. Subtabs missing → hard-refresh master-admin.html + master-feature-services.js s3.3.022."
     },
     {
       id:"s3-3-021-botdee-settings-bubble",

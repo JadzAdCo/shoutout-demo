@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.021";
+  const VERSION = "s3.3.022";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -43,7 +43,11 @@
       },
       "help-botdee-memory": {
         title: "Сохранённые чаты BOT DEE",
-        body: "Нажмите «Настройки» под полем чата, чтобы открыть сохранённые чаты и воспоминания. Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Закройте «Настройки» крестиком или после «Сохранить», «Экспорт» или «Удалить». Гости не сохраняются. Mingl остаётся в Mingl."
+        body: "Откройте Функции и заказы → Мой BOT DEE, чтобы сохранять чаты после паузы, экспортировать или удалять историю. Пятиминутная пауза завершает живую сессию. При согласии BOT DEE сохраняет чат. Гости не сохраняются. Mingl остаётся в Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Что BOT DEE знает обо мне",
+        body: "Факты с вашего согласия — в разделе Функции и заказы → Мой BOT DEE. Список пуст, если память выключена или фактов нет. Экспорт или удаление здесь. BOT DEE не сохраняет IP. Mingl не копируется."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -429,7 +433,11 @@
       },
       "help-botdee-memory": {
         title: "Opgeslagen BOT DEE-chats",
-        body: "Tik op Instellingen onder het chatvak om opgeslagen chats en herinneringen te openen. De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Sluit Instellingen met X of na Opslaan, Exporteren of Wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
+        body: "Open Functies & bestellingen → Mijn BOT DEE om chats na de pauze op te slaan, te exporteren of geschiedenis te wissen. De pauze van vijf minuten beëindigt de live sessie. Met opt-in bewaart BOT DEE de chat. Gasten worden niet bewaard. Mingl blijft Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Wat BOT DEE van mij weet",
+        body: "Feiten met uw toestemming staan onder Functies & bestellingen → Mijn BOT DEE. De lijst is leeg als geheugen uit staat of er niets is opgeslagen. Exporteer of wis hier. BOT DEE slaat geen IP-adres op. Mingl wordt niet gekopieerd."
       },
       "help-search-settings-appearance": {
         title: "Settings op Search",
@@ -815,7 +823,11 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE enregistrés",
-        body: "Touchez Réglages sous la zone de chat pour ouvrir les discussions et souvenirs enregistrés. La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Fermez Réglages avec X ou après Enregistrer, Exporter ou Supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
+        body: "Ouvrez Fonctionnalités et commandes → Mon BOT DEE pour enregistrer les chats après la pause, exporter ou supprimer l’historique. La pause de cinq minutes termine la session en direct. Si vous acceptez, BOT DEE conserve le chat. Les invités ne sont pas enregistrés. Mingl reste dans Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Ce que BOT DEE sait de moi",
+        body: "Les faits enregistrés avec votre accord se trouvent dans Fonctionnalités et commandes → Mon BOT DEE. La liste est vide si la mémoire est désactivée ou vide. Exportez ou supprimez ici. BOT DEE n’enregistre jamais votre adresse IP. Mingl n’est pas copié."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -1201,7 +1213,11 @@
       },
       "help-botdee-memory": {
         title: "Gespeicherte BOT DEE-Chats",
-        body: "Tippen Sie unter dem Chatfeld auf Einstellungen, um gespeicherte Chats und Erinnerungen zu öffnen. Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Schließen Sie Einstellungen mit X oder nach Speichern, Exportieren oder Löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+        body: "Öffnen Sie Funktionen & Bestellungen → Mein BOT DEE, um Chats nach der Pause zu speichern, zu exportieren oder den Verlauf zu löschen. Die 5-Minuten-Pause beendet die Live-Sitzung. Mit Opt-in behält BOT DEE den Chat. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Was BOT DEE von mir weiß",
+        body: "Mit Ihrer Zustimmung gespeicherte Fakten liegen unter Funktionen & Bestellungen → Mein BOT DEE. Die Liste ist leer, wenn die Erinnerung aus ist oder nichts gespeichert ist. Export oder Löschung hier. BOT DEE speichert keine IP-Adresse. Mingl wird nicht kopiert."
       },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
@@ -1587,7 +1603,11 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
-        body: "Toque Ajustes bajo el cuadro de chat para abrir chats y recuerdos guardados. La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Cierre Ajustes con X o después de Guardar, Exportar o Eliminar. Los invitados no se guardan. Mingl se queda en Mingl."
+        body: "Abra Funciones y pedidos → Mi BOT DEE para guardar chats tras la pausa, exportar o borrar historial. La pausa de cinco minutos termina la sesión en vivo. Si acepta, BOT DEE guarda el chat. Los invitados no se guardan. Mingl se queda en Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Lo que BOT DEE sabe de mí",
+        body: "Los hechos guardados con su consentimiento están en Funciones y pedidos → Mi BOT DEE. La lista está vacía si la memoria está apagada o no hay datos. Exporte o borre aquí. BOT DEE nunca guarda su dirección IP. Mingl no se copia."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1973,7 +1993,11 @@
       },
       "help-botdee-memory": {
         title: "Chat BOT DEE salvate",
-        body: "Tocca Impostazioni sotto la casella di chat per aprire chat e memorie salvate. La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Chiudi Impostazioni con X o dopo Salva, Esporta o Elimina. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+        body: "Apri Funzioni e ordini → Il mio BOT DEE per salvare le chat dopo la pausa, esportare o eliminare la cronologia. La pausa di cinque minuti chiude la sessione dal vivo. Con opt-in BOT DEE tiene la chat. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Cosa BOT DEE sa di me",
+        body: "I fatti salvati con il tuo consenso sono in Funzioni e ordini → Il mio BOT DEE. L’elenco è vuoto se la memoria è spenta o non c’è nulla. Esporta o elimina qui. BOT DEE non memorizza l’IP. Mingl non viene copiato."
       },
       "help-search-settings-appearance": {
         title: "Settings su Search",
@@ -2359,7 +2383,11 @@
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
-        body: "Toque em Definições abaixo da caixa de chat para abrir chats e memórias guardados. A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Feche Definições com X ou após Guardar, Exportar ou Apagar. Convidados não são guardados. Mingl fica no Mingl."
+        body: "Abra Funcionalidades e encomendas → O meu BOT DEE para guardar chats após a pausa, exportar ou apagar histórico. A pausa de cinco minutos termina a sessão ao vivo. Se aderir, o BOT DEE guarda o chat. Convidados não são guardados. Mingl fica no Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "O que o BOT DEE sabe de mim",
+        body: "Factos guardados com a sua aprovação estão em Funcionalidades e encomendas → O meu BOT DEE. A lista fica vazia se a memória estiver desligada ou não houver dados. Exporte ou apague aqui. O BOT DEE não guarda IP. Mingl não é copiado."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2745,7 +2773,11 @@
       },
       "help-botdee-memory": {
         title: "Αποθηκευμένες συνομιλίες BOT DEE",
-        body: "Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Κλείστε τις Ρυθμίσεις με X ή μετά από Αποθήκευση, Εξαγωγή ή Διαγραφή. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+        body: "Ανοίξτε Λειτουργίες & παραγγελίες → Το BOT DEE μου για αποθήκευση μετά την παύση, εξαγωγή ή διαγραφή ιστορικού. Η παύση πέντε λεπτών κλείνει τη ζωντανή συνεδρία. Με opt-in το BOT DEE κρατά τη συνομιλία. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Τι γνωρίζει το BOT DEE για μένα",
+        body: "Τα γεγονότα με την έγκρισή σας βρίσκονται σε Λειτουργίες & παραγγελίες → Το BOT DEE μου. Η λίστα είναι κενή αν η μνήμη είναι off ή δεν υπάρχουν δεδομένα. Εξαγωγή ή διαγραφή εδώ. Το BOT DEE δεν αποθηκεύει IP. Το Mingl δεν αντιγράφεται."
       },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
@@ -3131,7 +3163,11 @@
       },
       "help-botdee-memory": {
         title: "Zapisane czaty BOT DEE",
-        body: "Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Zamknij Ustawienia przez X albo po Zapisz, Eksportuj lub Usuń. Goście nie są zapisywani. Mingl zostaje w Mingl."
+        body: "Otwórz Funkcje i zamówienia → Mój BOT DEE, aby zapisywać czaty po pauzie, eksportować lub usuwać historię. Pięciominutowa pauza kończy sesję na żywo. Po zgodzie BOT DEE zachowuje czat. Goście nie są zapisywani. Mingl zostaje w Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "Co BOT DEE wie o mnie",
+        body: "Fakty zapisane za zgodą są w Funkcje i zamówienia → Mój BOT DEE. Lista jest pusta, gdy pamięć jest wyłączona lub brak danych. Eksport lub usuń tutaj. BOT DEE nie zapisuje IP. Mingl nie jest kopiowany."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -3517,7 +3553,11 @@
       },
       "help-botdee-memory": {
         title: "محادثات BOT DEE المحفوظة",
-        body: "اضغط الإعدادات تحت صندوق الدردشة لفتح المحادثات والذكريات المحفوظة. توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. أغلق الإعدادات بـ X أو بعد حفظ أو تصدير أو حذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
+        body: "افتح الميزات والطلبات → BOT DEE الخاص بي لحفظ المحادثات بعد التوقف أو التصدير أو الحذف. توقف الخمس دقائق ينهي الجلسة المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. لا يُحفظ الضيوف. يبقى Mingl في Mingl."
+      },
+      "help-botdee-knows-of-me": {
+        title: "ما يعرفه BOT DEE عني",
+        body: "الحقائق المحفوظة بموافقتك في الميزات والطلبات → BOT DEE الخاص بي. القائمة فارغة إذا كانت الذاكرة مغلقة أو لا توجد بيانات. صدّر أو احذف هنا. لا يخزّن BOT DEE عنوان IP. لا يُنسخ Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",

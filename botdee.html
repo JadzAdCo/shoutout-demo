@@ -23,11 +23,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.021"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.022"/>
 </head>
 <body class="botdee-standalone botdee-page" data-floqr-feature="botDee">
 <main class="botdee-standalone-main botdee-shell">
@@ -53,45 +52,6 @@
       </label>
       <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="botdee.chatSend">Send</button>
     </form>
-
-    <div class="botdee-composer-below" id="botDeeComposerBelow">
-      <button type="button" id="botDeeSettingsBubble" class="botdee-settings-bubble" aria-haspopup="dialog" aria-expanded="false" aria-controls="botDeeMemoryPopout" data-i18n-aria="botdee.settingsOpen" aria-label="Open saved chats and memories">
-        <svg class="botdee-settings-gear" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.55-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.8 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.92 14.16a.5.5 0 0 0-.12.64l1.92 3.32c.13.23.4.32.64.22l2.39-.96c.5.39 1.04.7 1.63.94l.36 2.54c.05.24.26.42.5.42h3.8c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.55 1.63-.94l2.39.96c.24.1.51.01.64-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/>
-        </svg>
-        <span data-i18n="botdee.settingsBubble">Settings</span>
-      </button>
-      <div id="botDeeMemoryPopout" class="botdee-memory-popout" hidden>
-        <div class="botdee-memory-popout-card" role="dialog" aria-modal="true" aria-labelledby="botDeeMemoryTitle">
-          <button type="button" id="botDeeMemoryClose" class="botdee-memory-popout-x" data-i18n-aria="botdee.settingsClose" aria-label="Close">×</button>
-          <section id="botDeeMemoryPanel" class="botdee-upgrade-panel" aria-labelledby="botDeeMemoryTitle">
-            <h2 id="botDeeMemoryTitle" data-i18n="botdee.memoryTitle">Saved chats and memories</h2>
-            <p id="botDeeSettingsFirstUse" class="botdee-settings-first-use" hidden data-i18n="botdee.settingsFirstUse">First time with BOT DEE — review saved chats and memories.</p>
-            <p class="sub small" data-keep-visible="true" data-i18n="botdee.memoryTimeoutNote">The five-minute pause ends the live chat. It does not delete history you opted to save. Guests stay ephemeral. Mingl chats are never copied here.</p>
-            <label><input id="botDeeConsentArchive" type="checkbox"/> <span data-i18n="botdee.memoryArchiveOptIn">Save this BOT DEE chat after the pause (opt in)</span></label>
-            <label><input id="botDeeConsentMemory" type="checkbox"/> <span data-i18n="botdee.memoryFactsOptIn">Let BOT DEE remember facts I approve</span></label>
-            <label><input id="botDeeConsentPersonalize" type="checkbox"/> <span data-i18n="botdee.memoryPersonalizeOptIn">Use my saved facts to personalize answers</span></label>
-            <p class="botdee-upgrade-actions">
-              <button type="button" id="botDeeConsentSave" class="primary" data-i18n="botdee.memorySave">Save memory settings</button>
-              <button type="button" id="botDeeExportBtn" class="buttonlike" data-i18n="botdee.memoryExport">Export my BOT DEE data</button>
-              <button type="button" id="botDeeDeleteArchiveBtn" class="buttonlike" data-i18n="botdee.memoryDelete">Delete saved history</button>
-            </p>
-            <p id="botDeeUpgradeStatus" class="status" role="status"></p>
-          </section>
-        </div>
-      </div>
-    </div>
-
-    <section id="botDeeLibraryPanel" class="botdee-upgrade-panel" aria-labelledby="botDeeLibraryTitle">
-      <h2 id="botDeeLibraryTitle" data-i18n="botdee.libraryTitle">Research Library and SmartViews</h2>
-      <p class="sub small" data-i18n="botdee.smartviewResearchDisabled">Public Web Research stays off until legal and identity review. Venue cards open the existing FLOQR Public Page.</p>
-      <p class="botdee-explain" data-i18n="botdee.explainTitle">Explain My Recommendation uses the sources and preferences shown on each card. Ads are labeled. You can ask for non-personalized results.</p>
-      <p><a class="buttonlike" href="./patron-portal.html?tab=profile" data-i18n="botdee.privacyOpenProfile">Open existing profile visibility</a></p>
-      <p class="botdee-upgrade-actions">
-        <button type="button" id="botDeeLoadSmartViews" class="buttonlike" data-i18n="botdee.libraryRefresh">Show mock SmartViews</button>
-      </p>
-      <div id="botDeeSmartViewDemo" class="botdee-sv-host" aria-live="polite"></div>
-    </section>
   </section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -99,24 +59,22 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.021"></script>
-<script src="./floqr-app-check.js?v=s3.3.021"></script>
-<script src="./floqr-session-shell.js?v=s3.3.021"></script>
-<script src="./floqr-nav.js?v=s3.3.021"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.021"></script>
-<script src="./floqr-i18n.js?v=s3.3.021"></script>
-<script src="./floqr-place-i18n.js?v=s3.3.021"></script>
-<script src="./botdee-help-repository.js?v=s3.3.021"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.021"></script>
-<script src="./floqr-venue-query.js?v=s3.3.021"></script>
-<script src="./floqr-data-classification.js?v=s3.3.021"></script>
-<script src="./botdee-access.js?v=s3.3.021"></script>
-<script src="./feature-gates.js?v=s3.3.021"></script>
-<script src="./floqr-feature-services.js?v=s3.3.021"></script>
-<script src="./helper-popouts.js?v=s3.3.021"></script>
-<script src="./bot-dee-chat.js?v=s3.3.021"></script>
-<script src="./botdee-smartview.js?v=s3.3.021"></script>
-<script src="./botdee-upgrade-ui.js?v=s3.3.021"></script>
-<script src="./botdee-page.js?v=s3.3.021"></script>
+<script src="./firebase-config.js?v=s3.3.022"></script>
+<script src="./floqr-app-check.js?v=s3.3.022"></script>
+<script src="./floqr-session-shell.js?v=s3.3.022"></script>
+<script src="./floqr-nav.js?v=s3.3.022"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.022"></script>
+<script src="./floqr-i18n.js?v=s3.3.022"></script>
+<script src="./floqr-place-i18n.js?v=s3.3.022"></script>
+<script src="./botdee-help-repository.js?v=s3.3.022"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.022"></script>
+<script src="./floqr-venue-query.js?v=s3.3.022"></script>
+<script src="./floqr-data-classification.js?v=s3.3.022"></script>
+<script src="./botdee-access.js?v=s3.3.022"></script>
+<script src="./feature-gates.js?v=s3.3.022"></script>
+<script src="./floqr-feature-services.js?v=s3.3.022"></script>
+<script src="./helper-popouts.js?v=s3.3.022"></script>
+<script src="./bot-dee-chat.js?v=s3.3.022"></script>
+<script src="./botdee-page.js?v=s3.3.022"></script>
 </body>
 </html>
