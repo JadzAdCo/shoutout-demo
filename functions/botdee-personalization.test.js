@@ -41,6 +41,9 @@ test("first name, demeanor, last-used, and greeting stay short", () => {
   assert.equal(p.looksLikeReservedComposerText("Hello sir"), true);
   assert.equal(p.looksLikeReservedComposerText("what's up"), true);
   assert.equal(p.looksLikeReservedComposerText("What’s up"), true);
+  assert.equal(p.looksLikeReservedComposerText("what's up?"), true);
+  assert.equal(p.looksLikeReservedComposerText("Hello."), true);
+  assert.equal(p.looksLikeReservedComposerText("help."), true);
   assert.equal(p.looksLikeReservedComposerText("hello ma'am"), true);
   assert.equal(p.looksLikeReservedComposerText("help"), true);
   assert.equal(p.looksLikeReservedComposerText("privacy"), true);
@@ -105,6 +108,9 @@ test("composer name capture skips greetings and cancel clears intercept", () => 
   const whatsUp = loadUi();
   whatsUp.api.maybeStartSetup();
   assert.equal(whatsUp.api.interceptSend("what's up"), false);
+  const dotted = loadUi();
+  dotted.api.maybeStartSetup();
+  assert.equal(dotted.api.interceptSend("Hello."), false);
   const keep = loadUi();
   keep.api.maybeStartSetup();
   assert.equal(keep.api.interceptSend("Don"), true);

@@ -93,7 +93,7 @@
     const q = String(raw || "")
       .toLowerCase()
       .replace(/[’']/g, "")
-      .replace(/[^a-z0-9@\s._/-]+/g, " ")
+      .replace(/[^a-z0-9]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
     if (!q) return true;
