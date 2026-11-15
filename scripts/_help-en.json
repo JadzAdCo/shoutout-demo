@@ -354,5 +354,25 @@
   "help-ballers-alert": {
     "title": "Baller's Alert",
     "body": "$100 Baller's Alert — the Baller's Express BUSINESS metal card with your face under the warrior helmet. Use Upload photo → Photo library / files or Camera with face guide (one Upload control — no duplicate Take photo button). Gemini isolates you from the background (coarse edges — not salon hair matting); then zoom and position so only the face sits in the medallion. Helmet, rim, and chip stay. If background removal fails, retry or keep the original. Company is optional (max 18 characters, always UPPERCASE on the card; preset WE'RE OUTSIDE LLC). Valid Thru 12/50."
+  },
+  "help-botdee-memory": {
+    "title": "BOT DEE saved chats",
+    "body": "The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Guests are not saved. Mingl conversations stay in Mingl."
+  },
+  "help-botdee-smartview": {
+    "title": "BOT DEE SmartViews",
+    "body": "SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved."
+  },
+  "help-botdee-research-library": {
+    "title": "BOT DEE Research Library",
+    "body": "Save places and cards you asked BOT DEE about. A Google Place ID is not a copy of Google’s photos or reviews. You can refresh or delete a saved item. Licensed caches stay off until the provider is approved."
+  },
+  "help-botdee-explain": {
+    "title": "Explain My Recommendation",
+    "body": "Each recommendation can show evidence, the date it was checked, whether personalization was on, and if a placement is sponsored. You can ask BOT DEE not to personalize this search."
+  },
+  "help-botdee-privacy-assistant": {
+    "title": "BOT DEE Privacy Assistant",
+    "body": "Change what other FLOQR users see in My Profile visibility — BOT DEE does not add a second public switch. If web research attached the wrong person, you can dispute it here without changing your profile. BOT DEE cannot promise that a third-party site will delete the original page."
   }
 }

@@ -682,7 +682,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 |---|---|
 | UI | `botdee.html` — chrome icon left, compact Back, transcript + input (`bot-dee-chat.css` / `bot-dee-chat.js`); Site chrome early-paint. Legacy `floqai.html` / `floqai-search.html` removed (404). |
 | Client | `bot-dee-chat.js` → callable `executeBotSession`; `botdee-page.js` binds chat; `botdee-access.js` / `getBotDeeAccess` (alias `getFloqAiAccess`) for audience scope |
-| Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`) |
+| Backend | `functions/bot-dee-functions.js` `executeBotSession` + `getBotDeeThread` + `setBotDeeSettings`; persist `functions/bot-dee-thread.js`; core `functions/bot-dee-core.js`; catalog `functions/bot-dee-search-catalog.json` (build: `scripts/build-bot-dee-search-catalog.js`); six-phase callables in `functions/botdee-upgrade-functions.js` (consent, export/delete, SmartViews, legal gates, capability manifest) |
 | Chat vs search | Greetings (`isChitchatPrompt`) → offer-help **only** on idle/farewell resume (`chatResume` / `chitchatReply`); mid-chat hi → `stillHereReply`. Mood/`how are you` (`isMoodPrompt` / `moodReply`, s3.2.72) → friendly chat reply, never search. Mid-chat acks (`isAckPrompt`) → soft `ackReply` (“Cool.” / “You're welcome.”) — **no** product pitch (s3.2.70). Identity → `identityReply` without offer-help. **Client mirror** in `bot-dee-chat.js` answers locally first. Search tool only for clear how-to intents; min score 3. |
 | Composer keys (s3.2.72–73) | `#botDeeChatInput`: **Enter** = Send; **Shift+Enter** = new line (`bot-dee-chat.js` keydown). Placeholder notes the shortcut in all langs. Help `?` (`help-botdee-page` + `botdee.helpComposer`) documents Enter/Shift+Enter and that mood/how-are-you stays chat (s3.2.73). |
 | Conversation idle (s3.2.70) | Client ends chat after `conversationIdleSeconds` (packaged default **300** / 5 minutes) with no message → `chatIdleEnded`; history cleared; next message resumes. Config: Firestore `botDeeSettings/default` (signed-in read; Functions-write). Master Admin → Features Mgmt → **BOT DEE** → Save via callable `setBotDeeSettings` (SOS2FA + reason ≥ 8). Clamp 15–600s. |
@@ -698,7 +698,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
 | Gate | `assertFeatureAccess(..., "botDee")` on session; packaged seed `botDee` **Beta** (alias `floqAi`) (`IsFeatureEnabled:1`, `IsTestFeature:1`); product tools re-assert `shoutOut` / `vipReservations` / `floqCast` |
-| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring) |
+| Tests | `functions/bot-dee-core.test.js`, `functions/botdee-page.test.js` (durable thread helpers + `getBotDeeThread` wiring), `functions/botdee-upgrade.test.js` (six-phase gates, mock-only providers) |
 | Help | `help-botdee-page` (BOT DEE chat + Enter/Shift+Enter + chatable mood); page popout `botdee.helpComposer` |
 | Search Settings tile | `#settingsBtnCard` → `patron-portal.html?tab=appearance` (opens Appearance); chrome icons `settings-*` via `data-floqr-chrome-icon="settings"` |
 | Search icon order | **1 ShoutOut · 2 BOT DEE · 3 VIP reserV · 4 Settings · 5 floqCast** (`index.html` `.search-icon-row`; tile label `cat.botdee` = **BOT DEE**) |
@@ -711,6 +711,24 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Black & Dark Green icons (s3.2.58) | `BLACK_DARK_GREEN_ICONS` full pack (`*-blackdarkgreen.*`) — accent = Settings wordmark \"tings\" **`#5ac783`** (+ companion `#2e8a5a`). Build: `scripts/build-blackdarkgreen-icons.py`. CSS `html[data-floqr-chrome=blackDarkGreen] --accent:#5ac783`. |
 | Profile chip chrome | Dark schemes: charcoal / accent face (`--floqr-profile-card-*`). **White/Black:** white face + shiny black initials — never list `whiteBlack` in the shared charcoal `.user-menu-btn` rule (`styles.css`). |
 | Page title size | Shared schema: `.floqr-page-title` / `.floqr-page-title-row` + feature `.feature-landing-title-row`. Size = Appearance `h2` via `--floqr-page-title-size` (= `--floqr-title-size`). All title text (`.help-label-text`) inherits; `?` stays 11px badge. Profile & Settings one line (`admin.css` / `floqr-feature-landing.css`). |
+
+---
+
+## BOT DEE six-phase upgrade (spec v1.2 — PR only)
+
+**Purpose:** Upgrade existing `executeBotSession` with durable execution, opt-in archive, schema-driven SmartViews, mock research, and mock actions. **Do not merge/deploy Functions without owner approval.** Third-party APIs stay `mock_only` until Master Admin records legal evidence.
+
+| Layer | Wiring |
+|---|---|
+| UI | `botdee.html` memory + Research Library panels (`botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css`). No `?` help popout. Satellite `FLOQRSessionShell`. Canonical venue link `./club-profile.html?location=` (no `?v=`). Profile visibility stays `patron-portal.html?tab=profile`. |
+| Client | `bot-dee-chat.js` restores `archiveTurns` after idle when opted in; mounts `smartViews`. Version prompts include deployed / changed / limitations / integrations. |
+| Backend | Same `executeBotSession` path. User turn persisted **before** Gemini. Archive under `botDeeThreads/{uid}/archive` (survives 300s idle). Checkpoints `botDeeExecutions`. Callables: `getBotDeeCapabilityManifest`, `get/setBotDeeConsent`, `list/upsert/deleteBotDeeMemory`, `exportBotDeeData`, `deleteBotDeeArchive`, `listBotDeeSmartViews`, `submitBotDeeEvidenceFeedback`, `disputeBotDeeIdentityMatch`, `get/setBotDeeLegalGate`. |
+| Manifest | `functions/botdee-upgrade-manifest.js` — `deployedClaim: false`; never leaks secrets; Master Admin version reply lists implemented/tested/not-deployed. |
+| Data | Classified: `botDeeThreads/archive\|memories\|research\|summaries\|executions`, `botDeeExecutions`, `botDeeFeedback`, `botDeeLegalGates`, `botDeeCapabilityManifest`. Functions-write. **No stored IP.** Mingl `messages` never imported. |
+| Legal | Master Admin → Features Mgmt → BOT DEE → Version and legal gates. `setBotDeeLegalGate` needs SOS2FA + `FLOQRReasonPrompt`. Approved without evidence stays mock-only. |
+| Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
+| Gate | Feature key `botDee`. New phases implemented/tested in code, **not production-deployed**. |
+| Docs | `docs/BOT-DEE-SIX-PHASE.md`, `docs/BOT-DEE-LEGAL-PROVIDER-GATE.md` |
 
 ---
 

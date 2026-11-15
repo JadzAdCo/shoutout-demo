@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.019";
+  const VERSION = "s3.3.020";
   const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
@@ -16,6 +16,26 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, пока не истечёт пауза. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
+      },
+      "help-botdee-privacy-assistant": {
+        title: "Помощник конфиденциальности BOT DEE",
+        body: "Меняйте видимость в «Моём профиле» — BOT DEE не добавляет второй публичный переключатель. Неверную веб-привязку можно оспорить, не меняя профиль. BOT DEE не обещает удаление на стороннем сайте."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Каждая рекомендация может показать доказательства, дату проверки, персонализацию и спонсорство. Можно попросить BOT DEE не персонализировать этот поиск."
+      },
+      "help-botdee-research-library": {
+        title: "Библиотека исследований BOT DEE",
+        body: "Сохраняйте места и карточки, о которых вы спрашивали BOT DEE. Place ID Google — не копия фото или отзывов. Можно обновить или удалить. Лицензионные кэши выключены, пока провайдер не одобрен."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews BOT DEE",
+        body: "SmartViews — компактные карточки заведений, событий и ресторанов. Карточка клуба открывает существующую публичную страницу FLOQR — это не второй профиль. Макеты помечены, пока провайдеры не одобрены."
+      },
+      "help-botdee-memory": {
+        title: "Сохранённые чаты BOT DEE",
+        body: "Пятиминутная пауза завершает живую сессию BOT DEE. При согласии BOT DEE сохраняет чат. Можно экспортировать или удалить. Гости не сохраняются. Mingl остаётся в Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings на Search",
@@ -375,6 +395,26 @@
         title: "BOT DEE",
         body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, tot de pauzetimer afloopt. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
       },
+      "help-botdee-privacy-assistant": {
+        title: "BOT DEE Privacy Assistant",
+        body: "Wijzig in Mijn profiel wat andere FLOQR-gebruikers zien — BOT DEE voegt geen tweede openbare schakelaar toe. Verkeerde webkoppeling kunt u betwisten zonder uw profiel te wijzigen. BOT DEE belooft geen verwijdering op sites van derden."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Elke aanbeveling kan bewijs, controledatum, personalisatie en sponsoring tonen. U kunt BOT DEE vragen deze zoekopdracht niet te personaliseren."
+      },
+      "help-botdee-research-library": {
+        title: "BOT DEE Research Library",
+        body: "Bewaar plaatsen en kaarten die u BOT DEE vroeg. Een Google Place-ID is geen kopie van foto’s of reviews. U kunt vernieuwen of wissen. Gelicentieerde caches blijven uit tot de provider is goedgekeurd."
+      },
+      "help-botdee-smartview": {
+        title: "BOT DEE SmartViews",
+        body: "SmartViews zijn compacte kaarten voor venues, events en restaurants. Een clubkaart opent de bestaande FLOQR-openbare pagina — geen tweede profiel. Mockkaarten zijn gelabeld tot providers zijn goedgekeurd."
+      },
+      "help-botdee-memory": {
+        title: "Opgeslagen BOT DEE-chats",
+        body: "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Met opt-in bewaart BOT DEE de chat. U kunt exporteren of wissen. Gasten worden niet bewaard. Mingl blijft Mingl."
+      },
       "help-search-settings-appearance": {
         title: "Settings op Search",
         body: "Tik op Search op Settings om Profile & Settings te openen op het tabblad Appearance — daar staat Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). De Settings-tegel gebruikt hetzelfde chrome-iconenpakket als de andere Search-merken."
@@ -732,6 +772,26 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, jusqu’à la fin de la pause. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
+      },
+      "help-botdee-privacy-assistant": {
+        title: "Assistant confidentialité BOT DEE",
+        body: "Changez ce que les autres utilisateurs FLOQR voient dans la visibilité de Mon profil — BOT DEE n’ajoute pas un second interrupteur public. Si la recherche web a lié la mauvaise personne, vous pouvez contester sans changer votre profil. BOT DEE ne promet pas qu’un site tiers supprimera la page d’origine."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Chaque recommandation peut montrer les preuves, la date de vérification, si la personnalisation était active, et si un emplacement est sponsorisé. Vous pouvez demander à BOT DEE de ne pas personnaliser cette recherche."
+      },
+      "help-botdee-research-library": {
+        title: "Bibliothèque de recherche BOT DEE",
+        body: "Enregistrez les lieux et cartes demandés à BOT DEE. Un identifiant Google Place n’est pas une copie des photos ou avis Google. Vous pouvez actualiser ou supprimer. Les caches licenciés restent off tant que le fournisseur n’est pas approuvé."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews BOT DEE",
+        body: "Les SmartViews sont des cartes compactes pour lieux, événements, restaurants. Une carte club ouvre la page publique FLOQR existante — ce n’est pas un second profil. Les maquettes sont indiquées tant que les fournisseurs ne sont pas approuvés."
+      },
+      "help-botdee-memory": {
+        title: "Chats BOT DEE enregistrés",
+        body: "La pause de cinq minutes termine la session BOT DEE en direct. Si vous acceptez, BOT DEE conserve ce chat pour y revenir. Vous pouvez l’exporter ou le supprimer. Les invités ne sont pas enregistrés. Les conversations Mingl restent dans Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings sur Search",
@@ -1091,6 +1151,26 @@
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, bis die Pause abläuft. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
       },
+      "help-botdee-privacy-assistant": {
+        title: "BOT DEE Privacy Assistant",
+        body: "Ändern Sie in Mein Profil, was andere FLOQR-Nutzer sehen — BOT DEE fügt keinen zweiten Öffentlich-Schalter hinzu. Falsche Web-Zuordnung können Sie widersprechen, ohne das Profil zu ändern. BOT DEE verspricht keine Löschung auf Drittseiten."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Jede Empfehlung kann Belege, Prüfdatum, Personalisierung und Sponsoring zeigen. Sie können BOT DEE bitten, diese Suche nicht zu personalisieren."
+      },
+      "help-botdee-research-library": {
+        title: "BOT DEE Research Library",
+        body: "Speichern Sie Orte und Karten, die Sie BOT DEE gefragt haben. Eine Google Place-ID ist keine Kopie von Fotos oder Bewertungen. Sie können aktualisieren oder löschen. Lizenzierte Caches bleiben aus, bis der Anbieter genehmigt ist."
+      },
+      "help-botdee-smartview": {
+        title: "BOT DEE SmartViews",
+        body: "SmartViews sind kompakte Karten für Venues, Events, Restaurants. Eine Club-Karte öffnet die vorhandene FLOQR-Public-Page — kein zweites Profil. Mock-Karten sind gekennzeichnet, bis Anbieter genehmigt sind."
+      },
+      "help-botdee-memory": {
+        title: "Gespeicherte BOT DEE-Chats",
+        body: "Die fünfminütige Pause beendet die live BOT DEE-Sitzung. Mit Opt-in behält BOT DEE den Chat. Sie können exportieren oder löschen. Gäste werden nicht gespeichert. Mingl bleibt Mingl."
+      },
       "help-search-settings-appearance": {
         title: "Settings auf Search",
         body: "Tippe auf dem Search-Bildschirm auf Settings, um Profile & Settings auf dem Tab Appearance zu öffnen — dort liegt Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Die Settings-Kachel nutzt dasselbe Chrome-Icon-Paket wie die anderen Search-Marken."
@@ -1448,6 +1528,26 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, hasta que termine la pausa. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
+      },
+      "help-botdee-privacy-assistant": {
+        title: "Asistente de privacidad BOT DEE",
+        body: "Cambie lo que otros usuarios FLOQR ven en la visibilidad de Mi perfil — BOT DEE no añade un segundo interruptor público. Si la investigación web asoció a la persona equivocada, puede disputarlo sin cambiar su perfil. BOT DEE no promete que un sitio tercero borre la página original."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Cada recomendación puede mostrar evidencias, fecha de comprobación, si hubo personalización y si un espacio es patrocinado. Puede pedir a BOT DEE que no personalice esta búsqueda."
+      },
+      "help-botdee-research-library": {
+        title: "Biblioteca de investigación BOT DEE",
+        body: "Guarde lugares y tarjetas que pidió a BOT DEE. Un Place ID de Google no copia fotos ni reseñas. Puede actualizar o borrar. Las cachés con licencia siguen apagadas hasta aprobar al proveedor."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews de BOT DEE",
+        body: "Las SmartViews son tarjetas compactas de locales, eventos y restaurantes. Una tarjeta de club abre la página pública FLOQR existente — no es un segundo perfil. Las maquetas se marcan hasta que los proveedores estén aprobados."
+      },
+      "help-botdee-memory": {
+        title: "Chats BOT DEE guardados",
+        body: "La pausa de cinco minutos termina la sesión BOT DEE en vivo. Si acepta, BOT DEE guarda el chat. Puede exportar o borrar. Los invitados no se guardan. Mingl se queda en Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings en Search",
@@ -1807,6 +1907,26 @@
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, fino alla fine della pausa. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
       },
+      "help-botdee-privacy-assistant": {
+        title: "Privacy Assistant BOT DEE",
+        body: "Cambia in Il mio profilo cosa vedono gli altri utenti FLOQR — BOT DEE non aggiunge un secondo interruttore pubblico. Se la ricerca web ha collegato la persona sbagliata, puoi contestare senza cambiare il profilo. BOT DEE non promette la cancellazione su siti terzi."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Ogni raccomandazione può mostrare prove, data di verifica, personalizzazione e sponsorship. Puoi chiedere a BOT DEE di non personalizzare questa ricerca."
+      },
+      "help-botdee-research-library": {
+        title: "Research Library BOT DEE",
+        body: "Salva luoghi e schede chieste a BOT DEE. Un Place ID Google non è una copia di foto o recensioni. Puoi aggiornare o eliminare. Le cache con licenza restano off finché il provider non è approvato."
+      },
+      "help-botdee-smartview": {
+        title: "SmartView BOT DEE",
+        body: "Le SmartView sono schede compatte per locali, eventi e ristoranti. Una scheda club apre la pagina pubblica FLOQR esistente — non è un secondo profilo. Le mock sono etichettate finché i provider non sono approvati."
+      },
+      "help-botdee-memory": {
+        title: "Chat BOT DEE salvate",
+        body: "La pausa di cinque minuti chiude la sessione BOT DEE dal vivo. Con opt-in BOT DEE tiene la chat. Puoi esportare o eliminare. Gli ospiti non vengono salvati. Mingl resta in Mingl."
+      },
       "help-search-settings-appearance": {
         title: "Settings su Search",
         body: "Nella schermata Search tocca Settings per aprire Profile & Settings sulla scheda Appearance — lì c’è Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). La tile Settings usa lo stesso pack di icone chrome degli altri marchi Search."
@@ -2164,6 +2284,26 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, até o fim da pausa. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
+      },
+      "help-botdee-privacy-assistant": {
+        title: "Assistente de privacidade BOT DEE",
+        body: "Altere em O meu perfil o que outros utilizadores FLOQR veem — o BOT DEE não adiciona um segundo interruptor público. Se a pesquisa web associou a pessoa errada, pode contestar sem alterar o perfil. O BOT DEE não promete que um site terceiro apague a página original."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Cada recomendação pode mostrar evidências, data da verificação, personalização e patrocínio. Pode pedir ao BOT DEE para não personalizar esta pesquisa."
+      },
+      "help-botdee-research-library": {
+        title: "Biblioteca de pesquisa BOT DEE",
+        body: "Guarde lugares e cartões que pediu ao BOT DEE. Um Place ID do Google não copia fotos ou avaliações. Pode atualizar ou apagar. Caches licenciados ficam desligados até o fornecedor ser aprovado."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews BOT DEE",
+        body: "SmartViews são cartões compactos de locais, eventos e restaurantes. Um cartão de clube abre a página pública FLOQR existente — não é um segundo perfil. Os mocks são rotulados até os fornecedores serem aprovados."
+      },
+      "help-botdee-memory": {
+        title: "Chats BOT DEE guardados",
+        body: "A pausa de cinco minutos termina a sessão BOT DEE ao vivo. Se aderir, o BOT DEE guarda o chat. Pode exportar ou apagar. Convidados não são guardados. Mingl fica no Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings na Search",
@@ -2523,6 +2663,26 @@
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, μέχρι να λήξει η παύση. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
       },
+      "help-botdee-privacy-assistant": {
+        title: "Βοηθός απορρήτου BOT DEE",
+        body: "Αλλάξτε στο Προφίλ μου τι βλέπουν άλλοι χρήστες FLOQR — το BOT DEE δεν προσθέτει δεύτερο δημόσιο διακόπτη. Λάθος διαδικτυακή αντιστοίχιση μπορείτε να αμφισβητήσετε χωρίς αλλαγή προφίλ. Το BOT DEE δεν υπόσχεται διαγραφή σε ιστότοπο τρίτου."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Κάθε σύσταση μπορεί να δείξει στοιχεία, ημερομηνία ελέγχου, εξατομίκευση και χορηγία. Μπορείτε να ζητήσετε από το BOT DEE να μην εξατομικεύσει αυτή την αναζήτηση."
+      },
+      "help-botdee-research-library": {
+        title: "Βιβλιοθήκη έρευνας BOT DEE",
+        body: "Αποθηκεύστε μέρη και κάρτες που ρωτήσατε το BOT DEE. Ένα Google Place ID δεν αντιγράφει φωτογραφίες ή κριτικές. Μπορείτε να ανανεώσετε ή να διαγράψετε. Οι αδειοδοτημένες μνήμες μένουν κλειστές μέχρι έγκριση παρόχου."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews BOT DEE",
+        body: "Τα SmartViews είναι συμπαγείς κάρτες για χώρους, εκδηλώσεις και εστιατόρια. Μια κάρτα club ανοίγει την υπάρχουσα δημόσια σελίδα FLOQR — όχι δεύτερο προφίλ. Τα mock επισημαίνονται μέχρι να εγκριθούν οι πάροχοι."
+      },
+      "help-botdee-memory": {
+        title: "Αποθηκευμένες συνομιλίες BOT DEE",
+        body: "Η παύση των πέντε λεπτών κλείνει τη ζωντανή συνεδρία BOT DEE. Με opt-in το BOT DEE κρατά τη συνομιλία. Μπορείτε να εξαγάγετε ή να διαγράψετε. Οι επισκέπτες δεν αποθηκεύονται. Το Mingl μένει στο Mingl."
+      },
       "help-search-settings-appearance": {
         title: "Settings στην Search",
         body: "Στην οθόνη Search πατήστε Settings για να ανοίξετε Profile & Settings στην καρτέλα Appearance — εκεί είναι το Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Το πλακίδιο Settings χρησιμοποιεί το ίδιο πακέτο εικονιδίων chrome με τα άλλα σήματα Search."
@@ -2881,6 +3041,26 @@
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, aż skończy się pauza. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
       },
+      "help-botdee-privacy-assistant": {
+        title: "Asystent prywatności BOT DEE",
+        body: "W Mój profil zmień, co widzą inni użytkownicy FLOQR — BOT DEE nie dodaje drugiego przełącznika publicznego. Błędne powiązanie z sieci możesz zgłosić bez zmiany profilu. BOT DEE nie obiecuje usunięcia na stronie trzeciej."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "Każda rekomendacja może pokazać dowody, datę sprawdzenia, personalizację i sponsoring. Możesz poprosić BOT DEE, aby nie personalizował tego wyszukiwania."
+      },
+      "help-botdee-research-library": {
+        title: "Biblioteka badań BOT DEE",
+        body: "Zapisuj miejsca i karty, o które pytałeś BOT DEE. Google Place ID to nie kopia zdjęć ani recenzji. Możesz odświeżyć lub usunąć. Licencjonowane cache zostaje wyłączone, dopóki dostawca nie zostanie zatwierdzony."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews BOT DEE",
+        body: "SmartViews to zwarte karty lokali, wydarzeń i restauracji. Karta klubu otwiera istniejącą publiczną stronę FLOQR — to nie drugi profil. Mocki są oznaczone, dopóki dostawcy nie zostaną zatwierdzeni."
+      },
+      "help-botdee-memory": {
+        title: "Zapisane czaty BOT DEE",
+        body: "Pięciominutowa pauza kończy sesję BOT DEE na żywo. Po zgodzie BOT DEE zachowuje czat. Możesz eksportować lub usunąć. Goście nie są zapisywani. Mingl zostaje w Mingl."
+      },
       "help-search-settings-appearance": {
         title: "Settings na Search",
         body: "Na ekranie Search stuknij Settings, aby otworzyć Profile & Settings na karcie Appearance — tam jest Site chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Kafelek Settings używa tego samego pakietu ikon chrome co inne znaki Search."
@@ -3238,6 +3418,26 @@
       "help-botdee-page": {
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر حتى تنتهي مهلة الإيقاف. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
+      },
+      "help-botdee-privacy-assistant": {
+        title: "مساعد خصوصية BOT DEE",
+        body: "غيّر في ملفي ما يراه مستخدمو FLOQR الآخرون — لا يضيف BOT DEE مفتاحًا عامًا ثانيًا. إذا ربط البحث شخصًا خطأ، يمكنك الاعتراض دون تغيير ملفك. لا يعد BOT DEE بحذف الصفحة الأصلية لدى طرف ثالث."
+      },
+      "help-botdee-explain": {
+        title: "Explain My Recommendation",
+        body: "يمكن لكل توصية إظهار الأدلة وتاريخ الفحص وما إذا كان التخصيص قيد التشغيل وما إذا كان الموضع مدعومًا. يمكنك أن تطلب من BOT DEE عدم تخصيص هذا البحث."
+      },
+      "help-botdee-research-library": {
+        title: "مكتبة بحث BOT DEE",
+        body: "احفظ الأماكن والبطاقات التي سألت BOT DEE عنها. معرّف Google Place ليس نسخة من صور أو مراجعات Google. يمكنك التحديث أو الحذف. تبقى ذاكرة التخزين المرخّصة متوقفة حتى اعتماد المزود."
+      },
+      "help-botdee-smartview": {
+        title: "SmartViews لـ BOT DEE",
+        body: "SmartViews بطاقات موجزة للأماكن والفعاليات والمطاعم. بطاقة النادي تفتح صفحة FLOQR العامة الحالية — وليست ملفًا ثانيًا. البطاقات التجريبية موسومة حتى اعتماد المزودين."
+      },
+      "help-botdee-memory": {
+        title: "محادثات BOT DEE المحفوظة",
+        body: "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. إذا وافقت، يحتفظ BOT DEE بالمحادثة. يمكنك التصدير أو الحذف. لا يُحفظ الضيوف. تبقى محادثات Mingl في Mingl."
       },
       "help-search-settings-appearance": {
         title: "Settings في Search",

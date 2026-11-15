@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.019";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.019";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.020";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.020";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.020",
+      title: "s3.3.020 — BOT DEE six-phase upgrade (mock-only)",
+      checks: [
+        {label:"BOT DEE memory + SmartView panels", file:"botdee.html", includes:["botDeeMemoryPanel", "botDeeLibraryPanel", "botdee-upgrade-ui.js"]},
+        {label:"Capability manifest never claims deploy", file:"functions/botdee-upgrade-manifest.js", includes:["deployedClaim: false", "mock_only"]},
+        {label:"Legal gates Master Admin", file:"master-admin.html", includes:["botDeeLegalTable", "botDeeLegalSave", "botDeeManifestReload"]},
+        {label:"Upgrade tests", file:"functions/botdee-upgrade.test.js", includes:["Phase 1 audit", "Phase 5 SmartViews"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-020-botdee-six-phase"]}
+      ]
+    },
     {
       version: "s3.3.019",
       title: "s3.3.019 — AI crawl publishing rules, CSV, past events, crawl logs",
@@ -3168,6 +3179,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-020-botdee-six-phase",
+      area:"BOT DEE",
+      feature:"Six-phase upgrade (opt-in memory, SmartViews, mock research/actions)",
+      changed:"s3.3.020 — BOT DEE keeps the 5-minute pause as session expiry. Opt-in saved history is separate. SmartViews are mock cards; venue cards open the existing FLOQR Public Page. Third-party APIs stay mock-only until Master Admin records legal evidence. Capability report never claims a production deploy.",
+      howToTest:"1) Hard-refresh botdee.html s3.3.020, sign in with botDee access. 2) Confirm no ? help bubble. Type version — reply names the FLOQR package and does not say deployed. 3) Leave memory opt-in off; wait or idle — live chat ends; no archive. 4) Tick Save this BOT DEE chat, Save memory settings, send a message, then idle — saved history can restore. 5) Show mock SmartViews — venue card Open FLOQR Public Page has no ?v=. Patron card says Public Web Research is off. 6) Master Admin → Features Mgmt → BOT DEE → Version and legal gates: providers mock-only, evidence missing. 7) Mark Succeed/Failed. Do not expect live Google/Yelp until legal evidence + Functions deploy.",
+      expected:"Idle still ends live chat. Opt-in archive is separate. SmartViews are labeled mock. Venue links are club-profile.html?location=. Manifest says not production-deployed. No stored IP. Mingl chats are not copied.",
+      troubleshoot:"Panels missing → hard-refresh botdee.html + botdee-upgrade-ui.js s3.3.020. Version still old → Functions not deployed (expected on this PR). Consent save fails → sign-in + botDee feature gate. Legal table empty → SOS2FA unlock Features Mgmt → BOT DEE. Live Places/Yelp appearing → stop; adapters must stay mock_only."
+    },
     {
       id:"s3-3-019-ai-crawl-csv-publish",
       area:"Master Admin",

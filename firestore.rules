@@ -23,6 +23,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.020: BOT DEE upgrade collections (archive/memories/research/executions/legal gates/feedback/manifest)
 // - s3.3.006: botDeeThreads/{uid} + events owner-read, Functions-write (durable BOT DEE resume)
 // - s3.2.28: venueTemplateTags create/update only for club-owned templates (clubLocations.clubOwnedTemplateIds
 //   or templates/{id}.venueIds). Shared FloqR catalog tags stay read-only for Club Admin. Delete still allowed
@@ -753,6 +754,61 @@ service cloud.firestore {
  && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
  allow write: if false;
  }
+ match /archive/{messageId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ match /memories/{memoryId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ match /research/{itemId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ match /summaries/{versionId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ match /executions/{executionId} {
+ allow read: if signedIn()
+ && request.auth.uid == threadId
+ && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
+ && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ }
+
+ match /botDeeExecutions/{executionId} {
+ allow read: if signedIn() && resource.data.uid == request.auth.uid;
+ allow write: if false;
+ }
+
+ match /botDeeFeedback/{feedbackId} {
+ allow read: if signedIn() && resource.data.uid == request.auth.uid;
+ allow write: if false;
+ }
+
+ match /botDeeLegalGates/{providerId} {
+ allow read: if signedIn();
+ allow write: if false;
+ }
+
+ match /botDeeCapabilityManifest/{docId} {
+ allow read: if signedIn();
+ allow write: if false;
  }
 
  // Staff marketing media consent evidence: written only by recordStaffMarketingConsent.
