@@ -231,7 +231,9 @@
         {label:"Save label", file:"master-admin.html", includes:["data-i18n=\"app.save\""], notIncludes:["Save BOT DEE settings"]},
         {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews"], notIncludes:["botdee.settingsBubble"]},
         {label:"Help knows-of-me", file:"botdee-help-repository.js", includes:["help-botdee-knows-of-me", "Feature & Orders → My BOT DEE"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-022-botdee-portal-mgmt"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-022-botdee-portal-mgmt"]},
+        {label:"Si-nema Search chrome tile", file:"index.html", includes:["id=\"sinemaBtnCard\"", "data-feature-key=\"sinema\"", "sinema-nightlife.jpg", "sinema-icon-face chrome-photo-face"]},
+        {label:"Approved Si-nema official logo", file:"scripts/build-sinema-chrome-icons.py", includes:["si-nema-blacktiffany.webp", "approved FloqMedia official mark"]}
       ]
     },
     {
@@ -3218,6 +3220,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-022-sinema-search-tile",
+      area:"Search",
+      feature:"Si-nema Search chrome card",
+      changed:"s3.3.022 — Si-nema sits on today's Search row like FloqCAST. Enabling Si-nema in Features & Services unhides sinemaBtnCard. Face art is the approved FloqMedia official clapper mark (not a generated LED placeholder).",
+      howToTest:"1) Hard-refresh live Search (index.html s3.3.022). 2) Master Admin → Features / Svc Status Mgmt → Si-nema: Enable Feature 1, Enable Beta Feature 1, Save, reason ≥8. 3) Hard-refresh Search — Si-nema clapper icon is on the same chrome row as ShoutOut / BOT DEE / VIP / Settings / FloqCAST, with a Beta pill. 4) Tap it — sinema.html opens (signed-in satellite). 5) Mark Succeed/Failed.",
+      expected:"After Enable Feature=1 the approved Si-nema clapper card appears on the Search row at the same size as the other chrome icons. Off keeps it hidden for everyone, including Master Admin.",
+      troubleshoot:"No tile → Enable Feature is still 0 or Search is a cached index.html without sinemaBtnCard. Wrong LED art → hard-refresh so sinema-nightlife.jpg is the official clapper. Tile visible while Off → applySearchUi is not hiding sinemaBtnCard."
+    },
     {
       id:"s3-3-020-spatial-studio-floqr",
       area:"Si-nema / identity",
