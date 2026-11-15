@@ -147,6 +147,26 @@ jobs:
             if ! printf '%s\n' "${FNS[@]}" | grep -qx 'scheduledRetirePastCrawledEvents'; then
               FNS+=("scheduledRetirePastCrawledEvents")
             fi
+            # First-time BOT DEE six-phase callables (functions:list cannot see them yet).
+            for f in \
+              getBotDeeCapabilityManifest \
+              getBotDeeConsent \
+              setBotDeeConsent \
+              listBotDeeMemories \
+              upsertBotDeeMemory \
+              deleteBotDeeMemory \
+              exportBotDeeData \
+              deleteBotDeeArchive \
+              listBotDeeSmartViews \
+              submitBotDeeEvidenceFeedback \
+              disputeBotDeeIdentityMatch \
+              getBotDeeLegalGates \
+              setBotDeeLegalGate
+            do
+              if ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then
+                FNS+=("$f")
+              fi
+            done
           fi
           echo "Deploying ${#FNS[@]} functions in batches of 20"
           BATCH=20
