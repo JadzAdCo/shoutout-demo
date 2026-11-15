@@ -796,10 +796,10 @@
 
   function showBotDeeMgmtPage(page) {
     const key = String(page || "pause").trim() || "pause";
-    document.querySelectorAll("#featuresBotDee [data-botdee-page]").forEach(el => {
+    document.querySelectorAll("#featuresBotDee .botdee-mgmt-page[data-botdee-page]").forEach(el => {
       const on = el.dataset.botdeePage === key;
       el.classList.toggle("hidden", !on);
-      if (el.classList.contains("botdee-mgmt-page")) el.hidden = !on;
+      el.hidden = !on;
     });
     document.querySelectorAll("#botDeeMgmtSubtabs [data-botdee-page]").forEach(btn => {
       const on = btn.dataset.botdeePage === key;
@@ -1059,7 +1059,17 @@
     if (id === "featuresBetaTesting") return loadBetaTesting();
     if (id === "featuresBotDee") {
       root.FLOQRBotDeeUpgradeUi?.bind?.();
-      showBotDeeMgmtPage("pause");
+      const sub = String(root.__floqrBotDeeMgmtPage || "pause").trim() || "pause";
+      delete root.__floqrBotDeeMgmtPage;
+      const focusId = String(root.__floqrBotDeeFocusId || "").trim();
+      delete root.__floqrBotDeeFocusId;
+      showBotDeeMgmtPage(sub);
+      if (focusId) {
+        requestAnimationFrame(() => {
+          const el = byId(focusId);
+          el?.scrollIntoView?.({block: "nearest", behavior: "smooth"});
+        });
+      }
       return;
     }
     if (id === "featuresAuditTrail") return loadAuditTrail();
@@ -1072,6 +1082,7 @@
     auditRowHtml,
     featureCell,
     flagChangeSummary,
+    showBotDeeMgmtPage,
     PANEL_IDS,
     activePanelId: () => activePanelId
   };

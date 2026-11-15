@@ -183,14 +183,38 @@
     }
   }
 
+  async function loadMockViews() {
+    const nav = global.FLOQRNav;
+    const mockUrl = nav?.stampCurrentVersion
+      ? nav.stampCurrentVersion("./botdee-smartview-mock.json")
+      : "./botdee-smartview-mock.json";
+    const res = await fetch(mockUrl, {credentials: "same-origin"});
+    if (!res.ok) throw new Error("mock_fetch_failed");
+    const payload = await res.json();
+    return Array.isArray(payload.views) ? payload.views : [];
+  }
+
   async function loadDemos(hostId) {
     const host = byId(hostId || "botDeeSmartViewDemo");
     if (!host || !global.FLOQRBotDeeSmartView) return;
+    const busy = t("botdee.chatThinking", "BOT DEE is thinking…");
+    host.setAttribute("aria-busy", "true");
+  /* Only replace card HTML; avoid clobbering if mount runs twice in quick succession. */
+    const prior = host.innerHTML;
+    if (!prior.trim()) host.textContent = busy;
     try {
       const data = await call("listBotDeeSmartViews");
       global.FLOQRBotDeeSmartView.mount(host, data.views || []);
     } catch (_) {
-      host.textContent = t("botdee.libraryEmpty", "No saved SmartViews yet.");
+      try {
+        const views = await loadMockViews();
+        if (views.length) global.FLOQRBotDeeSmartView.mount(host, views);
+        else host.textContent = t("botdee.libraryEmpty", "No saved SmartViews yet.");
+      } catch (__) {
+        host.textContent = t("botdee.libraryEmpty", "No saved SmartViews yet.");
+      }
+    } finally {
+      host.removeAttribute("aria-busy");
     }
   }
 

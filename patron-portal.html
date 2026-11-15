@@ -8,8 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.023"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.023"/>
+<link rel="stylesheet" href="./styles.css?v=s3.3.024"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.024"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.024"/>
   <script>
     /* Paint Site chrome before CSS so the closed profile card matches the chosen theme. */
     try{
@@ -35,8 +36,7 @@
       <div>
         <div class="floqr-page-brand">
           <a href="./?start=search" class="floqr-home-link" data-floqr-home-logo aria-label="FloqR home">
-            <img src="./images/floqr-color.png?v=s3.3.023" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          </a>
+            <img src="./images/floqr-color.png?v=s3.3.024" alt="FloqR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>          </a>
         </div>
         <div class="floqr-page-title-row">
           <h1 class="floqr-page-title help-label"
@@ -505,6 +505,19 @@
               data-floqr-help-body="Facts BOT DEE stored with your approval. Empty if you have not opted in or nothing is stored. Export or delete here. BOT DEE never stores your IP address.">What BOT DEE knows of me</h3>
             <p class="sub small" data-keep-visible="true" data-i18n="botdee.knowsNote">These facts were saved with your approval. Export or delete them here. BOT DEE never stores your IP address.</p>
             <div id="botDeeKnowsList" class="report-block" aria-live="polite"></div>
+          </div>
+          <div class="card portal-botdee-panel" id="botDeeSmartViewPanel" aria-labelledby="botDeeSmartViewTitle">
+            <h3 id="botDeeSmartViewTitle"
+              data-i18n="botdee.libraryTitle"
+              data-floqr-help-id="help-botdee-smartview"
+              data-floqr-help-title="BOT DEE SmartViews"
+              data-floqr-help-search="smartview|smart view|venue card|mock smartview|public page"
+              data-floqr-help-body="SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved.">Research Library and SmartViews</h3>
+            <p class="sub small" data-i18n="botdee.smartviewResearchDisabled">Public Web Research stays off until legal and identity review. Venue cards open the existing FLOQR Public Page.</p>
+            <p class="botdee-upgrade-actions">
+              <button type="button" id="botDeeLoadSmartViews" class="buttonlike" data-i18n="botdee.libraryRefresh">Show mock SmartViews</button>
+            </p>
+            <div id="botDeeSmartViewDemo" class="botdee-sv-host report-block" aria-live="polite"></div>
           </div>
         </div>
         <div id="foInvoicesPane" class="fo-pane hidden">
@@ -1010,59 +1023,60 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.023"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.023"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.023"></script>
-<script src="./floqr-people-directory.js?v=s3.3.023"></script>
-<script src="./floqr-app-check.js?v=s3.3.023"></script>
-<script src="./floqr-nav.js?v=s3.3.023"></script>
-<script src="./floqr-qrcode-lib.js?v=s3.3.023"></script>
-<script src="./floqr-qr.js?v=s3.3.023"></script>
-<script src="./global-profile-status.js?v=s3.3.023"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.023"></script>
-<script src="./shared-data.js?v=s3.3.023"></script>
-<script src="./url-media-field.js?v=s3.3.023"></script>
-<script src="./ai-service.js?v=s3.3.023"></script>
-<script src="./ai-index-service.js?v=s3.3.023"></script>
-<script src="./ai-search-service.js?v=s3.3.023"></script>
-<script src="./ai-notification-service.js?v=s3.3.023"></script>
-<script src="./ai-template-studio.js?v=s3.3.023"></script>
-<script src="./ai-grammar-service.js?v=s3.3.023"></script>
-  <script src="./floqr-action-feedback.js?v=s3.3.023"></script>
-<script src="./floqr-tab-gates.js?v=s3.3.023"></script>
-<script src="./floqr-feature-services.js?v=s3.3.023"></script>
-<script src="./floqr-i18n.js?v=s3.3.023"></script>
-<script src="./floqr-geo-search.js?v=s3.3.023"></script>
-<script src="./floqr-geo-catalog.js?v=s3.3.023"></script>
-<script src="./floqr-profile-locale.js?v=s3.3.023"></script>
-<script src="./floqr-place-suggest.js?v=s3.3.023"></script>
-<script src="./botdee-help-repository.js?v=s3.3.023"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.023"></script>
-<script src="./help-attach.js?v=s3.3.023"></script>
-<script src="./helper-popouts.js?v=s3.3.023"></script>
-<script src="./floqr-identity.js?v=s3.3.023"></script>
-<script src="./floqr-blocks.js?v=s3.3.023"></script>
-<script src="./payment-service.js?v=s3.3.023"></script>
-<script src="./dj-commerce-policy.js?v=s3.3.023"></script>
-<script src="./floqr-service-access.js?v=s3.3.023"></script>
-<script src="./floqr-venue-picker.js?v=s3.3.023"></script>
-<script src="./floqr-employee-network.js?v=s3.3.023"></script>
-<script src="./floqr-staff-marketing-consent.js?v=s3.3.023"></script>
-<script src="./floqr-canonical.js?v=s3.3.023"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.023"></script>
-<script src="./floqr-consent-mode.js?v=s3.3.023"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.023"></script>
-<script src="./ad-campaigns.js?v=s3.3.023"></script>
-<script src="./floqr-ad-composer.js?v=s3.3.023"></script>
-<script src="./patron-ad-campaigns.js?v=s3.3.023"></script>
-<script src="./floqr-access-notice.js?v=s3.3.023"></script>
-<script src="./floqr-safe-render.js?v=s3.3.023"></script>
-<script src="./floqr-board-frame.js?v=s3.3.023"></script>
-<script src="./floqr-template-preview.js?v=s3.3.023"></script>
-<script src="./floqr-portal-tabs.js?v=s3.3.023"></script>
-<script src="./botdee-upgrade-ui.js?v=s3.3.023"></script>
-<script src="./patron-portal-app.js?v=s3.3.023"></script>
-  <script src="./profile-access-guard.js?v=s3.3.023"></script>
+<script src="./firebase-config.js?v=s3.3.024"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.024"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.024"></script>
+<script src="./floqr-people-directory.js?v=s3.3.024"></script>
+<script src="./floqr-app-check.js?v=s3.3.024"></script>
+<script src="./floqr-nav.js?v=s3.3.024"></script>
+<script src="./floqr-qrcode-lib.js?v=s3.3.024"></script>
+<script src="./floqr-qr.js?v=s3.3.024"></script>
+<script src="./global-profile-status.js?v=s3.3.024"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.024"></script>
+<script src="./shared-data.js?v=s3.3.024"></script>
+<script src="./url-media-field.js?v=s3.3.024"></script>
+<script src="./ai-service.js?v=s3.3.024"></script>
+<script src="./ai-index-service.js?v=s3.3.024"></script>
+<script src="./ai-search-service.js?v=s3.3.024"></script>
+<script src="./ai-notification-service.js?v=s3.3.024"></script>
+<script src="./ai-template-studio.js?v=s3.3.024"></script>
+<script src="./ai-grammar-service.js?v=s3.3.024"></script>
+  <script src="./floqr-action-feedback.js?v=s3.3.024"></script>
+<script src="./floqr-tab-gates.js?v=s3.3.024"></script>
+<script src="./floqr-feature-services.js?v=s3.3.024"></script>
+<script src="./floqr-i18n.js?v=s3.3.024"></script>
+<script src="./floqr-geo-search.js?v=s3.3.024"></script>
+<script src="./floqr-geo-catalog.js?v=s3.3.024"></script>
+<script src="./floqr-profile-locale.js?v=s3.3.024"></script>
+<script src="./floqr-place-suggest.js?v=s3.3.024"></script>
+<script src="./botdee-help-repository.js?v=s3.3.024"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.024"></script>
+<script src="./help-attach.js?v=s3.3.024"></script>
+<script src="./helper-popouts.js?v=s3.3.024"></script>
+<script src="./floqr-identity.js?v=s3.3.024"></script>
+<script src="./floqr-blocks.js?v=s3.3.024"></script>
+<script src="./payment-service.js?v=s3.3.024"></script>
+<script src="./dj-commerce-policy.js?v=s3.3.024"></script>
+<script src="./floqr-service-access.js?v=s3.3.024"></script>
+<script src="./floqr-venue-picker.js?v=s3.3.024"></script>
+<script src="./floqr-employee-network.js?v=s3.3.024"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.3.024"></script>
+<script src="./floqr-canonical.js?v=s3.3.024"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.024"></script>
+<script src="./floqr-consent-mode.js?v=s3.3.024"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.024"></script>
+<script src="./ad-campaigns.js?v=s3.3.024"></script>
+<script src="./floqr-ad-composer.js?v=s3.3.024"></script>
+<script src="./patron-ad-campaigns.js?v=s3.3.024"></script>
+<script src="./floqr-access-notice.js?v=s3.3.024"></script>
+<script src="./floqr-safe-render.js?v=s3.3.024"></script>
+<script src="./floqr-board-frame.js?v=s3.3.024"></script>
+<script src="./floqr-template-preview.js?v=s3.3.024"></script>
+<script src="./floqr-portal-tabs.js?v=s3.3.024"></script>
+<script src="./botdee-smartview.js?v=s3.3.024"></script>
+<script src="./botdee-upgrade-ui.js?v=s3.3.024"></script>
+<script src="./patron-portal-app.js?v=s3.3.024"></script>
+  <script src="./profile-access-guard.js?v=s3.3.024"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

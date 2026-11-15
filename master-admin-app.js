@@ -211,7 +211,19 @@
   };
 
   function hashPanelId() {
-    return String(location.hash || "").replace(/^#/, "").trim();
+    const raw = String(location.hash || "").replace(/^#/, "").trim();
+    if (!raw) return "";
+    if (raw === "botDeeMasterSmartViewDemo") {
+      window.__floqrBotDeeMgmtPage = "smartviews";
+      window.__floqrBotDeeFocusId = "botDeeMasterSmartViewDemo";
+      return "featuresBotDee";
+    }
+    const sub = /^featuresBotDee[-_:](\w+)$/.exec(raw);
+    if (sub) {
+      window.__floqrBotDeeMgmtPage = sub[1];
+      return "featuresBotDee";
+    }
+    return raw;
   }
 
   function rememberMasterDeepLink(panelId = "") {
