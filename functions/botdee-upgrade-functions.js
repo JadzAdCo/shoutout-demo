@@ -223,7 +223,13 @@ exports.deleteBotDeeArchive = onCall(CALL_OPTS, async request => {
 
 exports.listBotDeeSmartViews = onCall(CALL_OPTS, async request => {
   try {
-    await requireBotDee(request);
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to use BOT DEE.");
+    }
+  /* Master Admin SMARTviews mock host: show catalog without botDee feature gate (demo / legal review). */
+    if (!isServerAdminAuth(request.auth)) {
+      await requireBotDee(request);
+    }
     const kind = String(request.data?.kind || "").trim();
     const catalog = smart.mockCatalog();
     const views = kind ? catalog.filter(row => row.kind === kind) : catalog;

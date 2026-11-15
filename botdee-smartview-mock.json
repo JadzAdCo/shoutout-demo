@@ -1,0 +1,395 @@
+{
+  "schemaVersion": "floqr.smartViewMock/export",
+  "updatedAt": "2026-11-15",
+  "views": [
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "venue",
+      "title": "Aurelia",
+      "visibility": "public",
+      "canonicalFloqrPageId": "temp-democlub-1",
+      "summary": "FLOQR demo club. SmartView is a compact wrapper — the club public page is canonical.",
+      "images": [
+        {
+          "url": "./images/chrome/botdee-nightlife.jpg",
+          "licenseStatus": "approved",
+          "attribution": "FLOQR chrome pack"
+        }
+      ],
+      "ratings": [
+        {
+          "provider": "FLOQR",
+          "value": 4.8,
+          "retrievedAt": "2026-11-14T00:00:00.000Z"
+        }
+      ],
+      "sources": [
+        {
+          "provider": "FLOQR",
+          "url": "./club-profile.html?location=temp-democlub-1",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "approved"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "locationId": "temp-democlub-1",
+        "city": "Washington, DC",
+        "genres": [
+          "House",
+          "Afrobeats"
+        ]
+      },
+      "recommendationExplanation": {},
+      "actions": [
+        {
+          "id": "open-public-page",
+          "label": "Open FLOQR Public Page",
+          "href": "./club-profile.html?location=temp-democlub-1"
+        }
+      ]
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "restaurant",
+      "title": "Mock · District Kitchen",
+      "visibility": "public",
+      "canonicalFloqrPageId": null,
+      "summary": "Mock restaurant card. Google/Yelp values are placeholders and not live API data.",
+      "images": [
+        {
+          "url": "./images/chrome/botdee-nightlife.jpg",
+          "licenseStatus": "unknown",
+          "attribution": "Mock placeholder — not a Google Places photo"
+        }
+      ],
+      "ratings": [
+        {
+          "provider": "Google",
+          "value": 4.4,
+          "retrievedAt": "2026-11-14T00:00:00.000Z"
+        },
+        {
+          "provider": "Yelp",
+          "value": 4,
+          "retrievedAt": "2026-11-14T00:00:00.000Z"
+        },
+        {
+          "provider": "FLOQR",
+          "value": 4.6,
+          "retrievedAt": "2026-11-14T00:00:00.000Z"
+        }
+      ],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.floqr.app/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "unknown"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "address": "Mock address — not copied from Google Places",
+        "menuIframeAllowed": false,
+        "menuHref": "https://www.floqr.app/",
+        "cuisine": [
+          "American",
+          "Caribbean"
+        ]
+      },
+      "recommendationExplanation": {},
+      "actions": [
+        {
+          "id": "menu-external",
+          "label": "Menu (external)",
+          "href": "https://www.floqr.app/",
+          "iframe": false
+        }
+      ]
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "vehicle",
+      "title": "Mock · 2024 family sedan",
+      "visibility": "public",
+      "canonicalFloqrPageId": null,
+      "summary": "Safety ratings shown only when year/trim/test match. This mock has no verified NHTSA row.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.nhtsa.gov/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "unknown"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "year": 2024,
+        "trim": "unspecified",
+        "nhtsa": {
+          "status": "missing",
+          "note": "No exact year/trim/test match — ratings withheld."
+        },
+        "iihs": {
+          "status": "missing"
+        }
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "hotel",
+      "title": "Mock · Capitol Row Hotel",
+      "visibility": "public",
+      "canonicalFloqrPageId": null,
+      "summary": "Mock hotel. Dates and rates are not live inventory.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.floqr.app/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "unknown"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "amenities": [
+          "wifi",
+          "late checkout"
+        ],
+        "availability": "stale_mock",
+        "refreshRequired": true
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "short_term_rental",
+      "title": "Mock · Shaw loft (unlicensed listing withheld)",
+      "visibility": "restricted",
+      "canonicalFloqrPageId": null,
+      "summary": "Airbnb-style cards stay mock-only until partner terms exist. No scraped listing photos.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.floqr.app/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "restricted"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "platform": "mock",
+        "feesUnknown": true
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "event",
+      "title": "Mock · Friday night at Aurelia",
+      "visibility": "public",
+      "canonicalFloqrPageId": "temp-democlub-1",
+      "summary": "Event SmartView points at the venue public page and published FLOQR event fields.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "FLOQR",
+          "url": "./club-profile.html?location=temp-democlub-1",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "approved"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "venueLocationId": "temp-democlub-1",
+        "ticketUrl": null,
+        "agePolicy": "21+"
+      },
+      "recommendationExplanation": {},
+      "actions": [
+        {
+          "id": "open-public-page",
+          "label": "Open FLOQR Public Page",
+          "href": "./club-profile.html?location=temp-democlub-1"
+        }
+      ]
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "real_estate",
+      "title": "Mock · listing withheld",
+      "visibility": "restricted",
+      "canonicalFloqrPageId": null,
+      "summary": "MLS/IDX photos and addresses are not shown without a broker agreement. Fair housing controls on.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.floqr.app/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "restricted"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "fairHousing": true,
+        "listingStatus": "blocked_no_mls_agreement"
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "product",
+      "title": "Mock · FLOQR merch tee",
+      "visibility": "public",
+      "canonicalFloqrPageId": null,
+      "summary": "Merchant-authorized mock. Not a live catalog offer.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "FLOQR",
+          "url": "./commerce.html",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "approved"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "sku": "mock-tee",
+        "price": null
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "travel",
+      "title": "Mock · DC weekend itinerary",
+      "visibility": "private",
+      "canonicalFloqrPageId": null,
+      "summary": "Saved itinerary mock. Flight fares are not live GDS data.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "mock",
+          "url": "https://www.floqr.app/",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "unknown"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "reason": "legal_gate_blocked"
+      },
+      "floqrPublicData": {
+        "legs": [
+          "IAD → DCA mock"
+        ],
+        "advisories": []
+      },
+      "recommendationExplanation": {},
+      "actions": []
+    },
+    {
+      "schemaVersion": "floqr.smartView/1",
+      "kind": "patron",
+      "title": "Mock patron",
+      "visibility": "restricted",
+      "canonicalFloqrPageId": null,
+      "summary": "FLOQR public-within-app profile fields only. Not indexed for the open web.",
+      "images": [],
+      "ratings": [],
+      "sources": [
+        {
+          "provider": "FLOQR",
+          "url": "./patron-portal.html?tab=profile",
+          "retrievedAt": "2026-11-14T00:00:00.000Z",
+          "reuseRights": "restricted"
+        }
+      ],
+      "publicWebResearch": {
+        "enabled": false,
+        "placeholder": true,
+        "reason": "legal_gate_and_identity_unapproved",
+        "label": "Public Web Research"
+      },
+      "floqrPublicData": {
+        "displayName": "Mock patron",
+        "handle": "@mock",
+        "bio": "Public-within-FLOQR bio",
+        "sharedDatapoints": [
+          "food",
+          "music"
+        ],
+        "datapoints": {
+          "food": [
+            "Nigerian jollof",
+            "sushi"
+          ],
+          "music": [
+            "Afrobeats"
+          ]
+        },
+        "cuisines": [
+          "Nigerian",
+          "Japanese"
+        ]
+      },
+      "recommendationExplanation": {
+        "personalized": false,
+        "preferencesUsed": [],
+        "sources": [
+          "FLOQR public-within-app profile"
+        ],
+        "sponsorship": false
+      },
+      "actions": [
+        {
+          "id": "open-profile-privacy",
+          "label": "Profile visibility (existing FLOQR controls)",
+          "href": "./patron-portal.html?tab=profile"
+        }
+      ]
+    }
+  ]
+}

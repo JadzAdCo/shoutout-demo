@@ -428,7 +428,11 @@
       title: "BOT DEE SmartViews",
       body: "SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved.",
       searchPhrases: ["smartview", "smart view", "venue card", "restaurant card", "public page", "mock smartview"],
-      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
+        {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})},
+        {label: "SMARTviews (Master Admin)", href: pageUrl("./master-admin.html") + "#featuresBotDee-smartviews"}
+      ],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#featuresBotDee"

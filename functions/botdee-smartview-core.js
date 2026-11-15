@@ -212,7 +212,7 @@ function mockCatalog() {
       canonicalFloqrPageId: venueId,
       summary: "FLOQR demo club. SmartView is a compact wrapper — the club public page is canonical.",
       images: [{
-        url: "https://www.floqr.app/images/chrome/botdee-nightlife.jpg",
+        url: "./images/chrome/botdee-nightlife.jpg",
         licenseStatus: "approved",
         attribution: "FLOQR chrome pack"
       }],
@@ -227,7 +227,7 @@ function mockCatalog() {
       visibility: "public",
       summary: "Mock restaurant card. Google/Yelp values are placeholders and not live API data.",
       images: [{
-        url: "https://www.floqr.app/images/chrome/botdee-nightlife.jpg",
+        url: "./images/chrome/botdee-nightlife.jpg",
         licenseStatus: "unknown",
         attribution: "Mock placeholder — not a Google Places photo"
       }],
