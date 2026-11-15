@@ -235,19 +235,36 @@
     return `<div class="tag-row">${rows.map(([, label, ok]) => `<span>${ok ? "Pass" : "Missing"}: ${esc(label)}</span>`).join("")}</div>`;
   }
 
+  function discoverySortMs(item = {}) {
+    const created = item.createdAt;
+    const createdMs = created && typeof created.toMillis === "function"
+      ? created.toMillis()
+      : (created && created.seconds ? created.seconds * 1000 : Number(item.createdAtMs || 0));
+    const collected = Date.parse(item.collectedAtIso || item.collectedAtLabel || "") || 0;
+    return Number(createdMs || collected || 0);
+  }
+
   async function getCollectionSafe(name, limit = 500, orderByField = "") {
     try {
       let query = db.collection(name);
       if (orderByField) query = query.orderBy(orderByField, "desc");
       const snap = await query.limit(limit).get();
-      return snap.docs.map(d => ({id:d.id, ...d.data()}));
+      const rows = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      /* orderBy skips docs missing that field and returns [] without throwing. */
+      if (orderByField && !rows.length) {
+        const fallback = await db.collection(name).limit(limit).get();
+        return fallback.docs.map(d => ({id:d.id, ...d.data()}))
+          .sort((a, b) => discoverySortMs(b) - discoverySortMs(a));
+      }
+      return rows;
     } catch(e) {
       // Unordered limit returns document-id order and hides recent crawl writes.
       if (orderByField) {
         console.warn(`Ordered read failed for ${name} (${orderByField}); falling back unordered:`, e.message);
         try {
           const snap = await db.collection(name).limit(limit).get();
-          return snap.docs.map(d => ({id:d.id, ...d.data()}));
+          return snap.docs.map(d => ({id:d.id, ...d.data()}))
+            .sort((a, b) => discoverySortMs(b) - discoverySortMs(a));
         } catch (fallbackError) {
           console.warn(`Could not read ${name}:`, fallbackError.message);
           return [];
@@ -397,7 +414,7 @@
     const duplicateBlocks = item.duplicateFlag && item.crawlScope !== "updates-only";
     const ready = missing.length === 0 && !duplicateBlocks && String(item.status || "pendingReview") !== "approved";
     const collected = formatCollectedAt(item);
-    return `<div class="queue-item ai-discovery-item${item.duplicateFlag ? " is-duplicate" : ""}" data-queue-index="${index}" data-queue-id="${esc(item.id || "")}" data-onboard-ready="${ready ? "1" : "0"}">`
+    return `<div class="queue-item ai-discovery-item${item.duplicateFlag ? " is-duplicate" : ""}" data-queue-index="${index}" data-queue-id="${esc(item.id || "")}" data-onboard-ready="${ready ? "1" : "0"}">
       <div class="club-option-head">
         <div>
           <label class="consent-line"><input type="checkbox" data-onboard-select ${ready ? "" : "disabled"} aria-label="Select for mass onboard"/> ${ready ? "Ready — select to onboard" : "Not ready to onboard"}</label>
@@ -405,7 +422,7 @@
           <p>${esc(recordKind(item))} - ${esc(window.FLOQRAddress?.publicLocation(item) || [item.city, item.country].filter(Boolean).join(", "))}</p>
           <p class="discovery-meta">${collected ? `Collected ${esc(collected)}` : "Collected time unavailable"}${item.socialPagesFetched?.length ? ` · Social pages checked: ${esc(item.socialPagesFetched.length)}` : ""}</p>
           ${duplicateBlocks ? `<p class="sub small"><strong>Do not import as a new club.</strong> Same establishment as ${esc(item.duplicateMatch?.matchName || item.duplicateMatch?.matchId || "an existing listing")} (${esc((item.duplicateReasons || []).join(", ") || "address, name, or phone")}). Use Updates only or Mark Duplicate.</p>` : ""}
-          ${missing.length ? `<p class="sub small"><strong>Missing datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Onboard ready</strong> — import datapoints Master Admin selected are present.</p>`}`
+          ${missing.length ? `<p class="sub small"><strong>Missing datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Onboard ready</strong> — import datapoints Master Admin selected are present.</p>`}
         </div>
         <div>
           <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
@@ -464,6 +481,7 @@
         <button type="button" data-discovery-action="reject">Reject</button>
         <button type="button" data-discovery-action="duplicate">Mark Duplicate</button>
         <button type="button" data-discovery-action="delete">Delete</button>
+        ${item.sourceUrl || item.website ? `<button type="button" data-discovery-action="gemini-fill">Fill missing with Gemini</button>` : ""}
         ${item.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(item.sourceUrl)}">Open source</a>` : ""}
       </div>
     </div>`;
@@ -565,6 +583,7 @@
         if (action === "needs-research") return markNeedsResearch(card, item);
         if (action === "reject") return setQueueStatus(item, "rejected");
         if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, duplicateFlag:true, crawlResultStatus:"possible-duplicate", aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
+        if (action === "gemini-fill") return geminiFillFromSource(item);
         if (action === "delete" && confirm("Remove this discovery card from active review?")) return setQueueStatus(item, "deleted");
       });
     });
@@ -823,11 +842,92 @@
     await loadDiscoveryQueue();
   }
 
+  const CRAWL_PAGE_LABELS = {
+    overview: "Overview",
+    review: "Review queue",
+    run: "Run & schedule",
+    rules: "Rules",
+    import: "Import",
+    insights: "Insights"
+  };
+  const QUEUE_STATUS_LABELS = {
+    pendingReview: "Pending review",
+    needsResearch: "Needs research",
+    approved: "Approved",
+    rejected: "Rejected",
+    deleted: "Deleted",
+    all: "All"
+  };
+
+  function showAiCrawlPage(page) {
+    const next = CRAWL_PAGE_LABELS[page] ? page : "overview";
+    document.querySelectorAll("#aiCrawling .ai-crawl-page").forEach(el => {
+      const on = el.getAttribute("data-ai-crawl-page") === next;
+      el.hidden = !on;
+      el.classList.toggle("hidden", !on);
+    });
+    document.querySelectorAll(".ai-crawl-pages [data-ai-crawl-page]").forEach(btn => {
+      const on = btn.getAttribute("data-ai-crawl-page") === next;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    try { sessionStorage.setItem("floqr.aiCrawlPage", next); } catch (_e) { /* ignore */ }
+    return next;
+  }
+
+  function bindAiCrawlPages() {
+    const root = byId("aiCrawling");
+    if (!root) return;
+    const tabs = root.querySelector(".ai-crawl-pages");
+    tabs?.classList.remove("hidden");
+    if (!bindAiCrawlPages.bound) {
+      bindAiCrawlPages.bound = true;
+      tabs?.addEventListener("click", event => {
+        const btn = event.target?.closest?.("[data-ai-crawl-page]");
+        if (!btn) return;
+        event.preventDefault();
+        showAiCrawlPage(btn.getAttribute("data-ai-crawl-page"));
+      });
+      root.addEventListener("click", event => {
+        const open = event.target?.closest?.("[data-ai-crawl-open]");
+        if (!open) return;
+        event.preventDefault();
+        const page = showAiCrawlPage(open.getAttribute("data-ai-crawl-open"));
+        if (page === "run") byId("runInstantCrawlBtn")?.focus();
+        if (page === "review") byId("aiDiscoveryQueueList")?.scrollIntoView({behavior: "smooth", block: "start"});
+      });
+    }
+    let initial = "review";
+    try { initial = sessionStorage.getItem("floqr.aiCrawlPage") || "review"; } catch (_e) { initial = "review"; }
+    showAiCrawlPage(initial);
+  }
+
   function jumpToStatus(status) {
+    showAiCrawlPage("review");
     const sel = byId("aiDiscoveryStatusFilter");
     if (sel && status) sel.value = status;
+    const label = QUEUE_STATUS_LABELS[status] || status || "Pending review";
+    setStatus(`Showing ${label}.`);
     byId("aiDiscoveryQueueList")?.scrollIntoView({behavior: "smooth", block: "start"});
     return loadDiscoveryQueue();
+  }
+
+  async function geminiFillFromSource(item = {}) {
+    const url = String(item.sourceUrl || item.website || item.eventsUrl || "").trim();
+    showAiCrawlPage("import");
+    if (byId("sourceExtractUrl") && url) byId("sourceExtractUrl").value = url;
+    byId("sourceExtractUrl")?.scrollIntoView({behavior: "smooth", block: "center"});
+    if (!url) {
+      setStatus("This card has no source URL. Add one, Save, then try Fill missing with Gemini.");
+      return;
+    }
+    setStatus("Gemini can read this official page for DJ, promoter, and contact. It must not invent names. Press Extract details, review, then Save on the card.");
+    const extract = window.FLOQRDiagnostics?.extractSourceDetails;
+    if (typeof extract === "function") {
+      try { await extract(); } catch (error) {
+        setStatus(error?.message || "Gemini extract did not run. Use Extract details on Import.");
+      }
+    }
   }
 
   function applyClientDiscoveryStamp(item, universe) {
@@ -861,14 +961,46 @@
     return next;
   }
 
+  function renderQueuePreview(rows = []) {
+    const el = byId("aiCrawlQueuePreview");
+    if (!el) return;
+    const work = rows.filter(item => {
+      const st = String(item.status || "pendingReview");
+      return st === "pendingReview" || st === "needsResearch";
+    }).slice(0, 6);
+    if (!rows.length) {
+      el.innerHTML = "<p class='sub'>No clubs or events in the discovery queue yet. Open <strong>Run &amp; schedule</strong> and press Instant Crawl Now, or import a CSV on Import.</p>";
+      return;
+    }
+    if (!work.length) {
+      el.innerHTML = `<p class='sub'>Queue has ${esc(rows.length)} record(s), but none are pending review. Open Review queue and set Status to All.</p>`;
+      return;
+    }
+    el.innerHTML = `<p class="sub small"><strong>${esc(work.length)}</strong> awaiting review (of ${esc(rows.length)} in Firestore). Cards live on Review queue.</p>
+      <ul class="ai-crawl-steps">${work.map(item => `<li><strong>${esc(item.proposedTitle || item.proposedLocationName || item.id)}</strong> — ${esc(item.city || "—")}, ${esc(item.country || "—")} · ${esc(item.status || "pendingReview")}</li>`).join("")}</ul>`;
+  }
+
   async function loadDiscoveryQueue() {
+    bindAiCrawlPages();
     const status = byId("aiDiscoveryStatusFilter")?.value || "pendingReview";
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
-    const [rows, clubs, events] = await Promise.all([
-      getCollectionSafe("aiDiscoveryQueue", 500, "createdAt"),
-      getCollectionSafe("clubLocations", 800),
-      getCollectionSafe("events", 400)
-    ]);
+    const wrap = byId("aiDiscoveryQueueList");
+    if (wrap && !wrap.dataset.loaded) wrap.innerHTML = "<p class='sub'>Loading clubs and events from Firestore…</p>";
+    let rows = [];
+    let clubs = [];
+    let events = [];
+    try {
+      [rows, clubs, events] = await Promise.all([
+        getCollectionSafe("aiDiscoveryQueue", 500, "createdAt"),
+        getCollectionSafe("clubLocations", 800),
+        getCollectionSafe("events", 400)
+      ]);
+    } catch (error) {
+      const message = error?.message || "Could not read the discovery queue from Firestore.";
+      if (wrap) wrap.innerHTML = `<p class='sub'>${esc(message)} Confirm Master Admin sign-in. Rules allow Master Admin read of aiDiscoveryQueue.</p>`;
+      setStatus(message);
+      return;
+    }
     const universe = [
       ...clubs.map(row => ({...row, collection: "clubLocations"})),
       ...events.map(row => ({...row, collection: "events", entityKind: row.entityKind || "event"})),
@@ -884,8 +1016,18 @@
       if (city && !String(item.city || "").toLowerCase().includes(city)) return false;
       return true;
     }).map(item => applyClientDiscoveryStamp(item, universe));
+    if (wrap) wrap.dataset.loaded = "1";
+    renderQueuePreview(rows);
     renderCountryTabs(allQueueRows);
     renderQueueCards();
+    const label = QUEUE_STATUS_LABELS[status] || status;
+    if (!rows.length) {
+      setStatus("Firestore returned 0 aiDiscoveryQueue documents. Run a crawl or import CSV — this is not a missing tab.");
+    } else if (!allQueueRows.length) {
+      setStatus(`Loaded ${rows.length} from Firestore, but none match ${label}. Set Status to All.`);
+    } else {
+      setStatus(`Showing ${allQueueRows.length} club/event card(s) · ${label} · ${rows.length} in Firestore.`);
+    }
   }
 
   function listingSearchText(item = {}) {
@@ -1199,10 +1341,30 @@
     setStatus("Past-event policy saved. The crawler ignores past dates when Ignore is on.");
   }
 
+  async function withBusyButton(button, work, busyText) {
+    if (!button) return work();
+    if (button.classList.contains("is-busy")) return;
+    const original = button.textContent;
+    button.disabled = true;
+    button.classList.add("is-busy");
+    button.setAttribute("aria-busy", "true");
+    button.textContent = busyText || "Working…";
+    try { return await work(); }
+    finally {
+      button.disabled = false;
+      button.classList.remove("is-busy");
+      button.removeAttribute("aria-busy");
+      button.textContent = original;
+    }
+  }
+
   async function cleanPastEventsNow() {
+    const button = byId("aiDiscoveryCleanPastBtn");
+    return withBusyButton(button, async () => {
     readPastEventPolicyFromForm();
     const hours = Math.max(0, Number(pastEventPolicy.removeAfterDays || 0) * 24);
     try {
+      setStatus("Clean past events sent. Waiting for the function…");
       const callable = firebase.functions().httpsCallable("retirePastCrawledEvents");
       const result = await callable({mode: "remove", olderThanHours: hours, limit: 400});
       const summary = result.data || {};
@@ -1212,6 +1374,7 @@
       setStatus(error?.message || "Could not clean past events. Functions deploy may still be pending.");
       writeDiscoveryLog("past_event_cleaned", error?.message || "clean failed", {error: error?.message || String(error)});
     }
+    }, "Cleaning — function received…");
   }
 
   function setStatus(value) {
@@ -1228,14 +1391,17 @@
     if (masterPanelLoading) return masterPanelLoading;
     masterPanelLoading = (async () => {
       await ensureDiscoveryDefaults();
+      /* Crawl run buttons live in diagnostics JS; bind them here so Instant Crawl works without opening Diagnostics. */
+      window.FLOQRDiagnostics?.ensureCrawlReady?.({db, auth});
       /* Counts live in #aiCrawlingSummary from masterAdminRollups; keep operator how-to here. */
-      byId("aiDiscoverySummary").innerHTML = simpleRows([
-        ["How it works", "Search → review cards → Save drafts, Publish when ready, or Needs research → live listing"],
-        ["Publish rule", "Each crawl type has its own checklist. Nightclubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Promoter(s) and Instagram are optional."],
-        ["Duplicates", "Same phone, same address, or same club name = one establishment. Monaco and Monte Carlo are treated as the same city."],
-        ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
-        ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
-      ]);
+      bindAiCrawlPages();
+      showAiCrawlPage("review");
+      byId("aiDiscoverySummary").innerHTML = `<ol class="ai-crawl-steps">
+        <li><strong>Run</strong> — Instant Crawl or the saved schedule searches Google Places and official pages.</li>
+        <li><strong>Review</strong> — Fill missing fields. Save keeps a draft. Publish only when the rule passes and it is not a duplicate.</li>
+        <li><strong>Live</strong> — Published listings appear on Search. Auto-publish emails Master Admin. Logs are under Diagnostics → AI Crawling.</li>
+      </ol>
+      <p class="sub small">Same phone, address, or club name is one establishment (Monaco = Monte Carlo). Nightclubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email.</p>`;
       window.FLOQRMasterAdminRollup?.paintForPanel?.("aiCrawling");
       if (!masterPanelBound) {
         masterPanelBound = true;
@@ -1292,6 +1458,12 @@
     mountMasterAdminPanel,
     loadDiscoveryQueue,
     jumpToStatus,
+    showAiCrawlPage,
     loadListingDeleteTool
   };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindAiCrawlPages, {once: true});
+  } else {
+    bindAiCrawlPages();
+  }
 })();

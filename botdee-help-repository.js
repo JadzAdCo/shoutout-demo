@@ -1099,18 +1099,34 @@
       id: "help-venue-crawl-datapoints",
       audiences: ["masterAdmin"],
       title: "AI crawl venue datapoints",
-      body: "On Master Admin → AI Crawling, set a Publishing rule per crawl type. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. Download the sample CSV, export unpublished rows, and import with the same headers. Save keeps edits on the review card without going live. Publish always blocks duplicates (same phone, address, or club name — Monaco equals Monte Carlo) and ignores past events. Auto-published listings are emailed; logs are under Diagnostics → AI Crawling.",
+      body: "Master Admin → AI Crawling is split into Overview, Review queue, Run & schedule, Rules, Import, and Insights. Set a Publishing rule per crawl type on Rules. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s) and need Date and Time. Promoter(s) and Instagram stay optional unless you tick them. Download the sample CSV on Import. Save keeps edits on the review card without going live. Publish always blocks duplicates (same phone, address, or club name — Monaco equals Monte Carlo) and ignores past events. Auto-published listings are emailed; logs are under Diagnostics → AI Crawling.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
         "import datapoints", "publishing rule", "csv import", "csv export", "duplicate venue", "monaco monte carlo",
         "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
-        "club admin imports", "publish discovery", "save discovery card"
+        "club admin imports", "publish discovery", "save discovery card",
+        "ai crawling tabs", "review queue", "run and schedule"
       ],
       links: [
         {label: "Master Admin AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html"
+    },
+    {
+      id: "help-ai-crawl-gemini",
+      audiences: ["masterAdmin"],
+      title: "Gemini on AI Crawling",
+      body: "Gemini should improve crawling by reading official event and venue pages FLOQR already found — for DJ(s), “presented by” / promoter, and contact — not by inventing names. Use Fill missing with Gemini on a Review card (needs a source URL), or paste one detail page on Import → Extract details. If the page does not name a DJ, leave the field empty and choose Needs research. Natural-language search is on Run & schedule. Places still finds the venues; Gemini fills the gaps.",
+      searchPhrases: [
+        "gemini crawl", "fill missing with gemini", "extract dj promoter", "gemini source extractor",
+        "ai crawling gemini", "invent tba", "lineup page"
+      ],
+      links: [
+        {label: "AI Crawling", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#aiCrawling", search: "ai crawling"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#aiCrawling"
     },
     {
       id: "help-network-promoters",

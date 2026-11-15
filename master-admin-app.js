@@ -283,7 +283,8 @@
 
   function setupTabs() {
     const hideAllSubtabs = () => {
-      document.querySelectorAll(".admin-subtabs").forEach((el) => el.classList.add("hidden"));
+      /* Only the left-nav groups. In-page tablists (AI Crawling, country chips) use .admin-subtabs too. */
+      document.querySelectorAll(".admin-tabs .admin-subtabs").forEach((el) => el.classList.add("hidden"));
       document.querySelectorAll(".admin-tab-parent").forEach((el) => el.setAttribute("aria-expanded", "false"));
     };
 
@@ -300,7 +301,7 @@
       rememberMasterDeepLink(panelId);
       document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
       document.querySelectorAll(".admin-tab:not(.admin-tab-parent)").forEach((x) => x.classList.remove("active"));
-      document.querySelectorAll(".admin-subtab").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tabs .admin-subtab").forEach((x) => x.classList.remove("active"));
       document.querySelectorAll(".admin-tab-parent").forEach((x) => x.classList.remove("active"));
       byId(panelId).classList.add("active");
 
@@ -452,9 +453,15 @@
     document.addEventListener("click", event => {
       const target = event.target?.closest?.("a,button");
       if (!target || !byId("masterAdminPage")?.contains(target)) return;
-      const rawLabel = target.textContent || target.getAttribute("aria-label") || target.id || target.href || "action";
+      const rawLabel = target.getAttribute("data-ai-label")
+        || target.getAttribute("aria-label")
+        || target.textContent
+        || target.id
+        || target.href
+        || "action";
       const label = rawLabel.replace(/\s+/g, " ").trim().slice(0, 140) || "action";
       const href = target.tagName === "A" ? target.href : "";
+      const skipLiveStatus = !!(target.closest("[data-ai-status-filter], .ai-crawl-pages, [data-ai-crawl-open], #runInstantCrawlBtn, #runManualCrawlBtn, #previewCrawlPlanBtn, #saveCrawlScheduleBtn, #extractSourceDetailsBtn, #aiDiscoveryCleanPastBtn"));
       const message = href
         ? `Clicked link: ${label}. Destination: ${href}`
         : `Clicked action: ${label}. Waiting for the feature-specific result message...`;
@@ -465,7 +472,7 @@
       if (target.closest("#diagnosticsFloqCast")) setText("floqcastDiagStatus", message);
       if (target.closest("#diagnosticsShoutOut")) setText("shoutoutDiagStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
-      if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
+      if (target.closest("#aiCrawling") && !skipLiveStatus) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
     }, true);
   }

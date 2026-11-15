@@ -7,10 +7,12 @@ alwaysApply: true
 
 Resume: `@crawl$` / `$discovery$`.
 
-Master Admin → **AI Crawling**. Internet search (Google Places + public pages today) → parse → human review → approve → live `clubLocations` / `events`. Ticketmaster Discovery API confirmation is **later**.
+Master Admin → **AI Crawling** (one page, inner tabs: Overview · Review queue · Run & schedule · Rules · Import · Insights). Internet search (Google Places + public pages today) → parse → human review → approve → live `clubLocations` / `events`. Ticketmaster Discovery API confirmation is **later**. Last-run status is a banner (`#aiCrawlLastRun`), not a 46px KPI. Gemini fills missing DJ/promoter/contact from an official page — never invents TBA.
 
 ## Operator UX contract (non-technical)
 
+- Workspace tabs keep daily work (Review) separate from schedule, rules, and CSV/Gemini extract. Opening AI Crawling lands on **Review queue**.
+- **Instant Crawl Now** (and Run / Preview / Save schedule) must bind when this page opens — do not require Diagnostics first. The button greys out until the callable returns; status writes on this page (`#aiDiscoveryStatus`).
 - Approval is driven by **named form fields** and a Pass/Missing checklist — never by editing JSON.
 - Raw/parsed payloads are **Advanced** only. Labels: “Source snapshot” / “What FLOQR understood” — not “JSON”.
 - Rating criteria use **number inputs** (weights). Machine dump stays under Advanced.

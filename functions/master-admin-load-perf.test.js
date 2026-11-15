@@ -30,6 +30,8 @@ test("master-admin-app activatePanel mounts heavy panels on demand", () => {
   const actBlock = src.slice(actIdx, actIdx + 5500);
   assert.match(actBlock, /FLOQRDiagnostics\?\.mount/);
   assert.match(actBlock, /panelId === "aiCrawling"/);
+  assert.match(read("master-admin-app.js"), /document\.querySelectorAll\("\.admin-tabs \.admin-subtabs"\)/);
+  assert.match(read("master-admin-app.js"), /document\.querySelectorAll\("\.admin-tabs \.admin-subtab"\)/);
   assert.match(actBlock, /FLOQRDuplicateRecords\?\.mount/);
   assert.match(actBlock, /FLOQRMasterServices\?\.mount/);
   assert.match(actBlock, /panelId === "templateManagement"/);

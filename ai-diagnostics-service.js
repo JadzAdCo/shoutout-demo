@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.019";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.019";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.020";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.020";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -221,6 +221,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.020",
+      title: "s3.3.020 — AI Crawling workspace tabs, last-run banner, Gemini fill",
+      checks: [
+        {label:"AI Crawling inner tabs", file:"master-admin.html", includes:["data-ai-crawl-page=\"overview\"", "aiCrawlLastRun", "Gemini on this crawl"]},
+        {label:"Last crawl banner not a KPI", file:"master-admin-rollup.js", includes:["paintAiCrawlLastRun", "metric-card-value"]},
+        {label:"Review jump + Gemini fill", file:"ai-discovery-service.js", includes:["showAiCrawlPage(\"review\")", "geminiFillFromSource"]},
+        {label:"Instant Crawl from AI Crawling", file:"ai-diagnostics-service.js", includes:["ensureCrawlReady", "crawlNotice", "is-busy"]},
+        {label:"Action feedback skip", file:"master-admin-app.js", includes:["skipLiveStatus", "data-ai-label"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-020-ai-crawl-workspace"]}
+      ]
+    },
     {
       version: "s3.3.019",
       title: "s3.3.019 — AI crawl publishing rules, CSV, past events, crawl logs",
@@ -1270,8 +1282,6 @@
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.30\""]}
       ]
     },
-
-    {
     {
       version: "s3.2.29",
       title: "s3.2.29 — PC Search composition centered",
@@ -1301,6 +1311,7 @@
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.2.28\""]}
       ]
     },
+    {
       version: "s3.2.27",
       title: "s3.2.27 — Template howitWorks + Traditional description",
       checks: [
@@ -3168,6 +3179,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-020-ai-crawl-workspace",
+      area:"Master Admin",
+      feature:"AI Crawling workspace tabs + last-run banner",
+      changed:"s3.3.020 — AI Crawling is one page with Overview, Review queue, Run & schedule, Rules, Import, and Insights. Last crawl is a status banner (not a wrapping 46px KPI). Review is the default tab. Instant Crawl Now binds when AI Crawling opens (no need to visit Diagnostics first); the button greys out until the function returns. Needs research / Approved KPIs open Review. Gemini fill uses the official page; it must not invent DJ names.",
+      howToTest:"1) Hard-refresh master-admin.html s3.3.020, sign in, AI Crawling. 2) Review queue is the first inner tab; last crawl is a one-line banner. 3) Open Run & schedule, tap Instant Crawl Now — the button greys out (Sending / function received) and #aiDiscoveryStatus updates. It must not stay blank. 4) Tap Needs research — Review opens and status is Showing Needs research (not Needs research2). 5) On a card with a source URL, Fill missing with Gemini opens Import. 6) Mark Succeed/Failed.",
+      expected:"Instant Crawl shows a status on this page. The button is grey while the callable runs. KPIs stay numeric. Last run does not wrap. Gemini extract never invents TBA.",
+      troubleshoot:"Instant Crawl does nothing → hard-refresh so AI Crawling mount calls FLOQRDiagnostics.ensureCrawlReady; do not require opening Diagnostics first. Button never greys → admin.css button.is-busy. Letters wrap → last crawl must be #aiCrawlLastRun. Empty queue after a successful crawl → set Status to All, then Refresh."
+    },
     {
       id:"s3-3-019-ai-crawl-csv-publish",
       area:"Master Admin",
@@ -8227,16 +8247,72 @@
     };
   }
 
-  async function saveCrawlSchedule(options = {}) {
-    if (!state.db) return;
-    const schedule = readScheduleFromControls();
-    setText("diagnosticsStatus", "Saving crawler schedule and search criteria...");
-    await state.db.collection("aiCrawlerSchedules").doc("default").set(schedule, {merge: true});
-    if (!options.silent) {
-      setText("diagnosticsStatus", `Crawler schedule saved for ${schedule.scheduleHours.join(", ")} in ${schedule.timeZone}. Deploy scheduledAiDiscoveryCrawl once to activate the 24-hour processing engine.`);
-      await refreshDiagnostics();
+  function crawlNotice(message) {
+    setText("diagnosticsStatus", message);
+    setText("aiDiscoveryStatus", message);
+  }
+
+  function ensureCrawlDb() {
+    if (!state.db && window.firebase?.firestore) state.db = firebase.firestore();
+    if (!state.auth && window.firebase?.auth) state.auth = firebase.auth();
+    return state.db;
+  }
+
+  function ensureCrawlReady(options = {}) {
+    state.db = options.db || state.db;
+    state.auth = options.auth || state.auth;
+    ensureCrawlDb();
+    hydrateDefaultControls();
+    if (!state.mounted) {
+      state.mounted = true;
+      bindControls();
     }
-    return schedule;
+    return {ready: !!state.db, bound: !!state.mounted};
+  }
+
+  async function withBusyButton(button, work, labels = {}) {
+    if (!button) return work({});
+    if (button.classList.contains("is-busy")) return;
+    const original = button.textContent;
+    const busyText = labels.busyText || "Working…";
+    const receivedText = labels.receivedText || "Function received…";
+    button.disabled = true;
+    button.classList.add("is-busy");
+    button.setAttribute("aria-busy", "true");
+    button.textContent = busyText;
+    try {
+      return await work({
+        markReceived() {
+          button.textContent = receivedText;
+        }
+      });
+    } finally {
+      button.disabled = false;
+      button.classList.remove("is-busy");
+      button.removeAttribute("aria-busy");
+      button.textContent = original;
+    }
+  }
+
+  async function saveCrawlSchedule(options = {}) {
+    const button = options.event?.currentTarget || (options.silent ? null : byId("saveCrawlScheduleBtn"));
+    const run = async ({markReceived} = {}) => {
+      if (!ensureCrawlDb()) {
+        crawlNotice("Cannot save schedule: Firestore is not ready. Stay signed in as Master Admin.");
+        return;
+      }
+      const schedule = readScheduleFromControls();
+      crawlNotice("Saving crawler schedule and search criteria...");
+      markReceived?.();
+      await state.db.collection("aiCrawlerSchedules").doc("default").set(schedule, {merge: true});
+      if (!options.silent) {
+        crawlNotice(`Crawler schedule saved for ${schedule.scheduleHours.join(", ")} in ${schedule.timeZone}. Deploy scheduledAiDiscoveryCrawl once to activate the 24-hour processing engine.`);
+        await refreshDiagnostics();
+      }
+      return schedule;
+    };
+    if (options.silent || !button) return run({});
+    return withBusyButton(button, run, {busyText: "Saving schedule…", receivedText: "Function received…"});
   }
 
   function renderCrawlSearchPlan(plan = state.lastCrawlPlan || buildCrawlSearchPlan(readCriteriaFromControls())) {
@@ -8265,11 +8341,17 @@
     wrap.innerHTML = `${simpleRows(rows)}${jobsHtml}`;
   }
 
-  function previewCrawlPlan() {
-    const plan = buildCrawlSearchPlan(readCriteriaFromControls());
-    renderCrawlSearchPlan(plan);
-    setText("diagnosticsStatus", `Search plan ready: ${plan.jobCount} crawl/search job(s) generated from plain English input.`);
-    return plan;
+  function previewCrawlPlan(event) {
+    const button = event?.currentTarget || byId("previewCrawlPlanBtn");
+    const run = () => {
+      ensureCrawlReady();
+      const plan = buildCrawlSearchPlan(readCriteriaFromControls());
+      renderCrawlSearchPlan(plan);
+      crawlNotice(`Search plan ready: ${plan.jobCount} crawl/search job(s) generated from plain English input.`);
+      return plan;
+    };
+    if (!button) return run();
+    return withBusyButton(button, async () => run(), {busyText: "Building plan…", receivedText: "Plan received…"});
   }
 
   function renderSourceExtractionReport(record = state.lastExtractedSourceRecord) {
@@ -8563,59 +8645,79 @@
     }));
   }
 
-  async function runInstantCrawl() {
-    if (!state.db) return;
-    if (!window.firebase?.app) {
-      setText("diagnosticsStatus", "Instant crawl failed: Firebase Functions client unavailable.");
-      return;
-    }
-    const schedule = await readScheduleSafe();
-    const criteria = schedule?.criteria || readCriteriaFromControls();
-    const plan = criteria?.structuredPlan || buildCrawlSearchPlan(criteria || readCriteriaFromControls());
-    const jobLimit = 8;
-    setText("diagnosticsStatus", `Instant crawl starting (${Math.min(jobLimit, plan.jobCount || plan.jobs?.length || 0)} job cap)...`);
-    try {
-      const callable = firebase.app().functions("us-central1").httpsCallable("runInstantDiscoveryCrawl");
-      const result = await callable({
-        criteria,
-        structuredPlan: plan,
-        jobLimit
-      });
-      const data = result?.data || {};
-      const stats = data.contactStats || {};
-      const statusMessage = data.message
-        || `Instant crawl wrote ${data.created || 0} record(s). Contact-complete ${stats.contactCompleteBeforePct ?? "—"}% → ${stats.contactCompleteAfterPct ?? "—"}%.`;
-      setText("diagnosticsStatus", statusMessage);
-      const report = byId("crawlSearchPlanReport");
-      if (report && data.contactStats) {
-        const baselines = data.baselines || {};
-        report.innerHTML = `${report.innerHTML || ""}
-          <div class="queue-item" style="margin-top:12px">
-            <strong>Instant crawl contact lift</strong>
-            <p>Created: ${esc(data.created || 0)} · Jobs: ${esc(data.jobsAttempted || 0)}/${esc(data.jobLimit || jobLimit)}</p>
-            <p>This run contact-complete: ${esc(stats.contactCompleteBeforePct)}% → ${esc(stats.contactCompleteAfterPct)}% (+${esc(stats.liftPctPoints)} pp)</p>
-            <p>Gained IG ${esc(stats.gained?.instagram || 0)} · Email ${esc(stats.gained?.email || 0)} · FB ${esc(stats.gained?.facebook || 0)} · Phone ${esc(stats.gained?.phone || 0)}</p>
-            <small>Baselines: previous engine ${esc(baselines.previousEngineContactCompletePct ?? 0)}% · enrich v1 ${esc(baselines.enrichV1ContactCompletePct ?? 37.8)}%</small>
-          </div>`;
+  async function runInstantCrawl(event) {
+    const button = event?.currentTarget || byId("runInstantCrawlBtn");
+    return withBusyButton(button, async ({markReceived}) => {
+      ensureCrawlReady();
+      if (!ensureCrawlDb()) {
+        crawlNotice("Instant crawl cannot run: Firestore is not ready. Stay signed in as Master Admin.");
+        return;
       }
-      await refreshDiagnostics();
-      if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
-    } catch (error) {
-      console.warn("runInstantDiscoveryCrawl failed:", error?.message || error);
-      setText("diagnosticsStatus", `Instant crawl failed: ${error?.message || error}`);
-      await refreshDiagnostics();
-    }
+      if (!window.firebase?.app) {
+        crawlNotice("Instant crawl failed: Firebase Functions client unavailable.");
+        return;
+      }
+      const schedule = await readScheduleSafe();
+      const criteria = schedule?.criteria || readCriteriaFromControls();
+      const plan = criteria?.structuredPlan || buildCrawlSearchPlan(criteria || readCriteriaFromControls());
+      const jobLimit = 8;
+      crawlNotice(`Instant crawl sent (${Math.min(jobLimit, plan.jobCount || plan.jobs?.length || 0)} job cap). Waiting for the function…`);
+      markReceived?.();
+      try {
+        const callable = firebase.app().functions("us-central1").httpsCallable("runInstantDiscoveryCrawl");
+        const result = await callable({
+          criteria,
+          structuredPlan: plan,
+          jobLimit
+        });
+        const data = result?.data || {};
+        const stats = data.contactStats || {};
+        const statusMessage = data.message
+          || `Instant crawl wrote ${data.created || 0} record(s). Contact-complete ${stats.contactCompleteBeforePct ?? "—"}% → ${stats.contactCompleteAfterPct ?? "—"}%.`;
+        crawlNotice(statusMessage);
+        const report = byId("crawlSearchPlanReport");
+        if (report && data.contactStats) {
+          const baselines = data.baselines || {};
+          report.innerHTML = `${report.innerHTML || ""}
+            <div class="queue-item" style="margin-top:12px">
+              <strong>Instant crawl contact lift</strong>
+              <p>Created: ${esc(data.created || 0)} · Jobs: ${esc(data.jobsAttempted || 0)}/${esc(data.jobLimit || jobLimit)}</p>
+              <p>This run contact-complete: ${esc(stats.contactCompleteBeforePct)}% → ${esc(stats.contactCompleteAfterPct)}% (+${esc(stats.liftPctPoints)} pp)</p>
+              <p>Gained IG ${esc(stats.gained?.instagram || 0)} · Email ${esc(stats.gained?.email || 0)} · FB ${esc(stats.gained?.facebook || 0)} · Phone ${esc(stats.gained?.phone || 0)}</p>
+              <small>Baselines: previous engine ${esc(baselines.previousEngineContactCompletePct ?? 0)}% · enrich v1 ${esc(baselines.enrichV1ContactCompletePct ?? 37.8)}%</small>
+            </div>`;
+        }
+        await refreshDiagnostics();
+        if (window.FLOQRAIDiscovery?.showAiCrawlPage) window.FLOQRAIDiscovery.showAiCrawlPage("review");
+        if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
+      } catch (error) {
+        console.warn("runInstantDiscoveryCrawl failed:", error?.message || error);
+        crawlNotice(`Instant crawl failed: ${error?.message || error}`);
+        await refreshDiagnostics();
+      }
+    }, {busyText: "Sending Instant Crawl…", receivedText: "Crawling — function received…"});
   }
 
-  async function runManualCrawl() {
-    if (!state.db) return;
+  async function runManualCrawl(event) {
+    const button = event?.currentTarget || byId("runManualCrawlBtn");
+    return withBusyButton(button, async ({markReceived}) => {
+    ensureCrawlReady();
+    if (!ensureCrawlDb()) {
+      crawlNotice("Discovery crawl cannot run: Firestore is not ready. Stay signed in as Master Admin.");
+      return;
+    }
     const user = state.auth?.currentUser;
     const schedule = await saveCrawlSchedule({silent: true});
+    if (!schedule) {
+      crawlNotice("Discovery crawl cannot run: schedule did not save.");
+      return;
+    }
     const criteria = schedule.criteria;
     const runRef = state.db.collection("aiCrawlRuns").doc();
     const plan = buildCrawlSearchPlan(criteria);
     renderCrawlSearchPlan(plan);
-    setText("diagnosticsStatus", `Running discovery crawl for ${plan.jobCount} search job(s)...`);
+    crawlNotice(`Discovery crawl sent for ${plan.jobCount} search job(s). Waiting for the function…`);
+    markReceived?.();
     await runRef.set({
       trigger: "manual",
       mode: "master-admin-refined-discovery-crawl",
@@ -8644,8 +8746,9 @@
           completedAt: fieldValue(),
           updatedAt: fieldValue()
         }, {merge: true});
-        setText("diagnosticsStatus", statusMessage);
+        crawlNotice(statusMessage);
         await refreshDiagnostics();
+        if (window.FLOQRAIDiscovery?.showAiCrawlPage) window.FLOQRAIDiscovery.showAiCrawlPage("review");
         if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
         return;
       } catch (error) {
@@ -8658,8 +8761,7 @@
           completedAt: fieldValue(),
           updatedAt: fieldValue()
         }, {merge: true});
-        setText(
-          "diagnosticsStatus",
+        crawlNotice(
           `Discovery crawl failed: ${error?.message || error}. Check that Functions are deployed and GOOGLE_PLACES_API_KEY is configured. No placeholder review cards were created.`
         );
         await refreshDiagnostics();
@@ -8674,11 +8776,11 @@
       completedAt: fieldValue(),
       updatedAt: fieldValue()
     }, {merge: true});
-    setText(
-      "diagnosticsStatus",
+    crawlNotice(
       "Discovery crawl failed: Firebase Functions client unavailable. No placeholder review cards were created."
     );
     await refreshDiagnostics();
+    }, {busyText: "Sending Discovery Crawl…", receivedText: "Crawling — function received…"});
   }
 
   function staleAgeThresholdDays() {
@@ -10086,7 +10188,7 @@
     byId("rulesSmokeTestFilter")?.addEventListener("change", renderRulesSmokeResults);
     byId("copyRulesSmokeFailuresBtn")?.addEventListener("click", copyRulesSmokeFailures);
     byId("downloadRulesSmokeJsonBtn")?.addEventListener("click", downloadRulesSmokeJson);
-    byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
+    byId("saveCrawlScheduleBtn")?.addEventListener("click", event => saveCrawlSchedule({event}));
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
     byId("runInstantCrawlBtn")?.addEventListener("click", runInstantCrawl);
@@ -10094,17 +10196,24 @@
     byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
     byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);
     byId("clearCachedCrawlsBtn")?.addEventListener("click", clearCachedCrawlRecords);
-    byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
-    byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
+    byId("extractSourceDetailsBtn")?.addEventListener("click", event => {
+      withBusyButton(event.currentTarget, () => extractSourceDetails(), {busyText: "Extracting…", receivedText: "Function received…"});
+    });
+    byId("saveExtractedDiscoveryBtn")?.addEventListener("click", event => {
+      withBusyButton(event.currentTarget, () => saveExtractedDiscoveryRecord(), {busyText: "Saving extract…", receivedText: "Function received…"});
+    });
     byId("sourceExtractUrl")?.addEventListener("input", updateSourceExtractUrlHint);
     byId("sourceExtractUrl")?.addEventListener("change", updateSourceExtractUrlHint);
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
     byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
     byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
     byId("downloadCrawlContactsCsvBtn")?.addEventListener("click", downloadCrawlContactsCsv);
-    byId("testGeminiSourceExtractorBtn")?.addEventListener("click", () => testGeminiSourceExtractor().catch(error => {
-      setText("diagnosticsStatus", `Gemini/source extractor test failed: ${error?.message || error}`);
-    }));
+    byId("testGeminiSourceExtractorBtn")?.addEventListener("click", event => {
+      withBusyButton(event.currentTarget, async () => {
+        try { await testGeminiSourceExtractor(); }
+        catch (error) { crawlNotice(`Gemini/source extractor test failed: ${error?.message || error}`); }
+      }, {busyText: "Testing Gemini…", receivedText: "Function received…"});
+    });
   }
 
   let mountInFlight = null;
@@ -10133,7 +10242,7 @@
       renderCrawlContactExport();
       renderPackageDiagnosticsArchives();
       /* Summary strip comes from masterAdminRollups/current (5-min schedule).
-         Full refresh (27 collections + package file fetches) only on Run / Refresh Diagnostics. */
+         Full refresh (27 collections + package file fetches) only on Run / Refresh Diagnostics — never on Master Admin sign-in. */
       setText("diagnosticsStatus", "Rollup summary loaded. Press Run Diagnostics or Refresh Diagnostics for a full live scan.");
       state.diagnosticsReady = true;
     })().finally(() => { mountInFlight = null; });
@@ -10142,6 +10251,11 @@
 
   window.FLOQRDiagnostics = {
     mount,
+    ensureCrawlReady,
+    runInstantCrawl,
+    runManualCrawl,
+    previewCrawlPlan,
+    saveCrawlSchedule,
     refreshDiagnostics,
     runFeatureDiagnostics,
     runPackageInstallDiagnostics,

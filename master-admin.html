@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.019"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.019"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.019"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.019"/>  <script>
+<link rel="stylesheet" href="./styles.css?v=s3.3.020"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.020"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.020"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.020"/>  <script>
     try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
@@ -147,7 +147,7 @@
           </div>
         </div>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
-        <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
+        <button class="admin-tab" data-panel="aiCrawling" type="button" data-i18n="master.aiCrawling">AI Crawling</button>
       </nav>
 
       <section id="networkDashboard" class="admin-panel-section active">
@@ -1586,15 +1586,141 @@
         </div>
       </section>
 
-      <section id="aiCrawling" class="admin-panel-section">
+            <section id="aiCrawling" class="admin-panel-section">
         <!-- Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc -->
-        <div class="card">
-          <h2>AI Crawling</h2>
-          <p class="sub small">Set where and what to look for. FLOQR searches the internet (Google Places and public pages today), shows club and event candidates for your review, then publishes only what you approve. Ticketmaster confirmation is planned for a later release.</p>
-          <div id="aiCrawlingSummary" class="report-block"></div>
-          <div id="aiDiscoverySummary" class="report-block"></div>
-          <p id="aiDiscoveryStatus" class="status"></p>
+        <div class="card ai-crawl-workspace">
+          <h2 class="help-label">
+            <span data-i18n="master.aiCrawling">AI Crawling</span>
+            <details class="help-popout inline-help-popout" data-help-id="help-venue-crawl-datapoints">
+              <summary aria-label="Help">?</summary>
+              <div class="help-popout-body">Use the tabs on this page. Overview is status. Review queue is daily work (Save vs Publish). Run &amp; schedule starts a crawl. Rules set what “ready” means. Import is CSV and Gemini page extract. Insights are reports. Diagnostics → AI Crawling holds categorized logs.</div>
+            </details>
+          </h2>
+          <p class="sub small">Search the internet for clubs and events, review the queue, then publish. Ticketmaster confirmation is later.</p>
+          <div id="aiCrawlingSummary" class="report-block ai-crawl-kpis"></div>
+          <div id="aiCrawlLastRun" class="ai-crawl-last-run" role="status">Last crawl — open Overview after sign-in.</div>
+          <p id="aiDiscoveryStatus" class="status" role="status"></p>
+          <div class="ai-crawl-pages" role="tablist" aria-label="AI Crawling sections">
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="overview" data-i18n="master.aiCrawlOverview">Overview</button>
+            <button type="button" class="admin-subtab active" role="tab" aria-selected="true" data-ai-crawl-page="review" data-i18n="master.aiCrawlReview">Review queue</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="run" data-i18n="master.aiCrawlRun">Run &amp; schedule</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="rules" data-i18n="master.aiCrawlRules">Rules</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="import" data-i18n="master.aiCrawlImport">Import</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-ai-crawl-page="insights" data-i18n="master.aiCrawlInsights">Insights</button>
+          </div>
         </div>
+
+        <div class="ai-crawl-page hidden" data-ai-crawl-page="overview" hidden>
+          <div class="card">
+            <h2>How it works</h2>
+            <div id="aiDiscoverySummary" class="report-block"></div>
+            <div id="aiCrawlQueuePreview" class="report-block"></div>
+            <div class="queue-actions">
+              <button type="button" data-ai-crawl-open="review">Open review queue</button>
+              <button type="button" class="primary" data-ai-crawl-open="run">Run a crawl</button>
+              <a class="buttonlike" href="#diagnosticsAiCrawl">Diagnostics logs</a>
+            </div>
+          </div>
+          <div class="card">
+            <h2 class="help-label">
+              <span>Gemini on this crawl</span>
+              <details class="help-popout inline-help-popout" data-help-id="help-ai-crawl-gemini">
+                <summary aria-label="Help">?</summary>
+                <div class="help-popout-body">Gemini should fill missing DJ, promoter, and contact from the official page — never invent “TBA”. Use Fill missing with Gemini on a review card, or paste one event URL on Import. Places still finds venues; Gemini reads the page FLOQR already fetched.</div>
+              </details>
+            </h2>
+            <ul class="ai-crawl-gemini-list">
+              <li><strong>Lineup</strong> — read /events, RA, Dice, Shotgun, or Eventbrite detail pages for DJ(s) and “presented by”.</li>
+              <li><strong>Classify</strong> — club vs event vs beach club from the page, not from the search query alone.</li>
+              <li><strong>Contact</strong> — phone, email, Instagram from footer and contact pages (already started in website enrich).</li>
+              <li><strong>Never invent</strong> — if the page does not name a DJ, leave the field empty and mark Needs research.</li>
+            </ul>
+            <p class="sub small">Natural-language search lives on <strong>Run &amp; schedule</strong>. Page extract lives on <strong>Import</strong>.</p>
+          </div>
+        </div>
+
+        <div class="ai-crawl-page" data-ai-crawl-page="review">
+        <div class="card">
+          <h2>Review Discovery Queue</h2>
+          <p class="sub small">Fill in missing details on the card, then Save to keep the draft or Publish when it is ready. Needs research if someone must look up contacts later. You do not need to edit technical data dumps.</p>
+          <div id="aiDiscoveryCountryTabs" class="admin-subtabs discovery-country-tabs" role="tablist" aria-label="Filter by country"></div>
+          <div class="profile-grid">
+            <label>Status
+              <select id="aiDiscoveryStatusFilter">
+                <option value="pendingReview">Pending review</option>
+                <option value="needsResearch">Needs research</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="deleted">Deleted</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Onboard readiness
+              <select id="aiDiscoveryReadinessFilter">
+                <option value="all">All</option>
+                <option value="duplicates">Possible duplicates</option>
+                <option value="ready">Ready to onboard</option>
+                <option value="notReady">Not ready (show missing)</option>
+              </select>
+            </label>
+            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington DC, Seattle, Miami"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="aiDiscoveryRefreshBtn" type="button">Refresh Discovery Queue</button>
+            <button id="aiDiscoverySelectReadyBtn" type="button">Select all ready</button>
+            <button id="aiDiscoveryClearSelectionBtn" type="button">Clear selection</button>
+            <button id="aiDiscoveryMassOnboardBtn" class="primary" type="button">Onboard selected (ready only)</button>
+          </div>
+          <p class="sub small">Mass onboard publishes only selected cards that already pass the Publishing rule for their crawl type. Save on a card keeps edits without publishing. Promoter(s) and Instagram stay optional unless ticked. Possible duplicates and past events cannot onboard as a new listing.</p>
+          <div id="aiDiscoveryOnboardReport" class="report-block"></div>
+          <div id="aiDiscoveryQueueList" class="report-block"></div>
+        </div>
+        </div>
+
+        <div class="ai-crawl-page hidden" data-ai-crawl-page="run" hidden>
+        <div class="card crawler-engine-card">
+          <h2>Refined Discovery Search</h2>
+          <p class="sub small">Master Admin defines city, genre, and venue-or-event type. FLOQR runs a crawl (Google Places + public pages today). Ticketmaster Discovery API will be added later for extra confirmation — not required now.</p>
+          <div class="profile-grid">
+            <label>First daily run (24-hour time)<input id="crawlPrimaryTime" type="time" value="00:00"/></label>
+            <label>Time zone<select id="crawlTimeZone"><option value="America/New_York">America/New_York</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="Europe/Paris">Europe/Paris</option><option value="Europe/Berlin">Europe/Berlin</option><option value="Europe/Madrid">Europe/Madrid</option><option value="Africa/Lagos">Africa/Lagos</option><option value="Asia/Dubai">Asia/Dubai</option><option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Tokyo">Asia/Tokyo</option></select></label>
+            <label>Runs per day<select id="crawlRunsPerDay"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option><option value="6">6</option></select></label>
+            <label>Language strategy<select id="crawlLanguageStrategy"><option value="nativePlusEnglish">Native market language + English</option><option value="nativeOnly">Native market language only</option><option value="selectedOnly">Only selected languages</option></select></label>
+            <label>Search languages<select id="crawlLanguageCriteria" multiple size="7"><option>English</option><option>Spanish</option><option>German</option><option>French</option><option>Italian</option><option>Portuguese</option><option>Dutch</option><option>Arabic</option><option>Turkish</option><option>Chinese</option><option>Thai</option><option>Catalan</option></select></label>
+            <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option selected>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
+            <label>Music / activity genres<select id="crawlGenreCriteria" multiple size="8"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option><option selected>Community</option><option selected>Festival</option><option selected>Market</option></select></label>
+            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="12"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="pool party">Pool Parties</option><option value="day club">Day Parties / Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option><option value="daytime event" selected>Daytime Events</option><option value="flea market" selected>Flea Markets</option><option value="farmers market" selected>Farmers Markets</option><option value="community market" selected>Community Markets</option><option value="daytime festival" selected>Daytime Festivals</option><option value="fall festival" selected>Fall Festivals</option></select></label>
+            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington, DC, Seattle, Washington State"/></label>
+          </div>
+          <p class="sub small">US places: use <strong>Washington, DC</strong> for the capital (District of Columbia). Use <strong>Washington State</strong> or <strong>Seattle</strong> for the Pacific Northwest — bare “Washington” is treated as Washington, DC.</p>
+          <label>Ask Gemini in plain English<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs, flea markets, and fall festivals in Washington, DC and Spain, using native-language sources plus English sources."></textarea></label>
+          <input id="crawlSearchCriteria" type="hidden" value="nightlife venues, concerts, daytime flea markets, fall festivals, farmers markets, community markets, events and official ticket sources"/>
+          <input id="crawlRegionCriteria" type="hidden"/>
+          <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
+          <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
+          <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
+          <div class="queue-actions">
+            <button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button>
+            <button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button>
+            <button id="runManualCrawlBtn" type="button">Run Discovery Crawl</button>
+            <button id="runInstantCrawlBtn" class="primary" type="button">Instant Crawl Now</button>
+          </div>
+          <p class="sub small">Instant Crawl Now uses the <strong>saved schedule</strong> (or current form) and runs immediately with a short job cap — no waiting for the next 00/04/08 slot.</p>
+          <p class="sub small"><strong>Expected output:</strong> Name/Title, Genre, DJ(s)/Artist(s) or Organizer(s) for daytime, Promoter(s), Phone, Email, Instagram, Physical address (+ Date/Time for comedy and daytime events).</p>
+          <p class="sub small"><em>Ticketmaster confirmation: later</em></p>
+          <div id="crawlSearchPlanReport" class="report-block"></div>
+          <details class="admin-detail">
+            <summary>How the multilingual algorithm works</summary>
+            <p class="sub small">FLOQR expands each market into separate native-language and English queries, keeps the language and source URL on every record, normalizes duplicate venues across languages, and requires a final official venue or event-detail page before approval. Search-result pages are evidence sources, not publishable records.</p>
+          </details>
+        </div>
+        <div class="card">
+          <h2>Crawl Activity Report</h2>
+          <div id="crawlActivityReport" class="report-block"></div>
+        </div>
+        </div>
+
+        <div class="ai-crawl-page hidden" data-ai-crawl-page="rules" hidden>
         <div class="card">
           <h2>Rating Criteria</h2>
           <p class="sub small">Adjust how strongly each factor counts toward the 1–5 star score. Higher numbers matter more. Total does not need to equal 100.</p>
@@ -1635,17 +1761,6 @@
           <button id="saveAiDiscoveryImportGatesBtn" class="primary" type="button">Save publishing rule</button>
         </div>
         <div class="card">
-          <h2>CSV mass import / export</h2>
-          <p class="sub small">One template for unpublished crawl rows and for mass import. Download the sample, fill rows, then import. Publishing still checks duplicates and the publishing rule for each crawl type.</p>
-          <div class="queue-actions">
-            <button id="aiDiscoveryCsvTemplateBtn" type="button">Download sample CSV</button>
-            <button id="aiDiscoveryCsvExportBtn" type="button">Export unpublished CSV</button>
-            <label class="file-button">Import CSV<input id="aiDiscoveryCsvFile" type="file" accept=".csv,text/csv"/></label>
-            <button id="aiDiscoveryCsvImportBtn" class="primary" type="button">Import CSV to queue</button>
-          </div>
-          <div id="aiDiscoveryCsvReport" class="report-block"></div>
-        </div>
-        <div class="card">
           <h2>Past events</h2>
           <p class="sub small">The crawler ignores already-past events. Live events move off upcoming rails, then FLOQR removes them after the window you set.</p>
           <div class="profile-grid">
@@ -1658,98 +1773,23 @@
             <button id="aiDiscoveryCleanPastBtn" class="primary" type="button">Clean past events now</button>
           </div>
         </div>
-        <div class="card">
-          <h2>Review Discovery Queue</h2>
-          <p class="sub small">Fill in missing details on the card, then Save to keep the draft or Publish when it is ready. Needs research if someone must look up contacts later. You do not need to edit technical data dumps.</p>
-          <div id="aiDiscoveryCountryTabs" class="admin-subtabs discovery-country-tabs" role="tablist" aria-label="Filter by country"></div>
-          <div class="profile-grid">
-            <label>Status
-              <select id="aiDiscoveryStatusFilter">
-                <option value="pendingReview">Pending review</option>
-                <option value="needsResearch">Needs research</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="deleted">Deleted</option>
-                <option value="all">All</option>
-              </select>
-            </label>
-            <label>Onboard readiness
-              <select id="aiDiscoveryReadinessFilter">
-                <option value="all">All</option>
-                <option value="duplicates">Possible duplicates</option>
-                <option value="ready">Ready to onboard</option>
-                <option value="notReady">Not ready (show missing)</option>
-              </select>
-            </label>
-            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington DC, Seattle, Miami"/></label>
-          </div>
-          <div class="queue-actions">
-            <button id="aiDiscoveryRefreshBtn" type="button">Refresh Discovery Queue</button>
-            <button id="aiDiscoverySelectReadyBtn" type="button">Select all ready</button>
-            <button id="aiDiscoveryClearSelectionBtn" type="button">Clear selection</button>
-            <button id="aiDiscoveryMassOnboardBtn" class="primary" type="button">Onboard selected (ready only)</button>
-          </div>
-          <p class="sub small">Mass onboard publishes only selected cards that already pass the Publishing rule for their crawl type. Save on a card keeps edits without publishing. Promoter(s) and Instagram stay optional unless ticked. Possible duplicates and past events cannot onboard as a new listing.</p>
-          <div id="aiDiscoveryOnboardReport" class="report-block"></div>
-          <div id="aiDiscoveryQueueList" class="report-block"></div>
         </div>
+
+        <div class="ai-crawl-page hidden" data-ai-crawl-page="import" hidden>
         <div class="card">
-          <h2>Delete / Restore Listings</h2>
-          <p class="sub small">Soft delete hides clubs and events from patron searches without deleting ShoutOut history, guest list history, or audit logs.</p>
-          <div class="profile-grid">
-            <label>Search listings<input id="listingDeleteSearch" placeholder="Venue, event, city, country"/></label>
-            <label class="consent-line"><input id="listingIncludeDeleted" type="checkbox"/> Include deleted listings</label>
-          </div>
-          <div id="listingDeleteResults" class="report-block"></div>
-        </div>
-        <div class="card crawler-engine-card">
-          <h2>Refined Discovery Search</h2>
-          <p class="sub small">Master Admin defines city, genre, and venue-or-event type. FLOQR runs a crawl (Google Places + public pages today). Ticketmaster Discovery API will be added later for extra confirmation — not required now.</p>
-          <div class="profile-grid">
-            <label>First daily run (24-hour time)<input id="crawlPrimaryTime" type="time" value="00:00"/></label>
-            <label>Time zone<select id="crawlTimeZone"><option value="America/New_York">America/New_York</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="Europe/Paris">Europe/Paris</option><option value="Europe/Berlin">Europe/Berlin</option><option value="Europe/Madrid">Europe/Madrid</option><option value="Africa/Lagos">Africa/Lagos</option><option value="Asia/Dubai">Asia/Dubai</option><option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Tokyo">Asia/Tokyo</option></select></label>
-            <label>Runs per day<select id="crawlRunsPerDay"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option><option value="6">6</option></select></label>
-            <label>Language strategy<select id="crawlLanguageStrategy"><option value="nativePlusEnglish">Native market language + English</option><option value="nativeOnly">Native market language only</option><option value="selectedOnly">Only selected languages</option></select></label>
-            <label>Search languages<select id="crawlLanguageCriteria" multiple size="7"><option>English</option><option>Spanish</option><option>German</option><option>French</option><option>Italian</option><option>Portuguese</option><option>Dutch</option><option>Arabic</option><option>Turkish</option><option>Chinese</option><option>Thai</option><option>Catalan</option></select></label>
-            <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option selected>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
-            <label>Music / activity genres<select id="crawlGenreCriteria" multiple size="8"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option><option selected>Community</option><option selected>Festival</option><option selected>Market</option></select></label>
-            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="12"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="pool party">Pool Parties</option><option value="day club">Day Parties / Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option><option value="daytime event" selected>Daytime Events</option><option value="flea market" selected>Flea Markets</option><option value="farmers market" selected>Farmers Markets</option><option value="community market" selected>Community Markets</option><option value="daytime festival" selected>Daytime Festivals</option><option value="fall festival" selected>Fall Festivals</option></select></label>
-            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington, DC, Seattle, Washington State"/></label>
-          </div>
-          <p class="sub small">US places: use <strong>Washington, DC</strong> for the capital (District of Columbia). Use <strong>Washington State</strong> or <strong>Seattle</strong> for the Pacific Northwest — bare “Washington” is treated as Washington, DC.</p>
-          <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs, flea markets, and fall festivals in Washington, DC and Spain, using native-language sources plus English sources."></textarea></label>
-          <input id="crawlSearchCriteria" type="hidden" value="nightlife venues, concerts, daytime flea markets, fall festivals, farmers markets, community markets, events and official ticket sources"/>
-          <input id="crawlRegionCriteria" type="hidden"/>
-          <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
-          <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
-          <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
+          <h2>CSV mass import / export</h2>
+          <p class="sub small">One template for unpublished crawl rows and for mass import. Download the sample, fill rows, then import. Publishing still checks duplicates and the publishing rule for each crawl type.</p>
           <div class="queue-actions">
-            <button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button>
-            <button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button>
-            <button id="runManualCrawlBtn" type="button">Run Discovery Crawl</button>
-            <button id="runInstantCrawlBtn" class="primary" type="button">Instant Crawl Now</button>
+            <button id="aiDiscoveryCsvTemplateBtn" type="button">Download sample CSV</button>
+            <button id="aiDiscoveryCsvExportBtn" type="button">Export unpublished CSV</button>
+            <label class="file-button">Import CSV<input id="aiDiscoveryCsvFile" type="file" accept=".csv,text/csv"/></label>
+            <button id="aiDiscoveryCsvImportBtn" class="primary" type="button">Import CSV to queue</button>
           </div>
-          <p class="sub small">Instant Crawl Now uses the <strong>saved schedule</strong> (or current form) and runs immediately with a short job cap — no waiting for the next 00/04/08 slot.</p>
-          <p class="sub small"><strong>Expected output:</strong> Name/Title, Genre, DJ(s)/Artist(s) or Organizer(s) for daytime, Promoter(s), Phone, Email, Instagram, Physical address (+ Date/Time for comedy and daytime events).</p>
-          <p class="sub small"><em>Ticketmaster confirmation: later</em></p>
-          <div id="crawlSearchPlanReport" class="report-block"></div>
-          <details class="admin-detail">
-            <summary>How the multilingual algorithm works</summary>
-            <p class="sub small">FLOQR expands each market into separate native-language and English queries, keeps the language and source URL on every record, normalizes duplicate venues across languages, and requires a final official venue or event-detail page before approval. Search-result pages are evidence sources, not publishable records.</p>
-          </details>
-        </div>
-        <div class="card">
-          <h2>Crawl Contact Export</h2>
-          <p class="sub small">Formatted club and event crawl contacts for review and CSV download.</p>
-          <div class="queue-actions">
-            <button id="downloadCrawlContactsCsvBtn" type="button">Download Crawl Contacts CSV</button>
-            <button id="testGeminiSourceExtractorBtn" type="button">Test Gemini Source Extractor</button>
-          </div>
-          <div id="crawlContactExportReport" class="report-block"></div>
+          <div id="aiDiscoveryCsvReport" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Source Detail Extraction</h2>
-          <p class="sub small">Add one club or event from a public webpage when the automatic crawl missed details.</p>
+          <p class="sub small">Add one club or event from a public webpage when the automatic crawl missed details. Gemini reads that page for DJ, promoter, and contact — it must not invent names.</p>
           <ol class="crawl-extract-steps sub small">
             <li>Open <strong>one</strong> specific Eventbrite, Ticketmaster, venue, or comedy <strong>detail</strong> page (not a search list).</li>
             <li>Copy that page’s address into Source URL.</li>
@@ -1762,6 +1802,7 @@
           <div class="queue-actions">
             <button id="extractSourceDetailsBtn" type="button">Extract details</button>
             <button id="saveExtractedDiscoveryBtn" class="primary" type="button">Save for review</button>
+            <button id="testGeminiSourceExtractorBtn" type="button">Test Gemini Source Extractor</button>
           </div>
           <div id="sourceExtractionReport" class="report-block"></div>
         </div>
@@ -1776,9 +1817,16 @@
           <details class="admin-detail json-disclosure"><summary>Advanced: generated data (engineers)</summary><label>Generated import data<textarea id="clubProfileImportJson" rows="10"></textarea></label></details>
           <div id="clubProfileDiagnosticsReport" class="report-block"></div>
         </div>
+        </div>
+
+        <div class="ai-crawl-page hidden" data-ai-crawl-page="insights" hidden>
         <div class="card">
-          <h2>Crawl Activity Report</h2>
-          <div id="crawlActivityReport" class="report-block"></div>
+          <h2>Crawl Contact Export</h2>
+          <p class="sub small">Formatted club and event crawl contacts for review and CSV download.</p>
+          <div class="queue-actions">
+            <button id="downloadCrawlContactsCsvBtn" type="button">Download Crawl Contacts CSV</button>
+          </div>
+          <div id="crawlContactExportReport" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Consolidated Discovery Records</h2>
@@ -1789,9 +1837,19 @@
           <h2>Collected Data Analytics</h2>
           <div id="crawlAnalyticsInsights" class="report-block"></div>
         </div>
+        <div class="card">
+          <h2>Delete / Restore Listings</h2>
+          <p class="sub small">Soft delete hides clubs and events from patron searches without deleting ShoutOut history, guest list history, or audit logs.</p>
+          <div class="profile-grid">
+            <label>Search listings<input id="listingDeleteSearch" placeholder="Venue, event, city, country"/></label>
+            <label class="consent-line"><input id="listingIncludeDeleted" type="checkbox"/> Include deleted listings</label>
+          </div>
+          <div id="listingDeleteResults" class="report-block"></div>
+        </div>
+        </div>
       </section>
 
-      <section id="staleRecordCleanup" class="admin-panel-section">
+<section id="staleRecordCleanup" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Reports · cleanup</p>
           <h2>Stale Record Cleanup</h2>
@@ -2082,61 +2140,61 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.3.019"></script>
-<script src="./firebase-config.js?v=s3.3.019"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.019"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.019"></script>
-<script src="./floqr-app-check.js?v=s3.3.019"></script>
-<script src="./floqr-nav.js?v=s3.3.019"></script>
-<script src="./global-profile-status.js?v=s3.3.019"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.019"></script>
-<script src="./shared-data.js?v=s3.3.019"></script>
-<script src="./feature-gates.js?v=s3.3.019"></script>
-<script src="./sos2fa.js?v=s3.3.019"></script>
-<script src="./entity-management.js?v=s3.3.019"></script>
-<script src="./ai-service.js?v=s3.3.019"></script>
-<script src="./ai-index-service.js?v=s3.3.019"></script>
-<script src="./ai-search-service.js?v=s3.3.019"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.3.019"></script>
-<script src="./floqr-discovery-gates.js?v=s3.3.019"></script>
-<script src="./ai-discovery-service.js?v=s3.3.019"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.019"></script>
-<script src="./botdee-help-repository.js?v=s3.3.019"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.019"></script>
-<script src="./help-attach.js?v=s3.3.019"></script>
-<script src="./helper-popouts.js?v=s3.3.019"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.019"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.019"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.019"></script>
-<script src="./ad-campaigns.js?v=s3.3.019"></script>
-<script src="./ai-diagnostics-service.js?v=s3.3.019"></script>
-<script src="./master-admin-rollup.js?v=s3.3.019"></script>
-<script src="./duplicate-record-service.js?v=s3.3.019"></script>
-<script src="./floqr-logger.js?v=s3.3.019"></script>
-<script src="./payment-service.js?v=s3.3.019"></script>
-<script src="./floqr-access-notice.js?v=s3.3.019"></script>
-<script src="./master-admin-app.js?v=s3.3.019"></script>
-<script src="./master-ad-management.js?v=s3.3.019"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.3.019"></script>
-<script src="./floqr-feature-services.js?v=s3.3.019"></script>
-<script src="./floqr-reason-prompt.js?v=s3.3.019"></script>
-<script src="./master-feature-services.js?v=s3.3.019"></script>
-<script src="./master-demo-employees.js?v=s3.3.019"></script>
-<script src="./floqr-data-classification.js?v=s3.3.019"></script>
-<script src="./master-data-classification.js?v=s3.3.019"></script>
-<script src="./master-admin-shoutouts.js?v=s3.3.019"></script>
-<script src="./floqr-critical-log-blink.js?v=s3.3.019"></script>
-<script src="./master-display-security.js?v=s3.3.019"></script>
-<script src="./master-diagnostics-panels.js?v=s3.3.019"></script>
-<script src="./master-services-extension.js?v=s3.3.019"></script>
-<script src="./master-logging-extension.js?v=s3.3.019"></script>
-<script src="./master-floqcast-logging.js?v=s3.3.019"></script>
-<script src="./master-shoutout-logging.js?v=s3.3.019"></script>
-<script src="./master-aicrawl-logging.js?v=s3.3.019"></script>
-<script src="./master-mail-logging.js?v=s3.3.019"></script>
-<script src="./master-twilio-logging.js?v=s3.3.019"></script>
-<script src="./notification-center.js?v=s3.3.019"></script>
-<script src="./profile-access-guard.js?v=s3.3.019"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+<script src="./floqr-i18n.js?v=s3.3.020"></script>
+<script src="./firebase-config.js?v=s3.3.020"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.020"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.020"></script>
+<script src="./floqr-app-check.js?v=s3.3.020"></script>
+<script src="./floqr-nav.js?v=s3.3.020"></script>
+<script src="./global-profile-status.js?v=s3.3.020"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.020"></script>
+<script src="./shared-data.js?v=s3.3.020"></script>
+<script src="./feature-gates.js?v=s3.3.020"></script>
+<script src="./sos2fa.js?v=s3.3.020"></script>
+<script src="./entity-management.js?v=s3.3.020"></script>
+<script src="./ai-service.js?v=s3.3.020"></script>
+<script src="./ai-index-service.js?v=s3.3.020"></script>
+<script src="./ai-search-service.js?v=s3.3.020"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.3.020"></script>
+<script src="./floqr-discovery-gates.js?v=s3.3.020"></script>
+<script src="./ai-discovery-service.js?v=s3.3.020"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.020"></script>
+<script src="./botdee-help-repository.js?v=s3.3.020"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.020"></script>
+<script src="./help-attach.js?v=s3.3.020"></script>
+<script src="./helper-popouts.js?v=s3.3.020"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.020"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.020"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.020"></script>
+<script src="./ad-campaigns.js?v=s3.3.020"></script>
+<script src="./ai-diagnostics-service.js?v=s3.3.020"></script>
+<script src="./master-admin-rollup.js?v=s3.3.020"></script>
+<script src="./duplicate-record-service.js?v=s3.3.020"></script>
+<script src="./floqr-logger.js?v=s3.3.020"></script>
+<script src="./payment-service.js?v=s3.3.020"></script>
+<script src="./floqr-access-notice.js?v=s3.3.020"></script>
+<script src="./master-admin-app.js?v=s3.3.020"></script>
+<script src="./master-ad-management.js?v=s3.3.020"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.3.020"></script>
+<script src="./floqr-feature-services.js?v=s3.3.020"></script>
+<script src="./floqr-reason-prompt.js?v=s3.3.020"></script>
+<script src="./master-feature-services.js?v=s3.3.020"></script>
+<script src="./master-demo-employees.js?v=s3.3.020"></script>
+<script src="./floqr-data-classification.js?v=s3.3.020"></script>
+<script src="./master-data-classification.js?v=s3.3.020"></script>
+<script src="./master-admin-shoutouts.js?v=s3.3.020"></script>
+<script src="./floqr-critical-log-blink.js?v=s3.3.020"></script>
+<script src="./master-display-security.js?v=s3.3.020"></script>
+<script src="./master-diagnostics-panels.js?v=s3.3.020"></script>
+<script src="./master-services-extension.js?v=s3.3.020"></script>
+<script src="./master-logging-extension.js?v=s3.3.020"></script>
+<script src="./master-floqcast-logging.js?v=s3.3.020"></script>
+<script src="./master-shoutout-logging.js?v=s3.3.020"></script>
+<script src="./master-aicrawl-logging.js?v=s3.3.020"></script>
+<script src="./master-mail-logging.js?v=s3.3.020"></script>
+<script src="./master-twilio-logging.js?v=s3.3.020"></script>
+<script src="./notification-center.js?v=s3.3.020"></script>
+<script src="./profile-access-guard.js?v=s3.3.020"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>
 </body>
 </html>

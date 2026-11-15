@@ -48,11 +48,22 @@ test("AI Crawling Needs research and Approved KPI cards jump to queue filters", 
   assert.match(src, /Approved[\s\S]*filter:\s*"approved"/);
   assert.match(src, /data-ai-status-filter/);
   assert.match(src, /FLOQRAIDiscovery\?\.jumpToStatus/);
+  assert.match(src, /aiCrawlLastRun/);
+  assert.doesNotMatch(src, /\["Last crawl"/);
   const discovery = read("ai-discovery-service.js");
   assert.match(discovery, /function jumpToStatus/);
+  assert.match(discovery, /showAiCrawlPage\("review"\)/);
+  assert.match(discovery, /Showing \$\{label\}/);
   assert.match(discovery, /aiDiscoveryStatusFilter/);
   assert.match(discovery, /aiDiscoveryQueueList/);
   assert.match(discovery, /jumpToStatus,/);
+  const app = read("master-admin-app.js");
+  assert.match(app, /data-ai-label/);
+  assert.match(app, /skipLiveStatus/);
+  const html = read("master-admin.html");
+  assert.match(html, /data-ai-crawl-page="overview"/);
+  assert.match(html, /data-ai-crawl-page="review"/);
+  assert.match(html, /id="aiCrawlLastRun"/);
 });
 
 test("client rollup module paints strips and calls refreshMasterAdminRollup", () => {

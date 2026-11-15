@@ -36,6 +36,20 @@ test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
   const diagnostics = read("ai-diagnostics-service.js");
   assert.match(diagnostics, /runInstantCrawl/);
   assert.match(diagnostics, /runInstantDiscoveryCrawl/);
+  assert.match(diagnostics, /function ensureCrawlReady/);
+  assert.match(diagnostics, /function crawlNotice/);
+  assert.match(diagnostics, /classList.add\("is-busy"\)/);
+  assert.match(diagnostics, /Crawling — function received/);
+  assert.doesNotMatch(diagnostics, /async function runInstantCrawl\([^)]*\) \{\s*if \(!state\.db\) return;/);
+  const discovery = read("ai-discovery-service.js");
+  assert.match(discovery, /ensureCrawlReady/);
+  assert.doesNotMatch(discovery, /data-onboard-ready="\$\{ready \? "1" : "0"\}">`/);
+  const {spawnSync} = require("child_process");
+  const parsed = spawnSync("node", ["--check", require("path").join(__dirname, "..", "ai-discovery-service.js")], {encoding: "utf8"});
+  assert.equal(parsed.status, 0, parsed.stderr || parsed.stdout);
+  const app = read("master-admin-app.js");
+  assert.match(app, /\.admin-tabs \.admin-subtabs/);
+  assert.match(app, /#runInstantCrawlBtn/);
 });
 
 test("runFloqrDiscoveryCrawl export exists in ai-discovery-functions", () => {
@@ -162,6 +176,9 @@ test("discovery review UX is form-first with Needs research", () => {
   const discovery = read("ai-discovery-service.js");
   const html = read("master-admin.html");
   assert.match(html, /Save to keep the draft or Publish when it is ready/);
+  assert.match(html, /data-ai-crawl-page="overview"/);
+  assert.match(html, /Fill missing with Gemini|Gemini on this crawl/);
+  assert.match(discovery, /geminiFillFromSource/);
   assert.match(discovery, /Needs research/);
   assert.match(discovery, /Advanced: source snapshot/);
   assert.match(discovery, /Advanced: what FLOQR understood/);

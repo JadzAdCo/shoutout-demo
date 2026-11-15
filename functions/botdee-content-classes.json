@@ -12,6 +12,9 @@
     "help-ad-campaigns": [
       "patron"
     ],
+    "help-ai-crawl-gemini": [
+      "masterAdmin"
+    ],
     "help-ai-recommendations": [
       "patron"
     ],

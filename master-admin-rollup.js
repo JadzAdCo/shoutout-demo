@@ -46,10 +46,13 @@
     return `<div class="metric-grid floqr-rollup-strip">${rows.map(([label, value, meta]) => {
       const filter = meta?.filter ? String(meta.filter) : "";
       const tag = filter ? "button" : "div";
+      const aria = filter
+        ? ` aria-label="${esc(label)}: ${esc(value)}. Open the review queue." data-ai-label="${esc(label)}"`
+        : ` aria-label="${esc(label)}: ${esc(value)}"`;
       const extra = filter
-        ? ` type="button" class="metric-card" data-ai-status-filter="${esc(filter)}"`
-        : ` class="metric-card"`;
-      return `<${tag}${extra}><span>${esc(label)}</span><strong>${esc(value)}</strong></${tag}>`;
+        ? ` type="button" class="metric-card metric-card--stat" data-ai-status-filter="${esc(filter)}"${aria}`
+        : ` class="metric-card metric-card--stat"${aria}`;
+      return `<${tag}${extra}><span>${esc(label)}</span><strong class="metric-card-value">${esc(value)}</strong></${tag}>`;
     }).join("")}</div>
     <p class="sub small floqr-rollup-meta">Rollup ${esc(fmtWhen(cached?.updatedAtMs))} · source ${esc(cached?.source || "—")} · Refresh for live detail.</p>`;
   }
@@ -69,6 +72,19 @@
     ]);
   }
 
+  function paintAiCrawlLastRun(a = {}) {
+    const last = byId("aiCrawlLastRun");
+    if (!last) return;
+    const status = String(a.lastRunStatus || "").trim() || (a.lastRunId ? "run" : "idle");
+    const when = a.lastRunAtMs ? fmtWhen(a.lastRunAtMs) : "No crawl yet";
+    const tone = /fail|error/i.test(status) ? "is-error" : /runn|progress|live/i.test(status) ? "is-live" : "is-ok";
+    last.className = `ai-crawl-last-run ${tone}`;
+    last.innerHTML = `<span class="ai-crawl-last-run-label">Last crawl</span>
+      <strong class="ai-crawl-last-run-status">${esc(status)}</strong>
+      <span class="ai-crawl-last-run-when">${esc(when)}</span>
+      ${a.lastRunId ? `<span class="ai-crawl-last-run-id">${esc(a.lastRunId)}</span>` : ""}`;
+  }
+
   function paintAiCrawl() {
     const a = cached?.aiCrawl || {};
     const html = metricGrid([
@@ -76,12 +92,12 @@
       ["Pending review", fmtNum(a.pendingReview), {filter: "pendingReview"}],
       ["Needs research", fmtNum(a.needsResearch), {filter: "needsResearch"}],
       ["Approved", fmtNum(a.approved), {filter: "approved"}],
-      ["Schedule on", a.scheduleEnabled === true ? "Yes" : a.scheduleEnabled === false ? "No" : "—"],
-      ["Last crawl", a.lastRunId ? `${a.lastRunStatus || "run"} · ${fmtWhen(a.lastRunAtMs)}` : "—"]
+      ["Schedule on", a.scheduleEnabled === true ? "Yes" : a.scheduleEnabled === false ? "No" : "—"]
     ]);
     /* Prefer #aiCrawlingSummary so #aiDiscoverySummary can keep the how-to copy. */
     const primary = byId("aiCrawlingSummary") || byId("aiDiscoverySummary");
     if (primary) primary.innerHTML = html;
+    paintAiCrawlLastRun(a);
   }
 
   function paintDuplicates() {
