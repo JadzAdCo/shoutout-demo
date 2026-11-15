@@ -15,11 +15,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 test("SOS2FA recovery code only inside the dated window", () => {
-  const until = "2026-11-15T04:00:00Z";
-  assert.equal(recoveryWindowOpen(until, Date.parse("2026-10-02T12:00:00Z")), true);
-  assert.equal(recoveryWindowOpen(until, Date.parse("2026-11-15T04:00:00Z")), false);
+  const until = "2026-12-15T04:00:00Z";
+  assert.equal(recoveryWindowOpen(until, Date.parse("2026-11-15T12:00:00Z")), true);
+  assert.equal(recoveryWindowOpen(until, Date.parse("2026-12-15T04:00:00Z")), false);
   assert.equal(recoveryWindowOpen("", Date.now()), false);
   assert.equal(recoveryWindowOpen("not-a-date", Date.now()), false);
+  const src = fs.readFileSync(path.join(__dirname, "sos2fa-functions.js"), "utf8");
+  assert.match(src, /RECOVERY_UNTIL_ISO = "2026-12-15T04:00:00Z"/);
 });
 
 test("SOS2FA recovery code compares exactly and refuses short secrets", () => {

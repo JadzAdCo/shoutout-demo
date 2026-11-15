@@ -124,7 +124,12 @@ jobs:
           # first-time scheduledRetirePastCrawledEvents, which functions:list cannot see yet).
           set -euo pipefail
           COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-spatial\]'; then
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-sos2fa\]'; then
+            FNS=(
+              verifySos2faRecoveryCode
+            )
+            echo "SOS2FA recovery deploy: ${FNS[*]}"
+          elif echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-spatial\]'; then
             FNS=(
               issueFloqrOidcAuthCode
               floqrOidcToken

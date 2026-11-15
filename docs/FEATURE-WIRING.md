@@ -585,6 +585,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | UI | `master-admin.html` SOS2FA gate + channel radios (Both / SMS / Email) |
 | Styles | `admin.css` `.sos2fa-channel-option` (radio sizing); `styles.css` must not force radios to `width:100%` |
 | Backend | `functions/sos2fa-functions.js` (+ Twilio / mail paths as deployed) |
+| Recovery | Break-glass `SOS2FA_RECOVERY_CODE` (Secret Manager). Window `RECOVERY_UNTIL_ISO` = **2026-12-15T04:00:00Z**. Listed Super Admin + verified email only. Deploy `verifySos2faRecoveryCode` with `[firebase-deploy-sos2fa]`. |
 | Help | SOS2FA popouts + BOT DEE repository entries |
 
 ---
