@@ -49,12 +49,13 @@ Credentials: Admin SDK uses `GOOGLE_APPLICATION_CREDENTIALS` if set, else a temp
 | Azure | subscription / tenant / resource group / SWA name / DNS zone · GitHub secret `AZURE_STATIC_WEB_APPS_API_TOKEN` · manual: custom domains www / admin / master / staging, apex 301 |
 | Domain | canonical origin `https://www.floqr.app`, admin / master / staging hosts, reCAPTCHA site key · env `FLOQR_PUBLIC_ORIGIN`, `FLOQR_DISPLAY_BASE_URL` (**cutover day only** — leave empty while Pages is staging) · manual: OAuth redirects, App Check |
 | floqCast TURN | env `FLOQCAST_TURN_URLS` · secrets `FLOQCAST_TURN_USERNAME`, `FLOQCAST_TURN_CREDENTIAL` |
+| BOT DEE vendor slots | secrets `BOTDEE_GOOGLE_PLACES_API_KEY`, `BOTDEE_GEMINI_GROUNDING_API_KEY`, `BOTDEE_YELP_API_KEY`, `BOTDEE_TICKETMASTER_DISCOVERY_API_KEY`, `BOTDEE_TICKETMASTER_PARTNER_API_KEY`, `BOTDEE_EVENTBRITE_API_KEY` (`readByCodeToday: false`; mock until slot enabled + evidence) |
 | Display token signer | runtime service account · manual: `roles/iam.serviceAccountTokenCreator` |
 | POS | Square / Toast / SpotOn / Clover: app or client ids + environment (env `POS_*`), secrets `POS_*_SECRET` / webhook keys (names from `reports/vip-pos-integrations.md`) · manual: redirect URIs on www.floqr.app |
 | TSA | provider digicert / sectigo (VIP-P-04) · env `VIP_TSA_URL` · optional secrets `VIP_TSA_USERNAME` / `VIP_TSA_PASSWORD` |
 | Meta Business | business id, WhatsApp Business Account id, display name · manual: business verification |
 
-Fields marked `readByCodeToday: false` (Connect, TURN, POS, TSA, App Check key, SWA token) are stored ahead of the code that will read them; wire `defineSecret` with the same name when that feature ships.
+Fields marked `readByCodeToday: false` (Connect, TURN, POS, TSA, App Check key, SWA token, BOT DEE vendor slots) are stored ahead of the code that will read them; wire `defineSecret` with the same name when that feature ships. BOT DEE adapters stay mock until a slot is enabled and live HTTP is separately implemented.
 
 ## Never
 

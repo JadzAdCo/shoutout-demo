@@ -806,6 +806,11 @@ service cloud.firestore {
  allow write: if false;
  }
 
+ match /botDeeProviderSlots/{providerId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
  match /botDeeCapabilityManifest/{docId} {
  allow read: if signedIn();
  allow write: if false;

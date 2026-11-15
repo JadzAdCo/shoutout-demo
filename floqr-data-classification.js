@@ -115,6 +115,7 @@
     ["botDeeExecutions", "ownMaster", 0, "BOT DEE workflow checkpoints and idempotency receipts; Functions-write"],
     ["botDeeFeedback", "ownMaster", 0, "SmartView evidence relevant/not-relevant votes and identity disputes; not consent"],
     ["botDeeLegalGates", "internal", 0, "Master Admin provider legal-approval records (no secrets)"],
+    ["botDeeProviderSlots", "internal", 0, "BOT DEE later-fill integration slots: enabled 0|1, secret names, legalEvidenceRef, expiresAt; no secret values"],
     ["botDeeCapabilityManifest", "internal", 0, "BOT DEE version/capability registry; signed-in read, Functions-write"],
     ["botDeeAccessThrottle", "secret", 0, "BOT DEE access-denial log rate limits"],
     ["floqAiAccessThrottle", "secret", 0, "Legacy BOT DEE access-denial throttle id (pre-botDee rename; deny-all)"],

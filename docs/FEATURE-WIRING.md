@@ -716,20 +716,21 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## BOT DEE six-phase upgrade (spec v1.2 — PR only)
+## BOT DEE six-phase upgrade (spec v1.2)
 
-**Purpose:** Upgrade existing `executeBotSession` with durable execution, opt-in archive, schema-driven SmartViews, mock research, and mock actions. **Do not merge/deploy Functions without owner approval.** Third-party APIs stay `mock_only` until Master Admin records legal evidence.
+**Purpose:** Upgrade existing `executeBotSession` with durable execution, opt-in archive, schema-driven SmartViews, mock research, and mock actions. Third-party APIs stay `mock_only`. Later-fill slots hold enabled/secret **names**/evidence/expiry so keys can be added later without a new product path. **No live vendor HTTP** until a later Functions change.
 
 | Layer | Wiring |
 |---|---|
 | UI | `botdee.html` memory + Research Library panels (`botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css`). No `?` help popout. Satellite `FLOQRSessionShell`. Canonical venue link `./club-profile.html?location=` (no `?v=`). Profile visibility stays `patron-portal.html?tab=profile`. |
 | Client | `bot-dee-chat.js` restores `archiveTurns` after idle when opted in; mounts `smartViews`. Version prompts include deployed / changed / limitations / integrations. |
-| Backend | Same `executeBotSession` path. User turn persisted **before** Gemini. Archive under `botDeeThreads/{uid}/archive` (survives 300s idle). Checkpoints `botDeeExecutions`. Callables: `getBotDeeCapabilityManifest`, `get/setBotDeeConsent`, `list/upsert/deleteBotDeeMemory`, `exportBotDeeData`, `deleteBotDeeArchive`, `listBotDeeSmartViews`, `submitBotDeeEvidenceFeedback`, `disputeBotDeeIdentityMatch`, `get/setBotDeeLegalGate`. |
+| Backend | Same `executeBotSession` path. User turn persisted **before** Gemini. Archive under `botDeeThreads/{uid}/archive` (survives 300s idle). Checkpoints `botDeeExecutions`. Callables: `getBotDeeCapabilityManifest`, `get/setBotDeeConsent`, `list/upsert/deleteBotDeeMemory`, `exportBotDeeData`, `deleteBotDeeArchive`, `listBotDeeSmartViews`, `submitBotDeeEvidenceFeedback`, `disputeBotDeeIdentityMatch`, `get/setBotDeeLegalGate`, `get/setBotDeeProviderSlot`. |
 | Manifest | `functions/botdee-upgrade-manifest.js` — `deployedClaim: false`; never leaks secrets; Master Admin version reply lists implemented/tested/not-deployed. |
-| Data | Classified: `botDeeThreads/archive\|memories\|research\|summaries\|executions`, `botDeeExecutions`, `botDeeFeedback`, `botDeeLegalGates`, `botDeeCapabilityManifest`. Functions-write. **No stored IP.** Mingl `messages` never imported. |
-| Legal | Master Admin → Features Mgmt → BOT DEE → Version and legal gates. `setBotDeeLegalGate` needs SOS2FA + `FLOQRReasonPrompt`. Approved without evidence stays mock-only. |
+| Data | Classified: `botDeeThreads/archive\|memories\|research\|summaries\|executions`, `botDeeExecutions`, `botDeeFeedback`, `botDeeLegalGates`, `botDeeProviderSlots`, `botDeeCapabilityManifest`. Functions-write. **No stored IP.** Mingl `messages` never imported. Slots store `enabled` 0\|1, `secretName`, `legalEvidenceRef`, `expiresAtMs`, `billingAccountRef` — **never secret values**. |
+| Legal / slots | Master Admin → Features Mgmt → BOT DEE. `setBotDeeLegalGate` and `setBotDeeProviderSlot` need SOS2FA + `FLOQRReasonPrompt`. Runtime mock unless `enabled=1` **and** named Firebase secret present **and** `legalEvidenceRef` set **and** not expired. Even then adapters do not call vendors. Ticketmaster is two slots: Discovery vs Partner. |
+| Secrets | Accounts profile account `botDeeProviders` (`scripts/seed-accounts-profile.js`). Names: `BOTDEE_GOOGLE_PLACES_API_KEY`, `BOTDEE_GEMINI_GROUNDING_API_KEY`, `BOTDEE_YELP_API_KEY`, `BOTDEE_TICKETMASTER_DISCOVERY_API_KEY`, `BOTDEE_TICKETMASTER_PARTNER_API_KEY`, `BOTDEE_EVENTBRITE_API_KEY`. `readByCodeToday: false`. |
 | Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
-| Gate | Feature key `botDee`. New phases implemented/tested in code, **not production-deployed**. |
+| Gate | Feature key `botDee`. |
 | Docs | `docs/BOT-DEE-SIX-PHASE.md`, `docs/BOT-DEE-LEGAL-PROVIDER-GATE.md` |
 
 ---

@@ -162,7 +162,9 @@ jobs:
               submitBotDeeEvidenceFeedback \
               disputeBotDeeIdentityMatch \
               getBotDeeLegalGates \
-              setBotDeeLegalGate
+              setBotDeeLegalGate \
+              getBotDeeProviderSlots \
+              setBotDeeProviderSlot
             do
               if ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then
                 FNS+=("$f")

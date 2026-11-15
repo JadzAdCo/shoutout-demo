@@ -438,8 +438,8 @@
     {
       id: "help-bot-dee-mgmt",
       title: "BOT DEE conversation pause",
-      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the live chat (default 300 / 5 minutes). After the pause, the next message starts a fresh live session. Opt-in saved history is separate and is not deleted by the pause. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Legal provider gates stay mock-only until you record evidence. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
-      searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause"],
+      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the live chat (default 300 / 5 minutes). After the pause, the next message starts a fresh live session. Opt-in saved history is separate and is not deleted by the pause. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Legal provider gates and later-fill slots (Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery vs Partner, Eventbrite) stay mock until you record evidence, set enabled=1, and store the named Firebase secret — never paste keys into the form. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
+      searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause", "provider slot", "api key slot", "ticketmaster discovery"],
       links: [{label: "BOT DEE (Master Admin)", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#featuresBotDee"}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",

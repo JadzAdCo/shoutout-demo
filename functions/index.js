@@ -31,6 +31,8 @@ module.exports = {
   disputeBotDeeIdentityMatch: require("./botdee-upgrade-functions").disputeBotDeeIdentityMatch,
   getBotDeeLegalGates: require("./botdee-upgrade-functions").getBotDeeLegalGates,
   setBotDeeLegalGate: require("./botdee-upgrade-functions").setBotDeeLegalGate,
+  getBotDeeProviderSlots: require("./botdee-upgrade-functions").getBotDeeProviderSlots,
+  setBotDeeProviderSlot: require("./botdee-upgrade-functions").setBotDeeProviderSlot,
   ...require("./people-directory-functions"),
   ...require("./shoutout-stories-functions"),
   ...require("./floqcast-functions"),
