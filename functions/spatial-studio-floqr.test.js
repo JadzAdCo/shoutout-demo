@@ -291,4 +291,6 @@ test("production rules stay unpublished; OIDC Functions deploy is the Continue p
   const workflow = read(".github/workflows/functions-ci.yml");
   assert.match(workflow, /firebase-deploy-spatial/);
   assert.match(workflow, /issueFloqrOidcAuthCode/);
+  assert.match(read("functions/floqr-oidc-functions.js"), /invoker:\s*"public"/);
+  assert.match(read("functions/spatial-grant-functions.js"), /invoker:\s*"public"/);
 });

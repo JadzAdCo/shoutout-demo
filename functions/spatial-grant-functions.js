@@ -11,7 +11,7 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
 const CALL_OPTS = { region: "us-central1", cors: true, timeoutSeconds: 30, memory: "256MiB" };
-const HTTP_OPTS = { region: "us-central1", cors: false, timeoutSeconds: 30, memory: "256MiB" };
+const HTTP_OPTS = { region: "us-central1", cors: false, invoker: "public", timeoutSeconds: 30, memory: "256MiB" };
 const COLLECTION = "spatialGrantRefs";
 
 function jwtSecret() {
