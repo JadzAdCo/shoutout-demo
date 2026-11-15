@@ -318,7 +318,7 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.match(read("functions/index.js"), /executeBotSession:\s*require\("\.\/bot-dee-functions"\)\.executeBotSession/);
   assert.match(read("functions/index.js"), /getBotDeeThread:\s*require\("\.\/bot-dee-functions"\)\.getBotDeeThread/);
   assert.match(src, /exports\.getBotDeeThread/);
-  assert.match(src, /persistExchange/);
+  assert.match(src, /persistUserTurn/);
   assert.match(src, /durableThreads/);
   const names = bot.toolDeclarations().map(t => t.name);
   assert.ok(names.includes("contextualSearch"));

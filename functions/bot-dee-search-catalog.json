@@ -339,11 +339,11 @@
       "id": "help-bot-dee-mgmt",
       "kind": "help",
       "label": "BOT DEE conversation pause",
-      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 300 / 5 minutes). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patro",
+      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the live chat (default 300 / 5 minutes). After the pause, the next message starts a fresh live session. Opt-in saved history is separate and is not deleted by the pause. Signed-in cha",
       "href": "./master-admin.html?from=botdee#featuresBotDee",
       "phrases": [
         "bot dee conversation pause",
-        "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the chat default 300 / 5 minutes . after the pause the next messa",
+        "features mgmt bot dee sets how many seconds bot dee waits after the last message before ending the live chat default 300 / 5 minutes . after the pause the next ",
         "bot dee idle",
         "bot dee pause",
         "conversation timeout",
@@ -378,6 +378,46 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-explain",
+      "id": "help-botdee-explain",
+      "kind": "help",
+      "label": "Explain My Recommendation",
+      "blurb": "Each recommendation can show evidence, the date it was checked, whether personalization was on, and if a placement is sponsored. You can ask BOT DEE not to personalize this search.",
+      "href": "./botdee.html",
+      "phrases": [
+        "explain my recommendation",
+        "each recommendation can show evidence the date it was checked whether personalization was on and if a placement is sponsored. you can ask bot dee not to persona",
+        "why this result",
+        "sponsored",
+        "don t personalize",
+        "nonpersonalized",
+        "open bot dee",
+        "help-botdee-explain"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-memory",
+      "id": "help-botdee-memory",
+      "kind": "help",
+      "label": "BOT DEE saved chats",
+      "blurb": "The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Guests are not saved. Mingl conversations stay in Mingl.",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee saved chats",
+        "the five-minute pause ends the live bot dee session. if you opt in bot dee keeps that chat so you can come back later. you can export or delete it. guests are n",
+        "saved chat",
+        "bot dee memory",
+        "opt in history",
+        "export bot dee",
+        "delete bot dee history",
+        "pause vs save",
+        "five minute pause",
+        "300 seconds",
+        "open bot dee",
+        "help-botdee-memory"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-page",
       "id": "help-botdee-page",
       "kind": "help",
@@ -409,6 +449,63 @@
         "public profile",
         "enlarge photo",
         "tap photo"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-privacy-assistant",
+      "id": "help-botdee-privacy-assistant",
+      "kind": "help",
+      "label": "BOT DEE Privacy Assistant",
+      "blurb": "Change what other FLOQR users see in My Profile visibility — BOT DEE does not add a second public switch. If web research attached the wrong person, you can dispute it here without changing your profile. BOT DEE cannot promise that a third-party site will delete the original page",
+      "href": "./patron-portal.html?tab=profile",
+      "phrases": [
+        "bot dee privacy assistant",
+        "change what other floqr users see in my profile visibility bot dee does not add a second public switch. if web research attached the wrong person you can disput",
+        "privacy assistant",
+        "profile visibility",
+        "wrong person",
+        "dispute match",
+        "not a second public toggle",
+        "open bot dee",
+        "help-botdee-privacy-assistant"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-research-library",
+      "id": "help-botdee-research-library",
+      "kind": "help",
+      "label": "BOT DEE Research Library",
+      "blurb": "Save places and cards you asked BOT DEE about. A Google Place ID is not a copy of Google’s photos or reviews. You can refresh or delete a saved item. Licensed caches stay off until the provider is approved.",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee research library",
+        "save places and cards you asked bot dee about. a google place id is not a copy of google s photos or reviews. you can refresh or delete a saved item. licensed c",
+        "research library",
+        "saved places",
+        "google place id",
+        "refresh research",
+        "open bot dee",
+        "help-botdee-research-library"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-smartview",
+      "id": "help-botdee-smartview",
+      "kind": "help",
+      "label": "BOT DEE SmartViews",
+      "blurb": "SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved.",
+      "href": "./botdee.html",
+      "phrases": [
+        "bot dee smartviews",
+        "smartviews are compact cards for venues events restaurants and more. a club card opens the existing floqr public page it is not a second profile. mock cards are",
+        "smartview",
+        "smart view",
+        "venue card",
+        "restaurant card",
+        "public page",
+        "mock smartview",
+        "open bot dee",
+        "help-botdee-smartview"
       ]
     },
     {
@@ -3203,6 +3300,12 @@
         "what can bot dee",
         "floqai help",
         "what can floqai",
+        "saved chat",
+        "bot dee memory",
+        "smartview",
+        "research library",
+        "explain my recommendation",
+        "privacy assistant",
         "help-general"
       ]
     },

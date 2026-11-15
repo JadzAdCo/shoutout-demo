@@ -396,6 +396,11 @@ function isVersionPrompt(raw) {
   if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;
   if (/^(?:package|release)\s+(?:info|version|number)\??$/.test(q)) return true;
   if (/\bversion\s+info\b/.test(q)) return true;
+  if (/\bwhat\s+(?:is\s+)?deployed\b/.test(q)) return true;
+  if (/\bwhat\s+changed\b/.test(q)) return true;
+  if (/\bwhat\s+limitations?\b/.test(q)) return true;
+  if (/\bwhich\s+integrations?\s+(?:are\s+)?approved\b/.test(q)) return true;
+  if (/\bwhat\s+version\s+are\s+you\s+running\b/.test(q)) return true;
   return false;
 }
 
@@ -649,7 +654,11 @@ function identityReply() {
   return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper.";
 }
 
-function versionReply() {
+function versionReply(role) {
+  try {
+    const described = require("./botdee-upgrade-manifest").describeForRole(role || "patron");
+    if (described?.reply) return described.reply;
+  } catch (_) {}
   return `I'm BOT DEE on FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}).`;
 }
 

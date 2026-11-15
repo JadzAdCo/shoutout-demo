@@ -373,6 +373,59 @@
       page: "index.html#settingsBtnCard"
     },
     {
+      id: "help-botdee-memory",
+      title: "BOT DEE saved chats",
+      body: "The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Guests are not saved. Mingl conversations stay in Mingl.",
+      searchPhrases: ["saved chat", "bot dee memory", "opt in history", "export bot dee", "delete bot dee history", "pause vs save", "five minute pause", "300 seconds"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeMemoryPanel"
+    },
+    {
+      id: "help-botdee-smartview",
+      title: "BOT DEE SmartViews",
+      body: "SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved.",
+      searchPhrases: ["smartview", "smart view", "venue card", "restaurant card", "public page", "mock smartview"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeLibraryPanel"
+    },
+    {
+      id: "help-botdee-research-library",
+      title: "BOT DEE Research Library",
+      body: "Save places and cards you asked BOT DEE about. A Google Place ID is not a copy of Google’s photos or reviews. You can refresh or delete a saved item. Licensed caches stay off until the provider is approved.",
+      searchPhrases: ["research library", "saved places", "google place id", "refresh research"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeLibraryPanel"
+    },
+    {
+      id: "help-botdee-explain",
+      title: "Explain My Recommendation",
+      body: "Each recommendation can show evidence, the date it was checked, whether personalization was on, and if a placement is sponsored. You can ask BOT DEE not to personalize this search.",
+      searchPhrases: ["explain my recommendation", "why this result", "sponsored", "don't personalize", "nonpersonalized"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeLibraryPanel"
+    },
+    {
+      id: "help-botdee-privacy-assistant",
+      title: "BOT DEE Privacy Assistant",
+      body: "Change what other FLOQR users see in My Profile visibility — BOT DEE does not add a second public switch. If web research attached the wrong person, you can dispute it here without changing your profile. BOT DEE cannot promise that a third-party site will delete the original page.",
+      searchPhrases: ["privacy assistant", "profile visibility", "wrong person", "dispute match", "not a second public toggle"],
+      links: [
+        {label: "Profile visibility", href: pageUrl("./patron-portal.html", {tab: "profile"})},
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
       id: "help-botdee-page",
       title: "BOT DEE",
       body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself and asks what you want help with. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone, until the pause timer ends. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Signed-in BOT DEE uses the same public volunteered profile datapoints you can see (music, food, travel, hobbies, and the rest of Privacy datapoint sharing) — never email, phone, card numbers, or GPS. Tap a photo in the chat to pop it out into a separate window. Close with X or Close to see the chat again.",
@@ -385,7 +438,7 @@
     {
       id: "help-bot-dee-mgmt",
       title: "BOT DEE conversation pause",
-      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the chat (default 300 / 5 minutes). After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
+      body: "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before ending the live chat (default 300 / 5 minutes). After the pause, the next message starts a fresh live session. Opt-in saved history is separate and is not deleted by the pause. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Legal provider gates stay mock-only until you record evidence. Mid-chat cool/ok/thanks stay short and do not repeat the offer-help pitch. Save asks for a reason under SOS2FA.",
       searchPhrases: ["bot dee idle", "bot dee pause", "conversation timeout", "bot dee settings", "botdee mgmt", "idle pause"],
       links: [{label: "BOT DEE (Master Admin)", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#featuresBotDee"}],
       audiences: ["masterAdmin"],

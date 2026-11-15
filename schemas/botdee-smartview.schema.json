@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BOT-DEE SmartViewPayload",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "kind",
+    "title",
+    "visibility",
+    "sources"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "patron",
+        "restaurant",
+        "vehicle",
+        "hotel",
+        "short_term_rental",
+        "event",
+        "venue",
+        "real_estate",
+        "product",
+        "travel"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "visibility": {
+      "enum": [
+        "private",
+        "public",
+        "restricted"
+      ]
+    },
+    "canonicalFloqrPageId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "url",
+          "licenseStatus"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "licenseStatus": {
+            "enum": [
+              "approved",
+              "blocked",
+              "unknown"
+            ]
+          },
+          "attribution": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ratings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "provider",
+          "value",
+          "retrievedAt"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "provider",
+          "url",
+          "retrievedAt",
+          "reuseRights"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reuseRights": {
+            "enum": [
+              "approved",
+              "restricted",
+              "unknown"
+            ]
+          }
+        }
+      }
+    },
+    "publicWebResearch": {
+      "type": "object"
+    },
+    "floqrPublicData": {
+      "type": "object"
+    },
+    "recommendationExplanation": {
+      "type": "object"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

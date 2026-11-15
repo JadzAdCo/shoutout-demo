@@ -31,14 +31,19 @@ function run(root) {
   ].filter(file => !EXEMPT.includes(file));
   for (const file of servedJs) edit(file, stripPageLinkVersions);
   edit("floqr-i18n.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
+  edit("floqr-i18n-help.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
   edit("ai-diagnostics-service.js", src => src
     .replace(/PREVIEW_LINKS_PACKAGE = "s3\.\d+\.\d+"/, `PREVIEW_LINKS_PACKAGE = "${NEXT}"`)
     .replace(/CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3\.\d+\.\d+"/, `CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "${NEXT}"`));
   edit("functions/package.json", src => src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`));
   edit("README.md", src => src
     .replace(/^# CURRENT PACKAGE: FLOQR ShoutOut s3\.\d+\.\d+[^\n]*/m, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)
-    .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner\n$1`));
+    .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: BOT DEE six-phase upgrade (opt-in memory, mock SmartViews, legal gates) + AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner\n$1`));
+  edit("functions/i18n-coverage.test.js", src => src
+    .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/, `floqr-i18n and help VERSION are ${NEXT}`)
+    .replace(/assert\.match\(i18n, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(i18n, /const VERSION\\s*=\\s*"${NEXT}"/)`)
+    .replace(/assert\.match\(help, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(help, /const VERSION\\s*=\\s*"${NEXT}"/)`));
   edit("bot-dee-chat.js", src => src.replace(/return "s3\.\d+\.\d+";/, `return "${NEXT}";`));
-  console.log(`bumped to ${NEXT} (floqr-i18n-help.js stays s3.3.019)`);
+  console.log(`bumped to ${NEXT}`);
 }
 run(path.resolve(__dirname, ".."));

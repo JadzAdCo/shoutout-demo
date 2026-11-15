@@ -1556,6 +1556,40 @@
           </p>
           <p class="sub small" id="botDeeSettingsMeta"></p>
         </div>
+        <div class="card">
+          <p class="eyebrow">BOT DEE</p>
+          <h2 class="brand-mixed-case">Version and legal gates</h2>
+          <p class="sub small">Capability registry is code-derived. New six-phase work is implemented on this branch and is not production-deployed until you approve. Every third-party provider stays mock-only until you record license evidence.</p>
+          <p id="botDeeManifestStatus" class="status" aria-live="polite"></p>
+          <pre id="botDeeManifestPre" class="report-block" style="white-space:pre-wrap;max-height:18rem;overflow:auto"></pre>
+          <p class="button-row">
+            <button type="button" id="botDeeManifestReload" class="buttonlike">Reload capability report</button>
+          </p>
+          <p id="botDeeLegalPrompt" class="sub small"></p>
+          <div class="report-block">
+            <table class="admin-table" id="botDeeLegalTable">
+              <thead>
+                <tr>
+                  <th scope="col">Provider</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Mode</th>
+                  <th scope="col">Evidence</th>
+                </tr>
+              </thead>
+              <tbody id="botDeeLegalBody"></tbody>
+            </table>
+          </div>
+          <div class="profile-grid">
+            <label>Provider
+              <select id="botDeeLegalProvider"></select>
+            </label>
+            <label><input id="botDeeLegalEvidence" type="checkbox"/> Evidence recorded (license / API / privacy)</label>
+            <label><input id="botDeeLegalApprove" type="checkbox"/> Mark approved (still mock-only without evidence)</label>
+          </div>
+          <p class="button-row">
+            <button type="button" id="botDeeLegalSave" class="primary">Save legal gate</button>
+          </p>
+        </div>
       </section>
 
       <section id="featuresAuditTrail" class="admin-panel-section">

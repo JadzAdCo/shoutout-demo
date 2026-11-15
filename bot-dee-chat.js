@@ -240,6 +240,11 @@
     if (/^(?:version|build)(?:\s+info|\s+number)?\??$/.test(q)) return true;
     if (/^(?:package|release)\s+(?:info|version|number)\??$/.test(q)) return true;
     if (/\bversion\s+info\b/.test(q)) return true;
+    if (/\bwhat\s+(?:is\s+)?deployed\b/.test(q)) return true;
+    if (/\bwhat\s+changed\b/.test(q)) return true;
+    if (/\bwhat\s+limitations?\b/.test(q)) return true;
+    if (/\bwhich\s+integrations?\s+(?:are\s+)?approved\b/.test(q)) return true;
+    if (/\bwhat\s+version\s+are\s+you\s+running\b/.test(q)) return true;
     return false;
   }
 
@@ -687,7 +692,7 @@
     article.appendChild(gallery);
   }
 
-  function appendBubble(role, text, results, media) {
+  function appendBubble(role, text, results, media, smartViews) {
     const log = byId("botDeeTranscript");
     if (!log) return;
     const isUser = role === "user";
@@ -740,6 +745,12 @@
         list.appendChild(li);
       });
       article.appendChild(list);
+    }
+    if (!isUser && Array.isArray(smartViews) && smartViews.length && global.FLOQRBotDeeSmartView?.mount) {
+      const host = document.createElement("div");
+      host.className = "botdee-sv-host";
+      article.appendChild(host);
+      global.FLOQRBotDeeSmartView.mount(host, smartViews);
     }
     row.appendChild(article);
     log.appendChild(row);
@@ -895,7 +906,7 @@
       const data = (await fn(payload))?.data || {};
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const reply = displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media);
+      appendBubble("bot", reply, localizeResults(data.results), media, data.smartViews);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
@@ -1002,6 +1013,12 @@
             phase = "active";
             setStatus("");
             armIdleTimer(data.remainingMs);
+            return;
+          }
+          if (durableEnabled && data.status === "idle_ended" && Array.isArray(data.archiveTurns) && data.archiveTurns.length) {
+            restoreTurns(data.archiveTurns);
+            phase = "ended";
+            setStatus(t("botdee.memoryTimeoutNote", "Live chat paused. Saved history is still here if you opted in."));
             return;
           }
         } catch (error) {

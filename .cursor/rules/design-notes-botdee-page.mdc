@@ -15,7 +15,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` |
 | Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo |
-| Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css` |
+| Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing
 
@@ -37,14 +37,19 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 - `functions/bot-dee-thread.js` — Firestore persist under `botDeeThreads/{uid}`
 - `functions/bot-dee-core.js` — tools, scoring, sanitization, thread helpers
 - `functions/data-classification-functions.js` — `getBotDeeAccess` (+ `getFloqAiAccess` alias)
+- `functions/botdee-upgrade-functions.js` — consent, export/delete, SmartViews, legal gates, capability manifest
 - Catalog: `node scripts/build-bot-dee-search-catalog.js` (server-side intent catalog; not a page UI)
 
 ## Durable resume (s3.3.006)
 
 Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the conversation pause (`conversationIdleSeconds`; Master Admin; packaged default 300 / 5 minutes). Pause / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
 
+## Six-phase upgrade (spec v1.2)
+
+Order **1 → 2 → 3 → 5 → 4 → 6**. Upgrade, never rebuild. Brand **BOT DEE**. Idle 300s still ends the **active** session; opt-in archive is separate (default off). Guests stay ephemeral. Mingl is never copied into BOT DEE memory. SmartViews are mock until legal evidence. Venue cards open `club-profile.html?location=` (no `?v=`). Patron Public Web Research is off. No second profile-visibility toggle. Capability manifest never claims deploy. No LangChain / Redis / SQL. No stored IP. Functions stay PR-only until the owner approves deploy.
+
 ## Owner action
 
-BOT DEE stays gated until Master Admin → Features & Services sets **botDee** Live/Test (UI label **BOT DEE**). `seedFeatureServices` copies flags from legacy `featureServices/floqAi` when creating `botDee`. Deploy Functions when callables / classification change.
+BOT DEE stays gated until Master Admin → Features & Services sets **botDee** Live/Test (UI label **BOT DEE**). `seedFeatureServices` copies flags from legacy `featureServices/floqAi` when creating `botDee`. Deploy Functions when callables / classification change. Six-phase legal gates: Master Admin records provider evidence before any live adapter.
 
-Tests: `functions/botdee-page.test.js`, `functions/bot-dee-core.test.js`, `functions/botdee-help-access.test.js`.
+Tests: `functions/botdee-page.test.js`, `functions/bot-dee-core.test.js`, `functions/botdee-help-access.test.js`, `functions/botdee-upgrade.test.js`.

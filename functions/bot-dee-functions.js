@@ -11,6 +11,9 @@ const {GoogleGenAI, FunctionCallingConfigMode} = require("@google/genai");
 const core = require("./data-classification-core");
 const bot = require("./bot-dee-core");
 const threads = require("./bot-dee-thread");
+const memory = require("./botdee-memory");
+const smart = require("./botdee-smartview-core");
+const execution = require("./botdee-execution");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const {__botDeeHelpers} = require("./data-classification-functions");
 const {assertSos2faSession} = require("./sos2fa-functions");
@@ -136,6 +139,13 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
     for (const call of calls) {
       const args = call.args && typeof call.args === "object" ? call.args : {};
       const result = await bot.runTool(call.name, args, session);
+      if (session?.userId && execution.isConsequentialTool(call.name)) {
+        try {
+          await threads.writeExecutionReceipt(session.userId, call.name, args, result, Date.now());
+        } catch (err) {
+          console.warn("BOT DEE execution receipt failed", err?.message || err);
+        }
+      }
       if (call.name === "contextualSearch") lastSearch = result;
       bot.linksFromToolResult(result, lang).forEach(link => actionLinks.push(link));
       bot.mediaFromToolResult(result).forEach(item => {
@@ -204,7 +214,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures} = 
   }
   if (bot.isVersionPrompt(userPrompt)) {
     return {
-      reply: bot.versionReply(),
+      reply: bot.versionReply(role),
       results: [],
       provider: "local-version",
       model: "version",
@@ -263,7 +273,16 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE loadThread failed", err?.message || err);
       }
     }
-    const history = settings.durableThreads ? stored.history : clientHistory;
+    const consent = memory.normalizeConsent(stored.consent);
+    let history = settings.durableThreads ? stored.history : clientHistory;
+    if (settings.durableThreads && stored.idleEnded && memory.consentAllows(consent, "archive")) {
+      try {
+        const archived = await threads.loadArchiveHistory(uid, 12);
+        if (archived.length) history = archived;
+      } catch (err) {
+        console.warn("BOT DEE archive load failed", err?.message || err);
+      }
+    }
     const active = bot.conversationIsActive(
       history,
       stored.lastMessageAtMs,
@@ -288,6 +307,17 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     });
 
     const apiKey = geminiKey();
+    if (settings.durableThreads) {
+      try {
+        await threads.persistUserTurn(uid, settings, storedUserText, {
+          receivedAtMs,
+          consent
+        });
+      } catch (err) {
+        console.warn("BOT DEE persist user failed", err?.message || err);
+        throw new HttpsError("unavailable", "BOT DEE could not save that message. Try again.");
+      }
+    }
     let outcome;
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
     if (
@@ -314,17 +344,23 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
 
     if (settings.durableThreads) {
       try {
-        await threads.persistExchange(uid, settings, storedUserText, outcome.reply, {
+        await threads.persistModelTurn(uid, settings, outcome.reply, {
           receivedAtMs,
-          media: outcome.media
+          media: outcome.media,
+          consent
         });
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
         }
       } catch (err) {
-        console.warn("BOT DEE persist failed", err?.message || err);
+        console.warn("BOT DEE persist model failed", err?.message || err);
       }
     }
+    try {
+      if (/\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)) {
+        outcome.smartViews = smart.mockCatalog();
+      }
+    } catch (_) {}
 
     console.info(JSON.stringify({
       event: "botdee.session",
@@ -351,7 +387,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       toolRounds: outcome.toolRounds || 0,
       durable: !!settings.durableThreads,
       threadId: coercedThreadId || bot.threadIdForUid(uid),
-      conversationIdleSeconds: settings.conversationIdleSeconds
+      conversationIdleSeconds: settings.conversationIdleSeconds,
+      consent,
+      smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : []
     };
   } catch (error) {
     throw asHttps(error);
@@ -431,16 +469,25 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         threadId: bot.threadIdForUid(uid),
         turns: [],
         idleSeconds: settings.conversationIdleSeconds,
-        remainingMs: settings.conversationIdleSeconds * 1000
+        remainingMs: settings.conversationIdleSeconds * 1000,
+        consent: memory.normalizeConsent({})
       };
     }
     const state = await threads.loadThreadState(uid, settings);
+    let archiveTurns = [];
+    if (state.idleEnded && state.archiveRetained) {
+      try {
+        archiveTurns = await threads.loadArchiveHistory(uid, 12);
+      } catch (_) {}
+    }
     return {
       ok: true,
       durable: true,
       status: state.status,
       threadId: state.threadId,
       turns: state.turns,
+      archiveTurns,
+      consent: state.consent,
       conversationEpoch: state.conversationEpoch,
       lastMessageAtMs: state.lastMessageAtMs,
       remainingMs: state.remainingMs,

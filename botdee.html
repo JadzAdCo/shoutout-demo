@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.020"/>
   <link rel="stylesheet" href="./botdee-search.css?v=s3.3.020"/>
   <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.020"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.020"/>
 </head>
 <body class="botdee-standalone botdee-page" data-floqr-feature="botDee">
 <main class="botdee-standalone-main botdee-shell">
@@ -52,6 +53,31 @@
       </label>
       <button id="botDeeChatSend" class="buttonlike botdee-chat-send" type="submit" data-i18n="botdee.chatSend">Send</button>
     </form>
+
+    <section id="botDeeMemoryPanel" class="botdee-upgrade-panel" aria-labelledby="botDeeMemoryTitle">
+      <h2 id="botDeeMemoryTitle" data-i18n="botdee.memoryTitle">Saved chats and memories</h2>
+      <p class="sub small" data-i18n="botdee.memoryTimeoutNote">The five-minute pause ends the live chat. It does not delete history you opted to save. Guests stay ephemeral. Mingl chats are never copied here.</p>
+      <label><input id="botDeeConsentArchive" type="checkbox"/> <span data-i18n="botdee.memoryArchiveOptIn">Save this BOT DEE chat after the pause (opt in)</span></label>
+      <label><input id="botDeeConsentMemory" type="checkbox"/> <span data-i18n="botdee.memoryFactsOptIn">Let BOT DEE remember facts I approve</span></label>
+      <label><input id="botDeeConsentPersonalize" type="checkbox"/> <span data-i18n="botdee.memoryPersonalizeOptIn">Use my saved facts to personalize answers</span></label>
+      <p class="botdee-upgrade-actions">
+        <button type="button" id="botDeeConsentSave" class="primary" data-i18n="botdee.memorySave">Save memory settings</button>
+        <button type="button" id="botDeeExportBtn" class="buttonlike" data-i18n="botdee.memoryExport">Export my BOT DEE data</button>
+        <button type="button" id="botDeeDeleteArchiveBtn" class="buttonlike" data-i18n="botdee.memoryDelete">Delete saved history</button>
+      </p>
+      <p id="botDeeUpgradeStatus" class="status" role="status"></p>
+    </section>
+
+    <section id="botDeeLibraryPanel" class="botdee-upgrade-panel" aria-labelledby="botDeeLibraryTitle">
+      <h2 id="botDeeLibraryTitle" data-i18n="botdee.libraryTitle">Research Library and SmartViews</h2>
+      <p class="sub small" data-i18n="botdee.smartviewResearchDisabled">Public Web Research stays off until legal and identity review. Venue cards open the existing FLOQR Public Page.</p>
+      <p class="botdee-explain" data-i18n="botdee.explainTitle">Explain My Recommendation uses the sources and preferences shown on each card. Ads are labeled. You can ask for non-personalized results.</p>
+      <p><a class="buttonlike" href="./patron-portal.html?tab=profile" data-i18n="botdee.privacyOpenProfile">Open existing profile visibility</a></p>
+      <p class="botdee-upgrade-actions">
+        <button type="button" id="botDeeLoadSmartViews" class="buttonlike" data-i18n="botdee.libraryRefresh">Show mock SmartViews</button>
+      </p>
+      <div id="botDeeSmartViewDemo" class="botdee-sv-host" aria-live="polite"></div>
+    </section>
   </section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -75,6 +101,8 @@
 <script src="./floqr-feature-services.js?v=s3.3.020"></script>
 <script src="./helper-popouts.js?v=s3.3.020"></script>
 <script src="./bot-dee-chat.js?v=s3.3.020"></script>
+<script src="./botdee-smartview.js?v=s3.3.020"></script>
+<script src="./botdee-upgrade-ui.js?v=s3.3.020"></script>
 <script src="./botdee-page.js?v=s3.3.020"></script>
 </body>
 </html>

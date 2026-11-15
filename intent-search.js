@@ -986,7 +986,10 @@
         {label: "Role profiles", href: pageUrl("./role-profiles.html", {from: "botdee"})},
         {label: "Classic Search", href: pageUrl("./", {start: "search"})}
       ],
-      searchPhrases: ["ask floqr", "bot dee help", "help popout", "what can bot dee", "floqai help", "what can floqai"],
+      searchPhrases: [
+        "ask floqr", "bot dee help", "help popout", "what can bot dee", "floqai help", "what can floqai",
+        "saved chat", "bot dee memory", "smartview", "research library", "explain my recommendation", "privacy assistant"
+      ],
       patterns: [
         /help\s*me/, /how\s+do\s+i/, /i\s+want\s+to\s+be\s+able/,
         /what\s+can\s+(you|bot\s*dee|floqai|i)\s+(do|help)/, /show\s*me\s*how/,

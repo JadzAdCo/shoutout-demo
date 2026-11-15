@@ -709,6 +709,8 @@
     byId("featureAuditVerifyBtn")?.addEventListener("click", () => verifyAudit());
     byId("botDeeSettingsSave")?.addEventListener("click", () => saveBotDeeSettings());
     byId("botDeeSettingsReload")?.addEventListener("click", () => loadBotDeeSettings());
+    byId("botDeeManifestReload")?.addEventListener("click", () => loadBotDeeManifest());
+    byId("botDeeLegalSave")?.addEventListener("click", () => saveBotDeeLegalGate());
     if (typeof window.matchMedia === "function") {
       const mq = window.matchMedia("(max-width: 1024px)");
       const onMq = () => syncInviteFeaturesVisibility();
@@ -799,6 +801,82 @@
     meta.textContent = `Last saved ${when} UTC by ${who}${rev}`;
   }
 
+  async function loadBotDeeManifest() {
+    const pre = byId("botDeeManifestPre");
+    const prompt = byId("botDeeLegalPrompt");
+    const body = byId("botDeeLegalBody");
+    if (!isUnlocked()) {
+      setStatus("botDeeManifestStatus", "Unlock with SOS2FA to load the BOT DEE capability report.");
+      return;
+    }
+    setStatus("botDeeManifestStatus", "Loading capability report…");
+    try {
+      const data = await call("getBotDeeCapabilityManifest", {});
+      if (pre) pre.textContent = data.reply || JSON.stringify(data.manifest || {}, null, 2);
+      const gates = await call("getBotDeeLegalGates", {});
+      if (prompt) prompt.textContent = gates.prompt || "";
+      if (body) {
+        body.innerHTML = (gates.gates || []).map(row => `<tr>
+          <td>${esc(row.label)}</td>
+          <td>${esc(row.status)}</td>
+          <td>${esc(row.mode)}</td>
+          <td>${row.evidenceRecorded ? "recorded" : "missing"}</td>
+        </tr>`).join("");
+      }
+      const select = byId("botDeeLegalProvider");
+      if (select && !select.options.length) {
+        (gates.gates || []).forEach(row => {
+          const opt = document.createElement("option");
+          opt.value = row.id;
+          opt.textContent = row.label;
+          select.appendChild(opt);
+        });
+      }
+      setStatus("botDeeManifestStatus", data.manifest?.deployedClaim
+        ? "Registry claims a production deploy — verify Diagnostics."
+        : "Not production-deployed. Providers remain mock-only until evidence is recorded.");
+    } catch (error) {
+      setStatus("botDeeManifestStatus", errorText(error));
+    }
+  }
+
+  async function saveBotDeeLegalGate() {
+    if (!isUnlocked()) {
+      setStatus("botDeeManifestStatus", "Unlock with SOS2FA to record a provider gate.");
+      return;
+    }
+    const providerId = String(byId("botDeeLegalProvider")?.value || "").trim();
+    if (!providerId) {
+      setStatus("botDeeManifestStatus", "Pick a provider.");
+      return;
+    }
+    const evidenceRecorded = !!byId("botDeeLegalEvidence")?.checked;
+    const status = byId("botDeeLegalApprove")?.checked && evidenceRecorded ? "approved" : "blocked";
+    const promptApi = root.FLOQRReasonPrompt;
+    if (!promptApi?.ask) {
+      setStatus("botDeeManifestStatus", "Reason prompt is unavailable — nothing was saved.");
+      return;
+    }
+    const reason = await promptApi.ask({
+      summary: `BOT DEE legal gate ${providerId}: evidence ${evidenceRecorded ? "recorded" : "missing"} → ${status}`,
+      minLength: REASON_MIN
+    });
+    if (reason === null) {
+      setStatus("botDeeManifestStatus", "Cancelled — nothing was saved.");
+      return;
+    }
+    setStatus("botDeeManifestStatus", "Saving legal gate…");
+    try {
+      await call("setBotDeeLegalGate", {providerId, evidenceRecorded, status, reason});
+      await loadBotDeeManifest();
+      setStatus("botDeeManifestStatus", evidenceRecorded && status === "approved"
+        ? "Gate saved. Live APIs still need a Functions deploy after owner approval."
+        : "Gate saved as mock-only.");
+    } catch (error) {
+      setStatus("botDeeManifestStatus", errorText(error));
+    }
+  }
+
   async function loadBotDeeSettings() {
     if (!isUnlocked()) {
       setStatus("botDeeSettingsStatus", "Unlock with SOS2FA to manage BOT DEE.");
@@ -877,7 +955,10 @@
     activePanelId = id;
     if (id === "featuresReleaseControl") return loadReleaseControl();
     if (id === "featuresBetaTesting") return loadBetaTesting();
-    if (id === "featuresBotDee") return loadBotDeeSettings();
+    if (id === "featuresBotDee") {
+      loadBotDeeSettings();
+      return loadBotDeeManifest();
+    }
     if (id === "featuresAuditTrail") return loadAuditTrail();
   }
 
