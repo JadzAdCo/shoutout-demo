@@ -796,10 +796,10 @@
 
   function showBotDeeMgmtPage(page) {
     const key = String(page || "pause").trim() || "pause";
-    document.querySelectorAll("#featuresBotDee [data-botdee-page]").forEach(el => {
+    document.querySelectorAll("#featuresBotDee .botdee-mgmt-page[data-botdee-page]").forEach(el => {
       const on = el.dataset.botdeePage === key;
       el.classList.toggle("hidden", !on);
-      if (el.classList.contains("botdee-mgmt-page")) el.hidden = !on;
+      el.hidden = !on;
     });
     document.querySelectorAll("#botDeeMgmtSubtabs [data-botdee-page]").forEach(btn => {
       const on = btn.dataset.botdeePage === key;
