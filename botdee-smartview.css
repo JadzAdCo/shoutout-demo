@@ -1,0 +1,51 @@
+.botdee-sv-card {
+  margin: 0.75rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, #111 70%, transparent);
+}
+.botdee-sv-kind {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.botdee-sv-head h3 {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 1.05rem;
+}
+.botdee-sv-mock,
+.botdee-sv-research,
+.botdee-sv-missing {
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  color: #fbbf24;
+}
+.botdee-sv-summary { margin: 0 0 0.5rem; font-size: 0.92rem; }
+.botdee-sv-images { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.botdee-sv-images img {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #000;
+}
+.botdee-sv-images figcaption { font-size: 0.72rem; opacity: 0.75; }
+.botdee-sv-ratings ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
+.botdee-sv-provider { font-weight: 700; }
+.botdee-sv-actions { list-style: none; margin: 0.6rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.botdee-upgrade-panel {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, #0b0b0b 55%, transparent);
+}
+.botdee-upgrade-panel h2 { margin: 0 0 0.35rem; font-size: 1rem; }
+.botdee-upgrade-panel label { display: flex; gap: 0.45rem; align-items: flex-start; margin: 0.35rem 0; font-size: 0.9rem; }
+.botdee-upgrade-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+.botdee-explain { font-size: 0.88rem; }
+@media (max-width: 600px) {
+  .botdee-sv-images img { width: 100%; height: auto; max-height: 140px; }
+}

@@ -27,6 +27,7 @@
     window.FLOQRChromeScheme?.applyDocument?.();
     window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
     window.FLOQRBotDeeChat?.bind({});
+    window.FLOQRBotDeeUpgradeUi?.bind?.();
     const q = new URL(location.href).searchParams.get("q");
     if (q) {
       const chatInput = byId("botDeeChatInput");
