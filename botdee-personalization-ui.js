@@ -91,16 +91,16 @@
 
   function looksLikeReservedComposerText(raw) {
     const q = String(raw || "")
-      .replace(/[’']/g, "'")
-      .replace(/[^a-z0-9'+\s?]/gi, " ")
+      .toLowerCase()
+      .replace(/[’']/g, "")
+      .replace(/[^a-z0-9@\s._/-]+/g, " ")
       .replace(/\s+/g, " ")
-      .trim()
-      .toLowerCase();
+      .trim();
     if (!q) return true;
     if (/^(?:help|aide|ayuda|hilfe|aiuto|ajuda|pomoc|privacy|session|pause|keyboard|settings|prefs|preferences)\??$/.test(q)) {
       return true;
     }
-    const tail = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|ma'?am|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
+    const tail = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|maam|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
     if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${tail}$`).test(q)) return true;
     if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|what s up|whats up|what up)${tail}$`).test(q)) {
       return true;
