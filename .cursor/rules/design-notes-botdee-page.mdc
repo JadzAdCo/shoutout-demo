@@ -14,7 +14,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 | Piece | Role |
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Settings bubble** under the composer opens saved chats/memories (not a `?` help popout). |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`). Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing

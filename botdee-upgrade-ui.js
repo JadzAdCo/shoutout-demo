@@ -1,6 +1,6 @@
-/* BOT DEE upgrade panels — consent, memories, mock SmartViews, explain, privacy assistant.
-   No second public/private profile toggle. Profile edits stay on My Profile.
-   Memory settings live in a Settings bubble popout (composer-below card), not an inline card. */
+/* BOT DEE upgrade panels — consent, memories, mock SmartViews (Master Admin SMARTviews tab).
+   Saved chats, memories, and "what BOT DEE knows of me" live on My Profile → Feature & Orders → My BOT DEE.
+   Chat page has no Settings bubble / memory popout. First-use does not open an overlay. */
 (function (global) {
   "use strict";
 
@@ -8,8 +8,6 @@
     const value = global.FLOQRI18n?.t?.(key);
     return value && value !== key ? value : fallback;
   };
-
-  let firstUseOpened = false;
 
   function byId(id) {
     return document.getElementById(id);
@@ -19,23 +17,9 @@
     return value === 1 || value === "1" ? 1 : 0;
   }
 
-  function applyFirstUseUi(flag, opts) {
-    const firstUse = usageFlagFrom(flag) !== 1;
-    const note = byId("botDeeSettingsFirstUse");
-    const bubble = byId("botDeeSettingsBubble");
-    if (note) note.hidden = !firstUse;
-    bubble?.classList.toggle("is-first-use", firstUse);
-    const autoOpen = !opts || opts.autoOpen !== false;
-    if (autoOpen && firstUse && !firstUseOpened) {
-      firstUseOpened = true;
-      openMemoryPopout();
-    }
-  }
-
-  function applyUsageFlag(value, opts) {
+  function applyUsageFlag(value) {
     const flag = usageFlagFrom(value);
-    global.FLOQRBotDeeAccess?.applyUsageFlag?.(flag, opts);
-    applyFirstUseUi(flag, opts);
+    global.FLOQRBotDeeAccess?.applyUsageFlag?.(flag, {autoOpen: false});
     return flag;
   }
 
@@ -59,46 +43,20 @@
     return (await fn(payload || {}))?.data || {};
   }
 
-  function isPopoutOpen() {
-    const popout = byId("botDeeMemoryPopout");
-    return !!(popout && !popout.hidden);
-  }
-
-  function closeMemoryPopout() {
-    const popout = byId("botDeeMemoryPopout");
-    const bubble = byId("botDeeSettingsBubble");
-    if (!popout || popout.hidden) return;
-    popout.hidden = true;
-    if (bubble) {
-      bubble.setAttribute("aria-expanded", "false");
-      bubble.focus();
-    }
-  }
-
-  function openMemoryPopout() {
-    const popout = byId("botDeeMemoryPopout");
-    const bubble = byId("botDeeSettingsBubble");
-    const closeBtn = byId("botDeeMemoryClose");
-    if (!popout) return;
-    popout.hidden = false;
-    if (bubble) bubble.setAttribute("aria-expanded", "true");
-    loadConsent();
-    (closeBtn || popout.querySelector("input, button"))?.focus?.();
-    popout.scrollIntoView({block: "nearest", inline: "nearest"});
-  }
-
-  function toggleMemoryPopout() {
-    if (isPopoutOpen()) closeMemoryPopout();
-    else openMemoryPopout();
+  function stampChatLink() {
+    const link = byId("portalBotDeeChatLink");
+    if (!link) return;
+    const nav = global.FLOQRNav;
+    const href = nav?.intentSearchHome?.() || nav?.stampCurrentVersion?.("./botdee.html") || "./botdee.html";
+    link.href = href;
   }
 
   async function loadConsent() {
+    if (!byId("botDeeConsentArchive") && !byId("botDeeKnowsList")) return;
     try {
       const data = await call("getBotDeeConsent");
       if (data && Object.prototype.hasOwnProperty.call(data, "hasUsedBotDee")) {
         applyUsageFlag(data.hasUsedBotDee);
-      } else {
-        applyFirstUseUi(global.FLOQRBotDeeAccess?.hasUsedBotDee?.() === 1 ? 1 : 0);
       }
       const c = data.consent || {};
       const archive = byId("botDeeConsentArchive");
@@ -107,23 +65,23 @@
       if (archive) archive.checked = c.archive === 1;
       if (mem) mem.checked = c.memory === 1;
       if (pers) pers.checked = c.personalization === 1;
+      await loadKnows(c);
     } catch (_) {
-      applyFirstUseUi(global.FLOQRBotDeeAccess?.hasUsedBotDee?.() === 1 ? 1 : 0);
+      await loadKnows(null);
     }
   }
 
   async function saveConsent() {
     setLine("botDeeUpgradeStatus", t("botdee.chatThinking", "BOT DEE is thinking…"));
     try {
-      await call("setBotDeeConsent", {
+      const next = {
         archive: byId("botDeeConsentArchive")?.checked ? 1 : 0,
         memory: byId("botDeeConsentMemory")?.checked ? 1 : 0,
         personalization: byId("botDeeConsentPersonalize")?.checked ? 1 : 0
-      });
-      const saved = t("botdee.memorySaved", "Saved. The 5-minute pause still ends the live chat; opted-in history stays.");
-      setLine("botDeeUpgradeStatus", saved);
-      setLine("botDeeChatStatus", saved);
-      closeMemoryPopout();
+      };
+      await call("setBotDeeConsent", next);
+      setLine("botDeeUpgradeStatus", t("botdee.memorySaved", "Saved. The 5-minute pause still ends the live chat; opted-in history stays."));
+      await loadKnows(next);
     } catch (error) {
       setLine("botDeeUpgradeStatus", t("botdee.chatError", "BOT DEE could not answer. Try again in a moment."));
       console.warn("BOT DEE consent save failed", error);
@@ -141,30 +99,92 @@
       a.download = "bot-dee-export.json";
       a.click();
       URL.revokeObjectURL(url);
-      const done = t("botdee.memoryExported", "Export downloaded.");
-      setLine("botDeeUpgradeStatus", done);
-      setLine("botDeeChatStatus", done);
-      closeMemoryPopout();
+      setLine("botDeeUpgradeStatus", t("botdee.memoryExported", "Export downloaded."));
     } catch (error) {
       setLine("botDeeUpgradeStatus", t("botdee.chatError", "BOT DEE could not answer. Try again in a moment."));
     }
   }
 
   async function deleteArchive() {
-    if (!window.confirm(t("botdee.memoryDelete", "Delete saved BOT DEE history?"))) return;
+    if (!window.confirm(t("botdee.memoryDelete", "Delete saved history"))) return;
     try {
       await call("deleteBotDeeArchive", {confirm: "DELETE"});
-      const done = t("botdee.memoryDeleted", "Saved BOT DEE history deleted.");
-      setLine("botDeeUpgradeStatus", done);
-      setLine("botDeeChatStatus", done);
-      closeMemoryPopout();
+      setLine("botDeeUpgradeStatus", t("botdee.memoryDeleted", "Saved BOT DEE history deleted."));
     } catch (error) {
       setLine("botDeeUpgradeStatus", t("botdee.chatError", "BOT DEE could not answer. Try again in a moment."));
     }
   }
 
-  async function loadDemos() {
-    const host = byId("botDeeSmartViewDemo");
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderKnows(items, consent) {
+    const host = byId("botDeeKnowsList");
+    if (!host) return;
+    const memoryOn = consent && Number(consent.memory) === 1;
+    if (!memoryOn) {
+      host.innerHTML = `<p class="sub">${escapeHtml(t("botdee.knowsOff", "Turn on memory above so BOT DEE can keep facts you approve."))}</p>`;
+      return;
+    }
+    const rows = Array.isArray(items) ? items : [];
+    if (!rows.length) {
+      host.innerHTML = `<p class="sub">${escapeHtml(t("botdee.knowsEmpty", "BOT DEE has not stored any facts about you yet."))}</p>`;
+      return;
+    }
+    host.innerHTML = rows.map(row => {
+      const id = String(row.memoryId || "").trim();
+      const value = String(row.value || "").trim();
+      const purpose = String(row.purpose || "").trim();
+      const meta = purpose ? `<span class="sub small">${escapeHtml(purpose)}</span>` : "";
+      return `<div class="report-row portal-botdee-fact" data-memory-id="${escapeHtml(id)}">` +
+        `<strong>${escapeHtml(value)}</strong> ${meta}` +
+        `<button type="button" class="buttonlike" data-botdee-forget="${escapeHtml(id)}">${escapeHtml(t("botdee.knowsDelete", "Remove this fact"))}</button>` +
+        `</div>`;
+    }).join("");
+    host.querySelectorAll("[data-botdee-forget]").forEach(btn => {
+      btn.addEventListener("click", () => deleteKnowsFact(btn.getAttribute("data-botdee-forget")));
+    });
+  }
+
+  async function loadKnows(consentHint) {
+    const host = byId("botDeeKnowsList");
+    if (!host) return;
+    const consent = consentHint && typeof consentHint === "object"
+      ? consentHint
+      : {
+        memory: byId("botDeeConsentMemory")?.checked ? 1 : 0
+      };
+    if (Number(consent.memory) !== 1) {
+      renderKnows([], consent);
+      return;
+    }
+    try {
+      const data = await call("listBotDeeMemories");
+      renderKnows(data.memories || [], {memory: 1});
+    } catch (_) {
+      renderKnows([], {memory: 1});
+    }
+  }
+
+  async function deleteKnowsFact(memoryId) {
+    const id = String(memoryId || "").trim();
+    if (!id) return;
+    try {
+      await call("deleteBotDeeMemory", {memoryId: id});
+      setLine("botDeeUpgradeStatus", t("botdee.knowsDeleted", "Fact removed."));
+      await loadKnows({memory: 1});
+    } catch (error) {
+      setLine("botDeeUpgradeStatus", t("botdee.chatError", "BOT DEE could not answer. Try again in a moment."));
+    }
+  }
+
+  async function loadDemos(hostId) {
+    const host = byId(hostId || "botDeeSmartViewDemo");
     if (!host || !global.FLOQRBotDeeSmartView) return;
     try {
       const data = await call("listBotDeeSmartViews");
@@ -174,50 +194,28 @@
     }
   }
 
-  function bindPopout() {
-    const bubble = byId("botDeeSettingsBubble");
-    const popout = byId("botDeeMemoryPopout");
-    const closeBtn = byId("botDeeMemoryClose");
-    bubble?.addEventListener("click", event => {
-      event.preventDefault();
-      toggleMemoryPopout();
-    });
-    closeBtn?.addEventListener("click", event => {
-      event.preventDefault();
-      closeMemoryPopout();
-    });
-    popout?.addEventListener("click", event => {
-      const link = event.target.closest?.("a[href]");
-      if (!link || !popout.contains(link)) return;
-      closeMemoryPopout();
-    });
-    document.addEventListener("keydown", event => {
-      if (event.key !== "Escape") return;
-      if (!isPopoutOpen()) return;
-      event.preventDefault();
-      closeMemoryPopout();
-    });
-  }
+  let bound = false;
 
   function bind() {
-    bindPopout();
+    stampChatLink();
+    if (bound) {
+      if (byId("botDeeConsentArchive") || byId("botDeeKnowsList")) loadConsent();
+      return;
+    }
+    bound = true;
     byId("botDeeConsentSave")?.addEventListener("click", saveConsent);
     byId("botDeeExportBtn")?.addEventListener("click", exportData);
     byId("botDeeDeleteArchiveBtn")?.addEventListener("click", deleteArchive);
-    byId("botDeeLoadSmartViews")?.addEventListener("click", loadDemos);
-    global.FLOQRBotDeeAccess?.onChange?.(info => {
-      applyFirstUseUi(info?.hasUsedBotDee === 1 ? 1 : 0, {autoOpen: info?.hasUsedBotDee !== 1});
-    });
-    applyFirstUseUi(global.FLOQRBotDeeAccess?.hasUsedBotDee?.() === 1 ? 1 : 0, {autoOpen: false});
-    loadConsent();
+    byId("botDeeLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeSmartViewDemo"));
+    byId("botDeeMasterLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeMasterSmartViewDemo"));
+    if (byId("botDeeConsentArchive") || byId("botDeeKnowsList")) loadConsent();
   }
 
   global.FLOQRBotDeeUpgradeUi = {
     bind,
     loadConsent,
+    loadKnows,
     loadDemos,
-    openMemoryPopout,
-    closeMemoryPopout,
     applyUsageFlag
   };
 })(window);

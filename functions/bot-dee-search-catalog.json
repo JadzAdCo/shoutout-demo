@@ -399,15 +399,35 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-knows-of-me",
+      "id": "help-botdee-knows-of-me",
+      "kind": "help",
+      "label": "What BOT DEE knows of me",
+      "blurb": "Facts BOT DEE stored with your approval live in Feature & Orders → My BOT DEE. The list is empty if memory is off or nothing is stored. Export or delete facts here. BOT DEE never stores your IP address. Mingl chats are not copied.",
+      "href": "./patron-portal.html?tab=feature-orders&sub=botdee",
+      "phrases": [
+        "what bot dee knows of me",
+        "facts bot dee stored with your approval live in feature orders my bot dee. the list is empty if memory is off or nothing is stored. export or delete facts here.",
+        "what bot dee knows",
+        "bot dee facts",
+        "approved facts",
+        "delete fact",
+        "personalize",
+        "dsar",
+        "my bot dee",
+        "help-botdee-knows-of-me"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-memory",
       "id": "help-botdee-memory",
       "kind": "help",
       "label": "BOT DEE saved chats",
-      "blurb": "Tap Settings under the chat box to open saved chats and memories. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Close Settings with X or after Save, Export, or Delete. Guests ar",
-      "href": "./botdee.html",
+      "blurb": "Open Feature & Orders → My BOT DEE to save chats after the pause, export, or delete history. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. Guests are not saved. Mingl conversations stay in Mingl.",
+      "href": "./patron-portal.html?tab=feature-orders&sub=botdee",
       "phrases": [
         "bot dee saved chats",
-        "tap settings under the chat box to open saved chats and memories. the five-minute pause ends the live bot dee session. if you opt in bot dee keeps that chat so ",
+        "open feature orders my bot dee to save chats after the pause export or delete history. the five-minute pause ends the live bot dee session. if you opt in bot de",
         "saved chat",
         "bot dee memory",
         "opt in history",
@@ -416,9 +436,9 @@
         "pause vs save",
         "five minute pause",
         "300 seconds",
-        "settings bubble",
+        "my bot dee",
+        "feature and orders",
         "memory settings",
-        "bot dee settings",
         "open bot dee",
         "help-botdee-memory"
       ]

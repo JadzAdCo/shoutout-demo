@@ -261,34 +261,18 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(read("master-feature-services.js"), /setBotDeeLegalGate/);
   assert.match(read("master-feature-services.js"), /listBotDeeProviderSlots/);
   assert.match(read("master-feature-services.js"), /setBotDeeProviderSlot/);
-  assert.match(read("botdee.html"), /id="botDeeMemoryPanel"/);
-  assert.match(read("botdee.html"), /id="botDeeSettingsBubble"/);
-  assert.match(read("botdee.html"), /id="botDeeMemoryPopout"/);
-  assert.match(read("botdee.html"), /id="botDeeMemoryClose"/);
-  assert.match(read("botdee.html"), /botdee-composer-below/);
   const botdeeHtml = read("botdee.html");
-  assert.ok(
-    botdeeHtml.indexOf('id="botDeeSettingsBubble"') < botdeeHtml.indexOf('id="botDeeMemoryPanel"'),
-    "Settings bubble precedes the memory panel"
-  );
-  assert.ok(
-    botdeeHtml.indexOf('id="botDeeMemoryPopout"') < botdeeHtml.indexOf('id="botDeeMemoryPanel"')
-      && botdeeHtml.indexOf('id="botDeeMemoryPanel"') < botdeeHtml.indexOf('id="botDeeLibraryPanel"'),
-    "memory panel lives in the popout, not as an inline card above the library"
-  );
+  assert.doesNotMatch(botdeeHtml, /id="botDeeMemoryPanel"|botDeeSettingsBubble|botDeeLibraryPanel|botdee-upgrade-ui/);
   assert.match(read("botdee.html"), /floqr-session-shell\.js/);
   assert.doesNotMatch(read("botdee.html"), /help-popout/);
-  assert.match(read("botdee-upgrade-ui.js"), /function closeMemoryPopout/);
-  assert.match(read("botdee-upgrade-ui.js"), /closeMemoryPopout\(\)/);
-  assert.match(read("bot-dee-chat.css"), /\.botdee-settings-bubble/);
-  assert.match(read("bot-dee-chat.css"), /\.botdee-memory-popout-x/);
-  assert.match(read("bot-dee-chat.css"), /#botDeeChatForm \+ #botDeeMemoryPanel/);
-  assert.match(botdeeHtml, /id="botDeeMemoryPopout"[^>]*\bhidden\b/);
-  assert.ok(
-    botdeeHtml.indexOf("</form>") < botdeeHtml.indexOf('id="botDeeSettingsBubble"')
-      && botdeeHtml.indexOf('id="botDeeSettingsBubble"') < botdeeHtml.indexOf('id="botDeeMemoryPopout"'),
-    "Settings bubble sits under the composer; memory panel is not the next card"
-  );
+  assert.match(read("patron-portal.html"), /id="foBotDeePane"/);
+  assert.match(read("patron-portal.html"), /data-fo-pane="foBotDeePane"/);
+  assert.match(read("patron-portal.html"), /id="botDeeKnowsList"/);
+  assert.match(read("botdee-upgrade-ui.js"), /function loadKnows/);
+  assert.match(read("master-admin.html"), /data-botdee-page="smartviews"/);
+  assert.match(read("master-admin.html"), /id="botDeeMasterSmartViewDemo"/);
+  assert.doesNotMatch(read("master-admin.html"), /Save BOT DEE settings/);
+  assert.match(read("master-feature-services.js"), /showBotDeeMgmtPage/);
 });
 
 test("hasUsedBotDee is integer 0|1 on botDeeThreads and every BOT DEE gate returns it", () => {
@@ -309,8 +293,8 @@ test("hasUsedBotDee is integer 0|1 on botDeeThreads and every BOT DEE gate retur
   assert.match(read("functions/data-classification-functions.js"), /hasUsedBotDee: hasUsedBotDee === 1 \? 1 : 0/);
   assert.match(read("botdee-access.js"), /function requireUsage/);
   assert.match(read("floqr-feature-services.js"), /requireUsage/);
-  assert.match(read("botdee.html"), /id="botDeeSettingsFirstUse"/);
-  assert.match(read("floqr-i18n.js"), /botdee\.settingsFirstUse/);
+  assert.doesNotMatch(read("botdee.html"), /id="botDeeSettingsFirstUse"/);
+  assert.doesNotMatch(read("floqr-i18n.js"), /botdee\.settingsFirstUse/);
   assert.match(read("functions/data-classification-core.js"), /botDeeThreads", "hasUsedBotDee"/);
   assert.match(read("firestore.rules"), /hasUsedBotDee 0\|1/);
 });

@@ -456,8 +456,13 @@
   }
 
   function showFeatureOrdersPane(paneId) {
-    const target = String(paneId || "foStatusPane");
-    ["foStatusPane", "foVipPane", "foShoutoutsPane", "foFloqCastsPane", "foInvoicesPane"].forEach(id => {
+    let target = String(paneId || "foStatusPane");
+    if (target === "foBotDeePane") {
+      const botDeeTab = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foBotDeePane"]');
+      const botDeeOn = botDeeTab && !botDeeTab.hidden && !botDeeTab.classList.contains("hidden");
+      if (!botDeeOn) target = "foStatusPane";
+    }
+    ["foStatusPane", "foVipPane", "foShoutoutsPane", "foFloqCastsPane", "foBotDeePane", "foInvoicesPane"].forEach(id => {
       byId(id)?.classList.toggle("hidden", id !== target);
     });
     document.querySelectorAll("#featureOrdersSubtabs .admin-subtab").forEach(btn => {
@@ -472,6 +477,10 @@
     byId("portalFeatureOrders")?.classList.add("active");
     if (target === "foVipPane") loadVipReservationsPanel();
     if (target === "foStatusPane") renderFeatureOrdersStatus();
+    if (target === "foBotDeePane") {
+      window.FLOQRBotDeeUpgradeUi?.bind?.();
+      window.FLOQRBotDeeUpgradeUi?.loadConsent?.();
+    }
     if (target === "foShoutoutsPane") {
       const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
       if (!activeSub) showShoutoutPane("shoutoutSavedPane");
@@ -494,10 +503,13 @@
     const vipOn = vipBtn && !vipBtn.hidden && !vipBtn.classList.contains("hidden");
     const castBtn = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foFloqCastsPane"]');
     const castOn = castBtn && !castBtn.hidden && !castBtn.classList.contains("hidden");
+    const botDeeTab = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foBotDeePane"]');
+    const botDeeOn = botDeeTab && !botDeeTab.hidden && !botDeeTab.classList.contains("hidden");
     const rows = [
       {label: t("nav.myShoutouts", "My ShoutOuts"), status: shoutStatus, pane: "foShoutoutsPane"},
       vipOn ? {label: t("nav.guestListReserv", "Guest List & reserV"), status: t("portal.fo.periodActive", "Active this period"), pane: "foVipPane"} : null,
       castOn ? {label: t("nav.myFloqCasts", "My FloqCAST"), status: t("portal.fo.periodActive", "Active this period"), pane: "foFloqCastsPane"} : null,
+      botDeeOn ? {label: t("nav.myBotDee", "My BOT DEE"), status: t("portal.fo.periodActive", "Active this period"), pane: "foBotDeePane"} : null,
       {label: t("nav.myInvoices", "My Invoices"), status: t("portal.fo.invoicesHint", "Open for paid receipts"), pane: "foInvoicesPane"}
     ].filter(Boolean);
     host.innerHTML = rows.map(r =>
@@ -580,6 +592,12 @@
       window.FLOQRChromeScheme?.syncAccessGate?.(byId("portalPanel") || document);
       window.FLOQRChromeScheme?.bindToggle?.(byId("portalPanel") || document);
     } catch (_) { /* ignore */ }
+    const botDeeTab = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foBotDeePane"]');
+    const botDeeOn = botDeeTab && !botDeeTab.hidden && !botDeeTab.classList.contains("hidden");
+    if (!botDeeOn && !byId("foBotDeePane")?.classList.contains("hidden")) {
+      showFeatureOrdersPane("foStatusPane");
+    }
+    if (byId("foStatusPane") && !byId("foStatusPane").classList.contains("hidden")) renderFeatureOrdersStatus();
     if (!document.querySelector(".admin-panel-section.active")) showPortalPanel("portalOverview", "portalOverview");
   }
 
@@ -660,6 +678,10 @@
         showFeatureOrdersPane("foInvoicesPane");
       } else if (sub === "floqcast" || sub === "floqcasts") {
         showFeatureOrdersPane("foFloqCastsPane");
+      } else if (["botdee", "bot-dee", "my-botdee", "my-bot-dee"].includes(tab) || sub === "botdee" || sub === "bot-dee") {
+        const botDeeTab = document.querySelector('#featureOrdersSubtabs [data-fo-pane="foBotDeePane"]');
+        const botDeeOn = botDeeTab && !botDeeTab.hidden && !botDeeTab.classList.contains("hidden");
+        showFeatureOrdersPane(botDeeOn ? "foBotDeePane" : "foStatusPane");
       } else {
         showFeatureOrdersPane("foStatusPane");
       }

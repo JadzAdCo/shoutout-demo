@@ -357,7 +357,7 @@
   },
   "help-botdee-memory": {
     "title": "BOT DEE saved chats",
-    "body": "Tap Settings under the chat box to open saved chats and memories. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. You can export or delete it. Close Settings with X or after Save, Export, or Delete. Guests are not saved. Mingl conversations stay in Mingl."
+    "body": "Open Feature & Orders → My BOT DEE to save chats after the pause, export, or delete history. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. Guests are not saved. Mingl conversations stay in Mingl."
   },
   "help-botdee-smartview": {
     "title": "BOT DEE SmartViews",
@@ -382,5 +382,9 @@
   "help-floqr-oidc-floqmedia": {
     "title": "FloqR account for Spatial Studio",
     "body": "Spatial Studio on FloqMedia uses your existing FloqR account. There is no FloqMedia signup. Guest drafts stay in the FloqMedia browser until you confirm attaching them to this FloqR account. FloqR issues a one-time authorization code (PKCE). Access tokens are not stored in the spatial project file."
+  },
+  "help-botdee-knows-of-me": {
+    "title": "What BOT DEE knows of me",
+    "body": "Facts BOT DEE stored with your approval live in Feature & Orders → My BOT DEE. The list is empty if memory is off or nothing is stored. Export or delete facts here. BOT DEE never stores your IP address. Mingl chats are not copied."
   }
 }

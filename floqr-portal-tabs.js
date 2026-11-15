@@ -61,6 +61,10 @@
     pass: "portalFeatureOrders",
     "door-pass": "portalFeatureOrders",
     doorpass: "portalFeatureOrders",
+    botdee: "portalFeatureOrders",
+    "bot-dee": "portalFeatureOrders",
+    "my-botdee": "portalFeatureOrders",
+    "my-bot-dee": "portalFeatureOrders",
     "guest-lists": "portalGuestLists",
     guestlists: "portalGuestLists",
     bartr: "portalBartrStore",
@@ -90,7 +94,8 @@
     foShoutoutsPane: "shoutouts",
     foVipPane: "vip",
     foInvoicesPane: "invoices",
-    foFloqCastsPane: "floqcast"
+    foFloqCastsPane: "floqcast",
+    foBotDeePane: "botdee"
   };
 
   function panelFromTab(tab) {

@@ -57,6 +57,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-knows-of-me": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-memory": [
       "masterAdmin",
       "patron",

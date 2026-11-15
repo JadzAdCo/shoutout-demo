@@ -8,10 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.021"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.021"/>  <script>
+<link rel="stylesheet" href="./styles.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.022"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.022"/>  <script>
     try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
@@ -1535,35 +1536,42 @@
 
       <section id="featuresBotDee" class="admin-panel-section">
         <div class="card">
-          <p class="eyebrow" data-i18n="master.featuresBotDee">BOT DEE</p>
-          <h2
+          <h2 data-i18n="master.featuresBotDee">BOT DEE</h2>
+          <div class="admin-subtabs botdee-mgmt-subtabs" id="botDeeMgmtSubtabs" role="tablist" aria-label="BOT DEE management">
+            <button type="button" class="admin-subtab active" role="tab" aria-selected="true" data-botdee-page="pause" data-i18n="master.botDeeSubPause">Conversation Pause</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-botdee-page="legal" data-i18n="master.botDeeSubLegal">Version &amp; Legal Gates</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-botdee-page="smartviews" data-i18n="master.botDeeSubSmartviews">SMARTviews</button>
+          </div>
+        </div>
+        <div class="card botdee-mgmt-page" data-botdee-page="pause">
+          <h3
             class="brand-mixed-case"
             data-floqr-help-id="help-bot-dee-mgmt"
             data-floqr-help-title="BOT DEE conversation"
-            data-floqr-help-search="bot dee|botdee|idle pause|conversation timeout|bot dee settings|floqai settings"
+            data-floqr-help-search="bot dee|botdee|idle pause|conversation timeout|bot dee settings"
             data-floqr-help-body="Controls how long BOT DEE waits after the last message before ending the chat. After the pause, the next message starts a fresh conversation and BOT DEE may ask how it can help again. Signed-in chats are stored under the patron uid so a refresh or second phone can resume until that pause. Mid-chat replies stay short and do not repeat the offer-help pitch."
-          >Conversation pause</h2>
-          <p class="sub small">After this many seconds with no new message, BOT DEE ends the conversation. Saying hi (or anything) after that starts a fresh chat. Default is 300 seconds (5 minutes). Range 15–600.</p>
+            data-i18n="master.botDeeSubPause"
+          >Conversation Pause</h3>
+          <p class="sub small" data-i18n="master.botDeePauseNote">After this many seconds with no new message, BOT DEE ends the conversation. Saying hi (or anything) after that starts a fresh chat. Default is 300 seconds (5 minutes). Range 15–600.</p>
           <p id="botDeeSettingsStatus" class="status" aria-live="polite"></p>
           <div class="profile-grid">
-            <label>Idle pause (seconds)
+            <label data-i18n="master.botDeeIdleLabel">Idle pause (seconds)
               <input id="botDeeIdleSeconds" type="number" min="15" max="600" step="1" value="300" inputmode="numeric"/>
             </label>
           </div>
           <p class="button-row">
-            <button type="button" id="botDeeSettingsSave" class="primary">Save BOT DEE settings</button>
-            <button type="button" id="botDeeSettingsReload" class="buttonlike">Reload</button>
+            <button type="button" id="botDeeSettingsSave" class="primary" data-i18n="app.save">Save</button>
+            <button type="button" id="botDeeSettingsReload" class="buttonlike" data-i18n="dataClass.reload">Reload</button>
           </p>
           <p class="sub small" id="botDeeSettingsMeta"></p>
         </div>
-        <div class="card">
-          <p class="eyebrow">BOT DEE</p>
-          <h2 class="brand-mixed-case">Version and legal gates</h2>
-          <p class="sub small">Capability registry is code-derived. New six-phase work is implemented on this branch and is not production-deployed until you approve. Every third-party provider stays mock-only until you record license evidence.</p>
+        <div class="card botdee-mgmt-page hidden" data-botdee-page="legal" hidden>
+          <h3 class="brand-mixed-case" data-i18n="master.botDeeSubLegal">Version &amp; Legal Gates</h3>
+          <p class="sub small" data-i18n="master.botDeeLegalIntro">Capability registry is code-derived. New six-phase work is not production-deployed until you approve. Every third-party provider stays mock-only until you record license evidence.</p>
           <p id="botDeeManifestStatus" class="status" aria-live="polite"></p>
           <pre id="botDeeManifestPre" class="report-block" style="white-space:pre-wrap;max-height:18rem;overflow:auto"></pre>
           <p class="button-row">
-            <button type="button" id="botDeeManifestReload" class="buttonlike">Reload capability report</button>
+            <button type="button" id="botDeeManifestReload" class="buttonlike" data-i18n="master.botDeeReloadManifest">Reload capability report</button>
           </p>
           <p id="botDeeLegalPrompt" class="sub small"></p>
           <div class="report-block">
@@ -1587,10 +1595,10 @@
             <label><input id="botDeeLegalApprove" type="checkbox"/> Mark approved (still mock-only without evidence)</label>
           </div>
           <p class="button-row">
-            <button type="button" id="botDeeLegalSave" class="primary">Save legal gate</button>
+            <button type="button" id="botDeeLegalSave" class="primary" data-i18n="master.botDeeSaveLegalGate">Save legal gate</button>
           </p>
-          <h3 class="brand-mixed-case">Later-fill integration slots</h3>
-          <p class="sub small">Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner, and Eventbrite stay mock until enabled=1, the named Firebase secret is present, and a legal evidence ref is saved. Do not paste API keys here. Missing or unknown slots stay mock. Live vendor HTTP is not wired.</p>
+          <h4 class="brand-mixed-case" data-i18n="master.botDeeSlotsTitle">Later-fill integration slots</h4>
+          <p class="sub small" data-i18n="master.botDeeSlotsNote">Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner, and Eventbrite stay mock until enabled=1, the named Firebase secret is present, and a legal evidence ref is saved. Do not paste API keys here. Live vendor HTTP is not wired.</p>
           <div class="report-block">
             <table class="admin-table" id="botDeeSlotTable">
               <thead>
@@ -1623,8 +1631,17 @@
             </label>
           </div>
           <p class="button-row">
-            <button type="button" id="botDeeSlotSave" class="primary">Save integration slot</button>
+            <button type="button" id="botDeeSlotSave" class="primary" data-i18n="master.botDeeSaveSlot">Save integration slot</button>
           </p>
+        </div>
+        <div class="card botdee-mgmt-page hidden" data-botdee-page="smartviews" hidden>
+          <h3 class="brand-mixed-case" data-i18n="master.botDeeSubSmartviews">SMARTviews</h3>
+          <p class="sub small" data-i18n="botdee.smartviewResearchDisabled">Public Web Research stays off until legal and identity review. Venue cards open the existing FLOQR Public Page.</p>
+          <p class="sub small" data-i18n="botdee.explainTitle">Explain My Recommendation uses the sources and preferences shown on each card. Ads are labeled. You can ask for non-personalized results.</p>
+          <p class="botdee-upgrade-actions">
+            <button type="button" id="botDeeMasterLoadSmartViews" class="buttonlike" data-i18n="botdee.libraryRefresh">Show mock SmartViews</button>
+          </p>
+          <div id="botDeeMasterSmartViewDemo" class="botdee-sv-host report-block" aria-live="polite"></div>
         </div>
       </section>
 
@@ -2216,61 +2233,63 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.3.021"></script>
-<script src="./firebase-config.js?v=s3.3.021"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.021"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.021"></script>
-<script src="./floqr-app-check.js?v=s3.3.021"></script>
-<script src="./floqr-nav.js?v=s3.3.021"></script>
-<script src="./global-profile-status.js?v=s3.3.021"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.021"></script>
-<script src="./shared-data.js?v=s3.3.021"></script>
-<script src="./feature-gates.js?v=s3.3.021"></script>
-<script src="./sos2fa.js?v=s3.3.021"></script>
-<script src="./entity-management.js?v=s3.3.021"></script>
-<script src="./ai-service.js?v=s3.3.021"></script>
-<script src="./ai-index-service.js?v=s3.3.021"></script>
-<script src="./ai-search-service.js?v=s3.3.021"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.3.021"></script>
-<script src="./floqr-discovery-gates.js?v=s3.3.021"></script>
-<script src="./ai-discovery-service.js?v=s3.3.021"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.021"></script>
-<script src="./botdee-help-repository.js?v=s3.3.021"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.021"></script>
-<script src="./help-attach.js?v=s3.3.021"></script>
-<script src="./helper-popouts.js?v=s3.3.021"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.021"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.021"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.021"></script>
-<script src="./ad-campaigns.js?v=s3.3.021"></script>
-<script src="./ai-diagnostics-service.js?v=s3.3.021"></script>
-<script src="./master-admin-rollup.js?v=s3.3.021"></script>
-<script src="./duplicate-record-service.js?v=s3.3.021"></script>
-<script src="./floqr-logger.js?v=s3.3.021"></script>
-<script src="./payment-service.js?v=s3.3.021"></script>
-<script src="./floqr-access-notice.js?v=s3.3.021"></script>
-<script src="./master-admin-app.js?v=s3.3.021"></script>
-<script src="./master-ad-management.js?v=s3.3.021"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.3.021"></script>
-<script src="./floqr-feature-services.js?v=s3.3.021"></script>
-<script src="./floqr-reason-prompt.js?v=s3.3.021"></script>
-<script src="./master-feature-services.js?v=s3.3.021"></script>
-<script src="./master-demo-employees.js?v=s3.3.021"></script>
-<script src="./floqr-data-classification.js?v=s3.3.021"></script>
-<script src="./master-data-classification.js?v=s3.3.021"></script>
-<script src="./master-admin-shoutouts.js?v=s3.3.021"></script>
-<script src="./floqr-critical-log-blink.js?v=s3.3.021"></script>
-<script src="./master-display-security.js?v=s3.3.021"></script>
-<script src="./master-diagnostics-panels.js?v=s3.3.021"></script>
-<script src="./master-services-extension.js?v=s3.3.021"></script>
-<script src="./master-logging-extension.js?v=s3.3.021"></script>
-<script src="./master-floqcast-logging.js?v=s3.3.021"></script>
-<script src="./master-shoutout-logging.js?v=s3.3.021"></script>
-<script src="./master-aicrawl-logging.js?v=s3.3.021"></script>
-<script src="./master-mail-logging.js?v=s3.3.021"></script>
-<script src="./master-twilio-logging.js?v=s3.3.021"></script>
-<script src="./notification-center.js?v=s3.3.021"></script>
-<script src="./profile-access-guard.js?v=s3.3.021"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+<script src="./floqr-i18n.js?v=s3.3.022"></script>
+<script src="./firebase-config.js?v=s3.3.022"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.022"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.022"></script>
+<script src="./floqr-app-check.js?v=s3.3.022"></script>
+<script src="./floqr-nav.js?v=s3.3.022"></script>
+<script src="./global-profile-status.js?v=s3.3.022"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.022"></script>
+<script src="./shared-data.js?v=s3.3.022"></script>
+<script src="./feature-gates.js?v=s3.3.022"></script>
+<script src="./sos2fa.js?v=s3.3.022"></script>
+<script src="./entity-management.js?v=s3.3.022"></script>
+<script src="./ai-service.js?v=s3.3.022"></script>
+<script src="./ai-index-service.js?v=s3.3.022"></script>
+<script src="./ai-search-service.js?v=s3.3.022"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.3.022"></script>
+<script src="./floqr-discovery-gates.js?v=s3.3.022"></script>
+<script src="./ai-discovery-service.js?v=s3.3.022"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.022"></script>
+<script src="./botdee-help-repository.js?v=s3.3.022"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.022"></script>
+<script src="./help-attach.js?v=s3.3.022"></script>
+<script src="./helper-popouts.js?v=s3.3.022"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.022"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.022"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.022"></script>
+<script src="./ad-campaigns.js?v=s3.3.022"></script>
+<script src="./ai-diagnostics-service.js?v=s3.3.022"></script>
+<script src="./master-admin-rollup.js?v=s3.3.022"></script>
+<script src="./duplicate-record-service.js?v=s3.3.022"></script>
+<script src="./floqr-logger.js?v=s3.3.022"></script>
+<script src="./payment-service.js?v=s3.3.022"></script>
+<script src="./floqr-access-notice.js?v=s3.3.022"></script>
+<script src="./master-admin-app.js?v=s3.3.022"></script>
+<script src="./master-ad-management.js?v=s3.3.022"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.3.022"></script>
+<script src="./floqr-feature-services.js?v=s3.3.022"></script>
+<script src="./floqr-reason-prompt.js?v=s3.3.022"></script>
+<script src="./botdee-smartview.js?v=s3.3.022"></script>
+<script src="./botdee-upgrade-ui.js?v=s3.3.022"></script>
+<script src="./master-feature-services.js?v=s3.3.022"></script>
+<script src="./master-demo-employees.js?v=s3.3.022"></script>
+<script src="./floqr-data-classification.js?v=s3.3.022"></script>
+<script src="./master-data-classification.js?v=s3.3.022"></script>
+<script src="./master-admin-shoutouts.js?v=s3.3.022"></script>
+<script src="./floqr-critical-log-blink.js?v=s3.3.022"></script>
+<script src="./master-display-security.js?v=s3.3.022"></script>
+<script src="./master-diagnostics-panels.js?v=s3.3.022"></script>
+<script src="./master-services-extension.js?v=s3.3.022"></script>
+<script src="./master-logging-extension.js?v=s3.3.022"></script>
+<script src="./master-floqcast-logging.js?v=s3.3.022"></script>
+<script src="./master-shoutout-logging.js?v=s3.3.022"></script>
+<script src="./master-aicrawl-logging.js?v=s3.3.022"></script>
+<script src="./master-mail-logging.js?v=s3.3.022"></script>
+<script src="./master-twilio-logging.js?v=s3.3.022"></script>
+<script src="./notification-center.js?v=s3.3.022"></script>
+<script src="./profile-access-guard.js?v=s3.3.022"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>
 </body>
 </html>
