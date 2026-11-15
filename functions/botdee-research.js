@@ -4,12 +4,20 @@
 "use strict";
 
 const {PROVIDER_GATES} = require("./botdee-upgrade-manifest");
+const slots = require("./botdee-provider-slots");
 
 const GATE_STATUSES = Object.freeze(["unknown", "blocked", "approved", "revoked"]);
 const FEEDBACK = Object.freeze(["relevant", "not_relevant", "incorrect_match"]);
 
+function canonicalProviderId(id) {
+  const raw = String(id || "").trim();
+  if (raw === "ticketmaster") return "ticketmaster_discovery";
+  return raw;
+}
+
 function normalizeGate(row) {
-  const base = PROVIDER_GATES.find(p => p.id === row?.id) || {
+  const id = canonicalProviderId(row?.id);
+  const base = PROVIDER_GATES.find(p => p.id === id) || {
     id: String(row?.id || "unknown"),
     label: String(row?.label || "Unknown provider"),
     intended: "",
@@ -23,7 +31,8 @@ function normalizeGate(row) {
     ...row,
     id: base.id,
     status: approved ? "approved" : (status === "approved" ? "blocked" : status),
-    mode: approved ? "live_allowed" : "mock_only",
+    mode: "mock_only",
+    liveVendorHttp: false,
     evidenceRecorded: !!row?.evidenceRecorded,
     askedMasterAdmin: true
   };
@@ -35,8 +44,9 @@ function gateMatrix(overrides) {
 }
 
 function mayCallProvider(gates, providerId) {
-  const row = (gates || gateMatrix()).find(g => g.id === providerId);
-  return !!(row && row.status === "approved" && row.mode === "live_allowed");
+  void gates;
+  void providerId;
+  return false;
 }
 
 function mockGroundedSearch({query, subjectType}) {
@@ -113,6 +123,7 @@ const MASTER_ADMIN_GATE_PROMPT =
 module.exports = {
   GATE_STATUSES,
   FEEDBACK,
+  canonicalProviderId,
   normalizeGate,
   gateMatrix,
   mayCallProvider,
@@ -120,5 +131,6 @@ module.exports = {
   feedbackRecord,
   identityAssociation,
   disputeRecord,
-  MASTER_ADMIN_GATE_PROMPT
+  MASTER_ADMIN_GATE_PROMPT,
+  slots
 };

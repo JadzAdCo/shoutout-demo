@@ -1589,6 +1589,42 @@
           <p class="button-row">
             <button type="button" id="botDeeLegalSave" class="primary">Save legal gate</button>
           </p>
+          <h3 class="brand-mixed-case">Later-fill integration slots</h3>
+          <p class="sub small">Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner, and Eventbrite stay mock until enabled=1, the named Firebase secret is present, and a legal evidence ref is saved. Do not paste API keys here. Missing or unknown slots stay mock. Live vendor HTTP is not wired.</p>
+          <div class="report-block">
+            <table class="admin-table" id="botDeeSlotTable">
+              <thead>
+                <tr>
+                  <th scope="col">Provider</th>
+                  <th scope="col">Enabled</th>
+                  <th scope="col">Secret name</th>
+                  <th scope="col">Secret present</th>
+                  <th scope="col">Evidence ref</th>
+                  <th scope="col">Expires</th>
+                  <th scope="col">Mode</th>
+                </tr>
+              </thead>
+              <tbody id="botDeeSlotBody"></tbody>
+            </table>
+          </div>
+          <div class="profile-grid">
+            <label>Fill slot
+              <select id="botDeeSlotProvider"></select>
+            </label>
+            <label><input id="botDeeSlotEnabled" type="checkbox"/> Enable slot (0 → 1)</label>
+            <label>Legal evidence ref
+              <input id="botDeeSlotEvidenceRef" type="text" maxlength="200" placeholder="desk ticket / counsel memo id"/>
+            </label>
+            <label>Billing account ref
+              <input id="botDeeSlotBillingRef" type="text" maxlength="200" placeholder="GCP billing / vendor account id"/>
+            </label>
+            <label>Expires (optional)
+              <input id="botDeeSlotExpires" type="date"/>
+            </label>
+          </div>
+          <p class="button-row">
+            <button type="button" id="botDeeSlotSave" class="primary">Save integration slot</button>
+          </p>
         </div>
       </section>
 

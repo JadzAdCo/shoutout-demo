@@ -711,6 +711,7 @@
     byId("botDeeSettingsReload")?.addEventListener("click", () => loadBotDeeSettings());
     byId("botDeeManifestReload")?.addEventListener("click", () => loadBotDeeManifest());
     byId("botDeeLegalSave")?.addEventListener("click", () => saveBotDeeLegalGate());
+    byId("botDeeSlotSave")?.addEventListener("click", () => saveBotDeeProviderSlot());
     if (typeof window.matchMedia === "function") {
       const mq = window.matchMedia("(max-width: 1024px)");
       const onMq = () => syncInviteFeaturesVisibility();
@@ -805,6 +806,7 @@
     const pre = byId("botDeeManifestPre");
     const prompt = byId("botDeeLegalPrompt");
     const body = byId("botDeeLegalBody");
+    const slotBody = byId("botDeeSlotBody");
     if (!isUnlocked()) {
       setStatus("botDeeManifestStatus", "Unlock with SOS2FA to load the BOT DEE capability report.");
       return;
@@ -832,9 +834,34 @@
           select.appendChild(opt);
         });
       }
+      try {
+        const slotData = await call("getBotDeeProviderSlots", {});
+        if (slotBody) {
+          slotBody.innerHTML = (slotData.slots || []).map(row => `<tr>
+          <td>${esc(row.label)}</td>
+          <td>${row.enabled === 1 ? "1" : "0"}</td>
+          <td>${esc(row.secretName)}</td>
+          <td>${row.secretPresent === 1 ? "1" : "0"}</td>
+          <td>${esc(row.legalEvidenceRef || "missing")}</td>
+          <td>${row.expiresAtMs ? new Date(row.expiresAtMs).toISOString().slice(0, 10) : "none"}</td>
+          <td>${esc(row.mode)}</td>
+        </tr>`).join("");
+        }
+        const slotSelect = byId("botDeeSlotProvider");
+        if (slotSelect && !slotSelect.options.length) {
+          (slotData.slots || []).forEach(row => {
+            const opt = document.createElement("option");
+            opt.value = row.id;
+            opt.textContent = row.label;
+            slotSelect.appendChild(opt);
+          });
+        }
+      } catch (slotError) {
+        if (slotBody) slotBody.innerHTML = `<tr><td colspan="7">${esc(errorText(slotError))}</td></tr>`;
+      }
       setStatus("botDeeManifestStatus", data.manifest?.deployedClaim
         ? "Registry claims a production deploy — verify Diagnostics."
-        : "Not production-deployed. Providers remain mock-only until evidence is recorded.");
+        : "Not production-deployed. Providers remain mock-only until a slot is filled and live HTTP is separately wired.");
     } catch (error) {
       setStatus("botDeeManifestStatus", errorText(error));
     }
@@ -872,6 +899,51 @@
       setStatus("botDeeManifestStatus", evidenceRecorded && status === "approved"
         ? "Gate saved. Live APIs still need a Functions deploy after owner approval."
         : "Gate saved as mock-only.");
+    } catch (error) {
+      setStatus("botDeeManifestStatus", errorText(error));
+    }
+  }
+
+  async function saveBotDeeProviderSlot() {
+    if (!isUnlocked()) {
+      setStatus("botDeeManifestStatus", "Unlock with SOS2FA to save an integration slot.");
+      return;
+    }
+    const providerId = String(byId("botDeeSlotProvider")?.value || "").trim();
+    if (!providerId) {
+      setStatus("botDeeManifestStatus", "Pick a fill slot.");
+      return;
+    }
+    const promptApi = root.FLOQRReasonPrompt;
+    if (!promptApi?.ask) {
+      setStatus("botDeeManifestStatus", "Reason prompt is unavailable — nothing was saved.");
+      return;
+    }
+    const enabled = byId("botDeeSlotEnabled")?.checked ? 1 : 0;
+    const legalEvidenceRef = String(byId("botDeeSlotEvidenceRef")?.value || "").trim();
+    const billingAccountRef = String(byId("botDeeSlotBillingRef")?.value || "").trim();
+    const expiresRaw = String(byId("botDeeSlotExpires")?.value || "").trim();
+    const expiresAtMs = expiresRaw ? Date.parse(`${expiresRaw}T23:59:59.000Z`) : 0;
+    const reason = await promptApi.ask({
+      summary: `BOT DEE slot ${providerId}: enabled ${enabled} · evidence ${legalEvidenceRef || "missing"}`,
+      minLength: REASON_MIN
+    });
+    if (reason === null) {
+      setStatus("botDeeManifestStatus", "Cancelled — nothing was saved.");
+      return;
+    }
+    setStatus("botDeeManifestStatus", "Saving integration slot…");
+    try {
+      await call("setBotDeeProviderSlot", {
+        providerId,
+        enabled,
+        legalEvidenceRef,
+        billingAccountRef,
+        expiresAtMs: Number.isFinite(expiresAtMs) ? expiresAtMs : 0,
+        reason
+      });
+      await loadBotDeeManifest();
+      setStatus("botDeeManifestStatus", "Slot saved. Runtime stays mock until enabled=1, the named secret is present, evidence is saved, and live HTTP is separately wired.");
     } catch (error) {
       setStatus("botDeeManifestStatus", errorText(error));
     }

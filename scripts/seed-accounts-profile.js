@@ -161,6 +161,22 @@ const CATALOG = [
     manual: []
   },
   {
+    id: "botDeeProviders",
+    label: "BOT DEE later-fill vendor keys (mock until slot enabled)",
+    fields: [
+      f("googlePlaces", "Google Places API key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_GOOGLE_PLACES_API_KEY"}, where: "Google Cloud Console → APIs → Places API (New) → Credentials. Do not enable live HTTP until legal evidence is recorded."}),
+      f("geminiGrounding", "Gemini Search grounding key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_GEMINI_GROUNDING_API_KEY"}, where: "Google AI Studio / Vertex grounding. Separate from existing ShoutOut Gemini use."}),
+      f("yelp", "Yelp Places API key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_YELP_API_KEY"}, where: "Yelp developer / Places Enterprise. Paid license, not a scrape."}),
+      f("ticketmasterDiscovery", "Ticketmaster Discovery API key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_TICKETMASTER_DISCOVERY_API_KEY"}, where: "developer.ticketmaster.com → Discovery v2. Not a ticket-sales license."}),
+      f("ticketmasterPartner", "Ticketmaster Partner API key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_TICKETMASTER_PARTNER_API_KEY"}, where: "Ticketmaster Partner / distribution contract only."}),
+      f("eventbrite", "Eventbrite API key", {secret: true, required: false, wired: false, format: "token", target: {type: "firebaseSecret", name: "BOTDEE_EVENTBRITE_API_KEY"}, where: "Eventbrite Account Settings → Developer Links → API Keys."})
+    ],
+    manual: [
+      {key: "legalEvidenceRecorded", label: "Master Admin recorded legalEvidenceRef on each enabled BOT DEE fill slot (Features Mgmt → BOT DEE)"},
+      {key: "liveHttpNotWired", label: "Confirm runtime adapters are still mock-only until a later Functions change explicitly adds vendor HTTP"}
+    ]
+  },
+  {
     id: "gcpDisplaySigner",
     label: "Google Cloud IAM — display token signer",
     fields: [

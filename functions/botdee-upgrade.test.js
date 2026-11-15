@@ -163,6 +163,10 @@ test("Phase 5 SmartViews: ten kinds, venue canonical page, patron research disab
 
 test("Phase 4 research: mock only, votes are not consent, name is not identity", () => {
   assert.equal(research.mayCallProvider(research.gateMatrix(), "google_places"), false);
+  assert.equal(research.canonicalProviderId("ticketmaster"), "ticketmaster_discovery");
+  assert.ok(research.gateMatrix().some(row => row.id === "ticketmaster_discovery"));
+  assert.ok(research.gateMatrix().some(row => row.id === "ticketmaster_partner"));
+  assert.ok(research.gateMatrix().every(row => row.mode === "mock_only" && row.liveVendorHttp === false));
   const search = research.mockGroundedSearch({query: "Ada Lovelace", subjectType: "person"});
   assert.equal(search.scrapedAiMode, false);
   assert.equal(search.identityMatched, false);
@@ -188,23 +192,72 @@ test("Phase 6 actions: existing FLOQR tools, no card data, mock partners", () =>
   assert.equal(denied.ok, false);
 });
 
+test("later-fill provider slots stay mock without enabled+secret+evidence", () => {
+  const slots = require("./botdee-provider-slots");
+  const empty = slots.normalizeSlot({id: "google_places"}, {}, 1_000);
+  assert.equal(empty.enabled, 0);
+  assert.equal(empty.secretPresent, 0);
+  assert.equal(empty.slotReady, false);
+  assert.equal(empty.mode, "mock_only");
+  assert.equal(empty.httpAllowed, false);
+  const filled = slots.normalizeSlot({
+    id: "yelp",
+    enabled: 1,
+    legalEvidenceRef: "counsel-memo-yelp-1",
+    expiresAtMs: 2_000
+  }, {BOTDEE_YELP_API_KEY: "present-not-echoed"}, 1_000);
+  assert.equal(filled.slotReady, true);
+  assert.equal(filled.secretPresent, 1);
+  assert.equal(filled.mode, "mock_only");
+  const expired = slots.normalizeSlot({
+    id: "eventbrite",
+    enabled: 1,
+    legalEvidenceRef: "eb-1",
+    expiresAtMs: 500
+  }, {BOTDEE_EVENTBRITE_API_KEY: "x"}, 1_000);
+  assert.equal(expired.slotReady, false);
+  assert.equal(expired.expired, true);
+  const unknown = slots.normalizeSlot({id: "not_a_vendor"}, {}, 1_000);
+  assert.equal(unknown.known, false);
+  assert.equal(unknown.mode, "mock_only");
+  const rejected = slots.sanitizeSlotWrite({enabled: 1, apiKey: "paste-me"}, "google_places");
+  assert.equal(rejected.ok, false);
+  const mock = slots.runMockAdapter({
+    providerId: "gemini_grounding",
+    query: "clubs",
+    slot: filled
+  });
+  assert.equal(mock.httpCalled, false);
+  assert.equal(mock.mode, "mock_only");
+  assert.equal(slots.FILL_IDS.includes("ticketmaster_discovery"), true);
+  assert.equal(slots.FILL_IDS.includes("ticketmaster_partner"), true);
+  assert.doesNotMatch(read("functions/botdee-provider-slots.js"), /\bfetch\s*\(|axios|https\.request|www\.googleapis\.com|api\.yelp\.com|app\.ticketmaster\.com|www\.eventbriteapi\.com/);
+  assert.doesNotMatch(read("functions/botdee-research.js"), /\bfetch\s*\(|axios|https\.request/);
+});
+
 test("wiring: new callables exported and rules classified collections exist", () => {
   const index = read("functions/index.js");
   assert.match(index, /getBotDeeCapabilityManifest/);
   assert.match(index, /setBotDeeConsent/);
   assert.match(index, /exportBotDeeData/);
   assert.match(index, /getBotDeeLegalGates/);
+  assert.match(index, /getBotDeeProviderSlots/);
+  assert.match(index, /setBotDeeProviderSlot/);
   const rules = read("firestore.rules");
   assert.match(rules, /match \/botDeeThreads\/\{threadId\}/);
   assert.match(rules, /match \/archive\/\{messageId\}/);
   assert.match(rules, /match \/memories\/\{memoryId\}/);
   assert.match(rules, /match \/botDeeLegalGates\/\{providerId\}/);
+  assert.match(rules, /match \/botDeeProviderSlots\/\{providerId\}/);
   assert.match(rules, /match \/botDeeCapabilityManifest\/\{docId\}/);
   assert.match(read("functions/data-classification-core.js"), /botDeeThreads\/archive/);
   assert.match(read("functions/data-classification-core.js"), /botDeeLegalGates/);
+  assert.match(read("functions/data-classification-core.js"), /botDeeProviderSlots/);
   assert.doesNotMatch(read("functions/botdee-upgrade-functions.js"), /request\.rawRequest\.ip|clientIp/);
   assert.match(read("master-admin.html"), /id="botDeeLegalSave"/);
+  assert.match(read("master-admin.html"), /id="botDeeSlotSave"/);
   assert.match(read("master-feature-services.js"), /setBotDeeLegalGate/);
+  assert.match(read("master-feature-services.js"), /setBotDeeProviderSlot/);
   assert.match(read("botdee.html"), /id="botDeeMemoryPanel"/);
   assert.match(read("botdee.html"), /floqr-session-shell\.js/);
   assert.doesNotMatch(read("botdee.html"), /help-popout/);

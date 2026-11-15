@@ -427,6 +427,83 @@
       },
       "manual": {}
     },
+    "botDeeProviders": {
+      "_label": "BOT DEE later-fill vendor keys (mock until slot enabled)",
+      "fields": {
+        "googlePlaces": {
+          "value": "",
+          "description": "Google Places API key",
+          "whereToGet": "Google Cloud Console → APIs → Places API (New) → Credentials. Do not enable live HTTP until legal evidence is recorded.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_GOOGLE_PLACES_API_KEY",
+          "readByCodeToday": false
+        },
+        "geminiGrounding": {
+          "value": "",
+          "description": "Gemini Search grounding key",
+          "whereToGet": "Google AI Studio / Vertex grounding. Separate from existing ShoutOut Gemini use.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_GEMINI_GROUNDING_API_KEY",
+          "readByCodeToday": false
+        },
+        "yelp": {
+          "value": "",
+          "description": "Yelp Places API key",
+          "whereToGet": "Yelp developer / Places Enterprise. Paid license, not a scrape.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_YELP_API_KEY",
+          "readByCodeToday": false
+        },
+        "ticketmasterDiscovery": {
+          "value": "",
+          "description": "Ticketmaster Discovery API key",
+          "whereToGet": "developer.ticketmaster.com → Discovery v2. Not a ticket-sales license.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_TICKETMASTER_DISCOVERY_API_KEY",
+          "readByCodeToday": false
+        },
+        "ticketmasterPartner": {
+          "value": "",
+          "description": "Ticketmaster Partner API key",
+          "whereToGet": "Ticketmaster Partner / distribution contract only.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_TICKETMASTER_PARTNER_API_KEY",
+          "readByCodeToday": false
+        },
+        "eventbrite": {
+          "value": "",
+          "description": "Eventbrite API key",
+          "whereToGet": "Eventbrite Account Settings → Developer Links → API Keys.",
+          "secret": true,
+          "required": false,
+          "format": "single-line token, 8+ characters, no spaces",
+          "target": "Firebase secret BOTDEE_EVENTBRITE_API_KEY",
+          "readByCodeToday": false
+        }
+      },
+      "manual": {
+        "legalEvidenceRecorded": {
+          "value": false,
+          "description": "Master Admin recorded legalEvidenceRef on each enabled BOT DEE fill slot (Features Mgmt → BOT DEE)",
+          "target": "Console-only manual step"
+        },
+        "liveHttpNotWired": {
+          "value": false,
+          "description": "Confirm runtime adapters are still mock-only until a later Functions change explicitly adds vendor HTTP",
+          "target": "Console-only manual step"
+        }
+      }
+    },
     "gcpDisplaySigner": {
       "_label": "Google Cloud IAM — display token signer",
       "fields": {

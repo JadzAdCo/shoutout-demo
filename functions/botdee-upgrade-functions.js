@@ -8,6 +8,7 @@ const bot = require("./bot-dee-core");
 const threads = require("./bot-dee-thread");
 const memory = require("./botdee-memory");
 const research = require("./botdee-research");
+const slots = require("./botdee-provider-slots");
 const smart = require("./botdee-smartview-core");
 const manifest = require("./botdee-upgrade-manifest");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
@@ -283,7 +284,25 @@ exports.getBotDeeLegalGates = onCall(CALL_OPTS, async request => {
   }
 });
 
-exports.setBotDeeLegalGate = onCall(CALL_OPTS, async request => {
+exports.getBotDeeProviderSlots = onCall(CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    if (!isServerAdminAuth(request.auth)) {
+      throw new HttpsError("permission-denied", "Master Admin only.");
+    }
+    const snap = await db.collection("botDeeProviderSlots").get();
+    const overrides = {};
+    snap.docs.forEach(doc => {
+      overrides[doc.id] = {id: doc.id, ...doc.data()};
+    });
+    const matrix = slots.slotMatrix(overrides, process.env, Date.now()).map(slots.publicSlot);
+    return {ok: true, slots: matrix};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.setBotDeeProviderSlot = onCall(CALL_OPTS, async request => {
   try {
     if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
     if (!isServerAdminAuth(request.auth)) {
@@ -295,6 +314,43 @@ exports.setBotDeeLegalGate = onCall(CALL_OPTS, async request => {
       throw new HttpsError("invalid-argument", `Enter a reason of at least ${REASON_MIN} characters.`);
     }
     const providerId = String(request.data?.providerId || "").trim();
+    const sanitized = slots.sanitizeSlotWrite(request.data, providerId);
+    if (!sanitized.ok) {
+      const message = sanitized.error === "secret_value_rejected"
+        ? "Do not paste API keys here. Store the secret with the accounts profile, then save the slot."
+        : "Unknown provider slot.";
+      throw new HttpsError("invalid-argument", message);
+    }
+    const now = Date.now();
+    const row = {
+      ...sanitized.row,
+      updatedAtMs: now,
+      updatedByEmail: email || request.auth.token?.email || "",
+      lastChangeReason: reason.slice(0, 500)
+    };
+    await db.collection("botDeeProviderSlots").doc(providerId).set({
+      ...row,
+      updatedAt: FieldValue.serverTimestamp()
+    }, {merge: true});
+    const resolved = slots.publicSlot(slots.normalizeSlot(row, process.env, now));
+    return {ok: true, slot: resolved};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.setBotDeeLegalGate = onCall(CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    if (!isServerAdminAuth(request.auth)) {
+      throw new HttpsError("permission-denied", "Master Admin only.");
+    }
+    const {email} = await assertSos2faSession(request);
+    const reason = String(request.data?.reason || "").trim();
+    if (reason.length < REASON_MIN) {
+      throw new HttpsError("invalid-argument", `Enter a reason of at least ${REASON_MIN} characters.`);
+    }
+    const providerId = research.canonicalProviderId(request.data?.providerId);
     const known = manifest.PROVIDER_GATES.some(row => row.id === providerId);
     if (!known) throw new HttpsError("invalid-argument", "Unknown provider.");
     const evidenceRecorded = request.data?.evidenceRecorded === true;
