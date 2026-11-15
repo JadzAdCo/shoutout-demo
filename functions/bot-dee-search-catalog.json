@@ -350,6 +350,9 @@
         "bot dee settings",
         "botdee mgmt",
         "idle pause",
+        "provider slot",
+        "api key slot",
+        "ticketmaster discovery",
         "bot dee master admin",
         "help-bot-dee-mgmt"
       ]
