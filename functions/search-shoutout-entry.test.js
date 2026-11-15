@@ -21,12 +21,13 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
-  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast
-  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"/);
+  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast · 6 Si-nema
+  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"[\s\S]*?id="sinemaBtnCard"/);
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
   assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
   assert.match(page, /id="floqcastBtnCard"[^>]*class="shoutout-icon-card floqcast-icon-card[^"]*"[\s\S]*floqcast-nightlife\.jpg/);
+  assert.match(page, /id="sinemaBtnCard"[^>]*class="shoutout-icon-card sinema-icon-card hidden"[^>]*data-feature-key="sinema"[\s\S]*sinema-nightlife\.jpg/);
   assert.match(page, /id="vipReservBtnCard"[^>]*>[\s\S]*vip-icon-face--mark-only[\s\S]*vip-nightlife\.jpg/);
   assert.doesNotMatch(page, /id="vipReservBtnCard"[\s\S]*vip-icon-word/);
   assert.match(page, /id="intentSearchBtnCard"[^>]*botdee-icon-card[\s\S]*botdee-nightlife\.jpg/);
@@ -46,8 +47,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /\.floqr-back-btn,/);
   assert.match(css, /\.search-icon-row\{/);
   assert.match(css, /html\[data-floqr-chrome="traditional"\]/);
-  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*background:transparent/);
-  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face\{[^}]*rgba\(0,200,255/);
+  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face,\.sinema-icon-face\{[^}]*background:transparent/);
+  assert.match(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face,\.sinema-icon-face\{[^}]*rgba\(0,200,255/);
   assert.match(css, /--floqr-tile-cyan:#00c8ff/);
   assert.match(css, /--floqr-brand-gradient-h:linear-gradient/);
   assert.match(css, /html\[data-floqr-chrome="blackTiffany"\]\{[\s\S]*--accent:var\(--floqr-tile-cyan\)/);
@@ -55,7 +56,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(css, /html\[data-floqr-chrome="purpleWhite"\]\{/);
   assert.match(css, /html\[data-floqr-chrome="blackDarkGreen"\]\{[\s\S]*--accent:#5ac783/);
   assert.doesNotMatch(css, /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face(?:,\.settings-icon-face)?\{[^}]*background:#000/);
-  assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?\{/);
+  assert.match(css, /\.vip-icon-face\.vip-icon-face--mark-only(?:,\.shoutout-icon-face\.chrome-photo-face)?(?:,\.sinema-icon-face\.sinema-icon-face--mark-only)?\{/);
   assert.match(css, /max-width:900px\)[\s\S]*calc\(\(100% - 20px\) \/ 3\)/);
   assert.match(css, /max-width:1180px\)[\s\S]*#categoryPage\.page\.active[\s\S]*margin-top:auto!important/, "phones/tablets pin Search icon row to viewport bottom");
   assert.match(css, /min-width:1181px\)[\s\S]*#categoryPage\.page\.active \.category-grid\.compact-category-grid:has\(\.search-icon-row\)\{[\s\S]*margin-top:28px!important/, "wide desktop keeps icons under Search");
@@ -88,6 +89,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(patronApp, /userDropdownHasContent/);
   assert.match(chrome, /shoutout-traditional-green\.png/);
   assert.match(chrome, /shoutout-nightlife\.png/);
+  assert.match(chrome, /sinema-nightlife\.jpg/);
+  assert.match(chrome, /sinema-whiteblack\.jpg/);
   const portal = read("patron-portal.html");
   assert.match(portal, /data-floqr-theme-panel/);
   assert.match(portal, /data-floqr-chrome-btn="traditional"/);

@@ -20,8 +20,8 @@
     {key: "passes", label: "Passes", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=passes", sortOrder: 75, IsFeatureEnabled: 1, IsTestFeature: 0},
     // No Search tile — Site chrome toggle lives in My Profile → Appearance.
     {key: "siteChrome", label: "Site chrome", patronGate: "", buttonIds: [], route: "./patron-portal.html?tab=appearance", sortOrder: 80, IsFeatureEnabled: 0, IsTestFeature: 1},
-    // No Search tile — Si-nema is grant-only, geometry stays on FloqMedia.
-    {key: "sinema", label: "Si-nema", patronGate: "", buttonIds: [], route: "./sinema.html?from=search", sortOrder: 85, IsFeatureEnabled: 0, IsTestFeature: 1}
+    // Search tile `sinemaBtnCard` — Master Admin / granted beta see it when Enable Feature=1.
+    {key: "sinema", label: "Si-nema", patronGate: "", buttonIds: ["sinemaBtnCard"], route: "./sinema.html?from=search", sortOrder: 85, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
   const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));

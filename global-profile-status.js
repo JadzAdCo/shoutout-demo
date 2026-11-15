@@ -184,6 +184,7 @@
       ${featureLink("rydr", hrefStamp("./rydr.html", { from: "search" }), t("cat.rydr", "RydR"), blank)}
       ${featureLink("floqCast", hrefStamp("./floqcast-search.html", { from: "search" }), t("cat.floqcast", "FloqCAST"), blank)}
       ${featureLink("vipReservations", hrefStamp("./vip.html", { from: "search" }), t("cat.vipreserv", "VIP reserV"), blank)}
+      ${featureLink("sinema", hrefStamp("./sinema.html", { from: "search" }), t("cat.sinema", "Si-nema"), blank)}
       ${featureLink("botDee", hrefBotDee(), t("cat.botdee", "BOT DEE"), blank)}
       <button id="floqrGlobalSignOutBtn" type="button">${esc(t("app.signOut", "Sign out"))}</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => {

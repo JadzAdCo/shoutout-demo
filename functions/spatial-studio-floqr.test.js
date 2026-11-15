@@ -58,6 +58,8 @@ test("auth audit: FloqR reuses Firebase Auth; no parallel signup surface", () =>
   const sinemaHtml = read("sinema.html");
   assert.match(sinemaHtml, /data-floqr-feature="sinema"/);
   assert.match(sinemaHtml, /floqr-session-shell\.js/);
+  assert.match(sinemaHtml, /data-floqr-chrome-icon="sinema"/);
+  assert.match(sinemaHtml, /feature-landing-hero-logo/);
   assert.doesNotMatch(sinemaHtml, /product-parent-logo/);
 });
 
@@ -270,7 +272,7 @@ test("Si-nema pins revision and 48h clock from original FloqR save", () => {
   assert.equal(bump.reason, "pin_revision_locked");
 });
 
-test("regression: ShoutOut display URLs, VIP floor viewer, no Search tile for Si-nema", () => {
+test("regression: ShoutOut display URLs, VIP floor viewer, Si-nema Search tile gated", () => {
   const display = read("display.html");
   assert.match(display, /display\.html\?location=<id> only/);
   assert.doesNotMatch(display, /\?screen=/);
@@ -286,8 +288,11 @@ test("regression: ShoutOut display URLs, VIP floor viewer, no Search tile for Si
   assert.match(vip, /data-floqr-feature="vipReservations"/);
   assert.match(vip, /vip-floor-viewer\.js/);
 
+  assert.match(read("floqr-feature-services.js"), /buttonIds: \["sinemaBtnCard"\]/);
   const index = read("index.html");
-  assert.doesNotMatch(index, /sinemaBtnCard|data-feature-key="sinema"/);
+  assert.match(index, /id="sinemaBtnCard"[^>]*class="[^"]*\bhidden\b[^"]*"[^>]*data-feature-key="sinema"/);
+  assert.match(index, /data-floqr-chrome-icon="sinema"/);
+  assert.match(index, /sinema-nightlife\.jpg/);
   assert.match(index, /id="shoutoutBtnCard"/);
   assert.match(index, /id="vipReservBtnCard"/);
 

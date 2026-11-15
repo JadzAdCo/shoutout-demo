@@ -6324,6 +6324,7 @@
       ["rydr", window.FLOQRNav?.stampCurrentVersion?.("./rydr.html", {from: "search"}) || "./rydr.html?from=search", tt("cat.rydr", {}, "RydR")],
       ["floqCast", window.FLOQRNav?.stampCurrentVersion?.("./floqcast-search.html", {from: "search"}) || "./floqcast-search.html?from=search", tt("cat.floqcast", {}, "FloqCAST")],
       ["vipReservations", window.FLOQRNav?.stampCurrentVersion?.("./vip.html", {from: "search"}) || "./vip.html?from=search", tt("cat.vipreserv", {}, "VIP reserV")],
+      ["sinema", window.FLOQRNav?.stampCurrentVersion?.("./sinema.html", {from: "search"}) || "./sinema.html?from=search", tt("cat.sinema", {}, "Si-nema")],
       ["botDee", window.FLOQRNav?.intentSearchHome?.() || "./?start=intent", tt("cat.botdee", {}, "dj BOT")]
     ];
     featureItems.forEach(([key, href, label]) => {

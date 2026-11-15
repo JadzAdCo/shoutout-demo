@@ -287,7 +287,7 @@ test("firestore rules: feature collections are server-write-only and superAdmin 
 test("Search tiles: ShoutOut visible, every other feature hidden until Features & Services allows it", () => {
   const html = read("index.html");
   assert.match(html, /id="shoutoutBtnCard" class="shoutout-icon-card"[^>]*data-feature-key="shoutOut"/);
-  ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "floqcastBtnCard", "intentSearchBtnCard"].forEach(id => {
+  ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "floqcastBtnCard", "intentSearchBtnCard", "sinemaBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
   assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
