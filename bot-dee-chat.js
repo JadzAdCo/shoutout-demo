@@ -981,8 +981,7 @@
   function welcome() {
     const log = byId("botDeeTranscript");
     if (!log || log.childElementCount) return;
-    const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
-    appendBubble("bot", fromPrefs || t(
+    appendBubble("bot", t(
       "botdee.chatWelcome",
       "Hi, I am BOT DEE. How can I help you?"
     ));
@@ -1059,6 +1058,8 @@
           console.warn("BOT DEE restore failed", error?.message || error);
           durableEnabled = false;
         }
+      } else {
+        global.FLOQRBotDeePersonalization?.applyFromThread?.({}, false);
       }
       setStatus("");
       welcome();

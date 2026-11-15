@@ -56,19 +56,56 @@
     return t("botdee.greetingAfternoon", "Good afternoon");
   }
 
+  function fillTemplate(tpl, vars) {
+    const dict = vars && typeof vars === "object" ? vars : {};
+    return String(tpl || "").replace(/\{(\w+)\}/g, (_, key) => (
+      dict[key] == null ? "" : String(dict[key])
+    ));
+  }
+
+  function greetingTemplates() {
+    return {
+      sociallyCool: {
+        unnamed: t("botdee.greetingCool", "Wassup! What's the move?"),
+        named: t("botdee.greetingCoolNamed", "Wassup, {name}! What's the move?")
+      },
+      professional: {
+        unnamed: t("botdee.greetingPro", "{lead}. How can I help?"),
+        named: t("botdee.greetingProNamed", "{lead}, {name}. How can I help?")
+      },
+      balanced: {
+        unnamed: t("botdee.greetingBalanced", "Hey, {leadLower}. What are we working on?"),
+        named: t("botdee.greetingBalancedNamed", "Hey, {leadLower}, {name}. What are we working on?")
+      }
+    };
+  }
+
   function greetingFor(row, hour) {
     const name = clipName(row?.preferredAddressName);
     const lead = greetingLead(timeOfDay(hour));
-    if (row?.demeanor === "sociallyCool") {
-      return name ? `Wassup, ${name}! What's the move?` : "Wassup! What's the move?";
+    const demeanor = normalizeDemeanor(row?.demeanor);
+    const pack = greetingTemplates()[demeanor] || greetingTemplates().balanced;
+    const tpl = name ? pack.named : pack.unnamed;
+    return fillTemplate(tpl, {name, lead, leadLower: lead.toLowerCase()});
+  }
+
+  function looksLikeReservedComposerText(raw) {
+    const q = String(raw || "")
+      .replace(/[’']/g, "'")
+      .replace(/[^a-z0-9'+\s?]/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+    if (!q) return true;
+    if (/^(?:help|aide|ayuda|hilfe|aiuto|ajuda|pomoc|privacy|session|pause|keyboard|settings|prefs|preferences)\??$/.test(q)) {
+      return true;
     }
-    if (row?.demeanor === "professional") {
-      return name ? `${lead}, ${name}. How can I help?` : `${lead}. How can I help?`;
+    const tail = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|ma'?am|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
+    if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${tail}$`).test(q)) return true;
+    if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|what s up|whats up|what up)${tail}$`).test(q)) {
+      return true;
     }
-    const low = lead.toLowerCase();
-    return name
-      ? `Hey, ${low}, ${name}. What are we working on?`
-      : `Hey, ${low}. What are we working on?`;
+    return false;
   }
 
   function needsOnboarding(row) {
@@ -171,10 +208,14 @@
 
   function closeDialog() {
     const dialog = byId("botDeePersonalizationDialog");
-    if (!dialog) return;
-    dialog.hidden = true;
-    dialog.setAttribute("aria-hidden", "true");
-    try { sessionStorage.setItem(DEFERRED_KEY, "1"); } catch (_) {}
+    if (dialog) {
+      dialog.hidden = true;
+      dialog.setAttribute("aria-hidden", "true");
+    }
+    if (state.setupStep === "name" || state.setupStep === "dialog") {
+      state.setupStep = "";
+      try { sessionStorage.setItem(DEFERRED_KEY, "1"); } catch (_) {}
+    }
   }
 
   async function saveFromDialog() {
@@ -237,6 +278,7 @@
     choices.push({
       label: t("botdee.anotherName", "Another name or title"),
       onPick: () => {
+        state.setupStep = "dialog";
         openDialog();
         byId("botDeePrefName")?.focus();
       }
@@ -290,6 +332,11 @@
     return "";
   }
 
+  function deferSetup() {
+    try { sessionStorage.setItem(DEFERRED_KEY, "1"); } catch (_) {}
+    state.setupStep = "";
+  }
+
   function interceptSend(text) {
     const raw = String(text || "").trim();
     if (!raw) return false;
@@ -300,9 +347,12 @@
         askDemeanor();
         return true;
       }
-      if (/^(throw|book|find|search|make me|go live|schedule)\b/i.test(raw) || raw.split(/\s+/).length > 4) {
-        try { sessionStorage.setItem(DEFERRED_KEY, "1"); } catch (_) {}
-        state.setupStep = "";
+      if (
+        looksLikeReservedComposerText(raw)
+        || /^(throw|book|find|search|make me|go live|schedule)\b/i.test(raw)
+        || raw.split(/\s+/).length > 4
+      ) {
+        deferSetup();
         return false;
       }
       state.tempName = clipName(raw);
@@ -315,8 +365,7 @@
         finishSetup(demeanor);
         return true;
       }
-      try { sessionStorage.setItem(DEFERRED_KEY, "1"); } catch (_) {}
-      state.setupStep = "";
+      deferSetup();
       return false;
     }
     const callMe = parseCallMe(raw);
@@ -352,9 +401,16 @@
     fillDialog();
   }
 
+  function loadGuestPrefs() {
+    if (state.signedIn) return;
+    mergePersonalization({...state.personalization, ...readGuest()});
+    fillDialog();
+  }
+
   function bind() {
     if (state.bound) return;
     state.bound = true;
+    loadGuestPrefs();
     byId("botDeePrefsOpen")?.addEventListener("click", openDialog);
     byId("botDeePrefSave")?.addEventListener("click", event => {
       event.preventDefault();
@@ -379,6 +435,8 @@
     applyFromThread,
     maybeStartSetup,
     interceptSend,
+    closeDialog,
+    looksLikeReservedComposerText,
     greetingFor: (hour) => greetingFor(state.personalization, hour),
     recapFromTurns,
     needsOnboarding: () => needsOnboarding(state.personalization),

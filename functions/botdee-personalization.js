@@ -54,6 +54,48 @@ function greetingLead(slot) {
   return "Good afternoon";
 }
 
+const GREETING_TEMPLATES = Object.freeze({
+  sociallyCool: Object.freeze({
+    unnamed: "Wassup! What's the move?",
+    named: "Wassup, {name}! What's the move?"
+  }),
+  professional: Object.freeze({
+    unnamed: "{lead}. How can I help?",
+    named: "{lead}, {name}. How can I help?"
+  }),
+  balanced: Object.freeze({
+    unnamed: "Hey, {leadLower}. What are we working on?",
+    named: "Hey, {leadLower}, {name}. What are we working on?"
+  })
+});
+
+function fillTemplate(tpl, vars) {
+  const dict = vars && typeof vars === "object" ? vars : {};
+  return String(tpl || "").replace(/\{(\w+)\}/g, (_, key) => (
+    dict[key] == null ? "" : String(dict[key])
+  ));
+}
+
+/** Greetings, help, privacy — never treat as a preferred name during first-use capture. */
+function looksLikeReservedComposerText(raw) {
+  const q = String(raw || "")
+    .replace(/[’']/g, "'")
+    .replace(/[^a-z0-9'+\s?]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+  if (!q) return true;
+  if (/^(?:help|aide|ayuda|hilfe|aiuto|ajuda|pomoc|privacy|session|pause|keyboard|settings|prefs|preferences)\??$/.test(q)) {
+    return true;
+  }
+  const tail = "(?:\\s+(?:bot\\s*dee|floqai|floq\\s*ai|there|again|friend|everyone|yall|y all|sir|ma'?am|madam|miss|mister|mr|ms|mrs|boss|chief|captain|don))*";
+  if (new RegExp(`^(?:hey|hi|hello|howdy|yo|sup|hiya|hola)${tail}$`).test(q)) return true;
+  if (new RegExp(`^(?:good morning|good afternoon|good evening|good night|what s up|whats up|what up)${tail}$`).test(q)) {
+    return true;
+  }
+  return false;
+}
+
 function normalizePersonalization(raw, extras) {
   const src = raw && typeof raw === "object" ? raw : {};
   const extra = extras && typeof extras === "object" ? extras : {};
@@ -85,14 +127,12 @@ function greetingFor(personalization, opts) {
   const options = opts && typeof opts === "object" ? opts : {};
   const slot = timeOfDay(options.nowMs, options.hour);
   const name = row.preferredAddressName;
-  const lead = greetingLead(slot);
-  if (row.demeanor === "sociallyCool") {
-    return name ? `Wassup, ${name}! What's the move?` : "Wassup! What's the move?";
-  }
-  if (row.demeanor === "professional") {
-    return name ? `${lead}, ${name}. How can I help?` : `${lead}. How can I help?`;
-  }
-  return name ? `Hey, ${lead.toLowerCase()}, ${name}. What are we working on?` : `Hey, ${lead.toLowerCase()}. What are we working on?`;
+  const lead = String(options.lead || greetingLead(slot));
+  const pack = (options.templates && options.templates[row.demeanor])
+    || GREETING_TEMPLATES[row.demeanor]
+    || GREETING_TEMPLATES.balanced;
+  const tpl = name ? pack.named : pack.unnamed;
+  return fillTemplate(tpl, {name, lead, leadLower: lead.toLowerCase()});
 }
 
 function recapFromTurns(turns) {
@@ -190,6 +230,10 @@ module.exports = {
   needsOnboarding,
   nextLastUsed,
   timeOfDay,
+  greetingLead,
+  GREETING_TEMPLATES,
+  fillTemplate,
+  looksLikeReservedComposerText,
   greetingFor,
   recapFromTurns,
   formatActionLine,
