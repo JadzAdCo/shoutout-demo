@@ -148,6 +148,7 @@ jobs:
               FNS+=("scheduledRetirePastCrawledEvents")
             fi
             # First-time BOT DEE six-phase callables (functions:list cannot see them yet).
+            # Redeploy from origin/main after Instant Crawl merge cancelled the first batch run.
             for f in \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \
